@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\rest\Functional\EntityResource\ModeratedNode;
 
 use Drupal\Core\Cache\Cache;
@@ -35,7 +37,10 @@ abstract class ModeratedNodeResourceTestBase extends NodeResourceTestBase {
       case 'POST':
       case 'PATCH':
       case 'DELETE':
-        $this->grantPermissionsToTestedRole(['use editorial transition publish', 'use editorial transition create_new_draft']);
+        $this->grantPermissionsToTestedRole([
+          'use editorial transition publish',
+          'use editorial transition create_new_draft',
+        ]);
         break;
     }
   }

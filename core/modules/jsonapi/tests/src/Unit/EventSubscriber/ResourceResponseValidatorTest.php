@@ -1,24 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Unit\EventSubscriber;
 
+use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\jsonapi\EventSubscriber\ResourceResponseValidator;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\Routing\Routes;
-use Drupal\Core\Extension\Extension;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\rest\ResourceResponse;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\jsonapi\EventSubscriber\ResourceResponseValidator
- * @group jsonapi
+ * Tests Drupal\jsonapi\EventSubscriber\ResourceResponseValidator.
  *
  * @internal
  */
+#[CoversClass(ResourceResponseValidator::class)]
+#[Group('jsonapi')]
 class ResourceResponseValidatorTest extends UnitTestCase {
 
   /**
@@ -53,10 +59,12 @@ class ResourceResponseValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validateResponse
-   * @dataProvider validateResponseProvider
+   * Tests validate response.
+   *
+   * @legacy-covers ::validateResponse
    */
-  public function testValidateResponse($request, $response, $expected, $description) {
+  #[DataProvider('validateResponseProvider')]
+  public function testValidateResponse($request, $response, $expected, $description): void {
     // Expose protected ResourceResponseSubscriber::validateResponse() method.
     $object = new \ReflectionObject($this->subscriber);
     $method = $object->getMethod('validateResponse');
@@ -70,7 +78,7 @@ class ResourceResponseValidatorTest extends UnitTestCase {
    * @return array
    *   An array of test cases.
    */
-  public function validateResponseProvider() {
+  public static function validateResponseProvider() {
     $defaults = [
       'route_name' => 'jsonapi.node--article.individual',
       'resource_type' => new ResourceType('node', 'article', NULL),

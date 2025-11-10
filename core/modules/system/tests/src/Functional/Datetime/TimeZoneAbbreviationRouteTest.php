@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Datetime;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore ABCDEFGHIJK
-
 /**
  * Tests converting JavaScript time zone abbreviations to time zone identifiers.
- *
- * @group Datetime
  */
+#[Group('Datetime')]
+#[RunTestsInSeparateProcesses]
 class TimeZoneAbbreviationRouteTest extends BrowserTestBase {
 
   /**
@@ -26,7 +30,7 @@ class TimeZoneAbbreviationRouteTest extends BrowserTestBase {
   /**
    * Test that the AJAX Timezone Callback can deal with various formats.
    */
-  public function testSystemTimezone() {
+  public function testSystemTimezone(): void {
     $options = [
       'query' => [
         'date' => 'Tue+Sep+17+2013+21%3A35%3A31+GMT%2B0100+(BST)#',
@@ -46,10 +50,9 @@ class TimeZoneAbbreviationRouteTest extends BrowserTestBase {
    *   Expected response, or NULL if expecting error.
    * @param bool $expectInvalidRequest
    *   Whether to expect the request is invalid.
-   *
-   * @dataProvider providerAbbreviationConversion
    */
-  public function testAbbreviationConversion($path, $expectedResponse = NULL, $expectInvalidRequest = FALSE) {
+  #[DataProvider('providerAbbreviationConversion')]
+  public function testAbbreviationConversion($path, $expectedResponse = NULL, $expectInvalidRequest = FALSE): void {
     $response = $this->drupalGet('system/timezone/' . $path);
     if (isset($expectedResponse)) {
       $this->assertEquals($response, $expectedResponse);
@@ -63,7 +66,7 @@ class TimeZoneAbbreviationRouteTest extends BrowserTestBase {
    * @return array
    *   Test scenarios.
    */
-  public function providerAbbreviationConversion() {
+  public static function providerAbbreviationConversion() {
     return [
       'valid, default offset' => [
         'CST/0/0',

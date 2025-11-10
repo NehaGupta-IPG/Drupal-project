@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\Core\Database\Database;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests all ui related settings under admin/structure/views/settings.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class SettingsTest extends UITestBase {
 
   /**
@@ -34,7 +38,7 @@ class SettingsTest extends UITestBase {
   /**
    * Tests the settings for the edit ui.
    */
-  public function testEditUI() {
+  public function testEditUI(): void {
     $this->drupalLogin($this->adminUser);
 
     // Test the settings tab exists.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_ui\Functional;
 
 use Drupal\field\Entity\FieldConfig;
@@ -8,20 +10,20 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests deletion of a field and their dependencies in the UI.
- *
- * @group field_ui
  */
+#[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class FieldUIDeleteTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -72,7 +74,7 @@ class FieldUIDeleteTest extends BrowserTestBase {
   /**
    * Tests that deletion removes field storages and fields as expected.
    */
-  public function testDeleteField() {
+  public function testDeleteField(): void {
     $field_label = $this->randomMachineName();
     $field_name_input = 'test';
     $field_name = 'field_test';
@@ -111,6 +113,8 @@ class FieldUIDeleteTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('The listed configuration will be deleted.');
     $this->assertSession()->elementNotExists('xpath', '//ul[@data-drupal-selector="edit-view"]');
     $this->assertSession()->pageTextNotContains('test_view_field_delete');
+    // Test Breadcrumbs.
+    $this->assertSession()->linkExists($field_label, 0, 'Field label is correct in the breadcrumb of the field delete page.');
 
     // Delete the first field.
     $this->fieldUIDeleteField($bundle_path1, "node.$type_name1.$field_name", $field_label, $type_name1, 'content type');

@@ -1,24 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Core\Entity\EntityViewBuilder;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityViewBuilder;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity view builder.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityViewBuilderTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -39,7 +44,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   /**
    * Tests entity render cache handling.
    */
-  public function testEntityViewBuilderCache() {
+  public function testEntityViewBuilderCache(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $cache_contexts_manager = \Drupal::service("cache_contexts_manager");
@@ -94,7 +99,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   /**
    * Tests entity render cache with references.
    */
-  public function testEntityViewBuilderCacheWithReferences() {
+  public function testEntityViewBuilderCacheWithReferences(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $cache_contexts_manager = \Drupal::service("cache_contexts_manager");
@@ -161,7 +166,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   /**
    * Tests entity render cache toggling.
    */
-  public function testEntityViewBuilderCacheToggling() {
+  public function testEntityViewBuilderCacheToggling(): void {
     $entity_test = $this->createTestEntity('entity_test');
     $entity_test->save();
 
@@ -188,7 +193,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   /**
    * Tests weighting of display components.
    */
-  public function testEntityViewBuilderWeight() {
+  public function testEntityViewBuilderWeight(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
 
@@ -210,7 +215,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   /**
    * Tests EntityViewBuilder::viewField() language awareness.
    */
-  public function testViewField() {
+  public function testViewField(): void {
     // Allow access to view translations as well.
     Role::load(RoleInterface::ANONYMOUS_ID)
       ->grantPermission('view test entity translations')
@@ -309,6 +314,35 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests a view mode alter on an entity.
+   */
+  public function testHookEntityTypeViewModeAlter(): void {
+    $entity_ids = [];
+    // Create some entities to test.
+    for ($i = 0; $i < 5; $i++) {
+      $entity = $this->createTestEntity('entity_test');
+      $entity->save();
+      $entity_ids[] = $entity->id();
+    }
+    /** @var \Drupal\entity_test\EntityTestViewBuilder $view_builder */
+    $view_builder = $this->container->get('entity_type.manager')->getViewBuilder('entity_test');
+
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
+    $storage = $this->container->get('entity_type.manager')->getStorage('entity_test');
+    $storage->resetCache();
+    $entities = $storage->loadMultiple($entity_ids);
+
+    $build = $view_builder->viewMultiple($entities, 'entity_test.vm_alter_test');
+    foreach ($build as $key => $entity_build) {
+      if (!is_numeric($key)) {
+        continue;
+      }
+      $this->assertArrayHasKey('#view_mode', $entity_build);
+      $this->assertEquals('entity_test.vm_alter_full', $entity_build['#view_mode']);
+    }
+  }
+
+  /**
    * Creates an entity for testing.
    *
    * @param string $entity_type
@@ -317,7 +351,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The created entity.
    */
-  protected function createTestEntity($entity_type) {
+  protected function createTestEntity($entity_type): EntityInterface {
     $data = [
       'bundle' => $entity_type,
       'name' => $this->randomMachineName(),
@@ -328,7 +362,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   /**
    * Tests that viewing an entity without template does not specify #theme.
    */
-  public function testNoTemplate() {
+  public function testNoTemplate(): void {
     // Ensure that an entity type without explicit view builder uses the
     // default.
     $entity_type_manager = \Drupal::entityTypeManager();
@@ -347,7 +381,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
   /**
    * Tests an entity type with an external canonical rel.
    */
-  public function testExternalEntity() {
+  public function testExternalEntity(): void {
     $this->installEntitySchema('entity_test_external');
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');

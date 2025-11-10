@@ -1,23 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\Password;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Element\Password
- * @group Render
+ * Tests Drupal\Core\Render\Element\Password.
  */
+#[CoversClass(Password::class)]
+#[Group('Render')]
 class PasswordTest extends UnitTestCase {
 
   /**
-   * @covers ::valueCallback
+   * Tests value callback.
    *
-   * @dataProvider providerTestValueCallback
+   * @legacy-covers ::valueCallback
    */
-  public function testValueCallback($expected, $input) {
+  #[DataProvider('providerTestValueCallback')]
+  public function testValueCallback($expected, $input): void {
     $element = [];
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
     $this->assertSame($expected, Password::valueCallback($element, $input, $form_state));
@@ -26,7 +33,7 @@ class PasswordTest extends UnitTestCase {
   /**
    * Data provider for testValueCallback().
    */
-  public function providerTestValueCallback() {
+  public static function providerTestValueCallback() {
     $data = [];
     $data[] = [NULL, FALSE];
     $data[] = [NULL, NULL];

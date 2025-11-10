@@ -7,18 +7,29 @@ parameters:
   # \Drupal\Core\Cache\ListCacheBinsPass::process() will override this but defining this allows the cache system to
   # function properly before that runs.
   cache_default_bin_backends: []
+  memory_cache_default_bin_backends: []
+  entity.memory_cache.slots: 1000
+  security.enable_super_user: true
+  core.moved_classes:
+    'Drupal\Core\StringTranslation\TranslationWrapper':
+      class: 'Drupal\Core\StringTranslation\TranslatableMarkup'
+    'Doctrine\Common\Annotations\AnnotationException':
+      class: 'Drupal\Component\Annotation\Doctrine\AnnotationException'
+      deprecation_version: drupal:11.3.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3551049
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100
     gc_maxlifetime: 200000
     cookie_lifetime: 2000000
     cookie_samesite: Lax
-    sid_length: 48
-    sid_bits_per_character: 6
+    name_suffix: ''
   twig.config:
     debug: false
     auto_reload: null
     cache: true
+    use_yield: true
     allowed_file_extensions:
       - css
       - html
@@ -65,6 +76,21 @@ parameters:
 services:
   _defaults:
     autoconfigure: true
+  plugin.manager.config_action:
+    class: Drupal\Core\Config\Action\ConfigActionManager
+    parent: default_plugin_manager
+    arguments: ['@config.manager', '@config.storage', '@config.typed', '@config.factory']
+  Drupal\Core\DefaultContent\Importer:
+    autowire: true
+  Drupal\Core\DefaultContent\Exporter:
+    autowire: true
+    calls:
+      - [setLogger, ['@logger.channel.default_content']]
+  Drupal\Core\DefaultContent\AdminAccountSwitcher:
+    arguments:
+      $isSuperUserAccessEnabled: '%security.enable_super_user%'
+    autowire: true
+    public: false
   # Simple cache contexts, directly derived from the request context.
   cache_context.ip:
     class: Drupal\Core\Cache\Context\IpCacheContext
@@ -194,7 +220,7 @@ services:
 
   cache_factory:
     class: Drupal\Core\Cache\CacheFactory
-    arguments: ['@settings', '%cache_default_bin_backends%']
+    arguments: ['@settings', '%cache_default_bin_backends%', '%memory_cache_default_bin_backends%']
     calls:
       - [setContainer, ['@service_container']]
   Drupal\Core\Cache\CacheFactoryInterface: '@cache_factory'
@@ -207,12 +233,11 @@ services:
     arguments: ['@service_container', '%cache_contexts%' ]
   Drupal\Core\Cache\Context\CacheContextsManager: '@cache_contexts_manager'
   cache_tags.invalidator:
-    parent: container.trait
     class: Drupal\Core\Cache\CacheTagsInvalidator
-    calls:
-      - [setContainer, ['@service_container']]
     tags:
       - { name: service_collector, call: addInvalidator, tag: cache_tags_invalidator }
+      - { name: service_collector, call: addBin, tag: cache.bin }
+      - { name: service_collector, call: addBin, tag: cache.bin.memory }
   Drupal\Core\Cache\CacheTagsInvalidatorInterface: '@cache_tags.invalidator'
   cache_tags.invalidator.checksum:
     class: Drupal\Core\Cache\DatabaseCacheTagsChecksum
@@ -221,6 +246,9 @@ services:
       - { name: cache_tags_invalidator}
       - { name: backend_overridable }
   Drupal\Core\Cache\CacheTagsChecksumInterface: '@cache_tags.invalidator.checksum'
+  cache_tags.preloader:
+    class: Drupal\Core\Cache\EventSubscriber\CacheTagPreloadSubscriber
+    autowire: true
   cache.backend.chainedfast:
     class: Drupal\Core\Cache\ChainedFastBackendFactory
     arguments: ['@settings']
@@ -228,22 +256,28 @@ services:
       - [setContainer, ['@service_container']]
   cache.backend.database:
     class: Drupal\Core\Cache\DatabaseBackendFactory
-    arguments: ['@database', '@cache_tags.invalidator.checksum', '@settings']
+    arguments: ['@database', '@cache_tags.invalidator.checksum', '@settings', '@serialization.phpserialize', '@datetime.time']
     tags:
       - { name: backend_overridable }
   cache.backend.apcu:
     class: Drupal\Core\Cache\ApcuBackendFactory
-    arguments: ['%app.root%', '%site.path%', '@cache_tags.invalidator.checksum']
+    arguments: ['%app.root%', '%site.path%', '@cache_tags.invalidator.checksum', '@datetime.time']
   cache.backend.php:
     class: Drupal\Core\Cache\PhpBackendFactory
-    arguments: ['@cache_tags.invalidator.checksum']
+    arguments: ['@cache_tags.invalidator.checksum', '@datetime.time']
   cache.backend.memory:
     class: Drupal\Core\Cache\MemoryBackendFactory
+    arguments: ['@datetime.time']
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use cache.backend.memory.memory instead. See https://www.drupal.org/node/3546856'
+  cache.backend.memory.memory:
+    class: Drupal\Core\Cache\MemoryCache\MemoryCacheFactory
+    arguments: ['@datetime.time']
   # A special cache bin that does not persist beyond the length of the request.
   cache.static:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin, default_backend: cache.backend.memory }
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use the cache.memory bin instead. See https://www.drupal.org/node/3546856'
     factory: ['@cache_factory', 'get']
     arguments: [static]
   cache.bootstrap:
@@ -289,9 +323,11 @@ services:
     factory: ['@cache_factory', 'get']
     arguments: [access_policy]
   cache.access_policy_memory:
-    class: Drupal\Core\Cache\MemoryCache\MemoryCache
+    class: Drupal\Core\Cache\CacheBackendInterface
     tags:
-      - { name: cache_tags_invalidator }
+      - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+    factory: ['@cache_factory', 'get']
+    arguments: [access_policy_memory]
   cache.data:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
@@ -304,21 +340,26 @@ services:
       - { name: cache.bin, default_backend: cache.backend.chainedfast }
     factory: ['@cache_factory', 'get']
     arguments: [discovery]
+  cache.memory:
+    class: Drupal\Core\Cache\MemoryCache\MemoryCacheInterface
+    tags:
+      - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+    factory: ['@cache_factory', 'get']
+    arguments: [memory]
+  cache_prewarmer:
+    class: Drupal\Core\PreWarm\CachePreWarmer
+    arguments: ['@class_resolver']
+    tags:
+      - { name: service_id_collector, tag: cache_prewarmable }
+  Drupal\Core\PreWarm\CachePreWarmerInterface: '@cache_prewarmer'
   variation_cache.access_policy:
     class: Drupal\Core\Cache\VariationCacheInterface
     factory: ['@variation_cache_factory', 'get']
     arguments: [access_policy]
-  # We cannot use the VariationCacheFactory here because that expects that the
-  # backend it should wrap a VariationCache around is a proper cache bin. The
-  # MemoryCache backend, however, is not so we cannot use the factory here.
-  #
-  # By instantiating a VariationCache via the container and tagging the cache
-  # it's wrapping as a cache tags invalidator, it does still behave the way we
-  # want it to, though.
   variation_cache.access_policy_memory:
-    class: Drupal\Core\Cache\VariationCache
-    arguments: ['@request_stack', '@cache.access_policy_memory', '@cache_contexts_manager']
-  Drupal\Core\Cache\VariationCacheInterface: '@variation_cache.access_policy_memory'
+    class: Drupal\Core\Cache\VariationCacheInterface
+    factory: ['@variation_cache_factory', 'get']
+    arguments: [access_policy_memory]
   Drupal\Core\Asset\AssetQueryStringInterface: '@asset.query_string'
   asset.query_string:
     class: Drupal\Core\Asset\AssetQueryString
@@ -368,6 +409,8 @@ services:
       - { name: service_collector, tag: 'config.factory.override', call: addOverride }
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
   Drupal\Core\Config\ConfigFactoryInterface: '@config.factory'
+  Drupal\Core\Config\ConfigImporterFactory:
+    autowire: true
   config.importer_subscriber:
     class: Drupal\Core\Config\Importer\FinalMissingContentSubscriber
   config.installer:
@@ -385,6 +428,14 @@ services:
     public: false
     tags:
       - { name: backend_overridable }
+  config.storage.checkpoint:
+    class: Drupal\Core\Config\Checkpoint\CheckpointStorage
+    arguments: [ '@config.storage', '@config.checkpoints', '@keyvalue' ]
+  Drupal\Core\Config\Checkpoint\CheckpointStorageInterface: '@config.storage.checkpoint'
+  config.checkpoints:
+    class: Drupal\Core\Config\Checkpoint\LinearHistory
+    arguments: [ '@state', '@datetime.time' ]
+  Drupal\Core\Config\Checkpoint\CheckpointListInterface: '@config.checkpoints'
   config.import_transformer:
     class: Drupal\Core\Config\ImportStorageTransformer
     arguments: ['@event_dispatcher', '@database', '@lock', '@lock.persistent']
@@ -430,7 +481,6 @@ services:
   cron:
     class: Drupal\Core\Cron
     arguments: ['@module_handler', '@lock', '@queue', '@state', '@account_switcher', '@logger.channel.cron', '@plugin.manager.queue_worker', '@datetime.time', '%queue.config%']
-    lazy: true
   Drupal\Core\CronInterface: '@cron'
   diff.formatter:
     class: Drupal\Core\Diff\DiffFormatter
@@ -456,7 +506,7 @@ services:
   Drupal\Component\Datetime\TimeInterface: '@datetime.time'
   file_system:
     class: Drupal\Core\File\FileSystem
-    arguments: ['@stream_wrapper_manager', '@settings', '@logger.channel.file']
+    arguments: ['@stream_wrapper_manager', '@settings']
   Drupal\Core\File\FileSystemInterface: '@file_system'
   file_url_generator:
     class: Drupal\Core\File\FileUrlGenerator
@@ -482,21 +532,25 @@ services:
     arguments: ['%app.root%', '@keyvalue.expirable', '@module_handler', '@current_user', '@csrf_token', '@logger.channel.form', '@request_stack', '@page_cache_request_policy']
     public: false  # Private to form_builder
   Drupal\Core\Form\FormCacheInterface: '@form_cache'
+  Drupal\Core\Form\FormPreprocess:
+    class: Drupal\Core\Form\FormPreprocess
   keyvalue:
     class: Drupal\Core\KeyValueStore\KeyValueFactory
     arguments: ['@service_container', '%factory.keyvalue%']
+  Drupal\Core\KeyValueStore\KeyValueFactoryInterface: '@keyvalue'
   keyvalue.database:
     class: Drupal\Core\KeyValueStore\KeyValueDatabaseFactory
     arguments: ['@serialization.phpserialize', '@database']
   keyvalue.expirable:
     class: Drupal\Core\KeyValueStore\KeyValueExpirableFactory
     arguments: ['@service_container', '%factory.keyvalue.expirable%']
+  Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface: '@keyvalue.expirable'
   keyvalue.expirable.database:
     class: Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory
-    arguments: ['@serialization.phpserialize', '@database']
+    arguments: ['@serialization.phpserialize', '@database', '@datetime.time']
   logger.factory:
     class: Drupal\Core\Logger\LoggerChannelFactory
-    parent: container.trait
+    arguments: ['@request_stack', '@current_user']
     tags:
       - { name: service_collector, tag: logger, call: addLogger }
   Drupal\Core\Logger\LoggerChannelFactoryInterface: '@logger.factory'
@@ -507,6 +561,9 @@ services:
   logger.channel.default:
     parent: logger.channel_base
     arguments: ['system']
+  logger.channel.default_content:
+    parent: logger.channel_base
+    arguments: ['default_content']
   logger.channel.php:
     parent: logger.channel_base
     arguments: ['php']
@@ -543,6 +600,7 @@ services:
     class: Drupal\Component\Serialization\Json
   serialization.phpserialize:
     class: Drupal\Component\Serialization\PhpSerialize
+  Drupal\Component\Serialization\ObjectAwareSerializationInterface: '@serialization.phpserialize'
   serialization.yaml:
     class: Drupal\Component\Serialization\Yaml
 
@@ -552,13 +610,13 @@ services:
   Drupal\Core\Site\Settings: '@settings'
   state:
     class: Drupal\Core\State\State
-    arguments: ['@keyvalue']
+    arguments: ['@keyvalue', '@cache.bootstrap', '@lock']
+    tags:
+      - { name: needs_destruction }
   Drupal\Core\State\StateInterface: '@state'
   queue:
     class: Drupal\Core\Queue\QueueFactory
-    arguments: ['@settings']
-    calls:
-      - [setContainer, ['@service_container']]
+    autowire: true
   Drupal\Core\Queue\QueueFactory: '@queue'
   queue.database:
     class: Drupal\Core\Queue\QueueDatabaseFactory
@@ -621,15 +679,17 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
   module_handler:
     class: Drupal\Core\Extension\ModuleHandler
-    arguments: ['%app.root%', '%container.modules%', '@cache.bootstrap']
+    arguments: ['%app.root%', '%container.modules%', '@keyvalue', '@callable_resolver', '@cache.bootstrap']
   Drupal\Core\Extension\ModuleHandlerInterface: '@module_handler'
   module_installer:
     class: Drupal\Core\Extension\ModuleInstaller
-    tags:
-      - { name: service_collector, tag: 'module_install.uninstall_validator', call: addUninstallValidator }
-    arguments: ['%app.root%', '@module_handler', '@kernel', '@database', '@update.update_hook_registry', '@logger.channel.default']
+    autowire: true
     lazy: true
   Drupal\Core\Extension\ModuleInstallerInterface: '@module_installer'
+  module_installer.uninstall_validators:
+    class: \IteratorIterator
+    arguments: [!tagged_iterator module_install.uninstall_validator]
+    deprecated: The "%service_id%" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject "!tagged_iterator module_install.uninstall_validator" instead. See https://www.drupal.org/node/3432595
   extension.list.module:
     class: Drupal\Core\Extension\ModuleExtensionList
     arguments: ['%app.root%', 'module', '@cache.default', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.profile', '%install_profile%', '%container.modules%']
@@ -640,7 +700,7 @@ services:
   Drupal\Core\Extension\ProfileExtensionList: '@extension.list.profile'
   extension.list.theme:
     class: Drupal\Core\Extension\ThemeExtensionList
-    arguments: ['%app.root%', 'theme', '@cache.default', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.theme_engine', '%install_profile%']
+    arguments: ['%app.root%', 'theme', '@cache.bootstrap', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.theme_engine', '%install_profile%']
   Drupal\Core\Extension\ThemeExtensionList: '@extension.list.theme'
   extension.list.theme_engine:
     class: Drupal\Core\Extension\ThemeEngineExtensionList
@@ -656,49 +716,42 @@ services:
   Drupal\Core\Extension\ExtensionPathResolver: '@extension.path.resolver'
   content_uninstall_validator:
     class: Drupal\Core\Entity\ContentUninstallValidator
-    tags:
-      - { name: module_install.uninstall_validator }
     arguments: ['@entity_type.manager', '@string_translation']
-    lazy: true
   required_module_uninstall_validator:
     class: Drupal\Core\Extension\RequiredModuleUninstallValidator
-    tags:
-      - { name: module_install.uninstall_validator }
     arguments: ['@string_translation', '@extension.list.module']
-    lazy: true
   module_required_by_themes_uninstall_validator:
     class: Drupal\Core\Extension\ModuleRequiredByThemesUninstallValidator
-    tags:
-      - { name: module_install.uninstall_validator }
     arguments: ['@string_translation', '@extension.list.module', '@extension.list.theme']
-    lazy: true
   database_driver_uninstall_validator:
     class: Drupal\Core\Extension\DatabaseDriverUninstallValidator
-    tags:
-      - { name: module_install.uninstall_validator }
     arguments: ['@string_translation', '@extension.list.module', '@database']
-    lazy: true
+  install_profile_uninstall_validator:
+    class: Drupal\Core\Extension\InstallProfileUninstallValidator
+    arguments: ['@string_translation', '@extension.list.module', '@extension.list.theme', '%install_profile%', '%app.root%', '%site.path%']
   theme_handler:
     class: Drupal\Core\Extension\ThemeHandler
     arguments: ['%app.root%', '@config.factory', '@extension.list.theme']
   Drupal\Core\Extension\ThemeHandlerInterface: '@theme_handler'
   theme_installer:
     class: Drupal\Core\Extension\ThemeInstaller
-    arguments: ['@theme_handler', '@config.factory', '@config.installer', '@module_handler', '@config.manager', '@asset.css.collection_optimizer', '@router.builder', '@logger.channel.default', '@state', '@extension.list.module', '@theme.registry']
+    autowire: true
   Drupal\Core\Extension\ThemeInstallerInterface: '@theme_installer'
   entity.memory_cache:
-    class: Drupal\Core\Cache\MemoryCache\MemoryCache
-  Drupal\Core\Cache\MemoryCache\MemoryCacheInterface: '@entity.memory_cache'
+    class: Drupal\Core\Cache\MemoryCache\LruMemoryCache
+    arguments: ['@datetime.time', '%entity.memory_cache.slots%']
+  Drupal\Core\Cache\MemoryCache\MemoryCacheInterface:
+    alias: 'entity.memory_cache'
+    deprecated: 'The "%alias_id%" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use #Autowire to pick a specific cache bin, such as cache.memory. See https://www.drupal.org/node/3546856'
   entity_type.manager:
     class: Drupal\Core\Entity\EntityTypeManager
-    arguments: ['@container.namespaces', '@module_handler', '@cache.discovery', '@string_translation', '@class_resolver', '@entity.last_installed_schema.repository']
-    parent: container.trait
+    arguments: ['@container.namespaces', '@module_handler', '@cache.discovery', '@string_translation', '@class_resolver', '@entity.last_installed_schema.repository', '@service_container']
     tags:
       - { name: plugin_manager_cache_clear }
   Drupal\Core\Entity\EntityTypeManagerInterface: '@entity_type.manager'
   entity_type.repository:
     class: Drupal\Core\Entity\EntityTypeRepository
-    arguments: ['@entity_type.manager']
+    arguments: ['@entity_type.manager', '@entity_type.bundle.info']
   Drupal\Core\Entity\EntityTypeRepositoryInterface: '@entity_type.repository'
   entity_type.bundle.info:
     class: Drupal\Core\Entity\EntityTypeBundleInfo
@@ -747,6 +800,9 @@ services:
     class: Drupal\Core\Field\FieldDefinitionListener
     arguments: ['@entity_type.manager', '@entity_field.manager', '@keyvalue', '@cache.discovery']
   Drupal\Core\Field\FieldDefinitionListenerInterface: '@field_definition.listener'
+  Drupal\Core\Field\FieldPreprocess:
+    class: Drupal\Core\Field\FieldPreprocess
+    autowire: true
   entity.form_builder:
     class: Drupal\Core\Entity\EntityFormBuilder
     arguments: ['@entity_type.manager', '@form_builder']
@@ -806,7 +862,7 @@ services:
   Drupal\Core\Menu\DefaultMenuLinkTreeManipulators: '@menu.default_tree_manipulators'
   menu.active_trail:
     class: Drupal\Core\Menu\MenuActiveTrail
-    arguments: ['@plugin.manager.menu.link', '@current_route_match', '@cache.menu', '@lock']
+    arguments: ['@plugin.manager.menu.link', '@current_route_match', '@cache.menu', '@lock', '@path.matcher']
     tags:
       - { name: needs_destruction }
     lazy: true
@@ -827,6 +883,9 @@ services:
     class: Drupal\Core\Menu\ContextualLinkManager
     arguments: ['@controller_resolver', '@module_handler', '@cache.discovery', '@language_manager', '@access_manager', '@current_user', '@request_stack']
   Drupal\Core\Menu\ContextualLinkManagerInterface: '@plugin.manager.menu.contextual_link'
+  Drupal\Core\Menu\MenuPreprocess:
+    class: Drupal\Core\Menu\MenuPreprocess
+    autowire: true
   plugin.manager.display_variant:
     class: Drupal\Core\Display\VariantManager
     parent: default_plugin_manager
@@ -836,7 +895,7 @@ services:
   Drupal\Core\Queue\QueueWorkerManagerInterface: '@plugin.manager.queue_worker'
   plugin.cache_clearer:
     class: Drupal\Core\Plugin\CachedDiscoveryClearer
-    lazy: true
+    autowire: true
   Drupal\Core\Plugin\CachedDiscoveryClearerInterface: '@plugin.cache_clearer'
   paramconverter.menu_link:
     class: Drupal\Core\ParamConverter\MenuLinkPluginConverter
@@ -865,9 +924,10 @@ services:
     arguments: ['@request_stack']
   Drupal\Core\Routing\RouteMatchInterface: '@current_route_match'
   event_dispatcher:
-    class: Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher
-    arguments: ['@service_container']
+    class: Symfony\Component\EventDispatcher\EventDispatcher
+  Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Contracts\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
+  Symfony\Component\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   controller_resolver:
     class: Drupal\Core\Controller\ControllerResolver
     arguments: ['@callable_resolver']
@@ -875,8 +935,7 @@ services:
   Symfony\Component\HttpKernel\Controller\ControllerResolverInterface: '@controller_resolver'
   class_resolver:
     class: Drupal\Core\DependencyInjection\ClassResolver
-    calls:
-      - [setContainer, ['@service_container']]
+    arguments: ['@service_container']
   Drupal\Core\DependencyInjection\ClassResolverInterface: '@class_resolver'
   callable_resolver:
     class: Drupal\Core\Utility\CallableResolver
@@ -916,6 +975,11 @@ services:
   argument_resolver.default:
     class: Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver
     public: false
+  http_middleware.content_length:
+    class: Drupal\Core\StackMiddleware\ContentLength
+    tags:
+      # Must run before the page_cache and big_pipe middleware.
+      - { name: http_middleware, priority: 140 }
   http_middleware.ajax_page_state:
     class: Drupal\Core\StackMiddleware\AjaxPageState
     tags:
@@ -936,10 +1000,9 @@ services:
       - { name: http_middleware, priority: 100 }
   http_middleware.session:
     class: Drupal\Core\StackMiddleware\Session
+    autowire: true
     tags:
       - { name: http_middleware, priority: 50 }
-    calls:
-      - [setContainer, ['@service_container']]
   http_middleware.cors:
     class: Asm89\Stack\Cors
     arguments: ['%cors.config%']
@@ -1043,7 +1106,7 @@ services:
     arguments: ['@router.route_provider', '@router.builder']
   router.route_preloader:
     class: Drupal\Core\Routing\RoutePreloader
-    arguments: ['@router.route_provider', '@state', '@cache.bootstrap']
+    arguments: ['@router.route_provider', '@state']
   url_generator.non_bubbling:
     class: Drupal\Core\Routing\UrlGenerator
     arguments: ['@router.route_provider', '@path_processor_manager', '@route_processor_manager', '@request_stack', '%filter_protocols%']
@@ -1075,11 +1138,9 @@ services:
   Drupal\Core\Routing\AccessAwareRouterInterface: '@router'
   router.no_access_checks:
     class: \Drupal\Core\Routing\Router
-    arguments: ['@router.route_provider', '@path.current', '@url_generator']
+    arguments: ['@router.route_provider', '@path.current']
     tags:
-      - { name: service_collector, tag: non_lazy_route_enhancer, call: addDeprecatedRouteEnhancer }
       - { name: service_collector, tag: route_enhancer, call: addRouteEnhancer  }
-      - { name: service_collector, tag: non_lazy_route_filter, call: addDeprecatedRouteFilter }
       - { name: service_collector, tag: route_filter, call: addRouteFilter }
     calls:
       - [setContext, ['@router.request_context']]
@@ -1097,6 +1158,7 @@ services:
   pgsql.entity.query.sql:
     class: Drupal\Core\Entity\Query\Sql\pgsql\QueryFactory
     arguments: ['@database']
+    deprecated: The "%service_id%" service is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Install the pgsql module to replace this service. See https://www.drupal.org/node/3488580
   entity.query.null:
     class: Drupal\Core\Entity\Query\Null\QueryFactory
   entity.query.keyvalue:
@@ -1193,7 +1255,7 @@ services:
     arguments: ['@resolver_manager.entity']
   ajax_response.subscriber:
     class: Drupal\Core\EventSubscriber\AjaxResponseSubscriber
-    arguments: ['@ajax_response.attachments_processor']
+    autowire: true
   form_ajax_subscriber:
     class: Drupal\Core\Form\EventSubscriber\FormAjaxSubscriber
     arguments: ['@form_ajax_response_builder', '@string_translation', '@messenger']
@@ -1226,7 +1288,10 @@ services:
   psr_response_view_subscriber:
     class: Drupal\Core\EventSubscriber\PsrResponseSubscriber
     arguments: ['@psr7.http_foundation_factory']
-
+  # HTMX content view subscriber runs before main_content_view subscriber.
+  htmx_content_view_subscriber:
+    class: Drupal\Core\EventSubscriber\HtmxContentViewSubscriber
+    autowire: true
   # Main content view subscriber plus the renderers it uses.
   main_content_view_subscriber:
     class: Drupal\Core\EventSubscriber\MainContentViewSubscriber
@@ -1238,6 +1303,11 @@ services:
     arguments: ['@title_resolver', '@plugin.manager.display_variant', '@event_dispatcher', '@module_handler', '@renderer', '@render_cache', '%renderer.config%', '@theme.manager']
     tags:
       - { name: render.main_content_renderer, format: html }
+  main_content_renderer.htmx:
+    class: Drupal\Core\Render\MainContent\HtmxRenderer
+    arguments: ['@title_resolver', '@renderer', '@render_cache', '%renderer.config%']
+    tags:
+      - { name: render.main_content_renderer, format: drupal_htmx }
   main_content_renderer.ajax:
     class: Drupal\Core\Render\MainContent\AjaxRenderer
     arguments: ['@element_info', '@renderer']
@@ -1284,7 +1354,7 @@ services:
     arguments: ['@router.route_provider']
   bare_html_page_renderer:
     class: Drupal\Core\Render\BareHtmlPageRenderer
-    arguments: ['@renderer', '@html_response.attachments_processor']
+    arguments: ['@renderer', '@html_response.attachments_processor', '@Drupal\Core\Extension\ThemeSettingsProvider']
     lazy: true
   Drupal\Core\Render\BareHtmlPageRendererInterface: '@bare_html_page_renderer'
   private_key:
@@ -1304,8 +1374,7 @@ services:
   Drupal\Core\Access\AccessManagerInterface: '@access_manager'
   access_manager.check_provider:
     class: Drupal\Core\Access\CheckProvider
-    calls:
-      - [setContainer, ['@service_container']]
+    arguments: ['%dynamic_access_check_services%']
     public: false
   Drupal\Core\Access\CheckProviderInterface: '@access_manager.check_provider'
   access_check.default:
@@ -1338,7 +1407,7 @@ services:
       - { name: access_check, applies_to: _access_theme }
   access_check.custom:
     class: Drupal\Core\Access\CustomAccessCheck
-    arguments: ['@controller_resolver', '@access_arguments_resolver_factory']
+    arguments: ['@callable_resolver', '@access_arguments_resolver_factory']
     tags:
       - { name: access_check, applies_to: _custom_access }
   access_check.csrf:
@@ -1357,7 +1426,7 @@ services:
   Drupal\Core\Site\MaintenanceModeInterface: '@maintenance_mode'
   maintenance_mode_subscriber:
     class: Drupal\Core\EventSubscriber\MaintenanceModeSubscriber
-    arguments: ['@maintenance_mode', '@config.factory', '@string_translation', '@url_generator', '@current_user', '@bare_html_page_renderer', '@messenger', '@event_dispatcher']
+    autowire: true
   route_access_response_subscriber:
     class: Drupal\Core\EventSubscriber\RouteAccessResponseSubscriber
   client_error_response_subscriber:
@@ -1376,22 +1445,17 @@ services:
     arguments: ['@html_response.attachments_processor']
   finish_response_subscriber:
     class: Drupal\Core\EventSubscriber\FinishResponseSubscriber
-    arguments: ['@language_manager', '@config.factory', '@page_cache_request_policy', '@page_cache_response_policy', '@cache_contexts_manager', '%http.response.debug_cacheability_headers%']
+    arguments: ['@language_manager', '@config.factory', '@page_cache_request_policy', '@page_cache_response_policy', '@cache_contexts_manager', '@datetime.time', '%http.response.debug_cacheability_headers%']
   response_generator_subscriber:
     class: Drupal\Core\EventSubscriber\ResponseGeneratorSubscriber
   redirect_response_subscriber:
     class: Drupal\Core\EventSubscriber\RedirectResponseSubscriber
-    arguments: ['@unrouted_url_assembler', '@router.request_context']
+    autowire: true
   redirect_leading_slashes_subscriber:
     class: Drupal\Core\EventSubscriber\RedirectLeadingSlashesSubscriber
-  request_close_subscriber:
-    class: Drupal\Core\EventSubscriber\RequestCloseSubscriber
-    arguments: ['@module_handler']
   config_import_subscriber:
     class: Drupal\Core\EventSubscriber\ConfigImportSubscriber
-    tags:
-      - { name: service_collector, tag: 'module_install.uninstall_validator', call: addUninstallValidator }
-    arguments: ['@theme_handler', '@extension.list.module']
+    autowire: true
   config_snapshot_subscriber:
     class: Drupal\Core\EventSubscriber\ConfigSnapshotSubscriber
     arguments: ['@config.manager', '@config.storage', '@config.storage.snapshot']
@@ -1450,13 +1514,13 @@ services:
     class: Drupal\Core\Access\RouteProcessorCsrf
     tags:
       - { name: route_processor_outbound }
-    arguments: ['@csrf_token']
+    arguments: ['@csrf_token', '@request_stack']
   transliteration:
     class: Drupal\Core\Transliteration\PhpTransliteration
     arguments: [null, '@module_handler']
   flood:
     class: Drupal\Core\Flood\DatabaseBackend
-    arguments: ['@database', '@request_stack']
+    arguments: ['@database', '@request_stack', '@datetime.time']
     tags:
       - { name: backend_overridable }
   Drupal\Core\Flood\FloodInterface: '@flood'
@@ -1474,8 +1538,6 @@ services:
   Drupal\Core\Render\ElementInfoManagerInterface: '@plugin.manager.element_info'
   stream_wrapper_manager:
     class: Drupal\Core\StreamWrapper\StreamWrapperManager
-    calls:
-      - [setContainer, ['@service_container']]
   Drupal\Core\StreamWrapper\StreamWrapperManagerInterface: '@stream_wrapper_manager'
   stream_wrapper.assets:
     class: Drupal\Core\StreamWrapper\AssetsStream
@@ -1490,10 +1552,6 @@ services:
     class: Drupal\Core\StreamWrapper\TemporaryStream
     tags:
       - { name: stream_wrapper, scheme: temporary }
-  kernel_destruct_subscriber:
-    class: Drupal\Core\EventSubscriber\KernelDestructionSubscriber
-    calls:
-      - [setContainer, ['@service_container']]
   image.toolkit.manager:
     class: Drupal\Core\ImageToolkit\ImageToolkitManager
     arguments: ['@config.factory']
@@ -1518,6 +1576,9 @@ services:
     tags:
       - { name: service_collector, tag: breadcrumb_builder, call: addBuilder }
   Drupal\Core\Breadcrumb\ChainBreadcrumbBuilderInterface: '@breadcrumb'
+  Drupal\Core\Breadcrumb\BreadcrumbPreprocess:
+    class: Drupal\Core\Breadcrumb\BreadcrumbPreprocess
+    autowire: true
   token:
     class: Drupal\Core\Utility\Token
     arguments: ['@module_handler', '@cache.default', '@language_manager', '@cache_tags.invalidator', '@renderer']
@@ -1539,22 +1600,35 @@ services:
   Drupal\Core\Datetime\DateFormatterInterface: '@date.formatter'
   theme.manager:
     class: Drupal\Core\Theme\ThemeManager
-    arguments: ['%app.root%', '@theme.negotiator', '@theme.initialization', '@module_handler']
+    autowire: true
     calls:
       - [setThemeRegistry, ['@theme.registry']]
   Drupal\Core\Theme\ThemeManagerInterface: '@theme.manager'
+  Drupal\Core\Template\TwigThemeEngine:
+    autowire: true
+    tags:
+      - { name: theme_engine, engine_name: twig }
   theme.initialization:
     class: Drupal\Core\Theme\ThemeInitialization
-    arguments: ['%app.root%', '@theme_handler', '@cache.bootstrap', '@module_handler']
+    autowire: true
   Drupal\Core\Theme\ThemeInitializationInterface: '@theme.initialization'
   theme.registry:
     class: Drupal\Core\Theme\Registry
-    arguments: ['%app.root%', '@cache.default', '@lock', '@module_handler', '@theme_handler', '@theme.initialization', '@cache.bootstrap', '@extension.list.module']
+    arguments: ['%app.root%', '@cache.default', '@lock', '@module_handler', '@theme_handler', '@theme.initialization', '@cache.bootstrap', '@extension.list.module', '@kernel', ~, '@keyvalue']
     tags:
       - { name: needs_destruction }
     calls:
       - [setThemeManager, ['@theme.manager']]
   Drupal\Core\Theme\Registry: '@theme.registry'
+  Drupal\Core\Theme\ThemePreprocess:
+    class: Drupal\Core\Theme\ThemePreprocess
+    autowire: true
+  Drupal\Core\Theme\ImagePreprocess:
+    class: Drupal\Core\Theme\ImagePreprocess
+    autowire: true
+  Drupal\Core\Datetime\DatePreprocess:
+    class: Drupal\Core\Datetime\DatePreprocess
+    autowire: true
   authentication:
     class: Drupal\Core\Authentication\AuthenticationManager
     arguments: ['@authentication_collector']
@@ -1576,14 +1650,25 @@ services:
     arguments: ['@variation_cache.access_policy', '@variation_cache.access_policy_memory', '@cache.access_policy_memory', '@current_user', '@account_switcher']
     tags:
       - { name: service_collector, call: addAccessPolicy, tag: access_policy }
-  Drupal\Core\Session\AccessPolicyChainInterface: '@access_policy_processor'
+  Drupal\Core\Session\AccessPolicyProcessorInterface: '@access_policy_processor'
+  access_policy.super_user:
+    class: Drupal\Core\Session\SuperUserAccessPolicy
+    tags:
+      - { name: access_policy }
+  Drupal\Core\Session\SuperUserAccessPolicy: '@access_policy.super_user'
+  access_policy.user_roles:
+    class: Drupal\Core\Session\UserRolesAccessPolicy
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: access_policy }
+  Drupal\Core\Session\UserRolesAccessPolicy: '@access_policy.user_roles'
   permission_checker:
     class: Drupal\Core\Session\PermissionChecker
-    arguments: ['@entity_type.manager']
+    arguments: ['@access_policy_processor']
   Drupal\Core\Session\PermissionCheckerInterface: '@permission_checker'
   user_permissions_hash_generator:
     class: Drupal\Core\Session\PermissionsHashGenerator
-    arguments: ['@private_key', '@cache.bootstrap', '@cache.static', '@entity_type.manager']
+    arguments: ['@private_key', '@cache.memory', '@access_policy_processor']
   Drupal\Core\Session\PermissionsHashGeneratorInterface: '@user_permissions_hash_generator'
   current_user:
     class: Drupal\Core\Session\AccountProxy
@@ -1615,7 +1700,7 @@ services:
     alias: session_handler.storage
   session_handler.storage:
     class: Drupal\Core\Session\SessionHandler
-    arguments: ['@request_stack', '@database']
+    arguments: ['@request_stack', '@database', '@datetime.time']
     tags:
       - { name: backend_overridable }
   session_handler.write_safe:
@@ -1625,7 +1710,7 @@ services:
   Drupal\Core\Session\WriteSafeSessionHandlerInterface: '@session_handler.write_safe'
   session_manager:
     class: Drupal\Core\Session\SessionManager
-    arguments: ['@request_stack', '@database', '@session_manager.metadata_bag', '@session_configuration', '@session_handler']
+    arguments: ['@request_stack', '@database', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@session_handler']
     tags:
       - { name: backend_overridable }
     calls:
@@ -1651,7 +1736,7 @@ services:
     arguments: ['@file_system']
   asset.js.collection_renderer:
     class: Drupal\Core\Asset\JsCollectionRenderer
-    arguments: [ '@asset.query_string','@file_url_generator' ]
+    arguments: [ '@asset.query_string','@file_url_generator', '@datetime.time' ]
   asset.js.collection_optimizer:
     class: Drupal\Core\Asset\JsCollectionOptimizerLazy
     arguments: [ '@asset.js.collection_grouper', '@asset.js.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager']
@@ -1664,17 +1749,18 @@ services:
     class: Drupal\Core\Asset\AssetDumper
     arguments: ['@file_system']
   library.discovery:
-    class: Drupal\Core\Asset\LibraryDiscovery
-    arguments: ['@library.discovery.collector']
-  Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
-  library.discovery.collector:
     class: Drupal\Core\Asset\LibraryDiscoveryCollector
     arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager']
     tags:
       - { name: needs_destruction }
+  Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
+  library.discovery.collector:
+    arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager']
+    class: Drupal\Core\Asset\LibraryDiscoveryCollector
+    deprecated: The "%service_id%" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use LibraryDiscovery instead. See https://www.drupal.org/node/3462970
   library.discovery.parser:
     class: Drupal\Core\Asset\LibraryDiscoveryParser
-    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver']
+    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc']
   Drupal\Core\Asset\LibraryDiscoveryParser: '@library.discovery.parser'
   library.libraries_directory_file_finder:
     class: Drupal\Core\Asset\LibrariesDirectoryFileFinder
@@ -1684,9 +1770,17 @@ services:
     class: Drupal\Core\Asset\LibraryDependencyResolver
     arguments: ['@library.discovery']
   Drupal\Core\Asset\LibraryDependencyResolverInterface: '@library.dependency_resolver'
+  # Set up a cache chain for asset caching as the same assets may be
+  # requested several times, non-public as they are not meant to be reused.
+  cache.asset_chain:
+    class: Drupal\Core\Cache\BackendChain
+    public: false
+    calls:
+      - [ appendBackend, [ '@cache.memory' ] ]
+      - [ appendBackend, [ '@cache.data' ] ]
   asset.resolver:
     class: Drupal\Core\Asset\AssetResolver
-    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.data']
+    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.asset_chain', '@theme_handler']
   Drupal\Core\Asset\AssetResolverInterface: '@asset.resolver'
   info_parser:
     class: Drupal\Core\Extension\InfoParser
@@ -1703,6 +1797,14 @@ services:
     arguments: ['@renderer', '@url_generator', '@theme.manager', '@date.formatter', '@file_url_generator']
     tags:
       - { name: twig.extension, priority: 100 }
+  Drupal\Core\Template\ComponentsTwigExtension:
+    arguments: ['@plugin.manager.sdc', '@Drupal\Core\Theme\Component\ComponentValidator']
+    tags:
+      - { name: twig.extension, priority: 101 }
+  Drupal\Core\Template\IconsTwigExtension:
+    arguments: ['@plugin.manager.icon_pack']
+    tags:
+      - { name: twig.extension, priority: 101 }
   twig.extension.debug:
     class: Twig\Extension\DebugExtension
     tags:
@@ -1742,7 +1844,7 @@ services:
     alias: plugin.manager.element_info
   file.htaccess_writer:
     class: Drupal\Core\File\HtaccessWriter
-    arguments: ['@logger.channel.security', '@stream_wrapper_manager']
+    arguments: ['@logger.channel.security', '@stream_wrapper_manager', '@settings']
   Drupal\Core\File\HtaccessWriterInterface: '@file.htaccess_writer'
   file.mime_type.guesser:
     class: Drupal\Core\File\MimeType\MimeTypeGuesser
@@ -1752,10 +1854,17 @@ services:
     lazy: true
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
-    arguments: ['@module_handler']
+    arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']
     tags:
       - { name: mime_type_guesser }
     lazy: true
+  Drupal\Core\File\MimeType\MimeTypeMapFactory:
+    autowire: true
+    public: false
+  Drupal\Core\File\MimeType\MimeTypeMapInterface:
+    factory: ['@Drupal\Core\File\MimeType\MimeTypeMapFactory', create]
+  Drupal\Core\File\EventSubscriber\LegacyMimeTypeMapLoadedSubscriber:
+    autowire: true
   # Currently needs to be public as it is called by
   # \Drupal\Core\Render\Element\StatusMessages.
   # @todo Consider making this service private again after
@@ -1784,6 +1893,11 @@ services:
     tags:
       - { name: service_collector, tag: placeholder_strategy, call: addPlaceholderStrategy }
   Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface: '@placeholder_strategy'
+  placeholder_strategy.cached:
+    class: Drupal\Core\Render\Placeholder\CachedStrategy
+    arguments: ['@placeholder_strategy', '@render_cache']
+    tags:
+      - { name: placeholder_strategy, priority: 100 }
   placeholder_strategy.single_flush:
     class: Drupal\Core\Render\Placeholder\SingleFlushStrategy
     tags:
@@ -1793,17 +1907,16 @@ services:
   Drupal\Component\Utility\EmailValidatorInterface: '@email.validator'
   update.update_hook_registry:
     class: Drupal\Core\Update\UpdateHookRegistry
-    factory: ['@update.update_hook_registry_factory', create]
+    arguments: ['%container.modules%', '@keyvalue']
   Drupal\Core\Update\UpdateHookRegistry: '@update.update_hook_registry'
-  update.update_hook_registry_factory:
-    class: Drupal\Core\Update\UpdateHookRegistryFactory
-    parent: container.trait
   update.post_update_registry:
     class: Drupal\Core\Update\UpdateRegistry
-    factory: ['@update.post_update_registry_factory', create]
-  update.post_update_registry_factory:
-    class: Drupal\Core\Update\UpdateRegistryFactory
-    parent: container.trait
+    arguments: ['%app.root%', '%site.path%', '%container.modules%', '@update.key_value.post_update', '@theme_handler', 'post_update']
+  update.key_value.post_update:
+    class: Drupal\Core\KeyValueStore\KeyValueStoreInterface
+    factory: ['@keyvalue', 'get']
+    arguments: ['post_update']
+    public: false
   uuid:
     class: Drupal\Component\Uuid\Php
   Drupal\Component\Uuid\UuidInterface: '@uuid'
@@ -1836,3 +1949,73 @@ services:
     class: Drupal\Core\Pager\PagerParameters
     arguments: ['@request_stack']
   Drupal\Core\Pager\PagerParametersInterface: '@pager.parameters'
+  Drupal\Core\Pager\PagerPreprocess:
+    class: Drupal\Core\Pager\PagerPreprocess
+    autowire: true
+  Drupal\Core\Theme\Component\SchemaCompatibilityChecker: {}
+  Drupal\Core\Theme\Component\ComponentValidator:
+    calls:
+      - [setValidator, []]
+  Drupal\Core\Theme\ComponentNegotiator:
+    arguments:
+      - '@theme.manager'
+  plugin.manager.sdc:
+    public: true
+    class: Drupal\Core\Theme\ComponentPluginManager
+    arguments:
+      - '@module_handler'
+      - '@theme_handler'
+      - '@cache.discovery'
+      - '@config.factory'
+      - '@theme.manager'
+      - '@Drupal\Core\Theme\ComponentNegotiator'
+      - '@file_system'
+      - '@Drupal\Core\Theme\Component\SchemaCompatibilityChecker'
+      - '@Drupal\Core\Theme\Component\ComponentValidator'
+      - '%app.root%'
+  Drupal\Core\Theme\ComponentPluginManager: '@plugin.manager.sdc'
+  Drupal\Core\Template\Loader\ComponentLoader:
+    arguments:
+      - '@plugin.manager.sdc'
+      - '@logger.channel.default'
+    tags:
+      - { name: twig.loader, priority: 5 }
+  Drupal\Core\EventSubscriber\CsrfExceptionSubscriber: ~
+  plugin.manager.icon_pack:
+    class: Drupal\Core\Theme\Icon\Plugin\IconPackManager
+    calls:
+      - [setValidator, []]
+    arguments:
+      [
+        '@module_handler',
+        '@theme_handler',
+        '@cache.discovery',
+        '@plugin.manager.icon_extractor',
+        '@Drupal\Core\Theme\Icon\IconCollector',
+        '%app.root%',
+      ]
+  Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface: '@plugin.manager.icon_pack'
+  plugin.manager.icon_extractor:
+    class: Drupal\Core\Theme\Icon\IconExtractorPluginManager
+    parent: default_plugin_manager
+    arguments: ['@plugin_form.factory']
+  Drupal\Core\Theme\Icon\IconExtractorInterface: '@plugin.manager.icon_extractor'
+  Drupal\Core\Theme\Icon\IconFinder:
+    autowire: true
+    arguments:
+      [
+        '@file_url_generator',
+        '@logger.channel.default',
+        '%app.root%',
+      ]
+  Drupal\Core\Theme\Icon\IconCollector:
+    arguments:
+      [
+        '@plugin.manager.icon_extractor',
+        '@cache.default',
+        '@lock',
+      ]
+    tags:
+      - { name: needs_destruction }
+  Drupal\Core\Extension\ThemeSettingsProvider:
+    autowire: true

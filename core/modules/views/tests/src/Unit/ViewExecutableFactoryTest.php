@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Unit;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\ViewExecutableFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\views\ViewExecutableFactory
- * @group views
+ * Tests Drupal\views\ViewExecutableFactory.
  */
+#[CoversClass(ViewExecutableFactory::class)]
+#[Group('views')]
 class ViewExecutableFactoryTest extends UnitTestCase {
 
   /**
@@ -56,6 +61,13 @@ class ViewExecutableFactoryTest extends UnitTestCase {
   protected $routeProvider;
 
   /**
+   * The display plugin manager.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   */
+  protected $displayPluginManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -68,15 +80,18 @@ class ViewExecutableFactoryTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
-    $this->viewExecutableFactory = new ViewExecutableFactory($this->user, $this->requestStack, $this->viewsData, $this->routeProvider);
+    $this->displayPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->viewExecutableFactory = new ViewExecutableFactory($this->user, $this->requestStack, $this->viewsData, $this->routeProvider, $this->displayPluginManager);
   }
 
   /**
    * Tests the get method.
    *
-   * @covers ::get
+   * @legacy-covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     $request_1 = new Request();
     $request_2 = new Request();
 

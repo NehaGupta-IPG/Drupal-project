@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Form;
 
 use Drupal\Core\Config\Config;
@@ -7,21 +9,28 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\ConfigTarget;
-use Drupal\Core\Form\ToConfig;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
+use Drupal\Core\Form\ToConfig;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\ConfigTarget
- * @group Form
+ * Tests Drupal\Core\Form\ConfigTarget.
  */
+#[CoversClass(ConfigTarget::class)]
+#[Group('Form')]
 class ConfigTargetTest extends UnitTestCase {
 
   /**
-   * @covers \Drupal\Core\Form\ConfigFormBase::storeConfigKeyToFormElementMap
+   * Tests duplicate targets not allowed.
+   *
+   * @legacy-covers \Drupal\Core\Form\ConfigFormBase::storeConfigKeyToFormElementMap
    */
   public function testDuplicateTargetsNotAllowed(): void {
     $form = [
@@ -52,18 +61,71 @@ class ConfigTargetTest extends UnitTestCase {
 
     };
     $form_state = new FormState();
-    $test_form->storeConfigKeyToFormElementMap($form['test'], $form_state);
 
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessage('Two #config_targets both target "admin_compact_mode" in the "system.site" config: `$form[\'test\']` and `$form[\'duplicate\']`.');
-    $test_form->storeConfigKeyToFormElementMap($form['duplicate'], $form_state);
+    $test_form->storeConfigKeyToFormElementMap($form, $form_state);
   }
 
   /**
-   * @covers ::fromForm
-   * @covers ::fromString
+   * Tests form cacheable.
+   *
+   * @legacy-covers \Drupal\Core\Form\ConfigFormBase::storeConfigKeyToFormElementMap
    */
-  public function testFromFormString() {
+  #[DataProvider('providerTestFormCacheable')]
+  public function testFormCacheable(bool $expected, ?callable $fromConfig, ?callable $toConfig): void {
+    $form = [
+      'test' => [
+        '#type' => 'text',
+        '#default_value' => 'A test',
+        '#config_target' => new ConfigTarget('system.site', 'admin_compact_mode', $fromConfig, $toConfig),
+        '#name' => 'test',
+        '#array_parents' => ['test'],
+      ],
+    ];
+
+    $test_form = new class(
+      $this->prophesize(ConfigFactoryInterface::class)->reveal(),
+      $this->prophesize(TypedConfigManagerInterface::class)->reveal(),
+    ) extends ConfigFormBase {
+      use RedundantEditableConfigNamesTrait;
+
+      public function getFormId() {
+        return 'test';
+      }
+
+    };
+    $form_state = new FormState();
+    // Make the form cacheable.
+    $form_state
+      ->setRequestMethod('POST')
+      ->setCached();
+
+    $test_form->storeConfigKeyToFormElementMap($form, $form_state);
+
+    $this->assertSame($expected, $form_state->isCached());
+  }
+
+  public static function providerTestFormCacheable(): array {
+    $closure = fn (bool $something): string => $something ? 'Yes' : 'No';
+    return [
+      'No callables' => [TRUE, NULL, NULL],
+      'Serializable fromConfig callable' => [TRUE, "intval", NULL],
+      'Serializable toConfig callable' => [TRUE, NULL, "boolval"],
+      'Serializable callables' => [TRUE, "intval", "boolval"],
+      'Unserializable fromConfig callable' => [FALSE, $closure, NULL],
+      'Unserializable toConfig callable' => [FALSE, NULL, $closure],
+      'Unserializable callables' => [FALSE, $closure, $closure],
+    ];
+  }
+
+  /**
+   * Tests from form string.
+   *
+   * @legacy-covers ::fromForm
+   * @legacy-covers ::fromString
+   */
+  public function testFromFormString(): void {
     $form = [
       'group' => [
         '#type' => 'details',
@@ -83,9 +145,11 @@ class ConfigTargetTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::fromForm
+   * Tests from form config target.
+   *
+   * @legacy-covers ::fromForm
    */
-  public function testFromFormConfigTarget() {
+  public function testFromFormConfigTarget(): void {
     $form = [
       'test' => [
         '#type' => 'text',
@@ -104,16 +168,18 @@ class ConfigTargetTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::fromForm
-   * @dataProvider providerTestFromFormException
+   * Tests from form exception.
+   *
+   * @legacy-covers ::fromForm
    */
-  public function testFromFormException(array $form, array $array_parents, string $exception_message) {
+  #[DataProvider('providerTestFromFormException')]
+  public function testFromFormException(array $form, array $array_parents, string $exception_message): void {
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessage($exception_message);
     ConfigTarget::fromForm($array_parents, $form);
   }
 
-  public function providerTestFromFormException(): array {
+  public static function providerTestFromFormException(): array {
     return [
       'No #config_target' => [
         [
@@ -156,15 +222,16 @@ class ConfigTargetTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerMultiTargetWithoutCallables
+   * Tests multi target without callables.
    */
+  #[DataProvider('providerMultiTargetWithoutCallables')]
   public function testMultiTargetWithoutCallables(...$arguments): void {
     $this->expectException(\LogicException::class);
     $this->expectExceptionMessage('The $fromConfig and $toConfig arguments must be passed to Drupal\Core\Form\ConfigTarget::__construct() if multiple property paths are targeted.');
     new ConfigTarget(...$arguments);
   }
 
-  public function providerMultiTargetWithoutCallables(): \Generator {
+  public static function providerMultiTargetWithoutCallables(): \Generator {
     yield "neither callable" => ['foo.settings', ['a', 'b']];
     yield "only fromConfig" => ['foo.settings', ['a', 'b'], "intval"];
     yield "only toConfig" => ['foo.settings', ['a', 'b'], NULL, "intval"];
@@ -235,14 +302,14 @@ class ConfigTargetTest extends UnitTestCase {
     $config->set('something', FALSE)->shouldBeCalledTimes(1);
     $config_target->setValue($config->reveal(), 'No', $this->prophesize(FormStateInterface::class)->reveal());
 
-    // Test `ConfigTargetValue::NoMapping`: nothing should happen to the Config.
+    // Test `ToConfig::NoOp`: nothing should happen to the Config.
     $config = $this->prophesize(Config::class);
     $config->getName()->willReturn('foo.settings');
     $config->set('something', Argument::any())->shouldBeCalledTimes(0);
     $config->clear('something', Argument::any())->shouldBeCalledTimes(0);
     $config_target->setValue($config->reveal(), '<test:noop>', $this->prophesize(FormStateInterface::class)->reveal());
 
-    // Test `ConfigTargetValue::DeleteKey`: Config::clear() should be called.
+    // Test `ToConfig::DeleteKey`: Config::clear() should be called.
     $config = $this->prophesize(Config::class);
     $config->getName()->willReturn('foo.settings');
     $config->clear('something')->shouldBeCalledTimes(1);
@@ -288,16 +355,17 @@ class ConfigTargetTest extends UnitTestCase {
   }
 
   /**
-   * @testWith ["this string was returned by toConfig", "The toConfig callable returned a string, but it must be an array with a key-value pair for each of the targeted property paths."]
-   *           [true, "The toConfig callable returned a boolean, but it must be an array with a key-value pair for each of the targeted property paths."]
-   *           [42, "The toConfig callable returned a integer, but it must be an array with a key-value pair for each of the targeted property paths."]
-   *           [[], "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: first, second."]
-   *           [{"yar": 42}, "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: first, second."]
-   *           [{"FIRST": 42, "SECOND": 1337}, "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: first, second."]
-   *           [{"second": 42}, "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: first."]
-   *           [{"first": 42}, "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: second."]
-   *           [{"first": 42, "second": 1337, "yar": "har"}, "The toConfig callable returned an array that contains key-value pairs that do not match targeted property paths: yar."]
+   * Tests set value multi target to config return value.
    */
+  #[TestWith(["this string was returned by toConfig", "The toConfig callable returned a string, but it must be an array with a key-value pair for each of the targeted property paths."])]
+  #[TestWith([TRUE, "The toConfig callable returned a boolean, but it must be an array with a key-value pair for each of the targeted property paths."])]
+  #[TestWith([42, "The toConfig callable returned a integer, but it must be an array with a key-value pair for each of the targeted property paths."])]
+  #[TestWith([[], "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: first, second."])]
+  #[TestWith([["yar" => 42], "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: first, second."])]
+  #[TestWith([["FIRST" => 42, "SECOND" => 1337], "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: first, second."])]
+  #[TestWith([["second" => 42], "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: first."])]
+  #[TestWith([["first" => 42], "The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: second."])]
+  #[TestWith([["first" => 42, "second" => 1337, "yar" => "har"], "The toConfig callable returned an array that contains key-value pairs that do not match targeted property paths: yar."])]
   public function testSetValueMultiTargetToConfigReturnValue(mixed $toConfigReturnValue, string $expected_exception_message): void {
     $config_target = new ConfigTarget(
       'foo.settings',
@@ -306,7 +374,7 @@ class ConfigTargetTest extends UnitTestCase {
         'second',
       ],
       // In case of multiple targets, the return value must be an array with the
-      // keys matching
+      // keys matching.
       // @see ::testMultiTarget()
       fromConfig: fn (int $first, int $second): string => "$first|$second",
       toConfig: fn (): mixed => $toConfigReturnValue,

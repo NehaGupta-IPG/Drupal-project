@@ -1,30 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path\Kernel;
 
 use Drupal\content_translation_test\Entity\EntityTestTranslatableUISkip;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests path alias deletion when there is no canonical link template.
- *
- * @group path
  */
+#[Group('path')]
+#[RunTestsInSeparateProcesses]
 class PathNoCanonicalLinkTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
-    'path',
     'content_translation_test',
     'language',
     'entity_test',
     'user',
-    'system',
   ];
 
   /**
@@ -48,7 +48,7 @@ class PathNoCanonicalLinkTest extends KernelTestBase {
   /**
    * Tests for no canonical link templates.
    */
-  public function testNoCanonicalLinkTemplate() {
+  public function testNoCanonicalLinkTemplate(): void {
     $entity_type = EntityTestTranslatableUISkip::create([
       'name' => 'name english',
       'language' => 'en',

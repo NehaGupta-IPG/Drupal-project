@@ -4,9 +4,15 @@ namespace Drupal\filter\Plugin\Filter;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\Html;
+use Drupal\filter\Attribute\Filter;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
+use Drupal\filter\Plugin\FilterInterface;
+use Masterminds\HTML5\Parser\DOMTreeBuilder;
+use Masterminds\HTML5\Parser\Scanner;
+use Masterminds\HTML5\Parser\Tokenizer;
 
 /**
  * Provides a filter to limit allowed HTML tags.
@@ -14,19 +20,18 @@ use Drupal\filter\Plugin\FilterBase;
  * The attributes in the annotation show examples of allowing all attributes
  * by only having the attribute name, or allowing a fixed list of values, or
  * allowing a value with a wildcard prefix.
- *
- * @Filter(
- *   id = "filter_html",
- *   title = @Translation("Limit allowed HTML tags and correct faulty HTML"),
- *   type = Drupal\filter\Plugin\FilterInterface::TYPE_HTML_RESTRICTOR,
- *   settings = {
- *     "allowed_html" = "<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type='1 A I'> <li> <dl> <dt> <dd> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id>",
- *     "filter_html_help" = TRUE,
- *     "filter_html_nofollow" = FALSE
- *   },
- *   weight = -10
- * )
  */
+#[Filter(
+  id: "filter_html",
+  title: new TranslatableMarkup("Limit allowed HTML tags and correct faulty HTML"),
+  type: FilterInterface::TYPE_HTML_RESTRICTOR,
+  weight: -10,
+  settings: [
+    "allowed_html" => "<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type='1 A I'> <li> <dl> <dt> <dd> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id>",
+    "filter_html_help" => TRUE,
+    "filter_html_nofollow" => FALSE,
+  ],
+)]
 class FilterHtml extends FilterBase {
 
   /**
@@ -45,11 +50,6 @@ class FilterHtml extends FilterBase {
       '#title' => $this->t('Allowed HTML tags'),
       '#default_value' => $this->settings['allowed_html'],
       '#description' => $this->t('A list of HTML tags that can be used. By default only the <em>lang</em> and <em>dir</em> attributes are allowed for all HTML tags. Each HTML tag may have attributes which are treated as allowed attribute names for that HTML tag. Each attribute may allow all values, or only allow specific values. Attribute names or values may be written as a prefix and wildcard like <em>jump-*</em>. JavaScript event attributes, JavaScript URLs, and CSS are always stripped.'),
-      '#attached' => [
-        'library' => [
-          'filter/drupal.filter.filter_html.admin',
-        ],
-      ],
     ];
     $form['filter_html_help'] = [
       '#type' => 'checkbox',
@@ -121,7 +121,7 @@ class FilterHtml extends FilterBase {
       $allowed_attributes = ['exact' => [], 'prefix' => []];
       foreach (($global_allowed_attributes + $tag_attributes) as $name => $values) {
         // A trailing * indicates wildcard, but it must have some prefix.
-        if (substr($name, -1) === '*' && $name[0] !== '*') {
+        if (str_ends_with($name, '*') && $name[0] !== '*') {
           $allowed_attributes['prefix'][str_replace('*', '', $name)] = $this->prepareAttributeValues($values);
         }
         else {
@@ -196,6 +196,7 @@ class FilterHtml extends FilterBase {
    *   The name to find or match against a prefix.
    *
    * @return bool|array
+   *   The allowed value if found, or FALSE if no match is found.
    */
   protected function findAllowedValue(array $allowed, $name) {
     if (isset($allowed['exact'][$name])) {
@@ -220,6 +221,8 @@ class FilterHtml extends FilterBase {
    *   TRUE, FALSE, or an array of allowed values.
    *
    * @return bool|array
+   *   An array containing 'exact' and 'prefix' lists of allowed values,
+   *   or TRUE/FALSE if all or no values are allowed.
    */
   protected function prepareAttributeValues($attribute_values) {
     if ($attribute_values === TRUE || $attribute_values === FALSE) {
@@ -228,7 +231,7 @@ class FilterHtml extends FilterBase {
     $result = ['exact' => [], 'prefix' => []];
     foreach ($attribute_values as $name => $allowed) {
       // A trailing * indicates wildcard, but it must have some prefix.
-      if (substr($name, -1) === '*' && $name[0] !== '*') {
+      if (str_ends_with($name, '*') && $name[0] !== '*') {
         $result['prefix'][str_replace('*', '', $name)] = $allowed;
       }
       else {
@@ -258,7 +261,24 @@ class FilterHtml extends FilterBase {
     $star_protector = '__zqh6vxfbk3cg__';
     $html = str_replace('*', $star_protector, $html);
 
-    $dom = Html::load($html);
+    // Use HTML5 parser with a custom tokenizer to correctly parse tags that
+    // normally use text mode, such as iframe.
+    $events = new DOMTreeBuilder(FALSE, ['disable_html_ns' => TRUE]);
+    $scanner = new Scanner('<body>' . $html);
+    $parser = new class($scanner, $events) extends Tokenizer {
+
+      /**
+       * phpcs:ignore Drupal.Commenting.FunctionComment.Missing
+       * @phpstan-ignore-next-line
+       */
+      public function setTextMode($textMode, $untilTag = NULL) {
+        // Do nothing, we never enter text mode.
+      }
+
+    };
+    $parser->parse();
+
+    $dom = $events->document();
     $xpath = new \DOMXPath($dom);
     foreach ($xpath->query('//body//*') as $node) {
       $tag = $node->tagName;
@@ -333,7 +353,7 @@ class FilterHtml extends FilterBase {
     // added by hand to content, and especially the class attribute can have
     // undesired visual effects by allowing content authors to apply any
     // available style, so specific values should be explicitly allowed.
-    // @see http://www.w3.org/TR/html5/dom.html#global-attributes
+    // @see https://www.w3.org/TR/html5/dom.html#global-attributes
     $restrictions['allowed']['*'] = [
       'style' => FALSE,
       'on*' => FALSE,
@@ -368,10 +388,23 @@ class FilterHtml extends FilterBase {
     $output .= '<p>' . $this->t('This site allows HTML content. While learning all of HTML may feel intimidating, learning how to use a very small number of the most basic HTML "tags" is very easy. This table provides examples for each tag that is enabled on this site.') . '</p>';
     $output .= '<p>' . $this->t('For more information see the <a href=":html-specifications">HTML Living Standard</a> or use your favorite search engine to find other sites that explain HTML.', [':html-specifications' => 'https://html.spec.whatwg.org/']) . '</p>';
     $tips = [
-      'a' => [$this->t('Anchors are used to make links to other pages.'), '<a href="' . $base_url . '">' . Html::escape(\Drupal::config('system.site')->get('name')) . '</a>'],
-      'br' => [$this->t('By default line break tags are automatically added, so use this tag to add additional ones. Use of this tag is different because it is not used with an open/close pair like all the others. Use the extra " /" inside the tag to maintain XHTML 1.0 compatibility'), $this->t('Text with <br />line break')],
-      'p' => [$this->t('By default paragraph tags are automatically added, so use this tag to add additional ones.'), '<p>' . $this->t('Paragraph one.') . '</p> <p>' . $this->t('Paragraph two.') . '</p>'],
-      'strong' => [$this->t('Strong', [], ['context' => 'Font weight']), '<strong>' . $this->t('Strong', [], ['context' => 'Font weight']) . '</strong>'],
+      'a' => [
+        $this->t('Anchors are used to make links to other pages.'),
+        '<a href="' . $base_url . '">' . Html::escape(\Drupal::config('system.site')
+          ->get('name')) . '</a>',
+      ],
+      'br' => [
+        $this->t('By default line break tags are automatically added, so use this tag to add additional ones. Use of this tag is different because it is not used with an open/close pair like all the others. Use the extra " /" inside the tag to maintain XHTML 1.0 compatibility'),
+        $this->t('Text with <br />line break'),
+      ],
+      'p' => [
+        $this->t('By default paragraph tags are automatically added, so use this tag to add additional ones.'),
+        '<p>' . $this->t('Paragraph one.') . '</p> <p>' . $this->t('Paragraph two.') . '</p>',
+      ],
+      'strong' => [
+        $this->t('Strong', [], ['context' => 'Font weight']),
+        '<strong>' . $this->t('Strong', [], ['context' => 'Font weight']) . '</strong>',
+      ],
       'em' => [$this->t('Emphasized'), '<em>' . $this->t('Emphasized') . '</em>'],
       'cite' => [$this->t('Cited'), '<cite>' . $this->t('Cited') . '</cite>'],
       'code' => [$this->t('Coded text used to show programming source code'), '<code>' . $this->t('Coded') . '</code>'],
@@ -386,18 +419,30 @@ class FilterHtml extends FilterBase {
       'blockquote' => [$this->t('Block quoted'), '<blockquote>' . $this->t('Block quoted') . '</blockquote>'],
       'q' => [$this->t('Quoted inline'), '<q>' . $this->t('Quoted inline') . '</q>'],
       // Assumes and describes tr, td, th.
-      'table' => [$this->t('Table'), '<table> <tr><th>' . $this->t('Table header') . '</th></tr> <tr><td>' . $this->t('Table cell') . '</td></tr> </table>'],
+      'table' => [
+        $this->t('Table'),
+        '<table> <tr><th>' . $this->t('Table header') . '</th></tr> <tr><td>' . $this->t('Table cell') . '</td></tr> </table>',
+      ],
       'tr' => NULL,
       'td' => NULL,
       'th' => NULL,
       'del' => [$this->t('Deleted'), '<del>' . $this->t('Deleted') . '</del>'],
       'ins' => [$this->t('Inserted'), '<ins>' . $this->t('Inserted') . '</ins>'],
        // Assumes and describes li.
-      'ol' => [$this->t('Ordered list - use the &lt;li&gt; to begin each list item'), '<ol> <li>' . $this->t('First item') . '</li> <li>' . $this->t('Second item') . '</li> </ol>'],
-      'ul' => [$this->t('Unordered list - use the &lt;li&gt; to begin each list item'), '<ul> <li>' . $this->t('First item') . '</li> <li>' . $this->t('Second item') . '</li> </ul>'],
+      'ol' => [
+        $this->t('Ordered list - use the &lt;li&gt; to begin each list item'),
+        '<ol> <li>' . $this->t('First item') . '</li> <li>' . $this->t('Second item') . '</li> </ol>',
+      ],
+      'ul' => [
+        $this->t('Unordered list - use the &lt;li&gt; to begin each list item'),
+        '<ul> <li>' . $this->t('First item') . '</li> <li>' . $this->t('Second item') . '</li> </ul>',
+      ],
       'li' => NULL,
       // Assumes and describes dt and dd.
-      'dl' => [$this->t('Definition lists are similar to other HTML lists. &lt;dl&gt; begins the definition list, &lt;dt&gt; begins the definition term and &lt;dd&gt; begins the definition description.'), '<dl> <dt>' . $this->t('First term') . '</dt> <dd>' . $this->t('First definition') . '</dd> <dt>' . $this->t('Second term') . '</dt> <dd>' . $this->t('Second definition') . '</dd> </dl>'],
+      'dl' => [
+        $this->t('Definition lists are similar to other HTML lists. &lt;dl&gt; begins the definition list, &lt;dt&gt; begins the definition term and &lt;dd&gt; begins the definition description.'),
+        '<dl> <dt>' . $this->t('First term') . '</dt> <dd>' . $this->t('First definition') . '</dd> <dt>' . $this->t('Second term') . '</dt> <dd>' . $this->t('Second definition') . '</dd> </dl>',
+      ],
       'dt' => NULL,
       'dd' => NULL,
       'h1' => [$this->t('Heading'), '<h1>' . $this->t('Title') . '</h1>'],
@@ -430,7 +475,11 @@ class FilterHtml extends FilterBase {
       }
       else {
         $rows[] = [
-          ['data' => $this->t('No help provided for tag %tag.', ['%tag' => $tag]), 'class' => ['description'], 'colspan' => 3],
+          [
+            'data' => $this->t('No help provided for tag %tag.', ['%tag' => $tag]),
+            'class' => ['description'],
+            'colspan' => 3,
+          ],
         ];
       }
     }
@@ -442,7 +491,7 @@ class FilterHtml extends FilterBase {
     $output .= \Drupal::service('renderer')->render($table);
 
     $output .= '<p>' . $this->t('Most unusual characters can be directly entered without any problems.') . '</p>';
-    $output .= '<p>' . $this->t('If you do encounter problems, try using HTML character entities. A common example looks like &amp;amp; for an ampersand &amp; character. For a full list of entities see HTML\'s <a href=":html-entities">entities</a> page. Some of the available characters include:', [':html-entities' => 'http://www.w3.org/TR/html4/sgml/entities.html']) . '</p>';
+    $output .= '<p>' . $this->t('If you do encounter problems, try using HTML character entities. A common example looks like &amp;amp; for an ampersand &amp; character. For a full list of entities see HTML\'s <a href=":html-entities">entities</a> page. Some of the available characters include:', [':html-entities' => 'https://www.w3.org/TR/html4/sgml/entities.html']) . '</p>';
 
     $entities = [
       [$this->t('Ampersand'), '&amp;'],

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
@@ -11,17 +13,21 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Tests the core views_handler_area_display_link handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\DisplayLink
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaDisplayLinkTest extends ViewsKernelTestBase {
 
   /**
@@ -126,7 +132,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
   /**
    * Tests the views area display_link handler.
    */
-  public function testAreaDisplayLink() {
+  public function testAreaDisplayLink(): void {
     $view = Views::getView('test_view');
 
     // Assert only path-based displays are available in the display link
@@ -148,8 +154,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
 
     // Assert some special request parameters are filtered from the display
     // links.
-    $request_stack = new RequestStack();
-    $request_stack->push(Request::create('page_1', 'GET', [
+    $request = Request::create('page_1', 'GET', [
       'name' => 'John',
       'sort_by' => 'created',
       'sort_order' => 'ASC',
@@ -166,8 +171,9 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
       AjaxResponseSubscriber::AJAX_REQUEST_PARAMETER => 1,
       FormBuilderInterface::AJAX_FORM_REQUEST => 1,
       MainContentViewSubscriber::WRAPPER_FORMAT => 1,
-    ]));
-    $this->container->set('request_stack', $request_stack);
+    ]);
+    $request->setSession(new Session(new MockArraySessionStorage()));
+    $view->setRequest($request);
     $view->destroy();
     $view->setDisplay('page_1');
     $view->setCurrentPage(2);

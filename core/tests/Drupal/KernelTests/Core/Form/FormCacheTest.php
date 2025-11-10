@@ -1,27 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Form;
 
+use Drupal\Core\Form\FormBuilder;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests FormBuilder caching.
- *
- * @covers \Drupal\Core\Form\FormBuilder::getCache
- * @covers \Drupal\Core\Form\FormBuilder::setCache
- *
- * @group Form
  */
+#[Group('Form')]
+#[CoversMethod(FormBuilder::class, 'getCache')]
+#[CoversMethod(FormBuilder::class, 'setCache')]
+#[RunTestsInSeparateProcesses]
 class FormCacheTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'user'];
 
@@ -57,7 +60,7 @@ class FormCacheTest extends KernelTestBase {
   /**
    * Tests the form cache with a logged-in user.
    */
-  public function testCacheToken() {
+  public function testCacheToken(): void {
     \Drupal::currentUser()->setAccount(new UserSession(['uid' => 1]));
     \Drupal::formBuilder()->setCache($this->formBuildId, $this->form, $this->formState);
 
@@ -88,7 +91,7 @@ class FormCacheTest extends KernelTestBase {
   /**
    * Tests the form cache without a logged-in user.
    */
-  public function testNoCacheToken() {
+  public function testNoCacheToken(): void {
     // Switch to an anonymous user account.
     $account_switcher = \Drupal::service('account_switcher');
     $account_switcher->switchTo(new AnonymousUserSession());
@@ -109,7 +112,7 @@ class FormCacheTest extends KernelTestBase {
   /**
    * Tests the form cache with an overridden cache expiration.
    */
-  public function testCacheCustomExpiration() {
+  public function testCacheCustomExpiration(): void {
     // Override form cache expiration so that the cached form expired yesterday.
     new Settings(['form_cache_expiration' => -1 * (24 * 60 * 60), 'hash_salt' => $this->randomMachineName()]);
     \Drupal::formBuilder()->setCache($this->formBuildId, $this->form, $this->formState);

@@ -1,17 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\block\Entity\Block;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Who's Online Block.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class WhoIsOnlineBlockTest extends KernelTestBase {
+  use UserCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -71,16 +77,16 @@ class WhoIsOnlineBlockTest extends KernelTestBase {
   /**
    * Tests the Who's Online block.
    */
-  public function testWhoIsOnlineBlock() {
-    $request_time = \Drupal::time()->getRequestTime();
+  public function testWhoIsOnlineBlock(): void {
     // Generate users.
     $user1 = User::create([
       'name' => 'user1',
       'mail' => 'user1@example.com',
+      'roles' => [$this->createRole(['access user profiles'])],
     ]);
-    $user1->addRole('administrator');
     $user1->activate();
-    $user1->setLastAccessTime($request_time);
+    $requestTime = \Drupal::time()->getRequestTime();
+    $user1->setLastAccessTime($requestTime);
     $user1->save();
 
     $user2 = User::create([
@@ -88,7 +94,7 @@ class WhoIsOnlineBlockTest extends KernelTestBase {
       'mail' => 'user2@example.com',
     ]);
     $user2->activate();
-    $user2->setLastAccessTime($request_time + 1);
+    $user2->setLastAccessTime($requestTime + 1);
     $user2->save();
 
     $user3 = User::create([
@@ -97,7 +103,7 @@ class WhoIsOnlineBlockTest extends KernelTestBase {
     ]);
     $user3->activate();
     // Insert an inactive user who should not be seen in the block.
-    $inactive_time = $request_time - (60 * 60);
+    $inactive_time = $requestTime - (60 * 60);
     $user3->setLastAccessTime($inactive_time);
     $user3->save();
 
@@ -115,7 +121,8 @@ class WhoIsOnlineBlockTest extends KernelTestBase {
     $this->assertText($user2->getAccountName(), 'Active user 2 found in online list.');
     $this->assertNoText($user3->getAccountName(), 'Inactive user not found in online list.');
     // Verify that online users are ordered correctly.
-    $this->assertGreaterThan(strpos($this->getRawContent(), $user2->getAccountName()), strpos($this->getRawContent(), $user1->getAccountName()));
+    $raw_content = (string) $this->getRawContent();
+    $this->assertGreaterThan(strpos($raw_content, $user2->getAccountName()), strpos($raw_content, $user1->getAccountName()));
   }
 
 }

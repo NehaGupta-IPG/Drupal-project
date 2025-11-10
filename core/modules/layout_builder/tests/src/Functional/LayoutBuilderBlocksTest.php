@@ -1,22 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Functional;
 
+use Drupal\block_content\Entity\BlockContentType;
+use Drupal\Core\Url;
+use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\node\Entity\Node;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore blocktest
 /**
  * Tests the Layout Builder UI with blocks.
- *
- * @group layout_builder
- * @group #slow
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
 
   /**
    * Tests that block plugins can define custom attributes and contextual links.
    */
-  public function testPluginsProvidingCustomAttributesAndContextualLinks() {
+  public function testPluginsProvidingCustomAttributesAndContextualLinks(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -47,7 +54,7 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
   /**
    * Tests preview-aware layout & block plugins.
    */
-  public function testPreviewAwarePlugins() {
+  public function testPreviewAwarePlugins(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -79,23 +86,41 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Tests altering block definitions in the choose block controller.
+   *
+   * @see \Drupal\layout_builder_test\Hook\LayoutBuilderTestHooks::pluginFilterBlockLayoutBuilderAlter
    */
-  public function testLayoutBuilderChooseBlocksAlter() {
-    // See layout_builder_test_plugin_filter_block__layout_builder_alter().
+  public function testLayoutBuilderChooseBlocksAlter(): void {
+    \Drupal::service('module_installer')->install(['block_content']);
+
     $assert_session = $this->assertSession();
+
+    // Create 2 block content types so the inline block list displays.
+    BlockContentType::create([
+      'id' => 'not_hidden_type',
+      'label' => 'I can be added to all sections',
+    ])->save();
+    BlockContentType::create([
+      'id' => 'hidden_type',
+      'label' => 'I cannot be added to the first section',
+    ])->save();
 
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',
       'administer node display',
       'administer node fields',
+      'create and edit custom blocks',
     ]));
 
-    // From the manage display page, go to manage the layout.
-    $this->drupalGet('admin/structure/types/manage/bundle_with_section_field/display/default');
-    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
-    $assert_session->linkExists('Manage layout');
-    $this->clickLink('Manage layout');
+    // Enable layout builder and go to manage the layout.
+    LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default')
+      ->enableLayoutBuilder()
+      ->save();
+    $manageLayoutUrl = Url::fromRoute('layout_builder.defaults.node.view', [
+      'node_type' => 'bundle_with_section_field',
+      'view_mode_name' => 'default',
+    ]);
+    $this->drupalGet($manageLayoutUrl);
 
     // Add a new block.
     $this->clickLink('Add block');
@@ -117,9 +142,13 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
     // Verify that Changed block is not present on first section.
     $assert_session->linkNotExists('Changed');
 
+    // Verify the inline block list is also filtered.
+    $this->clickLink('Create content block');
+    $assert_session->linkExists('I can be added to all sections');
+    $assert_session->linkNotExists('I cannot be added to the first section');
+
     // Go back to Manage layout.
-    $this->drupalGet('admin/structure/types/manage/bundle_with_section_field/display/default');
-    $this->clickLink('Manage layout');
+    $this->drupalGet($manageLayoutUrl);
 
     // Add a new section.
     $this->clickLink('Add section', 1);
@@ -132,12 +161,16 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
 
     // Verify that Changed block is present on second section.
     $assert_session->linkExists('Changed');
+    // Verify the inline block type is present on the second section.
+    $this->clickLink('Create content block');
+    $assert_session->linkExists('I can be added to all sections');
+    $assert_session->linkExists('I cannot be added to the first section');
   }
 
   /**
    * Tests that deleting a View block used in Layout Builder works.
    */
-  public function testDeletedView() {
+  public function testDeletedView(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -179,7 +212,7 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
    * @see \Drupal\Core\Render\PreviewFallbackInterface::getPreviewFallbackString()
    * @see \Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray::onBuildRender()
    */
-  public function testBlockPlaceholder() {
+  public function testBlockPlaceholder(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -209,7 +242,7 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
     $assert_session->pageTextNotContains($block_content);
 
     // Set block content and reload the page.
-    \Drupal::state()->set('block_test.content', $block_content);
+    \Drupal::keyValue('block_test')->set('content', $block_content);
     $this->getSession()->reload();
 
     // The block placeholder is no longer displayed and the content is visible.
@@ -220,7 +253,7 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
   /**
    * Tests the ability to use a specified block label for field blocks.
    */
-  public function testFieldBlockLabel() {
+  public function testFieldBlockLabel(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -260,7 +293,7 @@ class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
   /**
    * Tests the Block UI when Layout Builder is installed.
    */
-  public function testBlockUiListing() {
+  public function testBlockUiListing(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

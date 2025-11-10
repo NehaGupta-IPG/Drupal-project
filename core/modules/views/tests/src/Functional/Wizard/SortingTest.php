@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Wizard;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ability of the views wizard to create views with sorts.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class SortingTest extends WizardTestBase {
 
   /**
@@ -26,13 +31,13 @@ class SortingTest extends WizardTestBase {
   /**
    * Tests the sorting functionality.
    */
-  public function testSorting() {
+  public function testSorting(): void {
     // Create nodes, each with a different creation time so that we can do a
     // meaningful sort.
     $this->drupalCreateContentType(['type' => 'page']);
-    $node1 = $this->drupalCreateNode(['created' => REQUEST_TIME]);
-    $node2 = $this->drupalCreateNode(['created' => REQUEST_TIME + 1]);
-    $node3 = $this->drupalCreateNode(['created' => REQUEST_TIME + 2]);
+    $node1 = $this->drupalCreateNode(['created' => \Drupal::time()->getRequestTime()]);
+    $node2 = $this->drupalCreateNode(['created' => \Drupal::time()->getRequestTime() + 1]);
+    $node3 = $this->drupalCreateNode(['created' => \Drupal::time()->getRequestTime() + 2]);
 
     // Create a view that sorts oldest first.
     $view1 = [];

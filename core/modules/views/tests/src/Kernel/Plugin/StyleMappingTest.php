@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Plugin;
 
-use Drupal\views\Views;
 use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests mapping style functionality.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class StyleMappingTest extends StyleTestBase {
-
-  protected static $modules = ['system'];
 
   /**
    * Views used by this test.
@@ -24,9 +26,9 @@ class StyleMappingTest extends StyleTestBase {
   /**
    * Verifies that the fields were mapped correctly.
    */
-  public function testMappedOutput() {
+  public function testMappedOutput(): void {
     $view = Views::getView('test_style_mapping');
-    $output = $this->mappedOutputHelper($view);
+    $output = (string) $this->mappedOutputHelper($view);
     $this->assertStringNotContainsString('job', $output, 'The job field is added to the view but not in the mapping.');
     $view->destroy();
 
@@ -45,9 +47,9 @@ class StyleMappingTest extends StyleTestBase {
    * @return string
    *   The view rendered as HTML.
    */
-  protected function mappedOutputHelper(ViewExecutable $view) {
+  protected function mappedOutputHelper(ViewExecutable $view): string {
     $output = $view->preview();
-    $rendered_output = \Drupal::service('renderer')->renderRoot($output);
+    $rendered_output = (string) \Drupal::service('renderer')->renderRoot($output);
     $this->storeViewPreview($rendered_output);
     $rows = $this->elements->body->div->div;
     $data_set = $this->dataSet();

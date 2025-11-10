@@ -1,24 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin\Discovery;
 
 use Drupal\Component\Discovery\YamlDirectoryDiscovery as ComponentYamlDirectoryDiscovery;
+use Drupal\Core\Plugin\Discovery\YamlDirectoryDiscovery;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
-use Drupal\Core\Plugin\Discovery\YamlDirectoryDiscovery;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\Discovery\YamlDirectoryDiscovery
- *
- * @group Plugin
+ * Tests Drupal\Core\Plugin\Discovery\YamlDirectoryDiscovery.
  */
+#[CoversClass(\Drupal\Core\Plugin\Discovery\YamlDirectoryDiscovery::class)]
+#[Group('Plugin')]
 class YamlDirectoryDiscoveryTest extends UnitTestCase {
 
   /**
-   * @covers ::getDefinitions
+   * Tests get definitions.
+   *
+   * @legacy-covers ::getDefinitions
    */
-  public function testGetDefinitions() {
+  public function testGetDefinitions(): void {
     vfsStream::setup('modules', NULL, [
       'module_a' => [
         'subdir1' => [
@@ -64,9 +70,11 @@ class YamlDirectoryDiscoveryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDefinitions
+   * Tests get definitions with translatable definitions.
+   *
+   * @legacy-covers ::getDefinitions
    */
-  public function testGetDefinitionsWithTranslatableDefinitions() {
+  public function testGetDefinitionsWithTranslatableDefinitions(): void {
     vfsStream::setup('modules', NULL, [
       'module_a' => [
         'subdir1' => [

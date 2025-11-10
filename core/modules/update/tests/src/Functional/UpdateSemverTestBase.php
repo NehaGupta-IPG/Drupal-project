@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\update\Functional;
 
 use Drupal\Tests\Traits\Core\CronRunTrait;
@@ -9,8 +11,6 @@ use Drupal\Tests\Traits\Core\CronRunTrait;
  *
  * For classes that extend this class, the XML fixtures they use will start with
  * ::$projectTitle.
- *
- * @group update
  */
 abstract class UpdateSemverTestBase extends UpdateTestBase {
 
@@ -18,11 +18,9 @@ abstract class UpdateSemverTestBase extends UpdateTestBase {
   use UpdateTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['update_test', 'update', 'language', 'block'];
+  protected static $modules = ['language', 'block'];
 
   /**
    * {@inheritdoc}
@@ -54,7 +52,7 @@ abstract class UpdateSemverTestBase extends UpdateTestBase {
    */
   protected function refreshUpdateStatus($xml_map, $url = 'update-test') {
     if (!isset($xml_map['drupal'])) {
-      $xml_map['drupal'] = '0.0';
+      $xml_map['drupal'] = '8.0.0';
     }
     parent::refreshUpdateStatus($xml_map, $url);
   }

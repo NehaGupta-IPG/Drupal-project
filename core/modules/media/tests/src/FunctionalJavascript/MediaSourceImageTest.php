@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\FunctionalJavascript;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
@@ -10,12 +12,14 @@ use Drupal\media\Entity\MediaType;
 use Drupal\media\Plugin\media\Source\Image;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the image media source.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaSourceImageTest extends MediaSourceTestBase {
 
   /**
@@ -26,7 +30,7 @@ class MediaSourceImageTest extends MediaSourceTestBase {
   /**
    * Tests the image media source.
    */
-  public function testMediaImageSource() {
+  public function testMediaImageSource(): void {
     $media_type_id = 'test_media_image_type';
     $source_field_id = 'field_media_image';
     $provided_fields = [
@@ -77,7 +81,7 @@ class MediaSourceImageTest extends MediaSourceTestBase {
     $image_element = $field->find('css', 'img');
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
     $file_url_generator = \Drupal::service('file_url_generator');
-    $expected_image_src = $file_url_generator->generateString(\Drupal::token()->replace('public://styles/large/public/[date:custom:Y]-[date:custom:m]/example_1.jpeg'));
+    $expected_image_src = $file_url_generator->generate(\Drupal::token()->replace('public://styles/large/public/[date:custom:Y]-[date:custom:m]/example_1.jpeg'))->toString();
     $this->assertStringContainsString($expected_image_src, $image_element->getAttribute('src'));
     $assert_session->elementNotExists('css', 'a', $field);
 
@@ -98,8 +102,6 @@ class MediaSourceImageTest extends MediaSourceTestBase {
       'administer media types',
       'administer media display',
       'view media',
-      // We need 'access content' for system.machine_name_transliterate.
-      'access content',
     ]));
 
     $page = $this->getSession()->getPage();
@@ -124,8 +126,6 @@ class MediaSourceImageTest extends MediaSourceTestBase {
       'administer media',
       'administer media types',
       'view media',
-      // We need 'access content' for system.machine_name_transliterate.
-      'access content',
     ]));
     // Test that hook_requirements adds warning about the lack of an image
     // style.

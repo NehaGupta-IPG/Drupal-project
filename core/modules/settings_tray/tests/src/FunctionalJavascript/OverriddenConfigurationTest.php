@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\settings_tray\FunctionalJavascript;
 
 use Drupal\block\Entity\Block;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests handling of configuration overrides.
- *
- * @group settings_tray
  */
+#[Group('settings_tray')]
+#[RunTestsInSeparateProcesses]
 class OverriddenConfigurationTest extends SettingsTrayTestBase {
 
   /**
@@ -44,7 +48,7 @@ class OverriddenConfigurationTest extends SettingsTrayTestBase {
   /**
    * Tests blocks with overridden related configuration removed when overridden.
    */
-  public function testOverriddenConfigurationRemoved() {
+  public function testOverriddenConfigurationRemoved(): void {
     $web_assert = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->grantPermissions(Role::load(Role::AUTHENTICATED_ID), ['administer site configuration', 'administer menu']);
@@ -117,7 +121,7 @@ class OverriddenConfigurationTest extends SettingsTrayTestBase {
   /**
    * Tests that blocks with configuration overrides are disabled.
    */
-  public function testOverriddenBlock() {
+  public function testOverriddenBlock(): void {
     $web_assert = $this->assertSession();
     $page = $this->getSession()->getPage();
     $overridden_block = $this->placeBlock('system_powered_by_block', [

@@ -1,20 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Plugin;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\PluginAwareInterface;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
-use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Plugin\PluginFormFactory;
+use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\PluginFormFactory
- * @group Plugin
+ * Tests Drupal\Core\Plugin\PluginFormFactory.
  */
+#[CoversClass(PluginFormFactory::class)]
+#[Group('Plugin')]
 class PluginFormFactoryTest extends UnitTestCase {
 
   /**
@@ -42,9 +47,11 @@ class PluginFormFactoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createInstance
+   * Tests create instance.
+   *
+   * @legacy-covers ::createInstance
    */
-  public function testCreateInstance() {
+  public function testCreateInstance(): void {
     $plugin_form = $this->prophesize(PluginFormInterface::class);
     $expected = $plugin_form->reveal();
 
@@ -59,9 +66,11 @@ class PluginFormFactoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createInstance
+   * Tests create instance using plugin.
+   *
+   * @legacy-covers ::createInstance
    */
-  public function testCreateInstanceUsingPlugin() {
+  public function testCreateInstanceUsingPlugin(): void {
     $this->classResolver->getInstanceFromDefinition(Argument::cetera())->shouldNotBeCalled();
 
     $plugin = $this->prophesize(PluginWithFormsInterface::class)->willImplement(PluginFormInterface::class);
@@ -73,9 +82,11 @@ class PluginFormFactoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createInstance
+   * Tests create instance using plugin with slashes.
+   *
+   * @legacy-covers ::createInstance
    */
-  public function testCreateInstanceUsingPluginWithSlashes() {
+  public function testCreateInstanceUsingPluginWithSlashes(): void {
     $this->classResolver->getInstanceFromDefinition(Argument::cetera())->shouldNotBeCalled();
 
     $plugin = $this->prophesize(PluginWithFormsInterface::class)->willImplement(PluginFormInterface::class);
@@ -87,9 +98,11 @@ class PluginFormFactoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createInstance
+   * Tests create instance default fallback.
+   *
+   * @legacy-covers ::createInstance
    */
-  public function testCreateInstanceDefaultFallback() {
+  public function testCreateInstanceDefaultFallback(): void {
     $this->classResolver->getInstanceFromDefinition(Argument::cetera())->shouldNotBeCalled();
 
     $plugin = $this->prophesize(PluginWithFormsInterface::class)->willImplement(PluginFormInterface::class);
@@ -102,9 +115,11 @@ class PluginFormFactoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createInstance
+   * Tests create instance plugin aware.
+   *
+   * @legacy-covers ::createInstance
    */
-  public function testCreateInstancePluginAware() {
+  public function testCreateInstancePluginAware(): void {
     $plugin_form = $this->prophesize(PluginFormInterface::class)->willImplement(PluginAwareInterface::class);
 
     $expected = $plugin_form->reveal();
@@ -122,9 +137,11 @@ class PluginFormFactoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createInstance
+   * Tests create instance definition exception.
+   *
+   * @legacy-covers ::createInstance
    */
-  public function testCreateInstanceDefinitionException() {
+  public function testCreateInstanceDefinitionException(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The "the_plugin_id" plugin did not specify a "anything" form class');
 
@@ -137,9 +154,11 @@ class PluginFormFactoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createInstance
+   * Tests create instance invalid exception.
+   *
+   * @legacy-covers ::createInstance
    */
-  public function testCreateInstanceInvalidException() {
+  public function testCreateInstanceInvalidException(): void {
     $this->expectException(InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage('The "the_plugin_id" plugin did not specify a valid "invalid" form class, must implement \Drupal\Core\Plugin\PluginFormInterface');
 

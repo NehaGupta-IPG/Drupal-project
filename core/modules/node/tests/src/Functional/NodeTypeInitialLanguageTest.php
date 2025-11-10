@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node type initial language settings.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTypeInitialLanguageTest extends NodeTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'field_ui'];
 
@@ -46,12 +48,13 @@ class NodeTypeInitialLanguageTest extends NodeTestBase {
    * The default initial language must be the site's default, and the language
    * locked option must be on.
    */
-  public function testNodeTypeInitialLanguageDefaults() {
+  public function testNodeTypeInitialLanguageDefaults(): void {
     $this->drupalGet('admin/structure/types/manage/article');
     $this->assertTrue($this->assertSession()->optionExists('edit-language-configuration-langcode', LanguageInterface::LANGCODE_SITE_DEFAULT)->isSelected());
     $this->assertSession()->checkboxNotChecked('edit-language-configuration-language-alterable');
 
-    // Tests if the language field cannot be rearranged on the manage fields tab.
+    // Tests if the language field cannot be rearranged on the manage fields
+    // tab.
     $this->drupalGet('admin/structure/types/manage/article/fields');
     $this->assertSession()->elementNotExists('xpath', '//*[@id="field-overview"]/*[@id="language"]');
 
@@ -109,7 +112,7 @@ class NodeTypeInitialLanguageTest extends NodeTestBase {
   /**
    * Tests language field visibility features.
    */
-  public function testLanguageFieldVisibility() {
+  public function testLanguageFieldVisibility(): void {
     // Creates a node to test Language field visibility feature.
     $edit = [
       'title[0][value]' => $this->randomMachineName(8),

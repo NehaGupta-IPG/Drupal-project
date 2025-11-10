@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_layout\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests using field layout for entity displays.
- *
- * @group field_layout
  */
+#[Group('field_layout')]
+#[RunTestsInSeparateProcesses]
 class FieldLayoutTest extends BrowserTestBase {
 
   /**
@@ -56,7 +60,7 @@ class FieldLayoutTest extends BrowserTestBase {
   /**
    * Tests an entity type that has fields shown by default.
    */
-  public function testNodeView() {
+  public function testNodeView(): void {
     // By default, the one-column layout is used.
     $this->drupalGet('node/1');
     $this->assertSession()->elementExists('css', '.layout--onecol');
@@ -70,7 +74,7 @@ class FieldLayoutTest extends BrowserTestBase {
   /**
    * Tests that changes to the regions still leave the fields visible.
    */
-  public function testRegionChanges() {
+  public function testRegionChanges(): void {
     $this->drupalGet('admin/structure/types/manage/article/display');
     $this->assertEquals(['Content', 'Disabled'], $this->getRegionTitles());
     $this->assertSession()->optionExists('fields[body][region]', 'content');
@@ -89,7 +93,7 @@ class FieldLayoutTest extends BrowserTestBase {
    * @return string[]
    *   An array of region titles.
    */
-  protected function getRegionTitles() {
+  protected function getRegionTitles(): array {
     $region_titles = [];
     $region_title_elements = $this->getSession()->getPage()->findAll('css', '.region-title td');
     /** @var \Behat\Mink\Element\NodeElement[] $region_title_elements */

@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\ckeditor5\Kernel;
 
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests configurable plugins.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class ConfigurablePluginTest extends KernelTestBase {
 
   /**
@@ -44,7 +49,7 @@ class ConfigurablePluginTest extends KernelTestBase {
   /**
    * Tests default settings for configurable CKEditor 5 plugins.
    */
-  public function testDefaults() {
+  public function testDefaults(): void {
     $all_definitions = $this->manager->getDefinitions();
     $configurable_definitions = array_filter($all_definitions, function (CKEditor5PluginDefinition $definition): bool {
       return $definition->isConfigurable();
@@ -92,6 +97,7 @@ class ConfigurablePluginTest extends KernelTestBase {
         'properties' => [
           'reversed' => TRUE,
           'startIndex' => TRUE,
+          'styles' => TRUE,
         ],
         'multiBlock' => TRUE,
       ],

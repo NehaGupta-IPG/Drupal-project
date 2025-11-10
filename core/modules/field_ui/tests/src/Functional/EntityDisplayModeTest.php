@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_ui\Functional;
 
 use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity display modes UI.
- *
- * @group field_ui
  */
+#[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class EntityDisplayModeTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'entity_test', 'field_ui', 'node'];
 
@@ -45,7 +47,7 @@ class EntityDisplayModeTest extends BrowserTestBase {
   /**
    * Tests the EntityViewMode user interface.
    */
-  public function testEntityViewModeUI() {
+  public function testEntityViewModeUI(): void {
     // Test the listing page.
     $this->drupalGet('admin/structure/display-modes/view');
     $this->assertSession()->statusCodeEquals(403);
@@ -64,6 +66,8 @@ class EntityDisplayModeTest extends BrowserTestBase {
 
     // Test adding a view mode including dots in machine_name.
     $this->clickLink('Test entity');
+    // Check if 'Name' field is required.
+    $this->assertTrue($this->getSession()->getPage()->findField('label')->hasClass('required'));
     $edit = [
       'id' => $this->randomMachineName() . '.' . $this->randomMachineName(),
       'label' => $this->randomString(),
@@ -100,7 +104,7 @@ class EntityDisplayModeTest extends BrowserTestBase {
   /**
    * Tests the EntityFormMode user interface.
    */
-  public function testEntityFormModeUI() {
+  public function testEntityFormModeUI(): void {
     // Test the listing page.
     $this->drupalGet('admin/structure/display-modes/form');
     $this->assertSession()->statusCodeEquals(403);
@@ -118,6 +122,8 @@ class EntityDisplayModeTest extends BrowserTestBase {
 
     // Test adding a view mode including dots in machine_name.
     $this->clickLink('Test entity');
+    // Check if 'Name' field is required.
+    $this->assertTrue($this->getSession()->getPage()->findField('label')->hasClass('required'));
     $edit = [
       'id' => $this->randomMachineName() . '.' . $this->randomMachineName(),
       'label' => $this->randomString(),
@@ -129,6 +135,7 @@ class EntityDisplayModeTest extends BrowserTestBase {
     $edit = [
       'id' => $this->randomMachineName(),
       'label' => $this->randomString(),
+      'description' => $this->randomString(),
     ];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains("Saved the {$edit['label']} form mode.");
@@ -158,7 +165,7 @@ class EntityDisplayModeTest extends BrowserTestBase {
    *
    * @see https://www.drupal.org/node/2858569
    */
-  public function testAlphabeticalDisplaySettings() {
+  public function testAlphabeticalDisplaySettings(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
       'administer content types',

@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\ckeditor5\FunctionalJavascript;
 
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore esque imageUpload sourceediting Editing's
-
 /**
  * Tests for CKEditor 5.
  *
- * @group ckeditor5
  * @internal
  */
+#[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
   /**
@@ -39,9 +43,9 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
   /**
    * The default allowed elements for filter_html's "allowed_html" setting.
    *
-   * @see \Drupal\filter\Plugin\Filter\FilterHtml
-   *
    * @var string
+   *
+   * @see \Drupal\filter\Plugin\Filter\FilterHtml
    */
   protected $defaultElementsWhenUpdatingNotCkeditor5 = "<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type='1 A I'> <li> <dl> <dt> <dd> <h2 id='jump-*'> <h3 id> <h4 id> <h5 id> <h6 id>";
 
@@ -50,12 +54,12 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
    *
    * @var string
    */
-  protected $defaultElementsAfterUpdatingToCkeditor5 = '<br> <p> <h2 id="jump-*"> <h3 id> <h4 id> <h5 id> <h6 id> <cite> <dl> <dt> <dd> <a hreflang href> <blockquote cite> <ul type> <ol type="1 A I" start> <strong> <em> <code> <li>';
+  protected $defaultElementsAfterUpdatingToCkeditor5 = '<br> <p> <h2 id="jump-*"> <h3 id> <h4 id> <h5 id> <h6 id> <cite> <dl> <dt> <dd> <a hreflang href> <blockquote cite> <strong> <em> <code> <ul type> <ol type reversed start> <li>';
 
   /**
    * Test enabling CKEditor 5 in a way that triggers validation.
    */
-  public function testEnablingToVersion5Validation() {
+  public function testEnablingToVersion5Validation(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -94,10 +98,10 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
         'status' => TRUE,
         'scheme' => 'public',
         'directory' => 'inline-images',
-        'max_size' => '',
+        'max_size' => NULL,
         'max_dimensions' => [
-          'width' => 0,
-          'height' => 0,
+          'width' => NULL,
+          'height' => NULL,
         ],
       ],
     ])->save();
@@ -126,7 +130,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
   /**
    * Confirm that switching to CKEditor 5 from another editor updates tags.
    */
-  public function testSwitchToVersion5() {
+  public function testSwitchToVersion5(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -160,7 +164,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
   /**
    * Tests that the img tag is added after enabling image uploads.
    */
-  public function testImgAddedViaUploadPlugin() {
+  public function testImgAddedViaUploadPlugin(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -232,7 +236,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
   /**
    * Test filter_html allowed tags.
    */
-  public function testAllowedTags() {
+  public function testAllowedTags(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -336,7 +340,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
   /**
    * Test that <drupal-media> is added to allowed tags when media embed enabled.
    */
-  public function testMediaElementAllowedTags() {
+  public function testMediaElementAllowedTags(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -415,7 +419,7 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
   /**
    * Tests full HTML text format.
    */
-  public function testFullHtml() {
+  public function testFullHtml(): void {
     FilterFormat::create(
       Yaml::parseFile('core/profiles/standard/config/install/filter.format.full_html.yml')
     )->save();

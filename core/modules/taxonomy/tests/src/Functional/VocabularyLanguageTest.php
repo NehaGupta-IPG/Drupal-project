@@ -1,17 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Entity\ContentLanguageSettings;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the language functionality for vocabularies.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class VocabularyLanguageTest extends TaxonomyTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['language'];
 
   /**
@@ -43,7 +50,7 @@ class VocabularyLanguageTest extends TaxonomyTestBase {
   /**
    * Tests language settings for vocabularies.
    */
-  public function testVocabularyLanguage() {
+  public function testVocabularyLanguage(): void {
     $this->drupalGet('admin/structure/taxonomy/add');
 
     // Check that we have the language selector available.
@@ -74,7 +81,7 @@ class VocabularyLanguageTest extends TaxonomyTestBase {
   /**
    * Tests term language settings for vocabulary terms are saved and updated.
    */
-  public function testVocabularyDefaultLanguageForTerms() {
+  public function testVocabularyDefaultLanguageForTerms(): void {
     // Add a new vocabulary and check that the default language settings are for
     // the terms are saved.
     $edit = [

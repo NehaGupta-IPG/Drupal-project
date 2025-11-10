@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
 use Drupal\Core\Url;
 use Drupal\field_ui\FieldUI;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the media library widget when no media types are available.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class WidgetWithoutTypesTest extends MediaLibraryTestBase {
 
   /**
@@ -25,7 +29,7 @@ class WidgetWithoutTypesTest extends MediaLibraryTestBase {
   /**
    * Tests that the widget works as expected when media types are deleted.
    */
-  public function testWidgetWithoutMediaTypes() {
+  public function testWidgetWithoutMediaTypes(): void {
     $assert_session = $this->assertSession();
 
     $user = $this->drupalCreateUser([

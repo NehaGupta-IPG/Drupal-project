@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config_translation\Functional;
 
 use Drupal\FunctionalTests\Installer\InstallerTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Installs the config translation module on a site installed in non english.
- *
- * @group config_translation
  */
+#[Group('config_translation')]
+#[RunTestsInSeparateProcesses]
 class ConfigTranslationInstallTest extends InstallerTestBase {
 
   use ContentTypeCreationTrait;
@@ -27,7 +31,7 @@ class ConfigTranslationInstallTest extends InstallerTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpLanguage() {
+  protected function setUpLanguage(): void {
     // Place custom local translations in the translations directory.
     mkdir(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
     file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0.eo.po', $this->getPo('eo'));
@@ -46,8 +50,8 @@ class ConfigTranslationInstallTest extends InstallerTestBase {
    * @return string
    *   Contents for the test .po file.
    */
-  protected function getPo($langcode) {
-    return <<<ENDPO
+  protected function getPo($langcode): string {
+    return <<<PO
 msgid ""
 msgstr ""
 
@@ -59,10 +63,13 @@ msgstr "Anonymous $langcode"
 
 msgid "Language"
 msgstr "Language $langcode"
-ENDPO;
+PO;
   }
 
-  public function testConfigTranslation() {
+  /**
+   * Tests install of Configuration Translation module.
+   */
+  public function testConfigTranslation(): void {
     \Drupal::service('module_installer')->install(['node', 'field_ui']);
     $this->createContentType(['type' => 'article']);
 

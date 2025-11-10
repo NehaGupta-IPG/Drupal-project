@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 
 use Drupal\node\Entity\Node;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal 6 upgrade using the migrate UI.
  *
  * The test method is provided by the MigrateUpgradeTestBase class.
- *
- * @group migrate_drupal_ui
- * @group #slow
  */
+#[Group('migrate_drupal_ui')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
 
   /**
@@ -20,11 +24,11 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
    */
   protected static $modules = [
     'config_translation',
+    'contact',
     'content_translation',
     'datetime_range',
     'language',
     'migrate_drupal_ui',
-    'statistics',
     'telephone',
     'update',
   ];
@@ -52,28 +56,34 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
     $this->nodeStorage->delete($this->nodeStorage->loadMultiple());
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal6.php');
+
+    $this->expectedLoggedErrors = 41;
+    // If saving the logs, then set the admin user.
+    if ($this->outputLogs) {
+      $this->migratedAdminUserName = 'admin';
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath() {
+  protected function getSourceBasePath(): string {
     return __DIR__ . '/files';
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getEntityCounts() {
+  protected function getEntityCounts(): array {
     return [
-      'block' => 37,
+      'block' => 36,
       'block_content' => 2,
       'block_content_type' => 1,
       'comment' => 8,
       // The 'standard' profile provides the 'comment' comment type, and the
       // migration creates 12 comment types, one per node type.
       'comment_type' => 14,
-      'contact_form' => 5,
+      'contact_form' => 4,
       'contact_message' => 0,
       'configurable_language' => 5,
       'editor' => 2,
@@ -90,7 +100,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'search_page' => 3,
       'shortcut' => 2,
       'shortcut_set' => 1,
-      'action' => 33,
+      'action' => 30,
       'menu' => 8,
       'path_alias' => 8,
       'taxonomy_term' => 15,
@@ -126,7 +136,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getAvailablePaths() {
+  protected function getAvailablePaths(): array {
     return [
       'Block',
       'Block translation',
@@ -153,7 +163,6 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'Path',
       'Profile translation',
       'Search',
-      'Statistics',
       'String translation',
       'Synchronize translations',
       'System',
@@ -180,18 +189,19 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getMissingPaths() {
+  protected function getMissingPaths(): array {
     return [
       'Aggregator',
       'Book',
       'Forum',
+      'Statistics',
     ];
   }
 
   /**
    * Executes all steps of migrations upgrade.
    */
-  public function testUpgradeAndIncremental() {
+  public function testUpgradeAndIncremental(): void {
     // Perform upgrade followed by an incremental upgrade.
     $this->doUpgradeAndIncremental();
 
@@ -201,6 +211,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
     $this->assertFollowUpMigrationResults();
     $this->assertEntityRevisionsCount('node', 26);
     $this->assertEmailsSent();
+    $this->assertLogError();
   }
 
   /**

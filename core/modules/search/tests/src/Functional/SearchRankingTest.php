@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
@@ -11,12 +13,14 @@ use Drupal\search\Entity\SearchPage;
 use Drupal\search\SearchIndexInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Indexes content and tests ranking factors.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchRankingTest extends BrowserTestBase {
 
   use CommentTestTrait;
@@ -59,7 +63,10 @@ class SearchRankingTest extends BrowserTestBase {
     ]));
   }
 
-  public function testRankings() {
+  /**
+   * Tests the impact of different ranking factors on search results.
+   */
+  public function testRankings(): void {
     // Add a comment field.
     $this->addDefaultCommentField('node', 'page');
 
@@ -77,7 +84,7 @@ class SearchRankingTest extends BrowserTestBase {
         'title' => 'Drupal rocks',
         'body' => [['value' => "Drupal's search rocks"]],
         // Node is one day old.
-        'created' => REQUEST_TIME - 24 * 3600,
+        'created' => \Drupal::time()->getRequestTime() - 24 * 3600,
         'sticky' => 0,
         'promote' => 0,
       ];
@@ -95,7 +102,7 @@ class SearchRankingTest extends BrowserTestBase {
 
             case 'recent':
               // Node is 1 hour hold.
-              $settings['created'] = REQUEST_TIME - 3600;
+              $settings['created'] = \Drupal::time()->getRequestTime() - 3600;
               break;
 
             case 'comments':
@@ -209,7 +216,7 @@ class SearchRankingTest extends BrowserTestBase {
   /**
    * Tests rankings of HTML tags.
    */
-  public function testHTMLRankings() {
+  public function testHTMLRankings(): void {
     $full_html_format = FilterFormat::create([
       'format' => 'full_html',
       'name' => 'Full HTML',
@@ -230,7 +237,12 @@ class SearchRankingTest extends BrowserTestBase {
     foreach ($shuffled_tags as $tag) {
       switch ($tag) {
         case 'a':
-          $settings['body'] = [['value' => Link::fromTextAndUrl('Drupal Rocks', Url::fromRoute('<front>'))->toString(), 'format' => 'full_html']];
+          $settings['body'] = [
+            [
+              'value' => Link::fromTextAndUrl('Drupal Rocks', Url::fromRoute('<front>'))->toString(),
+              'format' => 'full_html',
+            ],
+          ];
           break;
 
         case 'NoTag':

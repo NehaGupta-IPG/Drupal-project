@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\comment\Tests\CommentTestTrait;
@@ -9,17 +11,20 @@ use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
+use Drupal\node\NodePreviewMode;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the node entity preview functionality.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class PagePreviewTest extends NodeTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -193,7 +198,7 @@ class PagePreviewTest extends NodeTestBase {
   /**
    * Checks the node preview functionality.
    */
-  public function testPagePreview() {
+  public function testPagePreview(): void {
     $title_key = 'title[0][value]';
     $body_key = 'body[0][value]';
     $term_key = $this->fieldName . '[target_id]';
@@ -227,7 +232,7 @@ class PagePreviewTest extends NodeTestBase {
     // Get the UUID.
     $url = parse_url($this->getUrl());
     $paths = explode('/', $url['path']);
-    $view_mode = array_pop($paths);
+    array_pop($paths);
     $uuid = array_pop($paths);
 
     // Switch view mode. We'll remove the body from the teaser view mode.
@@ -332,7 +337,7 @@ class PagePreviewTest extends NodeTestBase {
 
     // Check with required preview.
     $node_type = NodeType::load('page');
-    $node_type->setPreviewMode(DRUPAL_REQUIRED);
+    $node_type->setPreviewMode(NodePreviewMode::Required);
     $node_type->save();
     $this->drupalGet('node/add/page');
     $this->assertSession()->responseNotContains('edit-submit');
@@ -447,7 +452,7 @@ class PagePreviewTest extends NodeTestBase {
   /**
    * Checks the node preview functionality, when using revisions.
    */
-  public function testPagePreviewWithRevisions() {
+  public function testPagePreviewWithRevisions(): void {
     $title_key = 'title[0][value]';
     $body_key = 'body[0][value]';
     $term_key = $this->fieldName . '[target_id]';
@@ -503,7 +508,7 @@ class PagePreviewTest extends NodeTestBase {
   /**
    * Checks the node preview accessible for simultaneous node editing.
    */
-  public function testSimultaneousPreview() {
+  public function testSimultaneousPreview(): void {
     $title_key = 'title[0][value]';
     $node = $this->drupalCreateNode([]);
 
@@ -520,14 +525,17 @@ class PagePreviewTest extends NodeTestBase {
     $edit2 = [$title_key => 'Another page title'];
     $this->drupalGet('node/' . $node->id() . '/edit');
     $this->submitForm($edit2, 'Preview');
-    $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', ['node_preview' => $node->uuid(), 'view_mode_id' => 'full']));
+    $this->assertSession()->addressEquals(Url::fromRoute('entity.node.preview', [
+      'node_preview' => $node->uuid(),
+      'view_mode_id' => 'full',
+    ]));
     $this->assertSession()->pageTextContains($edit2[$title_key]);
   }
 
   /**
    * Tests node preview with dynamic_page_cache and anonymous users.
    */
-  public function testPagePreviewCache() {
+  public function testPagePreviewCache(): void {
     \Drupal::service('module_installer')->uninstall(['node_test']);
     $this->drupalLogout();
     $title_key = 'title[0][value]';

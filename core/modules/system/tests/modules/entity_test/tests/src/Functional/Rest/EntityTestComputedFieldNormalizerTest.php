@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\entity_test\Functional\Rest;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Tests\rest\Functional\AnonResourceTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test normalization of computed field.
- *
- * @group rest
  */
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class EntityTestComputedFieldNormalizerTest extends EntityTestResourceTestBase {
 
   use AnonResourceTestTrait;
@@ -56,6 +60,12 @@ class EntityTestComputedFieldNormalizerTest extends EntityTestResourceTestBase {
         'value' => 'computed test cacheable string field',
       ],
     ];
+    // @see \Drupal\entity_test\Plugin\Field\ComputedTestCacheableIntegerItemList::computeValue().
+    $expected['computed_test_cacheable_integer_field'] = [
+      [
+        'value' => 0,
+      ],
+    ];
 
     $expected['uuid'] = [
       0 => [
@@ -83,7 +93,7 @@ class EntityTestComputedFieldNormalizerTest extends EntityTestResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testPost() {
+  public function testPost(): void {
     // Post test not required.
     $this->markTestSkipped();
   }
@@ -91,7 +101,7 @@ class EntityTestComputedFieldNormalizerTest extends EntityTestResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testPatch() {
+  public function testPatch(): void {
     // Patch test not required.
     $this->markTestSkipped();
   }
@@ -99,7 +109,7 @@ class EntityTestComputedFieldNormalizerTest extends EntityTestResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testDelete() {
+  public function testDelete(): void {
     // Delete test not required.
     $this->markTestSkipped();
   }

@@ -15,7 +15,7 @@
 .skip-link {
   display: block;
   width: 100%;
-  max-width: var(--max-bg-color);
+  max-width: calc(var(--max-bg-color) + var(--drupal-displace-offset-left, 0px));
   padding-block: var(--sp0-5);
   padding-inline-start: var(--sp);
   padding-inline-end: var(--sp);
@@ -24,16 +24,16 @@
   color: var(--color--white);
   outline: 0;
   background-color: var(--color--gray-5);
-}
 
-.skip-link:hover {
-  -webkit-text-decoration: underline;
-  text-decoration: underline;
-  color: var(--color--white);
-}
+  &:hover {
+    -webkit-text-decoration: underline;
+    text-decoration: underline;
+    color: var(--color--white);
+  }
 
-.skip-link::after {
-  content: "\0020	➔";
+  &::after {
+    content: "\0020	➔";
+  }
 }
 
 .skip-link.focusable:focus {

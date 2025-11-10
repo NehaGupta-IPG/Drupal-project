@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Unit\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -12,13 +14,17 @@ use Drupal\user\Plugin\Validation\Constraint\UserMailRequired;
 use Drupal\user\Plugin\Validation\Constraint\UserMailRequiredValidator;
 use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Prophet;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * @coversDefaultClass \Drupal\user\Plugin\Validation\Constraint\UserMailRequiredValidator
- * @group user
+ * Tests Drupal\user\Plugin\Validation\Constraint\UserMailRequiredValidator.
  */
+#[CoversClass(UserMailRequiredValidator::class)]
+#[Group('user')]
 class UserMailRequiredValidatorTest extends UnitTestCase {
 
   /**
@@ -52,11 +58,12 @@ class UserMailRequiredValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests validate.
    *
-   * @dataProvider providerTestValidate
+   * @legacy-covers ::validate
    */
-  public function testValidate($items, $expected_violation, $is_admin = FALSE) {
+  #[DataProvider('providerTestValidate')]
+  public function testValidate($items, $expected_violation, $is_admin = FALSE): void {
     $constraint = new UserMailRequired();
 
     // If a violation is expected, then the context's addViolation method will
@@ -146,7 +153,11 @@ class UserMailRequiredValidatorTest extends UnitTestCase {
     $account->getFieldDefinition("mail")->willReturn($field_definition->reveal())->shouldBeCalledTimes(1);
     $items->getEntity()->willReturn($account->reveal())->shouldBeCalledTimes(1);
     $items->isEmpty()->willReturn(TRUE);
-    $cases['Existing users without an email should be ignored if the current user is an administrator.'] = [$items->reveal(), FALSE, TRUE];
+    $cases['Existing users without an email should be ignored if the current user is an administrator.'] = [
+      $items->reveal(),
+      FALSE,
+      TRUE,
+    ];
 
     return $cases;
   }

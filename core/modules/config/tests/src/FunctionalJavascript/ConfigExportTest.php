@@ -1,20 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\config\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the config export form.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigExportTest extends WebDriverTestBase {
+
+  use BlockContentCreationTrait;
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['config', 'system'];
+  protected static $modules = ['config', 'system', 'block', 'block_content'];
 
   /**
    * {@inheritdoc}
@@ -22,11 +29,46 @@ class ConfigExportTest extends WebDriverTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * A prefix string used in naming the test blocks.
+   *
+   * @var string
+   */
+  protected string $blockNamePrefix = 'aaaaaa_config_export_test_block';
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer blocks',
+      'access block library',
+      'administer block types',
+      'administer block content',
+    ]));
+
+    // Create test blocks, so we know what the titles will be to check their
+    // order.
+    foreach ([1, 2, 3, 4] as $num) {
+      $block_name = $this->blockNamePrefix . $num;
+      $new_block = $this->createBlockContent($block_name);
+      $this->drupalPlaceBlock('block_content:' . $new_block->uuid(), [
+        'id' => $block_name,
+        'label' => $this->randomMachineName(),
+        'theme' => $this->defaultTheme,
+        'region' => 'sidebar_first',
+      ]);
+    }
+  }
+
+  /**
    * Tests Ajax form functionality on the config export page.
    */
-  public function testAjaxOnExportPage() {
+  public function testAjaxOnExportPage(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'export configuration',
+      'administer blocks',
     ]));
 
     $page = $this->getSession()->getPage();
@@ -51,6 +93,18 @@ class ConfigExportTest extends WebDriverTestBase {
     $page->selectFieldOption('config_type', 'Action');
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->fieldValueEquals('export', '');
+
+    // Check that the 'Configuration name' list is sorted alphabetically by ID,
+    // which always begins with our prefix, and not the label, which is
+    // randomized.
+    $page->selectFieldOption('config_type', 'Block');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $options = $page->findField('config_name')->findAll('css', 'option');
+    foreach ([1, 2, 3, 4] as $num) {
+      $block_name = $this->blockNamePrefix . $num;
+      $this->assertStringStartsWith($block_name, $options[$num]->getText());
+      $this->assertEquals($block_name, $options[$num]->getValue());
+    }
   }
 
 }

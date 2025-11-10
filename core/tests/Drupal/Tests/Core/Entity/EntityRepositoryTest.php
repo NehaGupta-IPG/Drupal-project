@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -10,12 +12,15 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\EntityRepository
- * @group Entity
+ * Tests Drupal\Core\Entity\EntityRepository.
  */
+#[CoversClass(EntityRepository::class)]
+#[Group('Entity')]
 class EntityRepositoryTest extends UnitTestCase {
 
   /**
@@ -62,9 +67,9 @@ class EntityRepositoryTest extends UnitTestCase {
   /**
    * Tests the getTranslationFromContext() method.
    *
-   * @covers ::getTranslationFromContext
+   * @legacy-covers ::getTranslationFromContext
    */
-  public function testGetTranslationFromContext() {
+  public function testGetTranslationFromContext(): void {
     $language = new Language(['id' => 'en']);
     $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)
       ->willReturn($language)

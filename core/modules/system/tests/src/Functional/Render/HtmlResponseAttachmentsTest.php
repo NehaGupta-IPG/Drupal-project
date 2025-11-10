@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Render;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Functional tests for HtmlResponseAttachmentsProcessor.
- *
- * @group Render
  */
+#[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class HtmlResponseAttachmentsTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['render_attached_test'];
 
@@ -26,7 +28,7 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
   /**
    * Tests rendering of ['#attached'].
    */
-  public function testAttachments() {
+  public function testAttachments(): void {
     // Test ['#attached']['http_header] = ['Status', $code].
     $this->drupalGet('/render_attached_test/teapot');
     $this->assertSession()->statusCodeEquals(418);
@@ -77,7 +79,7 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
   /**
    * Tests caching of ['#attached'].
    */
-  public function testRenderCachedBlock() {
+  public function testRenderCachedBlock(): void {
     // Make sure our test block is visible.
     $this->drupalPlaceBlock('attached_rendering_block', ['region' => 'content']);
 
