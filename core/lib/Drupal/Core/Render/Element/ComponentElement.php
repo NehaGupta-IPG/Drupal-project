@@ -7,8 +7,10 @@ use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Component\Exception\InvalidComponentDataException;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Template\Attribute;
+use Twig\Markup as TwigMarkup;
 
 /**
  * Provides a Single-Directory Component render element.
@@ -137,19 +139,31 @@ class ComponentElement extends RenderElementBase implements FormElementInterface
     $template .= sprintf('{%% embed \'%s\' %%}', $id);
     $template .= PHP_EOL;
     foreach ($slots as $slot_name => $slot_value) {
-      if (\is_scalar($slot_value)) {
+      if (\is_scalar($slot_value) || $slot_value instanceof \Stringable) {
+        // Ensure that strings are properly escaped.
         $slot_value = [
           "#plain_text" => (string) $slot_value,
         ];
       }
-      if ($slot_value instanceof MarkupInterface) {
+      if ($slot_value === NULL) {
+        // NULL may be return value of callbacks like EntityInterface::label().
+        $slot_value = [];
+      }
+      if (($slot_value instanceof MarkupInterface) || ($slot_value instanceof TwigMarkup)) {
+        // Mark value as safe for rendering.
         $slot_value = [
-          "#markup" => $slot_value,
+          '#markup' => $slot_value,
         ];
       }
-      if (!Element::isRenderArray($slot_value)) {
+      if ($slot_value instanceof RenderableInterface) {
+        // Return the wrapped renderable (array) of the renderable (object).
+        $slot_value = $slot_value->toRenderable();
+      }
+
+      // Check the final render array. Note ::isRenderArray([]) === FALSE.
+      if ($slot_value !== [] && !Element::isRenderArray($slot_value)) {
         $message = sprintf(
-          'Unable to render component "%s". A render array or a scalar is expected for the slot "%s" when using the render element with the "#slots" property',
+          'Unable to render component "%s". A scalar, render array, markup, or RenderableInterface is expected for the slot "%s" when using the render element with the "#slots" property',
           $id,
           $slot_name
         );
