@@ -136,7 +136,7 @@ class ConfigTranslationUiSiteInformationTest extends ConfigTranslationUiTestBase
     $site_name = 'Site name for testing configuration translation';
     $site_slogan = 'Site slogan for testing configuration translation';
     $site_frontpage = '/node';
-    $fr_site_frontpage = '/admin/config';
+    $fr_site_frontpage = '/entity_test/list';
     $translation_base_url = 'admin/config/system/site-information/translate';
     $this->setSiteInformation($site_name, $site_slogan, $site_frontpage);
 
