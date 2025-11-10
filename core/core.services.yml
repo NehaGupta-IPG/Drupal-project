@@ -1610,6 +1610,7 @@ services:
       - '@>batch.storage'
       - '@>path.validator'
       - '@>form_submitter'
+      - '@>callable_resolver'
   Drupal\Core\Batch\BatchProcessorInterface: '@batch.processor'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage

@@ -17,6 +17,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -82,6 +83,8 @@ class BatchProcessor implements BatchProcessorInterface {
    *   The path validator.
    * @param \Closure $formSubmitter
    *   The form submitter.
+   * @param \Closure $callableResolver
+   *   The callable resolver.
    */
   public function __construct(
     protected readonly string $root,
@@ -94,6 +97,7 @@ class BatchProcessor implements BatchProcessorInterface {
     protected readonly \Closure $batchStorage,
     protected readonly \Closure $pathValidator,
     protected readonly \Closure $formSubmitter,
+    protected readonly \Closure $callableResolver,
   ) {}
 
   /**
@@ -324,8 +328,9 @@ class BatchProcessor implements BatchProcessorInterface {
         $query_options['op'] = 'start';
         $query_options['id'] = static::$batch['id'];
         $batch_url->setOption('query', $query_options);
-        if (($function = static::$batch['redirect_callback']) && function_exists($function)) {
-          $function($batch_url->toString(), ['query' => $query_options]);
+        if (($callback = static::$batch['redirect_callback'])) {
+          $callable = $this->getCallableResolver()->getCallableFromDefinition($callback);
+          $callable($batch_url->toString(), ['query' => $query_options]);
         }
         else {
           return new RedirectResponse($batch_url->setAbsolute()->toString(TRUE)->getGeneratedUrl());
@@ -392,7 +397,8 @@ class BatchProcessor implements BatchProcessorInterface {
           'finished' => &$finished,
           'message'  => &$task_message,
         ];
-        call_user_func_array($callback, array_merge($args, [&$batch_context]));
+        $callable = $this->getCallableResolver()->getCallableFromDefinition($callback);
+        $callable(...array_merge($args, [&$batch_context]));
 
         if ($finished >= 1) {
           // Make sure this step is not counted twice when computing $current.
@@ -485,7 +491,7 @@ class BatchProcessor implements BatchProcessorInterface {
    */
   public function nextSet(): bool {
     $set_indexes = array_keys(static::$batch['sets']);
-    $current_set_index_key = array_search(static::$batch['current_set'], $set_indexes);
+    $current_set_index_key = array_search(static::$batch['current_set'], $set_indexes, TRUE);
     if (isset($set_indexes[$current_set_index_key + 1])) {
       static::$batch['current_set'] = $set_indexes[$current_set_index_key + 1];
       $current_set = &$this->getCurrentSet();
@@ -493,7 +499,8 @@ class BatchProcessor implements BatchProcessorInterface {
         // We use our stored copies of $form and $form_state to account for
         // possible alterations by previous form submit handlers.
         $complete_form = &static::$batch['form_state']->getCompleteForm();
-        call_user_func_array($callback, [&$complete_form, &static::$batch['form_state']]);
+        $callable = $this->getCallableResolver()->getCallableFromDefinition($callback);
+        $callable(...[&$complete_form, static::$batch['form_state']]);
       }
       return TRUE;
     }
@@ -516,24 +523,20 @@ class BatchProcessor implements BatchProcessorInterface {
         if (isset($batch_set['file']) && is_file($batch_set['file'])) {
           include_once $this->root . '/' . $batch_set['file'];
         }
-        if (is_callable($batch_set['finished'])) {
-          $queue = $this->getQueue($batch_set);
-          $operations = $queue->getAllItems();
-          $batch_set_result = call_user_func_array(
-            $batch_set['finished'],
-            [
-              $batch_set['success'],
-              $batch_set['results'],
-              $operations,
-              $this->dateFormatter->formatInterval((int) ($batch_set['elapsed'] / 1000)),
-            ],
-          );
-          // If a batch 'finished' callback requested a redirect after the
-          // batch is complete, save that for later use. If more than one batch
-          // set returned a redirect, the last one is used.
-          if ($batch_set_result instanceof RedirectResponse) {
-            $batch_finished_redirect = $batch_set_result;
-          }
+        $queue = $this->getQueue($batch_set);
+        $operations = $queue->getAllItems();
+        $callable = $this->getCallableResolver()->getCallableFromDefinition($batch_set['finished']);
+        $batch_set_result = $callable(...array_merge([
+          $batch_set['success'],
+          $batch_set['results'],
+          $operations,
+          $this->dateFormatter->formatInterval((int) ($batch_set['elapsed'] / 1000)),
+        ]));
+        // If a batch 'finished' callback requested a redirect after the batch
+        // is complete, save that for later use. If more than one batch set
+        // returned a redirect, the last one is used.
+        if ($batch_set_result instanceof RedirectResponse) {
+          $batch_finished_redirect = $batch_set_result;
         }
       }
     }
@@ -661,6 +664,16 @@ class BatchProcessor implements BatchProcessorInterface {
    */
   protected function getBatchStorage(): BatchStorageInterface {
     return ($this->batchStorage)();
+  }
+
+  /**
+   * Gets the callable resolver.
+   *
+   * @return \Drupal\Core\Utility\CallableResolver
+   *   The callable resolver.
+   */
+  protected function getCallableResolver(): CallableResolver {
+    return ($this->callableResolver)();
   }
 
   /**

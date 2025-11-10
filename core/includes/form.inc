@@ -8,8 +8,6 @@
 use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Form\FormPreprocess;
 use Drupal\Core\Url;
-use Drupal\Core\Utility\CallableResolver;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Prepares variables for select element templates.
