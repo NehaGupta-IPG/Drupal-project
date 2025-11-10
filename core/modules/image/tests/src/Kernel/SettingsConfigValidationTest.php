@@ -6,10 +6,14 @@ namespace Drupal\Tests\image\Kernel;
 
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group image
+ * Tests Settings Config Validation.
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class SettingsConfigValidationTest extends KernelTestBase {
 
   /**

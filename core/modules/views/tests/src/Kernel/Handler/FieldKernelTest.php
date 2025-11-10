@@ -8,13 +8,16 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the generic field handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\field\FieldPluginBase
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FieldKernelTest extends ViewsKernelTestBase {
 
   /**
@@ -808,7 +811,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
       $this->assertEquals($expect[$key], $result_text);
     }
 
-    // Test also word_boundary
+    // Test also word_boundary.
     $alter['word_boundary'] = TRUE;
     $expect = [
       'Tuy nhiên',

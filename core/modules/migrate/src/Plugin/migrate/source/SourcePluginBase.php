@@ -293,7 +293,12 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
     $result = TRUE;
     try {
       $result_hook = $this->getModuleHandler()->invokeAll('migrate_prepare_row', [$row, $this, $this->migration]);
-      $result_named_hook = $this->getModuleHandler()->invokeAll('migrate_' . $this->migration->id() . '_prepare_row', [$row, $this, $this->migration]);
+      $result_named_hook = $this->getModuleHandler()
+        ->invokeAll('migrate_' . $this->migration->id() . '_prepare_row', [
+          $row,
+          $this,
+          $this->migration,
+        ]);
       // We will skip if any hook returned FALSE.
       $skip = ($result_hook && in_array(FALSE, $result_hook)) || ($result_named_hook && in_array(FALSE, $result_named_hook));
       $save_to_map = TRUE;
@@ -609,15 +614,15 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * {@inheritdoc}
    */
   public function preRollback(MigrateRollbackEvent $event) {
-    // Nothing to do in this implementation.
+    // Reset the high-water mark.
+    $this->saveHighWater(NULL);
   }
 
   /**
    * {@inheritdoc}
    */
   public function postRollback(MigrateRollbackEvent $event) {
-    // Reset the high-water mark.
-    $this->saveHighWater(NULL);
+    // Nothing to do in this implementation.
   }
 
   /**

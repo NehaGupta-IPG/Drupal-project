@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests redundant status filter warnings raised by node_requirements().
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeRequirementsStatusFilterWarningTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -24,7 +27,6 @@ class NodeRequirementsStatusFilterWarningTest extends KernelTestBase {
     'system',
     'user',
     'node',
-    'text',
     'field',
     'views',
   ];
@@ -77,7 +79,7 @@ class NodeRequirementsStatusFilterWarningTest extends KernelTestBase {
 
     $requirements = $this->getRequirements();
     $this->assertArrayHasKey('node_status_filter', $requirements);
-    $this->assertEquals(REQUIREMENT_WARNING, $requirements['node_status_filter']['severity']);
+    $this->assertEquals(RequirementSeverity::Warning, $requirements['node_status_filter']['severity']);
   }
 
   /**
@@ -102,7 +104,7 @@ class NodeRequirementsStatusFilterWarningTest extends KernelTestBase {
 
     $requirements = $this->getRequirements();
     $this->assertArrayHasKey('node_status_filter', $requirements);
-    $this->assertEquals(REQUIREMENT_WARNING, $requirements['node_status_filter']['severity']);
+    $this->assertEquals(RequirementSeverity::Warning, $requirements['node_status_filter']['severity']);
   }
 
   /**

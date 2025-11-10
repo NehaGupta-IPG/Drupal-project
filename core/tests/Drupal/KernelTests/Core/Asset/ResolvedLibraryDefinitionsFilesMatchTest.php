@@ -6,6 +6,9 @@ namespace Drupal\KernelTests\Core\Asset;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the asset files for all core libraries exist.
@@ -13,10 +16,10 @@ use Drupal\KernelTests\KernelTestBase;
  * This test also changes the active theme to each core theme to verify
  * the libraries after theme-level libraries-override and libraries-extend are
  * applied.
- *
- * @group Asset
- * @group #slow
  */
+#[Group('Asset')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
 
   /**
@@ -155,15 +158,16 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
     }
     sort($this->allModules);
     $this->container->get('module_installer')->install($this->allModules);
+    // Get a library discovery from the new container.
+    $this->libraryDiscovery = $this->container->get('library.discovery');
 
     $this->assertLibraries();
   }
 
   /**
    * Ensures that module and theme library files exist for a deprecated modules.
-   *
-   * @group legacy
    */
+  #[IgnoreDeprecations]
   public function testCoreLibraryCompletenessDeprecated(): void {
     // Find and install deprecated modules to test.
     $all_modules = $this->container->get('extension.list.module')->getList();
@@ -174,6 +178,7 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
       }
     });
     $this->container->get('module_installer')->install(array_keys($deprecated_modules_to_test));
+    $this->libraryDiscovery = $this->container->get('library.discovery');
     $this->allModules = array_keys(\Drupal::moduleHandler()->getModuleList());
 
     $this->assertLibraries();
