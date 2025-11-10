@@ -290,12 +290,10 @@ class ConfigActionManager extends DefaultPluginManager {
    *   The data to process. If this is an array, it'll be processed recursively.
    * @param array $replacements
    *   An array whose keys are the placeholders to replace in the data, and
-   *   whose values are the the replacements. Normally this will only mention
-   *   the `%bundle` and `%label` placeholders. If $data is an array, the only
-   *   placeholder that is replaced in the array's keys is `%bundle`.
+   *   whose values are the the replacements.
    *
    * @return mixed
-   *   The given $data, with the `%bundle` and `%label` placeholders replaced.
+   *   The given $data, with the placeholders replaced.
    */
   public static function replacePlaceholders(mixed $data, array $replacements): mixed {
     if (is_string($data)) {
