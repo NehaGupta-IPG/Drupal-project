@@ -130,7 +130,6 @@ abstract class LocalStream implements StreamWrapperInterface {
     }
 
     $realpath = realpath($path);
-    $file_system = \Drupal::service('file_system');
     if (!$realpath) {
       // This file does not yet exist.
       $realpath = realpath(dirname($path)) . '/' . basename($path);
