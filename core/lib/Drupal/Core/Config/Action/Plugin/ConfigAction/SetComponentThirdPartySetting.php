@@ -48,7 +48,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  *     # It is possible to set third-party settings on multiple components.
  *     core.entity_view_display.user.user.compact:
- *       setComponentThirdPartySetting:
+ *       setComponentThirdPartySettings:
  *         -
  *           component: user_picture
  *           provider: system
