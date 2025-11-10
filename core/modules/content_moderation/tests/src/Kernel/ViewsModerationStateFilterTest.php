@@ -40,7 +40,6 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
     'workflow_type_test',
     'entity_test',
     'language',
-    'content_translation',
   ];
 
   /**
@@ -363,7 +362,7 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
   /**
    * Assert the plugin states.
    *
-   * @param string[] $states
+   * @param string[][] $states
    *   The states which should appear in the filter.
    *
    * @internal
