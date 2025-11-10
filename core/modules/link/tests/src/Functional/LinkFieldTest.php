@@ -13,6 +13,7 @@ use Drupal\link\LinkItemInterface;
 use Drupal\link\LinkTitleVisibility;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -24,7 +25,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class LinkFieldTest extends BrowserTestBase {
 
-\PathAliasTestTrait
+use PathAliasTestTrait;
 
 /**
  * {@inheritdoc}
@@ -518,14 +519,19 @@ protected function assertDeletedEntries(string $field_name, array $valid_entries
     $entities_created[] = $this->getUrl();
   }
   // Delete the referenced node.
-  $referenced_node = $this->container->get('entity_type.manager')->getStorage('node')->load('1');
+  $referenced_node = $this->container->get('entity_type.manager')
+    ->getStorage('node')
+    ->load('1');
   $node_title = $referenced_node->label();
   $referenced_node->delete();
   foreach ($entities_created as $entity_edit_path) {
     $this->drupalGet($entity_edit_path);
-    $this->assertSession()->fieldValueNotEquals("{$field_name}[0][uri]", $node_title . ' (1)');
-    $this->assertSession()->fieldValueNotEquals("{$field_name}[0][uri]", "entity:node/1");
+    $this->assertSession()
+      ->fieldValueNotEquals("{$field_name}[0][uri]", $node_title . ' (1)');
+    $this->assertSession()
+      ->fieldValueNotEquals("{$field_name}[0][uri]", "entity:node/1");
   }
+}
 
   /**
    * Test link widget exception handled if link uri value is invalid.
