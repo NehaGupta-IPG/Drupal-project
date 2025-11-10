@@ -86,7 +86,7 @@ interface ConditionInterface {
   /**
    * Compiles this conditional clause.
    *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param mixed $query
    *   The query object this conditional clause belongs to.
    */
   public function compile($query);
