@@ -111,14 +111,14 @@ class DateRangeFieldItemList extends DateTimeFieldItemList {
       $default_values = [[]];
 
       if (!empty($default_value[0]['default_date_type'])) {
-        $start_date = new DrupalDateTime($default_value[0]['default_date'], DateTimeItemInterface::STORAGE_TIMEZONE);
+        $start_date = new DrupalDateTime($default_value[0]['default_date'], date_default_timezone_get());
         $start_value = $start_date->format($storage_format);
         $default_values[0]['value'] = $start_value;
         $default_values[0]['start_date'] = $start_date;
       }
 
       if (!empty($default_value[0]['default_end_date_type'])) {
-        $end_date = new DrupalDateTime($default_value[0]['default_end_date'], DateTimeItemInterface::STORAGE_TIMEZONE);
+        $end_date = new DrupalDateTime($default_value[0]['default_end_date'], date_default_timezone_get());
         $end_value = $end_date->format($storage_format);
         $default_values[0]['end_value'] = $end_value;
         $default_values[0]['end_date'] = $end_date;
