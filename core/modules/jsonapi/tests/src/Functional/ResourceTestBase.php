@@ -977,7 +977,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
         ],
       ],
     ];
-    $this->assertResourceResponse(400, $expected_document, $response, ['4xx-response', 'http_response'], ['url.query_args', 'url.site'], 'UNCACHEABLE (request policy)', TRUE);
+    $this->assertResourceResponse(
+      400,
+      $expected_document,
+      $response,
+      ['4xx-response', 'http_response'],
+      ['url.query_args', 'url.site'],
+      'UNCACHEABLE (request policy)',
+      TRUE,
+    );
 
     // 200 for well-formed HEAD request.
     $response = $this->request('HEAD', $url, $request_options);
@@ -988,7 +996,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Same for Dynamic Page Cache hit.
     $response = $this->request('GET', $url, $request_options);
 
-    $this->assertResourceResponse(200, $this->getExpectedDocument(), $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), 'UNCACHEABLE (request policy)', $this->generateDynamicPageCacheExpectedHeaderValue($this->getExpectedCacheContexts()) === 'MISS' ? 'HIT' : 'UNCACHEABLE (poor cacheability)');
+    $expected_document = $this->getExpectedDocument();
+
+    if ($this->entity->getEntityType()->isRevisionable()) {
+      $rel_working_copy_url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
+      $rel_working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
+      $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+    }
+    $this->assertResourceResponse(200, $expected_document, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), 'UNCACHEABLE (request policy)', $this->generateDynamicPageCacheExpectedHeaderValue($this->getExpectedCacheContexts()) === 'MISS' ? 'HIT' : 'UNCACHEABLE (poor cacheability)');
     // Assert that Dynamic Page Cache did not store a ResourceResponse object,
     // which needs serialization after every cache hit. Instead, it should
     // contain a flattened response. Otherwise performance suffers.
@@ -1062,14 +1077,50 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $random_uuid]);
     $response = $this->request('GET', $url, $request_options);
     $message_url = clone $url;
-    $path = str_replace($random_uuid, '{entity}', $message_url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString());
+    $path = str_replace(
+      $random_uuid,
+     '{entity}',
+      $message_url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString(),
+    );
     $message = 'The "entity" parameter was not converted for the path "' . $path . '" (route name: "jsonapi.' . static::$resourceTypeName . '.individual")';
-    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.query_args', 'url.site'], 'UNCACHEABLE (request policy)', 'UNCACHEABLE (poor cacheability)');
+    $this->assertResourceErrorResponse(
+      404,
+      $message,
+      $url,
+      $response,
+      FALSE,
+      [
+        '4xx-response',
+        'http_response',
+      ],
+      [
+        'url.query_args',
+        'url.site',
+      ],
+      'UNCACHEABLE (request policy)',
+      'UNCACHEABLE (poor cacheability)',
+    );
 
     // DX: when Accept request header is missing, still 404, same response.
     unset($request_options[RequestOptions::HEADERS]['Accept']);
     $response = $this->request('GET', $url, $request_options);
-    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.query_args', 'url.site'], 'UNCACHEABLE (request policy)', 'UNCACHEABLE (poor cacheability)');
+    $this->assertResourceErrorResponse(
+      404,
+      $message,
+      $url,
+      $response,
+      FALSE,
+      [
+        '4xx-response',
+        'http_response',
+      ],
+      [
+        'url.query_args',
+        'url.site',
+      ],
+      'UNCACHEABLE (request policy)',
+      'UNCACHEABLE (poor cacheability)',
+    );
   }
 
   /**
@@ -2710,9 +2761,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
           }
         }
       }
+      $rel_working_copy_url = clone $url;
+      $rel_working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
       $url->setOption('query', $query);
       // 'self' link should include the 'fields' query param.
       $expected_document['links']['self']['href'] = $url->setAbsolute()->toString();
+
+      if ($this->entity->getEntityType()->isRevisionable()) {
+        $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+      }
 
       $response = $this->request('GET', $url, $request_options);
       $this->assertResourceResponse(
@@ -2769,6 +2826,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $actual_response = $this->request('GET', $url, $request_options);
       $expected_response = $this->getExpectedIncludedResourceResponse($included_paths, $request_options);
       $expected_document = $expected_response->getResponseData();
+
+      if ($this->entity->getEntityType()->isRevisionable()) {
+        $rel_working_copy_url = clone $url;
+        $rel_working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
+        $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+      }
       // Dynamic Page Cache miss because cache should vary based on the
       // 'include' query param.
       $expected_cacheability = $expected_response->getCacheableMetadata();
@@ -2904,6 +2967,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // The resource object should always links to the specific revision it
     // represents.
     $expected_document['data']['links']['self']['href'] = $latest_revision_id_url->setAbsolute()->toString();
+    $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
     $amend_relationship_urls($expected_document, $latest_revision_id);
     // Resource objects always link to their specific revision by revision ID.
     $expected_document['data']['attributes'][$revision_id_key] = $latest_revision_id;
@@ -2991,10 +3055,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $default_revision_id_url = $default_revision_id_url->setOption('query', ['resourceVersion' => "id:$default_revision_id"]);
     $expected_document['data']['links']['self']['href'] = $default_revision_id_url->setAbsolute()->toString();
     $amend_relationship_urls($expected_document, $default_revision_id);
-    // Since the requested version is the latest version and working copy, there
-    // should be no links.
+    // When viewing the latest version (current default revision), there should
+    // not be a link to the latest version.
     unset($expected_document['data']['links']['latest-version']);
-    unset($expected_document['data']['links']['working-copy']);
     $expected_document = $this->alterExpectedDocumentForRevision($expected_document);
     $expected_cache_tags = array_unique([...$expected_cache_tags, ...$workflow->getCacheTags()]);
     $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cache_contexts, NULL, TRUE);
@@ -3031,7 +3094,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.query_args',
       'url.site',
     ];
-    $this->assertResourceErrorResponse(400, 'Collection resources only support the following resource version identifiers: rel:latest-version, rel:working-copy', $rel_invalid_collection_url, $actual_response, FALSE, ['4xx-response', 'http_response'], $invalid_version_expected_cache_contexts);
+    $this->assertResourceErrorResponse(
+      400,
+      'Collection resources only support the following resource version identifiers: rel:latest-version, rel:working-copy',
+      $rel_invalid_collection_url,
+      $actual_response,
+      FALSE,
+      ['4xx-response', 'http_response'],
+      $invalid_version_expected_cache_contexts,
+    );
 
     // Move the entity to its draft moderation state.
     $entity->set('field_revisionable_number', 42);
@@ -3116,7 +3187,6 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Since the working copy is not the default revision. A `latest-version`
     // link is required to indicate that the requested version is not the
     // default revision.
-    unset($expected_document['data']['links']['working-copy']);
     $expected_document['data']['links']['latest-version']['href'] = $rel_latest_version_url->setAbsolute()->toString();
     $expected_cache_tags = $this->getExpectedCacheTags();
     $expected_cache_contexts = $this->getExpectedCacheContexts();

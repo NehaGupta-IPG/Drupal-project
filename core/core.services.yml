@@ -13,6 +13,11 @@ parameters:
   core.moved_classes:
     'Drupal\Core\StringTranslation\TranslationWrapper':
       class: 'Drupal\Core\StringTranslation\TranslatableMarkup'
+    'Doctrine\Common\Annotations\AnnotationException':
+      class: 'Drupal\Component\Annotation\Doctrine\AnnotationException'
+      deprecation_version: drupal:11.3.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3551049
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100
@@ -24,6 +29,7 @@ parameters:
     debug: false
     auto_reload: null
     cache: true
+    use_yield: true
     allowed_file_extensions:
       - css
       - html
@@ -78,6 +84,8 @@ services:
     autowire: true
   Drupal\Core\DefaultContent\Exporter:
     autowire: true
+    calls:
+      - [setLogger, ['@logger.channel.default_content']]
   Drupal\Core\DefaultContent\AdminAccountSwitcher:
     arguments:
       $isSuperUserAccessEnabled: '%security.enable_super_user%'
@@ -260,6 +268,7 @@ services:
   cache.backend.memory:
     class: Drupal\Core\Cache\MemoryBackendFactory
     arguments: ['@datetime.time']
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use cache.backend.memory.memory instead. See https://www.drupal.org/node/3546856'
   cache.backend.memory.memory:
     class: Drupal\Core\Cache\MemoryCache\MemoryCacheFactory
     arguments: ['@datetime.time']
@@ -268,6 +277,7 @@ services:
     class: Drupal\Core\Cache\CacheBackendInterface
     tags:
       - { name: cache.bin, default_backend: cache.backend.memory }
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use the cache.memory bin instead. See https://www.drupal.org/node/3546856'
     factory: ['@cache_factory', 'get']
     arguments: [static]
   cache.bootstrap:
@@ -330,6 +340,12 @@ services:
       - { name: cache.bin, default_backend: cache.backend.chainedfast }
     factory: ['@cache_factory', 'get']
     arguments: [discovery]
+  cache.memory:
+    class: Drupal\Core\Cache\MemoryCache\MemoryCacheInterface
+    tags:
+      - { name: cache.bin.memory, default_backend: cache.backend.memory.memory }
+    factory: ['@cache_factory', 'get']
+    arguments: [memory]
   cache_prewarmer:
     class: Drupal\Core\PreWarm\CachePreWarmer
     arguments: ['@class_resolver']
@@ -393,6 +409,8 @@ services:
       - { name: service_collector, tag: 'config.factory.override', call: addOverride }
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
   Drupal\Core\Config\ConfigFactoryInterface: '@config.factory'
+  Drupal\Core\Config\ConfigImporterFactory:
+    autowire: true
   config.importer_subscriber:
     class: Drupal\Core\Config\Importer\FinalMissingContentSubscriber
   config.installer:
@@ -543,6 +561,9 @@ services:
   logger.channel.default:
     parent: logger.channel_base
     arguments: ['system']
+  logger.channel.default_content:
+    parent: logger.channel_base
+    arguments: ['default_content']
   logger.channel.php:
     parent: logger.channel_base
     arguments: ['php']
@@ -658,7 +679,7 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
   module_handler:
     class: Drupal\Core\Extension\ModuleHandler
-    arguments: ['%app.root%', '%container.modules%', '@event_dispatcher', '%hook_implementations_map%']
+    arguments: ['%app.root%', '%container.modules%', '@keyvalue', '@callable_resolver', '@cache.bootstrap']
   Drupal\Core\Extension\ModuleHandlerInterface: '@module_handler'
   module_installer:
     class: Drupal\Core\Extension\ModuleInstaller
@@ -714,12 +735,14 @@ services:
   Drupal\Core\Extension\ThemeHandlerInterface: '@theme_handler'
   theme_installer:
     class: Drupal\Core\Extension\ThemeInstaller
-    arguments: ['@theme_handler', '@config.factory', '@config.installer', '@module_handler', '@config.manager', '@asset.css.collection_optimizer', '@router.builder', '@logger.channel.default', '@state', '@extension.list.module', '@theme.registry', '@extension.list.theme', '@plugin.manager.sdc']
+    autowire: true
   Drupal\Core\Extension\ThemeInstallerInterface: '@theme_installer'
   entity.memory_cache:
     class: Drupal\Core\Cache\MemoryCache\LruMemoryCache
     arguments: ['@datetime.time', '%entity.memory_cache.slots%']
-  Drupal\Core\Cache\MemoryCache\MemoryCacheInterface: '@entity.memory_cache'
+  Drupal\Core\Cache\MemoryCache\MemoryCacheInterface:
+    alias: 'entity.memory_cache'
+    deprecated: 'The "%alias_id%" service is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use #Autowire to pick a specific cache bin, such as cache.memory. See https://www.drupal.org/node/3546856'
   entity_type.manager:
     class: Drupal\Core\Entity\EntityTypeManager
     arguments: ['@container.namespaces', '@module_handler', '@cache.discovery', '@string_translation', '@class_resolver', '@entity.last_installed_schema.repository', '@service_container']
@@ -904,7 +927,7 @@ services:
     class: Symfony\Component\EventDispatcher\EventDispatcher
   Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Contracts\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
-  Symfony\Component\EventDispatcher\EventDispatcher: '@event_dispatcher'
+  Symfony\Component\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   controller_resolver:
     class: Drupal\Core\Controller\ControllerResolver
     arguments: ['@callable_resolver']
@@ -1265,7 +1288,10 @@ services:
   psr_response_view_subscriber:
     class: Drupal\Core\EventSubscriber\PsrResponseSubscriber
     arguments: ['@psr7.http_foundation_factory']
-
+  # HTMX content view subscriber runs before main_content_view subscriber.
+  htmx_content_view_subscriber:
+    class: Drupal\Core\EventSubscriber\HtmxContentViewSubscriber
+    autowire: true
   # Main content view subscriber plus the renderers it uses.
   main_content_view_subscriber:
     class: Drupal\Core\EventSubscriber\MainContentViewSubscriber
@@ -1277,6 +1303,11 @@ services:
     arguments: ['@title_resolver', '@plugin.manager.display_variant', '@event_dispatcher', '@module_handler', '@renderer', '@render_cache', '%renderer.config%', '@theme.manager']
     tags:
       - { name: render.main_content_renderer, format: html }
+  main_content_renderer.htmx:
+    class: Drupal\Core\Render\MainContent\HtmxRenderer
+    arguments: ['@title_resolver', '@renderer', '@render_cache', '%renderer.config%']
+    tags:
+      - { name: render.main_content_renderer, format: drupal_htmx }
   main_content_renderer.ajax:
     class: Drupal\Core\Render\MainContent\AjaxRenderer
     arguments: ['@element_info', '@renderer']
@@ -1323,7 +1354,7 @@ services:
     arguments: ['@router.route_provider']
   bare_html_page_renderer:
     class: Drupal\Core\Render\BareHtmlPageRenderer
-    arguments: ['@renderer', '@html_response.attachments_processor']
+    arguments: ['@renderer', '@html_response.attachments_processor', '@Drupal\Core\Extension\ThemeSettingsProvider']
     lazy: true
   Drupal\Core\Render\BareHtmlPageRendererInterface: '@bare_html_page_renderer'
   private_key:
@@ -1395,7 +1426,7 @@ services:
   Drupal\Core\Site\MaintenanceModeInterface: '@maintenance_mode'
   maintenance_mode_subscriber:
     class: Drupal\Core\EventSubscriber\MaintenanceModeSubscriber
-    arguments: ['@maintenance_mode', '@config.factory', '@string_translation', '@url_generator', '@current_user', '@bare_html_page_renderer', '@messenger', '@event_dispatcher']
+    autowire: true
   route_access_response_subscriber:
     class: Drupal\Core\EventSubscriber\RouteAccessResponseSubscriber
   client_error_response_subscriber:
@@ -1569,17 +1600,21 @@ services:
   Drupal\Core\Datetime\DateFormatterInterface: '@date.formatter'
   theme.manager:
     class: Drupal\Core\Theme\ThemeManager
-    arguments: ['%app.root%', '@theme.negotiator', '@theme.initialization', '@module_handler', '@callable_resolver']
+    autowire: true
     calls:
       - [setThemeRegistry, ['@theme.registry']]
   Drupal\Core\Theme\ThemeManagerInterface: '@theme.manager'
+  Drupal\Core\Template\TwigThemeEngine:
+    autowire: true
+    tags:
+      - { name: theme_engine, engine_name: twig }
   theme.initialization:
     class: Drupal\Core\Theme\ThemeInitialization
-    arguments: ['%app.root%', '@theme_handler', '@cache.bootstrap', '@module_handler']
+    autowire: true
   Drupal\Core\Theme\ThemeInitializationInterface: '@theme.initialization'
   theme.registry:
     class: Drupal\Core\Theme\Registry
-    arguments: ['%app.root%', '@cache.default', '@lock', '@module_handler', '@theme_handler', '@theme.initialization', '@cache.bootstrap', '@extension.list.module', '@kernel', ~, '%preprocess_for_suggestions%']
+    arguments: ['%app.root%', '@cache.default', '@lock', '@module_handler', '@theme_handler', '@theme.initialization', '@cache.bootstrap', '@extension.list.module', '@kernel', ~, '@keyvalue']
     tags:
       - { name: needs_destruction }
     calls:
@@ -1633,7 +1668,7 @@ services:
   Drupal\Core\Session\PermissionCheckerInterface: '@permission_checker'
   user_permissions_hash_generator:
     class: Drupal\Core\Session\PermissionsHashGenerator
-    arguments: ['@private_key', '@cache.static', '@access_policy_processor']
+    arguments: ['@private_key', '@cache.memory', '@access_policy_processor']
   Drupal\Core\Session\PermissionsHashGeneratorInterface: '@user_permissions_hash_generator'
   current_user:
     class: Drupal\Core\Session\AccountProxy
@@ -1737,15 +1772,11 @@ services:
   Drupal\Core\Asset\LibraryDependencyResolverInterface: '@library.dependency_resolver'
   # Set up a cache chain for asset caching as the same assets may be
   # requested several times, non-public as they are not meant to be reused.
-  cache.asset_memory:
-    class: Drupal\Core\Cache\MemoryCache\MemoryCache
-    arguments: ['@datetime.time']
-    public: false
   cache.asset_chain:
     class: Drupal\Core\Cache\BackendChain
     public: false
     calls:
-      - [ appendBackend, [ '@cache.asset_memory' ] ]
+      - [ appendBackend, [ '@cache.memory' ] ]
       - [ appendBackend, [ '@cache.data' ] ]
   asset.resolver:
     class: Drupal\Core\Asset\AssetResolver
@@ -1823,7 +1854,7 @@ services:
     lazy: true
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
-    arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface', '@file_system']
+    arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']
     tags:
       - { name: mime_type_guesser }
     lazy: true
@@ -1986,3 +2017,5 @@ services:
       ]
     tags:
       - { name: needs_destruction }
+  Drupal\Core\Extension\ThemeSettingsProvider:
+    autowire: true

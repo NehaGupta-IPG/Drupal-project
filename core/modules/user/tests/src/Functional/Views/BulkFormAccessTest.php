@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Functional\Views;
 
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests if entity access is respected on a user bulk form.
  *
- * @group user
  * @see \Drupal\user\Plugin\views\field\UserBulkForm
  * @see \Drupal\user\Tests\Views\BulkFormTest
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class BulkFormAccessTest extends UserTestBase {
 
   /**
