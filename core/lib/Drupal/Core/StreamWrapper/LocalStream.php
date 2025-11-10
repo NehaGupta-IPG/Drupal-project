@@ -133,7 +133,7 @@ abstract class LocalStream implements StreamWrapperInterface {
     $file_system = \Drupal::service('file_system');
     if (!$realpath) {
       // This file does not yet exist.
-      $realpath = realpath(dirname($path)) . '/' . $file_system->basename($path);
+      $realpath = realpath(dirname($path)) . '/' . basename($path);
     }
     // Get the target path relative to the files repository.
     $target = DIRECTORY_SEPARATOR . $this->getTarget($uri);
@@ -142,7 +142,7 @@ abstract class LocalStream implements StreamWrapperInterface {
     // Get the target directory.
     $target_dir = realpath(dirname($repository . $target)) . DIRECTORY_SEPARATOR;
     // Get the target name, without any directory components.
-    $target_name = $file_system->basename($repository . $target);
+    $target_name = basename($repository . $target);
     // A directory component can point outside its parent directory if the path
     // separator ('/' or '\') is followed by '..' to reference the parent
     // directory.
