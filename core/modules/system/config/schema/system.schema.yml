@@ -249,7 +249,9 @@ system.theme:
       nullable: true
       constraints:
         ExtensionName: []
-        ExtensionExists: theme
+        ExtensionExists:
+          type: theme
+          mustBeInstalled: false
       # @see \Drupal\user\Theme\AdminNegotiator::determineActiveTheme()
       requiredKey: false
     default:
