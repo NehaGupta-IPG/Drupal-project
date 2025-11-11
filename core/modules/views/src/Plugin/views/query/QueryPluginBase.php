@@ -163,6 +163,10 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
    * phpcs:enable
    */
   public function setOffset(/* int */$offset) {
+    if (!is_int($offset)) {
+      @trigger_error('Passing a non-integer to ' . __FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Pass an integer instead. See https://www.drupal.org/node/3557243', E_USER_DEPRECATED);
+      $offset = (int) $offset;
+    }
     $this->offset = $offset;
   }
 
