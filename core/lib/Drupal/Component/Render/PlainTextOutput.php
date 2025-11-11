@@ -19,7 +19,7 @@ class PlainTextOutput implements OutputStrategyInterface {
    * {@inheritdoc}
    */
   public static function renderFromHtml($string) {
-    return trim(preg_replace('/\s+/', ' ', Html::decodeEntities(strip_tags(str_replace('<', ' <', (string) $string)))));
+    return trim(preg_replace('/\s+/', ' ', Html::decodeEntities(strip_tags(str_replace('><', '> <', (string) $string)))));
   }
 
 }
