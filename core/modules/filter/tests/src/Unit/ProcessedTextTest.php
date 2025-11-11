@@ -28,7 +28,7 @@ final class ProcessedTextTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->element = new ProcessedText([], 'filter_image_lazy_load', ['provider' => 'test']);
+    $this->element = new ProcessedText( ['provider' => 'test']);
     parent::setUp();
   }
 
@@ -44,7 +44,7 @@ final class ProcessedTextTest extends UnitTestCase {
    */
   #[DataProvider('providerElement')]
   public function testPreRenderText(array $element, array $expected): void {
-    $this->assertSame($expected, $this->filter->preRenderText($element, 'en')->getInfo());
+    $this->assertSame($expected, $this->element::preRenderText($element, 'en')->getInfo());
   }
 
 }
