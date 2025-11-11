@@ -37,7 +37,7 @@ function system_install(): void {
 /**
  * Implements hook_schema().
  */
-function system_schema(bool $returnArraySchema = TRUE): array {
+function system_schema(bool $asArray = TRUE): array {
   // @deprecated The sequences table has been deprecated in drupal:10.2.0 and is
   // removed from drupal:12.0.0. See https://www.drupal.org/node/3220378.
   // @todo Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
@@ -56,7 +56,7 @@ function system_schema(bool $returnArraySchema = TRUE): array {
     primaryKey: new PrimaryKey(['value']),
   );
 
-  return $returnArraySchema ? ConvertDefinition::schemaToArray($schema) : $schema;
+  return $asArray ? ConvertDefinition::schemaToArray($schema) : $schema;
 }
 
 /**

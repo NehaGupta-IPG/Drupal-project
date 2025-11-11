@@ -579,14 +579,14 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  * definitions are for documentation purposes only; foreign keys are not
  * created in the database, nor are they enforced by Drupal.
  *
- * @param bool $returnArraySchema
+ * @param bool $asArray
  *   (Optional) FALSE indicates to return an array of
  *   Drupal\Core\Database\SchemaDefinition\Table objects, TRUE to return
  *   an array-based schema based on legacy (prior to Drupal xx.yy.zz)
  *   definition. Defaults to TRUE.
  *
  * @return array
- *   A schema definition structure array. Depending on the $returnArraySchema
+ *   A schema definition structure array. Depending on the $asArray
  *   parameter: if TRUE for each element of the array, the key is a table name
  *   and the value is a legacy array-based table structure definition; if FALSE
  *   the array is a list of Drupal\Core\Database\SchemaDefinition\Table
@@ -594,7 +594,7 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  *
  * @ingroup schemaapi
  */
-function hook_schema(bool $returnArraySchema = TRUE): array {
+function hook_schema(bool $asArray = TRUE): array {
   $schema[] = new Table(
     name: 'users_data',
     description: 'Stores module data as key/value pairs per user.',
@@ -656,10 +656,7 @@ function hook_schema(bool $returnArraySchema = TRUE): array {
     ],
   );
 
-  return match ($returnArraySchema) {
-    TRUE => ConvertDefinition::schemaToArray($schema),
-    FALSE => $schema,
-  };
+  return $asArray ? ConvertDefinition::schemaToArray($schema) : $schema;
 }
 
 /**
