@@ -11,7 +11,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests Drupal\filter\Plugin\Filter\FilterImageLazyLoad.
+ * Tests Drupal\filter\Element\ProcessedText.
  */
 #[CoversClass(ProcessedText::class)]
 #[Group('filter')]
@@ -28,7 +28,8 @@ final class ProcessedTextTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->element = new ProcessedText( ['provider' => 'test']);
+    $configuration = [];
+    $this->element = new ProcessedText($configuration, 'processed_text', ['provider' => 'test']);
     parent::setUp();
   }
 
@@ -45,6 +46,11 @@ final class ProcessedTextTest extends UnitTestCase {
   #[DataProvider('providerElement')]
   public function testPreRenderText(array $element, array $expected): void {
     $this->assertSame($expected, $this->element::preRenderText($element, 'en')->getInfo());
+  }
+
+  public static function providerElement(): array {
+    return [
+    ];
   }
 
 }
