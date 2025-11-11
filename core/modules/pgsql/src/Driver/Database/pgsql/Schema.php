@@ -74,7 +74,7 @@ class Schema extends DatabaseSchema {
    *   - idx for indexes
    *   - key for constraints
    *   - pkey for primary keys
-   *   - seq for sequences
+   *   - seq for sequences.
    *
    * @param string $table_identifier_part
    *   The first argument used to build the identifier string. This usually
@@ -318,8 +318,8 @@ EOD;
     $statements[] = $sql;
 
     if (isset($table['indexes']) && is_array($table['indexes'])) {
-      foreach ($table['indexes'] as $key_name => $spec) {
-        $statements[] = $this->_createIndexSql($name, $key_name, $spec);
+      foreach ($table['indexes'] as $key_name => $specification) {
+        $statements[] = $this->_createIndexSql($name, $key_name, $specification);
       }
     }
 
@@ -1028,14 +1028,14 @@ EOD;
   }
 
   /**
-   * Generate index creation statement.
+   * Generates an index creation statement.
    *
    * @param string $table
-   *   Table name.
+   *   The table name.
    * @param string $name
-   *   Index name.
+   *   The index name.
    * @param iterable $fields
-   *   Fields used by the index.
+   *   The fields used by the index.
    *
    * @return string
    *   Database statement.
@@ -1050,7 +1050,7 @@ EOD;
       }
       // Index must be on a full column.
       if (is_array($fields->getIterator()->current())) {
-        throw new \RuntimeException(sprintf('Postgres %s indexes are incompatible with substring column definition.', $config['type']->value));
+        throw new \RuntimeException(sprintf('Postgres %s indexes are incompatible with the sub-string column definition.', $config['type']->value));
       }
       $query .= 'USING ' . $config['type']->value . ' ';
       // While the operator is technically applied to a specific column, we
