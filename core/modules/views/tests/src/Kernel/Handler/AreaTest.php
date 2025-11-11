@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the plugin base of the area handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\AreaPluginBase
  * @see \Drupal\views_test\Plugin\views\area\TestExample
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaTest extends ViewsKernelTestBase {
 
   /**
@@ -54,7 +59,7 @@ class AreaTest extends ViewsKernelTestBase {
   /**
    * Tests the rendering of an area.
    */
-  public function testRenderArea() {
+  public function testRenderArea(): void {
     $view = Views::getView('test_example_area');
     $view->initHandlers();
 
@@ -75,7 +80,7 @@ class AreaTest extends ViewsKernelTestBase {
 
     // Check whether the strings exist in the output and are sanitized.
     $output = $view->preview();
-    $output = $this->container->get('renderer')->renderRoot($output);
+    $output = (string) $this->container->get('renderer')->renderRoot($output);
     $this->assertStringContainsString(Xss::filterAdmin($header_string), $output, 'Views header exists in the output and is sanitized');
     $this->assertStringContainsString(Xss::filterAdmin($footer_string), $output, 'Views footer exists in the output and is sanitized');
     $this->assertStringContainsString(Xss::filterAdmin($empty_string), $output, 'Views empty exists in the output and is sanitized');
@@ -85,7 +90,7 @@ class AreaTest extends ViewsKernelTestBase {
   /**
    * Tests the access for an area.
    */
-  public function testAreaAccess() {
+  public function testAreaAccess(): void {
     // Test with access denied for the area handler.
     $view = Views::getView('test_example_area_access');
     $view->initDisplay();
@@ -94,7 +99,7 @@ class AreaTest extends ViewsKernelTestBase {
     $this->assertCount(0, $handlers);
 
     $output = $view->preview();
-    $output = \Drupal::service('renderer')->renderRoot($output);
+    $output = (string) \Drupal::service('renderer')->renderRoot($output);
     // The area output should not be present since access was denied.
     $this->assertStringNotContainsString('a custom string', $output);
     $view->destroy();
@@ -116,7 +121,7 @@ class AreaTest extends ViewsKernelTestBase {
     $handlers = $view->display_handler->getHandlers('empty');
 
     $output = $view->preview();
-    $output = \Drupal::service('renderer')->renderRoot($output);
+    $output = (string) \Drupal::service('renderer')->renderRoot($output);
     $this->assertStringContainsString('a custom string', $output);
     $this->assertCount(1, $handlers);
   }

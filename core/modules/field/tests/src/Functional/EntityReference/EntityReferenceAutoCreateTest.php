@@ -1,24 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Functional\EntityReference;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\node\Entity\Node;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creating new entity (e.g. taxonomy-term) from an autocomplete widget.
- *
- * @group entity_reference
  */
+#[Group('entity_reference')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceAutoCreateTest extends BrowserTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['node', 'taxonomy', 'entity_test'];
 
   /**
@@ -105,7 +112,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
   /**
    * Tests the autocomplete input element and entity auto-creation.
    */
-  public function testAutoCreate() {
+  public function testAutoCreate(): void {
     $this->drupalGet('node/add/' . $this->referencingType);
     $target = $this->assertSession()->fieldExists("edit-test-field-0-target-id");
     $this->assertTrue($target->hasClass("form-autocomplete"));
@@ -158,7 +165,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
    * Tests if an entity reference field having multiple target bundles is
    * storing the auto-created entity in the right destination.
    */
-  public function testMultipleTargetBundles() {
+  public function testMultipleTargetBundles(): void {
     /** @var \Drupal\taxonomy\Entity\Vocabulary[] $vocabularies */
     $vocabularies = [];
     for ($i = 0; $i < 2; $i++) {
@@ -183,7 +190,6 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
       'auto_create_bundle' => $vocabularies[1]->id(),
     ];
     $this->createEntityReferenceField('node', $this->referencingType, $field_name, $this->randomString(), 'taxonomy_term', 'default', $handler_settings);
-    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $fd */
     \Drupal::service('entity_display.repository')
       ->getFormDisplay('node', $this->referencingType)
       ->setComponent($field_name, ['type' => 'entity_reference_autocomplete'])
@@ -253,7 +259,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
   /**
    * Tests autocreation for an entity that has no bundles.
    */
-  public function testNoBundles() {
+  public function testNoBundles(): void {
     $account = $this->drupalCreateUser([
       'access content',
       "create $this->referencingType content",

@@ -1,15 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
-use PHPUnit\Util\Test;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Base class for tests of Migrate source plugins.
+ *
+ * Implementing classes must declare a providerSource() method for this class
+ * to work, defined as follows:
+ *
+ * @code
+ * abstract public static function providerSource(): array;
+ * @endcode
+ *
+ * The returned array should be as follows:
+ *
+ * @code
+ *    Array of data sets to test, each of which is a numerically indexed array
+ *    with the following elements:
+ *    - An array of source data, which can be optionally processed and set up
+ *      by subclasses.
+ *    - An array of expected result rows.
+ *    - (optional) The number of result rows the plugin under test is expected
+ *      to return. If this is not a numeric value, the plugin will not be
+ *      counted.
+ *    - (optional) Array of configuration options for the plugin under test.
+ * @endcode
+ *
+ * @see \Drupal\Tests\migrate\Kernel\MigrateSourceTestBase::testSource
  */
 abstract class MigrateSourceTestBase extends KernelTestBase {
 
@@ -31,24 +56,6 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
    * @var \Drupal\migrate\Plugin\MigrateSourceInterface
    */
   protected $plugin;
-
-  /**
-   * The data provider.
-   *
-   * @see \Drupal\Tests\migrate\Kernel\MigrateSourceTestBase::testSource
-   *
-   * @return array
-   *   Array of data sets to test, each of which is a numerically indexed array
-   *   with the following elements:
-   *   - An array of source data, which can be optionally processed and set up
-   *     by subclasses.
-   *   - An array of expected result rows.
-   *   - (optional) The number of result rows the plugin under test is expected
-   *     to return. If this is not a numeric value, the plugin will not be
-   *     counted.
-   *   - (optional) Array of configuration options for the plugin under test.
-   */
-  abstract public function providerSource();
 
   /**
    * {@inheritdoc}
@@ -73,22 +80,26 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
   }
 
   /**
-   * Determines the plugin to be tested by reading the class @covers annotation.
+   * Determines the plugin to be tested.
+   *
+   * This is identified by the first #[CoverClass] attribute set on the
+   * concrete test class.
    *
    * @return string
+   *   The fully qualified class name of the plugin to be tested.
    */
   protected function getPluginClass() {
-    $annotations = Test::parseTestMethodAnnotations(
-      static::class,
-      $this->getName()
-    );
+    $coversClass = $this->valueObjectForEvents()->metadata()->isCoversClass()->isClassLevel()->asArray();
+    if (isset($coversClass[0])) {
+      return $coversClass[0]->className();
+    }
 
-    if (isset($annotations['class']['covers'])) {
-      return $annotations['class']['covers'][0];
+    $covers = $this->valueObjectForEvents()->metadata()->isCovers()->isClassLevel()->asArray();
+    if (isset($covers[0])) {
+      return $covers[0]->target();
     }
-    else {
-      $this->fail('No plugin class was specified');
-    }
+
+    $this->fail('No plugin class was specified');
   }
 
   /**
@@ -141,10 +152,9 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
    *   (optional) Configuration for the source plugin.
    * @param mixed $high_water
    *   (optional) The value of the high water field.
-   *
-   * @dataProvider providerSource
    */
-  public function testSource(array $source_data, array $expected_data, $expected_count = NULL, array $configuration = [], $high_water = NULL) {
+  #[DataProvider('providerSource')]
+  public function testSource(array $source_data, array $expected_data, $expected_count = NULL, array $configuration = [], $high_water = NULL): void {
     $plugin = $this->getPlugin($configuration);
     $clone_plugin = clone $plugin;
 
@@ -203,5 +213,13 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
       }
     }
   }
+
+  /**
+   * Provides source data for ::testSource.
+   *
+   * @return iterable
+   *   The source data.
+   */
+  abstract public static function providerSource();
 
 }

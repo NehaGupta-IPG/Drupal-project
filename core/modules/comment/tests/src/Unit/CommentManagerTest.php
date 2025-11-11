@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Unit;
 
 use Drupal\comment\CommentManager;
@@ -9,19 +11,22 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\comment\CommentManager
- * @group comment
+ * Tests Drupal\comment\CommentManager.
  */
+#[CoversClass(CommentManager::class)]
+#[Group('comment')]
 class CommentManagerTest extends UnitTestCase {
 
   /**
    * Tests the getFields method.
    *
-   * @covers ::getFields
+   * @legacy-covers ::getFields
    */
-  public function testGetFields() {
+  public function testGetFields(): void {
     // Set up a content entity type.
     $entity_type = $this->createMock('Drupal\Core\Entity\ContentEntityTypeInterface');
     $entity_type->expects($this->any())

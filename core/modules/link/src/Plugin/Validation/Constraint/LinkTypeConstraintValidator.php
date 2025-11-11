@@ -14,7 +14,7 @@ class LinkTypeConstraintValidator extends ConstraintValidator {
   /**
    * {@inheritdoc}
    */
-  public function validate($value, Constraint $constraint) {
+  public function validate($value, Constraint $constraint): void {
     if (isset($value)) {
       $uri_is_valid = TRUE;
 
@@ -26,7 +26,7 @@ class LinkTypeConstraintValidator extends ConstraintValidator {
       try {
         $url = $link_item->getUrl();
       }
-      catch (\InvalidArgumentException $e) {
+      catch (\InvalidArgumentException) {
         $uri_is_valid = FALSE;
       }
 
@@ -43,7 +43,9 @@ class LinkTypeConstraintValidator extends ConstraintValidator {
       }
 
       if (!$uri_is_valid) {
-        $this->context->addViolation($constraint->message, ['@uri' => $link_item->uri]);
+        $this->context->buildViolation($constraint->message, ['@uri' => $link_item->uri])
+          ->atPath('uri')
+          ->addViolation();
       }
     }
   }

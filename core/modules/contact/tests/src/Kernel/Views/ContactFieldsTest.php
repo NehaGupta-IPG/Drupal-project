@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\contact\Kernel\Views;
 
 use Drupal\contact\Entity\ContactForm;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that no storage is created for the contact_message entity.
- *
- * @group contact
  */
+#[Group('contact')]
+#[RunTestsInSeparateProcesses]
 class ContactFieldsTest extends KernelTestBase {
 
   /**
@@ -29,7 +33,7 @@ class ContactFieldsTest extends KernelTestBase {
   /**
    * Tests the views data generation.
    */
-  public function testViewsData() {
+  public function testViewsData(): void {
     $this->installConfig(['contact']);
     FieldStorageConfig::create([
       'type' => 'text',

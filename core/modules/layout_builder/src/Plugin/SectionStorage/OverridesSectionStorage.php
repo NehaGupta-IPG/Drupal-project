@@ -11,12 +11,14 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\layout_builder\Attribute\SectionStorage;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\layout_builder\LayoutEntityHelperTrait;
 use Drupal\layout_builder\OverridesSectionStorageInterface;
 use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -31,22 +33,31 @@ use Symfony\Component\Routing\RouteCollection;
  * - The default weight is 0, so custom implementations will not take
  *   precedence unless otherwise specified.
  *
- * @SectionStorage(
- *   id = "overrides",
- *   weight = -20,
- *   handles_permission_check = TRUE,
- *   context_definitions = {
- *     "entity" = @ContextDefinition("entity", constraints = {
- *       "EntityHasField" = \Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage::FIELD_NAME,
- *     }),
- *     "view_mode" = @ContextDefinition("string", default_value = "default"),
- *   }
- * )
- *
  * @internal
  *   Plugin classes are internal.
  */
+#[SectionStorage(
+  id: "overrides",
+  weight: -20,
+  context_definitions: [
+    'entity' => new ContextDefinition(
+      data_type: 'entity',
+      label: new TranslatableMarkup("Entity"),
+      constraints: [
+        "EntityHasField" => OverridesSectionStorage::FIELD_NAME,
+      ],
+    ),
+    'view_mode' => new ContextDefinition(
+      data_type: 'string',
+      label: new TranslatableMarkup("View mode"),
+      default_value: "default",
+    ),
+  ],
+  handles_permission_check: TRUE,
+)]
 class OverridesSectionStorage extends SectionStorageBase implements ContainerFactoryPluginInterface, OverridesSectionStorageInterface, SectionStorageLocalTaskProviderInterface {
+
+  use LayoutEntityHelperTrait;
 
   /**
    * The field name used by this storage.
@@ -68,13 +79,6 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected $entityFieldManager;
-
-  /**
-   * The section storage manager.
-   *
-   * @var \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface
-   */
-  protected $sectionStorageManager;
 
   /**
    * The entity repository.
@@ -167,14 +171,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
     $contexts = [];
 
     if ($entity = $this->extractEntityFromRoute($value, $defaults)) {
-      $contexts['entity'] = EntityContext::fromEntity($entity);
-      // @todo Expand to work for all view modes in
-      //   https://www.drupal.org/node/2907413.
-      $view_mode = 'full';
-      // Retrieve the actual view mode from the returned view display as the
-      // requested view mode may not exist and a fallback will be used.
-      $view_mode = LayoutBuilderEntityViewDisplay::collectRenderDisplay($entity, $view_mode)->getMode();
-      $contexts['view_mode'] = new Context(new ContextDefinition('string'), $view_mode);
+      $contexts = $this->getSectionStorageContextsForEntity($entity);
     }
     return $contexts;
   }
@@ -188,7 +185,9 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    *   The route defaults array.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
-   *   The entity for the route, or NULL if none exist.
+   *   The entity for the route, or NULL if none exist. The entity is not
+   *   guaranteed to be fieldable, or contain the necessary field for this
+   *   section storage plugin.
    *
    * @see \Drupal\layout_builder\SectionStorageInterface::deriveContextsFromRoute()
    * @see \Drupal\Core\ParamConverter\ParamConverterInterface::convert()
@@ -206,9 +205,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
     }
 
     $entity = $this->entityRepository->getActive($entity_type_id, $entity_id);
-    if ($entity instanceof FieldableEntityInterface && $entity->hasField(static::FIELD_NAME)) {
-      return $entity;
-    }
+    return ($entity instanceof FieldableEntityInterface) ? $entity : NULL;
   }
 
   /**
@@ -232,6 +229,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
       // Ensure that upcasting is run in the correct order.
       $options['parameters']['section_storage'] = [];
       $options['parameters'][$entity_type_id]['type'] = 'entity:' . $entity_type_id;
+      $options['_admin_route'] = FALSE;
 
       $template = $entity_type->getLinkTemplate('canonical') . '/layout';
       $this->buildLayoutRoutes($collection, $this->getPluginDefinition(), $template, $defaults, $requirements, $options, $entity_type_id, $entity_type_id);
@@ -335,7 +333,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
   /**
    * {@inheritdoc}
    */
-  public function access($operation, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     if ($account === NULL) {
       $account = $this->currentUser;
     }
@@ -359,6 +357,8 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
 
     // Access also depends on the default being enabled.
     $result = $result->andIf($this->getDefaultSectionStorage()->access($operation, $account, TRUE));
+    // Access also depends on the default layout being overridable.
+    $result = $result->andIf(AccessResult::allowedIf($this->getDefaultSectionStorage()->isOverridable())->addCacheableDependency($this->getDefaultSectionStorage()));
     $result = $this->handleTranslationAccess($result, $operation, $account);
     return $return_as_object ? $result : $result->isAllowed();
   }

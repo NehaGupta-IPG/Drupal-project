@@ -1,17 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Entity;
 
+use Drupal\Core\Entity\Controller\VersionHistoryController;
 use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests version history page.
- *
- * @group Entity
- * @coversDefaultClass \Drupal\Core\Entity\Controller\VersionHistoryController
  */
+#[CoversClass(VersionHistoryController::class)]
+#[Group('Entity')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class RevisionVersionHistoryTest extends BrowserTestBase {
 
   /**
@@ -62,7 +69,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
   /**
    * Test current revision is indicated.
    *
-   * @covers \Drupal\Core\Entity\Controller\VersionHistoryController::revisionOverview
+   * @legacy-covers \Drupal\Core\Entity\Controller\VersionHistoryController::revisionOverview
    */
   public function testCurrentRevision(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -91,7 +98,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
   /**
    * Test description with entity implementing revision log.
    *
-   * @covers ::getRevisionDescription
+   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionRevLog(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -103,14 +110,14 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
     $entity->save();
 
     $this->drupalGet($entity->toUrl('version-history'));
-    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', '02/02/2013 - 16:00');
+    $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', '2 Feb 2013 - 16:00');
     $this->assertSession()->elementTextContains('css', 'table tbody tr:nth-child(1)', $user->getAccountName());
   }
 
   /**
    * Test description with entity implementing revision log, with empty values.
    *
-   * @covers ::getRevisionDescription
+   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionRevLogNullValues(): void {
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
@@ -129,7 +136,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
   /**
    * Test description with entity, without revision log, no label access.
    *
-   * @covers ::getRevisionDescription
+   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionNoRevLogNoLabelAccess(): void {
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
@@ -145,7 +152,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
   /**
    * Test description with entity, without revision log, with label access.
    *
-   * @covers ::getRevisionDescription
+   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionNoRevLogWithLabelAccess(): void {
     // Permission grants 'view label' access.
@@ -164,7 +171,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
   /**
    * Test revision link, without access to revision page.
    *
-   * @covers ::getRevisionDescription
+   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionLinkNoAccess(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -183,7 +190,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * Test two revisions. Usually the latest revision only checks canonical
    * route access, whereas all others will check individual revision access.
    *
-   * @covers ::getRevisionDescription
+   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionLinkWithAccess(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -212,7 +219,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
   /**
    * Test revision log message if supported, and HTML tags are stripped.
    *
-   * @covers ::getRevisionDescription
+   * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionRevisionLogMessage(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -229,7 +236,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
   /**
    * Test revert operation.
    *
-   * @covers ::buildRevertRevisionLink
+   * @legacy-covers ::buildRevertRevisionLink
    */
   public function testOperationRevertRevision(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -269,7 +276,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
   /**
    * Test delete operation.
    *
-   * @covers ::buildDeleteRevisionLink
+   * @legacy-covers ::buildDeleteRevisionLink
    */
   public function testOperationDeleteRevision(): void {
     /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
@@ -303,6 +310,46 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
     $this->assertSession()->elementNotExists('named', ['link', 'Delete'], $row3);
     $this->drupalGet($entity->toUrl('version-history'));
     $this->assertSession()->elementsCount('css', 'table tbody tr', 3);
+  }
+
+  /**
+   * Test revisions are paginated.
+   */
+  public function testRevisionsPagination(): void {
+    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    $entity = EntityTestRev::create([
+      'type' => 'entity_test_rev',
+      'name' => 'view all revisions,view revision',
+    ]);
+    $entity->save();
+
+    $firstRevisionId = $entity->getRevisionId();
+
+    for ($i = 0; $i < VersionHistoryController::REVISIONS_PER_PAGE; $i++) {
+      $entity->setNewRevision(TRUE);
+      // We need to change something on the entity for it to be considered a new
+      // revision to display. We need "view all revisions" and "view revision"
+      // in a comma separated string to grant access.
+      $entity->setName('view all revisions,view revision,' . $i)->save();
+    }
+
+    $this->drupalGet($entity->toUrl('version-history'));
+    $this->assertSession()->elementsCount('css', 'table tbody tr', VersionHistoryController::REVISIONS_PER_PAGE);
+    $this->assertSession()->elementExists('css', '.pager');
+
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $this->container->get('entity_type.manager')->getStorage($entity->getEntityTypeId());
+    $firstRevision = $storage->loadRevision($firstRevisionId);
+    $secondRevision = $storage->loadRevision($firstRevisionId + 1);
+    // We should see everything up to the second revision, but not the first.
+    $this->assertSession()->linkByHrefExists($secondRevision->toUrl('revision')->toString());
+    $this->assertSession()->linkByHrefNotExists($firstRevision->toUrl('revision')->toString());
+    // The next page should show just the first revision.
+    $this->clickLink('Go to next page');
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 1);
+    $this->assertSession()->elementExists('css', '.pager');
+    $this->assertSession()->linkByHrefNotExists($secondRevision->toUrl('revision')->toString());
+    $this->assertSession()->linkByHrefExists($firstRevision->toUrl('revision')->toString());
   }
 
 }

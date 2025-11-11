@@ -1,15 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Unit;
 
 use Drupal\comment\CommentStatistics;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\comment\CommentStatistics
- * @group comment
+ * Tests Drupal\comment\CommentStatistics.
  */
+#[CoversClass(CommentStatistics::class)]
+#[Group('comment')]
 class CommentStatisticsUnitTest extends UnitTestCase {
 
   /**
@@ -67,11 +73,11 @@ class CommentStatisticsUnitTest extends UnitTestCase {
 
     $this->select->expects($this->any())
       ->method('fields')
-      ->will($this->returnSelf());
+      ->willReturnSelf();
 
     $this->select->expects($this->any())
       ->method('condition')
-      ->will($this->returnSelf());
+      ->willReturnSelf();
 
     $this->select->expects($this->any())
       ->method('execute')
@@ -85,18 +91,17 @@ class CommentStatisticsUnitTest extends UnitTestCase {
       ->method('select')
       ->willReturn($this->select);
 
-    $this->commentStatistics = new CommentStatistics($this->database, $this->createMock('Drupal\Core\Session\AccountInterface'), $this->createMock(EntityTypeManagerInterface::class), $this->createMock('Drupal\Core\State\StateInterface'), $this->database);
+    $this->commentStatistics = new CommentStatistics($this->database, $this->createMock('Drupal\Core\Session\AccountInterface'), $this->createMock(EntityTypeManagerInterface::class), $this->createMock('Drupal\Core\State\StateInterface'), $this->createMock(TimeInterface::class), $this->database);
   }
 
   /**
    * Tests the read method.
    *
    * @see \Drupal\comment\CommentStatistics::read()
-   *
-   * @group Drupal
-   * @group Comment
    */
-  public function testRead() {
+  #[Group('Drupal')]
+  #[Group('Comment')]
+  public function testRead(): void {
     $this->callsToFetch = 0;
     $results = $this->commentStatistics->read(['1' => 'boo', '2' => 'foo'], 'snafus');
     $this->assertEquals(['something', 'something-else'], $results);

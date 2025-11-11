@@ -1,26 +1,25 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\Core\Access\CustomAccessCheckTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Access;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\CustomAccessCheck;
-use Drupal\Core\Controller\ControllerResolver;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Access\CustomAccessCheck
- * @group Access
+ * Tests Drupal\Core\Access\CustomAccessCheck.
  */
+#[CoversClass(CustomAccessCheck::class)]
+#[Group('Access')]
 class CustomAccessCheckTest extends UnitTestCase {
 
   /**
@@ -31,11 +30,11 @@ class CustomAccessCheckTest extends UnitTestCase {
   protected $accessChecker;
 
   /**
-   * The mocked controller resolver.
+   * The mocked callable resolver.
    *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Utility\CallableResolver|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $controllerResolver;
+  protected $callableResolver;
 
   /**
    * The mocked arguments resolver.
@@ -50,19 +49,20 @@ class CustomAccessCheckTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->controllerResolver = $this->createMock('Drupal\Core\Controller\ControllerResolverInterface');
+    $this->callableResolver = $this->createMock(CallableResolver::class);
     $this->argumentsResolverFactory = $this->createMock('Drupal\Core\Access\AccessArgumentsResolverFactoryInterface');
-    $this->accessChecker = new CustomAccessCheck($this->controllerResolver, $this->argumentsResolverFactory);
+    $this->accessChecker = new CustomAccessCheck($this->callableResolver, $this->argumentsResolverFactory);
   }
 
   /**
    * Tests the access method.
    */
-  public function testAccess() {
+  public function testAccess(): void {
     $route_match = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
 
-    $this->controllerResolver->expects($this->exactly(4))
-      ->method('getControllerFromDefinition')
+    $this->callableResolver
+      ->expects($this->exactly(4))
+      ->method('getCallableFromDefinition')
       ->willReturnMap([
         ['\Drupal\Tests\Core\Access\TestController::accessDeny', [new TestController(), 'accessDeny']],
         ['\Drupal\Tests\Core\Access\TestController::accessAllow', [new TestController(), 'accessAllow']],
@@ -114,19 +114,18 @@ class CustomAccessCheckTest extends UnitTestCase {
   /**
    * Tests the access method exception for invalid access callbacks.
    */
-  public function testAccessException() {
-    $callableResolver = $this->createMock(CallableResolver::class);
-    $callableResolver->method('getCallableFromDefinition')
-      ->willThrowException(new \InvalidArgumentException());
-
-    // Re-create the controllerResolver mock with proxy to original methods.
-    $this->controllerResolver = $this->getMockBuilder(ControllerResolver::class)
-      ->setConstructorArgs([$callableResolver])
-      ->enableProxyingToOriginalMethods()
+  public function testAccessException(): void {
+    // Create callableResolver mock to return InvalidArgumentException.
+    $this->callableResolver = $this->getMockBuilder(CallableResolver::class)
+      ->disableOriginalConstructor()
       ->getMock();
 
-    // Overwrite the access checker using the newly mocked controller resolve.
-    $this->accessChecker = new CustomAccessCheck($this->controllerResolver, $this->argumentsResolverFactory);
+    $this->callableResolver->expects($this->any())
+      ->method('getCallableFromDefinition')
+      ->willThrowException(new \InvalidArgumentException());
+
+    // Overwrite the access checker using the newly mocked callable resolve.
+    $this->accessChecker = new CustomAccessCheck($this->callableResolver, $this->argumentsResolverFactory);
 
     // Add a route with a _custom_access route that doesn't exist.
     $route = new Route('/test-route', [], ['_custom_access' => '\Drupal\Tests\Core\Access\NonExistentController::nonExistentMethod']);
@@ -143,6 +142,9 @@ class CustomAccessCheckTest extends UnitTestCase {
 
 }
 
+/**
+ * Controller for testing custom access.
+ */
 class TestController {
 
   public function accessAllow() {

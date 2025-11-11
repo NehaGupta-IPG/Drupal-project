@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the numeric filter handler.
- *
- * @group views
  */
+#[Group('views')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class FilterNumericTest extends ViewsKernelTestBase {
-
-  protected static $modules = ['system'];
 
   /**
    * Views used by this test.
@@ -31,6 +35,9 @@ class FilterNumericTest extends ViewsKernelTestBase {
     'views_test_data_age' => 'age',
   ];
 
+  /**
+   * Defines Views data, allowing 'age' to be empty and 'id' to be required.
+   */
   public function viewsData() {
     $data = parent::viewsData();
     $data['views_test_data']['age']['filter']['allow empty'] = TRUE;
@@ -39,11 +46,14 @@ class FilterNumericTest extends ViewsKernelTestBase {
     return $data;
   }
 
-  public function testFilterNumericSimple() {
+  /**
+   * Tests filtering records using an exact match on a numeric field.
+   */
+  public function testFilterNumericSimple(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
-    // Change the filtering
+    // Change the filtering.
     $view->displayHandlers->get('default')->overrideOption('filters', [
       'age' => [
         'id' => 'age',
@@ -65,12 +75,15 @@ class FilterNumericTest extends ViewsKernelTestBase {
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
   }
 
-  public function testFilterNumericExposedGroupedSimple() {
+  /**
+   * Tests filtering using exposed grouped filters.
+   */
+  public function testFilterNumericExposedGroupedSimple(): void {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
     $view->newDisplay('page', 'Page', 'page_1');
 
-    // Filter: Age, Operator: =, Value: 28
+    // Filter: Age, Operator: =, Value: 28.
     $filters['age']['group_info']['default_group'] = 1;
     $view->setDisplay('page_1');
     $view->displayHandlers->get('page_1')->overrideOption('filters', $filters);
@@ -97,10 +110,9 @@ class FilterNumericTest extends ViewsKernelTestBase {
    *   The max value.
    * @param array $expected_result
    *   The expected results.
-   *
-   * @dataProvider providerTestFilterNumericBetween
    */
-  public function testFilterNumericBetween($operator, $min, $max, array $expected_result) {
+  #[DataProvider('providerTestFilterNumericBetween')]
+  public function testFilterNumericBetween($operator, $min, $max, array $expected_result): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -129,7 +141,7 @@ class FilterNumericTest extends ViewsKernelTestBase {
    *   An array of arrays, each containing the parameters for
    *   self::testFilterNumericBetween().
    */
-  public function providerTestFilterNumericBetween() {
+  public static function providerTestFilterNumericBetween() {
     $all_result = [
       ['name' => 'John', 'age' => 25],
       ['name' => 'George', 'age' => 27],
@@ -189,12 +201,15 @@ class FilterNumericTest extends ViewsKernelTestBase {
     ];
   }
 
-  public function testFilterNumericExposedGroupedBetween() {
+  /**
+   * Tests filtering records using a ranged condition on a numeric field.
+   */
+  public function testFilterNumericExposedGroupedBetween(): void {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
     $view->newDisplay('page', 'Page', 'page_1');
 
-    // Filter: Age, Operator: between, Value: 26 and 29
+    // Filter: Age, Operator: between, Value: 26 and 29.
     $filters['age']['group_info']['default_group'] = 2;
     $view->setDisplay('page_1');
     $view->displayHandlers->get('page_1')->overrideOption('filters', $filters);
@@ -218,12 +233,15 @@ class FilterNumericTest extends ViewsKernelTestBase {
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
   }
 
-  public function testFilterNumericExposedGroupedNotBetween() {
+  /**
+   * Tests filtering records outside a specified numeric range.
+   */
+  public function testFilterNumericExposedGroupedNotBetween(): void {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
     $view->newDisplay('page', 'Page', 'page_1');
 
-    // Filter: Age, Operator: between, Value: 26 and 29
+    // Filter: Age, Operator: between, Value: 26 and 29.
     $filters['age']['group_info']['default_group'] = 3;
     $view->setDisplay('page_1');
     $view->displayHandlers->get('page_1')->overrideOption('filters', $filters);
@@ -246,7 +264,7 @@ class FilterNumericTest extends ViewsKernelTestBase {
   /**
    * Tests the numeric filter handler with the 'regular_expression' operator.
    */
-  public function testFilterNumericRegularExpression() {
+  public function testFilterNumericRegularExpression(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -277,7 +295,7 @@ class FilterNumericTest extends ViewsKernelTestBase {
   /**
    * Tests the numeric filter with negated 'regular_expression' operator.
    */
-  public function testFilterNumericNotRegularExpression() {
+  public function testFilterNumericNotRegularExpression(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -322,12 +340,12 @@ class FilterNumericTest extends ViewsKernelTestBase {
    *
    * The tests are performed with the 'regular_expression' operator.
    */
-  public function testFilterNumericExposedGroupedRegularExpression() {
+  public function testFilterNumericExposedGroupedRegularExpression(): void {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
     $view->newDisplay('page', 'Page', 'page_1');
 
-    // Filter: Age, Operator: regular_expression, Value: 2[7-8]
+    // Filter: Age, Operator: regular_expression, Value: 2[7-8].
     $filters['age']['group_info']['default_group'] = 6;
     $view->setDisplay('page_1');
     $view->displayHandlers->get('page_1')->overrideOption('filters', $filters);
@@ -353,12 +371,12 @@ class FilterNumericTest extends ViewsKernelTestBase {
    * Tests the numeric filter handler with the 'not_regular_expression' operator
    * to grouped exposed filters.
    */
-  public function testFilterNumericExposedGroupedNotRegularExpression() {
+  public function testFilterNumericExposedGroupedNotRegularExpression(): void {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
     $view->newDisplay('page', 'Page', 'page_1');
 
-    // Filter: Age, Operator: not_regular_expression, Value: 2[7-8]
+    // Filter: Age, Operator: not_regular_expression, Value: 2[7-8].
     $filters['age']['group_info']['default_group'] = 7;
     $view->setDisplay('page_1');
     $view->displayHandlers->get('page_1')->overrideOption('filters', $filters);
@@ -382,11 +400,14 @@ class FilterNumericTest extends ViewsKernelTestBase {
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
   }
 
-  public function testFilterNumericEmpty() {
+  /**
+   * Tests filtering records based on empty and non-empty values.
+   */
+  public function testFilterNumericEmpty(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
-    // Change the filtering
+    // Change the filtering.
     $view->displayHandlers->get('default')->overrideOption('filters', [
       'age' => [
         'id' => 'age',
@@ -404,7 +425,7 @@ class FilterNumericTest extends ViewsKernelTestBase {
     $view->destroy();
     $view->setDisplay();
 
-    // Change the filtering
+    // Change the filtering.
     $view->displayHandlers->get('default')->overrideOption('filters', [
       'age' => [
         'id' => 'age',
@@ -441,7 +462,10 @@ class FilterNumericTest extends ViewsKernelTestBase {
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
   }
 
-  public function testFilterNumericExposedGroupedEmpty() {
+  /**
+   * Tests filtering exposed grouped records based on empty values.
+   */
+  public function testFilterNumericExposedGroupedEmpty(): void {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
     $view->newDisplay('page', 'Page', 'page_1');
@@ -457,7 +481,10 @@ class FilterNumericTest extends ViewsKernelTestBase {
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
   }
 
-  public function testFilterNumericExposedGroupedNotEmpty() {
+  /**
+   * Tests filtering exposed grouped records based on non-empty values.
+   */
+  public function testFilterNumericExposedGroupedNotEmpty(): void {
     $filters = $this->getGroupedExposedFilters();
     $view = Views::getView('test_view');
     $view->newDisplay('page', 'Page', 'page_1');
@@ -494,7 +521,10 @@ class FilterNumericTest extends ViewsKernelTestBase {
     $this->assertIdenticalResultset($view, $resultset, $this->columnMap);
   }
 
-  public function testAllowEmpty() {
+  /**
+   * Tests whether empty filters are allowed for specific fields.
+   */
+  public function testAllowEmpty(): void {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
@@ -524,7 +554,13 @@ class FilterNumericTest extends ViewsKernelTestBase {
     $this->assertTrue(isset($age_operators['not empty']));
   }
 
-  protected function getGroupedExposedFilters() {
+  /**
+   * Returns predefined grouped filter configurations for 'age'.
+   *
+   * @return array
+   *   An array of grouped exposed filters.
+   */
+  protected function getGroupedExposedFilters(): array {
     $filters = [
       'age' => [
         'id' => 'age',

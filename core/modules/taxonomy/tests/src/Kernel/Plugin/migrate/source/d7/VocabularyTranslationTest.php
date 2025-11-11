@@ -1,17 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\taxonomy\Kernel\Plugin\migrate\source\d7;
 
+use Drupal\taxonomy\Plugin\migrate\source\d7\VocabularyTranslation;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore objectid objectindex
-
+// cspell:ignore objectid objectindex plid textgroup
 /**
  * Tests D7 i18n vocabulary source plugin.
- *
- * @covers \Drupal\taxonomy\Plugin\migrate\source\d7\VocabularyTranslation
- * @group taxonomy
  */
+#[CoversClass(VocabularyTranslation::class)]
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class VocabularyTranslationTest extends MigrateSqlSourceTestBase {
 
   /**
@@ -22,7 +27,7 @@ class VocabularyTranslationTest extends MigrateSqlSourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function providerSource() {
+  public static function providerSource() {
     $tests = [];
 
     // The source data.
@@ -112,7 +117,7 @@ class VocabularyTranslationTest extends MigrateSqlSourceTestBase {
       ],
     ];
 
-    $tests[0]['expected_results'] = [
+    $tests[0]['expected_data'] = [
       [
         'vid' => 1,
         'name' => 'vocabulary 1',
@@ -172,7 +177,7 @@ class VocabularyTranslationTest extends MigrateSqlSourceTestBase {
       unset($data['language']);
       unset($data['i18n_mode']);
     }
-    foreach ($tests[1]['expected_results'] as &$data) {
+    foreach ($tests[1]['expected_data'] as &$data) {
       unset($data['v_language']);
       unset($data['i18n_mode']);
     }

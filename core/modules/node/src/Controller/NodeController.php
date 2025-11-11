@@ -13,7 +13,6 @@ use Drupal\Core\Url;
 use Drupal\node\NodeStorageInterface;
 use Drupal\node\NodeTypeInterface;
 use Drupal\node\NodeInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Returns responses for Node routes.
@@ -58,17 +57,6 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('date.formatter'),
-      $container->get('renderer'),
-      $container->get('entity.repository')
-    );
-  }
-
-  /**
    * Displays add content links for available content types.
    *
    * Redirects to node/add/[type] if only one content type is available.
@@ -104,7 +92,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     // Bypass the node/add listing if only one content type is available.
     if (count($content) == 1) {
       $type = array_shift($content);
-      return $this->redirect('node.add', ['node_type' => $type->id()]);
+      return $this->redirect('entity.node.add_form', ['node_type' => $type->id()]);
     }
 
     $build['#content'] = $content;
@@ -129,22 +117,6 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   }
 
   /**
-   * Page title callback for a node revision.
-   *
-   * @param \Drupal\node\NodeInterface $node_revision
-   *   The node revision.
-   *
-   * @return string
-   *   The page title.
-   */
-  public function revisionPageTitle(NodeInterface $node_revision) {
-    return $this->t('Revision of %title from %date', [
-      '%title' => $node_revision->label(),
-      '%date' => $this->dateFormatter->format($node_revision->getRevisionCreationTime()),
-    ]);
-  }
-
-  /**
    * Generates an overview table of older revisions of a node.
    *
    * @param \Drupal\node\NodeInterface $node
@@ -154,17 +126,21 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    *   An array as expected by \Drupal\Core\Render\RendererInterface::render().
    */
   public function revisionOverview(NodeInterface $node) {
+    // Always use the latest revision in the current content language to
+    // determine if this node has translations. This supports showing the
+    // correct translation revisions for translations that only have.
+    // non-default revisions.
+    $node = $this->entityRepository->getActive($node->getEntityTypeId(), $node->id());
     $langcode = $node->language()->getId();
-    $langname = $node->language()->getName();
+    $language_name = $node->language()->getName();
     $languages = $node->getTranslationLanguages();
     $has_translations = (count($languages) > 1);
     $node_storage = $this->entityTypeManager()->getStorage('node');
 
-    $build['#title'] = $has_translations ? $this->t('@langname revisions for %title', ['@langname' => $langname, '%title' => $node->label()]) : $this->t('Revisions for %title', ['%title' => $node->label()]);
+    $build['#title'] = $has_translations ? $this->t('@language_name revisions for %title', ['@language_name' => $language_name, '%title' => $node->label()]) : $this->t('Revisions for %title', ['%title' => $node->label()]);
     $header = [$this->t('Revision'), $this->t('Operations')];
 
     $rows = [];
-    $default_revision = $node->getRevisionId();
     $current_revision_displayed = FALSE;
 
     foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
@@ -185,7 +161,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
         // revision, if it was the default revision, as its values for the
         // current language will be the same of the current default revision in
         // this case.
-        $is_current_revision = $vid == $default_revision || (!$current_revision_displayed && $revision->wasDefaultRevision());
+        $is_current_revision = $revision->isDefaultRevision() || (!$current_revision_displayed && $revision->wasDefaultRevision());
         if (!$is_current_revision) {
           $link = Link::fromTextAndUrl($date, new Url('entity.node.revision', ['node' => $node->id(), 'node_revision' => $vid]))->toString();
         }
@@ -201,13 +177,15 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
             '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message }}</p>{% endif %}',
             '#context' => [
               'date' => $link,
-              'username' => $this->renderer->renderPlain($username),
+              'username' => $username,
               'message' => ['#markup' => $revision->revision_log->value, '#allowed_tags' => Xss::getHtmlTagList()],
+            ],
+            // @todo Fix this properly in https://www.drupal.org/project/drupal/issues/3227637.
+            '#cache' => [
+              'max-age' => 0,
             ],
           ],
         ];
-        // @todo Simplify once https://www.drupal.org/node/2334319 lands.
-        $this->renderer->addCacheableDependency($column['data'], $username);
         $row[] = $column;
 
         if ($is_current_revision) {

@@ -1,9 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\KernelTests\Core\Theme\TwigMarkupInterfaceTest.
- */
+declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Theme;
 
@@ -11,39 +8,34 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\MarkupTrait;
 use Drupal\Core\GeneratedLink;
-use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Twig with MarkupInterface objects.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class TwigMarkupInterfaceTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = [
-    'language',
-  ];
-
-  /**
-   * @dataProvider providerTestMarkupInterfaceEmpty
-   */
-  public function testMarkupInterfaceEmpty($expected, $variable) {
+ * Tests markup interface empty.
+ */
+  #[DataProvider('providerTestMarkupInterfaceEmpty')]
+  public function testMarkupInterfaceEmpty($expected, $variable): void {
     $this->assertSame($expected, (string) $this->renderObjectWithTwig($variable));
   }
 
   /**
    * Provide test examples.
    */
-  public function providerTestMarkupInterfaceEmpty() {
+  public static function providerTestMarkupInterfaceEmpty() {
     return [
       // The first argument to \Drupal\Core\StringTranslation\TranslatableMarkup
       // is not supposed to be an empty string.
@@ -64,7 +56,7 @@ class TwigMarkupInterfaceTest extends KernelTestBase {
   /**
    * Tests behavior if a string is translated to become an empty string.
    */
-  public function testEmptyTranslation() {
+  public function testEmptyTranslation(): void {
     $settings = Settings::getAll();
     $settings['locale_custom_strings_en'] = ['' => ['test' => '']];
     // Recreate the settings static.

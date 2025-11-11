@@ -1,17 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field_ui\Unit;
 
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\TempStore\PrivateTempStore;
 use Drupal\field_ui\Form\FieldConfigEditForm;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\field_ui\Form\FieldConfigEditForm
- *
- * @group field_ui
+ * Tests Drupal\field_ui\Form\FieldConfigEditForm.
  */
+#[CoversClass(FieldConfigEditForm::class)]
+#[Group('field_ui')]
 class FieldConfigEditFormTest extends UnitTestCase {
 
   /**
@@ -30,16 +36,18 @@ class FieldConfigEditFormTest extends UnitTestCase {
     $entity_type_bundle_info = $this->createMock('\Drupal\Core\Entity\EntityTypeBundleInfoInterface');
     $typed_data = $this->createMock('\Drupal\Core\TypedData\TypedDataManagerInterface');
     $temp_store = $this->createMock(PrivateTempStore::class);
+    $element_info_manager = $this->createMock(ElementInfoManagerInterface::class);
     $entity_display_repository = $this->createMock(EntityDisplayRepositoryInterface::class);
-    $this->fieldConfigEditForm = new FieldConfigEditForm($entity_type_bundle_info, $typed_data, $entity_display_repository, $temp_store);
+    $this->fieldConfigEditForm = new FieldConfigEditForm($entity_type_bundle_info, $typed_data, $entity_display_repository, $temp_store, $element_info_manager);
   }
 
   /**
-   * @covers ::hasAnyRequired
+   * Tests has any required.
    *
-   * @dataProvider providerRequired
+   * @legacy-covers ::hasAnyRequired
    */
-  public function testHasAnyRequired(array $element, bool $result) {
+  #[DataProvider('providerRequired')]
+  public function testHasAnyRequired(array $element, bool $result): void {
     $reflection = new \ReflectionClass('\Drupal\field_ui\Form\FieldConfigEditForm');
     $method = $reflection->getMethod('hasAnyRequired');
     $this->assertEquals($result, $method->invoke($this->fieldConfigEditForm, $element));
@@ -48,7 +56,7 @@ class FieldConfigEditFormTest extends UnitTestCase {
   /**
    * Provides test cases with required and optional elements.
    */
-  public function providerRequired(): \Generator {
+  public static function providerRequired(): \Generator {
     yield 'required' => [
       [['#required' => TRUE]],
       TRUE,
