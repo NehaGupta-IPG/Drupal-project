@@ -269,7 +269,7 @@ class DbLogController extends ControllerBase {
       ],
       [
         ['data' => $this->t('Message'), 'header' => TRUE],
-        $message,
+        ['data' => ['#markup' => $message]],
       ],
       [
         ['data' => $this->t('Severity'), 'header' => TRUE],
@@ -360,7 +360,7 @@ class DbLogController extends ControllerBase {
    *   used in the message, the formatted backtrace will be assigned to a new
    *   backtrace property on the row object which can be displayed separately.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|false
+   * @return \Drupal\Component\Render\MarkupInterface|string|false
    *   The formatted log message or FALSE if the message or variables properties
    *   are not set.
    */
@@ -370,7 +370,7 @@ class DbLogController extends ControllerBase {
       $variables = @unserialize($row->variables);
       // Messages without variables or user specified text.
       if ($variables === NULL) {
-        $message = Xss::filterAdmin($row->message);
+        $message = $row->message;
       }
       elseif (!is_array($variables)) {
         $message = $this->t('Log data is corrupted and cannot be unserialized: @message', ['@message' => Xss::filterAdmin($row->message)]);
@@ -388,8 +388,9 @@ class DbLogController extends ControllerBase {
           }
         }
         // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-        $message = $this->t(Xss::filterAdmin($row->message), $variables);
+        $message = $this->t($row->message, $variables);
       }
+      $message = $this->t(Xss::filterAdmin($message));
     }
     else {
       $message = FALSE;
@@ -454,7 +455,7 @@ class DbLogController extends ControllerBase {
     $rows = [];
     foreach ($result as $dblog) {
       if ($message = $this->formatMessage($dblog)) {
-        $rows[] = [$dblog->count, $message];
+        $rows[] = [$dblog->count, '#markup' => $message];
       }
     }
 

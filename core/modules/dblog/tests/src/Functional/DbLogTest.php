@@ -12,6 +12,8 @@ use Drupal\Core\Url;
 use Drupal\dblog\Controller\DbLogController;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use Drupal\Component\Utility\Xss;
+use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -33,6 +35,7 @@ class DbLogTest extends BrowserTestBase {
     'node',
     'help',
     'block',
+    'locale',
   ];
 
   /**
@@ -128,7 +131,7 @@ class DbLogTest extends BrowserTestBase {
       'ip' => '0.0.1.0',
       'timestamp' => \Drupal::time()->getRequestTime(),
     ];
-    \Drupal::service('logger.dblog')->log(RfcLogLevel::NOTICE, 'Test message', $context);
+    \Drupal::service('logger.dblog')->notice('Test message', $context);
     $query = Database::getConnection()->select('watchdog');
     $query->addExpression('MAX([wid])');
     $wid = $query->execute()->fetchField();
@@ -297,6 +300,106 @@ class DbLogTest extends BrowserTestBase {
     $this->drupalGet('admin/reports/dblog/event/' . $wid);
     $this->assertSession()
       ->responseContains('Incorrect parameter {bar} in path /baz: horse');
+  }
+
+  /**
+   * Make sure log messages in log pages are properly escaped.
+   */
+  public function testLogEventPageMessageEscaped() {
+    $this->drupalLogin($this->adminUser);
+
+    $context = [
+      'request_uri' => 'http://example.com?dblog=1',
+      'referer' => 'http://example.org?dblog=2',
+      'uid' => 0,
+      'channel' => 'testing',
+      'link' => 'foo/bar',
+      'ip' => '0.0.1.0',
+      'timestamp' => \Drupal::time()->getRequestTime(),
+    ];
+
+    // Make sure HTML tags are filtered out in admin/reports/dblog/event/.
+    \Drupal::service('logger.dblog')->notice("<script>alert('foo');</script> <strong>Lorem ipsum</strong>", $context);
+    $get_wid = Database::getConnection()->select('watchdog');
+    $get_wid->addExpression('MAX([wid])');
+    $wid = $get_wid->execute()->fetchField();
+
+    $this->drupalGet('admin/reports/dblog/event/' . $wid);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseNotContains("<script>alert('foo');</script>");
+    $this->assertSession()->responseContains("alert('foo'); <strong>Lorem ipsum</strong>");
+  }
+
+  /**
+   * Make sure log messages in log pages are properly translated and filtered.
+   */
+  public function testLogEventPageMessageTranslated() {
+    $this->drupalLogin($this->adminUser);
+
+    $langcode = 'ja';
+    ConfigurableLanguage::createFromLangcode($langcode)->save();
+    $this->config('system.site')->set('default_langcode', $langcode)->save();
+
+    $text_source = '< > & source @one %two :three';
+    $text_translation = '< > & source @one %two :three';
+
+    $locale_storage = $this->container->get('locale.storage');
+
+    $source = $locale_storage->createString([
+      'source' => $text_source,
+    ]);
+    $source->save();
+    $translation = $locale_storage->createTranslation([
+      'lid' => $source->lid,
+      'language' => $langcode,
+      'translation' => $text_translation,
+    ]);
+    $translation->save();
+
+    $translation_manager = $this->container->get('string_translation');
+    $translation_manager->reset();
+
+    $translation_variables = [
+      '@one' => 'foo',
+      '%two' => 'bar',
+      ':three' => 'http://example.com',
+    ];
+
+    $context = $translation_variables + [
+      'request_uri' => 'http://example.com?dblog=1',
+      'referer' => 'http://example.org?dblog=2',
+      'uid' => 0,
+      'channel' => 'testing',
+      'link' => 'foo/bar',
+      'ip' => '0.0.1.0',
+      'timestamp' => \Drupal::time()->getRequestTime(),
+    ];
+
+    \Drupal::service('logger.dblog')->notice($text_source, $context);
+    $get_wid = Database::getConnection()->select('watchdog');
+    $get_wid->addExpression('MAX([wid])');
+    $wid = $get_wid->execute()->fetchField();
+
+    // Make sure HTML tags are filtered out after translation.
+    $this->drupalGet('admin/reports/dblog/event/' . $wid);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertTranslations($text_source, $text_translation, $translation_variables);
+  }
+
+  /**
+   * Returns FormattableMarkup object.
+   */
+  protected function assertTranslations($text_source, $text_translation, $translation_variables) {
+
+    $source_unfiltered = new FormattableMarkup($text_source, $translation_variables);
+    $source_filtered = Xss::filterAdmin(new FormattableMarkup($text_source, $translation_variables));
+    $translation_unfiltered = new FormattableMarkup($text_translation, $translation_variables);
+    $translation_filtered = Xss::filterAdmin(new FormattableMarkup($text_translation, $translation_variables));
+
+    $this->assertSession()->responseNotContains($source_unfiltered);
+    $this->assertSession()->responseContains($source_filtered);
+    $this->assertSession()->responseNotContains($translation_unfiltered);
+    $this->assertSession()->responseContains($translation_filtered);
   }
 
   /**
@@ -866,7 +969,7 @@ class DbLogTest extends BrowserTestBase {
    */
   protected function testOverviewLinks(): void {
     $this->drupalLogin($this->adminUser);
-    // cSpell:disable-next-line
+    // cSpell:disable-next-line.
     $this->generateLogEntries(1, ['message' => "&lt;script&gt;alert('foo');&lt;/script&gt;<strong>Lorem</strong> ipsum dolor sit amet, consectetur adipiscing & elit."]);
     $this->drupalGet('admin/reports/dblog');
     $this->assertSession()->statusCodeEquals(200);
