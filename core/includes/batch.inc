@@ -286,14 +286,14 @@ function _batch_process() {
  *   until we are finished, but we also never print more decimal places than
  *   are meaningful.
  *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
  *    Use \Drupal\Core\Batch\Percentage::format() instead.
  *
  * @see https://www.drupal.org/node/3229844
  * @see \Drupal\Core\Batch\BatchProcessorInterface::processQueue()
  */
 function _batch_api_percentage($total, $current) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Batch\Percentage::format() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Batch\Percentage::format() instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
   return Percentage::format($total, $current);
 }
 

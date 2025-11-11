@@ -128,7 +128,7 @@ class DbUpdateController extends ControllerBase {
     $this->bareHtmlPageRenderer = $bare_html_page_renderer;
     $this->postUpdateRegistry = $post_update_registry;
     if ($this->batchProcessor === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
       $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
     }
   }

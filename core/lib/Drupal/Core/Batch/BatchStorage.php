@@ -45,14 +45,13 @@ class BatchStorage implements BatchStorageInterface {
     protected TimeInterface $time,
   ) {
     if ($this->requestStack instanceof RequestStack) {
-      // BC layer for Drupal 11.3.0.
       $this->session = $this->requestStack->getSession();
     }
     else {
       $this->session = $this->requestStack;
       $this->requestStack = \Drupal::requestStack();
-      @trigger_error('Calling ' . __METHOD__ . '() without the $requestStack argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
-      @trigger_error('Calling ' . __METHOD__ . '() with the $session argument is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use $requestStack instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $requestStack argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $session argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use $requestStack instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
     }
   }
 
