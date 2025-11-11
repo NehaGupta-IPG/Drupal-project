@@ -40,6 +40,7 @@ class VocabularyCrudTest extends KernelTestBase {
     parent::setUp();
     $this->installSchema('user', ['users_data']);
     $this->installEntitySchema('taxonomy_term');
+    $this->installEntitySchema('user');
   }
 
   /**

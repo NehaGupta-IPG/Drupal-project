@@ -395,22 +395,6 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
-    parent::preSaveRevision($storage, $record);
-
-    if (!$this->isNewRevision() && $this->getOriginal() && empty($record->revision_log_message)) {
-      // If we are updating an existing media item without adding a
-      // new revision, we need to make sure $entity->revision_log_message is
-      // reset whenever it is empty.
-      // Therefore, this code allows us to avoid clobbering an existing log
-      // entry with an empty one.
-      $this->setRevisionLogMessage($this->getOriginal()->getRevisionLogMessage());
-    }
-  }
-
-  /**
    * Sets the media entity's field values from the source's metadata.
    *
    * Fetching the metadata could be slow (e.g., if requesting it from a remote
@@ -560,7 +544,6 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
       ->setDescription(t('The time the media item was created.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
-      ->setDefaultValueCallback(static::class . '::getRequestTime')
       ->setDisplayOptions('form', [
         'type' => 'datetime_timestamp',
         'weight' => 10,
@@ -586,6 +569,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    * {@inheritdoc}
    */
   public static function getRequestTime() {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. No replacement provided. See https://www.drupal.org/node/3349765', E_USER_DEPRECATED);
     return \Drupal::time()->getRequestTime();
   }
 

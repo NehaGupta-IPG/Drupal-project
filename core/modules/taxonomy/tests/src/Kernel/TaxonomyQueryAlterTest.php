@@ -35,6 +35,7 @@ class TaxonomyQueryAlterTest extends KernelTestBase {
    */
   public function testTaxonomyQueryAlter(): void {
     $this->installEntitySchema('taxonomy_term');
+    $this->installEntitySchema('user');
 
     // Create a new vocabulary and add a few terms to it.
     $vocabulary = $this->createVocabulary();

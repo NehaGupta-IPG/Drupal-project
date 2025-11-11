@@ -136,21 +136,6 @@ class Node extends EditorialContentEntityBase implements NodeInterface {
   /**
    * {@inheritdoc}
    */
-  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
-    parent::preSaveRevision($storage, $record);
-
-    if (!$this->isNewRevision() && $this->getOriginal() && (!isset($record->revision_log) || $record->revision_log === '')) {
-      // If we are updating an existing node without adding a new revision, we
-      // need to make sure $entity->revision_log is reset whenever it is empty.
-      // Therefore, this code allows us to avoid clobbering an existing log
-      // entry with an empty one.
-      $record->revision_log = $this->getOriginal()->revision_log->value;
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     if ($update && \Drupal::moduleHandler()->moduleExists('search')) {
       // Remove deleted translations from the search index.
