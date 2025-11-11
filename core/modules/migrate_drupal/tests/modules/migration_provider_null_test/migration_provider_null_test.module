@@ -1,9 +1,10 @@
 <?php
-
 /**
  * @file
  * Hooks and functionality for migration_provider_null_test.
  */
+
+declare(strict_types=1);
 
 /**
  * Implements hook_migration_plugins_alter().
