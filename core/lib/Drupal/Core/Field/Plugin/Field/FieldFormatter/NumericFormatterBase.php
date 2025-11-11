@@ -72,10 +72,9 @@ abstract class NumericFormatterBase extends FormatterBase {
         $prefix = (count($prefixes) > 1) ? $this->formatPlural($item->value, $prefixes[0], $prefixes[1]) : $prefixes[0];
         $suffix = (count($suffixes) > 1) ? $this->formatPlural($item->value, $suffixes[0], $suffixes[1]) : $suffixes[0];
         $original_output = $output;
-        $output = '';
-        $output .= !empty($prefix) ? '<span class="prefix">' . $prefix . "</span>" : NULL;
+        $output = ($prefix !== '') ? '<span class="prefix">' . $prefix . '</span>' : '';
         $output .= $original_output;
-        $output .= !empty($suffix) ? '<span class="suffix">' . $suffix . "</span>" : NULL;
+        $output .= ($suffix !== '') ? '<span class="suffix">' . $suffix . '</span>' : '';
       }
       // Output the raw value in a content attribute if the text of the HTML
       // element differs from the raw value (for example when a prefix is used).
