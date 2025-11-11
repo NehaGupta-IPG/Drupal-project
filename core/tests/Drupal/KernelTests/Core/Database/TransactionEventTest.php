@@ -6,11 +6,13 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Event\TransactionEvent;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Transaction events.
  */
 #[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class TransactionEventTest extends DatabaseTestBase {
 
   /**
