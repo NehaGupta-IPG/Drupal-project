@@ -70,10 +70,10 @@ class QueryParameterWorkspaceNegotiator extends SessionWorkspaceNegotiator {
    * @return array
    *   An array of query options that can be used for a \Drupal\Core\Url object.
    */
-  public function getQueryOptions(string $workspace_id): array {
+  public static function getQueryOptions(string $workspace_id): array {
     return [
       'workspace' => $workspace_id,
-      'token' => $this->getQueryToken($workspace_id),
+      'token' => static::getQueryToken($workspace_id),
     ];
   }
 
@@ -86,7 +86,7 @@ class QueryParameterWorkspaceNegotiator extends SessionWorkspaceNegotiator {
    * @return string
    *   An 8 char token based on the given workspace ID.
    */
-  protected function getQueryToken(string $workspace_id): string {
+  protected static function getQueryToken(string $workspace_id): string {
     // Return the first 8 characters.
     return substr(Crypt::hmacBase64($workspace_id, Settings::getHashSalt()), 0, 8);
   }

@@ -22,6 +22,9 @@ use Drupal\content_moderation\Entity\Handler\ModerationHandler;
 use Drupal\content_moderation\Entity\Handler\NodeModerationHandler;
 use Drupal\content_moderation\Entity\Handler\TaxonomyTermModerationHandler;
 use Drupal\content_moderation\Entity\Routing\EntityModerationRouteProvider;
+use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Drupal\node\Form\NodePreviewForm;
+use Drupal\workspaces\Negotiator\QueryParameterWorkspaceNegotiator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -72,6 +75,13 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   protected $validator;
 
   /**
+   * The tempstore factory.
+   *
+   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
+   */
+  protected $tempStoreFactory;
+
+  /**
    * A keyed array of custom moderation handlers for given entity types.
    *
    * Any entity not specified will use a common default.
@@ -99,14 +109,25 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    *   Current user.
    * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
    *   State transition validator.
+   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
+   *    The factory for the temp store object.
    */
-  public function __construct(TranslationInterface $translation, ModerationInformationInterface $moderation_information, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, AccountInterface $current_user, StateTransitionValidationInterface $validator) {
+  public function __construct(
+    TranslationInterface $translation,
+    ModerationInformationInterface $moderation_information,
+    EntityTypeManagerInterface $entity_type_manager,
+    EntityTypeBundleInfoInterface $bundle_info,
+    AccountInterface $current_user,
+    StateTransitionValidationInterface $validator,
+    PrivateTempStoreFactory $temp_store_factory,
+  ) {
     $this->stringTranslation = $translation;
     $this->moderationInfo = $moderation_information;
     $this->entityTypeManager = $entity_type_manager;
     $this->bundleInfo = $bundle_info;
     $this->currentUser = $current_user;
     $this->validator = $validator;
+    $this->tempStoreFactory = $temp_store_factory;
   }
 
   /**
@@ -119,7 +140,8 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
       $container->get('current_user'),
-      $container->get('content_moderation.state_transition_validation')
+      $container->get('content_moderation.state_transition_validation'),
+      $container->get('tempstore.private'),
     );
   }
 
@@ -305,7 +327,8 @@ class EntityTypeInfo implements ContainerInjectionInterface {
     /** @var \Drupal\Core\Entity\EntityFormInterface $form_object */
     $form_object = $form_state->getFormObject();
 
-    if ($this->isModeratedEntityEditForm($form_object) && !$entity->isNew()) {
+    $is_moderated_entity_form = $this->isModeratedEntityEditForm($form_object);
+    if ($is_moderated_entity_form && !$entity->isNew()) {
       // Generate a proper revision object for the current entity. This allows
       // to correctly handle translatable entities having pending revisions.
       /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
@@ -320,6 +343,13 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $revision_key = $new_revision->getEntityType()->getKey('revision');
       $new_revision->set($revision_key, $new_revision->getLoadedRevisionId());
       $form_object->setEntity($new_revision);
+    }
+
+    if ($is_moderated_entity_form && $entity->isNew()) {
+      $temporary_moderation_workspace_id = $form_state->getUserInput()['temporary_moderation_workspace_id'] ?? NULL;
+      if ($temporary_moderation_workspace_id) {
+        $form_object->getEntity()->_temporaryModerationWorkspace = $temporary_moderation_workspace_id;
+      }
     }
   }
 
@@ -368,6 +398,22 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       // the current state instead.
       if (isset($form['meta']['published'])) {
         $form['meta']['published']['#markup'] = $this->moderationInfo->getWorkflowForEntity($entity)->getTypePlugin()->getState($entity->moderation_state->value)->label();
+      }
+
+      if ($temporary_moderation_workspace_id = $entity->_temporaryModerationWorkspace) {
+        $form['temporary_moderation_workspace_id'] = [
+          '#type' => 'hidden',
+          '#value' => $temporary_moderation_workspace_id,
+        ];
+      }
+    }
+    elseif ($form_object instanceof NodePreviewForm) {
+      /** @var \Drupal\Core\Form\FormStateInterface $node_form_state */
+      $node_form_state = $this->tempStoreFactory->get('node_preview')->get($form['uuid']['#value']);
+      if ($temporary_workspace_id = $node_form_state->getUserInput()['temporary_moderation_workspace_id'] ?? NULL) {
+        // Persist the temporary moderation workspace when going back to the
+        // node form.
+        $form['backlink']['#options']['query'] += QueryParameterWorkspaceNegotiator::getQueryOptions($temporary_workspace_id);
       }
     }
   }

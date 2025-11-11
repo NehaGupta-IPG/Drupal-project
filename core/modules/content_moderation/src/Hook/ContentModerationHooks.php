@@ -2,7 +2,9 @@
 
 namespace Drupal\content_moderation\Hook;
 
+use Drupal\content_moderation\ContentModerationWorkspaceProvider;
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\views\Plugin\views\filter\Broken;
 use Drupal\views\ViewExecutable;
@@ -111,6 +113,14 @@ class ContentModerationHooks {
   #[Hook('entity_type_alter')]
   public function entityTypeAlter(array &$entity_types) : void {
     \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityTypeInfo::class)->entityTypeAlter($entity_types);
+  }
+
+  /**
+   * Implements hook_entity_create().
+   */
+  #[Hook('entity_create')]
+  public function entityCreate(EntityInterface $entity): void {
+    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityCreate($entity);
   }
 
   /**
@@ -379,6 +389,34 @@ class ContentModerationHooks {
         $view->result = [];
         break;
       }
+    }
+  }
+
+  /**
+   * Implements hook_cron().
+   */
+  #[Hook('cron')]
+  public function cron(): void {
+    $storage = \Drupal::entityTypeManager()->getStorage('workspace');
+
+    // Forms are cached for 6 hours by default.
+    $form_expiration = Settings::get('form_cache_expiration', 21600);
+
+    // Get all temporary moderation workspaces for which the form cache
+    // expiration time has passed.
+    $result = $storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('provider', ContentModerationWorkspaceProvider::getId())
+      ->condition('id', ContentModerationWorkspaceProvider::TEMP_PREFIX, 'STARTS_WITH')
+      ->condition('created', \Drupal::time()->getRequestTime() - $form_expiration, '<')
+      ->execute();
+
+    // Delete temporary workspaces so their data can be purged.
+    // @todo What about referenced entities (e.g. media). We'd need to check if
+    //   they've been used in other places. Since we don't have a generic entity
+    //   usage mechanism in core, only the workspace itself is safe to delete.
+    if ($result && ($workspaces = $storage->loadMultiple($result))) {
+      $storage->delete($workspaces);
     }
   }
 

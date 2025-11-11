@@ -43,6 +43,10 @@ services:
     parent: workspaces.negotiator.session
     tags:
       - { name: workspace_negotiator, priority: 100 }
+  Drupal\workspaces\Negotiator\RequestParameterWorkspaceNegotiator:
+    autowire: true
+    tags:
+      - { name: workspace_negotiator, priority: 150 }
 
   access_check.workspaces.active_workspace:
     class: Drupal\workspaces\Access\ActiveWorkspaceCheck

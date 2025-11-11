@@ -70,7 +70,7 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
       ->setRequired(TRUE)
       ->addConstraint('UniqueField')
       ->addConstraint('DeletedWorkspace')
-      ->addPropertyConstraints('value', ['Regex' => ['pattern' => '/^[a-z0-9_]+$/']]);
+      ->addPropertyConstraints('value', ['Regex' => ['pattern' => '/^[a-z0-9_.]+$/']]);
 
     $fields['label'] = BaseFieldDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Workspace name'))

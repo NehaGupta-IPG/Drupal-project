@@ -145,11 +145,11 @@ class WorkspaceManager implements WorkspaceManagerInterface {
       throw new \InvalidArgumentException('The ' . $workspace_id . ' workspace does not exist.');
     }
 
-    $previous_active_workspace = $this->getActiveWorkspace();
+    $previous_active_workspace = $this->activeWorkspace;
 
     // Switch to the requested workspace only if we're in Live or in another
     // workspace.
-    $should_switch_workspace = !$previous_active_workspace || $previous_active_workspace->id() != $workspace_id;
+    $should_switch_workspace = $previous_active_workspace === FALSE || $previous_active_workspace->id() != $workspace_id;
     if ($should_switch_workspace) {
       $this->doSwitchWorkspace($workspace, TRUE);
     }
@@ -167,16 +167,16 @@ class WorkspaceManager implements WorkspaceManagerInterface {
    * {@inheritdoc}
    */
   public function executeOutsideWorkspace(callable $function) {
-    $previous_active_workspace = $this->getActiveWorkspace();
+    $previous_active_workspace = $this->activeWorkspace;
 
     // Switch to Live if we're in a workspace.
-    if ($previous_active_workspace) {
+    if ($previous_active_workspace !== FALSE) {
       $this->doSwitchWorkspace(NULL, TRUE);
     }
     $result = $function();
 
     // Switch back if needed.
-    if ($previous_active_workspace) {
+    if ($previous_active_workspace !== FALSE) {
       $this->doSwitchWorkspace($previous_active_workspace, TRUE);
     }
 

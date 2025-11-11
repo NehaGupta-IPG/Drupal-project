@@ -117,12 +117,6 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
    * {@inheritdoc}
    */
   public function entityPresave(EntityInterface $entity): void {
-    // Disallow any change to an unsupported entity when we are not in the
-    // default workspace.
-    if (!$this->workspaceInfo->isEntitySupported($entity)) {
-      throw new \RuntimeException(sprintf('The "%s" entity type can only be saved in the default workspace.', $entity->getEntityTypeId()));
-    }
-
     /** @var \Drupal\Core\Entity\ContentEntityInterface|\Drupal\Core\Entity\EntityPublishedInterface $entity */
     if (!$entity->isNew() && !$entity->isSyncing()) {
       // Force a new revision if the entity is not replicating.
@@ -234,15 +228,7 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
   /**
    * {@inheritdoc}
    */
-  public function entityPredelete(EntityInterface $entity): void {
-    // Prevent the entity from being deleted if the entity type does not have
-    // support for workspaces, or if the entity has a published default
-    // revision.
-    $active_workspace = $this->workspaceManager->getActiveWorkspace();
-    if (!$this->workspaceInfo->isEntitySupported($entity) || !$this->workspaceInfo->isEntityDeletable($entity, $active_workspace)) {
-      throw new \RuntimeException("This {$entity->getEntityType()->getSingularLabel()} can only be deleted in the Live workspace.");
-    }
-  }
+  public function entityPredelete(EntityInterface $entity): void {}
 
   /**
    * {@inheritdoc}
