@@ -155,7 +155,7 @@ class StringArgument extends ArgumentPluginBase {
       '#group' => 'options][more',
     ];
 
-    // exclude
+    // Exclude.
     $form['not'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Exclude'),
@@ -276,7 +276,8 @@ class StringArgument extends ArgumentPluginBase {
       }
       elseif ($operator == 'NOT IN') {
         $field .= " NOT IN($placeholder)";
-      } else {
+      }
+      else {
         $field .= " $operator $placeholder";
       }
       $placeholders = [
