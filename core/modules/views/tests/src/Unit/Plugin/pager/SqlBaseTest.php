@@ -99,4 +99,26 @@ class SqlBaseTest extends UnitTestCase {
     $this->assertSame(0, $this->pager->options['items_per_page']);
   }
 
+  /**
+   * Tests the query() method when the items_per_page option is not an integer.
+   *
+   * @see \Drupal\views\Plugin\views\pager\SqlBase::query()
+   */
+  public function testQueryNonIntItemsPerPage(): void {
+    $request = new Request([
+      'items_per_page' => 'All',
+    ]);
+    $this->view->expects($this->any())
+      ->method('getRequest')
+      ->willReturn($request);
+
+    $options = [
+      'items_per_page' => '',
+    ];
+    $this->pager->init($this->view, $this->display, $options);
+    $this->pager->query();
+    // We're just asserting that an error isn't thrown.
+    $this->addToAssertionCount(1);
+  }
+
 }
