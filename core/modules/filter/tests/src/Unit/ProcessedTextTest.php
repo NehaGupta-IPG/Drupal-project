@@ -48,9 +48,14 @@ final class ProcessedTextTest extends UnitTestCase {
     $this->assertSame($expected, $this->element::preRenderText($element, 'en')->getInfo());
   }
 
+  /**
+   * Provides data for testPreRenderText.
+   *
+   * @return array
+   *   An array of test data.
+   */
   public static function providerElement(): array {
-    return [
-    ];
+    return [];
   }
 
 }
