@@ -71,22 +71,19 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
     $build['#theme'] = 'navigation_menu__' . strtr($menu_name, '-', '_');
 
     // Loop through menu items and add the plugin id as a class.
-    foreach ($tree as $item) {
-      if ($item->access->isAllowed()) {
-        $plugin_id = $item->link->getPluginId();
-        $plugin_class = Html::getClass(str_replace('.', '_', $plugin_id));
-        $build['#items'][$plugin_id]['class'] = $plugin_class;
-        $url = $build['#items'][$plugin_id]['url'];
-        $icon_defaults = [
-          'pack_id' => 'navigation',
-          'icon_id' => $plugin_class,
-          'settings' => [
-            'class' => 'toolbar-button__icon',
-            'size' => 20,
-          ],
-        ];
-        $build['#items'][$plugin_id]['icon'] = NestedArray::mergeDeep($icon_defaults, $url->getOption('icon') ?? []);
-      }
+    foreach ($build['#items'] as $plugin_id => $item) {
+      $plugin_class = Html::getClass(str_replace('.', '_', $plugin_id));
+      $build['#items'][$plugin_id]['class'] = $plugin_class;
+      $url = $build['#items'][$plugin_id]['url'];
+      $icon_defaults = [
+        'pack_id' => 'navigation',
+        'icon_id' => $plugin_class,
+        'settings' => [
+          'class' => 'toolbar-button__icon',
+          'size' => 20,
+        ],
+      ];
+      $build['#items'][$plugin_id]['icon'] = NestedArray::mergeDeep($icon_defaults, $url->getOption('icon') ?? []);
     }
 
     return $build;
