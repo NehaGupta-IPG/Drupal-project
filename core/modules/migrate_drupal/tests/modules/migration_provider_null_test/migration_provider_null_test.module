@@ -10,7 +10,7 @@ declare(strict_types=1);
 /**
  * Implements hook_migration_plugins_alter().
  */
-function migration_provider_null_test_migration_plugins_alter(array &$definitions) {
+function migration_provider_null_test_migration_plugins_alter(array &$definitions): void {
   if (isset($definitions['d7_action'])) {
     $definitions['d7_action']['provider'] = NULL;
   }
