@@ -22,6 +22,11 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
+   * {@inheritdoc}
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
+
+  /**
    * The id of the entity being translated.
    *
    * @var mixed
