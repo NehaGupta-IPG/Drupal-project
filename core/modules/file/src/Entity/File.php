@@ -169,7 +169,7 @@ class File extends ContentEntityBase implements FileInterface {
   public static function preCreate(EntityStorageInterface $storage, array &$values) {
     // Automatically detect filename if not set.
     if (!isset($values['filename']) && isset($values['uri'])) {
-      $values['filename'] = \Drupal::service('file_system')->basename($values['uri']);
+      $values['filename'] = basename($values['uri']);
     }
 
     // Automatically detect filemime if not set.
@@ -298,6 +298,17 @@ class File extends ContentEntityBase implements FileInterface {
       $tags = Cache::mergeTags($tags, $this->getCacheTagsToInvalidate());
     }
     Cache::invalidateTags($tags);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDownloadHeaders(): array {
+    return [
+      'Content-Type' => $this->getMimeType(),
+      'Content-Length' => $this->getSize(),
+      'Cache-Control' => 'private',
+    ];
   }
 
 }

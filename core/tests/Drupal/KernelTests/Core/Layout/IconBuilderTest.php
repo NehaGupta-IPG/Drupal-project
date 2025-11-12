@@ -7,22 +7,29 @@ namespace Drupal\KernelTests\Core\Layout;
 use Drupal\Core\Layout\Icon\SvgIconBuilder;
 use Drupal\Core\Render\RenderContext;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Layout\Icon\SvgIconBuilder
- * @group Layout
+ * Tests Drupal\Core\Layout\Icon\SvgIconBuilder.
  */
+#[CoversClass(SvgIconBuilder::class)]
+#[Group('Layout')]
+#[RunTestsInSeparateProcesses]
 class IconBuilderTest extends KernelTestBase {
 
   /**
-   * @covers ::build
-   * @covers ::buildRenderArray
-   * @covers ::calculateSvgValues
-   * @covers ::getLength
-   * @covers ::getOffset
+   * Tests build.
    *
-   * @dataProvider providerTestBuild
+   * @legacy-covers ::build
+   * @legacy-covers ::buildRenderArray
+   * @legacy-covers ::calculateSvgValues
+   * @legacy-covers ::getLength
+   * @legacy-covers ::getOffset
    */
+  #[DataProvider('providerTestBuild')]
   public function testBuild(SvgIconBuilder $icon_builder, $icon_map, $expected): void {
     $renderer = $this->container->get('renderer');
 
@@ -34,6 +41,9 @@ class IconBuilderTest extends KernelTestBase {
     $this->assertSame($expected, $output);
   }
 
+  /**
+   * Returns data for testing the icon builder.
+   */
   public static function providerTestBuild() {
     $data = [];
     $data['empty'][] = (new SvgIconBuilder());

@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\contact\Entity\ContactForm;
-use Drupal\Core\Config\ConfigImporter;
+use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ContentEntityNullStorage entity query support.
  *
  * @see \Drupal\Core\Entity\ContentEntityNullStorage
  * @see \Drupal\Core\Entity\Query\Null\Query
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ContentEntityNullStorageTest extends KernelTestBase {
 
   /**
@@ -54,19 +56,7 @@ class ContentEntityNullStorageTest extends KernelTestBase {
       $this->container->get('config.storage.sync'),
       $this->container->get('config.storage')
     );
-    $config_importer = new ConfigImporter(
-      $storage_comparer->createChangelist(),
-      $this->container->get('event_dispatcher'),
-      $this->container->get('config.manager'),
-      $this->container->get('lock'),
-      $this->container->get('config.typed'),
-      $this->container->get('module_handler'),
-      $this->container->get('module_installer'),
-      $this->container->get('theme_handler'),
-      $this->container->get('string_translation'),
-      $this->container->get('extension.list.module'),
-      $this->container->get('extension.list.theme')
-    );
+    $config_importer = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer->createChangelist());
 
     // Delete the contact message in sync.
     $sync = $this->container->get('config.storage.sync');

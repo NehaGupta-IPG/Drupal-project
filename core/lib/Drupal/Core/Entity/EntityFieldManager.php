@@ -11,6 +11,7 @@ use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 
@@ -20,7 +21,7 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
  * This includes field definitions, base field definitions, and field storage
  * definitions.
  */
-class EntityFieldManager implements EntityFieldManagerInterface {
+class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInterface {
 
   use UseCacheBackendTrait;
   use StringTranslationTrait;
@@ -65,6 +66,13 @@ class EntityFieldManager implements EntityFieldManagerInterface {
    * @var array
    */
   protected $activeFieldStorageDefinitions;
+
+  /**
+   * Static cache of base field overrides per entity type and bundle.
+   *
+   * @var array
+   */
+  protected $baseFieldOverrides;
 
   /**
    * An array of lightweight maps of fields, keyed by entity type.
@@ -391,16 +399,21 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     // overrides of base fields.
     $bundle_field_definitions = $class::bundleFieldDefinitions($entity_type, $bundle, $base_field_definitions);
 
-    // Load base field overrides from configuration. These take precedence over
-    // base field overrides returned above.
-    $base_field_override_ids = array_map(function ($field_name) use ($entity_type_id, $bundle) {
-      return $entity_type_id . '.' . $bundle . '.' . $field_name;
-    }, array_keys($base_field_definitions));
-    $base_field_overrides = $this->entityTypeManager->getStorage('base_field_override')->loadMultiple($base_field_override_ids);
-    foreach ($base_field_overrides as $base_field_override) {
+    if (!isset($this->baseFieldOverrides)) {
+      $this->baseFieldOverrides = [];
+      $base_field_overrides = $this->entityTypeManager->getStorage('base_field_override')->loadMultiple();
+      foreach ($base_field_overrides as $override) {
+        $this->baseFieldOverrides[$override->getTargetEntityTypeId()][$override->getTargetBundle()][] = $override;
+      }
+    }
+
+    foreach ($this->baseFieldOverrides[$entity_type_id][$bundle] ?? [] as $base_field_override) {
       /** @var \Drupal\Core\Field\Entity\BaseFieldOverride $base_field_override */
-      $field_name = $base_field_override->getName();
-      $bundle_field_definitions[$field_name] = $base_field_override;
+      // Base field definitions can be removed.
+      if (isset($base_field_definitions[$base_field_override->getName()])) {
+        $field_name = $base_field_override->getName();
+        $bundle_field_definitions[$field_name] = $base_field_override;
+      }
     }
 
     $provider = $entity_type->getProvider();
@@ -627,6 +640,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     $this->fieldMapByFieldType = [];
     $this->entityDisplayRepository->clearDisplayModeInfo();
     $this->extraFields = NULL;
+    $this->baseFieldOverrides = NULL;
     Cache::invalidateTags(['entity_field_info']);
     // The typed data manager statically caches prototype objects with injected
     // definitions, clear those as well.
@@ -643,6 +657,7 @@ class EntityFieldManager implements EntityFieldManagerInterface {
       $this->baseFieldDefinitions = [];
       $this->fieldStorageDefinitions = [];
       $this->activeFieldStorageDefinitions = [];
+      $this->baseFieldOverrides = NULL;
     }
   }
 
@@ -695,6 +710,13 @@ class EntityFieldManager implements EntityFieldManagerInterface {
     ]);
 
     return $extra;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preWarm(): void {
+    $this->getFieldMap();
   }
 
   /**

@@ -90,25 +90,6 @@ class UserHooks {
   }
 
   /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'user' => [
-        'render element' => 'elements',
-      ],
-      'username' => [
-        'variables' => [
-          'account' => NULL,
-          'attributes' => [],
-          'link_options' => [],
-        ],
-      ],
-    ];
-  }
-
-  /**
    * Implements hook_js_settings_alter().
    */
   #[Hook('js_settings_alter')]
@@ -151,20 +132,6 @@ class UserHooks {
       'weight' => 5,
     ];
     return $fields;
-  }
-
-  /**
-   * Implements hook_ENTITY_TYPE_presave() for user entities.
-   *
-   * @todo https://www.drupal.org/project/drupal/issues/3112704 Move to
-   *   \Drupal\user\Entity\User::preSave().
-   */
-  #[Hook('user_presave')]
-  public function userPresave(UserInterface $account): void {
-    $config = \Drupal::config('system.date');
-    if ($config->get('timezone.user.configurable') && !$account->getTimeZone() && !$config->get('timezone.user.default')) {
-      $account->timezone = $config->get('timezone.default');
-    }
   }
 
   /**
@@ -266,7 +233,7 @@ class UserHooks {
     $mail_config = \Drupal::config('user.mail');
     $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE];
     $message['subject'] .= PlainTextOutput::renderFromHtml($token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options));
-    $message['body'][] = $token_service->replace($mail_config->get($key . '.body'), $variables, $token_options);
+    $message['body'][] = $token_service->replacePlain($mail_config->get($key . '.body'), $variables, $token_options);
     $language_manager->setConfigOverrideLanguage($original_language);
   }
 

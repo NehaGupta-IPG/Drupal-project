@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Form\FormState;
 use Drupal\views\Plugin\views\area\Broken as BrokenArea;
 use Drupal\views\Plugin\views\field\Broken as BrokenField;
-use Drupal\views\Plugin\views\filter\BooleanOperator;
 use Drupal\views\Plugin\views\filter\Broken as BrokenFilter;
 use Drupal\views\Plugin\views\filter\Standard;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests basic functions from the Views module.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ModuleTest extends ViewsKernelTestBase {
 
   /**
@@ -26,12 +26,12 @@ class ModuleTest extends ViewsKernelTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_view_status', 'test_view', 'test_argument', 'test_redirect_view'];
+  public static $testViews = ['test_view_status', 'test_view', 'test_argument'];
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['field', 'user', 'block', 'node', 'views_test_data_alter'];
+  protected static $modules = ['field', 'user', 'block'];
 
   /**
    * Stores the last triggered error.
@@ -79,7 +79,7 @@ class ModuleTest extends ViewsKernelTestBase {
         $this->assertEquals($description_bottom, $form['description']['description_bottom']['#markup']);
         $details = [];
         foreach ($item as $key => $value) {
-          $details[] = new FormattableMarkup('@key: @value', ['@key' => $key, '@value' => $value]);
+          $details[] = "$key: $value";
         }
         $this->assertEquals($details, $form['description']['detail_list']['#items']);
       }
@@ -110,14 +110,6 @@ class ModuleTest extends ViewsKernelTestBase {
     ];
     $handler = $this->container->get('plugin.manager.views.filter')->getHandler($item, 'standard');
     $this->assertInstanceOf(Standard::class, $handler);
-
-    // Test that the configuration is respected rather than overridden
-    // by views data. Using assertSame() here to make the error more clearly
-    // show what the result is when an error is caused.
-    $test_view_config = $this->config('views.view.test_redirect_view');
-    $item = $test_view_config->get('display.default.display_options.filters.status');
-    $handler = $this->container->get('plugin.manager.views.filter')->getHandler($item);
-    $this->assertSame(BooleanOperator::class, get_class($handler));
   }
 
   /**

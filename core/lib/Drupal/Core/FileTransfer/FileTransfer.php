@@ -19,6 +19,11 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *   Path to connection chroot.
  * @property object|false|null $connection
  *   The instantiated connection object.
+ *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
+ *   replacement. Use composer to manage the code for your site.
+ *
+ * @see https://www.drupal.org/node/3512364
  */
 #[\AllowDynamicProperties]
 abstract class FileTransfer {
@@ -69,6 +74,8 @@ abstract class FileTransfer {
    *   able to touch other parts of the filesystem.
    */
   public function __construct($jail) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
     $this->jail = $jail;
   }
 
@@ -87,12 +94,12 @@ abstract class FileTransfer {
    *   getSettingsForm() method uses any nested settings, the same structure
    *   will be assumed here.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return object
    *   New instance of the appropriate FileTransfer subclass.
    *
    * @throws \Drupal\Core\FileTransfer\FileTransferException
    */
-  // phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
   public static function factory($jail, $settings) {
     throw new FileTransferException('FileTransfer::factory() static method not overridden by FileTransfer subclass.');
   }
@@ -332,7 +339,7 @@ abstract class FileTransfer {
    */
   protected function copyDirectoryJailed($source, $destination) {
     if ($this->isDirectory($destination)) {
-      $destination = $destination . '/' . \Drupal::service('file_system')->basename($source);
+      $destination = $destination . '/' . basename($source);
     }
     $this->createDirectory($destination);
     foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST) as $filename => $file) {
@@ -407,7 +414,7 @@ abstract class FileTransfer {
    *
    * It does this by moving up the tree until it finds itself
    *
-   * @return string|bool
+   * @return string|false
    *   If successful, the chroot path for this connection, otherwise FALSE.
    */
   public function findChroot() {
@@ -424,7 +431,7 @@ abstract class FileTransfer {
     $chroot = '';
     while (count($parts)) {
       $check = implode('/', $parts);
-      if ($this->isFile($check . '/' . \Drupal::service('file_system')->basename(__FILE__))) {
+      if ($this->isFile($check . '/' . basename(__FILE__))) {
         // Remove the trailing slash.
         return substr($chroot, 0, -1);
       }

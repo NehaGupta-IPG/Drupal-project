@@ -11,6 +11,10 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Provides the file transfer authorization form.
  *
+ * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
+ *   replacement. Use composer to manage the code for your site.
+ *
+ * @see https://www.drupal.org/node/3512364
  * @internal
  */
 class FileTransferAuthorizeForm extends FormBase {
@@ -29,6 +33,8 @@ class FileTransferAuthorizeForm extends FormBase {
    *   The app root.
    */
   public function __construct($root) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+
     $this->root = $root;
   }
 
@@ -234,7 +240,7 @@ class FileTransferAuthorizeForm extends FormBase {
    * @param array $settings
    *   Array of settings for the FileTransfer.
    *
-   * @return \Drupal\Core\FileTransfer\FileTransfer|bool
+   * @return \Drupal\Core\FileTransfer\FileTransfer|false
    *   An instantiated FileTransfer object for the requested method and
    *   settings, or FALSE if there was an error finding or instantiating it.
    */
@@ -310,7 +316,7 @@ class FileTransferAuthorizeForm extends FormBase {
   /**
    * Runs the operation specified in 'authorize_operation' session property.
    *
-   * @param array $filetransfer
+   * @param \Drupal\Core\FileTransfer\FileTransfer|false $filetransfer
    *   The FileTransfer object to use for running the operation.
    *
    * @return \Symfony\Component\HttpFoundation\Response|null

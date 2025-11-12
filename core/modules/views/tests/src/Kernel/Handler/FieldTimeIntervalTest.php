@@ -6,13 +6,16 @@ namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the time interval handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\field\TimeInterval
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FieldTimeIntervalTest extends ViewsKernelTestBase {
 
   /**
@@ -44,16 +47,13 @@ class FieldTimeIntervalTest extends ViewsKernelTestBase {
    * Tests the TimeInterval handler.
    */
   public function testFieldTimeInterval(): void {
-    $view_config = $this->config('views.view.test_view');
-    $view_config->set('display.default.display_options.fields.age.plugin_id', 'time_interval');
-    foreach (array_keys($this->ages) as $delta) {
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+    $this->executeView($view);
+    foreach ($view->result as $delta => $row) {
       [, $formatted_value, $granularity] = $this->ages[$delta];
-      $view_config->set('display.default.display_options.fields.age.granularity', $granularity);
-      $view_config->save();
-      $view = Views::getView('test_view');
-      $view->setDisplay();
-      $this->executeView($view);
-      $this->assertEquals($formatted_value, $view->field['age']->advancedRender($view->result[$delta]));
+      $view->field['age']->options['granularity'] = $granularity;
+      $this->assertEquals($formatted_value, $view->field['age']->advancedRender($row));
     }
   }
 
