@@ -447,7 +447,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     foreach ($this->translations as $langcode => $data) {
       if ($this->hasTranslation($langcode)) {
         $translation = $this->getTranslation($langcode);
-        $translation_original = $this->original && $this->original->hasTranslation($langcode) ? $this->original->getTranslation($langcode) : NULL;
+        $translation_original = $this->getOriginal() && $this->getOriginal()->hasTranslation($langcode) ? $this->getOriginal()->getTranslation($langcode) : NULL;
         // Try to set fields provided by the media source and mapped in
         // media type config.
         $original = $this->getOriginal();
