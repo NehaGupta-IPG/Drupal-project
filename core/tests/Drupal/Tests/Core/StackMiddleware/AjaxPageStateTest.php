@@ -91,4 +91,59 @@ class AjaxPageStateTest extends UnitTestCase {
     return $data;
   }
 
+  /**
+   * Tests that libraries key is set to empty string when missing.
+   */
+  public function testLibrariesKeyMissing(): void {
+    $request = Request::create('/');
+    $request->request->set('ajax_page_state', ['theme' => 'stark']);
+
+    $kernel = $this->prophesize(HttpKernelInterface::class);
+    $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, TRUE)
+      ->shouldBeCalled()
+      ->willReturn(new Response());
+
+    $middleware = new AjaxPageState($kernel->reveal());
+    $middleware->handle($request);
+    $ajax_page_state = $request->request->all('ajax_page_state');
+    $this->assertSame('', $ajax_page_state['libraries']);
+  }
+
+  /**
+   * Tests that non-string libraries value is set to empty string.
+   */
+  public function testLibrariesNonString(): void {
+    $request = Request::create('/');
+    $request->request->set('ajax_page_state', ['libraries' => ['core/drupal']]);
+
+    $kernel = $this->prophesize(HttpKernelInterface::class);
+    $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, TRUE)
+      ->shouldBeCalled()
+      ->willReturn(new Response());
+
+    $middleware = new AjaxPageState($kernel->reveal());
+    $middleware->handle($request);
+    $ajax_page_state = $request->request->all('ajax_page_state');
+    $this->assertSame('', $ajax_page_state['libraries']);
+  }
+
+  /**
+   * Tests that sub-requests are not processed.
+   */
+  public function testSubRequest(): void {
+    $compressed = UrlHelper::compressQueryParameter('core/drupal');
+    $request = Request::create('/');
+    $request->request->set('ajax_page_state', ['libraries' => $compressed]);
+
+    $kernel = $this->prophesize(HttpKernelInterface::class);
+    $kernel->handle($request, HttpKernelInterface::SUB_REQUEST, TRUE)
+      ->shouldBeCalled()
+      ->willReturn(new Response());
+
+    $middleware = new AjaxPageState($kernel->reveal());
+    $middleware->handle($request, HttpKernelInterface::SUB_REQUEST);
+    $ajax_page_state = $request->request->all('ajax_page_state');
+    $this->assertSame($compressed, $ajax_page_state['libraries']);
+  }
+
 }
