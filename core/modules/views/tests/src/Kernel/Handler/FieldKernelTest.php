@@ -8,13 +8,16 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the generic field handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\field\FieldPluginBase
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FieldKernelTest extends ViewsKernelTestBase {
 
   /**
@@ -532,7 +535,8 @@ class FieldKernelTest extends ViewsKernelTestBase {
     });
     $this->assertSame($random_name, (string) $render, 'If the rewritten string is not empty, "0" should not be treated as empty.');
 
-    // Test when results are rewritten to an empty string and non-zero empty results are hidden.
+    // Test when results are rewritten to an empty string and non-zero empty
+    // results are hidden.
     $view->field['name']->options['hide_alter_empty'] = TRUE;
     $view->field['name']->options['hide_empty'] = TRUE;
     $view->field['name']->options['empty_zero'] = FALSE;
@@ -807,7 +811,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
       $this->assertEquals($expect[$key], $result_text);
     }
 
-    // Test also word_boundary
+    // Test also word_boundary.
     $alter['word_boundary'] = TRUE;
     $expect = [
       'Tuy nhiên',

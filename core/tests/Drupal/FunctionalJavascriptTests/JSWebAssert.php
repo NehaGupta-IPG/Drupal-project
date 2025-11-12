@@ -15,7 +15,7 @@ use PHPUnit\Framework\Constraint\IsNull;
 use PHPUnit\Framework\Constraint\LogicalNot;
 use WebDriver\Exception;
 
-// cspell:ignore interactable
+// cspell:ignore interactable xmlhttprequest
 
 /**
  * Defines a class with methods for asserting presence of elements during tests.
@@ -85,7 +85,7 @@ JS;
     window.drupalCumulativeXhrCount,
     window.performance
       .getEntries()
-      .filter(entry => entry.initiatorType === 'xmlhttprequest')
+      .filter(({initiatorType}) => initiatorType === 'xmlhttprequest' || initiatorType === 'fetch')
       .length,
     window.performance.timeOrigin
   ];
@@ -304,8 +304,8 @@ JS);
    * Tests that a node, or its specific corner, is visible in the viewport.
    *
    * Note: Always set the viewport size. This can be done in your test with
-   * \Behat\Mink\Session->resizeWindow(). Drupal CI JavaScript tests by default
-   * use a viewport of 1024x768px.
+   * \Behat\Mink\Session->resizeWindow(). JavaScript tests in the default CI
+   * environment use a viewport of 1024x768px.
    *
    * @param string $selector_type
    *   The element selector type (css, xpath).

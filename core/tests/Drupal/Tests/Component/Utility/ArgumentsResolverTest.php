@@ -5,26 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\ArgumentsResolver;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Utility\ArgumentsResolver
- * @group Access
+ * Tests Drupal\Component\Utility\ArgumentsResolver.
  */
+#[CoversClass(ArgumentsResolver::class)]
+#[Group('Access')]
 class ArgumentsResolverTest extends TestCase {
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
-
-  /**
    * Tests the getArgument() method.
-   *
-   * @dataProvider providerTestGetArgument
    */
+  #[DataProvider('providerTestGetArgument')]
   public function testGetArgument($callable, $scalars, $objects, $wildcards, $expected): void {
     $arguments = (new ArgumentsResolver($scalars, $objects, $wildcards))->getArguments($callable);
     $this->assertSame($expected, $arguments);
@@ -126,7 +122,8 @@ class ArgumentsResolverTest extends TestCase {
   /**
    * Tests getArgument() with a wildcard parameter with no type hint.
    *
-   * Without the type hint, the wildcard object will not be passed to the callable.
+   * Without the type hint, the wildcard object will not be passed to the
+   * callable.
    */
   public function testGetWildcardArgumentNoTypeHint(): void {
     $a = $this->getMockBuilder('\Drupal\Tests\Component\Utility\Test1Interface')->getMock();
@@ -170,9 +167,8 @@ class ArgumentsResolverTest extends TestCase {
 
   /**
    * Tests handleUnresolvedArgument() for missing arguments.
-   *
-   * @dataProvider providerTestHandleUnresolvedArgument
    */
+  #[DataProvider('providerTestHandleUnresolvedArgument')]
   public function testHandleUnresolvedArgument($callable): void {
     $resolver = new ArgumentsResolver([], [], []);
     $this->expectException(\RuntimeException::class);
@@ -203,6 +199,9 @@ class TestClass {
 
 }
 
+/**
+ * Provides a class for testing a static method.
+ */
 class TestStaticMethodClass {
 
   public static function access($foo) {

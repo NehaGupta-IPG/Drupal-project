@@ -7,41 +7,89 @@ namespace Drupal\Tests\Core\StackMiddleware;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\StackMiddleware\AjaxPageState;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\StackMiddleware\AjaxPageState
- * @group Middleware
+ * Tests Drupal\Core\StackMiddleware\AjaxPageState.
  */
+#[CoversClass(AjaxPageState::class)]
+#[Group('StackMiddleware')]
 class AjaxPageStateTest extends UnitTestCase {
 
   /**
-   * Tests that sub-requests are not processed.
-   *
-   * @covers ::handle
+   * Tests that the query and request libraries are merged.
    */
-  public function testHandle(): void {
-    $compressed = UrlHelper::compressQueryParameter('core/drupal');
-    $request = Request::create('/');
-    $request->request->set('ajax_page_state', ['libraries' => $compressed]);
+  #[DataProvider('providerHandle')]
+  public function testHandle(?string $query_libraries, ?string $request_libraries, ?string $query_expected, ?string $request_expected): void {
+    $request = new Request();
+    if ($query_libraries) {
+      $request->query->set('ajax_page_state', ['libraries' => $query_libraries]);
+    }
+    if ($request_libraries) {
+      $request->request->set('ajax_page_state', ['libraries' => $request_libraries]);
+    }
+
+    $result_request = new Request();
+    if ($query_expected) {
+      $result_request->query->set('ajax_page_state', ['libraries' => $query_expected]);
+    }
+    if ($request_expected) {
+      $result_request->request->set('ajax_page_state', ['libraries' => $request_expected]);
+    }
 
     $kernel = $this->prophesize(HttpKernelInterface::class);
-    $kernel->handle($request, HttpKernelInterface::SUB_REQUEST, TRUE)
+    $kernel->handle($result_request, HttpKernelInterface::MAIN_REQUEST, TRUE)
       ->shouldBeCalled()
-      ->willReturn(new Response());
-
+      ->willReturn($this->createMock(Response::class));
     $middleware = new AjaxPageState($kernel->reveal());
-    $middleware->handle($request, HttpKernelInterface::SUB_REQUEST);
-    $ajax_page_state = $request->request->all('ajax_page_state');
-    $this->assertSame($compressed, $ajax_page_state['libraries']);
+    $middleware->handle($request);
+
+    // Ensure the modified request matches the expected request.
+    $this->assertEquals($request->request->all(), $result_request->request->all());
+    $this->assertEquals($request->query->all(), $result_request->query->all());
+  }
+
+  /**
+   * Provides data for testHandle().
+   */
+  public static function providerHandle(): array {
+    $foo_bar = UrlHelper::compressQueryParameter('foo,bar');
+    $foo_baz = UrlHelper::compressQueryParameter('foo,baz');
+    $data = [];
+    $data['only query'] = [
+      $foo_bar,
+      NULL,
+      'foo,bar',
+      NULL,
+    ];
+    $data['only request'] = [
+      NULL,
+      $foo_bar,
+      NULL,
+      'foo,bar',
+    ];
+    $data['matching'] = [
+      $foo_bar,
+      $foo_bar,
+      'foo,bar',
+      'foo,bar',
+    ];
+    $data['different'] = [
+      $foo_baz,
+      $foo_bar,
+      'foo,bar,baz',
+      'foo,bar,baz',
+    ];
+    return $data;
   }
 
   /**
    * Tests that libraries key is set to empty string when missing.
-   *
-   * @covers ::handle
    */
   public function testLibrariesKeyMissing(): void {
     $request = Request::create('/');
@@ -60,83 +108,39 @@ class AjaxPageStateTest extends UnitTestCase {
 
   /**
    * Tests that non-string libraries value is set to empty string.
-   *
-   * @covers ::handle
    */
   public function testLibrariesNonString(): void {
     $request = Request::create('/');
     $request->request->set('ajax_page_state', ['libraries' => ['core/drupal']]);
 
-    $app = $this->prophesize(HttpKernelInterface::class);
-    $app->handle($request, HttpKernelInterface::MAIN_REQUEST, TRUE)
+    $kernel = $this->prophesize(HttpKernelInterface::class);
+    $kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, TRUE)
       ->shouldBeCalled()
       ->willReturn(new Response());
 
-    $middleware = new AjaxPageState($app->reveal());
+    $middleware = new AjaxPageState($kernel->reveal());
     $middleware->handle($request);
     $ajax_page_state = $request->request->all('ajax_page_state');
     $this->assertSame('', $ajax_page_state['libraries']);
   }
 
   /**
-   * Tests that compressed libraries are decompressed.
-   *
-   * @covers ::handle
+   * Tests that sub-requests are not processed.
    */
-  public function testLibrariesDecompressed(): void {
-    $libraries = 'core/drupal,core/jquery';
-    $compressed = UrlHelper::compressQueryParameter($libraries);
+  public function testSubRequest(): void {
+    $compressed = UrlHelper::compressQueryParameter('core/drupal');
     $request = Request::create('/');
     $request->request->set('ajax_page_state', ['libraries' => $compressed]);
 
-    $app = $this->prophesize(HttpKernelInterface::class);
-    $app->handle($request, HttpKernelInterface::MAIN_REQUEST, TRUE)
+    $kernel = $this->prophesize(HttpKernelInterface::class);
+    $kernel->handle($request, HttpKernelInterface::SUB_REQUEST, TRUE)
       ->shouldBeCalled()
       ->willReturn(new Response());
 
-    $middleware = new AjaxPageState($app->reveal());
-    $middleware->handle($request);
+    $middleware = new AjaxPageState($kernel->reveal());
+    $middleware->handle($request, HttpKernelInterface::SUB_REQUEST);
     $ajax_page_state = $request->request->all('ajax_page_state');
-    $this->assertSame($libraries, $ajax_page_state['libraries']);
-  }
-
-  /**
-   * Tests that query parameters are processed.
-   *
-   * @covers ::handle
-   */
-  public function testQueryParameters(): void {
-    $libraries = 'core/drupal';
-    $compressed = UrlHelper::compressQueryParameter($libraries);
-    $request = Request::create('/');
-    $request->query->set('ajax_page_state', ['libraries' => $compressed]);
-
-    $app = $this->prophesize(HttpKernelInterface::class);
-    $app->handle($request, HttpKernelInterface::MAIN_REQUEST, TRUE)
-      ->shouldBeCalled()
-      ->willReturn(new Response());
-
-    $middleware = new AjaxPageState($app->reveal());
-    $middleware->handle($request);
-    $ajax_page_state = $request->query->all('ajax_page_state');
-    $this->assertSame($libraries, $ajax_page_state['libraries']);
-  }
-
-  /**
-   * Tests that handle works without ajax_page_state.
-   *
-   * @covers ::handle
-   */
-  public function testHandleWithoutAjaxPageState(): void {
-    $request = Request::create('/');
-
-    $app = $this->prophesize(HttpKernelInterface::class);
-    $app->handle($request, HttpKernelInterface::MAIN_REQUEST, TRUE)
-      ->shouldBeCalled()
-      ->willReturn(new Response());
-
-    $middleware = new AjaxPageState($app->reveal());
-    $middleware->handle($request);
+    $this->assertSame($compressed, $ajax_page_state['libraries']);
   }
 
 }

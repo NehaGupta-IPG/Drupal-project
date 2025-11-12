@@ -6,14 +6,19 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\Core\Form\FormState;
+use Drupal\field_ui\Form\EntityDisplayFormBase;
 use Drupal\field_ui\Form\EntityViewDisplayEditForm;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\field_ui\Form\EntityDisplayFormBase
- *
- * @group Entity
+ * Tests Drupal\field_ui\Form\EntityDisplayFormBase.
  */
+#[CoversClass(EntityDisplayFormBase::class)]
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityDisplayFormBaseTest extends KernelTestBase {
 
   /**
@@ -22,7 +27,9 @@ class EntityDisplayFormBaseTest extends KernelTestBase {
   protected static $modules = ['entity_test'];
 
   /**
-   * @covers ::copyFormValuesToEntity
+   * Tests copy form values to entity.
+   *
+   * @legacy-covers ::copyFormValuesToEntity
    */
   public function testCopyFormValuesToEntity(): void {
     $field_values = [];

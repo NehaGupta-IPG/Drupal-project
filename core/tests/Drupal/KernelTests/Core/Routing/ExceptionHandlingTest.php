@@ -7,14 +7,16 @@ namespace Drupal\KernelTests\Core\Routing;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\CacheableJsonResponse;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests the exception handling for various cases.
- *
- * @group Routing
  */
+#[Group('Routing')]
+#[RunTestsInSeparateProcesses]
 class ExceptionHandlingTest extends KernelTestBase {
 
   /**
@@ -146,6 +148,7 @@ class ExceptionHandlingTest extends KernelTestBase {
    *   The path to test.
    *
    * @return \Drupal\Core\Render\HtmlResponse
+   *   The generated 404 response.
    *
    * @see \Drupal\system\Tests\Routing\ExceptionHandlingTest::testExceptionResponseGeneratedForOriginalRequest()
    */
@@ -174,7 +177,7 @@ class ExceptionHandlingTest extends KernelTestBase {
     $kernel = \Drupal::getContainer()->get('http_kernel');
     $response = $kernel->handle($request)->prepare($request);
     $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
-    $this->assertEquals('text/html; charset=UTF-8', $response->headers->get('Content-type'));
+    $this->assertEquals('text/html; charset=utf-8', $response->headers->get('Content-type'));
 
     // Test both that the backtrace is properly escaped, and that the unescaped
     // string is not output at all.
@@ -197,7 +200,7 @@ class ExceptionHandlingTest extends KernelTestBase {
     $kernel = \Drupal::getContainer()->get('http_kernel');
     $response = $kernel->handle($request)->prepare($request);
     $this->assertEquals(Response::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
-    $this->assertEquals('text/html; charset=UTF-8', $response->headers->get('Content-type'));
+    $this->assertEquals('text/html; charset=utf-8', $response->headers->get('Content-type'));
 
     // Test message is properly escaped, and that the unescaped string is not
     // output at all.
@@ -214,7 +217,7 @@ class ExceptionHandlingTest extends KernelTestBase {
     // contained in the output would not matter, but because it is output by the
     // final exception subscriber, it is printed as partial HTML, and hence
     // escaped.
-    $this->assertEquals('text/plain; charset=UTF-8', $response->headers->get('Content-type'));
+    $this->assertEquals('text/plain; charset=utf-8', $response->headers->get('Content-type'));
     // cspell:ignore jsonalert
     $this->assertStringStartsWith('Not acceptable format: jsonalert(123);', $response->getContent());
   }
