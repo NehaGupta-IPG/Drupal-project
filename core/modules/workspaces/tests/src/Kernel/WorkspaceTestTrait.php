@@ -38,6 +38,15 @@ trait WorkspaceTestTrait {
     $this->entityTypeManager = \Drupal::entityTypeManager();
     $this->workspaceManager = \Drupal::service('workspaces.manager');
 
+    $this->installEntitySchema('workspace');
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
+
+    // Install the entity schema for supported entity types to ensure that the
+    // 'workspace' revision metadata field gets created.
+    foreach (array_keys(\Drupal::service('workspaces.information')->getSupportedEntityTypes()) as $entity_type_id) {
+      $this->installEntitySchema($entity_type_id);
+    }
+
     // Create two workspaces by default, 'live' and 'stage'.
     $this->workspaces['live'] = Workspace::create(['id' => 'live', 'label' => 'Live']);
     $this->workspaces['live']->save();
