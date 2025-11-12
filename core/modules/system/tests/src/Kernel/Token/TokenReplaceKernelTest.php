@@ -205,13 +205,11 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
     $build = [
       '#theme' => 'image',
       '#uri' => $themeSettingsProvider->getSetting('logo.url', 'olivero'),
-      '#alt' => 'The site logo',
     ];
     $olivero_logo_html_string = $renderer->renderInIsolation($build)->__toString();
     $build = [
       '#theme' => 'image',
       '#uri' => $themeSettingsProvider->getSetting('logo.url', 'claro'),
-      '#alt' => 'The site logo',
     ];
     $claro_logo_html_string = $renderer->renderInIsolation($build)->__toString();
 
@@ -283,7 +281,6 @@ class TokenReplaceKernelTest extends TokenReplaceKernelTestBase {
     $build = [
       '#theme' => 'image',
       '#uri' => $themeSettingsProvider->getSetting('logo.url', 'olivero'),
-      '#alt' => 'The site logo',
     ];
     $olivero_logo_html_string = $renderer->renderInIsolation($build)->__toString();
 
