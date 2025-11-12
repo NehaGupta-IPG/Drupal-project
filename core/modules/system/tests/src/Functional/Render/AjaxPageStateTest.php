@@ -112,4 +112,19 @@ class AjaxPageStateTest extends BrowserTestBase {
     $this->assertSession()->responseContains('/core/misc/drupalSettingsLoader.js');
   }
 
+  /**
+   * Tests ajax_page_state with uncompressed libraries string.
+   */
+  public function testAjaxPageStateWithUncompressedLibraries(): void {
+    $this->drupalGet('node', [
+      'query' => [
+        'ajax_page_state' => [
+          'libraries' => 'core/drupalSettings',
+        ],
+      ],
+    ]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseNotContains('/core/misc/drupalSettingsLoader.js');
+  }
+
 }
