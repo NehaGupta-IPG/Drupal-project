@@ -8,12 +8,14 @@ use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Extension\ThemeExtensionList.
  */
 #[CoversClass(ThemeExtensionList::class)]
 #[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ThemeExtensionListTest extends KernelTestBase {
 
   /**
@@ -25,6 +27,7 @@ class ThemeExtensionListTest extends KernelTestBase {
     \Drupal::configFactory()->getEditable('core.extension')
       ->set('module.testing', 1000)
       ->set('theme.test_theme', 0)
+      ->set('profile', 'testing')
       ->save();
 
     // The installation profile is provided by a container parameter.

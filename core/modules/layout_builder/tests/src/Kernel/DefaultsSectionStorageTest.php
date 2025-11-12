@@ -19,12 +19,14 @@ use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage.
  */
 #[CoversClass(DefaultsSectionStorage::class)]
 #[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class DefaultsSectionStorageTest extends KernelTestBase {
 
   /**
@@ -35,7 +37,6 @@ class DefaultsSectionStorageTest extends KernelTestBase {
     'layout_builder',
     'layout_builder_defaults_test',
     'entity_test',
-    'field',
     'user',
   ];
 

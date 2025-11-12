@@ -8,11 +8,13 @@ use Drupal\block\Entity\Block;
 use Drupal\block\Hook\BlockHooks;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests migration of blocks to configuration entities.
  */
 #[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateBlockTest extends MigrateDrupal6TestBase {
 
   /**
@@ -21,11 +23,7 @@ class MigrateBlockTest extends MigrateDrupal6TestBase {
   protected static $modules = [
     'block',
     'views',
-    'comment',
-    'menu_ui',
     'block_content',
-    'taxonomy',
-    'node',
     'path_alias',
   ];
 

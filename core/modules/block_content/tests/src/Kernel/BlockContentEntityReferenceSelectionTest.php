@@ -10,6 +10,7 @@ use Drupal\block_content_test\Plugin\EntityReferenceSelection\TestSelection;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityReference selection handlers don't return non-reusable blocks.
@@ -17,13 +18,13 @@ use PHPUnit\Framework\Attributes\Group;
  * @see block_content_query_entity_reference_alter()
  */
 #[Group('block_content')]
+#[RunTestsInSeparateProcesses]
 class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
     'block_content',
     'block_content_test',
     'user',

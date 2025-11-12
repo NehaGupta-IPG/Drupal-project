@@ -7,14 +7,10 @@ use Drupal\Core\Entity\RevisionableInterface;
 /**
  * Defines an interface for the workspace_association service.
  *
- * The canonical workspace association data is stored in a revision metadata
- * field on each entity revision that is tracked by a workspace.
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+ * Use \Drupal\workspaces\WorkspaceTrackerInterface instead.
  *
- * For the purpose of optimizing workspace-specific queries, the default
- * implementation of this interface defines a custom 'workspace_association'
- * index table which stores only the latest revisions tracked by a workspace.
- *
- * @internal
+ * @see https://www.drupal.org/node/3551450
  */
 interface WorkspaceAssociationInterface {
 
@@ -123,6 +119,29 @@ interface WorkspaceAssociationInterface {
    *   array if it is not tracked anywhere.
    */
   public function getEntityTrackingWorkspaceIds(RevisionableInterface $entity, bool $latest_revision = FALSE);
+
+  /**
+   * Moves tracked entities from one workspace to another.
+   *
+   * @param string $source_workspace_id
+   *   The ID of the source workspace.
+   * @param string $target_workspace_id
+   *   The ID of the target workspace.
+   * @param string|null $entity_type_id
+   *   (optional) The entity type ID to filter the move operation. If NULL,
+   *   all entity types will be moved. Defaults to NULL.
+   * @param int[]|string[]|null $entity_ids
+   *   (optional) An array of entity IDs to move. If NULL, all entities of the
+   *   specified type (or all entities if no type specified) will be moved.
+   *   Defaults to NULL.
+   *
+   * @throws \InvalidArgumentException
+   *   If the source and target workspace IDs are the same, or if entity IDs
+   *   are provided without an entity type ID.
+   * @throws \DomainException
+   *   If either workspace is not top-level or has sub-workspaces.
+   */
+  public function moveTrackedEntities(string $source_workspace_id, string $target_workspace_id, ?string $entity_type_id = NULL, ?array $entity_ids = NULL): void;
 
   /**
    * Deletes all the workspace association records for the given workspace.

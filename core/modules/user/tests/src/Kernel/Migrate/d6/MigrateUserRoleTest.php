@@ -11,11 +11,13 @@ use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Upgrade user roles to user.role.*.yml.
  */
 #[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateUserRoleTest extends MigrateDrupal6TestBase {
 
   /**
@@ -29,7 +31,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
   /**
    * Assert the logged migrate messages.
    *
-   * @param string[][] $role_data
+   * @param array{string, array{'rid': int, 'valid': string[], 'invalid': string[]}} $role_data
    *   An array of role data keyed by the destination role id. The role data
    *   contains the source role id, an array of valid permissions and an array
    *   of invalid permissions.
@@ -182,7 +184,6 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
           'block',
           'block_content',
           'comment',
-          'contact',
           'config_translation',
           'language',
           'link',
@@ -195,7 +196,6 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
           'language',
           'd6_comment_type',
           'block_content_type',
-          'contact_category',
           'd6_filter_format',
           'd6_taxonomy_vocabulary',
           'd6_taxonomy_vocabulary_translation',
@@ -239,7 +239,6 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
             'rid' => 4,
             'valid' => [
               'access content overview',
-              'administer contact forms',
               'administer nodes',
               'create forum content',
               'delete any forum content',
@@ -250,6 +249,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
               'use text format php_code',
             ],
             'invalid' => [
+              'administer contact forms',
               'delete any blog content',
               'delete own blog content',
               'edit any blog content',
@@ -277,7 +277,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
    *   A list of modules to install.
    * @param string[] $migrations
    *   A list of migrations to execute.
-   * @param string[][] $role_data
+   * @param array{string, array{'rid': int, 'valid': string[], 'invalid': string[]}} $role_data
    *   An array of role data keyed by the destination role id. The role data
    *   contains the source role id, an array of valid permissions and an array
    *   of invalid permissions.

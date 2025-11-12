@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\Kernel;
 
+// cspell:ignore arta codesnippet
+
 use Drupal\ckeditor5\HTMLRestrictions;
+use Drupal\ckeditor5\SmartDefaultSettings;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\Entity\EntityViewMode;
@@ -13,9 +16,10 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
-// cspell:ignore arta codesnippet
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\Yaml\Yaml;
 
@@ -23,9 +27,10 @@ use Symfony\Component\Yaml\Yaml;
  * Tests Smart Default Settings.
  *
  * @internal
- * @legacy-covers \Drupal\ckeditor5\SmartDefaultSettings::computeSmartDefaultSettings
  */
 #[Group('ckeditor5')]
+#[CoversMethod(SmartDefaultSettings::class, 'computeSmartDefaultSettings')]
+#[RunTestsInSeparateProcesses]
 class SmartDefaultSettingsTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
@@ -94,8 +99,6 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     'user',
     // For being able to test media_embed + Media button in CKE5.
     'media',
-    'media_library',
-    'views',
     'help',
     'editor_test',
     'ckeditor_test',

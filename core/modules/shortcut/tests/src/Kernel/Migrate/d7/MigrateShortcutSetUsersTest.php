@@ -7,11 +7,13 @@ namespace Drupal\Tests\shortcut\Kernel\Migrate\d7;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test shortcut_set_users migration.
  */
 #[Group('shortcut')]
+#[RunTestsInSeparateProcesses]
 class MigrateShortcutSetUsersTest extends MigrateDrupal7TestBase {
 
   /**
@@ -19,7 +21,6 @@ class MigrateShortcutSetUsersTest extends MigrateDrupal7TestBase {
    */
   protected static $modules = [
     'link',
-    'field',
     'shortcut',
     'menu_link_content',
   ];
