@@ -396,7 +396,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       'cache' => ['cache'],
       'title' => ['title'],
       'css_class' => ['css_class'],
-      'use_ajax' => ['use_ajax'],
+      'use_ajax' => ['use_ajax', 'disable_scroll_to_top'],
       'hide_attachment_summary' => ['hide_attachment_summary'],
       'show_admin_links' => ['show_admin_links'],
       'group_by' => ['group_by'],
@@ -460,7 +460,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
           'display_description' => FALSE,
           'use_ajax' => TRUE,
-          'disable_scroll_to_top' => FALSE,
+          'disable_scroll_to_top' => TRUE,
           'hide_attachment_summary' => TRUE,
           'show_admin_links' => TRUE,
           'pager' => TRUE,
@@ -505,6 +505,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         'default' => '',
       ],
       'use_ajax' => [
+        'default' => FALSE,
+      ],
+      'disable_scroll_to_top' => [
         'default' => FALSE,
       ],
       'hide_attachment_summary' => [
