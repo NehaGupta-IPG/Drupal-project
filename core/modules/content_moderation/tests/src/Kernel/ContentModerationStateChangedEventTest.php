@@ -14,6 +14,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Constraint\Constraint;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -21,6 +22,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * Tests events are properly fired during create/save of moderation states.
  */
 #[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ContentModerationStateChangedEventTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -81,9 +83,10 @@ class ContentModerationStateChangedEventTest extends KernelTestBase {
       [[FALSE, 'draft', 1, 'en']],
       [['draft', 'published', 2, 'en']],
       [['published', 'archived', 3, 'en']],
-      [['archived', 'published', 4, 'fr']],
+      [[NULL, 'published', 4, 'fr']],
       [['published', 'draft', 5, 'fr']],
     ];
+
     $callSequenceObjects = array_map(function ($element) {
       $entity = $this->createMock(EditorialContentEntityBase::class);
       $language = $this->createMock(LanguageInterface::class);
@@ -155,29 +158,8 @@ class ContentModerationStateChangedEventTest extends KernelTestBase {
 
   /**
    * Callback for consecutive calls to mocked objects.
-   *
-   * Since the removal of InvocationMocker::withConsecutive() from PHPUnit, we
-   * can use InvocationMocker::willReturnCallback() instead, passing a stack
-   * of expected calls to mocked methods. This method provides a generic
-   * callback for the purpose, checking actual arguments against expected ones
-   * and returning a value if needed.
-   *
-   * @param array $expectedConsecutiveCalls
-   *   An array of expected arguments and return values for a stack of calls
-   *   to the method. The first element of the array contains the expected
-   *   call arguments, either concrete values or Constraint objects (could be
-   *   a partial list, in which case the actual arguments in excess of the
-   *   expected ones are ignored). The second element, if specified, is
-   *   returned by the callback when the arguments match.
-   * @param array $actualArgs
-   *   The array of arguments actually passed to the mocked object.
-   *
-   * @return mixed
-   *   The value specified by the second array item of
-   *   $expectedConsecutiveCalls. NULL if not specified.
    */
   protected function consecutiveCallsCallback(array &$expectedConsecutiveCalls, array $actualArgs): mixed {
-    // @todo Use MockTrait when https://www.drupal.org/i/3306554 lands.
     // Return early if there are no expected calls.
     if ($expectedConsecutiveCalls === []) {
       return NULL;
