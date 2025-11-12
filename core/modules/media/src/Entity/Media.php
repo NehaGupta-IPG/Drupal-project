@@ -490,6 +490,11 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
           }
         }
 
+        // Try to set a default name for this media item if no name is provided.
+        if ($translation->get('name')->isEmpty()) {
+          $translation->setName($translation->getName());
+        }
+
         // Set thumbnail.
         if ($translation->shouldUpdateThumbnail($this->isNew())) {
           $translation->updateThumbnail();
