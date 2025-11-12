@@ -34,6 +34,7 @@ class ModerationStateWidgetTest extends KernelTestBase {
     'workflows',
     'content_moderation',
     'node',
+    'workspaces',
   ];
 
   /**
@@ -42,6 +43,7 @@ class ModerationStateWidgetTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installWorkspacesModuleSchema();
     $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema('user');
     $this->installConfig(['content_moderation', 'system']);

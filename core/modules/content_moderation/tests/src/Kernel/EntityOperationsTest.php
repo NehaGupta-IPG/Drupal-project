@@ -31,6 +31,7 @@ class EntityOperationsTest extends KernelTestBase {
     'node',
     'user',
     'workflows',
+    'workspaces',
   ];
 
   /**
@@ -38,6 +39,7 @@ class EntityOperationsTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installWorkspacesModuleSchema();
     $this->installEntitySchema('node');
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('user');

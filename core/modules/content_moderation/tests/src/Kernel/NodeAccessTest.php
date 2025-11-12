@@ -41,6 +41,7 @@ class NodeAccessTest extends KernelTestBase {
     'system',
     'user',
     'workflows',
+    'workspaces',
   ];
 
   /**
@@ -49,6 +50,7 @@ class NodeAccessTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installWorkspacesModuleSchema();
     $this->installEntitySchema('content_moderation_state');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');

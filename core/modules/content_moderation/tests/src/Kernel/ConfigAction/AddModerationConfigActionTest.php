@@ -45,6 +45,7 @@ class AddModerationConfigActionTest extends KernelTestBase {
     'taxonomy',
     'text',
     'user',
+    'workspaces',
   ];
 
   /**

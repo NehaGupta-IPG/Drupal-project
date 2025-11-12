@@ -62,20 +62,6 @@ class EntityOperations implements ContainerInjectionInterface {
    */
   protected $routerBuilder;
 
-  /**
-   * Constructs a new EntityOperations object.
-   *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
-   *   Moderation information service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   Entity type manager service.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
-   *   The entity bundle information service.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
-   *   The router builder service.
-   */
   public function __construct(
     ModerationInformationInterface $moderation_info,
     EntityTypeManagerInterface $entity_type_manager,
@@ -85,7 +71,6 @@ class EntityOperations implements ContainerInjectionInterface {
     protected WorkspaceManagerInterface $workspaceManager,
     protected WorkspaceInformationInterface $workspaceInfo,
     protected WorkspaceProviderInterface $workspaceProvider,
-
   ) {
     $this->moderationInfo = $moderation_info;
     $this->entityTypeManager = $entity_type_manager;
@@ -118,7 +103,7 @@ class EntityOperations implements ContainerInjectionInterface {
    *
    * @see hook_entity_create()
    */
-  public function entityCreate(EntityInterface $entity) {
+  public function entityCreate(EntityInterface $entity): void {
     if ($this->moderationInfo->isModeratedEntity($entity)
       && $this->workspaceInfo->isEntitySupported($entity)
       && !$this->workspaceManager->hasActiveWorkspace()

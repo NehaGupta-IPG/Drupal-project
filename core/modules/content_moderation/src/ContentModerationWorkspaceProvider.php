@@ -79,6 +79,11 @@ class ContentModerationWorkspaceProvider extends WorkspaceProviderBase {
    * {@inheritdoc}
    */
   public function entityPresave(EntityInterface $entity): void {
+    // Bypass the pre-save protection for unsupported entity types.
+    if (!$this->workspaceInfo->isEntitySupported($entity)) {
+      return;
+    }
+
     $previous_is_default_revision = $entity->isDefaultRevision();
     parent::entityPresave($entity);
 
@@ -155,8 +160,17 @@ class ContentModerationWorkspaceProvider extends WorkspaceProviderBase {
   }
 
   /**
-   * @todo
+   * {@inheritdoc}
    */
+  public function entityPredelete(EntityInterface $entity): void {
+    // Bypass the pre-delete protection for unsupported entity types.
+    if (!$this->workspaceInfo->isEntitySupported($entity)) {
+      return;
+    }
+
+    parent::entityPredelete($entity);
+  }
+
   protected function getModerationState(EntityInterface $entity): ?ContentModerationState {
     if ($entity->moderation_state->value) {
       $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
@@ -167,9 +181,6 @@ class ContentModerationWorkspaceProvider extends WorkspaceProviderBase {
     return $current_state ?? NULL;
   }
 
-  /**
-   * @todo
-   */
   public function createModerationWorkspace(EntityInterface $entity, bool $temporary = FALSE): WorkspaceInterface {
     $parts = $temporary
       ? [
@@ -196,9 +207,6 @@ class ContentModerationWorkspaceProvider extends WorkspaceProviderBase {
     return $workspace;
   }
 
-  /**
-   * @todo
-   */
   public function getOrCreateModerationWorkspace(string $entity_type_id, int|string $entity_id, string $langcode): WorkspaceInterface {
     if ($workspace = $this->getModerationWorkspace($entity_type_id, $entity_id, $langcode)) {
       return $workspace;
@@ -223,9 +231,6 @@ class ContentModerationWorkspaceProvider extends WorkspaceProviderBase {
     }
   }
 
-  /**
-   * @todo
-   */
   public function getModerationWorkspace(string $entity_type_id, int|string $entity_id, string $langcode): ?WorkspaceInterface {
     $workspace_id = implode('.', [static::PREFIX, $entity_type_id, $entity_id, $langcode]);
 
@@ -234,9 +239,6 @@ class ContentModerationWorkspaceProvider extends WorkspaceProviderBase {
     return $workspace;
   }
 
-  /**
-   * @todo
-   */
   protected function getModeratedEntityInfo(WorkspaceInterface $workspace): array {
     $parts = explode('.', $workspace->id());
     $is_temporary = $parts[0] === static::TEMP_PREFIX;

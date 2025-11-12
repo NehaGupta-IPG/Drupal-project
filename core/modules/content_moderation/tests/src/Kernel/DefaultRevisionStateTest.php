@@ -33,6 +33,7 @@ class DefaultRevisionStateTest extends KernelTestBase {
     'language',
     'content_translation',
     'workflows',
+    'workspaces',
   ];
 
   /**
@@ -46,6 +47,7 @@ class DefaultRevisionStateTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installWorkspacesModuleSchema();
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');

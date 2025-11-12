@@ -30,6 +30,7 @@ class ViewsDataIntegrationTest extends ViewsKernelTestBase {
     'content_moderation',
     'workflows',
     'entity_test',
+    'workspaces',
   ];
 
   /**
@@ -38,6 +39,7 @@ class ViewsDataIntegrationTest extends ViewsKernelTestBase {
   protected function setUp($import_test_views = TRUE): void {
     parent::setUp($import_test_views);
 
+    $this->installWorkspacesModuleSchema();
     $this->installEntitySchema('node');
     $this->installEntitySchema('entity_test_mulrevpub');
     $this->installEntitySchema('user');

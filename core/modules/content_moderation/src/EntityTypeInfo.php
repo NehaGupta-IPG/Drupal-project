@@ -75,13 +75,6 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   protected $validator;
 
   /**
-   * The tempstore factory.
-   *
-   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
-   */
-  protected $tempStoreFactory;
-
-  /**
    * A keyed array of custom moderation handlers for given entity types.
    *
    * Any entity not specified will use a common default.
@@ -94,24 +87,6 @@ class EntityTypeInfo implements ContainerInjectionInterface {
     'taxonomy_term' => TaxonomyTermModerationHandler::class,
   ];
 
-  /**
-   * EntityTypeInfo constructor.
-   *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The translation service. for form alters.
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
-   *   The moderation information service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   Entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
-   *   Bundle information service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   Current user.
-   * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
-   *   State transition validator.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *    The factory for the temp store object.
-   */
   public function __construct(
     TranslationInterface $translation,
     ModerationInformationInterface $moderation_information,
@@ -119,7 +94,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
     EntityTypeBundleInfoInterface $bundle_info,
     AccountInterface $current_user,
     StateTransitionValidationInterface $validator,
-    PrivateTempStoreFactory $temp_store_factory,
+    protected PrivateTempStoreFactory $tempStoreFactory,
   ) {
     $this->stringTranslation = $translation;
     $this->moderationInfo = $moderation_information;
@@ -127,7 +102,6 @@ class EntityTypeInfo implements ContainerInjectionInterface {
     $this->bundleInfo = $bundle_info;
     $this->currentUser = $current_user;
     $this->validator = $validator;
-    $this->tempStoreFactory = $temp_store_factory;
   }
 
   /**

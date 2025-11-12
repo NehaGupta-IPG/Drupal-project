@@ -25,6 +25,7 @@ class ContentModerationPermissionsTest extends KernelTestBase {
     'workflows',
     'content_moderation',
     'workflow_type_test',
+    'workspaces',
   ];
 
   /**

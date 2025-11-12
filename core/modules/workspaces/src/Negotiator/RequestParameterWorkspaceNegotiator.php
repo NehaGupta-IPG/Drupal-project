@@ -59,14 +59,14 @@ class RequestParameterWorkspaceNegotiator implements WorkspaceNegotiatorInterfac
   /**
    * {@inheritdoc}
    */
-  public function setActiveWorkspace(WorkspaceInterface $workspace) {
+  public function setActiveWorkspace(WorkspaceInterface $workspace): void {
     // Do not persist - this negotiator is request-scoped only.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function unsetActiveWorkspace() {
+  public function unsetActiveWorkspace(): void {
     // Do not persist - this negotiator is request-scoped only.
   }
 

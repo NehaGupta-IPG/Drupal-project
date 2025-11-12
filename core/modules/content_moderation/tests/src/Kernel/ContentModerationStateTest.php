@@ -54,6 +54,7 @@ class ContentModerationStateTest extends KernelTestBase {
     'language',
     'text',
     'workflows',
+    'workspaces',
     'taxonomy',
   ];
 
@@ -90,6 +91,7 @@ class ContentModerationStateTest extends KernelTestBase {
     parent::setUp();
 
     $this->installConfig('system');
+    $this->installWorkspacesModuleSchema();
     $this->installSchema('node', 'node_access');
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
