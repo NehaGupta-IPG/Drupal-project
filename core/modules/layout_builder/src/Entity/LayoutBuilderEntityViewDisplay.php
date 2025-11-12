@@ -292,30 +292,22 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
    * {@inheritdoc}
    */
   public function buildMultiple(array $entities) {
-    $build_list = parent::buildMultiple($entities);
+    $build_list = [];
 
-    // Layout Builder can not be enabled for the '_custom' view mode that is
-    // used for on-the-fly rendering of fields in isolation from the entity.
-    if ($this->isCustomMode()) {
-      return $build_list;
-    }
-
-    foreach ($entities as $id => $entity) {
-      $build_list[$id]['_layout_builder'] = $this->buildSections($entity);
-
-      // If there are any sections, remove all fields with configurable display
-      // from the existing build. These fields are replicated within sections as
-      // field blocks by ::setComponent().
-      if (!Element::isEmpty($build_list[$id]['_layout_builder'])) {
-        foreach ($build_list[$id] as $name => $build_part) {
-          $field_definition = $this->getFieldDefinition($name);
-          if ($field_definition && $field_definition->isDisplayConfigurable($this->displayContext)) {
-            unset($build_list[$id][$name]);
-          }
+    if ($this->isLayoutBuilderEnabled()) {
+      foreach ($entities as $id => $entity) {
+        $build_list[$id]['_layout_builder'] = $this->buildSections($entity);
+        // If there are no sections, fallback to field ui settings.
+        // TODO: What is the usecase here? Is this really needed?
+        if (Element::isEmpty($build_list[$id]['_layout_builder'])) {
+          $build_list[$id] = parent::buildMultiple([$entity])[0];
         }
       }
     }
-
+    else {
+      // No need to use LayoutBuilderEntityViewDisplay, use parent instead.
+      $build_list = parent::buildMultiple($entities);
+    }
     return $build_list;
   }
 
