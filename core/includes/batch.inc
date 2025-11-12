@@ -258,7 +258,7 @@ function _batch_progress_page(): array {
  *   An array containing a completion value (in percent) and a status message.
  *
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
- *    Use \Drupal\Core\Batch\BatchProcessorInterface::process() instead.
+ *    Use \Drupal\Core\Batch\BatchProcessorInterface::processQueue() instead.
  *
  * @see https://www.drupal.org/node/3229844
  */
