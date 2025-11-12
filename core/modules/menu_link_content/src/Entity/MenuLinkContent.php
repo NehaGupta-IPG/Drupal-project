@@ -295,9 +295,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     $fields['langcode']->setDescription(t('The menu link language code.'));
 
     $fields['bundle']
-      ->setDescription(t('The content menu link bundle.'))
-      ->setSetting('max_length', EntityTypeInterface::BUNDLE_MAX_LENGTH)
-      ->setSetting('is_ascii', TRUE);
+      ->setDescription(t('The content menu link bundle.'));
 
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Menu link title'))
