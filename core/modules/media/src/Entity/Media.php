@@ -472,12 +472,12 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
             // available.
             $old_value = NULL;
             if ($translation_original) {
-              $old_value = $translation_original->get($entity_field_name)->getValue();
+              $old_value = $translation_original->get($entity_field_name)?->getValue();
             }
             // If this is a new translation then use the value of the field
             // from the original entity.
-            elseif ($this->original && $this->original->hasField($entity_field_name)) {
-              $old_value = $this->original->get($entity_field_name)->getValue();
+            elseif ($this->getOriginal() && $this->getOriginal()->hasField($entity_field_name)) {
+              $old_value = $this->getOriginal()->get($entity_field_name)->getValue();
             }
 
             // Only save the field value when the field is not actively being
@@ -488,11 +488,6 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
             }
 
           }
-        }
-
-        // Try to set a default name for this media item if no name is provided.
-        if ($translation->get('name')->isEmpty()) {
-          $translation->setName($translation->getName());
         }
 
         // Set thumbnail.
