@@ -29,7 +29,7 @@ class MenuLinkContentInternalTest extends MenuLinkContentTest {
    * {@inheritdoc}
    */
   protected function setUpAuthorization($method): void {
-    $this->grantPermissionsToTestedRole(['administer menu', 'access user profiles']);
+    $this->grantPermissionsToTestedRole(['administer menu']);
   }
 
   /**

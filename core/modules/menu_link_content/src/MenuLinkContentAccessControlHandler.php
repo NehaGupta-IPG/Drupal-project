@@ -50,12 +50,12 @@ class MenuLinkContentAccessControlHandler extends EntityAccessControlHandler imp
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     switch ($operation) {
       case 'view':
+        /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
         $result = AccessResult::allowedIfHasPermission($account, 'administer menu');
+        $result->addCacheableDependency($entity);
 
         if (!$result->isAllowed()) {
-          /** @var \Drupal\Core\Url $url_object */
           $url_object = $entity->getUrlObject();
-          $result->addCacheableDependency($entity);
 
           // If menu link is internal, and user has access, grant view access to
           // the menu link.
