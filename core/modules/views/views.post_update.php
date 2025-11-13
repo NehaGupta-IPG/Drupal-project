@@ -134,3 +134,10 @@ function views_post_update_dropbutton_type(?array &$sandbox = NULL): void {
     return $view_config_updater->needsDropbuttonFieldUpdate($view);
   });
 }
+
+/**
+ * Clear cache to add new date default arguments.
+ */
+function views_post_update_add_date_default_arguments(): void {
+  // Empty update to cause a cache rebuild so that schema additions are read.
+}

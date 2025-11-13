@@ -73,7 +73,6 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     'views',
     'language',
     'content_translation',
-    'path_alias',
     'form_test',
   ];
 
@@ -1186,6 +1185,24 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     // Check that there are no more revisions to push after publishing.
     $this->workspaces['stage']->publish();
     $this->assertEmpty($workspace_publisher->getDifferringRevisionIdsOnTarget());
+  }
+
+  /**
+   * Tests that cron runs outside of workspace context.
+   */
+  public function testCronRunsOutsideWorkspace(): void {
+    $this->initializeWorkspacesModule();
+    \Drupal::service('module_installer')->install(['workspaces_test']);
+
+    // Switch to a workspace.
+    $this->switchToWorkspace('stage');
+
+    // Run cron while in the 'stage' workspace.
+    \Drupal::service('cron')->run();
+
+    // Check that cron ran without an active workspace.
+    $recorded_workspace_id = \Drupal::keyValue('ws_test')->get('cron_active_workspace');
+    $this->assertFalse($recorded_workspace_id, 'Cron should run without an active workspace.');
   }
 
 }

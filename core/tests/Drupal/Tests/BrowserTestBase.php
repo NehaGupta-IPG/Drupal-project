@@ -284,7 +284,9 @@ abstract class BrowserTestBase extends TestCase {
     }
 
     if ($this->minkDefaultDriverClass === BrowserKitDriver::class) {
-      $driver = new $this->minkDefaultDriverClass(new DrupalTestBrowser());
+      $browser = new DrupalTestBrowser();
+      $browser->useHtml5Parser(FALSE);
+      $driver = new $this->minkDefaultDriverClass($browser);
     }
     elseif (is_array($this->minkDefaultDriverArgs)) {
       // Use ReflectionClass to instantiate class with received params.
@@ -615,7 +617,7 @@ abstract class BrowserTestBase extends TestCase {
    *   The configuration object with original configuration data.
    */
   protected function config($name) {
-    return $this->container->get('config.factory')->getEditable($name);
+    return \Drupal::configFactory()->getEditable($name);
   }
 
   /**
