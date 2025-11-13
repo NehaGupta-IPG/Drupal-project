@@ -7,7 +7,6 @@ use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\user\UserInterface;
 use Drupal\user\RoleInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -95,21 +94,6 @@ class CommentHooks {
       ];
     }
     return $return;
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'comment' => [
-        'render element' => 'elements',
-      ],
-      'field__comment' => [
-        'base hook' => 'field',
-      ],
-    ];
   }
 
   /**
@@ -214,55 +198,12 @@ class CommentHooks {
   }
 
   /**
-   * Implements hook_ENTITY_TYPE_view_alter() for node entities.
-   */
-  #[Hook('node_view_alter')]
-  public function nodeViewAlter(array &$build, EntityInterface $node, EntityViewDisplayInterface $display): void {
-    if (\Drupal::moduleHandler()->moduleExists('history')) {
-      $build['#attributes']['data-history-node-id'] = $node->id();
-    }
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter() for field_ui_field_storage_add_form.
-   */
-  #[Hook('form_field_ui_field_storage_add_form_alter')]
-  public function formFieldUiFieldStorageAddFormAlter(&$form, FormStateInterface $form_state) : void {
-    $route_match = \Drupal::routeMatch();
-    if ($form_state->get('entity_type_id') == 'comment' && $route_match->getParameter('commented_entity_type')) {
-      $form['#title'] = \Drupal::service('comment.manager')->getFieldUIPageTitle($route_match->getParameter('commented_entity_type'), $route_match->getParameter('field_name'));
-    }
-  }
-
-  /**
    * Implements hook_field_info_entity_type_ui_definitions_alter().
    */
   #[Hook('field_info_entity_type_ui_definitions_alter')]
   public function fieldInfoEntityTypeUiDefinitionsAlter(array &$ui_definitions, string $entity_type_id): void {
     if (!_comment_entity_uses_integer_id($entity_type_id)) {
       unset($ui_definitions['comment']);
-    }
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter().
-   */
-  #[Hook('form_field_ui_form_display_overview_form_alter')]
-  public function formFieldUiFormDisplayOverviewFormAlter(&$form, FormStateInterface $form_state) : void {
-    $route_match = \Drupal::routeMatch();
-    if ($form['#entity_type'] == 'comment' && $route_match->getParameter('commented_entity_type')) {
-      $form['#title'] = \Drupal::service('comment.manager')->getFieldUIPageTitle($route_match->getParameter('commented_entity_type'), $route_match->getParameter('field_name'));
-    }
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter().
-   */
-  #[Hook('form_field_ui_display_overview_form_alter')]
-  public function formFieldUiDisplayOverviewFormAlter(&$form, FormStateInterface $form_state) : void {
-    $route_match = \Drupal::routeMatch();
-    if ($form['#entity_type'] == 'comment' && $route_match->getParameter('commented_entity_type')) {
-      $form['#title'] = \Drupal::service('comment.manager')->getFieldUIPageTitle($route_match->getParameter('commented_entity_type'), $route_match->getParameter('field_name'));
     }
   }
 
@@ -476,9 +417,9 @@ class CommentHooks {
   }
 
   /**
-   * Implements hook_ranking().
+   * Implements hook_node_search_ranking().
    */
-  #[Hook('ranking')]
+  #[Hook('node_search_ranking')]
   public function ranking(): array {
     return \Drupal::service('comment.statistics')->getRankingInfo();
   }

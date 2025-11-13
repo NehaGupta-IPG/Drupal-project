@@ -77,10 +77,22 @@ class Datetime extends DateElementBase {
     $element += ['#date_timezone' => date_default_timezone_get()];
 
     if ($input !== FALSE) {
-      $date_input = $element['#date_date_element'] != 'none' && !empty($input['date']) ? $input['date'] : '';
-      $time_input = $element['#date_time_element'] != 'none' && !empty($input['time']) ? $input['time'] : '';
-      $date_format = $element['#date_date_element'] != 'none' ? static::getHtml5DateFormat($element) : '';
-      $time_format = $element['#date_time_element'] != 'none' ? static::getHtml5TimeFormat($element) : '';
+      if ($element['#date_date_element'] === 'datetime-local' && !empty($input['date'])) {
+        // With a datetime-local input, the date value is always normalized to
+        // the format Y-m-d\TH:i
+        // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
+        // 'html_datetime' is not a valid format to pass to
+        // DrupalDateTime::createFromFormat()
+        [$date_input, $time_input] = explode('T', $input['date']);
+        $date_format = DateFormat::load('html_date')->getPattern();
+        $time_format = DateFormat::load('html_time')->getPattern();
+      }
+      else {
+        $date_input = $element['#date_date_element'] != 'none' && !empty($input['date']) ? $input['date'] : '';
+        $time_input = $element['#date_time_element'] != 'none' && !empty($input['time']) ? $input['time'] : '';
+        $date_format = $element['#date_date_format'] != 'none' ? static::getHtml5DateFormat($element) : '';
+        $time_format = $element['#date_time_element'] != 'none' ? static::getHtml5TimeFormat($element) : '';
+      }
 
       // Seconds will be omitted in a post in case there's no entry.
       if (!empty($time_input) && strlen($time_input) == 5) {
@@ -232,6 +244,15 @@ class Datetime extends DateElementBase {
     if ($element['#date_date_element'] != 'none') {
 
       $date_format = $element['#date_date_element'] != 'none' ? static::getHtml5DateFormat($element) : '';
+      // With a datetime-local input, the date value is always normalized to
+      // the format Y-m-d\TH:i
+      // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
+      // 'html_datetime' returned by static::getHtml5DateFormat($element) is not
+      // a valid format.
+      // @see https://www.drupal.org/project/drupal/issues/3505318
+      if ($element['#date_date_element'] === 'datetime-local') {
+        $date_format = DateFormat::load('html_date')->getPattern() . '\T' . DateFormat::load('html_time')->getPattern();
+      }
       $date_value = !empty($date) ? $date->format($date_format, $format_settings) : $element['#value']['date'];
 
       // Creating format examples on every individual date item is messy, and
@@ -357,13 +378,32 @@ class Datetime extends DateElementBase {
       // If there's empty input and the field is required, set an error. A
       // reminder of the required format in the message provides a good UX.
       elseif (empty($input['date']) && empty($input['time']) && $element['#required']) {
-        $form_state->setError($element, t('The %field date is required.', ['%field' => $title]));
+        if (isset($element['#required_error'])) {
+          $form_state->setError($element, $element['#required_error']);
+        }
+        else {
+          $form_state->setError($element, t('The %field date is required.', ['%field' => $title]));
+        }
       }
       else {
         // If the date is valid, set it.
         $date = $input['object'];
         if ($date instanceof DrupalDateTime && !$date->hasErrors()) {
-          $form_state->setValueForElement($element, $date);
+          $range = static::datetimeRangeYears($element['#date_year_range']);
+          $min = DrupalDateTime::createFromArray(['year' => $range[0]], $date->getTimezone());
+          $max = DrupalDateTime::createFromArray(['year' => $range[1] + 1], $date->getTimezone());
+
+          // Validate the date. It's valid if it's within the valid year range.
+          if ($date->getTimestamp() < $min->getTimestamp() || $date->getTimestamp() >= $max->getTimestamp()) {
+            $form_state->setError(
+              $element,
+              t('The %field date is invalid. Date should be in the %min-%max year range.',
+                ['%field' => $title, '%min' => $range[0], '%max' => $range[1]])
+            );
+          }
+          else {
+            $form_state->setValueForElement($element, $date);
+          }
         }
         // If the date is invalid, set an error. A reminder of the required
         // format in the message provides a good UX.

@@ -13,6 +13,7 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\file\FileInterface;
 use Drupal\link\Plugin\Field\FieldType\LinkItem;
 use Drupal\user\EntityOwnerInterface;
@@ -61,13 +62,16 @@ final class Importer implements LoggerAwareInterface {
    *   - \Drupal\Core\DefaultContent\Existing::Error: Throw an exception.
    *   - \Drupal\Core\DefaultContent\Existing::Skip: Leave the existing entity
    *     as-is.
+   * @param \Drupal\Core\Session\AccountInterface|null $account
+   *   (optional) The account to use when importing the entities. Defaults to
+   *   the administrator account.
    *
    * @throws \Drupal\Core\DefaultContent\ImportException
    *   - If any of the entities being imported are not content entities.
    *   - If any of the entities being imported already exists, by UUID, and
    *     $existing is \Drupal\Core\DefaultContent\Existing::Error.
    */
-  public function importContent(Finder $content, Existing $existing = Existing::Error): void {
+  public function importContent(Finder $content, Existing $existing = Existing::Error, ?AccountInterface $account = NULL): void {
     if (count($content->data) === 0) {
       return;
     }
@@ -75,7 +79,12 @@ final class Importer implements LoggerAwareInterface {
     $event = new PreImportEvent($content, $existing);
     $skip = $this->eventDispatcher->dispatch($event)->getSkipList();
 
-    $account = $this->accountSwitcher->switchToAdministrator();
+    if ($account !== NULL) {
+      $this->accountSwitcher->switchTo($account);
+    }
+    else {
+      $account = $this->accountSwitcher->switchToAdministrator();
+    }
 
     try {
       /** @var array{_meta: array<mixed>} $decoded */
@@ -175,8 +184,11 @@ final class Importer implements LoggerAwareInterface {
       }
     }
 
+    $scheme = parse_url($destination, PHP_URL_SCHEME);
     $target_directory = dirname($destination);
-    $this->fileSystem->prepareDirectory($target_directory, FileSystemInterface::CREATE_DIRECTORY);
+    if (!isset($scheme) || rtrim($target_directory, ':') !== $scheme) {
+      $this->fileSystem->prepareDirectory($target_directory, FileSystemInterface::CREATE_DIRECTORY);
+    }
     if ($copy_file) {
       $uri = $this->fileSystem->copy($source, $destination);
       $entity->setFileUri($uri);
@@ -202,6 +214,11 @@ final class Importer implements LoggerAwareInterface {
     if (empty($data['_meta']['uuid'])) {
       throw new ImportException('The uuid metadata must be specified.');
     }
+
+    // Allow third-party code to modify the entity data before the entity is
+    // created.
+    $event = new PreEntityImportEvent($data);
+    $data = ['_meta' => $event->metadata] + $this->eventDispatcher->dispatch($event)->data;
 
     $is_root = FALSE;
     // @see ::loadEntityDependency()
@@ -279,7 +296,7 @@ final class Importer implements LoggerAwareInterface {
         unset($item_value['target_uuid']);
       }
 
-      $serialized_property_names = $this->getCustomSerializedPropertyNames($item);
+      $serialized_property_names = self::getCustomSerializedPropertyNames($item);
       foreach ($item_value as $property_name => $value) {
         if (\in_array($property_name, $serialized_property_names)) {
           if (\is_string($value)) {
@@ -319,7 +336,7 @@ final class Importer implements LoggerAwareInterface {
    *
    * @see \Drupal\serialization\Normalizer\SerializedColumnNormalizerTrait::getCustomSerializedPropertyNames
    */
-  private function getCustomSerializedPropertyNames(FieldItemInterface $field_item): array {
+  public static function getCustomSerializedPropertyNames(FieldItemInterface $field_item): array {
     if ($field_item instanceof PluginInspectionInterface) {
       $definition = $field_item->getPluginDefinition();
       $serialized_fields = $field_item->getEntity()->getEntityType()->get('serialized_field_property_names');

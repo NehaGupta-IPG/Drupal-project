@@ -10,7 +10,15 @@ namespace Drupal\Core\FileTransfer;
  *
  * @see https://www.drupal.org/node/3512364
  */
+// phpcs:ignore Drupal.NamingConventions.ValidClassName.NoUpperAcronyms
 class SSH extends FileTransfer implements ChmodInterface {
+
+  /**
+   * The connection.
+   *
+   * @var resource|false
+   */
+  protected $connection;
 
   /**
    * {@inheritdoc}

@@ -385,7 +385,7 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    * with more complex permissions can extend this class to do their own access
    * checks.
    *
-   * @return string|bool
+   * @return string|false
    *   The name of the administrative permission. Defaults to FALSE, if the
    *   permission does not exist.
    */
@@ -447,7 +447,7 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    * @param string $key
    *   The link type.
    *
-   * @return string|bool
+   * @return string|false
    *   The path for this link, or FALSE if it doesn't exist.
    */
   public function getLinkTemplate($key);
@@ -732,6 +732,17 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   An array of the cache tags for this entity type.
    */
   public function getListCacheTags();
+
+  /**
+   * The list cache tags associated with a specific bundle.
+   *
+   * Enables code listing entities of this type and bundle to ensure that newly
+   * created entities show up immediately.
+   *
+   * @return string[]
+   *   An array of the cache tags for this bundle.
+   */
+  public function getBundleListCacheTags(string $bundle): array;
 
   /**
    * Gets the key that is used to store configuration dependencies.

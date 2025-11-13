@@ -223,6 +223,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
+      @trigger_error('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and will throw an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+    }
+
     parent::setUp();
 
     // Allow tests to compare MarkupInterface objects via assertEquals().
@@ -439,7 +443,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       throw new \Exception('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh. See https://www.drupal.org/node/2116263#skipped-tests for more information.');
     }
     else {
-      $database = Database::convertDbUrlToConnectionInfo($db_url, $this->root, TRUE);
+      $database = Database::convertDbUrlToConnectionInfo($db_url, TRUE);
       Database::addConnectionInfo('default', 'default', $database);
     }
 
@@ -528,9 +532,14 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->addArgument(new Reference('request_stack'));
     $container
       ->register('lock', 'Drupal\Core\Lock\NullLockBackend');
-    $container
-      ->register('cache_factory', 'Drupal\Core\Cache\MemoryBackendFactory')
-      ->addArgument(new Reference('datetime.time'));
+
+    // Explicitly configure all cache bins to use the memory backend.
+    foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
+      $definition = $container->getDefinition($id);
+      $tags = $definition->getTags();
+      $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
+      $definition->setTags($tags);
+    }
 
     // Disable the super user access policy so that we are sure our tests check
     // for the right permissions.
@@ -602,6 +611,11 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Remove the stored configuration importer so if used again it will be
     // built with up-to-date services.
     $this->configImporter = NULL;
+
+    // Allow kernel tests to register hooks.
+    $definition = $container->register(static::class, static::class)->setSynthetic(TRUE);
+    $container->set(static::class, $this);
+    $container->addCompilerPass(new KernelTestCompilerPass($definition), priority: -100);
   }
 
   /**
@@ -675,7 +689,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     }
 
     // If the test used the regular file system, remove any files created.
-    if (!str_starts_with($this->siteDirectory, 'vfs://')) {
+    if ($this->siteDirectory && !str_starts_with($this->siteDirectory, 'vfs://')) {
       // Delete test site directory.
       $callback = function (string $path) {
         @chmod($path, 0700);
@@ -839,20 +853,21 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // the event dispatcher which can prevent modules from registering events.
     $active_storage = $this->container->get('config.storage');
     $extension_config = $active_storage->read('core.extension');
+    $extensions = $module_handler->getModuleList();
 
     foreach ($modules as $module) {
       if ($module_handler->moduleExists($module)) {
         continue;
       }
-      $module_handler->addModule($module, $module_list[$module]->getPath());
+      $extensions[$module] = $module_list[$module];
       // Maintain the list of enabled modules in configuration.
       $extension_config['module'][$module] = 0;
     }
     $active_storage->write('core.extension', $extension_config);
 
     // Update the kernel to make their services available.
-    $extensions = $module_handler->getModuleList();
     $this->container->get('kernel')->updateModules($extensions, $extensions);
+    $this->container = $this->container->get('kernel')->getContainer();
 
     // Ensure isLoaded() is TRUE in order to make
     // \Drupal\Core\Theme\ThemeManagerInterface::render() work.
@@ -966,7 +981,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->save();
 
     // The installation profile is provided by a container parameter. Saving
-    // the configuration doesn't automatically trigger invalidation
+    // the configuration doesn't automatically trigger invalidation.
     $this->container->get('kernel')->rebuildContainer();
   }
 
@@ -986,7 +1001,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @return array
    *   An array of modules to install.
    */
-  private static function getModulesToEnable($class) {
+  protected static function getModulesToEnable($class) {
     $modules = [];
     while ($class) {
       if (property_exists($class, 'modules')) {
