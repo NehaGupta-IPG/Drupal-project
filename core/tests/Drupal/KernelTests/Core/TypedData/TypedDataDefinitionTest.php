@@ -73,6 +73,9 @@ class TypedDataDefinitionTest extends KernelTestBase {
 
     $this->assertInstanceOf(ComplexDataDefinitionInterface::class, $map_definition);
 
+    // Test serialization.
+    $this->assertEquals($map_definition, unserialize(serialize($map_definition)));
+
     // Test retrieving metadata about contained properties.
     $this->assertEquals(['one', 'two', 'three'], array_keys($map_definition->getPropertyDefinitions()));
     $this->assertEquals('string', $map_definition->getPropertyDefinition('one')->getDataType());
