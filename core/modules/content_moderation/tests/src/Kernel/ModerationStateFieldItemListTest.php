@@ -126,6 +126,8 @@ class ModerationStateFieldItemListTest extends KernelTestBase {
     // This test case mimics the lifecycle of an entity that is being patched in
     // a rest resource.
     $this->testNode->moderation_state->setValue([]);
+    $x = \Drupal::service('workspaces.manager');
+    $a = 1;
     $this->assertTrue($this->testNode->moderation_state->isEmpty());
     $this->assertEmptiedModerationFieldItemList();
 
@@ -180,6 +182,7 @@ class ModerationStateFieldItemListTest extends KernelTestBase {
     $this->assertTrue($this->testNode->moderation_state->isEmpty());
     // Test the empty value causes a violation in the entity.
     $violations = $this->testNode->validate();
+    $a = 1;
     $this->assertCount(1, $violations);
     $this->assertEquals('This value should not be null.', $violations->get(0)->getMessage());
     // Test that incorrectly saving the entity regardless will not produce a
