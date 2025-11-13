@@ -5,21 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\Tests\ApiRequestTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\Tests\jsonapi\Traits\GetDocumentFromResponseTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Provides helper methods for the JSON:API module's functional tests.
@@ -31,6 +28,9 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
   use EntityReferenceFieldCreationTrait;
   use GetDocumentFromResponseTrait;
   use ImageFieldCreationTrait;
+  use ApiRequestTrait {
+    makeApiRequest as request;
+  }
 
   const IS_MULTILINGUAL = TRUE;
   const IS_NOT_MULTILINGUAL = FALSE;
@@ -212,40 +212,6 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
     ]);
 
     \Drupal::service('router.builder')->rebuild();
-  }
-
-  /**
-   * Performs a HTTP request. Wraps the Guzzle HTTP client.
-   *
-   * Why wrap the Guzzle HTTP client? Because any error response is returned via
-   * an exception, which would make the tests unnecessarily complex to read.
-   *
-   * @param string $method
-   *   HTTP method.
-   * @param \Drupal\Core\Url $url
-   *   URL to request.
-   * @param array $request_options
-   *   Request options to apply.
-   *
-   * @return \Psr\Http\Message\ResponseInterface
-   *   The request response.
-   *
-   * @throws \Psr\Http\Client\ClientExceptionInterface
-   *
-   * @see \GuzzleHttp\ClientInterface::request
-   */
-  protected function request($method, Url $url, array $request_options): ResponseInterface {
-    try {
-      $response = $this->httpClient->request($method, $url->toString(), $request_options);
-    }
-    catch (ClientException $e) {
-      $response = $e->getResponse();
-    }
-    catch (ServerException $e) {
-      $response = $e->getResponse();
-    }
-
-    return $response;
   }
 
   /**
