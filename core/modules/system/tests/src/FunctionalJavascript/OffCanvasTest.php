@@ -187,4 +187,18 @@ class OffCanvasTest extends OffCanvasTestBase {
     $this->assertEquals("Thing $link_index says hello", $tray_text);
   }
 
+  /**
+   * Tests that the off-canvas dialog is not resizable.
+   */
+  public function testOffCanvasNotResizable(): void {
+    $this->drupalGet('/off-canvas-test-links');
+    $page = $this->getSession()->getPage();
+
+    // Open the off-canvas dialog.
+    $page->clickLink("Open side panel resize test");
+    $this->waitForOffCanvasToOpen();
+    // Assert that .ui-resizable-false class is present.
+    $this->assertNotEmpty($this->assertSession()->waitForElement('css', '.ui-resizable-false'));
+  }
+
 }

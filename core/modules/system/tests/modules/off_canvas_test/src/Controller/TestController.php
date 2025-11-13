@@ -77,6 +77,23 @@ class TestController {
           ]),
         ],
       ],
+      'off_canvas_link_3' => [
+        '#title' => 'Open side panel resize test',
+        '#type' => 'link',
+        '#url' => Url::fromRoute('off_canvas_test.thing2'),
+        '#attributes' => [
+          'class' => ['use-ajax'],
+          'data-dialog-type' => 'dialog',
+          'data-dialog-renderer' => 'off_canvas',
+          'data-dialog-options' => Json::encode([
+            'width' => '50%',
+            'resizable' => FALSE,
+            'classes' => [
+              "ui-dialog" => "ui-corner-all side-2",
+            ],
+          ]),
+        ],
+      ],
       'off_canvas_top_link_1' => [
         '#title' => 'Open top panel 1',
         '#type' => 'link',

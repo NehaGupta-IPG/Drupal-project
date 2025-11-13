@@ -53,10 +53,13 @@ class OpenOffCanvasDialogCommand extends OpenDialogCommand {
     else {
       $dialog_options['classes']['ui-dialog'] = "ui-dialog-off-canvas ui-dialog-position-$position";
     }
+    // Allow off-canvas dialog to disallow expansion.
+    if (!array_key_exists('resizable', $dialog_options)) {
+      $dialog_options['resizable'] = 'w';
+    }
     parent::__construct('#drupal-off-canvas', $title, $content, $dialog_options, $settings);
     $this->dialogOptions['modal'] = FALSE;
     $this->dialogOptions['autoResize'] = FALSE;
-    $this->dialogOptions['resizable'] = 'w';
     $this->dialogOptions['draggable'] = FALSE;
     $this->dialogOptions['drupalAutoButtons'] = FALSE;
     $this->dialogOptions['drupalOffCanvasPosition'] = $position;
