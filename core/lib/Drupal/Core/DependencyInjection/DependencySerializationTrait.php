@@ -31,7 +31,7 @@ trait DependencySerializationTrait {
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    $vars = get_object_vars($this);
+    $vars = get_mangled_object_vars($this);
     try {
       $container = \Drupal::getContainer();
       $reverse_container = $container->get(ReverseContainer::class);
