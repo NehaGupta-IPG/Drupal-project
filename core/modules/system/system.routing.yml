@@ -325,14 +325,6 @@ system.admin_index:
   requirements:
     _permission: 'access administration pages'
 
-system.files:
-  path: '/system/files/{scheme}'
-  defaults:
-    _controller: '\Drupal\system\FileDownloadController::download'
-    scheme: private
-  requirements:
-    _access: 'TRUE'
-
 system.private_file_download:
   path: '/system/files/{filepath}'
   defaults:

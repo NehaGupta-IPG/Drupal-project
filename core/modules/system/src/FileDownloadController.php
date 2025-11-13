@@ -6,7 +6,6 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -42,8 +41,8 @@ class FileDownloadController extends ControllerBase {
    * file exists but no modules responded an AccessDeniedHttpException will be
    * thrown. If the file does not exist a NotFoundHttpException will be thrown.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
+   * @param string $filepath
+   *   The file path.
    * @param string $scheme
    *   The file scheme, defaults to 'private'.
    *
@@ -57,10 +56,9 @@ class FileDownloadController extends ControllerBase {
    *
    * @see hook_file_download()
    */
-  public function download(Request $request, $scheme = 'private') {
-    $target = $request->query->get('file');
+  public function download($filepath, $scheme = 'private') {
     // Merge remaining path arguments into relative file path.
-    $uri = $this->streamWrapperManager->normalizeUri($scheme . '://' . $target);
+    $uri = $this->streamWrapperManager->normalizeUri($scheme . '://' . $filepath);
 
     if ($this->streamWrapperManager->isValidScheme($scheme) && is_file($uri)) {
       // Let other modules provide headers and controls access to the file.

@@ -31,10 +31,6 @@ services:
     arguments: ['@router.request_context', '@access_manager', '@router', '@path_processor_manager', '@config.factory',  '@title_resolver', '@current_user', '@path.current', '@path.matcher']
     tags:
       - { name: breadcrumb_builder, priority: 0 }
-  path_processor.files:
-    class: Drupal\system\PathProcessor\PathProcessorFiles
-    tags:
-      - { name: path_processor_inbound, priority: 200 }
   system.admin_path.route_subscriber:
     class: Drupal\system\EventSubscriber\AdminRouteSubscriber
   theme.negotiator.system.batch:
