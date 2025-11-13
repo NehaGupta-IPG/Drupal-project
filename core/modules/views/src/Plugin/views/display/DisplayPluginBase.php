@@ -139,42 +139,6 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   public DisplayPluginInterface $default_display;
 
-  /**
-   * Constructs a new DisplayPluginBase object.
-   *
-   * Because DisplayPluginBase::initDisplay() takes the display configuration by
-   * reference and handles it differently than usual plugin configuration, pass
-   * an empty array of configuration to the parent. This prevents our
-   * configuration from being duplicated.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\views\ViewsData|null $viewsData
-   *   The views data.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $accessPluginManager
-   *   The plugin manager for views access plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $cachePluginManager
-   *   The plugin manager for views cache plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayExtenderPluginManager
-   *   The plugin manager for views display extender plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $exposedFormPluginManager
-   *   The plugin manager for views exposed form plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $pagerPluginManager
-   *   The plugin manager for views pager plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $rowPluginManager
-   *   The plugin manager for views row plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $stylePluginManager
-   *   The plugin manager for views style plugins.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $queryPluginManager
-   *   The plugin manager for views query plugins.
-   *
-   * @todo Replace DisplayPluginBase::$display with
-   *   DisplayPluginBase::$configuration to standardize with other plugins.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,
