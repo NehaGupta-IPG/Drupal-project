@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\node\Entity\Node;
-use Drupal\node\Entity\NodeType;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
@@ -26,7 +25,7 @@ class ArgumentStringTest extends ViewsKernelTestBase {
    */
   public static $testViews = [
     'test_glossary',
-    'test_argument_string_exclude'
+    'test_argument_string_exclude',
   ];
 
   /**
