@@ -8,6 +8,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\form_test\Callbacks;
+use Drupal\form_test\Form\FormTestFormIdEqualsBaseFormIdForm;
+use Drupal\form_test\Form\FormTestWithBaseFormIdForm;
 
 /**
  * Hook implementations for form_test.
@@ -32,6 +34,7 @@ class FormTestHooks {
     if ($form_id == 'form_test_alter_form') {
       \Drupal::messenger()->addStatus('form_test_form_alter() executed.');
     }
+    $form['#alter_calls'][] = __METHOD__;
   }
 
   /**
@@ -74,6 +77,21 @@ class FormTestHooks {
     $form['tabs3']['#access'] = TRUE;
     $form['fieldset1']['#access'] = FALSE;
     $form['container']['#access'] = FALSE;
+  }
+
+  #[Hook('form_' . FormTestFormIdEqualsBaseFormIdForm::FORM_ID . '_alter')]
+  public function formTestFormIdEqualsBaseFormIdFormAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
+    $form['#alter_calls'][] = __METHOD__;
+  }
+
+  #[Hook('form_' . FormTestWithBaseFormIdForm::FORM_ID . '_alter')]
+  public function formTestWithBaseFormIdFormAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
+    $form['#alter_calls'][] = __METHOD__;
+  }
+
+  #[Hook('form_' . FormTestWithBaseFormIdForm::BASE_FORM_ID . '_alter')]
+  public function formTestWithBaseFormIdBaseFormAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
+    $form['#alter_calls'][] = __METHOD__;
   }
 
 }
