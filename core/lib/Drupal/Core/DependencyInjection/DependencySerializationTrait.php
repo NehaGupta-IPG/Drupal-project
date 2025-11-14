@@ -31,7 +31,16 @@ trait DependencySerializationTrait {
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    $vars = get_object_vars($this);
+    $mangled_vars = get_mangled_object_vars($this);
+    $vars = [];
+
+    foreach ($mangled_vars as $key => $value) {
+      // Last segment after the final NUL byte is the real name
+      $key_parts = explode("\0", $key);
+      $key = end($key_parts) ?: $key;
+      $vars[$key] = $value;
+    }
+
     try {
       $container = \Drupal::getContainer();
       $reverse_container = $container->get(ReverseContainer::class);

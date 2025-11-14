@@ -45,6 +45,28 @@ class DependencySerializationTest extends UnitTestCase {
     $this->assertEmpty($dependencySerialization->getServiceIds());
   }
 
+  /**
+   * Tests serialization with PHP 8.4 property hooks.
+   *
+   * @requires PHP >= 8.4
+   * @legacy-covers ::__sleep
+   * @legacy-covers ::__wakeup
+   */
+  public function testSerializationWithPropertyHooks(): void {
+    $service = new \stdClass();
+    $container = TestKernel::setContainerWithKernel();
+    $container->set('test_service', $service);
+
+    $object = new DependencySerializationTestWithPropertyHooks($service);
+    $object->title = 'Test';
+    $string = serialize($object);
+    $unserialized = unserialize($string);
+
+    $this->assertInstanceOf(DependencySerializationTestWithPropertyHooks::class, $unserialized);
+    $this->assertSame($service, $unserialized->service);
+    $this->assertEquals('Test', $unserialized->title);
+  }
+
 }
 
 /**
@@ -90,6 +112,37 @@ class DependencySerializationTestDummy {
    */
   public function getServiceIds() {
     return $this->_serviceIds;
+  }
+
+}
+
+/**
+ * Test class with PHP 8.4 property hooks.
+ */
+class DependencySerializationTestWithPropertyHooks {
+
+  use DependencySerializationTrait;
+
+  /**
+   * A property with hooks.
+   */
+  public ?string $title {
+  get => $this->title ?? NULL;
+  set => $this->title = $value;
+  }
+
+  /**
+   * A service.
+   *
+   * @var object
+   */
+  public $service;
+
+  /**
+   * Constructor.
+   */
+  public function __construct(\stdClass $service) {
+    $this->service = $service;
   }
 
 }
