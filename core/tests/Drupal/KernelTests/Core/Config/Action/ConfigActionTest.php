@@ -30,14 +30,6 @@ class ConfigActionTest extends KernelTestBase {
   protected static $modules = ['config_test'];
 
   /**
-   * {@inheritdoc}
-   */
-  public function setUp(): void {
-    parent::setUp();
-    $this->installConfig('config_test');
-  }
-
-  /**
    * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\EntityCreate
    */
   public function testEntityCreate(): void {
@@ -67,6 +59,7 @@ class ConfigActionTest extends KernelTestBase {
    * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\EntityMethod
    */
   public function testEntityMethod(): void {
+    $this->installConfig('config_test');
     $storage = \Drupal::entityTypeManager()->getStorage('config_test');
 
     /** @var \Drupal\config_test\Entity\ConfigTest $config_test_entity */
@@ -178,6 +171,7 @@ class ConfigActionTest extends KernelTestBase {
    * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\EntityMethod
    */
   public function testPluralizedEntityMethod(): void {
+    $this->installConfig('config_test');
     $storage = \Drupal::entityTypeManager()->getStorage('config_test');
 
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
@@ -218,6 +212,7 @@ class ConfigActionTest extends KernelTestBase {
    * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\EntityMethod
    */
   public function testPluralizedEntityMethodException(): void {
+    $this->installConfig('config_test');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
     $this->expectException(EntityMethodException::class);
@@ -231,6 +226,7 @@ class ConfigActionTest extends KernelTestBase {
   public function testDuplicatePluralizedMethodNameException(): void {
     \Drupal::state()->set('config_test.class_override', DuplicatePluralizedMethodName::class);
     \Drupal::entityTypeManager()->clearCachedDefinitions();
+    $this->installConfig('config_test');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
     $this->expectException(EntityMethodException::class);
@@ -244,6 +240,7 @@ class ConfigActionTest extends KernelTestBase {
   public function testDuplicatePluralizedOtherMethodNameException(): void {
     \Drupal::state()->set('config_test.class_override', DuplicatePluralizedOtherMethodName::class);
     \Drupal::entityTypeManager()->clearCachedDefinitions();
+    $this->installConfig('config_test');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
     $this->expectException(EntityMethodException::class);
@@ -255,6 +252,7 @@ class ConfigActionTest extends KernelTestBase {
    * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\EntityMethod
    */
   public function testEntityMethodException(): void {
+    $this->installConfig('config_test');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
     $this->expectException(EntityMethodException::class);
@@ -266,6 +264,7 @@ class ConfigActionTest extends KernelTestBase {
    * @see \Drupal\Core\Config\Action\Plugin\ConfigAction\SimpleConfigUpdate
    */
   public function testSimpleConfigUpdate(): void {
+    $this->installConfig('config_test');
     $this->assertSame('bar', $this->config('config_test.system')->get('foo'));
 
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
@@ -299,6 +298,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["prepend"])]
   #[TestWith(["splice"])]
   public function testSimpleConfigArrayFailsOnEntities(string $derivative_id): void {
+    $this->installConfig('config_test');
+
     $this->expectException(ConfigActionException::class);
     $this->expectExceptionMessage("The simpleConfigArray:$derivative_id config action cannot be used on configuration entities.");
     $this->container->get('plugin.manager.config_action')->applyAction(
@@ -334,6 +335,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["splice", NULL])]
   #[TestWith(["splice", ""])]
   public function testSimpleConfigArrayFailsOnEmptyOrMissingPropertyPath(string $derivative_id, ?string $property_path): void {
+    $this->installConfig('config_test');
+
     $value = [];
     if (isset($property_path)) {
       $value['property'] = $property_path;
@@ -354,6 +357,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["append", NULL])]
   #[TestWith(["prepend", NULL])]
   public function testSimpleConfigArrayPrependAndAppendRequireArrayOfValues(string $derivative_id, mixed $values): void {
+    $this->installConfig('config_test');
+
     $this->expectException(ConfigActionException::class);
     $this->expectExceptionMessage("The simpleConfigArray:$derivative_id config action requires an array of values.");
     $this->container->get('plugin.manager.config_action')->applyAction(
@@ -373,6 +378,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["prepend", ["values" => [1, 2, 3]]])]
   #[TestWith(["splice", ["offset" => 0]])]
   public function testSimpleConfigArrayOnlyWorksOnArrays(string $derivative_id, array $value): void {
+    $this->installConfig('config_test');
+
     $this->expectException(ConfigActionException::class);
     $this->expectExceptionMessage("Config config_test.system cannot be updated because the property 'string' is not an array.");
     $this->container->get('plugin.manager.config_action')->applyAction(
@@ -392,6 +399,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["splice", ["offset" => 1, "length" => 0], ["itemA", "itemB"]])]
   #[TestWith(["splice", ["offset" => 1], ["itemA"]])]
   public function testSimpleConfigArray(string $derivative_id, array $value, array $expected_value): void {
+    $this->installConfig('config_test');
+
     $this->container->get('plugin.manager.config_action')->applyAction(
       "simpleConfigArray:$derivative_id",
       'config_test.system',
@@ -408,6 +417,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["splice", ["offset" => 1, "replacement" => "single"], ["itemA", "single"]])]
   #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => "single"], ["itemA", "single", "itemB"]])]
   public function testSimpleConfigArrayWithStringValues(string $derivative_id, array $value, array $expected_value): void {
+    $this->installConfig('config_test');
+
     $this->container->get('plugin.manager.config_action')->applyAction(
       "simpleConfigArray:$derivative_id",
       'config_test.system',
@@ -423,6 +434,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["prepend", [["values" => ["undo", "redo"]], ["values" => ["bold", "italic"]]], ["bold", "italic", "undo", "redo", "itemA", "itemB"]])]
   #[TestWith(["splice", [["offset" => 1, "length" => 1, "replacement" => ["itemC"]], ["offset" => 2, "length" => NULL, "replacement" => ["itemD", "itemE"]]], ["itemA", "itemC", "itemD", "itemE"]])]
   public function testSimpleConfigArrayMultipleInvocationsOfSameProperty(string $derivative_id, array $values, array $expected_value): void {
+    $this->installConfig('config_test');
+
     foreach ($values as &$value) {
       $value['property'] = 'array';
     }
@@ -442,6 +455,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["prepend", ["property" => "array", "values" => ["undo", "redo"]], ["property" => "other_array", "values" => ["bold", "italic"]], ["undo", "redo", "itemA", "itemB"], ["bold", "italic", "itemX", "itemY"]])]
   #[TestWith(["splice", ["property" => "array", "offset" => 1, "length" => 1, "replacement" => ["itemC"]], ["property" => "other_array", "offset" => 2, "length" => NULL, "replacement" => ["itemD", "itemE"]], ["itemA", "itemC"], ["itemX", "itemY", "itemD", "itemE"]])]
   public function testSimpleConfigArrayMultipleInvocationsOfDifferentProperty(string $derivative_id, array $array_values, array $other_array_values, array $expected_array_value, array $expected_other_array_value): void {
+    $this->installConfig('config_test');
+
     $this->container->get('plugin.manager.config_action')->applyAction(
       "simpleConfigArray:$derivative_id",
       'config_test.system',
@@ -455,6 +470,8 @@ class ConfigActionTest extends KernelTestBase {
    * Tests that simpleConfigArray:splice rejects invalid arguments.
    */
   public function testSimpleConfigArraySpliceWithInvalidArgument(): void {
+    $this->installConfig('config_test');
+
     $this->expectException(\Error::class);
     $this->expectExceptionMessage('Unknown named parameter $yep');
     $this->container->get('plugin.manager.config_action')->applyAction(
@@ -479,6 +496,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["splice", ["offset" => 1, "length" => 0], ["itemA", "itemB"]])]
   #[TestWith(["splice", ["offset" => 1], ["itemA"]])]
   public function testSimpleConfigArrayAppliedTwiceWithoutUniqueSetting(string $derivative_id, array $value, array $expected_value): void {
+    $this->installConfig('config_test');
+
     // Apply the action the first time.
     $this->container->get('plugin.manager.config_action')->applyAction(
       "simpleConfigArray:$derivative_id",
@@ -505,6 +524,8 @@ class ConfigActionTest extends KernelTestBase {
   #[TestWith(["splice", ["offset" => 1, "length" => 0], ["itemA", "itemB"]])]
   #[TestWith(["splice", ["offset" => 1], ["itemA"]])]
   public function testSimpleConfigArrayAppliedTwiceWithUniqueSetting(string $derivative_id, array $value, array $expected_value): void {
+    $this->installConfig('config_test');
+
     // Apply the action the first time.
     $this->container->get('plugin.manager.config_action')->applyAction(
       "simpleConfigArray:$derivative_id",
