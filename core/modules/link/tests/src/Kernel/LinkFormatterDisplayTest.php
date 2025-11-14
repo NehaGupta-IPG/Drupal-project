@@ -202,6 +202,31 @@ class LinkFormatterDisplayTest extends FieldKernelTestBase {
       ],
     ];
 
+    yield 'attribute class=test' => [
+      'display_settings' => [
+        'class' => 'test',
+      ],
+      'expected_results' => [
+        0 => '<div><a href="http://www.example.com/content/articles/archive?author=John&amp;year=2012#com" class="test">http://www.example.com/content/articles/archive?author=John&amp;year=2012#com</a></div>',
+        1 => '<div><a href="http://www.example.org/content/articles/archive?author=John&amp;year=2012#org" class="test">A very long &amp; strange example title that could break the nice layout of the site</a></div>',
+        2 => '<div><a href="#net" class="test">Fragment only</a></div>',
+        3 => '<div><a href="?a%5B0%5D=1&amp;a%5B1%5D=2" class="test">?a%5B0%5D=1&amp;a%5B1%5D=2</a></div>',
+        4 => '<div><a href="?b%5B0%5D=1&amp;b%5B1%5D=2" class="test">?b%5B0%5D=1&amp;b%5B1%5D=2</a></div>',
+        16 => '<div><a href="?b%5B0%5D=9&amp;b%5B1%5D=8" class="test">?b%5B0%5D=9&amp;b%5B1%5D=8</a></div>',
+        5 => '<div><a href="?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3" class="test">?c%5B0%5D=1&amp;c%5B1%5D=2&amp;d=3</a></div>',
+        6 => '<div><a href="?e%5Bf%5D%5Bg%5D=h" class="test">?e%5Bf%5D%5Bg%5D=h</a></div>',
+        7 => '<div><a href="?i%5Bj%5Bk%5D=l" class="test">?i%5Bj%5Bk%5D=l</a></div>',
+        8 => '<div><a href="?x=2" class="test">?x=2</a></div>',
+        9 => '<div><a href="?z%5B0%5D=2" class="test">?z%5B0%5D=2</a></div>',
+        10 => '<div><a href="" class="test"></a></div>',
+        11 => '<div><a href="" class="test">Title, no link</a></div>',
+        12 => '<div><span></span></div>',
+        13 => '<div><span>Title, no link</span></div>',
+        14 => '<div><button type="button"></button></div>',
+        15 => '<div><button type="button">Title, button</button></div>',
+      ],
+    ];
+
     yield 'url_only=false' => [
       'display_settings' => ['url_only' => FALSE],
       'expected_results' => $default,
