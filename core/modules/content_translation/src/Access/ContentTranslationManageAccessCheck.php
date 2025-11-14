@@ -71,19 +71,12 @@ class ContentTranslationManageAccessCheck implements AccessInterface {
     if ($entity = $route_match->getParameter($entity_type_id)) {
       $operation = $route->getRequirement('_access_content_translation_manage');
       $language = $this->languageManager->getLanguage($language) ?: $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT);
-      $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
 
       if (in_array($operation, ['update', 'delete'])) {
         // Translation operations cannot be performed on the default
         // translation.
         if ($language->getId() == $entity->getUntranslated()->language()->getId()) {
           return AccessResult::forbidden()->addCacheableDependency($entity);
-        }
-        // Editors have no access to the translation operations, as entity
-        // access already grants them an equal or greater access level.
-        $templates = ['update' => 'edit-form', 'delete' => 'delete-form'];
-        if ($entity->access($operation) && $entity_type->hasLinkTemplate($templates[$operation])) {
-          return AccessResult::forbidden()->cachePerPermissions();
         }
       }
 

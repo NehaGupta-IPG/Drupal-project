@@ -97,9 +97,10 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
     $this->assertSession()->linkByHrefNotExists($it_delete_href);
     $warning = 'The "Delete translation" action is only available for published translations.';
     $this->assertSession()->statusMessageContains($warning, 'warning');
+
+    $this->drupalLogin($this->translator);
     $this->drupalGet($this->getEditUrl($it_revision));
     $this->assertSession()->linkNotExistsExact('Delete translation');
-
     // Publish the translation and verify it can be deleted.
     $edit = [
       'title[0][value]' => "Test $index.3 IT",
@@ -134,6 +135,7 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
 
     // Delete the translation and verify that it is actually gone and that it is
     // possible to create it again.
+    $this->drupalLogin($this->translator);
     $this->drupalGet($it_delete_url);
     $this->submitForm([], 'Delete Italian translation');
     $entity = $this->storage->loadUnchanged($id);
@@ -161,6 +163,7 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
     $this->drupalLogin($this->currentAccount);
 
     // Create a published translation again and verify it could be deleted.
+    $this->drupalLogin($this->translator);
     $this->drupalGet($add_translation_url);
     $edit = [
       'title[0][value]' => "Test $index.7 IT",
@@ -205,7 +208,7 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
     $revision_deletion_href = $revision_deletion_url->toString();
     $this->getSession()->getDriver()->click("//a[@href='$revision_deletion_href']");
     $this->submitForm([], 'Delete');
-    $this->drupalLogin($this->currentAccount);
+    $this->drupalLogin($this->translator);
     $this->drupalGet($overview_url);
     $this->assertSession()->linkByHrefExists($it_delete_href);
 

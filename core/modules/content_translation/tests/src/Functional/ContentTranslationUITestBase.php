@@ -230,8 +230,13 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
         // Test that label is correctly shown for translation.
         $view_url = $entity->toUrl('canonical', ['language' => $language])->toString();
         $this->assertSession()->elementTextEquals('xpath', "//table//a[@href='{$view_url}']", $entity->getTranslation($langcode)->label() ?? $entity->getTranslation($langcode)->id());
-        // Test that edit link is correct for translation.
+
         $edit_path = $entity->toUrl('edit-form', ['language' => $language])->toString();
+        if ($langcode != $entity->getUntranslated()->language()->getId()) {
+          $edit_path = $entity->toUrl('drupal:content-translation-edit', ['language' => $language])->setRouteParameter('language', $langcode)->toString();
+        }
+
+        // Test that edit link is correct for translation.
         $this->assertSession()->elementTextEquals('xpath', "//table//ul[@class='dropbutton']/li/a[@href='{$edit_path}']", 'Edit');
       }
     }
