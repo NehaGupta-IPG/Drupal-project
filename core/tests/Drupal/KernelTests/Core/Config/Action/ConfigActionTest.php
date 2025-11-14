@@ -354,9 +354,9 @@ class ConfigActionTest extends KernelTestBase {
   /**
    * Tests that simpleConfigArray append and prepend require an array of values.
    */
-  #[TestWith(["append", NULL])]
-  #[TestWith(["prepend", NULL])]
-  public function testSimpleConfigArrayPrependAndAppendRequireArrayOfValues(string $derivative_id, mixed $values): void {
+  #[TestWith(["append"])]
+  #[TestWith(["prepend"])]
+  public function testSimpleConfigArrayPrependAndAppendRequireArrayOfValues(string $derivative_id): void {
     $this->installConfig('config_test');
 
     $this->expectException(ConfigActionException::class);
@@ -366,7 +366,7 @@ class ConfigActionTest extends KernelTestBase {
       'config_test.system',
       [
         'property' => 'array',
-        'values' => $values,
+        'values' => NULL,
       ],
     );
   }
@@ -410,13 +410,17 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * Test that the simpleConfigArray actions work with string value input.
+   * Test that the simpleConfigArray actions work with scalar value input.
    */
   #[TestWith(["append", ["values" => "single"], ["itemA", "itemB", "single"]])]
+  #[TestWith(["append", ["values" => 42], ["itemA", "itemB", 42]])]
   #[TestWith(["prepend", ["values" => "single"], ["single", "itemA", "itemB"]])]
+  #[TestWith(["prepend", ["values" => 42], [42, "itemA", "itemB"]])]
   #[TestWith(["splice", ["offset" => 1, "replacement" => "single"], ["itemA", "single"]])]
+  #[TestWith(["splice", ["offset" => 1, "replacement" => 42], ["itemA", 42]])]
   #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => "single"], ["itemA", "single", "itemB"]])]
-  public function testSimpleConfigArrayWithStringValues(string $derivative_id, array $value, array $expected_value): void {
+  #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => 42], ["itemA", 42, "itemB"]])]
+  public function testSimpleConfigArrayWithScalarValues(string $derivative_id, array $value, array $expected_value): void {
     $this->installConfig('config_test');
 
     $this->container->get('plugin.manager.config_action')->applyAction(
