@@ -123,15 +123,21 @@ class DependencySerializationTestWithPropertyHooks {
   use DependencySerializationTrait;
 
   /**
-   * A property with hooks.
+   * A property with a getter and setter.
+   *
+   * @var string|null
    */
+  // phpcs:disable
   public ?string $title {
   get => $this->title ?? NULL;
   set => $this->title = $value;
   }
+  // phpcs:enabled
 
   /**
-   * A service.
+   * Service object.
+   *
+   * @var \stdClass
    */
   public \stdClass $service;
 
