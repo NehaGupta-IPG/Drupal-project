@@ -46,9 +46,8 @@ class DependencySerializationTest extends UnitTestCase {
   }
 
   /**
-   * Tests serialization with PHP 8.4 property hooks.
+   * Tests serialization property hooks.
    *
-   * @requires PHP >= 8.4
    * @legacy-covers ::__sleep
    * @legacy-covers ::__wakeup
    */
@@ -117,7 +116,7 @@ class DependencySerializationTestDummy {
 }
 
 /**
- * Test class with PHP 8.4 property hooks.
+ * Test class with property hooks.
  */
 class DependencySerializationTestWithPropertyHooks {
 
@@ -133,10 +132,8 @@ class DependencySerializationTestWithPropertyHooks {
 
   /**
    * A service.
-   *
-   * @var object
    */
-  public $service;
+  public \stdClass $service;
 
   /**
    * Constructor.
