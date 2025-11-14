@@ -609,7 +609,7 @@
 
       const ckeditorAjaxDialog = Drupal.ajax({
         dialog: dialogSettings,
-        dialogType: 'modal',
+        dialogType: dialogSettings.useDialog ? 'dialog' : 'modal',
         selector: '.ckeditor5-dialog-loading-link',
         url,
         progress: { type: 'fullscreen' },
@@ -689,15 +689,20 @@
 
   // Respond to dialogs that are saved, sending data back to CKEditor.
   $(window).on('editor:dialogsave', (e, values) => {
-    if (Drupal.ckeditor5.saveCallback) {
-      Drupal.ckeditor5.saveCallback(values);
+    if (Drupal.ckeditor.saveCallback) {
+      Drupal.ckeditor.saveCallback(values);
+      if (Drupal.ckeditor.saveCallback.name === 'createBeanCallback') {
+        Drupal.ckeditor.saveCallback = null;
+      }
     }
   });
 
   // Respond to dialogs that are closed, removing the current save handler.
   window.addEventListener('dialog:afterclose', () => {
-    if (Drupal.ckeditor5.saveCallback) {
-      Drupal.ckeditor5.saveCallback = null;
+    if (Drupal.ckeditor.saveCallback) {
+      if (!Drupal.ckeditor.saveCallback.name === 'createBeanCallback') {
+        Drupal.ckeditor.saveCallback = null;
+      }
     }
   });
 })(Drupal, Drupal.debounce, CKEditor5, jQuery, once);
