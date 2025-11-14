@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Entity\Query;
 
+use Drupal\Core\Database\Query\ConditionInterface;
+
 /**
  * Defines the entity query condition interface.
  */
@@ -86,8 +88,8 @@ interface ConditionInterface {
   /**
    * Compiles this conditional clause.
    *
-   * @param mixed $query
-   *   The query object this conditional clause belongs to.
+   * @param \Drupal\Core\Entity\Query\QueryInterface|array $query
+   *   The query object or data this conditional clause belongs to.
    */
   public function compile($query);
 
