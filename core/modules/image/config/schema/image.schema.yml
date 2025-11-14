@@ -138,7 +138,6 @@ field.field_settings.image:
           choices:
             - 'resize_larger_images'
             - 'reject_larger_images_with_error'
-        FullyValidatable: ~
     min_resolution:
       type: string
       label: 'Minimum image dimensions'
