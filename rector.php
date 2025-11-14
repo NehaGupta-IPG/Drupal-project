@@ -210,7 +210,7 @@ return RectorConfig::configure()
         __DIR__ . '/vendor/palantirnet/drupal-rector/config/drupal-phpunit-bootstrap-file.php',
     ])
     ->withPaths([
-        __DIR__ . '/core/tests/Drupal/Tests',
+        __DIR__ . '/core',
     ])
     ->withSkip([
         '*/vendor/*',
