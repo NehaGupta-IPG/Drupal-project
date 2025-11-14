@@ -188,7 +188,7 @@ class LinkFormatterTest extends UnitTestCase {
     $linkItem->expects($this->any())
       ->method('__get')
       ->with('options')
-      ->willReturn([]);
+      ->willReturn($expectedOptions);
     $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
