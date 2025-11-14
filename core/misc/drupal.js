@@ -38,38 +38,47 @@
  *
  * @namespace
  */
-window.Drupal = { 
-  behaviors: typeof Proxy !== 'undefined' ? new Proxy({}, {
-    set(target, property, value) {
-      // Store the new behavior
-      target[property] = value;
-      
-      // Auto-attach if behavior has attach method and DOM is ready
-      if (value && typeof value.attach === 'function') {
-        if (document.readyState !== 'loading' && window.Drupal.attachBehaviors) {
-          setTimeout(() => {
-            window.Drupal._autoAttachBehavior(value);
-          }, 0);
-        }
-      }
-      
-      return true;
-    }
-  }) : {},
+window.Drupal = {
+  behaviors:
+    typeof Proxy !== 'undefined'
+      ? new Proxy(
+          {},
+          {
+            set(target, property, value) {
+              // Store the new behavior
+              target[property] = value;
+
+              // Auto-attach if behavior has attach method and DOM is ready
+              if (value && typeof value.attach === 'function') {
+                if (
+                  document.readyState !== 'loading' &&
+                  window.Drupal.attachBehaviors
+                ) {
+                  setTimeout(() => {
+                    window.Drupal._autoAttachBehavior(value);
+                  }, 0);
+                }
+              }
+
+              return true;
+            },
+          },
+        )
+      : {},
   locale: {},
-  
+
   /**
    * Auto-attach a single behavior when it's registered.
    *
    * @param {object} behavior
    *   The behavior object to attach.
    */
-  _autoAttachBehavior: function (behavior) {
+  _autoAttachBehavior(behavior) {
     // Track attached behaviors to prevent double attachment
     if (!window.Drupal._attachedBehaviors) {
       window.Drupal._attachedBehaviors = new WeakSet();
     }
-    
+
     // Only attach if not already attached
     if (!window.Drupal._attachedBehaviors.has(behavior)) {
       window.Drupal._attachedBehaviors.add(behavior);
@@ -83,9 +92,8 @@ window.Drupal = {
         }
       }
     }
-  }
+  },
 };
-
 
 // JavaScript should be made compatible with libraries other than jQuery by
 // wrapping it in an anonymous closure.
@@ -204,7 +212,7 @@ window.Drupal = {
   Drupal.attachBehaviors = function (context, settings) {
     context = context || document;
     settings = settings || drupalSettings;
-    const behaviors = Drupal.behaviors;
+    const { behaviors } = Drupal;
     // Execute all of them.
     Object.keys(behaviors || {}).forEach((i) => {
       if (typeof behaviors[i].attach === 'function') {
@@ -263,7 +271,7 @@ window.Drupal = {
     context = context || document;
     settings = settings || drupalSettings;
     trigger = trigger || 'unload';
-    const behaviors = Drupal.behaviors;
+    const { behaviors } = Drupal;
     // Execute all of them.
     Object.keys(behaviors || {}).forEach((i) => {
       if (typeof behaviors[i].detach === 'function') {
@@ -548,7 +556,7 @@ window.Drupal = {
     args = args || {};
     args['@count'] = count;
 
-    const pluralDelimiter = drupalSettings.pluralDelimiter;
+    const { pluralDelimiter } = drupalSettings;
     const translations = Drupal.t(
       singular + pluralDelimiter + plural,
       args,
@@ -614,7 +622,7 @@ window.Drupal = {
    *   A key of the deprecated property.
    * @param {string} deprecation.message
    *   The deprecation message.
-   * @returns {Object}
+   * @return {Object}
    *
    * @see https://www.drupal.org/core/deprecation#javascript
    */
@@ -626,11 +634,11 @@ window.Drupal = {
     }
 
     return new Proxy(target, {
-      get: (target, key, ...rest) => {
+      get: (proxyTarget, key, ...rest) => {
         if (key === deprecatedProperty) {
           Drupal.deprecationError({ message });
         }
-        return Reflect.get(target, key, ...rest);
+        return Reflect.get(proxyTarget, key, ...rest);
       },
     });
   };

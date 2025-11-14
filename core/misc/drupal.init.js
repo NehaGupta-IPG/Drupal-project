@@ -33,7 +33,7 @@ document.documentElement.className += ' js';
     if (!Drupal._attachedBehaviors) {
       Drupal._attachedBehaviors = new WeakSet();
     }
-    
+
     // Mark all existing behaviors as attached
     Object.keys(Drupal.behaviors || {}).forEach((key) => {
       const behavior = Drupal.behaviors[key];
@@ -41,7 +41,7 @@ document.documentElement.className += ' js';
         Drupal._attachedBehaviors.add(behavior);
       }
     });
-    
+
     // Call attachBehaviors
     Drupal.attachBehaviors(document, drupalSettings);
   });
