@@ -86,24 +86,20 @@ final class SimpleConfigArray implements ConfigActionPluginInterface, ContainerF
     $property_name = $value['property'];
     unset($value['property']);
 
-    $unique = !empty($value['unique']) && (bool) $value['unique'];
+    $unique = !empty($value['unique']);
     unset($value['unique']);
 
     // The `array_push()` and `array_unshift()` functions have a similar
     // signature, and need to be given an array of values.
     if (in_array($this->function, ['array_push', 'array_unshift'], TRUE)) {
-      $arguments = NULL;
+      $arguments = [];
       if (isset($value['values'])) {
         if (is_array($value['values'])) {
           $arguments = array_values($value['values']);
         }
-        elseif (is_string($value['values'])) {
+        elseif (is_scalar($value['values'])) {
           $arguments = [$value['values']];
         }
-      }
-
-      if (!is_array($arguments)) {
-        throw new ConfigActionException('The ' . $this->pluginId . ' config action requires an array of values.');
       }
     }
     else {
