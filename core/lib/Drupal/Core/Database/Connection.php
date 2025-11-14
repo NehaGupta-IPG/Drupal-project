@@ -1434,7 +1434,7 @@ abstract class Connection {
    *
    * @param string $url
    *   The URL.
-   * @param string $root
+   * @param string|null $root
    *   (deprecated) The root directory of the Drupal installation. Some
    *   database drivers, like for example SQLite, need this information.
    *
