@@ -198,9 +198,9 @@ class LinkFormatterTest extends UnitTestCase {
       ->willReturn($linkItem);
     $urlGenerator = $this->createMock(UrlGenerator::class);
     $urlGenerator->expects($this->once())
-    ->method('generateFromRoute')
-    ->with('<front>', [], [], FALSE)
-    ->willReturn('http://example.com');
+      ->method('generateFromRoute')
+      ->with('<front>', [], [], FALSE)
+      ->willReturn('http://example.com');
     $container = new ContainerBuilder();
     $container->set('plugin.manager.field.field_type', $fieldTypePluginManager);
     $container->set('url_generator', $urlGenerator);
