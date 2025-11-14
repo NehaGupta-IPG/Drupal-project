@@ -33,7 +33,18 @@ function navigation_post_update_update_permissions(array &$sandbox): void {
  * Defines the values for the default logo dimensions.
  */
 function navigation_post_update_set_logo_dimensions_default(array &$sandbox): void {
-  // Empty post_update hook.
+  $config_factory = \Drupal::configFactory();
+  $editable = $config_factory->getEditable('navigation.settings');
+  $max = $editable->get('logo.max') ?: [];
+  $width = $max['width'] ?? NULL;
+  $height = $max['height'] ?? NULL;
+
+  // Only update if still using the legacy 40x40 default.
+  if ($width === 40 && $height === 40) {
+    $max['width'] = 200;
+    $max['height'] = 200;
+    $editable->set('logo.max', $max)->save();
+  }
 }
 
 /**

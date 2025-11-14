@@ -230,7 +230,8 @@ body {
 
   & img {
     display: block;
-    max-width: var(--admin-toolbar-space-40);
+    max-width: var(--admin-toolbar-space-150);
+    height: auto;
   }
 }
 

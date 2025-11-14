@@ -216,15 +216,14 @@ body {
   display: inline-flex;
   overflow: hidden;
   border-radius: var(--admin-toolbar-space-8);
-
-  &:hover {
-    background-color: transparent;
-  }
-
-  & img {
-    display: block;
-    max-width: var(--admin-toolbar-space-40);
-  }
+}
+.admin-toolbar__logo:hover {
+  background-color: transparent;
+}
+.admin-toolbar__logo img {
+  display: block;
+  max-width: var(--admin-toolbar-space-150);
+  height: auto;
 }
 /**
  * Scroll wrapper for Mobile.
@@ -294,14 +293,12 @@ body {
   padding: var(--admin-toolbar-space-16);
   border-block-start: 1px solid var(--admin-toolbar-color-gray-200);
   border-inline-end: 1px solid var(--admin-toolbar-color-gray-100);
-
-  & > .toolbar-block {
-    &:last-of-type {
-      margin-block-end: var(--admin-toolbar-space-12);
-    }
-  }
-
-  @media (min-width: 64rem) {
+}
+.admin-toolbar__footer > .toolbar-block:last-of-type {
+  margin-block-end: var(--admin-toolbar-space-12);
+}
+@media (min-width: 64rem) {
+  .admin-toolbar__footer {
     --admin-toolbar-z-index-footer: -1;
 
     position: sticky;
@@ -319,11 +316,9 @@ body {
     display: flex;
   }
 }
-[data-drupal-tooltip]:hover + .admin-toolbar__tooltip,
-[data-drupal-tooltip]:focus + .admin-toolbar__tooltip {
-  [data-admin-toolbar="expanded"] & {
-    display: none;
-  }
+[data-admin-toolbar="expanded"] :is([data-drupal-tooltip]:hover + .admin-toolbar__tooltip),
+[data-admin-toolbar="expanded"] :is([data-drupal-tooltip]:focus + .admin-toolbar__tooltip) {
+  display: none;
 }
 /**
  * Element is used to overlay the content when Toolbar is expanded in smaller devices.
