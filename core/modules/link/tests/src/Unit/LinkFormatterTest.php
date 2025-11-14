@@ -152,82 +152,83 @@ class LinkFormatterTest extends UnitTestCase {
     ], $elements);
   }
 
-/**
- * Tests the LinkFormatter with custom class attributes.
- */
-public function testFormatterLinkItemWithClasses(): void {
-  // Mock the Url object, but don’t mock toString directly.
-  $expectedUrl = $this->createMock(Url::class);
-  $expectedOptions = [
-    'attributes' => [
-      'class' => ['custom-link', 'link-active'],
-    ],
-  ];
-  $expectedUrl->expects($this->once())
-    ->method('setOptions')
-    ->with($expectedOptions);
-  $expectedUrl->expects($this->atLeastOnce())
-    ->method('getOptions')
-    ->willReturn($expectedOptions);
-  // Mock getRouteName and getRouteParameters to match the route.
-  $expectedUrl->expects($this->any())
-    ->method('getRouteName')
-    ->willReturn('<front>');
-  $expectedUrl->expects($this->any())
-    ->method('getRouteParameters')
-    ->willReturn([]);
-
-  $linkItem = $this->createMock(LinkItemInterface::class);
-  $entity = $this->createMock(EntityInterface::class);
-  $linkItem->expects($this->any())
-    ->method('getParent')
-    ->willReturn($entity);
-  $linkItem->expects($this->once())
-    ->method('getUrl')
-    ->willReturn($expectedUrl);
-  $linkItem->expects($this->any())
-    ->method('__get')
-    ->with('options')
-    ->willReturn([]);
-  $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
-  $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
-
-  $fieldTypePluginManager = $this->createMock(FieldTypePluginManagerInterface::class);
-  $fieldTypePluginManager->expects($this->once())
-    ->method('createFieldItem')
-    ->willReturn($linkItem);
-  $urlGenerator = $this->createMock(UrlGenerator::class);
-  $urlGenerator->expects($this->once())
-  ->method('generateFromRoute')
-  ->with('<front>', [], [], FALSE)
-  ->willReturn('http://example.com');
-  $container = new ContainerBuilder();
-  $container->set('plugin.manager.field.field_type', $fieldTypePluginManager);
-  $container->set('url_generator', $urlGenerator);
-  \Drupal::setContainer($container);
-  $fieldList->setValue([$linkItem]);
-
-  $pathValidator = $this->createMock(PathValidatorInterface::class);
-  $settings = [
-    'trim_length' => '',
-    'url_only' => '',
-    'url_plain' => '',
-    'rel' => '',
-    'target' => '',
-    'class' => 'custom-link link-active',
-  ];
-  $linkFormatter = new LinkFormatter('', [], $fieldDefinition, $settings, '', '', [], $pathValidator);
-  $elements = $linkFormatter->viewElements($fieldList, 'en');
-
-  $this->assertEquals([
-    [
-      '#type' => 'link',
-      '#title' => '',
-      '#url' => $expectedUrl,
-      '#attributes' => [
+  /**
+   * Tests the LinkFormatter with custom class attributes.
+   */
+  public function testFormatterLinkItemWithClasses(): void {
+    // Mock the Url object, but don’t mock toString directly.
+    $expectedUrl = $this->createMock(Url::class);
+    $expectedOptions = [
+      'attributes' => [
         'class' => ['custom-link', 'link-active'],
       ],
-    ],
-  ], $elements);
-}
+    ];
+    $expectedUrl->expects($this->once())
+      ->method('setOptions')
+      ->with($expectedOptions);
+    $expectedUrl->expects($this->atLeastOnce())
+      ->method('getOptions')
+      ->willReturn($expectedOptions);
+    // Mock getRouteName and getRouteParameters to match the route.
+    $expectedUrl->expects($this->any())
+      ->method('getRouteName')
+      ->willReturn('<front>');
+    $expectedUrl->expects($this->any())
+      ->method('getRouteParameters')
+      ->willReturn([]);
+
+    $linkItem = $this->createMock(LinkItemInterface::class);
+    $entity = $this->createMock(EntityInterface::class);
+    $linkItem->expects($this->any())
+      ->method('getParent')
+      ->willReturn($entity);
+    $linkItem->expects($this->once())
+      ->method('getUrl')
+      ->willReturn($expectedUrl);
+    $linkItem->expects($this->any())
+      ->method('__get')
+      ->with('options')
+      ->willReturn([]);
+    $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
+    $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
+
+    $fieldTypePluginManager = $this->createMock(FieldTypePluginManagerInterface::class);
+    $fieldTypePluginManager->expects($this->once())
+      ->method('createFieldItem')
+      ->willReturn($linkItem);
+    $urlGenerator = $this->createMock(UrlGenerator::class);
+    $urlGenerator->expects($this->once())
+    ->method('generateFromRoute')
+    ->with('<front>', [], [], FALSE)
+    ->willReturn('http://example.com');
+    $container = new ContainerBuilder();
+    $container->set('plugin.manager.field.field_type', $fieldTypePluginManager);
+    $container->set('url_generator', $urlGenerator);
+    \Drupal::setContainer($container);
+    $fieldList->setValue([$linkItem]);
+
+    $pathValidator = $this->createMock(PathValidatorInterface::class);
+    $settings = [
+      'trim_length' => '',
+      'url_only' => '',
+      'url_plain' => '',
+      'rel' => '',
+      'target' => '',
+      'class' => 'custom-link link-active',
+    ];
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, $settings, '', '', [], $pathValidator);
+    $elements = $linkFormatter->viewElements($fieldList, 'en');
+
+    $this->assertEquals([
+      [
+        '#type' => 'link',
+        '#title' => '',
+        '#url' => $expectedUrl,
+        '#attributes' => [
+          'class' => ['custom-link', 'link-active'],
+        ],
+      ],
+    ], $elements);
+  }
+
 }
