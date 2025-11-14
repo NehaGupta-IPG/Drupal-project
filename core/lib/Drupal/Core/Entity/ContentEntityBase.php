@@ -663,6 +663,11 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function set($name, $value, $notify = TRUE) {
+    if ($this->defaultLangcode === NULL) {
+      // The method is invoked early during translation initialization.
+      return $this;
+    }
+
     // Assign the value on the child and overrule notify such that we get
     // notified to handle changes afterwards. We can ignore notify as there is
     // no parent to notify anyway.
