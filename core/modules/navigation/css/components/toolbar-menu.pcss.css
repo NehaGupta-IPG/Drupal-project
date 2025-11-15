@@ -35,6 +35,7 @@
 }
 
 .toolbar-menu--level-2 {
+  padding-block-start: var(--admin-toolbar-space-12);
   padding-block-end: var(--admin-toolbar-space-12);
   box-shadow: inset var(--admin-toolbar-space-4) 0 0 0 var(--admin-toolbar-color-gray-100);
 
