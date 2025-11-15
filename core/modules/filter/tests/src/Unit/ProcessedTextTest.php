@@ -45,7 +45,7 @@ final class ProcessedTextTest extends UnitTestCase {
    */
   #[DataProvider('providerElement')]
   public function testPreRenderText(array $element, array $expected): void {
-    $this->assertSame($expected, $this->element::preRenderText($element, 'en')->getInfo());
+    $this->assertSame($expected, $this->element::preRenderText($element));
   }
 
   /**
@@ -55,7 +55,12 @@ final class ProcessedTextTest extends UnitTestCase {
    *   An array of test data.
    */
   public static function providerElement(): array {
-    return [];
+    return [
+      'empty text' => [
+        ['#text' => '', '#format' => NULL, '#langcode' => '', '#filter_types_to_skip' => []],
+        ['#text' => '', '#format' => NULL, '#langcode' => '', '#filter_types_to_skip' => [], '#markup' => ''],
+      ],
+    ];
   }
 
 }
