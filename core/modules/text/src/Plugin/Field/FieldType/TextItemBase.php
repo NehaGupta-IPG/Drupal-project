@@ -75,7 +75,7 @@ abstract class TextItemBase extends FieldItemBase {
   /**
    * {@inheritdoc}
    */
-  public static function onDependencyRemoval(FieldDefinitionInterface $field_definition, array $dependencies) {
+  public static function onDependencyRemoval(FieldDefinitionInterface $field_definition, array $dependencies): bool {
     $changed = parent::onDependencyRemoval($field_definition, $dependencies);
 
     if (!$field_definition instanceof FieldConfigInterface || !isset($dependencies['config'])) {
