@@ -44,7 +44,7 @@ abstract class ConvertDefinition {
       $spec['unique keys'] = self::uniqueKeysToArray($table->uniqueKeys);
     }
     if ($table->indexes !== Property::Undefined) {
-      $spec['indexes'] = self::indexesToArray($table->indexes);
+      self::indexesToArray($table->indexes, $spec);
     }
     if ($table->foreignKeys !== Property::Undefined) {
       $spec['foreign keys'] = self::foreignKeysToArray($table->foreignKeys);
@@ -165,12 +165,13 @@ abstract class ConvertDefinition {
    *
    * @internal
    */
-  final public static function indexesToArray(array $indexes): array {
-    $spec = [];
+  final public static function indexesToArray(array $indexes, array &$spec): void {
     foreach ($indexes as $index) {
-      $spec[$index->name] = self::keyColumnsToArray($index->columns);
+      $spec['indexes'][$index->name] = self::keyColumnsToArray($index->columns);
+      if ($index->dbSpecificExtra !== Property::Undefined) {
+        $spec['indexes extra'][$index->name] = $index->dbSpecificExtra;
+      }
     }
-    return $spec;
   }
 
   /**

@@ -75,6 +75,19 @@ class ConvertDefinitionTest extends UnitTestCase {
         'ages' => ['age'],
         'age_job_prefix' => ['age', ['job', 50]],
         'age_name_prefix' => ['age', ['name', 20]],
+        'foo' => ['job'],
+      ],
+      'indexes extra' => [
+        'foo' => [
+          'pgsql' => [
+            'type' => 'gist',
+            'operator' => 'gist_trgm_ops',
+          ],
+          'time_warp' => [
+            'jump' => 'to_the_left',
+            'step' => 'to_the_right',
+          ],
+        ],
       ],
       'foreign keys' => [
         'user_id' => [
@@ -151,6 +164,20 @@ class ConvertDefinitionTest extends UnitTestCase {
         new Index(
           name: 'age_name_prefix',
           columns: ['age', new KeyColumn(name: 'name', length: 20)],
+        ),
+        new Index(
+          name: 'foo',
+          columns: ['job'],
+          dbSpecificExtra: [
+            'pgsql' => [
+              'type' => 'gist',
+              'operator' => 'gist_trgm_ops',
+            ],
+            'time_warp' => [
+              'jump' => 'to_the_left',
+              'step' => 'to_the_right',
+            ],
+          ],
         ),
       ],
       foreignKeys: [
