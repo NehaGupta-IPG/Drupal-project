@@ -6,11 +6,13 @@ namespace Drupal\Tests\field\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Migrate field instance option translations.
  */
 #[Group('migrate_drupal_7')]
+#[RunTestsInSeparateProcesses]
 class MigrateFieldInstanceOptionTranslationTest extends MigrateDrupal7TestBase {
 
   /**
@@ -21,11 +23,9 @@ class MigrateFieldInstanceOptionTranslationTest extends MigrateDrupal7TestBase {
     'config_translation',
     'datetime',
     'datetime_range',
-    'file',
     'image',
     'language',
     'link',
-    'locale',
     'menu_ui',
     'node',
     'taxonomy',

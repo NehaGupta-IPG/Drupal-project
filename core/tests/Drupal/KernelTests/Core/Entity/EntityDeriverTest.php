@@ -13,12 +13,14 @@ use Drupal\node\Entity\NodeType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityDeriver functionality.
  */
 #[CoversClass(EntityDeriver::class)]
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityDeriverTest extends KernelTestBase {
 
   /**
@@ -32,7 +34,6 @@ class EntityDeriverTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'field',
     'user',
     'node',
     'comment',

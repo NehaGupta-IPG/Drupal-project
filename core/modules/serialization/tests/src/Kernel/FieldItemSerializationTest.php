@@ -9,24 +9,21 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 /**
  * Test field level normalization process.
  */
 #[Group('serialization')]
+#[RunTestsInSeparateProcesses]
 class FieldItemSerializationTest extends NormalizerTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'serialization',
-    'field',
     'entity_test',
-    'text',
-    'filter',
-    'user',
     'field_normalization_test',
   ];
 

@@ -12,6 +12,7 @@ use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\jsonapi\Normalizer\FieldItemNormalizer.
@@ -20,13 +21,13 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(FieldItemNormalizer::class)]
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class FieldItemNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'file',
     'user',
     'link',
     'entity_test',

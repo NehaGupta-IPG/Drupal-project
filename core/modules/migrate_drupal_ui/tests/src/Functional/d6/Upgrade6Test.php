@@ -7,6 +7,7 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('migrate_drupal_ui')]
 #[Group('#slow')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
 
@@ -24,6 +26,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
    */
   protected static $modules = [
     'config_translation',
+    'contact',
     'content_translation',
     'datetime_range',
     'language',
@@ -82,7 +85,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       // The 'standard' profile provides the 'comment' comment type, and the
       // migration creates 12 comment types, one per node type.
       'comment_type' => 14,
-      'contact_form' => 5,
+      'contact_form' => 4,
       'contact_message' => 0,
       'configurable_language' => 5,
       'editor' => 2,

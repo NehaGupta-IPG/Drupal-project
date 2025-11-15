@@ -184,8 +184,11 @@ final class Importer implements LoggerAwareInterface {
       }
     }
 
+    $scheme = parse_url($destination, PHP_URL_SCHEME);
     $target_directory = dirname($destination);
-    $this->fileSystem->prepareDirectory($target_directory, FileSystemInterface::CREATE_DIRECTORY);
+    if (!isset($scheme) || rtrim($target_directory, ':') !== $scheme) {
+      $this->fileSystem->prepareDirectory($target_directory, FileSystemInterface::CREATE_DIRECTORY);
+    }
     if ($copy_file) {
       $uri = $this->fileSystem->copy($source, $destination);
       $entity->setFileUri($uri);
@@ -211,6 +214,11 @@ final class Importer implements LoggerAwareInterface {
     if (empty($data['_meta']['uuid'])) {
       throw new ImportException('The uuid metadata must be specified.');
     }
+
+    // Allow third-party code to modify the entity data before the entity is
+    // created.
+    $event = new PreEntityImportEvent($data);
+    $data = ['_meta' => $event->metadata] + $this->eventDispatcher->dispatch($event)->data;
 
     $is_root = FALSE;
     // @see ::loadEntityDependency()

@@ -12,12 +12,14 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the ContentModerationState storage schema.
  */
 #[CoversClass(ContentModerationStateStorageSchema::class)]
 #[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ContentModerationStateStorageSchemaTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -29,7 +31,6 @@ class ContentModerationStateStorageSchemaTest extends KernelTestBase {
     'node',
     'content_moderation',
     'user',
-    'text',
     'workflows',
     'entity_test',
   ];

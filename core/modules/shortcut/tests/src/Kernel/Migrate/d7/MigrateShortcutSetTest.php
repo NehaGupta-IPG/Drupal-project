@@ -8,11 +8,13 @@ use Drupal\shortcut\Entity\ShortcutSet;
 use Drupal\shortcut\ShortcutSetInterface;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test shortcut_set migration to ShortcutSet entities.
  */
 #[Group('shortcut')]
+#[RunTestsInSeparateProcesses]
 class MigrateShortcutSetTest extends MigrateDrupal7TestBase {
 
   /**
@@ -20,7 +22,6 @@ class MigrateShortcutSetTest extends MigrateDrupal7TestBase {
    */
   protected static $modules = [
     'link',
-    'field',
     'shortcut',
     'menu_link_content',
   ];

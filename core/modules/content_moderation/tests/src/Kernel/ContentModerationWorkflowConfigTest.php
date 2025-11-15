@@ -10,11 +10,13 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests how Content Moderation handles workflow config changes.
  */
 #[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ContentModerationWorkflowConfigTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -27,7 +29,6 @@ class ContentModerationWorkflowConfigTest extends KernelTestBase {
     'content_moderation',
     'user',
     'system',
-    'text',
     'workflows',
   ];
 

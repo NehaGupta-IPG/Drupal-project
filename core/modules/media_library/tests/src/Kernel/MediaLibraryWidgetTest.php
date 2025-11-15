@@ -16,12 +16,14 @@ use Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the media library widget.
  */
 #[CoversClass(MediaLibraryWidget::class)]
 #[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryWidgetTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -32,7 +34,6 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   protected static $modules = [
     'media',
     'media_library',
-    'field',
     'file',
     'filter',
     'image',

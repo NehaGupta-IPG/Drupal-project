@@ -8,6 +8,7 @@ use Drupal\field\Plugin\migrate\source\d7\FieldLabelDescriptionTranslation;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore objectid plid textgroup
 /**
@@ -15,13 +16,13 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(FieldLabelDescriptionTranslation::class)]
 #[Group('migrate_drupal')]
+#[RunTestsInSeparateProcesses]
 class FieldInstanceLabelDescriptionTranslationTest extends MigrateSqlSourceTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'config_translation',
     'migrate_drupal',
     'field',
   ];
