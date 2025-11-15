@@ -83,19 +83,19 @@ abstract class TextItemBase extends FieldItemBase {
     }
 
     foreach ($dependencies['config'] as $config) {
-      // Remove deleted filter formats from allowed_formats so that the field
-      // configuration entity is not deleted.
       if (!$config instanceof FilterFormatInterface) {
         continue;
       }
       $settings = $field_definition->getSettings();
       $allowed_formats = $settings['allowed_formats'] ?? [];
-      $updated_allowed_formats = array_diff($allowed_formats, [$config->id()]);
-      if ($updated_allowed_formats !== $allowed_formats) {
-        $settings['allowed_formats'] = $updated_allowed_formats;
-        $field_definition->set('settings', $settings);
-        $changed = TRUE;
+      if (!in_array($config->id(), $allowed_formats, TRUE)) {
+        continue;
       }
+      // Remove deleted filter format from allowed_formats so that the field
+      // configuration entity is not deleted.
+      $settings['allowed_formats'] = array_diff($allowed_formats, [$config->id()]);
+      $field_definition->set('settings', $settings);
+      $changed = TRUE;
     }
 
     return $changed;
