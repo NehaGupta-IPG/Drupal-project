@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Form;
 
+use Drupal\Core\Recipe\RecipeInputFormTrait;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\Core\Recipe\RecipeInputFormTrait
- * @group system
+ * Tests Recipe Form Input.
  */
+#[Group('system')]
+#[CoversTrait(RecipeInputFormTrait::class)]
+#[RunTestsInSeparateProcesses]
 class RecipeFormInputTest extends BrowserTestBase {
 
   /**
@@ -29,15 +35,20 @@ class RecipeFormInputTest extends BrowserTestBase {
     $this->drupalGet('/form-test/recipe-input');
 
     $assert_session = $this->assertSession();
-    // There should only be one nested input element on the page: the one
-    // defined by the input_test recipe.
-    $assert_session->elementsCount('css', 'input[name*="["]', 1);
+    // There should only be two nested input elements on the page: the one
+    // defined by the input_test recipe and the other defined by its dependency,
+    // the create_node_type recipe.
+    $assert_session->elementsCount('css', 'input[name*="["]', 2);
     // The default value and description should be visible.
     $assert_session->fieldValueEquals('input_test[owner]', 'Dries Buytaert');
     $assert_session->pageTextContains('The name of the site owner.');
-    // All recipe inputs are required.
+    $this->assertSame('checkbox', $assert_session->fieldExists('Allow mischief')->getAttribute('type'));
+    // All recipe inputs are required, except for checkboxes, for which that
+    // behavior makes no sense.
     $this->submitForm(['input_test[owner]' => ''], 'Apply recipe');
+    $assert_session->statusCodeEquals(200);
     $assert_session->statusMessageContains("Site owner's name field is required.", 'error');
+    $assert_session->statusMessageNotContains('Allow mischief field is required.', 'error');
     // All inputs should be validated with their own constraints.
     $this->submitForm(['input_test[owner]' => 'Hacker Joe'], 'Apply recipe');
     $assert_session->statusMessageContains("I don't think you should be owning sites.", 'error');

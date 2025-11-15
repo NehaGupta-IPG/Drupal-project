@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Serialization\Yaml;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests installing a profile with non-English language and no locale module.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerNonEnglishProfileWithoutLocaleModuleTest extends InstallerTestBase {
 
   /**
@@ -55,7 +57,7 @@ class InstallerNonEnglishProfileWithoutLocaleModuleTest extends InstallerTestBas
     file_put_contents($profile_info_file, Yaml::encode($profile_info));
 
     // Copy a non-English language config YAML to be installed with the profile.
-    copy($this->root . '/core/profiles/testing_multilingual/config/install/language.entity.de.yml', $profile_config_dir . '/language.entity.de.yml');
+    copy($this->root . '/core/profiles/tests/testing_multilingual/config/install/language.entity.de.yml', $profile_config_dir . '/language.entity.de.yml');
   }
 
   /**
