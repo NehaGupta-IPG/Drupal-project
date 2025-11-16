@@ -1080,4 +1080,60 @@ class FilterStringTest extends ViewsKernelTestBase {
     return $filters;
   }
 
+  /**
+   * Tests that the word tokenizer does not generate empty or punctuation-only terms.
+   */
+  public function testFilterStringTokenizerEmpty() {
+    // Load the test view provided by Views.
+    $view = Views::getView('test_view');
+    $view->setDisplay();
+
+    // Add a string filter programmatically using the 'contains any word' operator.
+    // The filter id is unique; field name here is "name" because test_view uses it.
+    $view->display_handler->overrideOption('filters', [
+      'name' => [
+        'id' => 'name',
+        'table' => 'views_test_data',
+        'field' => 'name',
+        'relationship' => 'none',
+        'operator' => 'word',   // "Contains any word".
+        'exposed' => TRUE,
+        'expose' => [
+          'operator_id' => 'name_op',
+          'label' => 'Name contains any word',
+          'identifier' => 'name',
+        ],
+        'value' => '',
+        'group' => 1,
+      ],
+    ]);
+
+    // Provide exposed input containing punctuation adjacent to whitespace.
+    $input = 'Hello from me !';
+    $view->setExposedInput([
+      'name' => $input,
+    ]);
+
+    // Execute the view; this triggers the filter parsing.
+    $this->executeView($view);
+
+    /** @var \Drupal\views\Plugin\views\filter\StringFilter $handler */
+    $handler = $view->filter['name'];
+    $this->assertInstanceOf(\Drupal\views\Plugin\views\filter\StringFilter::class, $handler);
+
+    // Extract the parsed words.
+    $tokens = $handler->value;
+
+    // Assertions (this reveals the bug).
+    // Expected: ['Hello', 'from', 'me']
+    // Actual today: ['Hello', 'from', 'me', '', '!'] depending on tokenizer behavior.
+
+    $this->assertNotContains('', $tokens, 'Tokenizer should not produce empty search terms.');
+    $this->assertNotContains(' ', $tokens, 'Tokenizer should not produce whitespace-only terms.');
+    $this->assertNotContains('!', $tokens, 'Tokenizer should not produce punctuation-only terms.');
+
+    // Ensure the number of tokens is correct (3).
+    $this->assertCount(3, $tokens, 'Tokenizer should produce exactly three valid words.');
+  }
+
 }
