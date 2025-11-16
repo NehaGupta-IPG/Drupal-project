@@ -329,15 +329,6 @@ class FilterAPITest extends EntityKernelTestBase {
     ];
     \Drupal::service('renderer')->renderRoot($build);
     $this->assertSame('', $build['#markup']);
-
-    // Test case for an object input (should be serialized).
-    $build = [
-      '#type' => 'processed_text',
-      '#text' => new \stdClass(),
-      '#format' => 'filtered_html',
-    ];
-    \Drupal::service('renderer')->renderRoot($build);
-    $this->assertSame('O:8:"stdClass":0:{}', (string) $build['#markup']);
   }
 
   /**
