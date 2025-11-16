@@ -177,7 +177,7 @@ class BatchStorage implements BatchStorageInterface {
   protected function ensureTableExists() {
     try {
       $database_schema = $this->connection->schema();
-      $schema_definition = $this->schemaDefinition();
+      $schema_definition = $this->schemaDefinition(asArray: FALSE);
       if (!$this->connection->supportsSchemaDefinition()) {
         $schema_definition = ConvertDefinition::tableToArray($schema_definition);
       }
@@ -217,8 +217,8 @@ class BatchStorage implements BatchStorageInterface {
    *
    * @internal
    */
-  public function schemaDefinition() {
-    return new Table(
+  public function schemaDefinition(bool $asArray = TRUE) {
+    $table = new Table(
       name: static::TABLE_NAME,
       description: 'Stores details about batches (processes that run in multiple HTTP requests).',
       columns: [
@@ -258,6 +258,8 @@ class BatchStorage implements BatchStorageInterface {
         ),
       ],
     );
+
+    return $asArray ? ConvertDefinition::tableToArray($table) : $table;
   }
 
 }
