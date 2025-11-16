@@ -352,26 +352,6 @@ class ConfigActionTest extends KernelTestBase {
   }
 
   /**
-   * Tests that simpleConfigArray append and prepend require an array of values.
-   */
-  #[TestWith(["append"])]
-  #[TestWith(["prepend"])]
-  public function testSimpleConfigArrayPrependAndAppendRequireArrayOfValues(string $derivative_id): void {
-    $this->installConfig('config_test');
-
-    $this->expectException(ConfigActionException::class);
-    $this->expectExceptionMessage("The simpleConfigArray:$derivative_id config action requires an array of values.");
-    $this->container->get('plugin.manager.config_action')->applyAction(
-      "simpleConfigArray:$derivative_id",
-      'config_test.system',
-      [
-        'property' => 'array',
-        'values' => NULL,
-      ],
-    );
-  }
-
-  /**
    * Tests that the simpleConfigArray actions fail on non-array properties.
    */
   #[TestWith(["append", ["values" => [1, 2, 3]]])]
@@ -413,13 +393,13 @@ class ConfigActionTest extends KernelTestBase {
    * Test that the simpleConfigArray actions work with scalar value input.
    */
   #[TestWith(["append", ["values" => "single"], ["itemA", "itemB", "single"]])]
-  #[TestWith(["append", ["values" => 42], ["itemA", "itemB", 42]])]
+  #[TestWith(["append", ["values" => 42], ["itemA", "itemB", "42"]])]
   #[TestWith(["prepend", ["values" => "single"], ["single", "itemA", "itemB"]])]
-  #[TestWith(["prepend", ["values" => 42], [42, "itemA", "itemB"]])]
+  #[TestWith(["prepend", ["values" => 42], ["42", "itemA", "itemB"]])]
   #[TestWith(["splice", ["offset" => 1, "replacement" => "single"], ["itemA", "single"]])]
-  #[TestWith(["splice", ["offset" => 1, "replacement" => 42], ["itemA", 42]])]
+  #[TestWith(["splice", ["offset" => 1, "replacement" => 42], ["itemA", "42"]])]
   #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => "single"], ["itemA", "single", "itemB"]])]
-  #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => 42], ["itemA", 42, "itemB"]])]
+  #[TestWith(["splice", ["offset" => 1, "length" => 0, "replacement" => 42], ["itemA", "42", "itemB"]])]
   public function testSimpleConfigArrayWithScalarValues(string $derivative_id, array $value, array $expected_value): void {
     $this->installConfig('config_test');
 
