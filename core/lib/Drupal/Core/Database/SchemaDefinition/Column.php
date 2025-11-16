@@ -16,7 +16,7 @@ final class Column implements SchemaDefinitionInterface {
    *   The column name.
    * @param ColumnType $type
    *   (Optional) The column data type, generic. Each database will map this to
-   *   its own definition. This argument is mandatory unless $dbSpecificType is
+   *   its own definition. This argument is mandatory unless $dbSpecificExtra is
    *   specified. See
    *   \Drupal\Core\Database\SchemaDefinition\ColumnType for allowed values.
    * @param Property|string $description
@@ -58,12 +58,12 @@ final class Column implements SchemaDefinitionInterface {
    *   'varchar' or 'text' fields to use case-sensitive binary collation. This
    *   has no effect on other database types for which case sensitivity is
    *   already the default behavior.
-   * @param Property|array<string,string> $dbSpecificType
+   * @param Property|array<string,array<string,mixed>> $dbSpecificExtra
    *   (Optional) If you need to use a column type not included in the
    *   officially supported list of types above, you can specify a type for
    *   each database backend. Specify this as an associative array having the
    *   database type ('mysql', 'sqlite', 'pgsql', 'oracle', etc.) as the key,
-   *   and the database specific type as the value.
+   *   and an array of extra information <string,mixed> as the value.
    *
    * @see \Drupal\Core\Database\SchemaDefinition\ColumnType
    * @see \Drupal\Core\Database\SchemaDefinition\ColumnSize
@@ -81,7 +81,7 @@ final class Column implements SchemaDefinitionInterface {
     public readonly Property|int $precision = Property::Undefined,
     public readonly Property|int $scale = Property::Undefined,
     public readonly Property|bool $binary = Property::Undefined,
-    public readonly Property|array $dbSpecificType = Property::Undefined,
+    public readonly Property|array $dbSpecificExtra = Property::Undefined,
   ) {
   }
 

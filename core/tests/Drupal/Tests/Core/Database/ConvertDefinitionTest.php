@@ -95,6 +95,8 @@ class ConvertDefinitionTest extends UnitTestCase {
           'columns' => ['id' => 'id'],
         ],
       ],
+      'mysql_engine' => 'InnoDB',
+      'mysql_character_set' => 'utf8mb4',
     ];
 
     $schemaDefinition = new Table(
@@ -136,10 +138,16 @@ class ConvertDefinitionTest extends UnitTestCase {
         new Column(
           name: 'db_timestamp',
           description: "The database timestamp",
-          dbSpecificType: [
-            'mysql' => 'timestamp',
-            'pgsql' => 'timestamp',
-            'sqlite' => 'datetime',
+          dbSpecificExtra: [
+            'mysql' => [
+              'mysql_type' => 'timestamp',
+            ],
+            'pgsql' => [
+              'pgsql_type' => 'timestamp',
+            ],
+            'sqlite' => [
+              'sqlite_type' => 'datetime',
+            ],
           ],
           notNull: FALSE,
           default: NULL,
@@ -187,6 +195,12 @@ class ConvertDefinitionTest extends UnitTestCase {
           columns: ['id'],
           foreignColumns: ['id'],
         ),
+      ],
+      dbSpecificExtra: [
+        'mysql' => [
+          'mysql_engine' => 'InnoDB',
+          'mysql_character_set' => 'utf8mb4',
+        ],
       ],
     );
 

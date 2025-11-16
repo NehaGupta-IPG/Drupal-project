@@ -49,6 +49,13 @@ abstract class ConvertDefinition {
     if ($table->foreignKeys !== Property::Undefined) {
       $spec['foreign keys'] = self::foreignKeysToArray($table->foreignKeys);
     }
+    if ($table->dbSpecificExtra !== Property::Undefined) {
+      foreach ($table->dbSpecificExtra as $db => $extra) {
+        foreach ($extra as $key => $value) {
+          $spec[$key] = $value;
+        }
+      }
+    }
     return $spec;
   }
 
@@ -105,9 +112,11 @@ abstract class ConvertDefinition {
     if ($column->binary !== Property::Undefined) {
       $spec['binary'] = $column->binary;
     }
-    if ($column->dbSpecificType !== Property::Undefined) {
-      foreach ($column->dbSpecificType as $db => $dbType) {
-        $spec[$db . '_type'] = $dbType;
+    if ($column->dbSpecificExtra !== Property::Undefined) {
+      foreach ($column->dbSpecificExtra as $db => $extra) {
+        foreach ($extra as $key => $value) {
+          $spec[$key] = $value;
+        }
       }
     }
     return $spec;

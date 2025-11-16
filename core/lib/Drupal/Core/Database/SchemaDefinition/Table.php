@@ -33,6 +33,12 @@ final class Table implements SchemaDefinitionInterface {
    *   (Optional) An array of foreign keys for the table. This argument is for
    *   documentation purposes only; foreign keys are not created in the
    *   database, nor are they enforced by Drupal.
+   * @param Property|array<string,array<string,mixed>> $dbSpecificExtra
+   *   (Optional) If you need to define a table requiring information not
+   *   included elsewhere, you can specify it for each database backend.
+   *   Specify this as an associative array having the database type ('mysql',
+   *   'sqlite', 'pgsql', 'oracle', etc.) as the key, and an array of extra
+   *   information <string,mixed> as the value.
    */
   public function __construct(
     public readonly string $name,
@@ -42,6 +48,7 @@ final class Table implements SchemaDefinitionInterface {
     public readonly Property|array $uniqueKeys = Property::Undefined,
     public readonly Property|array $indexes = Property::Undefined,
     public readonly Property|array $foreignKeys = Property::Undefined,
+    public readonly Property|array $dbSpecificExtra = Property::Undefined,
   ) {
   }
 
