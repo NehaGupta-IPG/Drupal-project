@@ -1113,12 +1113,11 @@ class FilterStringTest extends ViewsKernelTestBase {
     $view->setExposedInput([
       'name' => $input,
     ]);
-
-    // Execute the view; this triggers the filter parsing.
-    $this->executeView($view);
+    $view->execute();
 
     /** @var \Drupal\views\Plugin\views\filter\StringFilter $handler */
     $handler = $view->filter['name'];
+    var_dump($handler);
     $this->assertInstanceOf(StringFilter::class, $handler);
 
     // Extract the parsed words.
