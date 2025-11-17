@@ -14,6 +14,7 @@ use Drupal\Core\Database\SchemaDefinition\KeyColumn;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
+use Drupal\Core\Database\SchemaDefinition\Value;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -77,18 +78,6 @@ class ConvertDefinitionTest extends UnitTestCase {
         'age_name_prefix' => ['age', ['name', 20]],
         'foo' => ['job'],
       ],
-      'indexes extra' => [
-        'foo' => [
-          'pgsql' => [
-            'type' => 'gist',
-            'operator' => 'gist_trgm_ops',
-          ],
-          'time_warp' => [
-            'jump' => 'to_the_left',
-            'step' => 'to_the_right',
-          ],
-        ],
-      ],
       'foreign keys' => [
         'user_id' => [
           'table' => 'test_users',
@@ -101,7 +90,7 @@ class ConvertDefinitionTest extends UnitTestCase {
 
     $schemaDefinition = new Table(
       name: 'test',
-      description: 'Basic test table for the database unit tests.',
+      description: new Value('Basic test table for the database unit tests.'),
       columns: [
         new Column(
           name: 'id',
@@ -111,33 +100,33 @@ class ConvertDefinitionTest extends UnitTestCase {
         ),
         new Column(
           name: 'name',
-          description: "A person's name",
+          description: new Value("A person's name"),
           type: ColumnType::VarcharAscii,
           length: 255,
           notNull: TRUE,
-          default: '',
+          default: new Value(''),
           binary: TRUE,
         ),
         new Column(
           name: 'age',
-          description: "The person's age",
+          description: new Value("The person's age"),
           type: ColumnType::Int,
           size: ColumnSize::Small,
           unsigned: TRUE,
           notNull: TRUE,
-          default: 0,
+          default: new Value(0),
         ),
         new Column(
           name: 'job',
-          description: "The person's job",
+          description: new Value("The person's job"),
           type: ColumnType::Varchar,
           length: 255,
           notNull: TRUE,
-          default: 'Undefined',
+          default: new Value('Undefined'),
         ),
         new Column(
           name: 'db_timestamp',
-          description: "The database timestamp",
+          description: new Value("The database timestamp"),
           dbSpecificExtra: [
             'mysql' => [
               'mysql_type' => 'timestamp',
@@ -150,7 +139,7 @@ class ConvertDefinitionTest extends UnitTestCase {
             ],
           ],
           notNull: FALSE,
-          default: NULL,
+          default: new Value(NULL),
         ),
       ],
       primaryKey: new PrimaryKey(['id']),
@@ -176,16 +165,6 @@ class ConvertDefinitionTest extends UnitTestCase {
         new Index(
           name: 'foo',
           columns: ['job'],
-          dbSpecificExtra: [
-            'pgsql' => [
-              'type' => 'gist',
-              'operator' => 'gist_trgm_ops',
-            ],
-            'time_warp' => [
-              'jump' => 'to_the_left',
-              'step' => 'to_the_right',
-            ],
-          ],
         ),
       ],
       foreignKeys: [

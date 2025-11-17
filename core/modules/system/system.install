@@ -11,6 +11,7 @@ use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\Value;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
 
@@ -43,11 +44,11 @@ function system_schema(bool $asArray = TRUE): array {
   // @todo Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
   $schema[] = new Table(
     name: 'sequences',
-    description: 'Stores IDs.',
+    description: new Value('Stores IDs.'),
     columns: [
       new Column(
         name: 'value',
-        description: 'The value of the sequence.',
+        description: new Value('The value of the sequence.'),
         type: ColumnType::Serial,
         unsigned: TRUE,
         notNull: TRUE,

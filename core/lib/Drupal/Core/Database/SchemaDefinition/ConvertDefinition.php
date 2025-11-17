@@ -31,25 +31,25 @@ abstract class ConvertDefinition {
    */
   final public static function tableToArray(Table $table): array {
     $spec = [];
-    if ($table->description !== Property::Undefined) {
-      $spec['description'] = $table->description;
+    if ($table->description) {
+      $spec['description'] = $table->description->value;
     }
-    if ($table->columns !== Property::Undefined) {
+    if ($table->columns !== NULL) {
       $spec['fields'] = self::columnsToArray($table->columns);
     }
-    if ($table->primaryKey !== Property::Undefined) {
+    if ($table->primaryKey !== NULL) {
       $spec['primary key'] = self::primaryKeyToArray($table->primaryKey);
     }
-    if ($table->uniqueKeys !== Property::Undefined) {
+    if ($table->uniqueKeys !== NULL) {
       $spec['unique keys'] = self::uniqueKeysToArray($table->uniqueKeys);
     }
-    if ($table->indexes !== Property::Undefined) {
+    if ($table->indexes !== NULL) {
       self::indexesToArray($table->indexes, $spec);
     }
-    if ($table->foreignKeys !== Property::Undefined) {
+    if ($table->foreignKeys !== NULL) {
       $spec['foreign keys'] = self::foreignKeysToArray($table->foreignKeys);
     }
-    if ($table->dbSpecificExtra !== Property::Undefined) {
+    if ($table->dbSpecificExtra !== NULL) {
       foreach ($table->dbSpecificExtra as $extra) {
         foreach ($extra as $key => $value) {
           $spec[$key] = $value;
@@ -82,37 +82,37 @@ abstract class ConvertDefinition {
     if ($column->type !== ColumnType::Undefined) {
       $spec['type'] = $column->type->value;
     }
-    if ($column->description !== Property::Undefined) {
-      $spec['description'] = $column->description;
+    if ($column->description) {
+      $spec['description'] = $column->description->value;
     }
-    if ($column->serialize !== Property::Undefined) {
+    if ($column->serialize !== NULL) {
       $spec['serialize'] = $column->serialize;
     }
     if ($column->size !== ColumnSize::Undefined) {
       $spec['size'] = $column->size->value;
     }
-    if ($column->notNull !== Property::Undefined) {
+    if ($column->notNull !== NULL) {
       $spec['not null'] = $column->notNull;
     }
-    if ($column->default !== Property::Undefined) {
-      $spec['default'] = $column->default;
+    if ($column->default) {
+      $spec['default'] = $column->default->value;
     }
-    if ($column->length !== Property::Undefined) {
+    if ($column->length !== NULL) {
       $spec['length'] = $column->length;
     }
-    if ($column->unsigned !== Property::Undefined) {
+    if ($column->unsigned !== NULL) {
       $spec['unsigned'] = $column->unsigned;
     }
-    if ($column->precision !== Property::Undefined) {
+    if ($column->precision !== NULL) {
       $spec['precision'] = $column->precision;
     }
-    if ($column->scale !== Property::Undefined) {
+    if ($column->scale !== NULL) {
       $spec['scale'] = $column->scale;
     }
-    if ($column->binary !== Property::Undefined) {
+    if ($column->binary !== NULL) {
       $spec['binary'] = $column->binary;
     }
-    if ($column->dbSpecificExtra !== Property::Undefined) {
+    if ($column->dbSpecificExtra !== NULL) {
       foreach ($column->dbSpecificExtra as $extra) {
         foreach ($extra as $key => $value) {
           $spec[$key] = $value;
@@ -177,9 +177,6 @@ abstract class ConvertDefinition {
   final public static function indexesToArray(array $indexes, array &$spec): void {
     foreach ($indexes as $index) {
       $spec['indexes'][$index->name] = self::keyColumnsToArray($index->columns);
-      if ($index->dbSpecificExtra !== Property::Undefined) {
-        $spec['indexes extra'][$index->name] = $index->dbSpecificExtra;
-      }
     }
   }
 
