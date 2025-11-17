@@ -8,6 +8,8 @@ use Drupal\migrate_drupal\NodeMigrateType;
 use Drupal\Tests\migrate_drupal\Traits\NodeMigrateTypeTestTrait;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the classic node migration runs.
@@ -16,6 +18,8 @@ use PHPUnit\Framework\Attributes\Group;
  * when there is a pre-existing classic node migrate map table.
  */
 #[Group('migrate_drupal_ui')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class NodeClassicTest extends MigrateUpgradeExecuteTestBase {
 
   use NodeMigrateTypeTestTrait;

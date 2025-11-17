@@ -80,7 +80,7 @@ use function Symfony\Component\String\u;
  * array by the `::applyTo` method.
  *
  * A static method `Htmx::createFromRenderArray` is provided which
- * takes a render array as input and builds an new instance of Htmx with all
+ * takes a render array as input and builds a new instance of Htmx with all
  * the HTMX specific attributes and headers loaded from the array.
  *
  * @see https://htmx.org/reference/
@@ -177,7 +177,7 @@ class Htmx {
    *
    * @param string $id
    *   The HTMX attribute id.
-   * @param array{string, string} $value
+   * @param array<string, string|int|bool> $value
    *   The attribute values.
    */
   protected function createJsonAttribute(string $id, array $value): void {
@@ -1267,7 +1267,9 @@ class Htmx {
    */
   public function applyTo(array &$element, string $attributeKey = '#attributes'): void {
     // Attach HTMX and Drupal integration javascript.
-    $element['#attached']['library'][] = 'core/drupal.htmx';
+    if (!in_array('core/drupal.htmx', $element['#attached']['library'] ?? [])) {
+      $element['#attached']['library'][] = 'core/drupal.htmx';
+    }
 
     // Consolidate headers.
     if ($this->headers->count() !== 0) {

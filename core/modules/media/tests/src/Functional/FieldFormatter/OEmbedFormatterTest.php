@@ -6,21 +6,25 @@ namespace Drupal\Tests\media\Functional\FieldFormatter;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\media\Entity\Media;
+use Drupal\media\Plugin\Field\FieldFormatter\OEmbedFormatter;
 use Drupal\media_test_oembed\Controller\ResourceController;
 use Drupal\media_test_oembed\UrlResolver;
 use Drupal\Tests\media\Functional\MediaFunctionalTestBase;
 use Drupal\Tests\media\Traits\OEmbedTestTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Schipulcon
+
 /**
  * Tests OEmbed Formatter.
- *
- * @legacy-covers \Drupal\media\Plugin\Field\FieldFormatter\OEmbedFormatter
  */
 #[Group('media')]
 #[Group('#slow')]
+#[CoversClass(OEmbedFormatter::class)]
+#[RunTestsInSeparateProcesses]
 class OEmbedFormatterTest extends MediaFunctionalTestBase {
 
   use OEmbedTestTrait;

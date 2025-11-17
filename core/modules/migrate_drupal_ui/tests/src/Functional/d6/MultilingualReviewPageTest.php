@@ -6,6 +6,8 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\MultilingualReviewPageTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore multigroup nodeaccess
 /**
@@ -15,6 +17,8 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('migrate_drupal_6')]
 #[Group('migrate_drupal_ui')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
 
   /**
@@ -61,7 +65,6 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
       'CCK translation',
       'Calendar Signup',
       'Comment',
-      'Contact',
       'Content',
       'Content Copy',
       'Content Multigroup',
@@ -143,6 +146,7 @@ class MultilingualReviewPageTest extends MultilingualReviewPageTestBase {
       // Block is set not_finished in migrate_state_not_finished_test.
       'Block',
       'Color',
+      'Contact',
       'Devel',
       'Devel generate',
       'Devel node access',

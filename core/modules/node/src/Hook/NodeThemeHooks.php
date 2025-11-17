@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\node\Hook;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
@@ -15,6 +16,7 @@ use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\node\Form\NodePreviewForm;
 use Drupal\node\NodeInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Theme hook implementations for the node module.
@@ -25,7 +27,9 @@ class NodeThemeHooks {
     protected readonly RouteMatchInterface $routeMatch,
     protected readonly RendererInterface $renderer,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
-    protected readonly FormBuilderInterface $formBuilder,
+    #[AutowireServiceClosure('form_builder')]
+    protected readonly \Closure $formBuilderClosure,
+    protected readonly ThemeSettingsProvider $themeSettingsProvider,
   ) {
 
   }
@@ -194,21 +198,19 @@ class NodeThemeHooks {
       $node_type = $node->type->entity;
       $variables['author_attributes'] = new Attribute();
       $variables['display_submitted'] = $node_type->displaySubmitted();
-      if ($variables['display_submitted']) {
-        if (theme_get_setting('features.node_user_picture')) {
-          // To change user picture settings (e.g. image style), edit the
-          // 'compact' view mode on the User entity. Note that the 'compact'
-          // view mode might not be configured, so remember to always check the
-          // theme setting first.
-          if ($node_owner = $node->getOwner()) {
-            $variables['author_picture'] = $this->entityTypeManager
-              ->getViewBuilder('user')
-              ->view($node_owner, 'compact');
-          }
+      if ($variables['display_submitted'] && $this->themeSettingsProvider->getSetting('features.node_user_picture')) {
+        // To change user picture settings (e.g. image style), edit the
+        // 'compact' view mode on the User entity. Note that the 'compact'
+        // view mode might not be configured, so remember to always check the
+        // theme setting first.
+        $node_owner = $node->getOwner();
+        if ($node_owner) {
+          $variables['author_picture'] = $this->entityTypeManager
+            ->getViewBuilder('user')
+            ->view($node_owner, 'compact');
         }
       }
     }
-
   }
 
   /**
@@ -228,7 +230,7 @@ class NodeThemeHooks {
       foreach ($variables['content'] as $type) {
         $variables['types'][$type->id()] = [
           'type' => $type->id(),
-          'add_link' => Link::fromTextAndUrl($type->label(), Url::fromRoute('node.add', ['node_type' => $type->id()]))->toString(),
+          'add_link' => Link::fromTextAndUrl($type->label(), Url::fromRoute('entity.node.add_form', ['node_type' => $type->id()]))->toString(),
           'description' => [
             '#markup' => $type->getDescription(),
           ],
@@ -272,6 +274,8 @@ class NodeThemeHooks {
   public function pageTop(array &$page_top): void {
     // Add 'Back to content editing' link on preview page.
     if ($this->routeMatch->getRouteName() == 'entity.node.preview') {
+      $form_builder = ($this->formBuilderClosure)();
+      assert($form_builder instanceof FormBuilderInterface);
       $page_top['node_preview'] = [
         '#type' => 'container',
         '#attributes' => [
@@ -280,7 +284,7 @@ class NodeThemeHooks {
             'container-inline',
           ],
         ],
-        'view_mode' => $this->formBuilder->getForm(NodePreviewForm::class, $this->routeMatch->getParameter('node_preview')),
+        'view_mode' => $form_builder->getForm(NodePreviewForm::class, $this->routeMatch->getParameter('node_preview')),
       ];
     }
   }

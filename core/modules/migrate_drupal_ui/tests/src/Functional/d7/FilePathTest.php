@@ -10,6 +10,8 @@ use Drupal\Tests\ExtensionListTestTrait;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Drupal 7 public and private file migrations.
@@ -20,6 +22,8 @@ use PHPUnit\Framework\Attributes\Group;
  * from that.
  */
 #[Group('migrate_drupal_ui')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class FilePathTest extends MigrateUpgradeTestBase {
 
   use ExtensionListTestTrait;

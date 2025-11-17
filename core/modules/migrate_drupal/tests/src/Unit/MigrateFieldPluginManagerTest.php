@@ -17,6 +17,8 @@ use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the MigrateFieldPluginManager class.
+ *
+ * @phpstan-ignore classConstant.deprecatedClass
  */
 #[CoversClass(MigrateFieldPluginManager::class)]
 #[Group('migrate_drupal')]
@@ -33,7 +35,7 @@ class MigrateFieldPluginManagerTest extends UnitTestCase {
   public function testWeights($field_type, $core, $expected_plugin_id): void {
     /** @var \Drupal\Core\Cache\CacheBackendInterface $cache */
     $cache = $this->prophesize(CacheBackendInterface::class)->reveal();
-    /** @var \Drupal\Core\Extension\ModuleHandlerInterfaceModuleHandlerInterface $module_handler */
+    /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->prophesize(ModuleHandlerInterface::class)->reveal();
     $discovery = $this->prophesize(AnnotatedClassDiscovery::class);
     $discovery->getDefinitions()->willReturn($this->pluginFixtureData());

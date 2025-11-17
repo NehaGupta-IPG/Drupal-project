@@ -7,12 +7,14 @@ namespace Drupal\Tests\file\Kernel;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the spaceUsed() function.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class SpaceUsedTest extends FileManagedUnitTestBase {
 
   /**

@@ -27,19 +27,21 @@ use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\UserInterface;
 use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LogLevel;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests Content Import.
- *
- * @legacy-covers \Drupal\Core\DefaultContent\Importer
  */
 #[Group('DefaultContent')]
 #[Group('Recipe')]
 #[Group('#slow')]
+#[CoversClass(Importer::class)]
+#[RunTestsInSeparateProcesses]
 class ContentImportTest extends BrowserTestBase {
 
   use RecipeTestTrait;
@@ -307,6 +309,10 @@ class ContentImportTest extends BrowserTestBase {
     $term = $entity_repository->loadEntityByUuid('taxonomy_term', '9dfe4733-1347-4566-9340-27a9b22a1f64');
     $this->assertInstanceOf(TermInterface::class, $term);
     $this->assertSame('Default Content', $term->parent->entity?->label());
+
+    // When importing files that have URIs like `public://foo.png`, the `public`
+    // part should not have been treated as a directory name.
+    $this->assertDirectoryDoesNotExist($this->getDrupalRoot() . '/public:');
   }
 
   /**

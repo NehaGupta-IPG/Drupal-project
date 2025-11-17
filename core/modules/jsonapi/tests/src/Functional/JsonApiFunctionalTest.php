@@ -10,6 +10,7 @@ use Drupal\jsonapi\Query\OffsetPage;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\WaitTerminateTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * General functional test class.
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @internal
  */
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
 
   use WaitTerminateTestTrait;
@@ -949,7 +951,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
     ]);
     $updated_response = $this->getDocumentFromResponse($response, FALSE);
     $this->assertEquals(403, $response->getStatusCode());
-    $this->assertEquals("The current user is not allowed to PATCH the selected field (status). The 'administer nodes' permission is required.",
+    $this->assertEquals("The current user is not allowed to PATCH the selected field (status). The following permissions are required: 'administer node published status' OR 'administer nodes'.",
       $updated_response['errors'][0]['detail']);
 
     $node = \Drupal::service('entity.repository')->loadEntityByUuid('node', $uuid);

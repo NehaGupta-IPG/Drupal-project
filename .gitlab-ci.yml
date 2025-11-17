@@ -68,7 +68,7 @@ variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   _TARGET_PHP: "8.4-ubuntu"
   PHPUNIT_CONFIGURATION_FILE_PATH: $CI_PROJECT_DIR/core
-  PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: false
+  PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
 
 #############
 # Stages    #
@@ -167,6 +167,7 @@ default:
   # job from the target branch. Allow the job to proceed and pass if the file
   # doesn't exist.
   - mkdir core/phpstan-tmp
+  - echo "PHPStan cache URL - https://git.drupalcode.org/api/v4/projects/$CORE_GITLAB_PROJECT_ID/jobs/artifacts/$CACHE_TARGET/raw/core/phpstan-tmp/resultCache.php?job=Lint%20cache%20warming"
   - 'curl --location --output core/phpstan-tmp/resultCache.php "https://git.drupalcode.org/api/v4/projects/{$CORE_GITLAB_PROJECT_ID}/jobs/artifacts/{$CACHE_TARGET}/raw/core/phpstan-tmp/resultCache.php?job=Lint%20cache%20warming" || true'
 
 .cspell-cache: &cspell-cache
@@ -303,6 +304,14 @@ default:
     _TARGET_DB_DRIVER: "mysqli"
     _TARGET_DB_DRIVER_MODULE: "mysqli"
 
+'mysqli - PHP 8.5 MySQL 9.4':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_PHP: "8.5-ubuntu"
+    _TARGET_DB: "mysql-9"
+    _TARGET_DB_DRIVER: "mysqli"
+    _TARGET_DB_DRIVER_MODULE: "mysqli"
+
 'PHP 8.3 MySQL 8.0':
   <<: [ *default-stage, *run-on-mr ]
   variables:
@@ -350,6 +359,11 @@ default:
     _TARGET_PHP: "8.3-ubuntu"
     _TARGET_DB: "sqlite-3"
 
+'PHP 8.4 SQLite 3.45':
+  <<: [ *default-stage, *run-on-mr ]
+  variables:
+    _TARGET_DB: "sqlite-3"
+
 'PHP 8.5 SQLite 3.45':
   <<: [ *default-stage, *run-on-mr ]
   variables:
@@ -360,6 +374,8 @@ default:
   <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_DB: "mysql-8"
+    _TARGET_DB_DRIVER: "mysql"
+    _TARGET_DB_DRIVER_MODULE: "mysql"
 
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.
@@ -415,6 +431,7 @@ default:
     - *core-spellcheck
     - mv -f /build/core/package.json $CI_PROJECT_DIR/core/package.json
     - mv -f /build/core/yarn.lock $CI_PROJECT_DIR/core/yarn.lock
+    - rm -rf $CI_PROJECT_DIR/core/node_modules || true
     - mv /build/core/node_modules $CI_PROJECT_DIR/core
   cache:
     key:
@@ -583,7 +600,6 @@ default:
     KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
     _TARGET_PHP: "8.3-ubuntu"
-    PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
 
 '⚡️ PHPUnit Unit tests on PHP 8.4':
   <<: [ *default-job-settings-lint, *default-phpunit-job-settings ]
@@ -591,38 +607,31 @@ default:
     TESTSUITE: PHPUnit-Unit
     KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
-    PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
 
 '⚡️ PHPUnit Unit tests on PHP 8.5':
   <<: [ *default-job-settings-lint, *default-phpunit-job-settings ]
-  allow_failure: true
   variables:
     TESTSUITE: PHPUnit-Unit
     KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
     _TARGET_PHP: "8.5-ubuntu"
-    PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
 
 '⚡️ Component unit tests on PHP 8.3':
   <<: [ *default-job-settings-lint, *default-component-unit-test-job-settings ]
   variables:
     KUBERNETES_CPU_REQUEST: "2"
     _TARGET_PHP: "8.3-ubuntu"
-    PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
 
 '⚡️ Component unit tests on PHP 8.4':
   <<: [ *default-job-settings-lint, *default-component-unit-test-job-settings ]
   variables:
     KUBERNETES_CPU_REQUEST: "2"
-    PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
 
 '⚡️ Component unit tests on PHP 8.5':
   <<: [ *default-job-settings-lint, *default-component-unit-test-job-settings ]
-  allow_failure: true
   variables:
     KUBERNETES_CPU_REQUEST: "2"
     _TARGET_PHP: "8.5-ubuntu"
-    PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
 
 '✅️ PHPStan rules tests':
   <<: [ *default-job-settings-lint ]
@@ -742,6 +751,7 @@ default:
     - mv -f /build/core/.eslintcache $CI_PROJECT_DIR/core
     - mv -f /build/core/.stylelintcache $CI_PROJECT_DIR/core
   artifacts:
+    when: always
     paths:
       - core/phpstan-tmp/resultCache.php
       - core/.cspellcache
