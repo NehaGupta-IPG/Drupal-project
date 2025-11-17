@@ -1084,7 +1084,7 @@ class FilterStringTest extends ViewsKernelTestBase {
   /**
    * Tests that the word tokenizer does not generate empty or punctuation-only terms.
    */
-  public function testFilterStringTokenizerEmpty() {
+  public function testFilterStringTokenizerEmpty(): void {
     // Load the test view provided by Views.
     $view = Views::getView('test_view');
     $view->setDisplay();
