@@ -14,6 +14,7 @@ use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\Value;
 
 /**
  * @defgroup database Database abstraction layer
@@ -579,64 +580,54 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  * definitions are for documentation purposes only; foreign keys are not
  * created in the database, nor are they enforced by Drupal.
  *
- * @param bool $asArray
- *   (Optional) FALSE indicates to return an array of
- *   Drupal\Core\Database\SchemaDefinition\Table objects, TRUE to return
- *   an array-based schema based on legacy (prior to Drupal xx.yy.zz)
- *   definition. Defaults to TRUE.
- *
- * @return array
- *   A schema definition structure array. Depending on the $asArray
- *   parameter: if TRUE for each element of the array, the key is a table name
- *   and the value is a legacy array-based table structure definition; if FALSE
- *   the array is a list of Drupal\Core\Database\SchemaDefinition\Table
- *   objects.
+ * @return list<\Drupal\Core\Database\SchemaDefinition\Table>|array<string<array<string,mixed>>>
+ *   A schema definition structure array.
  *
  * @ingroup schemaapi
  */
-function hook_schema(bool $asArray = TRUE): array {
+function hook_schema(): array {
   $schema[] = new Table(
     name: 'users_data',
-    description: 'Stores module data as key/value pairs per user.',
+    description: new Value('Stores module data as key/value pairs per user.'),
     columns: [
       new Column(
         name: 'uid',
-        description: 'The {users}.uid this record affects.',
+        description: new Value('The {users}.uid this record affects.'),
         type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
-        default: 0,
+        default: new Value(0),
       ),
       new Column(
         name: 'module',
-        description: 'The name of the module declaring the variable.',
+        description: new Value('The name of the module declaring the variable.'),
         type: ColumnType::VarcharAscii,
         length: DRUPAL_EXTENSION_NAME_MAX_LENGTH,
         notNull: TRUE,
-        default: '',
+        default: new Value(''),
       ),
       new Column(
         name: 'name',
-        description: 'The identifier of the data.',
+        description: new Value('The identifier of the data.'),
         type: ColumnType::VarcharAscii,
         length: 128,
         notNull: TRUE,
-        default: '',
+        default: new Value(''),
       ),
       new Column(
         name: 'value',
-        description: 'The value.',
+        description: new Value('The value.'),
         type: ColumnType::Blob,
         size: ColumnSize::Big,
         notNull: FALSE,
       ),
       new Column(
         name: 'serialized',
-        description: 'Whether value is serialized.',
+        description: new Value('Whether value is serialized.'),
         type: ColumnType::Int,
         size: ColumnSize::Tiny,
         unsigned: TRUE,
-        default: 0,
+        default: new Value(0),
       ),
     ],
     primaryKey: new PrimaryKey(['uid', 'module', 'name']),
