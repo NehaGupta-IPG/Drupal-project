@@ -7,7 +7,6 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\DefaultConfigMode;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
-use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -777,7 +776,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @internal
    */
   protected function installSchema(string $module): void {
-    $tables = $this->invoke($module, 'schema') ?? [];
+    $tables = ConvertDefinition::schemaToArray($this->invoke($module, 'schema') ?? []);
     $schema = $this->connection->schema();
     foreach ($tables as $name => $table) {
       $schema->createTable($name, $table);
@@ -793,7 +792,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @internal
    */
   protected function uninstallSchema(string $module): void {
-    $tables = $this->invoke($module, 'schema') ?? [];
+    $tables = ConvertDefinition::schemaToArray($this->invoke($module, 'schema') ?? []);
     $schema = $this->connection->schema();
     foreach (array_keys($tables) as $table) {
       if ($schema->tableExists($table)) {
@@ -828,12 +827,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function invoke(string $module, string $hook, array $args = []): mixed {
     $function = $module . '_' . $hook;
-    $return = function_exists($function) ? $function(... $args) : NULL;
-    // @todo deprecate and remove the special case for hook_schema().
-    if ($hook === 'schema' && $return !== NULL) {
-      return ConvertDefinition::schemaToArray($return);
-    }
-    return $return;
+    return function_exists($function) ? $function(... $args) : NULL;
   }
 
 }

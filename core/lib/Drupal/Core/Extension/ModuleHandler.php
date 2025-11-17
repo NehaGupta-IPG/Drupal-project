@@ -6,7 +6,6 @@ use Drupal\Component\Graph\Graph;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\ImplementationList;
@@ -355,12 +354,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       return reset($listeners)(... $args);
     }
 
-    $return = $this->legacyInvoke($module, $hook, $args);
-    // @todo deprecate and remove the special case for hook_schema().
-    if ($hook === 'schema' && $return !== NULL) {
-      return ConvertDefinition::schemaToArray($return);
-    }
-    return $return;
+    return $this->legacyInvoke($module, $hook, $args);
   }
 
   /**
