@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use Drupal\views\Plugin\views\filter\StringFilter;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -1096,7 +1097,7 @@ class FilterStringTest extends ViewsKernelTestBase {
         'table' => 'views_test_data',
         'field' => 'name',
         'relationship' => 'none',
-        'operator' => 'word',   // "Contains any word".
+        'operator' => 'word',
         'exposed' => TRUE,
         'expose' => [
           'operator_id' => 'name_op',
@@ -1119,7 +1120,7 @@ class FilterStringTest extends ViewsKernelTestBase {
 
     /** @var \Drupal\views\Plugin\views\filter\StringFilter $handler */
     $handler = $view->filter['name'];
-    $this->assertInstanceOf(\Drupal\views\Plugin\views\filter\StringFilter::class, $handler);
+    $this->assertInstanceOf(StringFilter::class, $handler);
 
     // Extract the parsed words.
     $tokens = $handler->value;
