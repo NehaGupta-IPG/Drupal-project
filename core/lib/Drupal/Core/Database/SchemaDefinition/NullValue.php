@@ -11,6 +11,8 @@ class NullValue {
 
   /**
    * A null value.
+   *
+   * @var null
    */
   public readonly null $value;
 
