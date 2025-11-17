@@ -20,12 +20,6 @@ class WorkspaceProviderCollector {
    */
   protected array $providers;
 
-  /**
-   * Construct a workspace provider collector.
-   *
-   * @param array<string,\Drupal\workspaces\Provider\WorkspaceProviderInterface> $providers
-   *   The providers.
-   */
   public function __construct(
     #[AutowireIterator(tag: 'workspace_provider', defaultIndexMethod: 'getId')]
     iterable $providers,
