@@ -8,11 +8,13 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests add_more config update for multivalued fields.
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class ShowAddMoreButtonConfigTest extends BrowserTestBase {
 
   /**
@@ -88,7 +90,10 @@ class ShowAddMoreButtonConfigTest extends BrowserTestBase {
     $this->assertArrayNotHasKey('add_more', $initial_component['settings'], 'Show add more not configured for field ' . $field_name);
     // Run the field update hook.
     \Drupal::moduleHandler()->loadInclude('field', 'install');
-    field_update_9001($sandbox);
+    $sandbox = [];
+    do {
+      field_update_9001($sandbox);
+    } while ($sandbox['#finished'] < 1);
     // Verify that add more config is updated as FALSE in form display config.
     $updated_component = $display_repository->getFormDisplay('entity_test', 'entity_test')
       ->getComponent($field_name);
