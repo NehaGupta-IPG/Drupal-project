@@ -318,4 +318,12 @@ class WorkspaceCRUDTest extends KernelTestBase {
     $this->assertSame([], $tree);
   }
 
+  /**
+   * Test workspace bundle key.
+   */
+  public function testWorkspaceBundleKey(): void {
+    $workspaceType = \Drupal::entityTypeManager()->getDefinition('workspace');
+    $this->assertSame('provider', $workspaceType->getKey('bundle'));
+  }
+
 }
