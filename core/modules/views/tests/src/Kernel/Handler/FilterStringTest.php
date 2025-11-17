@@ -1090,8 +1090,7 @@ class FilterStringTest extends ViewsKernelTestBase {
     $view->setDisplay();
 
     // Add a string filter programmatically using the 'contains any word' operator.
-    // The filter id is unique; field name here is "name" because test_view uses it.
-    $view->display_handler->overrideOption('filters', [
+    $view->displayHandlers->get('default')->overrideOption('filters', [
       'name' => [
         'id' => 'name',
         'table' => 'views_test_data',
@@ -1123,17 +1122,14 @@ class FilterStringTest extends ViewsKernelTestBase {
     $this->assertInstanceOf(StringFilter::class, $handler);
 
     // Extract the parsed words.
-    $tokens = $handler->value;
+    $tokens = is_array($handler->value) ? $handler->value : [$handler->value];
 
-    // Assertions (this reveals the bug).
     // Expected: ['Hello', 'from', 'me']
-    // Actual today: ['Hello', 'from', 'me', '', '!'] depending on tokenizer behavior.
-
     $this->assertNotContains('', $tokens, 'Tokenizer should not produce empty search terms.');
     $this->assertNotContains(' ', $tokens, 'Tokenizer should not produce whitespace-only terms.');
     $this->assertNotContains('!', $tokens, 'Tokenizer should not produce punctuation-only terms.');
 
-    // Ensure the number of tokens is correct (3).
+    // Ensure the number of tokens is correct.
     $this->assertCount(3, $tokens, 'Tokenizer should produce exactly three valid words.');
   }
 
