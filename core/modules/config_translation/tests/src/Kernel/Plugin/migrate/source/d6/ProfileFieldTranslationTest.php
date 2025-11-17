@@ -8,15 +8,15 @@ use Drupal\config_translation\Plugin\migrate\source\d6\ProfileFieldTranslation;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore objectid
 /**
  * Tests the i18nProfileField source plugin.
- *
- * @legacy-covers \Drupal\config_translation\Plugin\migrate\source\d6\ProfileFieldTranslation
  */
 #[CoversClass(ProfileFieldTranslation::class)]
 #[Group('migrate_drupal')]
+#[RunTestsInSeparateProcesses]
 class ProfileFieldTranslationTest extends MigrateSqlSourceTestBase {
 
   /**

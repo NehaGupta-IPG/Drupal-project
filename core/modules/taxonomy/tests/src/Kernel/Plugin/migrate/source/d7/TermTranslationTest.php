@@ -7,15 +7,15 @@ namespace Drupal\Tests\taxonomy\Kernel\Plugin\migrate\source\d7;
 use Drupal\taxonomy\Plugin\migrate\source\d7\TermTranslation;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore tsid
 /**
  * Tests D7 i18n term localized source plugin.
- *
- * @legacy-covers \Drupal\taxonomy\Plugin\migrate\source\d7\TermTranslation
  */
 #[CoversClass(TermTranslation::class)]
 #[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TermTranslationTest extends TermTest {
 
   /**

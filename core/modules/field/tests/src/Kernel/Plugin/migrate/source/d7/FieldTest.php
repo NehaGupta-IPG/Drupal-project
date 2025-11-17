@@ -8,14 +8,14 @@ use Drupal\field\Plugin\migrate\source\d7\Field;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests D7 field source plugin.
- *
- * @legacy-covers \Drupal\field\Plugin\migrate\source\d7\Field
  */
 #[CoversClass(Field::class)]
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldTest extends MigrateSqlSourceTestBase {
 
   /**

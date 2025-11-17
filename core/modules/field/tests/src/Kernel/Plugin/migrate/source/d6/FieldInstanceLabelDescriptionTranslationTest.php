@@ -8,22 +8,21 @@ use Drupal\field\Plugin\migrate\source\d6\FieldLabelDescriptionTranslation;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore objectid
 /**
  * Tests the field label and description translation source plugin.
- *
- * @legacy-covers \Drupal\field\Plugin\migrate\source\d6\FieldLabelDescriptionTranslation
  */
 #[CoversClass(FieldLabelDescriptionTranslation::class)]
 #[Group('migrate_drupal')]
+#[RunTestsInSeparateProcesses]
 class FieldInstanceLabelDescriptionTranslationTest extends MigrateSqlSourceTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'config_translation',
     'migrate_drupal',
     'field',
   ];

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Recipe;
 
 use Drupal\Component\Uuid\UuidInterface;
-use Drupal\contact\Entity\ContactForm;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Recipe\ConsoleInputCollector;
 use Drupal\Core\Recipe\InputCollectorInterface;
+use Drupal\Core\Recipe\InputConfigurator;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\Core\TypedData\DataDefinitionInterface;
@@ -16,7 +16,9 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -25,10 +27,10 @@ use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 /**
  * Tests Input.
- *
- * @legacy-covers \Drupal\Core\Recipe\InputConfigurator
  */
 #[Group('Recipe')]
+#[CoversClass(InputConfigurator::class)]
+#[RunTestsInSeparateProcesses]
 class InputTest extends KernelTestBase {
 
   use RecipeTestTrait;
@@ -60,7 +62,7 @@ class InputTest extends KernelTestBase {
       ->set('uuid', $this->container->get(UuidInterface::class)->generate())
       ->save();
 
-    $this->recipe = Recipe::createFromDirectory($this->getDrupalRoot() . '/core/recipes/feedback_contact_form');
+    $this->recipe = Recipe::createFromDirectory($this->getDrupalRoot() . '/core/tests/fixtures/recipes/input_test');
   }
 
   /**
@@ -78,7 +80,7 @@ class InputTest extends KernelTestBase {
     $this->recipe->input->collectAll($collector);
     RecipeRunner::processRecipe($this->recipe);
 
-    $this->assertSame(['ben@deep.space'], ContactForm::load('feedback')?->getRecipients());
+    $this->assertSame("Dries Buytaert's Turf", $this->config('system.site')->get('name'));
   }
 
   /**
@@ -88,8 +90,12 @@ class InputTest extends KernelTestBase {
     $collector = $this->createMock(InputCollectorInterface::class);
     $collector->expects($this->atLeastOnce())
       ->method('collectValue')
-      ->with('feedback_contact_form.recipient', $this->isInstanceOf(DataDefinitionInterface::class), $this->anything())
-      ->willReturn('not-an-email-address');
+      ->willReturnCallback(function (string $name) {
+        return match($name) {
+          'create_node_type.node_type' => 'test',
+          'input_test.owner' => 'hack',
+        };
+      });
 
     try {
       $this->recipe->input->collectAll($collector);
@@ -98,8 +104,8 @@ class InputTest extends KernelTestBase {
     catch (ValidationFailedException $e) {
       $value = $e->getValue();
       $this->assertInstanceOf(TypedDataInterface::class, $value);
-      $this->assertSame('not-an-email-address', $value->getValue());
-      $this->assertSame('This value is not a valid email address.', (string) $e->getViolations()->get(0)->getMessage());
+      $this->assertSame('hack', $value->getValue());
+      $this->assertSame("I don't think you should be owning sites.", (string) $e->getViolations()->get(0)->getMessage());
     }
   }
 
@@ -392,7 +398,7 @@ YAML
   /**
    * Tests getting a fallback value for an undefined environment variable.
    *
-   * @covers \Drupal\Core\Recipe\InputConfigurator::getDefaultValue
+   * @legacy-covers \Drupal\Core\Recipe\InputConfigurator::getDefaultValue
    */
   public function testFallbackValueForUndefinedEnvironmentVariable(): void {
     $recipe_data = [

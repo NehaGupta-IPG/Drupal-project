@@ -6,16 +6,20 @@ namespace Drupal\Tests\package_manager\Kernel;
 
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\SandboxDatabaseUpdatesValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Staged DBUpdate Validator.
  *
  * @internal
- * @legacy-covers \Drupal\package_manager\Validator\SandboxDatabaseUpdatesValidator
  */
 #[Group('package_manager')]
+#[CoversClass(SandboxDatabaseUpdatesValidator::class)]
+#[RunTestsInSeparateProcesses]
 class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
 
   /**

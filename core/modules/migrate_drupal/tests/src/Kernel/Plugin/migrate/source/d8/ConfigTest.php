@@ -9,15 +9,15 @@ use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the config source plugin.
- *
- * @legacy-covers \Drupal\migrate_drupal\Plugin\migrate\source\d8\Config
  */
 #[CoversClass(Config::class)]
 #[IgnoreDeprecations]
 #[Group('migrate_drupal')]
+#[RunTestsInSeparateProcesses]
 class ConfigTest extends MigrateSqlSourceTestBase {
 
   /**

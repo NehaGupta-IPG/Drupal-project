@@ -8,15 +8,15 @@ use Drupal\node\Plugin\migrate\source\d7\Node;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore tnid
 /**
  * Tests D7 node source plugin.
- *
- * @legacy-covers \Drupal\node\Plugin\migrate\source\d7\Node
  */
 #[CoversClass(Node::class)]
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTest extends MigrateSqlSourceTestBase {
 
   /**

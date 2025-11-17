@@ -9,12 +9,14 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay.
  */
 #[CoversClass(LayoutBuilderEntityViewDisplay::class)]
 #[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderEntityViewDisplayTest extends SectionListTestBase {
 
   /**
@@ -97,6 +99,24 @@ class LayoutBuilderEntityViewDisplayTest extends SectionListTestBase {
     // FALSE.
     $this->sectionList->setOverridable(FALSE);
     $this->assertTrue($this->sectionList->isLayoutBuilderEnabled());
+  }
+
+  /**
+   * Tests that enabling Layout Builder moves fields to hidden.
+   */
+  public function testFieldsMovedToHiddenOnEnable(): void {
+    $display = LayoutBuilderEntityViewDisplay::load('entity_test.entity_test.default');
+    $display->disableLayoutBuilder()->save();
+    $display->trustData();
+    $this->assertNotEmpty($display->get('content'));
+    $this->assertNotContains('langcode', $display->get('hidden'));
+    $this->assertNotContains('name', $display->get('hidden'));
+    $display->enableLayoutBuilder()->save();
+    $this->assertEmpty($display->get('content'));
+    $this->assertEquals([
+      'langcode' => TRUE,
+      'name' => TRUE,
+    ], $display->get('hidden'));
   }
 
 }

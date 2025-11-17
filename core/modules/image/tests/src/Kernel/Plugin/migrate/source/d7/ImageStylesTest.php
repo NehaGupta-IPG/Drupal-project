@@ -8,15 +8,15 @@ use Drupal\image\Plugin\migrate\source\d7\ImageStyles;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore ieid isid
 /**
  * Tests the D7 ImageStyles source plugin.
- *
- * @legacy-covers \Drupal\image\Plugin\migrate\source\d7\ImageStyles
  */
 #[CoversClass(ImageStyles::class)]
 #[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageStylesTest extends MigrateSqlSourceTestBase {
 
   /**

@@ -8,15 +8,15 @@ use Drupal\field\Plugin\migrate\source\d7\FieldOptionTranslation;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore objectid objectindex plid textgroup
 /**
  * Tests the field option translation source plugin.
- *
- * @legacy-covers \Drupal\field\Plugin\migrate\source\d7\FieldOptionTranslation
  */
 #[CoversClass(FieldOptionTranslation::class)]
 #[Group('migrate_drupal')]
+#[RunTestsInSeparateProcesses]
 class FieldOptionTranslationTest extends MigrateSqlSourceTestBase {
 
   /**
