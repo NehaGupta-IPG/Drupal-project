@@ -9,7 +9,6 @@ use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
-use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;

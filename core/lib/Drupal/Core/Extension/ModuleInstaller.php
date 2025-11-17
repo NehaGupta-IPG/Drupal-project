@@ -834,7 +834,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $tmp = [];
       foreach ($return as $name => $table) {
         if ($table instanceof Table) {
-          $tmp[$name] = ConvertDefinition::tableToArray($table);
+          $tmp[$table->name] = ConvertDefinition::tableToArray($table);
         }
         else {
           $tmp[$name] = $table;
