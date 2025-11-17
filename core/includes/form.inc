@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Batch\BatchStorageInterface;
+use Drupal\Core\Form\SelectEmptyOption;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -77,7 +78,7 @@ function form_select_options($element, $choices = NULL): array {
     else {
       $option = [];
       $key = (string) $key;
-      $empty_choice = $empty_value && $key == '_none';
+      $empty_choice = $empty_value && $key === SelectEmptyOption::None->value;
       if ($value_valid && ((!$value_is_array && (string) $element['#value'] === $key || ($value_is_array && in_array($key, $element['#value']))) || $empty_choice)) {
         $option['selected'] = TRUE;
       }
