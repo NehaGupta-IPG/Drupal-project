@@ -149,7 +149,10 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
     return $fields;
   }
 
-  public static function create(array $values = []) {
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(array $values = []): self {
     // Provide default value for ::create calls w/o bundle.
     return parent::create($values + ['provider' => DefaultWorkspaceProvider::getId()]);
   }
