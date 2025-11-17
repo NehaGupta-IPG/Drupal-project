@@ -830,17 +830,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $function = $module . '_' . $hook;
     $return = function_exists($function) ? $function(... $args) : NULL;
     // @todo deprecate and remove the special case for hook_schema().
-    if ($return !== NULL && $hook === 'schema') {
-      $tmp = [];
-      foreach ($return as $name => $table) {
-        if ($table instanceof Table) {
-          $tmp[$table->name] = ConvertDefinition::tableToArray($table);
-        }
-        else {
-          $tmp[$name] = $table;
-        }
-      }
-      $return = $tmp;
+    if ($hook === 'schema' && $return !== NULL) {
+      return ConvertDefinition::schemaToArray($return);
     }
     return $return;
   }

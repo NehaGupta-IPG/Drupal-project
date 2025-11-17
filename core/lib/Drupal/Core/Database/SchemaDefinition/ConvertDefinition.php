@@ -18,8 +18,13 @@ abstract class ConvertDefinition {
    */
   final public static function schemaToArray(array $schema): array {
     $spec = [];
-    foreach ($schema as $table) {
-      $spec[$table->name] = self::tableToArray($table);
+    foreach ($schema as $name => $table) {
+      if ($table instanceof Table) {
+        $spec[$table->name] = self::tableToArray($table);
+      }
+      else {
+        $spec[$name] = $table;
+      }
     }
     return $spec;
   }
