@@ -2042,15 +2042,17 @@
  * To create a class as a plugin, add code similar to the following immediately
  * preceding the class declaration:
  * @code
- * * @ContentEntityType(
- * *   id = "comment",
- * *   label = @Translation("Comment"),
- * *   ...
- * *   base_table = "comment"
- * * )
+ * #[ContentEntityType(
+ *   id: 'my_entity_type',
+ *   label: new TranslatableMarkup('New content type'),
+ *   id = "comment",
+ *   label = @Translation("Comment"),
+ *   ...
+ *   base_table = "comment"
+ * )
  * @endcode
  *
- * Some attribute types, which extend the "@ PluginID" attribute class, have
+ * Some attribute types, which extend the Plugin ID attribute class, have
  * only a single 'id' attribute argument. For these, it is possible to use
  * a shorthand syntax. For example:
  * @code
@@ -2068,9 +2070,6 @@
  * "#[plugin_type_name]" preceding the class declaration. To find examples of a
  * for a particular attribute class, such as ContentEntityType, look for class
  * files that have "#[ContentEntityType(".
- *
- * @see plugin_translatable
- * @see plugin_context
  *
  * @}
  */
