@@ -9,6 +9,9 @@ namespace Drupal\Core\Database\SchemaDefinition;
  */
 class NullValue {
 
+  /**
+   * A null value.
+   */
   public readonly null $value;
 
   public function __construct() {

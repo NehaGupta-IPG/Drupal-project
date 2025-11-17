@@ -14,7 +14,6 @@ use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
-use Drupal\Core\Database\SchemaDefinition\Value;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
