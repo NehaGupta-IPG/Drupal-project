@@ -23,6 +23,4 @@ enum ColumnSize: string {
   case Medium = 'medium';
   case Big = 'big';
 
-  case Undefined = 'und';
-
 }

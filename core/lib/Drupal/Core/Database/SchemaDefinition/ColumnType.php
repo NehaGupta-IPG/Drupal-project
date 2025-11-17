@@ -29,6 +29,4 @@ enum ColumnType: string {
 
   case Blob = 'blob';
 
-  case Undefined = 'und';
-
 }

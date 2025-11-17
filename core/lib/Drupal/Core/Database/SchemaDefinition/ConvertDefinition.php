@@ -84,7 +84,7 @@ abstract class ConvertDefinition {
    */
   final public static function columnToArray(Column $column): array {
     $spec = [];
-    if ($column->type !== ColumnType::Undefined) {
+    if ($column->type) {
       $spec['type'] = $column->type->value;
     }
     if ($column->description) {
@@ -93,7 +93,7 @@ abstract class ConvertDefinition {
     if ($column->serialize !== NULL) {
       $spec['serialize'] = $column->serialize;
     }
-    if ($column->size !== ColumnSize::Undefined) {
+    if ($column->size) {
       $spec['size'] = $column->size->value;
     }
     if ($column->notNull !== NULL) {

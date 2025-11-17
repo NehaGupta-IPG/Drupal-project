@@ -14,7 +14,7 @@ final class Column implements SchemaDefinitionInterface {
    *
    * @param string $name
    *   The column name.
-   * @param ColumnType $type
+   * @param ?ColumnType $type
    *   (Optional) The column data type, generic. Each database will map this to
    *   its own definition. This argument is mandatory unless $dbSpecificExtra is
    *   specified. See
@@ -27,7 +27,7 @@ final class Column implements SchemaDefinitionInterface {
    * @param ?bool $serialize
    *   (Optional) A boolean indicating whether the field will be stored as a
    *   serialized string.
-   * @param ColumnSize $size
+   * @param ?ColumnSize $size
    *   (Optional) The column data size. This is a hint about the largest value
    *   the column will store. See
    *   \Drupal\Core\Database\SchemaDefinition\ColumnSize for allowed values.
@@ -70,10 +70,10 @@ final class Column implements SchemaDefinitionInterface {
    */
   public function __construct(
     public readonly string $name,
-    public readonly ColumnType $type = ColumnType::Undefined,
+    public readonly ?ColumnType $type = NULL,
     public readonly ?Value $description = NULL,
     public readonly ?bool $serialize = NULL,
-    public readonly ColumnSize $size = ColumnSize::Undefined,
+    public readonly ?ColumnSize $size = NULL,
     public readonly ?bool $notNull = NULL,
     public readonly ?Value $default = NULL,
     public readonly ?int $length = NULL,
