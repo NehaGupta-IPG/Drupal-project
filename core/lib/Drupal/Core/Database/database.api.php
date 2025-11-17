@@ -11,9 +11,10 @@ use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
-use Drupal\Core\Database\SchemaDefinition\Value;
 
 /**
  * @defgroup database Database abstraction layer
@@ -587,46 +588,46 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
 function hook_schema(): array {
   $schema[] = new Table(
     name: 'users_data',
-    description: new Value('Stores module data as key/value pairs per user.'),
+    description: new StringValue('Stores module data as key/value pairs per user.'),
     columns: [
       new Column(
         name: 'uid',
-        description: new Value('The {users}.uid this record affects.'),
+        description: new StringValue('The {users}.uid this record affects.'),
         type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
-        default: new Value(0),
+        default: new IntValue(0),
       ),
       new Column(
         name: 'module',
-        description: new Value('The name of the module declaring the variable.'),
+        description: new StringValue('The name of the module declaring the variable.'),
         type: ColumnType::VarcharAscii,
         length: DRUPAL_EXTENSION_NAME_MAX_LENGTH,
         notNull: TRUE,
-        default: new Value(''),
+        default: new StringValue(''),
       ),
       new Column(
         name: 'name',
-        description: new Value('The identifier of the data.'),
+        description: new StringValue('The identifier of the data.'),
         type: ColumnType::VarcharAscii,
         length: 128,
         notNull: TRUE,
-        default: new Value(''),
+        default: new StringValue(''),
       ),
       new Column(
         name: 'value',
-        description: new Value('The value.'),
+        description: new StringValue('The value.'),
         type: ColumnType::Blob,
         size: ColumnSize::Big,
         notNull: FALSE,
       ),
       new Column(
         name: 'serialized',
-        description: new Value('Whether value is serialized.'),
+        description: new StringValue('Whether value is serialized.'),
         type: ColumnType::Int,
         size: ColumnSize::Tiny,
         unsigned: TRUE,
-        default: new Value(0),
+        default: new IntValue(0),
       ),
     ],
     primaryKey: new PrimaryKey(['uid', 'module', 'name']),

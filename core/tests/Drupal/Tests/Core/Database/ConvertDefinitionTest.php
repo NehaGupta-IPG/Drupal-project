@@ -8,13 +8,16 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
+use Drupal\Core\Database\SchemaDefinition\FloatValue;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\KeyColumn;
+use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
-use Drupal\Core\Database\SchemaDefinition\Value;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -90,7 +93,7 @@ class ConvertDefinitionTest extends UnitTestCase {
 
     $schemaDefinition = new Table(
       name: 'test',
-      description: new Value('Basic test table for the database unit tests.'),
+      description: new StringValue('Basic test table for the database unit tests.'),
       columns: [
         new Column(
           name: 'id',
@@ -100,33 +103,33 @@ class ConvertDefinitionTest extends UnitTestCase {
         ),
         new Column(
           name: 'name',
-          description: new Value("A person's name"),
+          description: new StringValue("A person's name"),
           type: ColumnType::VarcharAscii,
           length: 255,
           notNull: TRUE,
-          default: new Value(''),
+          default: new StringValue(''),
           binary: TRUE,
         ),
         new Column(
           name: 'age',
-          description: new Value("The person's age"),
+          description: new StringValue("The person's age"),
           type: ColumnType::Int,
           size: ColumnSize::Small,
           unsigned: TRUE,
           notNull: TRUE,
-          default: new Value(0),
+          default: new IntValue(0),
         ),
         new Column(
           name: 'job',
-          description: new Value("The person's job"),
+          description: new StringValue("The person's job"),
           type: ColumnType::Varchar,
           length: 255,
           notNull: TRUE,
-          default: new Value('Undefined'),
+          default: new StringValue('Undefined'),
         ),
         new Column(
           name: 'db_timestamp',
-          description: new Value("The database timestamp"),
+          description: new StringValue("The database timestamp"),
           dbSpecificExtra: [
             'mysql' => [
               'mysql_type' => 'timestamp',
@@ -139,7 +142,7 @@ class ConvertDefinitionTest extends UnitTestCase {
             ],
           ],
           notNull: FALSE,
-          default: new Value(NULL),
+          default: new NullValue(),
         ),
       ],
       primaryKey: new PrimaryKey(['id']),

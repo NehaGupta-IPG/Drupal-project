@@ -19,7 +19,7 @@ final class Table implements SchemaDefinitionInterface {
    *   normally mandatory. Some methods in the Schema API - for example
    *   Schema::addField() - require partial table definition, so this is
    *   optional to support it.
-   * @param ?Value $description
+   * @param StringValue|NullValue|null $description
    *   (Optional) A string in non-markup plain text describing this table and
    *   its purpose. References to other tables should be enclosed in curly
    *   brackets.
@@ -43,7 +43,7 @@ final class Table implements SchemaDefinitionInterface {
   public function __construct(
     public readonly string $name,
     public readonly ?array $columns = NULL,
-    public readonly ?Value $description = NULL,
+    public readonly StringValue|NullValue|null $description = NULL,
     public readonly ?PrimaryKey $primaryKey = NULL,
     public readonly ?array $uniqueKeys = NULL,
     public readonly ?array $indexes = NULL,
