@@ -30230,6 +30230,36 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/src/PhpStorage/MockPhpStorage.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Attribute class Drupal\\\\Core\\\\Archiver\\\\Attribute\\\\Archiver is deprecated\\: in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+  replacement\\.$#',
+	'identifier' => 'attribute.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/src/Plugin/Archiver/Tar.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Class Drupal\\\\system\\\\Plugin\\\\Archiver\\\\Tar extends deprecated class Drupal\\\\Core\\\\Archiver\\\\Tar\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+  replacement\\.$#',
+	'identifier' => 'class.extendsDeprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/src/Plugin/Archiver/Tar.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Attribute class Drupal\\\\Core\\\\Archiver\\\\Attribute\\\\Archiver is deprecated\\: in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+  replacement\\.$#',
+	'identifier' => 'attribute.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/src/Plugin/Archiver/Zip.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Class Drupal\\\\system\\\\Plugin\\\\Archiver\\\\Zip extends deprecated class Drupal\\\\Core\\\\Archiver\\\\Zip\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+  replacement\\.$#',
+	'identifier' => 'class.extendsDeprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/src/Plugin/Archiver/Zip.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Plugin\\\\Block\\\\SystemBrandingBlock\\:\\:blockSubmit\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34859,6 +34889,21 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/update/src/UpdateSettingsForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Attribute class Drupal\\\\Core\\\\Archiver\\\\Attribute\\\\Archiver is deprecated\\: in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+  replacement\\.$#',
+	'identifier' => 'attribute.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/update/tests/modules/update_test/src/Plugin/Archiver/UpdateTestArchiver.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Class Drupal\\\\update_test\\\\Plugin\\\\Archiver\\\\UpdateTestArchiver implements deprecated interface Drupal\\\\Core\\\\Archiver\\\\ArchiverInterface\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+  replacement\\.$#',
+	'identifier' => 'class.implementsDeprecatedInterface',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/update/tests/modules/update_test/src/Plugin/Archiver/UpdateTestArchiver.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Class Drupal\\\\update_test\\\\TestFileTransferWithSettingsForm extends deprecated class Drupal\\\\Core\\\\FileTransfer\\\\Local\\:
@@ -49196,36 +49241,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityResolverManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityForm\\:\\:getBaseFormId\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityForm\\:\\:getFormId\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityForm\\:\\:setEntity\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityForm\\:\\:setEntityTypeManager\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityForm\\:\\:setOperation\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityTypeManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\TestEntityFormInjected\\:\\:create\\(\\) has no return type specified\\.$#',

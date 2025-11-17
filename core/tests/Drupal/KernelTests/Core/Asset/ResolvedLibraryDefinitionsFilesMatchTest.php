@@ -102,6 +102,8 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
+
     // Install all core themes.
     sort($this->allThemes);
     $this->container->get('theme_installer')->install($this->allThemes);
@@ -169,6 +171,9 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
    */
   #[IgnoreDeprecations]
   public function testCoreLibraryCompletenessDeprecated(): void {
+    // Install the 'path_alias' entity schema because the path alias path
+    // processor requires it.
+    $this->installEntitySchema('path_alias');
     // Find and install deprecated modules to test.
     $all_modules = $this->container->get('extension.list.module')->getList();
     $deprecated_modules_to_test = array_filter($all_modules, function ($module) {
