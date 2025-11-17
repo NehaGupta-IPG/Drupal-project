@@ -20,7 +20,7 @@ function field_update_last_removed(): int {
 /**
  * Adds default config for Show add more button for multivalued fields.
  */
-function field_update_9003(&$sandbox): void {
+function field_update_9001(&$sandbox): void {
   \Drupal::classResolver(ConfigEntityUpdater::class)
     ->update($sandbox, 'field_storage_config', function (FieldStorageConfigInterface $field_storage): bool {
       $exclude_field_types = ['list_string', 'list_float', 'list_integer'];
