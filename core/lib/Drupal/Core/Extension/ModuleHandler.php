@@ -6,6 +6,8 @@ use Drupal\Component\Graph\Graph;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\ImplementationList;
@@ -351,7 +353,23 @@ class ModuleHandler implements ModuleHandlerInterface {
       if (count($listeners) > 1) {
         throw new \LogicException("Module $module should not implement $hook more than once");
       }
-      return reset($listeners)(... $args);
+      $return = reset($listeners)(... $args);
+
+      // @todo deprecate and remove the special case for hook_schema().
+      if ($hook === 'schema') {
+        $tmp = [];
+        foreach ($return as $name => $table) {
+          if ($table instanceof Table) {
+            $tmp[$name] = ConvertDefinition::tableToArray($table);
+          }
+          else {
+            $tmp[$name] = $table;
+          }
+        }
+        $return = $tmp;
+      }
+
+      return $return;
     }
 
     return $this->legacyInvoke($module, $hook, $args);

@@ -6,8 +6,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\DefaultConfigMode;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
-use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -777,15 +775,9 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @internal
    */
   protected function installSchema(string $module): void {
-    $tables = $this->invoke($module, 'schema', [FALSE]) ?? [];
+    $tables = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
     foreach ($tables as $name => $table) {
-      if ($table instanceof Table) {
-        $name = $table->name;
-        if (!$this->connection->supportsSchemaDefinition()) {
-          $table = ConvertDefinition::tableToArray($table);
-        }
-      }
       $schema->createTable($name, $table);
     }
   }
@@ -799,14 +791,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * @internal
    */
   protected function uninstallSchema(string $module): void {
-    $tables = $this->invoke($module, 'schema', [FALSE]) ?? [];
+    $tables = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
-    foreach ($tables as $name => $table) {
-      if ($table instanceof Table) {
-        $name = $table->name;
-      }
-      if ($schema->tableExists($name)) {
-        $schema->dropTable($name);
+    foreach (array_keys($tables) as $table) {
+      if ($schema->tableExists($table)) {
+        $schema->dropTable($table);
       }
     }
   }
