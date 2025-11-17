@@ -7,12 +7,12 @@ namespace Drupal\Tests\field\Functional;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests add_more config update for multivalued fields.
- *
- * @group field
  */
+#[Group('field')]
 class ShowAddMoreButtonConfigTest extends BrowserTestBase {
 
   /**
