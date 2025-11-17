@@ -1227,19 +1227,6 @@ abstract class Connection {
   }
 
   /**
-   * Determines if this driver can handle SchemaDefinition objects.
-   *
-   * @return bool
-   *   TRUE if this driver can handle SchemaDefinition objects directly, FALSE
-   *   if they have to be converted to the legacy array-based specifications.
-   *
-   * @internal
-   */
-  public function supportsSchemaDefinition(): bool {
-    return FALSE;
-  }
-
-  /**
    * Returns the name of the database engine accessed by this driver.
    *
    * @return string

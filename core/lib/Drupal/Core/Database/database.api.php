@@ -647,7 +647,7 @@ function hook_schema(): array {
     ],
   );
 
-  return $asArray ? ConvertDefinition::schemaToArray($schema) : $schema;
+  return $schema;
 }
 
 /**

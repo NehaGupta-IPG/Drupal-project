@@ -178,11 +178,8 @@ class BatchStorage implements BatchStorageInterface {
   protected function ensureTableExists() {
     try {
       $database_schema = $this->connection->schema();
-      $schema_definition = $this->schemaDefinition(asArray: FALSE);
-      if (!$this->connection->supportsSchemaDefinition()) {
-        $schema_definition = ConvertDefinition::tableToArray($schema_definition);
-      }
-      $database_schema->createTable(static::TABLE_NAME, $schema_definition);
+      $schema_definition = $this->schemaDefinition();
+      $database_schema->createTable(static::TABLE_NAME, ConvertDefinition::tableToArray($schema_definition));
     }
     // If another process has already created the batch table, attempting to
     // recreate it will throw an exception. In this case just catch the
@@ -218,8 +215,8 @@ class BatchStorage implements BatchStorageInterface {
    *
    * @internal
    */
-  public function schemaDefinition(bool $asArray = TRUE) {
-    $table = new Table(
+  public function schemaDefinition(): Table {
+    return new Table(
       name: static::TABLE_NAME,
       description: new Value('Stores details about batches (processes that run in multiple HTTP requests).'),
       columns: [
@@ -256,8 +253,6 @@ class BatchStorage implements BatchStorageInterface {
         new Index(name: 'token', columns: ['token']),
       ],
     );
-
-    return $asArray ? ConvertDefinition::tableToArray($table) : $table;
   }
 
 }
