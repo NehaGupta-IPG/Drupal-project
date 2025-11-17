@@ -153,7 +153,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       'items' => $items,
       'default' => $this->isDefaultValueWidget($form_state),
     ];
-    \Drupal::moduleHandler()->alter(['field_widget_complete_form', 'field_widget_complete_' . $this->getPluginId() . '_form'], $field_widget_complete_form, $form_state, $context);
+    \Drupal::moduleHandler()->alter([
+      'field_widget_complete_form',
+      'field_widget_complete_' . $this->getPluginId() . '_form',
+    ], $field_widget_complete_form, $form_state, $context);
 
     return $field_widget_complete_form;
   }
@@ -276,8 +279,9 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         $elements['add_more'] = [
           '#type' => 'submit',
           '#name' => strtr($id_prefix, '-', '_') . '_add_more',
-          '#value' => t('Add another item'),
+          '#value' => $this->t('Add another item'),
           '#attributes' => ['class' => ['field-add-more-submit']],
+          '#button_type' => 'small',
           '#limit_validation_errors' => [],
           '#submit' => [[static::class, 'addMoreSubmit']],
           '#ajax' => [
@@ -348,7 +352,8 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
     // Add a DIV around the delta receiving the Ajax effect.
     $delta = $element['#max_delta'];
-    // Construct an attribute to add to div for use as selector to set the focus on.
+    // Construct an attribute to add to div for use as selector to set the focus
+    // on.
     $button_parent = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
     $focus_attribute = 'data-drupal-selector="field-' . $button_parent['#field_name'] . '-more-focus-target"';
     $element[$delta]['#prefix'] = '<div class="ajax-new-content" ' . $focus_attribute . '>' . ($element[$delta]['#prefix'] ?? '');
@@ -463,7 +468,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         'delta' => $delta,
         'default' => $this->isDefaultValueWidget($form_state),
       ];
-      \Drupal::moduleHandler()->alter(['field_widget_single_element_form', 'field_widget_single_element_' . $this->getPluginId() . '_form'], $element, $form_state, $context);
+      \Drupal::moduleHandler()->alter([
+        'field_widget_single_element_form',
+        'field_widget_single_element_' . $this->getPluginId() . '_form',
+      ], $element, $form_state, $context);
     }
 
     return $element;
@@ -613,9 +621,11 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    *   The location of processing information within $form_state.
    */
   protected static function getWidgetStateParents(array $parents, $field_name) {
+    // phpcs:disable Drupal.Files.LineLength
     // Field processing data is placed at
-    // $form_state->get(['field_storage', '#parents', ...$parents..., '#fields', $field_name]),
+    // "$form_state->get(['field_storage', '#parents', ...$parents..., '#fields', $field_name])"
     // to avoid clashes between field names and $parents parts.
+    // phpcs:enable
     return array_merge(['field_storage', '#parents'], $parents, ['#fields', $field_name]);
   }
 
