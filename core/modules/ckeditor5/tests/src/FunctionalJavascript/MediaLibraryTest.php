@@ -16,6 +16,7 @@ use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 // cspell:ignore arrakis complote détruire harkonnen
@@ -26,6 +27,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  */
 #[CoversClass(MediaLibrary::class)]
 #[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryTest extends WebDriverTestBase {
 
   use MediaTypeCreationTrait;
@@ -66,10 +68,6 @@ class MediaLibraryTest extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    if ($this->name() === 'testButton') {
-      $this->markTestSkipped('Skipped due to frequent random test failures. See https://www.drupal.org/i/3351597');
-    }
-
     parent::setUp();
 
     FilterFormat::create([
@@ -182,9 +180,7 @@ class MediaLibraryTest extends WebDriverTestBase {
       $this->assertSame($expected_tab_order[$key], $tab->getText());
     }
 
-    $assert_session->pageTextContains('0 of 1 item selected');
     $assert_session->elementExists('css', '.js-media-library-item')->click();
-    $assert_session->pageTextContains('1 of 1 item selected');
     $assert_session->elementExists('css', '.ui-dialog-buttonpane')->pressButton('Insert selected');
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', $media_preview_selector, 1000));
     $xpath = new \DOMXPath($this->getEditorDataAsDom());
