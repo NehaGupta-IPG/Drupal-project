@@ -1462,7 +1462,7 @@ class ViewExecutable {
     // Check for already-cached results.
     /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache */
     if (!empty($this->live_preview)) {
-      $cache = Views::pluginManager('cache')->createInstance('none');
+      $cache = $this->cachePluginManager->createInstance('none');
     }
     else {
       $cache = $this->display_handler->getPlugin('cache');
