@@ -305,7 +305,8 @@ class Schema extends DatabaseSchema {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
-    $this->connection->tableDropped = TRUE;
+#dump([__METHOD__, 'bss']);die();
+#    $this->connection->tableDropped = TRUE;
     $this->executeDdlStatement('DROP TABLE {' . $table . '}');
     return TRUE;
   }
