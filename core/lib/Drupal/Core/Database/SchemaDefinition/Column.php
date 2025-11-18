@@ -19,7 +19,7 @@ final class Column implements SchemaDefinitionInterface {
    *   its own definition. This argument is mandatory unless $dbSpecificExtra is
    *   specified. See
    *   \Drupal\Core\Database\SchemaDefinition\ColumnType for allowed values.
-   * @param StringValue|NullValue|null $description
+   * @param ?string $description
    *   (Optional) A string in non-markup plain text describing this field and
    *   its purpose. References to other tables should be enclosed in curly
    *   brackets. For example, the users_data table 'uid' field description
@@ -68,7 +68,7 @@ final class Column implements SchemaDefinitionInterface {
   public function __construct(
     public readonly string $name,
     public readonly ?ColumnType $type = NULL,
-    public readonly StringValue|NullValue|null $description = NULL,
+    public readonly ?string $description = NULL,
     public readonly ?bool $serialize = NULL,
     public readonly ?ColumnSize $size = NULL,
     public readonly ?bool $notNull = NULL,

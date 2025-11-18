@@ -588,11 +588,11 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
 function hook_schema(): array {
   $schema[] = new Table(
     name: 'users_data',
-    description: new StringValue('Stores module data as key/value pairs per user.'),
+    description: 'Stores module data as key/value pairs per user.',
     columns: [
       new Column(
         name: 'uid',
-        description: new StringValue('The {users}.uid this record affects.'),
+        description: 'The {users}.uid this record affects.',
         type: ColumnType::Int,
         unsigned: TRUE,
         notNull: TRUE,
@@ -600,7 +600,7 @@ function hook_schema(): array {
       ),
       new Column(
         name: 'module',
-        description: new StringValue('The name of the module declaring the variable.'),
+        description: 'The name of the module declaring the variable.',
         type: ColumnType::VarcharAscii,
         length: DRUPAL_EXTENSION_NAME_MAX_LENGTH,
         notNull: TRUE,
@@ -608,7 +608,7 @@ function hook_schema(): array {
       ),
       new Column(
         name: 'name',
-        description: new StringValue('The identifier of the data.'),
+        description: 'The identifier of the data.',
         type: ColumnType::VarcharAscii,
         length: 128,
         notNull: TRUE,
@@ -616,14 +616,14 @@ function hook_schema(): array {
       ),
       new Column(
         name: 'value',
-        description: new StringValue('The value.'),
+        description: 'The value.',
         type: ColumnType::Blob,
         size: ColumnSize::Big,
         notNull: FALSE,
       ),
       new Column(
         name: 'serialized',
-        description: new StringValue('Whether value is serialized.'),
+        description: 'Whether value is serialized.',
         type: ColumnType::Int,
         size: ColumnSize::Tiny,
         unsigned: TRUE,

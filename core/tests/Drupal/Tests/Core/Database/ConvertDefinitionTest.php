@@ -92,7 +92,7 @@ class ConvertDefinitionTest extends UnitTestCase {
 
     $schemaDefinition = new Table(
       name: 'test',
-      description: new StringValue('Basic test table for the database unit tests.'),
+      description: 'Basic test table for the database unit tests.',
       columns: [
         new Column(
           name: 'id',
@@ -102,7 +102,7 @@ class ConvertDefinitionTest extends UnitTestCase {
         ),
         new Column(
           name: 'name',
-          description: new StringValue("A person's name"),
+          description: "A person's name",
           type: ColumnType::VarcharAscii,
           length: 255,
           notNull: TRUE,
@@ -111,7 +111,7 @@ class ConvertDefinitionTest extends UnitTestCase {
         ),
         new Column(
           name: 'age',
-          description: new StringValue("The person's age"),
+          description: "The person's age",
           type: ColumnType::Int,
           size: ColumnSize::Small,
           unsigned: TRUE,
@@ -120,7 +120,7 @@ class ConvertDefinitionTest extends UnitTestCase {
         ),
         new Column(
           name: 'job',
-          description: new StringValue("The person's job"),
+          description: "The person's job",
           type: ColumnType::Varchar,
           length: 255,
           notNull: TRUE,
@@ -128,7 +128,7 @@ class ConvertDefinitionTest extends UnitTestCase {
         ),
         new Column(
           name: 'db_timestamp',
-          description: new StringValue("The database timestamp"),
+          description: "The database timestamp",
           dbSpecificExtra: [
             'mysql' => [
               'mysql_type' => 'timestamp',

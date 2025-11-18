@@ -12,7 +12,6 @@ use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
-use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -218,31 +217,31 @@ class BatchStorage implements BatchStorageInterface {
   public function schemaDefinition(): Table {
     return new Table(
       name: static::TABLE_NAME,
-      description: new StringValue('Stores details about batches (processes that run in multiple HTTP requests).'),
+      description: 'Stores details about batches (processes that run in multiple HTTP requests).',
       columns: [
         new Column(
           name: 'bid',
-          description: new StringValue('Primary Key: Unique batch ID.'),
+          description: 'Primary Key: Unique batch ID.',
           type: ColumnType::Serial,
           unsigned: TRUE,
           notNull: TRUE,
         ),
         new Column(
           name: 'token',
-          description: new StringValue("A string token generated against the current user's session id and the batch id, used to ensure that only the user who submitted the batch can effectively access it."),
+          description: "A string token generated against the current user's session id and the batch id, used to ensure that only the user who submitted the batch can effectively access it.",
           type: ColumnType::VarcharAscii,
           length: 64,
           notNull: TRUE,
         ),
         new Column(
           name: 'timestamp',
-          description: new StringValue('A Unix timestamp indicating when this batch was submitted for processing. Stale batches are purged at cron time.'),
+          description: 'A Unix timestamp indicating when this batch was submitted for processing. Stale batches are purged at cron time.',
           type: ColumnType::Int,
           notNull: TRUE,
         ),
         new Column(
           name: 'batch',
-          description: new StringValue('A serialized array containing the processing data for the batch.'),
+          description: 'A serialized array containing the processing data for the batch.',
           type: ColumnType::Blob,
           size: ColumnSize::Big,
           notNull: FALSE,

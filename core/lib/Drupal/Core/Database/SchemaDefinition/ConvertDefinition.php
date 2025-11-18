@@ -36,8 +36,8 @@ abstract class ConvertDefinition {
    */
   final public static function tableToArray(Table $table): array {
     $spec = [];
-    if ($table->description) {
-      $spec['description'] = $table->description->value;
+    if ($table->description !== NULL) {
+      $spec['description'] = $table->description;
     }
     if ($table->columns !== NULL) {
       $spec['fields'] = self::columnsToArray($table->columns);
@@ -87,8 +87,8 @@ abstract class ConvertDefinition {
     if ($column->type) {
       $spec['type'] = $column->type->value;
     }
-    if ($column->description) {
-      $spec['description'] = $column->description->value;
+    if ($column->description !== NULL) {
+      $spec['description'] = $column->description;
     }
     if ($column->serialize !== NULL) {
       $spec['serialize'] = $column->serialize;
