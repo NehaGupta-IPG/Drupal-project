@@ -172,6 +172,10 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
       }
     }
 
+    foreach ($cache as $item) {
+      $item->data = unserialize($item->data);
+    }
+
     return $cache;
   }
 
@@ -179,6 +183,8 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
    * {@inheritdoc}
    */
   public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []) {
+    $data = serialize($data);
+
     $this->consistentBackend->set($cid, $data, $expire, $tags);
     $this->markAsOutdated();
     $this->fastBackend->set($cid, $data, $expire, $tags);
@@ -188,6 +194,10 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
    * {@inheritdoc}
    */
   public function setMultiple(array $items) {
+    foreach ($items as &$item) {
+      $item['data'] = serialize($item['data']);
+    }
+
     $this->consistentBackend->setMultiple($items);
     $this->markAsOutdated();
     $this->fastBackend->setMultiple($items);

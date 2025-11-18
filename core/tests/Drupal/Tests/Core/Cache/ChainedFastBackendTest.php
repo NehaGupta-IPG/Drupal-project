@@ -55,7 +55,7 @@ class ChainedFastBackendTest extends UnitTestCase {
       ->method('getMultiple');
 
     $fast_cache = new MemoryBackend(new Time());
-    $fast_cache->set('foo', 'baz');
+    $fast_cache->set('foo', serialize('baz'));
 
     $chained_fast_backend = new ChainedFastBackend(
       $consistent_cache,
@@ -117,7 +117,7 @@ class ChainedFastBackendTest extends UnitTestCase {
     ];
     $cache_item = (object) [
       'cid' => 'foo',
-      'data' => 'baz',
+      'data' => serialize('baz'),
       'created' => time(),
       'expire' => time() + 3600,
       'tags' => ['tag'],
