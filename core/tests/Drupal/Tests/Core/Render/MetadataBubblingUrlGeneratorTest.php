@@ -109,3 +109,15 @@ class MetadataBubblingUrlGeneratorTest extends UrlGeneratorTest {
   }
 
 }
+
+// @todo Remove as part of https://www.drupal.org/node/2481833.
+if (!function_exists('base_path')) {
+
+  /**
+   * Returns the base path.
+   */
+  function base_path() {
+    return '/';
+  }
+
+}
