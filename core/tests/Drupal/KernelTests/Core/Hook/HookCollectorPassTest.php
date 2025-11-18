@@ -57,9 +57,7 @@ class HookCollectorPassTest extends KernelTestBase {
         UserHooksTest::class . '::userFormatNameAlter' => 'user_hooks_test',
       ],
       'user_mail_language_alter' => [
-        'Drupal\user_hooks_test\Hook\UserHooksTest' => [
-          'userMailLanguageAlter' => 'user_hooks_test',
-        ],
+        UserHooksTest::class . '::userMailLanguageAlter' => 'user_hooks_test',
       ],
     ], $container);
   }
