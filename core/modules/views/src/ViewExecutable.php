@@ -494,21 +494,7 @@ class ViewExecutable {
    */
   protected $serializationData;
 
-  /**
-   * Constructs a new ViewExecutable object.
-   *
-   * @param \Drupal\views\ViewEntityInterface $storage
-   *   The view config entity the actual information is stored on.
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user.
-   * @param \Drupal\views\ViewsData $views_data
-   *   The views data.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
-   *   The plugin manager for display.
-   */
-  public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
+  public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL, protected ?ViewsPluginManager $cachePluginManager = NULL) {
     // Reference the storage and the executable to each other.
     $this->storage = $storage;
     $this->storage->set('executable', $this);
@@ -518,6 +504,10 @@ class ViewExecutable {
     if ($this->displayPluginManager === NULL) {
       @trigger_error('Calling ' . __METHOD__ . ' without the $displayPluginManager argument is deprecated in drupal:10.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410349', E_USER_DEPRECATED);
       $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
+    }
+    if ($this->cachePluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $cachePluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->cachePluginManager = \Drupal::service('plugin.manager.views.cache');
     }
 
   }
@@ -1537,7 +1527,7 @@ class ViewExecutable {
     // Check for already-cached output.
     /** @var \Drupal\views\Plugin\views\cache\CachePluginBase $cache */
     if (!empty($this->live_preview)) {
-      $cache = Views::pluginManager('cache')->createInstance('none');
+      $cache = $this->cachePluginManager->createInstance('none');
     }
     else {
       $cache = $this->display_handler->getPlugin('cache');
@@ -2127,6 +2117,7 @@ class ViewExecutable {
       $defaults['request'],
       $defaults['routeProvider'],
       $defaults['displayPluginManager'],
+      $defaults['cachePluginManager'],
       $defaults['viewsData']
     );
 
@@ -2566,6 +2557,7 @@ class ViewExecutable {
       $this->viewsData = \Drupal::service('views.views_data');
       $this->routeProvider = \Drupal::service('router.route_provider');
       $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
+      $this->cachePluginManager = \Drupal::service('plugin.manager.views.cache');
 
       // Restore the state of this executable.
       if ($request = \Drupal::request()) {

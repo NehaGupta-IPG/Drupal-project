@@ -68,6 +68,13 @@ class ViewExecutableFactoryTest extends UnitTestCase {
   protected $displayPluginManager;
 
   /**
+   * The cache plugin manager.
+   *
+   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   */
+  protected $cachePluginManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -83,7 +90,10 @@ class ViewExecutableFactoryTest extends UnitTestCase {
     $this->displayPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->viewExecutableFactory = new ViewExecutableFactory($this->user, $this->requestStack, $this->viewsData, $this->routeProvider, $this->displayPluginManager);
+    $this->cachePluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->viewExecutableFactory = new ViewExecutableFactory($this->user, $this->requestStack, $this->viewsData, $this->routeProvider, $this->displayPluginManager, $this->cachePluginManager);
   }
 
   /**

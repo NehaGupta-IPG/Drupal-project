@@ -125,6 +125,13 @@ class ViewExecutableTest extends UnitTestCase {
   protected $displayPluginManager;
 
   /**
+   * The cache plugin manager.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected $cachePluginManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -146,7 +153,11 @@ class ViewExecutableTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->executable = new ViewExecutable($this->view, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager);
+    $this->cachePluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->executable = new ViewExecutable($this->view, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager, $this->cachePluginManager);
     $this->executable->display_handler = $this->displayHandler;
     $this->executable->displayHandlers = $this->displayHandlers;
 
@@ -580,7 +591,7 @@ class ViewExecutableTest extends UnitTestCase {
     ];
 
     $storage = new View($config, 'view');
-    $view = new ViewExecutable($storage, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager);
+    $view = new ViewExecutable($storage, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager, $this->cachePluginManager);
     $display = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
       ->disableOriginalConstructor()
       ->getMock();
