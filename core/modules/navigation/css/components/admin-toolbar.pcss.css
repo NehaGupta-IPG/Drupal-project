@@ -216,6 +216,11 @@ body {
     margin-block-start: revert;
     padding-block-start: revert;
     padding-block-end: 0;
+
+    :where([data-admin-toolbar="collapsed"]) & {
+      flex-direction: column;
+      align-items: center;
+    }
   }
 }
 
@@ -230,6 +235,10 @@ body {
 
   & img {
     display: block;
+    max-width: var(--admin-toolbar-space-40);
+  }
+
+  :where([data-admin-toolbar="collapsed"]) & {
     max-width: var(--admin-toolbar-space-40);
   }
 }
