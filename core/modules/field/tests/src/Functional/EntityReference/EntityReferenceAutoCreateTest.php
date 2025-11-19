@@ -110,9 +110,26 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
   }
 
   /**
-   * Tests the autocomplete input element and entity auto-creation.
+   * Provides data for test scenarios involving entity reference auto create.
    */
-  public function testAutoCreate(): void {
+  public function autoCreateProvider(): array {
+    return [
+      'Random machine name' => ['new_title' => $this->randomMachineName()],
+      'Random machine name followed by text in parentheses' => ['new_title' => $this->randomMachineName() . ' (a)'],
+      'Random machine name followed by integer in parentheses' => ['new_title' => $this->randomMachineName() . ' (1)'],
+    ];
+  }
+
+  /**
+   * Tests that autocomplete input element appears and a new entity is created.
+   *
+   * @param string $new_title
+   *   The title for the referenced entity to be created through the auto
+   *   create.
+   *
+   * @dataProvider autoCreateProvider
+   */
+  public function testAutoCreate(string $new_title): void {
     $this->drupalGet('node/add/' . $this->referencingType);
     $target = $this->assertSession()->fieldExists("edit-test-field-0-target-id");
     $this->assertTrue($target->hasClass("form-autocomplete"));
