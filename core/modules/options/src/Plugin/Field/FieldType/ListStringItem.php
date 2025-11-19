@@ -3,7 +3,6 @@
 namespace Drupal\options\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\Attribute\FieldType;
-use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
@@ -63,7 +62,6 @@ class ListStringItem extends ListItemBase {
     $description = '<p>' . $this->t('The name will be used in displayed options and edit forms.');
     $description .= '<br/>' . $this->t('The value is automatically generated machine name of the name provided and will be the stored value.');
     $description .= '</p>';
-    $description .= '<p>' . $this->t('Allowed HTML tags in labels: @tags', ['@tags' => FieldFilteredMarkup::displayAllowedTags()]) . '</p>';
     return $description;
   }
 

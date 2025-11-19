@@ -3,7 +3,6 @@
 namespace Drupal\options\Plugin\Field\FieldType;
 
 use Drupal\Core\Field\Attribute\FieldType;
-use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
@@ -59,7 +58,6 @@ class ListIntegerItem extends ListItemBase {
    */
   protected function allowedValuesDescription() {
     $description = '<p>' . $this->t('The name will be used in displayed options and edit forms. The value is the stored value, and must be numeric.') . '</p>';
-    $description .= '<p>' . $this->t('Allowed HTML tags in labels: @tags', ['@tags' => FieldFilteredMarkup::displayAllowedTags()]) . '</p>';
     return $description;
   }
 
