@@ -242,7 +242,7 @@ final class SmartDefaultSettings {
 
       if (!empty($plugins_enabled) || !$source_editing_additions->allowsNothing()) {
         $beginning = $help_enabled ?
-          $this->t('To maintain the capabilities of this text format, <a target="_blank" href=":ck_migration_url">the CKEditor 5 migration</a> did the following:', [
+          $this->t('To maintain the capabilities of this text format, <a href=":ck_migration_url">the CKEditor 5 migration</a> did the following:', [
             ':ck_migration_url' => Url::fromRoute('help.page', ['name' => 'ckeditor5'], ['fragment' => 'migration-settings'])->toString(),
           ]) :
           $this->t('To maintain the capabilities of this text format, the CKEditor 5 migration did the following:');
@@ -255,7 +255,7 @@ final class SmartDefaultSettings {
         $source_editing_info = '';
         if (!$source_editing_additions->allowsNothing()) {
           $source_editing_info = $help_enabled ?
-            $this->t('Added these tags/attributes to the Source Editing Plugin\'s <a target="_blank" href=":source_edit_url">Manually editable HTML tags</a> setting: @tag_list',
+            $this->t('Added these tags/attributes to the Source Editing Plugin\'s <a href=":source_edit_url">Manually editable HTML tags</a> setting: @tag_list',
               [
                 '@tag_list' => $source_editing_additions->toFilterHtmlAllowedTagsString(),
                 ':source_edit_url' => Url::fromRoute('help.page', ['name' => 'ckeditor5'], ['fragment' => 'source-editing'])->toString(),
@@ -264,7 +264,7 @@ final class SmartDefaultSettings {
         }
 
         $end = $can_access_dblog ?
-          $this->t('Additional details are available <a target="_blank" href=":dblog_url">in your logs</a>.',
+          $this->t('Additional details are available <a href=":dblog_url">in your logs</a>.',
             [
               ':dblog_url' => Url::fromRoute('dblog.overview')
                 ->setOption('query', ['type[]' => 'ckeditor5'])
@@ -290,8 +290,8 @@ final class SmartDefaultSettings {
         $fundamental_tags = '';
         if ($help_enabled && !$missing_fundamental_tags->allowsNothing()) {
           $fundamental_tags = $this->formatPlural(count($missing_fundamental_tags->toCKEditor5ElementsArray()),
-            'The @tag tag was added because it is <a target="_blank" href=":fundamental_tag_link">required by CKEditor 5</a>.',
-            'The @tag tags were added because they are <a target="_blank" href=":fundamental_tag_link">required by CKEditor 5</a>.',
+            'The @tag tag was added because it is <a href=":fundamental_tag_link">required by CKEditor 5</a>.',
+            'The @tag tags were added because they are <a href=":fundamental_tag_link">required by CKEditor 5</a>.',
             [
               '@tag' => implode(', ', $missing_fundamental_tags->toCKEditor5ElementsArray()),
               ':fundamental_tag_link' => URL::fromRoute('help.page', ['name' => 'ckeditor5'], ['fragment' => 'required-tags'])->toString(),
@@ -330,7 +330,7 @@ final class SmartDefaultSettings {
           ]
         ) : '';
         $end = $can_access_dblog ?
-          $this->t('Additional details are available <a target="_blank" href=":dblog_url">in your logs</a>.',
+          $this->t('Additional details are available <a href=":dblog_url">in your logs</a>.',
             [
               ':dblog_url' => Url::fromRoute('dblog.overview')
                 ->setOption('query', ['type[]' => 'ckeditor5'])

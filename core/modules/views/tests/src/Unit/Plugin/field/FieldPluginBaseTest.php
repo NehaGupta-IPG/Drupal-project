@@ -350,7 +350,7 @@ class FieldPluginBaseTest extends UnitTestCase {
     // Rel attributes.
     $data[] = ['test-path', ['rel' => 'up'], '<a href="/test-path" rel="up">value</a>'];
     // Target attributes.
-    $data[] = ['test-path', ['target' => '_blank'], '<a href="/test-path" target="_blank">value</a>'];
+    $data[] = ['test-path', ['target' => '_blank'], '<a href="/test-path">value</a>'];
     // Link attributes.
     $data[] = ['test-path', ['link_attributes' => ['foo' => 'bar']], '<a href="/test-path" foo="bar">value</a>'];
     // Manual specified query.
@@ -480,7 +480,7 @@ class FieldPluginBaseTest extends UnitTestCase {
       $url_with_target,
       '/test-path',
       clone $url_with_target,
-      '<a href="/test-path" target="_blank">value</a>',
+      '<a href="/test-path">value</a>',
     ];
 
     // Link attributes.

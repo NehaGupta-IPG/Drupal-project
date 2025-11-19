@@ -323,7 +323,7 @@ class HTMLRestrictionsTest extends UnitTestCase {
       ['a' => ['target' => TRUE]],
     ];
     yield 'tag with single attribute allowing single specific value' => [
-      '<a target="_blank">',
+      '<a>',
       ['a' => ['target' => ['_blank' => TRUE]]],
     ];
     yield 'tag with single attribute allowing multiple specific values' => [
@@ -359,11 +359,11 @@ class HTMLRestrictionsTest extends UnitTestCase {
       ['a' => TRUE],
     ];
     yield 'tag attribute configuration spread across declarations' => [
-      '<a target="_blank"> <a target="_self"> <a target="_*">',
+      '<a> <a target="_self"> <a target="_*">',
       ['a' => ['target' => ['_blank' => TRUE, '_self' => TRUE, '_*' => TRUE]]],
     ];
     yield 'tag attribute configuration spread across declarations, allow all attributes values' => [
-      '<a target> <a target="_blank"> <a target="_self"> <a target="_*">',
+      '<a target> <a> <a target="_self"> <a target="_*">',
       ['a' => ['target' => TRUE]],
     ];
 
