@@ -55,7 +55,6 @@ abstract class CKEditor5TestBase extends WebDriverTestBase {
   protected function addNewTextFormat($name = 'ckeditor5'): void {
     FilterFormat::create([
       'format' => $name,
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
       'name' => $name,
       'filters' => [
         'filter_html' => [
