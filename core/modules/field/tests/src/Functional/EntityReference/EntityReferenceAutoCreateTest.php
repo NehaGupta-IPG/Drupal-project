@@ -11,6 +11,7 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -112,11 +113,11 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
   /**
    * Provides data for test scenarios involving entity reference auto create.
    */
-  public function autoCreateProvider(): array {
+  public static function autoCreateProvider(): array {
     return [
-      'Random machine name' => ['new_title' => $this->randomMachineName()],
-      'Random machine name followed by text in parentheses' => ['new_title' => $this->randomMachineName() . ' (a)'],
-      'Random machine name followed by integer in parentheses' => ['new_title' => $this->randomMachineName() . ' (1)'],
+      'Random machine name' => ['new_title' => 'test_entity'],
+      'Random machine name followed by text in parentheses' => ['new_title' => 'test_entity (a)'],
+      'Random machine name followed by integer in parentheses' => ['new_title' => 'test_entity (1)'],
     ];
   }
 
@@ -126,9 +127,8 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
    * @param string $new_title
    *   The title for the referenced entity to be created through the auto
    *   create.
-   *
-   * @dataProvider autoCreateProvider
    */
+  #[DataProvider('autoCreateProvider')]
   public function testAutoCreate(string $new_title): void {
     $this->drupalGet('node/add/' . $this->referencingType);
     $target = $this->assertSession()->fieldExists("edit-test-field-0-target-id");
