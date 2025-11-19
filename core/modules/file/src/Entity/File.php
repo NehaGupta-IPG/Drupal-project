@@ -19,6 +19,7 @@ use Drupal\file\FileStorage;
 use Drupal\file\FileStorageSchema;
 use Drupal\file\FileViewsData;
 use Drupal\user\EntityOwnerTrait;
+use Drupal\user\Entity\Handler\BatchCancellationHandler;
 
 /**
  * Defines the file entity class.
@@ -43,6 +44,7 @@ use Drupal\user\EntityOwnerTrait;
     'storage_schema' => FileStorageSchema::class,
     'access' => FileAccessControlHandler::class,
     'views_data' => FileViewsData::class,
+    'user_cancel' => BatchCancellationHandler::class,
     'list_builder' => EntityListBuilder::class,
     'form' => ['delete' => ContentEntityDeleteForm::class],
     'route_provider' => ['html' => FileRouteProvider::class],

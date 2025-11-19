@@ -20,6 +20,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Ensure that account cancellation methods work as expected.
  */
 #[Group('user')]
+#[Group('#slow')]
+#[Group('legacy')]
 #[RunTestsInSeparateProcesses]
 class UserCancelTest extends BrowserTestBase {
 

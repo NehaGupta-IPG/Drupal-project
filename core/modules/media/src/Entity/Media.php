@@ -25,6 +25,7 @@ use Drupal\media\MediaStorage;
 use Drupal\media\MediaViewsData;
 use Drupal\media\Routing\MediaRouteProvider;
 use Drupal\user\EntityOwnerTrait;
+use Drupal\user\Entity\Handler\BatchCancellationHandler;
 
 /**
  * Defines the media entity class.
@@ -66,6 +67,7 @@ use Drupal\user\EntityOwnerTrait;
       'html' => MediaRouteProvider::class,
       'revision' => RevisionHtmlRouteProvider::class,
     ],
+    'user_cancel' => BatchCancellationHandler::class,
   ],
   links: [
     'add-page' => '/media/add',
@@ -101,7 +103,7 @@ use Drupal\user\EntityOwnerTrait;
     'revision_created' => 'revision_created',
     'revision_log_message' => 'revision_log_message',
   ],
-  )]
+)]
 class Media extends EditorialContentEntityBase implements MediaInterface {
 
   use EntityOwnerTrait;

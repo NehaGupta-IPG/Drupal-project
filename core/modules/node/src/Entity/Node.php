@@ -21,6 +21,7 @@ use Drupal\node\NodeTranslationHandler;
 use Drupal\node\NodeViewBuilder;
 use Drupal\node\NodeViewsData;
 use Drupal\user\EntityOwnerTrait;
+use Drupal\user\Entity\Handler\BatchCancellationHandler;
 
 /**
  * Defines the node entity class.
@@ -60,6 +61,7 @@ use Drupal\user\EntityOwnerTrait;
     ],
     'list_builder' => NodeListBuilder::class,
     'translation' => NodeTranslationHandler::class,
+    'user_cancel' => BatchCancellationHandler::class,
   ],
   links: [
     'canonical' => '/node/{node}',
