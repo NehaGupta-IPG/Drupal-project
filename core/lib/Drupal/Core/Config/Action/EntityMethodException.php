@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Config\Action;
 
 /**
- * Throws exception when an entity method fails during a config action.
+ * Defines an exception thrown when entity methods fail during a config action.
  *
  * @internal
  *   This API is experimental.

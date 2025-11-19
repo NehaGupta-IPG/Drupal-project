@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Core\Config\Action;
 
 /**
- * Throws exception during a configuration action failure.
+ * Defines an exception thrown during a configuration action failure.
  *
  * @internal
  *   This API is experimental.

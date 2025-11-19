@@ -7,7 +7,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 /**
  * Provides methods to work with plugin definitions.
  *
- * @see \\Drupal\Component\Plugin\Discovery\DiscoveryInterface
+ * @see \Drupal\Component\Plugin\Discovery\DiscoveryInterface
  */
 trait DiscoveryTrait {
 
