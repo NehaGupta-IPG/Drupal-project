@@ -169,7 +169,7 @@ abstract class FilterFormatFormBase extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
+  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state): void {
 
     parent::copyFormValuesToEntity($entity, $form, $form_state);
 

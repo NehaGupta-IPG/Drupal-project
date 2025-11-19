@@ -25,7 +25,6 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 /**
  * Tests the media entity metadata API.
  *
- * @group ckeditor5
  * @internal
  */
 #[Group('ckeditor5')]

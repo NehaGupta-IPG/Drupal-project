@@ -99,6 +99,8 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
   protected $weight = 0;
 
   /**
+   * @var array
+   *
    * List of role IDs to grant access to use this format on initial creation.
    *
    * This property is always empty and unused for existing text formats.
@@ -112,8 +114,6 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
    * @deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. Remove the
    *   'roles' key from the text format configuration.
    * @see https://www.drupal.org/node/3168851
-   *
-   * @var array
    */
   protected $roles;
 

@@ -10,9 +10,6 @@ use Drupal\user\RoleInterface;
 
 /**
  * Tests legacy filter behaviors.
- *
- * @group legacy
- * @group filter
  */
 class FilterLegacyTest extends KernelTestBase {
 
@@ -29,8 +26,6 @@ class FilterLegacyTest extends KernelTestBase {
 
   /**
    * Tests update of roles during installation of default formats.
-   *
-   * @group legacy
    */
   public function testInstallRoles(): void {
     $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
@@ -52,8 +47,6 @@ class FilterLegacyTest extends KernelTestBase {
 
   /**
    * Tests that changes to FilterFormat::$roles do not have an effect.
-   *
-   * @group legacy
    */
   public function testUpdateRoles(): void {
     $this->expectDeprecation('The \'roles\' property of text formats is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3168851.');
