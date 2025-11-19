@@ -789,7 +789,6 @@ JS;
     FilterFormat::create([
       'format' => 'ckeditor5_2',
       'name' => 'CKEditor 5 HTML 2',
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ])->save();
     Editor::create([
       'format' => 'ckeditor5_2',
