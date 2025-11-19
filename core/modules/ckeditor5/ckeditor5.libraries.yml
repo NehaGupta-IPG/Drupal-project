@@ -73,6 +73,14 @@ internal.drupal.ckeditor5.emphasis:
     - core/ckeditor5
     - core/ckeditor5.basic
 
+internal.drupal.ckeditor5.horizontalLine:
+  version: VERSION
+  js:
+    js/build/drupalHorizontalLine.js: { minified: true }
+  dependencies:
+    - core/ckeditor5
+    - core/ckeditor5.basic
+
 internal.drupal.ckeditor5.media:
   js:
     js/build/drupalMedia.js: { minified: true }

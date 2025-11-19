@@ -416,16 +416,22 @@ ckeditor5_list:
 
 ckeditor5_horizontalLine:
   ckeditor5:
-    plugins: [horizontalLine.HorizontalLine]
+    plugins:
+      - horizontalLine.HorizontalLine
+      - drupalHorizontalLine.DrupalHorizontalLine
+    config:
+      horizontalLine:
+        allowAttributes: [ hrClass ]
   drupal:
     label: Horizontal line
-    library: core/ckeditor5.horizontalLine
+    library: ckeditor5/internal.drupal.ckeditor5.horizontalLine
     admin_library: ckeditor5/internal.admin.horizontalLine
     toolbar_items:
       horizontalLine:
         label: Horizontal line
     elements:
       - <hr>
+      - <hr class>
 
 ckeditor5_alignment:
   ckeditor5:
