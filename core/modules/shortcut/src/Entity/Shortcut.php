@@ -15,6 +15,7 @@ use Drupal\shortcut\Form\ShortcutDeleteForm;
 use Drupal\shortcut\ShortcutAccessControlHandler;
 use Drupal\shortcut\ShortcutForm;
 use Drupal\shortcut\ShortcutInterface;
+use Drupal\views\EntityViewsData;
 
 /**
  * Defines the shortcut entity class.
@@ -42,6 +43,7 @@ use Drupal\shortcut\ShortcutInterface;
       'edit' => ShortcutForm::class,
       'delete' => ShortcutDeleteForm::class,
     ],
+    "views_data" => EntityViewsData::class,
   ],
   links: [
     'canonical' => '/admin/config/user-interface/shortcut/link/{shortcut}',

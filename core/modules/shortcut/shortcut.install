@@ -5,6 +5,9 @@
  * Install, update and uninstall functions for the shortcut module.
  */
 
+use Drupal\views\Entity\View;
+use Drupal\Component\Serialization\Yaml;
+
 /**
  * Implements hook_schema().
  */
@@ -70,6 +73,27 @@ function shortcut_uninstall(): void {
     \Drupal::configFactory()
       ->getEditable("claro.settings")
       ->clear('third_party_settings.shortcut')
+      ->save(TRUE);
+  }
+}
+
+/**
+ * Add a views shortcuts block.
+ */
+function shortcut_update_110200(&$sandbox): void {
+  $module_handler = \Drupal::moduleHandler();
+  // Skip the update if views and block module are not installed.
+  if (!$module_handler->moduleExists('views') || !$module_handler->moduleExists('block')) {
+    return;
+  }
+
+  if (!View::load('shortcuts')) {
+    $config_path = \Drupal::service('extension.list.module')
+      ->getPath('shortcut') . '/config/optional/views.view.shortcuts.yml';
+    $data = Yaml::decode(file_get_contents($config_path));
+    \Drupal::configFactory()
+      ->getEditable('views.view.shortcuts')
+      ->setData($data)
       ->save(TRUE);
   }
 }
