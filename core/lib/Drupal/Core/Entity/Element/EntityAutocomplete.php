@@ -222,9 +222,14 @@ class EntityAutocomplete extends Textfield {
 
         foreach ($input_values as $input) {
           $match = static::extractEntityIdFromAutocompleteInput($input);
-          // Handling the case when the entity label contains parentheses.
-          if (!empty($match)) {
-            $match = static::matchEntityByTitle($handler, $input, $element, $form_state, FALSE) ?? $match;
+          // Verify that the extracted ID actually corresponds to an existing
+          // entity. If not, treat the entire input as a new entity label to
+          // support titles containing parentheses with numbers like "(1)".
+          if ($match !== NULL) {
+            $entity_storage = \Drupal::entityTypeManager()->getStorage($element['#target_type']);
+            if (!$entity_storage->load($match)) {
+              $match = NULL;
+            }
           }
 
           if ($match === NULL) {
