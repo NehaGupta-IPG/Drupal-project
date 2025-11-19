@@ -563,6 +563,8 @@ function downcastBlockImageLink() {
         'attribute:htmlLinkAttributes:imageBlock',
       )
     ) {
+      let htmlLinkAttributes = data.item.getAttribute('htmlLinkAttributes') || {};
+      htmlLinkAttributes.attributes.href = data.attributeNewValue;
       setViewAttributes(
         conversionApi.writer,
         data.item.getAttribute('htmlLinkAttributes'),
