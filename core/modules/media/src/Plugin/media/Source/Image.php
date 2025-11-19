@@ -166,4 +166,15 @@ class Image extends File {
     $display->setComponent($field_name, $component);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function hasChanged(MediaInterface $media, MediaInterface $original) {
+    $image_has_changed = parent::hasChanged($media, $original);
+    $source_field = $this->configuration['source_field'];
+    $alt = $media->get($source_field)->alt;
+    $original_alt = $original->get($source_field)->alt;
+    return $image_has_changed || $alt != $original_alt;
+  }
+
 }

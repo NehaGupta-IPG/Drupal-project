@@ -207,4 +207,17 @@ interface MediaSourceInterface extends PluginInspectionInterface, ConfigurableIn
    */
   public function getSourceFieldValue(MediaInterface $media);
 
+  /**
+   * Determines if any of the relevant source field values has changed.
+   *
+   * Individual source plugins may override this method in order to specify
+   * source-specific criteria indicating whether the source has changed.
+   *
+   * @return bool
+   *   TRUE if the source changed, FALSE otherwise.
+   *
+   * @internal
+   */
+  public function hasChanged(MediaInterface $media, MediaInterface $original);
+
 }
