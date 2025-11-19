@@ -18,8 +18,8 @@ interface AccessArgumentsResolverFactoryInterface {
    *   The route match object to be checked.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The account being checked.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   Optional, the request object.
+   * @param \Symfony\Component\HttpFoundation\Request|null $request
+   *   (optional) The request object.
    *
    * @return \Drupal\Component\Utility\ArgumentsResolverInterface
    *   The parametrized arguments resolver instance.

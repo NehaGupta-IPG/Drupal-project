@@ -67,7 +67,7 @@ use Drupal\views\Views;
  *   rendered in the location you have defined.
  * @param string $display_id
  *   The ID of the display within $view whose contextual links will be added.
- * @param array $view_element
+ * @param array|null $view_element
  *   The render array of the view. It should contain the following properties:
  *     - #view_id: The ID of the view.
  *     - #view_display_show_admin_links: A boolean whether the admin links

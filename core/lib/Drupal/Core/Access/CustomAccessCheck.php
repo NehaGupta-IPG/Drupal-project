@@ -44,8 +44,8 @@ class CustomAccessCheck implements RoutingAccessInterface {
    *   The route match object to be checked.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The account being checked.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   Optional, a request. Only supply this parameter when checking the
+   * @param \Symfony\Component\HttpFoundation\Request|null $request
+   *   (optional) a request. Only supply this parameter when checking the
    *   incoming request.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

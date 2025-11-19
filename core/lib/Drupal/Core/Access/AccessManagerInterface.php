@@ -20,7 +20,7 @@ interface AccessManagerInterface {
    *   The route to check access to.
    * @param array $parameters
    *   Optional array of values to substitute into the route path pattern.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface|null $account
    *   (optional) Run access checks for this account. Defaults to the current
    *   user.
    * @param bool $return_as_object
@@ -40,7 +40,7 @@ interface AccessManagerInterface {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The incoming request.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface|null $account
    *   (optional) Run access checks for this account. Defaults to the current
    *   user.
    * @param bool $return_as_object
@@ -62,11 +62,11 @@ interface AccessManagerInterface {
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface|null $account
    *   (optional) Run access checks for this account. Defaults to the current
    *   user.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   Optional, a request. Only supply this parameter when checking the
+   * @param \Symfony\Component\HttpFoundation\Request|null $request
+   *   (optional) a request. Only supply this parameter when checking the
    *   incoming request, do not specify when checking routes on output.
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
