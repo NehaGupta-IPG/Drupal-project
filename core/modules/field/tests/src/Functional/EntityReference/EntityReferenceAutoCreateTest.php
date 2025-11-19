@@ -106,18 +106,23 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $account = $this->drupalCreateUser([
       'access content',
       "create $this->referencingType content",
+      "create $this->referencedType content",
     ]);
     $this->drupalLogin($account);
   }
 
   /**
    * Provides data for test scenarios involving entity reference auto create.
+   *
+   * @return array
+   *   An array of test cases with entity titles.
    */
   public static function autoCreateProvider(): array {
     return [
-      'Random machine name' => ['new_title' => 'test_entity'],
-      'Random machine name followed by text in parentheses' => ['new_title' => 'test_entity (a)'],
-      'Random machine name followed by integer in parentheses' => ['new_title' => 'test_entity (1)'],
+      'Simple title' => ['new_title' => 'test_entity'],
+      'Title with text in parentheses' => ['new_title' => 'test_entity (a)'],
+      'Title with integer in parentheses' => ['new_title' => 'test_entity (1)'],
+      'Title with leading zero in parentheses' => ['new_title' => 'test_entity (01)'],
     ];
   }
 
@@ -133,8 +138,6 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $this->drupalGet('node/add/' . $this->referencingType);
     $target = $this->assertSession()->fieldExists("edit-test-field-0-target-id");
     $this->assertTrue($target->hasClass("form-autocomplete"));
-
-    $new_title = $this->randomMachineName();
 
     // Assert referenced node does not exist.
     $base_query = \Drupal::entityQuery('node')->accessCheck(FALSE);
