@@ -222,6 +222,11 @@ class EntityAutocomplete extends Textfield {
 
         foreach ($input_values as $input) {
           $match = static::extractEntityIdFromAutocompleteInput($input);
+          // Handling the case when the entity label contains parentheses.
+          if (!empty($match)) {
+            $match = static::matchEntityByTitle($handler, $input, $element, $form_state, FALSE) ?? $match;
+          }
+
           if ($match === NULL) {
             // Try to get a match from the input string when the user didn't use
             // the autocomplete but filled in a value manually.
@@ -416,7 +421,10 @@ class EntityAutocomplete extends Textfield {
     // @todo Add support for entities containing parentheses in their ID.
     // @see https://www.drupal.org/node/2520416
     if (preg_match("/.+\s\(([^\)]+)\)/", $input, $matches)) {
-      $match = $matches[1];
+      // Check if string is an integer and does not start with a "0".
+      if (ctype_digit($matches[1]) && !str_starts_with($matches[1], "0")) {
+        $match = $matches[1];
+      }
     }
 
     return $match;
