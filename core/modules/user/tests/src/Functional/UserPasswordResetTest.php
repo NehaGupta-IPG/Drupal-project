@@ -341,6 +341,9 @@ class UserPasswordResetTest extends BrowserTestBase {
 
   /**
    * Retrieves password reset email and extracts the login link.
+   *
+   * @return string
+   *   A password reset url string.
    */
   public function getResetURL(): string {
     // Assume the most recent email.
