@@ -31,17 +31,15 @@ interface LanguageConfigFactoryOverrideInterface extends ConfigFactoryOverrideIn
   /**
    * Get language override for given language and configuration name.
    *
-   * If none exist for the requested $langcode,
-   * a new config override object is instantiated.
-   *
    * @param string $langcode
-   *   Language code If none provided a new config override object is
-   *   instantiated.
+   *   The language code for the override.
    * @param string $name
-   *   Configuration name.
+   *   The language configuration object name.
    *
-   * @return \Drupal\Core\Config\Config
-   *   Configuration override object.
+   * @return \Drupal\language\Config\LanguageConfigOverride
+   *   The language config override object is always instantiated for the
+   *   requested $langcode. If no configuration data exists, the object will be
+   *   empty.
    */
   public function getOverride($langcode, $name);
 
