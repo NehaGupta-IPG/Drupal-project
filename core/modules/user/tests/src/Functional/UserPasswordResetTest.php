@@ -12,6 +12,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -341,7 +342,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * Retrieves password reset email and extracts the login link.
    */
-  public function getResetURL() {
+  public function getResetURL(): string {
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
     $email = end($_emails);
@@ -353,9 +354,8 @@ class UserPasswordResetTest extends BrowserTestBase {
 
   /**
    * Tests password reset functionality when user has set hook mail language.
-   *
-   * @dataProvider languageHookTestProvider
    */
+  #[DataProvider('languageHookTestProvider')]
   public function testUserPasswordResetHookLanguage(
     string $setPreferredLangcode,
     string $activeLangcode,
