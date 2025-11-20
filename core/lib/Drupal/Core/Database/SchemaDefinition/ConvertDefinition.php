@@ -14,6 +14,12 @@ abstract class ConvertDefinition {
   /**
    * Converts an array of Table objects.
    *
+   * @param array<int|string,\Drupal\Core\Database\SchemaDefinition\Table|<array<string,mixed>>> $schema
+   *   An array of mixed Table objects or schema definition structure arrays.
+   *
+   * @return array<string<array<string,mixed>>>
+   *   A schema definition structure array.
+   *
    * @internal
    */
   final public static function schemaToArray(array $schema): array {
@@ -31,6 +37,12 @@ abstract class ConvertDefinition {
 
   /**
    * Converts a Table object.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Table $table
+   *   A Table object.
+   *
+   * @return array<string,mixed>
+   *   A schema definition structure array.
    *
    * @internal
    */
@@ -67,6 +79,12 @@ abstract class ConvertDefinition {
   /**
    * Converts an array of Column objects.
    *
+   * @param list<\Drupal\Core\Database\SchemaDefinition\Column> $columns
+   *   An array of Column objects.
+   *
+   * @return array<string,mixed>
+   *   A schema definition structure array.
+   *
    * @internal
    */
   final public static function columnsToArray(array $columns): array {
@@ -79,6 +97,12 @@ abstract class ConvertDefinition {
 
   /**
    * Converts a Column object.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Column $column
+   *   An Column object.
+   *
+   * @return array<string,mixed>
+   *   A schema definition structure array.
    *
    * @internal
    */
@@ -130,6 +154,12 @@ abstract class ConvertDefinition {
   /**
    * Converts an array of KeyColumn objects.
    *
+   * @param list<\Drupal\Core\Database\SchemaDefinition\KeyColumn> $columns
+   *   An array of KeyColumn objects.
+   *
+   * @return array<string,mixed>
+   *   A schema definition structure array.
+   *
    * @internal
    */
   final public static function keyColumnsToArray(array $columns): array {
@@ -143,6 +173,12 @@ abstract class ConvertDefinition {
   /**
    * Converts a KeyColumn object.
    *
+   * @param \Drupal\Core\Database\SchemaDefinition\KeyColumn $column
+   *   An KeyColumn object.
+   *
+   * @return array<string,mixed>
+   *   A schema definition structure array.
+   *
    * @internal
    */
   final public static function keyColumnToArray(KeyColumn $column): string|array {
@@ -155,6 +191,12 @@ abstract class ConvertDefinition {
   /**
    * Converts a PrimaryKey object.
    *
+   * @param \Drupal\Core\Database\SchemaDefinition\PrimaryKey $primaryKey
+   *   An PrimaryKey object.
+   *
+   * @return array<string,mixed>
+   *   A schema definition structure array.
+   *
    * @internal
    */
   final public static function primaryKeyToArray(PrimaryKey $primaryKey): array {
@@ -163,6 +205,12 @@ abstract class ConvertDefinition {
 
   /**
    * Converts an array of UniqueKey objects.
+   *
+   * @param list<\Drupal\Core\Database\SchemaDefinition\UniqueKey> $uniqueKeys
+   *   An array of UniqueKey objects.
+   *
+   * @return array<string,mixed>
+   *   A schema definition structure array.
    *
    * @internal
    */
@@ -177,6 +225,12 @@ abstract class ConvertDefinition {
   /**
    * Converts an array of Index objects.
    *
+   * @param list<\Drupal\Core\Database\SchemaDefinition\Index> $indexes
+   *   An array of Index objects.
+   *
+   * @return array<string,mixed>
+   *   A schema definition structure array.
+   *
    * @internal
    */
   final public static function indexesToArray(array $indexes): array {
@@ -189,6 +243,12 @@ abstract class ConvertDefinition {
 
   /**
    * Converts an array of ForeignKey objects.
+   *
+   * @param list<\Drupal\Core\Database\SchemaDefinition\ForeignKey> $foreignKeys
+   *   An array of ForeignKey objects.
+   *
+   * @return array<string,mixed>
+   *   A schema definition structure array.
    *
    * @internal
    */
