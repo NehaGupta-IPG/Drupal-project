@@ -5,6 +5,7 @@ namespace Drupal\file;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
+use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
@@ -86,12 +87,16 @@ class FileRepository implements FileRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function writeData(string $data, string $destination, int $replace = FileSystemInterface::EXISTS_RENAME): FileInterface {
+  public function writeData(string $data, string $destination, FileExists|int $fileExists = FileExists::Rename): FileInterface {
+    if (!$fileExists instanceof FileExists) {
+      // @phpstan-ignore staticMethod.deprecated
+      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+    }
     if (!$this->streamWrapperManager->isValidUri($destination)) {
       throw new InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
     }
-    $uri = $this->fileSystem->saveData($data, $destination, $replace);
-    return $this->createOrUpdate($uri, $destination, $replace === FileSystemInterface::EXISTS_RENAME);
+    $uri = $this->fileSystem->saveData($data, $destination, $fileExists);
+    return $this->createOrUpdate($uri, $destination, $fileExists === FileExists::Rename);
   }
 
   /**
@@ -118,7 +123,7 @@ class FileRepository implements FileRepositoryInterface {
     }
 
     if ($rename && is_file($destination)) {
-      $file->setFilename($this->fileSystem->basename($destination));
+      $file->setFilename(basename($destination));
     }
 
     $file->setPermanent();
@@ -130,14 +135,18 @@ class FileRepository implements FileRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function copy(FileInterface $source, string $destination, int $replace = FileSystemInterface::EXISTS_RENAME): FileInterface {
+  public function copy(FileInterface $source, string $destination, FileExists|int $fileExists = FileExists::Rename): FileInterface {
+    if (!$fileExists instanceof FileExists) {
+      // @phpstan-ignore staticMethod.deprecated
+      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+    }
     if (!$this->streamWrapperManager->isValidUri($destination)) {
       throw new InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
     }
-    $uri = $this->fileSystem->copy($source->getFileUri(), $destination, $replace);
+    $uri = $this->fileSystem->copy($source->getFileUri(), $destination, $fileExists);
 
     // If we are replacing an existing file, load it.
-    if ($replace === FileSystemInterface::EXISTS_REPLACE && $existing = $this->loadByUri($uri)) {
+    if ($fileExists === FileExists::Replace && $existing = $this->loadByUri($uri)) {
       $file = $existing;
     }
     else {
@@ -146,11 +155,11 @@ class FileRepository implements FileRepositoryInterface {
 
       // If we are renaming around an existing file (rather than a directory),
       // use its basename for the filename.
-      if ($replace === FileSystemInterface::EXISTS_RENAME && is_file($destination)) {
-        $file->setFilename($this->fileSystem->basename($destination));
+      if ($fileExists === FileExists::Rename && is_file($destination)) {
+        $file->setFilename(basename($destination));
       }
       else {
-        $file->setFilename($this->fileSystem->basename($uri));
+        $file->setFilename(basename($uri));
       }
     }
     $file->save();
@@ -164,17 +173,21 @@ class FileRepository implements FileRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function move(FileInterface $source, string $destination, int $replace = FileSystemInterface::EXISTS_RENAME): FileInterface {
+  public function move(FileInterface $source, string $destination, FileExists|int $fileExists = FileExists::Rename): FileInterface {
+    if (!$fileExists instanceof FileExists) {
+      // @phpstan-ignore staticMethod.deprecated
+      $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
+    }
     if (!$this->streamWrapperManager->isValidUri($destination)) {
       throw new InvalidStreamWrapperException("Invalid stream wrapper: {$destination}");
     }
-    $uri = $this->fileSystem->move($source->getFileUri(), $destination, $replace);
+    $uri = $this->fileSystem->move($source->getFileUri(), $destination, $fileExists);
     $delete_source = FALSE;
 
     $file = clone $source;
     $file->setFileUri($uri);
     // If we are replacing an existing file re-use its database record.
-    if ($replace === FileSystemInterface::EXISTS_REPLACE) {
+    if ($fileExists === FileExists::Replace) {
       if ($existing = $this->loadByUri($uri)) {
         $delete_source = TRUE;
         $file->fid = $existing->id();
@@ -183,8 +196,8 @@ class FileRepository implements FileRepositoryInterface {
     }
     // If we are renaming around an existing file (rather than a directory),
     // use its basename for the filename.
-    elseif ($replace === FileSystemInterface::EXISTS_RENAME && is_file($destination)) {
-      $file->setFilename($this->fileSystem->basename($destination));
+    elseif ($fileExists === FileExists::Rename && is_file($destination)) {
+      $file->setFilename(basename($destination));
     }
 
     $file->save();

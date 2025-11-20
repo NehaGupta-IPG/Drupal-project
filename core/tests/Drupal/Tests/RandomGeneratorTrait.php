@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests;
 
 use Drupal\TestTools\Random;
@@ -32,24 +34,9 @@ trait RandomGeneratorTrait {
   }
 
   /**
-   * Callback for random string validation.
-   *
-   * @see \Drupal\Component\Utility\Random::string()
-   *
-   * @param string $string
-   *   The random string to validate.
-   *
-   * @return bool
-   *   TRUE if the random string is valid, FALSE if not.
-   */
-  public function randomStringValidate($string) {
-    return Random::stringValidate($string);
-  }
-
-  /**
    * Generates a unique random string containing letters and numbers.
    *
-   * Do not use this method when testing unvalidated user input. Instead, use
+   * Do not use this method when testing non validated user input. Instead, use
    * \Drupal\Tests\RandomGeneratorTrait::randomString().
    *
    * @param int $length
@@ -60,7 +47,7 @@ trait RandomGeneratorTrait {
    *
    * @see \Drupal\Component\Utility\Random::name()
    */
-  protected function randomMachineName($length = 8) {
+  protected function randomMachineName($length = 8): string {
     return Random::machineName($length);
   }
 

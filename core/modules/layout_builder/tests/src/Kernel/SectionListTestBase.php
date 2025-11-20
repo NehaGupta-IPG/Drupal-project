@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Provides a base class for testing implementations of a section list.
- *
- * @coversDefaultClass \Drupal\layout_builder\Plugin\SectionStorage\SectionStorageBase
  */
 abstract class SectionListTestBase extends EntityKernelTestBase {
 
@@ -60,7 +61,7 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   /**
    * Tests ::getSections().
    */
-  public function testGetSections() {
+  public function testGetSections(): void {
     $expected = [
       new Section('layout_test_plugin', ['setting_1' => 'Default'], [
         '10000000-0000-1000-a000-000000000000' => new SectionComponent('10000000-0000-1000-a000-000000000000', 'content', ['id' => 'foo']),
@@ -73,25 +74,31 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   }
 
   /**
-   * @covers ::getSection
+   * Tests get section.
+   *
+   * @legacy-covers ::getSection
    */
-  public function testGetSection() {
+  public function testGetSection(): void {
     $this->assertInstanceOf(Section::class, $this->sectionList->getSection(0));
   }
 
   /**
-   * @covers ::getSection
+   * Tests get section invalid delta.
+   *
+   * @legacy-covers ::getSection
    */
-  public function testGetSectionInvalidDelta() {
+  public function testGetSectionInvalidDelta(): void {
     $this->expectException(\OutOfBoundsException::class);
-    $this->expectExceptionMessage('Invalid delta "2"');
+    $this->expectExceptionMessage('Invalid section delta "2", there are 2 sections.');
     $this->sectionList->getSection(2);
   }
 
   /**
-   * @covers ::insertSection
+   * Tests insert section.
+   *
+   * @legacy-covers ::insertSection
    */
-  public function testInsertSection() {
+  public function testInsertSection(): void {
     $expected = [
       new Section('layout_test_plugin', ['setting_1' => 'Default'], [
         '10000000-0000-1000-a000-000000000000' => new SectionComponent('10000000-0000-1000-a000-000000000000', 'content', ['id' => 'foo']),
@@ -107,9 +114,11 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   }
 
   /**
-   * @covers ::appendSection
+   * Tests append section.
+   *
+   * @legacy-covers ::appendSection
    */
-  public function testAppendSection() {
+  public function testAppendSection(): void {
     $expected = [
       new Section('layout_test_plugin', ['setting_1' => 'Default'], [
         '10000000-0000-1000-a000-000000000000' => new SectionComponent('10000000-0000-1000-a000-000000000000', 'content', ['id' => 'foo']),
@@ -125,11 +134,12 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   }
 
   /**
-   * @covers ::removeAllSections
+   * Tests remove all sections.
    *
-   * @dataProvider providerTestRemoveAllSections
+   * @legacy-covers ::removeAllSections
    */
-  public function testRemoveAllSections($set_blank, $expected) {
+  #[DataProvider('providerTestRemoveAllSections')]
+  public function testRemoveAllSections($set_blank, $expected): void {
     if ($set_blank === NULL) {
       $this->sectionList->removeAllSections();
     }
@@ -142,7 +152,7 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   /**
    * Provides test data for ::testRemoveAllSections().
    */
-  public function providerTestRemoveAllSections() {
+  public static function providerTestRemoveAllSections() {
     $data = [];
     $data[] = [NULL, []];
     $data[] = [FALSE, []];
@@ -151,9 +161,11 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   }
 
   /**
-   * @covers ::removeSection
+   * Tests remove section.
+   *
+   * @legacy-covers ::removeSection
    */
-  public function testRemoveSection() {
+  public function testRemoveSection(): void {
     $expected = [
       new Section('layout_test_plugin', ['setting_1' => 'bar'], [
         '20000000-0000-1000-a000-000000000000' => new SectionComponent('20000000-0000-1000-a000-000000000000', 'content', ['id' => 'foo']),
@@ -165,9 +177,11 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   }
 
   /**
-   * @covers ::removeSection
+   * Tests remove multiple sections.
+   *
+   * @legacy-covers ::removeSection
    */
-  public function testRemoveMultipleSections() {
+  public function testRemoveMultipleSections(): void {
     $expected = [
       new Section('layout_builder_blank'),
     ];
@@ -180,11 +194,11 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   /**
    * Tests __clone().
    */
-  public function testClone() {
+  public function testClone(): void {
     $this->assertSame(['setting_1' => 'Default'], $this->sectionList->getSection(0)->getLayoutSettings());
 
     $new_section_storage = clone $this->sectionList;
-    $new_section_storage->getSection(0)->setLayoutSettings(['asdf' => 'qwer']);
+    $new_section_storage->getSection(0)->setLayoutSettings(['asdf' => 'foo']);
     $this->assertSame(['setting_1' => 'Default'], $this->sectionList->getSection(0)->getLayoutSettings());
   }
 

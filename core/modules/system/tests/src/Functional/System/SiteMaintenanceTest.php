@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access to site while in maintenance mode.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class SiteMaintenanceTest extends BrowserTestBase {
 
   use AssertMailTrait {
@@ -19,17 +23,20 @@ class SiteMaintenanceTest extends BrowserTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['node'];
+  protected static $modules = ['node', 'dblog'];
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
+  /**
+   * The test user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $adminUser;
 
   /**
@@ -47,7 +54,10 @@ class SiteMaintenanceTest extends BrowserTestBase {
 
     // Configure 'node' as front page.
     $this->config('system.site')->set('page.front', '/node')->save();
-    $this->config('system.performance')->set('js.preprocess', 1)->save();
+    $this->config('system.performance')
+      ->set('js.preprocess', 1)
+      ->set('css.preprocess', 1)
+      ->save();
 
     // Create a user allowed to access site in maintenance mode.
     $this->user = $this->drupalCreateUser(['access site in maintenance mode']);
@@ -55,6 +65,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->adminUser = $this->drupalCreateUser([
       'administer site configuration',
       'access site in maintenance mode',
+      'access site reports',
     ]);
     $this->drupalLogin($this->adminUser);
   }
@@ -62,7 +73,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
   /**
    * Verifies site maintenance mode functionality.
    */
-  public function testSiteMaintenance() {
+  public function testSiteMaintenance(): void {
 
     // Verify that permission message is displayed.
     $this->drupalGet(Url::fromRoute('system.site_maintenance_mode'));
@@ -73,8 +84,9 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->assertSession()->linkByHrefExists(Url::fromRoute('user.login')->toString());
 
     $this->drupalGet(Url::fromRoute('user.page'));
-    // JS should be aggregated, so drupal.js is not in the page source.
+    // Aggregation should be enabled, individual assets should not be rendered.
     $this->assertSession()->elementNotExists('xpath', '//script[contains(@src, "/core/misc/drupal.js")]');
+    $this->assertSession()->elementNotExists('xpath', '//link[contains(@href, "/core/modules/system/css/components/align.module.css")]');
     // Turn on maintenance mode.
     $edit = [
       'maintenance_mode' => 1,
@@ -87,11 +99,17 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $offline_message = $this->config('system.site')->get('name') . ' is currently under maintenance. We should be back shortly. Thank you for your patience.';
 
     $this->drupalGet(Url::fromRoute('user.page'));
-    // JS should not be aggregated, so drupal.js is expected in the page source.
+    // Aggregation should be disabled, individual assets should be rendered.
     $this->assertSession()->elementExists('xpath', '//script[contains(@src, "/core/misc/drupal.js")]');
+    $this->assertSession()->elementExists('xpath', '//link[contains(@href, "/core/modules/system/css/components/align.module.css")]');
     $this->assertSession()->pageTextContains($admin_message);
     $this->assertSession()->linkExists('Go online.');
     $this->assertSession()->linkByHrefExists(Url::fromRoute('system.site_maintenance_mode')->toString());
+
+    // Verify that the change to maintenance mode is logged.
+    $this->drupalGet(Url::fromRoute('dblog.overview'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContainsOnce('Maintenance mode enabled.');
 
     // Logout and verify that offline message is displayed.
     $this->drupalLogout();
@@ -138,7 +156,8 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->assertEquals('Site under maintenance', $this->cssSelect('main h1')[0]->getText());
     $this->assertSession()->pageTextContains($offline_message);
 
-    // Verify that custom site offline message is not displayed on user/password.
+    // Verify that custom site offline message is not displayed on
+    // user/password.
     $this->drupalGet('user/password');
     $this->assertSession()->pageTextContains('Username or email address');
 
@@ -165,12 +184,34 @@ class SiteMaintenanceTest extends BrowserTestBase {
     $this->drupalLogout();
     $this->drupalGet('');
     $this->assertEquals('Site under maintenance', $this->cssSelect('main h1')[0]->getText());
+
+    $this->drupalLogin($this->adminUser);
+
+    // Re-save the form with maintenance mode on to ensure another log message is
+    // not added.
+    $edit = [
+      'maintenance_mode' => 1,
+    ];
+    $this->drupalGet('admin/config/development/maintenance');
+    $this->submitForm($edit, 'Save configuration');
+    $this->drupalGet(Url::fromRoute('dblog.overview'));
+    $this->assertSession()->pageTextContainsOnce('Maintenance mode enabled.');
+    $this->assertSession()->pageTextNotContains('Maintenance mode disabled.');
+
+    // Turn off maintenance mode.
+    $edit = [
+      'maintenance_mode' => 0,
+    ];
+    $this->drupalGet('admin/config/development/maintenance');
+    $this->submitForm($edit, 'Save configuration');
+    $this->drupalGet(Url::fromRoute('dblog.overview'));
+    $this->assertSession()->pageTextContainsOnce('Maintenance mode disabled.');
   }
 
   /**
    * Tests responses to non-HTML requests when in maintenance mode.
    */
-  public function testNonHtmlRequest() {
+  public function testNonHtmlRequest(): void {
     $this->drupalLogout();
     \Drupal::state()->set('system.maintenance_mode', TRUE);
     $formats = ['json', 'xml', 'non-existing'];

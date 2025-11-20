@@ -1,25 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Composer\Plugin\Scaffold\Integration;
 
 use Drupal\Composer\Plugin\Scaffold\Operations\ReplaceOp;
 use Drupal\Composer\Plugin\Scaffold\ScaffoldOptions;
 use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
-use Drupal\Tests\Traits\PhpUnitWarnings;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Composer\Plugin\Scaffold\Operations\ReplaceOp
- *
- * @group Scaffold
+ * Tests Drupal\Composer\Plugin\Scaffold\Operations\ReplaceOp.
  */
+#[CoversClass(ReplaceOp::class)]
+#[Group('Scaffold')]
 class ReplaceOpTest extends TestCase {
-  use PhpUnitWarnings;
 
   /**
-   * @covers ::process
+   * Tests process.
+   *
+   * @legacy-covers ::process
    */
-  public function testProcess() {
+  public function testProcess(): void {
     $fixtures = new Fixtures();
     $destination = $fixtures->destinationPath('[web-root]/robots.txt');
     $source = $fixtures->sourcePath('drupal-assets-fixture', 'robots.txt');
@@ -40,9 +44,11 @@ class ReplaceOpTest extends TestCase {
   }
 
   /**
-   * @covers ::process
+   * Tests empty file.
+   *
+   * @legacy-covers ::process
    */
-  public function testEmptyFile() {
+  public function testEmptyFile(): void {
     $fixtures = new Fixtures();
     $destination = $fixtures->destinationPath('[web-root]/empty_file.txt');
     $source = $fixtures->sourcePath('empty-file', 'empty_file.txt');

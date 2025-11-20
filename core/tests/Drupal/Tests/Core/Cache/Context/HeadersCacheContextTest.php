@@ -1,24 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache\Context;
 
 use Drupal\Core\Cache\Context\HeadersCacheContext;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Cache\Context\HeadersCacheContext
- * @group Cache
+ * Tests Drupal\Core\Cache\Context\HeadersCacheContext.
  */
+#[CoversClass(HeadersCacheContext::class)]
+#[Group('Cache')]
 class HeadersCacheContextTest extends UnitTestCase {
 
   /**
-   * @covers ::getContext
+   * Tests get context.
    *
-   * @dataProvider providerTestGetContext
+   * @legacy-covers ::getContext
    */
-  public function testGetContext($headers, $header_name, $context) {
+  #[DataProvider('providerTestGetContext')]
+  public function testGetContext($headers, $header_name, $context): void {
     $request_stack = new RequestStack();
     $request = Request::create('/', 'GET');
     // Request defaults could change, so compare with default values instead of
@@ -32,7 +39,7 @@ class HeadersCacheContextTest extends UnitTestCase {
   /**
    * Provides a list of headers and expected cache contexts.
    */
-  public function providerTestGetContext() {
+  public static function providerTestGetContext() {
     return [
       [[], NULL, ''],
       [[], 'foo', ''],
