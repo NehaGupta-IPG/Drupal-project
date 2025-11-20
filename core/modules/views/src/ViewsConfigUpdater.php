@@ -568,7 +568,9 @@ class ViewsConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['2815881'][$view->id()];
     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('Setting "group_column" on field "%s" to an empty value for the "%s" view is deprecated in drupal:9.4.0 and is disallowed in drupal:11.0.0. Module-provided Views configuration should be updated. See https://www.drupal.org/node/3255641', $handler['field'], $view->id()), E_USER_DEPRECATED);
+      // Update hooks call setDeprecationsEnabled(FALSE), so the warning only
+      // fires for module-provided configuration that has not been updated yet.
+      @trigger_error(sprintf('Setting "group_column" on field "%s" to an empty value for the "%s" view is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Module-provided Views configuration should be updated. See https://www.drupal.org/node/3255641', $handler['field'], $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
