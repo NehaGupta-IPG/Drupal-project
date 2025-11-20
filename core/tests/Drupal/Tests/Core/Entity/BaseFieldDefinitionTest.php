@@ -351,9 +351,6 @@ class BaseFieldDefinitionTest extends UnitTestCase {
 
   /**
    * Tests dedicated table.
-   *
-   * @covers ::hasDedicatedTable
-   * @covers ::setDedicatedTable
    */
   public function testDedicatedTable() {
     $definition = BaseFieldDefinition::create($this->fieldType);
