@@ -507,7 +507,7 @@ class DefaultTableMapping implements TableMappingInterface {
    *   TRUE if the field can be stored in a shared table, FALSE otherwise.
    */
   public function allowsSharedTableStorage(FieldStorageDefinitionInterface $storage_definition) {
-    return !$storage_definition->hasCustomStorage() && $storage_definition->isBaseField() && !$storage_definition->isMultiple() && !$storage_definition->isDeleted();
+    return !$storage_definition->hasCustomStorage() && !$storage_definition->hasDedicatedTable() && $storage_definition->isBaseField() && !$storage_definition->isMultiple() && !$storage_definition->isDeleted();
   }
 
   /**
