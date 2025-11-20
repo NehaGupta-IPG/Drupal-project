@@ -197,15 +197,16 @@ class WorkflowTest extends UnitTestCase {
   }
 
   /**
-   * Tests get state exception.
-   *
-   * @legacy-covers ::getState
+   * Tests getState on a non-existent state.
+   * 
+   * @covers ::getState
    */
-  public function testGetStateException(): void {
-    $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("The state 'state_that_does_not_exist' does not exist in workflow.");
+  public function testGetStateDeletedState(): void {
     $workflow = new Workflow(['id' => 'test', 'type' => 'test_type'], 'workflow');
-    $workflow->getTypePlugin()->getState('state_that_does_not_exist');
+    $deleted_state = $workflow->getTypePlugin()->getState('state_that_does_not_exist');
+
+    $this->assertNull($deleted_state->id());
+    $this->assertEquals('Deleted State', $deleted_state->label());
   }
 
   /**

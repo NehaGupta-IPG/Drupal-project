@@ -141,7 +141,7 @@ abstract class WorkflowTypeBase extends ConfigurablePluginBase implements Workfl
       return new State(
         $this,
         NULL,
-        'Deleted State',
+        $this->t('Deleted State'),
         NULL
       );
     }
