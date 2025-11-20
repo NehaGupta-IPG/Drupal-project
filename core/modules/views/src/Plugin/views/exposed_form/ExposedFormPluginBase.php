@@ -140,7 +140,12 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       $this->view->build_info['abort'] = TRUE;
     }
 
-    $form['#attributes'][self::DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER] = Html::cleanCssIdentifier(implode('-', ['views_exposed_form', $this->getPluginId(), $this->view->storage->id(), $this->view->display_handler->display['id']]));
+    $form['#attributes'][self::DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER] = Html::cleanCssIdentifier(implode('-', [
+      'views_exposed_form',
+      $this->getPluginId(),
+      $this->view->storage->id(),
+      $this->view->display_handler->display['id'],
+    ]));
 
     if (!$this->view->display_handler->displaysExposed() || (!$block && $this->view->display_handler->getOption('exposed_block'))) {
       return [];
