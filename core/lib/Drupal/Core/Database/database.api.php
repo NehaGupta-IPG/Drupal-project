@@ -574,11 +574,10 @@ function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $que
  * engines. You don't have to deal with the different SQL dialects for table
  * creation and alteration of the supported database engines.
  *
- * See the Schema API page at
- * https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Database%21database.api.php/group/schemaapi
- * for details on schema definition structures. Note that foreign key
- * definitions are for documentation purposes only; foreign keys are not
- * created in the database, nor are they enforced by Drupal.
+ * See the Schema API documentation for details on schema definition
+ * structures. Note that foreign key definitions are for documentation purposes
+ * only; foreign keys are not created in the database, nor are they enforced by
+ * Drupal.
  *
  * @return list<\Drupal\Core\Database\SchemaDefinition\Table>|array<string<array<string,mixed>>>
  *   A schema definition structure array.
