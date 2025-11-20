@@ -84,7 +84,7 @@ class ViewsConfigUpdater {
       if ($this->processRssViewModeUpdate($view)) {
         $changed = TRUE;
       }
-      if ($this->processEmptyGroupColumn($handler, $handler_type, $key, $display_id, $view)) {
+      if ($this->processEmptyGroupColumn($handler, $handler_type, $display_id, $view)) {
         $changed = TRUE;
       }
       return $changed;
@@ -510,7 +510,7 @@ class ViewsConfigUpdater {
    */
   public function needsFixForEmptyGroupColumn(ViewEntityInterface $view): bool {
     return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
-      return $this->processEmptyGroupColumn($handler, $handler_type, $key, $display_id, $view);
+      return $this->processEmptyGroupColumn($handler, $handler_type, $display_id, $view);
     });
   }
 
@@ -524,14 +524,12 @@ class ViewsConfigUpdater {
    *   A display handler.
    * @param string $handler_type
    *   The handler type.
-   * @param string $key
-   *   The handler key.
    * @param string $display_id
    *   The handler display ID.
    * @param \Drupal\views\ViewEntityInterface $view
    *   The view being updated.
    */
-  public function processEmptyGroupColumn(&$handler, string $handler_type, $key, $display_id, ViewEntityInterface $view): bool {
+  public function processEmptyGroupColumn(array &$handler, string $handler_type, string $display_id, ViewEntityInterface $view): bool {
     if ($handler_type !== 'field') {
       return FALSE;
     }
