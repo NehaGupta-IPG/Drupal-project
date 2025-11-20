@@ -198,8 +198,6 @@ class WorkflowTest extends UnitTestCase {
 
   /**
    * Tests getState on a non-existent state.
-   * 
-   * @covers ::getState
    */
   public function testGetStateDeletedState(): void {
     $workflow = new Workflow(['id' => 'test', 'type' => 'test_type'], 'workflow');
