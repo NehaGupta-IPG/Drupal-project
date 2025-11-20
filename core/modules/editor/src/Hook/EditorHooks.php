@@ -14,6 +14,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\system\FileDownloadController;
 
 /**
  * Hook implementations for editor.
@@ -315,7 +316,7 @@ class EditorHooks {
         }
       }
       if (!$referencing_entity_is_accessible) {
-        return -1;
+        return FileDownloadController::FILE_DOWNLOAD_DENY;
       }
     }
     // Access is granted.

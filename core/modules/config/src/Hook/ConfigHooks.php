@@ -7,6 +7,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\system\FileDownloadController;
 
 /**
  * Hook implementations for config.
@@ -89,7 +90,7 @@ class ConfigHooks {
         $disposition = 'attachment; filename="' . $filename . '"';
         return ['Content-disposition' => $disposition];
       }
-      return -1;
+      return FileDownloadController::FILE_DOWNLOAD_DENY;
     }
     return NULL;
   }
