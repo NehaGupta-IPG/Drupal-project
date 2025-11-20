@@ -523,6 +523,8 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
+   * Tests base field query when group column is missing.
+   *
    * @legacy-covers \Drupal\views\Plugin\views\field\EntityField::query
    */
   public function testQueryWithGroupByForBaseFieldFailure() {
@@ -650,6 +652,8 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
+   * Tests config field query when group column is missing.
+   *
    * @legacy-covers \Drupal\views\Plugin\views\field\EntityField::query
    */
   public function testQueryWithGroupByForConfigFieldFailure(): void {
@@ -889,6 +893,8 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
+   * Tests adding additional field tables for grouped fields.
+   *
    * @legacy-covers \Drupal\views\Plugin\views\field\EntityField::add_field_table
    */
   public function testAddAdditionalFieldTable() {
