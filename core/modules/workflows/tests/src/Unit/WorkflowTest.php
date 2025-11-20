@@ -34,6 +34,7 @@ class WorkflowTest extends UnitTestCase {
     $workflow_manager = $this->prophesize(WorkflowTypeManager::class);
     $workflow_manager->createInstance('test_type', Argument::any())->willReturn(new TestType([], '', []));
     $container->set('plugin.manager.workflows.type', $workflow_manager->reveal());
+    $container->set('string_translation', self::getStringTranslationStub());
     \Drupal::setContainer($container);
   }
 
@@ -156,7 +157,7 @@ class WorkflowTest extends UnitTestCase {
   /**
    * Tests getStates on non-existent state.
    */
-  public function testGetStatesException(): void {
+  public function testGetStatesDeletedState(): void {
     $workflow = new Workflow(['id' => 'test', 'type' => 'test_type'], 'workflow');
     $deleted_states = $workflow->getTypePlugin()->getStates(['state_that_does_not_exist']);
     $deleted_state = $deleted_states['state_that_does_not_exist'];
