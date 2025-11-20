@@ -523,7 +523,7 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::query
+   * @legacy-covers \Drupal\views\Plugin\views\field\EntityField::query
    */
   public function testQueryWithGroupByForBaseFieldFailure() {
     $definition = [
@@ -650,7 +650,7 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::query
+   * @legacy-covers \Drupal\views\Plugin\views\field\EntityField::query
    */
   public function testQueryWithGroupByForConfigFieldFailure(): void {
     $definition = [
@@ -889,7 +889,7 @@ class FieldTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::add_field_table
+   * @legacy-covers \Drupal\views\Plugin\views\field\EntityField::add_field_table
    */
   public function testAddAdditionalFieldTable() {
     $definition = [
