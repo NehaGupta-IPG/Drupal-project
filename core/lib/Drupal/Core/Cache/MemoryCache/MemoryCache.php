@@ -49,7 +49,10 @@ class MemoryCache extends MemoryBackend implements MemoryCacheInterface {
    */
   public function set($cid, $data, $expire = MemoryCacheInterface::CACHE_PERMANENT, array $tags = []) {
     assert(Inspector::assertAllStrings($tags), 'Cache tags must be strings.');
-    $tags = array_unique($tags);
+    if ($tags) {
+      $tags = array_unique($tags);
+      $this->hasCacheTags = TRUE;
+    }
 
     $this->cache[$cid] = (object) [
       'cid' => $cid,
