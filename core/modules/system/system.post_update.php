@@ -6,7 +6,6 @@
  */
 
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
-use Drupal\Core\Entity\EntityViewModeInterface;
 use Drupal\Core\Entity\EntityFormModeInterface;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewsConfigUpdater;
