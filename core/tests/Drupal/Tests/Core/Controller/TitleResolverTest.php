@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Controller;
 
 use Drupal\Core\Controller\TitleResolver;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
- * @coversDefaultClass \Drupal\Core\Controller\TitleResolver
- * @group Controller
+ * Tests Drupal\Core\Controller\TitleResolver.
  */
+#[CoversClass(TitleResolver::class)]
+#[Group('Controller')]
 class TitleResolverTest extends UnitTestCase {
 
   /**
@@ -201,9 +205,8 @@ class TitleResolverTest extends UnitTestCase {
    * Tests a dynamic title.
    *
    * @see \Drupal\Core\Controller\TitleResolver::getTitle()
-   *
-   * @dataProvider providerTestDynamicTitle
    */
+  #[DataProvider('providerTestDynamicTitle')]
   public function testDynamicTitle(\Stringable|string|array|null $title, \Stringable|string|array|null $expected): void {
     $request = new Request();
     $route = new Route('/test-route', ['_title' => 'static title', '_title_callback' => 'Drupal\Tests\Core\Controller\TitleCallback::example']);

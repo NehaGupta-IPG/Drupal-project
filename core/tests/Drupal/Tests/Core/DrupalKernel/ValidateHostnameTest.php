@@ -6,18 +6,24 @@ namespace Drupal\Tests\Core\DrupalKernel;
 
 use Drupal\Core\DrupalKernel;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\Core\DrupalKernel
- * @group DrupalKernel
+ * Tests Drupal\Core\DrupalKernel.
  */
+#[CoversClass(DrupalKernel::class)]
+#[Group('DrupalKernel')]
 class ValidateHostnameTest extends UnitTestCase {
 
   /**
-   * @covers ::validateHostname
-   * @dataProvider providerTestValidateHostname
+   * Tests validate hostname.
+   *
+   * @legacy-covers ::validateHostname
    */
+  #[DataProvider('providerTestValidateHostname')]
   public function testValidateHostname($hostname, $message, $expected = FALSE): void {
     $server = ['HTTP_HOST' => $hostname];
     $request = new Request([], [], [], [], [], $server);
@@ -50,7 +56,7 @@ class ValidateHostnameTest extends UnitTestCase {
 
     // Verifies that using valid IP address for the hostname is allowed.
     $data[] = ['72.21.91.99:80', 'Properly formed HTTP_HOST with IPv4 address valid.', TRUE];
-    $data[] = ['2607:f8b0:4004:803::1002:80', 'Properly formed HTTP_HOST with IPv6 address valid.', TRUE];
+    $data[] = ['[2607:f8b0:4004:803::1002]:80', 'Properly formed HTTP_HOST with IPv6 address valid.', TRUE];
 
     // Verifies that the IPv6 loopback address is valid.
     $data[] = ['[::1]:80', 'HTTP_HOST containing IPv6 loopback is valid.', TRUE];

@@ -5,19 +5,24 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionNameLengthException;
 use Drupal\Core\Extension\ExtensionNameReservedException;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\Extension\ModuleUninstallValidatorException;
-use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ThemeExtensionList;
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests installing and uninstalling of themes.
- *
- * @group Extension
  */
+#[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ThemeInstallerTest extends KernelTestBase {
 
   /**
@@ -56,8 +61,8 @@ class ThemeInstallerTest extends KernelTestBase {
     // Rebuilding available themes should always yield results though.
     $this->assertNotEmpty($this->extensionListTheme()->reset()->getList()['stark'], 'ThemeExtensionList::getList() yields all available themes.');
 
-    // theme_get_setting() should return global default theme settings.
-    $this->assertTrue(theme_get_setting('features.favicon'));
+    // The theme settings provider should return global default theme settings.
+    $this->assertTrue(\Drupal::service(ThemeSettingsProvider::class)->getSetting('features.favicon'));
   }
 
   /**
@@ -78,9 +83,10 @@ class ThemeInstallerTest extends KernelTestBase {
     $this->assertEquals($name, $themes[$name]->getName());
 
     // Verify that test_base_theme.settings is active.
-    $this->assertFalse(theme_get_setting('features.favicon', $name));
-    $this->assertEquals('only', theme_get_setting('base', $name));
-    $this->assertEquals('base', theme_get_setting('override', $name));
+    $themeSettingsProvider = \Drupal::service(ThemeSettingsProvider::class);
+    $this->assertFalse($themeSettingsProvider->getSetting('features.favicon', $name));
+    $this->assertEquals('only', $themeSettingsProvider->getSetting('base', $name));
+    $this->assertEquals('base', $themeSettingsProvider->getSetting('override', $name));
   }
 
   /**
@@ -170,9 +176,8 @@ class ThemeInstallerTest extends KernelTestBase {
 
   /**
    * Tests installing a theme with unmet module dependencies.
-   *
-   * @dataProvider providerTestInstallThemeWithUnmetModuleDependencies
    */
+  #[DataProvider('providerTestInstallThemeWithUnmetModuleDependencies')]
   public function testInstallThemeWithUnmetModuleDependencies($theme_name, $installed_modules, $message): void {
     $this->moduleInstaller()->install($installed_modules);
     $themes = $this->themeHandler()->listInfo();
@@ -185,10 +190,9 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Tests trying to install a deprecated theme.
    *
-   * @covers \Drupal\Core\Extension\ThemeInstaller::install
-   *
-   * @group legacy
+   * @legacy-covers \Drupal\Core\Extension\ThemeInstaller::install
    */
+  #[IgnoreDeprecations]
   public function testInstallDeprecated(): void {
     $this->expectDeprecation("The theme 'deprecated_theme_test' is deprecated. See https://example.com/deprecated");
     $this->themeInstaller()->install(['deprecated_theme_test']);

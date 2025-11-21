@@ -92,7 +92,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     // Bypass the node/add listing if only one content type is available.
     if (count($content) == 1) {
       $type = array_shift($content);
-      return $this->redirect('node.add', ['node_type' => $type->id()]);
+      return $this->redirect('entity.node.add_form', ['node_type' => $type->id()]);
     }
 
     $build['#content'] = $content;
@@ -177,7 +177,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
             '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message }}</p>{% endif %}',
             '#context' => [
               'date' => $link,
-              'username' => $this->renderer->renderInIsolation($username),
+              'username' => $username,
               'message' => ['#markup' => $revision->revision_log->value, '#allowed_tags' => Xss::getHtmlTagList()],
             ],
             // @todo Fix this properly in https://www.drupal.org/project/drupal/issues/3227637.

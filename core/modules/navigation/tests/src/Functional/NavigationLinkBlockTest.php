@@ -11,11 +11,13 @@ use Drupal\Core\Url;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for \Drupal\navigation\Plugin\Block\NavigationLinkBlockTest.
  */
 #[Group('navigation')]
+#[RunTestsInSeparateProcesses]
 class NavigationLinkBlockTest extends PageCacheTagsTestBase {
 
   /**
@@ -84,7 +86,7 @@ class NavigationLinkBlockTest extends PageCacheTagsTestBase {
     $this->verifyDynamicPageCache($test_page_url, 'MISS');
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
     // We should not see the admin page link in the page.
-    $link_selector = '.admin-toolbar__item .toolbar-button--icon--' . $link_icon;
+    $link_selector = '.toolbar-block .toolbar-button--icon--' . $link_icon;
     $this->assertSession()->elementNotExists('css', $link_selector);
     $this->assertSession()->pageTextNotContains($link_title);
     $this->assertSession()->pageTextNotContains($label);
