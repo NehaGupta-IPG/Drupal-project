@@ -6,12 +6,12 @@ namespace Drupal\Tests\system\Functional\Update;
 
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests update path for the entity view mode description value from '' to NULL.
- *
- * @group system
  */
+#[Group('system')]
 class EntityViewModeUpdatePathTest extends UpdatePathTestBase {
 
   /**
