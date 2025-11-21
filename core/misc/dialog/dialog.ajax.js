@@ -100,7 +100,7 @@
       buttonElements.forEach((button) => {
         button.style.display = 'none';
         buttons.push({
-          text: button.innerHTML || button.getAttribute('value'),
+          text: button.innerText || button.getAttribute('value'),
           class: button.getAttribute('class'),
           'data-once': button.dataset.once,
           click(e) {
