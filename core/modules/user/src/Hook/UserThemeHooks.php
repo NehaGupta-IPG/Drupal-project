@@ -4,6 +4,8 @@ namespace Drupal\user\Hook;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Access\AccessibleInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Element;
@@ -91,21 +93,36 @@ class UserThemeHooks {
       }
     }
 
-    // Set the name to a formatted name that is safe for printing and
-    // that won't break tables by being too long. Keep an un-shortened,
-    // unsanitized version, in case other preprocess functions want to implement
-    // their own shortening logic or add markup. If they do so, they must ensure
-    // that $variables['name'] is safe for printing.
-    $name = $account->getDisplayName();
-    $variables['name_raw'] = $account->getAccountName();
-    if (mb_strlen($name) > 20) {
-      $name = Unicode::truncate($name, 15, FALSE, TRUE);
-      $variables['truncated'] = TRUE;
+    // Check the current user can view label, or allow if not an entity.
+    if ($account instanceof EntityInterface) {
+      $access = $account->access('view label', NULL, TRUE);
+      $access_label = $access->isAllowed();
+      $cacheability = new CacheableMetadata();
+      $cacheability
+        ->addCacheableDependency($access)
+        ->addCacheableDependency($account)
+        ->applyTo($variables);
+    }
+    else {
+      $access_label = TRUE;
+    }
+
+    if ($access_label) {
+      // Set the name to a formatted name that is safe for printing and
+      // that won't break tables by being too long. Keep an un-shortened,
+      // unsanitized version, in case other preprocess functions
+      // want to implement their own shortening logic or add markup.
+      // If they do so, they must ensure
+      // that $variables['name'] is safe for printing.
+      $variables['name_raw'] = $account->getDisplayName();
+      $variables['truncated'] = mb_strlen($variables['name_raw']) > 20;
+      $variables['name'] = $variables['truncated'] ? Unicode::truncate($variables['name_raw'], 15, FALSE, TRUE) : $variables['name_raw'];
     }
     else {
       $variables['truncated'] = FALSE;
+      $variables['name'] = $variables['name_raw'] = $this->t('- Restricted access -');
     }
-    $variables['name'] = $name;
+
     if ($account instanceof AccessibleInterface) {
       $variables['profile_access'] = $account->access('view');
     }

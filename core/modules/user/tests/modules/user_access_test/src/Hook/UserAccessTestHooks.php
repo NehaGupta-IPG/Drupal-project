@@ -22,19 +22,27 @@ class UserAccessTestHooks {
    */
   #[Hook('user_access')]
   public function userAccess(User $entity, $operation, $account): AccessResultInterface {
+    $access = AccessResult::neutral();
     if ($entity->getAccountName() == "no_edit" && $operation == "update") {
       // Deny edit access.
-      return AccessResult::forbidden();
+      $access = AccessResult::forbidden();
     }
     if ($entity->getAccountName() == "no_delete" && $operation == "delete") {
       // Deny delete access.
-      return AccessResult::forbidden();
+      $access = AccessResult::forbidden();
+    }
+    elseif ($entity->getAccountName() == "no_view_label" && $operation == "view label") {
+      // Deny view label access.
+      $access = AccessResult::forbidden();
     }
     // Account with role sub-admin can manage users with no roles.
-    if (count($entity->getRoles()) == 1) {
-      return AccessResult::allowedIfHasPermission($account, 'sub-admin');
+    elseif (count($entity->getRoles()) == 1) {
+      $access = AccessResult::allowedIfHasPermission($account, 'sub-admin');
     }
-    return AccessResult::neutral();
+    if (isset($entity->testAccessAddCacheTags)) {
+      $access->addCacheTags($entity->testAccessAddCacheTags);
+    }
+    return $access;
   }
 
   /**
