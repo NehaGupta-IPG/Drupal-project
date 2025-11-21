@@ -154,40 +154,39 @@ function system_update_11202(): void {
 }
 
 /**
- * Add composite index for queue claiming performance.
+ * Replace queue index to prevent deadlocks under high concurrency.
  */
-function system_update_10301(&$sandbox = NULL) : void {
+function system_update_11203(): void {
   $schema = \Drupal::database()->schema();
-
-  $spec = [
-    'fields' => [
-      'name' => [
-        'type' => 'varchar_ascii',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'The queue name.',
+  if (!$schema->indexExists('queue', 'queue_claim_idx')) {
+    $spec = [
+      'fields' => [
+        'name' => [
+          'type' => 'varchar_ascii',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+          'description' => 'The queue name.',
+        ],
+        'expire' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+          'size' => 'big',
+          'description' => 'Timestamp when the claim lease expires on the item.',
+        ],
+        'created' => [
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 0,
+          'size' => 'big',
+          'description' => 'Timestamp when the item was created.',
+        ],
       ],
-      'expire' => [
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'big',
-        'description' => 'Timestamp when the claim lease expires on the item.',
+      'indexes' => [
+        'queue_claim_idx' => ['name', 'expire', 'created'],
       ],
-      'created' => [
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'big',
-        'description' => 'Timestamp when the item was created.',
-      ],
-    ],
-    'indexes' => [
-      'queue_claim_idx' => ['name', 'expire', 'created'],
-    ],
-  ];
-  $schema->addIndex('queue', 'queue_claim_idx',
-    ['name', 'expire', 'created'], $spec
-  );
+    ];
+    $schema->addIndex('queue', 'queue_claim_idx', ['name', 'expire', 'created'], $spec);
+  }
 }
