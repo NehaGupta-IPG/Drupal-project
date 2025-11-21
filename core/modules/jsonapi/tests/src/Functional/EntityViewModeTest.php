@@ -60,7 +60,7 @@ class EntityViewModeTest extends ConfigEntityResourceTestBase {
     $entity_view_mode = EntityViewMode::create([
       'id' => 'user.test',
       'label' => 'Test',
-      'description' => NULL,
+      'description' => '',
       'targetEntityType' => 'user',
     ]);
     $entity_view_mode->save();

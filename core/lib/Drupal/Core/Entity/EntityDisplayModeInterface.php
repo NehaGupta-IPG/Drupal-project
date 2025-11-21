@@ -33,6 +33,6 @@ interface EntityDisplayModeInterface extends ConfigEntityInterface {
    * @return string|null
    *   The display mode description.
    */
-  public function getDescription(): ?string;
+  public function getDescription(): string;
 
 }
