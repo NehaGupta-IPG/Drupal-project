@@ -190,7 +190,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
       return;
     }
     foreach ($this->cache as $cid => $item) {
-      if (array_intersect($tags, $item->tags)) {
+      if ($this->tags && array_intersect($tags, $item->tags)) {
         $this->cache[$cid]->expire = $this->time->getRequestTime() - 1;
       }
     }
