@@ -32,7 +32,7 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   /**
    * Whether any cache items in the backend have cache tags.
    */
-  protected $hasCacheTags = FALSE;
+  protected bool $hasCacheTags = FALSE;
 
   /**
    * Constructs a MemoryBackend object.
