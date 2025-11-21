@@ -14,7 +14,8 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\DeploymentIncubatingAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\ServiceIncubatingAttributes;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -341,10 +342,11 @@ trait PerformanceTestTrait {
       // Therefore, continue collecting performance data until all of the
       // following are true, or until 30 seconds has passed:
       // - a largestContentfulPaint::candidate event has been fired
+      //   (only if an OTEL_COLLECTOR is set)
       // - all network requests have received a response
       // - no new performance log events have been recorded since the last
       //   iteration.
-      if ($lcp_count && empty($performance_log) && ($request_count === $response_count)) {
+      if (($lcp_count || !getenv('OTEL_COLLECTOR')) && empty($performance_log) && ($request_count === $response_count)) {
         break;
       }
       sleep(1);
@@ -497,11 +499,11 @@ trait PerformanceTestTrait {
     //   @see https://www.drupal.org/project/drupal/issues/3379761
     $resource = ResourceInfoFactory::defaultResource();
     $resource = $resource->merge(ResourceInfo::create(Attributes::create([
-      ResourceAttributes::SERVICE_NAMESPACE => 'Drupal',
-      ResourceAttributes::SERVICE_NAME => $service_name,
-      ResourceAttributes::SERVICE_INSTANCE_ID => 1,
-      ResourceAttributes::SERVICE_VERSION => \Drupal::VERSION,
-      ResourceAttributes::DEPLOYMENT_ENVIRONMENT_NAME => 'local',
+      ServiceIncubatingAttributes::SERVICE_NAMESPACE => 'Drupal',
+      ServiceIncubatingAttributes::SERVICE_NAME => $service_name,
+      ServiceIncubatingAttributes::SERVICE_INSTANCE_ID => 1,
+      ServiceIncubatingAttributes::SERVICE_VERSION => \Drupal::VERSION,
+      DeploymentIncubatingAttributes::DEPLOYMENT_ENVIRONMENT_NAME => 'local',
     ])));
 
     $otel_collector_headers = getenv('OTEL_COLLECTOR_HEADERS') ?: [];

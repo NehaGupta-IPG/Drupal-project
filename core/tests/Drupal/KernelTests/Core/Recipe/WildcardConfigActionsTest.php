@@ -21,6 +21,7 @@ use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -30,6 +31,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 #[Group('Recipe')]
 #[CoversClass(CreateForEachBundle::class)]
+#[RunTestsInSeparateProcesses]
 class WildcardConfigActionsTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -197,10 +199,17 @@ YAML;
     $this->enableModules(['image']);
 
     // We should be able to use the `%label` placeholder.
+    // Also ensure nested and non-string keys/values are handled correctly.
     $this->container->get('plugin.manager.config_action')
       ->applyAction('createForEach', 'node.type.*', [
         'image.style.node_%bundle_big' => [
           'label' => 'Big image for %label content',
+          'effects' => [
+            [
+              'id' => 'image_scale',
+              'weight' => 10,
+            ],
+          ],
         ],
       ]);
     $this->assertSame('Big image for Type A content', ImageStyle::load('node_one_big')?->label());

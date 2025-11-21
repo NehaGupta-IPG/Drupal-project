@@ -9,12 +9,14 @@ use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the configure route for core modules.
  */
 #[Group('Module')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ModuleConfigureRouteTest extends KernelTestBase {
 
   use FileSystemModuleDiscoveryDataProviderTrait;
@@ -41,6 +43,7 @@ class ModuleConfigureRouteTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig('system');
     $this->routeProvider = \Drupal::service('router.route_provider');
     $this->moduleInfo = \Drupal::service('extension.list.module')->getList();
     $this->installEntitySchema('path_alias');

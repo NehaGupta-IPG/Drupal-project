@@ -284,7 +284,9 @@ abstract class BrowserTestBase extends TestCase {
     }
 
     if ($this->minkDefaultDriverClass === BrowserKitDriver::class) {
-      $driver = new $this->minkDefaultDriverClass(new DrupalTestBrowser());
+      $browser = new DrupalTestBrowser();
+      $browser->useHtml5Parser(FALSE);
+      $driver = new $this->minkDefaultDriverClass($browser);
     }
     elseif (is_array($this->minkDefaultDriverArgs)) {
       // Use ReflectionClass to instantiate class with received params.
@@ -330,6 +332,10 @@ abstract class BrowserTestBase extends TestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
+      @trigger_error('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and is throwing an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+    }
+
     parent::setUp();
 
     $this->setUpAppRoot();
@@ -611,7 +617,7 @@ abstract class BrowserTestBase extends TestCase {
    *   The configuration object with original configuration data.
    */
   protected function config($name) {
-    return $this->container->get('config.factory')->getEditable($name);
+    return \Drupal::configFactory()->getEditable($name);
   }
 
   /**
