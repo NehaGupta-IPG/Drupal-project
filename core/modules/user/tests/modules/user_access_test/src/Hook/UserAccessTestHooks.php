@@ -27,7 +27,7 @@ class UserAccessTestHooks {
       // Deny edit access.
       $access = AccessResult::forbidden();
     }
-    if ($entity->getAccountName() == "no_delete" && $operation == "delete") {
+    elseif ($entity->getAccountName() == "no_delete" && $operation == "delete") {
       // Deny delete access.
       $access = AccessResult::forbidden();
     }
