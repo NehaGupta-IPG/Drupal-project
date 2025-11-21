@@ -117,7 +117,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    * Returns a copy of the given ResourceObject with the given arity.
    *
    * @param int $arity
-   *   The new arity; must be a non-negative integer.
+   *   The new arity, must be a non-negative integer.
    *
    * @return static
    *   A newly created ResourceObject with the given arity, otherwise
