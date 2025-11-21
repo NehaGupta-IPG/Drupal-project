@@ -158,35 +158,33 @@ function system_update_11202(): void {
  */
 function system_update_11203(): void {
   $schema = \Drupal::database()->schema();
-  if (!$schema->indexExists('queue', 'queue_claim_idx')) {
-    $spec = [
-      'fields' => [
-        'name' => [
-          'type' => 'varchar_ascii',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-          'description' => 'The queue name.',
-        ],
-        'expire' => [
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-          'size' => 'big',
-          'description' => 'Timestamp when the claim lease expires on the item.',
-        ],
-        'created' => [
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-          'size' => 'big',
-          'description' => 'Timestamp when the item was created.',
-        ],
+  $spec = [
+    'fields' => [
+      'name' => [
+        'type' => 'varchar_ascii',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The queue name.',
       ],
-      'indexes' => [
-        'queue_claim_idx' => ['name', 'expire', 'created'],
+      'expire' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'big',
+        'description' => 'Timestamp when the claim lease expires on the item.',
       ],
-    ];
-    $schema->addIndex('queue', 'queue_claim_idx', ['name', 'expire', 'created'], $spec);
-  }
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'big',
+        'description' => 'Timestamp when the item was created.',
+      ],
+    ],
+    'indexes' => [
+      'queue_claim_idx' => ['name', 'expire', 'created'],
+    ],
+  ];
+  $schema->addIndex('queue', 'queue_claim_idx', ['name', 'expire', 'created'], $spec);
 }
