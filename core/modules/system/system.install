@@ -156,7 +156,7 @@ function system_update_11202(): void {
 /**
  * Add composite index for queue claiming performance.
  */
-function system_update_10301(&$sandbox = NULL) {
+function system_update_10301(&$sandbox = NULL) : void {
   $schema = \Drupal::database()->schema();
 
   $spec = [
