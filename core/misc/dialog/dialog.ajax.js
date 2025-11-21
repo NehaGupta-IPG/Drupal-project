@@ -78,7 +78,12 @@
             }, 0);
           }
         }
-        $(event.target).remove();
+        if (
+          !$(event.target).is('.ui-widget-content')
+          || !$(event.target).dialog('option', 'drupalPersist')
+        ) {
+          $(event.target).remove();
+        }
       };
     },
 
