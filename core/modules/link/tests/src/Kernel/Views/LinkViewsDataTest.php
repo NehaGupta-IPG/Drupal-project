@@ -9,11 +9,13 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests link views data.
  */
 #[Group('link')]
+#[RunTestsInSeparateProcesses]
 class LinkViewsDataTest extends ViewsKernelTestBase {
 
   /**
