@@ -56,9 +56,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 345,
-      'CacheSetCount' => 361,
+      'CacheSetCount' => 360,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 26,
+      'CacheTagLookupQueryCount' => 25,
       'CacheTagInvalidationCount' => 0,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
@@ -118,11 +118,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 110,
-      'CacheGetCount' => 207,
+      'CacheGetCount' => 206,
       'CacheSetCount' => 64,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 22,
+      'CacheTagLookupQueryCount' => 21,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
@@ -250,7 +250,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 91,
-      'CacheGetCount' => 200,
+      'CacheGetCount' => 199,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 66,
@@ -259,14 +259,14 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         'data' => 6,
         'entity' => 21,
         'dynamic_page_cache' => 1,
-        'render' => 21,
+        'render' => 20,
         'default' => 3,
         'menu' => 2,
       ],
       'CacheSetCount' => 42,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 22,
+      'CacheTagLookupQueryCount' => 21,
       'CacheTagGroupedLookups' => [
         [
           'entity_types',
@@ -319,7 +319,6 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'config:block.block.umami_branding',
           'config:system.site',
         ],
-        ['config:block.block.umami_messages'],
         ['config:block.block.umami_help'],
         [
           'block_content:1',
@@ -335,6 +334,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'config:block.block.umami_languageswitcher',
           'config:block.block.umami_local_tasks',
           'config:block.block.umami_main_menu',
+          'config:block.block.umami_messages',
           'config:block.block.umami_page_title',
           'config:block.block.umami_views_block__articles_aside_block_1',
           'config:block.block.umami_views_block__promoted_items_block_1',

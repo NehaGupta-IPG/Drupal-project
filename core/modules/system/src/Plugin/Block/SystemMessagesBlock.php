@@ -6,6 +6,7 @@ use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Block\MessagesBlockPluginInterface;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheOptionalInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -17,7 +18,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   id: "system_messages_block",
   admin_label: new TranslatableMarkup("Messages")
 )]
-class SystemMessagesBlock extends BlockBase implements MessagesBlockPluginInterface {
+class SystemMessagesBlock extends BlockBase implements MessagesBlockPluginInterface, CacheOptionalInterface {
 
   /**
    * {@inheritdoc}
