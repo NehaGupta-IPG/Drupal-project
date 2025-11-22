@@ -67,7 +67,7 @@ class Counter extends FieldPluginBase {
       $count += ($pager->getItemsPerPage() * $pager->getCurrentPage() + $pager->getOffset());
     }
     // Add the counter for the current site.
-    $count += $this->view->row_index + 1;
+    $count += $values->index + 1;
 
     return $count;
   }

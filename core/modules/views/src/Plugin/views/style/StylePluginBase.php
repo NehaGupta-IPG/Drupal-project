@@ -736,8 +736,8 @@ abstract class StylePluginBase extends PluginBase {
             }
             unset($fibers[$key]);
           }
+          $iterations++;
         }
-        $iterations++;
       }
     }
 
