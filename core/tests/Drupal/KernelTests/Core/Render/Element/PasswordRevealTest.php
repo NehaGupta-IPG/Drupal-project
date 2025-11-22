@@ -8,7 +8,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\PasswordUnmask;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -21,8 +20,9 @@ class PasswordRevealTest extends UnitTestCase {
 
   /**
    * Tests value callback.
+   *
+   * @covers ::valueCallback
    */
-  #[CoversMethod(PasswordUnmask::class, 'valueCallback')]
   #[DataProvider('providerTestValueCallback')]
   public function testValueCallback($expected, $input): void {
     $element = [];

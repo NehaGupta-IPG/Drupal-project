@@ -19,6 +19,7 @@ class PasswordConfirmDeprecationTest extends KernelTestBase {
    */
   public function testPasswordConfirmDeprecation(): void {
     $this->expectDeprecation('\Drupal\Core\Render\Element\PasswordConfirm is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use Core/Render/Element/PasswordUnmask instead. See https://www.drupal.org/node/3394247');
+    // @phpstan-ignore-next-line
     new PasswordConfirm([], 'password_confirm', [
       'id' => 'password_confirm',
       'class' => 'Drupal\Core\Render\Element\PasswordConfirm',
