@@ -556,7 +556,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
   /**
    * Tests using the TaxonomyIndexTid in a filter group.
    */
-  public function testFilterGroupingWith2DifferentTerms() {
+  public function testFilterGroupingWith2DifferentTerms(): void {
     $node_type = $this->drupalCreateContentType(['type' => 'page']);
 
     // Create the tag field itself.

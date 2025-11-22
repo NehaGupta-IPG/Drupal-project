@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\taxonomy\Entity\Vocabulary;
@@ -9,8 +11,6 @@ use Drupal\views\Views;
 
 /**
  * Tests the many to one filter.
- *
- * @group views
  */
 class ManyToOneFilterTest extends ViewsKernelTestBase {
 
