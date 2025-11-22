@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Core\Form;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the password unmask functionality.
- *
- * @group javascript
  */
+#[Group('javascript')]
 class PasswordUnmaskTest extends WebDriverTestBase {
 
   /**
@@ -34,10 +35,9 @@ class PasswordUnmaskTest extends WebDriverTestBase {
 
   /**
    * Test the password_unmask form element functionality.
-   *
-   * @dataProvider providerPasswordFieldSelector
    */
-  public function testPasswordRevealFormElement($label, $selector, $password_field_id, $data_selector) {
+  #[DataProvider('providerPasswordFieldSelector')]
+  public function testPasswordRevealFormElement($label, $selector, $password_field_id, $data_selector): void {
 
     $this->drupalGet('/form-test/password-reveal');
     $page = $this->getSession()->getPage();
@@ -72,7 +72,7 @@ class PasswordUnmaskTest extends WebDriverTestBase {
   /**
    * Data provider for testPasswordRevealFormElement().
    */
-  public static function providerPasswordFieldSelector() {
+  public static function providerPasswordFieldSelector(): array {
     return [
       'password_one_field' => ['password_one_field', '.form-item-password-one button', 'edit-password-one', '[data-drupal-selector="edit-password-one"]'],
     ];

@@ -24,7 +24,7 @@ class PasswordRevealTest extends UnitTestCase {
    */
   #[CoversMethod(PasswordUnmask::class, 'valueCallback')]
   #[DataProvider('providerTestValueCallback')]
-  public function testValueCallback($expected, $input) {
+  public function testValueCallback($expected, $input): void {
     $element = [];
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
     $this->assertSame($expected, PasswordUnmask::valueCallback($element, $input, $form_state));
@@ -33,7 +33,7 @@ class PasswordRevealTest extends UnitTestCase {
   /**
    * Data provider for the testValueCallback().
    */
-  public static function providerTestValueCallback() {
+  public static function providerTestValueCallback(): array {
     $data = [];
     $data[] = [NULL, FALSE];
     $data[] = [NULL, NULL];

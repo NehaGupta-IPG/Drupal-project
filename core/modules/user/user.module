@@ -610,7 +610,7 @@ function _user_mail_notify($op, AccountInterface $account) {
 /**
  * Implements hook_element_info_alter().
  */
-function user_element_info_alter(array &$types) {
+function user_element_info_alter(array &$types): void {
   if (isset($types['password_confirm'])) {
     $types['password_confirm']['#process'][] = 'user_form_process_password_confirm';
   }
@@ -651,7 +651,7 @@ function user_form_process_password_confirm($element) {
  * elements to add the JavaScript to display and hide the password and string
  * translations for dynamic password validation.
  */
-function user_form_process_password_unmask($element) {
+function user_form_process_password_unmask($element): array {
   $password_settings = [
     'confirmTitle' => '',
     'showStrengthIndicator' => FALSE,
@@ -700,7 +700,7 @@ function _user_password_strength_settings(array $password_settings = []) {
 /**
  * Implements hook_modules_uninstalled().
  */
-function user_modules_uninstalled($modules) {
+function user_modules_uninstalled($modules): void {
   // Remove any potentially orphan module data stored for users.
   \Drupal::service('user.data')->delete($modules);
 }
