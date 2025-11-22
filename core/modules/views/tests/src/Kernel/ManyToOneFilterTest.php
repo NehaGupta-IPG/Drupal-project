@@ -8,10 +8,12 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the many to one filter.
  */
+#[RunTestsInSeparateProcesses]
 class ManyToOneFilterTest extends ViewsKernelTestBase {
 
   use TaxonomyTestTrait;
