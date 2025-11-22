@@ -23,7 +23,7 @@ use Drupal\Core\Render\Attribute\FormElement;
  * ];
  * @endcode
  *
- * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
  *   Core/Render/Element/PasswordUnmask instead.
  *
  * @see https://www.drupal.org/node/3394247
@@ -38,7 +38,7 @@ class PasswordConfirm extends FormElementBase {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    @trigger_error('\Drupal\Core\Render\Element\PasswordConfirm is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use Core/Render/Element/PasswordUnmask instead. See https://www.drupal.org/node/3394247', E_USER_DEPRECATED);
+    @trigger_error('\Drupal\Core\Render\Element\PasswordConfirm is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use Core/Render/Element/PasswordUnmask instead. See https://www.drupal.org/node/3394247', E_USER_DEPRECATED);
   }
 
   /**
