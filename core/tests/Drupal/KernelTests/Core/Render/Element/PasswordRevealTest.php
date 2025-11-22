@@ -20,8 +20,6 @@ class PasswordRevealTest extends UnitTestCase {
 
   /**
    * Tests value callback.
-   *
-   * @covers ::valueCallback
    */
   #[DataProvider('providerTestValueCallback')]
   public function testValueCallback($expected, $input): void {
