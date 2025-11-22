@@ -36,6 +36,9 @@ default:
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
+      - vendor/
+      - composer.lock
+      - composer/Metapackage/
       - test-artifacts/jobs/$CI_JOB_ID
       - core/test-artifacts/deprecation-handler
       - ./sites/default/files/simpletest/phpunit-*.xml
