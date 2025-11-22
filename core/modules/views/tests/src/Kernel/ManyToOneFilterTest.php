@@ -110,18 +110,29 @@ class ManyToOneFilterTest extends ViewsKernelTestBase {
    * Tests filters.
    */
   public function testFilters(): void {
-    $view = Views::getView('test_many_to_one_exposed');
-    $view->initHandlers();
-    $view->filter['field_tags_target_id']->value = [
+    $filter_values = [
       $this->terms[0]->id(),
       $this->terms[1]->id(),
     ];
+
+    $view = Views::getView('test_many_to_one_exposed');
+    $view->initHandlers();
+    $view->filter['field_tags_target_id']->value = $filter_values;
     $view->filter['field_tags_target_id']->operator = 'or';
     $this->executeView($view);
     $this->assertCount(4, $view->result);
+
+    // Recreate the view so the next operator runs a fresh query.
+    $view = Views::getView('test_many_to_one_exposed');
+    $view->initHandlers();
+    $view->filter['field_tags_target_id']->value = $filter_values;
     $view->filter['field_tags_target_id']->operator = 'and';
     $this->executeView($view);
     $this->assertCount(2, $view->result);
+
+    $view = Views::getView('test_many_to_one_exposed');
+    $view->initHandlers();
+    $view->filter['field_tags_target_id']->value = $filter_values;
     $view->filter['field_tags_target_id']->operator = 'not';
     $this->executeView($view);
     $this->assertCount(1, $view->result);
@@ -136,6 +147,10 @@ class ManyToOneFilterTest extends ViewsKernelTestBase {
     $args = [$this->terms[0]->id() . "+" . $this->terms[1]->id()];
     $this->executeView($view, $args);
     $this->assertCount(4, $view->result);
+
+    // Recreate the view so the second argument combination executes again.
+    $view = Views::getView('test_many_to_one_contextual');
+    $view->initHandlers();
     $args = [$this->terms[0]->id() . "," . $this->terms[1]->id()];
     $this->executeView($view, $args);
     $this->assertCount(2, $view->result);
