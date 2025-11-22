@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 
 /**
  * Provides a form element for entering a password.
@@ -19,9 +20,8 @@ use Drupal\Core\Form\FormStateInterface;
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Password
- *
- * @FormElement("password_unmask")
  */
+#[FormElement('password_unmask')]
 class PasswordUnmask extends Password {
 
   /**
