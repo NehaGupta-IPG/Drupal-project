@@ -2,7 +2,6 @@
 
 stages:
   - 🗜️ Test
-  - Summary
 
 #############
 # Templates #
@@ -125,23 +124,6 @@ variables:
 #
 # Documentation: https://docs.gitlab.com/ee/ci/jobs/
 ################
-
-'Summary':
-  stage: Summary
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
-  needs:
-    - job: '⚙️️ PHPUnit Kernel'
-    - pipeline: $PARENT_PIPELINE_ID
-      job: '🧹 PHP Coding standards (PHPCS)'
-  script:
-    - find test-artifacts
-    - php .gitlab-ci/scripts/statistics-consolidator.php
-  artifacts:
-    when: always
-    expire_in: 6 mos
-    paths:
-      - test-artifacts
 
 '🩹 Test-only changes':
   <<: [ *with-composer, *default-job-settings ]
@@ -305,3 +287,17 @@ variables:
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
     - sudo -u www-data git config --global --add safe.directory $CI_PROJECT_DIR
     - sudo SIMPLETEST_BASE_URL="http://$HOSTNAME/subdirectory" -u www-data -E -H ./vendor/bin/phpunit -c core --group OpenTelemetry --log-junit=./sites/default/files/simpletest/phpunit-performance.xml
+
+'Summary':
+  stage: .post
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline" && $PERFORMANCE_TEST != "1"
+  script:
+    - find test-artifacts
+    - php .gitlab-ci/scripts/statistics-consolidator.php
+  artifacts:
+    when: always
+    expire_in: 6 mos
+    paths:
+      - test-artifacts
+

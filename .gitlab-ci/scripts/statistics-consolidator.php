@@ -7,7 +7,7 @@
  */
 
 use Symfony\Component\Finder\Finder;
- 
+
 function trim_with_ellipsis(string $input, int $length, int $side): string {
     if (strlen($input) < $length) {
         return str_pad($input, $length, ' ', STR_PAD_RIGHT);
@@ -20,7 +20,7 @@ function trim_with_ellipsis(string $input, int $length, int $side): string {
     }
     return $input;
 }
-  
+
 // -----------------------------------------------------------------
 
 if (PHP_SAPI !== 'cli') {
@@ -31,12 +31,12 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 $finder = new Finder();
 
-$files = $finder->files()->in(__DIR__ . '/../../test-artifacts')->name('deprecation-ignore-stats.json');
+$files = $finder->files()->in(__DIR__ . '/  ../../test-artifacts')->name('deprecation-ignore-stats.json');
 
 $tmp = [];
 foreach ($files as $file) {
   $contents = json_decode($file->getContents(), TRUE);
-  dump($contents);
+  dump([$file->getRealPath(), $contents['metadata']]);
   foreach ($contents['skips'] as $key => $count) {
     $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
   }
