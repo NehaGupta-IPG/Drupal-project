@@ -72,6 +72,9 @@ class TaxonomyViewsHooks {
           if (isset($field_data['filter']) && $field_name != 'delta') {
             $data[$table_name][$field_name]['filter']['id'] = 'taxonomy_index_tid';
           }
+          if (isset($field_data['argument']) && $field_name != 'delta') {
+            $data[$table_name][$field_name]['argument']['id'] = 'taxonomy_index_tid';
+          }
         }
       }
     }
