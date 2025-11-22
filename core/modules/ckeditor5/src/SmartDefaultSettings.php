@@ -354,6 +354,9 @@ final class SmartDefaultSettings {
     return [$editor, $messages];
   }
 
+  /**
+   * Add given tags to the manually editable HTML tags of the source editor.
+   */
   private function addTagsToSourceEditing(EditorInterface $editor, HTMLRestrictions $tags): array {
     $messages = [];
     $settings = $editor->getSettings();

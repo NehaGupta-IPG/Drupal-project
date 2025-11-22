@@ -538,6 +538,9 @@ class ViewUI implements ViewEntityInterface {
     $this->additionalQueries = $queries;
   }
 
+  /**
+   * Render the preview of the view.
+   */
   public function renderPreview($display_id, $args = []) {
     // Save the current path so it can be restored before returning from this
     // function.

@@ -67,6 +67,9 @@ class MessagePlugin implements PluginInterface, EventSubscriberInterface {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function displayPostCreateMessage(Event $event) {
     $message = new Message($this->composer->getPackage(), $event->getName());
     if ($message = $message->getText()) {

@@ -303,6 +303,9 @@ class ResourceObjectNormalizer extends NormalizerBase {
     ];
   }
 
+  /**
+   * Builds the attributes schema for a configuration entity.
+   */
   protected function processConfigEntitySchema(ResourceType $resource_type, array $context, array &$attributes_schema): void {
     // This is largely the same as in ResourceObject but without a real entity.
     $fields = $resource_type->getFields();
@@ -320,6 +323,9 @@ class ResourceObjectNormalizer extends NormalizerBase {
     }
   }
 
+  /**
+   * Builds the attributes and relations schema for a content entity.
+   */
   protected function processContentEntitySchema(ResourceObject $resource_object, array $context, array &$attributes_schema, &$relationships_schema): void {
     // Actual normalization supports sparse fieldsets, however we provide schema
     // for all possible fields that may be retrieved.

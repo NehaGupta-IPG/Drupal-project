@@ -20,10 +20,16 @@ final class ContextualLinksNegotiator implements ThemeNegotiatorInterface {
     protected readonly ConfigFactoryInterface $configFactory,
   ) {}
 
+  /**
+   * {@inheritdoc}
+   */
   public function applies(RouteMatchInterface $route_match): bool {
     return $route_match->getRouteName() === 'contextual.render';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function determineActiveTheme(RouteMatchInterface $route_match): string {
     $request = $this->requestStack->getCurrentRequest();
     $theme = $request?->query->get('theme', '') ?? '';

@@ -9,6 +9,9 @@ namespace Drupal\serialization\Normalizer;
  */
 trait SchematicNormalizerFallbackTrait {
 
+  /**
+   * Generates a message when there is no schema for a property.
+   */
   public static function generateNoSchemaAvailableMessage(mixed $object): string {
     $baseMessage = 'See https://www.drupal.org/node/3424710 for information on implementing schemas in your program code.';
     return is_object($object)

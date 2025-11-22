@@ -54,6 +54,9 @@ class EntityRouteHelper {
     return array_key_exists($this->routeMatch->getRouteObject()->getPath(), $this->getContentEntityPaths());
   }
 
+  /**
+   * Gets the content entity for the route.
+   */
   public function getContentEntityFromRoute(): ?ContentEntityInterface {
     $path = $this->routeMatch->getRouteObject()->getPath();
     if (!$entity_type = $this->getContentEntityPaths()[$path] ?? NULL) {
@@ -93,6 +96,9 @@ class EntityRouteHelper {
     return $this->contentEntityPaths;
   }
 
+  /**
+   * Gets the paths for the all entity types.
+   */
   protected function doGetContentEntityPaths(): array {
     $content_entity_paths = [];
     $entity_types = $this->entityTypeManager->getDefinitions();
