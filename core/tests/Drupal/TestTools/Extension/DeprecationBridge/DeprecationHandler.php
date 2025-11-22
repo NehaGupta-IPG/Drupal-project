@@ -17,9 +17,8 @@ use PHPUnit\Util\Filesystem;
 /**
  * Drupal's PHPUnit extension to manage code deprecation.
  *
- * This class is a replacement for symfony/phpunit-bridge that does not
- * support PHPUnit 10. In the future this extension might be dropped if
- * PHPUnit adds support for all deprecation management needs.
+ * In the future this extension might be dropped if PHPUnit adds support for
+ * ignoring a specified list of deprecations.
  *
  * @internal
  */
@@ -290,7 +289,9 @@ final class DeprecationHandler implements Extension {
     if (!self::isEnabled()) {
       return;
     }
-    self::$collectedDeprecations[] = $message;
+    if (!array_search($message, self::$collectedDeprecations, TRUE)) {
+      self::$collectedDeprecations[] = $message;
+    }
   }
 
   /**
