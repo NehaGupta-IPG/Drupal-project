@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests locale translation project handling.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleTranslationProjectsTest extends KernelTestBase {
 
   /**
@@ -46,7 +48,7 @@ class LocaleTranslationProjectsTest extends KernelTestBase {
   /**
    * Tests locale_translation_clear_cache_projects().
    */
-  public function testLocaleTranslationClearCacheProjects() {
+  public function testLocaleTranslationClearCacheProjects(): void {
     $this->moduleHandler->loadInclude('locale', 'inc', 'locale.translation');
 
     $expected = [];

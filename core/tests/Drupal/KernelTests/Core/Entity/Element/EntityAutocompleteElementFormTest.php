@@ -14,12 +14,14 @@ use Drupal\entity_test\Entity\EntityTestStringId;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the EntityAutocomplete Form API element.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements FormInterface {
 
   /**
@@ -213,7 +215,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   /**
    * Tests valid entries in the EntityAutocomplete Form API element.
    */
-  public function testValidEntityAutocompleteElement() {
+  public function testValidEntityAutocompleteElement(): void {
     $form_state = (new FormState())
       ->setValues([
         'single' => $this->getAutocompleteInput($this->referencedEntities[0]),
@@ -293,10 +295,10 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   /**
    * Tests invalid entries in the EntityAutocomplete Form API element.
    */
-  public function testInvalidEntityAutocompleteElement() {
+  public function testInvalidEntityAutocompleteElement(): void {
     $form_builder = $this->container->get('form_builder');
 
-    // Test 'single' with an entity label that doesn't exist
+    // Test 'single' with an entity label that doesn't exist.
     $form_state = (new FormState())
       ->setValues([
         'single' => 'single - non-existent label',
@@ -343,7 +345,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   /**
    * Tests that access is properly checked by the EntityAutocomplete element.
    */
-  public function testEntityAutocompleteAccess() {
+  public function testEntityAutocompleteAccess(): void {
     $form_builder = $this->container->get('form_builder');
     $form = $form_builder->getForm($this);
 
@@ -372,7 +374,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
    *
    * E.g. This can happen with GET form parameters.
    */
-  public function testEntityAutocompleteIdInput() {
+  public function testEntityAutocompleteIdInput(): void {
     /** @var \Drupal\Core\Form\FormBuilderInterface $form_builder */
     $form_builder = $this->container->get('form_builder');
     // $form = $form_builder->getForm($this);

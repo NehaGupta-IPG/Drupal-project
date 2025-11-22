@@ -8,19 +8,23 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
-use SebastianBergmann\Comparator\Factory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use SebastianBergmann\Comparator\ComparisonFailure;
+use SebastianBergmann\Comparator\Factory;
 
 /**
  * Tests \Drupal\TestTools\Comparator\MarkupInterfaceComparator.
  *
  * We need to test the class with a kernel test since casting MarkupInterface
  * objects to strings can require an initialized container.
- *
- * @group Test
- *
- * @coversDefaultClass \Drupal\TestTools\Comparator\MarkupInterfaceComparator
  */
+#[CoversClass(MarkupInterfaceComparator::class)]
+#[Group('Test')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class MarkupInterfaceComparatorTest extends KernelTestBase {
 
   /**
@@ -175,9 +179,11 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::accepts
-   * @dataProvider dataSetProvider
+   * Tests accepts.
+   *
+   * @legacy-covers ::accepts
    */
+  #[DataProvider('dataSetProvider')]
   public function testAccepts($expected, $actual, bool $accepts_result, $equals_result): void {
     if ($accepts_result) {
       $this->assertTrue($this->comparator->accepts($expected, $actual));
@@ -188,9 +194,11 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::assertEquals
-   * @dataProvider dataSetProvider
+   * Tests assert equals.
+   *
+   * @legacy-covers ::assertEquals
    */
+  #[DataProvider('dataSetProvider')]
   public function testAssertEquals($expected, $actual, bool $accepts_result, $equals_result): void {
     try {
       $this->assertNull($this->comparator->assertEquals($expected, $actual));

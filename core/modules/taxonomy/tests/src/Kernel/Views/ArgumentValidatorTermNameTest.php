@@ -6,12 +6,14 @@ namespace Drupal\Tests\taxonomy\Kernel\Views;
 
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the plugin of the taxonomy: taxonomy_term_name argument validator.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
 
   /**
@@ -80,7 +82,7 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
   /**
    * Tests the term name argument validator plugin.
    */
-  public function testArgumentValidatorTermName() {
+  public function testArgumentValidatorTermName(): void {
     $view = Views::getView('test_taxonomy_name_argument');
     $view->initHandlers();
 
@@ -150,7 +152,7 @@ class ArgumentValidatorTermNameTest extends TaxonomyTestBase {
   /**
    * Tests the access checking in term name argument validator plugin.
    */
-  public function testArgumentValidatorTermNameAccess() {
+  public function testArgumentValidatorTermNameAccess(): void {
     $this->installConfig(['user']);
     $this->setCurrentUser($this->createUser(['access content']));
     $view = Views::getView('test_taxonomy_name_argument');

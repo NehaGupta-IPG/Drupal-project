@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Wizard;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests the ability of the views wizard to create views with sorts.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class SortingTest extends WizardTestBase {
 
   /**
@@ -28,7 +31,7 @@ class SortingTest extends WizardTestBase {
   /**
    * Tests the sorting functionality.
    */
-  public function testSorting() {
+  public function testSorting(): void {
     // Create nodes, each with a different creation time so that we can do a
     // meaningful sort.
     $this->drupalCreateContentType(['type' => 'page']);

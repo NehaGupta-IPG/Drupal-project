@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\taxonomy\Kernel\Migrate\d7;
 
 use Drupal\taxonomy\Entity\Term;
-use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\taxonomy\TermInterface;
+use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test migration of translated taxonomy terms.
- *
- * @group migrate_drupal_7
  */
+#[Group('migrate_drupal_7')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class MigrateTaxonomyTermTranslationTest extends MigrateDrupal7TestBase {
 
   /**
@@ -132,7 +135,7 @@ class MigrateTaxonomyTermTranslationTest extends MigrateDrupal7TestBase {
   /**
    * Tests the Drupal i18n  taxonomy term to Drupal 8 migration.
    */
-  public function testTaxonomyTermTranslation() {
+  public function testTaxonomyTermTranslation(): void {
     // Forums vocabulary, no multilingual option.
     $this->assertEntity(1, 'en', 'General discussion', 'sujet_de_discussion', NULL, NULL, 2, []);
     $this->assertEntity(5, 'en', 'Custom Forum', 'sujet_de_discussion', 'Where the cool kids are.', NULL, 3, []);

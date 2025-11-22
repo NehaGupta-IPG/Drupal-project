@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config\Action;
 
-// cspell:ignore inflector
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\config_test\ConfigActionErrorEntity\DuplicatePluralizedMethodName;
@@ -13,12 +12,15 @@ use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\DuplicateConfigActionIdException;
 use Drupal\Core\Config\Action\EntityMethodException;
 use Drupal\KernelTests\KernelTestBase;
+// cspell:ignore inflector
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the config action system.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigActionTest extends KernelTestBase {
 
   /**
@@ -33,15 +35,15 @@ class ConfigActionTest extends KernelTestBase {
     $this->assertCount(0, \Drupal::entityTypeManager()->getStorage('config_test')->loadMultiple(), 'There are no config_test entities');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
-    $manager->applyAction('entity_create:ensure_exists', 'config_test.dynamic.action_test', ['label' => 'Action test']);
+    $manager->applyAction('entity_create:createIfNotExists', 'config_test.dynamic.action_test', ['label' => 'Action test']);
     /** @var \Drupal\config_test\Entity\ConfigTest[] $config_test_entities */
     $config_test_entities = \Drupal::entityTypeManager()->getStorage('config_test')->loadMultiple();
     $this->assertCount(1, \Drupal::entityTypeManager()->getStorage('config_test')->loadMultiple(), 'There is 1 config_test entity');
     $this->assertSame('Action test', $config_test_entities['action_test']->label());
     $this->assertTrue(Uuid::isValid((string) $config_test_entities['action_test']->uuid()), 'Config entity assigned a valid UUID');
 
-    // Calling ensure exists action again will not error.
-    $manager->applyAction('entity_create:ensure_exists', 'config_test.dynamic.action_test', ['label' => 'Action test']);
+    // Calling createIfNotExists action again will not error.
+    $manager->applyAction('entity_create:createIfNotExists', 'config_test.dynamic.action_test', ['label' => 'Action test']);
 
     try {
       $manager->applyAction('entity_create:create', 'config_test.dynamic.action_test', ['label' => 'Action test']);
@@ -127,6 +129,15 @@ class ConfigActionTest extends KernelTestBase {
     $config_test_entity = $storage->load('dotted.default');
     $this->assertSame([['a', 'b', 'c'], ['a']], $config_test_entity->getArrayProperty());
 
+    // Ensure that we can affect an optional config entity that actually exists.
+    $manager->applyAction(
+      'entity_method:config_test.dynamic:setArray',
+      '?config_test.dynamic.dotted.default',
+      ['x', 'y', 'z'],
+    );
+    $config_test_entity = $storage->load('dotted.default');
+    $this->assertSame(['x', 'y', 'z'], $config_test_entity->getArrayProperty());
+
     $config_test_entity->delete();
     try {
       $manager->applyAction('entity_method:config_test.dynamic:setProtectedProperty', 'config_test.dynamic.dotted.default', 'Test value');
@@ -134,6 +145,20 @@ class ConfigActionTest extends KernelTestBase {
     }
     catch (ConfigActionException $e) {
       $this->assertSame('Entity config_test.dynamic.dotted.default does not exist', $e->getMessage());
+    }
+
+    // Do the same with the optional modifier in the name does not throw an exception.
+    $manager->applyAction('entity_method:config_test.dynamic:setProtectedProperty', '?config_test.dynamic.dotted.default', 'Test value');
+    // The configuration also didn't get created with and without the modifier.
+    $this->assertNull($storage->load('config_test.dynamic.dotted.default'));
+    $this->assertNull($storage->load('?config_test.dynamic.dotted.default'));
+
+    try {
+      $manager->applyAction('entity_method:config_test.dynamic:setProtectedProperty', '?config_test.dynamic.*.default', 'Test value');
+      $this->fail('Expected exception not thrown');
+    }
+    catch (ConfigActionException $e) {
+      $this->assertSame("The '?config_test.dynamic.*.default' configuration name is optional because it starts with a question mark, and therefore cannot contain wildcards.", $e->getMessage());
     }
 
     // Test custom and default admin labels.
@@ -244,11 +269,11 @@ class ConfigActionTest extends KernelTestBase {
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
     // Call the simple config update action.
-    $manager->applyAction('simple_config_update', 'config_test.system', ['foo' => 'Yay!']);
+    $manager->applyAction('simpleConfigUpdate', 'config_test.system', ['foo' => 'Yay!']);
     $this->assertSame('Yay!', $this->config('config_test.system')->get('foo'));
 
     try {
-      $manager->applyAction('simple_config_update', 'config_test.system', 'Test');
+      $manager->applyAction('simpleConfigUpdate', 'config_test.system', 'Test');
       $this->fail('Expected exception not thrown');
     }
     catch (ConfigActionException $e) {
@@ -257,7 +282,7 @@ class ConfigActionTest extends KernelTestBase {
 
     $this->config('config_test.system')->delete();
     try {
-      $manager->applyAction('simple_config_update', 'config_test.system', ['foo' => 'Yay!']);
+      $manager->applyAction('simpleConfigUpdate', 'config_test.system', ['foo' => 'Yay!']);
       $this->fail('Expected exception not thrown');
     }
     catch (ConfigActionException $e) {
@@ -273,7 +298,7 @@ class ConfigActionTest extends KernelTestBase {
     $this->assertCount(0, $storage->loadMultiple(), 'There are no config_test entities');
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $manager */
     $manager = $this->container->get('plugin.manager.config_action');
-    $manager->applyAction('ensure_exists', 'config_test.dynamic.action_test', ['label' => 'Action test', 'protected_property' => '']);
+    $manager->applyAction('createIfNotExists', 'config_test.dynamic.action_test', ['label' => 'Action test', 'protected_property' => '']);
     /** @var \Drupal\config_test\Entity\ConfigTest[] $config_test_entities */
     $config_test_entities = $storage->loadMultiple();
     $this->assertCount(1, $config_test_entities, 'There is 1 config_test entity');
@@ -299,7 +324,7 @@ class ConfigActionTest extends KernelTestBase {
     $manager = $this->container->get('plugin.manager.config_action');
     $this->expectException(DuplicateConfigActionIdException::class);
     $this->expectExceptionMessage("The plugins 'entity_method:config_test.dynamic:setProtectedProperty' and 'config_action_duplicate_test:config_test.dynamic:setProtectedProperty' both resolve to the same shorthand action ID for the 'config_test' entity type");
-    $manager->applyAction('ensure_exists', 'config_test.dynamic.action_test', ['label' => 'Action test', 'protected_property' => '']);
+    $manager->applyAction('createIfNotExists', 'config_test.dynamic.action_test', ['label' => 'Action test', 'protected_property' => '']);
   }
 
   /**

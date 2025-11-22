@@ -10,14 +10,18 @@ use Drupal\Core\Datetime\FormattedDateDiff;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageManager;
-use Drupal\Tests\UnitTestCase;
-use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\Core\Datetime\DateFormatter
- * @group Datetime
+ * Tests Drupal\Core\Datetime\DateFormatter.
  */
+#[CoversClass(DateFormatter::class)]
+#[Group('Datetime')]
 class DateTest extends UnitTestCase {
 
   /**
@@ -98,11 +102,10 @@ class DateTest extends UnitTestCase {
   /**
    * Tests the formatInterval method.
    *
-   * @dataProvider providerTestFormatInterval
-   *
-   * @covers ::formatInterval
+   * @legacy-covers ::formatInterval
    */
-  public function testFormatInterval($interval, $granularity, $expected, $langcode = NULL) {
+  #[DataProvider('providerTestFormatInterval')]
+  public function testFormatInterval($interval, $granularity, $expected, $langcode = NULL): void {
     // Mocks a simple formatPlural implementation.
     $this->stringTranslation->expects($this->any())
       ->method('translateString')
@@ -117,7 +120,7 @@ class DateTest extends UnitTestCase {
     else {
       $result = $this->dateFormatter->formatInterval($interval);
     }
-
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     $this->assertEquals(new TranslatableMarkup($expected, [], ['langcode' => $langcode], $this->stringTranslation), $result);
   }
 
@@ -159,7 +162,7 @@ class DateTest extends UnitTestCase {
   /**
    * Tests the formatInterval method for 0 second.
    */
-  public function testFormatIntervalZeroSecond() {
+  public function testFormatIntervalZeroSecond(): void {
     $result = $this->dateFormatter->formatInterval(0, 1, 'xxx-lolspeak');
     $this->assertEquals(new TranslatableMarkup('0 sec', [], ['langcode' => 'xxx-lolspeak'], $this->stringTranslation), $result);
   }
@@ -167,9 +170,9 @@ class DateTest extends UnitTestCase {
   /**
    * Tests the getSampleDateFormats method.
    *
-   * @covers \Drupal\Core\Datetime\DateFormatter::getSampleDateFormats
+   * @legacy-covers \Drupal\Core\Datetime\DateFormatter::getSampleDateFormats
    */
-  public function testGetSampleDateFormats() {
+  public function testGetSampleDateFormats(): void {
     $timestamp = strtotime('2015-03-22 14:23:00');
     $expected = $this->dateFormatter->getSampleDateFormats('en', $timestamp, 'Australia/Sydney');
 
@@ -187,9 +190,9 @@ class DateTest extends UnitTestCase {
   /**
    * Tests the formatTimeDiffUntil method.
    *
-   * @covers ::formatTimeDiffUntil
+   * @legacy-covers ::formatTimeDiffUntil
    */
-  public function testFormatTimeDiffUntil() {
+  public function testFormatTimeDiffUntil(): void {
     $expected = '1 second';
     $request_time = self::createTimestamp('2013-12-11 10:09:08');
     $timestamp = self::createTimestamp('2013-12-11 10:09:09');
@@ -220,9 +223,9 @@ class DateTest extends UnitTestCase {
   /**
    * Tests the formatTimeDiffSince method.
    *
-   * @covers ::formatTimeDiffSince
+   * @legacy-covers ::formatTimeDiffSince
    */
-  public function testFormatTimeDiffSince() {
+  public function testFormatTimeDiffSince(): void {
     $expected = '1 second';
     $timestamp = self::createTimestamp('2013-12-11 10:09:07');
     $request_time = self::createTimestamp('2013-12-11 10:09:08');
@@ -253,10 +256,9 @@ class DateTest extends UnitTestCase {
   /**
    * Tests the formatDiff method.
    *
-   * @dataProvider providerTestFormatDiff
-   *
-   * @covers ::formatDiff
+   * @legacy-covers ::formatDiff
    */
+  #[DataProvider('providerTestFormatDiff')]
   public function testFormatDiff(string $expected, int $max_age, int $timestamp1, int $timestamp2, array $options = []): void {
     // Mocks a simple translateString implementation.
     $this->stringTranslation->expects($this->any())
@@ -266,9 +268,11 @@ class DateTest extends UnitTestCase {
       });
 
     if (isset($options['langcode'])) {
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $expected_markup = new TranslatableMarkup($expected, [], ['langcode' => $options['langcode']], $this->stringTranslation);
     }
     else {
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $expected_markup = new TranslatableMarkup($expected, [], [], $this->stringTranslation);
     }
     $this->assertEquals($expected_markup, $this->dateFormatter->formatDiff($timestamp1, $timestamp2, $options));
@@ -400,11 +404,11 @@ class DateTest extends UnitTestCase {
   /**
    * Tests FormattedDateDiff.
    *
-   * @covers \Drupal\Core\Datetime\FormattedDateDiff::toRenderable
-   * @covers \Drupal\Core\Datetime\FormattedDateDiff::getString
-   * @covers \Drupal\Core\Datetime\FormattedDateDiff::getCacheMaxAge
+   * @legacy-covers \Drupal\Core\Datetime\FormattedDateDiff::toRenderable
+   * @legacy-covers \Drupal\Core\Datetime\FormattedDateDiff::getString
+   * @legacy-covers \Drupal\Core\Datetime\FormattedDateDiff::getCacheMaxAge
    */
-  public function testFormattedDateDiff() {
+  public function testFormattedDateDiff(): void {
     $string = '10 minutes';
     $max_age = 60;
     $object = new FormattedDateDiff($string, $max_age);
@@ -432,7 +436,7 @@ class DateTest extends UnitTestCase {
    *
    * @see http://www.faqs.org/rfcs/rfc2822.html
    *
-   * @covers ::format
+   * @legacy-covers ::format
    */
   public function testRfc2822DateFormat(): void {
     $timestamp = 1549110600;

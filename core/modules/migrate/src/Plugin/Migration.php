@@ -206,7 +206,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $migration_tags = [];
 
   /**
@@ -226,6 +226,8 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    * These are different from the configuration dependencies. Migration
    * dependencies are only used to store relationships between migrations.
    *
+   * @var array
+   *
    * The migration_dependencies value is structured like this:
    * @code
    * [
@@ -238,8 +240,6 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    *   ],
    * ];
    * @endcode
-   *
-   * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $migration_dependencies = [];
@@ -384,13 +384,12 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    * {@inheritdoc}
    */
   public function getProcessPlugins(?array $process = NULL) {
-    if (!isset($process)) {
-      $process = $this->getProcess();
-    }
+    $process = isset($process) ? $this->getProcessNormalized($process) : $this->getProcess();
     $index = serialize($process);
     if (!isset($this->processPlugins[$index])) {
       $this->processPlugins[$index] = [];
-      foreach ($this->getProcessNormalized($process) as $property => $configurations) {
+
+      foreach ($process as $property => $configurations) {
         $this->processPlugins[$index][$property] = [];
         foreach ($configurations as $configuration) {
           if (isset($configuration['source'])) {
@@ -622,6 +621,34 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   }
 
   /**
+   * Add required migration dependencies.
+   *
+   * @param string[] $required_dependencies
+   *   An array of migration IDs to be added to the required migration
+   *   dependencies.
+   *
+   * @return $this
+   */
+  public function addRequiredDependencies(array $required_dependencies): MigrationInterface {
+    $this->migration_dependencies['required'] = array_unique(array_merge($this->migration_dependencies['required'], $required_dependencies));
+    return $this;
+  }
+
+  /**
+   * Add optional migration dependencies.
+   *
+   * @param string[] $optional_dependencies
+   *   An array of migration IDs to be added to the optional migration
+   *   dependencies.
+   *
+   * @return $this
+   */
+  public function addOptionalDependencies(array $optional_dependencies): MigrationInterface {
+    $this->migration_dependencies['optional'] = array_unique(array_merge($this->migration_dependencies['optional'], $optional_dependencies));
+    return $this;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function mergeProcessOfProperty($property, array $process_of_property) {
@@ -629,7 +656,10 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
     // otherwise simply set it.
     $current_process = $this->getProcess();
     if (isset($current_process[$property])) {
-      $this->process = NestedArray::mergeDeepArray([$current_process, $this->getProcessNormalized([$property => $process_of_property])], TRUE);
+      $this->process = NestedArray::mergeDeepArray([
+        $current_process,
+        $this->getProcessNormalized([$property => $process_of_property]),
+      ], TRUE);
     }
     else {
       $this->setProcessOfProperty($property, $process_of_property);

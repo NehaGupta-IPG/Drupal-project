@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel\Migrate\d7;
 
-use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermInterface;
+use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests migration of localized translated taxonomy terms.
- *
- * @group migrate_drupal_7
  */
+#[Group('migrate_drupal_7')]
+#[RunTestsInSeparateProcesses]
 class MigrateTermLocalizedTranslationTest extends MigrateDrupal7TestBase {
 
   /**
@@ -115,7 +117,7 @@ class MigrateTermLocalizedTranslationTest extends MigrateDrupal7TestBase {
   /**
    * Tests the Drupal 6 i18n localized taxonomy term to Drupal 8 migration.
    */
-  public function testTranslatedLocalizedTaxonomyTerms() {
+  public function testTranslatedLocalizedTaxonomyTerms(): void {
     $this->assertEntity(19, 'en', 'Jupiter Station', 'vocablocalized', 'Holographic research.', 'filtered_html', 0, []);
     $this->assertEntity(20, 'en', 'DS9', 'vocablocalized', 'Terok Nor', 'filtered_html', 0, []);
     $this->assertEntity(25, 'en', 'Emissary', 'vocablocalized2', 'Pilot episode', 'filtered_html', 0, []);

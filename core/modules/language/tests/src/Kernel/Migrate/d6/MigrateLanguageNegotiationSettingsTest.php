@@ -6,12 +6,14 @@ namespace Drupal\Tests\language\Kernel\Migrate\d6;
 
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the migration of language negotiation and language types.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal6TestBase {
 
   /**
@@ -22,7 +24,7 @@ class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal6TestBase {
   /**
    * Tests the migration with LANGUAGE_NEGOTIATION_PATH_DEFAULT.
    */
-  public function testLanguageNegotiationWithDefaultPathPrefix() {
+  public function testLanguageNegotiationWithDefaultPathPrefix(): void {
     $this->executeMigrations([
       'language',
       'd6_language_negotiation_settings',
@@ -56,7 +58,7 @@ class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal6TestBase {
   /**
    * Tests the migration with LANGUAGE_NEGOTIATION_NONE.
    */
-  public function testLanguageNegotiationWithNoNegotiation() {
+  public function testLanguageNegotiationWithNoNegotiation(): void {
     $this->sourceDatabase->update('variable')
       ->fields(['value' => serialize(0)])
       ->condition('name', 'language_negotiation')
@@ -88,7 +90,7 @@ class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal6TestBase {
   /**
    * Tests the migration with LANGUAGE_NEGOTIATION_PATH.
    */
-  public function testLanguageNegotiationWithPathPrefix() {
+  public function testLanguageNegotiationWithPathPrefix(): void {
     $this->sourceDatabase->update('variable')
       ->fields(['value' => serialize(2)])
       ->condition('name', 'language_negotiation')
@@ -129,7 +131,7 @@ class MigrateLanguageNegotiationSettingsTest extends MigrateDrupal6TestBase {
   /**
    * Tests the migration with LANGUAGE_NEGOTIATION_DOMAIN.
    */
-  public function testLanguageNegotiationWithDomain() {
+  public function testLanguageNegotiationWithDomain(): void {
     $this->sourceDatabase->update('variable')
       ->fields(['value' => serialize(3)])
       ->condition('name', 'language_negotiation')

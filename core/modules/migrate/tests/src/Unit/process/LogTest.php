@@ -6,20 +6,20 @@ namespace Drupal\Tests\migrate\Unit\process;
 
 use Drupal\migrate\Plugin\migrate\process\Log;
 use Drupal\migrate\Row;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Log process plugin.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class LogTest extends MigrateProcessTestCase {
 
   /**
    * Tests the Log plugin.
-   *
-   * @dataProvider providerTestLog
    */
-  public function testLog($value, $expected_message) {
+  #[DataProvider('providerTestLog')]
+  public function testLog($value, $expected_message): void {
     // Test the expected log message.
     $this->migrateExecutable->expects($this->once())
       ->method('saveMessage')

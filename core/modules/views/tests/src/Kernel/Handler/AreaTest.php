@@ -7,14 +7,17 @@ namespace Drupal\Tests\views\Kernel\Handler;
 use Drupal\Component\Utility\Xss;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the plugin base of the area handler.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\area\AreaPluginBase
  * @see \Drupal\views_test\Plugin\views\area\TestExample
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class AreaTest extends ViewsKernelTestBase {
 
   /**
@@ -56,7 +59,7 @@ class AreaTest extends ViewsKernelTestBase {
   /**
    * Tests the rendering of an area.
    */
-  public function testRenderArea() {
+  public function testRenderArea(): void {
     $view = Views::getView('test_example_area');
     $view->initHandlers();
 
@@ -87,7 +90,7 @@ class AreaTest extends ViewsKernelTestBase {
   /**
    * Tests the access for an area.
    */
-  public function testAreaAccess() {
+  public function testAreaAccess(): void {
     // Test with access denied for the area handler.
     $view = Views::getView('test_example_area_access');
     $view->initDisplay();

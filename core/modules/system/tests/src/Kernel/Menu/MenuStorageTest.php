@@ -8,14 +8,16 @@ use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Menu;
 use Drupal\system\MenuStorage;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests MenuStorage.
  *
- * @group Menu
- *
  * @see \Drupal\system\MenuStorage
  */
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class MenuStorageTest extends KernelTestBase {
 
   /**
@@ -26,7 +28,7 @@ class MenuStorageTest extends KernelTestBase {
   /**
    * Tests MenuStorage::MAX_ID_LENGTH is enforced.
    */
-  public function testMaxIdLengthException() {
+  public function testMaxIdLengthException(): void {
     $id = $this->randomMachineName(MenuStorage::MAX_ID_LENGTH + 1);
     $this->expectException(ConfigEntityIdLengthException::class);
     $this->expectExceptionMessage(

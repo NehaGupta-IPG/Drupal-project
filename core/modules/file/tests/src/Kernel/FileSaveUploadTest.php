@@ -6,6 +6,9 @@ namespace Drupal\Tests\file\Kernel;
 
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -14,9 +17,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Tests file_save_upload().
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileSaveUploadTest extends KernelTestBase {
 
   /**
@@ -34,12 +37,16 @@ class FileSaveUploadTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    \file_put_contents('test.bbb', 'test');
+    $filename = 'test.bbb';
+    vfsStream::newFile($filename)
+      ->at($this->vfsRoot)
+      ->withContent('test');
+
     $request = new Request();
     $request->files->set('files', [
       'file' => new UploadedFile(
-        path: 'test.bbb',
-        originalName: 'test.bbb',
+        path: vfsStream::url("root/$filename"),
+        originalName: $filename,
         mimeType: 'text/plain',
         error: \UPLOAD_ERR_OK,
         test: TRUE
@@ -50,14 +57,6 @@ class FileSaveUploadTest extends KernelTestBase {
     $requestStack->push($request);
 
     $this->container->set('request_stack', $requestStack);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function tearDown(): void {
-    \unlink('test.bbb');
-    parent::tearDown();
   }
 
   /**

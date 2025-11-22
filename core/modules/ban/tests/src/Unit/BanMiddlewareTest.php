@@ -6,14 +6,19 @@ namespace Drupal\Tests\ban\Unit;
 
 use Drupal\ban\BanMiddleware;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * @coversDefaultClass \Drupal\ban\BanMiddleware
- * @group ban
+ * Tests Drupal\ban\BanMiddleware.
  */
+#[CoversClass(BanMiddleware::class)]
+#[Group('ban')]
+#[IgnoreDeprecations]
 class BanMiddlewareTest extends UnitTestCase {
 
   /**
@@ -51,7 +56,7 @@ class BanMiddlewareTest extends UnitTestCase {
   /**
    * Tests a banned IP.
    */
-  public function testBannedIp() {
+  public function testBannedIp(): void {
     $banned_ip = '17.0.0.2';
     $this->banManager->expects($this->once())
       ->method('isBanned')
@@ -71,7 +76,7 @@ class BanMiddlewareTest extends UnitTestCase {
   /**
    * Tests an unbanned IP.
    */
-  public function testUnbannedIp() {
+  public function testUnbannedIp(): void {
     $unbanned_ip = '18.0.0.2';
     $this->banManager->expects($this->once())
       ->method('isBanned')

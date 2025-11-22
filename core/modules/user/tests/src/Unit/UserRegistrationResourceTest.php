@@ -11,16 +11,17 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\user\Entity\User;
 use Drupal\user\Plugin\rest\resource\UserRegistrationResource;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Tests User Registration REST resource.
- *
- * @coversDefaultClass \Drupal\user\Plugin\rest\resource\UserRegistrationResource
- * @group user
  */
+#[CoversClass(UserRegistrationResource::class)]
+#[Group('user')]
 class UserRegistrationResourceTest extends UnitTestCase {
 
   const ERROR_MESSAGE = "Unprocessable Entity: validation failed.\nproperty_path: message\nproperty_path_2: message_2\n";
@@ -88,7 +89,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
   /**
    * Tests that an exception is thrown when no data provided for the account.
    */
-  public function testEmptyPost() {
+  public function testEmptyPost(): void {
     $this->expectException(BadRequestHttpException::class);
     $this->testClass->post(NULL);
   }
@@ -96,7 +97,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
   /**
    * Tests that only new user accounts can be registered.
    */
-  public function testExistedEntityPost() {
+  public function testExistedEntityPost(): void {
     $entity = $this->prophesize(User::class);
     $entity->isNew()->willReturn(FALSE);
     $this->expectException(BadRequestHttpException::class);
@@ -107,7 +108,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
   /**
    * Tests that admin permissions are required to register a user account.
    */
-  public function testRegistrationAdminOnlyPost() {
+  public function testRegistrationAdminOnlyPost(): void {
 
     $this->userSettings->get('register')->willReturn(UserInterface::REGISTER_ADMINISTRATORS_ONLY);
 
@@ -126,7 +127,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
   /**
    * Tests that only anonymous users can register users.
    */
-  public function testRegistrationAnonymousOnlyPost() {
+  public function testRegistrationAnonymousOnlyPost(): void {
     $this->currentUser->isAnonymous()->willReturn(FALSE);
 
     $this->testClass = new UserRegistrationResource([], 'plugin_id', '', [], $this->logger, $this->userSettings->reveal(), $this->currentUser->reveal(), $this->passwordGenerator);

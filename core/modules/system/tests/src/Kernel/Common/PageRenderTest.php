@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Common;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Test page rendering hooks.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class PageRenderTest extends KernelTestBase {
 
   /**
    * Tests hook_page_attachments() exceptions.
    */
-  public function testHookPageAttachmentsExceptions() {
+  public function testHookPageAttachmentsExceptions(): void {
     $this->enableModules(['common_test', 'system']);
 
     $this->assertPageRenderHookExceptions('common_test', 'hook_page_attachments');
@@ -27,7 +29,7 @@ class PageRenderTest extends KernelTestBase {
   /**
    * Tests hook_page_attachments_alter() exceptions.
    */
-  public function testHookPageAlter() {
+  public function testHookPageAlter(): void {
     $this->enableModules(['common_test', 'system']);
 
     $this->assertPageRenderHookExceptions('common_test', 'hook_page_attachments_alter');

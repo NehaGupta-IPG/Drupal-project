@@ -13,13 +13,16 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Menu\ContextualLinkDefault;
 use Drupal\Core\Menu\ContextualLinkManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Menu\ContextualLinkManager
- * @group Menu
+ * Tests Drupal\Core\Menu\ContextualLinkManager.
  */
+#[CoversClass(ContextualLinkManager::class)]
+#[Group('Menu')]
 class ContextualLinkManagerTest extends UnitTestCase {
 
   /**
@@ -100,7 +103,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::getContextualLinkPluginsByGroup()
    */
-  public function testGetContextualLinkPluginsByGroup() {
+  public function testGetContextualLinkPluginsByGroup(): void {
     $definitions = [
       'test_plugin1' => [
         'id' => 'test_plugin1',
@@ -139,7 +142,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
   /**
    * Tests the getContextualLinkPluginsByGroup method with a prefilled cache.
    */
-  public function testGetContextualLinkPluginsByGroupWithCache() {
+  public function testGetContextualLinkPluginsByGroupWithCache(): void {
     $definitions = [
       'test_plugin1' => [
         'id' => 'test_plugin1',
@@ -174,7 +177,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::processDefinition()
    */
-  public function testProcessDefinitionWithoutRoute() {
+  public function testProcessDefinitionWithoutRoute(): void {
     $definition = [
       'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
       'group' => 'example',
@@ -189,7 +192,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::processDefinition()
    */
-  public function testProcessDefinitionWithoutGroup() {
+  public function testProcessDefinitionWithoutGroup(): void {
     $definition = [
       'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
       'route_name' => 'example',
@@ -204,7 +207,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::getContextualLinksArrayByGroup()
    */
-  public function testGetContextualLinksArrayByGroup() {
+  public function testGetContextualLinksArrayByGroup(): void {
     $definitions = [
       'test_plugin1' => [
         'id' => 'test_plugin1',
@@ -264,7 +267,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Menu\ContextualLinkManager::getContextualLinksArrayByGroup()
    */
-  public function testGetContextualLinksArrayByGroupAccessCheck() {
+  public function testGetContextualLinksArrayByGroupAccessCheck(): void {
     $definitions = [
       'test_plugin1' => [
         'id' => 'test_plugin1',
@@ -307,7 +310,7 @@ class ContextualLinkManagerTest extends UnitTestCase {
   /**
    * Tests the plugins alter hook.
    */
-  public function testPluginDefinitionAlter() {
+  public function testPluginDefinitionAlter(): void {
     $definitions['test_plugin'] = [
       'id' => 'test_plugin',
       'class' => ContextualLinkDefault::class,

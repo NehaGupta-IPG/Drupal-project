@@ -6,14 +6,19 @@ namespace Drupal\Tests\system\Kernel\Migrate\d6;
 
 use Drupal\system\Entity\Action;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests migration of action items.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateActionsTest extends MigrateDrupal6TestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['comment', 'node'];
 
   /**
@@ -27,7 +32,7 @@ class MigrateActionsTest extends MigrateDrupal6TestBase {
   /**
    * Tests Drupal 6 action migration to Drupal 8.
    */
-  public function testActions() {
+  public function testActions(): void {
     // Test default actions.
     $this->assertEntity('node_publish_action', 'Publish post', 'node', []);
     $this->assertEntity('node_make_sticky_action', 'Make post sticky', 'node', []);

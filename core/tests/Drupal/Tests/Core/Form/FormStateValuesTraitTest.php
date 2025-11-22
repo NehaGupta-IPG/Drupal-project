@@ -6,20 +6,23 @@ namespace Drupal\Tests\Core\Form;
 
 use Drupal\Core\Form\FormStateValuesTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\FormStateValuesTrait
- *
- * @group Form
+ * Tests Drupal\Core\Form\FormStateValuesTrait.
  */
+#[CoversClass(FormStateValuesTrait::class)]
+#[Group('Form')]
 class FormStateValuesTraitTest extends UnitTestCase {
 
   /**
    * Tests that setting the value for an element adds to the values.
    *
-   * @covers ::setValueForElement
+   * @legacy-covers ::setValueForElement
    */
-  public function testSetValueForElement() {
+  public function testSetValueForElement(): void {
     $element = [
       '#parents' => [
         'foo',
@@ -39,11 +42,12 @@ class FormStateValuesTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getValue
+   * Tests get value.
    *
-   * @dataProvider providerGetValue
+   * @legacy-covers ::getValue
    */
-  public function testGetValue($key, $expected, $default = NULL) {
+  #[DataProvider('providerGetValue')]
+  public function testGetValue($key, $expected, $default = NULL): void {
     $form_state = (new FormStateValuesTraitStub())->setValues([
       'foo' => 'one',
       'bar' => [
@@ -89,9 +93,11 @@ class FormStateValuesTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getValue
+   * Tests get value modify return.
+   *
+   * @legacy-covers ::getValue
    */
-  public function testGetValueModifyReturn() {
+  public function testGetValueModifyReturn(): void {
     $initial_values = $values = [
       'foo' => 'one',
       'bar' => [
@@ -109,11 +115,12 @@ class FormStateValuesTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::setValue
+   * Tests set value.
    *
-   * @dataProvider providerSetValue
+   * @legacy-covers ::setValue
    */
-  public function testSetValue($key, $value, $expected) {
+  #[DataProvider('providerSetValue')]
+  public function testSetValue($key, $value, $expected): void {
     $form_state = (new FormStateValuesTraitStub())->setValues([
       'bar' => 'wrong',
     ]);
@@ -145,11 +152,12 @@ class FormStateValuesTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::hasValue
+   * Tests has value.
    *
-   * @dataProvider providerHasValue
+   * @legacy-covers ::hasValue
    */
-  public function testHasValue($key, $expected) {
+  #[DataProvider('providerHasValue')]
+  public function testHasValue($key, $expected): void {
     $form_state = (new FormStateValuesTraitStub())->setValues([
       'foo' => 'one',
       'bar' => [
@@ -194,11 +202,12 @@ class FormStateValuesTraitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::isValueEmpty
+   * Tests is value empty.
    *
-   * @dataProvider providerIsValueEmpty
+   * @legacy-covers ::isValueEmpty
    */
-  public function testIsValueEmpty($key, $expected) {
+  #[DataProvider('providerIsValueEmpty')]
+  public function testIsValueEmpty($key, $expected): void {
     $form_state = (new FormStateValuesTraitStub())->setValues([
       'foo' => 'one',
       'bar' => [
@@ -244,6 +253,9 @@ class FormStateValuesTraitTest extends UnitTestCase {
 
 }
 
+/**
+ * Stub class with trait for testing.
+ */
 class FormStateValuesTraitStub {
 
   use FormStateValuesTrait;

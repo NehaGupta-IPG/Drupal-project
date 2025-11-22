@@ -5,20 +5,23 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Log;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the query logging facility.
- *
- * @coversDefaultClass \Drupal\Core\Database\Log
- *
- * @group Database
  */
+#[CoversClass(Log::class)]
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class LoggingTest extends DatabaseTestBase {
 
   /**
    * Tests that we can log the existence of a query.
    */
-  public function testEnableLogging() {
+  public function testEnableLogging(): void {
     Database::startLog('testing');
 
     $start = microtime(TRUE);
@@ -42,7 +45,7 @@ class LoggingTest extends DatabaseTestBase {
   /**
    * Tests that we can run two logs in parallel.
    */
-  public function testEnableMultiLogging() {
+  public function testEnableMultiLogging(): void {
     Database::startLog('testing1');
 
     $this->connection->query('SELECT [name] FROM {test} WHERE [age] > :age', [':age' => 25])->fetchCol();
@@ -61,7 +64,7 @@ class LoggingTest extends DatabaseTestBase {
   /**
    * Tests logging queries against multiple targets on the same connection.
    */
-  public function testEnableTargetLogging() {
+  public function testEnableTargetLogging(): void {
     // Clone the primary credentials to a replica connection and to another fake
     // connection.
     $connection_info = Database::getConnectionInfo('default');
@@ -87,7 +90,7 @@ class LoggingTest extends DatabaseTestBase {
    * a fake target so the query should fall back to running on the default
    * target.
    */
-  public function testEnableTargetLoggingNoTarget() {
+  public function testEnableTargetLoggingNoTarget(): void {
     Database::startLog('testing1');
 
     $this->connection->query('SELECT [name] FROM {test} WHERE [age] > :age', [':age' => 25])->fetchCol();
@@ -109,7 +112,7 @@ class LoggingTest extends DatabaseTestBase {
   /**
    * Tests that we can log queries separately on different connections.
    */
-  public function testEnableMultiConnectionLogging() {
+  public function testEnableMultiConnectionLogging(): void {
     // Clone the primary credentials to a fake connection.
     // That both connections point to the same physical database is irrelevant.
     $connection_info = Database::getConnectionInfo('default');
@@ -136,7 +139,7 @@ class LoggingTest extends DatabaseTestBase {
   /**
    * Tests that getLog with a wrong key return an empty array.
    */
-  public function testGetLoggingWrongKey() {
+  public function testGetLoggingWrongKey(): void {
     $result = Database::getLog('wrong');
 
     $this->assertEquals([], $result, 'The function getLog with a wrong key returns an empty array.');

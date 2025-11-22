@@ -9,19 +9,19 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests stream wrapper functions.
- *
- * @group File
  */
+#[Group('File')]
+#[RunTestsInSeparateProcesses]
 class StreamWrapperTest extends FileTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['file_test'];
 
@@ -54,7 +54,7 @@ class StreamWrapperTest extends FileTestBase {
   /**
    * Tests the getClassName() function.
    */
-  public function testGetClassName() {
+  public function testGetClassName(): void {
     // Check the dummy scheme.
     $this->assertEquals($this->classname, \Drupal::service('stream_wrapper_manager')->getClass($this->scheme), 'Got correct class name for dummy scheme.');
     // Check core's scheme.
@@ -64,7 +64,7 @@ class StreamWrapperTest extends FileTestBase {
   /**
    * Tests the getViaScheme() method.
    */
-  public function testGetInstanceByScheme() {
+  public function testGetInstanceByScheme(): void {
     $instance = \Drupal::service('stream_wrapper_manager')->getViaScheme($this->scheme);
     $this->assertEquals($this->classname, get_class($instance), 'Got correct class type for dummy scheme.');
 
@@ -75,9 +75,7 @@ class StreamWrapperTest extends FileTestBase {
   /**
    * Tests the getViaUri() and getViaScheme() methods and target functions.
    */
-  public function testUriFunctions() {
-    $config = $this->config('system.file');
-
+  public function testUriFunctions(): void {
     /** @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager */
     $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
 
@@ -113,7 +111,7 @@ class StreamWrapperTest extends FileTestBase {
   /**
    * Tests some file handle functions.
    */
-  public function testFileFunctions() {
+  public function testFileFunctions(): void {
     $filename = 'public://' . $this->randomMachineName();
     file_put_contents($filename, str_repeat('d', 1000));
 
@@ -145,7 +143,7 @@ class StreamWrapperTest extends FileTestBase {
   /**
    * Tests the scheme functions.
    */
-  public function testGetValidStreamScheme() {
+  public function testGetValidStreamScheme(): void {
 
     /** @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager */
     $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');

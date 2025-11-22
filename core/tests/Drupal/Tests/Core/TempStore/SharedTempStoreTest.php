@@ -6,18 +6,21 @@ namespace Drupal\Tests\Core\TempStore;
 
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\TempStore\Lock;
-use Drupal\Core\Test\TestKernel;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\TempStore\SharedTempStore;
 use Drupal\Core\TempStore\TempStoreException;
+use Drupal\Core\Test\TestKernel;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\TempStore\SharedTempStore
- * @group TempStore
+ * Tests Drupal\Core\TempStore\SharedTempStore.
  */
+#[CoversClass(SharedTempStore::class)]
+#[Group('TempStore')]
 class SharedTempStoreTest extends UnitTestCase {
 
   /**
@@ -98,9 +101,11 @@ class SharedTempStoreTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::get
+   * Tests get.
+   *
+   * @legacy-covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     $calls = ['test_2', 'test'];
     $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
@@ -119,9 +124,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the getIfOwner() method.
    *
-   * @covers ::getIfOwner
+   * @legacy-covers ::getIfOwner
    */
-  public function testGetIfOwner() {
+  public function testGetIfOwner(): void {
     $calls = ['test_2', 'test', 'test'];
     $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
@@ -142,9 +147,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the set() method with no lock available.
    *
-   * @covers ::set
+   * @legacy-covers ::set
    */
-  public function testSetWithNoLockAvailable() {
+  public function testSetWithNoLockAvailable(): void {
     $this->lock->expects($this->exactly(2))
       ->method('acquire')
       ->with('test')
@@ -163,9 +168,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests a successful set() call.
    *
-   * @covers ::set
+   * @legacy-covers ::set
    */
-  public function testSet() {
+  public function testSet(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
@@ -186,9 +191,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the setIfNotExists() methods.
    *
-   * @covers ::setIfNotExists
+   * @legacy-covers ::setIfNotExists
    */
-  public function testSetIfNotExists() {
+  public function testSetIfNotExists(): void {
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
       ->with('test', $this->ownObject, 604800)
@@ -200,9 +205,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the setIfOwner() method when no key exists.
    *
-   * @covers ::setIfOwner
+   * @legacy-covers ::setIfOwner
    */
-  public function testSetIfOwnerWhenNotExists() {
+  public function testSetIfOwnerWhenNotExists(): void {
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
       ->willReturn(TRUE);
@@ -213,9 +218,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the setIfOwner() method when a key already exists but no object.
    *
-   * @covers ::setIfOwner
+   * @legacy-covers ::setIfOwner
    */
-  public function testSetIfOwnerNoObject() {
+  public function testSetIfOwnerNoObject(): void {
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
       ->willReturn(FALSE);
@@ -231,9 +236,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the setIfOwner() method with matching and non matching owners.
    *
-   * @covers ::setIfOwner
+   * @legacy-covers ::setIfOwner
    */
-  public function testSetIfOwner() {
+  public function testSetIfOwner(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
@@ -255,9 +260,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the getMetadata() method.
    *
-   * @covers ::getMetadata
+   * @legacy-covers ::getMetadata
    */
-  public function testGetMetadata() {
+  public function testGetMetadata(): void {
     $this->keyValue->expects($this->exactly(2))
       ->method('get')
       ->with('test')
@@ -275,9 +280,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the delete() method.
    *
-   * @covers ::delete
+   * @legacy-covers ::delete
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
@@ -298,9 +303,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the delete() method with no lock available.
    *
-   * @covers ::delete
+   * @legacy-covers ::delete
    */
-  public function testDeleteWithNoLockAvailable() {
+  public function testDeleteWithNoLockAvailable(): void {
     $this->lock->expects($this->exactly(2))
       ->method('acquire')
       ->with('test')
@@ -319,9 +324,9 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the deleteIfOwner() method.
    *
-   * @covers ::deleteIfOwner
+   * @legacy-covers ::deleteIfOwner
    */
-  public function testDeleteIfOwner() {
+  public function testDeleteIfOwner(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test_2')
@@ -350,7 +355,7 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests the serialization of a shared temp store.
    */
-  public function testSerialization() {
+  public function testSerialization(): void {
     // Add an unserializable request to the request stack. If the tempstore
     // didn't use DependencySerializationTrait, an exception would be thrown
     // when we try to serialize the tempstore.

@@ -10,11 +10,15 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Plugin\DefaultLazyPluginCollection;
 use Drupal\Tests\Core\Plugin\Fixtures\TestConfigurablePlugin;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Plugin\DefaultLazyPluginCollection
- * @group Plugin
+ * Tests Drupal\Core\Plugin\DefaultLazyPluginCollection.
  */
+#[CoversClass(DefaultLazyPluginCollection::class)]
+#[Group('Plugin')]
 class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
 
   /**
@@ -25,9 +29,11 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   protected $pluginInstances;
 
   /**
-   * @covers ::has
+   * Tests has.
+   *
+   * @legacy-covers ::has
    */
-  public function testHas() {
+  public function testHas(): void {
     $this->setupPluginCollection();
     $definitions = $this->getPluginDefinitions();
 
@@ -39,9 +45,11 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
-   * @covers ::get
+   * Tests get.
+   *
+   * @legacy-covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     $this->setupPluginCollection($this->once());
     $apple = $this->pluginInstances['apple'];
 
@@ -49,9 +57,11 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
-   * @covers ::get
+   * Tests get not existing plugin.
+   *
+   * @legacy-covers ::get
    */
-  public function testGetNotExistingPlugin() {
+  public function testGetNotExistingPlugin(): void {
     $this->setupPluginCollection();
     $this->expectException(PluginNotFoundException::class);
     $this->expectExceptionMessage("Plugin ID 'pear' was not found.");
@@ -74,6 +84,8 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
+   * Tests sort helper.
+   *
    * @param string $plugin_id_1
    *   The first plugin ID.
    * @param string $plugin_id_2
@@ -81,10 +93,10 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
    * @param int $expected
    *   The expected result.
    *
-   * @covers ::sortHelper
-   * @dataProvider providerTestSortHelper
+   * @legacy-covers ::sortHelper
    */
-  public function testSortHelper($plugin_id_1, $plugin_id_2, $expected) {
+  #[DataProvider('providerTestSortHelper')]
+  public function testSortHelper($plugin_id_1, $plugin_id_2, $expected): void {
     $this->setupPluginCollection($this->any());
     if ($expected != 0) {
       $expected = $expected > 0 ? 1 : -1;
@@ -93,9 +105,11 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
-   * @covers ::getConfiguration
+   * Tests get configuration.
+   *
+   * @legacy-covers ::getConfiguration
    */
-  public function testGetConfiguration() {
+  public function testGetConfiguration(): void {
     $this->setupPluginCollection($this->exactly(3));
     // The expected order matches $this->config.
     $expected = ['banana', 'cherry', 'apple'];
@@ -116,9 +130,11 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
-   * @covers ::addInstanceId
+   * Tests add instance id.
+   *
+   * @legacy-covers ::addInstanceId
    */
-  public function testAddInstanceId() {
+  public function testAddInstanceId(): void {
     $this->setupPluginCollection($this->exactly(4));
     $expected = [
       'banana' => 'banana',
@@ -144,9 +160,11 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
-   * @covers ::removeInstanceId
+   * Tests remove instance id.
+   *
+   * @legacy-covers ::removeInstanceId
    */
-  public function testRemoveInstanceId() {
+  public function testRemoveInstanceId(): void {
     $this->setupPluginCollection($this->exactly(2));
     $this->defaultPluginCollection->removeInstanceId('cherry');
     $config = $this->defaultPluginCollection->getConfiguration();
@@ -154,9 +172,11 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
-   * @covers ::setInstanceConfiguration
+   * Tests set instance configuration.
+   *
+   * @legacy-covers ::setInstanceConfiguration
    */
-  public function testSetInstanceConfiguration() {
+  public function testSetInstanceConfiguration(): void {
     $this->setupPluginCollection($this->exactly(3));
     $expected = [
       'id' => 'cherry',
@@ -171,9 +191,9 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   /**
    * Tests plugin instances are changed if the configuration plugin key changes.
    *
-   * @covers ::setInstanceConfiguration
+   * @legacy-covers ::setInstanceConfiguration
    */
-  public function testSetInstanceConfigurationPluginChange() {
+  public function testSetInstanceConfigurationPluginChange(): void {
     $configurable_plugin = $this->prophesize(ConfigurableInterface::class);
     $configurable_config = ['id' => 'configurable', 'foo' => 'bar'];
     $configurable_plugin->getConfiguration()->willReturn($configurable_config);
@@ -200,17 +220,21 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
-   * @covers ::count
+   * Tests count.
+   *
+   * @legacy-covers ::count
    */
-  public function testCount() {
+  public function testCount(): void {
     $this->setupPluginCollection();
     $this->assertCount(3, $this->defaultPluginCollection);
   }
 
   /**
-   * @covers ::clear
+   * Tests clear.
+   *
+   * @legacy-covers ::clear
    */
-  public function testClear() {
+  public function testClear(): void {
     $this->setupPluginCollection($this->exactly(6));
     $this->defaultPluginCollection->getConfiguration();
     $this->defaultPluginCollection->getConfiguration();
@@ -219,9 +243,11 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
-   * @covers ::set
+   * Tests set.
+   *
+   * @legacy-covers ::set
    */
-  public function testSet() {
+  public function testSet(): void {
     $this->setupPluginCollection($this->exactly(4));
     $instance = $this->pluginManager->createInstance('cherry', $this->config['cherry']);
     $this->defaultPluginCollection->set('cherry2', $instance);
@@ -245,18 +271,22 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   }
 
   /**
-   * @covers ::getConfiguration
+   * Tests configurable get configuration.
+   *
+   * @legacy-covers ::getConfiguration
    */
-  public function testConfigurableGetConfiguration() {
+  public function testConfigurableGetConfiguration(): void {
     $this->setupPluginCollection($this->exactly(3));
     $config = $this->defaultPluginCollection->getConfiguration();
     $this->assertSame($this->config, $config);
   }
 
   /**
-   * @covers ::setConfiguration
+   * Tests configurable set configuration.
+   *
+   * @legacy-covers ::setConfiguration
    */
-  public function testConfigurableSetConfiguration() {
+  public function testConfigurableSetConfiguration(): void {
     $this->setupPluginCollection($this->exactly(2));
 
     $this->defaultPluginCollection->setConfiguration(['apple' => ['value' => 'pineapple', 'id' => 'apple']]);
@@ -277,9 +307,9 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   /**
    * Tests that plugin methods are correctly attached to interfaces.
    *
-   * @covers ::getConfiguration
+   * @legacy-covers ::getConfiguration
    */
-  public function testConfigurableInterface() {
+  public function testConfigurableInterface(): void {
     $configurable_plugin = $this->prophesize(ConfigurableInterface::class);
     $configurable_config = ['id' => 'configurable', 'foo' => 'bar'];
     $configurable_plugin->getConfiguration()->willReturn($configurable_config);

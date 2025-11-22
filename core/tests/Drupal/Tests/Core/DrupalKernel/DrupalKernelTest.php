@@ -8,22 +8,27 @@ use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @coversDefaultClass \Drupal\Core\DrupalKernel
- * @group DrupalKernel
+ * Tests Drupal\Core\DrupalKernel.
  */
+#[CoversClass(DrupalKernel::class)]
+#[Group('DrupalKernel')]
 class DrupalKernelTest extends UnitTestCase {
 
   /**
    * Tests hostname validation with settings.
    *
-   * @covers ::setupTrustedHosts
-   * @dataProvider providerTestTrustedHosts
+   * @legacy-covers ::setupTrustedHosts
    */
-  public function testTrustedHosts($host, $server_name, $message, $expected = FALSE) {
+  #[DataProvider('providerTestTrustedHosts')]
+  public function testTrustedHosts($host, $server_name, $message, $expected = FALSE): void {
     $request = new Request();
 
     $trusted_host_patterns = [
@@ -111,10 +116,10 @@ class DrupalKernelTest extends UnitTestCase {
    * This test is run in a separate process since it defines DRUPAL_ROOT. This
    * stops any possible pollution of other tests.
    *
-   * @covers ::findSitePath
-   * @runInSeparateProcess
+   * @legacy-covers ::findSitePath
    */
-  public function testFindSitePath() {
+  #[RunInSeparateProcess]
+  public function testFindSitePath(): void {
     $vfs_root = vfsStream::setup('drupal_root');
     $sites_php = <<<'EOD'
 <?php
@@ -140,10 +145,12 @@ EOD;
   }
 
   /**
-   * @covers ::terminate
-   * @runInSeparateProcess
+   * Tests un booted terminate.
+   *
+   * @legacy-covers ::terminate
    */
-  public function testUnBootedTerminate() {
+  #[RunInSeparateProcess]
+  public function testUnBootedTerminate(): void {
     $kernel = new DrupalKernel('test', new ClassLoader());
     $kernel->terminate(new Request(), new Response());
     $this->assertTrue(TRUE, "\Drupal\Core\DrupalKernel::terminate() called without error on kernel which has not booted");
@@ -160,16 +167,16 @@ class FakeAutoloader {
    * Registers this instance as an autoloader.
    *
    * @param bool $prepend
-   *   Whether to prepend the autoloader or not
+   *   Whether to prepend the autoloader or not.
    */
-  public function register($prepend = FALSE) {
+  public function register($prepend = FALSE): void {
     spl_autoload_register([$this, 'loadClass'], TRUE, $prepend);
   }
 
   /**
    * Deregisters this instance as an autoloader.
    */
-  public function unregister() {
+  public function unregister(): void {
     spl_autoload_unregister([$this, 'loadClass']);
   }
 

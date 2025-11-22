@@ -12,14 +12,18 @@ use Drupal\media\OEmbed\UrlResolverInterface;
 use Drupal\media\Plugin\Validation\Constraint\OEmbedResourceConstraint;
 use Drupal\media\Plugin\Validation\Constraint\OEmbedResourceConstraintValidator;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * @coversDefaultClass \Drupal\media\Plugin\Validation\Constraint\OEmbedResourceConstraintValidator
- *
- * @group media
+ * Tests Drupal\media\Plugin\Validation\Constraint\OEmbedResourceConstraintValidator.
  */
+#[CoversClass(OEmbedResourceConstraintValidator::class)]
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
 
   use MediaTypeCreationTrait;
@@ -36,12 +40,15 @@ class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
     parent::setUp();
     $this->installEntitySchema('file');
     $this->installEntitySchema('user');
+    $this->installEntitySchema('media');
   }
 
   /**
-   * @covers ::validate
+   * Tests validate empty source.
+   *
+   * @legacy-covers ::validate
    */
-  public function testValidateEmptySource() {
+  public function testValidateEmptySource(): void {
     $media = Media::create([
       'bundle' => $this->createMediaType('oembed:video')->id(),
     ]);
@@ -66,9 +73,11 @@ class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::validate
+   * Tests validate url resolver invoked.
+   *
+   * @legacy-covers ::validate
    */
-  public function testValidateUrlResolverInvoked() {
+  public function testValidateUrlResolverInvoked(): void {
     $media = Media::create([
       'bundle' => $this->createMediaType('oembed:video')->id(),
       'field_media_oembed_video' => 'source value',
@@ -106,13 +115,21 @@ class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
   protected function getValue(Media $media) {
     return new class ($media) {
 
+      /**
+       * The test entity.
+       *
+       * @var \Drupal\media\Entity\Media
+       */
       private $entity;
 
       public function __construct($entity) {
         $this->entity = $entity;
       }
 
-      public function getEntity() {
+      /**
+       * Returns the test entity.
+       */
+      public function getEntity(): Media {
         return $this->entity;
       }
 

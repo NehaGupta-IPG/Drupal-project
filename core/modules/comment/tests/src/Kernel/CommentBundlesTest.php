@@ -6,12 +6,14 @@ namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Entity\CommentType;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that comment bundles behave as expected.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentBundlesTest extends KernelTestBase {
 
   /**
@@ -60,7 +62,7 @@ class CommentBundlesTest extends KernelTestBase {
   /**
    * Tests that the entity_id field is set correctly for each comment bundle.
    */
-  public function testEntityIdField() {
+  public function testEntityIdField(): void {
     $field_definitions = [];
 
     foreach (array_keys($this->targetEntityTypes) as $id) {

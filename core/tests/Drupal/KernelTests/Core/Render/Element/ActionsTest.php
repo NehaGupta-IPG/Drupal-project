@@ -6,18 +6,19 @@ namespace Drupal\KernelTests\Core\Render\Element;
 
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element\Actions;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Element\Actions
- * @group Render
+ * Tests Drupal\Core\Render\Element\Actions.
  */
+#[CoversClass(Actions::class)]
+#[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class ActionsTest extends KernelTestBase implements FormInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * {@inheritdoc}
@@ -63,7 +64,10 @@ class ActionsTest extends KernelTestBase implements FormInterface {
   public function submitForm(array &$form, FormStateInterface $form_state) {
   }
 
-  public function testDropbuttonWithBubbleableMetadata() {
+  /**
+   * Tests a drop button with Bubbleable metadata.
+   */
+  public function testDropbuttonWithBubbleableMetadata(): void {
     $result = \Drupal::formBuilder()->getForm($this);
     \Drupal::service('renderer')->renderRoot($result);
     $this->assertEquals(['system/base', 'core/drupal.dropbutton'], $result['#attached']['library']);

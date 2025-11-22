@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Access;
 
+use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
-use Drupal\Core\Access\CsrfTokenGenerator;
-use Drupal\Component\Utility\Crypt;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the CsrfTokenGenerator class.
- *
- * @group Access
- * @coversDefaultClass \Drupal\Core\Access\CsrfTokenGenerator
  */
+#[CoversClass(CsrfTokenGenerator::class)]
+#[Group('Access')]
 class CsrfTokenGeneratorTest extends UnitTestCase {
 
   /**
@@ -65,7 +67,7 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
   /**
    * Set up default expectations on the mocks.
    */
-  protected function setupDefaultExpectations() {
+  protected function setupDefaultExpectations(): void {
     $key = Crypt::randomBytesBase64();
     $this->privateKey->expects($this->any())
       ->method('get')
@@ -80,9 +82,9 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
   /**
    * Tests CsrfTokenGenerator::get().
    *
-   * @covers ::get
+   * @legacy-covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     $this->setupDefaultExpectations();
 
     $this->assertIsString($this->generator->get());
@@ -93,9 +95,9 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
   /**
    * Tests that a new token seed is generated upon first use.
    *
-   * @covers ::get
+   * @legacy-covers ::get
    */
-  public function testGenerateSeedOnGet() {
+  public function testGenerateSeedOnGet(): void {
     $key = Crypt::randomBytesBase64();
     $this->privateKey->expects($this->any())
       ->method('get')
@@ -115,9 +117,9 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
   /**
    * Tests CsrfTokenGenerator::validate().
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
-  public function testValidate() {
+  public function testValidate(): void {
     $this->setupDefaultExpectations();
 
     $token = $this->generator->get();
@@ -136,10 +138,10 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
    * @param mixed $value
    *   (optional) An additional value to base the token on.
    *
-   * @covers ::validate
-   * @dataProvider providerTestValidateParameterTypes
+   * @legacy-covers ::validate
    */
-  public function testValidateParameterTypes($token, $value) {
+  #[DataProvider('providerTestValidateParameterTypes')]
+  public function testValidateParameterTypes($token, $value): void {
     $this->setupDefaultExpectations();
 
     // The following check might throw PHP fatal errors and notices, so we
@@ -173,10 +175,10 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
    * @param mixed $value
    *   (optional) An additional value to base the token on.
    *
-   * @covers ::validate
-   * @dataProvider providerTestInvalidParameterTypes
+   * @legacy-covers ::validate
    */
-  public function testInvalidParameterTypes($token, $value = '') {
+  #[DataProvider('providerTestInvalidParameterTypes')]
+  public function testInvalidParameterTypes($token, $value = ''): void {
     $this->setupDefaultExpectations();
 
     $this->expectException(\InvalidArgumentException::class);
@@ -201,9 +203,9 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
   /**
    * Tests the exception thrown when no 'hash_salt' is provided in settings.
    *
-   * @covers ::get
+   * @legacy-covers ::get
    */
-  public function testGetWithNoHashSalt() {
+  public function testGetWithNoHashSalt(): void {
     // Update settings with no hash salt.
     new Settings([]);
     $generator = new CsrfTokenGenerator($this->privateKey, $this->sessionMetadata);

@@ -11,12 +11,15 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\field\Entity\FieldStorageConfig
- *
- * @group field
+ * Tests Drupal\field\Entity\FieldStorageConfig.
  */
+#[CoversClass(FieldStorageConfig::class)]
+#[Group('field')]
 class FieldStorageConfigEntityUnitTest extends UnitTestCase {
 
   /**
@@ -65,9 +68,11 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::calculateDependencies
+   * Tests calculate dependencies.
+   *
+   * @legacy-covers ::calculateDependencies
    */
-  public function testCalculateDependencies() {
+  public function testCalculateDependencies(): void {
     // Create a mock entity type for FieldStorageConfig.
     $fieldStorageConfigentityType = $this->createMock('\Drupal\Core\Config\Entity\ConfigEntityTypeInterface');
     $fieldStorageConfigentityType->expects($this->any())
@@ -114,9 +119,9 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
   /**
    * Tests stored cardinality.
    *
-   * @covers ::getCardinality
+   * @legacy-covers ::getCardinality
    */
-  public function testStoredCardinality() {
+  public function testStoredCardinality(): void {
     $this->fieldTypeManager->expects($this->any())
       ->method('getDefinition')
       ->with('test_field_type')
@@ -141,9 +146,9 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
   /**
    * Tests enforced cardinality.
    *
-   * @covers ::getCardinality
+   * @legacy-covers ::getCardinality
    */
-  public function testEnforcedCardinality() {
+  public function testEnforcedCardinality(): void {
     $this->fieldTypeManager->expects($this->any())
       ->method('getDefinition')
       ->with('test_field_type')
@@ -169,13 +174,13 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
   /**
    * Tests invalid enforced cardinality.
    *
-   * @covers ::getCardinality
-   * @dataProvider providerInvalidEnforcedCardinality
-   *
    * @param mixed $enforced_cardinality
-   *   Enforced cardinality
+   *   Enforced cardinality.
+   *
+   * @legacy-covers ::getCardinality
    */
-  public function testInvalidEnforcedCardinality($enforced_cardinality) {
+  #[DataProvider('providerInvalidEnforcedCardinality')]
+  public function testInvalidEnforcedCardinality($enforced_cardinality): void {
     $this->fieldTypeManager->expects($this->any())
       ->method('getDefinition')
       ->with('test_field_type')

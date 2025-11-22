@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\node\Kernel\Migrate\d7;
 
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test D7NodeDeriver.
- *
- * @group migrate_drupal_7
  */
+#[Group('migrate_drupal_7')]
+#[RunTestsInSeparateProcesses]
 class MigrateNodeDeriverTest extends MigrateDrupal7TestBase {
 
   /**
@@ -21,7 +23,7 @@ class MigrateNodeDeriverTest extends MigrateDrupal7TestBase {
   /**
    * Tests node translation migrations with translation disabled.
    */
-  public function testNoTranslations() {
+  public function testNoTranslations(): void {
     // Without content_translation, there should be no translation migrations.
     $migrations = $this->container->get('plugin.manager.migration')->createInstances('d7_node_translation');
     $this->assertEmpty($migrations);
@@ -30,7 +32,7 @@ class MigrateNodeDeriverTest extends MigrateDrupal7TestBase {
   /**
    * Tests node translation migrations with translation enabled.
    */
-  public function testTranslations() {
+  public function testTranslations(): void {
     // With content_translation, there should be translation migrations for
     // each content type.
     $this->enableModules(['language', 'content_translation', 'filter']);
@@ -39,10 +41,9 @@ class MigrateNodeDeriverTest extends MigrateDrupal7TestBase {
 
   /**
    * Tests the d7_node node driver.
-   *
-   * @group node
    */
-  public function testBuilder() {
+  #[Group('node')]
+  public function testBuilder(): void {
     $process = $this->getMigration('d7_node:test_content_type')->getProcess();
     $this->assertSame('field_boolean', $process['field_boolean'][0]['source']);
     $this->assertSame('field_email', $process['field_email'][0]['source']);

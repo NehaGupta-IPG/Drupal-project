@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests the Select query builder.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class SelectSubqueryTest extends DatabaseTestBase {
 
   /**
    * Tests that we can use a subquery in a FROM clause.
    */
-  public function testFromSubquerySelect() {
+  public function testFromSubquerySelect(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
@@ -50,7 +53,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
   /**
    * Tests that we can use a subquery in a FROM clause with a LIMIT.
    */
-  public function testFromSubquerySelectWithLimit() {
+  public function testFromSubquerySelectWithLimit(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
@@ -78,7 +81,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
   /**
    * Tests that we can use a subquery with an IN operator in a WHERE clause.
    */
-  public function testConditionSubquerySelect() {
+  public function testConditionSubquerySelect(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
@@ -101,7 +104,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
   /**
    * Tests we can use a subquery with a relational operator in a WHERE clause.
    */
-  public function testConditionSubquerySelect2() {
+  public function testConditionSubquerySelect2(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test', 't2');
     $subquery->addExpression('AVG([t2].[age])');
@@ -122,7 +125,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
   /**
    * Tests we can use 2 subqueries with a relational operator in a WHERE clause.
    */
-  public function testConditionSubquerySelect3() {
+  public function testConditionSubquerySelect3(): void {
     // Create subquery 1, which is just a normal query object.
     $subquery1 = $this->connection->select('test_task', 'tt');
     $subquery1->addExpression('AVG([tt].[priority])');
@@ -152,7 +155,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * the right hand side. The test query may not be that logical but that's due
    * to the limited amount of data and tables. 'Valid' use cases do exist :)
    */
-  public function testConditionSubquerySelect4() {
+  public function testConditionSubquerySelect4(): void {
     // Create subquery 1, which is just a normal query object.
     $subquery1 = $this->connection->select('test_task', 'tt');
     $subquery1->addExpression('AVG([tt].[priority])');
@@ -188,7 +191,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
   /**
    * Tests that we can use a subquery in a JOIN clause.
    */
-  public function testJoinSubquerySelect() {
+  public function testJoinSubquerySelect(): void {
     // Create a subquery, which is just a normal query object.
     $subquery = $this->connection->select('test_task', 'tt');
     $subquery->addField('tt', 'pid', 'pid');
@@ -217,7 +220,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * We essentially select all rows from the {test} table that have matching
    * rows in the {test_people} table based on the shared name column.
    */
-  public function testExistsSubquerySelect() {
+  public function testExistsSubquerySelect(): void {
     // Put George into {test_people}.
     $this->connection->insert('test_people')
       ->fields([
@@ -247,7 +250,7 @@ class SelectSubqueryTest extends DatabaseTestBase {
    * We essentially select all rows from the {test} table that don't have
    * matching rows in the {test_people} table based on the shared name column.
    */
-  public function testNotExistsSubquerySelect() {
+  public function testNotExistsSubquerySelect(): void {
     // Put George into {test_people}.
     $this->connection->insert('test_people')
       ->fields([

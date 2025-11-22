@@ -5,27 +5,31 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Cache\Context;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\CacheContextInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Container;
 
 // cspell:ignore cnenzrgre
-
 /**
- * @coversDefaultClass \Drupal\Core\Cache\Context\CacheContextsManager
- * @group Cache
+ * Tests Drupal\Core\Cache\Context\CacheContextsManager.
  */
+#[CoversClass(CacheContextsManager::class)]
+#[Group('Cache')]
 class CacheContextsManagerTest extends UnitTestCase {
 
   /**
-   * @covers ::optimizeTokens
+   * Tests optimize tokens.
    *
-   * @dataProvider providerTestOptimizeTokens
+   * @legacy-covers ::optimizeTokens
    */
-  public function testOptimizeTokens(array $context_tokens, array $optimized_context_tokens) {
+  #[DataProvider('providerTestOptimizeTokens')]
+  public function testOptimizeTokens(array $context_tokens, array $optimized_context_tokens): void {
     $container = $this->getMockBuilder('Drupal\Core\DependencyInjection\Container')
       ->disableOriginalConstructor()
       ->getMock();
@@ -102,9 +106,11 @@ class CacheContextsManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::convertTokensToKeys
+   * Tests convert tokens to keys.
+   *
+   * @legacy-covers ::convertTokensToKeys
    */
-  public function testConvertTokensToKeys() {
+  public function testConvertTokensToKeys(): void {
     $container = $this->getMockContainer();
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
 
@@ -123,9 +129,11 @@ class CacheContextsManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::convertTokensToKeys
+   * Tests invalid context.
+   *
+   * @legacy-covers ::convertTokensToKeys
    */
-  public function testInvalidContext() {
+  public function testInvalidContext(): void {
     $container = $this->getMockContainer();
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
 
@@ -134,11 +142,12 @@ class CacheContextsManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::convertTokensToKeys
+   * Tests invalid calculated context.
    *
-   * @dataProvider providerTestInvalidCalculatedContext
+   * @legacy-covers ::convertTokensToKeys
    */
-  public function testInvalidCalculatedContext($context_token) {
+  #[DataProvider('providerTestInvalidCalculatedContext')]
+  public function testInvalidCalculatedContext($context_token): void {
     $container = $this->getMockContainer();
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
 
@@ -156,13 +165,13 @@ class CacheContextsManagerTest extends UnitTestCase {
     ];
   }
 
-  public function testAvailableContextStrings() {
+  public function testAvailableContextStrings(): void {
     $cache_contexts_manager = new CacheContextsManager($this->getMockContainer(), $this->getContextsFixture());
     $contexts = $cache_contexts_manager->getAll();
     $this->assertEquals(["foo", "baz"], $contexts);
   }
 
-  public function testAvailableContextLabels() {
+  public function testAvailableContextLabels(): void {
     $container = $this->getMockContainer();
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
     $labels = $cache_contexts_manager->getLabels();
@@ -170,7 +179,7 @@ class CacheContextsManagerTest extends UnitTestCase {
     $this->assertEquals($expected, $labels);
   }
 
-  protected function getContextsFixture() {
+  protected function getContextsFixture(): array {
     return ['foo', 'baz'];
   }
 
@@ -199,6 +208,7 @@ class CacheContextsManagerTest extends UnitTestCase {
    * Provides a list of cache context token arrays.
    *
    * @return array
+   *   An array of cache context token arrays.
    */
   public static function validateTokensProvider() {
     return [
@@ -228,11 +238,12 @@ class CacheContextsManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validateTokens
+   * Tests validate contexts.
    *
-   * @dataProvider validateTokensProvider
+   * @legacy-covers ::validateTokens
    */
-  public function testValidateContexts(array $contexts, $expected_exception_message) {
+  #[DataProvider('validateTokensProvider')]
+  public function testValidateContexts(array $contexts, $expected_exception_message): void {
     $container = new ContainerBuilder();
     $cache_contexts_manager = new CacheContextsManager($container, ['foo', 'foo.bar', 'baz']);
     if ($expected_exception_message !== FALSE) {

@@ -9,19 +9,21 @@ use Drupal\Core\File\Exception\FileNotExistsException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystem;
 use Drupal\Core\Site\Settings;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the unmanaged file copy function.
- *
- * @group File
  */
+#[Group('File')]
+#[RunTestsInSeparateProcesses]
 class FileCopyTest extends FileTestBase {
 
   /**
    * Copy a normal file.
    */
-  public function testNormal() {
-    // Create a file for testing
+  public function testNormal(): void {
+    // Create a file for testing.
     $uri = $this->createUri();
 
     // Copying to a new name.
@@ -50,8 +52,8 @@ class FileCopyTest extends FileTestBase {
   /**
    * Copy a non-existent file.
    */
-  public function testNonExistent() {
-    // Copy non-existent file
+  public function testNonExistent(): void {
+    // Copy non-existent file.
     $desired_filepath = $this->randomMachineName();
     $this->assertFileDoesNotExist($desired_filepath);
     $this->expectException(FileNotExistsException::class);
@@ -62,8 +64,8 @@ class FileCopyTest extends FileTestBase {
   /**
    * Copy a file onto itself.
    */
-  public function testOverwriteSelf() {
-    // Create a file for testing
+  public function testOverwriteSelf(): void {
+    // Create a file for testing.
     $uri = $this->createUri();
 
     // Copy the file onto itself with renaming works.

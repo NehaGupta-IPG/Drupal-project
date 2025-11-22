@@ -8,24 +8,25 @@ use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\block_content_test\Plugin\EntityReferenceSelection\TestSelection;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityReference selection handlers don't return non-reusable blocks.
  *
  * @see block_content_query_entity_reference_alter()
- *
- * @group block_content
  */
+#[Group('block_content')]
+#[RunTestsInSeparateProcesses]
 class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
     'block_content',
     'block_content_test',
-    'system',
     'user',
   ];
 
@@ -75,8 +76,8 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
     // Create a block content type.
     $block_content_type = BlockContentType::create([
       'id' => 'spiffy',
-      'label' => 'Mucho spiffy',
-      'description' => "Provides a block type that increases your site's spiffiness by up to 11%",
+      'label' => 'Very spiffy',
+      'description' => "Provides a block type that increases your site's spiffy rating by up to 11%",
     ]);
     $block_content_type->save();
     $this->entityTypeManager = $this->container->get('entity_type.manager');
@@ -120,7 +121,7 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function testQueriesNotAltered() {
+  public function testQueriesNotAltered(): void {
     // Ensure that queries without all the tags are not altered.
     $query = $this->entityTypeManager->getStorage('block_content')
       ->getQuery()
@@ -145,7 +146,7 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  public function testNoConditions() {
+  public function testNoConditions(): void {
     $this->assertEquals(
       $this->expectations['block_reusable'],
       $this->selectionHandler->getReferenceableEntities()
@@ -164,11 +165,10 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
   /**
    * Tests setting 'reusable' condition on different levels.
    *
-   * @dataProvider fieldConditionProvider
-   *
    * @throws \Exception
    */
-  public function testFieldConditions($condition_type, $is_reusable) {
+  #[DataProvider('fieldConditionProvider')]
+  public function testFieldConditions($condition_type, $is_reusable): void {
     $this->selectionHandler->setTestMode($condition_type, $is_reusable);
     $this->assertEquals(
       $is_reusable ? $this->expectations['block_reusable'] : $this->expectations['block_non_reusable'],

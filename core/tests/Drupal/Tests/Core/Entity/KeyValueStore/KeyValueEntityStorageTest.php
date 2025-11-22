@@ -14,14 +14,16 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage;
 use Drupal\Core\Language\Language;
 use Drupal\Tests\UnitTestCase;
-use Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage
- * @group Entity
+ * Tests Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage.
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage::class)]
+#[\PHPUnit\Framework\Attributes\Group('Entity')]
 class KeyValueEntityStorageTest extends UnitTestCase {
 
   /**
@@ -60,6 +62,8 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   protected $languageManager;
 
   /**
+   * The entity storage.
+   *
    * @var \Drupal\Core\Entity\KeyValueStore\KeyValueEntityStorage
    */
   protected $entityStorage;
@@ -96,12 +100,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   /**
    * Prepares the key value entity storage.
    *
-   * @covers ::__construct
-   *
    * @param string $uuid_key
    *   (optional) The entity key used for the UUID. Defaults to 'uuid'.
+   *
+   * @legacy-covers ::__construct
    */
-  protected function setUpKeyValueEntityStorage($uuid_key = 'uuid') {
+  protected function setUpKeyValueEntityStorage($uuid_key = 'uuid'): void {
     $this->entityType->expects($this->atLeastOnce())
       ->method('getKey')
       ->willReturnMap([
@@ -150,10 +154,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::create
-   * @covers ::doCreate
+   * Tests create with predefined uuid.
+   *
+   * @legacy-covers ::create
+   * @legacy-covers ::doCreate
    */
-  public function testCreateWithPredefinedUuid() {
+  public function testCreateWithPredefinedUuid(): void {
     $this->entityType->expects($this->once())
       ->method('getClass')
       ->willReturn(get_class($this->getMockEntity()));
@@ -175,10 +181,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::create
-   * @covers ::doCreate
+   * Tests create without uuid key.
+   *
+   * @legacy-covers ::create
+   * @legacy-covers ::doCreate
    */
-  public function testCreateWithoutUuidKey() {
+  public function testCreateWithoutUuidKey(): void {
     // Set up the entity storage to expect no UUID key.
     $this->entityType->expects($this->once())
       ->method('getClass')
@@ -201,12 +209,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::create
-   * @covers ::doCreate
+   * Tests create.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @legacy-covers ::create
+   * @legacy-covers ::doCreate
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $entity = $this->getMockEntity(EntityBaseTest::class, [], ['toArray']);
     $this->entityType->expects($this->once())
       ->method('getClass')
@@ -227,22 +235,19 @@ class KeyValueEntityStorageTest extends UnitTestCase {
     $this->assertInstanceOf('Drupal\Core\Entity\EntityInterface', $entity);
     $this->assertSame('foo', $entity->id());
     $this->assertSame('bar', $entity->uuid());
-    return $entity;
   }
 
   /**
-   * @covers ::save
-   * @covers ::doSave
+   * Tests save insert.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *
-   * @depends testCreate
+   * @legacy-covers ::save
+   * @legacy-covers ::doSave
    */
-  public function testSaveInsert(EntityInterface $entity) {
+  public function testSaveInsert(): EntityInterface&MockObject {
     $this->setUpKeyValueEntityStorage();
+
+    $entity = $this->getMockEntity(EntityBaseTest::class, [['id' => 'foo']], ['toArray']);
+    $entity->enforceIsNew();
 
     $expected = ['id' => 'foo'];
     $this->keyValueStore->expects($this->exactly(2))
@@ -274,17 +279,16 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::save
-   * @covers ::doSave
+   * Tests save update.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *
-   * @depends testSaveInsert
+   * @legacy-covers ::save
+   * @legacy-covers ::doSave
    */
-  public function testSaveUpdate(EntityInterface $entity) {
+  #[\PHPUnit\Framework\Attributes\Depends('testSaveInsert')]
+  public function testSaveUpdate(EntityInterface $entity): void {
     $this->entityType->expects($this->once())
       ->method('getClass')
       ->willReturn(get_class($entity));
@@ -314,12 +318,13 @@ class KeyValueEntityStorageTest extends UnitTestCase {
       ->with('foo', $expected);
     $return = $this->entityStorage->save($entity);
     $this->assertSame(SAVED_UPDATED, $return);
-    return $entity;
   }
 
   /**
-   * @covers ::save
-   * @covers ::doSave
+   * Tests save config entity.
+   *
+   * @legacy-covers ::save
+   * @legacy-covers ::doSave
    */
   public function testSaveConfigEntity() {
     $this->setUpKeyValueEntityStorage();
@@ -353,12 +358,13 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::save
-   * @covers ::doSave
+   * Tests save rename config entity.
    *
-   * @depends testSaveConfigEntity
+   * @legacy-covers ::save
+   * @legacy-covers ::doSave
    */
-  public function testSaveRenameConfigEntity(ConfigEntityInterface $entity) {
+  #[\PHPUnit\Framework\Attributes\Depends('testSaveConfigEntity')]
+  public function testSaveRenameConfigEntity(ConfigEntityInterface $entity): void {
     $this->entityType->expects($this->once())
       ->method('getClass')
       ->willReturn(get_class($entity));
@@ -394,10 +400,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::save
-   * @covers ::doSave
+   * Tests save content entity.
+   *
+   * @legacy-covers ::save
+   * @legacy-covers ::doSave
    */
-  public function testSaveContentEntity() {
+  public function testSaveContentEntity(): void {
     $this->entityType->expects($this->any())
       ->method('getKeys')
       ->willReturn([
@@ -429,10 +437,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::save
-   * @covers ::doSave
+   * Tests save invalid.
+   *
+   * @legacy-covers ::save
+   * @legacy-covers ::doSave
    */
-  public function testSaveInvalid() {
+  public function testSaveInvalid(): void {
     $this->setUpKeyValueEntityStorage();
 
     $entity = $this->getMockEntity('Drupal\Core\Config\Entity\ConfigEntityBase');
@@ -448,10 +458,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::save
-   * @covers ::doSave
+   * Tests save duplicate.
+   *
+   * @legacy-covers ::save
+   * @legacy-covers ::doSave
    */
-  public function testSaveDuplicate() {
+  public function testSaveDuplicate(): void {
     $this->setUpKeyValueEntityStorage();
 
     $entity = $this->getMockEntity(EntityBaseTest::class, [['id' => 'foo']]);
@@ -469,10 +481,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::load
-   * @covers ::postLoad
+   * Tests load.
+   *
+   * @legacy-covers ::load
+   * @legacy-covers ::postLoad
    */
-  public function testLoad() {
+  public function testLoad(): void {
     $entity = $this->getMockEntity();
     $this->entityType->expects($this->once())
       ->method('getClass')
@@ -489,9 +503,11 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::load
+   * Tests load missing entity.
+   *
+   * @legacy-covers ::load
    */
-  public function testLoadMissingEntity() {
+  public function testLoadMissingEntity(): void {
     $this->setUpKeyValueEntityStorage();
 
     $this->keyValueStore->expects($this->once())
@@ -503,12 +519,14 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::loadMultiple
-   * @covers ::postLoad
-   * @covers ::mapFromStorageRecords
-   * @covers ::doLoadMultiple
+   * Tests load multiple all.
+   *
+   * @legacy-covers ::loadMultiple
+   * @legacy-covers ::postLoad
+   * @legacy-covers ::mapFromStorageRecords
+   * @legacy-covers ::doLoadMultiple
    */
-  public function testLoadMultipleAll() {
+  public function testLoadMultipleAll(): void {
     $expected['foo'] = $this->getMockEntity(EntityBaseTest::class, [['id' => 'foo']]);
     $expected['bar'] = $this->getMockEntity(EntityBaseTest::class, [['id' => 'bar']]);
     $this->entityType->expects($this->once())
@@ -528,12 +546,14 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::loadMultiple
-   * @covers ::postLoad
-   * @covers ::mapFromStorageRecords
-   * @covers ::doLoadMultiple
+   * Tests load multiple ids.
+   *
+   * @legacy-covers ::loadMultiple
+   * @legacy-covers ::postLoad
+   * @legacy-covers ::mapFromStorageRecords
+   * @legacy-covers ::doLoadMultiple
    */
-  public function testLoadMultipleIds() {
+  public function testLoadMultipleIds(): void {
     $entity = $this->getMockEntity(EntityBaseTest::class, [['id' => 'foo']]);
     $this->entityType->expects($this->once())
       ->method('getClass')
@@ -553,10 +573,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::delete
-   * @covers ::doDelete
+   * Tests delete.
+   *
+   * @legacy-covers ::delete
+   * @legacy-covers ::doDelete
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $entities['foo'] = $this->getMockEntity(EntityBaseTest::class, [['id' => 'foo']]);
     $entities['bar'] = $this->getMockEntity(EntityBaseTest::class, [['id' => 'bar']]);
     $this->setUpKeyValueEntityStorage();
@@ -584,10 +606,12 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::delete
-   * @covers ::doDelete
+   * Tests delete nothing.
+   *
+   * @legacy-covers ::delete
+   * @legacy-covers ::doDelete
    */
-  public function testDeleteNothing() {
+  public function testDeleteNothing(): void {
     $this->setUpKeyValueEntityStorage();
 
     $this->moduleHandler->expects($this->never())
@@ -604,35 +628,72 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * Creates an entity with specific methods mocked.
    *
    * @param string $class
-   *   (optional) The concrete entity class to mock. Defaults to
-   *   'Drupal\Core\Entity\EntityBase'.
+   *   (optional) The concrete entity class to mock. Defaults to a stub of
+   *   \Drupal\Core\Entity\EntityBase defined for test purposes.
    * @param array $arguments
    *   (optional) Arguments to pass to the constructor. An empty set of values
    *   and an entity type ID will be provided.
    * @param array $methods
    *   (optional) The methods to mock.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\Entity\EntityInterface&\PHPUnit\Framework\MockObject\MockObject
+   *   A mock entity instance with the specified methods mocked.
    */
-  public function getMockEntity($class = EntityBaseTest::class, array $arguments = [], $methods = []) {
+  protected function getMockEntity(string $class = EntityBaseTest::class, array $arguments = [], array $methods = []): EntityInterface&MockObject {
     // Ensure the entity is passed at least an array of values and an entity
-    // type ID
+    // type ID.
     if (!isset($arguments[0])) {
       $arguments[0] = [];
     }
     if (!isset($arguments[1])) {
       $arguments[1] = 'test_entity_type';
     }
-    return $this->getMockForAbstractClass($class, $arguments, '', TRUE, TRUE, TRUE, $methods);
+    return $this->getMockBuilder($class)
+      ->setConstructorArgs($arguments)
+      ->onlyMethods($methods)
+      ->getMock();
   }
 
 }
 
+/**
+ * A simple entity class for testing key value entity storage.
+ */
 class EntityBaseTest extends EntityBase {
+
+  /**
+   * The entity ID.
+   *
+   * @var string
+   */
   public $id;
+
+  /**
+   * The language code for the entity.
+   *
+   * @var string
+   */
   public $langcode;
+
+  /**
+   * The entity UUID.
+   *
+   * @var string
+   */
   public $uuid;
+
+  /**
+   * The entity label.
+   *
+   * @var string
+   */
   public $label;
+
+  /**
+   * The original, or NULL if the entity cannot be loaded.
+   *
+   * @var string
+   */
   public $original;
 
 }

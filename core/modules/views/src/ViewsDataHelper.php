@@ -67,9 +67,9 @@ class ViewsDataHelper {
         $strings = [];
         $skip_bases = [];
         foreach ($table_data as $field => $info) {
-          // Collect table data from this table
+          // Collect table data from this table.
           if ($field == 'table') {
-            // calculate what tables this table can join to.
+            // Calculate what tables this table can join to.
             if (!empty($info['join'])) {
               $bases = array_keys($info['join']);
             }
@@ -96,15 +96,15 @@ class ViewsDataHelper {
                 }
               }
               foreach (['title', 'group', 'help', 'base', 'aliases'] as $string) {
-                // First, try the lowest possible level
+                // First, try the lowest possible level.
                 if (!empty($info[$key][$string])) {
                   $strings[$field][$key][$string] = $info[$key][$string];
                 }
-                // Then try the field level
+                // Then try the field level.
                 elseif (!empty($info[$string])) {
                   $strings[$field][$key][$string] = $info[$string];
                 }
-                // Finally, try the table level
+                // Finally, try the table level.
                 elseif (!empty($table_data['table'][$string])) {
                   $strings[$field][$key][$string] = $table_data['table'][$string];
                 }
@@ -163,8 +163,8 @@ class ViewsDataHelper {
    * Sort function for fetched fields.
    *
    * @param array $a
-   *   First item for comparison. The compared items should be associative arrays
-   *   that include a 'group' and a 'title' key.
+   *   First item for comparison. The compared items should be associative
+   *   arrays that include a 'group' and a 'title' key.
    * @param array $b
    *   Second item for comparison.
    *

@@ -12,20 +12,25 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Element\MachineName;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Element\MachineName
- * @group Render
+ * Tests Drupal\Core\Render\Element\MachineName.
  */
+#[CoversClass(MachineName::class)]
+#[Group('Render')]
 class MachineNameTest extends UnitTestCase {
 
   /**
-   * @covers ::valueCallback
+   * Tests value callback.
    *
-   * @dataProvider providerTestValueCallback
+   * @legacy-covers ::valueCallback
    */
-  public function testValueCallback($expected, $input) {
+  #[DataProvider('providerTestValueCallback')]
+  public function testValueCallback($expected, $input): void {
     $element = [];
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
     $this->assertSame($expected, MachineName::valueCallback($element, $input, $form_state));
@@ -46,9 +51,11 @@ class MachineNameTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processMachineName
+   * Tests process machine name.
+   *
+   * @legacy-covers ::processMachineName
    */
-  public function testProcessMachineName() {
+  public function testProcessMachineName(): void {
     $form_state = new FormState();
 
     $element = [

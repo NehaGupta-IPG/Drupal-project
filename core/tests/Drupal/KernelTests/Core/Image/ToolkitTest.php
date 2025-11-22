@@ -9,12 +9,14 @@ use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 use Drupal\image\ImageEffectManager;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the image toolkit.
- *
- * @group Image
  */
+#[Group('Image')]
+#[RunTestsInSeparateProcesses]
 class ToolkitTest extends KernelTestBase {
 
   use ToolkitTestTrait;
@@ -24,7 +26,6 @@ class ToolkitTest extends KernelTestBase {
    */
   protected static $modules = [
     'image_test',
-    'system',
   ];
 
   /**
@@ -53,7 +54,7 @@ class ToolkitTest extends KernelTestBase {
   /**
    * Tests that the toolkit manager only returns available toolkits.
    */
-  public function testGetAvailableToolkits() {
+  public function testGetAvailableToolkits(): void {
     $manager = $this->container->get('image.toolkit.manager');
     $toolkits = $manager->getAvailableToolkits();
 
@@ -66,7 +67,7 @@ class ToolkitTest extends KernelTestBase {
   /**
    * Tests Image's methods.
    */
-  public function testLoad() {
+  public function testLoad(): void {
     $image = $this->getImage();
     $this->assertInstanceOf(ImageInterface::class, $image);
     $this->assertEquals('test', $image->getToolkitId());
@@ -76,7 +77,7 @@ class ToolkitTest extends KernelTestBase {
   /**
    * Tests the Image::save() function.
    */
-  public function testSave() {
+  public function testSave(): void {
     $this->assertFalse($this->image->save());
     $this->assertToolkitOperationsCalled(['save']);
   }
@@ -84,7 +85,7 @@ class ToolkitTest extends KernelTestBase {
   /**
    * Tests the 'apply' method.
    */
-  public function testApply() {
+  public function testApply(): void {
     $data = ['p1' => 1, 'p2' => TRUE, 'p3' => 'text'];
 
     // The operation plugin itself does not exist, so apply will return false.
@@ -102,7 +103,7 @@ class ToolkitTest extends KernelTestBase {
   /**
    * Tests the 'apply' method without parameters.
    */
-  public function testApplyNoParameters() {
+  public function testApplyNoParameters(): void {
     // The operation plugin itself does not exist, so apply will return false.
     $this->assertFalse($this->image->apply('my_operation'));
 
@@ -116,7 +117,7 @@ class ToolkitTest extends KernelTestBase {
   /**
    * Tests image toolkit operations inheritance by derivative toolkits.
    */
-  public function testDerivative() {
+  public function testDerivative(): void {
     $toolkit_manager = $this->container->get('image.toolkit.manager');
     $operation_manager = $this->container->get('image.toolkit.operation.manager');
 

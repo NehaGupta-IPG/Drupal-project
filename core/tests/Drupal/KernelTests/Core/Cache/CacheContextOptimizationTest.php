@@ -7,20 +7,20 @@ namespace Drupal\KernelTests\Core\Cache;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the cache context optimization.
- *
- * @group Render
  */
+#[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class CacheContextOptimizationTest extends KernelTestBase {
 
   use UserCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'system'];
 
@@ -36,7 +36,7 @@ class CacheContextOptimizationTest extends KernelTestBase {
   /**
    * Ensures that 'user.permissions' cache context is able to define cache tags.
    */
-  public function testUserPermissionCacheContextOptimization() {
+  public function testUserPermissionCacheContextOptimization(): void {
     $user1 = $this->createUser();
     $this->assertEquals(1, $user1->id());
 
@@ -79,7 +79,7 @@ class CacheContextOptimizationTest extends KernelTestBase {
   /**
    * Ensures that 'user.roles' still works when it is optimized away.
    */
-  public function testUserRolesCacheContextOptimization() {
+  public function testUserRolesCacheContextOptimization(): void {
     $root_user = $this->createUser();
     $this->assertEquals(1, $root_user->id());
 

@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore loquesea
 /**
  * Tests language-negotiation overrides are not on language-negotiation form.
  *
- * @group config
  * @see \Drupal\Core\Form\ConfigFormBase
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class LanguageNegotiationFormOverrideTest extends BrowserTestBase {
 
   /**
@@ -27,7 +31,7 @@ class LanguageNegotiationFormOverrideTest extends BrowserTestBase {
   /**
    * Tests that overrides do not affect language-negotiation form values.
    */
-  public function testFormWithOverride() {
+  public function testFormWithOverride(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'access administration pages',
       'administer site configuration',

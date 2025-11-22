@@ -6,11 +6,14 @@ namespace Drupal\Tests\user\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group rest
- * @group #slow
+ * Tests User Xml Cookie.
  */
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class UserXmlCookieTest extends UserResourceTestBase {
 
   use CookieResourceTestTrait;
@@ -35,21 +38,5 @@ class UserXmlCookieTest extends UserResourceTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatchDxForSecuritySensitiveBaseFields() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatchSecurityOtherUser() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
 
 }

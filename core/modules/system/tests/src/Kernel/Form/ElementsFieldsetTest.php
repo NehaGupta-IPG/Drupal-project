@@ -8,12 +8,14 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests fieldset element rendering and description placement.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ElementsFieldsetTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -111,7 +113,7 @@ class ElementsFieldsetTest extends KernelTestBase implements FormInterface {
   /**
    * Tests different display options for fieldset element descriptions.
    */
-  public function testFieldsetDescriptions() {
+  public function testFieldsetDescriptions(): void {
     $form_state = new FormState();
     $form = \Drupal::formBuilder()->getForm($this);
     $this->render($form);

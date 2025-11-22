@@ -45,12 +45,11 @@ class PasswordConfirm extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#markup' => '',
       '#process' => [
-        [$class, 'processPasswordConfirm'],
+        [static::class, 'processPasswordConfirm'],
       ],
       '#theme_wrappers' => ['form_element'],
     ];

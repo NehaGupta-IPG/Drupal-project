@@ -6,19 +6,23 @@ namespace Drupal\Tests\Core\Menu;
 
 use Drupal\Core\Menu\StaticMenuLinkOverrides;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Menu\StaticMenuLinkOverrides
- * @group Menu
+ * Tests Drupal\Core\Menu\StaticMenuLinkOverrides.
  */
+#[CoversClass(StaticMenuLinkOverrides::class)]
+#[Group('Menu')]
 class StaticMenuLinkOverridesTest extends UnitTestCase {
 
   /**
    * Tests the reload method.
    *
-   * @covers ::reload
+   * @legacy-covers ::reload
    */
-  public function testReload() {
+  public function testReload(): void {
     $config_factory = $this->createMock('Drupal\Core\Config\ConfigFactoryInterface');
     $config_factory->expects($this->once())
       ->method('reset')
@@ -32,12 +36,11 @@ class StaticMenuLinkOverridesTest extends UnitTestCase {
   /**
    * Tests the loadOverride method.
    *
-   * @dataProvider providerTestLoadOverride
-   *
-   * @covers ::loadOverride
-   * @covers ::getConfig
+   * @legacy-covers ::loadOverride
+   * @legacy-covers ::getConfig
    */
-  public function testLoadOverride($overrides, $id, $expected) {
+  #[DataProvider('providerTestLoadOverride')]
+  public function testLoadOverride($overrides, $id, $expected): void {
     $config_factory = $this->getConfigFactoryStub(['core.menu.static_menu_link_overrides' => ['definitions' => $overrides]]);
     $static_override = new StaticMenuLinkOverrides($config_factory);
 
@@ -53,7 +56,7 @@ class StaticMenuLinkOverridesTest extends UnitTestCase {
     $data[] = [['test1' => ['parent' => 'test0']], 'test1', ['parent' => 'test0']];
     // Non existing ID.
     $data[] = [['test1' => ['parent' => 'test0']], 'test2', []];
-    // Ensure that the ID is encoded properly
+    // Ensure that the ID is encoded properly.
     $data[] = [['test1__la___ma' => ['parent' => 'test0']], 'test1.la__ma', ['parent' => 'test0']];
 
     return $data;
@@ -62,10 +65,10 @@ class StaticMenuLinkOverridesTest extends UnitTestCase {
   /**
    * Tests the loadMultipleOverrides method.
    *
-   * @covers ::loadMultipleOverrides
-   * @covers ::getConfig
+   * @legacy-covers ::loadMultipleOverrides
+   * @legacy-covers ::getConfig
    */
-  public function testLoadMultipleOverrides() {
+  public function testLoadMultipleOverrides(): void {
     $overrides = [];
     $overrides['test1'] = ['parent' => 'test0'];
     $overrides['test2'] = ['parent' => 'test1'];
@@ -80,11 +83,11 @@ class StaticMenuLinkOverridesTest extends UnitTestCase {
   /**
    * Tests the saveOverride method.
    *
-   * @covers ::saveOverride
-   * @covers ::loadOverride
-   * @covers ::getConfig
+   * @legacy-covers ::saveOverride
+   * @legacy-covers ::loadOverride
+   * @legacy-covers ::getConfig
    */
-  public function testSaveOverride() {
+  public function testSaveOverride(): void {
     $config = $this->getMockBuilder('Drupal\Core\Config\Config')
       ->disableOriginalConstructor()
       ->getMock();
@@ -140,13 +143,12 @@ class StaticMenuLinkOverridesTest extends UnitTestCase {
    * @param array|string $ids
    *   Either a single ID or multiple ones as array.
    * @param array $old_definitions
-   *   The definitions before the deleting
+   *   The definitions before the deleting.
    * @param array $new_definitions
    *   The definitions after the deleting.
-   *
-   * @dataProvider providerTestDeleteOverrides
    */
-  public function testDeleteOverrides($ids, array $old_definitions, array $new_definitions) {
+  #[DataProvider('providerTestDeleteOverrides')]
+  public function testDeleteOverrides($ids, array $old_definitions, array $new_definitions): void {
     $config = $this->getMockBuilder('Drupal\Core\Config\Config')
       ->disableOriginalConstructor()
       ->getMock();

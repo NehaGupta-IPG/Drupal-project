@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests multiple file upload.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class MultipleFileUploadTest extends BrowserTestBase {
 
   /**
@@ -36,7 +38,7 @@ class MultipleFileUploadTest extends BrowserTestBase {
   /**
    * Tests multiple file field with all file extensions.
    */
-  public function testMultipleFileFieldWithAllFileExtensions() {
+  public function testMultipleFileFieldWithAllFileExtensions(): void {
     $theme = 'test_theme_settings';
     \Drupal::service('theme_installer')->install([$theme]);
     $this->drupalGet("admin/appearance/settings/$theme");

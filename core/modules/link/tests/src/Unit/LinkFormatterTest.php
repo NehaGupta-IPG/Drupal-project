@@ -15,12 +15,12 @@ use Drupal\Core\Url;
 use Drupal\link\LinkItemInterface;
 use Drupal\link\Plugin\Field\FieldFormatter\LinkFormatter;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Field Formatter for the link field type.
- *
- * @group link
  */
+#[Group('link')]
 class LinkFormatterTest extends UnitTestCase {
 
   /**
@@ -28,7 +28,7 @@ class LinkFormatterTest extends UnitTestCase {
    *
    * LinkItem::getUrl will throw \InvalidArgumentException.
    */
-  public function testFormatterLinkItemUrlMalformed() {
+  public function testFormatterLinkItemUrlMalformed(): void {
     $entity = $this->createMock(EntityInterface::class);
 
     $linkItem = $this->createMock(LinkItemInterface::class);
@@ -70,7 +70,7 @@ class LinkFormatterTest extends UnitTestCase {
   /**
    * Tests when LinkItem::getUrl throws an unexpected exception.
    */
-  public function testFormatterLinkItemUrlUnexpectedException() {
+  public function testFormatterLinkItemUrlUnexpectedException(): void {
     $exception = new \Exception('Unexpected!!!');
 
     $linkItem = $this->createMock(LinkItemInterface::class);
@@ -107,7 +107,7 @@ class LinkFormatterTest extends UnitTestCase {
   /**
    * Tests when LinkItem::getUrl returns a functional URL.
    */
-  public function testFormatterLinkItem() {
+  public function testFormatterLinkItem(): void {
     $expectedUrl = Url::fromUri('route:<front>');
 
     $linkItem = $this->createMock(LinkItemInterface::class);

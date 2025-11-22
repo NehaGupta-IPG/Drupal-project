@@ -6,18 +6,20 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\StatementInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Statement classes.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class StatementTest extends DatabaseTestBase {
 
   /**
    * Tests that a prepared statement object can be reused for multiple inserts.
    */
-  public function testRepeatedInsertStatementReuse() {
+  public function testRepeatedInsertStatementReuse(): void {
     $num_records_before = $this->connection->select('test')->countQuery()->execute()->fetchField();
 
     $sql = "INSERT INTO {test} ([name], [age]) VALUES (:name, :age)";
@@ -186,9 +188,11 @@ class StatementTest extends DatabaseTestBase {
 
     $count = 0;
 
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
     foreach ($statement as $row) {
       $count++;
     }
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis
     foreach ($statement as $row) {
       $count++;
     }
@@ -209,7 +213,7 @@ class StatementTest extends DatabaseTestBase {
 
     $this->expectException(DatabaseExceptionWrapper::class);
     $this->expectExceptionMessage('Attempted rewinding a StatementInterface object when fetching has already started. Refactor your code to avoid rewinding statement objects.');
-    $rowCount = iterator_count($statement);
+    iterator_count($statement);
   }
 
   /**

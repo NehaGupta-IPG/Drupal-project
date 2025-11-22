@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Kernel\Migrate\d6;
 
-use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermInterface;
+use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests migration of localized translated taxonomy terms.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateTermLocalizedTranslationTest extends MigrateDrupal6TestBase {
 
   /**
@@ -22,7 +24,6 @@ class MigrateTermLocalizedTranslationTest extends MigrateDrupal6TestBase {
     'content_translation',
     'language',
     'menu_ui',
-    'node',
     'taxonomy',
   ];
 
@@ -119,7 +120,7 @@ class MigrateTermLocalizedTranslationTest extends MigrateDrupal6TestBase {
   /**
    * Tests the Drupal 6 i18n localized taxonomy term to Drupal 8 migration.
    */
-  public function testTranslatedLocalizedTaxonomyTerms() {
+  public function testTranslatedLocalizedTaxonomyTerms(): void {
     $this->assertEntity(14, 'en', 'Talos IV', 'vocabulary_name_much_longer_th', 'The home of Captain Christopher Pike.', NULL, 0, []);
     $this->assertEntity(15, 'en', 'Vulcan', 'vocabulary_name_much_longer_th', NULL, NULL, 0, []);
 

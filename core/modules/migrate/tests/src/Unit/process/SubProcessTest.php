@@ -10,15 +10,15 @@ use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Plugin\migrate\process\Get;
 use Drupal\migrate\Plugin\migrate\process\SubProcess;
 use Drupal\migrate\Row;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 // cspell:ignore baaa
-
 /**
  * Tests the sub_process process plugin.
- *
- * @group migrate
  */
+#[Group('migrate')]
 class SubProcessTest extends MigrateProcessTestCase {
 
   /**
@@ -29,6 +29,8 @@ class SubProcessTest extends MigrateProcessTestCase {
   protected $plugin;
 
   /**
+   * The default migration configuration.
+   *
    * @var array
    */
   protected $migrationConfiguration = [
@@ -37,10 +39,9 @@ class SubProcessTest extends MigrateProcessTestCase {
 
   /**
    * Tests the sub_process process plugin.
-   *
-   * @dataProvider providerTestSubProcess
    */
-  public function testSubProcess($process_configuration, $source_values = []) {
+  #[DataProvider('providerTestSubProcess')]
+  public function testSubProcess($process_configuration, $source_values = []): void {
     $migration = $this->getMigration();
     // Set up the properties for the sub_process.
     $plugin = new SubProcess($process_configuration, 'sub_process', []);
@@ -131,10 +132,9 @@ class SubProcessTest extends MigrateProcessTestCase {
 
   /**
    * Tests the sub_process process plugin.
-   *
-   * @dataProvider providerTestNotFoundSubProcess
    */
-  public function testNotFoundSubProcess($process_configuration, $source_values = []) {
+  #[DataProvider('providerTestNotFoundSubProcess')]
+  public function testNotFoundSubProcess($process_configuration, $source_values = []): void {
     $migration = $this->getMigration();
     // Set up the properties for the sub_process.
     $plugin = new SubProcess($process_configuration, 'sub_process', []);
@@ -197,10 +197,9 @@ class SubProcessTest extends MigrateProcessTestCase {
 
   /**
    * Tests behavior when source children are not arrays.
-   *
-   * @dataProvider providerTestSourceNotArray
    */
-  public function testSourceNotArray($source_values, $type) {
+  #[DataProvider('providerTestSourceNotArray')]
+  public function testSourceNotArray($source_values, $type): void {
     $process = new SubProcess(['process' => ['foo' => 'source_foo']], 'sub_process', []);
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage("Input array should hold elements of type array, instead element was of type '$type'");

@@ -11,14 +11,17 @@ use Drupal\Core\Routing\RouteBuildEvent;
 use Drupal\Core\Routing\RouteCompiler;
 use Drupal\Core\Routing\RoutingEvents;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @coversDefaultClass \Drupal\Core\Routing\RouteBuilder
- * @group Routing
+ * Tests Drupal\Core\Routing\RouteBuilder.
  */
+#[CoversClass(RouteBuilder::class)]
+#[Group('Routing')]
 class RouteBuilderTest extends UnitTestCase {
 
   /**
@@ -99,7 +102,7 @@ class RouteBuilderTest extends UnitTestCase {
   /**
    * Tests that the route rebuilding both locks and unlocks.
    */
-  public function testRebuildLockingUnlocking() {
+  public function testRebuildLockingUnlocking(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -119,7 +122,7 @@ class RouteBuilderTest extends UnitTestCase {
   /**
    * Tests route rebuilding with a blocking lock.
    */
-  public function testRebuildBlockingLock() {
+  public function testRebuildBlockingLock(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -143,7 +146,7 @@ class RouteBuilderTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Routing\RouteBuilder::rebuild()
    */
-  public function testRebuildWithStaticModuleRoutes() {
+  public function testRebuildWithStaticModuleRoutes(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -189,7 +192,7 @@ class RouteBuilderTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Routing\RouteBuilder::rebuild()
    */
-  public function testRebuildWithProviderBasedRoutes() {
+  public function testRebuildWithProviderBasedRoutes(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -254,7 +257,7 @@ class RouteBuilderTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Routing\RouteBuilder::rebuildIfNeeded() method.
    */
-  public function testRebuildIfNeeded() {
+  public function testRebuildIfNeeded(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -282,7 +285,7 @@ class RouteBuilderTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Routing\RouteBuilder::rebuild()
    */
-  public function testRebuildWithOverriddenRouteClass() {
+  public function testRebuildWithOverriddenRouteClass(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -339,7 +342,7 @@ class TestRouteBuilder extends RouteBuilder {
    * @param \Drupal\Core\Discovery\YamlDiscovery $yaml_discovery
    *   The YAML discovery to set.
    */
-  public function setYamlDiscovery(YamlDiscovery $yaml_discovery) {
+  public function setYamlDiscovery(YamlDiscovery $yaml_discovery): void {
     $this->yamlDiscovery = $yaml_discovery;
   }
 

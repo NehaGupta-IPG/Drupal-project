@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\big_pipe\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests placeholder preview functionality.
- *
- * @group big_pipe
  */
+#[Group('big_pipe')]
+#[RunTestsInSeparateProcesses]
 class BigPipePreviewTest extends WebDriverTestBase {
 
   /**
@@ -31,7 +33,7 @@ class BigPipePreviewTest extends WebDriverTestBase {
   /**
    * Test preview functionality within placeholders.
    */
-  public function testLazyLoaderPreview() {
+  public function testLazyLoaderPreview(): void {
     $user = $this->drupalCreateUser([]);
     $display_name = $user->getDisplayName();
     $this->drupalLogin($user);

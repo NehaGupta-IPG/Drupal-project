@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\Entity;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creating entity reference fields in the UI.
- *
- * @group entity
  */
+#[Group('entity')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceFieldCreationTest extends BrowserTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -31,7 +33,7 @@ class EntityReferenceFieldCreationTest extends BrowserTestBase {
   /**
    * Tests that entity reference fields cannot target entity types without IDs.
    */
-  public function testAddReferenceFieldTargetingEntityTypeWithoutId() {
+  public function testAddReferenceFieldTargetingEntityTypeWithoutId(): void {
 
     $node_type = $this->drupalCreateContentType()->id();
     $this->drupalLogin($this->drupalCreateUser([

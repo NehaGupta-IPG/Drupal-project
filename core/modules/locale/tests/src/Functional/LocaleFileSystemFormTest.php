@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the locale functionality in the altered file settings form.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleFileSystemFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -37,7 +37,7 @@ class LocaleFileSystemFormTest extends BrowserTestBase {
   /**
    * Tests translation directory settings on the file settings form.
    */
-  public function testFileConfigurationPage() {
+  public function testFileConfigurationPage(): void {
     // By default there should be no setting for the translation directory.
     $this->drupalGet('admin/config/media/file-system');
     $this->assertSession()->fieldNotExists('translation_path');

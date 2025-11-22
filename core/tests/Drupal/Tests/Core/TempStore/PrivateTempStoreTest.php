@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\TempStore;
 
 use Drupal\Core\TempStore\Lock;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\TempStore\PrivateTempStore;
 use Drupal\Core\TempStore\TempStoreException;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\TempStore\PrivateTempStore
- * @group TempStore
+ * Tests Drupal\Core\TempStore\PrivateTempStore.
  */
+#[CoversClass(PrivateTempStore::class)]
+#[Group('TempStore')]
 class PrivateTempStoreTest extends UnitTestCase {
 
   /**
@@ -99,9 +102,9 @@ class PrivateTempStoreTest extends UnitTestCase {
   /**
    * Tests the get() method.
    *
-   * @covers ::get
+   * @legacy-covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     $calls = ['1:test_2', '1:test', '1:test'];
     $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
@@ -122,9 +125,9 @@ class PrivateTempStoreTest extends UnitTestCase {
   /**
    * Tests the set() method with no lock available.
    *
-   * @covers ::set
+   * @legacy-covers ::set
    */
-  public function testSetWithNoLockAvailable() {
+  public function testSetWithNoLockAvailable(): void {
     $this->lock->expects($this->exactly(2))
       ->method('acquire')
       ->with('1:test')
@@ -143,9 +146,9 @@ class PrivateTempStoreTest extends UnitTestCase {
   /**
    * Tests a successful set() call.
    *
-   * @covers ::set
+   * @legacy-covers ::set
    */
-  public function testSet() {
+  public function testSet(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('1:test')
@@ -166,9 +169,9 @@ class PrivateTempStoreTest extends UnitTestCase {
   /**
    * Tests the getMetadata() method.
    *
-   * @covers ::getMetadata
+   * @legacy-covers ::getMetadata
    */
-  public function testGetMetadata() {
+  public function testGetMetadata(): void {
     $this->keyValue->expects($this->exactly(2))
       ->method('get')
       ->with('1:test')
@@ -187,9 +190,9 @@ class PrivateTempStoreTest extends UnitTestCase {
   /**
    * Tests the locking in the delete() method.
    *
-   * @covers ::delete
+   * @legacy-covers ::delete
    */
-  public function testDeleteLocking() {
+  public function testDeleteLocking(): void {
     $this->keyValue->expects($this->once())
       ->method('get')
       ->with('1:test')
@@ -214,9 +217,9 @@ class PrivateTempStoreTest extends UnitTestCase {
   /**
    * Tests the delete() method with no lock available.
    *
-   * @covers ::delete
+   * @legacy-covers ::delete
    */
-  public function testDeleteWithNoLockAvailable() {
+  public function testDeleteWithNoLockAvailable(): void {
     $this->keyValue->expects($this->once())
       ->method('get')
       ->with('1:test')
@@ -239,9 +242,9 @@ class PrivateTempStoreTest extends UnitTestCase {
   /**
    * Tests the delete() method.
    *
-   * @covers ::delete
+   * @legacy-covers ::delete
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('1:test_2')

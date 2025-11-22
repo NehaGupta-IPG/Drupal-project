@@ -9,14 +9,14 @@ use Drupal\Composer\Generator\Builder\DrupalDevDependenciesBuilder;
 use Drupal\Composer\Generator\Builder\DrupalPinnedDevDependenciesBuilder;
 use Drupal\Composer\Generator\PackageGenerator;
 use Drupal\Composer\Generator\Util\DrupalCoreComposer;
-
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Test to see if the metapackages are up-to-date with the root composer.lock.
- *
- * @group Metapackage
  */
+#[Group('Metapackage')]
 class MetapackageUpdateTest extends TestCase {
 
   /**
@@ -51,11 +51,10 @@ class MetapackageUpdateTest extends TestCase {
    * @param string $builderClass
    *   The metapackage builder to test.
    * @param string $path
-   *   The relative path to the metapackage
-   *
-   *  @dataProvider updatedTestData
+   *   The relative path to the metapackage.
    */
-  public function testUpdated($builderClass, $path) {
+  #[DataProvider('updatedTestData')]
+  public function testUpdated($builderClass, $path): void {
     // Create a DrupalCoreComposer for the System Under Test (current repo)
     $repositoryRoot = dirname(__DIR__, 6);
     $drupalCoreInfo = DrupalCoreComposer::createFromPath($repositoryRoot);

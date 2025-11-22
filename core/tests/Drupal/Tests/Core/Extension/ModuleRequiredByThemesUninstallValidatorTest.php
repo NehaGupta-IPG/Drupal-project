@@ -8,11 +8,14 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleRequiredByThemesUninstallValidator;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Extension\ModuleRequiredByThemesUninstallValidator
- * @group Extension
+ * Tests Drupal\Core\Extension\ModuleRequiredByThemesUninstallValidator.
  */
+#[CoversClass(ModuleRequiredByThemesUninstallValidator::class)]
+#[Group('Extension')]
 class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
 
   /**
@@ -47,9 +50,11 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests validate no theme dependency.
+   *
+   * @legacy-covers ::validate
    */
-  public function testValidateNoThemeDependency() {
+  public function testValidateNoThemeDependency(): void {
     $this->themeExtensionList->getAllInstalledInfo()->willReturn([
       'stable9' => [
         'name' => 'Stable 9',
@@ -68,9 +73,11 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests validate one theme dependency.
+   *
+   * @legacy-covers ::validate
    */
-  public function testValidateOneThemeDependency() {
+  public function testValidateOneThemeDependency(): void {
     $module = 'single_module';
     $module_name = 'Single Module';
     $theme = 'one_theme';
@@ -107,9 +114,11 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests validate two theme dependencies.
+   *
+   * @legacy-covers ::validate
    */
-  public function testValidateTwoThemeDependencies() {
+  public function testValidateTwoThemeDependencies(): void {
     $module = 'popular_module';
     $module_name = 'Popular Module';
     $theme1 = 'first_theme';

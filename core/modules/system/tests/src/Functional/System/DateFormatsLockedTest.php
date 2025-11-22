@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the locked functionality of date formats.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class DateFormatsLockedTest extends BrowserTestBase {
 
   /**
@@ -21,7 +23,7 @@ class DateFormatsLockedTest extends BrowserTestBase {
   /**
    * Tests attempts at listing, editing, and deleting locked date formats.
    */
-  public function testDateLocking() {
+  public function testDateLocking(): void {
     $this->drupalLogin($this->drupalCreateUser(['administer site configuration']));
 
     // Locked date formats are not linked on the listing page, locked date

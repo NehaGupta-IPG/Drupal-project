@@ -5,19 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\language\Unit\process;
 
 use Drupal\language\Plugin\migrate\process\LanguageTypes;
-use Drupal\Tests\migrate\Unit\process\MigrateProcessTestCase;
 use Drupal\migrate\MigrateException;
+use Drupal\Tests\migrate\Unit\process\MigrateProcessTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\language\Plugin\migrate\process\LanguageTypes
- * @group language
+ * Tests Drupal\language\Plugin\migrate\process\LanguageTypes.
  */
+#[CoversClass(LanguageTypes::class)]
+#[Group('language')]
 class LanguageTypesTest extends MigrateProcessTestCase {
 
   /**
    * Tests successful transformation of all language types.
    */
-  public function testTransformAll() {
+  public function testTransformAll(): void {
     $this->plugin = new LanguageTypes([], 'map', []);
     $source = [
       'language' => TRUE,
@@ -36,7 +39,7 @@ class LanguageTypesTest extends MigrateProcessTestCase {
   /**
    * Tests successful transformation of configurable language types.
    */
-  public function testTransformConfigurable() {
+  public function testTransformConfigurable(): void {
     $this->plugin = new LanguageTypes(['filter_configurable' => TRUE], 'map', []);
     $source = [
       'language' => TRUE,
@@ -53,7 +56,7 @@ class LanguageTypesTest extends MigrateProcessTestCase {
   /**
    * Tests string input.
    */
-  public function testStringInput() {
+  public function testStringInput(): void {
     $this->plugin = new LanguageTypes([], 'map', []);
     $this->expectException(MigrateException::class);
     $this->expectExceptionMessage('The input should be an array');

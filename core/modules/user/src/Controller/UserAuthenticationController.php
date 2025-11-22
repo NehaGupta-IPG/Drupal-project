@@ -62,6 +62,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
 
   /**
    * The user authentication.
+   *
    * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
    */
   protected $userAuth;
@@ -201,7 +202,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         $authenticated = $this->userAuth->authenticateAccount($account, $credentials['pass']) ? $account->id() : FALSE;
       }
       else {
-        $authenticated = $this->userAuth->authenticateAccount($credentials['name'], $credentials['pass']);
+        $authenticated = $this->userAuth->authenticate($credentials['name'], $credentials['pass']);
       }
       if ($authenticated) {
         $this->userFloodControl->clear('user.http_login', $this->getLoginFloodIdentifier($request, $credentials['name']));
@@ -373,7 +374,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   protected function getRequestFormat(Request $request) {
     $format = $request->getRequestFormat();
     if (!in_array($format, $this->serializerFormats)) {
-      throw new BadRequestHttpException("Unrecognized format: $format.");
+      throw new BadRequestHttpException("Unrecognized format.");
     }
     return $format;
   }

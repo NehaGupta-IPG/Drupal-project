@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\DependencyInjection\Dumper;
 
+use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Drupal\Component\Utility\Crypt;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophet;
@@ -21,9 +25,10 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
- * @coversDefaultClass \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper
- * @group DependencyInjection
+ * Tests Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper.
  */
+#[CoversClass(OptimizedPhpArrayDumper::class)]
+#[Group('DependencyInjection')]
 class OptimizedPhpArrayDumperTest extends TestCase {
 
   use ExpectDeprecationTrait;
@@ -91,11 +96,11 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Tests that an empty container works properly.
    *
-   * @covers ::dump
-   * @covers ::getArray
-   * @covers ::supportsMachineFormat
+   * @legacy-covers ::dump
+   * @legacy-covers ::getArray
+   * @legacy-covers ::supportsMachineFormat
    */
-  public function testDumpForEmptyContainer() {
+  public function testDumpForEmptyContainer(): void {
     $serialized_definition = $this->dumper->dump();
     $this->assertEquals(serialize($this->containerDefinition), $serialized_definition);
   }
@@ -103,11 +108,10 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Tests that alias processing works properly.
    *
-   * @covers ::getAliases
-   *
-   * @dataProvider getAliasesDataProvider
+   * @legacy-covers ::getAliases
    */
-  public function testGetAliases($aliases, $definition_aliases) {
+  #[DataProvider('getAliasesDataProvider')]
+  public function testGetAliases($aliases, $definition_aliases): void {
     $this->containerDefinition['aliases'] = $definition_aliases;
     $this->containerBuilder->getAliases()->willReturn($aliases);
     $this->assertEquals($this->containerDefinition, $this->dumper->getArray(), 'Expected definition matches dump.');
@@ -138,15 +142,14 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Tests that parameter processing works properly.
    *
-   * @covers ::getParameters
-   * @covers ::prepareParameters
-   * @covers ::escape
-   * @covers ::dumpValue
-   * @covers ::getReferenceCall
-   *
-   * @dataProvider getParametersDataProvider
+   * @legacy-covers ::getParameters
+   * @legacy-covers ::prepareParameters
+   * @legacy-covers ::escape
+   * @legacy-covers ::dumpValue
+   * @legacy-covers ::getReferenceCall
    */
-  public function testGetParameters($parameters, $definition_parameters, $is_frozen) {
+  #[DataProvider('getParametersDataProvider')]
+  public function testGetParameters($parameters, $definition_parameters, $is_frozen): void {
     $this->containerDefinition['parameters'] = $definition_parameters;
     $this->containerDefinition['frozen'] = $is_frozen;
 
@@ -195,21 +198,20 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Tests that service processing works properly.
    *
-   * @covers ::getServiceDefinitions
-   * @covers ::getServiceDefinition
-   * @covers ::dumpMethodCalls
-   * @covers ::dumpCollection
-   * @covers ::dumpCallable
-   * @covers ::dumpValue
-   * @covers ::getPrivateServiceCall
-   * @covers ::getReferenceCall
-   * @covers ::getServiceCall
-   * @covers ::getServiceClosureCall
-   * @covers ::getParameterCall
-   *
-   * @dataProvider getDefinitionsDataProvider
+   * @legacy-covers ::getServiceDefinitions
+   * @legacy-covers ::getServiceDefinition
+   * @legacy-covers ::dumpMethodCalls
+   * @legacy-covers ::dumpCollection
+   * @legacy-covers ::dumpCallable
+   * @legacy-covers ::dumpValue
+   * @legacy-covers ::getPrivateServiceCall
+   * @legacy-covers ::getReferenceCall
+   * @legacy-covers ::getServiceCall
+   * @legacy-covers ::getServiceClosureCall
+   * @legacy-covers ::getParameterCall
    */
-  public function testGetServiceDefinitions($services, $definition_services) {
+  #[DataProvider('getDefinitionsDataProvider')]
+  public function testGetServiceDefinitions($services, $definition_services): void {
     $this->containerDefinition['services'] = $definition_services;
 
     $this->containerBuilder->getDefinitions()->willReturn($services);
@@ -498,11 +500,10 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Tests that references to aliases work correctly.
    *
-   * @covers ::getReferenceCall
-   *
-   * @dataProvider publicPrivateDataProvider
+   * @legacy-covers ::getReferenceCall
    */
-  public function testGetServiceDefinitionWithReferenceToAlias($public) {
+  #[DataProvider('publicPrivateDataProvider')]
+  public function testGetServiceDefinitionWithReferenceToAlias($public): void {
     $bar_definition = new Definition('\stdClass');
     $bar_definition_php_array = [
       'class' => '\stdClass',
@@ -559,9 +560,9 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    * Tests that the correct InvalidArgumentException is thrown for
    * getDecoratedService().
    *
-   * @covers ::getServiceDefinition
+   * @legacy-covers ::getServiceDefinition
    */
-  public function testGetServiceDefinitionForDecoratedService() {
+  public function testGetServiceDefinitionForDecoratedService(): void {
     $bar_definition = new Definition('\stdClass');
     $bar_definition->setPublic(TRUE);
     $bar_definition->setDecoratedService((string) new Reference('foo'));
@@ -575,9 +576,9 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Tests that the correct RuntimeException is thrown for expressions.
    *
-   * @covers ::dumpValue
+   * @legacy-covers ::dumpValue
    */
-  public function testGetServiceDefinitionForExpression() {
+  public function testGetServiceDefinitionForExpression(): void {
     $expression = new Expression('');
 
     $bar_definition = new Definition('\stdClass');
@@ -593,9 +594,9 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Tests that the correct RuntimeException is thrown for dumping an object.
    *
-   * @covers ::dumpValue
+   * @legacy-covers ::dumpValue
    */
-  public function testGetServiceDefinitionForObject() {
+  public function testGetServiceDefinitionForObject(): void {
     $service = new \stdClass();
 
     $bar_definition = new Definition('\stdClass');
@@ -611,9 +612,9 @@ class OptimizedPhpArrayDumperTest extends TestCase {
   /**
    * Tests that the correct RuntimeException is thrown for dumping a resource.
    *
-   * @covers ::dumpValue
+   * @legacy-covers ::dumpValue
    */
-  public function testGetServiceDefinitionForResource() {
+  public function testGetServiceDefinitionForResource(): void {
     $resource = fopen('php://memory', 'r');
 
     $bar_definition = new Definition('\stdClass');
@@ -628,10 +629,9 @@ class OptimizedPhpArrayDumperTest extends TestCase {
 
   /**
    * Tests that service arguments with escaped percents are correctly dumped.
-   *
-   * @dataProvider percentsEscapeProvider
    */
-  public function testPercentsEscape($expected, $argument) {
+  #[DataProvider('percentsEscapeProvider')]
+  public function testPercentsEscape($expected, $argument): void {
     $definition = new Definition('\stdClass', [$argument]);
     $definition->setPublic(TRUE);
     $this->containerBuilder->getDefinitions()->willReturn([

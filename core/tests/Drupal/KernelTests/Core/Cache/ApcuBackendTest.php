@@ -6,13 +6,16 @@ namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\ApcuBackend;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the APCu cache backend.
- *
- * @group Cache
- * @requires extension apcu
  */
+#[Group('Cache')]
+#[RequiresPhpExtension('apcu')]
+#[RunTestsInSeparateProcesses]
 class ApcuBackendTest extends GenericCacheBackendUnitTestBase {
 
   /**
@@ -35,7 +38,7 @@ class ApcuBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testSetGet() {
+  public function testSetGet(): void {
     parent::testSetGet();
 
     // Make sure entries are permanent (i.e. no TTL).
