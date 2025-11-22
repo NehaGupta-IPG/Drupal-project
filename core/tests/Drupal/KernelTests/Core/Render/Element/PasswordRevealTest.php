@@ -7,18 +7,23 @@ namespace Drupal\KernelTests\Core\Render\Element;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\PasswordUnmask;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Element\PasswordUnmask
- * @group Render
+ * Tests Drupal\Core\Render\Element\PasswordUnmask.
  */
+#[CoversClass(PasswordUnmask::class)]
+#[Group('Render')]
 class PasswordRevealTest extends UnitTestCase {
 
   /**
-   * @covers ::valueCallback
-   *
-   * @dataProvider providerTestValueCallback
+   * Tests value callback.
    */
+  #[CoversMethod(PasswordUnmask::class, 'valueCallback')]
+  #[DataProvider('providerTestValueCallback')]
   public function testValueCallback($expected, $input) {
     $element = [];
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();

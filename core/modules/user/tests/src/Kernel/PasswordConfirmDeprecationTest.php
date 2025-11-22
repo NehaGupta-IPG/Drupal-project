@@ -6,12 +6,12 @@ namespace Drupal\Tests\user\Kernel;
 
 use Drupal\Core\Render\Element\PasswordConfirm;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the deprecation of password_confirm.
- *
- * @group legacy
  */
+#[Group('legacy')]
 class PasswordConfirmDeprecationTest extends KernelTestBase {
 
   /**
