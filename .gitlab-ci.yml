@@ -82,6 +82,7 @@ variables:
 stages:
   - 🪄 Lint
   - ⚡️ Unit tests
+  - 🚚 Consolidate
   - 🗜️ Test
 
 #############
@@ -795,8 +796,8 @@ default:
     - if [ ! -f core/.stylelintcache ]; then exit 1; fi
     - if [ ! -f core/.phpcscache ]; then exit 1; fi
 
-'Summary':
-  stage: .post
+'🚚 Consolidate':
+  stage: 🚚 Consolidate
   script:
     - find test-artifacts
     - php .gitlab-ci/scripts/statistics-consolidator.php test-artifacts
@@ -804,4 +805,7 @@ default:
     when: always
     expire_in: 6 mos
     paths:
+      - vendor/
+      - composer.lock
+      - composer/Metapackage/
       - test-artifacts

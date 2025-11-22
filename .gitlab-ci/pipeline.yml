@@ -39,7 +39,7 @@ default:
       - vendor/
       - composer.lock
       - composer/Metapackage/
-#      - test-artifacts/jobs/$CI_JOB_ID
+      # - test-artifacts/jobs/$CI_JOB_ID
       - test-artifacts
       - core/test-artifacts/deprecation-handler
       - ./sites/default/files/simpletest/phpunit-*.xml
@@ -54,7 +54,8 @@ default:
 .with-composer: &with-composer
   needs:
     - pipeline: $PARENT_PIPELINE_ID
-      job: '🧹 PHP Coding standards (PHPCS)'
+      job: '🚚 Consolidate'
+      artifacts: true
 
 variables:
   FF_NETWORK_PER_BUILD: 1
