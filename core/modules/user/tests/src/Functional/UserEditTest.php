@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -15,6 +16,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('user')]
 #[RunTestsInSeparateProcesses]
 class UserEditTest extends BrowserTestBase {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -131,14 +134,14 @@ class UserEditTest extends BrowserTestBase {
     $config->set('password_strength', TRUE)->save();
 
     $this->drupalGet("user/" . $admin_user->id() . "/edit");
-    $this->assertSession()->responseContains(t('Password strength:'), 'The password strength indicator is displayed.');
+    $this->assertSession()->responseContains($this->t('Password strength:'), 'The password strength indicator is displayed.');
     $this->assertSession()->elementExists('xpath', '//input[@type="password"][@name="pass"]');
 
     $edit = [];
     $edit['pass'] = $this->randomMachineName();
     $edit['current_pass'] = $admin_user->pass_raw;
-    $this->submitForm($edit, t('Save'));
-    $this->assertSession()->responseContains(t("The changes have been saved."));
+    $this->submitForm($edit, $this->t('Save'));
+    $this->assertSession()->responseContains($this->t("The changes have been saved."));
     $this->assertSession()->pageTextNotContains($admin_user->pass_raw);
   }
 
