@@ -491,9 +491,11 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     $latest_revision_ids = $cached ? $cached->data : [];
     if (!isset($latest_revision_ids[LanguageInterface::LANGCODE_DEFAULT])) {
       $result = $this->getQuery()
-        ->latestRevision()
+        ->allRevisions()
+        ->sort($this->entityType->getKey('revision'), 'DESC')
         ->condition($this->entityType->getKey('id'), $entity_id)
         ->accessCheck(FALSE)
+        ->range(0, 1)
         ->execute();
 
       $latest_revision_ids[LanguageInterface::LANGCODE_DEFAULT] = key($result);
