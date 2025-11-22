@@ -27,11 +27,18 @@ if (PHP_SAPI !== 'cli') {
   return;
 }
 
+$args = $_SERVER['argv'];
+
+if (!isset($args[1])) {
+  echo "Artifacts path not specified.\n";
+  exit(2);
+}
+
 require __DIR__ . '/../../vendor/autoload.php';
 
 $finder = new Finder();
 
-$files = $finder->files()->in(__DIR__ . '/  ../../test-artifacts')->name('deprecation-ignore-stats.json');
+$files = $finder->files()->in($args[1])->name('deprecation-ignore-stats.json');
 
 $tmp = [];
 foreach ($files as $file) {
@@ -42,7 +49,7 @@ foreach ($files as $file) {
   }
 }
 
-$outputFile = __DIR__ . '/../../test-artifacts' . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
+$outputFile = $args[1] . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
 file_put_contents($outputFile, json_encode($tmp));
 
 echo "\n\nDeprecation skips statistics\n";

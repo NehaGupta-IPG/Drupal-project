@@ -235,6 +235,7 @@ default:
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
+      - test-artifacts
       - ./sites/default/files/simpletest/phpunit-*.xml
 
 'Unit tests Component':
