@@ -315,13 +315,8 @@ class ManyToOneHelper {
     // is set to TRUE, conditions will be added.
     $add_condition = TRUE;
     if ($operator == 'not') {
-      if (count($value) > 1) {
-        $operator = 'NOT IN';
-      }
-      else {
-        $value = is_array($value) ? array_pop($value) : $value;
-        $operator = '!=';
-      }
+      $value = NULL;
+      $operator = 'IS NULL';
       $add_condition = FALSE;
     }
     elseif ($operator == 'or' && empty($options['reduce_duplicates'])) {
