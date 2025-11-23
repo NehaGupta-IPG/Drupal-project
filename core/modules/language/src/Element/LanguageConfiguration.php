@@ -41,7 +41,7 @@ class LanguageConfiguration extends FormElementBase {
       '#type' => 'select',
       '#title' => t('Default language'),
       '#options' => $options + static::getDefaultOptions(),
-      '#description' => t('Explanation of the language options is found on the <a href=":languages_list_page">languages list page</a>.', [':languages_list_page' => Url::fromRoute('entity.configurable_language.collection')->toString()]),
+      '#description' => t('Explanation of the language options is found on the <a href=":languages_list_page">languages list page</a>.', [':languages_list_page' => Url::fromRoute('entity.configurable_language.collection')]),
       '#default_value' => ($default_config != NULL) ? $default_config->getDefaultLangcode() : LanguageInterface::LANGCODE_SITE_DEFAULT,
     ];
 

@@ -63,9 +63,9 @@ class EntityUrlLanguageTest extends LanguageTestBase {
    * Ensures that entity URLs in a language have the right language prefix.
    */
   public function testEntityUrlLanguage(): void {
-    $this->assertStringContainsString('/en/entity_test/' . $this->entity->id(), $this->entity->toUrl()->toString());
-    $this->assertStringContainsString('/es/entity_test/' . $this->entity->id(), $this->entity->getTranslation('es')->toUrl()->toString());
-    $this->assertStringContainsString('/fr/entity_test/' . $this->entity->id(), $this->entity->getTranslation('fr')->toUrl()->toString());
+    $this->assertStringContainsString('/en/entity_test/' . $this->entity->id(), (string) $this->entity->toUrl());
+    $this->assertStringContainsString('/es/entity_test/' . $this->entity->id(), (string) $this->entity->getTranslation('es')->toUrl());
+    $this->assertStringContainsString('/fr/entity_test/' . $this->entity->id(), (string) $this->entity->getTranslation('fr')->toUrl());
   }
 
   /**
@@ -96,9 +96,9 @@ class EntityUrlLanguageTest extends LanguageTestBase {
     // The method language-content-entity should run before language-url and
     // append query parameter for the content language and prevent language-url
     // from overwriting the URL.
-    $this->assertStringContainsString('/en/entity_test/' . $this->entity->id() . '?' . LanguageNegotiationContentEntity::QUERY_PARAMETER . '=en', $this->entity->toUrl('canonical')->toString());
-    $this->assertStringContainsString('/en/entity_test/' . $this->entity->id() . '?' . LanguageNegotiationContentEntity::QUERY_PARAMETER . '=es', $this->entity->getTranslation('es')->toUrl('canonical')->toString());
-    $this->assertStringContainsString('/en/entity_test/' . $this->entity->id() . '?' . LanguageNegotiationContentEntity::QUERY_PARAMETER . '=fr', $this->entity->getTranslation('fr')->toUrl('canonical')->toString());
+    $this->assertStringContainsString('/en/entity_test/' . $this->entity->id() . '?' . LanguageNegotiationContentEntity::QUERY_PARAMETER . '=en', (string) $this->entity->toUrl('canonical'));
+    $this->assertStringContainsString('/en/entity_test/' . $this->entity->id() . '?' . LanguageNegotiationContentEntity::QUERY_PARAMETER . '=es', (string) $this->entity->getTranslation('es')->toUrl('canonical'));
+    $this->assertStringContainsString('/en/entity_test/' . $this->entity->id() . '?' . LanguageNegotiationContentEntity::QUERY_PARAMETER . '=fr', (string) $this->entity->getTranslation('fr')->toUrl('canonical'));
 
     // Define the method language-url with a higher priority than
     // language-content-entity. This configuration should match the default one,

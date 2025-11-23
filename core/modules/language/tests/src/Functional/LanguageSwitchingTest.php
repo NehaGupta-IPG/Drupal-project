@@ -150,12 +150,12 @@ class LanguageSwitchingTest extends BrowserTestBase {
       0 => [
         'hreflang' => 'en',
         'data-drupal-link-system-path' => '<front>',
-        'href' => Url::fromRoute('<front>')->toString(),
+        'href' => (string) Url::fromRoute('<front>'),
       ],
       1 => [
         'hreflang' => 'fr',
         'data-drupal-link-system-path' => '<front>',
-        'href' => Url::fromRoute('<front>')->toString() . 'fr',
+        'href' => (string) Url::fromRoute('<front>') . 'fr',
       ],
     ];
     $this->assertSame($expected_anchors, $anchors, 'The anchors have the correct attributes that will link to the correct home page in that language.');
