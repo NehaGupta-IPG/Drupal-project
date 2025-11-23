@@ -4,6 +4,11 @@ namespace Drupal\Core\Config;
 
 /**
  * Defines an interface for comparison of configuration storage objects.
+ *
+ * @deprecated in drupal:11.0.0 and is removed from drupal:12.0.0.
+ *   Use \Drupal\Core\Config\StorageComparer instead.
+ *
+ * @see https://www.drupal.org/node/3410037
  */
 interface StorageComparerInterface {
 
@@ -142,3 +147,12 @@ interface StorageComparerInterface {
   public function getAllCollectionNames($include_default = TRUE);
 
 }
+
+// Trigger deprecation when file loads.
+@trigger_error(
+  sprintf(
+    '%s is deprecated in drupal:11.0.0 and will be removed from drupal:12.0.0. Use \Drupal\Core\Config\StorageComparer instead. See https://www.drupal.org/node/3410037',
+    StorageComparerInterface::class
+  ),
+  E_USER_DEPRECATED
+);
