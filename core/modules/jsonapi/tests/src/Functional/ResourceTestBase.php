@@ -333,9 +333,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    */
   protected function resaveEntity(EntityInterface $entity, AccountInterface $account): EntityInterface {
     // Reload entity so that it has the new field.
-    $reloaded_entity = $this->entityLoadUnchanged($entity->id());
+    $entity_id = $entity->id();
     // Some entity types are not stored, hence they cannot be reloaded.
-    if ($reloaded_entity !== NULL) {
+    if ($entity_id !== NULL) {
+      $reloaded_entity = $this->entityLoadUnchanged($entity_id);
       $entity = $reloaded_entity;
       // Set a default value on the fields.
       $entity->set('field_rest_test', ['value' => 'All the faith he had had had had no effect on the outcome of his life.']);
@@ -3562,6 +3563,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     /** @var \Drupal\Core\Field\TypedData\FieldItemDataDefinition $item_definition */
     $item_definition = $field_definition->getItemDefinition();
     $main_property = $item_definition->getMainPropertyName();
+    if ($main_property === NULL) {
+      return FALSE;
+    }
     $property_definition = $item_definition->getPropertyDefinition($main_property);
     return $property_definition instanceof DataReferenceTargetDefinition;
   }

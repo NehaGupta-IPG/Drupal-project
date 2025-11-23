@@ -56,9 +56,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 345,
-      'CacheSetCount' => 405,
+      'CacheSetCount' => 361,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 45,
+      'CacheTagLookupQueryCount' => 26,
       'CacheTagInvalidationCount' => 0,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
@@ -118,11 +118,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 110,
-      'CacheGetCount' => 214,
+      'CacheGetCount' => 207,
       'CacheSetCount' => 64,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 25,
+      'CacheTagLookupQueryCount' => 22,
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
@@ -222,7 +222,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "entity.node.canonical") AND ("route_param_key" = "node=1") AND ("menu_name" = "footer") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/recipes" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
-      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" INNER JOIN "node_field_revision" "node_field_revision" ON "node_field_revision"."vid" = "base_table"."vid" AND "node_field_revision"."langcode" = "en" WHERE ("node_field_data"."nid" = "1") AND ("node_field_revision"."revision_translation_affected" = 1) GROUP BY "base_table"."vid", "base_table"."nid" ORDER BY "base_table"."vid" DESC LIMIT 1 OFFSET 0',
+      'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" INNER JOIN "node_field_revision" "node_field_revision" ON "node_field_revision"."vid" = "base_table"."vid" AND "node_field_revision"."langcode" = "en" WHERE ("node_field_data"."nid" = "1") AND ("node_field_revision"."revision_translation_affected" = 1) ORDER BY "base_table"."vid" DESC LIMIT 1 OFFSET 0',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_uid" AS "revision_uid", "revision"."revision_timestamp" AS "revision_timestamp", "revision"."revision_log" AS "revision_log", "revision"."revision_default" AS "revision_default", "base"."nid" AS "nid", "base"."type" AS "type", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "node" "base" INNER JOIN "node_revision" "revision" ON "revision"."nid" = "base"."nid" AND "revision"."vid" IN (75)',
       'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."vid" IN (75)) AND ("revision"."vid" IN ("75")) ORDER BY "revision"."vid" ASC',
       'SELECT "t".* FROM "node_revision__field_cooking_time" "t" WHERE ("revision_id" IN ("75")) AND ("deleted" = 0) AND ("langcode" IN ("en", "es", "und", "zxx")) ORDER BY "delta" ASC',
@@ -250,13 +250,13 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 91,
-      'CacheGetCount' => 206,
+      'CacheGetCount' => 200,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 66,
         'bootstrap' => 12,
         'discovery' => 67,
-        'data' => 12,
+        'data' => 6,
         'entity' => 21,
         'dynamic_page_cache' => 1,
         'render' => 21,
@@ -266,7 +266,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 42,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 25,
+      'CacheTagLookupQueryCount' => 22,
       'CacheTagGroupedLookups' => [
         [
           'entity_types',
@@ -279,9 +279,8 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'local_task',
           'library_info',
         ],
-        ['config:views.view.related_recipes'],
         ['config:core.extension', 'views_data'],
-        ['node:10', 'node:3', 'node:6', 'node:7', 'node_list'],
+        ['config:views.view.related_recipes', 'node:10', 'node:3', 'node:6', 'node:7', 'node_list'],
         ['breakpoints'],
         [
           'config:core.entity_view_display.media.image.responsive_3x2',
@@ -311,7 +310,6 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'taxonomy_term:22',
           'taxonomy_term:31',
         ],
-        ['config:views.view.recipe_collections'],
         [
           'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
           'block_view',
@@ -355,6 +353,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'file:37',
           'media:19',
           'config:system.menu.main',
+          'config:views.view.recipe_collections',
           'taxonomy_term:1',
           'taxonomy_term:10',
           'taxonomy_term:11',
@@ -372,7 +371,6 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
           'taxonomy_term:9',
           'taxonomy_term_list',
         ],
-        ['config:views.view.recipes'],
         ['node:1:revisions'],
         ['content_moderation_state:1:revisions'],
         ['config:workflows.workflow.editorial'],
