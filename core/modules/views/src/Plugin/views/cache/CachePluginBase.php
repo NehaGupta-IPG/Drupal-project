@@ -326,6 +326,9 @@ abstract class CachePluginBase extends PluginBase {
 
     if (!empty($row->_relationship_entities)) {
       foreach ($row->_relationship_entities as $entity) {
+        if (empty($entity)) {
+          continue;
+        }
         $tags = Cache::mergeTags($tags, $entity->getCacheTags());
       }
     }
