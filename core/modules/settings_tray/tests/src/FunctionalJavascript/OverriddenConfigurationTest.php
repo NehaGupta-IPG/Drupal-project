@@ -103,7 +103,7 @@ class OverriddenConfigurationTest extends SettingsTrayTestBase {
     $this->openBlockForm($this->getBlockSelector($menu_block));
     $web_assert->elementNotExists('css', '#menu-overview');
     $page_load_hash_3 = $this->getSession()->evaluateScript('window.performance.timeOrigin');
-    $page->pressButton('Save Main navigation');
+    $page->pressButton('Save Labely label');
     // Pressing the button triggered no validation errors and an AJAX redirect
     // that reloaded the page.
     $this->waitForOffCanvasToClose();

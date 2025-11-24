@@ -7,6 +7,7 @@ use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
+use Drupal\Core\Entity\TranslatableEntityLabelMarkup;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
@@ -132,11 +133,14 @@ class FieldBlockDeriver extends DeriverBase implements ContainerDeriverInterface
 
           $derivative['category'] = $this->t('@entity fields', ['@entity' => $entity_type_labels[$entity_type_id]]);
 
-          $derivative['admin_label'] = $field_definition->getLabel();
-
-          // Add a dependency on the field if it is configurable.
+          // Add a dependency on the field if it is configurable and account
+          // for translatable config entities for admin label.
           if ($field_definition instanceof FieldConfigInterface) {
+            $derivative['admin_label'] = new TranslatableEntityLabelMarkup($field_definition->getEntityTypeId(), $field_definition->id());  
             $derivative['config_dependencies'][$field_definition->getConfigDependencyKey()][] = $field_definition->getConfigDependencyName();
+          }
+          else {
+            $derivative['admin_label'] = $field_definition->getLabel();
           }
           // For any field that is not display configurable, mark it as
           // unavailable to place in the block UI.
