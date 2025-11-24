@@ -426,7 +426,8 @@ class Xss {
    *   String to check for tokens.
    *
    * @return string|null
-   *   first section of the token string including the open square bracket, NULL when not present.
+   *   First section of the token string including the open square bracket,
+   *   NULL when not present.
    */
   protected static function fetchFirstSectionOfToken(string $string): ?string {
 
