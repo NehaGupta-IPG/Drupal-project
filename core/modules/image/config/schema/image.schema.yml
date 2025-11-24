@@ -127,6 +127,9 @@ field.field_settings.image:
   type: base_file_field_field_settings
   label: 'Image settings'
   mapping:
+    image_style:
+      type: string
+      label: 'Image style on upload'
     max_resolution:
       type: string
       label: 'Maximum image dimensions'

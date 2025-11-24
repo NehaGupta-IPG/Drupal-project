@@ -4,6 +4,7 @@
  * @file
  */
 
+use Drupal\image\Entity\ImageStyle;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\File\Exception\FileException;
@@ -124,6 +125,44 @@ function _file_save_upload_from_form(array $element, FormStateInterface $form_st
   }
 
   return $result;
+}
+
+/**
+ * Verifies that the uploaded image is processed with an image style.
+ *
+ * @param \Drupal\file\FileInterface $file
+ *   A file entity. This function may resize the file affecting its size.
+ * @param string $image_style_name
+ *   The name of the image style to use to process the image.
+ *
+ * @return array
+ *   An empty array if the image style was not specified, or the image file was
+ *   processed successfully. An array containing the error messages otherwise.
+ *
+ * @see hook_file_validate()
+ */
+function file_validate_image_style_on_upload(FileInterface $file, $image_style_name) {
+  $errors = [];
+
+  if (!empty($image_style_name)) {
+    $image_style = ImageStyle::load($image_style_name);
+    if ($image_style === NULL) {
+      $errors[] = t("The image style %image_style to be applied on the uploaded image does not exist.", ['%image_style' => $image_style_name]);
+    }
+    else {
+      $derived_uri = $file->getFileUri() . '.derived';
+      if (!$image_style->createDerivative($file->getFileUri(), $derived_uri)) {
+        $errors[] = t('The uploaded image could not be processed with style %image_style. The image file may be invalid.', ['%image_style' => $image_style_name]);
+      }
+      else {
+        if (file_unmanaged_move($derived_uri, $file->getFileUri(), FILE_EXISTS_REPLACE) === FALSE) {
+          $errors[] = t('An error occurred while saving the uploaded image file.');
+        }
+      }
+    }
+  }
+
+  return $errors;
 }
 
 /**
