@@ -1,0 +1,16 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Invalid
+description: A component with an unsolvable reference in a required prop.
+props:
+  type: object
+  required:
+    - unresolvable
+  properties:
+    image:
+      $ref: theme://sdc_theme_test_references/schema.json#image
+    attributes:
+      $ref: theme://sdc_theme_test_references/schema.json#attributes
+    links:
+      $ref: theme://sdc_theme_test_references/schema.json#links
+    unresolvable:
+      $ref: non-existing-schema://whatever

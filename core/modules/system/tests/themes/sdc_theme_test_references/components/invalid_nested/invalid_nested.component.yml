@@ -1,0 +1,14 @@
+$schema: https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json
+name: Invalid, nested
+description: A component with an unsolvable reference in a solved reference.
+props:
+  type: object
+  properties:
+    image:
+      $ref: theme://sdc_theme_test_references/schema.json#image
+    attributes:
+      $ref: theme://sdc_theme_test_references/schema.json#attributes
+    links:
+      $ref: theme://sdc_theme_test_references/schema.json#links
+    unresolvable:
+      $ref: theme://sdc_theme_test_references/bar.json#invalid_nested

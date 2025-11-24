@@ -28,8 +28,12 @@ class SchemaReferenceResolverTest extends ComponentKernelTestBase {
    * Test that components props schemas are resolved correctly.
    */
   public function testReferenceResolver(): void {
-    $definition = $this->manager->getDefinitions()['sdc_theme_test_references:foo'];
+    $definitions = $this->manager->getDefinitions();
+    $definition = $definitions['sdc_theme_test_references:foo'];
     $this->assertEquals($this->getExpectations(), $definition['props']['properties']);
+    // Unresolvable and required: the component is not loaded.
+    $this->assertArrayNotHasKey('sdc_theme_test_references:invalid', $definitions);
+    $this->assertArrayNotHasKey('sdc_theme_test_references:invalid_nested', $definitions);
   }
 
   /**
@@ -51,11 +55,7 @@ class SchemaReferenceResolverTest extends ComponentKernelTestBase {
     $expectations['links']['items'] = $system['link'];
     $expectations['links']['items']['properties']['attributes'] = $system['attributes'];
     $expectations['links']['items']['properties']['link_attributes'] = $system['attributes'];
-    // Test from a theme.
-    // $ref: theme://sdc_theme_test_references/bar.json#test.
-    $expectations['from_theme'] = $this->getDataFromJson('theme', 'sdc_theme_test_references', 'bar.json')['test'];
-    // Unresolvable: the $ref stays. It is how the schema resolver of
-    // justinrainbow works.
+    // Unresolvable and optional: the component is loaded and the $ref stays.
     $expectations['unresolvable'] = [
       '$ref' => 'non-existing-schema://whatever',
     ];
