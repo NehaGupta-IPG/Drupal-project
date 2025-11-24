@@ -274,7 +274,14 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     // Save in the definition whether this is a module or a theme. This is
     // important because when creating the plugin instance (the Component
     // object) we'll need to negotiate based on the active theme.
-    $definitions = array_map([$this, 'alterDefinition'], $definitions);
+    foreach ($definitions as $component_id => $definition) {
+      try {
+        $definitions[$component_id] = $this->alterDefinition($definition);
+      }
+      catch (RuntimeException) {
+        unset($definitions[$component_id]);
+      }
+    }
     // Validate the definition after alterations.
     assert(
       Inspector::assertAll(
@@ -369,7 +376,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
       $definition['documentation'] = file_get_contents($documentation_path);
     }
     if (isset($definition['props']['properties']) && is_array($definition['props']['properties']) && !empty($definition['props']['properties'])) {
-      $definition['props'] = $this->resolveJsonSchemaReferences($definition['props'], 0);
+      $definition['props'] = $this->resolveJsonSchemaReferences('props', $definition['props'], [], 0);
     }
     return $definition;
   }
@@ -542,15 +549,19 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   /**
    * Resolve schema references recursively.
    *
+   * @param string|int $key
+   *   Array key of the schema.
    * @param array $schema
    *   JSON schema of a component.
+   * @param array $required
+   *   List of the required properties.
    * @param int $depth
    *   Depth index to avoid infinite recursion.
    *
    * @return array
    *   JSON schema of a component, with references resolved.
    */
-  private function resolveJsonSchemaReferences(array $schema, int $depth = 0): array {
+  private function resolveJsonSchemaReferences(string|int $key, array $schema, array $required, int $depth = 0): array {
     if ($depth > self::MAXIMUM_RECURSION_LEVEL) {
       return $schema;
     }
@@ -567,13 +578,21 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
       $schema += $refSchema;
     }
     catch (RuntimeException) {
+      // Forbid unresolved $ref when prop is required.
+      if (in_array($key, $required)) {
+        throw new RuntimeException();
+      }
+      // Allow unresolved $ref when prop is optional.
       $schema = (array) $schema;
     }
 
     // Recursively resolve nested objects.
     foreach ($schema as $key => $value) {
       if (is_object($value)) {
-        $schema[$key] = $this->resolveJsonSchemaReferences((array) $value, $depth);
+        if (isset($schema['type']) && $schema['type'] == 'object') {
+          $required = $schema['required'] ?? [];
+        }
+        $schema[$key] = $this->resolveJsonSchemaReferences($key, (array) $value, $required, $depth);
       }
     }
 

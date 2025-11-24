@@ -1,7 +1,13 @@
 {
-  "test": {
-    "type": "number",
-    "min": 5,
-    "max": 10
+  "invalid_nested": {
+    "type": "object",
+    "required": [
+      "unresolvable"
+    ],
+    "properties": {
+      "unresolvable": {
+        "$ref": "non-existing-schema://whatever"
+      }
+    }
   }
 }

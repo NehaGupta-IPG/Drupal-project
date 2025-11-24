@@ -10,7 +10,5 @@ props:
       $ref: theme://sdc_theme_test_references/schema.json#attributes
     links:
       $ref: theme://sdc_theme_test_references/schema.json#links
-    from_theme:
-      $ref: theme://sdc_theme_test_references/bar.json#test
     unresolvable:
-      $ref: "non-existing-schema://whatever"
+      $ref: non-existing-schema://whatever
