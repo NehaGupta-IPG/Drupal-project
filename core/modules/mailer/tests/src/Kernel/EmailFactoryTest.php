@@ -9,13 +9,15 @@ use Drupal\Core\Mailer\EmailFactoryInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Mime\Email;
 
 /**
  * Test email factory service.
  */
-#[Group('mailer')]
 #[CoversClass(EmailFactory::class)]
+#[Group('mailer')]
+#[RunTestsInSeparateProcesses]
 class EmailFactoryTest extends KernelTestBase {
 
   /**

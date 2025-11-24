@@ -13,14 +13,16 @@ use Drupal\mailer_email_test\MinimalTestEmail;
 use Drupal\mailer_email_test\ScalarsTestEmail;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 
 /**
  * Tests alter hooks for emails.
  */
-#[Group('mailer')]
 #[CoversClass(EmailRenderer::class)]
+#[Group('mailer')]
+#[RunTestsInSeparateProcesses]
 class EmailHooksTest extends KernelTestBase {
 
   /**
