@@ -55,11 +55,11 @@ final class Settings {
   private static $deprecatedSettingsPatterns = [
     'queue_reliable_service_.*' => [
       'replacement' => '',
-      'message' => 'The "queue_reliable_service_*" setting is deprecated in drupal:11.4.0. This setting should be removed from the settings file, since its usage has been replaced by related Queue worker attribute definition of "queue_reliable_service" property. See https://www.drupal.org/node/3338022.',
+      'message' => 'The "queue_reliable_service_.*" setting is deprecated in drupal:11.4.0. This setting should be removed from the settings file, since its usage has been replaced by related Queue worker attribute definition of "queue_reliable_service" property. See https://www.drupal.org/node/3338022.',
     ],
     'queue_service_.*' => [
       'replacement' => '',
-      'message' => 'The "queue_service_*" setting is deprecated in drupal:11.4.0. This setting should be removed from the settings file, since its usage has been replaced by related Queue worker attribute definition of "queue_service" property. See https://www.drupal.org/node/3338022.',
+      'message' => 'The "queue_service_.*" setting is deprecated in drupal:11.4.0. This setting should be removed from the settings file, since its usage has been replaced by related Queue worker attribute definition of "queue_service" property. See https://www.drupal.org/node/3338022.',
     ],
   ];
 
@@ -240,7 +240,7 @@ final class Settings {
       $keys = array_keys($settings);
       $matches = preg_grep("/^$pattern$/", $keys);
       foreach ($matches as $legacy) {
-        self::$deprecatedSettings[$legacy] = $deprecation;
+        self::$deprecatedSettings[$legacy] = str_replace($pattern, $legacy, $deprecation);
       }
     }
     foreach (self::$deprecatedSettings as $legacy => $deprecation) {
