@@ -43,7 +43,7 @@ class QueueFactory {
   ) {
     $this->settings = $settings;
     if ($this->queueManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $queueManager argument is deprecated in drupal:10.1.0 and it will be required in drupal:11.0.0. See https://www.drupal.org/node/3338022', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $queueManager argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3338022', E_USER_DEPRECATED);
       $this->queueManager = \Drupal::service('plugin.manager.queue_worker');
     }
   }
