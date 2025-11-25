@@ -20,10 +20,10 @@ use Drupal\workflows\StateInterface;
 use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\workflows\WorkflowInterface;
 use Drupal\workflows\WorkflowTypeInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
- * @coversDefaultClass \Drupal\content_moderation\Plugin\Action\ModerationStateChange
- * @group content_moderation
+ * Test the moderation state change action.
  */
 class ModerationStateChangeTest extends UnitTestCase {
 
@@ -133,7 +133,7 @@ class ModerationStateChangeTest extends UnitTestCase {
   /**
    * Data provider for the access method test.
    */
-  public static function accessModerationStateChangeDataProvider(): array {
+  public static function providerAccessModerationStateChange(): array {
     $instance = new self("test");
 
     $instance->setupMocks();
@@ -450,9 +450,8 @@ class ModerationStateChangeTest extends UnitTestCase {
    * @param \Drupal\content_moderation\StateTransitionValidationInterface|null $validator
    *   (optional) A state transition validator mock with true and false
    *   rules set up. Defaults to NULL.
-   *
-   * @dataProvider accessModerationStateChangeDataProvider
    */
+  #[DataProvider('providerAccessModerationStateChange')]
   public function testAccessModerationStateChange(ModerationInformationInterface $moderation_info, $node, $result, ?AccountInterface $account = NULL, ?StateTransitionValidationInterface $validator = NULL): void {
     $config = ['workflow' => 'foo', 'state' => 'bar'];
     $plugin = $this->getModerationStateChangeMock($config, $moderation_info, $node, $validator);
