@@ -47,10 +47,9 @@
       tabs.removeChild(activeTab);
     }
 
-    const tabsTrigger = tabs.querySelector('.tabs__trigger');
-    if (tabsTrigger) {
-      tabsTrigger.addEventListener('click', handleTriggerClick);
-    }
+    tabs
+      .querySelector('.tabs__trigger')
+      ?.addEventListener('click', handleTriggerClick);
   }
 
   /**
