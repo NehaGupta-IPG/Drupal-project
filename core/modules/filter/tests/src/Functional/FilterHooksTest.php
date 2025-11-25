@@ -58,8 +58,6 @@ class FilterHooksTest extends BrowserTestBase {
 
     $format_id = $edit['format'];
 
-    // Grant RoleInterface::ANONYMOUS_ID to use the generated text format.
-    // @see core/profiles/standard/config/install/user.role.authenticated.yml
     $this->grantPermissions(
       Role::load(RoleInterface::ANONYMOUS_ID),
       ["use text format $format_id"]
@@ -72,8 +70,6 @@ class FilterHooksTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains("The text format {$name} has been updated.");
     $this->assertSession()->pageTextContains('hook_filter_format_update invoked.');
 
-    // Grant RoleInterface::AUTHENTICATED_ID to use the generated text format.
-    // @see core/profiles/standard/config/install/user.role.authenticated.yml
     $this->grantPermissions(
       Role::load(RoleInterface::AUTHENTICATED_ID),
       ["use text format $format_id"]

@@ -428,7 +428,6 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
     FilterFormat::create(
       Yaml::parseFile('core/profiles/standard/config/install/filter.format.basic_html.yml')
     )->save();
-    // @see core/profiles/standard/config/install/user.role.authenticated.yml
     $this->grantPermissions(
       Role::load(RoleInterface::AUTHENTICATED_ID),
       ['use text format basic_html']

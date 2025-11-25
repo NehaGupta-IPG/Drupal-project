@@ -12,6 +12,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -113,9 +114,10 @@ class SearchCommentTest extends BrowserTestBase {
       ],
     ]);
     $basic_html_format->save();
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, [
-      'use text format basic_html',
-    ]);
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ["use text format basic_html"]
+    );
 
     $comment_body = 'Test comment body';
 

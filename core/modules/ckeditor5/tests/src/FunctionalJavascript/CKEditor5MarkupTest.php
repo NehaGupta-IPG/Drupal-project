@@ -79,8 +79,6 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       ))
     ));
 
-    // Grant RoleInterface::AUTHENTICATED_ID to use the generated text format.
-    // @see core/profiles/standard/config/install/user.role.authenticated.yml
     $this->grantPermissions(
       Role::load(RoleInterface::AUTHENTICATED_ID),
       ["use text format ckeditor5"]
@@ -192,8 +190,6 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       ))
     ));
 
-    // Grant RoleInterface::AUTHENTICATED_ID to use the generated text format.
-    // @see core/profiles/standard/config/install/user.role.authenticated.yml
     $this->grantPermissions(
       Role::load(RoleInterface::AUTHENTICATED_ID),
       ["use text format ckeditor5"]
@@ -344,8 +340,6 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
       ))
     ));
 
-    // Grant RoleInterface::AUTHENTICATED_ID to use the generated text format.
-    // @see core/profiles/standard/config/install/user.role.authenticated.yml
     $this->grantPermissions(
       Role::load(RoleInterface::AUTHENTICATED_ID),
       ["use text format ckeditor5"]

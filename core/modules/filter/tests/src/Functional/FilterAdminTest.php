@@ -259,7 +259,6 @@ class FilterAdminTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('admin/config/content/formats');
     $this->assertSession()->statusMessageContains("Added text format {$edit['name']}.", 'status');
 
-    // @see core/profiles/standard/config/install/user.role.authenticated.yml
     $this->grantPermissions(
       Role::load(RoleInterface::AUTHENTICATED_ID),
       ["use text format {$edit['format']}"]
@@ -291,7 +290,6 @@ class FilterAdminTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('admin/config/content/formats/manage/' . $full);
     $this->assertSession()->statusMessageContains("The text format {$format->label()} has been updated.", 'status');
 
-    // @see core/profiles/standard/config/install/user.role.authenticated.yml
     $this->grantPermissions(
       Role::load(RoleInterface::AUTHENTICATED_ID),
       ["use text format $full"]
