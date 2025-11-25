@@ -60,7 +60,6 @@ use Drupal\user\Entity\Role;
     'name',
     'format',
     'weight',
-    'roles',
     'filters',
   ],
 )]
