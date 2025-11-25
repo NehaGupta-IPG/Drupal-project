@@ -10,6 +10,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
@@ -97,6 +98,7 @@ class AddedStylesheetsTest extends BrowserTestBase {
   /**
    * Test the ckeditor5-stylesheets theme config.
    */
+  #[IgnoreDeprecations]
   public function testCkeditorStylesheets(): void {
     $this->expectDeprecation('Specifying roles in text formats is deprecated in drupal:10.3.0 and will not be supported starting in drupal:11.0.0. See https://www.drupal.org/node/3168851');
     $assert_session = $this->assertSession();
