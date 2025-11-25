@@ -65,7 +65,10 @@ class ModerationStateChangeDeriver extends DeriverBase implements ContainerDeriv
     // Reset the discovered definitions.
     $this->derivatives = [];
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-    $entity_types = array_filter($this->entityTypeManager->getDefinitions(), [$this->moderationInfo, 'canModerateEntitiesOfEntityType']);
+    $entity_types = array_filter($this->entityTypeManager->getDefinitions(), [
+      $this->moderationInfo,
+      'canModerateEntitiesOfEntityType',
+    ]);
     foreach ($entity_types as $entity_type_id => $entity_type) {
       $plugin['type'] = $entity_type_id;
       $plugin['label'] = $this->t('Change moderation state of @entity_type', ['@entity_type' => $entity_type->getLabel()]);
