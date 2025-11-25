@@ -9,10 +9,12 @@ use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the many to one filter.
  */
+#[Group('views')]
 #[RunTestsInSeparateProcesses]
 class ManyToOneFilterTest extends ViewsKernelTestBase {
 
