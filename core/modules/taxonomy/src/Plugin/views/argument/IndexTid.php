@@ -31,7 +31,7 @@ class IndexTid extends ManyToOne {
   /**
    * {@inheritdoc}
    */
-  public function summaryName($data) {
+  public function summaryName($data): string {
     $tid = $data->{$this->name_alias};
     $term = $tid ? Term::load($tid) : NULL;
     if ($term) {
