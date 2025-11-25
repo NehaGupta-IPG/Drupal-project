@@ -25,6 +25,10 @@ class PathWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $entity = $items->getEntity();
 
+    // Prevent errors if alias has not been initialized at all.
+    if (!isset($items[$delta]->alias)) {
+      $items[$delta]->alias = '';
+    }
     // Fix alias if it is set in values but not in the alias property.
     if (!$items[$delta]->alias) {
       $items[$delta]->alias = $items[$delta]->getValue()['alias'] ?? $items[$delta]->alias;
