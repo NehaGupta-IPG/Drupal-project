@@ -806,6 +806,14 @@ JS;
         FilterFormat::load('ckeditor5_2')
       ))
     ));
+
+    // Grant RoleInterface::AUTHENTICATED_ID to use the generated text format.
+    // @see core/profiles/standard/config/install/user.role.authenticated.yml
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ["use text format ckeditor5"]
+    );
+
     $this->drupalCreateNode([
       'title' => 'My test content',
     ]);
