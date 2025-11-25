@@ -13,8 +13,6 @@ use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Ensures the change state action has valid config schema.
- *
- * @group content_moderation
  */
 class ActionConfigSchemaTest extends KernelTestBase {
 
