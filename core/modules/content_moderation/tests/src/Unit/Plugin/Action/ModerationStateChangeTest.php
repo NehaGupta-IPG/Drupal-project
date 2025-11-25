@@ -533,7 +533,15 @@ class ModerationStateChangeTest extends UnitTestCase {
       $usedValidator = $validator;
     }
     $plugin = $this->getMockBuilder(ModerationStateChange::class)
-      ->setConstructorArgs([$config, 'moderation_state_change', ['type' => 'node'], $moderation_info, $this->entityTypeManager, $this->currentUser, $usedValidator])
+      ->setConstructorArgs([
+        $config,
+        'moderation_state_change',
+        ['type' => 'node'],
+        $moderation_info,
+        $this->entityTypeManager,
+        $this->currentUser,
+        $usedValidator,
+      ])
       ->onlyMethods(['loadLatestRevision'])
       ->getMock();
 
