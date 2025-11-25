@@ -57,8 +57,8 @@ class FilterLegacyTest extends KernelTestBase {
   public function testUpdateRoles(): void {
     $this->expectDeprecation('The \'roles\' property of text formats is deprecated in drupal:10.3.0 and is removed from drupal:11.0.0. See https://www.drupal.org/node/3168851.');
     // Install filter_test module, which ships with the filter_test format.
-    $this->installConfig(['user', 'filter_test']);
-    $format = FilterFormat::load('filter_test');
+    $this->installConfig(['user', 'filter_test_legacy']);
+    $format = FilterFormat::load('filter_test_legacy');
     /* @see filter_test_filter_format_insert() */
     $this->assertEquals([
       RoleInterface::ANONYMOUS_ID,
@@ -73,11 +73,11 @@ class FilterLegacyTest extends KernelTestBase {
 
     // Update the role configuration directly to trigger the configuration
     // schema deprecation.
-    $config = $this->config('filter.format.filter_test');
+    $config = $this->config('filter.format.filter_test_legacy');
     $config->set('roles', [RoleInterface::AUTHENTICATED_ID])->save();
 
     // Verify that roles have not been updated.
-    $format = FilterFormat::load('filter_test');
+    $format = FilterFormat::load('filter_test_legacy');
     $this->assertEquals([
       RoleInterface::ANONYMOUS_ID,
       RoleInterface::AUTHENTICATED_ID,
