@@ -36,12 +36,31 @@ class ThemeAdminForm extends ConfigFormBase {
       '#title' => $this->t('Administration theme'),
       '#open' => TRUE,
     ];
+    $config = $this->config('system.theme');
     $form['admin_theme']['admin_theme'] = [
       '#type' => 'select',
       '#options' => ['' => $this->t('Default theme')] + $theme_options,
       '#title' => $this->t('Administration theme'),
       '#description' => $this->t('Choose "Default theme" to always use the same theme as the rest of the site.'),
-      '#default_value' => $this->config('system.theme')->get('admin'),
+      '#default_value' => $config->get('admin'),
+    ];
+    $form['admin_theme']['favicon'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Favicon'),
+      '#description' => $this->t('Use default theme favicon instead of administration theme favicon.'),
+      '#default_value' => $config->get('favicon'),
+      '#states' => [
+        'invisible' => [
+          'select[name="admin_theme"]' => [
+            [
+              'value' => 0,
+            ],
+            [
+              'value' => $config->get('default'),
+            ],
+          ],
+        ],
+      ],
     ];
     $form['admin_theme']['actions'] = ['#type' => 'actions'];
     $form['admin_theme']['actions']['submit'] = [
@@ -57,7 +76,10 @@ class ThemeAdminForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
-    $this->config('system.theme')->set('admin', $form_state->getValue('admin_theme'))->save();
+    $this->config('system.theme')
+      ->set('admin', $form_state->getValue('admin_theme'))
+      ->set('favicon', $form_state->getValue('favicon'))
+      ->save();
   }
 
 }
