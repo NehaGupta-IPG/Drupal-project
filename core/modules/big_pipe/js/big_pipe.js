@@ -74,7 +74,8 @@
    */
   function checkMutation(node) {
     return Boolean(
-      node.nodeType === Node.ELEMENT_NODE &&
+        node !== null &&
+        node.nodeType === Node.ELEMENT_NODE &&
         node.nodeName === 'SCRIPT' &&
         node.dataset?.bigPipeReplacementForPlaceholderWithId &&
         typeof drupalSettings.bigPipePlaceholderIds[
@@ -102,7 +103,7 @@
     // MutationObserver, the observer will notice and add a mutation for both
     // the addedNode and the removedNode - but the referenced element will not
     // have a parent node.
-    else if (node.parentNode !== null && checkMutation(node.parentNode)) {
+    else if (checkMutation(node.parentNode)) {
       processReplacement(node.parentNode);
     }
   }
