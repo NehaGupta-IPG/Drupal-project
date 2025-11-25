@@ -5,6 +5,9 @@
  * Post update functions for the Content Moderation module.
  */
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\workflows\WorkflowInterface;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -26,4 +29,14 @@ function content_moderation_post_update_add_index_content_moderation_state_field
   $update_manager = \Drupal::service('entity.definition_update_manager');
   $entity_type = $update_manager->getEntityType('content_moderation_state');
   $update_manager->updateEntityType($entity_type);
+}
+
+/**
+ * Ensure moderation state change actions are available for all workflows.
+ */
+function content_moderation_post_update_create_workflow_actions_X(array &$sandbox = []): void {
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, 'workflow', function (WorkflowInterface $workflow): bool {
+      return $workflow->getTypePlugin()->getPluginId() === 'content_moderation';
+    });
 }
