@@ -80,6 +80,7 @@ class FilterHooksTest extends BrowserTestBase {
     $edit = [];
     $edit['title[0][value]'] = $title;
     $edit['body[0][value]'] = $this->randomMachineName(32);
+    $edit['body[0][format]'] = $format_id;
     $this->drupalGet("node/add/{$type->id()}");
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains($type_name . ' ' . $title . ' has been created.');
