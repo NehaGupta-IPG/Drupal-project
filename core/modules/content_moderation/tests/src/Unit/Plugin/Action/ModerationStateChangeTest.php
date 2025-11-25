@@ -365,7 +365,7 @@ class ModerationStateChangeTest extends UnitTestCase {
     $validator->expects($instance->once())
       ->method('isTransitionValid')
       ->with($workflow, $state, $toState, $account, $node)
-      ->willReturn(TRUE);
+      ->willReturn(FALSE);
 
     $workflow->expects($instance->exactly(2))
       ->method('getTypePlugin')
