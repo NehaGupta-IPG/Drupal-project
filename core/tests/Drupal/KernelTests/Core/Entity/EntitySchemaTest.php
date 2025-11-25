@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
+use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the default entity storage schema handler.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntitySchemaTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
@@ -142,9 +145,8 @@ class EntitySchemaTest extends EntityKernelTestBase {
    *   The ID of the entity type whose schema is being tested.
    * @param string $field_name
    *   The name of the field that is being re-installed.
-   *
-   * @dataProvider providerTestPrimaryKeyUpdate
    */
+  #[DataProvider('providerTestPrimaryKeyUpdate')]
   public function testPrimaryKeyUpdate($entity_type_id, $field_name): void {
     // EntityKernelTestBase::setUp() already installs the schema for the
     // 'entity_test' entity type.
