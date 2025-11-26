@@ -10,10 +10,14 @@ use Drupal\system\Entity\Action;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures the change state action has valid config schema.
  */
+#[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ActionConfigSchemaTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
