@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\InvalidQueryException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal's extended prepared statement syntax.
- *
- * @coversDefaultClass \Drupal\Core\Database\Connection
- * @group Database
  */
+#[CoversClass(Connection::class)]
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class QueryTest extends DatabaseTestBase {
 
   /**
@@ -30,7 +34,7 @@ class QueryTest extends DatabaseTestBase {
    */
   public function testScalarSubstitution(): void {
     try {
-      $names = $this->connection->query('SELECT [name] FROM {test} WHERE [age] IN ( :ages[] ) ORDER BY [age]', [':ages[]' => 25])->fetchAll();
+      $this->connection->query('SELECT [name] FROM {test} WHERE [age] IN ( :ages[] ) ORDER BY [age]', [':ages[]' => 25])->fetchAll();
       $this->fail('Array placeholder with scalar argument should result in an exception.');
     }
     catch (\Exception $e) {

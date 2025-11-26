@@ -7,10 +7,12 @@
 
 declare(strict_types=1);
 
+// cspell:ignore postupdate
+
 /**
  * First update.
  */
-function update_test_postupdate_post_update_first() {
+function update_test_postupdate_post_update_first(): string {
   $execution = \Drupal::state()->get('post_update_test_execution', []);
   $execution[] = __FUNCTION__;
   \Drupal::state()->set('post_update_test_execution', $execution);
@@ -21,7 +23,7 @@ function update_test_postupdate_post_update_first() {
 /**
  * Second update.
  */
-function update_test_postupdate_post_update_second() {
+function update_test_postupdate_post_update_second(): string {
   $execution = \Drupal::state()->get('post_update_test_execution', []);
   $execution[] = __FUNCTION__;
   \Drupal::state()->set('post_update_test_execution', $execution);
@@ -32,7 +34,7 @@ function update_test_postupdate_post_update_second() {
 /**
  * Test1 update.
  */
-function update_test_postupdate_post_update_test1() {
+function update_test_postupdate_post_update_test1(): string {
   $execution = \Drupal::state()->get('post_update_test_execution', []);
   $execution[] = __FUNCTION__;
   \Drupal::state()->set('post_update_test_execution', $execution);
@@ -43,7 +45,7 @@ function update_test_postupdate_post_update_test1() {
 /**
  * Test0 update.
  */
-function update_test_postupdate_post_update_test0() {
+function update_test_postupdate_post_update_test0(): string {
   $execution = \Drupal::state()->get('post_update_test_execution', []);
   $execution[] = __FUNCTION__;
   \Drupal::state()->set('post_update_test_execution', $execution);
@@ -54,7 +56,7 @@ function update_test_postupdate_post_update_test0() {
 /**
  * Testing batch processing in post updates update.
  */
-function update_test_postupdate_post_update_test_batch(&$sandbox = NULL) {
+function update_test_postupdate_post_update_test_batch(&$sandbox = NULL): string {
   if (!isset($sandbox['steps'])) {
     $sandbox['current_step'] = 0;
     $sandbox['steps'] = 3;
@@ -73,7 +75,7 @@ function update_test_postupdate_post_update_test_batch(&$sandbox = NULL) {
 /**
  * Implements hook_removed_post_updates().
  */
-function update_test_postupdate_removed_post_updates() {
+function update_test_postupdate_removed_post_updates(): array {
   return [
     'update_test_postupdate_post_update_foo' => '8.x-1.0',
     'update_test_postupdate_post_update_bar' => '8.x-2.0',

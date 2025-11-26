@@ -4,18 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\Plugin;
 
+use Drupal\Component\Plugin\PluginBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Plugin\PluginBase
- * @group Plugin
+ * Tests Drupal\Component\Plugin\PluginBase.
  */
+#[CoversClass(PluginBase::class)]
+#[Group('Plugin')]
 class PluginBaseTest extends TestCase {
 
   /**
-   * @dataProvider providerTestGetPluginId
-   * @covers ::getPluginId
+   * Tests get plugin id.
+   *
+   * @legacy-covers ::getPluginId
    */
+  #[DataProvider('providerTestGetPluginId')]
   public function testGetPluginId($plugin_id, $expected): void {
     $plugin_base = new StubPluginBase(
       [],
@@ -30,6 +37,8 @@ class PluginBaseTest extends TestCase {
    * Returns test data for testGetPluginId().
    *
    * @return array
+   *   An array of test cases, where each item contains a plugin ID and
+   *   the expected plugin ID result.
    */
   public static function providerTestGetPluginId() {
     return [
@@ -39,9 +48,11 @@ class PluginBaseTest extends TestCase {
   }
 
   /**
-   * @dataProvider providerTestGetBaseId
+   * Tests get base id.
+   *
    * @coves ::getBaseId
    */
+  #[DataProvider('providerTestGetBaseId')]
   public function testGetBaseId($plugin_id, $expected): void {
     $plugin_base = new StubPluginBase(
       [],
@@ -56,6 +67,8 @@ class PluginBaseTest extends TestCase {
    * Returns test data for testGetBaseId().
    *
    * @return array
+   *   An array of test cases, where each item contains a plugin ID and
+   *   the expected base ID result.
    */
   public static function providerTestGetBaseId() {
     return [
@@ -65,9 +78,11 @@ class PluginBaseTest extends TestCase {
   }
 
   /**
-   * @dataProvider providerTestGetDerivativeId
-   * @covers ::getDerivativeId
+   * Tests get derivative id.
+   *
+   * @legacy-covers ::getDerivativeId
    */
+  #[DataProvider('providerTestGetDerivativeId')]
   public function testGetDerivativeId($plugin_id = NULL, $expected = NULL): void {
     $plugin_base = new StubPluginBase(
       [],
@@ -82,6 +97,8 @@ class PluginBaseTest extends TestCase {
    * Returns test data for testGetDerivativeId().
    *
    * @return array
+   *   An array of test cases, where each item contains a plugin ID and
+   *   the expected derivative ID result.
    */
   public static function providerTestGetDerivativeId() {
     return [
@@ -91,7 +108,9 @@ class PluginBaseTest extends TestCase {
   }
 
   /**
-   * @covers ::getPluginDefinition
+   * Tests get plugin definition.
+   *
+   * @legacy-covers ::getPluginDefinition
    */
   public function testGetPluginDefinition(): void {
     $plugin_base = new StubPluginBase(

@@ -84,7 +84,7 @@ class TestSiteTearDownCommand extends Command {
   protected function tearDown(TestDatabase $test_database, $db_url): void {
     // Connect to the test database.
     $root = dirname(__DIR__, 5);
-    $database = Database::convertDbUrlToConnectionInfo($db_url, $root);
+    $database = Database::convertDbUrlToConnectionInfo($db_url);
     $database['prefix'] = $test_database->getDatabasePrefix();
     Database::addConnectionInfo(__CLASS__, 'default', $database);
 
@@ -116,7 +116,7 @@ class TestSiteTearDownCommand extends Command {
    *
    * @see \Drupal\Core\File\FileSystemInterface::deleteRecursive()
    */
-  protected function fileUnmanagedDeleteRecursive($path, $callback = NULL) {
+  protected function fileUnmanagedDeleteRecursive($path, $callback = NULL): bool {
     if (isset($callback)) {
       call_user_func($callback, $path);
     }
