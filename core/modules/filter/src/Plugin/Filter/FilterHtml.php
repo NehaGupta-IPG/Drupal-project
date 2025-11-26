@@ -268,6 +268,7 @@ class FilterHtml extends FilterBase {
     $parser = new class($scanner, $events) extends Tokenizer {
 
       /**
+       * @phpstan-ignore-next-line
        * Set the text mode for the character data reader.
        */
       public function setTextMode($textMode, $untilTag = NULL) {

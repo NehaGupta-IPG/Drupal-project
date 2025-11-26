@@ -181,14 +181,10 @@ abstract class SortPluginBase extends HandlerBase implements CacheableDependency
     }
   }
 
-  /**
-   * Simple validate.
-   */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   protected function sortValidate(&$form, FormStateInterface $form_state) {}
 
-  /**
-   * Simple submit.
-   */
+  // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
   public function sortSubmit(&$form, FormStateInterface $form_state) {}
 
   /**
