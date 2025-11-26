@@ -351,7 +351,7 @@ class ContentModerationHooks {
     }
 
     // Create actions for changing the moderation state.
-    if ($entity->getTypePlugin()->getPluginId() === 'content_moderation') {
+    if ($entity->getTypePlugin()->getPluginId() === 'content_moderation' && !$entity->isSyncing()) {
       $this->saveWorkflowActions($entity);
     }
   }
@@ -372,7 +372,7 @@ class ContentModerationHooks {
     }
 
     // Create/update actions for changing the moderation state.
-    if ($entity->getTypePlugin()->getPluginId() === 'content_moderation') {
+    if ($entity->getTypePlugin()->getPluginId() === 'content_moderation' && !$entity->isSyncing()) {
       $this->saveWorkflowActions($entity);
     }
   }
@@ -382,6 +382,10 @@ class ContentModerationHooks {
    */
   #[Hook('workflow_delete')]
   public function workflowDelete(WorkflowInterface $entity): void {
+    if ($entity->getTypePlugin()->getPluginId() !== 'content_moderation' || $entity->isSyncing()) {
+      return;
+    }
+
     // Delete actions for changing moderation state.
     $workflow_base_action_id = 'content_moderation_' . $entity->id();
     $entity_types = $entity->getTypePlugin()->getEntityTypes();
