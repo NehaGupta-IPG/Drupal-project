@@ -8,6 +8,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Returns responses for HTMX Test Attachments routes.
@@ -111,7 +112,7 @@ final class HtmxTestAttachmentsController extends ControllerBase {
       '#value' => 'Click this',
     ];
     $replace_htmx = (new Htmx())
-      ->get($url)
+      ->get($url, full_page: !$useWrapperFormat)
       ->select('div.ajax-content')
       ->target('[data-drupal-htmx-target]');
     if ($swap !== '') {
@@ -127,6 +128,81 @@ final class HtmxTestAttachmentsController extends ControllerBase {
       ],
     ];
 
+    return $build;
+  }
+
+  /**
+   * Responses for the requests made by in buildPageWithHtmxRequestsExamples.
+   *
+   * @return array
+   *   The render array.
+   */
+  public function buildHtmxResponseByParams(Request $req): array {
+    $query = $req->query->all();
+    $method = $req->getMethod();
+
+    $type = 'full-page';
+    if (isset($query[MainContentViewSubscriber::WRAPPER_FORMAT]) && $query[MainContentViewSubscriber::WRAPPER_FORMAT] === 'drupal_htmx') {
+      $type = 'drupal-htmx';
+    }
+
+    return [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => 'Hello, world Htmx ' . $type . ' ' . strtolower($method),
+      '#attributes' => [
+        'id' => 'wrapper-htmx-response-' . $type . '-' . strtolower($method),
+        ...$query,
+      ],
+    ];
+  }
+
+  /**
+   * Builds a page with HTMX request example for each http verb supported.
+   *
+   * @return array
+   *   The render array.
+   */
+  public function buildPageWithHtmxRequestsExamples(): array {
+    $base_button = [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#attributes' => [
+        'type' => 'button',
+        'name' => 'replace',
+      ],
+    ];
+
+    $build = [
+      '#type' => 'container',
+      '#attributes' => [
+        'class' => ['htmx-test-container'],
+      ],
+    ];
+
+    $url = Url::fromRoute('test_htmx.build_response_by_params');
+
+    foreach (['get', 'post', 'delete', 'put', 'patch'] as $method) {
+      $button = $base_button;
+      $button['#value'] = 'Htmx Wrapper Format ' . $method;
+      $button['#attributes']['id'] = 'button-drupal-htmx-' . $method;
+      (new Htmx())
+        ->{$method}($url)
+        ->swap('outerHTML')
+        ->trigger('click')
+        ->applyTo($button);
+      $build['button_' . $method] = $button;
+
+      $button_full_page = $base_button;
+      $button_full_page['#attributes']['id'] = 'button-full-page-' . $method;
+      $button_full_page['#value'] = 'Htmx Full Page ' . $method;
+      (new Htmx())
+        ->{$method}($url, TRUE)
+        ->swap('outerHTML')
+        ->trigger('click')
+        ->applyTo($button_full_page);
+      $build['button_full_page_' . $method] = $button_full_page;
+    }
     return $build;
   }
 
