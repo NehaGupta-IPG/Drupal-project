@@ -20,11 +20,15 @@ use Drupal\workflows\StateInterface;
 use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\workflows\WorkflowInterface;
 use Drupal\workflows\WorkflowTypeInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Test the moderation state change action.
  */
+#[CoversClass(ModerationStateChange::class)]
+#[Group('content_moderation')]
 class ModerationStateChangeTest extends UnitTestCase {
 
   /**
