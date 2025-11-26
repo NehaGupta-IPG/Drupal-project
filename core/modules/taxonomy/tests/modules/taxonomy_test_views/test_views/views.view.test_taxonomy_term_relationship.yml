@@ -8,7 +8,7 @@ dependencies:
 id: test_taxonomy_term_relationship
 label: test_taxonomy_term_relationship
 module: views
-description: ''
+description: null
 tag: ''
 base_table: taxonomy_term_field_data
 base_field: tid
