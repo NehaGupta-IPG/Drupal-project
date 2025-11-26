@@ -90,7 +90,7 @@ class ConfigTranslationController extends ControllerBase {
    * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
    *   (deprecated) The inbound path processor.
    */
-  public function __construct(ConfigMapperManagerInterface $config_mapper_manager, AccessManagerInterface $access_manager, AccountInterface $account, LanguageManagerInterface $language_manager, RendererInterface $renderer, RequestMatcherInterface $router = NULL, InboundPathProcessorInterface $path_processor = NULL) {
+  public function __construct(ConfigMapperManagerInterface $config_mapper_manager, AccessManagerInterface $access_manager, AccountInterface $account, LanguageManagerInterface $language_manager, RendererInterface $renderer, ?RequestMatcherInterface $router = NULL, ?InboundPathProcessorInterface $path_processor = NULL) {
     $this->configMapperManager = $config_mapper_manager;
     $this->accessManager = $access_manager;
     $this->account = $account;
@@ -99,10 +99,10 @@ class ConfigTranslationController extends ControllerBase {
 
     // Handle deprecated parameters.
     if ($router !== NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $router argument is deprecated in drupal:11 and is removed from drupal:12. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $router argument is deprecated in drupal:11.1.9 and is removed from drupal:12.0.0. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
     }
     if ($path_processor !== NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $path_processor argument is deprecated in drupal:11 and is removed from drupal:12. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $path_processor argument is deprecated in drupal:11.1.9 and is removed from drupal:12.0.0. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
     }
   }
 
