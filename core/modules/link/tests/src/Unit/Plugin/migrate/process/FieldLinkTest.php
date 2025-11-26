@@ -9,17 +9,19 @@ use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @group Link
+ * Tests the link field migrate process plugin.
  */
+#[Group('Link')]
 class FieldLinkTest extends UnitTestCase {
 
   /**
    * Tests the URL transformations in the FieldLink process plugin.
-   *
-   * @dataProvider canonicalizeUriDataProvider
    */
+  #[DataProvider('canonicalizeUriDataProvider')]
   public function testCanonicalizeUri($url, $expected, $configuration = []): void {
     $link_plugin = new FieldLink($configuration, '', [], $this->createMock(MigrationInterface::class));
     $transformed = $link_plugin->transform([

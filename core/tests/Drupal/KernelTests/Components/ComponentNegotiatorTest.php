@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Components;
 
+use Drupal\Core\Theme\ComponentNegotiator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests the component negotiator.
- *
- * @coversDefaultClass \Drupal\Core\Theme\ComponentNegotiator
- * @group sdc
  */
+#[CoversClass(ComponentNegotiator::class)]
+#[Group('sdc')]
+#[RunTestsInSeparateProcesses]
 class ComponentNegotiatorTest extends ComponentKernelTestBase {
 
   /**
@@ -30,7 +35,9 @@ class ComponentNegotiatorTest extends ComponentKernelTestBase {
   ];
 
   /**
-   * @covers ::negotiate
+   * Tests negotiate.
+   *
+   * @legacy-covers ::negotiate
    */
   public function testNegotiate(): void {
     $data = [
@@ -72,6 +79,7 @@ class ComponentNegotiatorTest extends ComponentKernelTestBase {
       '#type' => 'inline_template',
       '#template' => "{{ include('sdc_theme_test:my-card') }}",
       '#context' => ['header' => 'Foo bar'],
+      '#variant' => 'horizontal',
     ];
     $crawler = $this->renderComponentRenderArray($build);
     $this->assertNotEmpty($crawler->filter('#sdc-wrapper .component--my-card--replaced__body'));

@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Session;
 
+use Drupal\Core\Session\SessionConfiguration;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\Core\Session\SessionConfiguration
- * @group Session
+ * Tests Drupal\Core\Session\SessionConfiguration.
  */
+#[CoversClass(SessionConfiguration::class)]
+#[Group('Session')]
 class SessionConfigurationTest extends UnitTestCase {
 
   /**
    * Constructs a partially mocked SUT.
    *
    * @return \Drupal\Core\Session\SessionConfiguration|\PHPUnit\Framework\MockObject\MockObject
+   *   A mock object of SessionConfiguration with specific methods overridden.
    */
   protected function createSessionConfiguration($options = []) {
     return $this->getMockBuilder('Drupal\Core\Session\SessionConfiguration')
@@ -28,10 +34,9 @@ class SessionConfigurationTest extends UnitTestCase {
   /**
    * Tests whether the session.cookie_domain ini settings is computed correctly.
    *
-   * @covers ::getOptions
-   *
-   * @dataProvider providerTestGeneratedCookieDomain
+   * @legacy-covers ::getOptions
    */
+  #[DataProvider('providerTestGeneratedCookieDomain')]
   public function testGeneratedCookieDomain($uri, $expected_domain): void {
     $config = $this->createSessionConfiguration();
 
@@ -66,11 +71,10 @@ class SessionConfigurationTest extends UnitTestCase {
   /**
    * Tests the constructor injected session.cookie_domain ini setting.
    *
-   * @covers ::__construct
-   * @covers ::getOptions
-   *
-   * @dataProvider providerTestEnforcedCookieDomain
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getOptions
    */
+  #[DataProvider('providerTestEnforcedCookieDomain')]
   public function testEnforcedCookieDomain($uri, $expected_domain): void {
     $config = $this->createSessionConfiguration(['cookie_domain' => '.example.com']);
 
@@ -105,10 +109,9 @@ class SessionConfigurationTest extends UnitTestCase {
   /**
    * Tests whether the session.cookie_secure ini settings is computed correctly.
    *
-   * @covers ::getOptions
-   *
-   * @dataProvider providerTestCookieSecure
+   * @legacy-covers ::getOptions
    */
+  #[DataProvider('providerTestCookieSecure')]
   public function testCookieSecure($uri, $expected_secure): void {
     $config = $this->createSessionConfiguration();
 
@@ -132,11 +135,10 @@ class SessionConfigurationTest extends UnitTestCase {
   /**
    * Tests that session.cookie_secure ini settings cannot be overridden.
    *
-   * @covers ::__construct
-   * @covers ::getOptions
-   *
-   * @dataProvider providerTestCookieSecure
+   * @legacy-covers ::__construct
+   * @legacy-covers ::getOptions
    */
+  #[DataProvider('providerTestCookieSecure')]
   public function testCookieSecureNotOverridable($uri, $expected_secure): void {
     $config = $this->createSessionConfiguration(['cookie_secure' => FALSE]);
 
@@ -166,10 +168,9 @@ class SessionConfigurationTest extends UnitTestCase {
   /**
    * Tests whether the session.name ini settings is computed correctly.
    *
-   * @covers ::getOptions
-   *
-   * @dataProvider providerTestGeneratedSessionName
+   * @legacy-covers ::getOptions
    */
+  #[DataProvider('providerTestGeneratedSessionName')]
   public function testGeneratedSessionName($uri, $expected_name): void {
     $config = $this->createSessionConfiguration();
 
@@ -214,10 +215,9 @@ class SessionConfigurationTest extends UnitTestCase {
   /**
    * Tests whether the session.name ini settings is computed correctly.
    *
-   * @covers ::getOptions
-   *
-   * @dataProvider providerTestEnforcedSessionName
+   * @legacy-covers ::getOptions
    */
+  #[DataProvider('providerTestEnforcedSessionName')]
   public function testEnforcedSessionNameViaCookieDomain($uri, $expected_name): void {
     $config = $this->createSessionConfiguration(['cookie_domain' => '.example.com']);
 
@@ -262,7 +262,7 @@ class SessionConfigurationTest extends UnitTestCase {
   /**
    * Tests constructor's default settings.
    *
-   * @covers ::__construct
+   * @legacy-covers ::__construct
    */
   public function testConstructorDefaultSettings(): void {
     $config = $this->createSessionConfiguration([]);

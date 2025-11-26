@@ -5,19 +5,21 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Menu;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorage;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore mlid
-
 /**
  * Tests the menu tree storage.
  *
- * @group Menu
- *
  * @see \Drupal\Core\Menu\MenuTreeStorage
  */
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class MenuTreeStorageTest extends KernelTestBase {
 
   /**
@@ -409,7 +411,7 @@ class MenuTreeStorageTest extends KernelTestBase {
    * Tests that a link's stored representation matches the expected values.
    *
    * @param string $id
-   *   The ID of the menu link to test
+   *   The ID of the menu link to test.
    * @param array $expected_properties
    *   A keyed array of column names and values like has_children and depth.
    * @param array $parents
@@ -426,7 +428,7 @@ class MenuTreeStorageTest extends KernelTestBase {
     foreach ($expected_properties as $field => $value) {
       $query->condition($field, $value);
     }
-    $all = $query->execute()->fetchAll(\PDO::FETCH_ASSOC);
+    $all = $query->execute()->fetchAll(FetchAs::Associative);
     $this->assertCount(1, $all, "Found link $id matching all the expected properties");
     $raw = reset($all);
 

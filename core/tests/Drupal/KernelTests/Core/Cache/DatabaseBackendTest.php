@@ -6,12 +6,14 @@ namespace Drupal\KernelTests\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\DatabaseBackend;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Unit test of the database backend using the generic cache unit test base.
- *
- * @group Cache
  */
+#[Group('Cache')]
+#[RunTestsInSeparateProcesses]
 class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
 
   /**
@@ -20,11 +22,6 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
    * @var int
    */
   protected static $maxRows = 100;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Creates a new instance of DatabaseBackend.
@@ -121,7 +118,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
   }
 
   /**
-   * Test that the service "cache_tags.invalidator.checksum" is backend overridable.
+   * Tests that "cache_tags.invalidator.checksum" is backend overridable.
    */
   public function testCacheTagsInvalidatorChecksumIsBackendOverridable(): void {
     $definition = $this->container->getDefinition('cache_tags.invalidator.checksum');
