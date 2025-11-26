@@ -6,7 +6,7 @@ dependencies:
 id: test_term_show_entity
 label: test_term_show_entity
 module: views
-description: ''
+description: null
 tag: ''
 base_table: taxonomy_term_field_data
 base_field: tid
