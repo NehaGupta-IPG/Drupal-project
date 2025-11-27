@@ -340,6 +340,7 @@ class ViewsConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['table_css_class'][$view->id()];
     if ($this->areDeprecationsEnabled() && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
       @\trigger_error(\sprintf('The update to add a default table CSS class for view "%s" is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3499943', $view->id()), E_USER_DEPRECATED);
     }
 
@@ -390,6 +391,7 @@ class ViewsConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['block_content_listing_empty'][$view->id()];
     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
       @\trigger_error(\sprintf('The update to remove the block_content_listing_empty plugin from view "%s" is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3336219', $view->id()), E_USER_DEPRECATED);
     }
 

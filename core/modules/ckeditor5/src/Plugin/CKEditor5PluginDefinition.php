@@ -78,6 +78,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
             'objectBlockRight' => 'IconObjectRight',
             default => 'Icon' . \ucfirst($style['icon'])
           };
+          // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
           @\trigger_error(\sprintf('The icon configuration value "%s" in drupalElementStyles group %s for CKEditor5 plugin %s is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. Try using "%s" instead. See https://www.drupal.org/node/3528806', $deprecated_icon, $group_id, $this->id(), $style['icon']), E_USER_DEPRECATED);
         }
       }

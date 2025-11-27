@@ -170,6 +170,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     $allowedKeys[] = $this->getMetadataBag()->getStorageKey();
     $deprecatedKeys = \array_diff(\array_keys($_SESSION), $allowedKeys);
     if (\count($deprecatedKeys) > 0) {
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
       @\trigger_error(\sprintf('Storing values directly in $_SESSION is deprecated in drupal:11.2.0 and will become unsupported in drupal:12.0.0. Use $request->getSession()->set() instead. Affected keys: %s. See https://www.drupal.org/node/3518527', \implode(", ", $deprecatedKeys)), E_USER_DEPRECATED);
     }
 

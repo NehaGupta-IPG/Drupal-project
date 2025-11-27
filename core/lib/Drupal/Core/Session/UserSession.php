@@ -94,7 +94,10 @@ class UserSession implements AccountInterface {
     $roles = $this->roles;
 
     if ($exclude_locked_roles) {
-      $roles = \array_values(\array_diff($roles, [AccountInterface::ANONYMOUS_ROLE, AccountInterface::AUTHENTICATED_ROLE]));
+      $roles = \array_values(\array_diff(
+        $roles,
+        [AccountInterface::ANONYMOUS_ROLE, AccountInterface::AUTHENTICATED_ROLE]
+      ));
     }
 
     return $roles;

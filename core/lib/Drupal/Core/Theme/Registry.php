@@ -674,6 +674,7 @@ class Registry implements DestructableInterface {
               foreach ([$prefix . '_preprocess', $prefix . '_preprocess_' . $hook] as $function) {
                 if (\function_exists($function)) {
                   if ($prefix !== $theme) {
+                    // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
                     @\trigger_error(\sprintf('Providing %s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3547356', $function), E_USER_DEPRECATED);
                   }
                   $info['preprocess functions'][] = $function;

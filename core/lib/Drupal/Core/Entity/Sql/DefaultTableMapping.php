@@ -178,7 +178,13 @@ class DefaultTableMapping implements TableMappingInterface {
 
     // The ID and UUID key may point to the same field, so make sure the list is
     // unique.
-    $key_fields = \array_values(\array_unique(\array_filter([$id_key, $revision_key, $bundle_key, $uuid_key, $langcode_key])));
+    $key_fields = \array_values(\array_unique(\array_filter([
+      $id_key,
+      $revision_key,
+      $bundle_key,
+      $uuid_key,
+      $langcode_key,
+    ])));
     $all_fields = \array_keys($shared_table_definitions);
     $revisionable_fields = \array_keys(\array_filter($shared_table_definitions, function (FieldStorageDefinitionInterface $definition) {
       return $definition->isRevisionable();

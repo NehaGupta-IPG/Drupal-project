@@ -815,6 +815,7 @@ class Renderer implements RendererInterface {
    */
   public function addCacheableDependency(array &$elements, $dependency) {
     if (!$dependency instanceof CacheableDependencyInterface) {
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
       @\trigger_error(\sprintf("Calling %s() with an object that doesn't implement %s is deprecated in drupal:11.3.0 and will throw an error in drupal:13.0.0. See https://www.drupal.org/node/3525389", __METHOD__, CacheableDependencyInterface::class), E_USER_DEPRECATED);
     }
     $meta_a = CacheableMetadata::createFromRenderArray($elements);

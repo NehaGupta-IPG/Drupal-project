@@ -38,6 +38,7 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
   public function __construct(array $directories, string $file_cache_key_suffix, ?FileSystemInterface $fileSystem = NULL) {
     parent::__construct($directories, $file_cache_key_suffix);
     if ($fileSystem) {
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
       @\trigger_error(\sprintf('Passing the $fileSystem parameter to %s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. The class no longer uses the file system service. See https://www.drupal.org/node/3530869', __METHOD__), E_USER_DEPRECATED);
     }
   }
