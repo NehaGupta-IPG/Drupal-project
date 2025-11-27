@@ -8,6 +8,7 @@ use Drupal\config_translation\Exception\ConfigMapperLanguageException;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -26,6 +27,16 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
  */
 class ConfigTranslationController extends ControllerBase {
 
+  use DeprecatedServicePropertyTrait;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected $deprecatedProperties = [
+    'router' => 'router',
+    'pathProcessor' => 'path_processor_manager',
+  ];
+
   /**
    * The configuration mapper manager.
    *
@@ -39,20 +50,6 @@ class ConfigTranslationController extends ControllerBase {
    * @var \Drupal\Core\Access\AccessManagerInterface
    */
   protected $accessManager;
-
-  /**
-   * The dynamic router service.
-   *
-   * @var \Symfony\Component\Routing\Matcher\RequestMatcherInterface
-   */
-  protected $router;
-
-  /**
-   * The path processor service.
-   *
-   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface
-   */
-  protected $pathProcessor;
 
   /**
    * The current user.
@@ -82,25 +79,31 @@ class ConfigTranslationController extends ControllerBase {
    *   The configuration mapper manager.
    * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
    *   The menu link access service.
-   * @param \Symfony\Component\Routing\Matcher\RequestMatcherInterface $router
-   *   The dynamic router service.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
-   *   The inbound path processor.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Symfony\Component\Routing\Matcher\RequestMatcherInterface $router
+   *   (deprecated) The dynamic router service.
+   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
+   *   (deprecated) The inbound path processor.
    */
-  public function __construct(ConfigMapperManagerInterface $config_mapper_manager, AccessManagerInterface $access_manager, RequestMatcherInterface $router, InboundPathProcessorInterface $path_processor, AccountInterface $account, LanguageManagerInterface $language_manager, RendererInterface $renderer) {
+  public function __construct(ConfigMapperManagerInterface $config_mapper_manager, AccessManagerInterface $access_manager, AccountInterface $account, LanguageManagerInterface $language_manager, RendererInterface $renderer, ?RequestMatcherInterface $router = NULL, ?InboundPathProcessorInterface $path_processor = NULL) {
     $this->configMapperManager = $config_mapper_manager;
     $this->accessManager = $access_manager;
-    $this->router = $router;
-    $this->pathProcessor = $path_processor;
     $this->account = $account;
     $this->languageManager = $language_manager;
     $this->renderer = $renderer;
+
+    // Handle deprecated parameters.
+    if ($router !== NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $router argument is deprecated in drupal:11.1.9 and is removed from drupal:12.0.0. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
+    }
+    if ($path_processor !== NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() with the $path_processor argument is deprecated in drupal:11.1.9 and is removed from drupal:12.0.0. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
+    }
   }
 
   /**
@@ -110,8 +113,6 @@ class ConfigTranslationController extends ControllerBase {
     return new static(
       $container->get('plugin.manager.config_translation.mapper'),
       $container->get('access_manager'),
-      $container->get('router'),
-      $container->get('path_processor_manager'),
       $container->get('current_user'),
       $container->get('language_manager'),
       $container->get('renderer')
