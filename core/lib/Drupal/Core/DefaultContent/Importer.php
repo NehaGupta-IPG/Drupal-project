@@ -123,7 +123,7 @@ final class Importer implements LoggerAwareInterface {
           }
         }
 
-        $entity = $this->toEntity($decoded)->enforceIsNew();
+        $entity = $this->toEntity($decoded)->enforceIsNew()->setSyncing(TRUE);
 
         // Ensure that the entity is not owned by the anonymous user.
         if ($entity instanceof EntityOwnerInterface && empty($entity->getOwnerId())) {
@@ -214,6 +214,11 @@ final class Importer implements LoggerAwareInterface {
     if (empty($data['_meta']['uuid'])) {
       throw new ImportException('The uuid metadata must be specified.');
     }
+
+    // Allow third-party code to modify the entity data before the entity is
+    // created.
+    $event = new PreEntityImportEvent($data);
+    $data = ['_meta' => $event->metadata] + $this->eventDispatcher->dispatch($event)->data;
 
     $is_root = FALSE;
     // @see ::loadEntityDependency()

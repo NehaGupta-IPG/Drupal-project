@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\Kernel;
 
+use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\ckeditor5\Plugin\Validation\Constraint\CKEditor5MediaAndFilterSettingsInSyncConstraintValidator;
 use Drupal\ckeditor5\Plugin\Validation\Constraint\EnabledConfigurablePluginsConstraintValidator;
 use Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraintValidator;
@@ -18,16 +19,16 @@ use Drupal\filter\FilterFormatInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Yaml\Yaml;
 
 // cspell:ignore onhover baguette
+
 /**
  * Tests Validators.
- *
- * @legacy-covers \Drupal\ckeditor5\Plugin\Editor\CKEditor5::validatePair
  */
 #[Group('ckeditor5')]
 #[CoversClass(ToolbarItemConstraintValidator::class)]
@@ -35,6 +36,7 @@ use Symfony\Component\Yaml\Yaml;
 #[CoversClass(EnabledConfigurablePluginsConstraintValidator::class)]
 #[CoversClass(FundamentalCompatibilityConstraintValidator::class)]
 #[CoversClass(CKEditor5MediaAndFilterSettingsInSyncConstraintValidator::class)]
+#[CoversMethod(CKEditor5::class, 'validatePair')]
 #[RunTestsInSeparateProcesses]
 class ValidatorsTest extends KernelTestBase {
 
@@ -59,6 +61,7 @@ class ValidatorsTest extends KernelTestBase {
     'filter_test',
     'media',
     'media_library',
+    'system',
     'user',
     'views',
   ];
@@ -69,6 +72,10 @@ class ValidatorsTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->typedConfig = $this->container->get('config.typed');
+
+    $this->installConfig(['system']);
+    // Avoid needing to install the Stark theme.
+    $this->config('system.theme')->delete();
   }
 
   /**
@@ -1597,6 +1604,7 @@ class ValidatorsTest extends KernelTestBase {
       ],
       'expected_violations' => [],
     ];
+
     return $data;
   }
 
