@@ -247,7 +247,7 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
       $output['#view_id'] = $this->view->storage->id();
       $output['#view_display_show_admin_links'] = $this->view->getShowAdminLinks();
       $output['#view_display_plugin_id'] = $this->view->display_handler->getPluginId();
-      \views_add_contextual_links($output, $block_type, $this->displayID);
+      views_add_contextual_links($output, $block_type, $this->displayID);
     }
   }
 

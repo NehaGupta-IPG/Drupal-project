@@ -60,7 +60,7 @@ class ViewPageController {
       $build = $class::buildBasicRenderable($view_id, $display_id, $args, $route);
       Page::setPageRenderArray($build);
 
-      \views_add_contextual_links($build, 'page', $display_id, $build);
+      views_add_contextual_links($build, 'page', $display_id, $build);
 
       return $build;
     }

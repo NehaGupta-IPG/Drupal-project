@@ -273,7 +273,15 @@
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceOperator"/>
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireShortTernaryOperator"/>
   <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
-  <rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions" />
+  <rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions">
+    <properties>
+      <property name="exclude" type="array">
+        <element value="base_path"/>
+        <element value="history_read"/>
+        <element value="views_add_contextual_links"/>
+      </property>
+    </properties>
+  </rule>
   <rule ref="SlevomatCodingStandard.PHP.TypeCast" />
   <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
     <properties>

@@ -1352,7 +1352,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
 
         // Make sure that paths which were run through URL generation work as
         // well.
-        $base_path = \base_path();
+        $base_path = base_path();
         // Checks whether the path starts with the base_path.
         if (\str_starts_with($more_link_path, $base_path)) {
           $more_link_path = \mb_substr($more_link_path, \mb_strlen($base_path));
@@ -1473,8 +1473,8 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       // Tokens might have resolved URL's, as is the case for tokens provided by
       // Link fields, so all internal paths will be prefixed by base_path(). For
       // proper further handling reset this to internal:/.
-      if (\str_starts_with($path, \base_path())) {
-        $path = 'internal:/' . \substr($path, \strlen(\base_path()));
+      if (\str_starts_with($path, base_path())) {
+        $path = 'internal:/' . \substr($path, \strlen(base_path()));
       }
 
       // If we have no $path and no $alter['url'], we have nothing to work with,
