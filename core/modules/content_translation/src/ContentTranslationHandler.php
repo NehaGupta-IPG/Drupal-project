@@ -462,26 +462,10 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
       // If there is only one published translation we cannot unpublish it,
       // since there would be nothing left to display.
       $enabled = TRUE;
-      $is_outdated = $metadata->isOutdated();
       if ($status) {
         $published = 0;
         foreach ($entity->getTranslationLanguages() as $langcode => $language) {
-          $translation_metadata = $this->manager->getTranslationMetadata($entity->getTranslation($langcode));
-          $published += $translation_metadata->isPublished();
-          if ($entity->language()->getId() === $langcode) {
-            $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-            $latest_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $langcode);
-            if ($latest_revision_id) {
-              /** @var \Drupal\Core\Entity\ContentEntityInterface $latest_revision */
-              $latest_revision = $storage->loadRevision($latest_revision_id);
-              $default_revision = $storage->load($entity->id());
-              // Set $is_outdated based on the latest revision's translation metadata.
-              if (!$latest_revision->wasDefaultRevision() || $default_revision->hasTranslation($langcode)) {
-                $translation_metadata = $this->manager->getTranslationMetadata($latest_revision->getTranslation($langcode));
-                $is_outdated = $translation_metadata->isOutdated();
-              }
-            }
-          }
+          $published += $this->manager->getTranslationMetadata($entity->getTranslation($langcode))->isPublished();
         }
         $enabled = $published > 1;
       }
@@ -497,7 +481,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         '#disabled' => !$enabled,
       ];
 
-      $translate = !$new_translation && $is_outdated;
+      $translate = !$new_translation && $metadata->isOutdated();
       if (!$translate) {
         $form['content_translation']['retranslate'] = [
           '#type' => 'checkbox',
