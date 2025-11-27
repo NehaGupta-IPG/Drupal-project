@@ -6,12 +6,14 @@ namespace Drupal\Tests\contact\Functional;
 
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test DB error on malicious contact URLs.
- *
- * @group contact
  */
+#[Group('contact')]
+#[RunTestsInSeparateProcesses]
 class ContactCoalitionDbFailTest extends BrowserTestBase {
 
   /**
