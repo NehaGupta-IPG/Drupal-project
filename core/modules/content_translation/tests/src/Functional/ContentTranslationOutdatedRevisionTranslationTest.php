@@ -31,7 +31,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
   /**
    * Tests that outdated revision translations work correctly.
    */
-  public function testFlagAsOutdatedHidden(): void {
+  public function testFlagAsOutdated(): void {
     // Create a test node.
     $values = [
       'title' => 'Test 1.1 EN',
@@ -54,7 +54,6 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
       ]
     );
     $this->drupalGet($add_translation_url);
-    $this->assertFlagWidget();
     $edit = [
       'title[0][value]' => 'Test 1.2 IT',
       'moderation_state[0][state]' => 'published',
@@ -74,7 +73,6 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
       ]
     );
     $this->drupalGet($add_translation_url);
-    $this->assertFlagWidget();
     $edit = [
       'title[0][value]' => 'Test 1.3 FR',
       'moderation_state[0][state]' => 'published',
@@ -82,20 +80,50 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $this->submitForm($edit, 'Save (this translation)');
 
     // Create an English draft.
+    $edit = [
+      'title[0][value]' => 'Test 1.4 EN',
+      'moderation_state[0][state]' => 'draft',
+    ];
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->storage->loadUnchanged($id);
     $en_edit_url = $this->getEditUrl($entity);
     $this->drupalGet($en_edit_url);
-    $this->assertFlagWidget();
-  }
+    $this->submitForm($edit, 'Save (this translation)');
+    // Create an Italian draft.
+    $edit = [
+      'title[0][value]' => 'Test 1.5 IT',
+      'moderation_state[0][state]' => 'draft',
+    ];
+    $it_edit_url = $this->getEditUrl($entity->getTranslation('it'));
+    $this->drupalGet($it_edit_url);
+    $this->submitForm($edit, t('Save (this translation)'));
 
-  /**
-   * Checks whether the flag widget is displayed.
-   *
-   * @internal
-   */
-  protected function assertFlagWidget(): void {
-    $this->assertSession()->pageTextNotContains('Flag other translations as outdated');
-    $this->assertSession()->pageTextContains('Translations cannot be flagged as outdated when content is moderated.');
+    // Create a French draft.
+    $edit = [
+      'title[0][value]' => 'Test 1.6 FR',
+      'moderation_state[0][state]' => 'draft',
+    ];
+    $fr_edit_url = $this->getEditUrl($entity->getTranslation('fr'));
+    $this->drupalGet($fr_edit_url);
+    $this->submitForm($edit, t('Save (this translation)'));
+
+    // Create another English draft and mark the other translations as outdated.
+    $edit = [
+      'title[0][value]' => 'Test 1.7 EN',
+      'moderation_state[0][state]' => 'draft',
+      'content_translation[retranslate]' => 1,
+    ];
+    $this->drupalGet($en_edit_url);
+    $this->submitForm($edit, t('Save (this translation)'));
+
+    // Verify that the expected translation drafts are loaded in the related
+    // entity forms.
+    $this->drupalGet($en_edit_url);
+    $this->assertSession()->pageTextContains('Test 1.7 EN');
+    $this->drupalGet($it_edit_url);
+    $this->assertSession()->pageTextContains('Test 1.5 IT');
+    $this->drupalGet($fr_edit_url);
+    $this->assertSession()->pageTextContains('Test 1.6 FR');
   }
 
 }
