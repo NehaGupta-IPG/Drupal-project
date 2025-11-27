@@ -81,7 +81,7 @@ class ResponsiveImageThemeHooks {
     $item = $variables['item'];
     $attributes = [];
     // Do not output an empty 'title' attribute.
-    if (!is_null($item->title) && mb_strlen($item->title) != 0) {
+    if (!\is_null($item->title) && \mb_strlen($item->title) != 0) {
       $attributes['title'] = $item->title;
     }
     $attributes['alt'] = $item->alt;
@@ -143,14 +143,14 @@ class ResponsiveImageThemeHooks {
     // while the largest weight is expected to have the largest breakpoint
     // width. For responsive images, we need largest breakpoint widths first, so
     // we need to reverse the order of these breakpoints.
-    $breakpoints = array_reverse($this->breakpointManager->getBreakpointsByGroup($responsive_image_style->getBreakpointGroup()));
+    $breakpoints = \array_reverse($this->breakpointManager->getBreakpointsByGroup($responsive_image_style->getBreakpointGroup()));
     foreach ($responsive_image_style->getKeyedImageStyleMappings() as $breakpoint_id => $multipliers) {
       if (isset($breakpoints[$breakpoint_id])) {
         $variables['sources'][] = $this->responsiveImageBuilder->buildSourceAttributes($variables, $breakpoints[$breakpoint_id], $multipliers);
       }
     }
 
-    if (isset($variables['sources']) && count($variables['sources']) === 1 && !isset($variables['sources'][0]['media'])) {
+    if (isset($variables['sources']) && \count($variables['sources']) === 1 && !isset($variables['sources'][0]['media'])) {
       // There is only one source tag with an empty media attribute. This means
       // we can output an image tag with the srcset attribute instead of a
       // picture tag.

@@ -214,12 +214,12 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       throw new RouteNotFoundException(\sprintf('Route "%s" does not exist.', $name));
     }
 
-    $result = reset($routes);
+    $result = \reset($routes);
     if ($result instanceof Alias) {
       $alias = $result->getId();
       if ($result->isDeprecated()) {
         $deprecation = $result->getDeprecation($name);
-        @trigger_error($deprecation['message'], E_USER_DEPRECATED);
+        @\trigger_error($deprecation['message'], E_USER_DEPRECATED);
       }
       return $this->getRouteByName($alias);
     }

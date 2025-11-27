@@ -559,7 +559,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $this->assertSession()->statusMessageContains("The domain for Italian may only contain the domain name, not a trailing slash, protocol and/or port.", 'error');
 
     // Build the link we're going to test.
-    $link = 'it.example.com' . \rtrim(base_path(), '/') . '/admin';
+    $link = 'it.example.com' . \rtrim(\base_path(), '/') . '/admin';
 
     // Test URL in another language: http://it.example.com/admin.
     // Base path gives problems on the testbot, so $correct_link is hard-coded.

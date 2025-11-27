@@ -51,12 +51,12 @@ class SyslogHooks {
       '#default_value' => $config->get('identity'),
       '#description' => $this->t('A string that will be prepended to every message logged to Syslog. If you have multiple sites logging to the same Syslog log file, a unique identity per site makes it easy to tell the log entries apart.') . $help,
     ];
-    if (defined('LOG_LOCAL0')) {
+    if (\defined('LOG_LOCAL0')) {
       $form['syslog_facility'] = [
         '#type' => 'select',
         '#title' => $this->t('Syslog facility'),
         '#default_value' => $config->get('facility'),
-        '#options' => syslog_facility_list(),
+        '#options' => \syslog_facility_list(),
         '#description' => $this->t('Depending on the system configuration, Syslog and other logging tools use this code to identify or filter messages from within the entire system log.') . $help,
       ];
     }

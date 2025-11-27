@@ -44,7 +44,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
     protected DrupalKernelInterface|CachedDiscoveryInterface|null $kernel = NULL,
   ) {
     if (!$this->kernel instanceof DrupalKernelInterface) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $kernel argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' without the $kernel argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
       $this->kernel = \Drupal::service('kernel');
     }
   }
@@ -176,9 +176,9 @@ class ThemeInstaller implements ThemeInstallerInterface {
 
     $this->cssCollectionOptimizer->deleteAll();
     // Add new themes to the list of installed themes.
-    $register_themes = array_merge(array_keys($installed_themes), $themes_installed);
+    $register_themes = \array_merge(\array_keys($installed_themes), $themes_installed);
     // Get list of extensions for the new list of themes.
-    $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
+    $register_themes = \array_intersect_key($theme_data, \array_flip($register_themes));
     $this->resetSystem($register_themes);
 
     // Invoke hook_themes_installed() after the themes have been installed.
@@ -232,9 +232,9 @@ class ThemeInstaller implements ThemeInstallerInterface {
     // Refresh theme info.
     $this->themeHandler->reset();
     // Remove themes that were uninstalled from the list.
-    $register_themes = array_diff(array_keys($installed_themes), $theme_list);
+    $register_themes = \array_diff(\array_keys($installed_themes), $theme_list);
     // Get list of extensions for the new list of themes.
-    $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
+    $register_themes = \array_intersect_key($theme_data, \array_flip($register_themes));
     $this->resetSystem($register_themes);
 
     $this->moduleHandler->invokeAll('themes_uninstalled', [$theme_list]);

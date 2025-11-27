@@ -168,7 +168,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
     $container->getDefinition('logger.channel.package_manager')
       ->addTag('persist');
 
-    array_walk($this->disableValidators, $container->removeDefinition(...));
+    \array_walk($this->disableValidators, $container->removeDefinition(...));
   }
 
   /**
@@ -252,7 +252,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
    */
   protected function registerPostUpdateFunctions(): void {
     static $updates = [];
-    $updates = array_merge($updates, $this->container->get('update.post_update_registry')
+    $updates = \array_merge($updates, $this->container->get('update.post_update_registry')
       ->getPendingUpdateFunctions());
 
     $this->container->get('keyvalue')
@@ -283,19 +283,19 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
     }
 
     $this->testProjectRoot = DrupalFileSystem::getOsTemporaryDirectory() . DIRECTORY_SEPARATOR . 'package_manager_testing_root' . $this->databasePrefix;
-    if (is_dir($this->testProjectRoot)) {
+    if (\is_dir($this->testProjectRoot)) {
       $this->fileSystem->remove($this->testProjectRoot);
     }
     $this->fileSystem->mkdir($this->testProjectRoot);
 
     // Create the active directory and copy its contents from a fixture.
     $active_dir = $this->testProjectRoot . DIRECTORY_SEPARATOR . 'active';
-    $this->assertTrue(mkdir($active_dir));
+    $this->assertTrue(\mkdir($active_dir));
     static::copyFixtureFilesTo($source_dir ?? __DIR__ . '/../../fixtures/fake_site', $active_dir);
 
     // Removing 'vfs://root/' from site path set in
     // \Drupal\KernelTests\KernelTestBase::setUpFilesystem as we don't use vfs.
-    $test_site_path = str_replace('vfs://root/', '', $this->siteDirectory);
+    $test_site_path = \str_replace('vfs://root/', '', $this->siteDirectory);
 
     // Copy directory structure from vfs site directory to our site directory.
     $this->fileSystem->mirror($this->siteDirectory, $active_dir . DIRECTORY_SEPARATOR . $test_site_path);
@@ -311,7 +311,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
 
     // Create a stage root directory alongside the active directory.
     $staging_root = $this->testProjectRoot . DIRECTORY_SEPARATOR . 'stage';
-    $this->assertTrue(mkdir($staging_root));
+    $this->assertTrue(\mkdir($staging_root));
 
     // Ensure the path locator points to the test project. We assume that is its
     // own web root and the vendor directory is at its top level.
@@ -368,7 +368,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
     // number of requests we expect to be made for update XML because it will
     // retrieve one item off the queue for each request.
     // @see \GuzzleHttp\Handler\MockHandler::__invoke()
-    $handler = new MockHandler(array_fill(0, 100, $callable));
+    $handler = new MockHandler(\array_fill(0, 100, $callable));
     $this->client = new Client([
       'handler' => HandlerStack::create($handler),
     ]);
@@ -517,7 +517,7 @@ class TestDiskSpaceValidator extends DiskSpaceValidator {
    */
   protected function stat(string $path): array {
     return [
-      'dev' => $this->sharedDisk ? 'disk' : uniqid(),
+      'dev' => $this->sharedDisk ? 'disk' : \uniqid(),
     ];
   }
 

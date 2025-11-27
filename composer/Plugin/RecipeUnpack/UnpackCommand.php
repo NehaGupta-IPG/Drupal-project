@@ -77,29 +77,29 @@ EOT
     $unpack_collection = new UnpackCollection();
     foreach ($package_names as $package_name) {
       if (!$manager->isRootDependency($package_name)) {
-        $io->error(sprintf('<info>%s</info> not found in the root composer.json.', $package_name));
+        $io->error(\sprintf('<info>%s</info> not found in the root composer.json.', $package_name));
         return 1;
       }
       $packages = $local_repo->findPackages($package_name);
-      $package = reset($packages);
+      $package = \reset($packages);
 
       if (!$package instanceof PackageInterface) {
-        $io->error(sprintf('<info>%s</info> does not resolve to a package.', $package_name));
+        $io->error(\sprintf('<info>%s</info> does not resolve to a package.', $package_name));
         return 1;
       }
 
       if ($package->getType() !== Plugin::RECIPE_PACKAGE_TYPE) {
-        $io->error(sprintf('<info>%s</info> is not a recipe.', $package->getPrettyName()));
+        $io->error(\sprintf('<info>%s</info> is not a recipe.', $package->getPrettyName()));
         return 1;
       }
 
       if ($manager->unpackOptions->isIgnored($package)) {
-        $io->error(sprintf('<info>%s</info> is in the extra.drupal-recipe-unpack.ignore list.', $package->getName()));
+        $io->error(\sprintf('<info>%s</info> is in the extra.drupal-recipe-unpack.ignore list.', $package->getName()));
         return 1;
       }
 
       if (UnpackManager::isDevRequirement($package)) {
-        $io->warning(sprintf('<info>%s</info> is present in the require-dev key. Unpacking will move the recipe\'s dependencies to the require key.', $package->getName()));
+        $io->warning(\sprintf('<info>%s</info> is present in the require-dev key. Unpacking will move the recipe\'s dependencies to the require key.', $package->getName()));
         if ($io->isInteractive() && !$io->askConfirmation('<info>Do you want to continue</info> [<comment>yes</comment>]?')) {
           return 0;
         }

@@ -220,7 +220,7 @@ final class SmartDefaultSettings {
     if ($has_html_restrictions) {
       // Determine what tags/attributes are allowed in this text format that
       // were not allowed previous to the switch.
-      $allowed_by_new_plugin_config = new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($this->pluginManager->getEnabledDefinitions($editor)), $editor));
+      $allowed_by_new_plugin_config = new HTMLRestrictions($this->pluginManager->getProvidedElements(\array_keys($this->pluginManager->getEnabledDefinitions($editor)), $editor));
       $surplus_tags_attributes = $allowed_by_new_plugin_config->diff($old_editor_restrictions)->diff($missing_fundamental_tags);
       $attributes_to_tag = [];
       $added_tags = [];

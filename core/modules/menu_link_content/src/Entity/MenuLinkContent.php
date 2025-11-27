@@ -104,7 +104,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
    */
   public function getUrlObject() {
     $url = $this->link->first()->getUrl();
-    assert($url instanceof Url);
+    \assert($url instanceof Url);
     if ($attributes = $url->getOption('attributes')) {
       $url->setOption('attributes', AttributeXss::sanitizeAttributes($attributes));
     }
@@ -301,7 +301,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
       ->setSetting('is_ascii', TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Menu link title'))
+      ->setLabel(\t('Menu link title'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
@@ -340,7 +340,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
       ->setSetting('is_ascii', TRUE);
 
     $fields['link'] = BaseFieldDefinition::create('link')
-      ->setLabel(t('Link'))
+      ->setLabel(\t('Link'))
       ->setRevisionable(TRUE)
       ->setRequired(TRUE)
       ->setSettings([

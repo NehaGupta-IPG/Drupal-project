@@ -212,8 +212,8 @@ class Renderer implements RendererInterface {
    */
   public function render(/* array */&$elements, $is_root_call = FALSE) {
 
-    if (!is_array($elements)) {
-      trigger_error('Calling ' . __METHOD__ . ' with NULL is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Either pass an array or skip the call. See https://www.drupal.org/node/3534020.');
+    if (!\is_array($elements)) {
+      \trigger_error('Calling ' . __METHOD__ . ' with NULL is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Either pass an array or skip the call. See https://www.drupal.org/node/3534020.');
       return '';
     }
 
@@ -223,7 +223,7 @@ class Renderer implements RendererInterface {
     }
 
     if ($is_root_call) {
-      trigger_error(__METHOD__ . ' with $is_root_call is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::renderRoot() instead.  See https://www.drupal.org/node/3497318.');
+      \trigger_error(__METHOD__ . ' with $is_root_call is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::renderRoot() instead.  See https://www.drupal.org/node/3497318.');
       return $this->doRenderRoot($elements, $context);
     }
 
@@ -652,11 +652,11 @@ class Renderer implements RendererInterface {
       // immediately resumed, assume that the fiber is waiting on an async
       // operation and wait a bit.
       if (!$fiber->isTerminated() && $resume_type !== FiberResumeType::Immediate) {
-        usleep(500);
+        \usleep(500);
       }
     }
     $result = $fiber->getReturn();
-    assert($context->count() <= 1, 'Bubbling failed.');
+    \assert($context->count() <= 1, 'Bubbling failed.');
 
     // Restore the original render context.
     $this->setCurrentRenderContext($previous_context);
@@ -685,7 +685,7 @@ class Renderer implements RendererInterface {
   protected function getCurrentRenderContext() {
     $request = $this->requestStack->getCurrentRequest();
 
-    if (is_null($request)) {
+    if (\is_null($request)) {
       return NULL;
     }
 
@@ -815,7 +815,7 @@ class Renderer implements RendererInterface {
    */
   public function addCacheableDependency(array &$elements, $dependency) {
     if (!$dependency instanceof CacheableDependencyInterface) {
-      @trigger_error(sprintf("Calling %s() with an object that doesn't implement %s is deprecated in drupal:11.3.0 and will throw an error in drupal:13.0.0. See https://www.drupal.org/node/3525389", __METHOD__, CacheableDependencyInterface::class), E_USER_DEPRECATED);
+      @\trigger_error(\sprintf("Calling %s() with an object that doesn't implement %s is deprecated in drupal:11.3.0 and will throw an error in drupal:13.0.0. See https://www.drupal.org/node/3525389", __METHOD__, CacheableDependencyInterface::class), E_USER_DEPRECATED);
     }
     $meta_a = CacheableMetadata::createFromRenderArray($elements);
     $meta_b = CacheableMetadata::createFromObject($dependency);

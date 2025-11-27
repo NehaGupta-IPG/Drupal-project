@@ -470,7 +470,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         if (\count($field_columns) > 1) {
           $definition_columns = $this->fieldStorageDefinitions[$field_name]->getColumns();
           foreach ($field_columns as $property_name => $column_name) {
-            if (property_exists($record, $column_name)) {
+            if (\property_exists($record, $column_name)) {
               $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT][$property_name] = !empty($definition_columns[$property_name]['serialize']) ? $this->handleNullableFieldUnserialize($record->{$column_name}) : $record->{$column_name};
               unset($record->{$column_name});
             }
@@ -481,7 +481,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
           $column_name = \reset($field_columns);
           if (\property_exists($record, $column_name)) {
             $columns = $this->fieldStorageDefinitions[$field_name]->getColumns();
-            $column = reset($columns);
+            $column = \reset($columns);
             $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT] = !empty($column['serialize']) ? $this->handleNullableFieldUnserialize($record->{$column_name}) : $record->{$column_name};
             unset($record->{$column_name});
           }
@@ -593,9 +593,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
           $definition_columns = $storage_definition->getColumns();
           $columns = $table_mapping->getColumnNames($field_name);
           // Do not key single-column fields by property name.
-          if (count($columns) == 1) {
-            $column_name = reset($columns);
-            $column_attributes = $definition_columns[key($columns)];
+          if (\count($columns) == 1) {
+            $column_name = \reset($columns);
+            $column_attributes = $definition_columns[\key($columns)];
             $values[$id][$field_name][$langcode] = (!empty($column_attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
           }
           else {
@@ -1806,7 +1806,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       return NULL;
     }
 
-    return unserialize($value);
+    return \unserialize($value);
   }
 
 }

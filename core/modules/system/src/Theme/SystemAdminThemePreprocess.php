@@ -47,7 +47,7 @@ class SystemAdminThemePreprocess {
    */
   public function preprocessAdminBlockContent(array &$variables): void {
     if (!empty($variables['content'])) {
-      $variables['compact'] = system_admin_compact_mode();
+      $variables['compact'] = \system_admin_compact_mode();
       foreach ($variables['content'] as $key => $item) {
         $variables['content'][$key]['link'] = Link::fromTextAndUrl($item['title'], $item['url'])->toString();
         if (!$variables['compact'] && !empty($item['description'])) {
@@ -112,7 +112,7 @@ class SystemAdminThemePreprocess {
       [$description, $items] = $block;
       $position = ++$stripe % 2 ? 'left' : 'right';
       // Output links.
-      if (count($items)) {
+      if (\count($items)) {
         $variables['containers'][$position][] = [
           '#theme' => 'admin_block',
           '#block' => [
@@ -173,8 +173,8 @@ class SystemAdminThemePreprocess {
       // Stick the key into $module for easier access.
       $module = $form[$key];
       unset($module['enable']['#title']);
-      $module['#requires'] = array_filter($module['#requires']);
-      $module['#required_by'] = array_filter($module['#required_by']);
+      $module['#requires'] = \array_filter($module['#requires']);
+      $module['#required_by'] = \array_filter($module['#required_by']);
       // Add the checkbox to allow installing new modules and to show the
       // installation status of the module.
       $module['checkbox'] = $module['enable'];
@@ -252,7 +252,7 @@ class SystemAdminThemePreprocess {
 
       if (!empty($module['#validation_reasons'])) {
         $module['validation_reasons'] = $module['#validation_reasons'];
-        $module['reasons_count'] = count($module['validation_reasons']);
+        $module['reasons_count'] = \count($module['validation_reasons']);
       }
       else {
         $module['reasons_count'] = 0;
@@ -282,7 +282,7 @@ class SystemAdminThemePreprocess {
     $variables['attributes']['id'] = 'system-themes-page';
 
     foreach ($variables['theme_group_titles'] as $state => $title) {
-      if (!count($theme_groups[$state])) {
+      if (!\count($theme_groups[$state])) {
         // Skip this group of themes if no theme is there.
         continue;
       }
@@ -342,10 +342,10 @@ class SystemAdminThemePreprocess {
           $current_theme['incompatible'] = $this->t("This theme is missing a 'content' region.");
         }
         elseif (!empty($theme->incompatible_php)) {
-          if (substr_count($theme->info['php'], '.') < 2) {
+          if (\substr_count($theme->info['php'], '.') < 2) {
             $theme->info['php'] .= '.*';
           }
-          $current_theme['incompatible'] = $this->t('This theme requires PHP version @php_required and is incompatible with PHP version @php_version.', ['@php_required' => $theme->info['php'], '@php_version' => phpversion()]);
+          $current_theme['incompatible'] = $this->t('This theme requires PHP version @php_required and is incompatible with PHP version @php_version.', ['@php_required' => $theme->info['php'], '@php_version' => \phpversion()]);
         }
         elseif (!empty($theme->incompatible_base)) {
           $current_theme['incompatible'] = $this->t('This theme requires the base theme @base_theme to operate correctly.', ['@base_theme' => $theme->info['base theme']]);

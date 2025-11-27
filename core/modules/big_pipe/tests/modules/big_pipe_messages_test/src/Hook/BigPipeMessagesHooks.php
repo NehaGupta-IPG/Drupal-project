@@ -29,11 +29,11 @@ class BigPipeMessagesHooks {
   #[TrustedCallback]
   public static function preRenderMessages(array $element): array {
     if (isset($element['#attached']['placeholders'])) {
-      $key = key($element['#attached']['placeholders']);
+      $key = \key($element['#attached']['placeholders']);
       unset($element['#attached']['placeholders'][$key]['#placeholder_strategy_denylist']);
     }
     if (isset($element['messages']['#attached']['placeholders'])) {
-      $key = key($element['messages']['#attached']['placeholders']);
+      $key = \key($element['messages']['#attached']['placeholders']);
       unset($element['messages']['#attached']['placeholders'][$key]['#placeholder_strategy_denylist']);
     }
     return $element;

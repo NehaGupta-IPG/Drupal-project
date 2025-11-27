@@ -113,7 +113,7 @@ abstract class FixturesBase {
    */
   public function projectFixtureDir(string $project_name): string {
     $dir = $this->allFixturesDir() . '/' . $project_name;
-    if (!is_dir($dir)) {
+    if (!\is_dir($dir)) {
       throw new \RuntimeException("Requested fixture project {$project_name} that does not exist.");
     }
     return $dir;
@@ -130,7 +130,7 @@ abstract class FixturesBase {
    */
   public function binFixtureDir(string $bin_name): string {
     $dir = $this->allFixturesDir() . '/scripts/' . $bin_name;
-    if (!is_dir($dir)) {
+    if (!\is_dir($dir)) {
       throw new \RuntimeException("Requested fixture bin dir {$bin_name} that does not exist.");
     }
     return $dir;
@@ -147,7 +147,7 @@ abstract class FixturesBase {
    */
   public function tmpDir(string $prefix): string {
     $prefix .= static::persistentPrefix();
-    $tmpDir = sys_get_temp_dir() . '/scaffold-' . $prefix . uniqid(md5($prefix . microtime()), TRUE);
+    $tmpDir = \sys_get_temp_dir() . '/scaffold-' . $prefix . \uniqid(\md5($prefix . \microtime()), TRUE);
     $this->tmpDirs[] = $tmpDir;
     return $tmpDir;
   }
@@ -164,7 +164,7 @@ abstract class FixturesBase {
    */
   protected static function persistentPrefix(): string {
     if (empty(static::$randomPrefix)) {
-      static::$randomPrefix = getmypid() . md5(microtime());
+      static::$randomPrefix = \getmypid() . \md5(\microtime());
     }
     return static::$randomPrefix;
   }
@@ -190,7 +190,7 @@ abstract class FixturesBase {
    */
   public function createIsolatedComposerCacheDir(): void {
     $cacheDir = $this->mkTmpDir('composer-cache');
-    putenv("COMPOSER_CACHE_DIR=$cacheDir");
+    \putenv("COMPOSER_CACHE_DIR=$cacheDir");
   }
 
   /**
@@ -206,7 +206,7 @@ abstract class FixturesBase {
     $this->tmpDirs = [];
     $this->io = NULL;
     // Clear the composer cache dir, if it was set
-    putenv('COMPOSER_CACHE_DIR=');
+    \putenv('COMPOSER_CACHE_DIR=');
   }
 
   /**
@@ -232,14 +232,14 @@ abstract class FixturesBase {
     $interpolator = new Interpolator('__', '__');
     $interpolator->setData($replacements);
     $filesystem->copy($this->allFixturesDir(), $fixturesDir);
-    $composer_json_templates = glob($fixturesDir . "/*/composer.json.tmpl");
+    $composer_json_templates = \glob($fixturesDir . "/*/composer.json.tmpl");
     foreach ($composer_json_templates as $composer_json_tmpl) {
       // Inject replacements into composer.json.
-      if (file_exists($composer_json_tmpl)) {
-        $composer_json_contents = file_get_contents($composer_json_tmpl);
+      if (\file_exists($composer_json_tmpl)) {
+        $composer_json_contents = \file_get_contents($composer_json_tmpl);
         $composer_json_contents = $interpolator->interpolate($composer_json_contents, [], FALSE);
-        file_put_contents(dirname($composer_json_tmpl) . "/composer.json", $composer_json_contents);
-        @unlink($composer_json_tmpl);
+        \file_put_contents(\dirname($composer_json_tmpl) . "/composer.json", $composer_json_contents);
+        @\unlink($composer_json_tmpl);
       }
     }
   }
@@ -256,7 +256,7 @@ abstract class FixturesBase {
    *   Standard output and standard error from the command.
    */
   public function runComposer(string $cmd, string $cwd): string {
-    chdir($cwd);
+    \chdir($cwd);
     $input = new StringInput($cmd);
     $output = new BufferedOutput();
     $application = new Application();

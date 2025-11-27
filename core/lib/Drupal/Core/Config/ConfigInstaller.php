@@ -118,7 +118,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
 
     if ($mode->createInstallConfig()) {
       $default_install_path = $this->getDefaultConfigDirectory($type, $name);
-      if (is_dir($default_install_path)) {
+      if (\is_dir($default_install_path)) {
         if (!$this->isSyncing()) {
           $storage = new FileStorage($default_install_path, StorageInterface::DEFAULT_COLLECTION);
           $prefix = '';
@@ -151,7 +151,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
           if ($collection === StorageInterface::DEFAULT_COLLECTION && ($mode === DefaultConfigMode::InstallEntities || $mode === DefaultConfigMode::InstallSimple)) {
             // Filter out config depending on the mode. The mode can be used to
             // only install simple config or config entities.
-            $config_to_create = array_filter($config_to_create, function ($config_name) use ($mode) {
+            $config_to_create = \array_filter($config_to_create, function ($config_name) use ($mode) {
               $is_config_entity = $this->configManager->getEntityTypeIdByName($config_name) !== NULL;
               if ($is_config_entity) {
                 return $mode === DefaultConfigMode::InstallEntities;
@@ -165,10 +165,10 @@ class ConfigInstaller implements ConfigInstallerInterface {
             // already exists is excluded as it will have already been written.
             // This means that if the configuration is changed by something else
             // during the install it will not be overwritten again.
-            $existing_configuration = array_filter($this->getActiveStorages($collection)->listAll(), function ($config_name) {
+            $existing_configuration = \array_filter($this->getActiveStorages($collection)->listAll(), function ($config_name) {
               return !$this->configManager->getEntityTypeIdByName($config_name);
             });
-            $config_to_create = array_diff_key($config_to_create, array_flip($existing_configuration));
+            $config_to_create = \array_diff_key($config_to_create, \array_flip($existing_configuration));
           }
 
           if (!empty($config_to_create)) {
@@ -183,10 +183,10 @@ class ConfigInstaller implements ConfigInstallerInterface {
       // end of the installation process. Once the install profile is installed
       // optional configuration should be installed as usual.
       // @see install_install_profile()
-      $profile_installed = in_array($this->drupalGetProfile(), $this->getEnabledExtensions(), TRUE);
+      $profile_installed = \in_array($this->drupalGetProfile(), $this->getEnabledExtensions(), TRUE);
       if (!$this->isSyncing() && (!InstallerKernel::installationAttempted() || $profile_installed)) {
         $optional_install_path = $extension_path . '/' . InstallStorage::CONFIG_OPTIONAL_DIRECTORY;
-        if (is_dir($optional_install_path)) {
+        if (\is_dir($optional_install_path)) {
           // Install any optional config the module provides.
           $storage = new FileStorage($optional_install_path, StorageInterface::DEFAULT_COLLECTION);
           $this->installOptionalConfig($storage, '');
@@ -199,7 +199,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
       // end of the installation process. Once the install profile is installed
       // optional configuration should be installed as usual.
       // @see install_install_profile()
-      $profile_installed = in_array($this->drupalGetProfile(), $this->getEnabledExtensions(), TRUE);
+      $profile_installed = \in_array($this->drupalGetProfile(), $this->getEnabledExtensions(), TRUE);
       if (!$this->isSyncing() && (!InstallerKernel::installationAttempted() || $profile_installed)) {
         // Install any optional configuration entities whose dependencies can
         // now be met. This searches all the installed modules config/optional
@@ -536,7 +536,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
       $config_to_create = \array_keys($this->getConfigToCreate($storage, $collection));
       $active_storage = $this->getActiveStorages($collection);
       foreach ($config_to_create as $config_name) {
-        if ($active_storage->exists($config_name) || array_search($config_name, $previous_config_names[$collection] ?? [], TRUE) !== FALSE) {
+        if ($active_storage->exists($config_name) || \array_search($config_name, $previous_config_names[$collection] ?? [], TRUE) !== FALSE) {
           $existing_configuration[$collection][] = $config_name;
         }
       }
@@ -563,7 +563,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
       $enabled_extensions[] = $name;
 
       $config_install_path = $this->getDefaultConfigDirectory($type, $name);
-      if (!is_dir($config_install_path)) {
+      if (!\is_dir($config_install_path)) {
         continue;
       }
 
@@ -578,7 +578,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
         $missing_dependencies,
       ] = $this->findDefaultConfigWithUnmetDependencies($storage, $enabled_extensions, $profile_storages, $previous_config_names);
       if (!empty($invalid_default_config)) {
-        throw UnmetDependenciesException::create($name, array_unique($missing_dependencies, SORT_REGULAR));
+        throw UnmetDependenciesException::create($name, \array_unique($missing_dependencies, SORT_REGULAR));
       }
 
       // Install profiles can not have config clashes. Configuration that
@@ -597,12 +597,12 @@ class ConfigInstaller implements ConfigInstallerInterface {
       // Store the config names for the checked module in order to add them to
       // the list of active configuration for the next module.
       foreach ($this->configManager->getConfigCollectionInfo()->getCollectionNames() as $collection) {
-        $config_to_create = array_keys($this->getConfigToCreate($storage, $collection));
+        $config_to_create = \array_keys($this->getConfigToCreate($storage, $collection));
         if (!isset($previous_config_names[$collection])) {
           $previous_config_names[$collection] = $config_to_create;
         }
         else {
-          $previous_config_names[$collection] = array_merge($previous_config_names[$collection], $config_to_create);
+          $previous_config_names[$collection] = \array_merge($previous_config_names[$collection], $config_to_create);
         }
       }
     }
@@ -630,7 +630,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
   protected function findDefaultConfigWithUnmetDependencies(StorageInterface $storage, array $enabled_extensions, array $profile_storages = [], array $previously_checked_config = []) {
     $missing_dependencies = [];
     $config_to_create = $this->getConfigToCreate($storage, StorageInterface::DEFAULT_COLLECTION, '', $profile_storages);
-    $all_config = array_merge($this->configFactory->listAll(), array_keys($config_to_create), $previously_checked_config[StorageInterface::DEFAULT_COLLECTION] ?? []);
+    $all_config = \array_merge($this->configFactory->listAll(), \array_keys($config_to_create), $previously_checked_config[StorageInterface::DEFAULT_COLLECTION] ?? []);
     foreach ($config_to_create as $config_name => $config) {
       if ($missing = $this->getMissingDependencies($config_name, $config, $enabled_extensions, $all_config)) {
         $missing_dependencies[$config_name] = $missing;

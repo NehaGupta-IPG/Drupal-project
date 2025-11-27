@@ -30,7 +30,7 @@ class MaintenanceThemeTest extends KernelTestBase {
     $this->assertEquals('test_subtheme', $active_theme->getName());
 
     $base_themes = $active_theme->getBaseThemeExtensions();
-    $base_theme_names = array_keys($base_themes);
+    $base_theme_names = \array_keys($base_themes);
     $this->assertSame(['test_base_theme'], $base_theme_names);
   }
 

@@ -163,10 +163,10 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
     // that will be installed after the import.
     $uninstalls = $config_importer->getExtensionChangelist('module', 'uninstall');
     foreach ($uninstalls as $module) {
-      foreach (array_keys($module_data[$module]->required_by) as $dependent_module) {
+      foreach (\array_keys($module_data[$module]->required_by) as $dependent_module) {
         if ($module_data[$dependent_module]->status &&
-          !in_array($dependent_module, $uninstalls, TRUE) &&
-          !in_array($dependent_module, [$install_profile, $database_driver_module], TRUE)
+          !\in_array($dependent_module, $uninstalls, TRUE) &&
+          !\in_array($dependent_module, [$install_profile, $database_driver_module], TRUE)
         ) {
           $module_name = $module_data[$module]->info['name'];
           $dependent_module_name = $module_data[$dependent_module]->info['name'];

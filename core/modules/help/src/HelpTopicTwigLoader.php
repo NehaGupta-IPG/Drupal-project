@@ -97,7 +97,7 @@ class HelpTopicTwigLoader extends FilesystemLoader {
    * {@inheritdoc}
    */
   protected function findTemplate($name, $throw = TRUE): ?string {
-    if (!str_ends_with($name, '.html.twig')) {
+    if (!\str_ends_with($name, '.html.twig')) {
       if (!$throw) {
         return NULL;
       }

@@ -63,7 +63,7 @@ class DisplayPluginCollection extends DefaultLazyPluginCollection {
    * {@inheritdoc}
    */
   public function clear() {
-    foreach (array_filter($this->pluginInstances) as $display) {
+    foreach (\array_filter($this->pluginInstances) as $display) {
       if ($display instanceof DisplayPluginInterface) {
         $display->destroy();
       }

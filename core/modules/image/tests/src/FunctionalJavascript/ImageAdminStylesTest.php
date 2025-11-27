@@ -76,7 +76,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     // Edit the 1st effect, multiple AJAX calls before updating.
     $style = ImageStyle::load($style_name);
-    $uuid = array_values($style->getEffects()->getInstanceIds())[0];
+    $uuid = \array_values($style->getEffects()->getInstanceIds())[0];
     $this->drupalGet($admin_path . '/manage/' . $style_name . '/effects/' . $uuid);
     $this->assertSession()->fieldValueEquals('data[test_parameter]', '111');
     $field = $page->findField('data[test_parameter]');

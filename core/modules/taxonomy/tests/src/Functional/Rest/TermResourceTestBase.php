@@ -132,7 +132,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
             'target_id' => 2,
             'target_type' => 'taxonomy_term',
             'target_uuid' => Term::load(2)->uuid(),
-            'url' => base_path() . 'taxonomy/term/2',
+            'url' => \base_path() . 'taxonomy/term/2',
           ],
         ];
         break;
@@ -146,7 +146,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
             'target_id' => 2,
             'target_type' => 'taxonomy_term',
             'target_uuid' => Term::load(2)->uuid(),
-            'url' => base_path() . 'taxonomy/term/2',
+            'url' => \base_path() . 'taxonomy/term/2',
           ],
         ];
         break;
@@ -157,13 +157,13 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
             'target_id' => 3,
             'target_type' => 'taxonomy_term',
             'target_uuid' => Term::load(3)->uuid(),
-            'url' => base_path() . 'taxonomy/term/3',
+            'url' => \base_path() . 'taxonomy/term/3',
           ],
           [
             'target_id' => 2,
             'target_type' => 'taxonomy_term',
             'target_uuid' => Term::load(2)->uuid(),
-            'url' => base_path() . 'taxonomy/term/2',
+            'url' => \base_path() . 'taxonomy/term/2',
           ],
         ];
         break;

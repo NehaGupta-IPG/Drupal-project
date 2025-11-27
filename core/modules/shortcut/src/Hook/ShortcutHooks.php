@@ -123,7 +123,7 @@ class ShortcutHooks {
     // Theme settings are not configuration entities and cannot depend on
     // modules so to set a module-specific setting, we need to set it with
     // logic.
-    if (in_array('claro', $theme_list, TRUE)) {
+    if (\in_array('claro', $theme_list, TRUE)) {
       \Drupal::configFactory()->getEditable("claro.settings")->set('third_party_settings.shortcut.module_link', TRUE)->save(TRUE);
     }
   }

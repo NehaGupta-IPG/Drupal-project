@@ -69,7 +69,7 @@ final class ProcessOutputCallback implements OutputCallbackInterface, LoggerAwar
   public function getOutput(): array {
     $error_output = $this->getErrorOutput();
     if ($error_output) {
-      $this->logger->warning(implode('', $error_output));
+      $this->logger->warning(\implode('', $error_output));
     }
     return $this->outBuffer;
   }
@@ -83,7 +83,7 @@ final class ProcessOutputCallback implements OutputCallbackInterface, LoggerAwar
   public function parseJsonOutput(): mixed {
     $output = $this->getOutput();
     if ($output) {
-      return json_decode(trim(implode('', $output)), TRUE, flags: JSON_THROW_ON_ERROR);
+      return \json_decode(\trim(\implode('', $output)), TRUE, flags: JSON_THROW_ON_ERROR);
     }
     return NULL;
   }

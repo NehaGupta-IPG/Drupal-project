@@ -197,8 +197,8 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
     $doc = new \DOMDocument();
     $doc->strictErrorChecking = TRUE;
     $doc->validateOnParse = FALSE;
-    libxml_use_internal_errors(TRUE);
-    libxml_clear_errors();
+    \libxml_use_internal_errors(TRUE);
+    \libxml_clear_errors();
     if (!$doc->loadXML('<html><body>' . $body . '</body></html>')) {
       foreach (\libxml_get_errors() as $error) {
         $this->fail('Topic ' . $id . ' fails HTML validation: ' . $error->message);
@@ -234,7 +234,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
    *   Array of all topic definitions, keyed by ID.
    */
   protected function verifyBadTopic($id, $definitions): void {
-    $bad_topic_type = substr($id, 16);
+    $bad_topic_type = \substr($id, 16);
     // Topics should fail verifyTopic() in specific ways.
     $found_error = FALSE;
     try {

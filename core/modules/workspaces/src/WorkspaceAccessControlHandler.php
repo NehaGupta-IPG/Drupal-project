@@ -18,7 +18,7 @@ class WorkspaceAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    assert($entity instanceof WorkspaceInterface);
+    \assert($entity instanceof WorkspaceInterface);
     // Delegate access checking to the workspace provider.
     return $entity->getProvider()->checkAccess($entity, $operation, $account);
   }

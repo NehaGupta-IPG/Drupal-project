@@ -59,7 +59,7 @@ final class ExecutableFinder implements ExecutableFinderInterface, LoggerAwareIn
       }
       catch (LogicException $e) {
         if (isset($legacy_executables[$name])) {
-          @trigger_error("Storing the path to rsync in configuration is deprecated in drupal:11.2.4 and not supported in drupal:12.0.0. Move it to the <code>package_manager_rsync_path</code> setting instead. See https://www.drupal.org/node/3540264", E_USER_DEPRECATED);
+          @\trigger_error("Storing the path to rsync in configuration is deprecated in drupal:11.2.4 and not supported in drupal:12.0.0. Move it to the <code>package_manager_rsync_path</code> setting instead. See https://www.drupal.org/node/3540264", E_USER_DEPRECATED);
           return $legacy_executables[$name];
         }
         throw $e;
@@ -69,7 +69,7 @@ final class ExecutableFinder implements ExecutableFinderInterface, LoggerAwareIn
     elseif ($name === 'composer') {
       $path = $this->getLocalComposerPath();
 
-      if ($path && file_exists($path)) {
+      if ($path && \file_exists($path)) {
         return $path;
       }
 
@@ -81,7 +81,7 @@ final class ExecutableFinder implements ExecutableFinderInterface, LoggerAwareIn
       }
       catch (LogicException $e) {
         if (isset($legacy_executables[$name])) {
-          @trigger_error("Storing the path to Composer in configuration is deprecated in drupal:11.2.4 and not supported in drupal:12.0.0. Add composer/composer directly to your project's dependencies instead. See https://www.drupal.org/node/3540264", E_USER_DEPRECATED);
+          @\trigger_error("Storing the path to Composer in configuration is deprecated in drupal:11.2.4 and not supported in drupal:12.0.0. Add composer/composer directly to your project's dependencies instead. See https://www.drupal.org/node/3540264", E_USER_DEPRECATED);
           return $legacy_executables[$name];
         }
         throw $e;
@@ -108,16 +108,16 @@ final class ExecutableFinder implements ExecutableFinderInterface, LoggerAwareIn
       return $this->composerBinaryPath;
     }
 
-    $composer_json = file_get_contents($this->composerPackagePath . '/composer.json');
+    $composer_json = \file_get_contents($this->composerPackagePath . '/composer.json');
     $composer_json = Json::decode($composer_json);
 
     foreach ($composer_json['bin'] ?? [] as $bin) {
-      if (str_ends_with($bin, '/composer')) {
+      if (\str_ends_with($bin, '/composer')) {
         $bin = $this->composerPackagePath . '/' . $bin;
 
         // For extra security, try to disable the binary's execute permission.
         // If that fails, it's worth warning about but is not an actual problem.
-        if (is_executable($bin) && !$this->fileSystem->chmod($bin, 0644)) {
+        if (\is_executable($bin) && !$this->fileSystem->chmod($bin, 0644)) {
           $this->logger?->warning('Composer was found at %path, but could not be made read-only.', [
             '%path' => $bin,
           ]);

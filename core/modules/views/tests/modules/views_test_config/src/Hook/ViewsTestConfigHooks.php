@@ -93,7 +93,7 @@ class ViewsTestConfigHooks {
    * Helper method to remove broken handler.
    */
   public function disableBrokenHandler(array &$definitions, string $handler_type): void {
-    if (in_array($handler_type, \Drupal::state()->get('views_test_config_disable_broken_handler', []))) {
+    if (\in_array($handler_type, \Drupal::state()->get('views_test_config_disable_broken_handler', []))) {
       unset($definitions['broken']);
     }
   }

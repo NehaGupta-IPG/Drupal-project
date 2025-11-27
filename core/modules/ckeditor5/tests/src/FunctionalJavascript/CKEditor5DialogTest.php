@@ -55,7 +55,7 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
       ],
     ])->save();
 
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },

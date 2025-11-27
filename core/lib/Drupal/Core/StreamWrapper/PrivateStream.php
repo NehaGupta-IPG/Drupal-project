@@ -48,7 +48,7 @@ class PrivateStream extends LocalStream {
    * {@inheritdoc}
    */
   public function getExternalUrl() {
-    $path = str_replace('\\', '/', $this->getTarget());
+    $path = \str_replace('\\', '/', $this->getTarget());
     return Url::fromRoute(
       'system.private_file_download',
       ['filepath' => $path],

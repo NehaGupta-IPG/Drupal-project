@@ -96,7 +96,7 @@ class ComposerPluginsValidatorInsecureTest extends PackageManagerKernelTestBase 
     catch (SandboxEventException $e) {
       // Processing is required because the error message we get from Composer
       // contains multiple white spaces at the start or end of line.
-      $this->assertStringContainsString($expected_message, preg_replace('/\s\s+/', '', $e->getMessage()));
+      $this->assertStringContainsString($expected_message, \preg_replace('/\s\s+/', '', $e->getMessage()));
       $this->assertInstanceOf(PreApplyEvent::class, $e->event);
     }
   }

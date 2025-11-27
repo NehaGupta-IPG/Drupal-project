@@ -98,7 +98,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       // the first one. Beware: MySQL is not case sensitive.
       do {
         $bundle = $this->randomMachineName();
-      } while ($bundles && strtolower($bundles[0]) >= strtolower($bundle));
+      } while ($bundles && \strtolower($bundles[0]) >= \strtolower($bundle));
       EntityTestHelper::createBundle($bundle, entity_type: $field_storage->getTargetEntityTypeId());
       foreach ($field_storages as $field_storage) {
         FieldConfig::create([

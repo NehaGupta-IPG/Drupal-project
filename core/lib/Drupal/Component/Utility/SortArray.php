@@ -133,11 +133,11 @@ class SortArray {
    */
   public static function sortByKeyRecursive(array &$data): void {
     // If the array is a list, it is by definition already sorted.
-    if (!array_is_list($data)) {
-      ksort($data);
+    if (!\array_is_list($data)) {
+      \ksort($data);
     }
     foreach ($data as &$value) {
-      if (is_array($value)) {
+      if (\is_array($value)) {
         self::sortByKeyRecursive($value);
       }
     }

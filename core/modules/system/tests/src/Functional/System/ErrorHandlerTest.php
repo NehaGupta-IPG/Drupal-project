@@ -131,7 +131,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     ];
     $select = \Drupal::database()->select('bananas_are_awesome', 'b')->fields('b');
     $message = \Drupal::database()->prepareStatement((string) $select, [])->getQueryString();
-    $message = str_replace(["\r", "\n"], ' ', $message);
+    $message = \str_replace(["\r", "\n"], ' ', $message);
     $error_pdo_exception = [
       '%type' => 'DatabaseExceptionWrapper',
       '@message' => PHP_VERSION_ID >= 80400 ?

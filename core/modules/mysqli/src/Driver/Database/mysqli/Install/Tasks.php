@@ -15,7 +15,7 @@ class Tasks extends BaseInstallTasks {
    * {@inheritdoc}
    */
   public function installable() {
-    return extension_loaded('mysqli');
+    return \extension_loaded('mysqli');
   }
 
   /**

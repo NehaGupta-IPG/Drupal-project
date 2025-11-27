@@ -191,10 +191,10 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     $process = new Process($command, \Drupal::root() . "/core", $process_environment_variables);
     $process->setTimeout(NULL);
     $process->run();
-    $output = explode("\n", $process->getOutput());
+    $output = \explode("\n", $process->getOutput());
     $errorOutput = $process->getErrorOutput();
     if (!empty($errorOutput)) {
-      $error = explode("\n", $process->getErrorOutput());
+      $error = \explode("\n", $process->getErrorOutput());
     }
     $status = $process->getExitCode();
   }
@@ -230,7 +230,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     $error = [];
     $this->runCommand($test_class_name, $log_junit_file_path, $status, $output, $error, $colors);
 
-    if (file_exists($log_junit_file_path)) {
+    if (\file_exists($log_junit_file_path)) {
       $results = JUnitConverter::xmlToRows($test_run->id(), $log_junit_file_path);
     }
     else {
@@ -240,10 +240,10 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     // If not passed, add full PHPUnit run output since individual test cases
     // messages may not give full clarity (deprecations, warnings, etc.).
     if ($status > TestStatus::PASS) {
-      $message = implode("\n", $output);
+      $message = \implode("\n", $output);
       if (!empty($error)) {
         $message .= "\nERROR:\n";
-        $message .= implode("\n", $error);
+        $message .= \implode("\n", $error);
       }
       $results[] = [
         'test_id' => $test_run->id(),
@@ -330,7 +330,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
 
         case 'cli_fail':
           $summaries[$result['test_class']]['#cli_fail']++;
-          $summaries[$result['test_class']]['#exit_code'] = max($summaries[$result['test_class']]['#exit_code'], $result['exit_code']);
+          $summaries[$result['test_class']]['#exit_code'] = \max($summaries[$result['test_class']]['#exit_code'], $result['exit_code']);
           break;
 
         case 'exception':

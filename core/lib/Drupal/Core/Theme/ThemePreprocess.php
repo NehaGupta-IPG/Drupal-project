@@ -138,7 +138,7 @@ class ThemePreprocess {
       // Prepend the heading to the list, if any.
       if (!empty($heading)) {
         // Convert a string heading into an array, using a <h2> tag by default.
-        if (is_string($heading)) {
+        if (\is_string($heading)) {
           $heading = ['text' => $heading];
         }
         // Merge in default array properties into $heading.
@@ -163,7 +163,7 @@ class ThemePreprocess {
         $link_element = [
           '#type' => 'link',
           '#title' => $link['title'],
-          '#options' => array_diff_key($link, array_combine($keys, $keys)),
+          '#options' => \array_diff_key($link, \array_combine($keys, $keys)),
           '#url' => $link['url'],
           '#ajax' => $link['ajax'],
         ];
@@ -196,7 +196,7 @@ class ThemePreprocess {
             // cache.
             if (!empty($link['query'])) {
               $query = $link['query'];
-              ksort($query);
+              \ksort($query);
               $li_attributes['data-drupal-link-query'] = Json::encode($query);
             }
 
@@ -277,19 +277,19 @@ class ThemePreprocess {
     }
     else {
       $system_path = $this->currentPathStack->getPath();
-      $variables['root_path'] = explode('/', $system_path)[1];
+      $variables['root_path'] = \explode('/', $system_path)[1];
     }
 
     $site_config = $this->configFactory->get('system.site');
     // Construct page title.
-    if (isset($variables['page']['#title']) && is_array($variables['page']['#title'])) {
+    if (isset($variables['page']['#title']) && \is_array($variables['page']['#title'])) {
       // Do an early render if the title is a render array.
       $variables['page']['#title'] = (string) $this->renderer->render($variables['page']['#title']);
     }
     if (!empty($variables['page']['#title'])) {
       $head_title = [
         // Marking the title as safe since it has had the tags stripped.
-        'title' => Markup::create(trim(strip_tags($variables['page']['#title']))),
+        'title' => Markup::create(\trim(\strip_tags($variables['page']['#title']))),
         'name' => $site_config->get('name'),
       ];
     }
@@ -304,7 +304,7 @@ class ThemePreprocess {
     else {
       $head_title = ['name' => $site_config->get('name')];
       if ($site_config->get('slogan')) {
-        $head_title['slogan'] = strip_tags($site_config->get('slogan'));
+        $head_title['slogan'] = \strip_tags($site_config->get('slogan'));
       }
     }
 
@@ -341,7 +341,7 @@ class ThemePreprocess {
       }
     }
 
-    $variables['base_path'] = base_path();
+    $variables['base_path'] = \base_path();
     $variables['front_page'] = Url::fromRoute('<front>')->toString();
     $variables['language'] = $language_interface;
 
@@ -404,7 +404,7 @@ class ThemePreprocess {
    */
   public function preprocessInstallPage(array &$variables): void {
     $installer_active_task = NULL;
-    if (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'install' && InstallerKernel::installationAttempted()) {
+    if (\defined('MAINTENANCE_MODE') && MAINTENANCE_MODE === 'install' && InstallerKernel::installationAttempted()) {
       $installer_active_task = $GLOBALS['install_state']['active_task'];
     }
 
@@ -412,9 +412,9 @@ class ThemePreprocess {
 
     // Override the site name that is displayed on the page, since Drupal is
     // still in the process of being installed.
-    $distribution_name = drupal_install_profile_distribution_name();
+    $distribution_name = \drupal_install_profile_distribution_name();
     $variables['site_name'] = $distribution_name;
-    $variables['site_version'] = $installer_active_task ? drupal_install_profile_distribution_version() : '';
+    $variables['site_version'] = $installer_active_task ? \drupal_install_profile_distribution_version() : '';
   }
 
   /**
@@ -547,7 +547,7 @@ class ThemePreprocess {
         $colgroup['cols'] = [];
 
         // Build columns.
-        if (is_array($cols) && !empty($cols)) {
+        if (\is_array($cols) && !empty($cols)) {
           foreach ($cols as $col_key => $col) {
             $colgroup['cols'][$col_key]['attributes'] = new Attribute($col);
           }
@@ -571,7 +571,7 @@ class ThemePreprocess {
         // Increase the responsive index.
         $responsive_index++;
 
-        if (!is_array($cell)) {
+        if (!\is_array($cell)) {
           $header_columns++;
           $cell_content = $cell;
           $cell_attributes = new Attribute();
@@ -597,11 +597,11 @@ class ThemePreprocess {
           // cells for a column are marked up with the responsive classes by a
           // module developer or themer. The responsive classes on the header
           // cells must be transferred to the content cells.
-          if (!empty($cell['class']) && is_array($cell['class'])) {
-            if (in_array(RESPONSIVE_PRIORITY_MEDIUM, $cell['class'])) {
+          if (!empty($cell['class']) && \is_array($cell['class'])) {
+            if (\in_array(RESPONSIVE_PRIORITY_MEDIUM, $cell['class'])) {
               $responsive_classes[$responsive_index] = RESPONSIVE_PRIORITY_MEDIUM;
             }
-            elseif (in_array(RESPONSIVE_PRIORITY_LOW, $cell['class'])) {
+            elseif (\in_array(RESPONSIVE_PRIORITY_LOW, $cell['class'])) {
               $responsive_classes[$responsive_index] = RESPONSIVE_PRIORITY_LOW;
             }
           }
@@ -650,7 +650,7 @@ class ThemePreprocess {
               // Increase the responsive index.
               $responsive_index++;
 
-              if (!is_array($cell)) {
+              if (!\is_array($cell)) {
                 $cell_content = $cell;
                 $cell_attributes = [];
                 $is_header = FALSE;
@@ -724,7 +724,7 @@ class ThemePreprocess {
     foreach ($variables['items'] as &$item) {
       $attributes = [];
       // If the item value is an array, then it is a render array.
-      if (is_array($item)) {
+      if (\is_array($item)) {
         // List items support attributes via the '#wrapper_attributes' property.
         if (isset($item['#wrapper_attributes'])) {
           $attributes = $item['#wrapper_attributes'];
@@ -747,7 +747,7 @@ class ThemePreprocess {
               // \Drupal\Core\Render\Element::children(), which cannot be used
               // here, since it triggers an error on string values.
               foreach ($child as $child_key => $child_value) {
-                if (is_int($child_key) || $child_key === '' || $child_key[0] !== '#') {
+                if (\is_int($child_key) || $child_key === '' || $child_key[0] !== '#') {
                   $child['#items'][$child_key] = $child_value;
                   unset($child[$child_key]);
                 }

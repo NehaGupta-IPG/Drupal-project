@@ -340,7 +340,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->drupalGet('');
     // Ensure everything finishes before we collect performance data.
     $this->drupalGet('');
-    sleep(2);
+    \sleep(2);
 
     \Drupal::service('cache_tags.invalidator.checksum')->reset();
     $this->drupalCreateNode(['type' => 'page', 'title' => 'new page']);

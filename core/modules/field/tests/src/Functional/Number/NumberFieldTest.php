@@ -200,7 +200,7 @@ class NumberFieldTest extends BrowserTestBase {
     $this->assertSession()->responseContains('placeholder="4"');
 
     // Submit a valid integer.
-    $value = rand($minimum, $maximum);
+    $value = \rand($minimum, $maximum);
     $edit = [
       "{$field_name}[0][value]" => $value,
     ];

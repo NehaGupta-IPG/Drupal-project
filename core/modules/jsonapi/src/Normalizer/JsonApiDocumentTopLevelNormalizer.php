@@ -179,7 +179,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
    * {@inheritdoc}
    */
   public function doNormalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
-    assert($object instanceof JsonApiDocumentTopLevel);
+    \assert($object instanceof JsonApiDocumentTopLevel);
     $data = $object->getData();
     $document['jsonapi'] = CacheableNormalization::permanent([
       'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
@@ -347,10 +347,10 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
     $fallbackSchema = [
       '$ref' => JsonApiSpec::SUPPORTED_SPECIFICATION_JSON_SCHEMA,
     ];
-    if (is_string($object)) {
+    if (\is_string($object)) {
       return $fallbackSchema;
     }
-    assert($object instanceof JsonApiDocumentTopLevel);
+    \assert($object instanceof JsonApiDocumentTopLevel);
     if ($object->getData() instanceof OmittedData) {
       // A top-level omitted data object is a bit weird but it will only contain
       // information in the 'links' property, so we can fall back.
@@ -413,7 +413,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
 
     if ($data instanceof ResourceObjectData) {
       if ($data->getCardinality() === 1) {
-        assert($data->count() === 1);
+        \assert($data->count() === 1);
         $schema['properties']['data'] = [
           'oneOf' => [
             ...$this->getSchemasForDataCollection($data->getData(), $context),
@@ -458,12 +458,12 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
       ];
     }
     $members = $data->toArray();
-    assert($this->serializer instanceof JsonSchemaProviderSerializerInterface);
+    \assert($this->serializer instanceof JsonSchemaProviderSerializerInterface);
     // Per the spec, data must either be comprised of a single instance or
     // collection of resource objects OR resource identifiers, but not both.
     foreach ($members as $member) {
       $resourceType = $member->getResourceType();
-      if (array_key_exists($resourceType->getTypeName(), $schemas)) {
+      if (\array_key_exists($resourceType->getTypeName(), $schemas)) {
         continue;
       }
       $schemas[$resourceType->getTypeName()] = $member instanceof ResourceIdentifier
@@ -479,7 +479,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
         ]
         : $this->serializer->getJsonSchema($member, $context);
     }
-    return array_values($schemas);
+    return \array_values($schemas);
   }
 
   /**

@@ -128,9 +128,9 @@ class Variable extends DrupalSqlBase {
   protected function values() {
     // Create an ID field so we can record migration in the map table.
     // Arbitrarily, use the first variable name.
-    $values['id'] = reset($this->variables);
-    return $values + array_map(
-      fn($data) => unserialize($data, ['allowed_classes' => FALSE]),
+    $values['id'] = \reset($this->variables);
+    return $values + \array_map(
+      fn($data) => \unserialize($data, ['allowed_classes' => FALSE]),
       $this->prepareQuery()->execute()->fetchAllKeyed(),
     );
   }

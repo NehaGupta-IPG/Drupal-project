@@ -125,7 +125,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
                 if (isset($cached['id'])) {
                   // Explicitly unserialize this to create a new object
                   // instance.
-                  $definitions[$cached['id']] = unserialize($cached['content']);
+                  $definitions[$cached['id']] = \unserialize($cached['content']);
                 }
                 continue;
               }

@@ -59,8 +59,8 @@ class FileDeleteTest extends FileTestBase {
   public function testSymlinkDirectory(): void {
     // A directory to operate on.
     $directory = \Drupal::service('file_system')->realpath($this->createDirectory());
-    $link = dirname($directory) . '/' . $this->randomMachineName();
-    symlink($directory, $link);
+    $link = \dirname($directory) . '/' . $this->randomMachineName();
+    \symlink($directory, $link);
     $this->assertDirectoryExists($link);
 
     \Drupal::service('file_system')->delete($link);
@@ -78,7 +78,7 @@ class FileDeleteTest extends FileTestBase {
     // A directory to operate on.
     $directory = $this->createDirectory();
     $link = 'public://' . $this->randomMachineName();
-    symlink(\Drupal::service('file_system')->realpath($directory), \Drupal::service('file_system')->realpath($link));
+    \symlink(\Drupal::service('file_system')->realpath($directory), \Drupal::service('file_system')->realpath($link));
     $this->assertDirectoryExists($link);
 
     $this->expectExceptionMessage("Cannot delete '$link' because it is a directory. Use deleteRecursive() instead.");

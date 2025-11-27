@@ -40,7 +40,7 @@ class HtmxContentViewSubscriber implements EventSubscriberInterface {
     $request = $event->getRequest();
     $result = $event->getControllerResult();
 
-    if ($htmxRoute && is_array($result) && $request->getRequestFormat() === 'html') {
+    if ($htmxRoute && \is_array($result) && $request->getRequestFormat() === 'html') {
       $response = $this->getHtmxRenderer()->renderResponse($result, $request, $this->routeMatch);
       $event->setResponse($response);
     }

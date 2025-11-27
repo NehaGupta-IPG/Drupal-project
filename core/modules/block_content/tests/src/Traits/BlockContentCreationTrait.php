@@ -61,10 +61,10 @@ trait BlockContentCreationTrait {
    *   Created block type.
    */
   protected function createBlockContentType(array|string $values, bool $create_body = FALSE): BlockContentType {
-    if (is_string($values)) {
-      @trigger_error('Using the variable $values as string is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Provide an array as parameter. See https://www.drupal.org/node/3473739', E_USER_DEPRECATED);
+    if (\is_string($values)) {
+      @\trigger_error('Using the variable $values as string is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Provide an array as parameter. See https://www.drupal.org/node/3473739', E_USER_DEPRECATED);
     }
-    if (is_array($values)) {
+    if (\is_array($values)) {
       if (!isset($values['id'])) {
         do {
           $id = $this->randomMachineName(8);

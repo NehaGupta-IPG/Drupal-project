@@ -30,7 +30,7 @@ class LayoutBuilderThemeSuggestionsTestThemeHooks {
    */
   #[Hook('preprocess_item_list__layouts')]
   public function itemListLayouts(&$variables): void {
-    foreach (array_keys($variables['items']) as $layout_id) {
+    foreach (\array_keys($variables['items']) as $layout_id) {
       if (isset($variables['items'][$layout_id]['value']['#title']['icon'])) {
         $variables['items'][$layout_id]['value']['#title']['icon'] = ['#markup' => __METHOD__];
       }

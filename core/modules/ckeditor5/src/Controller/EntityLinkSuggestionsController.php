@@ -80,7 +80,7 @@ class EntityLinkSuggestionsController extends ControllerBase {
    *   A JSON response containing the autocomplete suggestions.
    */
   public function suggestions(Request $request, EditorInterface $editor): JsonResponse {
-    $input = mb_strtolower($request->query->get('q'));
+    $input = \mb_strtolower($request->query->get('q'));
     $host_entity_type_id = $request->query->get('hostEntityTypeId');
     $host_entity_langcode = $request->query->get('hostEntityLangcode');
     $suggestions = [];
@@ -95,7 +95,7 @@ class EntityLinkSuggestionsController extends ControllerBase {
           }
         }
       }
-      if (in_array($host_entity_type_id, array_keys($allowed_bundles), TRUE)) {
+      if (\in_array($host_entity_type_id, \array_keys($allowed_bundles), TRUE)) {
         $suggestions = $this->getSuggestions(
           $host_entity_type_id,
           $allowed_bundles[$host_entity_type_id],
@@ -106,13 +106,13 @@ class EntityLinkSuggestionsController extends ControllerBase {
 
       // Second, find suggestions for all other entity types, in the specified
       // order.
-      $allowed_entity_type_ids = array_keys($allowed_bundles);
+      $allowed_entity_type_ids = \array_keys($allowed_bundles);
       foreach ($allowed_bundles as $entity_type_id => $bundles) {
         if ($host_entity_type_id === $entity_type_id) {
           continue;
         }
-        if (in_array($entity_type_id, $allowed_entity_type_ids, TRUE)) {
-          $suggestions = array_merge($suggestions, $this->getSuggestions(
+        if (\in_array($entity_type_id, $allowed_entity_type_ids, TRUE)) {
+          $suggestions = \array_merge($suggestions, $this->getSuggestions(
             $entity_type_id,
             $bundles,
             $input,
@@ -180,18 +180,18 @@ class EntityLinkSuggestionsController extends ControllerBase {
     // "link_target" variant of the default selection plugin for the given
     // entity type, if it exists.
     $selection_handler_groups = $this->selectionPluginManager->getSelectionGroups($target_entity_type_id);
-    if (!array_key_exists('default', $selection_handler_groups)) {
+    if (!\array_key_exists('default', $selection_handler_groups)) {
       return [];
     }
     // Sort the selection plugins by weight and select the best match.
-    uasort($selection_handler_groups['default'], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
-    end($selection_handler_groups['default']);
+    \uasort($selection_handler_groups['default'], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    \end($selection_handler_groups['default']);
     // Select the link_target variant of the default selection plugin for the
     // entity type, if it exists. Otherwise, select the next best match.
     $link_target_selection_plugin_id = "default:{$target_entity_type_id}_link_target";
-    $plugin_id = array_key_exists($link_target_selection_plugin_id, $selection_handler_groups['default'])
+    $plugin_id = \array_key_exists($link_target_selection_plugin_id, $selection_handler_groups['default'])
       ? $link_target_selection_plugin_id
-      : key($selection_handler_groups['default']);
+      : \key($selection_handler_groups['default']);
     $selection = $this->selectionPluginManager->createInstance($plugin_id, [
       'target_type' => $target_entity_type_id,
       'target_bundles' => $target_bundles,
@@ -202,8 +202,8 @@ class EntityLinkSuggestionsController extends ControllerBase {
     // their translation but then only keeps bundle, entity ID and label. Reload
     // them to generate rich results. Note that performance overhead of this is
     // minimal because all this data is statically cached already anyway.
-    $entity_ids = array_reduce($entities_by_bundle, function ($flattened, $bundle_entities) {
-      return array_merge($flattened, array_keys($bundle_entities));
+    $entity_ids = \array_reduce($entities_by_bundle, function ($flattened, $bundle_entities) {
+      return \array_merge($flattened, \array_keys($bundle_entities));
     }, []);
     $entities = $this->entityTypeManager()->getStorage($target_entity_type_id)->loadMultiple($entity_ids);
 
@@ -254,7 +254,7 @@ class EntityLinkSuggestionsController extends ControllerBase {
     $owner = $entity_type->hasKey('owner') && $entity->getOwner()
       ? $entity->getOwner()->getDisplayName()
       : NULL;
-    $creation_datetime = method_exists($entity, 'getCreatedTime')
+    $creation_datetime = \method_exists($entity, 'getCreatedTime')
       ? $this->dateFormatter->format($entity->getCreatedTime(), 'medium')
       : NULL;
 
@@ -308,8 +308,8 @@ class EntityLinkSuggestionsController extends ControllerBase {
    */
   protected static function findEntityIdByUrl(string $target_entity_type_id, string $user_input): ?string {
     $expected_url_prefix = "/$target_entity_type_id/";
-    if (str_starts_with($user_input, $expected_url_prefix)) {
-      return substr($user_input, strlen($expected_url_prefix));
+    if (\str_starts_with($user_input, $expected_url_prefix)) {
+      return \substr($user_input, \strlen($expected_url_prefix));
     }
     return NULL;
   }

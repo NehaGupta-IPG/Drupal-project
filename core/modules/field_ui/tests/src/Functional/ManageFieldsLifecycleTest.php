@@ -57,7 +57,7 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     $number_of_links = 2;
     $number_of_links_found = 0;
     $operation_links = $this->xpath('//ul[@class = "dropbutton"]/li/a');
-    $url = base_path() . "admin/structure/types/manage/$type/fields/node.$type.body";
+    $url = \base_path() . "admin/structure/types/manage/$type/fields/node.$type.body";
 
     foreach ($operation_links as $link) {
       switch ($link->getAttribute('title')) {

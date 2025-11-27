@@ -105,7 +105,7 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
     $this->installConfig('system');
 
     // Install all core themes.
-    sort($this->allThemes);
+    \sort($this->allThemes);
     $this->container->get('theme_installer')->install($this->allThemes);
 
     $this->themeHandler = $this->container->get('theme_handler');
@@ -176,15 +176,15 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
     $this->installEntitySchema('path_alias');
     // Find and install deprecated modules to test.
     $all_modules = $this->container->get('extension.list.module')->getList();
-    $deprecated_modules_to_test = array_filter($all_modules, function ($module) {
+    $deprecated_modules_to_test = \array_filter($all_modules, function ($module) {
       if ($module->origin == 'core'
         && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
         return TRUE;
       }
     });
-    $this->container->get('module_installer')->install(array_keys($deprecated_modules_to_test));
+    $this->container->get('module_installer')->install(\array_keys($deprecated_modules_to_test));
     $this->libraryDiscovery = $this->container->get('library.discovery');
-    $this->allModules = array_keys(\Drupal::moduleHandler()->getModuleList());
+    $this->allModules = \array_keys(\Drupal::moduleHandler()->getModuleList());
 
     $this->assertLibraries();
   }

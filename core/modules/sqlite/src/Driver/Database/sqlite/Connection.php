@@ -77,7 +77,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * Constructs a \Drupal\sqlite\Driver\Database\sqlite\Connection object.
    */
   public function __construct(\PDO $connection, array $connection_options) {
-    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof SqliteConnection : TRUE);
+    \assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof SqliteConnection : TRUE);
     parent::__construct($connection, $connection_options);
 
     // Empty prefix means query the main database -- no need to attach anything.
@@ -131,10 +131,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       $sqlite->createFunction('if', self::sqlFunctionIf(...));
       $sqlite->createFunction('greatest', self::sqlFunctionGreatest(...));
       $sqlite->createFunction('least', self::sqlFunctionLeast(...));
-      $sqlite->createFunction('pow', pow(...), 2);
-      $sqlite->createFunction('exp', exp(...), 1);
-      $sqlite->createFunction('length', strlen(...), 1);
-      $sqlite->createFunction('md5', md5(...), 1);
+      $sqlite->createFunction('pow', \pow(...), 2);
+      $sqlite->createFunction('exp', \exp(...), 1);
+      $sqlite->createFunction('length', \strlen(...), 1);
+      $sqlite->createFunction('md5', \md5(...), 1);
       $sqlite->createFunction('concat', self::sqlFunctionConcat(...));
       $sqlite->createFunction('concat_ws', self::sqlFunctionConcatWs(...));
       $sqlite->createFunction('substring', self::sqlFunctionSubstring(...), 3);
@@ -189,7 +189,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     // Execute sqlite init_commands.
     if (isset($connection_options['init_commands'])) {
-      $sqlite->exec(implode('; ', $connection_options['init_commands']));
+      $sqlite->exec(\implode('; ', $connection_options['init_commands']));
     }
 
     return $sqlite;
@@ -285,7 +285,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public static function sqlFunctionLeast() {
     // Remove all NULL, FALSE and empty strings values but leaves 0 (zero)
     // values.
-    $values = FilterArray::removeEmptyStrings(func_get_args());
+    $values = FilterArray::removeEmptyStrings(\func_get_args());
 
     return \count($values) < 1 ? NULL : \min($values);
   }
@@ -449,9 +449,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
-    assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    \assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
+    if (isset($options['fetch']) && \is_int($options['fetch'])) {
+      @\trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
     }
 
     try {
@@ -479,7 +479,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public static function createConnectionOptionsFromUrl($url, $root) {
     if ($root !== NULL) {
-      @trigger_error("Passing the \$root value to " . __METHOD__ . "() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
+      @\trigger_error("Passing the \$root value to " . __METHOD__ . "() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
     }
     $database = parent::createConnectionOptionsFromUrl($url, NULL);
 

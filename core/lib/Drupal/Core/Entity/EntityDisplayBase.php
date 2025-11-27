@@ -396,7 +396,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     }
 
     // Let other modules feedback about their own additions.
-    $weights = array_merge($weights,
+    $weights = \array_merge($weights,
       \Drupal::moduleHandler()->invokeAll('field_info_max_weight', [
         $this->targetEntityType,
         $this->bundle,
@@ -605,10 +605,10 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     // If changing the entity ID, also update the target entity type, bundle,
     // and view mode.
     if ($this->isNew() && $property_name === $this->getEntityType()->getKey('id')) {
-      if (substr_count($value, '.') !== 2) {
+      if (\substr_count($value, '.') !== 2) {
         throw new \InvalidArgumentException("'$value' is not a valid entity display ID.");
       }
-      [$this->targetEntityType, $this->bundle, $this->mode] = explode('.', $value);
+      [$this->targetEntityType, $this->bundle, $this->mode] = \explode('.', $value);
     }
     parent::set($property_name, $value);
     return $this;

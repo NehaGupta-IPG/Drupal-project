@@ -140,8 +140,8 @@ class HookCollectorPass implements CompilerPassInterface {
   public function process(ContainerBuilder $container): void {
     $module_list = $container->getParameter('container.modules');
     $parameters = $container->getParameterBag()->all();
-    $skip_procedural_modules = array_filter(
-      array_keys($module_list),
+    $skip_procedural_modules = \array_filter(
+      \array_keys($module_list),
       static fn (string $module) => !empty($parameters["$module.skip_procedural_hook_scan"]),
     );
     $collector = static::collectAllHookImplementations($module_list, $skip_procedural_modules);
@@ -176,8 +176,8 @@ class HookCollectorPass implements CompilerPassInterface {
 
     $packed_order_operations = [];
     $order_operations = $this->getOrderOperations();
-    foreach (preg_grep('@_alter$@', array_keys($order_operations)) as $alter_hook) {
-      $packed_order_operations[$alter_hook] = array_map(
+    foreach (\preg_grep('@_alter$@', \array_keys($order_operations)) as $alter_hook) {
+      $packed_order_operations[$alter_hook] = \array_map(
         fn (OrderOperation $operation) => $operation->pack(),
         $order_operations[$alter_hook],
       );
@@ -199,7 +199,7 @@ class HookCollectorPass implements CompilerPassInterface {
     // container.
     $parameters = $container->getParameterBag();
     foreach ($parameters->all() as $name => $value) {
-      if (str_ends_with($name, '.skip_procedural_hook_scan')) {
+      if (\str_ends_with($name, '.skip_procedural_hook_scan')) {
         $parameters->remove($name);
       }
     }
@@ -220,20 +220,20 @@ class HookCollectorPass implements CompilerPassInterface {
     $includesMap = [];
     foreach ($implementationsByHook as $hook => $hookImplementations) {
       foreach ($hookImplementations as $identifier => $module) {
-        if (str_contains($identifier, '::')) {
+        if (\str_contains($identifier, '::')) {
           continue;
         }
         $include = $this->includes[$identifier] ?? NULL;
         if ($include !== NULL) {
           // Do not add includes that are already in group includes.
-          if (isset($groupIncludes[$hook]) && in_array($include, $groupIncludes[$hook])) {
+          if (isset($groupIncludes[$hook]) && \in_array($include, $groupIncludes[$hook])) {
             continue;
           }
           $includesMap[$hook][$include] = TRUE;
         }
       }
     }
-    return array_map(array_keys(...), $includesMap);
+    return \array_map(\array_keys(...), $includesMap);
   }
 
   /**
@@ -282,7 +282,7 @@ class HookCollectorPass implements CompilerPassInterface {
     // List of hooks and modules formatted for hook_module_implements_alter().
     $moduleImplementsMap = [];
     foreach ($implementationsByHookOrig as $hook => $hookImplementations) {
-      foreach (array_intersect($this->modules, $hookImplementations) as $module) {
+      foreach (\array_intersect($this->modules, $hookImplementations) as $module) {
         $moduleImplementsMap[$hook][$module] = '';
       }
     }
@@ -294,10 +294,10 @@ class HookCollectorPass implements CompilerPassInterface {
         $alter($moduleImplements, $hook);
       }
       foreach ($moduleImplements as $module => $v) {
-        if (is_string($hook) && str_starts_with($hook, 'preprocess_') && str_contains($hook, '__')) {
+        if (\is_string($hook) && \str_starts_with($hook, 'preprocess_') && \str_contains($hook, '__')) {
           $this->preprocessForSuggestions[$module . '_' . $hook] = TRUE;
         }
-        foreach (array_keys($implementationsByHookOrig[$hook], $module, TRUE) as $identifier) {
+        foreach (\array_keys($implementationsByHookOrig[$hook], $module, TRUE) as $identifier) {
           $implementationsByHook[$hook][$identifier] = $module;
         }
       }
@@ -320,14 +320,14 @@ class HookCollectorPass implements CompilerPassInterface {
     $implementationsByHook = $this->getFilteredImplementations();
     $operations_by_hook = [];
     foreach ($this->orderOperations as $hook => $order_operations_by_weight) {
-      ksort($order_operations_by_weight);
-      $order_operations = array_merge(...$order_operations_by_weight);
+      \ksort($order_operations_by_weight);
+      $order_operations = \array_merge(...$order_operations_by_weight);
       foreach ($order_operations as $key => $operation) {
         if (!isset($implementationsByHook[$hook][$operation->identify()])) {
           unset($order_operations[$key]);
         }
       }
-      $operations_by_hook[$hook] = array_values($order_operations);
+      $operations_by_hook[$hook] = \array_values($order_operations);
 
     }
     return $operations_by_hook;
@@ -344,18 +344,18 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   protected static function applyOrderOperations(array &$implementation_list, array $order_operations): void {
     $module_finder = $implementation_list;
-    $identifiers = array_keys($module_finder);
+    $identifiers = \array_keys($module_finder);
     foreach ($order_operations as $order_operation) {
       $order_operation->apply($identifiers, $module_finder);
-      assert($identifiers === array_unique($identifiers));
-      assert(array_is_list($identifiers));
-      assert(!array_diff($identifiers, array_keys($module_finder)));
-      assert(!array_diff(array_keys($module_finder), $identifiers));
+      \assert($identifiers === \array_unique($identifiers));
+      \assert(\array_is_list($identifiers));
+      \assert(!\array_diff($identifiers, \array_keys($module_finder)));
+      \assert(!\array_diff(\array_keys($module_finder), $identifiers));
     }
     // Rebuild the identifier -> module array with the new order.
-    $identifiers = array_combine($identifiers, $identifiers);
-    $identifiers = array_intersect_key($identifiers, $module_finder);
-    $implementation_list = array_replace($identifiers, $module_finder);
+    $identifiers = \array_combine($identifiers, $identifiers);
+    $identifiers = \array_intersect_key($identifiers, $module_finder);
+    $implementation_list = \array_replace($identifiers, $module_finder);
   }
 
   /**
@@ -373,15 +373,15 @@ class HookCollectorPass implements CompilerPassInterface {
   ): void {
     $classesMap = [];
     foreach ($implementationsByHook as $hookImplementations) {
-      foreach (array_keys($hookImplementations) as $identifier) {
-        $parts = explode('::', $identifier, 2);
+      foreach (\array_keys($hookImplementations) as $identifier) {
+        $parts = \explode('::', $identifier, 2);
         if (isset($parts[1])) {
           $classesMap[$parts[0]] = TRUE;
         }
       }
     }
 
-    foreach (array_keys($classesMap) as $class) {
+    foreach (\array_keys($classesMap) as $class) {
       if (!$container->hasDefinition($class)) {
         $container
           ->register($class, $class)
@@ -410,13 +410,13 @@ class HookCollectorPass implements CompilerPassInterface {
    *   removed in Drupal 12.0.0.
    */
   public static function collectAllHookImplementations(array $module_list, array $skipProceduralModules = []): static {
-    $modules = array_keys($module_list);
+    $modules = \array_keys($module_list);
     $all_modules_preg = static::getModuleListPattern($modules);
     $collector = new static($modules);
     foreach ($module_list as $module => $info) {
-      $skip_procedural = in_array($module, $skipProceduralModules);
+      $skip_procedural = \in_array($module, $skipProceduralModules);
       $current_module_preg = static::getModuleListPattern([$module]);
-      $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg, $skip_procedural);
+      $collector->collectModuleHookImplementations(\dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg, $skip_procedural);
     }
     return $collector;
   }
@@ -434,9 +434,9 @@ class HookCollectorPass implements CompilerPassInterface {
    *   The pattern used to match hooks for the given module list.
    */
   protected static function getModuleListPattern(array $module_list): string {
-    usort($module_list, static fn ($a, $b) => strlen($b) - strlen($a));
-    $module_pattern = implode('|', array_map(
-      static fn ($x) => preg_quote($x, '/'),
+    \usort($module_list, static fn ($a, $b) => \strlen($b) - \strlen($a));
+    $module_pattern = \implode('|', \array_map(
+      static fn ($x) => \preg_quote($x, '/'),
       $module_list,
     ));
     return '/^(?<function>(?<module>' . $module_pattern . ')_(?!update_\d)(?<hook>[a-zA-Z0-9_\x80-\xff]+$))/';
@@ -466,7 +466,7 @@ class HookCollectorPass implements CompilerPassInterface {
     $iterator = new \RecursiveIteratorIterator($iterator);
     /** @var \RecursiveDirectoryIterator | \RecursiveIteratorIterator $iterator*/
     foreach ($iterator as $fileinfo) {
-      assert($fileinfo instanceof \SplFileInfo);
+      \assert($fileinfo instanceof \SplFileInfo);
       $extension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
 
@@ -477,11 +477,11 @@ class HookCollectorPass implements CompilerPassInterface {
           $attributes = $cached['attributes'];
         }
         else {
-          $namespace = preg_replace('#^src/#', "Drupal/$module/", $iterator->getSubPath());
+          $namespace = \preg_replace('#^src/#', "Drupal/$module/", $iterator->getSubPath());
           $class = $namespace . '/' . $fileinfo->getBasename('.php');
-          $class = str_replace('/', '\\', $class);
+          $class = \str_replace('/', '\\', $class);
           $attributes = [];
-          if (class_exists($class)) {
+          if (\class_exists($class)) {
             $reflectionClass = new \ReflectionClass($class);
             $attributes = self::getAttributeInstances($reflectionClass);
             $hook_file_cache->set($filename, ['class' => $class, 'attributes' => $attributes]);
@@ -526,7 +526,7 @@ class HookCollectorPass implements CompilerPassInterface {
               break;
             }
 
-            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches)) && !StaticReflectionParser::hasAttribute($attributes, LegacyModuleImplementsAlter::class)) {
+            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (\preg_match($current_module_preg, $function, $matches) || \preg_match($all_modules_preg, $function, $matches)) && !StaticReflectionParser::hasAttribute($attributes, LegacyModuleImplementsAlter::class)) {
               // Skip hooks that are not supported by the new hook system, they
               // do not need to be added to the BC layer. Note that is different
               // from static::checkForProceduralOnlyHooks(). hook_requirements
@@ -544,11 +544,11 @@ class HookCollectorPass implements CompilerPassInterface {
                 'update_last_removed',
                 'update_dependencies',
               ];
-              if (in_array($matches['hook'], $staticDenyHooks) || preg_match('/update_\d+$/', $function)) {
+              if (\in_array($matches['hook'], $staticDenyHooks) || \preg_match('/update_\d+$/', $function)) {
                 continue;
               }
 
-              assert($function === $matches['module'] . '_' . $matches['hook']);
+              \assert($function === $matches['module'] . '_' . $matches['hook']);
               $implementations[] = ['module' => $matches['module'], 'hook' => $matches['hook']];
             }
           }
@@ -559,8 +559,8 @@ class HookCollectorPass implements CompilerPassInterface {
         }
       }
       if ($extension === 'inc') {
-        $parts = explode('.', $fileinfo->getFilename());
-        if (count($parts) === 3 && $parts[0] === $module) {
+        $parts = \explode('.', $fileinfo->getFilename());
+        if (\count($parts) === 3 && $parts[0] === $module) {
           $this->groupIncludes[$parts[1]][] = $filename;
         }
       }
@@ -573,7 +573,7 @@ class HookCollectorPass implements CompilerPassInterface {
   protected static function filterIterator(\SplFileInfo $fileInfo, $key, \RecursiveDirectoryIterator $iterator): bool {
     $sub_path_name = $iterator->getSubPathname();
     $extension = $fileInfo->getExtension();
-    if (str_starts_with($sub_path_name, 'src/Hook/')) {
+    if (\str_starts_with($sub_path_name, 'src/Hook/')) {
       return $iterator->isDir() || $extension === 'php';
     }
     if ($iterator->isDir()) {
@@ -581,9 +581,9 @@ class HookCollectorPass implements CompilerPassInterface {
         return TRUE;
       }
       // glob() doesn't support streams but scandir() does.
-      return !in_array($fileInfo->getFilename(), ['tests', 'js', 'css']) && !array_filter(scandir($key), static fn ($filename) => str_ends_with($filename, '.info.yml'));
+      return !\in_array($fileInfo->getFilename(), ['tests', 'js', 'css']) && !\array_filter(\scandir($key), static fn ($filename) => \str_ends_with($filename, '.info.yml'));
     }
-    return in_array($extension, ['inc', 'module', 'profile', 'install']);
+    return \in_array($extension, ['inc', 'module', 'profile', 'install']);
   }
 
   /**
@@ -605,7 +605,7 @@ class HookCollectorPass implements CompilerPassInterface {
     }
     elseif ($hook === 'module_implements_alter') {
       $message = "$function without a #[LegacyModuleImplementsAlter] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788";
-      @trigger_error($message, E_USER_DEPRECATED);
+      @\trigger_error($message, E_USER_DEPRECATED);
       $this->moduleImplementsAlters[] = $function;
       include_once $fileinfo->getPathname();
     }
@@ -651,7 +651,7 @@ class HookCollectorPass implements CompilerPassInterface {
       'update_last_removed',
     ];
 
-    if (in_array($hookAttribute->hook, $staticDenyHooks) || preg_match('/^(post_update_|update_\d+$)/', $hookAttribute->hook)) {
+    if (\in_array($hookAttribute->hook, $staticDenyHooks) || \preg_match('/^(post_update_|update_\d+$)/', $hookAttribute->hook)) {
       throw new \LogicException("The hook $hookAttribute->hook on class $class does not support attributes and must remain procedural.");
     }
   }
@@ -672,7 +672,7 @@ class HookCollectorPass implements CompilerPassInterface {
     foreach ($reflections as $reflection) {
       if ($reflectionAttributes = $reflection->getAttributes(HookAttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF)) {
         $method = $reflection instanceof \ReflectionMethod ? $reflection->getName() : '__invoke';
-        $attributes[$method] = array_map(static fn (\ReflectionAttribute $ra) => $ra->newInstance(), $reflectionAttributes);
+        $attributes[$method] = \array_map(static fn (\ReflectionAttribute $ra) => $ra->newInstance(), $reflectionAttributes);
       }
     }
     return $attributes;

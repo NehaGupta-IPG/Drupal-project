@@ -60,7 +60,7 @@ class ContactHooks {
   #[Hook('entity_extra_field_info')]
   public function entityExtraFieldInfo(): array {
     $fields = [];
-    foreach (array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo('contact_message')) as $bundle) {
+    foreach (\array_keys(\Drupal::service('entity_type.bundle.info')->getBundleInfo('contact_message')) as $bundle) {
       $fields['contact_message'][$bundle]['form']['name'] = ['label' => $this->t('Sender name'), 'description' => $this->t('Text'), 'weight' => -50];
       $fields['contact_message'][$bundle]['form']['mail'] = ['label' => $this->t('Sender email'), 'description' => $this->t('Email'), 'weight' => -40];
       if ($bundle == 'personal') {

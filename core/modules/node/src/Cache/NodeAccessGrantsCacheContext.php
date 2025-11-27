@@ -28,7 +28,7 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
   ) {
     parent::__construct($user);
     if (!$entityTypeManager) {
-      @trigger_error('Calling NodeAccessGrantsCacheContext::__construct() without the $entityTypeManager argument is deprecated in drupal:11.3.0 and the $entityTypeManager argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
+      @\trigger_error('Calling NodeAccessGrantsCacheContext::__construct() without the $entityTypeManager argument is deprecated in drupal:11.3.0 and the $entityTypeManager argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
       $this->entityTypeManager = \Drupal::entityTypeManager();
     }
   }

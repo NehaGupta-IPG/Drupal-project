@@ -56,7 +56,7 @@ final class PhpTufValidator implements EventSubscriberInterface {
     private readonly Settings $settings,
     private readonly array $repositories,
   ) {
-    assert(Inspector::assertAllStrings($repositories));
+    \assert(Inspector::assertAllStrings($repositories));
   }
 
   /**
@@ -188,7 +188,7 @@ final class PhpTufValidator implements EventSubscriberInterface {
         $status[$url] = !empty($repository['tuf']);
       }
     }
-    return array_intersect_key($status, array_flip($this->repositories));
+    return \array_intersect_key($status, \array_flip($this->repositories));
   }
 
 }

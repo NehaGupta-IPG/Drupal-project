@@ -309,7 +309,7 @@ class WebAssert extends MinkWebAssert {
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkExists($label, $index = 0, $message = '') {
-    $message = ($message ?: strtr('Link with label %label not found.', ['%label' => $label]));
+    $message = ($message ?: \strtr('Link with label %label not found.', ['%label' => $label]));
     $links = $this->session->getPage()->findAll('named', ['link', $label]);
     $this->assert(!empty($links[$index]), $message);
   }
@@ -332,7 +332,7 @@ class WebAssert extends MinkWebAssert {
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkExistsExact($label, $index = 0, $message = '') {
-    $message = ($message ?: strtr('Link with label %label not found.', ['%label' => $label]));
+    $message = ($message ?: \strtr('Link with label %label not found.', ['%label' => $label]));
     $links = $this->session->getPage()->findAll('named_exact', ['link', $label]);
     $this->assert(!empty($links[$index]), $message);
   }
@@ -353,7 +353,7 @@ class WebAssert extends MinkWebAssert {
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkNotExists($label, $message = '') {
-    $message = ($message ?: strtr('Link with label %label found.', ['%label' => $label]));
+    $message = ($message ?: \strtr('Link with label %label found.', ['%label' => $label]));
     $links = $this->session->getPage()->findAll('named', ['link', $label]);
     $this->assert(empty($links), $message);
   }
@@ -374,7 +374,7 @@ class WebAssert extends MinkWebAssert {
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkNotExistsExact($label, $message = '') {
-    $message = ($message ?: strtr('Link with label %label found.', ['%label' => $label]));
+    $message = ($message ?: \strtr('Link with label %label found.', ['%label' => $label]));
     $links = $this->session->getPage()->findAll('named_exact', ['link', $label]);
     $this->assert(empty($links), $message);
   }
@@ -398,7 +398,7 @@ class WebAssert extends MinkWebAssert {
    */
   public function linkByHrefExists($href, $index = 0, $message = '') {
     $xpath = $this->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $href]);
-    $message = ($message ?: strtr('No link containing href %href found.', ['%href' => $href]));
+    $message = ($message ?: \strtr('No link containing href %href found.', ['%href' => $href]));
     $links = $this->session->getPage()->findAll('xpath', $xpath);
     $this->assert(!empty($links[$index]), $message);
   }
@@ -444,7 +444,7 @@ class WebAssert extends MinkWebAssert {
    */
   public function linkByHrefNotExists($href, $message = '') {
     $xpath = $this->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $href]);
-    $message = ($message ?: strtr('Link containing href %href found.', ['%href' => $href]));
+    $message = ($message ?: \strtr('Link containing href %href found.', ['%href' => $href]));
     $links = $this->session->getPage()->findAll('xpath', $xpath);
     $this->assert(empty($links), $message);
   }
@@ -518,7 +518,7 @@ class WebAssert extends MinkWebAssert {
       $replacement = function ($matches) use ($value) {
         return $value;
       };
-      $xpath = preg_replace_callback('/' . preg_quote($placeholder, NULL) . '\b/', $replacement, $xpath);
+      $xpath = \preg_replace_callback('/' . \preg_quote($placeholder, NULL) . '\b/', $replacement, $xpath);
     }
     return $xpath;
   }

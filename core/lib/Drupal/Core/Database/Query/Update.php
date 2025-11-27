@@ -161,7 +161,7 @@ class Update extends Query implements ConditionInterface {
 
     $max_placeholder = 0;
     [$args] = $this->getQueryArguments();
-    $placeholders = array_keys($args);
+    $placeholders = \array_keys($args);
     foreach ($fields as $field => $value) {
       $update_fields[] = $this->connection->escapeField($field) . '=' . $placeholders[$max_placeholder++];
     }

@@ -156,7 +156,7 @@ class LanguageHooks {
       if (!isset($type['language_select']['#theme_wrappers'])) {
         $type['language_select']['#theme_wrappers'] = [];
       }
-      $type['language_select']['#process'] = array_merge($type['language_select']['#process'], [
+      $type['language_select']['#process'] = \array_merge($type['language_select']['#process'], [
         'language_process_language_select',
             [
               'Drupal\Core\Render\Element\Select',
@@ -168,7 +168,7 @@ class LanguageHooks {
             ],
       ]);
       $type['language_select']['#theme'] = 'select';
-      $type['language_select']['#theme_wrappers'] = array_merge($type['language_select']['#theme_wrappers'], ['form_element']);
+      $type['language_select']['#theme_wrappers'] = \array_merge($type['language_select']['#theme_wrappers'], ['form_element']);
       $type['language_select']['#languages'] = LanguageInterface::STATE_CONFIGURABLE;
       $type['language_select']['#multiple'] = FALSE;
     }
@@ -216,7 +216,7 @@ class LanguageHooks {
     if ($is_syncing) {
       return;
     }
-    if (!in_array('language', $modules)) {
+    if (!\in_array('language', $modules)) {
       if (InstallerKernel::installationAttempted() && ($profile = \Drupal::installProfile())) {
         // If the install profile provides its own language.types configuration
         // do not overwrite it.

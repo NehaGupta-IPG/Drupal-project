@@ -81,7 +81,7 @@ class JUnitConverter {
       $test_cases[] = static::findTestCases($child, $element);
     }
 
-    return array_merge(...$test_cases);
+    return \array_merge(...$test_cases);
   }
 
   /**

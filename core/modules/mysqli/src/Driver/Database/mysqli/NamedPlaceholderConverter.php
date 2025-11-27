@@ -88,7 +88,7 @@ final class NamedPlaceholderConverter {
 
   public function __construct() {
     // Builds the combined regex pattern for parsing.
-    $this->sqlPattern = sprintf('(%s)', implode('|', [
+    $this->sqlPattern = \sprintf('(%s)', \implode('|', [
       $this->getAnsiSQLStringLiteralPattern("'"),
       $this->getAnsiSQLStringLiteralPattern('"'),
       self::BACKTICK_IDENTIFIER,
@@ -119,13 +119,13 @@ final class NamedPlaceholderConverter {
     $this->convertedParameters = [];
 
     foreach ($args as $key => $value) {
-      if (is_int($key)) {
+      if (\is_int($key)) {
         // Positional placeholder; edge case.
         $this->originalParameters[$key] = $value;
       }
       else {
         // Named placeholder like ':placeholder'; remove the initial colon.
-        $parameter = $key[0] === ':' ? substr($key, 1) : $key;
+        $parameter = $key[0] === ':' ? \substr($key, 1) : $key;
         $this->originalParameters[$parameter] = $value;
       }
     }
@@ -148,21 +148,21 @@ final class NamedPlaceholderConverter {
 
     $offset = 0;
 
-    while (($handler = current($patterns)) !== FALSE) {
-      if (preg_match('~\G' . key($patterns) . '~s', $sql, $matches, 0, $offset) === 1) {
+    while (($handler = \current($patterns)) !== FALSE) {
+      if (\preg_match('~\G' . \key($patterns) . '~s', $sql, $matches, 0, $offset) === 1) {
         $handler($matches[0]);
-        reset($patterns);
-        $offset += strlen($matches[0]);
+        \reset($patterns);
+        $offset += \strlen($matches[0]);
       }
-      elseif (preg_last_error() !== PREG_NO_ERROR) {
+      elseif (\preg_last_error() !== PREG_NO_ERROR) {
         throw new \RuntimeException('Regular expression error');
       }
       else {
-        next($patterns);
+        \next($patterns);
       }
     }
 
-    assert($offset === strlen($sql));
+    \assert($offset === \strlen($sql));
   }
 
   /**
@@ -190,7 +190,7 @@ final class NamedPlaceholderConverter {
   private function addPositionalParameter(string $sql): void {
     $index = $this->originalParameterIndex;
 
-    if (!array_key_exists($index, $this->originalParameters)) {
+    if (!\array_key_exists($index, $this->originalParameters)) {
       throw new \RuntimeException('Missing Positional Parameter ' . $index);
     }
 
@@ -207,9 +207,9 @@ final class NamedPlaceholderConverter {
    *   The SQL part.
    */
   private function addNamedParameter(string $sql): void {
-    $name = substr($sql, 1);
+    $name = \substr($sql, 1);
 
-    if (!array_key_exists($name, $this->originalParameters)) {
+    if (!\array_key_exists($name, $this->originalParameters)) {
       throw new \RuntimeException('Missing Named Parameter ' . $name);
     }
 
@@ -234,7 +234,7 @@ final class NamedPlaceholderConverter {
    *   The converted SQL statement with positional placeholders.
    */
   public function getConvertedSQL(): string {
-    return implode('', $this->convertedSQL);
+    return \implode('', $this->convertedSQL);
   }
 
   /**

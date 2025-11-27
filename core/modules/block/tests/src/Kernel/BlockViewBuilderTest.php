@@ -259,7 +259,7 @@ class BlockViewBuilderTest extends KernelTestBase {
     $build = $this->getBlockRenderArray();
     $cache_keys = ['entity_view', 'block', 'test_block'];
     $markup = $this->renderer->renderRoot($build);
-    $this->assertTrue(str_contains((string) $markup, 'This is content for a block that is not render cached.'));
+    $this->assertTrue(\str_contains((string) $markup, 'This is content for a block that is not render cached.'));
     $this->assertFalse($cache_bin->get($cache_keys, CacheableMetadata::createFromRenderArray($build)));
     // Confirm that build render array has no cache keys.
     $this->assertArrayNotHasKey('keys', $build['#cache']);

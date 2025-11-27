@@ -170,8 +170,8 @@ class ConfigManager implements ConfigManagerInterface {
     // YAML. But the configuration is not necessarily stored in files.
     // Therefore, they need to be read and parsed, and lastly, dumped into YAML
     // strings.
-    $source_data = explode("\n", Yaml::encode($source_storage->read($source_name)));
-    $target_data = explode("\n", Yaml::encode($target_storage->read($target_name)));
+    $source_data = \explode("\n", Yaml::encode($source_storage->read($source_name)));
+    $target_data = \explode("\n", Yaml::encode($target_storage->read($target_name)));
 
     // Check for new or removed files.
     if ($source_data === ['false']) {
@@ -294,13 +294,13 @@ class ConfigManager implements ConfigManagerInterface {
       // dependents of the system module are calculated since system.site has
       // a UUID key.
       if ($entity_type_id) {
-        $id = substr($config_name, strlen($definitions[$entity_type_id]->getConfigPrefix()) + 1);
+        $id = \substr($config_name, \strlen($definitions[$entity_type_id]->getConfigPrefix()) + 1);
         $entities[$entity_type_id][$config_name] = $id;
       }
     }
     // Align the order of entities returned to the dependency order by first
     // populating the keys in the same order.
-    $entities_to_return = array_fill_keys(array_keys($dependencies), NULL);
+    $entities_to_return = \array_fill_keys(\array_keys($dependencies), NULL);
     foreach ($entities as $entity_type_id => $entities_to_load) {
       $storage = $this->entityTypeManager->getStorage($entity_type_id);
       $loaded_entities = $storage->loadMultiple($entities_to_load);
@@ -309,7 +309,7 @@ class ConfigManager implements ConfigManagerInterface {
       }
     }
     // Return entities list with NULL entries removed.
-    return array_filter($entities_to_return);
+    return \array_filter($entities_to_return);
   }
 
   /**

@@ -113,7 +113,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\migrate\Plugin\migrate\source\ContentEntity instead. See https://www.drupal.org/node/3498916', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\migrate\Plugin\migrate\source\ContentEntity instead. See https://www.drupal.org/node/3498916', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     if (empty($plugin_definition['entity_type'])) {
       throw new InvalidPluginDefinitionException($plugin_id, 'Missing required "entity_type" definition.');

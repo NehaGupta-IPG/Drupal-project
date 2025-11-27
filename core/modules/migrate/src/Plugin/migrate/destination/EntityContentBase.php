@@ -151,7 +151,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     $this->fieldTypeManager = $field_type_manager;
     $this->accountSwitcher = $account_switcher;
     if ($entity_type_bundle_info === NULL) {
-      @trigger_error('Calling ' . __NAMESPACE__ . '\EntityContentBase::__construct() without the $entity_type_bundle_info argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3476634', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __NAMESPACE__ . '\EntityContentBase::__construct() without the $entity_type_bundle_info argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3476634', E_USER_DEPRECATED);
       $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
     }
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
@@ -437,12 +437,12 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       $bundle = $this->configuration['default_bundle'];
 
       if (!isset($bundle_info[$bundle])) {
-        throw new MigrateException(sprintf("The default_bundle value '%s' is not a valid bundle for the destination entity type '%s'.", $bundle, $entity_type->id()));
+        throw new MigrateException(\sprintf("The default_bundle value '%s' is not a valid bundle for the destination entity type '%s'.", $bundle, $entity_type->id()));
       }
     }
-    elseif (count($bundle_info) === 1) {
+    elseif (\count($bundle_info) === 1) {
       // If the destination entity type has only one bundle, use that.
-      $bundle = array_key_first($bundle_info);
+      $bundle = \array_key_first($bundle_info);
     }
 
     if (isset($bundle)) {

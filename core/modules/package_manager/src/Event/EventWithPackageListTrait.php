@@ -85,8 +85,8 @@ trait EventWithPackageListTrait {
   private function getKeyedPackages(array $packages): array {
     $keyed_packages = [];
     foreach ($packages as $package) {
-      if (strpos($package, ':') > 0) {
-        [$name, $constraint] = explode(':', $package);
+      if (\strpos($package, ':') > 0) {
+        [$name, $constraint] = \explode(':', $package);
       }
       else {
         [$name, $constraint] = [$package, '*'];

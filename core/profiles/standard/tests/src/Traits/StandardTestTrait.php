@@ -196,7 +196,7 @@ trait StandardTestTrait {
     // Make sure all image styles has webp conversion as last effect.
     foreach (ImageStyle::loadMultiple() as $style) {
       $effects = $style->getEffects()->getInstanceIds();
-      $last = $style->getEffects()->get(end($effects));
+      $last = $style->getEffects()->get(\end($effects));
       $this->assertSame('image_convert_avif', $last->getConfiguration()['id']);
       $this->assertSame('webp', $last->getConfiguration()['data']['extension']);
     }

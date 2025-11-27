@@ -24,7 +24,7 @@ final class BackwardsCompatibilityClassLoader {
         // @phpcs:ignore
         @trigger_error(sprintf('Class %s is deprecated in %s and is removed from %s, use %s instead. See %s', $class, $moved['deprecation_version'], $moved['removed_version'], $moved['class'], $moved['change_record']), E_USER_DEPRECATED);
       }
-      class_alias($moved['class'], $class, TRUE);
+      \class_alias($moved['class'], $class, TRUE);
     }
   }
 

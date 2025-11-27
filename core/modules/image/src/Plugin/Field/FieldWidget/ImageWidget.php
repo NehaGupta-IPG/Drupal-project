@@ -294,7 +294,7 @@ class ImageWidget extends FileWidget {
     // Only do validation if the function is triggered from other places than
     // the image process form.
     $triggering_element = $form_state->getTriggeringElement();
-    if (!empty($triggering_element['#submit']) && in_array([ManagedFile::class, 'submit'], $triggering_element['#submit'], TRUE)) {
+    if (!empty($triggering_element['#submit']) && \in_array([ManagedFile::class, 'submit'], $triggering_element['#submit'], TRUE)) {
       $form_state->setLimitValidationErrors([]);
     }
   }
@@ -350,7 +350,7 @@ class ImageWidget extends FileWidget {
   public function errorElement(array $element, ConstraintViolationInterface $error, array $form, FormStateInterface $form_state) {
     $element = parent::errorElement($element, $error, $form, $form_state);
 
-    $property_path_array = explode('.', $error->getPropertyPath());
+    $property_path_array = \explode('.', $error->getPropertyPath());
     return ($element === FALSE) ? FALSE : $element[$property_path_array[1]];
   }
 

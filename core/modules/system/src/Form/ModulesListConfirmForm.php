@@ -149,7 +149,7 @@ class ModulesListConfirmForm extends ConfirmFormBase {
         $items[] = [
           [
             '#markup' => $this->formatPlural(
-              count($dependencies),
+              \count($dependencies),
               'You must install the following module to install @module:',
               'You must install the following modules to install @module:',
               [

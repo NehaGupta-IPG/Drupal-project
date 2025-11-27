@@ -46,11 +46,11 @@ class HistoryManager {
       // entity.
       if (!$timestamp) {
         if ($entity->getEntityTypeId() == 'node') {
-          $timestamp = history_read($entity->id());
+          $timestamp = \history_read($entity->id());
         }
         else {
           $function = $entity->getEntityTypeId() . '_last_viewed';
-          if (function_exists($function)) {
+          if (\function_exists($function)) {
             $timestamp = $function($entity->id());
           }
           else {

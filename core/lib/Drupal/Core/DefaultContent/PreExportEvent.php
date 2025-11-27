@@ -56,7 +56,7 @@ final class PreExportEvent extends Event {
    */
   public function setEntityKeyExportable(string $key, bool $export = TRUE): void {
     $entity_type = $this->entity->getEntityType();
-    assert($entity_type instanceof ContentEntityTypeInterface);
+    \assert($entity_type instanceof ContentEntityTypeInterface);
 
     if ($entity_type->hasKey($key)) {
       $this->setExportable($entity_type->getKey($key), $export);

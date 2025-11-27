@@ -42,7 +42,7 @@ class Transaction {
    * Prevent transactions from being unserialized.
    */
   public function __wakeup(): void {
-    throw new \BadMethodCallException('Cannot unserialize ' . get_class($this));
+    throw new \BadMethodCallException('Cannot unserialize ' . \get_class($this));
   }
 
   /**

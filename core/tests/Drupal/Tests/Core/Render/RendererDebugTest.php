@@ -7,7 +7,6 @@ namespace Drupal\Tests\Core\Render;
 use Drupal\Core\Render\Renderer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use function preg_replace;
 
 /**
  * Tests Drupal\Core\Render\Renderer.

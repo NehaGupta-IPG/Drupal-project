@@ -93,11 +93,11 @@ class CreateNew extends GDImageToolkitOperationBase {
       case IMAGETYPE_PNG:
       case IMAGETYPE_WEBP:
       case IMAGETYPE_AVIF:
-        imagealphablending($image, FALSE);
-        $transparency = imagecolorallocatealpha($image, 0, 0, 0, 127);
-        imagefill($image, 0, 0, $transparency);
-        imagealphablending($image, TRUE);
-        imagesavealpha($image, TRUE);
+        \imagealphablending($image, FALSE);
+        $transparency = \imagecolorallocatealpha($image, 0, 0, 0, 127);
+        \imagefill($image, 0, 0, $transparency);
+        \imagealphablending($image, TRUE);
+        \imagesavealpha($image, TRUE);
         break;
 
       case IMAGETYPE_GIF:

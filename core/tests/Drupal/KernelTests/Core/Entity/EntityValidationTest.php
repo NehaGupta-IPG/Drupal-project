@@ -133,7 +133,7 @@ class EntityValidationTest extends EntityKernelTestBase {
       ]);
     }
     $entity_field_manager = \Drupal::service('entity_field.manager');
-    assert($entity_field_manager instanceof EntityFieldManagerInterface);
+    \assert($entity_field_manager instanceof EntityFieldManagerInterface);
     $entity_field_manager->clearCachedFieldDefinitions();
 
     // All entity variations have to have the same results.
@@ -218,7 +218,7 @@ class EntityValidationTest extends EntityKernelTestBase {
     $test_entity->set('created', -2147483649);
     $violations = $test_entity->validate();
     $this->assertEquals(1, $violations->count(), 'Validation failed for invalid created timestamp.');
-    $this->assertEquals('This value should be between "-2147483648" and "2147483648".', html_entity_decode(strip_tags((string) $violations[0]->getMessage())));
+    $this->assertEquals('This value should be between "-2147483648" and "2147483648".', \html_entity_decode(\strip_tags((string) $violations[0]->getMessage())));
 
     // Valid 'created' timestamp.
     $test_entity->set('created', 1234567890);
@@ -231,7 +231,7 @@ class EntityValidationTest extends EntityKernelTestBase {
     $test_entity->set('changed_no_test', -2147483649);
     $violations = $test_entity->validate();
     $this->assertEquals(1, $violations->count(), 'Validation failed for invalid changed timestamp.');
-    $this->assertEquals('This value should be between "-2147483648" and "2147483648".', html_entity_decode(strip_tags((string) $violations[0]->getMessage())));
+    $this->assertEquals('This value should be between "-2147483648" and "2147483648".', \html_entity_decode(\strip_tags((string) $violations[0]->getMessage())));
 
     // Valid 'changed' timestamp.
     $test_entity->set('changed_no_test', 1234567890);

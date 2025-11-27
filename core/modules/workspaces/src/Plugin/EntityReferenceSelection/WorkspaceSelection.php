@@ -80,7 +80,7 @@ class WorkspaceSelection extends DefaultSelection {
       ->execute();
     $loaded = $storage->loadMultiple($ids);
 
-    $entities = array_replace(array_intersect_key($workspace_tree, $loaded), $loaded);
+    $entities = \array_replace(\array_intersect_key($workspace_tree, $loaded), $loaded);
 
     // If we need to restrict the list of workspaces by searching only a part of
     // their label ($match) or by a number of results ($limit), the workspace

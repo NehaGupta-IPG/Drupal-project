@@ -293,7 +293,7 @@ class DisplayBlockTest extends ViewTestBase {
     $this->drupalGet('');
     $this->assertSession()->elementNotExists('xpath', "{$block_xpath}/h2");
 
-    $this->assertCacheTags(array_merge($block->getCacheTags(), [
+    $this->assertCacheTags(\array_merge($block->getCacheTags(), [
       'block_view',
       'config:block_list',
       'config:system.site',
@@ -333,7 +333,7 @@ class DisplayBlockTest extends ViewTestBase {
     $this->assertSession()->elementNotExists('xpath', $block_xpath);
     // Ensure that the view cacheability metadata is propagated even, for an
     // empty block.
-    $this->assertCacheTags(array_merge($block->getCacheTags(), [
+    $this->assertCacheTags(\array_merge($block->getCacheTags(), [
       'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
@@ -357,7 +357,7 @@ class DisplayBlockTest extends ViewTestBase {
 
     $this->drupalGet($url);
     $this->assertSession()->elementsCount('xpath', $block_xpath, 1);
-    $this->assertCacheTags(array_merge($block->getCacheTags(), [
+    $this->assertCacheTags(\array_merge($block->getCacheTags(), [
       'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
@@ -381,7 +381,7 @@ class DisplayBlockTest extends ViewTestBase {
 
     $this->drupalGet($url);
     $this->assertSession()->elementNotExists('xpath', $block_xpath);
-    $this->assertCacheTags(array_merge($block->getCacheTags(), [
+    $this->assertCacheTags(\array_merge($block->getCacheTags(), [
       'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
@@ -404,7 +404,7 @@ class DisplayBlockTest extends ViewTestBase {
 
     $this->drupalGet($url);
     $this->assertSession()->elementsCount('xpath', $block_xpath, 1);
-    $this->assertCacheTags(array_merge($block->getCacheTags(), [
+    $this->assertCacheTags(\array_merge($block->getCacheTags(), [
       'block_view',
       'config:block_list',
       'config:views.view.test_view_block',
@@ -453,8 +453,8 @@ class DisplayBlockTest extends ViewTestBase {
     $this->getSession()->getDriver()->getClient()->request('POST', $url, $post);
     $this->assertSession()->statusCodeEquals(200);
     $json = Json::decode($this->getSession()->getPage()->getContent());
-    $this->assertSame('<ul class="contextual-links"><li><a href="' . base_path() . 'admin/structure/block/manage/' . $block->id() . '">Configure block</a></li><li><a href="' . base_path() . 'admin/structure/block/manage/' . $block->id() . '/delete">Remove block</a></li><li><a href="' . base_path() . 'admin/structure/views/view/test_view_block/edit/block_1">Edit view</a></li></ul>', $json[$id]);
-    $this->assertSame('<ul class="contextual-links"><li><a href="' . base_path() . 'admin/structure/block/manage/' . $cached_block->id() . '">Configure block</a></li><li><a href="' . base_path() . 'admin/structure/block/manage/' . $cached_block->id() . '/delete">Remove block</a></li><li><a href="' . base_path() . 'admin/structure/views/view/test_view_block/edit/block_1">Edit view</a></li></ul>', $json[$cached_id]);
+    $this->assertSame('<ul class="contextual-links"><li><a href="' . \base_path() . 'admin/structure/block/manage/' . $block->id() . '">Configure block</a></li><li><a href="' . \base_path() . 'admin/structure/block/manage/' . $block->id() . '/delete">Remove block</a></li><li><a href="' . \base_path() . 'admin/structure/views/view/test_view_block/edit/block_1">Edit view</a></li></ul>', $json[$id]);
+    $this->assertSame('<ul class="contextual-links"><li><a href="' . \base_path() . 'admin/structure/block/manage/' . $cached_block->id() . '">Configure block</a></li><li><a href="' . \base_path() . 'admin/structure/block/manage/' . $cached_block->id() . '/delete">Remove block</a></li><li><a href="' . \base_path() . 'admin/structure/views/view/test_view_block/edit/block_1">Edit view</a></li></ul>', $json[$cached_id]);
   }
 
 }

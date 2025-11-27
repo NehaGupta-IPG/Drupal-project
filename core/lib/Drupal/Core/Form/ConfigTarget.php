@@ -219,8 +219,8 @@ final class ConfigTarget {
       if ($is_multi_target) {
         // If we're targeting multiple property paths, $value needs to be an
         // array with every targeted property path.
-        if (!is_array($value)) {
-          throw new \LogicException(sprintf('The toConfig callable returned a %s, but it must be an array with a key-value pair for each of the targeted property paths.', gettype($value)));
+        if (!\is_array($value)) {
+          throw new \LogicException(\sprintf('The toConfig callable returned a %s, but it must be an array with a key-value pair for each of the targeted property paths.', \gettype($value)));
         }
         elseif ($missing_keys = \array_diff($this->propertyPaths, \array_keys($value))) {
           throw new \LogicException(\sprintf('The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: %s.', \implode(', ', $missing_keys)));
@@ -238,7 +238,7 @@ final class ConfigTarget {
 
     // Set the returned value, or if a special value (one of the cases in the
     // ToConfig enum): apply the appropriate action.
-    array_walk($value, fn (mixed $value, string $property) => match ($value) {
+    \array_walk($value, fn (mixed $value, string $property) => match ($value) {
       // No-op.
       ToConfig::NoOp => NULL,
       // Delete.

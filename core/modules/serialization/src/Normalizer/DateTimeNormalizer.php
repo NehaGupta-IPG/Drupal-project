@@ -54,7 +54,7 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
    */
   #[JsonSchema(['type' => 'string', 'format' => 'date-time'])]
   public function doNormalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
-    assert($object instanceof DateTimeInterface);
+    \assert($object instanceof DateTimeInterface);
     $drupal_date_time = $object->getDateTime();
     if ($drupal_date_time === NULL) {
       return $drupal_date_time;

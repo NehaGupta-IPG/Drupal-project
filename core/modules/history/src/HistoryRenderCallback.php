@@ -22,7 +22,7 @@ class HistoryRenderCallback implements RenderCallbackInterface {
    */
   public static function lazyBuilder($node_id) {
     $element = [];
-    $element['#attached']['drupalSettings']['history']['lastReadTimestamps'][$node_id] = (int) history_read($node_id);
+    $element['#attached']['drupalSettings']['history']['lastReadTimestamps'][$node_id] = (int) \history_read($node_id);
     return $element;
   }
 

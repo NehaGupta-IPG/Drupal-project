@@ -127,7 +127,7 @@ final class SettingsForm extends ConfigFormBase {
 
     // Prepare local file path for description.
     if ($original_path && isset($friendly_path)) {
-      $local_file = strtr($original_path, ['public:/' => PublicStream::basePath()]);
+      $local_file = \strtr($original_path, ['public:/' => PublicStream::basePath()]);
     }
     else {
       $local_file = $this->themeManager->getActiveTheme()->getPath() . '/' . $default;
@@ -191,7 +191,7 @@ final class SettingsForm extends ConfigFormBase {
       $form_state->setValue('logo_path', '');
     }
     else {
-      $file = _file_save_upload_from_form($form['logo']['custom']['logo_upload'], $form_state, 0);
+      $file = \_file_save_upload_from_form($form['logo']['custom']['logo_upload'], $form_state, 0);
       if ($file) {
         $logo_dimensions = $this->adjustLogoDimensions($file);
         if (!$logo_dimensions) {
@@ -315,14 +315,14 @@ final class SettingsForm extends ConfigFormBase {
       return NULL;
     }
     // A path relative to the Drupal root or a fully qualified URI is valid.
-    if (is_file($path)) {
+    if (\is_file($path)) {
       return $path;
     }
     // Prepend 'public://' for relative file paths within public filesystem.
     if (StreamWrapperManager::getScheme($path) === FALSE) {
       $path = 'public://' . $path;
     }
-    if (is_file($path)) {
+    if (\is_file($path)) {
       return $path;
     }
     return NULL;

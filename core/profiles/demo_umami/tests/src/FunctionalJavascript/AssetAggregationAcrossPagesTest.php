@@ -65,7 +65,7 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     $user->addRole('editor');
     $user->save();
     $this->drupalLogin($user);
-    sleep(2);
+    \sleep(2);
     $performance_data = $this->collectPerformanceData(function () {
       $this->doRequests();
     }, 'umamiFrontAndRecipePagesEditor');

@@ -107,12 +107,12 @@ trait SchemaCheckTrait {
       // Also perform explicit validation. Note this does NOT require every node
       // in the config schema tree to have validation constraints defined.
       $violations = $this->schema->validate();
-      $filtered_violations = array_filter(
-        iterator_to_array($violations),
+      $filtered_violations = \array_filter(
+        \iterator_to_array($violations),
         fn(ConstraintViolationInterface $v) => !static::isViolationForIgnoredPropertyPath($v),
       );
-      $validation_errors = array_map(
-        fn(ConstraintViolationInterface $v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
+      $validation_errors = \array_map(
+        fn(ConstraintViolationInterface $v) => \sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
         $filtered_violations
       );
       // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.

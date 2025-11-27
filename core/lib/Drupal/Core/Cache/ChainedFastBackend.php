@@ -130,7 +130,7 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
     // higher level cache is warm, the lower level cache items that are used to
     // build it won't be requested. Once the grace period has passed, the fast
     // backend will begin to take over from the consistent backend again.
-    $compare = round(microtime(TRUE), 3);
+    $compare = \round(\microtime(TRUE), 3);
 
     if ($last_write_timestamp && $compare > $last_write_timestamp) {
       // Items in the fast backend might be invalid based on their timestamp,
@@ -322,9 +322,9 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
     // multiple times during a request. Reads and writes from the fast cache
     // are skipped when this timestamp is in the future, which also helps to
     // avoid write contention on the fast cache.
-    $compare = round(microtime(TRUE) + .001, 3);
+    $compare = \round(\microtime(TRUE) + .001, 3);
     if ($compare > $this->getLastWriteTimestamp()) {
-      $now = round(microtime(TRUE) + 1, 3);
+      $now = \round(\microtime(TRUE) + 1, 3);
       $this->lastWriteTimestamp = $now;
       $this->consistentBackend->set(self::LAST_WRITE_TIMESTAMP_PREFIX . $this->bin, $this->lastWriteTimestamp);
     }

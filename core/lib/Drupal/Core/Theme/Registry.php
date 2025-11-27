@@ -241,7 +241,7 @@ class Registry implements DestructableInterface {
     $this->moduleList = $module_list;
     $this->themeName = $theme_name;
     if (!$key_value_factory) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $key_value_factory argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3550627', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' without the $key_value_factory argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3550627', E_USER_DEPRECATED);
       $key_value_factory = \Drupal::service('keyvalue');
     }
     $this->keyValueFactory = $key_value_factory;
@@ -448,7 +448,7 @@ class Registry implements DestructableInterface {
         self::PREPROCESS_INVOKES => [],
       ];
       $cache[self::GLOBAL_PREPROCESS] = $this->collectModulePreprocess($cache, 'preprocess');
-      if (defined('MAINTENANCE_MODE') && constant('MAINTENANCE_MODE') === 'install') {
+      if (\defined('MAINTENANCE_MODE') && \constant('MAINTENANCE_MODE') === 'install') {
         // System is still set here so preprocess can be updated in install.
         $this->processExtension($cache, 'system', 'install', 'system', $this->moduleList->getPath('system'));
       }
@@ -575,10 +575,10 @@ class Registry implements DestructableInterface {
     else {
       // @todo Simplify in Drupal 12 in https://www.drupal.org/project/drupal/issues/3555931
       $function = $name . '_theme';
-      if (in_array($type, ['theme_engine', 'base_theme_engine'], TRUE) && $theme_engine = $this->themeManager->getThemeEngine($name)) {
+      if (\in_array($type, ['theme_engine', 'base_theme_engine'], TRUE) && $theme_engine = $this->themeManager->getThemeEngine($name)) {
         $function = [$theme_engine, 'theme'];
       }
-      if (is_callable($function)) {
+      if (\is_callable($function)) {
         $result = $function(... $args);
       }
     }
@@ -606,7 +606,7 @@ class Registry implements DestructableInterface {
 
         // Load the includes, as they may contain preprocess functions.
         if (isset($info['includes'])) {
-          @trigger_error('Providing includes for theme hook ' . $hook . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3549500', E_USER_DEPRECATED);
+          @\trigger_error('Providing includes for theme hook ' . $hook . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3549500', E_USER_DEPRECATED);
           foreach ($info['includes'] as $include_file) {
             include_once $this->root . '/' . $include_file;
           }
@@ -621,7 +621,7 @@ class Registry implements DestructableInterface {
           $include_file .= '/' . $info['file'];
           include_once $this->root . '/' . $include_file;
           $result[$hook]['includes'][] = $include_file;
-          @trigger_error('Providing a file for theme hook ' . $hook . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3549500', E_USER_DEPRECATED);
+          @\trigger_error('Providing a file for theme hook ' . $hook . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3549500', E_USER_DEPRECATED);
         }
 
         // Provide a default naming convention for 'template' based on the
@@ -651,15 +651,15 @@ class Registry implements DestructableInterface {
           if ($type == 'module') {
             // Add template_preprocess_HOOK function, if no initial preprocess
             // callback is defined.
-            if (empty($info['initial preprocess']) && function_exists('template_preprocess_' . $hook)) {
+            if (empty($info['initial preprocess']) && \function_exists('template_preprocess_' . $hook)) {
               if (!isset($info['deprecated'])) {
                 // Do not trigger a deprecation if the whole definition is
                 // deprecated.
-                @trigger_error('Providing template_preprocess_' . $hook . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+                @\trigger_error('Providing template_preprocess_' . $hook . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use initial preprocess for template_preprocess instead. See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
               }
               $info['preprocess functions'][] = 'template_preprocess_' . $hook;
             }
-            $info['preprocess functions'] = array_merge($info['preprocess functions'], $this->collectModulePreprocess($cache, 'preprocess_' . $hook));
+            $info['preprocess functions'] = \array_merge($info['preprocess functions'], $this->collectModulePreprocess($cache, 'preprocess_' . $hook));
           }
           elseif ($type == 'theme_engine' || $type == 'base_theme_engine') {
             // Theme engines get an extra set that come before the normally
@@ -672,9 +672,9 @@ class Registry implements DestructableInterface {
 
             foreach ($prefixes as $prefix) {
               foreach ([$prefix . '_preprocess', $prefix . '_preprocess_' . $hook] as $function) {
-                if (function_exists($function)) {
+                if (\function_exists($function)) {
                   if ($prefix !== $theme) {
-                    @trigger_error(sprintf('Providing %s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3547356', $function), E_USER_DEPRECATED);
+                    @\trigger_error(\sprintf('Providing %s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3547356', $function), E_USER_DEPRECATED);
                   }
                   $info['preprocess functions'][] = $function;
                 }
@@ -798,8 +798,8 @@ class Registry implements DestructableInterface {
     if (isset($cache[$source_hook_name]) && (!isset($cache[$source_hook_name]['incomplete preprocess functions']) || !isset($cache[$destination_hook_name]['incomplete preprocess functions']))) {
       $cache[$destination_hook_name] = $parent_hook + $cache[$source_hook_name];
       if (isset($parent_hook['preprocess functions'])) {
-        $diff = array_diff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions'] ?? []);
-        $cache[$destination_hook_name]['preprocess functions'] = array_merge($cache[$source_hook_name]['preprocess functions'] ?? [], $diff);
+        $diff = \array_diff($parent_hook['preprocess functions'], $cache[$source_hook_name]['preprocess functions'] ?? []);
+        $cache[$destination_hook_name]['preprocess functions'] = \array_merge($cache[$source_hook_name]['preprocess functions'] ?? [], $diff);
       }
       // If a base hook isn't set, this is the actual base hook.
       if (!isset($cache[$source_hook_name]['base hook'])) {
@@ -978,7 +978,7 @@ class Registry implements DestructableInterface {
       $theme_functions = $functions['user'];
     }
 
-    $theme_functions = array_merge($theme_functions, array_keys($this->getPreprocessForSuggestions()));
+    $theme_functions = \array_merge($theme_functions, \array_keys($this->getPreprocessForSuggestions()));
     $grouped_functions = [];
     // Splitting user defined functions into groups by the first prefix.
     foreach ($theme_functions as $function) {

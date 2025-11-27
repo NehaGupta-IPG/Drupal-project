@@ -53,14 +53,14 @@ final class SupportedReleaseValidator implements EventSubscriberInterface {
 
     // If this version is found in the list of installable releases, it is
     // secured and supported.
-    if (array_key_exists($semantic_version, $supported_releases)) {
+    if (\array_key_exists($semantic_version, $supported_releases)) {
       return TRUE;
     }
     // If the semantic version number wasn't in the list of
     // installable releases, convert it to a legacy version number and see
     // if the version number is in the list.
     $legacy_version = LegacyVersionUtility::convertToLegacyVersion($semantic_version);
-    if ($legacy_version && array_key_exists($legacy_version, $supported_releases)) {
+    if ($legacy_version && \array_key_exists($legacy_version, $supported_releases)) {
       return TRUE;
     }
     // Neither the semantic version nor the legacy version are in the list
@@ -77,7 +77,7 @@ final class SupportedReleaseValidator implements EventSubscriberInterface {
   public function validate(PreApplyEvent $event): void {
     $active = $this->composerInspector->getInstalledPackagesList($this->pathLocator->getProjectRoot());
     $staged = $this->composerInspector->getInstalledPackagesList($event->sandboxManager->getSandboxDirectory());
-    $updated_packages = array_merge(
+    $updated_packages = \array_merge(
       $staged->getPackagesNotIn($active)->getArrayCopy(),
       $staged->getPackagesWithDifferentVersionsIn($active)->getArrayCopy()
     );
@@ -86,8 +86,8 @@ final class SupportedReleaseValidator implements EventSubscriberInterface {
     foreach ($updated_packages as $package_name => $staged_package) {
       // Only packages of the types 'drupal-module' or 'drupal-theme' that
       // start with 'drupal/' will have update XML from drupal.org.
-      if (!in_array($staged_package->type, ['drupal-module', 'drupal-theme'], TRUE)
-         || !str_starts_with($package_name, 'drupal/')) {
+      if (!\in_array($staged_package->type, ['drupal-module', 'drupal-theme'], TRUE)
+         || !\str_starts_with($package_name, 'drupal/')) {
         continue;
       }
       $project_name = $staged[$package_name]->getProjectName();
@@ -106,7 +106,7 @@ final class SupportedReleaseValidator implements EventSubscriberInterface {
     }
     if ($unsupported_packages) {
       $summary = $this->formatPlural(
-        count($unsupported_packages),
+        \count($unsupported_packages),
         'Cannot update because the following project version is not in the list of installable releases.',
         'Cannot update because the following project versions are not in the list of installable releases.'
       );
@@ -115,11 +115,11 @@ final class SupportedReleaseValidator implements EventSubscriberInterface {
     if ($unknown_packages) {
       $event->addError([
         $this->formatPlural(
-          count($unknown_packages),
+          \count($unknown_packages),
           'Cannot update because the following new or updated Drupal package does not have project information: @unknown_packages',
           'Cannot update because the following new or updated Drupal packages do not have project information: @unknown_packages',
           [
-            '@unknown_packages' => implode(', ', $unknown_packages),
+            '@unknown_packages' => \implode(', ', $unknown_packages),
           ],
         ),
       ]);

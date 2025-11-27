@@ -46,11 +46,11 @@ class ViewsConfigUpdaterTest extends BrowserTestBase {
       ->condition('name', 'core.extension')
       ->execute()
       ->fetchField();
-    $extensions = unserialize($extensions);
+    $extensions = \unserialize($extensions);
     $extensions['module']['views_test_config_updater'] = 0;
     $connection->update('config')
       ->fields([
-        'data' => serialize($extensions),
+        'data' => \serialize($extensions),
       ])
       ->condition('collection', '')
       ->condition('name', 'core.extension')

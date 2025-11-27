@@ -78,7 +78,7 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
     }
     /** @var \Drupal\Core\File\MimeType\MimeTypeMapInterface $mime_type_map */
     $mime_type_map = \Drupal::service(MimeTypeMapInterface::class);
-    $extension_list = array_filter(preg_split('/\s+/', $field_definition->getSetting('file_extensions')));
+    $extension_list = \array_filter(\preg_split('/\s+/', $field_definition->getSetting('file_extensions')));
 
     foreach ($extension_list as $extension) {
       $mime_type = $mime_type_map->getMimeTypeForExtension($extension);

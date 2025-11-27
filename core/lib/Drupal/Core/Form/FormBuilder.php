@@ -783,7 +783,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       //   call, update the build id of the calling form.
       $hx_target = $current_request_headers->get('hx-target');
       $hx_trigger = $current_request_headers->get('hx-trigger');
-      $target_is_form = str_ends_with($hx_target ?? '', '-form');
+      $target_is_form = \str_ends_with($hx_target ?? '', '-form');
       if (!$target_is_form || ($target_is_form && $hx_target !== $hx_trigger)) {
         (new Htmx())
           ->swapOob('outerHTML:input[name="form_build_id"][value="' . $old_build_id . '"]')
@@ -908,7 +908,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     // Prevent cross site requests via the Form API by using an absolute URL
     // when the request uri starts with multiple slashes.
-    if (str_starts_with($request_uri, '//')) {
+    if (\str_starts_with($request_uri, '//')) {
       $request_uri = $request->getUri();
     }
 
@@ -1062,7 +1062,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     if (isset($element['#process']) && !$element['#processed']) {
       foreach ($element['#process'] as $callback) {
         $complete_form = &$form_state->getCompleteForm();
-        $element = call_user_func_array($form_state->prepareCallback($callback), [
+        $element = \call_user_func_array($form_state->prepareCallback($callback), [
           &$element,
           &$form_state,
           &$complete_form,

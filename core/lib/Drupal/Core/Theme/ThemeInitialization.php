@@ -143,12 +143,12 @@ class ThemeInitialization implements ThemeInitializationInterface {
   public function loadActiveTheme(ActiveTheme $active_theme) {
     // Initialize the theme.
     if ($engine = $active_theme->getEngine()) {
-      if (!$this->themeEngines->has($engine) && $active_theme->getOwner() && file_exists($this->root . '/' . $active_theme->getOwner())) {
-        @trigger_error(sprintf('Using .engine files for theme engines is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Convert %s.engine to a service. See https://www.drupal.org/node/3547356', $engine), E_USER_DEPRECATED);
+      if (!$this->themeEngines->has($engine) && $active_theme->getOwner() && \file_exists($this->root . '/' . $active_theme->getOwner())) {
+        @\trigger_error(\sprintf('Using .engine files for theme engines is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Convert %s.engine to a service. See https://www.drupal.org/node/3547356', $engine), E_USER_DEPRECATED);
         // Include the engine.
         include_once $this->root . '/' . $active_theme->getOwner();
       }
-      foreach (array_reverse($active_theme->getBaseThemeExtensions()) as $base) {
+      foreach (\array_reverse($active_theme->getBaseThemeExtensions()) as $base) {
         $base->load();
       }
       $active_theme->getExtension()->load();

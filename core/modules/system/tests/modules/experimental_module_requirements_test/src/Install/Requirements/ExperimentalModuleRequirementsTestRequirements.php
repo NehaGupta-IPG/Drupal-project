@@ -20,7 +20,7 @@ class ExperimentalModuleRequirementsTestRequirements implements InstallRequireme
     if (\Drupal::state()->get('experimental_module_requirements_test_requirements', FALSE)) {
       $requirements['experimental_module_requirements_test_requirements'] = [
         'severity' => RequirementSeverity::Error,
-        'description' => t('The Experimental Test Requirements module can not be installed.'),
+        'description' => \t('The Experimental Test Requirements module can not be installed.'),
       ];
     }
     return $requirements;

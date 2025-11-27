@@ -38,10 +38,10 @@ class WritableFileSystemValidatorTest extends PackageManagerKernelTestBase {
    */
   public static function providerWritable(): array {
     // @see \Drupal\Tests\package_manager\Traits\ValidationTestTrait::resolvePlaceholdersInArrayValuesWithRealPaths()
-    $drupal_root_error = t('The Drupal directory "<PROJECT_ROOT>/web" is not writable.');
-    $vendor_error = t('The vendor directory "<VENDOR_DIR>" is not writable.');
-    $project_root_error = t('The project root directory "<PROJECT_ROOT>" is not writable.');
-    $summary = t('The file system is not writable.');
+    $drupal_root_error = \t('The Drupal directory "<PROJECT_ROOT>/web" is not writable.');
+    $vendor_error = \t('The vendor directory "<VENDOR_DIR>" is not writable.');
+    $project_root_error = \t('The project root directory "<PROJECT_ROOT>" is not writable.');
+    $summary = \t('The file system is not writable.');
     $writable_permission = 0777;
     $non_writable_permission = 0550;
 
@@ -164,7 +164,7 @@ class WritableFileSystemValidatorTest extends PackageManagerKernelTestBase {
         // During pre-apply we don't care whether the staging root is writable.
         /** @var \Drupal\package_manager_bypass\MockPathLocator $path_locator */
         $path_locator = $this->container->get(PathLocator::class);
-        $this->assertTrue(chmod($path_locator->getStagingRoot(), 0550));
+        $this->assertTrue(\chmod($path_locator->getStagingRoot(), 0550));
       },
     );
 
@@ -193,17 +193,17 @@ class WritableFileSystemValidatorTest extends PackageManagerKernelTestBase {
     // Create the web root directory, if necessary.
     if (!empty($relative_web_root)) {
       $web_root .= '/' . $relative_web_root;
-      mkdir($web_root);
+      \mkdir($web_root);
     }
     $path_locator->setPaths($project_root, $vendor_dir, $relative_web_root, $path_locator->getStagingRoot());
 
     // We need to set the vendor directory and web root permissions first
     // because they may be located inside the project root.
-    $this->assertTrue(chmod($vendor_dir, $vendor_permissions));
+    $this->assertTrue(\chmod($vendor_dir, $vendor_permissions));
     if ($project_root !== $web_root) {
-      $this->assertTrue(chmod($web_root, $web_root_permissions));
+      $this->assertTrue(\chmod($web_root, $web_root_permissions));
     }
-    $this->assertTrue(chmod($project_root, $root_permissions));
+    $this->assertTrue(\chmod($project_root, $root_permissions));
   }
 
   /**
@@ -215,7 +215,7 @@ class WritableFileSystemValidatorTest extends PackageManagerKernelTestBase {
   public static function providerStagingRootPermissions(): array {
     $writable_permission = 0777;
     $non_writable_permission = 0550;
-    $summary = t('The file system is not writable.');
+    $summary = \t('The file system is not writable.');
     return [
       'writable stage root exists' => [
         $writable_permission,
@@ -225,14 +225,14 @@ class WritableFileSystemValidatorTest extends PackageManagerKernelTestBase {
       'write-protected stage root exists' => [
         $non_writable_permission,
         [
-          ValidationResult::createError([t('The stage root directory "<STAGE_ROOT>" is not writable.')], $summary),
+          ValidationResult::createError([\t('The stage root directory "<STAGE_ROOT>" is not writable.')], $summary),
         ],
         FALSE,
       ],
       'stage root directory does not exist, parent directory not writable' => [
         $non_writable_permission,
         [
-          ValidationResult::createError([t('The stage root directory will not able to be created at "<STAGE_ROOT_PARENT>".')], $summary),
+          ValidationResult::createError([\t('The stage root directory will not able to be created at "<STAGE_ROOT_PARENT>".')], $summary),
         ],
         TRUE,
       ],
@@ -258,9 +258,9 @@ class WritableFileSystemValidatorTest extends PackageManagerKernelTestBase {
     if ($delete_staging_root) {
       $fs = new Filesystem();
       $fs->remove($dir);
-      $dir = dirname($dir);
+      $dir = \dirname($dir);
     }
-    $this->assertTrue(chmod($dir, $permissions));
+    $this->assertTrue(\chmod($dir, $permissions));
     $this->assertStatusCheckResults($expected_results);
     $this->assertResults($expected_results, PreCreateEvent::class);
   }

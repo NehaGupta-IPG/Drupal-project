@@ -416,7 +416,7 @@ abstract class EntityBase implements EntityInterface {
     // Check if this is an entity bundle.
     if ($this->getEntityType()->getBundleOf()) {
       // Throw an exception if the bundle ID is longer than 32 characters.
-      if (mb_strlen($this->id()) > EntityTypeInterface::BUNDLE_MAX_LENGTH) {
+      if (\mb_strlen($this->id()) > EntityTypeInterface::BUNDLE_MAX_LENGTH) {
         throw new ConfigEntityIdLengthException("Attempt to create a bundle with an ID longer than " . EntityTypeInterface::BUNDLE_MAX_LENGTH . " characters: " . $this->id() . ".");
       }
     }
@@ -710,7 +710,7 @@ abstract class EntityBase implements EntityInterface {
    */
   public function __get($name) {
     if ($name == 'original') {
-      @trigger_error("Getting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::getOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
+      @\trigger_error("Getting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::getOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
       return $this->getOriginal();
     }
     return $this->$name ?? NULL;
@@ -721,7 +721,7 @@ abstract class EntityBase implements EntityInterface {
    */
   public function __set($name, $value) {
     if ($name == 'original') {
-      @trigger_error("Setting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::setOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
+      @\trigger_error("Setting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::setOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
       $this->setOriginal($value);
       return;
     }
@@ -733,7 +733,7 @@ abstract class EntityBase implements EntityInterface {
    */
   public function __isset($name) {
     if ($name == 'original') {
-      @trigger_error("Checking for the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::getOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
+      @\trigger_error("Checking for the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::getOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
       return $this->getOriginal();
     }
     return isset($this->$name);
@@ -744,7 +744,7 @@ abstract class EntityBase implements EntityInterface {
    */
   public function __unset($name) {
     if ($name == 'original') {
-      @trigger_error("Unsetting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::setOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
+      @\trigger_error("Unsetting the original property is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Entity\EntityInterface::setOriginal() instead. See https://www.drupal.org/node/3295826", E_USER_DEPRECATED);
       $this->setOriginal(NULL);
       return;
     }

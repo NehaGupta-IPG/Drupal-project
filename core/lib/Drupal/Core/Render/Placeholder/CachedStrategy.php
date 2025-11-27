@@ -45,12 +45,12 @@ class CachedStrategy implements PlaceholderStrategyInterface {
       }
     }
     if ($sets) {
-      $cached = $this->renderCache->getMultiple(...array_merge($sets));
+      $cached = $this->renderCache->getMultiple(...\array_merge($sets));
       if ($cached) {
         $cached = $this->processNestedPlaceholders($cached);
         foreach ($placeholders as $key => $placeholder) {
           if (!empty($placeholder['#attached']['placeholders'])) {
-            $placeholders[$key]['#attached']['placeholders'] = array_replace($placeholder['#attached']['placeholders'], $cached);
+            $placeholders[$key]['#attached']['placeholders'] = \array_replace($placeholder['#attached']['placeholders'], $cached);
           }
         }
       }

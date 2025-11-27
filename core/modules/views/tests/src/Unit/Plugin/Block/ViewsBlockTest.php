@@ -232,8 +232,8 @@ class ViewsBlockTest extends UnitTestCase {
     $plugin->setContext('context_name', $blockContext);
 
     // Assertions.
-    $this->assertEmpty(array_diff(Cache::mergeTags($viewCacheTags, $blockCacheTags), $plugin->getCacheTags()));
-    $this->assertEmpty(array_diff(Cache::mergeContexts($viewCacheContexts, $blockCacheContexts), $plugin->getCacheContexts()));
+    $this->assertEmpty(\array_diff(Cache::mergeTags($viewCacheTags, $blockCacheTags), $plugin->getCacheTags()));
+    $this->assertEmpty(\array_diff(Cache::mergeContexts($viewCacheContexts, $blockCacheContexts), $plugin->getCacheContexts()));
     $this->assertEquals($expectedCacheMaxAge, $plugin->getCacheMaxAge());
   }
 

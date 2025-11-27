@@ -59,7 +59,7 @@ class EntityAccessDeniedHttpException extends CacheableAccessDeniedHttpException
    *   The code.
    */
   public function __construct($entity, AccessResultInterface $entity_access, $pointer, $message = 'The current user is not allowed to GET the selected resource.', $relationship_field = NULL, ?\Throwable $previous = NULL, $code = 0) {
-    assert(is_null($entity) || $entity instanceof EntityInterface);
+    \assert(\is_null($entity) || $entity instanceof EntityInterface);
     parent::__construct(CacheableMetadata::createFromObject($entity_access), $message, $previous, $code);
     $error = [
       'entity' => $entity,

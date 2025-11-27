@@ -1462,9 +1462,9 @@ class DateRangeFieldTest extends DateTestBase {
 
     $this->drupalGet('entity_test/add');
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
-    $this->assertSession()->pageTextContains(sprintf('entity_test %d has been created.', $id));
+    $this->assertSession()->pageTextContains(\sprintf('entity_test %d has been created.', $id));
 
     // Now set display options.
     $this->displayOptions = [

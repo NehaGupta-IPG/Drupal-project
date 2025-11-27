@@ -27,7 +27,7 @@ trait ExecTrait {
    *   Standard output from the command
    */
   protected function mustExec($cmd, $cwd, array $env = [], string &$error_output = ''): string {
-    $process = Process::fromShellCommandline($cmd, $cwd, $env + ['PATH' => getenv('PATH'), 'HOME' => getenv('HOME')]);
+    $process = Process::fromShellCommandline($cmd, $cwd, $env + ['PATH' => \getenv('PATH'), 'HOME' => \getenv('HOME')]);
     $process->setTimeout(300)->setIdleTimeout(300)->run();
     $exitCode = $process->getExitCode();
     if (0 != $exitCode) {

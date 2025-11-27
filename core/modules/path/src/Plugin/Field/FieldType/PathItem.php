@@ -61,7 +61,7 @@ class PathItem extends FieldItemBase {
   public function preSave() {
     $alias = $this->get('alias')->getValue();
     if ($alias !== NULL) {
-      $this->set('alias', trim($alias));
+      $this->set('alias', \trim($alias));
     }
   }
 
@@ -99,7 +99,7 @@ class PathItem extends FieldItemBase {
           $query->condition($field, $value);
         }
         $ids = $query->execute();
-        $pid = $ids ? reset($ids) : $pid;
+        $pid = $ids ? \reset($ids) : $pid;
       }
 
       if (!$pid) {

@@ -51,7 +51,7 @@ class EntityRouteHelper {
    *   TRUE if the content entity route condition is met, FALSE otherwise.
    */
   public function isContentEntityRoute(): bool {
-    return array_key_exists($this->routeMatch->getRouteObject()->getPath(), $this->getContentEntityPaths());
+    return \array_key_exists($this->routeMatch->getRouteObject()->getPath(), $this->getContentEntityPaths());
   }
 
   public function getContentEntityFromRoute(): ?ContentEntityInterface {
@@ -99,7 +99,7 @@ class EntityRouteHelper {
     foreach ($entity_types as $entity_type) {
       if ($entity_type->entityClassImplements(ContentEntityInterface::class)) {
         $entity_paths = $this->getContentEntityTypePaths($entity_type);
-        $content_entity_paths = array_merge($content_entity_paths, $entity_paths);
+        $content_entity_paths = \array_merge($content_entity_paths, $entity_paths);
       }
     }
 
@@ -116,11 +116,11 @@ class EntityRouteHelper {
    *   Array containing the paths for the given content entity type.
    */
   protected function getContentEntityTypePaths(EntityTypeInterface $entity_type): array {
-    $paths = array_filter($entity_type->getLinkTemplates(), fn ($template) => $template !== 'collection', ARRAY_FILTER_USE_KEY);
+    $paths = \array_filter($entity_type->getLinkTemplates(), fn ($template) => $template !== 'collection', ARRAY_FILTER_USE_KEY);
     if ($this->isLayoutBuilderEntityType($entity_type)) {
       $paths[] = $entity_type->getLinkTemplate('canonical') . '/layout';
     }
-    return array_fill_keys($paths, $entity_type->id());
+    return \array_fill_keys($paths, $entity_type->id());
   }
 
   /**

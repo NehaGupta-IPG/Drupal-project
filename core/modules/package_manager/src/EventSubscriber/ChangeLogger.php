@@ -79,7 +79,7 @@ final class ChangeLogger implements EventSubscriberInterface, LoggerAwareInterfa
     // There could be multiple 'require' operations, so overlay the requested
     // packages from the current operation onto the requested packages from any
     // previous 'require' operation.
-    $requested_packages = array_merge(
+    $requested_packages = \array_merge(
       $event->sandboxManager->getMetadata(static::REQUESTED_PACKAGES_KEY) ?? [],
       $event->getRuntimePackages(),
       $event->getDevPackages(),
@@ -111,7 +111,7 @@ final class ChangeLogger implements EventSubscriberInterface, LoggerAwareInterfa
     $requested_packages = $event->sandboxManager->getMetadata(static::REQUESTED_PACKAGES_KEY) ?? [];
     // Sort the requested packages by name, to make it easier to review a large
     // change list.
-    ksort($requested_packages, SORT_NATURAL);
+    \ksort($requested_packages, SORT_NATURAL);
     foreach ($requested_packages as $name => $constraint) {
       $installed_version = $installed_at_start[$name]?->version;
       if ($installed_version === NULL) {
@@ -137,7 +137,7 @@ final class ChangeLogger implements EventSubscriberInterface, LoggerAwareInterfa
     // dispatches PostRequireEvent.
     if ($requested_log) {
       $message = $this->t("Requested changes:\n@change_list", [
-        '@change_list' => implode("\n", array_map('strval', $requested_log)),
+        '@change_list' => \implode("\n", \array_map('strval', $requested_log)),
       ]);
       $this->logger?->info($message);
     }
@@ -171,7 +171,7 @@ final class ChangeLogger implements EventSubscriberInterface, LoggerAwareInterfa
       $applied_log[] = $this->t('- Uninstalled @name', ['@name' => $name]);
     }
     $message = $this->t("Applied changes:\n@change_list", [
-      '@change_list' => implode("\n", array_map('strval', $applied_log)),
+      '@change_list' => \implode("\n", \array_map('strval', $applied_log)),
     ]);
     $this->logger?->info($message);
   }

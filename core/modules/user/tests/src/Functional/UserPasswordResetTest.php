@@ -183,8 +183,8 @@ class UserPasswordResetTest extends BrowserTestBase {
     // Check that the email message body does not contain HTML entities
     // Assume the most recent email.
     $_emails = $this->drupalGetMails();
-    $email = end($_emails);
-    $this->assertEquals(htmlspecialchars_decode($email['body']), $email['body'], 'Email body contains HTML entities');
+    $email = \end($_emails);
+    $this->assertEquals(\htmlspecialchars_decode($email['body']), $email['body'], 'Email body contains HTML entities');
     // Change site name to 'Drupal'
     $config->set('name', "Drupal")->save();
     $this->rebuildContainer();

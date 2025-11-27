@@ -710,7 +710,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   if that header should be absent. Defaults to FALSE.
    */
   protected function assertResourceResponse($expected_status_code, $expected_document, ResponseInterface $response, $expected_cache_tags = FALSE, $expected_cache_contexts = FALSE, $expected_page_cache_header_value = NULL, $expected_dynamic_page_cache_header_value = FALSE) {
-    $this->assertSame($expected_status_code, $response->getStatusCode(), var_export(Json::decode((string) $response->getBody()), TRUE));
+    $this->assertSame($expected_status_code, $response->getStatusCode(), \var_export(Json::decode((string) $response->getBody()), TRUE));
     if ($expected_status_code === 204) {
       // DELETE responses should not include a Content-Type header. But Apache
       // sets it to 'text/html' by default. We also cannot detect the presence
@@ -844,7 +844,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   if that header should be absent. Defaults to FALSE.
    */
   protected function assertResourceErrorResponse($expected_status_code, $expected_message, $via_link, ResponseInterface $response, $pointer = FALSE, $expected_cache_tags = FALSE, $expected_cache_contexts = FALSE, $expected_page_cache_header_value = NULL, $expected_dynamic_page_cache_header_value = FALSE) {
-    assert(is_null($via_link) || $via_link instanceof Url);
+    \assert(\is_null($via_link) || $via_link instanceof Url);
     $expected_error = [];
     if (!empty(Response::$statusTexts[$expected_status_code])) {
       $expected_error['title'] = Response::$statusTexts[$expected_status_code];
@@ -942,7 +942,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     if (!static::$anonymousUsersCanViewLabels) {
       $expected_403_cacheability = $this->getExpectedUnauthorizedAccessCacheability();
       $reason = $this->getExpectedUnauthorizedAccessMessage('GET');
-      $message = trim("The current user is not allowed to GET the selected resource. $reason");
+      $message = \trim("The current user is not allowed to GET the selected resource. $reason");
       $this->assertResourceErrorResponse(403, $message, $url, $response, '/data', $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', TRUE);
       $this->assertArrayNotHasKey('Link', $response->getHeaders());
     }
@@ -1000,7 +1000,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $expected_document = $this->getExpectedDocument();
 
     if ($this->entity->getEntityType()->isRevisionable()) {
-      $rel_working_copy_url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
+      $rel_working_copy_url = Url::fromRoute(\sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
       $rel_working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
       $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
     }
@@ -1078,7 +1078,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $url = Url::fromRoute(\sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $random_uuid]);
     $response = $this->request('GET', $url, $request_options);
     $message_url = clone $url;
-    $path = str_replace(
+    $path = \str_replace(
       $random_uuid,
      '{entity}',
       $message_url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString(),
@@ -2620,7 +2620,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     // Then check for child arrays.
     foreach ($array as &$value) {
-      if (is_array($value)) {
+      if (\is_array($value)) {
         static::recursiveKsort($value);
       }
     }
@@ -2735,7 +2735,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // This tests sparse field sets on included entities.
       if (\str_starts_with($type, 'nested')) {
         $this->grantPermissionsToTestedRole(['access user profiles']);
-        $query['fields[user--user]'] = implode(',', $field_set);
+        $query['fields[user--user]'] = \implode(',', $field_set);
         $query['include'] = $this->entity->getEntityType()->getKey('owner');
         $owner = $this->entity->getOwner();
         $owner_resource = static::toResourceIdentifier($owner);
@@ -3060,7 +3060,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // not be a link to the latest version.
     unset($expected_document['data']['links']['latest-version']);
     $expected_document = $this->alterExpectedDocumentForRevision($expected_document);
-    $expected_cache_tags = array_unique([...$expected_cache_tags, ...$workflow->getCacheTags()]);
+    $expected_cache_tags = \array_unique([...$expected_cache_tags, ...$workflow->getCacheTags()]);
     $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cache_contexts, NULL, TRUE);
     // Fetch the collection URL using the `latest-version` version argument.
     $actual_response = $this->request('GET', $rel_latest_version_collection_url, $request_options);
@@ -3154,7 +3154,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_cache_tags = Cache::mergeTags($expected_cacheability->getCacheTags(), $entity->getCacheTags());
       $expected_cache_contexts = $expected_cacheability->getCacheContexts();
       $detail = 'The current user is not allowed to GET the selected resource. The user does not have access to the requested version.';
-      $message = $result instanceof AccessResultReasonInterface ? trim($detail . ' ' . $result->getReason()) : $detail;
+      $message = $result instanceof AccessResultReasonInterface ? \trim($detail . ' ' . $result->getReason()) : $detail;
       $this->assertResourceErrorResponse(403, $message, $url, $actual_response, '/data', $expected_cache_tags, $expected_cache_contexts, NULL, TRUE);
       // On the collection URL, we should expect to see the draft omitted from
       // the collection.
@@ -3191,7 +3191,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $expected_document['data']['links']['latest-version']['href'] = $rel_latest_version_url->setAbsolute()->toString();
     $expected_cache_tags = $this->getExpectedCacheTags();
     $expected_cache_contexts = $this->getExpectedCacheContexts();
-    $expected_cache_tags = array_unique([...$expected_cache_tags, ...$workflow->getCacheTags()]);
+    $expected_cache_tags = \array_unique([...$expected_cache_tags, ...$workflow->getCacheTags()]);
     $this->assertResourceResponse(200, $expected_document, $actual_response, Cache::mergeTags($expected_cache_tags, $this->getExtraRevisionCacheTags()), $expected_cache_contexts, NULL, TRUE);
     // And the collection response should also have the latest revision.
     $actual_response = $this->request('GET', $rel_working_copy_collection_url, $request_options);
@@ -3251,7 +3251,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_cacheability = $expected_response->getCacheableMetadata();
       $expected_document['errors'][0]['links']['via']['href'] = $relationship_url->toString();
       // Only add node type check tags for non-default revisions.
-      $expected_cache_tags = !in_array($relationship_type, $default_revision_types, TRUE) ? Cache::mergeTags($expected_cacheability->getCacheTags(), $this->getExtraRevisionCacheTags()) : $expected_cacheability->getCacheTags();
+      $expected_cache_tags = !\in_array($relationship_type, $default_revision_types, TRUE) ? Cache::mergeTags($expected_cacheability->getCacheTags(), $this->getExtraRevisionCacheTags()) : $expected_cacheability->getCacheTags();
       // @todo Remove this in https://www.drupal.org/project/drupal/issues/3451483.
       $actual_response = $actual_response->withoutHeader('X-Drupal-Dynamic-Cache');
       $this->assertResourceResponse(403, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts());
@@ -3287,7 +3287,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_document['links']['self']['href'] = $relationship_url->setAbsolute()->toString();
       $expected_cacheability = $expected_response->getCacheableMetadata();
       // Only add node type check tags for non-default revisions.
-      $expected_cache_tags = !in_array($relationship_type, $default_revision_types, TRUE) ? Cache::mergeTags($expected_cacheability->getCacheTags(), $this->getExtraRevisionCacheTags()) : $expected_cacheability->getCacheTags();
+      $expected_cache_tags = !\in_array($relationship_type, $default_revision_types, TRUE) ? Cache::mergeTags($expected_cacheability->getCacheTags(), $this->getExtraRevisionCacheTags()) : $expected_cacheability->getCacheTags();
       $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), NULL, TRUE);
       // Request the related route.
       $actual_response = $this->request('GET', $related_url, $request_options);
@@ -3295,7 +3295,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_document = $expected_response->getResponseData();
       $expected_cacheability = $expected_response->getCacheableMetadata();
       $expected_document['links']['self']['href'] = $related_url->toString();
-      $expected_cache_tags = !in_array($relationship_type, $default_revision_types, TRUE) ? Cache::mergeTags($expected_cacheability->getCacheTags(), $this->getExtraRevisionCacheTags()) : $expected_cacheability->getCacheTags();
+      $expected_cache_tags = !\in_array($relationship_type, $default_revision_types, TRUE) ? Cache::mergeTags($expected_cacheability->getCacheTags(), $this->getExtraRevisionCacheTags()) : $expected_cacheability->getCacheTags();
       $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), NULL, TRUE);
     }
 
@@ -3646,14 +3646,14 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $user_role->revokePermission($permission);
     }
     $user_role->save();
-    assert([] === $user_role->getPermissions(), 'The anonymous user role has no permissions at all.');
+    \assert([] === $user_role->getPermissions(), 'The anonymous user role has no permissions at all.');
 
     $user_role = Role::load(RoleInterface::AUTHENTICATED_ID);
     foreach ($user_role->getPermissions() as $permission) {
       $user_role->revokePermission($permission);
     }
     $user_role->save();
-    assert([] === $user_role->getPermissions(), 'The authenticated user role has no permissions at all.');
+    \assert([] === $user_role->getPermissions(), 'The authenticated user role has no permissions at all.');
   }
 
   /**
@@ -3670,7 +3670,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected function generateDynamicPageCacheExpectedHeaderValue(array $cache_context, ?int $cache_max_age = NULL): string {
     // MISS or UNCACHEABLE (poor cacheability) depends on data.
     // It must not be HIT.
-    return $cache_max_age === 0 || !empty(array_intersect(['user', 'session'], $cache_context)) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+    return $cache_max_age === 0 || !empty(\array_intersect(['user', 'session'], $cache_context)) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
   }
 
 }

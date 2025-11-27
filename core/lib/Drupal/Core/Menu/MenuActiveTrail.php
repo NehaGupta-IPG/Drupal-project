@@ -55,7 +55,7 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     $this->menuLinkManager = $menu_link_manager;
     $this->routeMatch = $route_match;
     if ($this->pathMatcher === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $pathMatcher argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3523495', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' without the $pathMatcher argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3523495', E_USER_DEPRECATED);
       $this->pathMatcher = \Drupal::service('path.matcher');
     }
   }
@@ -164,12 +164,12 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
     // @todo Combine the two calls to loadLinksByRoute() in
     // https://www.drupal.org/project/drupal/issues/3523497
     if ($this->pathMatcher->isFrontPage()) {
-      $links = array_merge($links, $this->menuLinkManager->loadLinksByRoute('<front>', [], $menu_name));
+      $links = \array_merge($links, $this->menuLinkManager->loadLinksByRoute('<front>', [], $menu_name));
     }
 
     // Select the first matching link.
     if ($links) {
-      $found = reset($links);
+      $found = \reset($links);
     }
     return $found;
   }

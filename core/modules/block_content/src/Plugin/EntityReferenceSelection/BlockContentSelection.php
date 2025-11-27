@@ -37,7 +37,7 @@ class BlockContentSelection extends DefaultSelection {
   public function validateReferenceableNewEntities(array $entities) {
     $entities = parent::validateReferenceableNewEntities($entities);
     // Mirror the conditions checked in buildEntityQuery().
-    return array_filter($entities, static fn (BlockContentInterface $blockContent) => $blockContent->isReusable());
+    return \array_filter($entities, static fn (BlockContentInterface $blockContent) => $blockContent->isReusable());
   }
 
 }

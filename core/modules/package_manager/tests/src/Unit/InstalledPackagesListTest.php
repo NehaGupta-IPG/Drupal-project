@@ -86,13 +86,13 @@ class InstalledPackagesListTest extends UnitTestCase {
     ]);
 
     $added = $staged->getPackagesNotIn($active)->getArrayCopy();
-    $this->assertSame(['drupal/added'], array_keys($added));
+    $this->assertSame(['drupal/added'], \array_keys($added));
 
     $removed = $active->getPackagesNotIn($staged)->getArrayCopy();
-    $this->assertSame(['drupal/removed'], array_keys($removed));
+    $this->assertSame(['drupal/removed'], \array_keys($removed));
 
     $updated = $active->getPackagesWithDifferentVersionsIn($staged)->getArrayCopy();
-    $this->assertSame(['drupal/updated'], array_keys($updated));
+    $this->assertSame(['drupal/updated'], \array_keys($updated));
   }
 
   /**

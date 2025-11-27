@@ -406,7 +406,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    * @see https://www.drupal.org/node/3486781
    */
   public function defineExtraOptions(&$option) {
-    @trigger_error('defineExtraOptions() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method is no longer in use and should not be called. See https://www.drupal.org/node/3486781', E_USER_DEPRECATED);
+    @\trigger_error('defineExtraOptions() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method is no longer in use and should not be called. See https://www.drupal.org/node/3486781', E_USER_DEPRECATED);
   }
 
   /**
@@ -569,12 +569,12 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
-    if (isset($this->definition['access callback']) && function_exists($this->definition['access callback'])) {
+    if (isset($this->definition['access callback']) && \function_exists($this->definition['access callback'])) {
       // @todo when this is removed return FALSE.
       // See https://www.drupal.org/project/drupal/issues/3547724
-      @trigger_error('Passing the access callback using the array key is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3539918', E_USER_DEPRECATED);
-      if (isset($this->definition['access arguments']) && is_array($this->definition['access arguments'])) {
-        return call_user_func_array($this->definition['access callback'], [$account] + $this->definition['access arguments']);
+      @\trigger_error('Passing the access callback using the array key is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3539918', E_USER_DEPRECATED);
+      if (isset($this->definition['access arguments']) && \is_array($this->definition['access arguments'])) {
+        return \call_user_func_array($this->definition['access callback'], [$account] + $this->definition['access arguments']);
       }
       return $this->definition['access callback']($account);
     }
@@ -862,7 +862,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
     // Filter any empty matches (Like from '++' in a string) and reset the
     // array keys. 'strlen' is used as the filter callback so we do not lose
     // 0 values (would otherwise evaluate == FALSE).
-    $value = array_values(FilterArray::removeEmptyStrings($value));
+    $value = \array_values(FilterArray::removeEmptyStrings($value));
 
     if ($force_int) {
       $value = \array_map('intval', $value);

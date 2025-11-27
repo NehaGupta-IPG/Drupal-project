@@ -107,7 +107,7 @@ class ModulesUninstallForm extends FormBase {
 
     // Get a list of all available modules that can be uninstalled.
     $modules = $this->moduleExtensionList->getList();
-    $uninstallable = array_filter($modules, function ($module) {
+    $uninstallable = \array_filter($modules, function ($module) {
        return empty($module->info['required']) && $module->status;
     });
 
@@ -198,7 +198,7 @@ class ModulesUninstallForm extends FormBase {
       foreach (\array_keys($module->required_by) as $dependent) {
         if ($this->updateRegistry->getInstalledVersion($dependent) !== $this->updateRegistry::SCHEMA_UNINSTALLED) {
           $module_name = $modules[$dependent]->info['name'];
-          if ($dependent != strtolower(str_replace(' ', '_', $module_name))) {
+          if ($dependent != \strtolower(\str_replace(' ', '_', $module_name))) {
             $form['modules'][$module->getName()]['#required_by'][] = $module_name . " (" . $dependent . ")";
           }
           else {

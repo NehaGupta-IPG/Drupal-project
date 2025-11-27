@@ -352,7 +352,7 @@ class ModulesListForm extends FormBase {
 
     // Ensure this module is compatible with the currently installed version of
     // PHP.
-    if (version_compare(phpversion(), $module->info['php']) < 0) {
+    if (\version_compare(\phpversion(), $module->info['php']) < 0) {
       $compatible = FALSE;
       $required = $module->info['php'] . (\substr_count($module->info['php'], '.') < 2 ? '.*' : '');
       $reasons[] = $this->t('This module requires PHP version @php_required and is incompatible with PHP version @php_version.', [

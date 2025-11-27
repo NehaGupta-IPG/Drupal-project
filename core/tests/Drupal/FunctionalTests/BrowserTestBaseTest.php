@@ -494,7 +494,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
   public function testLocalTimeZone(): void {
     $expected = 'Australia/Sydney';
     // The 'Australia/Sydney' time zone is set in core/tests/bootstrap.php.
-    $this->assertEquals($expected, date_default_timezone_get());
+    $this->assertEquals($expected, \date_default_timezone_get());
 
     // The 'Australia/Sydney' time zone is also set in
     // FunctionalTestSetupTrait::initConfig().
@@ -611,10 +611,10 @@ class BrowserTestBaseTest extends BrowserTestBase {
     $object = (object) [
       'Aldebaran' => 'Betelgeuse',
     ];
-    dump($object);
-    dump('Alpheratz');
+    \dump($object);
+    \dump('Alpheratz');
 
-    $dumpString = json_encode(DebugDump::getDumps());
+    $dumpString = \json_encode(DebugDump::getDumps());
 
     $this->assertStringContainsString('BrowserTestBaseTest::testVarDump', $dumpString);
     $this->assertStringContainsString('Aldebaran', $dumpString);
@@ -637,7 +637,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
     $this->assertStringContainsString('</samp>}', $body);
 
     // Check that dump() in SUT did not leak into the test's dumps.
-    $this->assertSame($dumpString, json_encode(DebugDump::getDumps()));
+    $this->assertSame($dumpString, \json_encode(DebugDump::getDumps()));
   }
 
   /**

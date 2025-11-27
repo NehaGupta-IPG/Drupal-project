@@ -42,7 +42,7 @@ class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
         ],
         [
           ValidationResult::createError([
-            t('The stage directory has 2 instances of module.info.yml as compared to 1 in the active directory. This likely indicates that a duplicate extension was installed.'),
+            \t('The stage directory has 2 instances of module.info.yml as compared to 1 in the active directory. This likely indicates that a duplicate extension was installed.'),
           ]),
         ],
       ],
@@ -106,7 +106,7 @@ class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
         ],
         [
           ValidationResult::createError([
-            t('The stage directory has 2 instances of module.info.yml. This likely indicates that a duplicate extension was installed.'),
+            \t('The stage directory has 2 instances of module.info.yml. This likely indicates that a duplicate extension was installed.'),
           ]),
         ],
       ],
@@ -145,10 +145,10 @@ class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
         ],
         [
           ValidationResult::createError([
-            t('The stage directory has 3 instances of module2.info.yml as compared to 1 in the active directory. This likely indicates that a duplicate extension was installed.'),
+            \t('The stage directory has 3 instances of module2.info.yml as compared to 1 in the active directory. This likely indicates that a duplicate extension was installed.'),
           ]),
           ValidationResult::createError([
-            t('The stage directory has 2 instances of module1.info.yml as compared to 1 in the active directory. This likely indicates that a duplicate extension was installed.'),
+            \t('The stage directory has 2 instances of module1.info.yml as compared to 1 in the active directory. This likely indicates that a duplicate extension was installed.'),
           ]),
         ],
       ],
@@ -163,10 +163,10 @@ class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
         ],
         [
           ValidationResult::createError([
-            t('The stage directory has 3 instances of module2.info.yml. This likely indicates that a duplicate extension was installed.'),
+            \t('The stage directory has 3 instances of module2.info.yml. This likely indicates that a duplicate extension was installed.'),
           ]),
           ValidationResult::createError([
-            t('The stage directory has 2 instances of module1.info.yml. This likely indicates that a duplicate extension was installed.'),
+            \t('The stage directory has 2 instances of module1.info.yml. This likely indicates that a duplicate extension was installed.'),
           ]),
         ],
       ],
@@ -183,10 +183,10 @@ class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
         ],
         [
           ValidationResult::createError([
-            t('The stage directory has 3 instances of module2.info.yml. This likely indicates that a duplicate extension was installed.'),
+            \t('The stage directory has 3 instances of module2.info.yml. This likely indicates that a duplicate extension was installed.'),
           ]),
           ValidationResult::createError([
-            t('The stage directory has 2 instances of module1.info.yml as compared to 1 in the active directory. This likely indicates that a duplicate extension was installed.'),
+            \t('The stage directory has 2 instances of module1.info.yml as compared to 1 in the active directory. This likely indicates that a duplicate extension was installed.'),
           ]),
         ],
       ],
@@ -236,14 +236,14 @@ class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
    *   The path of the file to create.
    */
   private function createFileAtPath(string $root_directory, string $file_path): void {
-    $parts = explode(DIRECTORY_SEPARATOR, $file_path);
-    $filename = array_pop($parts);
-    $file_dir = str_replace($filename, '', $file_path);
+    $parts = \explode(DIRECTORY_SEPARATOR, $file_path);
+    $filename = \array_pop($parts);
+    $file_dir = \str_replace($filename, '', $file_path);
     $fs = new Filesystem();
-    if (!file_exists($file_dir)) {
+    if (!\file_exists($file_dir)) {
       $fs->mkdir($root_directory . $file_dir);
     }
-    file_put_contents($root_directory . $file_path, "name: SOME MODULE\ntype: module\n");
+    \file_put_contents($root_directory . $file_path, "name: SOME MODULE\ntype: module\n");
   }
 
 }

@@ -263,7 +263,7 @@ class Table extends FormElementBase {
           $row = ['select' => []] + $row;
           $row['select'] += [
             '#type' => $element['#multiple'] ? 'checkbox' : 'radio',
-            '#id' => HtmlUtility::getUniqueId('edit-' . implode('-', $element_parents)),
+            '#id' => HtmlUtility::getUniqueId('edit-' . \implode('-', $element_parents)),
             // @todo If rows happen to use numeric indexes instead of string
             //   keys, this results in a first row with $key === 0, which is
             //   always FALSE.
@@ -436,7 +436,7 @@ class Table extends FormElementBase {
     // hidden with the classes represented by the constants
     // RESPONSIVE_PRIORITY_MEDIUM and RESPONSIVE_PRIORITY_LOW, add the
     // tableresponsive behaviors.
-    if (count($element['#header']) && $element['#responsive']) {
+    if (\count($element['#header']) && $element['#responsive']) {
       $element['#attached']['library'][] = 'core/drupal.tableresponsive';
       // Add 'responsive-enabled' class to the table to identify it for JS.
       // This is needed to target tables constructed by this function.

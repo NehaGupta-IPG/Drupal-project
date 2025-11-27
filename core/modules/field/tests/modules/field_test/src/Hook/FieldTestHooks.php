@@ -191,7 +191,7 @@ class FieldTestHooks {
    */
   #[Hook('field_storage_config_create')]
   public function fieldStorageConfigCreate(FieldStorageConfigInterface $field_storage): void {
-    $args = func_get_args();
+    $args = \func_get_args();
     FieldTestHelper::memorize(__METHOD__, $args);
   }
 

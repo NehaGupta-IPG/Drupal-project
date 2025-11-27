@@ -47,7 +47,7 @@ class TestSandboxDatabaseUpdatesValidator extends BaseValidator {
   public function hasStagedUpdates(string $stage_dir, Extension $extension): bool {
     $extensions = $this->state->get(static::class);
     if (isset($extensions)) {
-      return in_array($extension->getName(), $extensions, TRUE);
+      return \in_array($extension->getName(), $extensions, TRUE);
     }
     return parent::hasStagedUpdates($stage_dir, $extension);
   }

@@ -52,13 +52,13 @@ class FilterSecurityKernelTest extends KernelTestBase {
 
     $this->assertSame(
       $expected,
-      (string) check_markup($text, 'kernel_filtered_html', '', []),
+      (string) \check_markup($text, 'kernel_filtered_html', '', []),
       'Expected filter result.'
     );
 
     $this->assertSame(
       $expected,
-      (string) check_markup($text, 'kernel_filtered_html', '', [FilterInterface::TYPE_HTML_RESTRICTOR]),
+      (string) \check_markup($text, 'kernel_filtered_html', '', [FilterInterface::TYPE_HTML_RESTRICTOR]),
       'Expected filter result, even when trying to skip security filters.'
     );
   }

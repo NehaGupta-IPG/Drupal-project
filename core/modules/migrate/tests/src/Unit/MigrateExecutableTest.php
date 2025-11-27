@@ -566,7 +566,7 @@ class MigrateExecutableTest extends MigrateTestCase {
    *   An ID map object prophecy.
    */
   public function getTestRollbackIdMap(array $items, array $source_id_keys, array $destination_id_keys): ObjectProphecy {
-    static::$idMapRecords = array_map(function (array $item) {
+    static::$idMapRecords = \array_map(function (array $item) {
       return $item + [
         'source_row_status' => '0',
         'rollback_action' => '0',

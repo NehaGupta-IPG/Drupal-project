@@ -77,7 +77,7 @@ class NavigationMenuLinkTreeManipulators {
     }
 
     $route_name = $element->link->getRouteName();
-    if (in_array($route_name, ['<nolink>', '<button>'])) {
+    if (\in_array($route_name, ['<nolink>', '<button>'])) {
       return FALSE;
     }
 
@@ -105,7 +105,7 @@ class NavigationMenuLinkTreeManipulators {
     // route uses that controller, do not add the overview link, because that
     // duplicates what is already in the navigation menu.
     try {
-      $controller = ltrim($this->routeProvider->getRouteByName($route_name)->getDefault('_controller') ?? '', "\\");
+      $controller = \ltrim($this->routeProvider->getRouteByName($route_name)->getDefault('_controller') ?? '', "\\");
       return $controller !== SystemController::class . '::systemAdminMenuBlockPage';
     }
     catch (RouteNotFoundException) {

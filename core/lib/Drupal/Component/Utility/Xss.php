@@ -295,9 +295,9 @@ class Xss {
           if (\preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
             $attribute_name = \strtolower($match[1]);
             $skip = (
-              in_array($attribute_name, ['style', 'srcdoc']) ||
-              str_starts_with($attribute_name, 'on') ||
-              str_starts_with($attribute_name, '-') ||
+              \in_array($attribute_name, ['style', 'srcdoc']) ||
+              \str_starts_with($attribute_name, 'on') ||
+              \str_starts_with($attribute_name, '-') ||
               // Ignore long attributes to avoid unnecessary processing
               // overhead.
               \strlen($attribute_name) > 96
@@ -311,7 +311,7 @@ class Xss {
             // such attributes.
             // @see \Drupal\Component\Utility\UrlHelper::filterBadProtocol()
             // @see https://www.w3.org/TR/html4/index/attributes.html
-            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') || in_array($attribute_name, [
+            $skip_protocol_filtering = \str_starts_with($attribute_name, 'data-') || \in_array($attribute_name, [
               'title',
               'alt',
               'rel',

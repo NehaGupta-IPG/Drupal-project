@@ -100,7 +100,7 @@ class LocaleHooks {
     // Changing the language settings impacts the interface: clear render cache.
     \Drupal::cache('render')->deleteAll();
     // Force JavaScript translation file re-creation for the new language.
-    _locale_invalidate_js($language->id());
+    \_locale_invalidate_js($language->id());
   }
 
   /**
@@ -113,7 +113,7 @@ class LocaleHooks {
     // Changing the language settings impacts the interface: clear render cache.
     \Drupal::cache('render')->deleteAll();
     // Force JavaScript translation file re-creation for the modified language.
-    _locale_invalidate_js($language->id());
+    \_locale_invalidate_js($language->id());
   }
 
   /**
@@ -125,14 +125,14 @@ class LocaleHooks {
     \Drupal::service('locale.storage')->deleteTranslations(['language' => $language->id()]);
     // Remove interface translation files.
     \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.bulk');
-    locale_translate_delete_translation_files([], [$language->id()]);
+    \locale_translate_delete_translation_files([], [$language->id()]);
     // Remove translated configuration objects.
     \Drupal::service('locale.config_manager')->deleteLanguageTranslations($language->id());
     // Changing the language settings impacts the interface:
-    _locale_invalidate_js($language->id());
+    \_locale_invalidate_js($language->id());
     \Drupal::cache('render')->deleteAll();
     // Clear locale translation caches.
-    locale_translation_status_delete_languages([$language->id()]);
+    \locale_translation_status_delete_languages([$language->id()]);
     \Drupal::cache()->delete('locale:' . $language->id());
   }
 
@@ -142,7 +142,7 @@ class LocaleHooks {
   #[Hook('modules_installed')]
   public function modulesInstalled($modules): void {
     $components['module'] = $modules;
-    locale_system_update($components);
+    \locale_system_update($components);
   }
 
   /**
@@ -151,7 +151,7 @@ class LocaleHooks {
   #[Hook('module_preuninstall')]
   public function modulePreuninstall($module): void {
     $components['module'] = [$module];
-    locale_system_remove($components);
+    \locale_system_remove($components);
   }
 
   /**
@@ -160,7 +160,7 @@ class LocaleHooks {
   #[Hook('themes_installed')]
   public function themesInstalled($themes): void {
     $components['theme'] = $themes;
-    locale_system_update($components);
+    \locale_system_update($components);
   }
 
   /**
@@ -169,7 +169,7 @@ class LocaleHooks {
   #[Hook('themes_uninstalled')]
   public function themesUninstalled($themes): void {
     $components['theme'] = $themes;
-    locale_system_remove($components);
+    \locale_system_remove($components);
   }
 
   /**
@@ -182,9 +182,9 @@ class LocaleHooks {
     // Update translations only when an update frequency was set by the admin
     // and a translatable language was set.
     // Update tasks are added to the queue here but processed by Drupal's cron.
-    if (\Drupal::config('locale.settings')->get('translation.update_interval_days') && locale_translatable_language_list()) {
+    if (\Drupal::config('locale.settings')->get('translation.update_interval_days') && \locale_translatable_language_list()) {
       \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.translation');
-      locale_cron_fill_queue();
+      \locale_cron_fill_queue();
     }
   }
 
@@ -214,7 +214,7 @@ class LocaleHooks {
     // Replace the placeholder file with the actual JS translation file.
     $placeholder_file = 'core/modules/locale/locale.translation.js';
     if (isset($javascript[$placeholder_file])) {
-      if ($translation_file = locale_js_translate($files, $language)) {
+      if ($translation_file = \locale_js_translate($files, $language)) {
         $js_translation_asset =& $javascript[$placeholder_file];
         $js_translation_asset['data'] = $translation_file;
         // @todo Remove this when https://www.drupal.org/node/1945262 lands.
@@ -252,21 +252,21 @@ class LocaleHooks {
   public function formLanguageAdminOverviewFormAlter(&$form, FormStateInterface $form_state) : void {
     $languages = $form['languages']['#languages'];
     $total_strings = \Drupal::service('locale.storage')->countStrings();
-    $stats = array_fill_keys(array_keys($languages), []);
+    $stats = \array_fill_keys(\array_keys($languages), []);
     // If we have source strings, count translations and calculate progress.
     if (!empty($total_strings)) {
       $translations = \Drupal::service('locale.storage')->countTranslations();
       foreach ($translations as $langcode => $translated) {
         $stats[$langcode]['translated'] = $translated;
         if ($translated > 0) {
-          $stats[$langcode]['ratio'] = round($translated / $total_strings * 100, 2);
+          $stats[$langcode]['ratio'] = \round($translated / $total_strings * 100, 2);
         }
       }
     }
-    array_splice($form['languages']['#header'], -1, 0, ['translation-interface' => $this->t('Interface translation')]);
+    \array_splice($form['languages']['#header'], -1, 0, ['translation-interface' => $this->t('Interface translation')]);
     foreach ($languages as $langcode => $language) {
       $stats[$langcode] += ['translated' => 0, 'ratio' => 0];
-      if (!$language->isLocked() && locale_is_translatable($langcode)) {
+      if (!$language->isLocked() && \locale_is_translatable($langcode)) {
         $form['languages'][$langcode]['locale_statistics'] = Link::fromTextAndUrl($this->t('@translated/@total (@ratio%)', [
           '@translated' => $stats[$langcode]['translated'],
           '@total' => $total_strings,

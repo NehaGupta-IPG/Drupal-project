@@ -113,7 +113,7 @@ class EntityTypedDataDefinitionTest extends KernelTestBase {
     $field_definitions = $entity_definition->getPropertyDefinitions();
     // Comparison should ignore the internal static cache, so compare the
     // serialized objects instead.
-    $this->assertEquals(serialize(\Drupal::service('entity_field.manager')->getBaseFieldDefinitions('entity_test_with_bundle')), serialize($field_definitions));
+    $this->assertEquals(\serialize(\Drupal::service('entity_field.manager')->getBaseFieldDefinitions('entity_test_with_bundle')), \serialize($field_definitions));
     $this->assertEquals('field_item:string', $entity_definition->getPropertyDefinition('name')->getItemDefinition()->getDataType());
     $this->assertNull($entity_definition->getMainPropertyName());
     $this->assertNull($entity_definition->getPropertyDefinition('invalid'));
@@ -125,8 +125,8 @@ class EntityTypedDataDefinitionTest extends KernelTestBase {
 
     // Test that the definition factory creates the right definitions for all
     // entity data types variants.
-    $this->assertEquals(serialize(EntityDataDefinition::create()), serialize($this->typedDataManager->createDataDefinition('entity')));
-    $this->assertEquals(serialize(EntityDataDefinition::create('entity_test_with_bundle')), serialize($this->typedDataManager->createDataDefinition('entity:entity_test_with_bundle')));
+    $this->assertEquals(\serialize(EntityDataDefinition::create()), \serialize($this->typedDataManager->createDataDefinition('entity')));
+    $this->assertEquals(\serialize(EntityDataDefinition::create('entity_test_with_bundle')), \serialize($this->typedDataManager->createDataDefinition('entity:entity_test_with_bundle')));
 
     // Config entities don't support typed data.
     $entity_definition = EntityDataDefinition::create('entity_test_bundle');

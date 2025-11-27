@@ -141,7 +141,7 @@ class FormTest extends FieldTestBase {
     // @todo check that the correct field is flagged for error.
 
     // Create an entity.
-    $value = mt_rand(1, 127);
+    $value = \mt_rand(1, 127);
     $edit = [
       "{$field_name}[0][value]" => $value,
     ];
@@ -236,7 +236,7 @@ class FormTest extends FieldTestBase {
     $this->assertSession()->pageTextContains("{$this->field['label']} field is required.");
 
     // Create an entity.
-    $value = mt_rand(1, 127);
+    $value = \mt_rand(1, 127);
     $edit = [
       "{$field_name}[0][value]" => $value,
     ];

@@ -100,8 +100,8 @@ class ConfigImportAllTest extends ModuleTestBase {
     $entity_type_manager = \Drupal::entityTypeManager();
     foreach ($entity_type_manager->getDefinitions() as $entity_type) {
       if (($entity_type instanceof ContentEntityTypeInterface
-          || in_array($entity_type->id(), ['field_storage_config', 'filter_format'], TRUE))
-        && !in_array($entity_type->getProvider(), ['system', 'user'], TRUE)) {
+          || \in_array($entity_type->id(), ['field_storage_config', 'filter_format'], TRUE))
+        && !\in_array($entity_type->getProvider(), ['system', 'user'], TRUE)) {
         $storage = $entity_type_manager->getStorage($entity_type->id());
         $storage->delete($storage->loadMultiple());
       }
@@ -115,12 +115,12 @@ class ConfigImportAllTest extends ModuleTestBase {
     $expected_modules = ['path_alias', 'system', 'user', $database_module];
     // If the database module has dependencies, they are expected too.
     $database_module_extension = \Drupal::service(ModuleExtensionList::class)->get($database_module);
-    $database_module_dependencies = $database_module_extension->requires ? array_keys($database_module_extension->requires) : [];
+    $database_module_dependencies = $database_module_extension->requires ? \array_keys($database_module_extension->requires) : [];
 
     // Ensure that only core required modules and the install profile can not be
     // uninstalled.
-    $validation_reasons = \Drupal::service('module_installer')->validateUninstall(array_keys($all_modules));
-    $validation_modules = array_keys($validation_reasons);
+    $validation_reasons = \Drupal::service('module_installer')->validateUninstall(\array_keys($all_modules));
+    $validation_modules = \array_keys($validation_reasons);
     $this->assertEqualsCanonicalizing($expected_modules, $validation_modules);
 
     $modules_to_uninstall = \array_filter($all_modules, function ($module) {

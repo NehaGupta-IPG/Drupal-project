@@ -164,7 +164,7 @@ class FileTest extends ResourceTestBase {
           'langcode' => 'en',
           'status' => TRUE,
           'uri' => [
-            'url' => base_path() . $this->siteDirectory . '/files/drupal.txt',
+            'url' => \base_path() . $this->siteDirectory . '/files/drupal.txt',
             'value' => 'public://drupal.txt',
           ],
           'drupal_internal__fid' => 1,

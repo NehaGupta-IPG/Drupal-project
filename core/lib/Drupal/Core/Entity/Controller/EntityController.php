@@ -105,7 +105,7 @@ class EntityController implements ContainerInjectionInterface {
    */
   public function addPage($entity_type_id, ?Request $request = NULL) {
     if ($request === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $request parameter is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3467748', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' without the $request parameter is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3467748', E_USER_DEPRECATED);
       $request = $this->requestStack->getCurrentRequest();
     }
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
@@ -315,8 +315,8 @@ class EntityController implements ContainerInjectionInterface {
     /** @var \Drupal\Core\Entity\EntityDescriptionInterface[] $bundle_entities */
     $bundle_entities = $storage->loadMultiple($bundle_names);
 
-    uasort($bundle_entities, [$bundle_entity_type->getClass(), 'sort']);
-    $bundles = array_replace($bundle_entities, $bundles);
+    \uasort($bundle_entities, [$bundle_entity_type->getClass(), 'sort']);
+    $bundles = \array_replace($bundle_entities, $bundles);
 
     foreach ($bundles as $bundle_name => &$bundle_info) {
       if (isset($bundle_entities[$bundle_name])) {

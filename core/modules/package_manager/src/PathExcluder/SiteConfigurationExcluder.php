@@ -77,7 +77,7 @@ class SiteConfigurationExcluder implements EventSubscriberInterface {
   public function makeDefaultSiteDirectoryWritable(PostCreateEvent $event): void {
     $dir = $this->getDefaultSiteDirectoryPath($event->sandboxManager->getSandboxDirectory());
     // If the directory doesn't even exist, there's nothing to do here.
-    if (!is_dir($dir)) {
+    if (!\is_dir($dir)) {
       return;
     }
     if (!$this->fileSystem->chmod($dir, 0700)) {
@@ -98,12 +98,12 @@ class SiteConfigurationExcluder implements EventSubscriberInterface {
   public function syncDefaultSiteDirectoryPermissions(PreApplyEvent $event): void {
     $staged_dir = $this->getDefaultSiteDirectoryPath($event->sandboxManager->getSandboxDirectory());
     // If the directory doesn't even exist, there's nothing to do here.
-    if (!is_dir($staged_dir)) {
+    if (!\is_dir($staged_dir)) {
       return;
     }
     $live_dir = $this->getDefaultSiteDirectoryPath($this->pathLocator->getProjectRoot());
 
-    $permissions = fileperms($live_dir);
+    $permissions = \fileperms($live_dir);
     if ($permissions === FALSE) {
       throw new FileException("Could not determine permissions for '$live_dir'.");
     }
@@ -128,7 +128,7 @@ class SiteConfigurationExcluder implements EventSubscriberInterface {
     if ($web_root) {
       $dir[] = $web_root;
     }
-    return implode(DIRECTORY_SEPARATOR, [...$dir, 'sites', 'default']);
+    return \implode(DIRECTORY_SEPARATOR, [...$dir, 'sites', 'default']);
   }
 
   /**

@@ -34,7 +34,7 @@ final class SandboxDirectoryValidator implements EventSubscriberInterface {
   public function validate(SandboxValidationEvent $event): void {
     $project_root = $this->pathLocator->getProjectRoot();
     $staging_root = $this->pathLocator->getStagingRoot();
-    if (str_starts_with($staging_root, $project_root)) {
+    if (\str_starts_with($staging_root, $project_root)) {
       $message = $this->t("The sandbox directory is a subdirectory of the active directory.");
       $event->addError([$message]);
     }

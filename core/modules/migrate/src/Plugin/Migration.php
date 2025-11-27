@@ -630,7 +630,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    * @return $this
    */
   public function addRequiredDependencies(array $required_dependencies): MigrationInterface {
-    $this->migration_dependencies['required'] = array_unique(array_merge($this->migration_dependencies['required'], $required_dependencies));
+    $this->migration_dependencies['required'] = \array_unique(\array_merge($this->migration_dependencies['required'], $required_dependencies));
     return $this;
   }
 
@@ -644,7 +644,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    * @return $this
    */
   public function addOptionalDependencies(array $optional_dependencies): MigrationInterface {
-    $this->migration_dependencies['optional'] = array_unique(array_merge($this->migration_dependencies['optional'], $optional_dependencies));
+    $this->migration_dependencies['optional'] = \array_unique(\array_merge($this->migration_dependencies['optional'], $optional_dependencies));
     return $this;
   }
 

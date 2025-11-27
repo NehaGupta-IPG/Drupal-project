@@ -197,7 +197,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
    */
   #[DataProvider('providerSubmitForm')]
   public function testSubmitForm(array $permissions, string $entityTypeId, string $entityLabel, array $expectedLog, string $expectedMessage, string $expectedDestination): void {
-    if (count($permissions) > 0) {
+    if (\count($permissions) > 0) {
       $this->drupalLogin($this->createUser($permissions));
     }
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
@@ -237,7 +237,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
     $logs = $this->getLogs($entity->getEntityType()->getProvider());
     $this->assertCount(1, $logs);
     $this->assertEquals('@type: reverted %title revision %revision.', $logs[0]->message);
-    $this->assertEquals($expectedLog, unserialize($logs[0]->variables));
+    $this->assertEquals($expectedLog, \unserialize($logs[0]->variables));
 
     // Messenger message.
     $this->assertSession()->pageTextContains($expectedMessage);

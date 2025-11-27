@@ -585,7 +585,7 @@ JS;
         ],
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
@@ -674,7 +674,7 @@ JS;
 
         // Open the list type toolbar and choose a type.
         $list_button_tip_text = $list_tag === 'ol' ? 'Numbered List' : 'Bulleted List';
-        $toolbar_selector = '[aria-label="' . str_replace(' L', ' l', $list_button_tip_text) . ' styles toolbar"]';
+        $toolbar_selector = '[aria-label="' . \str_replace(' L', ' l', $list_button_tip_text) . ' styles toolbar"]';
         $button_selector = '[data-cke-tooltip-text="' . $list_button_tip_text . '"]';
         $page->find('css', '[aria-expanded="false"]' . $button_selector)->click();
         $open_splitbutton = $assert_session->waitForElementVisible('css', '[aria-expanded="true"]' . $button_selector);
@@ -687,22 +687,22 @@ JS;
         // While this is a bit of an indirect way to find the correct button, it
         // accounts for the mixed dash characters and worked better than other
         // attempts.
-        $toolbar_button_tips = array_map(fn($item) => str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
-        $this->assertNotFalse(array_search($type, $toolbar_button_tips));
-        $toolbar_buttons[array_search($type, $toolbar_button_tips)]->click();
+        $toolbar_button_tips = \array_map(fn($item) => \str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
+        $this->assertNotFalse(\array_search($type, $toolbar_button_tips));
+        $toolbar_buttons[\array_search($type, $toolbar_button_tips)]->click();
         $widget_selector = '.ck-editor__editable_inline > ' . $list_tag . '[type="' . $type_attribute . '"]';
         $widget = $assert_session->waitForElementVisible('css', $widget_selector);
         $this->assertNotNull($widget, "The widget exists at $widget_selector");
 
         // Confirm the style applied in-editor is for the type of list chosen.
         $list_style_type = $this->getSession()->evaluateScript('window.getComputedStyle(document.querySelector(\'' . $widget_selector . '\')).listStyleType');
-        $this->assertSame(str_replace('latin', 'alpha', strtolower($type)), $list_style_type, "The $list_style_type list should have the correct style.");
+        $this->assertSame(\str_replace('latin', 'alpha', \strtolower($type)), $list_style_type, "The $list_style_type list should have the correct style.");
         $page->pressButton('Save');
 
         $fe_list_style_type = $this->getSession()->evaluateScript('window.getComputedStyle(document.querySelector(\'' . $list_tag . '[type]\')).listStyleType');
         // Confirm the style applied on the default theme is for the type of
         // list chosen.
-        $this->assertSame(str_replace('latin', 'alpha', strtolower($type)), strtolower($fe_list_style_type));
+        $this->assertSame(\str_replace('latin', 'alpha', \strtolower($type)), \strtolower($fe_list_style_type));
         $this->drupalGet($edit_url);
         $this->waitForEditor();
       }
@@ -739,7 +739,7 @@ JS;
         ],
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
@@ -760,7 +760,7 @@ JS;
         'status' => FALSE,
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },

@@ -58,7 +58,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
   ) {
     $file_cache_suffix = \str_replace('\\', '_', $this->pluginDefinitionAttributeName);
     $this->fileCache = FileCacheFactory::get('attribute_discovery:' . $this->getFileCacheSuffix($file_cache_suffix));
-    $this->rootTwoLevelNamespaces = array_unique(array_map(fn($namespace) => $this->getTwoLevelNamespace($namespace), array_keys($this->getPluginNamespaces())));
+    $this->rootTwoLevelNamespaces = \array_unique(\array_map(fn($namespace) => $this->getTwoLevelNamespace($namespace), \array_keys($this->getPluginNamespaces())));
   }
 
   /**
@@ -84,7 +84,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
     $definitions = [];
 
     $autoloader = new MissingClassDetectionClassLoader();
-    spl_autoload_register([$autoloader, 'loadClass']);
+    \spl_autoload_register([$autoloader, 'loadClass']);
 
     // Search for classes within all PSR-4 namespace locations.
     foreach ($this->getPluginNamespaces() as $namespace => $dirs) {
@@ -100,9 +100,9 @@ class AttributeClassDiscovery implements DiscoveryInterface {
                 if (isset($cached['id'])) {
                   // Explicitly unserialize this to create a new object
                   // instance.
-                  $dependencies = isset($cached['dependencies']) ? unserialize($cached['dependencies']) : [];
+                  $dependencies = isset($cached['dependencies']) ? \unserialize($cached['dependencies']) : [];
                   if (!$this->hasMissingDependencies($dependencies ?? [])) {
-                    $definitions[$cached['id']] = unserialize($cached['content']);
+                    $definitions[$cached['id']] = \unserialize($cached['content']);
                   }
                 }
                 continue;
@@ -138,7 +138,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
               // Drupal requires PHP 8.5.
               // @see https://github.com/php/php-src/issues/17959
               // @see https://github.com/php/php-src/commit/8731c95b35f6838bacd12a07c50886e020aad5a6
-              if (array_key_exists($class, self::$skipClasses)) {
+              if (\array_key_exists($class, self::$skipClasses)) {
                 $missing_classes = self::$skipClasses[$class];
                 foreach ($missing_classes as $missing_class) {
                   $missing_class_namespace = $this->getTwoLevelNamespace($missing_class);
@@ -152,14 +152,14 @@ class AttributeClassDiscovery implements DiscoveryInterface {
                   // namespace has become available in the meantime, assume that
                   // the class actually should be discovered since this probably
                   // means the optional module it depends on has been enabled.
-                  if (!in_array($missing_class_namespace, $this->rootTwoLevelNamespaces)) {
+                  if (!\in_array($missing_class_namespace, $this->rootTwoLevelNamespaces)) {
                     $autoloader->reset();
                     continue 2;
                   }
                 }
               }
               try {
-                $class_exists = class_exists($class, TRUE);
+                $class_exists = \class_exists($class, TRUE);
                 if (!$class_exists || \count($autoloader->getMissingTraits()) > 0) {
                   // @todo remove this workaround once PHP treats missing traits
                   // as catchable fatal errors.
@@ -175,7 +175,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
                   // @todo Add test coverage for unexpected Error exceptions in
                   // https://www.drupal.org/project/drupal/issues/3520811.
                   $autoloader->reset();
-                  spl_autoload_unregister([$autoloader, 'loadClass']);
+                  \spl_autoload_unregister([$autoloader, 'loadClass']);
                   throw $e;
                 }
                 $autoloader->reset();
@@ -191,8 +191,8 @@ class AttributeClassDiscovery implements DiscoveryInterface {
                 if (!isset(self::$skipClasses[$class])) {
                   $this->fileCache->set($fileinfo->getPathName(), [
                     'id' => $id,
-                    'content' => serialize($content),
-                    'dependencies' => serialize($result['dependencies'] ?? NULL),
+                    'content' => \serialize($content),
+                    'dependencies' => \serialize($result['dependencies'] ?? NULL),
                   ]);
                 }
               }
@@ -205,7 +205,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
         }
       }
     }
-    spl_autoload_unregister([$autoloader, 'loadClass']);
+    \spl_autoload_unregister([$autoloader, 'loadClass']);
 
     // Plugin discovery is a memory expensive process due to reflection and the
     // number of files involved. Collect cycles at the end of discovery to be as
@@ -283,7 +283,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    *   A namespace string containing only two levels.
    */
   protected function getTwoLevelNamespace(string $namespace): string {
-    return implode('\\', array_slice(explode('\\', $namespace), 0, 2));
+    return \implode('\\', \array_slice(\explode('\\', $namespace), 0, 2));
   }
 
   /**
@@ -312,7 +312,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
       $dependencies['class'][] = $parent_class->getName();
       if (($traits = $parent_class->getTraitNames())) {
         $dependencies['trait'] ??= [];
-        $dependencies['trait'] = array_unique(array_merge($dependencies['trait'], $traits));
+        $dependencies['trait'] = \array_unique(\array_merge($dependencies['trait'], $traits));
       }
       $child_class = $parent_class;
     }
@@ -333,12 +333,12 @@ class AttributeClassDiscovery implements DiscoveryInterface {
     foreach ($dependencies as $type_dependencies) {
       foreach ($type_dependencies as $dependency) {
         $namespace = $this->getTwoLevelNamespace($dependency);
-        if (!str_starts_with($namespace, 'Drupal')) {
+        if (!\str_starts_with($namespace, 'Drupal')) {
           // Not checking non-Drupal dependencies.
           continue;
         }
 
-        if (!in_array($namespace, $this->rootTwoLevelNamespaces)) {
+        if (!\in_array($namespace, $this->rootTwoLevelNamespaces)) {
           return TRUE;
         }
       }

@@ -22,10 +22,10 @@ class UnitTestCaseTest extends UnitTestCase {
     $object = (object) [
       'Aldebaran' => 'Betelgeuse',
     ];
-    dump($object);
-    dump('Alpheratz');
+    \dump($object);
+    \dump('Alpheratz');
 
-    $dumpString = json_encode(DebugDump::getDumps());
+    $dumpString = \json_encode(DebugDump::getDumps());
 
     $this->assertStringContainsString('Aldebaran', $dumpString);
     $this->assertStringContainsString('Betelgeuse', $dumpString);
@@ -41,10 +41,10 @@ class UnitTestCaseTest extends UnitTestCase {
     $object = (object) [
       'Denebola' => 'Aspidiske',
     ];
-    dump($object);
-    dump('Schedar');
+    \dump($object);
+    \dump('Schedar');
 
-    $dumpString = json_encode(DebugDump::getDumps());
+    $dumpString = \json_encode(DebugDump::getDumps());
 
     $this->assertStringContainsString('Denebola', $dumpString);
     $this->assertStringContainsString('Aspidiske', $dumpString);

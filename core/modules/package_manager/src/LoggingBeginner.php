@@ -36,14 +36,14 @@ final class LoggingBeginner implements BeginnerInterface {
     $path = $this->configFactory->get('package_manager.settings')->get('log');
     if ($path) {
       $callback = new FileProcessOutputCallback($path, $callback);
-      $callback(OutputTypeEnum::OUT, sprintf("### Beginning in %s\n", $stagingDir->absolute()));
+      $callback(OutputTypeEnum::OUT, \sprintf("### Beginning in %s\n", $stagingDir->absolute()));
     }
 
     $start_time = $this->time->getCurrentMicroTime();
     $this->decorated->begin($activeDir, $stagingDir, $exclusions, $callback, $timeout);
     $end_time = $this->time->getCurrentMicroTime();
     if ($callback) {
-      $callback(OutputTypeEnum::OUT, sprintf("### Finished in %0.3f seconds\n", $end_time - $start_time));
+      $callback(OutputTypeEnum::OUT, \sprintf("### Finished in %0.3f seconds\n", $end_time - $start_time));
     }
   }
 

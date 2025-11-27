@@ -69,7 +69,7 @@ class WorkspaceSubscriber implements EventSubscriberInterface {
     foreach ($tracked_revisions as $tracked_type => $tracked_revision_ids) {
       $entity_type_group = $query->andConditionGroup()
         ->condition('content_entity_type_id', $tracked_type)
-        ->condition('content_entity_revision_id', array_keys($tracked_revision_ids), 'IN');
+        ->condition('content_entity_revision_id', \array_keys($tracked_revision_ids), 'IN');
 
       $tracked_revisions_condition_group->condition($entity_type_group);
     }

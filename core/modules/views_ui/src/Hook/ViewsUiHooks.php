@@ -94,7 +94,7 @@ class ViewsUiHooks {
   public function contextualLinksViewAlter(&$element, $items): void {
     // Remove contextual links from being rendered, when so desired, such as
     // within a View preview.
-    if (views_ui_contextual_links_suppress()) {
+    if (\views_ui_contextual_links_suppress()) {
       $element['#links'] = [];
     }
     elseif (!empty($element['#links']['entityviewedit-form'])) {
@@ -115,7 +115,7 @@ class ViewsUiHooks {
   public function viewsAnalyze(ViewExecutable $view): array {
     $ret = [];
     // Check for something other than the default display:
-    if (count($view->displayHandlers) < 2) {
+    if (\count($view->displayHandlers) < 2) {
       $ret[] = Analyzer::formatMessage($this->t('This view has only a default display and therefore will not be placed anywhere on your site; perhaps you want to add a page or a block display.'), 'warning');
     }
     // If a display has a path, check that it does not match an existing path
@@ -143,7 +143,7 @@ class ViewsUiHooks {
     if ($entity instanceof BlockInterface) {
       $plugin = $entity->getPlugin();
       if ($plugin->getBaseId() === 'views_block') {
-        $view_id_parts = explode('-', $plugin->getDerivativeId());
+        $view_id_parts = \explode('-', $plugin->getDerivativeId());
         $view_id = $view_id_parts[0] ?? '';
         $display_id = $view_id_parts[1] ?? '';
         $view = View::load($view_id);

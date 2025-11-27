@@ -86,12 +86,12 @@ abstract class IconExtractorBase extends PluginBase implements IconExtractorInte
    */
   public function createIcon(string $icon_id, ?string $source = NULL, ?string $group = NULL, ?array $data = NULL): IconDefinitionInterface {
     if (!isset($this->configuration['template'])) {
-      throw new IconPackConfigErrorException(sprintf('Missing `template` in your definition, extractor %s requires this value.', $this->getPluginId()));
+      throw new IconPackConfigErrorException(\sprintf('Missing `template` in your definition, extractor %s requires this value.', $this->getPluginId()));
     }
 
     // Clean unused pack definition values as they will be passed to the context
     // of the Twig.
-    $data_definition = array_diff_key($this->configuration, array_flip(self::DEFINITION_REMOVE));
+    $data_definition = \array_diff_key($this->configuration, \array_flip(self::DEFINITION_REMOVE));
 
     return IconDefinition::create(
       $this->configuration['id'],
@@ -99,7 +99,7 @@ abstract class IconExtractorBase extends PluginBase implements IconExtractorInte
       $this->configuration['template'],
       $source,
       $group,
-      $data ? array_merge($data, $data_definition) : $data_definition,
+      $data ? \array_merge($data, $data_definition) : $data_definition,
     );
   }
 

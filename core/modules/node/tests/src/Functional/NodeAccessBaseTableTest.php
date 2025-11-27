@@ -274,7 +274,7 @@ class NodeAccessBaseTableTest extends NodeTestBase {
           $this->assertSame(
             $should_be_visible,
             isset($this->nidsVisible[$nid]),
-            strtr('A %private node by user %uid is %visible for user %current_uid on the %tid_is_private page.', [
+            \strtr('A %private node by user %uid is %visible for user %current_uid on the %tid_is_private page.', [
               '%private' => $is_private ? 'private' : 'public',
               '%uid' => $uid,
               '%visible' => isset($this->nidsVisible[$nid]) ? 'visible' : 'not visible',

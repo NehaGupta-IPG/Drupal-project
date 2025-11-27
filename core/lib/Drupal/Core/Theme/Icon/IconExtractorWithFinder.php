@@ -63,7 +63,7 @@ abstract class IconExtractorWithFinder extends IconExtractorBase implements Icon
     $this->checkRequiredConfigSources();
 
     if (!isset($this->configuration['relative_path'])) {
-      throw new IconPackConfigErrorException(sprintf('Empty relative path for extractor %s.', $this->getPluginId()));
+      throw new IconPackConfigErrorException(\sprintf('Empty relative path for extractor %s.', $this->getPluginId()));
     }
 
     return $this->iconFinder->getFilesFromSources(
@@ -82,9 +82,9 @@ abstract class IconExtractorWithFinder extends IconExtractorBase implements Icon
     if (
       !isset($this->configuration['config']['sources']) ||
       empty($this->configuration['config']['sources']) ||
-      !is_array($this->configuration['config']['sources'])
+      !\is_array($this->configuration['config']['sources'])
     ) {
-      throw new IconPackConfigErrorException(sprintf('Missing or invalid `config: sources` in your definition, extractor %s requires this value as array.', $this->getPluginId()));
+      throw new IconPackConfigErrorException(\sprintf('Missing or invalid `config: sources` in your definition, extractor %s requires this value as array.', $this->getPluginId()));
     }
   }
 

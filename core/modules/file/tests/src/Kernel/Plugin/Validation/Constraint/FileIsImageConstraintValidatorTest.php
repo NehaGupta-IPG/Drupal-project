@@ -42,11 +42,11 @@ class FileIsImageConstraintValidatorTest extends FileValidatorTestBase {
 
     $this->image = File::create();
     $this->image->setFileUri('core/misc/druplicon.png');
-    $this->image->setFilename(basename($this->image->getFileUri()));
+    $this->image->setFilename(\basename($this->image->getFileUri()));
 
     $this->nonImage = File::create();
     $this->nonImage->setFileUri('core/assets/vendor/jquery/jquery.min.js');
-    $this->nonImage->setFilename(basename($this->nonImage->getFileUri()));
+    $this->nonImage->setFilename(\basename($this->nonImage->getFileUri()));
   }
 
   /**

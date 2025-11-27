@@ -60,7 +60,7 @@ class MediaRequirementsHooks {
       // image style and adding a warning that the site builder might want to
       // add an image style.
       // @see Drupal\media\Plugin\media\Source\Image::prepareViewDisplay
-      if (!is_a($source_field_definition->getItemDefinition()->getClass(), ImageItem::class, TRUE)) {
+      if (!\is_a($source_field_definition->getItemDefinition()->getClass(), ImageItem::class, TRUE)) {
         continue;
       }
 

@@ -840,7 +840,7 @@ class UserTest extends ResourceTestBase {
    *   The cancel method.
    */
   private function sendDeleteRequestForUser(UserInterface $account, string $cancel_method): void {
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $account->uuid()]);
+    $url = Url::fromRoute(\sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $account->uuid()]);
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());

@@ -66,10 +66,10 @@ class NavigationHooks {
         return $output;
     }
     $configuration_route = 'layout_builder.navigation.';
-    if (!$route_match->getRouteObject()->getOption('_layout_builder') || !str_starts_with($route_name, $configuration_route)) {
+    if (!$route_match->getRouteObject()->getOption('_layout_builder') || !\str_starts_with($route_name, $configuration_route)) {
       return $this->moduleHandler->invoke('layout_builder', 'help', [$route_name, $route_match]);
     }
-    if (str_starts_with($route_name, $configuration_route)) {
+    if (\str_starts_with($route_name, $configuration_route)) {
       $output = '<p>' . $this->t('This layout builder tool allows you to configure the blocks in the navigation toolbar.') . '</p>';
       $output .= '<p>' . $this->t('Forms and links inside the content of the layout builder tool are disabled in Edit mode.') . '</p>';
       return $output;
@@ -96,7 +96,7 @@ class NavigationHooks {
   #[Hook('menu_links_discovered_alter')]
   public function menuLinksDiscoveredAlter(&$links): void {
     $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
-    assert($navigation_links instanceof NavigationContentLinks);
+    \assert($navigation_links instanceof NavigationContentLinks);
     $navigation_links->addMenuLinks($links);
   }
 
@@ -106,7 +106,7 @@ class NavigationHooks {
   #[Hook('block_build_local_tasks_block_alter')]
   public function blockBuildLocalTasksBlockAlter(array &$build, BlockPluginInterface $block): void {
     if ($this->currentUser->hasPermission('access navigation') &&
-      array_key_exists('page_actions', $this->topBarItemManager->getDefinitions())
+      \array_key_exists('page_actions', $this->topBarItemManager->getDefinitions())
     ) {
       $this->navigationRenderer->removeLocalTasks($build, $block);
     }
@@ -121,7 +121,7 @@ class NavigationHooks {
   public function pluginFilterBlockLayoutBuilderAlter(array &$definitions, array $extra): void {
     if (($extra['section_storage'] ?? NULL) instanceof NavigationSectionStorage) {
       // Include only blocks explicitly indicated as Navigation allowed.
-      $definitions = array_filter($definitions,
+      $definitions = \array_filter($definitions,
         fn (array $definition): bool => ($definition['allow_in_navigation'] ?? FALSE) === TRUE
       );
     }
@@ -143,8 +143,8 @@ class NavigationHooks {
    */
   #[Hook('block_alter')]
   public function blockAlter(&$definitions) : void {
-    array_walk($definitions, function (&$definition, $block_id) {
-      [$base_plugin_id] = explode(PluginBase::DERIVATIVE_SEPARATOR, $block_id);
+    \array_walk($definitions, function (&$definition, $block_id) {
+      [$base_plugin_id] = \explode(PluginBase::DERIVATIVE_SEPARATOR, $block_id);
 
       // Add the allow_in_navigation attribute to those blocks valid for
       // Navigation.
@@ -155,13 +155,13 @@ class NavigationHooks {
         'navigation_shortcuts',
         'navigation_menu',
       ];
-      if (in_array($base_plugin_id, $allow_in_navigation, TRUE)) {
+      if (\in_array($base_plugin_id, $allow_in_navigation, TRUE)) {
         $definition['allow_in_navigation'] = TRUE;
       }
 
       // Hide Navigation specific blocks from the generic UI.
       $hidden = ['navigation_user', 'navigation_shortcuts', 'navigation_menu', 'navigation_link'];
-      if (in_array($base_plugin_id, $hidden, TRUE)) {
+      if (\in_array($base_plugin_id, $hidden, TRUE)) {
         $definition['_block_ui_hidden'] = TRUE;
       }
     });
@@ -172,7 +172,7 @@ class NavigationHooks {
    */
   #[Hook('element_info_alter')]
   public function elementInfoAlter(array &$info): void {
-    if (array_key_exists('layout_builder', $info)) {
+    if (\array_key_exists('layout_builder', $info)) {
       $info['layout_builder']['#pre_render'][] = [RenderCallbacks::class, 'alterLayoutBuilder'];
     }
   }
@@ -225,7 +225,7 @@ class NavigationHooks {
     foreach ($modules as $module) {
       $blocks = $this->moduleHandler->invoke($module, 'navigation_defaults');
 
-      if (!is_array($blocks)) {
+      if (!\is_array($blocks)) {
         return;
       }
 

@@ -59,7 +59,7 @@ final readonly class UnpackOptions {
    *   TRUE if the package should be ignored, FALSE if not.
    */
   public function isIgnored(PackageInterface $package): bool {
-    return in_array($package->getName(), $this->options['ignore'], TRUE);
+    return \in_array($package->getName(), $this->options['ignore'], TRUE);
   }
 
   /**

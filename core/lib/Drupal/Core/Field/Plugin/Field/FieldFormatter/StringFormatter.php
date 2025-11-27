@@ -138,7 +138,7 @@ class StringFormatter extends FormatterBase {
 
     foreach ($items as $delta => $item) {
       if ($render_as_link) {
-        assert(isset($url));
+        \assert(isset($url));
         $elements[$delta] = [
           '#type' => 'link',
           '#title' => $this->viewValue($item),

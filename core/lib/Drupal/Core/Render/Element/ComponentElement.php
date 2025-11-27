@@ -164,7 +164,7 @@ class ComponentElement extends RenderElementBase {
   private function mergeElementAttributesToPropAttributes(array &$element): void {
     // Prepare #props attributes to be both mergeable and renderable.
     $prop_attributes = $element['#props']['attributes'] ?? [];
-    $prop_attributes = is_array($prop_attributes) ? new Attribute($prop_attributes) : $prop_attributes;
+    $prop_attributes = \is_array($prop_attributes) ? new Attribute($prop_attributes) : $prop_attributes;
 
     if (!isset($element['#attributes'])) {
       $element['#props']['attributes'] = $prop_attributes;
@@ -173,7 +173,7 @@ class ComponentElement extends RenderElementBase {
 
     // If attributes value is an array, convert it to an Attribute object as
     // \Drupal\Core\Template\Attribute::merge() expects an Attribute object.
-    $element_attributes = is_array($element['#attributes']) ? new Attribute($element['#attributes']) : $element['#attributes'];
+    $element_attributes = \is_array($element['#attributes']) ? new Attribute($element['#attributes']) : $element['#attributes'];
 
     // Merge ['#attributes'] with the ['#props']['attributes']. So that #props
     // attributes take precedence.

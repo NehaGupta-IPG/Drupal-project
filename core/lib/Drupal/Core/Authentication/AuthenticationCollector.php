@@ -73,7 +73,7 @@ class AuthenticationCollector implements AuthenticationCollectorInterface {
 
       // Merge nested providers from $this->providers into
       // $this->sortedProviders.
-      $this->sortedProviders = array_merge(...$this->providerOrders);
+      $this->sortedProviders = \array_merge(...$this->providerOrders);
     }
 
     return $this->sortedProviders;

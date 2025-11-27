@@ -65,7 +65,7 @@ class ImagePreprocess {
         }
         $srcset[] = $source;
       }
-      $variables['attributes']['srcset'] = implode(', ', $srcset);
+      $variables['attributes']['srcset'] = \implode(', ', $srcset);
     }
 
     foreach (['width', 'height', 'alt', 'title', 'sizes'] as $key) {

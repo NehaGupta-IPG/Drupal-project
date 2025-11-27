@@ -235,7 +235,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
     $expression = $matches[1];
     // From the expression, extract the instructions for where to retrieve a
     // value.
-    $instructions = explode('.', $expression);
+    $instructions = \explode('.', $expression);
 
     // Determine the property path to the configuration key that has determined
     // this type.

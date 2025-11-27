@@ -407,8 +407,8 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
           // Also detect what is technically a valid subset, but has lost the
           // ability to create tags that are still in the subset. This points to
           // a bug in the plugin's ::getElementsSubset() logic.
-          $defined_creatable = HTMLRestrictions::fromString(implode($definition->getCreatableElements()));
-          $subset_creatable_actual = HTMLRestrictions::fromString(implode(array_filter($subset, [
+          $defined_creatable = HTMLRestrictions::fromString(\implode($definition->getCreatableElements()));
+          $subset_creatable_actual = HTMLRestrictions::fromString(\implode(\array_filter($subset, [
             CKEditor5PluginDefinition::class,
             'isCreatableElement',
           ])));

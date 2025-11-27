@@ -151,7 +151,7 @@ class Insert extends Query implements \Countable {
       // same order for the insert fields.
       // This behavior can be overridden by calling fields() manually as only
       // the first call to fields() does have an effect.
-      $this->fields(array_merge(array_keys($this->fromQuery->getFields()), array_keys($this->fromQuery->getExpressions())));
+      $this->fields(\array_merge(\array_keys($this->fromQuery->getFields()), \array_keys($this->fromQuery->getExpressions())));
     }
     else {
       // Don't execute query without fields.

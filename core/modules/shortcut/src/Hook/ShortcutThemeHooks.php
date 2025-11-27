@@ -39,18 +39,18 @@ class ShortcutThemeHooks {
     // shortcuts, the feature is enabled for the current theme and if the
     // page's actual content is being shown (for example, we do not want to
     // display it on "access denied" or "page not found" pages).
-    if (shortcut_set_edit_access()->isAllowed() && $this->themeSettingsProvider->getSetting('third_party_settings.shortcut.module_link') && !\Drupal::request()->attributes->has('exception')) {
+    if (\shortcut_set_edit_access()->isAllowed() && $this->themeSettingsProvider->getSetting('third_party_settings.shortcut.module_link') && !\Drupal::request()->attributes->has('exception')) {
       $link = Url::fromRouteMatch(\Drupal::routeMatch())->getInternalPath();
       $route_match = \Drupal::routeMatch();
       // Replicate template_preprocess_html()'s processing to get the title in
       // string form, so we can set the default name for the shortcut.
       $name = $variables['title'] ?? '';
-      if (is_array($name)) {
+      if (\is_array($name)) {
         $name = \Drupal::service('renderer')->render($name);
       }
       $query = [
         'link' => $link,
-        'name' => trim(strip_tags($name)),
+        'name' => \trim(\strip_tags($name)),
       ];
       $shortcut_set = \Drupal::entityTypeManager()->getStorage('shortcut_set')->getDisplayedToUser(\Drupal::currentUser());
       // Pages with the add or remove shortcut button need cache invalidation
@@ -71,7 +71,7 @@ class ShortcutThemeHooks {
       }
       $link_mode = isset($shortcut_id) ? "remove" : "add";
       if ($link_mode == "add") {
-        $link_text = shortcut_set_switch_access()->isAllowed() ? $this->t('Add to %shortcut_set shortcuts', [
+        $link_text = \shortcut_set_switch_access()->isAllowed() ? $this->t('Add to %shortcut_set shortcuts', [
           '%shortcut_set' => $shortcut_set->label(),
         ]) : $this->t('Add to shortcuts');
         $route_name = 'shortcut.link_add_inline';
@@ -81,7 +81,7 @@ class ShortcutThemeHooks {
       }
       else {
         $query['id'] = $shortcut_id;
-        $link_text = shortcut_set_switch_access()->isAllowed() ? $this->t('Remove from %shortcut_set shortcuts', [
+        $link_text = \shortcut_set_switch_access()->isAllowed() ? $this->t('Remove from %shortcut_set shortcuts', [
           '%shortcut_set' => $shortcut_set->label(),
         ]) : $this->t('Remove from shortcuts');
         $route_name = 'entity.shortcut.link_delete_inline';

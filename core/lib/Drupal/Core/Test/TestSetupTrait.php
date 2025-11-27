@@ -208,7 +208,7 @@ trait TestSetupTrait {
       return \Drupal::hasContainer() ? \Drupal::getContainer() : $this->privateContainer;
     }
 
-    trigger_error('Undefined property ' . __CLASS__ . "::\${$name}", E_USER_WARNING);
+    \trigger_error('Undefined property ' . __CLASS__ . "::\${$name}", E_USER_WARNING);
     return NULL;
   }
 
@@ -229,7 +229,7 @@ trait TestSetupTrait {
     // be removed once property hooks can be used.
     // @see https://www.drupal.org/project/drupal/issues/3558863
     // @phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
-    trigger_error('Creation of dynamic property ' . __CLASS__ . "::\${$name} is deprecated", E_USER_DEPRECATED);
+    \trigger_error('Creation of dynamic property ' . __CLASS__ . "::\${$name} is deprecated", E_USER_DEPRECATED);
     $this->$name = $value;
   }
 

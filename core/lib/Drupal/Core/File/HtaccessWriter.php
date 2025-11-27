@@ -30,7 +30,7 @@ class HtaccessWriter implements HtaccessWriterInterface {
     protected ?Settings $settings = NULL,
   ) {
     if (!$settings) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $settings argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3249817', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $settings argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3249817', E_USER_DEPRECATED);
       $this->settings = \Drupal::service('settings');
     }
   }

@@ -88,9 +88,9 @@ class ConfigImportUploadTest extends BrowserTestBase {
     $this->assertFileExists($sync_directory . DIRECTORY_SEPARATOR . 'config.one.yml');
     $this->assertFileExists($sync_directory . DIRECTORY_SEPARATOR . 'config.two.yml');
     $this->assertFileExists($sync_directory . DIRECTORY_SEPARATOR . 'executable.yml');
-    $this->assertFalse(is_executable($sync_directory . DIRECTORY_SEPARATOR . 'executable.yml'));
+    $this->assertFalse(\is_executable($sync_directory . DIRECTORY_SEPARATOR . 'executable.yml'));
     $this->assertFileDoesNotExist($sync_directory . DIRECTORY_SEPARATOR . 'script.sh');
-    $this->assertFalse(is_executable($sync_directory . DIRECTORY_SEPARATOR . 'script.sh'));
+    $this->assertFalse(\is_executable($sync_directory . DIRECTORY_SEPARATOR . 'script.sh'));
   }
 
 }

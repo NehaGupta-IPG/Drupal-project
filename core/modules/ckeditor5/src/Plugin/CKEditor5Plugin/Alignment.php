@@ -116,7 +116,7 @@ class Alignment extends CKEditor5PluginDefault implements CKEditor5PluginConfigu
     $all_elements = $plugin_definition->getElements();
     $subset = HTMLRestrictions::fromString(\implode($all_elements));
     foreach ($plugin_definition->getCKEditor5Config()['alignment']['options'] as $configured_alignment) {
-      if (!in_array($configured_alignment['name'], $enabled_alignments, TRUE)) {
+      if (!\in_array($configured_alignment['name'], $enabled_alignments, TRUE)) {
         $element_string = '<$text-container class="' . $configured_alignment["className"] . '">';
         $subset = $subset->diff(HTMLRestrictions::fromString($element_string));
       }

@@ -373,7 +373,7 @@ class ConfigImporter {
    */
   protected function setProcessedExtension($type, $op, $name) {
     $name = (array) $name;
-    $this->processedExtensions[$type][$op] = array_merge($this->processedExtensions[$type][$op], $name);
+    $this->processedExtensions[$type][$op] = \array_merge($this->processedExtensions[$type][$op], $name);
   }
 
   /**
@@ -630,13 +630,13 @@ class ConfigImporter {
     $operation = $this->getNextExtensionOperation();
     if (!empty($operation)) {
       $this->processExtension($operation['type'], $operation['op'], $operation['name']);
-      $names = implode(', ', (array) $operation['name']);
+      $names = \implode(', ', (array) $operation['name']);
       $context['message'] = match ($operation['op']) {
         'install' => $this->t('Synchronizing extensions: installed @name.', ['@name' => $names]),
         'uninstall' => $this->t('Synchronizing extensions: uninstalled @name.', ['@name' => $names]),
       };
-      $processed_count = count($this->processedExtensions['module']['install']) + count($this->processedExtensions['module']['uninstall']);
-      $processed_count += count($this->processedExtensions['theme']['uninstall']) + count($this->processedExtensions['theme']['install']);
+      $processed_count = \count($this->processedExtensions['module']['install']) + \count($this->processedExtensions['module']['uninstall']);
+      $processed_count += \count($this->processedExtensions['theme']['uninstall']) + \count($this->processedExtensions['theme']['install']);
       $context['finished'] = $processed_count / $this->totalExtensionsToProcess;
     }
     else {
@@ -765,10 +765,10 @@ class ConfigImporter {
         $unprocessed = $this->getUnprocessedExtensions($type);
         if (!empty($unprocessed[$op])) {
           if ($type === 'module' && $op === 'install') {
-            $name = array_slice($unprocessed[$op], 0, Settings::get('core.multi_module_install_batch_size', 20));
+            $name = \array_slice($unprocessed[$op], 0, Settings::get('core.multi_module_install_batch_size', 20));
           }
           else {
-            $name = array_shift($unprocessed[$op]);
+            $name = \array_shift($unprocessed[$op]);
           }
           return [
             'op' => $op,

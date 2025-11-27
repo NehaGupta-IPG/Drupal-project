@@ -93,7 +93,7 @@ class WildcardHtmlSupportTest extends KernelTestBase {
 
     $editor = Editor::create($editor_config);
     $editor->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },

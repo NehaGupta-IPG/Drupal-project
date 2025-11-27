@@ -399,7 +399,7 @@ class ToolbarAdminMenuTest extends BrowserTestBase {
       'system-admin_config',
       'entity-user-collection',
       'front',
-    ], array_keys($ajax_result[0]['subtrees']), 'Correct subtrees returned.');
+    ], \array_keys($ajax_result[0]['subtrees']), 'Correct subtrees returned.');
   }
 
   /**

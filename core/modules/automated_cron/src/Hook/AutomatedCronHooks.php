@@ -56,10 +56,10 @@ class AutomatedCronHooks {
       '#default_value' => $automated_cron_settings->get('interval'),
       '#options' => [
         0 => $this->t('Never'),
-      ] + array_map([
+      ] + \array_map([
         \Drupal::service('date.formatter'),
         'formatInterval',
-      ], array_combine($options, $options)),
+      ], \array_combine($options, $options)),
     ];
     // Add submit callback.
     $form['#submit'][] = 'automated_cron_settings_submit';

@@ -89,7 +89,7 @@ class WorkspaceListBuilder extends EntityListBuilder {
 
     // Filter the tree to only include loaded entities, then replaces those tree
     // items with the actual loaded entity objects.
-    $entities = array_replace(array_intersect_key($workspace_tree, $loaded), $loaded);
+    $entities = \array_replace(\array_intersect_key($workspace_tree, $loaded), $loaded);
     foreach ($entities as $id => $entity) {
       $entity->_depth = $workspace_tree[$id]['depth'];
     }

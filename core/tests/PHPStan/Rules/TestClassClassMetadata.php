@@ -90,7 +90,7 @@ final class TestClassClassMetadata implements Rule {
       // Abstract test classes (i.e. base test classes) should not have any
       // metadata on the class definition, neither attributes nor annotations.
       foreach ($class->getAttributes() as $attribute) {
-        if (str_starts_with($attribute->getName(), 'PHPUnit\\Framework\\Attributes\\')) {
+        if (\str_starts_with($attribute->getName(), 'PHPUnit\\Framework\\Attributes\\')) {
           $fails[] = RuleErrorBuilder::message("Abstract test class {$class->getName()} must not add attribute {$attribute->getName()}.")
             ->identifier('abstractTestClass.metadataForbidden')
             ->line($node->getStartLine())
@@ -102,7 +102,7 @@ final class TestClassClassMetadata implements Rule {
       if ($resolvedPhpDoc) {
         foreach ($resolvedPhpDoc->getPhpDocNodes() as $phpDocNode) {
           foreach ($phpDocNode->getTags() as $tag) {
-            if (in_array($tag->name, $this->annotationTargets, TRUE)) {
+            if (\in_array($tag->name, $this->annotationTargets, TRUE)) {
               $fails[] = RuleErrorBuilder::message("Abstract test class {$class->getName()} must not add annotation {$tag->name}.")
                 ->identifier('abstractTestClass.metadataForbidden')
                 ->line($node->getStartLine())
@@ -119,7 +119,7 @@ final class TestClassClassMetadata implements Rule {
       if ($resolvedPhpDoc) {
         foreach ($resolvedPhpDoc->getPhpDocNodes() as $phpDocNode) {
           foreach ($phpDocNode->getTags() as $tag) {
-            if (in_array($tag->name, $this->annotationTargets, TRUE)) {
+            if (\in_array($tag->name, $this->annotationTargets, TRUE)) {
               $fails[] = RuleErrorBuilder::message("Test class {$class->getName()} must not add annotation {$tag->name}.")
                 ->identifier('testClass.metadataForbidden')
                 ->line($node->getStartLine())

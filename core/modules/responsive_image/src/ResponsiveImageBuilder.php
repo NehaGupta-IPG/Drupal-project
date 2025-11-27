@@ -172,14 +172,14 @@ class ResponsiveImageBuilder {
       $width = $variables['width'];
       $height = $variables['height'];
     }
-    $extension = pathinfo($variables['uri'], PATHINFO_EXTENSION);
+    $extension = \pathinfo($variables['uri'], PATHINFO_EXTENSION);
     $sizes = [];
     $srcset = [];
     $derivative_mime_types = [];
     // Traverse the multipliers in reverse so the largest image is processed
     // last./ The last image's dimensions are used for img.srcset height and
     // width.
-    foreach (array_reverse($multipliers) as $multiplier => $image_style_mapping) {
+    foreach (\array_reverse($multipliers) as $multiplier => $image_style_mapping) {
       switch ($image_style_mapping['image_mapping_type']) {
         // Create a <source> tag with the 'sizes' attribute.
         case 'sizes':
@@ -196,14 +196,14 @@ class ResponsiveImageBuilder {
             // it. Because of this, the image styles for all multipliers of
             // this breakpoint should be merged into one srcset and the sizes
             // attribute should be merged as well.
-            if (is_null($dimensions['width'])) {
+            if (\is_null($dimensions['width'])) {
               throw new \LogicException("Could not determine image width for '{$variables['uri']}' using image style with ID: $image_style_name. This image style can not be used for a responsive image style mapping using the 'sizes' attribute.");
             }
             // Use the image width as key so we can sort the array later on.
             // Images within a srcset should be sorted from small to large,
             // since the first matching source will be used.
-            $srcset[intval($dimensions['width'])] = $this->getImageStyleUrl($image_style_name, $variables['uri']) . ' ' . $dimensions['width'] . 'w';
-            $sizes = array_merge(explode(',', $image_style_mapping['image_mapping']['sizes']), $sizes);
+            $srcset[\intval($dimensions['width'])] = $this->getImageStyleUrl($image_style_name, $variables['uri']) . ' ' . $dimensions['width'] . 'w';
+            $sizes = \array_merge(\explode(',', $image_style_mapping['image_mapping']['sizes']), $sizes);
           }
           break;
 
@@ -216,25 +216,25 @@ class ResponsiveImageBuilder {
           // should be sorted from small to large, since the first matching
           // source will be used. We multiply it by 100 so multipliers with up
           // to two decimals can be used.
-          $srcset[intval(mb_substr($multiplier, 0, -1) * 100)] = $this->getImageStyleUrl($image_style_mapping['image_mapping'], $variables['uri']) . ' ' . $multiplier;
+          $srcset[\intval(\mb_substr($multiplier, 0, -1) * 100)] = $this->getImageStyleUrl($image_style_mapping['image_mapping'], $variables['uri']) . ' ' . $multiplier;
           $dimensions = $this->getImageDimensions($image_style_mapping['image_mapping'], ['width' => $width, 'height' => $height], $variables['uri']);
           break;
       }
     }
     // Sort the srcset from small to large image width or multiplier.
-    ksort($srcset);
+    \ksort($srcset);
     $source_attributes = new Attribute([
-      'srcset' => implode(', ', array_unique($srcset)),
+      'srcset' => \implode(', ', \array_unique($srcset)),
     ]);
-    $media_query = trim($breakpoint->getMediaQuery());
+    $media_query = \trim($breakpoint->getMediaQuery());
     if (!empty($media_query)) {
       $source_attributes->setAttribute('media', $media_query);
     }
-    if (count(array_unique($derivative_mime_types)) == 1) {
+    if (\count(\array_unique($derivative_mime_types)) == 1) {
       $source_attributes->setAttribute('type', $derivative_mime_types[0]);
     }
     if (!empty($sizes)) {
-      $source_attributes->setAttribute('sizes', implode(',', array_unique($sizes)));
+      $source_attributes->setAttribute('sizes', \implode(',', \array_unique($sizes)));
     }
     // The images used in a particular srcset attribute should all have the same
     // aspect ratio. The sizes attribute paired with the srcset attribute
@@ -280,7 +280,7 @@ class ResponsiveImageBuilder {
       ];
     }
     elseif ($entity = $this->entityTypeManager->getStorage('image_style')->load($image_style_name)) {
-      assert($entity instanceof ImageStyle);
+      \assert($entity instanceof ImageStyle);
       $entity->transformDimensions($dimensions, $uri);
     }
 

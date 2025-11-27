@@ -169,7 +169,7 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
       ],
     ])->save();
 
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },

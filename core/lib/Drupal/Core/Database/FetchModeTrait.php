@@ -134,7 +134,7 @@ trait FetchModeTrait {
     return match($mode) {
       FetchAs::Associative => $rowAssoc,
       FetchAs::ClassObject => $this->assocToClass($rowAssoc, $fetchOptions['class'], $fetchOptions['constructor_args']),
-      FetchAs::Column => $this->assocToColumn($rowAssoc, array_keys($rowAssoc), $fetchOptions['column']),
+      FetchAs::Column => $this->assocToColumn($rowAssoc, \array_keys($rowAssoc), $fetchOptions['column']),
       FetchAs::List => $this->assocToNum($rowAssoc),
       FetchAs::Object => $this->assocToObj($rowAssoc),
     };

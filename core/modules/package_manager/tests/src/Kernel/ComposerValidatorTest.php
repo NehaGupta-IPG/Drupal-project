@@ -34,14 +34,14 @@ class ComposerValidatorTest extends PackageManagerKernelTestBase {
    *   The test cases.
    */
   public static function providerComposerSettingsValidation(): array {
-    $summary = t("Composer settings don't satisfy Package Manager's requirements.");
+    $summary = \t("Composer settings don't satisfy Package Manager's requirements.");
 
     $secure_http_error = ValidationResult::createError([
-      t('HTTPS must be enabled for Composer downloads. See <a href="https://getcomposer.org/doc/06-config.md#secure-http">the Composer documentation</a> for more information.'),
+      \t('HTTPS must be enabled for Composer downloads. See <a href="https://getcomposer.org/doc/06-config.md#secure-http">the Composer documentation</a> for more information.'),
     ], $summary);
     $tls_error = ValidationResult::createError([
-      t('TLS must be enabled for HTTPS Composer downloads. See <a href="https://getcomposer.org/doc/06-config.md#disable-tls">the Composer documentation</a> for more information.'),
-      t('You should also check the value of <code>secure-http</code> and make sure that it is set to <code>true</code> or not set at all.'),
+      \t('TLS must be enabled for HTTPS Composer downloads. See <a href="https://getcomposer.org/doc/06-config.md#disable-tls">the Composer documentation</a> for more information.'),
+      \t('You should also check the value of <code>secure-http</code> and make sure that it is set to <code>true</code> or not set at all.'),
     ], $summary);
 
     return [
@@ -138,14 +138,14 @@ class ComposerValidatorTest extends PackageManagerKernelTestBase {
       'TLS disabled' => [
         ['disable-tls' => TRUE],
         [
-          t('TLS must be enabled for HTTPS Composer downloads. See <a href="/admin/help/package_manager#package-manager-requirements">the help page</a> for more information on how to configure Composer to download packages securely.'),
-          t('You should also check the value of <code>secure-http</code> and make sure that it is set to <code>true</code> or not set at all.'),
+          \t('TLS must be enabled for HTTPS Composer downloads. See <a href="/admin/help/package_manager#package-manager-requirements">the help page</a> for more information on how to configure Composer to download packages securely.'),
+          \t('You should also check the value of <code>secure-http</code> and make sure that it is set to <code>true</code> or not set at all.'),
         ],
       ],
       'secure-http is off' => [
         ['secure-http' => FALSE],
         [
-          t('HTTPS must be enabled for Composer downloads. See <a href="/admin/help/package_manager#package-manager-requirements">the help page</a> for more information on how to configure Composer to download packages securely.'),
+          \t('HTTPS must be enabled for Composer downloads. See <a href="/admin/help/package_manager#package-manager-requirements">the help page</a> for more information on how to configure Composer to download packages securely.'),
         ],
       ],
     ];

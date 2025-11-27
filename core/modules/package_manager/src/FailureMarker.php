@@ -44,7 +44,7 @@ final class FailureMarker implements EventSubscriberInterface {
    * Deletes the marker file.
    */
   public function clear(): void {
-    unlink($this->getPath());
+    \unlink($this->getPath());
   }
 
   /**
@@ -59,15 +59,15 @@ final class FailureMarker implements EventSubscriberInterface {
    */
   public function write(SandboxManagerBase $sandbox_manager, TranslatableMarkup $message, ?\Throwable $throwable = NULL): void {
     $data = [
-      'stage_class' => get_class($sandbox_manager),
+      'stage_class' => \get_class($sandbox_manager),
       'stage_type' => $sandbox_manager->getType(),
       'stage_file' => (new \ReflectionObject($sandbox_manager))->getFileName(),
       'message' => (string) $message,
-      'throwable_class' => $throwable ? get_class($throwable) : FALSE,
+      'throwable_class' => $throwable ? \get_class($throwable) : FALSE,
       'throwable_message' => $throwable?->getMessage() ?? 'Not available',
       'throwable_backtrace' => $throwable?->getTraceAsString() ?? 'Not available.',
     ];
-    file_put_contents($this->getPath(), Yaml::dump($data));
+    \file_put_contents($this->getPath(), Yaml::dump($data));
   }
 
   /**
@@ -81,8 +81,8 @@ final class FailureMarker implements EventSubscriberInterface {
    */
   private function getData(): ?array {
     $path = $this->getPath();
-    if (file_exists($path)) {
-      $data = file_get_contents($path);
+    if (\file_exists($path)) {
+      $data = \file_get_contents($path);
       try {
         return Yaml::parse($data);
 
@@ -115,7 +115,7 @@ final class FailureMarker implements EventSubscriberInterface {
     }
     $message = $data['message'];
     if ($data['throwable_class']) {
-      $message .= sprintf(
+      $message .= \sprintf(
         ' Caused by %s, with this message: %s',
         $data['throwable_class'],
         $data['throwable_message'],

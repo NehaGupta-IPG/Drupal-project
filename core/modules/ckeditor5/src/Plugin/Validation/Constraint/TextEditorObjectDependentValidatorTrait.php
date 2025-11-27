@@ -29,7 +29,7 @@ trait TextEditorObjectDependentValidatorTrait {
       ]);
     }
     else {
-      assert(in_array($this->context->getRoot()
+      \assert(\in_array($this->context->getRoot()
         ->getDataDefinition()
         ->getDataType(), ['editor.editor.*', 'entity:editor'], TRUE));
       $text_format = FilterFormat::load($this->context->getRoot()->get('format')->getValue());

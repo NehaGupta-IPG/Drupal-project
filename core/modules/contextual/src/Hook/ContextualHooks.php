@@ -117,7 +117,7 @@ class ContextualHooks {
   public function contextualLinksViewAlter(&$element, $items): void {
     if (isset($element['#contextual_links']['contextual'])) {
       $encoded_links = $element['#contextual_links']['contextual']['metadata']['contextual-views-field-links'];
-      $element['#links'] = Json::decode(rawurldecode($encoded_links));
+      $element['#links'] = Json::decode(\rawurldecode($encoded_links));
     }
   }
 

@@ -71,7 +71,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function __construct(\PDO $connection, array $connection_options) {
     // @phpstan-ignore class.notFound
-    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Mysql : TRUE);
+    \assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Mysql : TRUE);
     // If the SQL mode doesn't include 'ANSI_QUOTES' (explicitly or via a
     // combination mode), then MySQL doesn't interpret a double quote as an
     // identifier quote, in which case use the non-ANSI-standard backtick.

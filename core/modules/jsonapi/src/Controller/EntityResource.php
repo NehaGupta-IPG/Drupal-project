@@ -202,7 +202,7 @@ class EntityResource {
     $this->user = $user;
 
     if (!isset($event_dispatcher)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3280569', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3280569', E_USER_DEPRECATED);
       $event_dispatcher = \Drupal::service('event_dispatcher');
     }
     $this->eventDispatcher = $event_dispatcher;
@@ -761,7 +761,7 @@ class EntityResource {
    *   The field definition of the entity field to be updated.
    */
   protected function doPatchMultipleRelationship(EntityInterface $entity, array $resource_identifiers, FieldDefinitionInterface $field_definition) {
-    $entity->{$field_definition->getName()} = array_map(function (ResourceIdentifier $resource_identifier) {
+    $entity->{$field_definition->getName()} = \array_map(function (ResourceIdentifier $resource_identifier) {
       // We assume all entity reference fields have an 'entity' computed
       // property that can be used to assign the needed values.
       $field_properties = ['entity' => $this->getEntityFromResourceIdentifier($resource_identifier)];

@@ -136,7 +136,7 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
           if (\in_array(\strtolower($name), self::MAILBOX_LIST_HEADERS, TRUE)) {
             // Split values by comma, but ignore commas encapsulated in double
             // quotes.
-            $value = str_getcsv($value, escape: '\\');
+            $value = \str_getcsv($value, escape: '\\');
           }
           $headers->addHeader($name, $value);
         }

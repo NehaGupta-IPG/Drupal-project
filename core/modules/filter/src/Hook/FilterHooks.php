@@ -74,13 +74,13 @@ class FilterHooks {
   #[Hook('filter_secure_image_alter')]
   public function filterSecureImageAlter(&$image): void {
     // Turn an invalid image into an error indicator.
-    $image->setAttribute('src', base_path() . 'core/misc/icons/e32700/error.svg');
+    $image->setAttribute('src', \base_path() . 'core/misc/icons/e32700/error.svg');
     $image->setAttribute('alt', $this->t('Image removed.'));
     $image->setAttribute('title', $this->t('This image has been removed. For security reasons, only images from the local domain are allowed.'));
     $image->setAttribute('height', '16');
     $image->setAttribute('width', '16');
     // Add a CSS class to aid in styling.
-    $class = $image->getAttribute('class') ? trim($image->getAttribute('class')) . ' ' : '';
+    $class = $image->getAttribute('class') ? \trim($image->getAttribute('class')) . ' ' : '';
     $class .= 'filter-image-invalid';
     $image->setAttribute('class', $class);
   }

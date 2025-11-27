@@ -78,7 +78,7 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
    * @legacy-covers ::storeHash
    */
   public function testCreateWithNoLock(): void {
-    unlink($this->activeDir . '/composer.lock');
+    \unlink($this->activeDir . '/composer.lock');
     $project_root = $this->container->get(PathLocator::class)->getProjectRoot();
     $lock_file_path = $project_root . DIRECTORY_SEPARATOR . 'composer.lock';
     $no_lock = ValidationResult::createError([
@@ -101,7 +101,7 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
 
     // Change the lock file to ensure the stored hash of the previous version
     // has been deleted.
-    file_put_contents($this->activeDir . '/composer.lock', '{"changed": true}');
+    \file_put_contents($this->activeDir . '/composer.lock', '{"changed": true}');
     $this->assertResults([]);
   }
 
@@ -115,9 +115,9 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
     // priority of 0, this listener changes lock file before the validator
     // runs.
     $this->addEventTestListener(function () {
-      $lock = json_decode(file_get_contents($this->activeDir . '/composer.lock'), TRUE, flags: JSON_THROW_ON_ERROR);
+      $lock = \json_decode(\file_get_contents($this->activeDir . '/composer.lock'), TRUE, flags: JSON_THROW_ON_ERROR);
       $lock['extra']['key'] = 'value';
-      file_put_contents($this->activeDir . '/composer.lock', json_encode($lock, JSON_THROW_ON_ERROR));
+      \file_put_contents($this->activeDir . '/composer.lock', \json_encode($lock, JSON_THROW_ON_ERROR));
     }, $event_class);
     $result = ValidationResult::createError([
       $this->t('Unexpected changes were detected in the active lock file (@file), which indicates that other Composer operations were performed since this Package Manager operation started. This can put the code base into an unreliable state and therefore is not allowed.',
@@ -138,7 +138,7 @@ class LockFileValidatorTest extends PackageManagerKernelTestBase {
     // priority of 0, this listener deletes lock file before the validator
     // runs.
     $this->addEventTestListener(function () {
-      unlink($this->activeDir . '/composer.lock');
+      \unlink($this->activeDir . '/composer.lock');
     }, $event_class);
     $result = ValidationResult::createError([
       $this->t('The active lock file (@file) does not exist.', [

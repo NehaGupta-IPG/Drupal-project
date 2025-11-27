@@ -87,11 +87,11 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
 
     $http_base_url = \preg_replace('/^https?/', 'http', $base_url);
     $https_base_url = \preg_replace('/^https?/', 'https', $base_url);
-    $files_path = base_path() . $public_files_path;
+    $files_path = \base_path() . $public_files_path;
     $csrf_path = $public_files_path . '/' . \implode('/', \array_fill(0, \substr_count($public_files_path, '/') + 1, '..'));
 
     $druplicon = 'core/misc/druplicon.png';
-    $red_x_image = base_path() . 'core/misc/icons/e32700/error.svg';
+    $red_x_image = \base_path() . 'core/misc/icons/e32700/error.svg';
 
     // Put a test image in the files directory.
     $test_images = $this->getTestFiles('image');
@@ -110,14 +110,14 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
     $host = \Drupal::request()->getHost();
     $host_pattern = '|^http\://' . $host . '(\:[0-9]{0,5})|';
     $images = [
-      $http_base_url . '/' . $druplicon => base_path() . $druplicon,
-      $https_base_url . '/' . $druplicon => base_path() . $druplicon,
+      $http_base_url . '/' . $druplicon => \base_path() . $druplicon,
+      $https_base_url . '/' . $druplicon => \base_path() . $druplicon,
       // Test a URL that includes a port.
-      \preg_replace($host_pattern, 'http://' . $host . ':', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
-      \preg_replace($host_pattern, 'http://' . $host . ':80', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
-      \preg_replace($host_pattern, 'http://' . $host . ':443', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
-      \preg_replace($host_pattern, 'http://' . $host . ':8080', $http_base_url . '/' . $druplicon) => base_path() . $druplicon,
-      base_path() . $druplicon => base_path() . $druplicon,
+      \preg_replace($host_pattern, 'http://' . $host . ':', $http_base_url . '/' . $druplicon) => \base_path() . $druplicon,
+      \preg_replace($host_pattern, 'http://' . $host . ':80', $http_base_url . '/' . $druplicon) => \base_path() . $druplicon,
+      \preg_replace($host_pattern, 'http://' . $host . ':443', $http_base_url . '/' . $druplicon) => \base_path() . $druplicon,
+      \preg_replace($host_pattern, 'http://' . $host . ':8080', $http_base_url . '/' . $druplicon) => \base_path() . $druplicon,
+      \base_path() . $druplicon => \base_path() . $druplicon,
       $files_path . '/' . $test_image => $files_path . '/' . $test_image,
       $http_base_url . '/' . $public_files_path . '/' . $test_image => $files_path . '/' . $test_image,
       $https_base_url . '/' . $public_files_path . '/' . $test_image => $files_path . '/' . $test_image,

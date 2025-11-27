@@ -96,7 +96,7 @@ class UserSearchTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($user2->getAccountName());
 
     // Verify that wildcard search works for email.
-    $subkey = substr($keys, 0, 2) . '*' . substr($keys, 4, 2);
+    $subkey = \substr($keys, 0, 2) . '*' . \substr($keys, 4, 2);
     $edit = ['keys' => $subkey];
     $this->drupalGet('search/user');
     $this->submitForm($edit, 'Search');

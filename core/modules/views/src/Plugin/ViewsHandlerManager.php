@@ -57,7 +57,7 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
     $plugin_definition_annotation_name = 'Drupal\views\Annotation\Views' . Container::camelize($handler_type);
     // Special handling until all views plugins have attribute classes.
     $attribute_name_candidate = 'Drupal\views\Attribute\Views' . Container::camelize($handler_type);
-    $plugin_definition_attribute_name = class_exists($attribute_name_candidate) ? $attribute_name_candidate : Plugin::class;
+    $plugin_definition_attribute_name = \class_exists($attribute_name_candidate) ? $attribute_name_candidate : Plugin::class;
     $plugin_interface = ViewsHandlerInterface::class;
     if ($handler_type == 'join') {
       $plugin_interface = JoinPluginInterface::class;

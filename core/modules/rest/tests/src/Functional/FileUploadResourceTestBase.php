@@ -708,7 +708,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'filename' => [
@@ -719,7 +719,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
       'uri' => [
         [
           'value' => 'public://foobar/' . $expected_filename,
-          'url' => base_path() . $this->siteDirectory . '/files/foobar/' . \rawurlencode($expected_filename),
+          'url' => \base_path() . $this->siteDirectory . '/files/foobar/' . \rawurlencode($expected_filename),
         ],
       ],
       'filemime' => [

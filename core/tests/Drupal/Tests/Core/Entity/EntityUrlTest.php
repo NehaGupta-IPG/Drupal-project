@@ -216,7 +216,7 @@ class EntityUrlTest extends UnitTestCase {
   public function testToUrlLinkTemplateRevision(bool $is_default_revision, string $link_template, string $expected_route_name, array $expected_route_parameters): void {
     $values = ['id' => static::ENTITY_ID, 'langcode' => $this->langcode];
     $entity = $this->getEntity(StubRevisionableEntity::class, $values, ['getRevisionId', 'isDefaultRevision']);
-    assert($entity instanceof StubRevisionableEntity);
+    \assert($entity instanceof StubRevisionableEntity);
     $entity->method('getRevisionId')->willReturn(static::REVISION_ID);
     $entity->method('isDefaultRevision')->willReturn($is_default_revision);
     $this->registerLinkTemplate($link_template);
@@ -471,7 +471,7 @@ class EntityUrlTest extends UnitTestCase {
    *   A mock entity object with predefined methods and properties for testing.
    */
   protected function getEntity(string $class, array $values, array $methods = []): StubEntityBase&MockObject {
-    $methods = array_merge($methods, ['getEntityType', 'entityTypeBundleInfo']);
+    $methods = \array_merge($methods, ['getEntityType', 'entityTypeBundleInfo']);
 
     // Prophecy does not allow mocking abstract classes while actually calling
     // their code. We use Prophecy below because that allows us to add method

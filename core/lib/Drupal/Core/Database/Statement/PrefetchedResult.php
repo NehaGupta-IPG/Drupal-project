@@ -42,7 +42,7 @@ class PrefetchedResult extends ResultBase {
     public readonly ?int $rowCount,
   ) {
     parent::__construct($fetchMode, $fetchOptions);
-    $this->columnNames = isset($this->data[0]) ? array_keys($this->data[0]) : [];
+    $this->columnNames = isset($this->data[0]) ? \array_keys($this->data[0]) : [];
     $this->currentRowIndex = -1;
   }
 

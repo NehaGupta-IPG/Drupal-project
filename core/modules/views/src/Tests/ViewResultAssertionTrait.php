@@ -103,7 +103,7 @@ trait ViewResultAssertionTrait {
       foreach ($column_map as $expected_column) {
         // The comparison will be done on the string representation of the
         // value.
-        if (is_object($value)) {
+        if (\is_object($value)) {
           $row[$expected_column] = (string) $value->$expected_column;
         }
         // This case is about fields with multiple values.
@@ -125,8 +125,8 @@ trait ViewResultAssertionTrait {
 
     // Do the actual comparison.
     if (!isset($message)) {
-      $not = (strpos($assert_method, 'Not') ? 'not' : '');
-      $message = sprintf("Actual result <pre>\n%s\n</pre> is $not identical to expected <pre>\n%s\n</pre>", var_export($result, TRUE), var_export($expected_result, TRUE));
+      $not = (\strpos($assert_method, 'Not') ? 'not' : '');
+      $message = \sprintf("Actual result <pre>\n%s\n</pre> is $not identical to expected <pre>\n%s\n</pre>", \var_export($result, TRUE), \var_export($expected_result, TRUE));
     }
 
     switch ($assert_method) {

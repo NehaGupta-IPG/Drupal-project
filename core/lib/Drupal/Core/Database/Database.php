@@ -515,11 +515,11 @@ abstract class Database {
    */
   public static function convertDbUrlToConnectionInfo(string $url, $root = NULL, ?bool $include_test_drivers = NULL): array {
     if ($root !== NULL) {
-      if (is_bool($root)) {
+      if (\is_bool($root)) {
         $include_test_drivers = $root;
       }
       else {
-        @trigger_error("Passing a string \$root value to " . __METHOD__ . "() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
+        @\trigger_error("Passing a string \$root value to " . __METHOD__ . "() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
       }
     }
 

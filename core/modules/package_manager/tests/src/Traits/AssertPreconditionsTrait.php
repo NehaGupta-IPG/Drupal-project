@@ -58,7 +58,7 @@ trait AssertPreconditionsTrait {
    * @see self::tearDown()
    */
   protected static function failIfUnmetPreConditions(string $when): void {
-    assert(in_array($when, ['before', 'after'], TRUE));
+    \assert(\in_array($when, ['before', 'after'], TRUE));
     static::assertNoFailureMarker($when);
   }
 
@@ -76,7 +76,7 @@ trait AssertPreconditionsTrait {
     // root is defined as the directory containing the `vendor` directory.
     // @see \Drupal\package_manager\FailureMarker::getPath()
     $failure_marker = static::getProjectRoot() . '/PACKAGE_MANAGER_FAILURE.yml';
-    if (file_exists($failure_marker)) {
+    if (\file_exists($failure_marker)) {
       $suffix = $when === 'before'
         ? 'Remove it to continue.'
         : 'This test method created this marker but failed to clean up after itself.';
@@ -98,8 +98,8 @@ trait AssertPreconditionsTrait {
     // instance member.
     // Use reflection to extract the vendor directory from the class loader.
     $class_loaders = ClassLoader::getRegisteredLoaders();
-    $vendor_directory = key($class_loaders);
-    return dirname($vendor_directory);
+    $vendor_directory = \key($class_loaders);
+    return \dirname($vendor_directory);
   }
 
 }

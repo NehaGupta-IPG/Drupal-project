@@ -25,7 +25,7 @@ class ContextualThemeHooks {
   public function preprocess(&$variables, $hook, $info): void {
     // Determine the primary theme function argument.
     if (!empty($info['variables'])) {
-      $keys = array_keys($info['variables']);
+      $keys = \array_keys($info['variables']);
       $key = $keys[0];
     }
     elseif (!empty($info['render element'])) {
@@ -35,7 +35,7 @@ class ContextualThemeHooks {
       $element = $variables[$key];
     }
 
-    if (isset($element) && is_array($element) && !empty($element['#contextual_links'])) {
+    if (isset($element) && \is_array($element) && !empty($element['#contextual_links'])) {
       $variables['#cache']['contexts'][] = 'user.permissions';
       if ($this->currentUser->hasPermission('access contextual links')) {
         // Mark this element as potentially having contextual links attached to
@@ -50,7 +50,7 @@ class ContextualThemeHooks {
         // permission.
         $variables['title_suffix']['contextual_links'] = [
           '#type' => 'contextual_links_placeholder',
-          '#id' => _contextual_links_to_id($element['#contextual_links']),
+          '#id' => \_contextual_links_to_id($element['#contextual_links']),
         ];
       }
     }

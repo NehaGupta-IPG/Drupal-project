@@ -309,7 +309,7 @@ class MailTest extends KernelTestBase {
     $file = File::create(['uri' => "public://{$image_name}.png", 'filename' => "{$image_name}.png"]);
     $file->save();
 
-    $base_path = base_path();
+    $base_path = \base_path();
 
     $path_pairs = [
       'root relative' => [$file->getFileUri(), "{$http_host}{$base_path}{$image_name}.png"],

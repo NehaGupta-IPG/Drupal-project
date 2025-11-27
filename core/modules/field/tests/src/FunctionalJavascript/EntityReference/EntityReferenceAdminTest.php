@@ -261,7 +261,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
     // @todo remove after https://www.drupal.org/i/3395590 has been fixed.
     $this->getSession()->resizeWindow(1200, 1500);
-    usleep(5000);
+    \usleep(5000);
 
     $page->find('css', '.ui-dialog-buttonset')->pressButton('Save');
 

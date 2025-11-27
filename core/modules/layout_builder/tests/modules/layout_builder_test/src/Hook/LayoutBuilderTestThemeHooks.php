@@ -36,7 +36,7 @@ class LayoutBuilderTestThemeHooks {
     if (!empty($vars['content']['#entity'])) {
       $vars['content']['content'][$this->uuid->generate()] = [
         '#type' => 'markup',
-        '#markup' => sprintf('Yes, I can access the %s', $vars['content']['#entity']->label()),
+        '#markup' => \sprintf('Yes, I can access the %s', $vars['content']['#entity']->label()),
       ];
     }
   }
@@ -49,7 +49,7 @@ class LayoutBuilderTestThemeHooks {
     if (!empty($vars['content']['#entity'])) {
       $vars['content']['first'][$this->uuid->generate()] = [
         '#type' => 'markup',
-        '#markup' => sprintf('Yes, I can access the entity %s in two column', $vars['content']['#entity']->label()),
+        '#markup' => \sprintf('Yes, I can access the entity %s in two column', $vars['content']['#entity']->label()),
       ];
     }
   }

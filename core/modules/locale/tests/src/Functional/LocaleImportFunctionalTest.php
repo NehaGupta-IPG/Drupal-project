@@ -423,9 +423,9 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
     $file_system = \Drupal::service('file_system');
     $name = $file_system->tempnam('temporary://', "po_") . '.po';
     foreach ($encodings as $encoding) {
-      $contents = mb_convert_encoding($contents, $encoding);
+      $contents = \mb_convert_encoding($contents, $encoding);
     }
-    file_put_contents($name, $contents);
+    \file_put_contents($name, $contents);
     $options['files[file]'] = $name;
     $this->drupalGet('admin/config/regional/translate/import');
     $this->submitForm($options, 'Import');

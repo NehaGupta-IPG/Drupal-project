@@ -98,7 +98,7 @@ class DatePreprocess {
       $variables['title'] = $element['#title'];
       // If the element title is a string, wrap it a render array so that markup
       // will not be escaped (but XSS-filtered).
-      if (is_string($variables['title']) && $variables['title'] !== '') {
+      if (\is_string($variables['title']) && $variables['title'] !== '') {
         $variables['title'] = ['#markup' => $variables['title']];
       }
     }

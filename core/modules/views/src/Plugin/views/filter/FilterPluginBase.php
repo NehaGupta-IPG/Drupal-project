@@ -790,7 +790,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
   public function validateExposeForm($form, FormStateInterface $form_state) {
     $remember_role_keys = ['options', 'expose', 'remember_roles'];
     $roles = $form_state->getValue($remember_role_keys);
-    $form_state->setValue($remember_role_keys, array_filter($roles));
+    $form_state->setValue($remember_role_keys, \array_filter($roles));
     $identifier = $form_state->getValue(['options', 'expose', 'identifier']);
     $this->validateIdentifier($identifier, $form_state, $form['expose']['identifier']);
 
@@ -1152,7 +1152,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     // $form[$key] prior to rendering. That's why the preRender for it needs to
     // run first, so that when the next preRender (the one for fieldsets) runs,
     // it gets the flattened data.
-    array_unshift($form['#pre_render'], [static::class, 'preRenderFlattenData']);
+    \array_unshift($form['#pre_render'], [static::class, 'preRenderFlattenData']);
     $form['group_info']['#flatten'] = TRUE;
 
     if (!empty($this->options['group_info']['identifier'])) {

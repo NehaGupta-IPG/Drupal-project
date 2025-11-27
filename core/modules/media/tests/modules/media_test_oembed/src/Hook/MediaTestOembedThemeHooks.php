@@ -17,7 +17,7 @@ class MediaTestOembedThemeHooks {
   #[Hook('preprocess_media_oembed_iframe')]
   public function preprocessMediaOembedIframe(array &$variables): void {
     if ($variables['resource']->getProvider()->getName() === 'YouTube') {
-      $variables['media'] = str_replace('?feature=oembed', '?feature=oembed&pasta=rigatoni', (string) $variables['media']);
+      $variables['media'] = \str_replace('?feature=oembed', '?feature=oembed&pasta=rigatoni', (string) $variables['media']);
     }
     // @see \Drupal\Tests\media\Kernel\OEmbedIframeControllerTest
     $variables['#attached']['library'][] = 'media_test_oembed/frame';

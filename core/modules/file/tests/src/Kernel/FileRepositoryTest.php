@@ -65,8 +65,8 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
     $stream_wrapper_manager = \Drupal::service('stream_wrapper_manager');
     \assert($stream_wrapper_manager instanceof StreamWrapperManagerInterface);
     $this->assertEquals('public', $stream_wrapper_manager::getScheme($result->getFileUri()), "File was placed in Drupal's files directory.");
-    $this->assertEquals($filename, basename($result->getFileUri()), 'File was named correctly.');
-    $this->assertEquals($contents, file_get_contents($result->getFileUri()), 'Contents of the file are correct.');
+    $this->assertEquals($filename, \basename($result->getFileUri()), 'File was named correctly.');
+    $this->assertEquals($contents, \file_get_contents($result->getFileUri()), 'Contents of the file are correct.');
     $this->assertEquals('text/plain', $result->getMimeType(), 'A MIME type was set.');
     $this->assertTrue($result->isPermanent(), "The file's status was set to permanent.");
 

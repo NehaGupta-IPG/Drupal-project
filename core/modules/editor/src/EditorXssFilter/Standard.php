@@ -67,7 +67,7 @@ class Standard extends Xss implements EditorXssFilterInterface {
 
     // Don't remove dangerous tags that are explicitly allowed in both text
     // formats.
-    $removed_tags = array_diff($dangerous_tags, $allowed_tags);
+    $removed_tags = \array_diff($dangerous_tags, $allowed_tags);
 
     $output = static::filter($html, $removed_tags);
 

@@ -82,7 +82,7 @@ class BackendCompilerPassTest extends UnitTestCase {
     $container->setDefinition('mysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassMysql'));
     $container->setDefinition('DriverTestMysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassDriverTestMysql'));
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'DriverTestMysql', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'DriverTestMysql', \get_class($container->get('service')));
 
     // Set the mysql service, now the mysql service, as it is the database_type
     // override, should be used.
@@ -96,7 +96,7 @@ class BackendCompilerPassTest extends UnitTestCase {
     $container = $this->getDriverTestMysqlContainer($service);
     $container->setDefinition('DriverTestMysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassDriverTestMysql'));
     $this->backendPass->process($container);
-    $this->assertEquals($prefix . 'DriverTestMysql', get_class($container->get('service')));
+    $this->assertEquals($prefix . 'DriverTestMysql', \get_class($container->get('service')));
 
     // Verify that if the container has a default_backend parameter,
     // and there is a service named ".my-service", the right alias is created.

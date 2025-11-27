@@ -97,7 +97,7 @@ class RenderCache implements RenderCacheInterface {
    *   Whether the cache tags allow caching for the current HTTP method.
    */
   protected function isCacheableForCurrentHttpMethod(array $tags): bool {
-    return $this->requestStack->getCurrentRequest()->isMethodCacheable() || empty(array_filter($tags, fn (string $tag) => str_starts_with($tag, 'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:')));
+    return $this->requestStack->getCurrentRequest()->isMethodCacheable() || empty(\array_filter($tags, fn (string $tag) => \str_starts_with($tag, 'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:')));
   }
 
   /**

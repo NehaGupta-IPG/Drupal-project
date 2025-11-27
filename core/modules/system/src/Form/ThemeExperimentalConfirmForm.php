@@ -116,7 +116,7 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
       $items[] = [
         [
           '#markup' => $this->formatPlural(
-            count($dependencies),
+            \count($dependencies),
               'You must install the following theme to install @theme:',
               'You must install the following themes to install @theme:',
               [
@@ -127,7 +127,7 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
         [
           '#theme' => 'item_list',
           '#list_type' => 'ul',
-          '#items' => array_map($get_label, $dependencies),
+          '#items' => \array_map($get_label, $dependencies),
         ],
       ];
     }

@@ -100,8 +100,8 @@ final class ComposerPluginsValidator implements EventSubscriberInterface {
     private readonly PathLocator $pathLocator,
   ) {
     $settings = $config_factory->get('package_manager.settings');
-    $this->additionalTrustedComposerPlugins = array_fill_keys(
-      array_map(
+    $this->additionalTrustedComposerPlugins = \array_fill_keys(
+      \array_map(
         [__CLASS__, 'normalizePackageName'],
         $settings->get('additional_trusted_composer_plugins')
       ),
@@ -121,7 +121,7 @@ final class ComposerPluginsValidator implements EventSubscriberInterface {
    *   The normalized package name.
    */
   private static function normalizePackageName(string $package_name): string {
-    return strtolower($package_name);
+    return \strtolower($package_name);
   }
 
   /**
@@ -158,39 +158,39 @@ final class ComposerPluginsValidator implements EventSubscriberInterface {
       + self::SUPPORTED_PLUGINS_THAT_DO_MODIFY
       + self::SUPPORTED_PLUGINS_THAT_DO_NOT_MODIFY;
 
-    assert(is_array($allowed_plugins));
+    \assert(\is_array($allowed_plugins));
     // Only packages with `true` as a value are actually executed by Composer.
-    $allowed_plugins = array_keys(array_filter($allowed_plugins));
+    $allowed_plugins = \array_keys(\array_filter($allowed_plugins));
     // The keys are normalized package names, and the values are the original,
     // non-normalized package names.
-    $allowed_plugins = array_combine(
-      array_map([__CLASS__, 'normalizePackageName'], $allowed_plugins),
+    $allowed_plugins = \array_combine(
+      \array_map([__CLASS__, 'normalizePackageName'], $allowed_plugins),
       $allowed_plugins
     );
 
     $installed_packages = $this->inspector->getInstalledPackagesList($dir);
     // Determine which plugins are both trusted by us, AND allowed by Composer's
     // configuration.
-    $supported_plugins = array_intersect_key($allowed_plugins, $trusted_plugins);
+    $supported_plugins = \array_intersect_key($allowed_plugins, $trusted_plugins);
     // Create an array whose keys are the names of those plugins, and the values
     // are their installed versions.
-    $supported_plugins_installed_versions = array_combine(
+    $supported_plugins_installed_versions = \array_combine(
       $supported_plugins,
-      array_map(
+      \array_map(
         fn (string $name): ?string => $installed_packages[$name]?->version,
         $supported_plugins
       )
     );
     // Find the plugins whose installed versions aren't in the supported range.
-    $unsupported_installed_versions = array_filter(
+    $unsupported_installed_versions = \array_filter(
       $supported_plugins_installed_versions,
       fn (?string $version, string $name): bool => $version && !Semver::satisfies($version, $trusted_plugins[$name]),
       ARRAY_FILTER_USE_BOTH
     );
 
-    $untrusted_plugins = array_diff_key($allowed_plugins, $trusted_plugins);
+    $untrusted_plugins = \array_diff_key($allowed_plugins, $trusted_plugins);
 
-    $messages = array_map(
+    $messages = \array_map(
       fn (string $raw_name) => $this->t('<code>@name</code>', ['@name' => $raw_name]),
       $untrusted_plugins
     );
@@ -204,7 +204,7 @@ final class ComposerPluginsValidator implements EventSubscriberInterface {
 
     if ($messages) {
       $summary = $this->formatPlural(
-        count($messages),
+        \count($messages),
         'An unsupported Composer plugin was detected.',
         'Unsupported Composer plugins were detected.',
       );

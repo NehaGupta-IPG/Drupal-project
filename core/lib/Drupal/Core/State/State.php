@@ -169,7 +169,7 @@ class State extends CacheCollector implements StateInterface {
    */
   protected function registerKeySetDuringRequest(string $key, mixed $value, mixed $previousValue): void {
     $this->keysSetDuringRequest[$key]['value'] = $value;
-    if (!array_key_exists('original', $this->keysSetDuringRequest[$key])) {
+    if (!\array_key_exists('original', $this->keysSetDuringRequest[$key])) {
       $this->keysSetDuringRequest[$key]['original'] = $previousValue;
     }
   }

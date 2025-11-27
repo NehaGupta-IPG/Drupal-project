@@ -43,31 +43,31 @@ final class SetProperties implements ConfigActionPluginInterface, ContainerFacto
    */
   public function apply(string $configName, mixed $values): void {
     $entity = $this->configManager->loadConfigEntityByName($configName);
-    assert($entity instanceof ConfigEntityInterface);
+    \assert($entity instanceof ConfigEntityInterface);
 
-    assert(is_array($values));
-    assert(!array_is_list($values));
+    \assert(\is_array($values));
+    \assert(!\array_is_list($values));
 
     // Don't allow the ID or UUID to be changed.
     $entity_keys = $entity->getEntityType()->getKeys();
-    $forbidden_keys = array_filter([
+    $forbidden_keys = \array_filter([
       $entity_keys['id'],
       $entity_keys['uuid'],
     ]);
 
     foreach ($values as $property_name => $value) {
-      if (in_array($property_name, $forbidden_keys, TRUE)) {
+      if (\in_array($property_name, $forbidden_keys, TRUE)) {
         throw new ConfigActionException("Entity key '$property_name' cannot be changed by the setProperties config action.");
       }
-      $parts = explode('.', $property_name);
+      $parts = \explode('.', $property_name);
 
       $property_value = $entity->get($parts[0]);
-      if (count($parts) > 1) {
-        if (isset($property_value) && !is_array($property_value)) {
+      if (\count($parts) > 1) {
+        if (isset($property_value) && !\is_array($property_value)) {
           throw new ConfigActionException('The setProperties config action can only set nested values on arrays.');
         }
         $property_value ??= [];
-        NestedArray::setValue($property_value, array_slice($parts, 1), $value);
+        NestedArray::setValue($property_value, \array_slice($parts, 1), $value);
       }
       else {
         $property_value = $value;

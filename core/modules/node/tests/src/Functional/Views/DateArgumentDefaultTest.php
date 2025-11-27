@@ -81,18 +81,18 @@ class DateArgumentDefaultTest extends NodeTestBase {
     $this->sameTimeNode = $this->drupalCreateNode(['type' => 'page']);
     $this->otherTimeNode = $this->drupalCreateNode([
       'type' => 'page',
-      'created' => strtotime('-5 days'),
-      'changed' => strtotime('-5 days'),
+      'created' => \strtotime('-5 days'),
+      'changed' => \strtotime('-5 days'),
     ]);
     $this->fixedTimeNode = $this->drupalCreateNode([
       'type' => 'page',
-      'created' => strtotime('1975-05-18'),
-      'changed' => strtotime('1975-05-18'),
+      'created' => \strtotime('1975-05-18'),
+      'changed' => \strtotime('1975-05-18'),
     ]);
     $this->sameMonthNode = $this->drupalCreateNode([
       'type' => 'page',
-      'created' => strtotime('1975-05-13'),
-      'changed' => strtotime('1975-05-13'),
+      'created' => \strtotime('1975-05-13'),
+      'changed' => \strtotime('1975-05-13'),
     ]);
   }
 

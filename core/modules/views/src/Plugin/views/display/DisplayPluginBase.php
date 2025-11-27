@@ -2014,7 +2014,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       case 'style_options':
         // Submit plugin options. Every section with "_options" in it, belongs
         // to a plugin type, like "style_options".
-        $plugin_type = str_replace('_options', '', $section);
+        $plugin_type = \str_replace('_options', '', $section);
         if ($plugin = $this->getPlugin($plugin_type)) {
           $plugin_options = $this->getOption($plugin_type);
           $plugin->submitOptionsForm($form[$plugin_type . '_options'], $form_state);
@@ -2173,13 +2173,13 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    */
   protected function recursiveReplaceTokens(array $parts, array $tokens): array {
     foreach ($parts as $key => $value) {
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $value = $this->recursiveReplaceTokens($value, $tokens);
       }
       else {
         $value = $this->viewsTokenReplace($value, $tokens);
       }
-      if (!is_int($key)) {
+      if (!\is_int($key)) {
         unset($parts[$key]);
         $key = $this->viewsTokenReplace($key, $tokens);
       }
@@ -2435,7 +2435,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       $this->view->element['#cache'] += ['keys' => []];
       // Places like \Drupal\views\ViewExecutable::setCurrentPage() set up an
       // additional cache context.
-      $this->view->element['#cache']['keys'] = array_merge(
+      $this->view->element['#cache']['keys'] = \array_merge(
         ['views', 'display', $this->view->element['#name'], $this->view->element['#display_id']],
         $this->view->element['#cache']['keys']);
 

@@ -41,7 +41,7 @@ final class RootComposer {
    *   The JSON manipulator.
    */
   public function getComposerManipulator(): JsonManipulator {
-    $this->composerManipulator ??= new JsonManipulator(file_get_contents(Factory::getComposerFile()));
+    $this->composerManipulator ??= new JsonManipulator(\file_get_contents(Factory::getComposerFile()));
     return $this->composerManipulator;
   }
 
@@ -96,8 +96,8 @@ final class RootComposer {
     // Write composer.json.
     $composer_json = Factory::getComposerFile();
     $composer_content = $this->getComposerManipulator()->getContents();
-    if (!file_put_contents($composer_json, $composer_content)) {
-      throw new \RuntimeException(sprintf('Could not update %s', $composer_json));
+    if (!\file_put_contents($composer_json, $composer_content)) {
+      throw new \RuntimeException(\sprintf('Could not update %s', $composer_json));
     }
 
     // Create package lists for lock file update.
@@ -105,7 +105,7 @@ final class RootComposer {
     $packages = $dev_packages = [];
     $dev_package_names = $local_repo->getDevPackageNames();
     foreach ($local_repo->getPackages() as $package) {
-      if (in_array($package->getName(), $dev_package_names, TRUE)) {
+      if (\in_array($package->getName(), $dev_package_names, TRUE)) {
         $dev_packages[] = $package;
       }
       else {
@@ -139,7 +139,7 @@ final class RootComposer {
 
     $this->io->write("Unpacking has updated the root composer files.", verbosity: IOInterface::VERBOSE);
 
-    assert(self::checkRootPackage($composer_content, $this->composer->getPackage()), 'Composer root package and composer.json match');
+    \assert(self::checkRootPackage($composer_content, $this->composer->getPackage()), 'Composer root package and composer.json match');
   }
 
   /**
@@ -155,8 +155,8 @@ final class RootComposer {
    */
   private static function checkRootPackage(string $composer_content, RootPackageInterface $root_package): bool {
     $composer = JsonFile::parseJson($composer_content);
-    return empty(array_diff_key($composer['require'] ?? [], $root_package->getRequires()))
-      && empty(array_diff_key($composer['require-dev'] ?? [], $root_package->getDevRequires()));
+    return empty(\array_diff_key($composer['require'] ?? [], $root_package->getRequires()))
+      && empty(\array_diff_key($composer['require-dev'] ?? [], $root_package->getDevRequires()));
   }
 
 }

@@ -70,7 +70,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
 
     $tracked_revision_id = NULL;
     if (isset($tracked[$entity->getEntityTypeId()])) {
-      $tracked_revision_id = key($tracked[$entity->getEntityTypeId()]);
+      $tracked_revision_id = \key($tracked[$entity->getEntityTypeId()]);
     }
     $id_field = static::getIdField($entity->getEntityTypeId());
 
@@ -94,7 +94,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
 
       // Insert a new index entry for each workspace that is not tracking this
       // entity yet.
-      $missing_workspaces = array_diff($affected_workspaces, $this->getEntityTrackingWorkspaceIds($entity));
+      $missing_workspaces = \array_diff($affected_workspaces, $this->getEntityTrackingWorkspaceIds($entity));
       if ($missing_workspaces) {
         $insert_query = $this->database->insert(static::TABLE)
           ->fields([
@@ -211,7 +211,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
     $this->loadAssociatedRevisions($workspace_id);
 
     if ($entity_ids) {
-      return array_intersect($this->associatedRevisions[$workspace_id][$entity_type_id] ?? [], $entity_ids);
+      return \array_intersect($this->associatedRevisions[$workspace_id][$entity_type_id] ?? [], $entity_ids);
     }
     else {
       return $this->associatedRevisions[$workspace_id][$entity_type_id] ?? [];
@@ -225,7 +225,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
     $this->loadAssociatedRevisions($workspace_id);
 
     if ($entity_ids) {
-      return array_intersect($this->associatedInitialRevisions[$workspace_id][$entity_type_id] ?? [], $entity_ids);
+      return \array_intersect($this->associatedInitialRevisions[$workspace_id][$entity_type_id] ?? [], $entity_ids);
     }
     else {
       return $this->associatedInitialRevisions[$workspace_id][$entity_type_id] ?? [];
@@ -250,7 +250,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
       // Get workspace candidates for regular (non-initial) revisions.
       $workspace_tree = $this->workspaceRepository->loadTree();
       if (isset($workspace_tree[$workspace_id])) {
-        $workspace_candidates = array_merge([$workspace_id], $workspace_tree[$workspace_id]['ancestors']);
+        $workspace_candidates = \array_merge([$workspace_id], $workspace_tree[$workspace_id]['ancestors']);
       }
       else {
         $workspace_candidates = [$workspace_id];
@@ -316,7 +316,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
 
     // Return workspace IDs sorted in tree order.
     $tree = $this->workspaceRepository->loadTree();
-    return array_keys(array_intersect_key($tree, array_flip($result)));
+    return \array_keys(\array_intersect_key($tree, \array_flip($result)));
   }
 
   /**
@@ -363,7 +363,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
           // Move the revisions if they have the revision metadata field.
           if ($field_name = $entity_type->getRevisionMetadataKey('workspace')) {
             $affected_revisions = $this->entityTypeManager->getStorage($entity_type_id)
-              ->loadMultipleRevisions(array_keys($entity_ids));
+              ->loadMultipleRevisions(\array_keys($entity_ids));
 
             foreach ($affected_revisions as $revision) {
               $revision->{$field_name}->target_id = $target_workspace_id;

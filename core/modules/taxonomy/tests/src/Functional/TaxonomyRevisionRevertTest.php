@@ -108,8 +108,8 @@ class TaxonomyRevisionRevertTest extends BrowserTestBase {
     $this->submitForm([], 'Revert');
     $this->assertEquals($count + 1, $countRevisions());
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->addressEquals(sprintf('taxonomy/term/%s/revisions', $entity->id()));
-    $this->assertSession()->pageTextContains(sprintf('Test %s has been reverted to the revision from Sun, 11 Jan 2009 - 16:00.', $termName));
+    $this->assertSession()->addressEquals(\sprintf('taxonomy/term/%s/revisions', $entity->id()));
+    $this->assertSession()->pageTextContains(\sprintf('Test %s has been reverted to the revision from Sun, 11 Jan 2009 - 16:00.', $termName));
     $this->assertSession()->elementsCount('css', 'table tbody tr', 3);
   }
 

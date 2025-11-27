@@ -188,8 +188,8 @@ class Mapping extends ArrayElement {
       // are only valid in *some* cases: remove the statically valid keys from
       // every per-type array of valid keys.
       unset($valid_keys_per_type[$fallback_type]);
-      $valid_keys_per_type = array_map(
-        fn (array $keys) => array_values(array_filter($keys, fn (string $key) => !in_array($key, $statically_required_keys, TRUE))),
+      $valid_keys_per_type = \array_map(
+        fn (array $keys) => \array_values(\array_filter($keys, fn (string $key) => !\in_array($key, $statically_required_keys, TRUE))),
         $valid_keys_per_type
       );
     }
@@ -273,7 +273,7 @@ class Mapping extends ArrayElement {
     // `module\.something\.foo_.*`
     // or
     // `.*\.third_party\..*`.
-    $regex = str_replace(['.', '[]'], ['\.', '.*'], $name);
+    $regex = \str_replace(['.', '[]'], ['\.', '.*'], $name);
     // Now find all possible types:
     // 1. `module.something.foo_foo`, `module.something.foo_bar`, etc.
     $possible_types = \array_filter(

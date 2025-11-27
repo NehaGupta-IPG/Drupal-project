@@ -29,7 +29,7 @@ class Fieldgroup extends Fieldset {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    @trigger_error('The ' . __CLASS__ . ' element is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . Fieldset::class . ' instead. See https://www.drupal.org/node/3515272', E_USER_DEPRECATED);
+    @\trigger_error('The ' . __CLASS__ . ' element is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . Fieldset::class . ' instead. See https://www.drupal.org/node/3515272', E_USER_DEPRECATED);
   }
 
   /**

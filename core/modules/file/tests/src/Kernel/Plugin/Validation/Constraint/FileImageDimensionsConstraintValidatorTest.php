@@ -42,12 +42,12 @@ class FileImageDimensionsConstraintValidatorTest extends FileValidatorTestBase {
 
     $this->image = File::create();
     $this->image->setFileUri('core/misc/druplicon.png');
-    $this->image->setFilename(basename($this->image->getFileUri()));
-    $this->image->setSize(@filesize($this->image->getFileUri()));
+    $this->image->setFilename(\basename($this->image->getFileUri()));
+    $this->image->setSize(@\filesize($this->image->getFileUri()));
 
     $this->nonImage = File::create();
     $this->nonImage->setFileUri('core/assets/scaffold/README.txt');
-    $this->nonImage->setFilename(basename($this->nonImage->getFileUri()));
+    $this->nonImage->setFilename(\basename($this->nonImage->getFileUri()));
   }
 
   /**

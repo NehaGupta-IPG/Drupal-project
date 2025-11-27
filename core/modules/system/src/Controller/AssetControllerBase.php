@@ -195,7 +195,7 @@ abstract class AssetControllerBase extends FileDownloadController {
     // received hash and generated hash match. This prevents invalid filenames
     // from filling the disk, while still serving aggregates that may be
     // referenced in cached HTML.
-    if (hash_equals($generated_hash, $received_hash)) {
+    if (\hash_equals($generated_hash, $received_hash)) {
       $data = $this->optimizer->optimizeGroup($group);
       $this->dumper->dumpToUri($data, $this->assetType, $uri);
       $response = new Response($data, 200, [
@@ -206,7 +206,7 @@ abstract class AssetControllerBase extends FileDownloadController {
     else {
       $expected_filename = $this->fileExtension . '_' . $generated_hash . '.' . $this->fileExtension;
       $response = new RedirectResponse(
-        str_replace($file_name, $expected_filename, $request->getRequestUri()),
+        \str_replace($file_name, $expected_filename, $request->getRequestUri()),
         301,
         ['Cache-Control' => 'public, max-age=3600, must-revalidate'],
       );

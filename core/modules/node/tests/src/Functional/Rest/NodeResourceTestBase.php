@@ -187,7 +187,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'revision_uid' => [
@@ -195,7 +195,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'path' => [

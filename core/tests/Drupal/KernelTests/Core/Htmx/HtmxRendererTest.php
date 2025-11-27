@@ -101,7 +101,7 @@ class HtmxRendererTest extends KernelTestBase {
     $response = $this->httpKernel->handle($request);
     $this->assertEquals(200, $response->getStatusCode());
     $this->assertEquals('text/html; charset=UTF-8', $response->headers->get('Content-Type'));
-    $oneLine = str_replace(["\r", "\n"], "", $response->getContent());
+    $oneLine = \str_replace(["\r", "\n"], "", $response->getContent());
     $this->assertStringContainsString('<body><div class="ajax-content">Initial Content</div></body>', $oneLine);
   }
 

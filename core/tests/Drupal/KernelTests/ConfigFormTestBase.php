@@ -57,9 +57,9 @@ abstract class ConfigFormTestBase extends KernelTestBase {
     // Check that the form returns an error when expected, and vice versa.
     $errors = $form_state->getErrors();
     $valid_form = empty($errors);
-    $values = print_r($values, TRUE);
-    $errors = $valid_form ? $this->t('None') : implode(' ', $errors);
-    $this->assertTrue($valid_form, sprintf('Input values: %s<br/>Validation handler errors: %s', $values, $errors));
+    $values = \print_r($values, TRUE);
+    $errors = $valid_form ? $this->t('None') : \implode(' ', $errors);
+    $this->assertTrue($valid_form, \sprintf('Input values: %s<br/>Validation handler errors: %s', $values, $errors));
     foreach ($this->values as $data) {
       $this->assertEquals($this->config($data['#config_name'])->get($data['#config_key']), $data['#value']);
     }

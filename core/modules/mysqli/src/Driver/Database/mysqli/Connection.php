@@ -38,7 +38,7 @@ class Connection extends BaseMySqlConnection {
         // None of the modes in $ansiQuotesModes are substrings of other modes
         // that are not in $ansiQuotesModes, so a simple stripos() does not
         // return false positives.
-        if (stripos($connectionOptions['init_commands']['sql_mode'], $mode) !== FALSE) {
+        if (\stripos($connectionOptions['init_commands']['sql_mode'], $mode) !== FALSE) {
           $isAnsiQuotesMode = TRUE;
           break;
         }
@@ -59,7 +59,7 @@ class Connection extends BaseMySqlConnection {
     // Sets mysqli error reporting mode to report errors from mysqli function
     // calls and to throw mysqli_sql_exception for errors.
     // @see https://www.php.net/manual/en/mysqli-driver.report-mode.php
-    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+    \mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     // Allow PDO options to be overridden.
     $connection_options += [
@@ -117,7 +117,7 @@ class Connection extends BaseMySqlConnection {
     ];
     if (!empty($connection_options['isolation_level'])) {
       $connection_options['init_commands'] += [
-        'isolation_level' => 'SET SESSION TRANSACTION ISOLATION LEVEL ' . strtoupper($connection_options['isolation_level']),
+        'isolation_level' => 'SET SESSION TRANSACTION ISOLATION LEVEL ' . \strtoupper($connection_options['isolation_level']),
       ];
     }
 

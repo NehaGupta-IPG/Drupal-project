@@ -159,7 +159,7 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
     $value_frequency = \array_count_values($item_values);
 
     // Filter out item values which are not duplicates while preserving deltas.
-    $duplicate_values = array_intersect($item_values, array_keys(array_filter(
+    $duplicate_values = \array_intersect($item_values, \array_keys(\array_filter(
       $value_frequency, function ($value) {
         return $value > 1;
       })

@@ -323,7 +323,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
         ? $a_weight <=> $b_weight
         : $definition_a['provider'] <=> $definition_b['provider'];
     };
-    uasort($definitions, $sort_by_module_weight_and_name);
+    \uasort($definitions, $sort_by_module_weight_and_name);
   }
 
   /**
@@ -508,7 +508,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
       ? \substr($path, \strlen($this->appRoot) + 1)
       : $path;
     // Make sure this works seamlessly in every OS.
-    $path_from_root = str_replace(DIRECTORY_SEPARATOR, '/', $path_from_root);
+    $path_from_root = \str_replace(DIRECTORY_SEPARATOR, '/', $path_from_root);
     // The library owner is in <root>/core, so we need to go one level up to
     // find the app root.
     return '../' . $path_from_root;

@@ -109,9 +109,9 @@ class EntityOperationsTest extends KernelTestBase {
     // is a core bug that should get fixed.
     $storage = \Drupal::entityTypeManager()->getStorage('node');
     $query = $storage->getQuery()->allRevisions()->condition('nid', $page->id())->accessCheck(FALSE);
-    $revision_ids = array_keys($query->execute());
-    sort($revision_ids);
-    $latest = end($revision_ids);
+    $revision_ids = \array_keys($query->execute());
+    \sort($revision_ids);
+    $latest = \end($revision_ids);
     $page = $storage->loadRevision($latest);
     $this->assertEquals('C', $page->getTitle());
 

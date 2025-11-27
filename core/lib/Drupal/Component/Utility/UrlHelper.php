@@ -191,13 +191,13 @@ class UrlHelper {
     // The URL is considered external if it contains the '://' delimiter. Since
     // a URL can also be passed as a query argument, we check if this delimiter
     // appears in front of the '?' query argument delimiter.
-    $scheme_delimiter_position = strpos($url, '://');
-    $query_delimiter_position = strpos($url, '?');
-    $fragment_delimiter_position = strpos($url, '#');
+    $scheme_delimiter_position = \strpos($url, '://');
+    $query_delimiter_position = \strpos($url, '?');
+    $fragment_delimiter_position = \strpos($url, '#');
     if ($scheme_delimiter_position !== FALSE && ($query_delimiter_position === FALSE || $scheme_delimiter_position < $query_delimiter_position) && ($fragment_delimiter_position === FALSE || $scheme_delimiter_position < $fragment_delimiter_position)) {
       // Split off the fragment, if any.
       if ($fragment_delimiter_position !== FALSE) {
-        [$url, $options['fragment']] = explode('#', $url, 2);
+        [$url, $options['fragment']] = \explode('#', $url, 2);
       }
 
       // Split off everything before the query string into 'path'.
@@ -217,7 +217,7 @@ class UrlHelper {
     else {
       // parse_url() does not support relative URLs, so make it absolute. For
       // instance, the relative URL "foo/bar:1" isn't properly parsed.
-      $parts = parse_url('https://example.com/' . $url);
+      $parts = \parse_url('https://example.com/' . $url);
       // Strip the leading slash that was just added.
       $options['path'] = \substr($parts['path'], 1);
       if (isset($parts['query'])) {
@@ -412,7 +412,7 @@ class UrlHelper {
         // If a colon is preceded by a slash, question mark or hash, it cannot
         // possibly be part of the URL scheme. This must be a relative URL,
         // which inherits the (safe) protocol of the base document.
-        if (preg_match('![/?#]!', $protocol)) {
+        if (\preg_match('![/?#]!', $protocol)) {
           break;
         }
         // Check if this is a disallowed protocol. Per RFC2616, section 3.2.3

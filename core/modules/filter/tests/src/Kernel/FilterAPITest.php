@@ -84,7 +84,7 @@ class FilterAPITest extends EntityKernelTestBase {
     // this check focuses on the ability to filter multiple filter types at
     // once. Drupal core only ships with these two types of filters, so this is
     // the most extensive test possible.
-    $actual_filtered_text_without_html_generators = check_markup(
+    $actual_filtered_text_without_html_generators = \check_markup(
       $text,
       'filtered_html',
       '',

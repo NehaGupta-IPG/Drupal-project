@@ -230,10 +230,10 @@ class PagePreviewTest extends NodeTestBase {
     $this->assertSession()->elementExists('xpath', "//body[contains(@class, 'page-node-type-page')]");
 
     // Get the UUID.
-    $url = parse_url($this->getUrl());
-    $paths = explode('/', $url['path']);
-    array_pop($paths);
-    $uuid = array_pop($paths);
+    $url = \parse_url($this->getUrl());
+    $paths = \explode('/', $url['path']);
+    \array_pop($paths);
+    $uuid = \array_pop($paths);
 
     // Switch view mode. We'll remove the body from the teaser view mode.
     \Drupal::service('entity_display.repository')

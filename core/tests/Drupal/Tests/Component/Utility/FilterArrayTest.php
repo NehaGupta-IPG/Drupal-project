@@ -24,7 +24,7 @@ class FilterArrayTest extends TestCase {
    */
   #[DataProvider('providerRemoveEmptyStrings')]
   public function testRemoveEmptyStrings(array $values, array $expected): void {
-    $this->assertEquals($expected, array_values(FilterArray::removeEmptyStrings($values)));
+    $this->assertEquals($expected, \array_values(FilterArray::removeEmptyStrings($values)));
   }
 
   /**

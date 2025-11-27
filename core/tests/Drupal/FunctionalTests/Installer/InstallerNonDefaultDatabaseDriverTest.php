@@ -38,7 +38,7 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
       $this->markTestSkipped("This test does not support the {$driver} database driver.");
     }
     $driverNamespace = Database::getConnection()->getConnectionOptions()['namespace'];
-    $this->testDriverName = 'DriverTest' . ucfirst($driver);
+    $this->testDriverName = 'DriverTest' . \ucfirst($driver);
     $testDriverNamespace = "Drupal\\driver_test\\Driver\\Database\\{$this->testDriverName}";
 
     // Assert that we are using the database drivers from the driver_test
@@ -109,7 +109,7 @@ class InstallerNonDefaultDatabaseDriverTest extends InstallerTestBase {
     $app_root = $this->container->getParameter('app.root');
     $site_path = $this->siteDirectory;
     include $app_root . '/' . $site_path . '/settings.php';
-    assert(isset($databases));
+    \assert(isset($databases));
     return $databases;
   }
 

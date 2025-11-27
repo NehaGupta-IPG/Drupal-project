@@ -23,11 +23,11 @@ class ScaleAndCropImageEffect extends CropImageEffect {
   public function applyEffect(ImageInterface $image) {
     $width = (int) $this->configuration['width'];
     $height = (int) $this->configuration['height'];
-    $scale = max($width / $image->getWidth(), $height / $image->getHeight());
+    $scale = \max($width / $image->getWidth(), $height / $image->getHeight());
 
-    [$x, $y] = explode('-', $this->configuration['anchor']);
-    $x = Image::getKeywordOffset($x, (int) round($image->getWidth() * $scale), $width);
-    $y = Image::getKeywordOffset($y, (int) round($image->getHeight() * $scale), $height);
+    [$x, $y] = \explode('-', $this->configuration['anchor']);
+    $x = Image::getKeywordOffset($x, (int) \round($image->getWidth() * $scale), $width);
+    $y = Image::getKeywordOffset($y, (int) \round($image->getHeight() * $scale), $height);
 
     if (!$image->apply('scale_and_crop', ['x' => $x, 'y' => $y, 'width' => $width, 'height' => $height])) {
       $this->logger->error('Image scale and crop failed using the %toolkit toolkit on %path (%mimetype, %dimensions)', [

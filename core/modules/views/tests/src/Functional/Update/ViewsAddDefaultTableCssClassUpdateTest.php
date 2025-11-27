@@ -52,10 +52,10 @@ class ViewsAddDefaultTableCssClassUpdateTest extends UpdatePathTestBase {
     $data = $view->toArray();
     $counter = 0;
     foreach ($data['display'] as $display) {
-      if (array_key_exists('style', $display['display_options'])) {
+      if (\array_key_exists('style', $display['display_options'])) {
         $style = $display['display_options']['style'];
         // The style has type and options so we need to ensure we are reviewing options.
-        if (is_array($style) && array_key_exists('options', $style)) {
+        if (\is_array($style) && \array_key_exists('options', $style)) {
           $this->assertArrayNotHasKey('class', $style['options']);
           $counter++;
         }
@@ -70,11 +70,11 @@ class ViewsAddDefaultTableCssClassUpdateTest extends UpdatePathTestBase {
 
     $counter = 0;
     foreach ($data['display'] as $display) {
-      if (array_key_exists('style', $display['display_options'])) {
+      if (\array_key_exists('style', $display['display_options'])) {
         $style = $display['display_options']['style'];
         // The style has type and options so we need to ensure we are reviewing options.
-        if (is_array($style) && array_key_exists('options', $style)) {
-          if (is_array($style) && array_key_exists('options', $style)) {
+        if (\is_array($style) && \array_key_exists('options', $style)) {
+          if (\is_array($style) && \array_key_exists('options', $style)) {
             $this->assertArrayHasKey('class', $style['options']);
             $counter++;
           }

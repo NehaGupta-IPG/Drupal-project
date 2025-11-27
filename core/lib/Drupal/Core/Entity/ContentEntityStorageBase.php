@@ -496,7 +496,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         ->accessCheck(FALSE)
         ->execute();
 
-      $latest_revision_ids[LanguageInterface::LANGCODE_DEFAULT] = key($result);
+      $latest_revision_ids[LanguageInterface::LANGCODE_DEFAULT] = \key($result);
       $this->memoryCache->set("latest_revision_id:{$this->entityTypeId}:$entity_id", $latest_revision_ids, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
     }
 
@@ -529,7 +529,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         ->addTag('latest_translated_affected_revision')
         ->execute();
 
-      $latest_revision_ids[$langcode] = key($result);
+      $latest_revision_ids[$langcode] = \key($result);
       $this->memoryCache->set("latest_revision_id:{$this->entityTypeId}:$entity_id", $latest_revision_ids, MemoryCacheInterface::CACHE_PERMANENT, [$this->memoryCacheTag]);
     }
 
@@ -662,13 +662,13 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     // $revision_ids array for later comparison with the revision cache. The
     // $revision_ids array is reduced as items are loaded from cache, allowing
     // storage queries to be avoided.
-    $flipped_revision_ids = array_flip($revision_ids);
+    $flipped_revision_ids = \array_flip($revision_ids);
     // Try to load entities from the static cache.
     if (!$this->ignoreStaticRevisionCache && $revision_ids) {
       $revisions += $this->getFromStaticRevisionCache($revision_ids);
       // If any revisions were loaded, remove them from the ids still to load.
       if ($flipped_revision_ids && $revisions) {
-        $revision_ids = array_keys(array_diff_key($flipped_revision_ids, $revisions));
+        $revision_ids = \array_keys(\array_diff_key($flipped_revision_ids, $revisions));
       }
     }
 
@@ -724,7 +724,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     // IDs.
     if ($flipped_revision_ids) {
       // Remove any invalid revision IDs from the array.
-      $flipped_revision_ids = array_intersect_key($flipped_revision_ids, $revisions);
+      $flipped_revision_ids = \array_intersect_key($flipped_revision_ids, $revisions);
       foreach ($revisions as $revision_id => $revision) {
         $flipped_revision_ids[$revision_id] = $revision;
       }
@@ -977,7 +977,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   protected function invokeTranslationHooks(ContentEntityInterface $entity) {
     $translations = $entity->getTranslationLanguages(FALSE);
     $original_translations = $entity->getOriginal()->getTranslationLanguages(FALSE);
-    $all_translations = array_keys($translations + $original_translations);
+    $all_translations = \array_keys($translations + $original_translations);
 
     // Notify modules of translation insertion/deletion.
     foreach ($all_translations as $langcode) {
@@ -1080,8 +1080,8 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     // We need to call the delete method for field items of removed
     // translations.
     if ($method == 'postSave' && $entity->getOriginal()) {
-      $original_langcodes = array_keys($entity->getOriginal()->getTranslationLanguages());
-      foreach (array_diff($original_langcodes, $langcodes) as $removed_langcode) {
+      $original_langcodes = \array_keys($entity->getOriginal()->getTranslationLanguages());
+      foreach (\array_diff($original_langcodes, $langcodes) as $removed_langcode) {
         /** @var \Drupal\Core\Entity\ContentEntityInterface $translation */
         $translation = $entity->getOriginal()->getTranslation($removed_langcode);
 
@@ -1262,7 +1262,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     foreach ($ids as $id) {
       $cid_map[$id] = $this->buildRevisionCacheId($id);
     }
-    $cids = array_values($cid_map);
+    $cids = \array_values($cid_map);
     if ($cache = $this->cacheBackend->getMultiple($cids)) {
       // Get the entities that were found in the cache.
       foreach ($ids as $index => $id) {
@@ -1350,10 +1350,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     $revisions = [];
     // Load any available entities from the internal revision cache.
     if ($this->entityType->isStaticallyCacheable()) {
-      $cache_ids = array_map(function ($revision_id) {
+      $cache_ids = \array_map(function ($revision_id) {
         return $this->buildRevisionCacheId($revision_id);
       }, $revision_ids);
-      $map = array_combine($cache_ids, $revision_ids);
+      $map = \array_combine($cache_ids, $revision_ids);
 
       $cache_items = $this->memoryCache->getMultiple($cache_ids);
       foreach ($cache_items as $cache_id => $item) {
@@ -1491,11 +1491,11 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    */
   public function __get(string $name) {
     if ($name === 'latestRevisionIds') {
-      @trigger_error('Getting the static cache of latest revision IDs is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. You can retrieve it from the \'entity.memory_cache\' service instead. See https://www.drupal.org/node/3535160', E_USER_DEPRECATED);
+      @\trigger_error('Getting the static cache of latest revision IDs is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. You can retrieve it from the \'entity.memory_cache\' service instead. See https://www.drupal.org/node/3535160', E_USER_DEPRECATED);
       return [];
     }
 
-    trigger_error('Undefined property ' . __CLASS__ . "::\${$name}", E_USER_WARNING);
+    \trigger_error('Undefined property ' . __CLASS__ . "::\${$name}", E_USER_WARNING);
     return NULL;
   }
 
@@ -1507,7 +1507,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   caches for.
    */
   protected function resetRevisionCache(array $revision_ids): void {
-    $cache_ids = array_map(function ($revision_id) {
+    $cache_ids = \array_map(function ($revision_id) {
       return $this->buildRevisionCacheId($revision_id);
     }, $revision_ids);
 

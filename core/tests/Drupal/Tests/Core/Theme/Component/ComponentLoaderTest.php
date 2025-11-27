@@ -26,7 +26,7 @@ class ComponentLoaderTest extends UnitTestCaseTest {
   public function testIsFresh(): void {
     $vfs_root = vfsStream::setup();
     $component_directory = vfsStream::newDirectory('loader-test')->at($vfs_root);
-    $current_time = time();
+    $current_time = \time();
     $component_twig_file = vfsStream::newFile('loader-test.twig')
       ->at($component_directory)
       ->setContent('twig')
@@ -67,7 +67,7 @@ class ComponentLoaderTest extends UnitTestCaseTest {
     // It shouldn't matter that the time is in "future".
     $component_twig_file->lastModified($current_time + 1000);
     // Clear stat cache, to make sure component loader gets updated time.
-    clearstatcache();
+    \clearstatcache();
     // Component shouldn't be "fresh" anymore.
     $this->assertFalse($component_loader->isFresh('sdc_test:loader-test', $current_time), 'Twig file was supposed to be outdated');
 
@@ -76,7 +76,7 @@ class ComponentLoaderTest extends UnitTestCaseTest {
     $component_twig_file->lastModified($current_time);
     $component_yml_file->lastModified($current_time + 1000);
     // Clear stat cache, to make sure component loader gets updated time.
-    clearstatcache();
+    \clearstatcache();
     // Component shouldn't be "fresh" anymore.
     $this->assertFalse($component_loader->isFresh('sdc_test:loader-test', $current_time), 'YAML file was supposed to be outdated');
 
@@ -85,7 +85,7 @@ class ComponentLoaderTest extends UnitTestCaseTest {
     $component_twig_file->lastModified($current_time + 1000);
     $component_yml_file->lastModified($current_time + 1000);
     // Clear stat cache, to make sure component loader gets updated time.
-    clearstatcache();
+    \clearstatcache();
     // Component shouldn't be "fresh" anymore.
     $this->assertFalse($component_loader->isFresh('sdc_test:loader-test', $current_time), 'Twig and YAML files were supposed to be outdated');
   }

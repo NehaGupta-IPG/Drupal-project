@@ -96,7 +96,7 @@ class MediaHooks {
     /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $class = $field_type_manager->getPluginClass($field_type);
-    if (!is_a($class, 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem', TRUE)) {
+    if (!\is_a($class, 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem', TRUE)) {
       return;
     }
     // Set the default formatter for media in entity reference fields to be the
@@ -125,7 +125,7 @@ class MediaHooks {
       ]);
     }
     $field_types = ['file_upload', 'field_ui:entity_reference:media'];
-    if (in_array($form_state->getStorage()['field_type'], $field_types)) {
+    if (\in_array($form_state->getStorage()['field_type'], $field_types)) {
       $form['field_options_wrapper']['description_wrapper'] = ['#type' => 'item', '#markup' => $description_text];
     }
   }
@@ -148,7 +148,7 @@ class MediaHooks {
     }
     // Autocomplete widgets need different help text than options widgets.
     $widget_plugin_id = $context['widget']->getPluginId();
-    if (in_array($widget_plugin_id, ['entity_reference_autocomplete', 'entity_reference_autocomplete_tags'])) {
+    if (\in_array($widget_plugin_id, ['entity_reference_autocomplete', 'entity_reference_autocomplete_tags'])) {
       $is_autocomplete = TRUE;
     }
     else {
@@ -161,7 +161,7 @@ class MediaHooks {
     // which bundles are available to be created or referenced.
     $settings = $context['items']->getFieldDefinition()->getSetting('handler_settings');
     $allowed_bundles = !empty($settings['target_bundles']) ? $settings['target_bundles'] : [];
-    $add_url = _media_get_add_url($allowed_bundles);
+    $add_url = \_media_get_add_url($allowed_bundles);
     if ($add_url) {
       $elements['#media_help']['#media_add_help'] = $this->t('Create your media on the <a href=":add_page" target="_blank">media add page</a> (opens a new window), then add it by name to the field below.', [':add_page' => $add_url]);
     }
@@ -198,8 +198,8 @@ class MediaHooks {
       if ($overview_url->access()) {
         $elements['#media_help']['#media_list_link'] = $this->t('See the <a href=":list_url" target="_blank">media list</a> (opens a new window) to help locate media.', [':list_url' => $overview_url->toString()]);
       }
-      $bundle_labels = array_intersect_key(\Drupal::service('entity_type.bundle.info')->getBundleLabels('media'), $allowed_bundles);
-      $elements['#media_help']['#allowed_types_help'] = $this->t('Allowed media types: %types', ['%types' => implode(", ", $bundle_labels)]);
+      $bundle_labels = \array_intersect_key(\Drupal::service('entity_type.bundle.info')->getBundleLabels('media'), $allowed_bundles);
+      $elements['#media_help']['#allowed_types_help'] = $this->t('Allowed media types: %types', ['%types' => \implode(", ", $bundle_labels)]);
     }
   }
 

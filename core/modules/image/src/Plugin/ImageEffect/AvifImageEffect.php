@@ -80,7 +80,7 @@ class AvifImageEffect extends ConvertImageEffect {
    * Is AVIF supported by the image toolkit.
    */
   protected function isAvifSupported(): bool {
-    return in_array('avif', $this->imageToolkitManager->getDefaultToolkit()->getSupportedExtensions());
+    return \in_array('avif', $this->imageToolkitManager->getDefaultToolkit()->getSupportedExtensions());
   }
 
 }

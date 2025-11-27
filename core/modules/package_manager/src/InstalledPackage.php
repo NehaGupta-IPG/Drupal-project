@@ -39,11 +39,11 @@ final class InstalledPackage {
    * @return static
    */
   public static function createFromArray(array $data): static {
-    $path = isset($data['path']) ? realpath($data['path']) : NULL;
+    $path = isset($data['path']) ? \realpath($data['path']) : NULL;
     // Fall back to `library`.
     // @see https://getcomposer.org/doc/04-schema.md#type
     $type = $data['type'] ?? 'library';
-    assert(($type === 'metapackage') === is_null($path), 'Metapackage install path must be NULL.');
+    \assert(($type === 'metapackage') === \is_null($path), 'Metapackage install path must be NULL.');
 
     return new static($data['name'], $data['version'], $path, $type);
   }
@@ -76,7 +76,7 @@ final class InstalledPackage {
       'drupal-theme',
       'drupal-profile',
     ];
-    if ($this->path && str_starts_with($this->name, 'drupal/') && in_array($this->type, $drupal_package_types, TRUE)) {
+    if ($this->path && \str_starts_with($this->name, 'drupal/') && \in_array($this->type, $drupal_package_types, TRUE)) {
       return $this->scanForProjectName();
     }
     return NULL;
@@ -98,7 +98,7 @@ final class InstalledPackage {
     $iterator = new \RegexIterator($iterator, '/.+\.info\.yml$/', \RegexIterator::GET_MATCH);
 
     foreach ($iterator as $match) {
-      $info = file_get_contents($match[0]);
+      $info = \file_get_contents($match[0]);
       $info = Yaml::decode($info);
 
       if (!empty($info['project'])) {

@@ -123,7 +123,7 @@ class MediaTest extends MediaTestBase {
     ]);
     $filter_format->save();
 
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
@@ -177,7 +177,7 @@ class MediaTest extends MediaTestBase {
       ],
     ]);
     $filter_format->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
@@ -718,7 +718,7 @@ class MediaTest extends MediaTestBase {
     $filter_format->save();
     $editor->save();
 
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },

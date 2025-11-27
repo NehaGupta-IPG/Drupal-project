@@ -38,10 +38,10 @@ class SelectProfileForm extends FormBase {
     $names = [];
     foreach ($install_state['profiles'] as $profile) {
       /** @var \Drupal\Core\Extension\Extension $profile */
-      $details = install_profile_info($profile->getName());
+      $details = \install_profile_info($profile->getName());
       // Don't show hidden profiles. This is used by to hide the testing
       // profile, which only exists to speed up test runs.
-      if ($details['hidden'] === TRUE && !drupal_valid_test_ua()) {
+      if ($details['hidden'] === TRUE && !\drupal_valid_test_ua()) {
         continue;
       }
       $profiles[$profile->getName()] = $details;
@@ -79,7 +79,7 @@ class SelectProfileForm extends FormBase {
       '#options' => \array_map([$this, 't'], $names),
       '#default_value' => 'standard',
     ];
-    foreach (array_keys($names) as $profile_name) {
+    foreach (\array_keys($names) as $profile_name) {
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $form['profile'][$profile_name]['#description'] = isset($profiles[$profile_name]['description']) ? $this->t($profiles[$profile_name]['description']) : '';
     }

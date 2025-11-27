@@ -538,7 +538,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
     $filter_format->save();
     $this->assertSame('foobar', $filter_format->get('filters')['media_embed']['settings']['default_view_mode']);
     $this->assertSame(['foobar' => 'foobar'], $filter_format->get('filters')['media_embed']['settings']['allowed_view_modes']);
-    $this->assertTrue(in_array('core.entity_view_mode.media.foobar', $filter_format->getDependencies()['config']));
+    $this->assertTrue(\in_array('core.entity_view_mode.media.foobar', $filter_format->getDependencies()['config']));
 
     $role = Role::load($role_id);
     $this->assertContains($filter_format->getPermissionName(), $role->getPermissions());

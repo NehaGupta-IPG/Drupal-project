@@ -133,7 +133,7 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     foreach ($image_paths as $key => $image_path) {
       $image = File::create();
       $image->setFileUri($image_path);
-      $image->setFilename(basename($image->getFileUri()));
+      $image->setFilename(\basename($image->getFileUri()));
       $image->save();
 
       $file_usage = $this->container->get('file.usage');

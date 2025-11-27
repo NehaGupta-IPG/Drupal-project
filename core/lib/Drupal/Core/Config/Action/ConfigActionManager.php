@@ -131,11 +131,11 @@ class ConfigActionManager extends DefaultPluginManager {
    * @see \Drupal\Core\Config\Action\ConfigActionManager::getConfigNamesMatchingExpression()
    */
   public function applyAction(string $action_id, string $configName, mixed $data): void {
-    if (str_starts_with($configName, '?')) {
-      if (str_contains($configName, '*')) {
+    if (\str_starts_with($configName, '?')) {
+      if (\str_contains($configName, '*')) {
         throw new ConfigActionException("The '$configName' configuration name is optional because it starts with a question mark, and therefore cannot contain wildcards.");
       }
-      $configName = trim($configName, '?');
+      $configName = \trim($configName, '?');
       if (!$this->configStorage->exists($configName)) {
         // The config action is optional and the config doesn't exist.
         // So there is nothing to do.
@@ -158,8 +158,8 @@ class ConfigActionManager extends DefaultPluginManager {
       $entity_type = $this->configManager->getEntityTypeIdByName($configName);
       if ($entity_type) {
         $action_ids = $this->getShorthandActionIdsForEntityType($entity_type);
-        $valid_ids = implode(', ', array_keys($action_ids));
-        throw new PluginNotFoundException($action_id, sprintf('The "%s" entity does not support the "%s" config action. Valid config actions for %s are: %s', $entity_type, $action_id, $entity_type, $valid_ids));
+        $valid_ids = \implode(', ', \array_keys($action_ids));
+        throw new PluginNotFoundException($action_id, \sprintf('The "%s" entity does not support the "%s" config action. Valid config actions for %s are: %s', $entity_type, $action_id, $entity_type, $valid_ids));
       }
       throw $e;
     }

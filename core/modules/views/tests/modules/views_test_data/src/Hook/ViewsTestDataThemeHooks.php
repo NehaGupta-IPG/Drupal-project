@@ -40,7 +40,7 @@ class ViewsTestDataThemeHooks {
     foreach ($variables['rows'] as $delta => $row) {
       $fields = [];
       foreach ($variables['options']['mapping'] as $type => $field_names) {
-        if (!is_array($field_names)) {
+        if (!\is_array($field_names)) {
           $field_names = [$field_names];
         }
         foreach ($field_names as $field_name) {

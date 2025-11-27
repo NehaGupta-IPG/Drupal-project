@@ -109,7 +109,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
       $this->assertSession()->elementAttributeContains('xpath', "(//div[contains(@class, 'top-bar__content')]/div[contains(@class, 'top-bar__actions')]/button)[1]", 'class', 'toolbar-button--icon--dots');
       // Ensure that link to current page is not included in the dropdown.
       $url = $this->getSession()->getCurrentUrl();
-      $this->assertSession()->linkByHrefNotExistsExact(parse_url($url, PHP_URL_PATH));
+      $this->assertSession()->linkByHrefNotExistsExact(\parse_url($url, PHP_URL_PATH));
       // Ensure that the actions are displayed in the correct order.
       $this->assertActionsWeight($toolbar_links);
     }
@@ -132,7 +132,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
    */
   protected function assertActionsWeight(NodeElement $toolbar_links): void {
     // Displayed action links in the top bar.
-    $displayed_links = array_map(
+    $displayed_links = \array_map(
       fn($link) => $link->getText(),
       $toolbar_links->findAll('css', 'li')
     );
@@ -140,23 +140,23 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
     // Extract the route name from the URL.
     $current_url = $this->getSession()->getCurrentUrl();
     // Convert alias to system path.
-    $path = parse_url($current_url, PHP_URL_PATH);
+    $path = \parse_url($current_url, PHP_URL_PATH);
 
     if ($GLOBALS['base_path'] !== '/') {
-      $path = str_replace($GLOBALS['base_path'], '/', $path);
+      $path = \str_replace($GLOBALS['base_path'], '/', $path);
     }
 
     // Get local tasks for the current route.
     $entity_local_tasks = \Drupal::service('plugin.manager.menu.local_task')->getLocalTasks(Url::fromUserInput($path)->getRouteName());
 
     // Sort order of tabs based on their weights.
-    uasort($entity_local_tasks['tabs'], [SortArray::class, 'sortByWeightProperty']);
+    \uasort($entity_local_tasks['tabs'], [SortArray::class, 'sortByWeightProperty']);
 
     // Extract the expected order based on sorted weights.
-    $expected_order = array_values(array_map(fn($task) => $task['#link']['title'], $entity_local_tasks['tabs']));
+    $expected_order = \array_values(\array_map(fn($task) => $task['#link']['title'], $entity_local_tasks['tabs']));
 
     // Filter out elements not in displayed_links.
-    $expected_order = array_values(array_filter($expected_order, fn($title) => in_array($title, $displayed_links, TRUE)));
+    $expected_order = \array_values(\array_filter($expected_order, fn($title) => \in_array($title, $displayed_links, TRUE)));
 
     // Ensure that the displayed links match the expected order.
     $this->assertSame($expected_order, $displayed_links, 'Local tasks are displayed in the correct order based on their weights.');
@@ -185,7 +185,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
     }
 
     // Capture text values in the order they appear in the DOM.
-    $labels = array_map(fn($element) => trim($element->getText()), $elements);
+    $labels = \array_map(fn($element) => \trim($element->getText()), $elements);
 
     // Expected order based on weights: low (-10), zero (0), high (10).
     $expected = [

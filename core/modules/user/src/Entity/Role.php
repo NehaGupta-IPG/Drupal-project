@@ -214,7 +214,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
       \Drupal::logger('user')->error('Non-existent permission(s) assigned to role "@label" (@id) were removed. Invalid permission(s): @permissions.', [
         '@label' => $this->label(),
         '@id' => $this->id(),
-        '@permissions' => implode(', ', $invalid_permissions),
+        '@permissions' => \implode(', ', $invalid_permissions),
       ]);
       $this->permissions = $valid_permissions;
     }

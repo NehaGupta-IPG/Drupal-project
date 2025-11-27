@@ -35,7 +35,7 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
    */
   #[DataProvider('providerGetInstallableReleases')]
   public function testGetInstallableReleases(string $fixture, string $installed_version, array $expected_versions): void {
-    [$project] = explode('.', $fixture);
+    [$project] = \explode('.', $fixture);
     $fixtures_directory = __DIR__ . '/../../fixtures/release-history/';
     if ($project === 'drupal') {
       $this->setCoreVersion($installed_version);
@@ -59,7 +59,7 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
     $project_info = new ProjectInfo($project);
     $actual_releases = $project_info->getInstallableReleases();
     // Assert that we returned the correct releases in the expected order.
-    $this->assertSame($expected_versions, array_keys($actual_releases));
+    $this->assertSame($expected_versions, \array_keys($actual_releases));
     // Assert that we version keys match the actual releases.
     foreach ($actual_releases as $version => $release) {
       $this->assertSame($version, $release->getVersion());
@@ -142,8 +142,8 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
     $metadata_fixtures['drupal'] = $fixtures_directory . 'drupal.9.8.2.xml';
     $metadata_fixtures['package_manager_test_update'] = $fixtures_directory . 'package_manager_test_update.7.0.1.xml';
     $this->setReleaseMetadata($metadata_fixtures);
-    $available = update_get_available(TRUE);
-    $this->assertSame(['drupal'], array_keys($available));
+    $available = \update_get_available(TRUE);
+    $this->assertSame(['drupal'], \array_keys($available));
     $this->setReleaseMetadata($metadata_fixtures);
     $state = $this->container->get('state');
     // Set the state that the Update Status module uses to store last checked
@@ -166,14 +166,14 @@ class ProjectInfoTest extends PackageManagerKernelTestBase {
       '8.x-5.x',
     ];
     $uninstallable_releases = ['7.0.x-dev', '8.x-6.x-dev', '8.x-5.x'];
-    $installable_releases = array_values(array_diff($all_releases, $uninstallable_releases));
+    $installable_releases = \array_values(\array_diff($all_releases, $uninstallable_releases));
     $this->assertSame(
       $all_releases,
-      array_keys($project_data['releases'])
+      \array_keys($project_data['releases'])
     );
     $this->assertSame(
       $installable_releases,
-      array_keys($project_info->getInstallableReleases())
+      \array_keys($project_info->getInstallableReleases())
     );
     $this->assertNull($project_info->getInstalledVersion());
     // Ensure we have not changed the state the Update Status module uses to

@@ -98,7 +98,7 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
 
     $langcode = $request->query->get(static::QUERY_PARAMETER);
 
-    if ($langcode === NULL || !array_key_exists($langcode, $this->languageManager->getLanguages())) {
+    if ($langcode === NULL || !\array_key_exists($langcode, $this->languageManager->getLanguages())) {
       return NULL;
     }
 

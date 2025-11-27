@@ -253,7 +253,7 @@ class PerformanceData {
    *   Count of cache get operations keyed by bin.
    */
   public function getCacheGetCountByBin(): array {
-    return array_map(fn (array $cids) => count($cids), $this->cacheOperations['get'] ?? []);
+    return \array_map(fn (array $cids) => \count($cids), $this->cacheOperations['get'] ?? []);
   }
 
   /**
@@ -263,7 +263,7 @@ class PerformanceData {
    *   Count of cache set operations keyed by bin.
    */
   public function getCacheSetCountByBin(): array {
-    return array_map(fn (array $cids) => count($cids), $this->cacheOperations['set'] ?? []);
+    return \array_map(fn (array $cids) => \count($cids), $this->cacheOperations['set'] ?? []);
   }
 
   /**
@@ -273,7 +273,7 @@ class PerformanceData {
    *   Count of cache delete operations keyed by bin.
    */
   public function getCacheDeleteCountByBin(): array {
-    return array_map(fn (array $cids) => count($cids), $this->cacheOperations['delete'] ?? []);
+    return \array_map(fn (array $cids) => \count($cids), $this->cacheOperations['delete'] ?? []);
   }
 
   /**
@@ -338,7 +338,7 @@ class PerformanceData {
    * @see https://www.drupal.org/node/3511149
    */
   public function getCacheTagChecksumCount(): int {
-    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3511149', E_DEPRECATED);
+    @\trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3511149', E_DEPRECATED);
 
     return $this->cacheTagChecksumCount;
   }
@@ -365,7 +365,7 @@ class PerformanceData {
    * @see https://www.drupal.org/node/3511149
    */
   public function getCacheTagIsValidCount(): int {
-    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3511149', E_DEPRECATED);
+    @\trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3511149', E_DEPRECATED);
     return $this->cacheTagIsValidCount;
   }
 
@@ -416,7 +416,7 @@ class PerformanceData {
    *   The number of cache tag lookup queries recorded.
    */
   public function getCacheTagLookupQueryCount(): int {
-    return count($this->cacheTagGroupedLookups);
+    return \count($this->cacheTagGroupedLookups);
   }
 
   /**

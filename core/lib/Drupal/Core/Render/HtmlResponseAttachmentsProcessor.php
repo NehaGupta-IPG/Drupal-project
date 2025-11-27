@@ -100,8 +100,8 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $attached = $response->getAttachments();
 
     // Send a message back if the render array has unsupported #attached types.
-    $unsupported_types = array_diff(
-      array_keys($attached),
+    $unsupported_types = \array_diff(
+      \array_keys($attached),
       [
         'html_head',
         'feed',

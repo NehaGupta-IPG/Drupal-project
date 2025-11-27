@@ -58,12 +58,12 @@ class AutowireTest extends KernelTestBase {
 
     $filenames = \array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
     $filenames[] = 'core/core.services.yml';
-    foreach (array_filter($filenames, 'file_exists') as $filename) {
-      foreach ((Yaml::decode(file_get_contents($filename))['services'] ?? []) as $id => $service) {
-        if (is_string($service)) {
-          $aliases[$id] = substr($service, 1);
+    foreach (\array_filter($filenames, 'file_exists') as $filename) {
+      foreach ((Yaml::decode(\file_get_contents($filename))['services'] ?? []) as $id => $service) {
+        if (\is_string($service)) {
+          $aliases[$id] = \substr($service, 1);
         }
-        elseif (isset($service['class']) && class_exists($service['class'])) {
+        elseif (isset($service['class']) && \class_exists($service['class'])) {
           // Ignore services named by their own class.
           if ($id === $service['class']) {
             continue;
@@ -107,7 +107,7 @@ class AutowireTest extends KernelTestBase {
       }
 
       // Skip IDs that are interfaces already.
-      if (interface_exists($id)) {
+      if (\interface_exists($id)) {
         continue;
       }
 
@@ -143,10 +143,10 @@ class AutowireTest extends KernelTestBase {
 
     $filenames = \array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
     $filenames[] = 'core/core.services.yml';
-    foreach (array_filter($filenames, 'file_exists') as $filename) {
-      foreach ((Yaml::decode(file_get_contents($filename))['services'] ?? []) as $id => $service) {
-        if (is_string($service)) {
-          $aliases[$id] = substr($service, 1);
+    foreach (\array_filter($filenames, 'file_exists') as $filename) {
+      foreach ((Yaml::decode(\file_get_contents($filename))['services'] ?? []) as $id => $service) {
+        if (\is_string($service)) {
+          $aliases[$id] = \substr($service, 1);
         }
       }
     }

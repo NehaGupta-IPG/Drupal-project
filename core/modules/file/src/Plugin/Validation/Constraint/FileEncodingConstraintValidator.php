@@ -24,7 +24,7 @@ class FileEncodingConstraintValidator extends BaseFileConstraintValidator {
     }
 
     $encodings = $constraint->encodings;
-    $data = file_get_contents($file->getFileUri());
+    $data = \file_get_contents($file->getFileUri());
     foreach ($encodings as $encoding) {
       $this->validateEncoding($data, $encoding, $constraint);
     }
@@ -41,12 +41,12 @@ class FileEncodingConstraintValidator extends BaseFileConstraintValidator {
    *   The constraint.
    */
   protected function validateEncoding(string $data, string $encoding, FileEncodingConstraint $constraint): void {
-    if (mb_check_encoding($data, $encoding)) {
+    if (\mb_check_encoding($data, $encoding)) {
       return;
     }
     $this->context->addViolation($constraint->message, [
       '%encoding' => $encoding,
-      '%detected' => mb_detect_encoding($data),
+      '%detected' => \mb_detect_encoding($data),
     ]);
   }
 

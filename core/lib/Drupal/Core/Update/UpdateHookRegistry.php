@@ -113,7 +113,7 @@ class UpdateHookRegistry {
       // since looping through all PHP functions can take significant page
       // execution time and this function is called on every administrative page
       // via the system runtime_requirements hook.
-      foreach (preg_grep('/_\d+$/', $functions['user']) as $function) {
+      foreach (\preg_grep('/_\d+$/', $functions['user']) as $function) {
         // If this function is a module update function, add it to the list of
         // module updates.
         if (\preg_match(self::FUNC_NAME_REGEXP, $function, $matches)) {

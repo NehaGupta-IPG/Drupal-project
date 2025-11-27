@@ -25,7 +25,7 @@ class FilterArray {
    *   The filtered array.
    */
   public static function removeEmptyStrings(array $value): array {
-    return array_filter($value, static fn ($item) => (string) $item !== '');
+    return \array_filter($value, static fn ($item) => (string) $item !== '');
   }
 
 }

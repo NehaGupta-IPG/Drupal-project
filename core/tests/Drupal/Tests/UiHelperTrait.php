@@ -170,7 +170,7 @@ trait UiHelperTrait {
       $storage = \Drupal::entityTypeManager()->getStorage('user');
       /** @var \Drupal\user\UserInterface $accountUnchanged */
       $accountUnchanged = $storage->loadUnchanged($account->id());
-      $login = user_pass_reset_url($accountUnchanged) . '/login?destination=user/' . $account->id();
+      $login = \user_pass_reset_url($accountUnchanged) . '/login?destination=user/' . $account->id();
       $this->drupalGet($login);
     }
     else {

@@ -42,7 +42,7 @@ class RouterTest extends BrowserTestBase {
       $renderer_required_cache_contexts,
       ['url.query_args:' . MainContentViewSubscriber::WRAPPER_FORMAT, 'user.roles:authenticated'],
     );
-    sort($expected_cache_contexts);
+    \sort($expected_cache_contexts);
 
     // Confirm that the router can get to a controller.
     $this->drupalGet('router_test/test1');
@@ -60,7 +60,7 @@ class RouterTest extends BrowserTestBase {
     $this->drupalGet('router_test/test2');
     $this->assertSession()->pageTextContains('test2');
     // Check expected headers from FinishResponseSubscriber.
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', implode(' ', $expected_cache_contexts));
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', \implode(' ', $expected_cache_contexts));
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous http_response rendered');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
     // Confirm that the page wrapping is being added, so we're not getting a
@@ -78,8 +78,8 @@ class RouterTest extends BrowserTestBase {
       $renderer_required_cache_contexts,
       ['url', 'user.roles:authenticated'],
     );
-    sort($expected_cache_contexts);
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', implode(' ', $expected_cache_contexts));
+    \sort($expected_cache_contexts);
+    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Contexts', \implode(' ', $expected_cache_contexts));
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous foo http_response rendered');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache-Max-Age', '60');
     // 2. controller result: render array, per-role cacheable route access.
@@ -368,7 +368,7 @@ class RouterTest extends BrowserTestBase {
     $this->assertSession()->addressEquals($request->getUriForPath('/router_test/test1'));
 
     $routes = $route_provider->getRoutesByNames(['router_test.alias']);
-    $aliased_route = reset($routes);
+    $aliased_route = \reset($routes);
     $this->assertTrue($aliased_route instanceof Alias);
     $this->assertFalse($aliased_route->isDeprecated());
 
@@ -393,7 +393,7 @@ class RouterTest extends BrowserTestBase {
     $this->assertSession()->addressEquals($request->getUriForPath('/router_test/test1'));
 
     $routes = $route_provider->getRoutesByNames(['router_test.deprecated']);
-    $deprecated_route = reset($routes);
+    $deprecated_route = \reset($routes);
     $this->assertTrue($deprecated_route instanceof Alias);
     $this->assertTrue($deprecated_route->isDeprecated());
     $deprecation = $deprecated_route->getDeprecation('router_test.deprecated');

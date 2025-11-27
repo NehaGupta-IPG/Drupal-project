@@ -94,7 +94,7 @@ class DblogHooks {
       '#config_target' => 'dblog.settings:row_limit',
       '#options' => [
         0 => $this->t('All'),
-      ] + array_combine($row_limits, $row_limits),
+      ] + \array_combine($row_limits, $row_limits),
       '#description' => $this->t('The maximum number of messages to keep in the database log. Requires a <a href=":cron">cron maintenance task</a>.', [
         ':cron' => Url::fromRoute('system.status')->toString(),
       ]),

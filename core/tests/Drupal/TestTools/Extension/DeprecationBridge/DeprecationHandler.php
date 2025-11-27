@@ -74,11 +74,11 @@ final class DeprecationHandler {
       }
       $environmentVariable = "ignoreFile=$deprecationIgnoreFilename";
     }
-    parse_str($environmentVariable, $configuration);
+    \parse_str($environmentVariable, $configuration);
 
-    $environmentVariable = getenv('PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION');
+    $environmentVariable = \getenv('PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION');
     $phpUnitDeprecationVariable = $environmentVariable !== FALSE ? $environmentVariable : TRUE;
-    $configuration['failOnPhpunitDeprecation'] = filter_var($phpUnitDeprecationVariable, \FILTER_VALIDATE_BOOLEAN);
+    $configuration['failOnPhpunitDeprecation'] = \filter_var($phpUnitDeprecationVariable, \FILTER_VALIDATE_BOOLEAN);
 
     return $configuration;
   }
@@ -187,7 +187,7 @@ final class DeprecationHandler {
     if (!self::isEnabled()) {
       return;
     }
-    if (!array_search($message, self::$collectedDeprecations, TRUE)) {
+    if (!\array_search($message, self::$collectedDeprecations, TRUE)) {
       self::$collectedDeprecations[] = $message;
     }
   }

@@ -71,7 +71,7 @@ class PoItemTest extends TestCase {
 
     $item->setSource($source);
 
-    if (is_array($source)) {
+    if (\is_array($source)) {
       $item->setPlural(TRUE);
     }
     if (!empty($context)) {

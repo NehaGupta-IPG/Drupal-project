@@ -164,7 +164,7 @@ abstract class ImageEffectBase extends ConfigurablePluginBase implements ImageEf
   public function onCollectionDependencyRemoval(array $dependencies): RemovableDependentPluginReturn {
     // If the module that provides the image effect plugin is uninstalled,
     // the plugin instance should be removed from the collection.
-    return in_array($this->getPluginDefinition()['provider'], $dependencies['module'] ?? []) ? RemovableDependentPluginReturn::Remove : RemovableDependentPluginReturn::Unchanged;
+    return \in_array($this->getPluginDefinition()['provider'], $dependencies['module'] ?? []) ? RemovableDependentPluginReturn::Remove : RemovableDependentPluginReturn::Unchanged;
   }
 
 }

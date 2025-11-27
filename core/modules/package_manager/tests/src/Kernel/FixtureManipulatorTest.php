@@ -90,7 +90,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
     // Packages cannot be added without a name.
     foreach (['name', 'type'] as $require_key) {
       // Make a package that is missing the required key.
-      $package = array_diff_key(
+      $package = \array_diff_key(
         [
           'name' => 'Any old name',
           'type' => 'Any old type',
@@ -141,7 +141,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
     $root_info = $this->inspector->getRootPackageInfo($this->dir);
     $this->assertSame(
       ['drupal/core-dev', 'my/dev-package'],
-      array_keys($root_info['devRequires'])
+      \array_keys($root_info['devRequires'])
     );
   }
 
@@ -154,7 +154,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
     // Assert ::modifyPackage() works with a package in an existing fixture not
     // created by ::addPackage().
     $decode_packages_json = function (): array {
-      return json_decode(file_get_contents($this->dir . "/packages.json"), TRUE, flags: JSON_THROW_ON_ERROR);
+      return \json_decode(\file_get_contents($this->dir . "/packages.json"), TRUE, flags: JSON_THROW_ON_ERROR);
     };
     $original_packages_json = $decode_packages_json();
     (new ActiveFixtureManipulator())
@@ -208,7 +208,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
     $root_info = $this->inspector->getRootPackageInfo($this->dir);
     $this->assertSame(
       ['drupal/core-dev'],
-      array_keys($root_info['devRequires'])
+      \array_keys($root_info['devRequires'])
     );
   }
 
@@ -230,7 +230,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
   public function testAddDotGitFolder(): void {
     $path_locator = $this->container->get(PathLocator::class);
     $project_root = $path_locator->getProjectRoot();
-    $this->assertFalse(is_dir($project_root . "/relative/path/.git"));
+    $this->assertFalse(\is_dir($project_root . "/relative/path/.git"));
     // We should not be able to add a git folder to a non-existing directory.
     try {
       (new FixtureManipulator())
@@ -241,7 +241,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
     catch (\LogicException $e) {
       $this->assertSame('No directory exists at ' . $project_root . '/relative/path.', $e->getMessage());
     }
-    mkdir($project_root . "/relative/path", 0777, TRUE);
+    \mkdir($project_root . "/relative/path", 0777, TRUE);
     $fixture_manipulator = (new FixtureManipulator())
       ->addPackage([
         'name' => 'relative/project_path',
@@ -249,9 +249,9 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
       ])
       ->addDotGitFolder($path_locator->getVendorDirectory() . "/relative/project_path")
       ->addDotGitFolder($project_root . "/relative/path");
-    $this->assertTrue(!is_dir($project_root . "/relative/project_path/.git"));
+    $this->assertTrue(!\is_dir($project_root . "/relative/project_path/.git"));
     $fixture_manipulator->commitChanges($project_root);
-    $this->assertTrue(is_dir($project_root . "/relative/path/.git"));
+    $this->assertTrue(\is_dir($project_root . "/relative/path/.git"));
     // We should not be able to create already existing directory.
     try {
       (new FixtureManipulator())
@@ -283,7 +283,7 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
       parent::tearDown();
     }
     catch (\Exception $exception) {
-      if (!(get_class($exception) === get_class($this->expectedTearDownException) && $exception->getMessage() === $this->expectedTearDownException->getMessage())) {
+      if (!(\get_class($exception) === \get_class($this->expectedTearDownException) && $exception->getMessage() === $this->expectedTearDownException->getMessage())) {
         throw $exception;
       }
     }

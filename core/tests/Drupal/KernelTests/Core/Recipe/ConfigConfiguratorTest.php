@@ -172,9 +172,9 @@ class ConfigConfiguratorTest extends KernelTestBase {
    */
   private function cloneRecipe(string $original_dir): string {
     // Clone the recipe into the virtual file system.
-    $name = uniqid();
+    $name = \uniqid();
     $clone_dir = $this->vfsRoot->url() . '/' . $name;
-    mkdir($clone_dir);
+    \mkdir($clone_dir);
     $clone_dir = $this->vfsRoot->getChild($name);
     vfsStream::copyFromFileSystem($original_dir, $clone_dir);
     return $clone_dir->url();

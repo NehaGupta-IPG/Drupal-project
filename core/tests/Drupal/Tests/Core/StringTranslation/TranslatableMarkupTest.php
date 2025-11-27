@@ -76,7 +76,7 @@ class TranslatableMarkupTest extends UnitTestCase {
 
     // We set a custom error handler because of
     // https://github.com/sebastianbergmann/phpunit/issues/487
-    set_error_handler([$this, 'errorHandler']);
+    \set_error_handler([$this, 'errorHandler']);
     // We want this to trigger an error.
     (string) $text;
     \restore_error_handler();

@@ -83,7 +83,7 @@ class TestSiteTearDownCommand extends Command {
    */
   protected function tearDown(TestDatabase $test_database, $db_url): void {
     // Connect to the test database.
-    $root = dirname(__DIR__, 5);
+    $root = \dirname(__DIR__, 5);
     $database = Database::convertDbUrlToConnectionInfo($db_url);
     $database['prefix'] = $test_database->getDatabasePrefix();
     Database::addConnectionInfo(__CLASS__, 'default', $database);

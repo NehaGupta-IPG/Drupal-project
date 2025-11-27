@@ -25,23 +25,23 @@ class MenuLinkDepthConstraintValidator extends RangeConstraintValidator implemen
    * {@inheritdoc}
    */
   public function validate(mixed $value, Constraint $constraint): void {
-    assert($constraint instanceof MenuLinkDepthConstraint);
+    \assert($constraint instanceof MenuLinkDepthConstraint);
 
     // The depth can never exceed the maximum depth of a menu tree.
     $constraint->max = $this->menuLinkTree->maxDepth();
 
     $base_level = $constraint->baseLevel;
     // The base level might be a dynamic name that needs to be resolved.
-    if (is_string($base_level)) {
+    if (\is_string($base_level)) {
       $base_level = TypeResolver::resolveDynamicTypeName($base_level, $this->context->getObject());
     }
-    if (!is_numeric($base_level)) {
+    if (!\is_numeric($base_level)) {
       throw new RuntimeException('The `base` option must be a number, or an expression that resolves to one.');
     }
     // Clamp $base_level (which is zero-based) to at least 0 and no more than
     // the maximum depth of a menu tree.
-    $base_level = max(0, $base_level);
-    $base_level = min($base_level, $constraint->max);
+    $base_level = \max(0, $base_level);
+    $base_level = \min($base_level, $constraint->max);
 
     $constraint->max -= $base_level;
     // We're validating a depth -- i.e., the number of levels in the menu tree

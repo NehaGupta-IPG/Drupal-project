@@ -35,10 +35,10 @@ class DiskSpaceValidatorTest extends PackageManagerKernelTestBase {
     $root = '<PROJECT_ROOT>';
     $vendor = '<VENDOR_DIR>';
 
-    $root_insufficient = t('Drupal root filesystem "<PROJECT_ROOT>" has insufficient space. There must be at least 1024 megabytes free.');
-    $vendor_insufficient = t('Vendor filesystem "<VENDOR_DIR>" has insufficient space. There must be at least 1024 megabytes free.');
-    $temp_insufficient = t('Directory "temp" has insufficient space. There must be at least 1024 megabytes free.');
-    $summary = t("There is not enough disk space to create a stage directory.");
+    $root_insufficient = \t('Drupal root filesystem "<PROJECT_ROOT>" has insufficient space. There must be at least 1024 megabytes free.');
+    $vendor_insufficient = \t('Vendor filesystem "<VENDOR_DIR>" has insufficient space. There must be at least 1024 megabytes free.');
+    $temp_insufficient = \t('Directory "temp" has insufficient space. There must be at least 1024 megabytes free.');
+    $summary = \t("There is not enough disk space to create a stage directory.");
 
     return [
       'shared, vendor and temp sufficient, root insufficient' => [
@@ -153,12 +153,12 @@ class DiskSpaceValidatorTest extends PackageManagerKernelTestBase {
    */
   #[DataProvider('providerDiskSpaceValidation')]
   public function testDiskSpaceValidation(bool $shared_disk, array $free_space, array $expected_results): void {
-    $free_space = array_flip($this->resolvePlaceholdersInArrayValuesWithRealPaths(array_flip($free_space)));
+    $free_space = \array_flip($this->resolvePlaceholdersInArrayValuesWithRealPaths(\array_flip($free_space)));
 
     /** @var \Drupal\Tests\package_manager\Kernel\TestDiskSpaceValidator $validator */
     $validator = $this->container->get(DiskSpaceValidator::class);
     $validator->sharedDisk = $shared_disk;
-    $validator->freeSpace = array_map([Bytes::class, 'toNumber'], $free_space);
+    $validator->freeSpace = \array_map([Bytes::class, 'toNumber'], $free_space);
 
     $this->assertStatusCheckResults($expected_results);
     $this->assertResults($expected_results, PreCreateEvent::class);
@@ -179,13 +179,13 @@ class DiskSpaceValidatorTest extends PackageManagerKernelTestBase {
    */
   #[DataProvider('providerDiskSpaceValidation')]
   public function testDiskSpaceValidationDuringPreApply(bool $shared_disk, array $free_space, array $expected_results): void {
-    $free_space = array_flip($this->resolvePlaceholdersInArrayValuesWithRealPaths(array_flip($free_space)));
+    $free_space = \array_flip($this->resolvePlaceholdersInArrayValuesWithRealPaths(\array_flip($free_space)));
 
     $this->addEventTestListener(function () use ($shared_disk, $free_space): void {
       /** @var \Drupal\Tests\package_manager\Kernel\TestDiskSpaceValidator $validator */
       $validator = $this->container->get(DiskSpaceValidator::class);
       $validator->sharedDisk = $shared_disk;
-      $validator->freeSpace = array_map([Bytes::class, 'toNumber'], $free_space);
+      $validator->freeSpace = \array_map([Bytes::class, 'toNumber'], $free_space);
     });
 
     $this->assertResults($expected_results, PreApplyEvent::class);

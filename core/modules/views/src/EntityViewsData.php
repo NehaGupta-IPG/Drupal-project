@@ -129,7 +129,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    * @see https://www.drupal.org/node/3240278
    */
   protected function getFieldStorageDefinitions() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. No replacement is provided. See https://www.drupal.org/node/3240278', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. No replacement is provided. See https://www.drupal.org/node/3240278', E_USER_DEPRECATED);
     if (!isset($this->fieldStorageDefinitions)) {
       $this->fieldStorageDefinitions = $this->entityFieldManager->getFieldStorageDefinitions($this->entityType->id());
     }
@@ -325,7 +325,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
     // the entity base, revision, data tables.
     $field_definitions = $this->entityFieldManager->getBaseFieldDefinitions($this->entityType->id());
 
-    $field_storage_definitions = array_map(function (FieldDefinitionInterface $definition) {
+    $field_storage_definitions = \array_map(function (FieldDefinitionInterface $definition) {
       return $definition->getFieldStorageDefinition();
     }, $field_definitions);
 

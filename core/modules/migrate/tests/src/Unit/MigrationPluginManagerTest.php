@@ -240,7 +240,7 @@ class TestMigrationMock extends Migration {
    * {@inheritdoc}
    */
   public function set($prop, $value): void {
-    $this->set[] = func_get_args();
+    $this->set[] = \func_get_args();
   }
 
 }

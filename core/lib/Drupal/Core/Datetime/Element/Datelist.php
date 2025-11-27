@@ -348,7 +348,7 @@ class Datelist extends DateElementBase {
     // Filters out empty array values, any valid value would have a string
     // length.
     $filtered_input = FilterArray::removeEmptyStrings($input);
-    return array_diff($parts, array_keys($filtered_input));
+    return \array_diff($parts, \array_keys($filtered_input));
   }
 
   /**

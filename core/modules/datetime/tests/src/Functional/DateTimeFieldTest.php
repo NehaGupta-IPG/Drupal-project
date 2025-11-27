@@ -191,7 +191,7 @@ class DateTimeFieldTest extends DateTestBase {
       $display_repository->getViewDisplay($this->field->getTargetEntityTypeId(), $this->field->getTargetBundle(), 'full')
         ->setComponent($field_name, $this->displayOptions)
         ->save();
-      $expected = str_replace(
+      $expected = \str_replace(
         '@interval',
         $this->dateFormatter->formatTimeDiffSince(
           $timestamp,
@@ -216,7 +216,7 @@ class DateTimeFieldTest extends DateTestBase {
       $display_repository->getViewDisplay($this->field->getTargetEntityTypeId(), $this->field->getTargetBundle(), 'full')
         ->setComponent($field_name, $this->displayOptions)
         ->save();
-      $expected = str_replace(
+      $expected = \str_replace(
         '@interval',
         $this->dateFormatter->formatTimeDiffUntil(
           $timestamp,
@@ -350,7 +350,7 @@ class DateTimeFieldTest extends DateTestBase {
     $display_repository->getViewDisplay($this->field->getTargetEntityTypeId(), $this->field->getTargetBundle(), 'full')
       ->setComponent($field_name, $this->displayOptions)
       ->save();
-    $expected = str_replace(
+    $expected = \str_replace(
       '@interval',
       $this->dateFormatter->formatTimeDiffSince(
         $timestamp,
@@ -376,7 +376,7 @@ class DateTimeFieldTest extends DateTestBase {
       ->getViewDisplay($this->field->getTargetEntityTypeId(), $this->field->getTargetBundle(), 'full')
       ->setComponent($field_name, $this->displayOptions)
       ->save();
-    $expected = str_replace(
+    $expected = \str_replace(
       '@interval',
       $this->dateFormatter->formatTimeDiffUntil(
         $timestamp,

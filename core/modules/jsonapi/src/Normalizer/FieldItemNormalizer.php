@@ -60,7 +60,7 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
    * catch it, and pass it to the value object that JSON:API uses.
    */
   public function doNormalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
-    assert($object instanceof FieldItemInterface);
+    \assert($object instanceof FieldItemInterface);
     /** @var \Drupal\Core\TypedData\TypedDataInterface $property */
     $context[CacheableNormalizerInterface::SERIALIZATION_CONTEXT_CACHEABILITY] = new CacheableMetadata();
     // Default: The field has only internal (or no) properties but has a public
@@ -70,12 +70,12 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
     if ($field_properties = TypedDataInternalPropertiesHelper::getNonInternalProperties($object)) {
       // We normalize each individual value, so each can do their own casting,
       // if needed.
-      $values = array_map(function ($property) use ($format, $context) {
+      $values = \array_map(function ($property) use ($format, $context) {
         return $this->serializer->normalize($property, $format, $context);
       }, $field_properties);
       // Flatten if there is only a single property to normalize.
-      $flatten = count($field_properties) === 1 && $object::mainPropertyName() !== NULL;
-      $values = static::rasterizeValueRecursive($flatten ? reset($values) : $values);
+      $flatten = \count($field_properties) === 1 && $object::mainPropertyName() !== NULL;
+      $values = static::rasterizeValueRecursive($flatten ? \reset($values) : $values);
     }
     $normalization = new CacheableNormalization(
       $context[CacheableNormalizerInterface::SERIALIZATION_CONTEXT_CACHEABILITY],
@@ -119,7 +119,7 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
     // Because e.g. the 'bundle' entity key field requires field values to not
     // be expanded to an array of all properties, we special-case single-value
     // properties.
-    if (!is_array($data)) {
+    if (!\is_array($data)) {
       $property_value = $data;
       $property_name = $item_definition->getMainPropertyName();
       $property_value_class = $property_definitions[$property_name]->getClass();
@@ -243,19 +243,19 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
    */
   protected function getNormalizationSchema(mixed $object, array $context = []): array {
     $schema = ['type' => 'object'];
-    if (is_string($object)) {
+    if (\is_string($object)) {
       return ['$comment' => 'No detailed schema available.'] + $schema;
     }
-    assert($object instanceof FieldItemInterface);
+    \assert($object instanceof FieldItemInterface);
     $field_properties = TypedDataInternalPropertiesHelper::getNonInternalProperties($object);
-    if (count($field_properties) === 0) {
+    if (\count($field_properties) === 0) {
       // The field item has only internal (or no) properties. In this case, the
       // value is normalized from ::getValue(). Use a schema from the method or
       // interface, if available.
       return $this->getJsonSchemaForMethod(
         $object,
         'getValue',
-        ['$comment' => sprintf('Cannot determine schema for %s::getValue().', $object::class)]
+        ['$comment' => \sprintf('Cannot determine schema for %s::getValue().', $object::class)]
       );
     }
     // If we did not early return, iterate over the non-internal properties.
@@ -263,15 +263,15 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
       $property_schema = [
         'title' => (string) $property->getDataDefinition()->getLabel(),
       ];
-      assert($this->serializer instanceof JsonSchemaProviderSerializerInterface);
-      $property_schema = array_merge(
+      \assert($this->serializer instanceof JsonSchemaProviderSerializerInterface);
+      $property_schema = \array_merge(
         $this->serializer->getJsonSchema($property, $context),
         $property_schema,
       );
       $schema['properties'][$property_name] = $property_schema;
     }
     // Flatten if there is only a single property to normalize.
-    if (count($field_properties) === 1 && $object::mainPropertyName() !== NULL) {
+    if (\count($field_properties) === 1 && $object::mainPropertyName() !== NULL) {
       $schema = $schema['properties'][$object::mainPropertyName()] ?? [];
     }
     return $schema;

@@ -162,7 +162,7 @@ class ComponentMetadata {
   private function parseSchemaInfo(array $metadata_info): ?array {
     if (empty($metadata_info['props'])) {
       if ($this->mandatorySchemas) {
-        throw new InvalidComponentException(sprintf('The component "%s" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.', $this->id));
+        throw new InvalidComponentException(\sprintf('The component "%s" does not provide schema information. Schema definitions are mandatory for components declared in modules. For components declared in themes, schema definitions are only mandatory if the "enforce_prop_schemas" key is set to "true" in the theme info file.', $this->id));
       }
       $schema = NULL;
     }
@@ -178,15 +178,15 @@ class ComponentMetadata {
       foreach ($schema['properties'] ?? [] as $name => $prop_schema) {
         if (isset($prop_schema['enum'])) {
           // Ensure all enum values are also in meta:enum.
-          $enum = array_combine($prop_schema['enum'], $prop_schema['enum']);
-          $prop_schema['meta:enum'] = array_replace($enum, $prop_schema['meta:enum'] ?? []);
+          $enum = \array_combine($prop_schema['enum'], $prop_schema['enum']);
+          $prop_schema['meta:enum'] = \array_replace($enum, $prop_schema['meta:enum'] ?? []);
 
           // Remove meta:enum values which are not in enum.
-          $prop_schema['meta:enum'] = array_intersect_key($prop_schema['meta:enum'], $enum);
+          $prop_schema['meta:enum'] = \array_intersect_key($prop_schema['meta:enum'], $enum);
 
           // Make meta:enum label translatable.
           $translation_context = $prop_schema['x-translation-context'] ?? '';
-          $prop_schema['meta:enum'] = array_map(
+          $prop_schema['meta:enum'] = \array_map(
             // @phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
             fn($label) => new TranslatableMarkup((string) $label, [], ['context' => $translation_context]),
             $prop_schema['meta:enum']

@@ -49,8 +49,8 @@ class FieldSettings extends ProcessPluginBase {
     $max_length = empty($max_length) ? 255 : $max_length;
     $allowed_values = [];
     if (isset($global_settings['allowed_values'])) {
-      $list = explode("\n", $global_settings['allowed_values']);
-      $list = array_map('trim', $list);
+      $list = \explode("\n", $global_settings['allowed_values']);
+      $list = \array_map('trim', $list);
       $list = FilterArray::removeEmptyStrings($list);
       switch ($field_type) {
         case 'list_string':

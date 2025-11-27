@@ -38,7 +38,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
    * {@inheritdoc}
    */
   protected function getAdministratorPermissions(): array {
-    return array_merge($this->permissions, [
+    return \array_merge($this->permissions, [
       'create content translations',
       'bypass node access',
       'translate any entity',
@@ -353,7 +353,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     foreach (\range(11, 16) as $revision_id) {
       /** @var \Drupal\node\NodeInterface $revision */
       $revision = $storage->loadRevision($revision_id);
-      foreach (array_keys($revision->getTranslationLanguages()) as $langcode) {
+      foreach (\array_keys($revision->getTranslationLanguages()) as $langcode) {
         if ($revision->isRevisionTranslationAffected()) {
           $translation = $revision->getTranslation($langcode);
           $this->drupalGet($translation->toUrl('revision'));

@@ -50,9 +50,9 @@ class UpdateRequirements {
   #[Hook('runtime_requirements')]
   public function runtime(): array {
     $requirements = [];
-    if ($available = update_get_available(FALSE)) {
+    if ($available = \update_get_available(FALSE)) {
       $this->moduleHandler->loadInclude('update', 'inc', 'update.compare');
-      $data = update_calculate_project_data($available);
+      $data = \update_calculate_project_data($available);
       // First, populate the requirements for core:
       $requirements['update_core'] = $this->requirementCheck($data['drupal'], 'core');
       if (!empty($available['drupal']['releases'])) {
@@ -69,8 +69,8 @@ class UpdateRequirements {
         // status constants are numbered in the right order of precedence, so
         // we just need to make sure the projects are sorted in ascending
         // order of status, and we can look at the first project we find.
-        uasort($data, '_update_project_status_sort');
-        $first_project = reset($data);
+        \uasort($data, '_update_project_status_sort');
+        $first_project = \reset($data);
         $requirements['update_contrib'] = $this->requirementCheck($first_project, 'contrib');
       }
     }
@@ -79,7 +79,7 @@ class UpdateRequirements {
       $requirements['update_core']['value'] = $this->t('No update data available');
       $requirements['update_core']['severity'] = RequirementSeverity::Warning;
       $requirements['update_core']['reason'] = UpdateFetcherInterface::UNKNOWN;
-      $requirements['update_core']['description'] = _update_no_data();
+      $requirements['update_core']['description'] = \_update_no_data();
     }
     return $requirements;
   }
@@ -118,8 +118,8 @@ class UpdateRequirements {
       // When updates are available, append the available updates link to the
       // message from _update_message_text(), and format the two translated
       // strings together in a single paragraph.
-      $requirement['description'][] = ['#markup' => _update_message_text($type, $status)];
-      if (!in_array($status, [UpdateFetcherInterface::UNKNOWN, UpdateFetcherInterface::NOT_CHECKED, UpdateFetcherInterface::NOT_FETCHED, UpdateFetcherInterface::FETCH_PENDING])) {
+      $requirement['description'][] = ['#markup' => \_update_message_text($type, $status)];
+      if (!\in_array($status, [UpdateFetcherInterface::UNKNOWN, UpdateFetcherInterface::NOT_CHECKED, UpdateFetcherInterface::NOT_FETCHED, UpdateFetcherInterface::FETCH_PENDING])) {
         $requirement['description'][] = ['#prefix' => ' ', '#markup' => $this->t('See the <a href=":available_updates">available updates</a> page for more information.', [':available_updates' => Url::fromRoute('update.status')->toString()])];
       }
     }

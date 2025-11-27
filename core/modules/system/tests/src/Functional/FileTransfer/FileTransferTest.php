@@ -59,7 +59,7 @@ class FileTransferTest extends BrowserTestBase {
    */
   public function _buildFakeModule() {
     $location = 'temporary://fake';
-    if (is_dir($location)) {
+    if (\is_dir($location)) {
       if (!\Drupal::service('file_system')->deleteRecursive($location)) {
         throw new \Exception('Error removing fake module directory.');
       }
@@ -74,14 +74,14 @@ class FileTransferTest extends BrowserTestBase {
    * Writes a directory structure to the filesystem.
    */
   public function _writeDirectory($base, $files = []): void {
-    mkdir($base);
+    \mkdir($base);
     foreach ($files as $key => $file) {
       if (\is_array($file)) {
         $this->_writeDirectory($base . DIRECTORY_SEPARATOR . $key, $file);
       }
       else {
         // Just write the filename into the file.
-        file_put_contents($base . DIRECTORY_SEPARATOR . $file, $file);
+        \file_put_contents($base . DIRECTORY_SEPARATOR . $file, $file);
       }
     }
   }
@@ -94,7 +94,7 @@ class FileTransferTest extends BrowserTestBase {
     $this->testConnection->copyDirectory($source, $this->root . '/' . PublicStream::basePath());
     $this->expectException(FileTransferException::class);
     $this->expectExceptionMessage('@directory is outside of the @jail');
-    $this->testConnection->copyDirectory($source, sys_get_temp_dir());
+    $this->testConnection->copyDirectory($source, \sys_get_temp_dir());
   }
 
 }

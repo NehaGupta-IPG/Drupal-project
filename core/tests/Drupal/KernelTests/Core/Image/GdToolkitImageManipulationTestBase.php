@@ -84,8 +84,8 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
     if ($actual[3] == 127 && $expected[3] == 127) {
       return;
     }
-    $distance = pow(($actual[0] - $expected[0]), 2) + pow(($actual[1] - $expected[1]), 2) + pow(($actual[2] - $expected[2]), 2) + pow(($actual[3] - $expected[3]), 2);
-    $this->assertLessThanOrEqual($tolerance, $distance, $message . " - Actual: {" . implode(',', $actual) . "}, Expected: {" . implode(',', $expected) . "}, Distance: " . $distance . ", Tolerance: " . $tolerance);
+    $distance = \pow(($actual[0] - $expected[0]), 2) + \pow(($actual[1] - $expected[1]), 2) + \pow(($actual[2] - $expected[2]), 2) + \pow(($actual[3] - $expected[3]), 2);
+    $this->assertLessThanOrEqual($tolerance, $distance, $message . " - Actual: {" . \implode(',', $actual) . "}, Expected: {" . \implode(',', $expected) . "}, Distance: " . $distance . ", Tolerance: " . $tolerance);
   }
 
   /**
@@ -93,14 +93,14 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
    */
   public function getPixelColor(ImageInterface $image, int $x, int $y): array {
     $toolkit = $image->getToolkit();
-    $color_index = imagecolorat($toolkit->getImage(), $x, $y);
+    $color_index = \imagecolorat($toolkit->getImage(), $x, $y);
 
-    $transparent_index = imagecolortransparent($toolkit->getImage());
+    $transparent_index = \imagecolortransparent($toolkit->getImage());
     if ($color_index == $transparent_index) {
       return [0, 0, 0, 127];
     }
 
-    return array_values(imagecolorsforindex($toolkit->getImage(), $color_index));
+    return \array_values(\imagecolorsforindex($toolkit->getImage(), $color_index));
   }
 
   /**
@@ -153,14 +153,14 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
         'arguments' => ['x' => 12, 'y' => 4, 'width' => 16, 'height' => 12],
         'width' => 16,
         'height' => 12,
-        'corners' => array_fill(0, 4, static::WHITE),
+        'corners' => \array_fill(0, 4, static::WHITE),
       ],
       'scale_and_crop' => [
         'operation' => 'scale_and_crop',
         'arguments' => ['width' => 10, 'height' => 8],
         'width' => 10,
         'height' => 8,
-        'corners' => array_fill(0, 4, static::BLACK),
+        'corners' => \array_fill(0, 4, static::BLACK),
       ],
       'convert_jpg' => [
         'operation' => 'convert',
@@ -200,7 +200,7 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
     ];
 
     // Systems using non-bundled GD2 may miss imagerotate(). Test if available.
-    if (function_exists('imagerotate')) {
+    if (\function_exists('imagerotate')) {
       $test_cases += [
         'rotate_5' => [
           'operation' => 'rotate',
@@ -208,7 +208,7 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
           'arguments' => ['degrees' => 5, 'background' => '#FF00FF'],
           'width' => 40,
           'height' => 23,
-          'corners' => PHP_VERSION_ID < 80500 ? array_fill(0, 4, static::FUCHSIA) : [
+          'corners' => PHP_VERSION_ID < 80500 ? \array_fill(0, 4, static::FUCHSIA) : [
             [255, 0, 93, 0],
             static::FUCHSIA,
             static::FUCHSIA,
@@ -220,7 +220,7 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
           'arguments' => ['degrees' => 5],
           'width' => 40,
           'height' => 23,
-          'corners' => PHP_VERSION_ID < 80500 ? array_fill(0, 4, static::ROTATE_TRANSPARENT) : [
+          'corners' => PHP_VERSION_ID < 80500 ? \array_fill(0, 4, static::ROTATE_TRANSPARENT) : [
             [255, 93, 93, 46],
             static::ROTATE_TRANSPARENT,
             static::ROTATE_TRANSPARENT,
@@ -246,7 +246,7 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
     }
 
     // Systems using non-bundled GD2 may miss imagefilter(). Test if available.
-    if (function_exists('imagefilter')) {
+    if (\function_exists('imagefilter')) {
       $test_cases += [
         'desaturate' => [
           'operation' => 'desaturate',
@@ -257,10 +257,10 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
           // of gray. The values of these were determined simply by looking at
           // the final image to see what desaturated colors end up being.
           'corners' => [
-            array_fill(0, 3, 76) + [3 => 0],
-            array_fill(0, 3, 149) + [3 => 0],
-            array_fill(0, 3, 29) + [3 => 0],
-            array_fill(0, 3, 225) + [3 => 127],
+            \array_fill(0, 3, 76) + [3 => 0],
+            \array_fill(0, 3, 149) + [3 => 0],
+            \array_fill(0, 3, 29) + [3 => 0],
+            \array_fill(0, 3, 225) + [3 => 127],
           ],
         ],
       ];
@@ -292,20 +292,20 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
     $this->assertTrue($image->isValid());
     $image_original_type = $image->getToolkit()->getType();
 
-    $this->assertTrue(imageistruecolor($toolkit->getImage()), "Image '$this->sourceTestImage' after load should be a truecolor image, but it is not.");
+    $this->assertTrue(\imageistruecolor($toolkit->getImage()), "Image '$this->sourceTestImage' after load should be a truecolor image, but it is not.");
 
     // Perform our operation.
     $image->apply($operation, $arguments);
 
     // Flush Image object to disk storage.
-    $file_path = $this->directory . '/' . $test_case . image_type_to_extension($image->getToolkit()->getType());
+    $file_path = $this->directory . '/' . $test_case . \image_type_to_extension($image->getToolkit()->getType());
     $image->save($file_path);
 
     // Check that the both the GD object and the Image object have an accurate
     // record of the dimensions.
     if (isset($expected['height']) && isset($expected['width'])) {
-      $this->assertSame($expected['height'], imagesy($toolkit->getImage()), "Image '$this->sourceTestImage' after '$test_case' should have a proper height.");
-      $this->assertSame($expected['width'], imagesx($toolkit->getImage()), "Image '$this->sourceTestImage' after '$test_case' should have a proper width.");
+      $this->assertSame($expected['height'], \imagesy($toolkit->getImage()), "Image '$this->sourceTestImage' after '$test_case' should have a proper height.");
+      $this->assertSame($expected['width'], \imagesx($toolkit->getImage()), "Image '$this->sourceTestImage' after '$test_case' should have a proper width.");
       $this->assertSame($expected['height'], $image->getHeight(), "Image '$this->sourceTestImage' after '$test_case' should have a proper height.");
       $this->assertSame($expected['width'], $image->getWidth(), "Image '$this->sourceTestImage' after '$test_case' should have a proper width.");
     }

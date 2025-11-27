@@ -42,7 +42,7 @@ final class PackageManagerUpdateProcessor extends UpdateProcessor {
     KeyValueExpirableFactoryInterface $key_value_expirable_factory,
     TimeInterface $time,
   ) {
-    parent::__construct(...func_get_args());
+    parent::__construct(...\func_get_args());
     $this->fetchQueue = $queue_factory->get('package_manager.update_fetch_tasks');
     $this->tempStore = $key_value_expirable_factory->get('package_manager.update');
     $this->fetchTaskStore = $key_value_factory->get('package_manager.update_fetch_task');

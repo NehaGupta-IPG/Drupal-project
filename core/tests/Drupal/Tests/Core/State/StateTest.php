@@ -210,8 +210,8 @@ class StateTest extends UnitTestCase {
 
     $this->state->setMultiple($values + ['key4' => 'value4']);
 
-    $new_keys = array_merge($keys, ['key4']);
-    $new_values = array_merge($values, ['key4' => 'value4']);
+    $new_keys = \array_merge($keys, ['key4']);
+    $new_values = \array_merge($values, ['key4' => 'value4']);
 
     $this->assertEquals($values, $this->state->getMultiple($keys));
     $this->assertEquals($new_values, $this->state->getMultiple($new_keys));

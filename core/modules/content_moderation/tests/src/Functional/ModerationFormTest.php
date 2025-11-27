@@ -37,7 +37,7 @@ class ModerationFormTest extends ModerationStateTestBase {
    * {@inheritdoc}
    */
   protected function getAdministratorPermissions(): array {
-    return array_merge($this->permissions, [
+    return \array_merge($this->permissions, [
       'administer entity_test content',
       'view test entity',
       'translate any entity',

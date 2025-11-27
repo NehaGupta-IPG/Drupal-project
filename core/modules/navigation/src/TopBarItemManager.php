@@ -27,7 +27,7 @@ final class TopBarItemManager extends DefaultPluginManager implements TopBarItem
    * {@inheritdoc}
    */
   public function getDefinitionsByRegion(TopBarRegion $region): array {
-    return array_filter($this->getDefinitions(), fn (array $definition) => $definition['region'] === $region);
+    return \array_filter($this->getDefinitions(), fn (array $definition) => $definition['region'] === $region);
   }
 
   /**
@@ -49,7 +49,7 @@ final class TopBarItemManager extends DefaultPluginManager implements TopBarItem
     $definitions = parent::getDefinitions();
 
     // Sort definitions by weight.
-    uasort($definitions, function (array $a, array $b) {
+    \uasort($definitions, function (array $a, array $b) {
       return ($a['weight'] ?? 0) <=> ($b['weight'] ?? 0);
     });
 

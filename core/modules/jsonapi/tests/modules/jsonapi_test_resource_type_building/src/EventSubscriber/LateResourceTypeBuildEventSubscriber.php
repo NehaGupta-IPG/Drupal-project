@@ -35,7 +35,7 @@ class LateResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
   public function enableResourceTypeFields(ResourceTypeBuildEvent $event): void {
     $aliases = \Drupal::state()->get('jsonapi_test_resource_type_builder.enabled_resource_type_fields', []);
     $resource_type_name = $event->getResourceTypeName();
-    if (in_array($resource_type_name, array_keys($aliases), TRUE)) {
+    if (\in_array($resource_type_name, \array_keys($aliases), TRUE)) {
       foreach ($event->getFields() as $field) {
         if (isset($aliases[$resource_type_name][$field->getInternalName()]) && $aliases[$resource_type_name][$field->getInternalName()] === TRUE) {
           $event->enableField($field);

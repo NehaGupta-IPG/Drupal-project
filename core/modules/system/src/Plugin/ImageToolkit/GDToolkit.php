@@ -275,13 +275,13 @@ class GDToolkit extends ImageToolkitBase {
     }
     else {
       // Image types that support alpha need to be saved accordingly.
-      if (in_array($this->getType(), [
+      if (\in_array($this->getType(), [
         IMAGETYPE_PNG,
         IMAGETYPE_WEBP,
         IMAGETYPE_AVIF,
       ], TRUE)) {
-        imagealphablending($this->getImage(), FALSE);
-        imagesavealpha($this->getImage(), TRUE);
+        \imagealphablending($this->getImage(), FALSE);
+        \imagesavealpha($this->getImage(), TRUE);
       }
       try {
         $success = $function($this->getImage(), $destination);
@@ -472,7 +472,7 @@ class GDToolkit extends ImageToolkitBase {
     }
 
     // Check for filter and rotate support.
-    if (!function_exists('imagefilter') || !function_exists('imagerotate')) {
+    if (!\function_exists('imagefilter') || !\function_exists('imagerotate')) {
       $requirements['version']['severity'] = RequirementSeverity::Warning;
       $descriptions[] = $this->t('The GD Library for PHP is enabled, but was compiled without support for functions used by the rotate and desaturate effects. It was probably compiled using the official GD libraries from the <a href="https://libgd.github.io/">gdLibrary site</a> instead of the GD library bundled with PHP. You should recompile PHP --with-gd using the bundled GD library. See <a href="https://www.php.net/manual/book.image.php">the PHP manual</a>.');
     }
@@ -561,11 +561,11 @@ class GDToolkit extends ImageToolkitBase {
       return $supported;
     }
 
-    $tempFile = fopen('php://memory', 'r+');
+    $tempFile = \fopen('php://memory', 'r+');
     // We suppress any errors when running the imageavif command because of this
     // upstream php bug: https://bugs.php.net/bug.php?id=81217.
-    $supported = function_exists('imageavif') && @imageavif(imagecreatetruecolor(1, 1), $tempFile, 0, 10) && fstat($tempFile)['size'] > 0;
-    fclose($tempFile);
+    $supported = \function_exists('imageavif') && @\imageavif(\imagecreatetruecolor(1, 1), $tempFile, 0, 10) && \fstat($tempFile)['size'] > 0;
+    \fclose($tempFile);
 
     return $supported;
   }

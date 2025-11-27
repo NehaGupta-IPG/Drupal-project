@@ -143,8 +143,8 @@ class UpdateMailTest extends UnitTestCase {
     $this->assertSame("New release(s) available for $site_name", $message['subject']);
 
     // Confirm each part of the body.
-    for ($i = 0; $i < count($expected_body); $i++) {
-      $body_part = is_string($message['body'][$i]) ? $message['body'][$i] : $message['body'][$i]->render();
+    for ($i = 0; $i < \count($expected_body); $i++) {
+      $body_part = \is_string($message['body'][$i]) ? $message['body'][$i] : $message['body'][$i]->render();
       $this->assertSame($expected_body[$i], $body_part);
     }
   }

@@ -98,7 +98,7 @@ abstract class DriverSpecificConnectionUnitTestBase extends DriverSpecificKernel
     // Wait up to 100ms to give the database engine sufficient time to react.
     $this->assertTrue($this->waitFor(0.1, function () use ($id) {
       $key = $this->monitor->query($this->getQuery()['processlist'])->fetchAllKeyed(0, 0);
-      return !array_key_exists($id, $key);
+      return !\array_key_exists($id, $key);
     }));
   }
 
@@ -114,18 +114,18 @@ abstract class DriverSpecificConnectionUnitTestBase extends DriverSpecificKernel
    *   The result of the callback.
    */
   protected function waitFor(int|float $timeout, callable $callback): mixed {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $end = $start + $timeout;
 
     do {
-      $result = call_user_func($callback, $this);
+      $result = \call_user_func($callback, $this);
 
       if ($result) {
         break;
       }
 
-      usleep(10000);
-    } while (microtime(TRUE) < $end);
+      \usleep(10000);
+    } while (\microtime(TRUE) < $end);
 
     return $result;
   }

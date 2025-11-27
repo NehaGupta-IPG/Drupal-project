@@ -34,7 +34,7 @@ final class AllowListConfigStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function exists($name): bool {
-    if (in_array($name, $this->allowList, TRUE)) {
+    if (\in_array($name, $this->allowList, TRUE)) {
       return $this->decorated->exists($name);
     }
     return FALSE;
@@ -51,7 +51,7 @@ final class AllowListConfigStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function readMultiple(array $names): array {
-    $names = array_intersect($names, $this->allowList);
+    $names = \array_intersect($names, $this->allowList);
     return $this->decorated->readMultiple($names);
   }
 
@@ -94,7 +94,7 @@ final class AllowListConfigStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function listAll($prefix = ''): array {
-    return array_intersect($this->decorated->listAll($prefix), $this->allowList);
+    return \array_intersect($this->decorated->listAll($prefix), $this->allowList);
   }
 
   /**

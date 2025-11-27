@@ -509,10 +509,10 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $response = $this->request('GET', $url, $request_options);
     if ($has_canonical_url) {
       $this->assertSame(403, $response->getStatusCode());
-      $dynamic_cache = str_starts_with($response->getHeader('X-Drupal-Cache-Max-Age')[0], '0')
-        || !empty(array_intersect(
+      $dynamic_cache = \str_starts_with($response->getHeader('X-Drupal-Cache-Max-Age')[0], '0')
+        || !empty(\array_intersect(
           ['user', 'session'],
-          explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]))) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+          \explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]))) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
       $this->assertSame([$dynamic_cache], $response->getHeader('X-Drupal-Dynamic-Cache'));
     }
     else {
@@ -534,7 +534,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // 200 for well-formed HEAD request.
     $response = $this->request('HEAD', $url, $request_options);
-    $is_cacheable_by_dynamic_page_cache = empty(array_intersect(['user', 'session'], $this->getExpectedCacheContexts()));
+    $is_cacheable_by_dynamic_page_cache = empty(\array_intersect(['user', 'session'], $this->getExpectedCacheContexts()));
     $this->assertResourceResponse(200, '', $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), static::$auth ? FALSE : 'MISS', $is_cacheable_by_dynamic_page_cache ? 'MISS' : 'UNCACHEABLE (poor cacheability)');
     $head_headers = $response->getHeaders();
 
@@ -681,7 +681,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // DX: 404 when GETting non-existing entity.
     $response = $this->request('GET', $url, $request_options);
-    $path = str_replace(
+    $path = \str_replace(
       '987654321',
       '{' . static::$entityTypeId . '}',
       $url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString(),

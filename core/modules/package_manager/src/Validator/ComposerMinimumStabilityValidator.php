@@ -38,7 +38,7 @@ final class ComposerMinimumStabilityValidator implements EventSubscriberInterfac
   public function validate(PreRequireEvent $event): void {
     $dir = $this->pathLocator->getProjectRoot();
     $minimum_stability = $this->inspector->getConfig('minimum-stability', $dir);
-    $requested_packages = array_merge($event->getDevPackages(), $event->getRuntimePackages());
+    $requested_packages = \array_merge($event->getDevPackages(), $event->getRuntimePackages());
 
     foreach ($requested_packages as $package_name => $version) {
       // In the root composer.json, a stability flag can also be specified. They
@@ -46,7 +46,7 @@ final class ComposerMinimumStabilityValidator implements EventSubscriberInterfac
       // allows the project owner to deviate from the minimum-stability setting.
       // @see https://getcomposer.org/doc/04-schema.md#package-links
       // @see \Composer\Package\Loader\RootPackageLoader::extractStabilityFlags()
-      if (str_contains($version, '@')) {
+      if (\str_contains($version, '@')) {
         continue;
       }
       $stability = VersionParser::parseStability($version);

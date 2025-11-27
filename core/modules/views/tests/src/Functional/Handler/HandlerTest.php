@@ -129,9 +129,9 @@ class HandlerTest extends ViewTestBase {
 
     $s1 = $this->randomMachineName();
     // Generate three random numbers which can be used below.
-    $n1 = rand(0, 100);
-    $n2 = rand(0, 100);
-    $n3 = rand(0, 100);
+    $n1 = \rand(0, 100);
+    $n2 = \rand(0, 100);
+    $n3 = \rand(0, 100);
 
     // Test "or"s.
     $handlerBase = HandlerBase::breakString("$s1 $n2+$n3");
@@ -177,9 +177,9 @@ class HandlerTest extends ViewTestBase {
     $this->assertEquals('or', $handlerBase->operator);
 
     // Generate three random decimals which can be used below.
-    $d1 = rand(0, 10) / 10;
-    $d2 = rand(0, 10) / 10;
-    $d3 = rand(0, 10) / 10;
+    $d1 = \rand(0, 10) / 10;
+    $d2 = \rand(0, 10) / 10;
+    $d3 = \rand(0, 10) / 10;
 
     // Test "or"s.
     $handlerBase = HandlerBase::breakString("$s1 $d1+$d2");

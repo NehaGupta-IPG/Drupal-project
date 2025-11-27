@@ -34,7 +34,7 @@ class OliveroPagePreprocessHooks {
 
     // Convert custom hex to hsl so we can use the hue value.
     $brand_color_hex = $this->themeSettingsProvider->getSetting('base_primary_color') ?? '#1b9ae4';
-    [$h, $s, $l] = _olivero_hex_to_hsl($brand_color_hex);
+    [$h, $s, $l] = \_olivero_hex_to_hsl($brand_color_hex);
 
     $variables['html_attributes']->setAttribute('style', "--color--primary-hue:$h;--color--primary-saturation:$s%;--color--primary-lightness:$l");
 

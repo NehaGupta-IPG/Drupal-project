@@ -81,12 +81,12 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
       $classes[] = $dialog_options['classes']['ui-dialog'];
     }
     if (isset($dialog_options['dialogClass'])) {
-      @trigger_error('Passing $dialog_options[\'dialogClass\'] to OpenDialogCommand::__construct() is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Use $dialog_options[\'classes\'] instead. See https://www.drupal.org/node/3440844', E_USER_DEPRECATED);
+      @\trigger_error('Passing $dialog_options[\'dialogClass\'] to OpenDialogCommand::__construct() is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Use $dialog_options[\'classes\'] instead. See https://www.drupal.org/node/3440844', E_USER_DEPRECATED);
       $classes[] = $dialog_options['dialogClass'];
       unset($dialog_options['dialogClass']);
     }
     if ($classes) {
-      $dialog_options['classes']['ui-dialog'] = implode(' ', $classes);
+      $dialog_options['classes']['ui-dialog'] = \implode(' ', $classes);
     }
 
     $this->selector = $selector;

@@ -90,7 +90,7 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
     $scheme = StreamWrapperManager::getScheme($uri);
 
     if (!$scheme) {
-      $baseUrl = $relative ? base_path() : $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . base_path();
+      $baseUrl = $relative ? \base_path() : $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . \base_path();
       return $this->generatePath($baseUrl, $uri);
     }
     elseif ($scheme == 'http' || $scheme == 'https' || $scheme == 'data') {

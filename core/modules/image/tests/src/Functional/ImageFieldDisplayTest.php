@@ -84,7 +84,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->assertSession()->linkByHrefNotExists(Url::fromRoute('entity.image_style.collection')->toString(), 'Link to image styles configuration is absent when permissions are insufficient');
 
     // Restore 'administer image styles' permission to testing admin user.
-    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => TRUE]);
+    \user_role_change_permissions(\reset($admin_user_roles), ['administer image styles' => TRUE]);
 
     // Create a new node with an image attached.
     $test_image = \current($this->drupalGetTestFiles('image'));
@@ -387,7 +387,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->assertSession()->linkByHrefNotExists(Url::fromRoute('entity.image_style.collection')->toString(), 'Link to image styles configuration is absent when permissions are insufficient');
 
     // Restore 'administer image styles' permission to testing admin user.
-    user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => TRUE]);
+    \user_role_change_permissions(\reset($admin_user_roles), ['administer image styles' => TRUE]);
 
     // Create a new node with an image attached.
     $test_image = \current($this->drupalGetTestFiles('image'));

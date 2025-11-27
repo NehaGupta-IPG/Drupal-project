@@ -185,8 +185,8 @@ class BlockTest extends BlockTestBase {
       $this->assertSession()->elementTextEquals('xpath', $xpath, 'Place block');
 
       $link = $this->getSession()->getPage()->find('xpath', $xpath);
-      [, $query_string] = explode('?', $link->getAttribute('href'), 2);
-      parse_str($query_string, $query_parts);
+      [, $query_string] = \explode('?', $link->getAttribute('href'), 2);
+      \parse_str($query_string, $query_parts);
       $this->assertEquals($weight, $query_parts['weight'], 'Found the expected weight query string.');
 
       // Create a random title for the block.
@@ -459,7 +459,7 @@ class BlockTest extends BlockTestBase {
       'http_response',
       'rendered',
     ];
-    sort($expected_cache_tags);
+    \sort($expected_cache_tags);
     $keys = \Drupal::service('cache_contexts_manager')
       ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
       ->getKeys();
@@ -510,22 +510,22 @@ class BlockTest extends BlockTestBase {
       'config:block.block.powered',
       'rendered',
     ];
-    sort($expected_cache_tags);
+    \sort($expected_cache_tags);
     $keys = \Drupal::service('cache_contexts_manager')
       ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
       ->getKeys();
-    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
+    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . \implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
       'block_view',
       'config:block.block.powered_2',
       'rendered',
     ];
-    sort($expected_cache_tags);
+    \sort($expected_cache_tags);
     $keys = \Drupal::service('cache_contexts_manager')
       ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
       ->getKeys();
-    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered_2:' . implode(':', $keys));
+    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered_2:' . \implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
 
     // Now we should have a cache hit again.

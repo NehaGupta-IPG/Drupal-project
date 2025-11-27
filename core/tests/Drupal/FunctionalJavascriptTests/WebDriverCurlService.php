@@ -11,7 +11,7 @@ use WebDriver\Exception as WebDriverException;
 // cspell:ignore curle curlopt customrequest failonerror postfields
 // cspell:ignore returntransfer
 
-@trigger_error('The \Drupal\FunctionalJavascriptTests\WebDriverCurlService class is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3462152', E_USER_DEPRECATED);
+@\trigger_error('The \Drupal\FunctionalJavascriptTests\WebDriverCurlService class is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3462152', E_USER_DEPRECATED);
 
 /**
  * Provides a curl service to interact with Selenium driver.
@@ -136,7 +136,7 @@ class WebDriverCurlService extends CurlService {
         $info = \curl_getinfo($curl);
         $info['request_method'] = $requestMethod;
 
-        if (array_key_exists(CURLOPT_FAILONERROR, $extraOptions) && $extraOptions[CURLOPT_FAILONERROR] && CURLE_GOT_NOTHING !== curl_errno($curl) && $error = curl_error($curl)) {
+        if (\array_key_exists(CURLOPT_FAILONERROR, $extraOptions) && $extraOptions[CURLOPT_FAILONERROR] && CURLE_GOT_NOTHING !== \curl_errno($curl) && $error = \curl_error($curl)) {
           $curl = NULL;
 
           throw WebDriverException::factory(WebDriverException::CURL_EXEC, \sprintf("Curl error thrown for http %s to %s%s\n\n%s", $requestMethod, $url, $parameters && \is_array($parameters) ? ' with params: ' . \json_encode($parameters) : '', $error));

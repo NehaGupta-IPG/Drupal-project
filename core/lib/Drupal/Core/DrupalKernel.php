@@ -423,7 +423,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Determine whether multi-site functionality is enabled. If not, return
     // the default directory.
-    if (!is_file($app_root . '/sites/sites.php')) {
+    if (!\is_file($app_root . '/sites/sites.php')) {
       return 'sites/default';
     }
 
@@ -454,10 +454,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         // If the identifier is a key in $sites, check for a directory matching
         // the corresponding value. Otherwise, check for a directory matching
         // the identifier.
-        if (isset($sites[$site_id]) && is_dir($app_root . '/sites/' . $sites[$site_id])) {
+        if (isset($sites[$site_id]) && \is_dir($app_root . '/sites/' . $sites[$site_id])) {
           $site_id = $sites[$site_id];
         }
-        if (is_file($app_root . '/sites/' . $site_id . '/settings.php') || (!$require_settings && is_file($app_root . '/sites/' . $site_id))) {
+        if (\is_file($app_root . '/sites/' . $site_id . '/settings.php') || (!$require_settings && \is_file($app_root . '/sites/' . $site_id))) {
           return "sites/$site_id";
         }
       }
@@ -524,18 +524,18 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->initializeContainer();
 
     // Add the APCu prefix to use to cache found/not-found classes.
-    if (Settings::get('class_loader_auto_detect', TRUE) && method_exists($this->classLoader, 'setApcuPrefix')) {
+    if (Settings::get('class_loader_auto_detect', TRUE) && \method_exists($this->classLoader, 'setApcuPrefix')) {
       // Vary the APCu key by which extensions are installed to allow
       // class_exists() checks to determine functionality.
-      $installed_extensions = array_keys($this->container->getParameter('container.modules') + $this->container->getParameter('container.themes'));
-      $id = 'class_loader:' . crc32(implode(':', $installed_extensions));
+      $installed_extensions = \array_keys($this->container->getParameter('container.modules') + $this->container->getParameter('container.themes'));
+      $id = 'class_loader:' . \crc32(\implode(':', $installed_extensions));
       $prefix = Settings::getApcuPrefix($id, $this->root);
       $this->classLoader->setApcuPrefix($prefix);
     }
 
     if ($this->container->hasParameter('moved_classes')) {
       $bc_class_loader = new BackwardsCompatibilityClassLoader($this->container->getParameter('moved_classes'));
-      spl_autoload_register([$bc_class_loader, 'loadClass']);
+      \spl_autoload_register([$bc_class_loader, 'loadClass']);
     }
 
     $this->booted = TRUE;
@@ -684,8 +684,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       if (\class_exists($class)) {
         $this->serviceProviderClasses['app'][$module] = $class;
       }
-      $filename = dirname($filename) . "/$module.services.yml";
-      if (is_file($filename)) {
+      $filename = \dirname($filename) . "/$module.services.yml";
+      if (\is_file($filename)) {
         $this->serviceYamls['app'][$module] = $filename;
       }
     }
@@ -823,9 +823,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $listing = new ExtensionDiscovery($this->root);
     $listing->setProfileDirectories([]);
     $all_profiles = $listing->scan('profile');
-    $profiles = array_intersect_key($all_profiles, $this->moduleList);
+    $profiles = \array_intersect_key($all_profiles, $this->moduleList);
 
-    $profile_directories = array_map(function (Extension $profile) {
+    $profile_directories = \array_map(function (Extension $profile) {
       return $profile->getPath();
     }, $profiles);
     $listing->setProfileDirectories($profile_directories);
@@ -845,7 +845,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public function updateModules(array $module_list, array $module_filenames = []) {
     $pre_existing_module_namespaces = [];
-    if ($this->booted && is_array($this->moduleList)) {
+    if ($this->booted && \is_array($this->moduleList)) {
       $pre_existing_module_namespaces = $this->getExtensionNamespacesPsr4(
         $this->getExtensionFileNames($this->moduleList, [$this, 'moduleData'])
       );
@@ -866,7 +866,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // the current class loader might have stored a negative result for a
       // class that is now available.
       // @see \Composer\Autoload\ClassLoader::findFile()
-      $new_namespaces = array_diff_key(
+      $new_namespaces = \array_diff_key(
         $this->getExtensionNamespacesPsr4($this->getExtensionFileNames($this->moduleList, [$this, 'moduleData'])),
         $pre_existing_module_namespaces
       );
@@ -926,7 +926,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // the current class loader might have stored a negative result for a
       // class that is now available.
       // @see \Composer\Autoload\ClassLoader::findFile()
-      $new_namespaces = array_diff_key(
+      $new_namespaces = \array_diff_key(
         $this->getExtensionNamespacesPsr4(
           $this->getExtensionFileNames($this->themeList, [$this, 'themeExtensions'])
         ),
@@ -961,12 +961,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $parts = [
       'service_container',
       $this->environment,
-      class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION,
+      \class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION,
       Settings::get('deployment_identifier'),
       PHP_OS,
-      serialize(Settings::get('container_yamls')),
+      \serialize(Settings::get('container_yamls')),
     ];
-    return implode(':', $parts);
+    return \implode(':', $parts);
   }
 
   /**
@@ -1112,7 +1112,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $app_root = static::guessApplicationRoot();
     }
 
-    error_reporting(E_ALL);
+    \error_reporting(E_ALL);
 
     // Override PHP settings required for Drupal to work properly.
     // sites/default/default.settings.php contains more runtime settings.
@@ -1121,11 +1121,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (PHP_SAPI !== 'cli') {
       // Use session cookies, not transparent sessions that puts the session id
       // in the query string.
-      ini_set('session.use_cookies', '1');
-      ini_set('session.use_strict_mode', '1');
+      \ini_set('session.use_cookies', '1');
+      \ini_set('session.use_strict_mode', '1');
       if (\PHP_VERSION_ID < 80400) {
-        ini_set('session.use_only_cookies', '1');
-        ini_set('session.use_trans_sid', '0');
+        \ini_set('session.use_only_cookies', '1');
+        \ini_set('session.use_trans_sid', '0');
       }
       // Don't send HTTP headers using PHP's session handler.
       // Send an empty string to disable the cache limiter.
@@ -1150,15 +1150,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         // constant; e.g., the error/exception handler conditionally adds
         // further error information into HTTP response headers that are
         // consumed by the internal browser.
-        define('DRUPAL_TEST_IN_CHILD_SITE', TRUE);
+        \define('DRUPAL_TEST_IN_CHILD_SITE', TRUE);
 
         // Log fatal errors to the test site directory.
         \ini_set('log_errors', 1);
         \ini_set('error_log', $app_root . '/' . $test_db->getTestSitePath() . '/error.log');
 
         // Ensure that a rewritten settings.php is used if OPcache is on.
-        ini_set('opcache.validate_timestamps', 'on');
-        ini_set('opcache.revalidate_freq', 0);
+        \ini_set('opcache.validate_timestamps', 'on');
+        \ini_set('opcache.revalidate_freq', 0);
       }
       else {
         // Ensure that no other code defines this.
@@ -1620,7 +1620,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @see https://www.drupal.org/node/3551652
    */
   protected function getModulesParameter() {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+    @\trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
     return $this->getExtensionsParameter($this->moduleList, [$this, 'moduleData']);
   }
 
@@ -1663,7 +1663,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @see https://www.drupal.org/node/3551652
    */
   protected function getModuleFileNames() {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionFileNames() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+    @\trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionFileNames() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
     return $this->getExtensionFileNames($this->moduleList, [$this, 'moduleData']);
   }
 
@@ -1707,7 +1707,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @see https://www.drupal.org/node/3551652
    */
   protected function getModuleNamespacesPsr4($module_file_names) {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionNamespacesPsr4() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+    @\trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionNamespacesPsr4() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
     return $this->getExtensionNamespacesPsr4($module_file_names);
   }
 
@@ -1726,7 +1726,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected function getExtensionNamespacesPsr4(array $extension_file_names): array {
     $namespaces = [];
     foreach ($extension_file_names as $extension => $filename) {
-      $namespaces["Drupal\\$extension"] = dirname($filename) . '/src';
+      $namespaces["Drupal\\$extension"] = \dirname($filename) . '/src';
     }
     return $namespaces;
   }
@@ -1865,7 +1865,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   A list of service files.
    */
   protected function addServiceFiles(array $service_yamls) {
-    $this->serviceYamls['site'] = array_filter($service_yamls, 'is_file');
+    $this->serviceYamls['site'] = \array_filter($service_yamls, 'is_file');
   }
 
   /**
@@ -1877,7 +1877,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function getInstallProfile() {
     $config = $this->getExtensions();
-    if (is_array($config) && !array_key_exists('profile', $config)) {
+    if (\is_array($config) && !\array_key_exists('profile', $config)) {
       return FALSE;
     }
     return $config['profile'] ?? NULL;

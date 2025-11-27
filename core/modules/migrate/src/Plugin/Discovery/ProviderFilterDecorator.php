@@ -74,7 +74,7 @@ class ProviderFilterDecorator implements DiscoveryInterface {
       ];
       // There can be one or many providers, handle them as multiple always.
       $providers = $definition['providers'] ?: (array) $definition['provider'];
-      return count($providers) == count(array_filter($providers, $provider_exists));
+      return \count($providers) == \count(\array_filter($providers, $provider_exists));
     });
   }
 

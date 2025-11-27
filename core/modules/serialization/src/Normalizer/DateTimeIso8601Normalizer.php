@@ -40,7 +40,7 @@ class DateTimeIso8601Normalizer extends DateTimeNormalizer {
     if ($format === 'json_schema') {
       return $this->getNormalizationSchema($object, $context);
     }
-    assert($object instanceof DateTimeIso8601);
+    \assert($object instanceof DateTimeIso8601);
     $field_item = $object->getParent();
     // @todo Remove this in https://www.drupal.org/project/drupal/issues/2958416.
     if ($field_item instanceof DateTimeItem && $field_item->getFieldDefinition()->getFieldStorageDefinition()->getSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATE) {

@@ -95,7 +95,7 @@ class ToolbarHooks {
     // toolbar_subtrees route. We provide the JavaScript requesting that JSONP
     // script here with the hash parameter that is needed for that route.
     // @see toolbar_subtrees_jsonp()
-    [$hash, $hash_cacheability] = _toolbar_get_subtrees_hash();
+    [$hash, $hash_cacheability] = \_toolbar_get_subtrees_hash();
     $subtrees_attached['drupalSettings']['toolbar'] = ['subtreesHash' => $hash];
     // The administration element has a link that is themed to correspond to a
     // toolbar tray. The tray contains the full administrative menu of the site.

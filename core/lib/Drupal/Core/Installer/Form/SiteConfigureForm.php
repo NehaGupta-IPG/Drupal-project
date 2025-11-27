@@ -97,7 +97,7 @@ class SiteConfigureForm extends ConfigFormBase {
     // distract from the message that the Drupal installation has completed
     // successfully.)
     $post_params = $this->getRequest()->request->all();
-    if (empty($post_params) && (Settings::get('skip_permissions_hardening') || !drupal_verify_install_file($this->root . '/' . $settings_file, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE) || !drupal_verify_install_file($this->root . '/' . $settings_dir, FILE_NOT_WRITABLE, 'dir'))) {
+    if (empty($post_params) && (Settings::get('skip_permissions_hardening') || !\drupal_verify_install_file($this->root . '/' . $settings_file, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE) || !\drupal_verify_install_file($this->root . '/' . $settings_dir, FILE_NOT_WRITABLE, 'dir'))) {
       $this->messenger()
         ->addWarning($this->t('All necessary changes to %dir and %file have been made, so you should remove write permissions to them now in order to avoid security risks. If you are unsure how to do so, consult the <a href=":handbook_url">online handbook</a>.', [
           '%dir' => $settings_dir,

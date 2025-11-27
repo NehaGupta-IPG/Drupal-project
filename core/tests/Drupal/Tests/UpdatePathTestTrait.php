@@ -72,7 +72,7 @@ trait UpdatePathTestTrait {
       foreach (['update', 'post_update'] as $update_type) {
         switch ($update_type) {
           case 'update':
-            drupal_load_updates();
+            \drupal_load_updates();
             $all_updates = \update_get_update_list();
             break;
 
@@ -98,7 +98,7 @@ trait UpdatePathTestTrait {
       $modules_installed = FALSE;
       // Modules that are in configuration but not the module handler have been
       // installed.
-      $modules_installed = !empty(array_diff_key($config_module_list, $module_handler_list));
+      $modules_installed = !empty(\array_diff_key($config_module_list, $module_handler_list));
       $modules_uninstalled = FALSE;
       $module_handler_list = $module_handler->getModuleList();
       // Modules that are in the module handler but not configuration have been

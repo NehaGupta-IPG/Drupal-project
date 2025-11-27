@@ -98,11 +98,11 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
 
     // Add the module that is providing the database driver to the list of
     // modules that can not be uninstalled in the core.extension configuration.
-    if (file_exists($config_sync_directory . '/core.extension.yml')) {
-      $core_extension = Yaml::decode(file_get_contents($config_sync_directory . '/core.extension.yml'));
+    if (\file_exists($config_sync_directory . '/core.extension.yml')) {
+      $core_extension = Yaml::decode(\file_get_contents($config_sync_directory . '/core.extension.yml'));
       // If the database module has dependencies, they are expected too.
       $database_module_extension = \Drupal::service(ModuleExtensionList::class)->get(Database::getConnection()->getProvider());
-      $database_modules = $database_module_extension->requires ? array_keys($database_module_extension->requires) : [];
+      $database_modules = $database_module_extension->requires ? \array_keys($database_module_extension->requires) : [];
       $database_modules[] = Database::getConnection()->getProvider();
       foreach ($database_modules as $module) {
         $core_extension['module'][$module] = 0;

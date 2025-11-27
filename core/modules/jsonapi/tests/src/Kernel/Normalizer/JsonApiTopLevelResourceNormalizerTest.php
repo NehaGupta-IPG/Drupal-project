@@ -887,14 +887,14 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     $format = $this->getJsonSchemaTestNormalizationFormat();
     $schema = $serializer->normalize($resource_object, 'json_schema', $context);
     $this->doCheckSchemaAgainstMetaSchema($schema);
-    $normalized = json_decode(json_encode($serializer->normalize(
+    $normalized = \json_decode(\json_encode($serializer->normalize(
       $resource_object,
       $format,
       $context
     )->getNormalization()));
     $validator = $this->getValidator();
-    $validator->validate($normalized, json_decode(json_encode($schema)));
-    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . print_r($normalized, TRUE) . ' with schema ' . print_r($schema, TRUE));
+    $validator->validate($normalized, \json_decode(\json_encode($schema)));
+    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . \print_r($normalized, TRUE) . ' with schema ' . \print_r($schema, TRUE));
   }
 
   /**
@@ -910,14 +910,14 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     $format = $this->getJsonSchemaTestNormalizationFormat();
     $schema = $serializer->normalize($resource_object, 'json_schema', $context);
     $this->doCheckSchemaAgainstMetaSchema($schema);
-    $normalized = json_decode(json_encode($serializer->normalize(
+    $normalized = \json_decode(\json_encode($serializer->normalize(
       $resource_object,
       $format,
       $context
     )->getNormalization()));
     $validator = $this->getValidator();
-    $validator->validate($normalized, json_decode(json_encode($schema)));
-    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . print_r($normalized, TRUE) . ' with schema ' . print_r($schema, TRUE));
+    $validator->validate($normalized, \json_decode(\json_encode($schema)));
+    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . \print_r($normalized, TRUE) . ' with schema ' . \print_r($schema, TRUE));
   }
 
   /**
@@ -935,14 +935,14 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     );
     $schema = $serializer->normalize($topLevel, 'json_schema', $context);
     $this->doCheckSchemaAgainstMetaSchema($schema);
-    $normalized = json_decode(json_encode($serializer->normalize(
+    $normalized = \json_decode(\json_encode($serializer->normalize(
       $topLevel,
       $format,
       $context
     )->getNormalization()));
     $validator = $this->getValidator();
-    $validator->validate($normalized, json_decode(json_encode($schema)));
-    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . print_r($normalized, TRUE) . ' with schema ' . print_r($schema, TRUE));
+    $validator->validate($normalized, \json_decode(\json_encode($schema)));
+    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . \print_r($normalized, TRUE) . ' with schema ' . \print_r($schema, TRUE));
   }
 
 }

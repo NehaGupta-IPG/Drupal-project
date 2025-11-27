@@ -30,7 +30,7 @@ class SettingsTrayThemeHooks {
     $block_plugin = $block_plugin_manager->createInstance($variables['plugin_id']);
     if (isset($variables['elements']['#contextual_links']['block']['route_parameters']['block'])) {
       $block = Block::load($variables['elements']['#contextual_links']['block']['route_parameters']['block']);
-      if ($access_checker->accessBlockPlugin($block_plugin)->isAllowed() && !_settings_tray_has_block_overrides($block)) {
+      if ($access_checker->accessBlockPlugin($block_plugin)->isAllowed() && !\_settings_tray_has_block_overrides($block)) {
         // Add class and attributes to all blocks to allow JavaScript to target.
         $variables['attributes']['class'][] = 'settings-tray-editable';
         $variables['attributes']['data-drupal-settingstray'] = 'editable';

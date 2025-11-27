@@ -73,7 +73,7 @@ class NodeEntityHooks {
       ->allRevisions()
       ->accessCheck(FALSE)
       ->condition('uid', $account->id());
-    $revisions = array_keys($query->execute());
+    $revisions = \array_keys($query->execute());
     foreach ($revisions as $revision) {
       $storage_controller->deleteRevision($revision);
     }

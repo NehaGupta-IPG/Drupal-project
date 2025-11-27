@@ -248,9 +248,9 @@ class BigPipe {
     // Find the closing </body> tag and get the strings before and after. But be
     // careful to use the latest occurrence of the string "</body>", to ensure
     // that strings in inline JavaScript or CDATA sections aren't used instead.
-    $parts = explode('</body>', $content);
-    $post_body = array_pop($parts);
-    $pre_body = implode('</body>', $parts);
+    $parts = \explode('</body>', $content);
+    $post_body = \array_pop($parts);
+    $pre_body = \implode('</body>', $parts);
 
     $this->sendPreBody($pre_body, $nojs_placeholders, $cumulative_assets);
     $this->sendPlaceholders($placeholders, $this->getPlaceholderOrder($pre_body, $placeholders), $cumulative_assets);
@@ -389,7 +389,7 @@ class BigPipe {
           throw $e;
         }
         else {
-          trigger_error($e, E_USER_WARNING);
+          \trigger_error($e, E_USER_WARNING);
           continue;
         }
       }
@@ -425,7 +425,7 @@ class BigPipe {
           throw $e;
         }
         else {
-          trigger_error($e, E_USER_WARNING);
+          \trigger_error($e, E_USER_WARNING);
           continue;
         }
       }
@@ -631,7 +631,7 @@ EOF;
             throw $e;
           }
           else {
-            trigger_error($e, E_USER_WARNING);
+            \trigger_error($e, E_USER_WARNING);
           }
         }
       }
@@ -639,8 +639,8 @@ EOF;
     }
 
     if ($this->debugCacheabilityHeaders) {
-      $this->sendChunk("\n<!-- big_pipe cache tags: " . implode(' ', $cacheable_metadata->getCacheTags()) . " -->\n");
-      $this->sendChunk("\n<!-- big_pipe cache contexts: " . implode(' ', $cacheable_metadata->getCacheContexts()) . " -->\n");
+      $this->sendChunk("\n<!-- big_pipe cache tags: " . \implode(' ', $cacheable_metadata->getCacheTags()) . " -->\n");
+      $this->sendChunk("\n<!-- big_pipe cache contexts: " . \implode(' ', $cacheable_metadata->getCacheContexts()) . " -->\n");
     }
 
     // Send the stop signal.

@@ -173,7 +173,7 @@ class File extends ContentEntityBase implements FileInterface {
   public static function preCreate(EntityStorageInterface $storage, array &$values) {
     // Automatically detect filename if not set.
     if (!isset($values['filename']) && isset($values['uri'])) {
-      $values['filename'] = basename($values['uri']);
+      $values['filename'] = \basename($values['uri']);
     }
 
     // Automatically detect filemime if not set.

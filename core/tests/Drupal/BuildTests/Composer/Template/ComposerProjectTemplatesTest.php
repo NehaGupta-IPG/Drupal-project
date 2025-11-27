@@ -428,13 +428,13 @@ JSON;
     $version = \Drupal::VERSION;
     // If the current version is x.y-dev then this is the equivalent of the main
     // branch and should be treated as a dev release.
-    if (preg_match('/^(\d)+\.(\d)+-dev$/', $version)) {
+    if (\preg_match('/^(\d)+\.(\d)+-dev$/', $version)) {
       return 'dev';
     }
     $stability = VersionParser::parseStability($version);
     if ($stability === 'dev') {
       // Strip off "-dev".
-      $version_towards = substr($version, 0, -4);
+      $version_towards = \substr($version, 0, -4);
 
       if (!\str_ends_with($version_towards, '.0')) {
         // If the current version is developing towards an x.y.z release where

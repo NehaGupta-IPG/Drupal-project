@@ -57,8 +57,8 @@ class FilterEntityReferenceWebTest extends UITestBase {
 
     $options = $this->getUiOptions();
     // Should be sorted by title ASC.
-    uasort($this->targetEntities, function (EntityInterface $a, EntityInterface $b) {
-      return strnatcasecmp($a->getTitle(), $b->getTitle());
+    \uasort($this->targetEntities, function (EntityInterface $a, EntityInterface $b) {
+      return \strnatcasecmp($a->getTitle(), $b->getTitle());
     });
     $i = 0;
     foreach ($this->targetEntities as $entity) {
@@ -76,7 +76,7 @@ class FilterEntityReferenceWebTest extends UITestBase {
 
     $this->drupalGet('admin/structure/views/nojs/handler/test_filter_entity_reference/default/filter/field_test_target_id');
     // Items should now be in reverse id order.
-    krsort($this->targetEntities);
+    \krsort($this->targetEntities);
     $options = $this->getUiOptions();
     $i = 0;
     foreach ($this->targetEntities as $entity) {
@@ -122,7 +122,7 @@ class FilterEntityReferenceWebTest extends UITestBase {
 
     $options = $this->getUiOptions();
     // We should expect the content types defined as options.
-    $this->assertEquals(['article', 'page'], array_column($options, 'label'));
+    $this->assertEquals(['article', 'page'], \array_column($options, 'label'));
   }
 
   /**

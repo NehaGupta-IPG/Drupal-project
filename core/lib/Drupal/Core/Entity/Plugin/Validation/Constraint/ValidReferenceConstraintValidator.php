@@ -122,7 +122,7 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
     // Add violations on deltas with a target_id that is not valid.
     if ($target_ids) {
       $valid_target_ids = $handler->validateReferenceableEntities($target_ids);
-      if ($invalid_target_ids = array_diff($target_ids, $valid_target_ids)) {
+      if ($invalid_target_ids = \array_diff($target_ids, $valid_target_ids)) {
         // Get a list of pre-existing references.
         $previously_referenced_ids = [];
         if ($entity && !$entity->isNew()) {

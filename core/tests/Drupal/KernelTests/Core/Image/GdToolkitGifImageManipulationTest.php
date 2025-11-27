@@ -30,7 +30,7 @@ class GdToolkitGifImageManipulationTest extends GdToolkitImageManipulationTestBa
   public static function providerOperationTestCases(): array {
     $ret = parent::providerOperationTestCases();
 
-    if (PHP_VERSION_ID >= 80500 && array_key_exists('rotate_transparent_5', $ret)) {
+    if (PHP_VERSION_ID >= 80500 && \array_key_exists('rotate_transparent_5', $ret)) {
       $ret['rotate_transparent_5'][3]['corners'][0] = [255, 93, 0, 46];
     }
 
@@ -46,8 +46,8 @@ class GdToolkitGifImageManipulationTest extends GdToolkitImageManipulationTestBa
     $file = 'image-test-transparent-indexed.gif';
     $image = $this->imageFactory->get('core/tests/fixtures/files/' . $file);
     $gd_image = $image->getToolkit()->getImage();
-    $color_index = imagecolorat($gd_image, $image->getWidth() - 1, 0);
-    $color = array_values(imagecolorsforindex($gd_image, $color_index));
+    $color_index = \imagecolorat($gd_image, $image->getWidth() - 1, 0);
+    $color = \array_values(\imagecolorsforindex($gd_image, $color_index));
     $this->assertEquals(static::ROTATE_TRANSPARENT, $color, "Image {$file} after load has full transparent color at corner 1.");
 
     // Test deliberately creating a GIF image with no transparent color set.
@@ -59,16 +59,16 @@ class GdToolkitGifImageManipulationTest extends GdToolkitImageManipulationTestBa
     $image = $this->imageFactory->get();
     $image->createNew(50, 20, 'gif', NULL);
     $gd_image = $image->getToolkit()->getImage();
-    $color_index = imagecolorat($gd_image, $image->getWidth() - 1, 0);
-    $color = array_values(imagecolorsforindex($gd_image, $color_index));
+    $color_index = \imagecolorat($gd_image, $image->getWidth() - 1, 0);
+    $color = \array_values(\imagecolorsforindex($gd_image, $color_index));
     $this->assertEquals(static::ROTATE_TRANSPARENT, $color, "New GIF image with no transparent color set after creation has full transparent color at corner 1.");
     // Save image.
     $this->assertTrue($image->save($file_path), "New GIF image {$file} was saved.");
     // Reload image.
     $image_reloaded = $this->imageFactory->get($file_path);
     $gd_image = $image_reloaded->getToolkit()->getImage();
-    $color_index = imagecolorat($gd_image, $image_reloaded->getWidth() - 1, 0);
-    $color = array_values(imagecolorsforindex($gd_image, $color_index));
+    $color_index = \imagecolorat($gd_image, $image_reloaded->getWidth() - 1, 0);
+    $color = \array_values(\imagecolorsforindex($gd_image, $color_index));
     // Check explicitly for alpha == 0 as the rest of the color has been
     // compressed and may have slight difference from full white.
     $this->assertEquals(0, $color[3], "New GIF image {$file} after reload has no transparent color at corner 1.");
@@ -87,7 +87,7 @@ class GdToolkitGifImageManipulationTest extends GdToolkitImageManipulationTestBa
     $file = 'image-test-transparent-out-of-range.gif';
     $image = $this->imageFactory->get('core/tests/fixtures/files/' . $file);
     $this->assertTrue($image->isValid(), "Image '$file' after load should be valid, but it is not.");
-    $this->assertTrue(imageistruecolor($image->getToolkit()->getImage()), "Image '$file' after load should be a truecolor image, but it is not.");
+    $this->assertTrue(\imageistruecolor($image->getToolkit()->getImage()), "Image '$file' after load should be a truecolor image, but it is not.");
   }
 
 }

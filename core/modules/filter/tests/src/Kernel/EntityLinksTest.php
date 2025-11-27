@@ -161,7 +161,7 @@ class EntityLinksTest extends KernelTestBase {
     $entity->save();
 
     // Assert the entity has a translation for every expected language.
-    $this->assertSame(array_keys($expected_aliases), array_keys($entity->getTranslationLanguages()));
+    $this->assertSame(\array_keys($expected_aliases), \array_keys($entity->getTranslationLanguages()));
 
     // Create per-translation URL aliases.
     $canonical_url = $entity->toUrl()->toString(TRUE)->getGeneratedUrl();
@@ -171,20 +171,20 @@ class EntityLinksTest extends KernelTestBase {
 
     foreach ($expected_hrefs as $langcode => $expected_alias) {
       $expected_result = (new FilterProcessResult())
-        ->setProcessedText(sprintf('<a href="%s">Link text</a>', $expected_alias))
+        ->setProcessedText(\sprintf('<a href="%s">Link text</a>', $expected_alias))
         ->setCacheTags(['entity_test_mul:1'])
         ->setCacheContexts([])
         ->setCacheMaxAge(Cache::PERMANENT);
 
       // The expected href is generated.
       $this->assertFilterProcessResult(
-        sprintf('<a data-entity-type="entity_test_mul" data-entity-uuid="%s">Link text</a>', $entity->uuid()),
+        \sprintf('<a data-entity-type="entity_test_mul" data-entity-uuid="%s">Link text</a>', $entity->uuid()),
         $langcode,
         $expected_result
       );
       // The existing href is overwritten with the expected value.
       $this->assertFilterProcessResult(
-        sprintf('<a data-entity-type="entity_test_mul" data-entity-uuid="%s" href="something">Link text</a>', $entity->uuid()),
+        \sprintf('<a data-entity-type="entity_test_mul" data-entity-uuid="%s" href="something">Link text</a>', $entity->uuid()),
         $langcode,
         $expected_result
       );
@@ -192,10 +192,10 @@ class EntityLinksTest extends KernelTestBase {
       // The existing href is overwritten, but its customized query string and
       // fragment remain unchanged.
       $this->assertFilterProcessResult(
-        sprintf('<a data-entity-type="entity_test_mul" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $entity->uuid()),
+        \sprintf('<a data-entity-type="entity_test_mul" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $entity->uuid()),
         $langcode,
         (new FilterProcessResult())
-          ->setProcessedText(sprintf('<a href="%s?query=string#fragment">Link text</a>', $expected_alias))
+          ->setProcessedText(\sprintf('<a href="%s?query=string#fragment">Link text</a>', $expected_alias))
           ->setCacheTags(['entity_test_mul:1'])
           ->setCacheContexts([])
           ->setCacheMaxAge(Cache::PERMANENT)
@@ -218,10 +218,10 @@ class EntityLinksTest extends KernelTestBase {
     $file->save();
 
     $this->assertFilterProcessResult(
-      sprintf('<a data-entity-type="file" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $file->uuid()),
+      \sprintf('<a data-entity-type="file" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $file->uuid()),
       'en',
       (new FilterProcessResult())
-        ->setProcessedText(sprintf('<a href="%s?query=string#fragment">Link text</a>', $file->createFileUrl(TRUE)))
+        ->setProcessedText(\sprintf('<a href="%s?query=string#fragment">Link text</a>', $file->createFileUrl(TRUE)))
         ->setCacheTags(['file:1'])
         ->setCacheContexts([])
         ->setCacheMaxAge(Cache::PERMANENT)
@@ -280,12 +280,12 @@ class EntityLinksTest extends KernelTestBase {
     ]);
     $media->save();
 
-    $expected_url = str_replace('<SITE_DIRECTORY>', $this->siteDirectory, $expected_url);
+    $expected_url = \str_replace('<SITE_DIRECTORY>', $this->siteDirectory, $expected_url);
     $this->assertFilterProcessResult(
-      sprintf('<a data-entity-type="media" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $media->uuid()),
+      \sprintf('<a data-entity-type="media" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $media->uuid()),
       'en',
       (new FilterProcessResult())
-        ->setProcessedText(sprintf('<a href="%s?query=string#fragment">Link text</a>', $expected_url))
+        ->setProcessedText(\sprintf('<a href="%s?query=string#fragment">Link text</a>', $expected_url))
         ->setCacheTags($expected_cache_tags)
         ->setCacheContexts([])
         ->setCacheMaxAge(Cache::PERMANENT)
@@ -330,10 +330,10 @@ class EntityLinksTest extends KernelTestBase {
     $menu_link_content->save();
 
     $this->assertFilterProcessResult(
-      sprintf('<a data-entity-type="menu_link_content" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $menu_link_content->uuid()),
+      \sprintf('<a data-entity-type="menu_link_content" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $menu_link_content->uuid()),
       'en',
       (new FilterProcessResult())
-        ->setProcessedText(sprintf('<a href="%s?query=string#fragment">Link text</a>', $link))
+        ->setProcessedText(\sprintf('<a href="%s?query=string#fragment">Link text</a>', $link))
         ->setCacheTags(['menu_link_content:1'])
         ->setCacheContexts([])
         ->setCacheMaxAge(Cache::PERMANENT)
@@ -358,10 +358,10 @@ class EntityLinksTest extends KernelTestBase {
     $shortcut->save();
 
     $this->assertFilterProcessResult(
-      sprintf('<a data-entity-type="shortcut" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $shortcut->uuid()),
+      \sprintf('<a data-entity-type="shortcut" data-entity-uuid="%s" href="something?query=string#fragment">Link text</a>', $shortcut->uuid()),
       'en',
       (new FilterProcessResult())
-        ->setProcessedText(sprintf('<a href="%s?query=string#fragment">Link text</a>', $path))
+        ->setProcessedText(\sprintf('<a href="%s?query=string#fragment">Link text</a>', $path))
         ->setCacheTags(['config:shortcut.set.default'])
         ->setCacheContexts([])
         ->setCacheMaxAge(Cache::PERMANENT)

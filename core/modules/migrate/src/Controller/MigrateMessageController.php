@@ -260,9 +260,9 @@ class MigrateMessageController extends ControllerBase {
       }
       switch ($filter['type']) {
         case 'array':
-          $values = array_values($filter['value']);
+          $values = \array_values($filter['value']);
           if ($filter['field'] === 'msg.level') {
-            $values = array_map(fn($x) => (int) $x, $values);
+            $values = \array_map(fn($x) => (int) $x, $values);
           }
           $query->condition($filter['field'], $values, 'IN');
           break;

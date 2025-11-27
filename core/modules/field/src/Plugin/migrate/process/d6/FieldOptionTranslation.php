@@ -28,8 +28,8 @@ class FieldOptionTranslation extends ProcessPluginBase {
     $allowed_values = '';
     $i = 0;
     if (isset($global_settings['allowed_values'])) {
-      $list = explode("\n", $global_settings['allowed_values']);
-      $list = array_map('trim', $list);
+      $list = \explode("\n", $global_settings['allowed_values']);
+      $list = \array_map('trim', $list);
       $list = FilterArray::removeEmptyStrings($list);
       switch ($field_type) {
         case 'list_string':

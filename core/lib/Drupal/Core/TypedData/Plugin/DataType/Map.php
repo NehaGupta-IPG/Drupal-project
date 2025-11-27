@@ -107,7 +107,7 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
       $strings[] = $property->getString();
     }
     // Remove any empty strings resulting from empty items.
-    return implode(', ', FilterArray::removeEmptyStrings($strings));
+    return \implode(', ', FilterArray::removeEmptyStrings($strings));
   }
 
   /**

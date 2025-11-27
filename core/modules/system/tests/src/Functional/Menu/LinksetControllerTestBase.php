@@ -92,9 +92,9 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
    *   The response on which to assert cacheability.
    */
   protected function assertDrupalResponseCacheability($expect_cache, CacheableDependencyInterface $expected_metadata, Response $response) {
-    $this->assertTrue(in_array($expect_cache, ['HIT', 'MISS', FALSE], TRUE), 'Cache is HIT, MISS, FALSE.');
-    $this->assertSame(\Drupal::service('cache_contexts_manager')->optimizeTokens($expected_metadata->getCacheContexts()), explode(' ', $response->getHeaderLine('X-Drupal-Cache-Contexts')));
-    $this->assertSame($expected_metadata->getCacheTags(), explode(' ', $response->getHeaderLine('X-Drupal-Cache-Tags')));
+    $this->assertTrue(\in_array($expect_cache, ['HIT', 'MISS', FALSE], TRUE), 'Cache is HIT, MISS, FALSE.');
+    $this->assertSame(\Drupal::service('cache_contexts_manager')->optimizeTokens($expected_metadata->getCacheContexts()), \explode(' ', $response->getHeaderLine('X-Drupal-Cache-Contexts')));
+    $this->assertSame($expected_metadata->getCacheTags(), \explode(' ', $response->getHeaderLine('X-Drupal-Cache-Tags')));
     $max_age_message = $expected_metadata->getCacheMaxAge();
     if ($max_age_message === 0) {
       $max_age_message = '0 (Uncacheable)';

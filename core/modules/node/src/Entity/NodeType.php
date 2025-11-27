@@ -162,7 +162,7 @@ class NodeType extends ConfigEntityBundleBase implements NodeTypeInterface {
   public function getPreviewMode(bool $returnAsInt = TRUE) {
     $previewMode = NodePreviewMode::from($this->preview_mode);
     if ($returnAsInt) {
-      @trigger_error('Calling ' . __METHOD__ . ' with the $returnAsInt parameter is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3538666', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' with the $returnAsInt parameter is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. See https://www.drupal.org/node/3538666', E_USER_DEPRECATED);
       return $previewMode->value;
     }
     return $previewMode;
@@ -174,7 +174,7 @@ class NodeType extends ConfigEntityBundleBase implements NodeTypeInterface {
   #[ActionMethod(adminLabel: new TranslatableMarkup('Set preview mode'), pluralize: FALSE)]
   public function setPreviewMode(/* NodePreviewMode|int */ $preview_mode) {
     if (!$preview_mode instanceof NodePreviewMode) {
-      @trigger_error('Calling ' . __METHOD__ . ' with an integer $preview_mode parameter is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Use the \Drupal\node\NodePreviewMode enum instead. See https://www.drupal.org/node/3538666', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' with an integer $preview_mode parameter is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Use the \Drupal\node\NodePreviewMode enum instead. See https://www.drupal.org/node/3538666', E_USER_DEPRECATED);
       $this->preview_mode = $preview_mode;
       return;
     }

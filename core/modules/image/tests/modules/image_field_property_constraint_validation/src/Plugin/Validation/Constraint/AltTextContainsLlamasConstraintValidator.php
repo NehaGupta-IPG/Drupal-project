@@ -16,7 +16,7 @@ final class AltTextContainsLlamasConstraintValidator extends ConstraintValidator
    * {@inheritdoc}
    */
   public function validate(mixed $value, Constraint $constraint): void {
-    if (is_string($value) && !str_contains(strtolower($value), 'llamas')) {
+    if (\is_string($value) && !\str_contains(\strtolower($value), 'llamas')) {
       $this->context->buildViolation($constraint->message)
         ->setInvalidValue($value)
         ->addViolation();

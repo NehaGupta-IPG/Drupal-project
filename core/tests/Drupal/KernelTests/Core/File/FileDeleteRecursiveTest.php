@@ -82,16 +82,16 @@ class FileDeleteRecursiveTest extends FileTestBase {
    */
   public function testSymlinksInDirectory(): void {
     // Create files to link to.
-    mkdir($this->siteDirectory . '/dir1');
-    touch($this->siteDirectory . '/dir1/test1.txt');
-    touch($this->siteDirectory . '/test2.txt');
+    \mkdir($this->siteDirectory . '/dir1');
+    \touch($this->siteDirectory . '/dir1/test1.txt');
+    \touch($this->siteDirectory . '/test2.txt');
 
     // Create directory to be deleted.
-    mkdir($this->siteDirectory . '/dir2');
+    \mkdir($this->siteDirectory . '/dir2');
     // Symlink to a directory outside dir2.
-    symlink(realpath($this->siteDirectory . '/dir1'), $this->siteDirectory . '/dir2/subdir');
+    \symlink(\realpath($this->siteDirectory . '/dir1'), $this->siteDirectory . '/dir2/subdir');
     // Symlink to a file outside dir2.
-    symlink(realpath($this->siteDirectory . '/test2.txt'), $this->siteDirectory . '/dir2/test2.text');
+    \symlink(\realpath($this->siteDirectory . '/test2.txt'), $this->siteDirectory . '/dir2/test2.text');
     $this->assertFileExists($this->siteDirectory . '/dir2/subdir/test1.txt');
     $this->assertFileExists($this->siteDirectory . '/dir2/test2.text');
 
@@ -106,16 +106,16 @@ class FileDeleteRecursiveTest extends FileTestBase {
    */
   public function testSymlinksInDirectoryViaStreamWrappers(): void {
     // Create files to link to.
-    mkdir($this->siteDirectory . '/files/dir1');
-    touch($this->siteDirectory . '/files/dir1/test1.txt');
-    touch($this->siteDirectory . '/files/test2.txt');
+    \mkdir($this->siteDirectory . '/files/dir1');
+    \touch($this->siteDirectory . '/files/dir1/test1.txt');
+    \touch($this->siteDirectory . '/files/test2.txt');
 
     // Create directory to be deleted.
-    mkdir($this->siteDirectory . '/files/dir2');
+    \mkdir($this->siteDirectory . '/files/dir2');
     // Symlink to a directory outside dir2.
-    symlink(realpath($this->siteDirectory . '/files/dir1'), $this->siteDirectory . '/files/dir2/subdir');
+    \symlink(\realpath($this->siteDirectory . '/files/dir1'), $this->siteDirectory . '/files/dir2/subdir');
     // Symlink to a file outside dir2.
-    symlink(realpath($this->siteDirectory . '/files/test2.txt'), $this->siteDirectory . '/files/dir2/test2.text');
+    \symlink(\realpath($this->siteDirectory . '/files/test2.txt'), $this->siteDirectory . '/files/dir2/test2.text');
     $this->assertFileExists($this->siteDirectory . '/files/dir2/subdir/test1.txt');
     $this->assertFileExists($this->siteDirectory . '/files/dir2/test2.text');
 
@@ -131,10 +131,10 @@ class FileDeleteRecursiveTest extends FileTestBase {
    */
   public function testSymlinksToDirectory(): void {
     // Create files to link to.
-    mkdir($this->siteDirectory . '/dir1');
-    touch($this->siteDirectory . '/dir1/test1.txt');
+    \mkdir($this->siteDirectory . '/dir1');
+    \touch($this->siteDirectory . '/dir1/test1.txt');
     // Symlink to a directory outside dir2.
-    symlink(realpath($this->siteDirectory . '/dir1'), $this->siteDirectory . '/dir2');
+    \symlink(\realpath($this->siteDirectory . '/dir1'), $this->siteDirectory . '/dir2');
     $this->assertFileExists($this->siteDirectory . '/dir2/test1.txt');
 
     $this->container->get('file_system')->deleteRecursive($this->siteDirectory . '/dir2');
@@ -152,11 +152,11 @@ class FileDeleteRecursiveTest extends FileTestBase {
 
     // Create files to link to.
     $file_system->mkdir('public://dir1');
-    file_put_contents('public://dir1/test1.txt', 'test');
+    \file_put_contents('public://dir1/test1.txt', 'test');
 
     // Symlink to a directory outside dir2.
-    $public_path = realpath($this->siteDirectory . '/files');
-    symlink($public_path . '/dir1', $public_path . '/dir2');
+    $public_path = \realpath($this->siteDirectory . '/files');
+    \symlink($public_path . '/dir1', $public_path . '/dir2');
     $this->assertFileExists($public_path . '/dir1/test1.txt');
     $this->assertFileExists('public://dir2/test1.txt');
 
@@ -166,7 +166,7 @@ class FileDeleteRecursiveTest extends FileTestBase {
     $this->container->get('file_system')->deleteRecursive('public://dir2');
     $this->assertFileDoesNotExist($public_path . '/dir1/test1.txt');
     // The directory is now a broken link.
-    $this->assertTrue(is_link($public_path . '/dir2'));
+    $this->assertTrue(\is_link($public_path . '/dir2'));
   }
 
   /**

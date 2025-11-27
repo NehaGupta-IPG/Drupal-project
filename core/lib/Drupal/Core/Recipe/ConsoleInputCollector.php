@@ -44,7 +44,7 @@ final class ConsoleInputCollector implements InputCollectorInterface {
       static::INPUT_OPTION,
       'i',
       InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
-      sprintf('An input value to pass to the recipe or one of its dependencies, in the form `--%s=RECIPE_NAME.INPUT_NAME=VALUE`.', static::INPUT_OPTION),
+      \sprintf('An input value to pass to the recipe or one of its dependencies, in the form `--%s=RECIPE_NAME.INPUT_NAME=VALUE`.', static::INPUT_OPTION),
       [],
     );
   }
@@ -61,7 +61,7 @@ final class ConsoleInputCollector implements InputCollectorInterface {
     $options = [];
     try {
       foreach ($this->input->getOption(static::INPUT_OPTION) ?? [] as $option) {
-        [$key, $value] = explode('=', $option, 2);
+        [$key, $value] = \explode('=', $option, 2);
         $options[$key] = $value;
       }
     }
@@ -78,7 +78,7 @@ final class ConsoleInputCollector implements InputCollectorInterface {
     $option_values = $this->getInputFromOptions();
 
     // If the value was passed as a `--input` option, return that.
-    if (array_key_exists($name, $option_values)) {
+    if (\array_key_exists($name, $option_values)) {
       return $option_values[$name];
     }
 
@@ -108,7 +108,7 @@ final class ConsoleInputCollector implements InputCollectorInterface {
     // \Symfony\Component\Console\Style\StyleInterface::ask expects the default
     // value to be a string or NULL. Therefore, let's cast it to a string if
     // necessary.
-    if (isset($arguments['default']) && !is_string($arguments['default']) && $method === 'ask') {
+    if (isset($arguments['default']) && !\is_string($arguments['default']) && $method === 'ask') {
       $arguments['default'] = (string) $arguments['default'];
     }
     return $this->io->$method(...$arguments);

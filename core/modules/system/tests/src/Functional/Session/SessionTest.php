@@ -202,11 +202,11 @@ class SessionTest extends BrowserTestBase {
     $this->initFrontPage();
     // Session restart always resets all the cookies by design, so we
     // set an arbitrary session_id in the cookie for the next request.
-    $invalid_session_cookie_value = bin2hex($this->randomMachineName(13));
+    $invalid_session_cookie_value = \bin2hex($this->randomMachineName(13));
     $mink->setCookie($session_cookie_name, $invalid_session_cookie_value);
 
     // Make another request.
-    sleep(1);
+    \sleep(1);
     $this->drupalGet('session-test/set/bar');
 
     // Check returned cookie value.

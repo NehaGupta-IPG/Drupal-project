@@ -37,7 +37,7 @@ class ViewsPluginManager extends DefaultPluginManager implements PreWarmableInte
     $plugin_definition_annotation_name = 'Drupal\views\Annotation\Views' . Container::camelize($type);
     // Special handling until all views plugins have attribute classes.
     $attribute_name_candidate = 'Drupal\views\Attribute\Views' . Container::camelize($type);
-    $plugin_definition_attribute_name = class_exists($attribute_name_candidate) ? $attribute_name_candidate : Plugin::class;
+    $plugin_definition_attribute_name = \class_exists($attribute_name_candidate) ? $attribute_name_candidate : Plugin::class;
     parent::__construct("Plugin/views/$type", $namespaces, $module_handler, ViewsPluginInterface::class, $plugin_definition_attribute_name, $plugin_definition_annotation_name);
 
     $this->defaults += [

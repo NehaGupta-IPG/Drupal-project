@@ -87,7 +87,7 @@ class FieldTestHelper {
       $memorize = [];
       return $return;
     }
-    if (is_array($memorize)) {
+    if (\is_array($memorize)) {
       $memorize[$key][] = $value;
     }
 

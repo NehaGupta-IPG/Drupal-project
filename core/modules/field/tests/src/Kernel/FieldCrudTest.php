@@ -292,7 +292,7 @@ class FieldCrudTest extends FieldKernelTestBase {
     FieldConfig::create($another_field_definition)->save();
 
     // Test that the first field is not deleted, and then delete it.
-    $field = current(\Drupal::entityTypeManager()
+    $field = \current(\Drupal::entityTypeManager()
       ->getStorage('field_config')
       ->loadByProperties([
         'entity_type' => 'entity_test',

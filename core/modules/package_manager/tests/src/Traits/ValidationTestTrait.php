@@ -35,9 +35,9 @@ trait ValidationTestTrait {
    */
   protected function assertValidationResultsEqual(array $expected_results, array $actual_results, ?PathLocator $path_locator = NULL, ?string $stage_dir = NULL): void {
     if ($path_locator) {
-      assert(is_a(get_called_class(), UnitTestCase::class, TRUE));
+      \assert(\is_a(\get_called_class(), UnitTestCase::class, TRUE));
     }
-    $expected_results = array_map(
+    $expected_results = \array_map(
       function (array $result) use ($path_locator, $stage_dir): array {
         $result['messages'] = $this->resolvePlaceholdersInArrayValuesWithRealPaths($result['messages'], $path_locator, $stage_dir);
         return $result;
@@ -68,19 +68,19 @@ trait ValidationTestTrait {
   protected function resolvePlaceholdersInArrayValuesWithRealPaths(array $subject, ?PathLocator $path_locator = NULL, ?string $stage_dir = NULL): array {
     if (!$path_locator) {
       // Only kernel and browser tests have $this->container.
-      assert($this instanceof KernelTestBase || $this instanceof BrowserTestBase);
+      \assert($this instanceof KernelTestBase || $this instanceof BrowserTestBase);
       $path_locator = $this->container->get(PathLocator::class);
     }
-    $subject = str_replace(
+    $subject = \str_replace(
       ['<PROJECT_ROOT>', '<VENDOR_DIR>', '<STAGE_ROOT>', '<STAGE_ROOT_PARENT>'],
-      [$path_locator->getProjectRoot(), $path_locator->getVendorDirectory(), $path_locator->getStagingRoot(), dirname($path_locator->getStagingRoot())],
+      [$path_locator->getProjectRoot(), $path_locator->getVendorDirectory(), $path_locator->getStagingRoot(), \dirname($path_locator->getStagingRoot())],
       $subject
     );
     if ($stage_dir) {
-      $subject = str_replace(['<STAGE_DIR>'], [$stage_dir], $subject);
+      $subject = \str_replace(['<STAGE_DIR>'], [$stage_dir], $subject);
     }
     foreach ($subject as $message) {
-      if (str_contains($message, '<STAGE_DIR>')) {
+      if (\str_contains($message, '<STAGE_DIR>')) {
         throw new \LogicException("No stage directory passed to replace '<STAGE_DIR>' in message '$message'");
       }
     }
@@ -101,14 +101,14 @@ trait ValidationTestTrait {
    */
   protected function getValidationResultsAsArray(array $results): array {
     $string_translation_stub = NULL;
-    if (is_a(get_called_class(), UnitTestCase::class, TRUE)) {
-      assert($this instanceof UnitTestCase);
+    if (\is_a(\get_called_class(), UnitTestCase::class, TRUE)) {
+      \assert($this instanceof UnitTestCase);
       $string_translation_stub = $this->getStringTranslationStub();
     }
-    return array_values(array_map(static function (ValidationResult $result) use ($string_translation_stub) {
-      $messages = array_map(static function ($message) use ($string_translation_stub): string {
+    return \array_values(\array_map(static function (ValidationResult $result) use ($string_translation_stub) {
+      $messages = \array_map(static function ($message) use ($string_translation_stub): string {
         // Support data providers in unit tests using TranslatableMarkup.
-        if ($message instanceof TranslatableMarkup && is_a(get_called_class(), UnitTestCase::class, TRUE)) {
+        if ($message instanceof TranslatableMarkup && \is_a(\get_called_class(), UnitTestCase::class, TRUE)) {
           // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
           $message = new TranslatableMarkup($message->getUntranslatedString(), $message->getArguments(), $message->getOptions(), $string_translation_stub);
         }

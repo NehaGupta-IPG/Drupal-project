@@ -109,7 +109,7 @@ class ThemeInstallerTest extends KernelTestBase {
       $base_name,
       $name,
     ];
-    $this->assertEquals($expectedOrder, array_keys($themes));
+    $this->assertEquals($expectedOrder, \array_keys($themes));
 
     $this->themeInstaller()->uninstall([$name]);
 

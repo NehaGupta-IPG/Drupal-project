@@ -67,7 +67,7 @@ class AjaxResponse extends JsonResponse implements AttachmentsInterface {
    *   Returns this after merging.
    */
   public function mergeWith(AjaxResponse $other): AjaxResponse {
-    $this->commands = array_merge($this->getCommands(), $other->getCommands());
+    $this->commands = \array_merge($this->getCommands(), $other->getCommands());
     $this->attachments = BubbleableMetadata::mergeAttachments($this->getAttachments(), $other->getAttachments());
     return $this;
   }

@@ -636,13 +636,13 @@ class PageCacheTest extends BrowserTestBase {
    *   Array of headers.
    */
   protected function getHeaders($url): array {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_HEADER, TRUE);
-    curl_setopt($ch, CURLOPT_NOBODY, TRUE);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_USERAGENT, drupal_generate_test_ua($this->databasePrefix));
-    $output = curl_exec($ch);
+    $ch = \curl_init();
+    \curl_setopt($ch, CURLOPT_URL, $url);
+    \curl_setopt($ch, CURLOPT_HEADER, TRUE);
+    \curl_setopt($ch, CURLOPT_NOBODY, TRUE);
+    \curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    \curl_setopt($ch, CURLOPT_USERAGENT, \drupal_generate_test_ua($this->databasePrefix));
+    $output = \curl_exec($ch);
 
     $headers = [];
     foreach (\explode("\n", $output) as $header) {

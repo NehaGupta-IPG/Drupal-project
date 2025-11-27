@@ -224,7 +224,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    */
   protected function setUp(): void {
     if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
-      @trigger_error('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and will throw an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+      @\trigger_error('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and will throw an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
     }
 
     parent::setUp();
@@ -534,7 +534,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->register('lock', 'Drupal\Core\Lock\NullLockBackend');
 
     // Explicitly configure all cache bins to use the memory backend.
-    foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
+    foreach (\array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
       $definition = $container->getDefinition($id);
       $tags = $definition->getTags();
       $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
@@ -566,7 +566,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Determine whether the test is a core test.
     $test_file_name = (new \ReflectionClass($this))->getFileName();
     // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.
-    $is_core_test = str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
+    $is_core_test = \str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
 
     if ($this->strictConfigSchema) {
       $container
@@ -689,11 +689,11 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     }
 
     // If the test used the regular file system, remove any files created.
-    if ($this->siteDirectory && !str_starts_with($this->siteDirectory, 'vfs://')) {
+    if ($this->siteDirectory && !\str_starts_with($this->siteDirectory, 'vfs://')) {
       // Delete test site directory.
       $callback = function (string $path) {
-        if (!is_link($path)) {
-          @chmod($path, 0700);
+        if (!\is_link($path)) {
+          @\chmod($path, 0700);
         }
       };
       \Drupal::service('file_system')->deleteRecursive($this->siteDirectory, $callback);

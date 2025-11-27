@@ -20,7 +20,7 @@ class PackageInstallDirectWriteTest extends TemplateProjectTestBase {
    */
   public function testPackageInstall(): void {
     $this->createTestProject('RecommendedProject');
-    $allow_direct_write = var_export(TRUE, TRUE);
+    $allow_direct_write = \var_export(TRUE, TRUE);
     $this->writeSettings("\n\$settings['package_manager_allow_direct_write'] = $allow_direct_write;");
 
     $this->setReleaseMetadata([

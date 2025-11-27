@@ -139,15 +139,15 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
     foreach ($this->databaseDumpFiles as $file) {
       // Determine the version of the database dump if specified.
       $matches = [];
-      $dumpVersion = preg_match('/drupal-(\d+\.\d+\.\d+)\./', $file, $matches) === 1 ? $matches[1] : NULL;
+      $dumpVersion = \preg_match('/drupal-(\d+\.\d+\.\d+)\./', $file, $matches) === 1 ? $matches[1] : NULL;
 
       // If the db driver is mysqli, we do not need to run the update tests for
       // db dumps prior to 11.2 when the module was introduced.
-      if (Database::getConnection()->getProvider() === 'mysqli' && $dumpVersion && version_compare($dumpVersion, '11.2.0', '<')) {
+      if (Database::getConnection()->getProvider() === 'mysqli' && $dumpVersion && \version_compare($dumpVersion, '11.2.0', '<')) {
         $this->markTestSkipped("The mysqli driver was introduced in Drupal 11.2, skip update tests from database at version {$dumpVersion}");
       }
 
-      if (str_ends_with($file, '.gz')) {
+      if (\str_ends_with($file, '.gz')) {
         $file = "compress.zlib://$file";
       }
       require $file;

@@ -113,7 +113,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
           // Strip the "/" from the end of the thread.
           $max = \rtrim((string) $max, '/');
           // We need to get the value at the correct depth.
-          $parts = explode('.', $max);
+          $parts = \explode('.', $max);
           $n = $parts[0] ? Number::alphadecimalToInt($parts[0]) : 0;
           $prefix = '';
         }

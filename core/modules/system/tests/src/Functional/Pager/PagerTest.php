@@ -187,7 +187,7 @@ class PagerTest extends BrowserTestBase {
       $this->drupalGet($this->getAbsoluteUrl(\parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
       foreach ([0, 1, 4] as $pager_element) {
         $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['expected_page'][$pager_element]}')");
-        $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
+        $destination = \str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
         $this->assertStringEndsWith($data['expected_query'], $destination);
       }
     }

@@ -136,11 +136,11 @@ class ComponentValidator {
       $this->validator->getErrors()
     );
     $message_parts = [
-      sprintf('In component %s:', $definition['id']),
+      \sprintf('In component %s:', $definition['id']),
       ...$message_parts,
       ...$missing_class_errors,
     ];
-    $message = implode("\n", $message_parts);
+    $message = \implode("\n", $message_parts);
     // Throw the exception with the error message.
     throw new InvalidComponentException($message);
   }
@@ -197,7 +197,7 @@ class ComponentValidator {
       return TRUE;
     }
     // Dismiss type errors if the prop received a render array.
-    $errors = array_filter(
+    $errors = \array_filter(
       $this->validator->getErrors(),
       function (array $error) use ($context): bool {
         // Support 5.0 ($error['constraint']) and 6.0
@@ -211,7 +211,7 @@ class ComponentValidator {
     if (empty($errors)) {
       return TRUE;
     }
-    $message_parts = array_map(
+    $message_parts = \array_map(
       static function (array $error) use ($component_id, $context): string {
         // We check the error message instead of values and definitions here
         // because it's hard to access both given the possible complexity of a
@@ -227,11 +227,11 @@ class ComponentValidator {
           $error['message'] .= \sprintf('. The provided value is: "%s"', $context[$error['property']]);
         }
 
-        return sprintf('[%s/%s] %s.', $component_id, $error['property'], $error['message']);
+        return \sprintf('[%s/%s] %s.', $component_id, $error['property'], $error['message']);
       },
       $errors
     );
-    $message = implode("\n", $message_parts);
+    $message = \implode("\n", $message_parts);
     throw new InvalidComponentException($message);
   }
 
@@ -286,7 +286,7 @@ class ComponentValidator {
     }
     $props_schema = $this->nullifyClassPropsSchema($props_schema, $classes_per_prop);
     if (!empty($error_messages)) {
-      $message = implode("\n", $error_messages);
+      $message = \implode("\n", $error_messages);
       throw new InvalidComponentException($message);
     }
     return [$props_schema, $props_raw];

@@ -189,8 +189,8 @@ class SvgSpriteExtractorTest extends UnitTestCase {
 
     $icons = $this->svgSpriteExtractorPlugin->discoverIcons();
     $this->assertEmpty($icons);
-    foreach (libxml_get_errors() as $error) {
-      $this->assertSame("Start tag expected, '<' not found", trim($error->message));
+    foreach (\libxml_get_errors() as $error) {
+      $this->assertSame("Start tag expected, '<' not found", \trim($error->message));
     }
   }
 

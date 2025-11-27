@@ -154,7 +154,7 @@ final class NavigationRenderer {
 
     if ($logo_provider === self::LOGO_PROVIDER_CUSTOM) {
       $logo_path = $logo_settings->get('logo.path');
-      if (!empty($logo_path) && is_file($logo_path)) {
+      if (!empty($logo_path) && \is_file($logo_path)) {
         $logo_managed_url = $this->fileUrlGenerator->generateAbsoluteString($logo_path);
         $image = $this->imageFactory->get($logo_path);
         $build[0]['#settings']['logo_path'] = $logo_managed_url;
@@ -179,10 +179,10 @@ final class NavigationRenderer {
     ];
     $content_top_items = $this->moduleHandler->invokeAll('navigation_content_top');
     $this->moduleHandler->alter('navigation_content_top', $content_top_items);
-    uasort($content_top_items, [SortArray::class, 'sortByWeightElement']);
+    \uasort($content_top_items, [SortArray::class, 'sortByWeightElement']);
     // Filter out empty items, taking care to merge any cacheability metadata.
     $cacheability = new CacheableMetadata();
-    $content_top_items = array_filter($content_top_items, function ($item) use (&$cacheability) {
+    $content_top_items = \array_filter($content_top_items, function ($item) use (&$cacheability) {
       if (Element::isEmpty($item)) {
         $cacheability = $cacheability->merge(CacheableMetadata::createFromRenderArray($item));
         return FALSE;
@@ -273,7 +273,7 @@ final class NavigationRenderer {
       return $this->localTasks;
     }
     $entity_local_tasks = $this->localTaskManager->getLocalTasks($this->routeMatch->getRouteName());
-    uasort($entity_local_tasks['tabs'], [SortArray::class, 'sortByWeightProperty']);
+    \uasort($entity_local_tasks['tabs'], [SortArray::class, 'sortByWeightProperty']);
     foreach ($entity_local_tasks['tabs'] as $local_task_name => $local_task) {
       // Exclude current route local task, since it is not going to be included
       // in the page actions link list.

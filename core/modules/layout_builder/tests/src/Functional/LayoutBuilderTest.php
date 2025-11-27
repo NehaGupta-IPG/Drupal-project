@@ -661,7 +661,7 @@ class LayoutBuilderTest extends LayoutBuilderTestBase {
     foreach ($page->findAll('css', '.breadcrumb a') as $link) {
       $breadcrumb_titles[$link->getText()] = $link->getAttribute('href');
     }
-    $base_path = base_path();
+    $base_path = \base_path();
     $expected = [
       'Home' => $base_path,
       'Administration' => $base_path . 'admin',

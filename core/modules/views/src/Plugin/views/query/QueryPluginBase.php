@@ -319,7 +319,7 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
           $entity_type->getRevisionTable(),
           $entity_type->getRevisionDataTable(),
         ];
-        if (!in_array($relationship->definition['base'], $entity_base_tables)) {
+        if (!\in_array($relationship->definition['base'], $entity_base_tables)) {
           continue;
         }
 

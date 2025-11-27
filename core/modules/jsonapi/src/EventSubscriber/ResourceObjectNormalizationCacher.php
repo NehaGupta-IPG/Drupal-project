@@ -116,9 +116,9 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
     // that the expiration remains accurate based on the current cache state
     // and timestamp.
     $normalizer_values = $cached->data;
-    assert(is_array($normalizer_values));
+    \assert(\is_array($normalizer_values));
     if ($cached->expire >= 0) {
-      $max_age = max($cached->expire - $this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME'), 0);
+      $max_age = \max($cached->expire - $this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME'), 0);
       $cacheability = new CacheableMetadata();
       $cacheability->setCacheMaxAge($max_age);
 
@@ -128,7 +128,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
       ];
       foreach ($subsets as $subset) {
         foreach ($normalizer_values[$subset] as $name => $normalization) {
-          assert($normalization instanceof CacheableNormalization);
+          \assert($normalization instanceof CacheableNormalization);
           if ($normalization->getCacheMaxAge() > 0) {
             $normalizer_values[$subset][$name] = $normalization->withCacheableDependency($cacheability);
           }

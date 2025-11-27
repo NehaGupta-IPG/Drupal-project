@@ -71,7 +71,7 @@ class ViewsHooks {
           'views_dom_id:' . $view->dom_id => [
             'view_name' => $view->storage->id(),
             'view_display_id' => $view->current_display,
-            'view_args' => Html::escape(implode('/', $view->args)),
+            'view_args' => Html::escape(\implode('/', $view->args)),
             'view_path' => Html::escape(\Drupal::service('path.current')->getPath()),
             'view_base_path' => $view->getPath(),
             'view_dom_id' => $view->dom_id,
@@ -123,10 +123,10 @@ class ViewsHooks {
   #[Hook('theme_suggestions_container_alter')]
   public function themeSuggestionsContainerAlter(array &$suggestions, array $variables): void {
     if (!empty($variables['element']['#type']) && $variables['element']['#type'] == 'more_link' && !empty($variables['element']['#view']) && $variables['element']['#view'] instanceof ViewExecutable) {
-      $suggestions = array_merge(
+      $suggestions = \array_merge(
             $suggestions,
             // Theme suggestions use the reverse order compared to #theme hooks.
-            array_reverse($variables['element']['#view']->buildThemeFunctions('container__more_link'))
+            \array_reverse($variables['element']['#view']->buildThemeFunctions('container__more_link'))
         );
     }
   }
@@ -206,7 +206,7 @@ class ViewsHooks {
     // Replaces substitutions in tables.
     foreach ($tables as $table_name => $table_metadata) {
       foreach ($table_metadata['arguments'] as $replacement_key => $value) {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
           if (isset($substitutions[$value])) {
             $tables[$table_name]['arguments'][$replacement_key] = $substitutions[$value];
           }
@@ -221,7 +221,7 @@ class ViewsHooks {
       }
     }
     // Replaces substitutions in filter criteria.
-    _views_query_tag_alter_condition($query, $where, $substitutions);
+    \_views_query_tag_alter_condition($query, $where, $substitutions);
   }
 
   /**
@@ -249,10 +249,10 @@ class ViewsHooks {
    */
   #[Hook('block_presave')]
   public function blockPresave(BlockInterface $block): void {
-    if (str_starts_with($block->getPluginId(), 'views_block:')) {
+    if (\str_starts_with($block->getPluginId(), 'views_block:')) {
       $settings = $block->get('settings');
       if (isset($settings['items_per_page']) && $settings['items_per_page'] === 'none') {
-        @trigger_error('Saving a views block with "none" items per page is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. To use the items per page defined by the view, use NULL. See https://www.drupal.org/node/3522240', E_USER_DEPRECATED);
+        @\trigger_error('Saving a views block with "none" items per page is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. To use the items per page defined by the view, use NULL. See https://www.drupal.org/node/3522240', E_USER_DEPRECATED);
         $settings['items_per_page'] = NULL;
         $block->set('settings', $settings);
       }

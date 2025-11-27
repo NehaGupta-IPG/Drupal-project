@@ -79,7 +79,7 @@ class MultipleWidgetFormTest extends FieldTestBase {
       'bundle' => 'entity_test',
       'label' => $this->randomMachineName() . '_label',
       'description' => '[site:name]_description',
-      'weight' => mt_rand(0, 127),
+      'weight' => \mt_rand(0, 127),
       'settings' => [
         'test_field_setting' => $this->randomMachineName(),
       ],
@@ -113,7 +113,7 @@ class MultipleWidgetFormTest extends FieldTestBase {
       $field_name => '1, 2, 3',
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
 
     // Check that the values were saved.
@@ -138,7 +138,7 @@ class MultipleWidgetFormTest extends FieldTestBase {
     ])
       ->save();
     $this->drupalGet('entity_test/manage/' . $id . '/edit');
-    $name = str_replace('_', '-', $field_name);
+    $name = \str_replace('_', '-', $field_name);
     $session->responseContains('data-drupal-selector="edit-' . $name . '"');
   }
 
@@ -241,7 +241,7 @@ class MultipleWidgetFormTest extends FieldTestBase {
     $this->assertSession()->pageTextMatchesCount(1, '/From ' . $hook . '.* prefix on ' . $field_name . ' parent element\./');
     if ($widget === 'test_field_widget_multiple_single_value') {
       $suffix_text = "From $hook(): suffix on $field_name child element.";
-      $this->assertEquals($field_storage['cardinality'], substr_count($this->getTextContent(), $suffix_text), "'$suffix_text' was found {$field_storage['cardinality']} times  using widget $widget");
+      $this->assertEquals($field_storage['cardinality'], \substr_count($this->getTextContent(), $suffix_text), "'$suffix_text' was found {$field_storage['cardinality']} times  using widget $widget");
     }
   }
 

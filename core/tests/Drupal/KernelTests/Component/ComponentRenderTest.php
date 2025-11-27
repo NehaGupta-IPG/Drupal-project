@@ -48,10 +48,10 @@ final class ComponentRenderTest extends KernelTestBase {
     $dependent_position = NULL;
     foreach ($all_stylesheets as $index => $stylesheet) {
       $href = $stylesheet->attributes->getNamedItem('href')->nodeValue;
-      if (str_contains($href, 'css-load-order.css')) {
+      if (\str_contains($href, 'css-load-order.css')) {
         $component_position = $index;
       }
-      if (str_contains($href, 'css-order-dependent.css')) {
+      if (\str_contains($href, 'css-order-dependent.css')) {
         $dependent_position = $index;
       }
     }

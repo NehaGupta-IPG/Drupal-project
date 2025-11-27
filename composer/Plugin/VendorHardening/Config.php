@@ -127,7 +127,7 @@ class Config {
     }
 
     // Find the packages which should not be cleaned up.
-    $do_not_clean = array_filter($this->configData, function ($paths) {
+    $do_not_clean = \array_filter($this->configData, function ($paths) {
       return $paths === FALSE;
     });
 
@@ -144,7 +144,7 @@ class Config {
     }
 
     // Remove packages that should not be cleaned up.
-    $this->configData = array_diff_key($this->configData, $do_not_clean);
+    $this->configData = \array_diff_key($this->configData, $do_not_clean);
 
     return $this->configData;
   }

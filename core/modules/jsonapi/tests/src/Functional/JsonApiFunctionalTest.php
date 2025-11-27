@@ -660,7 +660,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
         $tagNames = $resource['relationships']['field_tags']['meta']['relationship_meta_name'];
         $tags = $node->field_tags->referencedEntities();
 
-        $this->assertCount(count($tags), $tagNames);
+        $this->assertCount(\count($tags), $tagNames);
         foreach ($tags as $tag) {
           $this->assertContains($tag->label(), $tagNames);
         }
@@ -682,7 +682,7 @@ class JsonApiFunctionalTest extends JsonApiFunctionalTestBase {
       $tagNames = $resource['data']['relationships']['field_tags']['meta']['relationship_meta_name'];
       $tags = $node->field_tags->referencedEntities();
 
-      $this->assertCount(count($tags), $tagNames);
+      $this->assertCount(\count($tags), $tagNames);
       foreach ($tags as $tag) {
         $this->assertContains($tag->label(), $tagNames);
       }

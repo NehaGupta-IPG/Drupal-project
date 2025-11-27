@@ -20,7 +20,7 @@ class WorkspacesRequirements implements InstallRequirementsInterface {
     if (\Drupal::moduleHandler()->moduleExists('workspace')) {
       $requirements['workspace_incompatibility'] = [
         'severity' => RequirementSeverity::Error,
-        'description' => t('Workspaces can not be installed when the contributed Workspace module is also installed. See the <a href=":link">upgrade path</a> page for more information on how to upgrade.', [
+        'description' => \t('Workspaces can not be installed when the contributed Workspace module is also installed. See the <a href=":link">upgrade path</a> page for more information on how to upgrade.', [
           ':link' => 'https://www.drupal.org/node/2987783',
         ]),
       ];

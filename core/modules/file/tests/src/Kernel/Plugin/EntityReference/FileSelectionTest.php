@@ -56,7 +56,7 @@ class FileSelectionTest extends KernelTestBase {
    */
   public function testCanReferToPermanentFiles(): void {
     $expected_result = [];
-    \file_put_contents('public://file.png', str_repeat('a', 10));
+    \file_put_contents('public://file.png', \str_repeat('a', 10));
     $file = File::create([
       'uri' => 'public://file.png',
       'filename' => 'file.png',
@@ -75,7 +75,7 @@ class FileSelectionTest extends KernelTestBase {
    * Tests that entity reference should avoid referring to temporary files.
    */
   public function testCanNotReferToTemporaryFiles(): void {
-    \file_put_contents('public://test.png', str_repeat('b', 10));
+    \file_put_contents('public://test.png', \str_repeat('b', 10));
     $file = File::create([
       'uri' => 'public://test.png',
       'filename' => 'test.png',

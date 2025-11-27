@@ -75,7 +75,7 @@ class Image {
   public static function getKeywordOffset(string $anchor, int $current_size, int $new_size): int {
     return match ($anchor) {
       'bottom', 'right' => $current_size - $new_size,
-      'center' => (int) round($current_size / 2 - $new_size / 2),
+      'center' => (int) \round($current_size / 2 - $new_size / 2),
       'top', 'left' => 0,
       default => throw new \InvalidArgumentException("Invalid anchor '{$anchor}' provided to getKeywordOffset()"),
     };

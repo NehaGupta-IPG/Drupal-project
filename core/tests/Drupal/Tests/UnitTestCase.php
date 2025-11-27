@@ -233,7 +233,7 @@ abstract class UnitTestCase extends TestCase {
    */
   protected function setupMockIterator(MockObject&\Iterator $mock, array $items): MockObject&\Iterator {
     $iterator = new \ArrayIterator($items);
-    foreach (get_class_methods(\Iterator::class) as $method) {
+    foreach (\get_class_methods(\Iterator::class) as $method) {
       $mock->method($method)->willReturnCallback([$iterator, $method]);
     }
     return $mock;

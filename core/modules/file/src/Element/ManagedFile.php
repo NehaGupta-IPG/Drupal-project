@@ -485,7 +485,7 @@ class ManagedFile extends FormElementBase {
     // Determine whether it was the upload or the remove button that was clicked
     // and set $element to the managed_file element that contains that button.
     $parents = $form_state->getTriggeringElement()['#array_parents'];
-    $button_key = array_pop($parents);
+    $button_key = \array_pop($parents);
     $element = NestedArray::getValue($form, $parents);
 
     // No action is needed here for the upload button, because all file uploads
@@ -494,16 +494,16 @@ class ManagedFile extends FormElementBase {
     // button was clicked. Action is needed here for the remove button, because
     // we only remove a file in response to its remove button being clicked.
     if ($button_key == 'remove_button') {
-      $fids = array_keys($element['#files']);
+      $fids = \array_keys($element['#files']);
       // Get files that will be removed.
       if ($element['#multiple']) {
         $remove_fids = [];
         foreach (Element::children($element) as $name) {
-          if (str_starts_with($name, 'file_') && $element[$name]['selected']['#value']) {
-            $remove_fids[] = (int) substr($name, 5);
+          if (\str_starts_with($name, 'file_') && $element[$name]['selected']['#value']) {
+            $remove_fids[] = (int) \substr($name, 5);
           }
         }
-        $fids = array_diff($fids, $remove_fids);
+        $fids = \array_diff($fids, $remove_fids);
       }
       else {
         // If we deal with single upload element remove the file and set
@@ -529,8 +529,8 @@ class ManagedFile extends FormElementBase {
       // widget. FormState::$input must be updated so that
       // \Drupal\file\Element\ManagedFile::valueCallback() has correct
       // information during the rebuild.
-      $form_state->setValueForElement($element['fids'], implode(' ', $fids));
-      NestedArray::setValue($form_state->getUserInput(), $element['fids']['#parents'], implode(' ', $fids));
+      $form_state->setValueForElement($element['fids'], \implode(' ', $fids));
+      NestedArray::setValue($form_state->getUserInput(), $element['fids']['#parents'], \implode(' ', $fids));
     }
 
     // Set the form to rebuild so that $form is correctly updated in response to

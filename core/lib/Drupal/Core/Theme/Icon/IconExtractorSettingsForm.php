@@ -62,7 +62,7 @@ class IconExtractorSettingsForm {
 
     foreach ($settings as $setting_id => $setting) {
 
-      if (isset($setting['enum']) && is_array($setting['enum']) && !empty($setting['enum'])) {
+      if (isset($setting['enum']) && \is_array($setting['enum']) && !empty($setting['enum'])) {
         $form[$setting_id] = self::buildEnumForm($setting_id, $setting, $saved_values);
         continue;
       }
@@ -78,7 +78,7 @@ class IconExtractorSettingsForm {
       };
     }
 
-    return array_filter($form);
+    return \array_filter($form);
   }
 
   /**
@@ -144,9 +144,9 @@ class IconExtractorSettingsForm {
    *   The enum options for select.
    */
   protected static function getOptions(array $setting): array {
-    $options = array_combine($setting['enum'], $setting['enum']);
+    $options = \array_combine($setting['enum'], $setting['enum']);
     foreach ($options as $key => $label) {
-      if (is_string($label)) {
+      if (\is_string($label)) {
         $options[$key] = Unicode::ucwords($label);
       }
     }
@@ -162,7 +162,7 @@ class IconExtractorSettingsForm {
     $meta = $setting['meta:enum'];
 
     // Remove meta:enum items not found in options.
-    return array_intersect_key($meta, $options);
+    return \array_intersect_key($meta, $options);
   }
 
   /**

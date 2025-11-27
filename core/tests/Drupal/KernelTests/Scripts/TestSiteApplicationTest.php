@@ -192,7 +192,7 @@ class TestSiteApplicationTest extends KernelTestBase {
  */
   #[CoversNothing]
   public function testInstallInDifferentLanguage(): void {
-    $command_line = $this->php . ' core/scripts/test-site.php install --json --langcode fr --setup-file core/tests/Drupal/TestSite/TestSiteMultilingualInstallTestScript.php --db-url "' . getenv('SIMPLETEST_DB') . '"';
+    $command_line = $this->php . ' core/scripts/test-site.php install --json --langcode fr --setup-file core/tests/Drupal/TestSite/TestSiteMultilingualInstallTestScript.php --db-url "' . \getenv('SIMPLETEST_DB') . '"';
     $process = Process::fromShellCommandline($command_line, $this->root);
     $process->setTimeout(500);
     $process->run();
@@ -296,7 +296,7 @@ class TestSiteApplicationTest extends KernelTestBase {
    *   The database key of the added connection.
    */
   protected function addTestDatabase($db_prefix): string {
-    $database = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'));
+    $database = Database::convertDbUrlToConnectionInfo(\getenv('SIMPLETEST_DB'));
     $database['prefix'] = $db_prefix;
     $target = __CLASS__ . $db_prefix;
     Database::addConnectionInfo($target, 'default', $database);
@@ -313,7 +313,7 @@ class TestSiteApplicationTest extends KernelTestBase {
    *   The lock file path.
    */
   protected function getTestLockFile($db_prefix): string {
-    $lock_id = str_replace('test', '', $db_prefix);
+    $lock_id = \str_replace('test', '', $db_prefix);
     return FileSystem::getOsTemporaryDirectory() . '/test_' . $lock_id;
   }
 

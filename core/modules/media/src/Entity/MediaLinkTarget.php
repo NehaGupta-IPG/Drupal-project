@@ -51,7 +51,7 @@ class MediaLinkTarget implements EntityLinkTargetInterface {
     // Technically, media link target handler should not be in the core until
     // core supports media entity by default, consider this is an example on how
     // to build a media link target handler.
-    assert($entity instanceof MediaInterface);
+    \assert($entity instanceof MediaInterface);
     if ($link_target = $entity->getSource()->getMetadata($entity, MediaSourceInterface::METADATA_ATTRIBUTE_LINK_TARGET)) {
       return $link_target;
     }

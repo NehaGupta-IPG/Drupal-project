@@ -174,7 +174,7 @@ abstract class UserResourceTestBase extends EntityResourceTestBase {
     /** @var \Drupal\user\UserInterface $user */
     $user = static::$auth ? $this->account : User::load(0);
     // @todo Remove the array_diff_key() call in https://www.drupal.org/node/2821077.
-    $original_normalization = array_diff_key(
+    $original_normalization = \array_diff_key(
       $this->serializer->normalize($user, static::$format),
       ['created' => TRUE, 'changed' => TRUE, 'name' => TRUE],
     );

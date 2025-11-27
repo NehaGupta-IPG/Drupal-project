@@ -150,7 +150,7 @@ class TimestampNormalizerTest extends UnitTestCase {
    */
   public static function jsonSchemaDataProvider(): array {
     $case = function (UnitTestCase $test) {
-      assert(in_array(JsonSchemaTestTrait::class, class_uses($test)));
+      \assert(\in_array(JsonSchemaTestTrait::class, \class_uses($test)));
       $drupal_date_time = $test->doProphesize(TimestampNormalizerTestDrupalDateTime::class);
       $drupal_date_time->setTimezone(new \DateTimeZone('UTC'))
         ->willReturn($drupal_date_time->reveal());

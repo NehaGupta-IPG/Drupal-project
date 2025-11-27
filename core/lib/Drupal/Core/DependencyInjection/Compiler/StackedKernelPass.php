@@ -66,9 +66,9 @@ class StackedKernelPass extends AbstractRecursivePass implements CompilerPassInt
     $decorated_id = 'http_kernel.basic';
     $middlewares_param = [new Reference($decorated_id)];
 
-    foreach (array_reverse($this->findAndSortTaggedServices('http_middleware', $container)) as $ref) {
+    foreach (\array_reverse($this->findAndSortTaggedServices('http_middleware', $container)) as $ref) {
       // Prepend a reference to the middlewares container parameter.
-      array_unshift($middlewares_param, $ref);
+      \array_unshift($middlewares_param, $ref);
 
       // Setup an alias on the outer middleware pointing to the inner one.
       $decorator_id = (string) $ref;
@@ -96,15 +96,15 @@ class StackedKernelPass extends AbstractRecursivePass implements CompilerPassInt
     $params = $constructor->getParameters();
     $innerType = $params[0]->getType();
     $innerParamTypes = ($innerType instanceof \ReflectionUnionType || $innerType instanceof \ReflectionIntersectionType) ? $innerType->getTypes() : [$innerType];
-    $paramTypeNames = array_map(fn ($param) => (string) $param, $innerParamTypes);
+    $paramTypeNames = \array_map(fn ($param) => (string) $param, $innerParamTypes);
 
     $inner = new Reference($this->currentId . '.http_middleware_inner');
-    if (in_array(\Closure::class, $paramTypeNames, TRUE)) {
+    if (\in_array(\Closure::class, $paramTypeNames, TRUE)) {
       $inner = new ServiceClosureArgument($inner);
     }
 
     $arguments = $value->getArguments();
-    array_unshift($arguments, $inner);
+    \array_unshift($arguments, $inner);
     $value->setArguments($arguments);
 
     return $value;

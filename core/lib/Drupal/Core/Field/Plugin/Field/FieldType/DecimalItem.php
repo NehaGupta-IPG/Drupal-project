@@ -130,9 +130,9 @@ class DecimalItem extends NumericItemBase {
     // Get the number of decimal digits for the $max.
     $decimal_digits = self::getDecimalDigits($max);
     // Do the same for the min and keep the higher number of decimal digits.
-    $decimal_digits = max(self::getDecimalDigits($min), $decimal_digits);
+    $decimal_digits = \max(self::getDecimalDigits($min), $decimal_digits);
     // If $min = 1.234 and $max = 1.33 then $decimal_digits = 3.
-    $scale = rand($decimal_digits, $scale);
+    $scale = \rand($decimal_digits, $scale);
 
     // @see "Example #1 Calculate a random floating-point number" in
     // http://php.net/manual/function.mt-getrandmax.php

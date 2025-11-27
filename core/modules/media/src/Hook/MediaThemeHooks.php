@@ -87,7 +87,7 @@ class MediaThemeHooks {
     $variables['legend_span_attributes'] = new Attribute();
     if (!empty($element['#media_help'])) {
       foreach ($element['#media_help'] as $key => $text) {
-        $variables[substr($key, 1)] = $text;
+        $variables[\substr($key, 1)] = $text;
       }
     }
   }

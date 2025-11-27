@@ -41,7 +41,7 @@ final class EnvironmentSupportValidator implements EventSubscriberInterface {
   public function validate(SandboxValidationEvent $event): void {
     $message = $this->t('Package Manager is not supported by your environment.');
 
-    $help_url = getenv(static::VARIABLE_NAME);
+    $help_url = \getenv(static::VARIABLE_NAME);
     if (empty($help_url)) {
       return;
     }
@@ -69,7 +69,7 @@ final class EnvironmentSupportValidator implements EventSubscriberInterface {
     // Set priority to run before BaseRequirementsFulfilledValidator, and even
     // before other base requirement validators.
     // @see \Drupal\package_manager\Validator\BaseRequirementsFulfilledValidator
-    return array_map(fn () => ['validate', BaseRequirementsFulfilledValidator::PRIORITY + 1000], static::getSubscribedEventsFromTrait());
+    return \array_map(fn () => ['validate', BaseRequirementsFulfilledValidator::PRIORITY + 1000], static::getSubscribedEventsFromTrait());
   }
 
 }

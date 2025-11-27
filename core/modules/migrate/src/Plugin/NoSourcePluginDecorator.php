@@ -35,7 +35,7 @@ class NoSourcePluginDecorator implements DiscoveryInterface {
   public function getDefinitions() {
     /** @var \Drupal\Component\Plugin\PluginManagerInterface $source_plugin_manager */
     $source_plugin_manager = \Drupal::service('plugin.manager.migrate.source');
-    return array_filter($this->decorated->getDefinitions(), function (array $definition) use ($source_plugin_manager) {
+    return \array_filter($this->decorated->getDefinitions(), function (array $definition) use ($source_plugin_manager) {
       return !empty($definition['source']['plugin']) && $source_plugin_manager->hasDefinition($definition['source']['plugin']);
     });
   }

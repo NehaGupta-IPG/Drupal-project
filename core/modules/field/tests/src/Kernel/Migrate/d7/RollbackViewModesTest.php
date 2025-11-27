@@ -49,7 +49,7 @@ class RollbackViewModesTest extends MigrateViewModesTest {
    *   The migration to rollback, or its ID.
    */
   protected function executeRollback($migration): void {
-    if (is_string($migration)) {
+    if (\is_string($migration)) {
       $this->migration = $this->getMigration($migration);
     }
     else {

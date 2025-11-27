@@ -145,7 +145,7 @@ class MetaEventSubscriber implements EventSubscriberInterface {
       ->loadByProperties(['is_admin' => TRUE]);
 
     $has_admin_role = 'yes';
-    if (count(array_intersect(\Drupal::currentUser()->getRoles(), array_keys($admin_roles))) === 0) {
+    if (\count(\array_intersect(\Drupal::currentUser()->getRoles(), \array_keys($admin_roles))) === 0) {
       $has_admin_role = 'no';
     }
     return $has_admin_role;

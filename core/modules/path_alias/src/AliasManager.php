@@ -56,7 +56,7 @@ class AliasManager implements AliasManagerInterface {
    * @see https://www.drupal.org/node/3532412
    */
   public function setCacheKey($key) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3532412', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3532412', E_USER_DEPRECATED);
   }
 
   /**
@@ -67,7 +67,7 @@ class AliasManager implements AliasManagerInterface {
    * @see https://www.drupal.org/node/3532412
    */
   public function writeCache() {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3532412', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3532412', E_USER_DEPRECATED);
   }
 
   /**
@@ -119,7 +119,7 @@ class AliasManager implements AliasManagerInterface {
     // Check the path prefix, if the top-level part before the first / is not in
     // the list, then there is no need to do anything further, it is not in the
     // database.
-    if ($path === '/' || !$this->pathPrefixes->get(strtok(trim($path, '/'), '/'))) {
+    if ($path === '/' || !$this->pathPrefixes->get(\strtok(\trim($path, '/'), '/'))) {
       return $path;
     }
 
@@ -153,10 +153,10 @@ class AliasManager implements AliasManagerInterface {
       return $this->lookupMap[$langcode][$path];
     }
 
-    $this->lookupMap[$langcode] = array_merge($this->lookupMap[$langcode] ?? [], $this->pathAliasRepository->preloadPathAlias($this->requestedPaths[$langcode], $langcode));
+    $this->lookupMap[$langcode] = \array_merge($this->lookupMap[$langcode] ?? [], $this->pathAliasRepository->preloadPathAlias($this->requestedPaths[$langcode], $langcode));
 
     // Keep a record of paths with no alias to avoid querying twice.
-    $this->noAlias[$langcode] = array_merge($this->noAlias[$langcode] ?? [], array_diff_key($this->requestedPaths[$langcode], $this->lookupMap[$langcode]));
+    $this->noAlias[$langcode] = \array_merge($this->noAlias[$langcode] ?? [], \array_diff_key($this->requestedPaths[$langcode], $this->lookupMap[$langcode]));
 
     // Unset the requested paths variable now they've been loaded.
     unset($this->requestedPaths[$langcode]);
@@ -204,7 +204,7 @@ class AliasManager implements AliasManagerInterface {
     // When paths are inserted, only rebuild the prefix list if the path has a
     // top level component which is not already in the prefix list.
     if (!empty($path)) {
-      if ($this->pathPrefixes->get(strtok($path, '/'))) {
+      if ($this->pathPrefixes->get(\strtok($path, '/'))) {
         return;
       }
     }
@@ -225,7 +225,7 @@ class AliasManager implements AliasManagerInterface {
    * cspell:ignore whitelist
    */
   protected function pathAliasWhitelistRebuild($path = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use \Drupal\path_alias\AliasManager::pathAliasPrefixListRebuild() instead. See https://www.drupal.org/node/3467559', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use \Drupal\path_alias\AliasManager::pathAliasPrefixListRebuild() instead. See https://www.drupal.org/node/3467559', E_USER_DEPRECATED);
     $this->pathAliasPrefixListRebuild($path);
   }
 

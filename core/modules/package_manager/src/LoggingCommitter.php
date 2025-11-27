@@ -36,14 +36,14 @@ class LoggingCommitter implements CommitterInterface {
     $path = $this->configFactory->get('package_manager.settings')->get('log');
     if ($path) {
       $callback = new FileProcessOutputCallback($path, $callback);
-      $callback(OutputTypeEnum::OUT, sprintf("### Committing changes from %s to %s\n", $stagingDir->absolute(), $activeDir->absolute()));
+      $callback(OutputTypeEnum::OUT, \sprintf("### Committing changes from %s to %s\n", $stagingDir->absolute(), $activeDir->absolute()));
     }
 
     $start_time = $this->time->getCurrentMicroTime();
     $this->decorated->commit($stagingDir, $activeDir, $exclusions, $callback, $timeout);
     $end_time = $this->time->getCurrentMicroTime();
     if ($callback) {
-      $callback(OutputTypeEnum::OUT, sprintf("### Finished in %0.3f seconds\n", $end_time - $start_time));
+      $callback(OutputTypeEnum::OUT, \sprintf("### Finished in %0.3f seconds\n", $end_time - $start_time));
     }
   }
 

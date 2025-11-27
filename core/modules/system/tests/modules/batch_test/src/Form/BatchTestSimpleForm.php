@@ -59,7 +59,7 @@ class BatchTestSimpleForm extends FormBase {
     $batch_test_helper->stack(NULL, TRUE);
 
     foreach ($form_state->getValue('batch') as $batch) {
-      batch_set($batch_test_definitions->$batch());
+      \batch_set($batch_test_definitions->$batch());
     }
 
     $form_state->setRedirect('batch_test.redirect');

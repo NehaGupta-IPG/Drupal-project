@@ -32,7 +32,7 @@ abstract class SandboxValidationEvent extends SandboxEvent {
    */
   public function getResults(?int $severity = NULL): array {
     if ($severity !== NULL) {
-      return array_filter($this->results, function ($result) use ($severity) {
+      return \array_filter($this->results, function ($result) use ($severity) {
         return $result->severity === $severity;
       });
     }
@@ -49,7 +49,7 @@ abstract class SandboxValidationEvent extends SandboxEvent {
    *   message.
    */
   public function addError(array $messages, ?TranslatableMarkup $summary = NULL): void {
-    $this->addResult(ValidationResult::createError(array_values($messages), $summary));
+    $this->addResult(ValidationResult::createError(\array_values($messages), $summary));
   }
 
   /**

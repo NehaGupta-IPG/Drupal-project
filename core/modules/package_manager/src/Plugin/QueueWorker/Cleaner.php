@@ -39,11 +39,11 @@ final class Cleaner extends QueueWorkerBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   public function processItem($dir): void {
-    assert(is_string($dir));
+    \assert(\is_string($dir));
 
-    if (file_exists($dir)) {
+    if (\file_exists($dir)) {
       $this->fileSystem->deleteRecursive($dir, function (string $path): void {
-        $this->fileSystem->chmod($path, is_dir($path) ? 0700 : 0600);
+        $this->fileSystem->chmod($path, \is_dir($path) ? 0700 : 0600);
       });
     }
   }

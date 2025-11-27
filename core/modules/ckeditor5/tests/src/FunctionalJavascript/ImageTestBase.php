@@ -55,7 +55,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
    */
   protected function imageAttributes() {
     return [
-      'src' => base_path() . 'core/misc/druplicon.png',
+      'src' => \base_path() . 'core/misc/druplicon.png',
       'width' => '88',
       'height' => '100',
     ];

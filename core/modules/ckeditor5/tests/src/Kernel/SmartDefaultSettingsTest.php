@@ -521,7 +521,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     }
 
     $updated_validation_errors = $this->validatePairToViolationsArray($updated_text_editor, $updated_text_format, TRUE);
-    if (is_null($expected_post_update_text_editor_violations)) {
+    if (\is_null($expected_post_update_text_editor_violations)) {
       // If a violation is not expected, it should be compared against an empty
       // array.
       $this->assertSame([], $updated_validation_errors);
@@ -543,7 +543,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     foreach ($log_messages as $log) {
       // Remove all from context except message arguments.
       $message_arguments = $this->parser->parseMessagePlaceholders($log[1], $log[2]);
-      $logs[$type_to_status[$log[0]]][] = [$log[1], serialize($message_arguments)];
+      $logs[$type_to_status[$log[0]]][] = [$log[1], \serialize($message_arguments)];
     }
 
     // Transforms TranslatableMarkup objects to string.
@@ -687,10 +687,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           'ckeditor5_imageResize' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_imageResize'],
           'ckeditor5_list' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_list'],
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => array_merge(
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 7),
+            'allowed_tags' => \array_merge(
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 7),
               ['<img data-caption>'],
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 7),
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 7),
             ),
           ],
         ],
@@ -728,10 +728,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           'ckeditor5_imageResize' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_imageResize'],
           'ckeditor5_list' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_list'],
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => array_merge(
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 7),
+            'allowed_tags' => \array_merge(
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 7),
               ['<img data-align>'],
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 7),
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 7),
             ),
           ],
         ],
@@ -767,10 +767,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           'ckeditor5_imageResize' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_imageResize'],
           'ckeditor5_list' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_list'],
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => array_merge(
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 7),
+            'allowed_tags' => \array_merge(
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 7),
               ['<img data-entity-type data-entity-uuid>'],
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 7),
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 7),
             ),
           ],
         ],
@@ -1255,10 +1255,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           'ckeditor5_imageResize' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_imageResize'],
           'ckeditor5_list' => $basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_list'],
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => array_merge(
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 7),
+            'allowed_tags' => \array_merge(
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 0, 7),
               ['<img data-*>'],
-              array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 7),
+              \array_slice($basic_html_test_case['expected_ckeditor5_settings']['plugins']['ckeditor5_sourceEditing']['allowed_tags'], 7),
             ),
           ],
         ] + $basic_html_test_case['expected_ckeditor5_settings']['plugins'],

@@ -33,7 +33,7 @@ class FileTransferAuthorizeForm extends FormBase {
    *   The app root.
    */
   public function __construct($root) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
     $this->root = $root;
   }
@@ -309,7 +309,7 @@ class FileTransferAuthorizeForm extends FormBase {
     // processing, pass in that subarray to the recursive call. Otherwise, just
     // pass on the whole $defaults array.
     foreach (Element::children($element) as $child_key) {
-      $this->setConnectionSettingsDefaults($element[$child_key], $child_key, ((isset($key, $defaults[$key]) && is_array($defaults[$key])) ? $defaults[$key] : $defaults));
+      $this->setConnectionSettingsDefaults($element[$child_key], $child_key, ((isset($key, $defaults[$key]) && \is_array($defaults[$key])) ? $defaults[$key] : $defaults));
     }
   }
 

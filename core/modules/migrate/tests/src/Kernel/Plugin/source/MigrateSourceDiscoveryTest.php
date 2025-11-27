@@ -34,8 +34,8 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
     // First, check the expected plugins are provided by migrate only.
     $expected = ['config_entity', 'embedded_data', 'empty'];
     $source_plugins = \Drupal::service('plugin.manager.migrate.source')->getDefinitions();
-    ksort($source_plugins);
-    $this->assertSame($expected, array_keys($source_plugins));
+    \ksort($source_plugins);
+    $this->assertSame($expected, \array_keys($source_plugins));
 
     // Next, install the file module, which has 4 migrate source plugins, all of
     // which depend on migrate_drupal. Since migrate_drupal is not installed,
@@ -46,8 +46,8 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
     $expected = ['config_entity', 'embedded_data', 'empty'];
     $this->enableModules(['file']);
     $source_plugins = \Drupal::service('plugin.manager.migrate.source')->getDefinitions();
-    ksort($source_plugins);
-    $this->assertSame($expected, array_keys($source_plugins));
+    \ksort($source_plugins);
+    $this->assertSame($expected, \array_keys($source_plugins));
 
     // Install user and 'content_entity:file', 'content_entity:user' should now
     // be discovered. The other source plugins in the user modules all depend
@@ -55,8 +55,8 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
     $expected = ['config_entity', 'content_entity:file', 'content_entity:user', 'embedded_data', 'empty'];
     $this->enableModules(['user']);
     $source_plugins = \Drupal::service('plugin.manager.migrate.source')->getDefinitions();
-    ksort($source_plugins);
-    $this->assertSame($expected, array_keys($source_plugins));
+    \ksort($source_plugins);
+    $this->assertSame($expected, \array_keys($source_plugins));
 
     // Install migrate_drupal and now the source plugins from the file modules
     // should be found.
@@ -71,7 +71,7 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
     ];
     $this->enableModules(['migrate_drupal']);
     $source_plugins = \Drupal::service('plugin.manager.migrate.source')->getDefinitions();
-    $this->assertSame(array_diff($expected, array_keys($source_plugins)), []);
+    $this->assertSame(\array_diff($expected, \array_keys($source_plugins)), []);
   }
 
   /**
@@ -83,8 +83,8 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
     // First, test attribute-only discovery.
     $expected = ['config_entity', 'embedded_data', 'empty'];
     $source_plugins = \Drupal::service('plugin.manager.migrate.source')->getDefinitions();
-    ksort($source_plugins);
-    $this->assertSame($expected, array_keys($source_plugins));
+    \ksort($source_plugins);
+    $this->assertSame($expected, \array_keys($source_plugins));
 
     // Next, test discovery of both attributed and annotated plugins. The
     // annotated plugin with multiple providers depends on migrate_drupal and
@@ -92,8 +92,8 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
     $expected = ['annotated', 'config_entity', 'embedded_data', 'empty'];
     $this->enableModules(['migrate_source_annotation_bc_test']);
     $source_plugins = \Drupal::service('plugin.manager.migrate.source')->getDefinitions();
-    ksort($source_plugins);
-    $this->assertSame($expected, array_keys($source_plugins));
+    \ksort($source_plugins);
+    $this->assertSame($expected, \array_keys($source_plugins));
 
     // Install migrate_drupal and now the annotated plugin that depends on it
     // should be discovered.
@@ -110,7 +110,7 @@ class MigrateSourceDiscoveryTest extends KernelTestBase {
     // migrate_source_annotation_bc_test are discovered. There are additional
     // plugins provided by migrate_drupal, but they do not need to be enumerated
     // here.
-    $this->assertSame(array_diff($expected, array_keys($source_plugins)), []);
+    $this->assertSame(\array_diff($expected, \array_keys($source_plugins)), []);
   }
 
 }

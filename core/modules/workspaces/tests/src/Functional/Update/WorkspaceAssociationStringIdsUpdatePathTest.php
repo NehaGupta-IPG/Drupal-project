@@ -30,7 +30,7 @@ class WorkspaceAssociationStringIdsUpdatePathTest extends UpdatePathTestBase {
    */
   public function testRunUpdates(): void {
     $schema = \Drupal::database()->schema();
-    $find_primary_key_columns = new \ReflectionMethod(get_class($schema), 'findPrimaryKeyColumns');
+    $find_primary_key_columns = new \ReflectionMethod(\get_class($schema), 'findPrimaryKeyColumns');
 
     $this->assertFalse($schema->fieldExists('workspace_association', 'target_entity_id_string'));
     $primary_key_columns = ['workspace', 'target_entity_type_id', 'target_entity_id'];

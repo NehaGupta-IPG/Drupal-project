@@ -46,7 +46,7 @@ class EntityLinks extends FilterBase implements ContainerFactoryPluginInterface 
   public function process($text, $langcode): FilterProcessResult {
     $result = new FilterProcessResult($text);
 
-    if (!str_contains($text, 'data-entity-type') && !str_contains($text, 'data-entity-uuid')) {
+    if (!\str_contains($text, 'data-entity-type') && !\str_contains($text, 'data-entity-uuid')) {
       return $result;
     }
 
@@ -79,7 +79,7 @@ class EntityLinks extends FilterBase implements ContainerFactoryPluginInterface 
           $url = $this->getUrl($entity);
 
           // Parse link href as URL, extract query and fragment from it.
-          $href_url = parse_url($element->getAttribute('href'));
+          $href_url = \parse_url($element->getAttribute('href'));
           $anchor = empty($href_url["fragment"]) ? '' : '#' . $href_url["fragment"];
           $query = empty($href_url["query"]) ? '' : '?' . $href_url["query"];
 

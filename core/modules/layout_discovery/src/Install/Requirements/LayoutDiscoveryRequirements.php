@@ -19,7 +19,7 @@ class LayoutDiscoveryRequirements implements InstallRequirementsInterface {
     $requirements = [];
     if (\Drupal::moduleHandler()->moduleExists('layout_plugin')) {
       $requirements['layout_discovery'] = [
-        'description' => t('Layout Discovery cannot be installed because the Layout Plugin module is installed and incompatible.'),
+        'description' => \t('Layout Discovery cannot be installed because the Layout Plugin module is installed and incompatible.'),
         'severity' => RequirementSeverity::Error,
       ];
     }

@@ -93,7 +93,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertSessionCookieExists('1');
     $this->assertBigPipeNoJsCookieExists('0');
-    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . UrlHelper::encodePath(base_path() . 'big_pipe_test') . '" />' . "\n" . '</noscript>');
+    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . \base_path() . 'big_pipe/no-js?destination=' . UrlHelper::encodePath(\base_path() . 'big_pipe_test') . '" />' . "\n" . '</noscript>');
     $this->assertSession()->responseNotContains($no_js_to_js_markup);
     $this->assertBigPipeNoJsMetaRefreshRedirect();
     $this->assertBigPipeNoJsCookieExists('1');
@@ -109,7 +109,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertSessionCookieExists('1');
     $this->assertBigPipeNoJsCookieExists('0');
-    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . base_path() . 'big_pipe_test" />' . "\n" . '</noscript>');
+    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . \base_path() . 'big_pipe/no-js?destination=' . \base_path() . 'big_pipe_test" />' . "\n" . '</noscript>');
     $this->assertSession()->responseNotContains($no_js_to_js_markup);
     $this->assertBigPipeNoJsMetaRefreshRedirect();
     $this->assertBigPipeNoJsCookieExists('1');
@@ -199,9 +199,9 @@ class BigPipeTest extends BrowserTestBase {
     // functionality.
     $records = $connection->select('watchdog', 'w')->fields('w')->orderBy('wid', 'DESC')->range(0, 2)->execute()->fetchAll();
     $this->assertEquals(RfcLogLevel::WARNING, $records[0]->severity);
-    $this->assertStringContainsString('Oh noes!', (string) unserialize($records[0]->variables)['@message']);
+    $this->assertStringContainsString('Oh noes!', (string) \unserialize($records[0]->variables)['@message']);
     $this->assertEquals(RfcLogLevel::WARNING, $records[1]->severity);
-    $this->assertStringContainsString('You are not allowed to say llamas are not cool!', (string) unserialize($records[1]->variables)['@message']);
+    $this->assertStringContainsString('You are not allowed to say llamas are not cool!', (string) \unserialize($records[1]->variables)['@message']);
 
     // Verify that 4xx responses work fine. (4xx responses are handled by
     // subrequests to a route pointing to a controller with the desired output.)
@@ -219,7 +219,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains(BigPipe::STOP_SIGNAL);
     $this->assertSession()->responseNotContains('</body>');
     // The exception is expected. Do not interpret it as a test failure.
-    unlink($this->root . '/' . $this->siteDirectory . '/error.log');
+    \unlink($this->root . '/' . $this->siteDirectory . '/error.log');
 
     // Tests the enforced redirect response exception handles redirecting to
     // a trusted redirect.
@@ -474,7 +474,7 @@ class BigPipeTest extends BrowserTestBase {
    * @internal
    */
   protected function assertSetsEqual(array $a, array $b): void {
-    count($a) == count($b) && !array_diff_assoc($a, $b);
+    \count($a) == \count($b) && !\array_diff_assoc($a, $b);
   }
 
   /**

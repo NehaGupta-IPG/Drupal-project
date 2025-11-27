@@ -165,12 +165,12 @@ abstract class FileResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $this->author->id(),
           'target_type' => 'user',
           'target_uuid' => $this->author->uuid(),
-          'url' => base_path() . 'user/' . $this->author->id(),
+          'url' => \base_path() . 'user/' . $this->author->id(),
         ],
       ],
       'uri' => [
         [
-          'url' => base_path() . $this->siteDirectory . '/files/drupal.txt',
+          'url' => \base_path() . $this->siteDirectory . '/files/drupal.txt',
           'value' => 'public://drupal.txt',
         ],
       ],

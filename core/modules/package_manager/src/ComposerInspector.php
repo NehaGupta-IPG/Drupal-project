@@ -124,7 +124,7 @@ class ComposerInspector implements LoggerAwareInterface {
 
     // Check for the presence of composer.lock, because `composer validate`
     // doesn't expect it to exist, but we do (see ::getInstalledPackagesList()).
-    if (!file_exists($working_dir . DIRECTORY_SEPARATOR . 'composer.lock')) {
+    if (!\file_exists($working_dir . DIRECTORY_SEPARATOR . 'composer.lock')) {
       $messages[] = $this->t('composer.lock not found in @dir.', [
         '@dir' => $working_dir,
       ]);
@@ -230,7 +230,7 @@ class ComposerInspector implements LoggerAwareInterface {
     $command = ['config', $key];
     // If we're consulting a specific file for the config value, we don't need
     // to validate the project as a whole.
-    if (is_file($context)) {
+    if (\is_file($context)) {
       $command[] = "--file={$context}";
     }
     else {
@@ -249,7 +249,7 @@ class ComposerInspector implements LoggerAwareInterface {
       };
     }
     $output = $this->processCallback->getOutput();
-    return $output ? trim(implode('', $output)) : NULL;
+    return $output ? \trim(\implode('', $output)) : NULL;
   }
 
   /**
@@ -267,7 +267,7 @@ class ComposerInspector implements LoggerAwareInterface {
     if (isset($data['application']['name'])
       && isset($data['application']['version'])
       && $data['application']['name'] === 'Composer'
-      && is_string($data['application']['version'])) {
+      && \is_string($data['application']['version'])) {
       return $data['application']['version'];
     }
     throw new \UnexpectedValueException('Unable to determine Composer version');
@@ -288,10 +288,10 @@ class ComposerInspector implements LoggerAwareInterface {
    *   working directory, and it is not of the `metapackage` type.
    */
   public function getInstalledPackagesList(string $working_dir): InstalledPackagesList {
-    $working_dir = realpath($working_dir);
+    $working_dir = \realpath($working_dir);
     $this->validate($working_dir);
 
-    if (array_key_exists($working_dir, $this->packageLists)) {
+    if (\array_key_exists($working_dir, $this->packageLists)) {
       return $this->packageLists[$working_dir];
     }
 
@@ -306,8 +306,8 @@ class ComposerInspector implements LoggerAwareInterface {
       // which will cause an exception if we try to parse it as a legitimate
       // semantic version. Since we don't need the abbreviated commit hash, just
       // remove it.
-      if (str_contains($package['version'], '-dev ')) {
-        $packages_data[$name]['version'] = explode(' ', $package['version'], 2)[0];
+      if (\str_contains($package['version'], '-dev ')) {
+        $packages_data[$name]['version'] = \explode(' ', $package['version'], 2)[0];
       }
 
       // We expect Composer to report that metapackages' install paths are the
@@ -324,10 +324,10 @@ class ComposerInspector implements LoggerAwareInterface {
         throw new \UnexpectedValueException("Package '$name' cannot be installed at path: '$path'");
       }
       else {
-        $packages_data[$name]['path'] = realpath($path);
+        $packages_data[$name]['path'] = \realpath($path);
       }
     }
-    $packages_data = array_map(InstalledPackage::createFromArray(...), $packages_data);
+    $packages_data = \array_map(InstalledPackage::createFromArray(...), $packages_data);
 
     $list = new InstalledPackagesList($packages_data);
     $this->packageLists[$working_dir] = $list;
@@ -351,10 +351,10 @@ class ComposerInspector implements LoggerAwareInterface {
    *   The packages data, with a `type` key added to each package.
    */
   private function getPackageTypes(array $packages_data, string $working_dir): array {
-    $lock_content = file_get_contents($working_dir . DIRECTORY_SEPARATOR . 'composer.lock');
-    $lock_data = json_decode($lock_content, TRUE, flags: JSON_THROW_ON_ERROR);
+    $lock_content = \file_get_contents($working_dir . DIRECTORY_SEPARATOR . 'composer.lock');
+    $lock_data = \json_decode($lock_content, TRUE, flags: JSON_THROW_ON_ERROR);
 
-    $lock_packages = array_merge($lock_data['packages'] ?? [], $lock_data['packages-dev'] ?? []);
+    $lock_packages = \array_merge($lock_data['packages'] ?? [], $lock_data['packages-dev'] ?? []);
     foreach ($lock_packages as $lock_package) {
       $name = $lock_package['name'];
       if (isset($packages_data[$name]) && isset($lock_package['type'])) {
@@ -441,9 +441,9 @@ class ComposerInspector implements LoggerAwareInterface {
     foreach (['composer.json', 'composer.lock'] as $filename) {
       $known_hash = $known_hashes[$working_dir][$filename] ?? '';
       // If the file doesn't exist, hash_file() will return FALSE.
-      $current_hash = @hash_file('xxh64', $working_dir . DIRECTORY_SEPARATOR . $filename);
+      $current_hash = @\hash_file('xxh64', $working_dir . DIRECTORY_SEPARATOR . $filename);
 
-      if ($known_hash && $current_hash && hash_equals($known_hash, $current_hash)) {
+      if ($known_hash && $current_hash && \hash_equals($known_hash, $current_hash)) {
         continue;
       }
       $known_hashes[$working_dir][$filename] = $current_hash;
@@ -472,7 +472,7 @@ class ComposerInspector implements LoggerAwareInterface {
 
     // Try to convert the value we got back to a boolean. If it's not a boolean,
     // it should be an array of plugin-specific flags.
-    $value = json_decode($value, TRUE, flags: JSON_THROW_ON_ERROR);
+    $value = \json_decode($value, TRUE, flags: JSON_THROW_ON_ERROR);
 
     // An empty array indicates that no plugins are allowed.
     return $value ?: [];

@@ -200,7 +200,7 @@ class TwigNodeTrans extends Node {
     }
 
     return [
-      new Nodes([new ConstantExpression(trim($text), $body->getTemplateLine())]),
+      new Nodes([new ConstantExpression(\trim($text), $body->getTemplateLine())]),
       $tokens,
     ];
   }

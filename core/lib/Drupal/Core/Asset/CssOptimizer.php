@@ -92,7 +92,7 @@ class CssOptimizer implements AssetOptimizerInterface {
 
     // Anchor all paths in the CSS with its base URL, ignoring external and
     // absolute paths and paths starting with '#'.
-    return preg_replace_callback(
+    return \preg_replace_callback(
       '/url\(\s*[\'"]?(?![a-z]+:|\/+|#|%23)([^\'")]+)[\'"]?\s*\)/i',
       [$this, 'rewriteFileURI'],
       $contents
@@ -143,7 +143,7 @@ class CssOptimizer implements AssetOptimizerInterface {
     // Store the parent base path to restore it later.
     $parent_base_path = $base_path;
     // Set the current base path to process possible child imports.
-    $base_path = dirname($file);
+    $base_path = \dirname($file);
 
     // Load the CSS stylesheet. We suppress errors because themes may specify
     // stylesheets in their .info.yml file that don't exist in the theme's path,
@@ -157,7 +157,7 @@ class CssOptimizer implements AssetOptimizerInterface {
       }
       // If no BOM, check for fallback encoding. Per CSS spec the regex is very
       // strict.
-      elseif (preg_match('/^@charset "([^"]+)";/', $contents, $matches)) {
+      elseif (\preg_match('/^@charset "([^"]+)";/', $contents, $matches)) {
         if ($matches[1] !== 'utf-8' && $matches[1] !== 'UTF-8') {
           $contents = \substr($contents, \strlen($matches[0]));
           $contents = Unicode::convertToUtf8($contents, $matches[1]);
@@ -267,7 +267,7 @@ class CssOptimizer implements AssetOptimizerInterface {
     // This happens recursively but omits external files and local files
     // with supports- or media-query qualifiers, as those are conditionally
     // loaded depending on the user agent.
-    $contents = preg_replace_callback(
+    $contents = \preg_replace_callback(
       '/@import\s*(?:url\(\s*)?[\'"]?(?![a-z]+:)(?!\/\/)([^\'"\()]+)[\'"]?\s*\)?\s*;/', [
         $this,
         'loadNestedFile',

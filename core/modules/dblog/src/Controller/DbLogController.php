@@ -334,7 +334,7 @@ class DbLogController extends ControllerBase {
         if ($key == 'severity') {
           $value = (int) $value;
         }
-        if (in_array($value, array_keys($filters[$key]['options']))) {
+        if (\in_array($value, \array_keys($filters[$key]['options']))) {
           $condition_or->condition($filters[$key]['field'], $value);
           $condition_or_used = TRUE;
         }

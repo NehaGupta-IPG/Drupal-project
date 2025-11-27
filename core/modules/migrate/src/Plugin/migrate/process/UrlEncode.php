@@ -46,7 +46,7 @@ class UrlEncode extends ProcessPluginBase {
       foreach ($parsed_url as $parsed_url_key => $parsed_url_value) {
         if (\in_array($parsed_url_key, $url_parts_to_encode)) {
           // urlencode() would convert spaces to + signs.
-          $urlencoded_parsed_url_value = rawurlencode($parsed_url_value);
+          $urlencoded_parsed_url_value = \rawurlencode($parsed_url_value);
           // Restore special characters depending on which part of the URL this
           // is.
           switch ($parsed_url_key) {

@@ -91,7 +91,7 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
    *   The event object.
    */
   public function handleEvent(SandboxEvent $event): void {
-    $this->events[] = get_class($event);
+    $this->events[] = \get_class($event);
 
     // The event should have a reference to the stage which fired it.
     $this->assertSame($event->sandboxManager, $this->stage);
@@ -145,7 +145,7 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
     // Set up an event listener which will only flag an error for the event
     // class under test.
     $handler = function (SandboxEvent $event) use ($event_class, $error_messages): void {
-      if (get_class($event) === $event_class) {
+      if (\get_class($event) === $event_class) {
         if ($event instanceof SandboxValidationEvent) {
           $event->addError($error_messages);
         }

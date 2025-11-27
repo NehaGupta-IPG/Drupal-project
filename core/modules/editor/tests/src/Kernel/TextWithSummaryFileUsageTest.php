@@ -99,7 +99,7 @@ class TextWithSummaryFileUsageTest extends EntityKernelTestBase {
     foreach ($image_paths as $key => $image_path) {
       $image = File::create();
       $image->setFileUri($image_path);
-      $image->setFilename(basename($image->getFileUri()));
+      $image->setFilename(\basename($image->getFileUri()));
       $image->save();
 
       $file_usage = $this->container->get('file.usage');
@@ -138,7 +138,7 @@ class TextWithSummaryFileUsageTest extends EntityKernelTestBase {
     $node->save();
 
     $original_values = [];
-    for ($i = 0; $i < count($image_entities); $i++) {
+    for ($i = 0; $i < \count($image_entities); $i++) {
       $original_value = $node->body[$i]->value;
       $original_values[$i] = $original_value;
     }

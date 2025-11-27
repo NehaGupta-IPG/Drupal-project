@@ -283,7 +283,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
         $elements['add_more'] = [
           '#type' => 'submit',
-          '#name' => strtr($id_prefix, '-', '_') . '_add_more',
+          '#name' => \strtr($id_prefix, '-', '_') . '_add_more',
           '#value' => $this->t('Add another item'),
           '#attributes' => ['class' => ['field-add-more-submit']],
           '#button_type' => 'small',
@@ -358,7 +358,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $delta = $element['#max_delta'];
     // Construct an attribute to add to div for use as selector to set the focus
     // on.
-    $button_parent = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $button_parent = NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -1));
     $focus_attribute = 'data-drupal-selector="field-' . $button_parent['#field_name'] . '-more-focus-target"';
     $element[$delta]['#prefix'] = '<div class="ajax-new-content" ' . $focus_attribute . '>' . ($element[$delta]['#prefix'] ?? '');
     $element[$delta]['#suffix'] = ($element[$delta]['#suffix'] ?? '') . '</div>';
@@ -630,7 +630,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     // "$form_state->get(['field_storage', '#parents', ...$parents..., '#fields', $field_name])"
     // to avoid clashes between field names and $parents parts.
     // phpcs:enable
-    return array_merge(['field_storage', '#parents'], $parents, ['#fields', $field_name]);
+    return \array_merge(['field_storage', '#parents'], $parents, ['#fields', $field_name]);
   }
 
   /**

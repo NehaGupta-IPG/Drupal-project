@@ -36,7 +36,7 @@ class FormTestClickedButtonForm extends FormBase {
     ];
 
     // Get button configurations, filter out NULL values.
-    $args = array_filter([$first, $second, $third]);
+    $args = \array_filter([$first, $second, $third]);
 
     // Define button types for each argument.
     $button_types = [

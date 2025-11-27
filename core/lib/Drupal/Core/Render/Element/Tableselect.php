@@ -196,7 +196,7 @@ class Tableselect extends Table {
       else {
         // Add an empty header when radio buttons are displayed or a "Select
         // all" checkbox is not desired.
-        array_unshift($header, '');
+        \array_unshift($header, '');
       }
     }
 

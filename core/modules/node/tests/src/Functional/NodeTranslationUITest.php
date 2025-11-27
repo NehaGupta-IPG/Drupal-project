@@ -153,7 +153,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
    * {@inheritdoc}
    */
   protected function getAdministratorPermissions(): array {
-    return array_merge(parent::getAdministratorPermissions(), [
+    return \array_merge(parent::getAdministratorPermissions(), [
       'access administration pages',
       'administer content types',
       'administer node fields',
@@ -352,7 +352,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
     // Need to check from the beginning, including the base_path, in the URL
     // since the pattern for the default language might be a substring of
     // the strings for other languages.
-    $base_path = base_path();
+    $base_path = \base_path();
 
     // Check the frontpage for 'Read more' links to each translation.
     // See also assertTaxonomyPage() in NodeAccessBaseTableTest.

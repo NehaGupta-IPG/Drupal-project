@@ -88,7 +88,7 @@ class Variable {
     else {
       // @todo var_export() does not use long array syntax. Fix in
       // https://www.drupal.org/project/drupal/issues/3476894
-      $output = var_export($var, TRUE);
+      $output = \var_export($var, TRUE);
     }
 
     if ($prefix) {

@@ -726,8 +726,8 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
     $label_counter = [];
     $all_labels = [];
     // Count the number of fields per label per field storage.
-    foreach (array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type)) as $bundle) {
-      $bundle_fields = array_filter($this->getFieldDefinitions($entity_type, $bundle), function ($field_definition) {
+    foreach (\array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type)) as $bundle) {
+      $bundle_fields = \array_filter($this->getFieldDefinitions($entity_type, $bundle), function ($field_definition) {
         return $field_definition instanceof FieldConfigInterface;
       });
       if (isset($bundle_fields[$field_name])) {
@@ -743,13 +743,13 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
     // Sort the field labels by the most used label and return the most used
     // one. If the counts are equal, sort by the label to ensure the result is
     // deterministic.
-    uksort($label_counter, function ($a, $b) use ($label_counter) {
+    \uksort($label_counter, function ($a, $b) use ($label_counter) {
       if ($label_counter[$a] === $label_counter[$b]) {
-        return strcmp($a, $b);
+        return \strcmp($a, $b);
       }
       return $label_counter[$b] <=> $label_counter[$a];
     });
-    $label_counter = array_keys($label_counter);
+    $label_counter = \array_keys($label_counter);
 
     return [$label_counter[0], $all_labels];
   }

@@ -70,7 +70,7 @@ class SelectTableSortDefaultTest extends DatabaseTestBase {
           'sort' => $sort['sort'],
         ],
       ]);
-      $data = json_decode($this->getSession()->getPage()->getContent());
+      $data = \json_decode($this->getSession()->getPage()->getContent());
 
       $first = \array_shift($data->tasks);
       $last = \array_pop($data->tasks);

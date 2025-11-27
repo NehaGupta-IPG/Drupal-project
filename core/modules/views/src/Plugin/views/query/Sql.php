@@ -890,7 +890,7 @@ class Sql extends QueryPluginBase {
 
     // We limit the length of the original alias up to 60 characters
     // to get a unique alias later if its have duplicates.
-    $alias = strtolower(substr($alias, 0, 60));
+    $alias = \strtolower(\substr($alias, 0, 60));
 
     // Create a field info array.
     $field_info = [
@@ -1568,8 +1568,8 @@ class Sql extends QueryPluginBase {
         if (!empty($this->limit) || !empty($this->offset)) {
           // We can't have an offset without a limit, so provide a very large
           // limit instead.
-          $limit = intval(!empty($this->limit) ? $this->limit : 999999);
-          $offset = intval(!empty($this->offset) ? $this->offset : 0);
+          $limit = \intval(!empty($this->limit) ? $this->limit : 999999);
+          $offset = \intval(!empty($this->offset) ? $this->offset : 0);
           $query->range($offset, $limit);
         }
 

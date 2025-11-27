@@ -325,15 +325,15 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
     // Iterate at least once, until no field with the generated ID is found.
     do {
       // Limit the base field name to the maximum allowed length.
-      $id = (strlen($base_id) > EntityTypeInterface::ID_MAX_LENGTH) ? substr($base_id, 0, EntityTypeInterface::ID_MAX_LENGTH) : $base_id;
+      $id = (\strlen($base_id) > EntityTypeInterface::ID_MAX_LENGTH) ? \substr($base_id, 0, EntityTypeInterface::ID_MAX_LENGTH) : $base_id;
       // If we've tried before, increment and append the suffix.
       if ($tries) {
         $id .= '_' . $tries;
 
         // Ensure the suffixed field name does not exceed the maximum allowed
         // length.
-        if (strlen($id) > EntityTypeInterface::ID_MAX_LENGTH) {
-          $id = substr($base_id, 0, (EntityTypeInterface::ID_MAX_LENGTH - strlen('_' . $tries))) . '_' . $tries;
+        if (\strlen($id) > EntityTypeInterface::ID_MAX_LENGTH) {
+          $id = \substr($base_id, 0, (EntityTypeInterface::ID_MAX_LENGTH - \strlen('_' . $tries))) . '_' . $tries;
         }
       }
       $field = $storage->load('media.' . $id);

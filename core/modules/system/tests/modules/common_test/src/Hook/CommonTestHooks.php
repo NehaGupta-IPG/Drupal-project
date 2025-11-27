@@ -17,27 +17,27 @@ class CommonTestHooks {
   #[Hook('drupal_alter_alter')]
   public function drupalAlterAlter(&$data, &$arg2 = NULL, &$arg3 = NULL): void {
     // Alter first argument.
-    if (is_array($data)) {
+    if (\is_array($data)) {
       $data['foo'] = 'Drupal';
     }
-    elseif (is_object($data)) {
+    elseif (\is_object($data)) {
       $data->foo = 'Drupal';
     }
     // Alter second argument, if present.
     if (isset($arg2)) {
-      if (is_array($arg2)) {
+      if (\is_array($arg2)) {
         $arg2['foo'] = 'Drupal';
       }
-      elseif (is_object($arg2)) {
+      elseif (\is_object($arg2)) {
         $arg2->foo = 'Drupal';
       }
     }
     // Try to alter third argument, if present.
     if (isset($arg3)) {
-      if (is_array($arg3)) {
+      if (\is_array($arg3)) {
         $arg3['foo'] = 'Drupal';
       }
-      elseif (is_object($arg3)) {
+      elseif (\is_object($arg3)) {
         $arg3->foo = 'Drupal';
       }
     }

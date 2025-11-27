@@ -18,7 +18,7 @@ class TestSuiteBaseTest extends TestCase {
    */
   public function testLocalTimeZone(): void {
     // The 'Australia/Sydney' time zone is set in core/tests/bootstrap.php.
-    $this->assertEquals('Australia/Sydney', date_default_timezone_get());
+    $this->assertEquals('Australia/Sydney', \date_default_timezone_get());
   }
 
 }

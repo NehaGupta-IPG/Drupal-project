@@ -93,7 +93,7 @@ trait FilterEntityReferenceTrait {
     for ($i = 0; $i < 10; $i++) {
       $node = $this->drupalCreateNode([
         'type' => $this->targetBundle->id(),
-        'title' => ucfirst($this->targetBundle->id()) . ' ' . $i,
+        'title' => \ucfirst($this->targetBundle->id()) . ' ' . $i,
       ]);
       $this->targetEntities[$node->id()] = $node;
     }
@@ -101,7 +101,7 @@ trait FilterEntityReferenceTrait {
     // Create 1 host entity to reference target entities from.
     $node = $this->drupalCreateNode([
       'type' => $this->hostBundle->id(),
-      'title' => ucfirst($this->hostBundle->id()) . ' 0',
+      'title' => \ucfirst($this->hostBundle->id()) . ' 0',
     ]);
     $this->hostEntities = [
       $node->id() => $node,

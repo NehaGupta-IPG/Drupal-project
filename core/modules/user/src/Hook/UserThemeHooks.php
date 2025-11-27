@@ -98,7 +98,7 @@ class UserThemeHooks {
     // that $variables['name'] is safe for printing.
     $name = $account->getDisplayName();
     $variables['name_raw'] = $account->getAccountName();
-    if (mb_strlen($name) > 20) {
+    if (\mb_strlen($name) > 20) {
       $name = Unicode::truncate($name, 15, FALSE, TRUE);
       $variables['truncated'] = TRUE;
     }

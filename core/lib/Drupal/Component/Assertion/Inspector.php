@@ -191,10 +191,10 @@ class Inspector {
    *   TRUE if $traversable can be traversed and all members have all keys.
    */
   public static function assertAllHaveKey($traversable, string ...$keys) {
-    if (is_iterable($traversable)) {
+    if (\is_iterable($traversable)) {
       foreach ($traversable as $member) {
         foreach ($keys as $key) {
-          if (!array_key_exists($key, $member)) {
+          if (!\array_key_exists($key, $member)) {
             return FALSE;
           }
         }
@@ -375,9 +375,9 @@ class Inspector {
    *   at least one of the listed classes or interfaces.
    */
   public static function assertAllObjects($traversable, string ...$classes) {
-    if (is_iterable($traversable)) {
+    if (\is_iterable($traversable)) {
       foreach ($traversable as $member) {
-        if (count($classes) > 0) {
+        if (\count($classes) > 0) {
           foreach ($classes as $instance) {
             if ($member instanceof $instance) {
               // We're continuing to the next member on the outer loop.

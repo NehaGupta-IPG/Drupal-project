@@ -62,7 +62,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
 
     // Install every entity type's schema that wasn't installed in the parent
     // method.
-    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user', 'entity_test'])) as $entity_type_id => $entity_type) {
+    foreach (\array_diff_key($this->entityTypeManager->getDefinitions(), \array_flip(['user', 'entity_test'])) as $entity_type_id => $entity_type) {
       $this->installEntitySchema($entity_type_id);
     }
   }
@@ -210,7 +210,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
 
     // Purge field data, and check that the storage definition has been
     // completely removed once the data is purged.
-    field_purge_batch(10);
+    \field_purge_batch(10);
     $deleted_storage_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldStorageDefinitions();
     $this->assertEmpty($deleted_storage_definitions, 'The base field has been deleted.');
     $this->assertFalse($schema_handler->tableExists($dedicated_deleted_table_name), 'A dedicated field table was deleted after new_base_field was purged.');

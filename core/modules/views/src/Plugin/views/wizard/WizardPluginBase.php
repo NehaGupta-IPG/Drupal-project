@@ -153,7 +153,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
 
     $entity_types = \Drupal::entityTypeManager()->getDefinitions();
     foreach ($entity_types as $entity_type_id => $entity_type) {
-      if (in_array($this->base_table, [
+      if (\in_array($this->base_table, [
         $entity_type->getBaseTable(),
         $entity_type->getDataTable(),
         $entity_type->getRevisionTable(),
@@ -566,7 +566,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
       // when the form is rebuilt option A is no longer one of the choices. In
       // that case, we don't want to use the value that was submitted anymore
       // but rather fall back to the default value.
-      if ($key_exists && in_array($submitted, array_keys($element['#options']))) {
+      if ($key_exists && \in_array($submitted, \array_keys($element['#options']))) {
         return $submitted;
       }
     }

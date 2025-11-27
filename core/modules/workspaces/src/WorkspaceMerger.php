@@ -34,7 +34,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
 
     try {
       $transaction = $this->database->startTransaction();
-      $max_execution_time = ini_get('max_execution_time');
+      $max_execution_time = \ini_get('max_execution_time');
       $step_size = Settings::get('entity_update_batch_size', 50);
       $counter = 0;
 
@@ -44,7 +44,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
           ->loadMultipleRevisions(\array_keys($revision_difference));
 
         // Clear the tracked entities of the source workspace.
-        $this->workspaceTracker->deleteTrackedEntities($this->sourceWorkspace->id(), $entity_type_id, $revision_difference, array_keys($revision_difference));
+        $this->workspaceTracker->deleteTrackedEntities($this->sourceWorkspace->id(), $entity_type_id, $revision_difference, \array_keys($revision_difference));
 
         /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
         foreach ($revisions_on_source as $revision) {
@@ -63,7 +63,7 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
           // Extend the execution time in order to allow processing workspaces
           // that contain a large number of items.
           if ((int) ($counter / $step_size) >= 1) {
-            set_time_limit($max_execution_time);
+            \set_time_limit($max_execution_time);
             $counter = 0;
           }
         }

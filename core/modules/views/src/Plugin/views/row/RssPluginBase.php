@@ -85,7 +85,7 @@ abstract class RssPluginBase extends RowPluginBase {
       $options['view_mode'] = ['default' => 'rss'];
     }
     else {
-      $options['view_mode'] = ['default' => key($view_modes)];
+      $options['view_mode'] = ['default' => \key($view_modes)];
     }
 
     return $options;

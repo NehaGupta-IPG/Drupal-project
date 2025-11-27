@@ -94,7 +94,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function __construct(\PDO $connection, array $connection_options) {
     // @phpstan-ignore class.notFound
-    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Pgsql : TRUE);
+    \assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Pgsql : TRUE);
     // Sanitize the schema name here, so we do not have to do it in other
     // functions.
     if (isset($connection_options['schema']) && ($connection_options['schema'] !== 'public')) {

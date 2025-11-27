@@ -45,7 +45,7 @@ class UpdateRoot {
    *   The request stack.
    */
   public function __construct(DrupalKernelInterface $drupal_kernel, RequestStack $request_stack) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3522119', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3522119', E_USER_DEPRECATED);
     $this->drupalKernel = $drupal_kernel;
     $this->requestStack = $request_stack;
   }

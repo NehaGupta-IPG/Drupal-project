@@ -62,7 +62,7 @@ class CKEditor5ToolbarTest extends WebDriverTestBase {
       ],
       'settings' => [],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },

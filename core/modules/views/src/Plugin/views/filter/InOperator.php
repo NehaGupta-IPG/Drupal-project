@@ -497,7 +497,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     }
     elseif (!empty($this->value) && ($this->operator == 'in' || $this->operator == 'not in')) {
       $errors[] = $this->t('The value @value is not an array for @operator on filter: @filter', [
-        '@value' => var_export($this->value, TRUE),
+        '@value' => \var_export($this->value, TRUE),
         '@operator' => $this->operator,
         '@filter' => $this->adminLabel(TRUE),
       ]);

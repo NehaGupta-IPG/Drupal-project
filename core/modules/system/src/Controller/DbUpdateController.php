@@ -166,7 +166,7 @@ class DbUpdateController extends ControllerBase {
     }
 
     $regions = [];
-    $requirements = update_check_requirements();
+    $requirements = \update_check_requirements();
     $severity = RequirementSeverity::maxSeverityFromRequirements($requirements);
     if ($severity === RequirementSeverity::Error || ($severity === RequirementSeverity::Warning && !$request->getSession()->has('update_ignore_warnings'))) {
       $regions['sidebar_first'] = $this->updateTasksList('requirements');

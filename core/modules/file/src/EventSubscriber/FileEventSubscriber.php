@@ -89,8 +89,8 @@ class FileEventSubscriber implements EventSubscriberInterface {
     if ($fileSettings->get('filename_sanitization.deduplicate_separators')) {
       $filename = \preg_replace('/(_)_+|(\.)\.+|(-)-+/u', $replacement, $filename);
       // Replace multiple separators with single one.
-      $filename = preg_replace('/(_|\.|\-)[(_|\.|\-)]+/u', $replacement, $filename);
-      $filename = preg_replace('/' . preg_quote($replacement, NULL) . '[' . preg_quote($replacement, NULL) . ']*/u', $replacement, $filename);
+      $filename = \preg_replace('/(_|\.|\-)[(_|\.|\-)]+/u', $replacement, $filename);
+      $filename = \preg_replace('/' . \preg_quote($replacement, NULL) . '[' . \preg_quote($replacement, NULL) . ']*/u', $replacement, $filename);
       // Remove replacement character from the end of the filename.
       $filename = \rtrim($filename, $replacement);
 

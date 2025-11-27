@@ -54,7 +54,7 @@ class Tasks extends InstallTasks {
 
     // Make the text more accurate for SQLite.
     $form['database']['#title'] = $this->t('Database file');
-    $form['database']['#description'] = $this->t('The absolute path to the file where @drupal data will be stored. This must be writable by the web server and should exist outside of the web root.', ['@drupal' => drupal_install_profile_distribution_name()]);
+    $form['database']['#description'] = $this->t('The absolute path to the file where @drupal data will be stored. This must be writable by the web server and should exist outside of the web root.', ['@drupal' => \drupal_install_profile_distribution_name()]);
     $default_database = \Drupal::getContainer()->getParameter('site.path') . '/files/.ht.sqlite';
     $form['database']['#default_value'] = empty($database['database']) ? $default_database : $database['database'];
     return $form;

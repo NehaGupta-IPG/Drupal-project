@@ -137,7 +137,7 @@ class CommentHooks {
     if ($field_storage->getType() == 'comment') {
       // Check that the target entity type uses an integer ID.
       $entity_type_id = $field_storage->getTargetEntityTypeId();
-      if (!_comment_entity_uses_integer_id($entity_type_id)) {
+      if (!\_comment_entity_uses_integer_id($entity_type_id)) {
         throw new \UnexpectedValueException('You cannot attach a comment field to an entity with a non-integer ID field');
       }
     }
@@ -202,7 +202,7 @@ class CommentHooks {
    */
   #[Hook('field_info_entity_type_ui_definitions_alter')]
   public function fieldInfoEntityTypeUiDefinitionsAlter(array &$ui_definitions, string $entity_type_id): void {
-    if (!_comment_entity_uses_integer_id($entity_type_id)) {
+    if (!\_comment_entity_uses_integer_id($entity_type_id)) {
       unset($ui_definitions['comment']);
     }
   }
@@ -263,7 +263,7 @@ class CommentHooks {
     // mismatched types. So, we need to verify that the ID is numeric (even for
     // an entity type that has an integer ID, $entity->id() might be a string
     // containing a number), and then cast it to an integer when querying.
-    if ($entity instanceof FieldableEntityInterface && is_numeric($entity->id())) {
+    if ($entity instanceof FieldableEntityInterface && \is_numeric($entity->id())) {
       $entity_query = \Drupal::entityQuery('comment')->accessCheck(FALSE);
       $entity_query->condition('entity_id', (int) $entity->id());
       $entity_query->condition('entity_type', $entity->getEntityTypeId());
@@ -331,7 +331,7 @@ class CommentHooks {
   public function cron(): void {
     // Store the maximum possible comments per thread (used for node search
     // ranking by reply count).
-    \Drupal::state()->set('comment.node_comment_statistics_scale', 1.0 / max(1, \Drupal::service('comment.statistics')->getMaximumCount('node')));
+    \Drupal::state()->set('comment.node_comment_statistics_scale', 1.0 / \max(1, \Drupal::service('comment.statistics')->getMaximumCount('node')));
   }
 
   /**
@@ -388,7 +388,7 @@ class CommentHooks {
         /** @var \Drupal\comment\CommentInterface[] $comments */
         $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
         foreach ($comments as $comment) {
-          $langcodes = array_keys($comment->getTranslationLanguages());
+          $langcodes = \array_keys($comment->getTranslationLanguages());
           // For efficiency manually set the original comment before applying
           // any changes.
           $comment->setOriginal(clone $comment);

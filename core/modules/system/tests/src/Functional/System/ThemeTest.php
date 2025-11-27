@@ -112,12 +112,12 @@ class ThemeTest extends BrowserTestBase {
       // Relative path to an arbitrary file.
       'core/misc/druplicon.png' => [
         'form' => 'core/misc/druplicon.png',
-        'src' => base_path() . 'core/misc/druplicon.png',
+        'src' => \base_path() . 'core/misc/druplicon.png',
       ],
       // Relative path to a file in a theme.
       $default_theme_path . '/logo.svg' => [
         'form' => $default_theme_path . '/logo.svg',
-        'src' => base_path() . $default_theme_path . '/logo.svg',
+        'src' => \base_path() . $default_theme_path . '/logo.svg',
       ],
     ];
     foreach ($supported_paths as $input => $expected) {

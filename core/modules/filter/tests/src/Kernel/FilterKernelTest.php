@@ -518,7 +518,7 @@ class FilterKernelTest extends KernelTestBase {
       'children' => 'Test two',
     ];
     $render = (string) \Drupal::service(TwigThemeEngine::class)->renderTemplate('container', $variables);
-    $render = trim($render);
+    $render = \trim($render);
 
     // Render text before applying the auto paragraph filter.
     $this->assertSame("<!-- THEME DEBUG -->

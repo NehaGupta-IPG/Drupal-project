@@ -228,11 +228,11 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
 
     // Gather the list of deleted workspace IDs, since the passed-in array is
     // not required to be keyed by them.
-    $workspaces_ids = array_map(fn($entity) => $entity->id(), $entities);
+    $workspaces_ids = \array_map(fn($entity) => $entity->id(), $entities);
 
     // Disable the currently active workspace if it has been deleted.
     if ($workspace_manager->hasActiveWorkspace()
-      && in_array($workspace_manager->getActiveWorkspace()->id(), $workspaces_ids, TRUE)
+      && \in_array($workspace_manager->getActiveWorkspace()->id(), $workspaces_ids, TRUE)
     ) {
       $workspace_manager->switchToLive();
     }

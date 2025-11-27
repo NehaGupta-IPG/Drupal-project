@@ -42,9 +42,9 @@ class PhpExtensionsValidator implements EventSubscriberInterface {
       // such as a configured CI environment.
       $loaded_extensions = \Drupal::state()
         ->get('package_manager_loaded_php_extensions', ['openssl']);
-      return in_array($name, $loaded_extensions, TRUE);
+      return \in_array($name, $loaded_extensions, TRUE);
     }
-    return extension_loaded($name);
+    return \extension_loaded($name);
   }
 
   /**
@@ -84,11 +84,11 @@ class PhpExtensionsValidator implements EventSubscriberInterface {
    */
   private static function insideTest(): bool {
     // @see \Drupal\Core\CoreServiceProvider::registerTest()
-    $in_functional_test = drupal_valid_test_ua();
+    $in_functional_test = \drupal_valid_test_ua();
     // @see \Drupal\Core\DependencyInjection\DependencySerializationTrait::__wakeup()
     $in_kernel_test = isset($GLOBALS['__PHPUNIT_BOOTSTRAP']);
     // @see \Drupal\BuildTests\Framework\BuildTestBase::setUp()
-    $in_build_test = str_contains(__FILE__, DrupalFilesystem::getOsTemporaryDirectory() . '/build_workspace_');
+    $in_build_test = \str_contains(__FILE__, DrupalFilesystem::getOsTemporaryDirectory() . '/build_workspace_');
     return $in_functional_test || $in_kernel_test || $in_build_test;
   }
 

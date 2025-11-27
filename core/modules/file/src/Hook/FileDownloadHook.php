@@ -45,7 +45,7 @@ class FileDownloadHook {
       }
     }
     // Find out which (if any) fields of this type contain the file.
-    $references = file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_CURRENT, NULL);
+    $references = \file_get_file_references($file, NULL, EntityStorageInterface::FIELD_LOAD_CURRENT, NULL);
     // Stop processing if there are no references in order to avoid returning
     // headers for files controlled by other modules. Make an exception for
     // temporary files where the host entity has not yet been saved (for

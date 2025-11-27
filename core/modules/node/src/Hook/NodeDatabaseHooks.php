@@ -69,7 +69,7 @@ class NodeDatabaseHooks {
           }
           // If one of the node base tables are in the query, add it to the list
           // of possible base tables to join against.
-          if (in_array($table, $node_base_tables)) {
+          if (\in_array($table, $node_base_tables)) {
             $base_table = $table;
           }
         }

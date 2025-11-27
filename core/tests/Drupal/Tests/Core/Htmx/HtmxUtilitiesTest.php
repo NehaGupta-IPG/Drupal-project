@@ -74,7 +74,7 @@ class HtmxUtilitiesTest extends UnitTestCase {
    */
   public function testGetAttributes(): void {
     $attributes = $this->htmx->getAttributes();
-    $this->assertEquals(2, count($attributes->storage()));
+    $this->assertEquals(2, \count($attributes->storage()));
   }
 
   /**
@@ -104,8 +104,8 @@ class HtmxUtilitiesTest extends UnitTestCase {
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertTrue(isset($render['#attached']['library']));
     // We added 2 attributes and 2 headers.
-    $this->assertEquals(3, count($render['#attributes']));
-    $this->assertEquals(3, count($render['#attached']['http_header']));
+    $this->assertEquals(3, \count($render['#attributes']));
+    $this->assertEquals(3, \count($render['#attached']['http_header']));
     $this->assertEquals(['core/drupal.htmx'], $render['#attached']['library']);
   }
 
@@ -116,7 +116,7 @@ class HtmxUtilitiesTest extends UnitTestCase {
     $render = [];
     $this->htmx->applyTo($render, '#wrapper_attributes');
     $this->assertTrue(isset($render['#wrapper_attributes']));
-    $this->assertEquals(2, count($render['#wrapper_attributes']));
+    $this->assertEquals(2, \count($render['#wrapper_attributes']));
   }
 
   /**
@@ -145,8 +145,8 @@ class HtmxUtilitiesTest extends UnitTestCase {
     $this->assertFalse($htmx->hasHeader('pear'));
     $render = [];
     $htmx->applyTo($render);
-    $this->assertEquals(1, count($render['#attributes']));
-    $this->assertEquals(1, count($render['#attached']['http_header']));
+    $this->assertEquals(1, \count($render['#attributes']));
+    $this->assertEquals(1, \count($render['#attached']['http_header']));
     $this->assertEquals(['node:3', 'node:12'], $render['#cache']['tags']);
   }
 

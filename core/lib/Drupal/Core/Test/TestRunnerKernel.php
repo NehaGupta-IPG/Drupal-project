@@ -47,8 +47,8 @@ class TestRunnerKernel extends DrupalKernel {
 
     // Remove Drupal's error/exception handlers; they are designed for HTML
     // and there is no storage nor a (watchdog) logger here.
-    if (get_error_handler() === '_drupal_error_handler') {
-      restore_error_handler();
+    if (\get_error_handler() === '_drupal_error_handler') {
+      \restore_error_handler();
     }
     \restore_exception_handler();
 

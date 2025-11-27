@@ -68,7 +68,7 @@ final class InstalledPackagesList extends \ArrayObject {
    *   name.
    */
   public function getPackagesNotIn(self $other): static {
-    $packages = array_diff_key($this->getArrayCopy(), $other->getArrayCopy());
+    $packages = \array_diff_key($this->getArrayCopy(), $other->getArrayCopy());
     return new static($packages);
   }
 
@@ -87,9 +87,9 @@ final class InstalledPackagesList extends \ArrayObject {
    */
   public function getPackagesWithDifferentVersionsIn(self $other): static {
     // Only compare packages that are both here and there.
-    $packages = array_intersect_key($this->getArrayCopy(), $other->getArrayCopy());
+    $packages = \array_intersect_key($this->getArrayCopy(), $other->getArrayCopy());
 
-    $packages = array_filter($packages, fn (InstalledPackage $p) => Comparator::notEqualTo($p->version, $other[$p->name]->version));
+    $packages = \array_filter($packages, fn (InstalledPackage $p) => Comparator::notEqualTo($p->version, $other[$p->name]->version));
     return new static($packages);
   }
 
@@ -114,7 +114,7 @@ final class InstalledPackagesList extends \ArrayObject {
     foreach ($this as $package) {
       if ($package->getProjectName() === $project_name) {
         if ($matching_package) {
-          throw new \UnexpectedValueException(sprintf("Project '%s' was found in packages '%s' and '%s'.", $project_name, $matching_package->name, $package->name));
+          throw new \UnexpectedValueException(\sprintf("Project '%s' was found in packages '%s' and '%s'.", $project_name, $matching_package->name, $package->name));
         }
         $matching_package = $package;
       }
@@ -157,14 +157,14 @@ final class InstalledPackagesList extends \ArrayObject {
    *   A list of the installed core packages.
    */
   public function getCorePackages(bool $include_dev = TRUE): static {
-    $core_packages = array_intersect_key(
+    $core_packages = \array_intersect_key(
       $this->getArrayCopy(),
-      array_flip(static::getCorePackageList())
+      \array_flip(static::getCorePackageList())
     );
 
     // If drupal/core-recommended is present, it supersedes drupal/core, since
     // drupal/core will always be one of its direct dependencies.
-    if (array_key_exists('drupal/core-recommended', $core_packages)) {
+    if (\array_key_exists('drupal/core-recommended', $core_packages)) {
       unset($core_packages['drupal/core']);
     }
     if (!$include_dev) {

@@ -27,9 +27,9 @@ class ValidSequenceKeysConstraintValidator extends ConstraintValidator implement
    * {@inheritdoc}
    */
   public function validate(mixed $value, Constraint $constraint): void {
-    assert($constraint instanceof ValidSequenceKeysConstraint);
+    \assert($constraint instanceof ValidSequenceKeysConstraint);
 
-    if (!is_array($value)) {
+    if (!\is_array($value)) {
       throw new UnexpectedTypeException($value, 'array');
     }
 
@@ -37,10 +37,10 @@ class ValidSequenceKeysConstraintValidator extends ConstraintValidator implement
       return;
     }
 
-    $previousViolationCount = count($this->context->getViolations());
+    $previousViolationCount = \count($this->context->getViolations());
     $constraintValidatorFactory = new ConstraintValidatorFactory($this->classResolver);
 
-    foreach (array_keys($value) as $sequence_key) {
+    foreach (\array_keys($value) as $sequence_key) {
       foreach ($constraint->constraints as $item) {
         $validator = $constraintValidatorFactory->getInstance($item);
         $validator->initialize($this->context);
@@ -48,7 +48,7 @@ class ValidSequenceKeysConstraintValidator extends ConstraintValidator implement
       }
     }
 
-    if (count($this->context->getViolations()) > $previousViolationCount) {
+    if (\count($this->context->getViolations()) > $previousViolationCount) {
       $this->context->buildViolation($constraint->message)->addViolation();
     }
   }

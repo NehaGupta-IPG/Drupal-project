@@ -74,7 +74,7 @@ abstract class FileTransfer {
    *   able to touch other parts of the filesystem.
    */
   public function __construct($jail) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
     $this->jail = $jail;
   }
@@ -339,7 +339,7 @@ abstract class FileTransfer {
    */
   protected function copyDirectoryJailed($source, $destination) {
     if ($this->isDirectory($destination)) {
-      $destination = $destination . '/' . basename($source);
+      $destination = $destination . '/' . \basename($source);
     }
     $this->createDirectory($destination);
     foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST) as $filename => $file) {
@@ -429,9 +429,9 @@ abstract class FileTransfer {
     $path = $this->fixRemotePath($path, FALSE);
     $parts = \explode('/', $path);
     $chroot = '';
-    while (count($parts)) {
-      $check = implode('/', $parts);
-      if ($this->isFile($check . '/' . basename(__FILE__))) {
+    while (\count($parts)) {
+      $check = \implode('/', $parts);
+      if ($this->isFile($check . '/' . \basename(__FILE__))) {
         // Remove the trailing slash.
         return \substr($chroot, 0, -1);
       }

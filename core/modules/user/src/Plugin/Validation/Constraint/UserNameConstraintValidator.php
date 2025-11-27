@@ -30,8 +30,8 @@ class UserNameConstraintValidator extends ConstraintValidator {
     if (\str_contains($name, '  ')) {
       $this->context->addViolation($constraint->multipleSpacesMessage);
     }
-    if (preg_match('/[^\x{80}-\x{F7} a-z0-9@+_.\'-]/i', $name)
-      || preg_match(
+    if (\preg_match('/[^\x{80}-\x{F7} a-z0-9@+_.\'-]/i', $name)
+      || \preg_match(
         // Non-printable ISO-8859-1 + NBSP.
         '/[\x{80}-\x{A0}' .
         // Soft-hyphen.
@@ -54,7 +54,7 @@ class UserNameConstraintValidator extends ConstraintValidator {
     ) {
       $this->context->addViolation($constraint->illegalMessage);
     }
-    if (mb_strlen($name) > UserInterface::USERNAME_MAX_LENGTH) {
+    if (\mb_strlen($name) > UserInterface::USERNAME_MAX_LENGTH) {
       $this->context->addViolation($constraint->tooLongMessage,
         ['%name' => $name, '%max' => UserInterface::USERNAME_MAX_LENGTH]);
     }

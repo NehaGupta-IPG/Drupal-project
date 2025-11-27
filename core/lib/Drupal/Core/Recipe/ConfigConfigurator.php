@@ -34,7 +34,7 @@ final class ConfigConfigurator {
    *   The active configuration storage.
    */
   public function __construct(public readonly array $config, string $recipe_directory, StorageInterface $active_configuration) {
-    $this->recipeConfigDirectory = is_dir($recipe_directory . '/config') ? $recipe_directory . '/config' : NULL;
+    $this->recipeConfigDirectory = \is_dir($recipe_directory . '/config') ? $recipe_directory . '/config' : NULL;
     // @todo Consider defaulting this to FALSE in https://drupal.org/i/3478669.
     $this->strict = $config['strict'] ?? TRUE;
 
@@ -111,7 +111,7 @@ final class ConfigConfigurator {
         // provided by the current extension. In the latter case, we only want
         // to import the config that is in the list, so use an
         // AllowListConfigStorage to filter out the extension's other config.
-        if ($names && is_array($names)) {
+        if ($names && \is_array($names)) {
           $storage = new AllowListConfigStorage($storage, $names);
         }
         $storages[] = $storage;
@@ -125,7 +125,7 @@ final class ConfigConfigurator {
     // If we're not in strict mode, we only want to import config that doesn't
     // exist yet in active storage.
 
-    $names = array_diff(
+    $names = \array_diff(
       $storage->listAll(),
       \Drupal::service('config.storage')->listAll(),
     );

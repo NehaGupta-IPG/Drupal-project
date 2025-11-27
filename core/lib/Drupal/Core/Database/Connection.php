@@ -431,9 +431,9 @@ abstract class Connection {
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
-    assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    \assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
+    if (isset($options['fetch']) && \is_int($options['fetch'])) {
+      @\trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
     }
 
     try {
@@ -650,11 +650,11 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Connection::defaultOptions()
    */
   public function query($query, array $args = [], $options = []) {
-    assert(is_string($query), 'The \'$query\' argument to ' . __METHOD__ . '() must be a string');
-    assert(!isset($options['return']), 'Passing "return" option to query() has no effect. See https://www.drupal.org/node/3185520');
-    assert(!isset($options['target']), 'Passing "target" option to query() has no effect. See https://www.drupal.org/node/2993033');
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in query() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    \assert(\is_string($query), 'The \'$query\' argument to ' . __METHOD__ . '() must be a string');
+    \assert(!isset($options['return']), 'Passing "return" option to query() has no effect. See https://www.drupal.org/node/3185520');
+    \assert(!isset($options['target']), 'Passing "target" option to query() has no effect. See https://www.drupal.org/node/2993033');
+    if (isset($options['fetch']) && \is_int($options['fetch'])) {
+      @\trigger_error("Passing the 'fetch' key as an integer to \$options in query() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
     }
 
     // Use default values if not already set.
@@ -1333,10 +1333,10 @@ abstract class Connection {
    */
   public static function createConnectionOptionsFromUrl($url, $root) {
     if ($root !== NULL) {
-      @trigger_error("Passing the \$root value to " . __METHOD__ . "() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
+      @\trigger_error("Passing the \$root value to " . __METHOD__ . "() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
     }
 
-    $url_components = parse_url($url);
+    $url_components = \parse_url($url);
     if (!isset($url_components['scheme'], $url_components['host'], $url_components['path'])) {
       throw new \InvalidArgumentException("The database connection URL '$url' is invalid. The minimum requirement is: 'driver://host/database'");
     }

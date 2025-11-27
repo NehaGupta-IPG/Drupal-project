@@ -127,10 +127,10 @@ class NodeDisplayConfigurableTest extends NodeTestBase {
       // When field classes aren't available, use HTML elements for testing.
       $formatted_time = \Drupal::service('date.formatter')->format($node->getCreatedTime());
       if ($is_inline) {
-        $created_selector = sprintf('//article//%s//%s/time[text()="%s"]', $metadata_region, $html_element, $formatted_time);
+        $created_selector = \sprintf('//article//%s//%s/time[text()="%s"]', $metadata_region, $html_element, $formatted_time);
       }
       else {
-        $created_selector = sprintf('//article//%s//%s/time[text()="%s"]', $html_element, $html_element, $formatted_time);
+        $created_selector = \sprintf('//article//%s//%s/time[text()="%s"]', $html_element, $html_element, $formatted_time);
       }
       $assert->elementExists('xpath', $created_selector);
     }
@@ -138,7 +138,7 @@ class NodeDisplayConfigurableTest extends NodeTestBase {
     $uid_selector = 'article ' . $html_element . ($field_classes ? '.field--name-uid' : '');
     if (!$is_inline) {
       $field_classes_selector = $field_classes ? "[contains(concat(' ', normalize-space(@class), ' '), ' field--name-uid ')]" : '';
-      $assert->elementExists('xpath', sprintf('//article//%s//*%s//%s[text()="Authored by"]', $html_element, $field_classes_selector, $html_element));
+      $assert->elementExists('xpath', \sprintf('//article//%s//*%s//%s[text()="Authored by"]', $html_element, $field_classes_selector, $html_element));
       $assert->elementTextContains('css', $uid_selector, $user->getAccountName());
       $assert->elementNotExists('css', "$uid_selector a");
       if ($field_classes) {

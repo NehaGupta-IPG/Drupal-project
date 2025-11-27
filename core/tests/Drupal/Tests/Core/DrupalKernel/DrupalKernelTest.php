@@ -170,14 +170,14 @@ class FakeAutoloader {
    *   Whether to prepend the autoloader or not.
    */
   public function register($prepend = FALSE): void {
-    spl_autoload_register([$this, 'loadClass'], TRUE, $prepend);
+    \spl_autoload_register([$this, 'loadClass'], TRUE, $prepend);
   }
 
   /**
    * Deregisters this instance as an autoloader.
    */
   public function unregister(): void {
-    spl_autoload_unregister([$this, 'loadClass']);
+    \spl_autoload_unregister([$this, 'loadClass']);
   }
 
   /**

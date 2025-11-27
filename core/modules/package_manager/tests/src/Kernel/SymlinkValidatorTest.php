@@ -37,16 +37,16 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
       ->getProjectRoot();
 
     $drush_dir = $project_root . '/vendor/drush/drush';
-    mkdir($drush_dir . '/docs', 0777, TRUE);
-    touch($drush_dir . '/drush_logo-black.png');
+    \mkdir($drush_dir . '/docs', 0777, TRUE);
+    \touch($drush_dir . '/drush_logo-black.png');
     // Relative symlinks must be made from their actual directory to be
     // correctly evaluated.
-    chdir($drush_dir . '/docs');
-    symlink('../drush_logo-black.png', 'drush_logo-black.png');
+    \chdir($drush_dir . '/docs');
+    \symlink('../drush_logo-black.png', 'drush_logo-black.png');
 
     // Switch back to the Drupal root to ensure that the check isn't affected
     // by which directory we happen to be in.
-    chdir($this->getDrupalRoot());
+    \chdir($this->getDrupalRoot());
     $this->assertStatusCheckResults([]);
   }
 
@@ -57,7 +57,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
 
-    link($project_root . '/composer.json', $project_root . '/composer.link');
+    \link($project_root . '/composer.json', $project_root . '/composer.link');
     $result = ValidationResult::createError([
       $this->t('The %which directory at %dir contains hard links, which is not supported. The first one is %file.', [
         '%which' => 'active',
@@ -75,7 +75,7 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
 
-    symlink($project_root . '/composer.json', $project_root . '/composer.link');
+    \symlink($project_root . '/composer.json', $project_root . '/composer.link');
     $result = ValidationResult::createError([
       $this->t('The %which directory at %dir contains absolute links, which is not supported. The first one is %file.', [
         '%which' => 'active',
@@ -93,12 +93,12 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
 
-    $parent_dir = dirname($project_root);
-    touch($parent_dir . '/hello.txt');
+    $parent_dir = \dirname($project_root);
+    \touch($parent_dir . '/hello.txt');
     // Relative symlinks must be made from their actual directory to be
     // correctly evaluated.
-    chdir($project_root);
-    symlink('../hello.txt', 'fail.txt');
+    \chdir($project_root);
+    \symlink('../hello.txt', 'fail.txt');
     $result = ValidationResult::createError([
       $this->t('The %which directory at %dir contains links that point outside the codebase, which is not supported. The first one is %file.', [
         '%which' => 'active',
@@ -121,12 +121,12 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     $stage->require(['ext-json:*']);
 
     $stage_dir = $stage->getSandboxDirectory();
-    $parent_dir = dirname($stage_dir);
-    touch($parent_dir . '/hello.txt');
+    $parent_dir = \dirname($stage_dir);
+    \touch($parent_dir . '/hello.txt');
     // Relative symlinks must be made from their actual directory to be
     // correctly evaluated.
-    chdir($stage_dir);
-    symlink('../hello.txt', 'fail.txt');
+    \chdir($stage_dir);
+    \symlink('../hello.txt', 'fail.txt');
 
     $result = ValidationResult::createError([
       $this->t('The %which directory at %dir contains links that point outside the codebase, which is not supported. The first one is %file.', [
@@ -151,15 +151,15 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
 
-    mkdir($project_root . '/modules/custom');
+    \mkdir($project_root . '/modules/custom');
     // Relative symlinks must be made from their actual directory to be
     // correctly evaluated.
-    chdir($project_root . '/modules/custom');
-    symlink('../example', 'example_module');
+    \chdir($project_root . '/modules/custom');
+    \symlink('../example', 'example_module');
 
     // Switch back to the Drupal root to ensure that the check isn't affected
     // by which directory we happen to be in.
-    chdir($this->getDrupalRoot());
+    \chdir($this->getDrupalRoot());
     $this->assertStatusCheckResults([]);
   }
 
@@ -176,8 +176,8 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
       ->getProjectRoot();
     // Relative symlinks must be made from their actual directory to be
     // correctly evaluated.
-    chdir($project_root);
-    symlink('composer.json', 'composer.link');
+    \chdir($project_root);
+    \symlink('composer.json', 'composer.link');
 
     $result = ValidationResult::createError([
       $this->t('The %which directory at %dir contains links, which is not supported on Windows. The first one is %file.', [
@@ -203,9 +203,9 @@ class SymlinkValidatorTest extends PackageManagerKernelTestBase {
     // Create absolute symlinks (which are not supported by Composer Stager) in
     // both `node_modules`, which is a regular directory, and `.git`, which is a
     // hidden directory.
-    mkdir($project_root . '/node_modules');
-    symlink($project_root . '/composer.json', $project_root . '/node_modules/composer.link');
-    symlink($project_root . '/composer.json', $project_root . '/.git/composer.link');
+    \mkdir($project_root . '/node_modules');
+    \symlink($project_root . '/composer.json', $project_root . '/node_modules/composer.link');
+    \symlink($project_root . '/composer.json', $project_root . '/.git/composer.link');
 
     $this->assertStatusCheckResults([]);
   }

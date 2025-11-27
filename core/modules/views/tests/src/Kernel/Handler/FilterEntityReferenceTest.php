@@ -101,7 +101,7 @@ class FilterEntityReferenceTest extends ViewsKernelTestBase {
     $this->user2 = $this->createUser();
 
     // Create target nodes to be referenced.
-    foreach (range(0, 5) as $count) {
+    foreach (\range(0, 5) as $count) {
       $this->targetNodes[$count] = $this->createNode([
         'type' => 'article',
         'title' => 'Article ' . $count,
@@ -115,7 +115,7 @@ class FilterEntityReferenceTest extends ViewsKernelTestBase {
       'type' => 'page',
       'title' => 'Page 0',
       'status' => 1,
-      'created' => time(),
+      'created' => \time(),
       'field_test' => [
         $this->targetNodes[0]->id(),
         $this->targetNodes[1]->id(),
@@ -128,7 +128,7 @@ class FilterEntityReferenceTest extends ViewsKernelTestBase {
       'type' => 'page',
       'title' => 'Page 1',
       'status' => 1,
-      'created' => time() - 100,
+      'created' => \time() - 100,
       'field_test' => [
         $this->targetNodes[1]->id(),
         $this->targetNodes[2]->id(),
@@ -142,7 +142,7 @@ class FilterEntityReferenceTest extends ViewsKernelTestBase {
       'type' => 'page',
       'title' => 'Page 2',
       'status' => 1,
-      'created' => time() - 200,
+      'created' => \time() - 200,
       'uid' => $this->user2,
     ]);
   }
@@ -238,7 +238,7 @@ class FilterEntityReferenceTest extends ViewsKernelTestBase {
       $this->targetNodes[0]->getConfigDependencyName(),
       $this->targetNodes[3]->getConfigDependencyName(),
     ];
-    sort($content_dependencies);
+    \sort($content_dependencies);
 
     $this->assertEquals([
       'config' => [

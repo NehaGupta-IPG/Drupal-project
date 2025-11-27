@@ -47,15 +47,15 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
   public function setUp(): void {
     parent::setUp();
     $xmlOutputFile = $this->container->getParameter('app.root') . DIRECTORY_SEPARATOR . 'test-list.xml';
-    touch($xmlOutputFile);
-    $this->xmlOutputFile = realpath($xmlOutputFile);
+    \touch($xmlOutputFile);
+    $this->xmlOutputFile = \realpath($xmlOutputFile);
   }
 
   /**
    * {@inheritdoc}
    */
   public function tearDown(): void {
-    @unlink($this->xmlOutputFile);
+    @\unlink($this->xmlOutputFile);
     parent::tearDown();
   }
 
@@ -70,12 +70,12 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
     );
     $internalList = [];
     foreach ($testDiscovery->getTestClasses() as $group) {
-      foreach (array_keys($group) as $class) {
+      foreach (\array_keys($group) as $class) {
         $internalList[] = $class;
       }
     }
-    $internalList = array_unique($internalList);
-    asort($internalList);
+    $internalList = \array_unique($internalList);
+    \asort($internalList);
 
     // Location of PHPUnit configuration file.
     $configurationFilePath = $this->root . \DIRECTORY_SEPARATOR . 'core';
@@ -99,15 +99,15 @@ class PhpUnitTestDiscoveryTest extends KernelTestBase {
     );
 
     $phpUnitXmlList = new \DOMDocument();
-    $phpUnitXmlList->loadXML(file_get_contents($this->xmlOutputFile));
+    $phpUnitXmlList->loadXML(\file_get_contents($this->xmlOutputFile));
     $phpUnitClientList = [];
     foreach ($phpUnitXmlList->getElementsByTagName('testClass') as $node) {
       $phpUnitClientList[] = $node->getAttribute('name');
     }
-    asort($phpUnitClientList);
+    \asort($phpUnitClientList);
 
     // Check against Drupal's discovery.
-    $this->assertEquals(implode("\n", $phpUnitClientList), implode("\n", $internalList), self::TEST_LIST_MISMATCH_MESSAGE);
+    $this->assertEquals(\implode("\n", $phpUnitClientList), \implode("\n", $internalList), self::TEST_LIST_MISMATCH_MESSAGE);
   }
 
 }

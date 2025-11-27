@@ -29,20 +29,20 @@ class ClaroFormHooks {
 
     // Make entity forms delete link use the action-link component.
     if (isset($form['actions']['delete']['#type']) && $form['actions']['delete']['#type'] === 'link' && !empty($build_info['callback_object']) && $build_info['callback_object'] instanceof EntityForm) {
-      $form['actions']['delete'] = _claro_convert_link_to_action_link($form['actions']['delete'], 'trash', 'default', 'danger');
+      $form['actions']['delete'] = \_claro_convert_link_to_action_link($form['actions']['delete'], 'trash', 'default', 'danger');
     }
 
     if (isset($form['actions']['delete_translation']['#type']) && $form['actions']['delete_translation']['#type'] === 'link' && !empty($build_info['callback_object']) && $build_info['callback_object'] instanceof EntityForm) {
-      $form['actions']['delete_translation'] = _claro_convert_link_to_action_link($form['actions']['delete_translation'], 'trash', 'default', 'danger');
+      $form['actions']['delete_translation'] = \_claro_convert_link_to_action_link($form['actions']['delete_translation'], 'trash', 'default', 'danger');
     }
 
     if (($form_object instanceof ViewsForm || $form_object instanceof ViewsFormInterface) && isset($form['override']['#prefix'])) {
       // Replace form--inline class so positioning of override form elements
       // don't have to depend on floats.
-      $form['override']['#prefix'] = str_replace('form--inline', 'form--flex', $form['override']['#prefix']);
+      $form['override']['#prefix'] = \str_replace('form--inline', 'form--flex', $form['override']['#prefix']);
     }
 
-    if ($form_object instanceof ViewsForm && str_starts_with($form_object->getBaseFormId(), 'views_form_media_library')) {
+    if ($form_object instanceof ViewsForm && \str_starts_with($form_object->getBaseFormId(), 'views_form_media_library')) {
       if (isset($form['header'])) {
         $form['header']['#attributes']['class'][] = 'media-library-views-form__header';
         $form['header']['media_bulk_form']['#attributes']['class'][] = 'media-library-views-form__bulk_form';
@@ -59,7 +59,7 @@ class ClaroFormHooks {
       // does, move it to the bottom and remove the second bulk operations
       // submit.
       foreach (Element::children($form['header']) as $key) {
-        if (str_contains($key, '_bulk_form')) {
+        if (\str_contains($key, '_bulk_form')) {
           // Move the bulk actions form from the header to its own container.
           $form['bulk_actions_container'] = $form['header'][$key];
           unset($form['header'][$key]);
@@ -119,7 +119,7 @@ class ClaroFormHooks {
                 $form['bulk_actions_container'][$bulk_action_item_key]['#attributes']['class'][] = 'views-bulk-actions__item';
               }
 
-              if (!in_array($form['bulk_actions_container'][$bulk_action_item_key]['#type'], ['hidden', 'actions'])) {
+              if (!\in_array($form['bulk_actions_container'][$bulk_action_item_key]['#type'], ['hidden', 'actions'])) {
                 $form['bulk_actions_container'][$bulk_action_item_key]['#wrapper_attributes']['class'][] = 'views-bulk-actions__item';
                 $bulk_last_key = $bulk_action_item_key;
               }

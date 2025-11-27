@@ -42,7 +42,7 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
     $this->renderer = $renderer;
     $this->htmlResponseAttachmentsProcessor = $html_response_attachments_processor;
     if ($themeSettingsProvider === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $themeSettingsProvider argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3035289', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __CLASS__ . ' constructor without the $themeSettingsProvider argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3035289', E_USER_DEPRECATED);
       $this->themeSettingsProvider = \Drupal::service(ThemeSettingsProvider::class);
     }
   }
@@ -124,7 +124,7 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
     }
 
     // Get the major Drupal version.
-    [$version] = explode('.', \Drupal::VERSION);
+    [$version] = \explode('.', \Drupal::VERSION);
 
     // Attach default meta tags.
     $meta_default = [

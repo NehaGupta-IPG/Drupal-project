@@ -19,11 +19,11 @@ class HoldTestHelper {
    */
   public static function requestHold(bool $status): void {
     $site_path = \Drupal::getContainer()->getParameter('site.path');
-    file_put_contents($site_path . '/hold_test_request.txt', $status);
+    \file_put_contents($site_path . '/hold_test_request.txt', $status);
     // If we're releasing the hold wait for a bit to allow the subscriber to
     // read the file.
     if (!$status) {
-      usleep(HoldTestSubscriber::WAIT * 2);
+      \usleep(HoldTestSubscriber::WAIT * 2);
     }
   }
 
@@ -35,11 +35,11 @@ class HoldTestHelper {
    */
   public static function responseHold(bool $status): void {
     $site_path = \Drupal::getContainer()->getParameter('site.path');
-    file_put_contents($site_path . '/hold_test_response.txt', $status);
+    \file_put_contents($site_path . '/hold_test_response.txt', $status);
     // If we're releasing the hold wait for a bit to allow the subscriber to
     // read the file.
     if (!$status) {
-      usleep(HoldTestSubscriber::WAIT * 2);
+      \usleep(HoldTestSubscriber::WAIT * 2);
     }
   }
 

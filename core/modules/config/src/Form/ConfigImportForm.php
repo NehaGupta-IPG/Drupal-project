@@ -121,7 +121,7 @@ class ConfigImportForm extends FormBase {
         $archiver = new ArchiveTar($path, 'gz');
         $files = [];
         foreach ($archiver->listContent() as $file) {
-          if (str_ends_with($file['filename'], '.yml')) {
+          if (\str_ends_with($file['filename'], '.yml')) {
             $files[] = $file['filename'];
           }
         }

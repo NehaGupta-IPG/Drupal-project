@@ -109,7 +109,7 @@ class StatementPrefetchIterator extends StatementBase {
    */
   public function getClientStatement(): \PDOStatement {
     if (isset($this->clientStatement)) {
-      assert($this->clientStatement instanceof \PDOStatement);
+      \assert($this->clientStatement instanceof \PDOStatement);
       return $this->clientStatement;
     }
     throw new \LogicException('\\PDOStatement not initialized');
@@ -119,8 +119,8 @@ class StatementPrefetchIterator extends StatementBase {
    * {@inheritdoc}
    */
   public function execute($args = [], $options = []) {
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in execute() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    if (isset($options['fetch']) && \is_int($options['fetch'])) {
+      @\trigger_error("Passing the 'fetch' key as an integer to \$options in execute() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
     }
 
     $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
@@ -190,7 +190,7 @@ class StatementPrefetchIterator extends StatementBase {
    * @see https://www.drupal.org/node/3490312
    */
   public function fetchColumn($index = 0) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ::fetchField() instead. See https://www.drupal.org/node/3490312', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ::fetchField() instead. See https://www.drupal.org/node/3490312', E_USER_DEPRECATED);
     return $this->fetchField($index);
   }
 

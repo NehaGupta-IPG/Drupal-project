@@ -86,7 +86,7 @@ class NavigationLogoTest extends BrowserTestBase {
     $this->assertSession()->elementNotExists('css', 'a.admin-toolbar__logo');
 
     // Option 3: Set the logo provider to custom and upload a logo.
-    $file = reset($test_files);
+    $file = \reset($test_files);
     $logo_file = File::create((array) $file + ['status' => 1]);
     $logo_file->save();
     $this->assertNotEmpty($logo_file, 'File entity is not empty.');
@@ -113,7 +113,7 @@ class NavigationLogoTest extends BrowserTestBase {
     $this->assertSession()->elementAttributeContains('css', 'a.admin-toolbar__logo > img', 'src', 'drupal-logo.svg');
 
     // Option 5: Upload custom logo.
-    $file = end($test_files);
+    $file = \end($test_files);
     $edit = [
       'logo_provider' => 'custom',
       'files[logo_upload]' => $this->fileSystem->realpath($file->uri),

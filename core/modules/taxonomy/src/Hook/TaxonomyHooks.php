@@ -135,7 +135,7 @@ class TaxonomyHooks {
   #[Hook('node_insert')]
   public function nodeInsert(EntityInterface $node): void {
     // Add taxonomy index entries for the node.
-    taxonomy_build_node_index($node);
+    \taxonomy_build_node_index($node);
   }
 
   /**
@@ -148,8 +148,8 @@ class TaxonomyHooks {
     if (!$node->isDefaultRevision()) {
       return;
     }
-    taxonomy_delete_node_index($node);
-    taxonomy_build_node_index($node);
+    \taxonomy_delete_node_index($node);
+    \taxonomy_build_node_index($node);
   }
 
   /**
@@ -158,7 +158,7 @@ class TaxonomyHooks {
   #[Hook('node_predelete')]
   public function nodePredelete(EntityInterface $node): void {
     // Clean up the {taxonomy_index} table when nodes are deleted.
-    taxonomy_delete_node_index($node);
+    \taxonomy_delete_node_index($node);
   }
 
   /**

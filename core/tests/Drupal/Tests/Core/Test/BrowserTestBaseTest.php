@@ -88,7 +88,7 @@ class BrowserTestBaseTest extends UnitTestCase {
    */
   public function testTearDownWithoutSetUp(): void {
     $method = 'cleanupEnvironment';
-    $this->assertTrue(method_exists(BrowserTestBase::class, $method));
+    $this->assertTrue(\method_exists(BrowserTestBase::class, $method));
     $btb = $this->getMockBuilder(BrowserTestBaseMockableClassTest::class)
       ->disableOriginalConstructor()
       ->onlyMethods([$method])

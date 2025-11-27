@@ -172,7 +172,7 @@ YAML
 
     // Confirm new .theme file.
     $dot_theme_file = $this->getWorkspaceDirectory() . '/themes/generated_from_another_theme/generated_from_another_theme.theme';
-    $this->assertStringContainsString('function generated_from_another_theme_preprocess_image_widget(array &$variables): void {', file_get_contents($dot_theme_file));
+    $this->assertStringContainsString('function generated_from_another_theme_preprocess_image_widget(array &$variables): void {', \file_get_contents($dot_theme_file));
   }
 
   /**
@@ -582,7 +582,7 @@ EDITED, \file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender
   }
 
   public function testIncludeDotFiles(): void {
-    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/.gitignore', '*.map');
+    \file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/.gitignore', '*.map');
     $tester = $this->runCommand(
       [
         'machine-name' => 'test_custom_theme',

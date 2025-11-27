@@ -56,15 +56,15 @@ class ChainedPlaceholderStrategy implements PlaceholderStrategyInterface {
       }
 
       $processed_placeholders = $strategy->processPlaceholders($candidate_placeholders);
-      assert(array_intersect_key($processed_placeholders, $placeholders) === $processed_placeholders, 'Processed placeholders must be a subset of all placeholders.');
-      $placeholders = array_diff_key($placeholders, $processed_placeholders);
+      \assert(\array_intersect_key($processed_placeholders, $placeholders) === $processed_placeholders, 'Processed placeholders must be a subset of all placeholders.');
+      $placeholders = \array_diff_key($placeholders, $processed_placeholders);
       $new_placeholders += $processed_placeholders;
 
       if (empty($placeholders)) {
         break;
       }
     }
-    assert(empty($placeholders), 'It was not possible to replace all placeholders in ChainedPlaceholderStrategy::processPlaceholders()');
+    \assert(empty($placeholders), 'It was not possible to replace all placeholders in ChainedPlaceholderStrategy::processPlaceholders()');
 
     return $new_placeholders;
   }

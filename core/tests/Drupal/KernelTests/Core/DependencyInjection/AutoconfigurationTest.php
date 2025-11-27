@@ -25,8 +25,8 @@ class AutoconfigurationTest extends KernelTestBase {
   public function testCoreServiceTags(): void {
     $filenames = \array_map(fn($module) => "core/modules/{$module[0]}/{$module[0]}.services.yml", $this->coreModuleListDataProvider());
     $filenames[] = 'core/core.services.yml';
-    foreach (array_filter($filenames, 'file_exists') as $filename) {
-      $services = Yaml::decode(file_get_contents($filename))['services'] ?? [];
+    foreach (\array_filter($filenames, 'file_exists') as $filename) {
+      $services = Yaml::decode(\file_get_contents($filename))['services'] ?? [];
       if (!empty($services['_defaults']['autoconfigure'])) {
         foreach ($services as $id => $service) {
           if (\is_array($service) && isset($service['tags'])) {

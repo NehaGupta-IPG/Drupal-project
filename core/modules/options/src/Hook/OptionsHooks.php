@@ -57,7 +57,7 @@ class OptionsHooks {
    */
   #[Hook('field_storage_config_update')]
   public function fieldStorageConfigUpdate(FieldStorageConfigInterface $field_storage): void {
-    drupal_static_reset('options_allowed_values');
+    \drupal_static_reset('options_allowed_values');
   }
 
   /**
@@ -65,7 +65,7 @@ class OptionsHooks {
    */
   #[Hook('field_storage_config_delete')]
   public function fieldStorageConfigDelete(FieldStorageConfigInterface $field_storage): void {
-    drupal_static_reset('options_allowed_values');
+    \drupal_static_reset('options_allowed_values');
   }
 
   /**
@@ -77,8 +77,8 @@ class OptionsHooks {
       // Forbid any update that removes allowed values with actual data.
       $allowed_values = $field_storage->getSetting('allowed_values');
       $prior_allowed_values = $prior_field_storage->getSetting('allowed_values');
-      $lost_keys = array_keys(array_diff_key($prior_allowed_values, $allowed_values));
-      if (_options_values_in_use($field_storage->getTargetEntityTypeId(), $field_storage->getName(), $lost_keys)) {
+      $lost_keys = \array_keys(\array_diff_key($prior_allowed_values, $allowed_values));
+      if (\_options_values_in_use($field_storage->getTargetEntityTypeId(), $field_storage->getName(), $lost_keys)) {
         throw new FieldStorageDefinitionUpdateForbiddenException("A list field '{$field_storage->getName()}' with existing data cannot have its keys changed.");
       }
     }

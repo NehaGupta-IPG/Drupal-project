@@ -143,27 +143,27 @@ trait PerformanceTestTrait {
           static::logQuery($performance_data, $normalized_query, $event->args);
         }
         // Keep track of cache tag lookup queries.
-        elseif (str_starts_with($normalized_query, 'SELECT "tag", "invalidations" FROM "cachetags"')) {
-          $cache_tag_lookup_query_args[] = array_values($event->args);
+        elseif (\str_starts_with($normalized_query, 'SELECT "tag", "invalidations" FROM "cachetags"')) {
+          $cache_tag_lookup_query_args[] = \array_values($event->args);
         }
       }
       $cache_operations = [];
       foreach ($performance_test_data['cache_operations'] as $operation) {
-        if (in_array($operation['operation'], ['get', 'getMultiple'], TRUE)) {
+        if (\in_array($operation['operation'], ['get', 'getMultiple'], TRUE)) {
           if (!isset($cache_operations['get'][$operation['bin']])) {
             $cache_operations['get'][$operation['bin']] = [];
           }
           $cache_operations['get'][$operation['bin']][] = $operation['cids'];
           $cache_get_count++;
         }
-        elseif (in_array($operation['operation'], ['set', 'setMultiple'], TRUE)) {
+        elseif (\in_array($operation['operation'], ['set', 'setMultiple'], TRUE)) {
           if (!isset($cache_operations['get'][$operation['bin']])) {
             $cache_operations['set'][$operation['bin']] = [];
           }
           $cache_operations['set'][$operation['bin']][] = $operation['cids'];
           $cache_set_count++;
         }
-        elseif (in_array($operation['operation'], ['delete', 'deleteMultiple'], TRUE)) {
+        elseif (\in_array($operation['operation'], ['delete', 'deleteMultiple'], TRUE)) {
           if (!isset($cache_operations['delete'][$operation['bin']])) {
             $cache_operations['delete'][$operation['bin']] = [];
           }
@@ -266,8 +266,8 @@ trait PerformanceTestTrait {
 
     // Inline query arguments and log the query, reverse arguments to avoid
     // matches on placeholders with 2+ digits.
-    $args = array_reverse($args);
-    $query = str_replace(array_keys($args), array_values(static::quoteQueryArgs($args)), $query);
+    $args = \array_reverse($args);
+    $query = \str_replace(\array_keys($args), \array_values(static::quoteQueryArgs($args)), $query);
     $performance_data->logQuery($query);
   }
 
@@ -346,7 +346,7 @@ trait PerformanceTestTrait {
       // - all network requests have received a response
       // - no new performance log events have been recorded since the last
       //   iteration.
-      if (($lcp_count || !getenv('OTEL_COLLECTOR')) && empty($performance_log) && ($request_count === $response_count)) {
+      if (($lcp_count || !\getenv('OTEL_COLLECTOR')) && empty($performance_log) && ($request_count === $response_count)) {
         break;
       }
       \sleep(1);
@@ -402,35 +402,35 @@ trait PerformanceTestTrait {
     // not.
     foreach ($stylesheet_urls as $url) {
       $stylesheet_count++;
-      if (!str_starts_with($url, $GLOBALS['base_url'])) {
-        $stylesheet_bytes += strlen(file_get_contents($url));
+      if (!\str_starts_with($url, $GLOBALS['base_url'])) {
+        $stylesheet_bytes += \strlen(\file_get_contents($url));
       }
       else {
         if ($GLOBALS['base_path'] === '/') {
-          $filename = ltrim(parse_url($url, PHP_URL_PATH), '/');
-          $stylesheet_bytes += strlen(file_get_contents($filename));
+          $filename = \ltrim(\parse_url($url, PHP_URL_PATH), '/');
+          $stylesheet_bytes += \strlen(\file_get_contents($filename));
         }
         else {
-          $filename = str_replace($GLOBALS['base_path'], '', parse_url($url, PHP_URL_PATH));
+          $filename = \str_replace($GLOBALS['base_path'], '', \parse_url($url, PHP_URL_PATH));
           // Strip the basepath from the contents of the file so that tests
           // running in a subdirectory get the same results.
-          $stylesheet_bytes += strlen(str_replace($GLOBALS['base_path'], '/', file_get_contents($filename)));
+          $stylesheet_bytes += \strlen(\str_replace($GLOBALS['base_path'], '/', \file_get_contents($filename)));
         }
       }
     }
     foreach ($script_urls as $url) {
       $script_count++;
-      if (!str_starts_with($url, $GLOBALS['base_url'])) {
-        $script_bytes += strlen(file_get_contents($url));
+      if (!\str_starts_with($url, $GLOBALS['base_url'])) {
+        $script_bytes += \strlen(\file_get_contents($url));
       }
       else {
         if ($GLOBALS['base_path'] === '/') {
-          $filename = ltrim(parse_url($url, PHP_URL_PATH), '/');
+          $filename = \ltrim(\parse_url($url, PHP_URL_PATH), '/');
         }
         else {
-          $filename = str_replace($GLOBALS['base_path'], '', parse_url($url, PHP_URL_PATH));
+          $filename = \str_replace($GLOBALS['base_path'], '', \parse_url($url, PHP_URL_PATH));
         }
-        $script_bytes += strlen(file_get_contents($filename));
+        $script_bytes += \strlen(\file_get_contents($filename));
       }
     }
 
@@ -682,7 +682,7 @@ trait PerformanceTestTrait {
     ];
     $values = [];
     foreach ($expected as $name => $metric) {
-      if (in_array($name, $assertRange)) {
+      if (\in_array($name, $assertRange)) {
         $this->assertCountBetween($metric - 500, $metric + 500, $performance_data->{"get$name"}(), "Asserting $name");
         unset($expected[$name]);
       }
@@ -730,7 +730,7 @@ trait PerformanceTestTrait {
    *   The normalized query string.
    */
   protected static function normalizeQuery(string $query_string, string $database_prefix): string {
-    return str_replace([$database_prefix, "\r\n", "\r", "\n"], ['', ' ', ' ', ' '], $query_string);
+    return \str_replace([$database_prefix, "\r\n", "\r", "\n"], ['', ' ', ' ', ' '], $query_string);
   }
 
 }

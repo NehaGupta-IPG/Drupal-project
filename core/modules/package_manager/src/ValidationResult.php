@@ -41,12 +41,12 @@ final class ValidationResult {
     bool $assert_translatable,
   ) {
     if ($assert_translatable) {
-      assert(Inspector::assertAll(fn ($message) => $message instanceof TranslatableMarkup, $messages));
+      \assert(Inspector::assertAll(fn ($message) => $message instanceof TranslatableMarkup, $messages));
     }
     if (empty($messages)) {
       throw new \InvalidArgumentException('At least one message is required.');
     }
-    if (count($messages) > 1 && !$summary) {
+    if (\count($messages) > 1 && !$summary) {
       throw new \InvalidArgumentException('If more than one message is provided, a summary is required.');
     }
   }
@@ -143,8 +143,8 @@ final class ValidationResult {
   public static function isEqual(self $a, self $b): bool {
     return (
       $a->severity === $b->severity &&
-      strval($a->summary) === strval($b->summary) &&
-      array_map('strval', $a->messages) === array_map('strval', $b->messages)
+      \strval($a->summary) === \strval($b->summary) &&
+      \array_map('strval', $a->messages) === \array_map('strval', $b->messages)
     );
   }
 

@@ -42,7 +42,7 @@ final class MockPathLocator extends BasePathLocator {
     $project_root = $this->state->get(static::class . ' root');
     if ($project_root === NULL) {
       $project_root = $this->getVendorDirectory() . DIRECTORY_SEPARATOR . '..';
-      $project_root = realpath($project_root);
+      $project_root = \realpath($project_root);
     }
     return $project_root;
   }
@@ -88,10 +88,10 @@ final class MockPathLocator extends BasePathLocator {
         throw new \InvalidArgumentException('project_root and staging_root need to be absolute paths.');
       }
     }
-    $this->state->set(static::class . ' root', is_null($project_root) ? NULL : realpath($project_root));
-    $this->state->set(static::class . ' vendor', is_null($vendor_dir) ? NULL : realpath($vendor_dir));
-    $this->state->set(static::class . ' web', is_null($web_root) ? NULL : Path::canonicalize($web_root));
-    $this->state->set(static::class . ' stage', is_null($staging_root) ? NULL : realpath($staging_root));
+    $this->state->set(static::class . ' root', \is_null($project_root) ? NULL : \realpath($project_root));
+    $this->state->set(static::class . ' vendor', \is_null($vendor_dir) ? NULL : \realpath($vendor_dir));
+    $this->state->set(static::class . ' web', \is_null($web_root) ? NULL : Path::canonicalize($web_root));
+    $this->state->set(static::class . ' stage', \is_null($staging_root) ? NULL : \realpath($staging_root));
   }
 
 }

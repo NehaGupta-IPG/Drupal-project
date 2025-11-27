@@ -22,7 +22,7 @@ class FinderTest extends UnitTestCase {
    */
   public function testFoundDataIsInDependencyOrder(): void {
     $finder = new Finder(__DIR__ . '/../../../../fixtures/default_content');
-    $actual_order = array_keys($finder->data);
+    $actual_order = \array_keys($finder->data);
 
     $node_uuid = 'e1714f23-70c0-4493-8e92-af1901771921';
     // The author of the node should come before the node itself. We're using
@@ -64,9 +64,9 @@ class FinderTest extends UnitTestCase {
    *   The item which should come after.
    */
   private function assertRelativeOrder(array $haystack, mixed $earlier, mixed $later): void {
-    $haystack = array_values($haystack);
-    $earlier_index = array_search($earlier, $haystack, TRUE);
-    $later_index = array_search($later, $haystack, TRUE);
+    $haystack = \array_values($haystack);
+    $earlier_index = \array_search($earlier, $haystack, TRUE);
+    $later_index = \array_search($later, $haystack, TRUE);
     $this->assertIsInt($earlier_index);
     $this->assertIsInt($later_index);
     // "Later" should be greater than "earlier".

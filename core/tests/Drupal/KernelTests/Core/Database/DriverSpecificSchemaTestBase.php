@@ -1182,7 +1182,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertFalse($this->schema->tableExists('test_view'), 'View is not checked by tableExists() method');
 
     // Test \Drupal\Core\Database\Schema::findTables().
-    $tables = array_values($test_schema->findTables('t%'));
+    $tables = \array_values($test_schema->findTables('t%'));
     $this->assertEquals(['test_table'], $tables, 'All tables were found.');
 
     // Test \Drupal\Core\Database\Schema::getComment().

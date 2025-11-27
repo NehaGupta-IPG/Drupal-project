@@ -73,7 +73,7 @@ class PhpUnitTestRunnerTest extends UnitTestCase {
     $this->assertEquals(TestStatus::SYSTEM, $status);
 
     // A serious error in runCommand() should give us a fixed set of results.
-    $row = reset($results);
+    $row = \reset($results);
     unset($row['time']);
     $fail_row = [
       'test_id' => $test_id,

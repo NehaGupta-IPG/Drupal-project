@@ -69,11 +69,11 @@ class ThemeManager implements ThemeManagerInterface {
     protected ?CacheBackendInterface $cache = NULL,
   ) {
     if ($this->keyValueFactory === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $keyValueFactory argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' without the $keyValueFactory argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
       $this->keyValueFactory = \Drupal::service('keyvalue');
     }
     if ($this->cache === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $cache argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' without the $cache argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
       $this->cache = \Drupal::service('cache.bootstrap');
     }
   }
@@ -233,7 +233,7 @@ class ThemeManager implements ThemeManagerInterface {
       if ($theme_registry->has($suggestion)) {
         $info = $theme_registry->get($suggestion);
         if (isset($deprecated_suggestions[$suggestion])) {
-          @trigger_error($deprecated_suggestions[$suggestion], E_USER_DEPRECATED);
+          @\trigger_error($deprecated_suggestions[$suggestion], E_USER_DEPRECATED);
         }
         break;
       }
@@ -280,7 +280,7 @@ class ThemeManager implements ThemeManagerInterface {
     if (!empty($info['initial preprocess'])) {
       $callable = $info['initial preprocess'];
       try {
-        if (!is_callable($callable)) {
+        if (!\is_callable($callable)) {
           $callable = $this->callableResolver->getCallableFromDefinition($callable);
         }
         $callable($variables, $hook, $info);
@@ -294,7 +294,7 @@ class ThemeManager implements ThemeManagerInterface {
       // Preprocess hooks are stored as strings resembling functions.
       // This is for backwards compatibility and may represent OOP
       // implementations as well.
-      if (is_string($preprocessor_function) && isset($invoke_map[$preprocessor_function])) {
+      if (\is_string($preprocessor_function) && isset($invoke_map[$preprocessor_function])) {
         // The invoke map has either a module or a theme key.
         if (isset($invoke_map[$preprocessor_function]['module'])) {
           // Invoke module preprocess functions.
@@ -312,8 +312,8 @@ class ThemeManager implements ThemeManagerInterface {
       }
       // Invoke preprocess callbacks that are not in the invoke map, such as
       // those from an alter hook.
-      elseif (is_callable($preprocessor_function)) {
-        call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
+      elseif (\is_callable($preprocessor_function)) {
+        \call_user_func_array($preprocessor_function, [&$variables, $hook, $info]);
       }
       return $variables;
     };
@@ -331,7 +331,7 @@ class ThemeManager implements ThemeManagerInterface {
       foreach ($info['preprocess functions'] as $preprocessor_function) {
         // If global preprocess functions have not been called yet and this is
         // not a template preprocess function, invoke them now.
-        if (!$global_preprocess_called && is_string($preprocessor_function) && !str_starts_with($preprocessor_function, 'template_')) {
+        if (!$global_preprocess_called && \is_string($preprocessor_function) && !\str_starts_with($preprocessor_function, 'template_')) {
           $global_preprocess_called = TRUE;
           foreach ($global_preprocess as $global_preprocess_callback) {
             $invoke_preprocess_callback($global_preprocess_callback);
@@ -381,11 +381,11 @@ class ThemeManager implements ThemeManagerInterface {
     else {
       // @todo Remove in Drupal 12 in https://www.drupal.org/project/drupal/issues/3555931
       $render_function = $theme_engine . '_render_template';
-      if (!function_exists($render_function)) {
+      if (!\function_exists($render_function)) {
         $render_function = 'twig_render_template';
       }
       $extension_function = $theme_engine . '_extension';
-      if (function_exists($extension_function)) {
+      if (\function_exists($extension_function)) {
         $extension = $extension_function();
       }
       else {
@@ -517,10 +517,10 @@ class ThemeManager implements ThemeManagerInterface {
   public function invoke(string $theme, string $hook, array $args = []) {
     $listeners = $this->getImplementationsForTheme($theme, $hook);
     if ($listeners) {
-      if (count($listeners) > 1) {
+      if (\count($listeners) > 1) {
         throw new \LogicException("Theme $theme should not implement $hook more than once");
       }
-      return reset($listeners)(... $args);
+      return \reset($listeners)(... $args);
     }
   }
 
@@ -534,7 +534,7 @@ class ThemeManager implements ThemeManagerInterface {
     // normalize it to that. When passed as an array, usually the first item in
     // the array is a generic type, and additional items in the array are more
     // specific variants of it, as in the case of ['form', 'form_FORM_ID'].
-    if (is_array($type)) {
+    if (\is_array($type)) {
       $extra_types = $type;
       $type = \array_shift($extra_types);
       // Allow if statements in this function to use the faster isset() rather
@@ -549,16 +549,16 @@ class ThemeManager implements ThemeManagerInterface {
     $listeners = [];
     $base_hook = $type . '_alter';
     foreach ($theme_keys as $theme_key) {
-      $listeners = array_merge($listeners, $this->getImplementationsForTheme($theme_key, $base_hook));
+      $listeners = \array_merge($listeners, $this->getImplementationsForTheme($theme_key, $base_hook));
       if (isset($extra_types)) {
         foreach ($extra_types as $extra_type) {
           $hook = $extra_type . '_alter';
-          $listeners = array_merge($listeners, $this->getImplementationsForTheme($theme_key, $hook));
+          $listeners = \array_merge($listeners, $this->getImplementationsForTheme($theme_key, $hook));
         }
       }
     }
 
-    $listeners = array_filter($listeners);
+    $listeners = \array_filter($listeners);
     foreach ($listeners as $callback) {
       $callback($data, $context1, $context2);
     }
@@ -607,7 +607,7 @@ class ThemeManager implements ThemeManagerInterface {
    *   The list of theme keys with the active theme last.
    */
   protected function getThemeChain(ActiveTheme $active_theme): array {
-    $theme_keys = array_reverse(array_keys($active_theme->getBaseThemeExtensions()));
+    $theme_keys = \array_reverse(\array_keys($active_theme->getBaseThemeExtensions()));
     $theme_keys[] = $active_theme->getName();
     return $theme_keys;
   }
@@ -642,7 +642,7 @@ class ThemeManager implements ThemeManagerInterface {
         'content_attributes' => [],
         'title_prefix' => [],
         'title_suffix' => [],
-        'db_is_active' => !defined('MAINTENANCE_MODE'),
+        'db_is_active' => !\defined('MAINTENANCE_MODE'),
         'is_admin' => FALSE,
         'logged_in' => FALSE,
       ];

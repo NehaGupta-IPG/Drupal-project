@@ -283,7 +283,7 @@ class ViewsConfigUpdater {
   public function processRememberRolesUpdate(array &$handler, string $handler_type): bool {
     if ($handler_type === 'filter' && !empty($handler['expose']['remember_roles'])) {
       $needsUpdate = FALSE;
-      foreach (array_keys($handler['expose']['remember_roles'], '0', TRUE) as $role_key) {
+      foreach (\array_keys($handler['expose']['remember_roles'], '0', TRUE) as $role_key) {
         unset($handler['expose']['remember_roles'][$role_key]);
         $needsUpdate = TRUE;
       }
@@ -340,7 +340,7 @@ class ViewsConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['table_css_class'][$view->id()];
     if ($this->areDeprecationsEnabled() && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The update to add a default table CSS class for view "%s" is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3499943', $view->id()), E_USER_DEPRECATED);
+      @\trigger_error(\sprintf('The update to add a default table CSS class for view "%s" is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3499943', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
@@ -390,7 +390,7 @@ class ViewsConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['block_content_listing_empty'][$view->id()];
     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The update to remove the block_content_listing_empty plugin from view "%s" is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3336219', $view->id()), E_USER_DEPRECATED);
+      @\trigger_error(\sprintf('The update to remove the block_content_listing_empty plugin from view "%s" is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3336219', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
@@ -434,7 +434,7 @@ class ViewsConfigUpdater {
 
     foreach ($displays as &$display) {
       if (isset($display['display_options']['row']['options']['view_mode']) &&
-        array_key_exists($display['display_options']['row']['type'], $row_types) &&
+        \array_key_exists($display['display_options']['row']['type'], $row_types) &&
         $display['display_options']['row']['options']['view_mode'] === 'default') {
 
         // When system.rss is already removed but a view is saved, we still need
@@ -448,14 +448,14 @@ class ViewsConfigUpdater {
         // use that.
         if ($previous_view_mode === NULL) {
           $view_modes = $this->entityDisplayRepository->getViewModes($row_types[$display['display_options']['row']['type']]);
-          if (array_key_exists('default', $view_modes)) {
+          if (\array_key_exists('default', $view_modes)) {
             return FALSE;
           }
 
           // If there is no default, the most likely view mode is RSS. If that
           // is available we use that. Otherwise, fall back to the first
           // available.
-          $probable_view_mode = isset($view_modes['rss']) ? 'rss' : array_key_first($view_modes);
+          $probable_view_mode = isset($view_modes['rss']) ? 'rss' : \array_key_first($view_modes);
           $display['display_options']['row']['options']['view_mode'] = $probable_view_mode;
           $changed = TRUE;
         }

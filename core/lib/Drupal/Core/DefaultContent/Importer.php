@@ -72,7 +72,7 @@ final class Importer implements LoggerAwareInterface {
    *     $existing is \Drupal\Core\DefaultContent\Existing::Error.
    */
   public function importContent(Finder $content, Existing $existing = Existing::Error, ?AccountInterface $account = NULL): void {
-    if (count($content->data) === 0) {
+    if (\count($content->data) === 0) {
       return;
     }
 
@@ -96,7 +96,7 @@ final class Importer implements LoggerAwareInterface {
 
         // The event subscribers asked to skip importing this entity. If they
         // explained why, log that.
-        if (array_key_exists($uuid, $skip)) {
+        if (\array_key_exists($uuid, $skip)) {
           if ($skip[$uuid]) {
             $this->logger?->info('Skipped importing @entity_type @uuid because: %reason', [
               '@entity_type' => $entity_type_id,
@@ -184,9 +184,9 @@ final class Importer implements LoggerAwareInterface {
       }
     }
 
-    $scheme = parse_url($destination, PHP_URL_SCHEME);
-    $target_directory = dirname($destination);
-    if (!isset($scheme) || rtrim($target_directory, ':') !== $scheme) {
+    $scheme = \parse_url($destination, PHP_URL_SCHEME);
+    $target_directory = \dirname($destination);
+    if (!isset($scheme) || \rtrim($target_directory, ':') !== $scheme) {
       $this->fileSystem->prepareDirectory($target_directory, FileSystemInterface::CREATE_DIRECTORY);
     }
     if ($copy_file) {

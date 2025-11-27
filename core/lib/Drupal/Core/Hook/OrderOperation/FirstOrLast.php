@@ -37,7 +37,7 @@ class FirstOrLast extends OrderOperation {
    * {@inheritdoc}
    */
   public function apply(array &$identifiers, array $module_finder): void {
-    $index = array_search($this->identifier, $identifiers);
+    $index = \array_search($this->identifier, $identifiers);
     if ($index === FALSE) {
       // The element does not exist.
       return;
@@ -49,7 +49,7 @@ class FirstOrLast extends OrderOperation {
     else {
       $identifiers = [$this->identifier, ...$identifiers];
     }
-    $identifiers = array_values($identifiers);
+    $identifiers = \array_values($identifiers);
   }
 
 }

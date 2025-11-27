@@ -63,7 +63,7 @@ class ModuleHandlerTest extends UnitTestCase {
       $moduleList[$module] = [
         'type' => 'module',
         'pathname' => "$path/$module.info.yml",
-        'filename' => file_exists("$this->root/$path/$filename") ? $filename : NULL,
+        'filename' => \file_exists("$this->root/$path/$filename") ? $filename : NULL,
       ];
     }
     $keyvalue = new KeyValueMemoryFactory();
@@ -421,9 +421,9 @@ class ModuleHandlerTest extends UnitTestCase {
     self::setupGroupIncludes();
     $this->expectDeprecation('Autoloading hooks in the file (vfs://drupal_root/test_module.tokens.inc) is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765');
     $moduleHandler = $this->getModuleHandler([], ['token_info' => ['test_module_token_info' => 'test_module']], [], ['token_info' => self::GROUP_INCLUDES['token_info']]);
-    $this->assertFalse(function_exists('_test_module_helper'));
+    $this->assertFalse(\function_exists('_test_module_helper'));
     $moduleHandler->invokeAll('token_info');
-    $this->assertTrue(function_exists('_test_module_helper'));
+    $this->assertTrue(\function_exists('_test_module_helper'));
   }
 
 }

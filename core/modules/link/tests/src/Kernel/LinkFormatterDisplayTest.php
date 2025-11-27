@@ -69,8 +69,8 @@ class LinkFormatterDisplayTest extends FieldKernelTestBase {
     $entity->field_test->setValue($this->getLinkInputValues());
 
     foreach ($this->getTestCases() as $case_name => $case_options) {
-      [$display_settings, $expected_results] = array_values($case_options);
-      $this->assertEquals(count($this->getLinkInputValues()), count($expected_results), "Each field delta have expected result. Case name: '$case_name'");
+      [$display_settings, $expected_results] = \array_values($case_options);
+      $this->assertEquals(\count($this->getLinkInputValues()), \count($expected_results), "Each field delta have expected result. Case name: '$case_name'");
 
       // Render link field with default 'link' formatter and custom
       // display settings. Hide field label.
@@ -80,11 +80,11 @@ class LinkFormatterDisplayTest extends FieldKernelTestBase {
       ]);
       $output = (string) \Drupal::service('renderer')->renderRoot($render_array);
       // Convert each field delta value to separate array item.
-      $field_deltas_display = explode("\n", trim($output));
+      $field_deltas_display = \explode("\n", \trim($output));
 
       // Check results.
       foreach ($expected_results as $delta => $expected_result) {
-        $rendered_delta = trim($field_deltas_display[$delta]);
+        $rendered_delta = \trim($field_deltas_display[$delta]);
         $message = "Test case failed. Case name: '$case_name'. Delta: '$delta'. Uri: '{$this->getLinkInputValues()[$delta]['uri']}'";
         $this->assertEquals($expected_result, $rendered_delta, $message);
       }

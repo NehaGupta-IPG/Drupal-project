@@ -73,7 +73,7 @@ class StackSessionHandlerIntegrationTest extends BrowserTestBase {
 
     // Call the write trace handler again with the session cookie to modify
     // the session data.
-    $actual_trace = json_decode($this->drupalGet('session-test/trace-handler', $options, $headers));
+    $actual_trace = \json_decode($this->drupalGet('session-test/trace-handler', $options, $headers));
     $sessionId = $this->getSessionCookies()->getCookieByName($this->getSessionName())->getValue();
 
     $expect_trace = [
@@ -119,7 +119,7 @@ class StackSessionHandlerIntegrationTest extends BrowserTestBase {
     $this->drupalGet('session-test/trace-handler');
 
     // Call the rewrite-unmodified trace handler with the session cookie.
-    $actual_trace = json_decode($this->drupalGet('session-test/trace-handler-rewrite-unmodified', $options, $headers));
+    $actual_trace = \json_decode($this->drupalGet('session-test/trace-handler-rewrite-unmodified', $options, $headers));
     $sessionId = $this->getSessionCookies()->getCookieByName($this->getSessionName())->getValue();
 
     $expect_trace = [

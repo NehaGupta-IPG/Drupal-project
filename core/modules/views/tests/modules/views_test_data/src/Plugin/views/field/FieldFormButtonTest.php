@@ -69,7 +69,7 @@ class FieldFormButtonTest extends FieldPluginBase {
     $triggering_element = $form_state->getTriggeringElement();
     if (!empty($triggering_element['#test_button'])) {
       $row_index = $triggering_element['#row_index'];
-      $view_args = !empty($this->view->args) ? implode(', ', $this->view->args) : 'no arguments';
+      $view_args = !empty($this->view->args) ? \implode(', ', $this->view->args) : 'no arguments';
       $display = $this->view->current_display;
       $view_id = $this->view->id();
       $this->messenger()->addStatus("The test button at row $row_index for $view_id ($display) View with args: $view_args was submitted.");

@@ -89,7 +89,7 @@ class View extends RenderElementBase {
           $element['#view_id'] = $view->storage->id();
           $element['#view_display_show_admin_links'] = $view->getShowAdminLinks();
           $element['#view_display_plugin_id'] = $view->display_handler->getPluginId();
-          views_add_contextual_links($element, 'view', $view->current_display);
+          \views_add_contextual_links($element, 'view', $view->current_display);
         }
       }
       if (empty($view->display_handler->getPluginDefinition()['returns_response'])) {

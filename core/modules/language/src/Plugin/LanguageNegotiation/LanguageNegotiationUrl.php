@@ -153,7 +153,7 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
       if (\is_object($options['language']) && !empty($config['domains'][$options['language']->getId()])) {
 
         // Check if the base URLs match, return early if they do.
-        if (isset($options['base_url']) && $request && $request->getHost() === parse_url($options['base_url'], PHP_URL_HOST)) {
+        if (isset($options['base_url']) && $request && $request->getHost() === \parse_url($options['base_url'], PHP_URL_HOST)) {
           return $path;
         }
 
@@ -172,8 +172,8 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
 
           // In case either the original base URL or the HTTP host contains a
           // port, retain it.
-          if (isset($normalized_base_url) && str_contains($normalized_base_url, ':')) {
-            [, $port] = explode(':', $normalized_base_url);
+          if (isset($normalized_base_url) && \str_contains($normalized_base_url, ':')) {
+            [, $port] = \explode(':', $normalized_base_url);
             $options['base_url'] .= ':' . $port;
           }
           elseif (($url_scheme == 'http' && $port != 80) || ($url_scheme == 'https' && $port != 443)) {
@@ -182,15 +182,15 @@ class LanguageNegotiationUrl extends LanguageNegotiationMethodBase implements In
 
           if (isset($options['https'])) {
             if ($options['https'] === TRUE) {
-              $options['base_url'] = str_replace('http://', 'https://', $options['base_url']);
+              $options['base_url'] = \str_replace('http://', 'https://', $options['base_url']);
             }
             elseif ($options['https'] === FALSE) {
-              $options['base_url'] = str_replace('https://', 'http://', $options['base_url']);
+              $options['base_url'] = \str_replace('https://', 'http://', $options['base_url']);
             }
           }
 
           // Add Drupal's subfolder from the base_path if there is one.
-          $options['base_url'] .= rtrim(base_path(), '/');
+          $options['base_url'] .= \rtrim(\base_path(), '/');
           if ($bubbleable_metadata) {
             $bubbleable_metadata->addCacheContexts(['languages:' . LanguageInterface::TYPE_URL, 'url.site']);
           }

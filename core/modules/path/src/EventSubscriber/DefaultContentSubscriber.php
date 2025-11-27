@@ -46,7 +46,7 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
     // they're undergirded by path_alias entities, they're not true entity
     // references and therefore aren't portable.
     foreach ($this->entityFieldManager->getFieldMapByFieldType('path') as $path_fields_in_entity_type) {
-      foreach (array_keys($path_fields_in_entity_type) as $name) {
+      foreach (\array_keys($path_fields_in_entity_type) as $name) {
         $event->setExportable($name, TRUE);
       }
     }

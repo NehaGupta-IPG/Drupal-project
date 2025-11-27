@@ -202,7 +202,7 @@ class Date extends NumericFilter {
     // This is safe because we are manually scrubbing the values. It is
     // necessary to do it this way because $a and $b are formulas when using an
     // offset.
-    $operator = strtoupper($this->operator);
+    $operator = \strtoupper($this->operator);
     $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
   }
 

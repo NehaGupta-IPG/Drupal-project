@@ -45,7 +45,7 @@ class CronHook {
       foreach ($files as $file) {
         $references = $this->fileUsage->listUsage($file);
         if (empty($references)) {
-          if (!file_exists($file->getFileUri())) {
+          if (!\file_exists($file->getFileUri())) {
             if (!$this->streamWrapperManager->isValidUri($file->getFileUri())) {
               $this->logger->warning('Temporary file "%path" that was deleted during garbage collection did not exist on the filesystem. This could be caused by a missing stream wrapper.', ['%path' => $file->getFileUri()]);
             }
@@ -60,7 +60,7 @@ class CronHook {
         else {
           $this->logger->info('Did not delete temporary file "%path" during garbage collection because it is in use by the following modules: %modules.', [
             '%path' => $file->getFileUri(),
-            '%modules' => implode(', ', array_keys($references)),
+            '%modules' => \implode(', ', \array_keys($references)),
           ]);
         }
       }

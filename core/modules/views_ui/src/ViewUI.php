@@ -299,7 +299,7 @@ class ViewUI implements ViewEntityInterface {
 
     if (empty($name)) {
       $name = $this->t('Apply');
-      if (!empty($this->stack) && count($this->stack) > 1) {
+      if (!empty($this->stack) && \count($this->stack) > 1) {
         $name = $this->t('Apply and continue');
       }
       $names = [$this->t('Apply'), $this->t('Apply and continue')];
@@ -339,8 +339,8 @@ class ViewUI implements ViewEntityInterface {
 
     // Create a "Cancel" button. For purely informational forms, label it "OK".
     $cancel_submit = [$this, 'standardCancel'];
-    if (function_exists($form_id . '_cancel')) {
-      @trigger_error('Support for magic cancel submit handlers such as ' . $form_id . '_cancel() is deprecated in drupal:11.3.0 and removed in drupal:13.0.0. Specify a submit handler in a class method instead. See https://www.drupal.org/node/3536715', E_USER_DEPRECATED);
+    if (\function_exists($form_id . '_cancel')) {
+      @\trigger_error('Support for magic cancel submit handlers such as ' . $form_id . '_cancel() is deprecated in drupal:11.3.0 and removed in drupal:13.0.0. Specify a submit handler in a class method instead. See https://www.drupal.org/node/3536715', E_USER_DEPRECATED);
       $cancel_submit = $form_id . '_cancel';
     }
     $form['actions']['cancel'] = [
@@ -470,11 +470,11 @@ class ViewUI implements ViewEntityInterface {
       $display->setOverride($section);
     }
 
-    if (!$form_state->isValueEmpty('name') && is_array($form_state->getValue('name'))) {
+    if (!$form_state->isValueEmpty('name') && \is_array($form_state->getValue('name'))) {
       // Loop through each of the items that were checked and add them to the
       // view.
-      foreach (array_keys(array_filter($form_state->getValue('name'))) as $field) {
-        [$table, $field] = explode('.', $field, 2);
+      foreach (\array_keys(\array_filter($form_state->getValue('name'))) as $field) {
+        [$table, $field] = \explode('.', $field, 2);
 
         if ($cut = \strpos($field, '$')) {
           $field = \substr($field, 0, $cut);
@@ -617,7 +617,7 @@ class ViewUI implements ViewEntityInterface {
       // @todo We'll want to add contextual links specific to editing the View,
       //   so the suppression may need to be moved deeper into the Preview
       //   pipeline.
-      views_ui_contextual_links_suppress_push();
+      \views_ui_contextual_links_suppress_push();
 
       $show_additional_queries = $config->get('ui.show.additional_queries');
 
@@ -688,7 +688,7 @@ class ViewUI implements ViewEntityInterface {
                 $query_string = \strtr($query['query'], $query['args']);
                 $queries[] = [
                   '#prefix' => "\n",
-                  '#markup' => $this->t('[@time ms] @query', ['@time' => round($query['time'] * 100000, 1) / 100000.0, '@query' => $query_string]),
+                  '#markup' => $this->t('[@time ms] @query', ['@time' => \round($query['time'] * 100000, 1) / 100000.0, '@query' => $query_string]),
                 ];
               }
 
@@ -755,7 +755,7 @@ class ViewUI implements ViewEntityInterface {
                   '#template' => "<strong>{% trans 'Query build time' %}</strong>",
                 ],
               ],
-              $this->t('@time ms', ['@time' => intval($executable->build_time * 100000) / 100]),
+              $this->t('@time ms', ['@time' => \intval($executable->build_time * 100000) / 100]),
             ];
 
             $rows['statistics'][] = [
@@ -765,7 +765,7 @@ class ViewUI implements ViewEntityInterface {
                   '#template' => "<strong>{% trans 'Query execute time' %}</strong>",
                 ],
               ],
-              $this->t('@time ms', ['@time' => intval($executable->execute_time * 100000) / 100]),
+              $this->t('@time ms', ['@time' => \intval($executable->execute_time * 100000) / 100]),
             ];
 
             $rows['statistics'][] = [
@@ -775,7 +775,7 @@ class ViewUI implements ViewEntityInterface {
                   '#template' => "<strong>{% trans 'View render time' %}</strong>",
                 ],
               ],
-              $this->t('@time ms', ['@time' => intval($this->render_time * 100) / 100]),
+              $this->t('@time ms', ['@time' => \intval($this->render_time * 100) / 100]),
             ];
           }
           \Drupal::moduleHandler()->alter('views_preview_info', $rows, $executable);

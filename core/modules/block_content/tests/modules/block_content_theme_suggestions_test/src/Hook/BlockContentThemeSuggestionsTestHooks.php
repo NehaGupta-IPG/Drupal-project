@@ -43,7 +43,7 @@ class BlockContentThemeSuggestionsTestHooks {
       $block_content = $entity_type_manager->getStorage('block_content')->loadByProperties([
         'uuid' => 'b22c881a-bcfd-4d0c-a41d-3573327705df',
       ]);
-      $block_content = reset($block_content);
+      $block_content = \reset($block_content);
       $build['block_content_extra_field_test'] = $entity_type_manager->getViewBuilder('block_content')->view($block_content);
     }
   }

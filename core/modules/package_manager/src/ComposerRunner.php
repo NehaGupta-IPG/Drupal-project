@@ -39,7 +39,7 @@ final class ComposerRunner implements ComposerProcessRunnerInterface {
   public function run(array $command, ?PathInterface $cwd = NULL, array $env = [], ?OutputCallbackInterface $callback = NULL, int $timeout = ProcessInterface::DEFAULT_TIMEOUT): void {
     // Run Composer through the PHP interpreter so we don't have to rely on
     // PHP being in the PATH.
-    array_unshift($command, (new PhpExecutableFinder())->find(), $this->executableFinder->find('composer'));
+    \array_unshift($command, (new PhpExecutableFinder())->find(), $this->executableFinder->find('composer'));
 
     $home = $this->fileSystem->getTempDirectory();
     $home .= '/package_manager_composer_home-';

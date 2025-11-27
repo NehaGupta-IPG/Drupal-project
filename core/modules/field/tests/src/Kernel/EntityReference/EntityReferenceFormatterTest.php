@@ -414,7 +414,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
     $referenced_entity_with_no_link_template->save();
 
     $build = $this->buildRenderArray([$referenced_entity_with_no_link_template], $formatter, ['link' => TRUE]);
-    $this->assertEquals($referenced_entity_with_no_link_template->label(), $build[0]['#plain_text'], sprintf('The markup returned by the %s formatter is correct for an entity type with no valid link template.', $formatter));
+    $this->assertEquals($referenced_entity_with_no_link_template->label(), $build[0]['#plain_text'], \sprintf('The markup returned by the %s formatter is correct for an entity type with no valid link template.', $formatter));
 
     // Test link visibility if the URL is not accessible.
     $entity_with_user = EntityTest::create([

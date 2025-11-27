@@ -73,19 +73,19 @@ class ResourceObjectNormalizer extends NormalizerBase {
     $this->cacher = $cacher;
 
     if ($event_dispatcher === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3280569', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3280569', E_USER_DEPRECATED);
       $event_dispatcher = \Drupal::service('event_dispatcher');
     }
     $this->eventDispatcher = $event_dispatcher;
 
     if ($entity_field_manager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $entity_field_manager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3031367', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $entity_field_manager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3031367', E_USER_DEPRECATED);
       $entity_field_manager = \Drupal::service('entity_field_manager');
     }
     $this->entityFieldManager = $entity_field_manager;
 
     if ($entity_type_manager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $entity_type_manager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3031367', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $entity_type_manager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3031367', E_USER_DEPRECATED);
       $entity_type_manager = \Drupal::service('entity_type_manager');
     }
     $this->entityTypeManager = $entity_type_manager;
@@ -102,7 +102,7 @@ class ResourceObjectNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function doNormalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
-    assert($object instanceof ResourceObject);
+    \assert($object instanceof ResourceObject);
     // If the fields to use were specified, only output those field values.
     $context['resource_object'] = $object;
     $resource_type = $object->getResourceType();
@@ -124,18 +124,18 @@ class ResourceObjectNormalizer extends NormalizerBase {
     $fields = $normalization_parts[ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_FIELDS];
     $field_normalizations = \array_intersect_key($fields, \array_flip($field_names));
 
-    $relationship_field_names = array_keys($resource_type->getRelatableResourceTypes());
-    $attributes = array_diff_key($field_normalizations, array_flip($relationship_field_names));
-    $relationships = array_intersect_key($field_normalizations, array_flip($relationship_field_names));
+    $relationship_field_names = \array_keys($resource_type->getRelatableResourceTypes());
+    $attributes = \array_diff_key($field_normalizations, \array_flip($relationship_field_names));
+    $relationships = \array_intersect_key($field_normalizations, \array_flip($relationship_field_names));
 
     $event = new CollectResourceObjectMetaEvent($object, $context);
     $this->eventDispatcher->dispatch($event);
 
-    $entity_normalization = array_filter(
+    $entity_normalization = \array_filter(
       $normalization_parts[ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_BASE] + [
         'attributes' => CacheableNormalization::aggregate($attributes)->omitIfEmpty(),
         'relationships' => CacheableNormalization::aggregate($relationships)->omitIfEmpty(),
-        'meta' => (count($event->getMeta()) > 0) ? new CacheableNormalization($event, $event->getMeta()) : '',
+        'meta' => (\count($event->getMeta()) > 0) ? new CacheableNormalization($event, $event->getMeta()) : '',
       ]
     );
     return CacheableNormalization::aggregate($entity_normalization)->withCacheableDependency($object);
@@ -263,7 +263,7 @@ class ResourceObjectNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function getNormalizationSchema(mixed $object, array $context = []): array {
-    if (is_string($object)) {
+    if (\is_string($object)) {
       // Without a true object we can only provide a generic schema.
       return [
         '$ref' => JsonApiSpec::SUPPORTED_SPECIFICATION_JSON_SCHEMA . '#/definitions/resource',
@@ -273,7 +273,7 @@ class ResourceObjectNormalizer extends NormalizerBase {
     // a placeholder can be created for purposes of schema generation which
     // would provide access to the resource type, but not contain any "live"
     // data.
-    assert($object instanceof ResourceObject);
+    \assert($object instanceof ResourceObject);
 
     $attributes_schema = [];
     $relationships_schema = [];
@@ -307,9 +307,9 @@ class ResourceObjectNormalizer extends NormalizerBase {
     // This is largely the same as in ResourceObject but without a real entity.
     $fields = $resource_type->getFields();
     // Filter the array based on the field names.
-    $enabled_field_names = array_filter(array_keys($fields), static fn (string $internal_field_name) => $resource_type->isFieldEnabled($internal_field_name));
+    $enabled_field_names = \array_filter(\array_keys($fields), static fn (string $internal_field_name) => $resource_type->isFieldEnabled($internal_field_name));
     // Return a sub-array of $output containing the keys in $enabled_fields.
-    $input = array_intersect_key($fields, array_flip($enabled_field_names));
+    $input = \array_intersect_key($fields, \array_flip($enabled_field_names));
     foreach ($input as $field_name => $field_value) {
       $attributes_schema['properties'][$resource_type->getPublicName($field_name)] = [
         'title' => $field_name,
@@ -333,11 +333,11 @@ class ResourceObjectNormalizer extends NormalizerBase {
     // @see \Drupal\jsonapi\JsonApiResource\ResourceObject::extractContentEntityFields()
     // @todo Eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
     if ($resource_type->getEntityTypeId() === 'user') {
-      $resource_fields = array_diff_key($resource_fields, array_flip([$resource_type->getPublicName('display_name')]));
+      $resource_fields = \array_diff_key($resource_fields, \array_flip([$resource_type->getPublicName('display_name')]));
     }
 
     /** @var \Drupal\Core\Field\FieldDefinitionInterface[] $fields */
-    $fields = array_reduce(
+    $fields = \array_reduce(
       $resource_fields,
       function (array $carry, ResourceTypeField $resource_field) use ($field_definitions) {
         if (!$resource_field->isFieldEnabled()) {
@@ -348,8 +348,8 @@ class ResourceObjectNormalizer extends NormalizerBase {
       },
       []
     );
-    assert($this->serializer instanceof Serializer);
-    $relationship_field_names = array_keys($resource_type->getRelatableResourceTypes());
+    \assert($this->serializer instanceof Serializer);
+    $relationship_field_names = \array_keys($resource_type->getRelatableResourceTypes());
 
     $create_values = [];
     if ($bundle_key = $this->entityTypeManager->getDefinition($resource_type->getEntityTypeId())->getKey('bundle')) {
@@ -376,7 +376,7 @@ class ResourceObjectNormalizer extends NormalizerBase {
       if (empty($schema['description']) && $description = $field->getFieldStorageDefinition()->getDescription()) {
         $schema['description'] = (string) $description;
       }
-      if (in_array($field_name, $relationship_field_names, TRUE)) {
+      if (\in_array($field_name, $relationship_field_names, TRUE)) {
         $relationships_schema['properties'][$field_name] = $schema;
       }
       else {

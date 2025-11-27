@@ -86,7 +86,7 @@ class AssetResolver implements AssetResolverInterface {
    */
   public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ?ThemeHandlerInterface $theme_handler = NULL) {
     if ($theme_handler === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $theme_handler argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3451667', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' without the $theme_handler argument is deprecated in drupal:11.1.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3451667', E_USER_DEPRECATED);
       $theme_handler = \Drupal::service('theme_handler');
     }
 
@@ -128,7 +128,7 @@ class AssetResolver implements AssetResolverInterface {
   protected function getLibrariesToLoad(AttachedAssetsInterface $assets, ?string $asset_type = NULL) {
     // @see Drupal\FunctionalTests\Core\Asset\AssetOptimizationTestUmami
     // @todo https://www.drupal.org/project/drupal/issues/1945262
-    $libraries_to_load = array_diff(
+    $libraries_to_load = \array_diff(
       $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getLibraries()),
       $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries())
     );
@@ -142,9 +142,9 @@ class AssetResolver implements AssetResolverInterface {
     // even for an otherwise identical set of libraries. To ensure that any
     // particular set of libraries results in the same aggregate URL, sort the
     // libraries, then generate the minimum representative set again.
-    sort($libraries_to_load);
+    \sort($libraries_to_load);
     $minimum_libraries = $this->libraryDependencyResolver->getMinimalRepresentativeSubset($libraries_to_load);
-    $libraries_to_load = array_diff(
+    $libraries_to_load = \array_diff(
       $this->libraryDependencyResolver->getLibrariesWithDependencies($minimum_libraries),
       $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries())
     );
@@ -171,7 +171,7 @@ class AssetResolver implements AssetResolverInterface {
    */
   protected function filterLibrariesByType(array $libraries, string $asset_type): array {
     foreach ($libraries as $key => $library) {
-      [$extension, $name] = explode('/', $library, 2);
+      [$extension, $name] = \explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (empty($definition[$asset_type])) {
         unset($libraries[$key]);
@@ -203,7 +203,7 @@ class AssetResolver implements AssetResolverInterface {
     // active admin theme may include the default theme's ckeditor5-stylesheets
     // and default themes may be set conditionally and dynamically.
     $default_theme = $this->themeHandler->getDefault();
-    $cid = 'css:' . $active_theme . ':' . $default_theme . ':' . $language->getId() . Crypt::hashBase64(serialize($libraries_to_load)) . (int) $optimize;
+    $cid = 'css:' . $active_theme . ':' . $default_theme . ':' . $language->getId() . Crypt::hashBase64(\serialize($libraries_to_load)) . (int) $optimize;
     if ($cached = $this->cache->get($cid)) {
       return $cached->data;
     }
@@ -218,7 +218,7 @@ class AssetResolver implements AssetResolverInterface {
     ];
 
     foreach ($libraries_to_load as $library) {
-      [$extension, $name] = explode('/', $library, 2);
+      [$extension, $name] = \explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       foreach ($definition['css'] as $options) {
         $options += $default_options;
@@ -272,7 +272,7 @@ class AssetResolver implements AssetResolverInterface {
     $settings = [];
 
     foreach ($this->getLibrariesToLoad($assets, 'js') as $library) {
-      [$extension, $name] = explode('/', $library, 2);
+      [$extension, $name] = \explode('/', $library, 2);
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (isset($definition['drupalSettings'])) {
         $settings = NestedArray::mergeDeepArray([$settings, $definition['drupalSettings']], TRUE);
@@ -317,7 +317,7 @@ class AssetResolver implements AssetResolverInterface {
     // Add the theme name to the cache key since themes may implement
     // hook_library_info_alter(). Additionally add the current language to
     // support translation of JavaScript files via hook_js_alter().
-    $cid = 'js:' . $theme_info->getName() . ':' . $language->getId() . ':' . Crypt::hashBase64(serialize($libraries_to_load)) . ':' . (int) $optimize;
+    $cid = 'js:' . $theme_info->getName() . ':' . $language->getId() . ':' . Crypt::hashBase64(\serialize($libraries_to_load)) . ':' . (int) $optimize;
 
     if ($cached = $this->cache->get($cid)) {
       [$js_assets_header, $js_assets_footer, $settings, $settings_in_header] = $cached->data;
@@ -398,7 +398,7 @@ class AssetResolver implements AssetResolverInterface {
       $this->moduleHandler->invokeAllWith('js_settings_build', function (callable $hook, string $module) use (&$settings, $assets) {
         $hook($settings, $assets);
       });
-      $settings_in_header = in_array('core/drupalSettings', $header_js_libraries);
+      $settings_in_header = \in_array('core/drupalSettings', $header_js_libraries);
       $this->cache->set($cid, [$js_assets_header, $js_assets_footer, $settings, $settings_in_header], CacheBackendInterface::CACHE_PERMANENT, ['library_info']);
     }
 
@@ -407,8 +407,8 @@ class AssetResolver implements AssetResolverInterface {
     // single "regular" JavaScript asset. But only if there are settings to
     // add. Do the quickest checks first.
     $process_settings = FALSE;
-    if (count($libraries_to_load) > 0 || count($asset_settings) > 0) {
-      $process_settings = in_array('core/drupalSettings', $libraries_to_load) || in_array('core/drupalSettings', $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()));
+    if (\count($libraries_to_load) > 0 || \count($asset_settings) > 0) {
+      $process_settings = \in_array('core/drupalSettings', $libraries_to_load) || \in_array('core/drupalSettings', $this->libraryDependencyResolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()));
     }
     if ($process_settings) {
       // Attached settings override both library definitions and

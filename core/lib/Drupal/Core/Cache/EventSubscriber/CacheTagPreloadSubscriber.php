@@ -25,7 +25,7 @@ class CacheTagPreloadSubscriber implements EventSubscriberInterface {
    */
   public function onRequest(RequestEvent $event): void {
     if ($event->isMainRequest() && $this->cacheTagsChecksum instanceof CacheTagsChecksumPreloadInterface) {
-      $default_preload_cache_tags = array_merge([
+      $default_preload_cache_tags = \array_merge([
         'route_match',
         'access_policies',
         'routes',

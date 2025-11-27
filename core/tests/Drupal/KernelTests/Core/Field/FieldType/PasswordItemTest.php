@@ -208,7 +208,7 @@ class PasswordItemTest extends FieldKernelTestBase {
 
     $this->expectException(EntityStorageException::class);
     $this->expectExceptionMessage('Failed to hash the Test entity password.');
-    $entity->test_field = str_repeat('a', PasswordInterface::PASSWORD_MAX_LENGTH + 1);
+    $entity->test_field = \str_repeat('a', PasswordInterface::PASSWORD_MAX_LENGTH + 1);
     $entity->save();
   }
 

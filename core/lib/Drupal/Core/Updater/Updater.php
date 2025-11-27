@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Updater;
 
-@trigger_error('The ' . __NAMESPACE__ . '\Updater base class is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+@\trigger_error('The ' . __NAMESPACE__ . '\Updater base class is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
 use Drupal\Core\FileTransfer\FileTransferException;
 use Drupal\Core\FileTransfer\FileTransfer;
@@ -136,7 +136,7 @@ abstract class Updater {
       return FALSE;
     }
     foreach ($info_files as $info_file) {
-      if (mb_substr($info_file->filename, 0, -9) == basename($directory)) {
+      if (\mb_substr($info_file->filename, 0, -9) == \basename($directory)) {
         // Info file Has the same name as the directory, return it.
         return $info_file->uri;
       }
@@ -181,7 +181,7 @@ abstract class Updater {
    *   The name of the project.
    */
   public static function getProjectName($directory) {
-    return basename($directory);
+    return \basename($directory);
   }
 
   /**

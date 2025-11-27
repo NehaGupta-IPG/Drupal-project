@@ -273,7 +273,7 @@ class KernelTestBaseTest extends KernelTestBase {
    */
   public function testLocalTimeZone(): void {
     // The 'Australia/Sydney' time zone is set in core/tests/bootstrap.php.
-    $this->assertEquals('Australia/Sydney', date_default_timezone_get());
+    $this->assertEquals('Australia/Sydney', \date_default_timezone_get());
   }
 
   /**
@@ -330,10 +330,10 @@ class KernelTestBaseTest extends KernelTestBase {
     $object = (object) [
       'Aldebaran' => 'Betelgeuse',
     ];
-    dump($object);
-    dump('Alpheratz');
+    \dump($object);
+    \dump('Alpheratz');
 
-    $dumpString = json_encode(DebugDump::getDumps());
+    $dumpString = \json_encode(DebugDump::getDumps());
 
     $this->assertStringContainsString('KernelTestBaseTest::testVarDump', $dumpString);
     $this->assertStringContainsString('Aldebaran', $dumpString);

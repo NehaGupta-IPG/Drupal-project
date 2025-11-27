@@ -79,7 +79,7 @@ class CommentInterfaceTest extends CommentTestBase {
 
     // Comment as anonymous with preview required.
     $this->drupalLogout();
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access content',
       'access comments',
       'post comments',
@@ -94,7 +94,7 @@ class CommentInterfaceTest extends CommentTestBase {
     $this->drupalGet('node/' . $this->node->id());
     $this->assertSession()->pageTextContains($subject_text);
     $this->assertSession()->pageTextContains($comment_text);
-    $this->assertSession()->elementExists('xpath', '//footer/a[contains(@href,"' . base_path() . 'comment/' . $comment->id() . '#comment-' . $comment->id() . '") and text()="Permalink"]');
+    $this->assertSession()->elementExists('xpath', '//footer/a[contains(@href,"' . \base_path() . 'comment/' . $comment->id() . '#comment-' . $comment->id() . '") and text()="Permalink"]');
 
     // Set comments to have subject and preview to optional.
     $this->drupalLogout();

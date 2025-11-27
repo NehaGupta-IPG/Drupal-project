@@ -159,8 +159,8 @@ class Views {
     }
 
     if (!empty($plugins)) {
-      uasort($plugins, static function ($a, $b) {
-        return strcmp((string) $a, (string) $b);
+      \uasort($plugins, static function ($a, $b) {
+        return \strcmp((string) $a, (string) $b);
       });
     }
 
@@ -334,7 +334,7 @@ class Views {
     else {
       // Append a ':' to the $exclude_view string so we always have more than
       // one item to explode.
-      [$exclude_view_name, $exclude_view_display] = explode(':', "$exclude_view:");
+      [$exclude_view_name, $exclude_view_display] = \explode(':', "$exclude_view:");
     }
 
     $options = [];

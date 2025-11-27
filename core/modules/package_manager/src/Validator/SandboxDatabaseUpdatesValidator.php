@@ -45,7 +45,7 @@ class SandboxDatabaseUpdatesValidator implements EventSubscriberInterface {
     $extensions_with_updates = $this->getExtensionsWithDatabaseUpdates($stage_dir);
     if ($extensions_with_updates) {
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
-      $extensions_with_updates = array_map($this->t(...), $extensions_with_updates);
+      $extensions_with_updates = \array_map($this->t(...), $extensions_with_updates);
       $event->addWarning($extensions_with_updates, $this->t('Database updates have been detected in the following extensions.'));
     }
   }
@@ -85,7 +85,7 @@ class SandboxDatabaseUpdatesValidator implements EventSubscriberInterface {
     $active_functions = $this->getUpdateFunctions($active_dir, $extension);
     $staged_functions = $this->getUpdateFunctions($stage_dir, $extension);
 
-    return (bool) array_diff($staged_functions, $active_functions);
+    return (bool) \array_diff($staged_functions, $active_functions);
   }
 
   /**
@@ -108,7 +108,7 @@ class SandboxDatabaseUpdatesValidator implements EventSubscriberInterface {
   private function getUpdateFunctions(string $root_dir, Extension $extension): array {
     $name = $extension->getName();
 
-    $path = implode(DIRECTORY_SEPARATOR, [
+    $path = \implode(DIRECTORY_SEPARATOR, [
       $root_dir,
       $extension->getPath(),
       $name,
@@ -122,15 +122,15 @@ class SandboxDatabaseUpdatesValidator implements EventSubscriberInterface {
     foreach ($patterns as $suffix => $pattern) {
       $file = $path . $suffix;
 
-      if (!file_exists($file)) {
+      if (!\file_exists($file)) {
         continue;
       }
       // Parse the file and scan for named functions which match the pattern.
-      $code = file_get_contents($file);
-      $tokens = token_get_all($code);
+      $code = \file_get_contents($file);
+      $tokens = \token_get_all($code);
 
-      for ($i = 0; $i < count($tokens); $i++) {
-        $chunk = array_slice($tokens, $i, 3);
+      for ($i = 0; $i < \count($tokens); $i++) {
+        $chunk = \array_slice($tokens, $i, 3);
         if ($this->tokensMatchFunctionNamePattern($chunk, $pattern)) {
           $function_names[] = $chunk[2][1];
         }
@@ -155,7 +155,7 @@ class SandboxDatabaseUpdatesValidator implements EventSubscriberInterface {
    * @see token_get_all()
    */
   private function tokensMatchFunctionNamePattern(array $tokens, string $pattern): bool {
-    if (count($tokens) !== 3 || !Inspector::assertAllStrictArrays($tokens)) {
+    if (\count($tokens) !== 3 || !Inspector::assertAllStrictArrays($tokens)) {
       return FALSE;
     }
     // A named function declaration will always be a T_FUNCTION (the word
@@ -163,9 +163,9 @@ class SandboxDatabaseUpdatesValidator implements EventSubscriberInterface {
     // invalid), followed by a T_STRING (the function name). This will ignore
     // anonymous functions, but match class methods (although class methods are
     // highly unlikely to match the naming patterns of update hooks).
-    $names = array_map('token_name', array_column($tokens, 0));
+    $names = \array_map('token_name', \array_column($tokens, 0));
     if ($names === ['T_FUNCTION', 'T_WHITESPACE', 'T_STRING']) {
-      return (bool) preg_match($pattern, $tokens[2][1]);
+      return (bool) \preg_match($pattern, $tokens[2][1]);
     }
     return FALSE;
   }

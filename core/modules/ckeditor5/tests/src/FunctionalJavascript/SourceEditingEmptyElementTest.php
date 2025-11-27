@@ -98,7 +98,7 @@ class SourceEditingEmptyElementTest extends SourceEditingTestBase {
       $text_format->setFilterConfig('filter_html', $filter_html_config);
 
       // Verify the text format and editor are still a valid pair.
-      $this->assertSame([], array_map(
+      $this->assertSame([], \array_map(
         function (ConstraintViolationInterface $v) {
           return (string) $v->getMessage();
         },
@@ -123,7 +123,7 @@ class SourceEditingEmptyElementTest extends SourceEditingTestBase {
       ->save();
 
     // Verify the text format and editor are still a valid pair.
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },

@@ -122,7 +122,7 @@ class FileStorage implements PhpStorageInterface {
         // The directory path is not disclosed to avoid an information
         // disclosure vulnerability. For security reasons, further details are
         // not provided in the error message.
-        trigger_error('mkdir(): Permission Denied', E_USER_WARNING);
+        \trigger_error('mkdir(): Permission Denied', E_USER_WARNING);
       }
     }
     return FALSE;

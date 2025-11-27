@@ -582,7 +582,7 @@ class TwigExtension extends AbstractExtension {
       elseif ($arg instanceof MarkupInterface) {
         return $arg;
       }
-      elseif (method_exists($arg, '__toString')) {
+      elseif (\method_exists($arg, '__toString')) {
         return (string) $arg;
       }
       // You can't throw exceptions in the magic PHP __toString() methods, see

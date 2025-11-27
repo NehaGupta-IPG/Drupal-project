@@ -70,7 +70,7 @@ class MenuLinkContentHooks {
    */
   #[Hook('path_alias_insert')]
   public function pathAliasInsert(PathAliasInterface $path_alias): void {
-    _menu_link_content_update_path_alias($path_alias->getAlias());
+    \_menu_link_content_update_path_alias($path_alias->getAlias());
   }
 
   /**
@@ -79,11 +79,11 @@ class MenuLinkContentHooks {
   #[Hook('path_alias_update')]
   public function pathAliasUpdate(PathAliasInterface $path_alias): void {
     if ($path_alias->getAlias() != $path_alias->getOriginal()->getAlias()) {
-      _menu_link_content_update_path_alias($path_alias->getAlias());
-      _menu_link_content_update_path_alias($path_alias->getOriginal()->getAlias());
+      \_menu_link_content_update_path_alias($path_alias->getAlias());
+      \_menu_link_content_update_path_alias($path_alias->getOriginal()->getAlias());
     }
     elseif ($path_alias->getPath() != $path_alias->getOriginal()->getPath()) {
-      _menu_link_content_update_path_alias($path_alias->getAlias());
+      \_menu_link_content_update_path_alias($path_alias->getAlias());
     }
   }
 
@@ -92,7 +92,7 @@ class MenuLinkContentHooks {
    */
   #[Hook('path_alias_delete')]
   public function pathAliasDelete(PathAliasInterface $path_alias): void {
-    _menu_link_content_update_path_alias($path_alias->getAlias());
+    \_menu_link_content_update_path_alias($path_alias->getAlias());
   }
 
   /**
@@ -120,7 +120,7 @@ class MenuLinkContentHooks {
       $result = $menu_link_manager->loadLinksByRoute($url->getRouteName(), $route_parameters);
       if ($result) {
         foreach ($result as $id => $instance) {
-          if ($instance->isDeletable() && str_starts_with($id, 'menu_link_content:')) {
+          if ($instance->isDeletable() && \str_starts_with($id, 'menu_link_content:')) {
             $instance->deleteLink();
           }
         }

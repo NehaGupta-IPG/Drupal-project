@@ -24,7 +24,7 @@ class ShortcutLinkTarget implements EntityLinkTargetInterface {
    * {@inheritdoc}
    */
   public function getLinkTarget(EntityInterface $entity): GeneratedUrl {
-    assert($entity instanceof ShortcutInterface);
+    \assert($entity instanceof ShortcutInterface);
     return $entity->getUrl()->toString(TRUE);
   }
 

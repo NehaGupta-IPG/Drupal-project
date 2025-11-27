@@ -200,7 +200,7 @@ class FileItemTest extends FieldKernelTestBase {
 
     // Verify the file URI starts with the expected protocol and structure.
     $this->assertStringStartsWith($expected_start, $fileUri);
-    $this->assertMatchesRegularExpression('#^' . preg_quote($expected_start, '#') . '[^/]+#', $fileUri);
+    $this->assertMatchesRegularExpression('#^' . \preg_quote($expected_start, '#') . '[^/]+#', $fileUri);
   }
 
 }

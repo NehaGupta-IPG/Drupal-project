@@ -31,7 +31,7 @@ class InstallerDependenciesResolutionTest extends KernelTestBase {
     // location.
     // @todo Remove as part of https://www.drupal.org/node/2186491
     $profile_list = \Drupal::service('extension.list.profile');
-    assert($profile_list instanceof ProfileExtensionList);
+    \assert($profile_list instanceof ProfileExtensionList);
     $profile_list->setPathname('testing_missing_dependencies', 'core/profiles/tests/testing_missing_dependencies/testing_missing_dependencies.info.yml');
 
     // Requires install.inc to be able to use drupal_verify_profile.

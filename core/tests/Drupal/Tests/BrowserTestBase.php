@@ -331,7 +331,7 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected function setUp(): void {
     if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
-      @trigger_error('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and is throwing an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+      @\trigger_error('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and is throwing an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
     }
 
     parent::setUp();
@@ -431,9 +431,9 @@ abstract class BrowserTestBase extends TestCase {
       // test request, wait for it to complete.
       if ($this->container->has('module_handler') && $this->container->has('lock')) {
         $module_handler = $this->container->get('module_handler');
-        assert($module_handler instanceof ModuleHandlerInterface);
+        \assert($module_handler instanceof ModuleHandlerInterface);
         $lock = $this->container->get('lock');
-        assert($lock instanceof LockBackendInterface);
+        \assert($lock instanceof LockBackendInterface);
         if ($module_handler->moduleExists('automated_cron') && !$lock->lockMayBeAvailable('cron')) {
           // Use the timeout that is used for acquiring the lock as a delay.
           /* @see \Drupal\Core\Cron::run() */
@@ -529,8 +529,8 @@ abstract class BrowserTestBase extends TestCase {
    * @see https://www.drupal.org/node/3523039
    */
   protected function getOptions($select, ?Element $container = NULL) {
-    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3523039', E_DEPRECATED);
-    if (is_string($select)) {
+    @\trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3523039', E_DEPRECATED);
+    if (\is_string($select)) {
       $select = $this->assertSession()->selectExists($select, $container);
     }
     $options = [];

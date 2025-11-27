@@ -106,7 +106,7 @@ class StatusExtraTest extends NodeTestBase {
     \Drupal::service('module_installer')->install(['node_access_test']);
     NodeType::create(['type' => 'page', 'name' => 'page'])->save();
     $this->addPrivateField(NodeType::load('page'));
-    node_access_rebuild();
+    \node_access_rebuild();
     $node_published_private = $this->drupalCreateNode(['uid' => $admin_user->id(), 'private' => ['value' => 1]]);
     $node_unpublished_private = $this->drupalCreateNode([
       'uid' => $admin_user->id(),

@@ -50,7 +50,7 @@ class LocaleStringIsSafeTest extends KernelTestBase {
 
     // Check a translatable string which includes a wbr tag.
     $string = 'DrupalLocaleModule<wbr>Test<wbr>Example';
-    $result = locale_string_is_safe($string);
+    $result = \locale_string_is_safe($string);
     $this->assertTrue($result);
   }
 

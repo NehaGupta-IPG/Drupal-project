@@ -286,7 +286,7 @@ class CssCollectionOptimizerLazyUnitTest extends UnitTestCase {
       ],
     ]);
 
-    $expected = file_get_contents(__DIR__ . '/css_test_files/css_minified_with_relative_paths.css.optimized.css');
+    $expected = \file_get_contents(__DIR__ . '/css_test_files/css_minified_with_relative_paths.css.optimized.css');
     self::assertEquals($expected, $result, 'Relative paths in local minified CSS assets are correctly replaced.');
   }
 

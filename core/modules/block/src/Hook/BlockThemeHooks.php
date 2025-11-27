@@ -26,10 +26,10 @@ class BlockThemeHooks {
     // we need to convert hyphens to underscores in block deltas for the theme
     // suggestions. We can safely explode on : because we know the Block plugin
     // type manager enforces that delimiter for all derivatives.
-    $parts = explode(':', $variables['elements']['#plugin_id']);
+    $parts = \explode(':', $variables['elements']['#plugin_id']);
     $suggestion = 'block';
-    while ($part = array_shift($parts)) {
-      $suggestions[] = $suggestion .= '__' . strtr($part, '-', '_');
+    while ($part = \array_shift($parts)) {
+      $suggestions[] = $suggestion .= '__' . \strtr($part, '-', '_');
     }
     if (!empty($variables['elements']['#id'])) {
       $suggestions[] = 'block__' . $variables['elements']['#id'];

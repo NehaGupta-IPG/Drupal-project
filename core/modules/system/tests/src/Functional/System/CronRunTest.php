@@ -135,7 +135,7 @@ class CronRunTest extends BrowserTestBase {
     // Now check that it has run.
     // Sleep to allow cron time to complete since it happens during kernel
     // terminate after the page response is set.
-    sleep(3);
+    \sleep(3);
     $this->drupalGet('admin/config/system/cron');
     $this->assertSession()->pageTextNotContains('Last run: never');
 

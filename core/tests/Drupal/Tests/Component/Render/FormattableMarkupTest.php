@@ -80,7 +80,7 @@ class FormattableMarkupTest extends TestCase {
   public function testUnexpectedPlaceholder($string, $arguments, $error_number, $error_message): void {
     // We set a custom error handler because of
     // https://github.com/sebastianbergmann/phpunit/issues/487
-    set_error_handler([$this, 'errorHandler']);
+    \set_error_handler([$this, 'errorHandler']);
     // We want this to trigger an error.
     $markup = new FormattableMarkup($string, $arguments);
     // Cast it to a string which will generate the errors.

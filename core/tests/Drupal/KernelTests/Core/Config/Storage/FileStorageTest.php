@@ -52,21 +52,21 @@ class FileStorageTest extends ConfigStorageTestBase {
    * {@inheritdoc}
    */
   protected function insert($name, $data): void {
-    file_put_contents($this->storage->getFilePath($name), $data);
+    \file_put_contents($this->storage->getFilePath($name), $data);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function update($name, $data): void {
-    file_put_contents($this->storage->getFilePath($name), $data);
+    \file_put_contents($this->storage->getFilePath($name), $data);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function delete($name): void {
-    unlink($this->storage->getFilePath($name));
+    \unlink($this->storage->getFilePath($name));
   }
 
   /**

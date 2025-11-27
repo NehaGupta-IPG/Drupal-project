@@ -159,7 +159,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("You WIN!");
-    $this->assertFileExists('temporary://' . $dir . '/' . trim(basename($image3_realpath)));
+    $this->assertFileExists('temporary://' . $dir . '/' . \trim(\basename($image3_realpath)));
   }
 
   /**

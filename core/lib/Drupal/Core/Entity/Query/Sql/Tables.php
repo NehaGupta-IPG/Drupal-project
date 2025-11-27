@@ -240,7 +240,7 @@ class Tables implements TablesInterface {
           // If this is a numeric specifier then, add a condition on the
           // specific delta. Since this is a single value base field, the only
           // value that makes sense is 0.
-          if (is_numeric($next)) {
+          if (\is_numeric($next)) {
             if ($next > 0) {
               $this->sqlQuery->alwaysFalse();
             }
@@ -249,7 +249,7 @@ class Tables implements TablesInterface {
           }
           // Is this a field column?
           $columns = $field_storage?->getColumns() ?? [];
-          if (isset($columns[$next]) || in_array($next, $table_mapping->getReservedColumns())) {
+          if (isset($columns[$next]) || \in_array($next, $table_mapping->getReservedColumns())) {
             // Use it.
             $sql_column = $table_mapping->getFieldColumnName($field_storage, $next);
             // Do not process it again.
@@ -301,7 +301,7 @@ class Tables implements TablesInterface {
             $entity_type_id = $target_definition->getEntityTypeId();
           }
           if (!$entity_type_id) {
-            throw new QueryException(sprintf("Cannot determine entity type for relationship '%s' for field '%s'", $relationship_specifier ?? '', $field));
+            throw new QueryException(\sprintf("Cannot determine entity type for relationship '%s' for field '%s'", $relationship_specifier ?? '', $field));
           }
           $entity_type = $this->entityTypeManager->getActiveDefinition($entity_type_id);
           $field_storage_definitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($entity_type_id);

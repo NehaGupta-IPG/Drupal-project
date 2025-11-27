@@ -60,11 +60,11 @@ class BatchTestMultiStepForm extends FormBase {
     $step = $form_state->get('step');
     switch ($step) {
       case 1:
-        batch_set($batch_test_definitions->batch1());
+        \batch_set($batch_test_definitions->batch1());
         break;
 
       case 2:
-        batch_set($batch_test_definitions->batch2());
+        \batch_set($batch_test_definitions->batch2());
         break;
     }
 

@@ -52,7 +52,7 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     if (!$this->entityRepository instanceof EntityRepositoryInterface) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $entityRepository argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3175985', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __CLASS__ . ' constructor without the $entityRepository argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3175985', E_USER_DEPRECATED);
       $this->entityRepository = \Drupal::service(EntityRepositoryInterface::class);
     }
   }

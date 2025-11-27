@@ -141,7 +141,7 @@ class AppendOp extends AbstractOperation {
     }
 
     // Write the resulting data.
-    file_put_contents($destination_path, $this->contents());
+    \file_put_contents($destination_path, $this->contents());
 
     // Return a ScaffoldResult with knowledge of whether this file is managed.
     return new ScaffoldResult($destination, $this->managed);

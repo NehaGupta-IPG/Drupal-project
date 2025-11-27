@@ -65,7 +65,7 @@ class BlockConfigUpdater {
    *   TRUE if the block has deprecated settings.
    */
   public function needsInfoStatusSettingsRemoved(BlockInterface $block): bool {
-    if (!str_starts_with($block->getPluginId(), 'block_content')) {
+    if (!\str_starts_with($block->getPluginId(), 'block_content')) {
       return FALSE;
     }
     $settings = $block->get('settings');
@@ -76,7 +76,7 @@ class BlockConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['3426302'][$block->id()];
     if ($this->deprecationsEnabled && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error('Block content blocks with the "status" and "info" settings is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. They were unused, so there is no replacement. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3499836', E_USER_DEPRECATED);
+      @\trigger_error('Block content blocks with the "status" and "info" settings is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. They were unused, so there is no replacement. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3499836', E_USER_DEPRECATED);
     }
 
     return TRUE;

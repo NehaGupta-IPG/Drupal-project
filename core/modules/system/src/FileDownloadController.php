@@ -86,11 +86,11 @@ class FileDownloadController extends ControllerBase {
         // If there is no Cache-Control header, then respect the
         // file_additional_public_schemes setting, but never treat the core
         // 'private' or 'temporary' schemes as cacheable.
-        $additional_public_schemes = array_diff(
+        $additional_public_schemes = \array_diff(
           Settings::get('file_additional_public_schemes', []),
           ['private', 'temporary'],
         );
-        return in_array($scheme, $additional_public_schemes, TRUE)
+        return \in_array($scheme, $additional_public_schemes, TRUE)
           ? $response->setPublic()
           : $response->setPrivate();
       }

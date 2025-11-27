@@ -42,8 +42,8 @@ class BatchTestController {
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
 
-    batch_set($batch_test_definitions->batch5());
-    return batch_process('batch-test/redirect');
+    \batch_set($batch_test_definitions->batch5());
+    return \batch_process('batch-test/redirect');
   }
 
   /**
@@ -61,8 +61,8 @@ class BatchTestController {
     // Set the batch and process it.
     $batch_builder = (new BatchBuilder())
       ->addOperation([$batch_test_helper, 'nestedDrupalFormSubmitCallback'], [$value]);
-    batch_set($batch_builder->toArray());
-    return batch_process('batch-test/redirect');
+    \batch_set($batch_builder->toArray());
+    return \batch_process('batch-test/redirect');
   }
 
   /**
@@ -76,8 +76,8 @@ class BatchTestController {
     $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
     $batch_test_helper->stack(NULL, TRUE);
-    batch_set($batch_test_definitions->batch1());
-    return batch_process('batch-test/redirect');
+    \batch_set($batch_test_definitions->batch1());
+    return \batch_process('batch-test/redirect');
 
   }
 
@@ -94,8 +94,8 @@ class BatchTestController {
     $batch_test_helper->stack(NULL, TRUE);
     $batch = $batch_test_definitions->batch1();
     $batch['finished'] = BatchTestCallbacks::class . ':finished1Finished';
-    batch_set($batch);
-    return batch_process('batch-test/redirect');
+    \batch_set($batch);
+    return \batch_process('batch-test/redirect');
   }
 
   /**

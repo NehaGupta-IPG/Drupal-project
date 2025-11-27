@@ -67,7 +67,7 @@ class ThemeHandler implements ThemeHandlerInterface {
   public function listInfo() {
     if (!isset($this->list)) {
       $this->list = [];
-      $installed_themes = array_keys($this->configFactory->get('core.extension')->get('theme'));
+      $installed_themes = \array_keys($this->configFactory->get('core.extension')->get('theme'));
       if (!empty($installed_themes)) {
         $list = $this->themeList->getList();
         foreach ($installed_themes as $theme) {

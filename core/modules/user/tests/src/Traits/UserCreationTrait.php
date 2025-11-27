@@ -290,7 +290,7 @@ trait UserCreationTrait {
    *   TRUE if the permissions are valid.
    */
   protected function checkPermissions(array $permissions): bool {
-    $available = array_keys(\Drupal::service('user.permissions')->getPermissions());
+    $available = \array_keys(\Drupal::service('user.permissions')->getPermissions());
     foreach ($permissions as $permission) {
       if (!\in_array($permission, $available)) {
         $this->fail("Invalid permission $permission.");

@@ -41,8 +41,8 @@ class SvgExtractor extends IconExtractorWithFinder {
     // remote sources before.
     $this->checkRequiredConfigSources();
 
-    $this->configuration['config']['sources'] = array_filter($this->configuration['config']['sources'], function ($source) {
-      return empty(parse_url($source, PHP_URL_SCHEME));
+    $this->configuration['config']['sources'] = \array_filter($this->configuration['config']['sources'], function ($source) {
+      return empty(\parse_url($source, PHP_URL_SCHEME));
     });
 
     if (empty($this->configuration['config']['sources'])) {
@@ -106,9 +106,9 @@ class SvgExtractor extends IconExtractorWithFinder {
       return NULL;
     }
 
-    libxml_use_internal_errors(TRUE);
+    \libxml_use_internal_errors(TRUE);
 
-    if (!$svg = simplexml_load_string((string) $content)) {
+    if (!$svg = \simplexml_load_string((string) $content)) {
       // @todo do we need to log a warning with the xml error?
       return NULL;
     }

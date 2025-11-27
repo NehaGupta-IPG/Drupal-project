@@ -205,9 +205,9 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
    *   The trimmed path.
    */
   protected function trimFilePath($path) {
-    $base_path_position = \strpos($path, base_path());
+    $base_path_position = \strpos($path, \base_path());
     if ($base_path_position !== FALSE) {
-      $path = \substr_replace($path, '', $base_path_position, \strlen(base_path()));
+      $path = \substr_replace($path, '', $base_path_position, \strlen(\base_path()));
     }
     $query_pos = \strpos($path, '?');
     return $query_pos !== FALSE ? \substr($path, 0, $query_pos) : $path;

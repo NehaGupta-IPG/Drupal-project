@@ -131,7 +131,7 @@ class UserMailNotifyTest extends EntityKernelTestBase {
     $logger_factory->get('user')
       ->addLogger($logger);
 
-    $return = _user_mail_notify($op, $this->createUser([], NULL, FALSE, [
+    $return = \_user_mail_notify($op, $this->createUser([], NULL, FALSE, [
       'mail' => NULL,
     ]));
 

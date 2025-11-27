@@ -218,7 +218,7 @@ class ContactSitewideTest extends BrowserTestBase {
     $this->addContactForm(
       $this->randomMachineName(16),
       $label = $this->randomMachineName(16),
-      implode(',',
+      \implode(',',
         [
           $recipients[0],
           $recipients[1],
@@ -231,7 +231,7 @@ class ContactSitewideTest extends BrowserTestBase {
     $this->addContactForm(
       $name = $this->randomMachineName(16),
       $label = $this->randomMachineName(16),
-      implode(',',
+      \implode(',',
         [
           $recipients[0],
           $recipients[1],
@@ -251,7 +251,7 @@ class ContactSitewideTest extends BrowserTestBase {
 
     // Check to see that anonymous user cannot see contact page without
     // permission.
-    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access site-wide contact form']);
+    \user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access site-wide contact form']);
     $this->drupalGet('contact');
     $this->assertSession()->statusCodeEquals(403);
 

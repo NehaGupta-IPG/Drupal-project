@@ -98,16 +98,16 @@ class FieldNormalizer extends NormalizerBase implements DenormalizerInterface {
    * {@inheritdoc}
    */
   protected function getNormalizationSchema(mixed $object, array $context = []): array {
-    assert($object instanceof FieldItemListInterface);
+    \assert($object instanceof FieldItemListInterface);
     // Some aspects of the schema are determined by the field config.
     $cardinality = $object->getFieldDefinition()->getFieldStorageDefinition()->getCardinality();
     $schema = [];
     // Normalizers are resolved by the class/object being normalized. Even
     // without data, we must retrieve a representative field item.
     $field_item = $object->appendItem($object->generateSampleItems());
-    assert($this->serializer instanceof JsonSchemaProviderSerializerInterface);
+    \assert($this->serializer instanceof JsonSchemaProviderSerializerInterface);
     $item_schema = $this->serializer->getJsonSchema($field_item, $context);
-    $object->removeItem(count($object) - 1);
+    $object->removeItem(\count($object) - 1);
     unset($field_item);
 
     $schema = $item_schema;

@@ -149,7 +149,7 @@ final class ComposerPatchesValidator implements EventSubscriberInterface {
     $installed_version = $list[static::PLUGIN_NAME]?->version;
 
     $info = $this->composerInspector->getRootPackageInfo($working_dir);
-    $is_root_requirement = array_key_exists(static::PLUGIN_NAME, $info['requires'] ?? []) || array_key_exists(static::PLUGIN_NAME, $info['devRequires'] ?? []);
+    $is_root_requirement = \array_key_exists(static::PLUGIN_NAME, $info['requires'] ?? []) || \array_key_exists(static::PLUGIN_NAME, $info['devRequires'] ?? []);
 
     // The 2.x version of the plugin always exits with an error if a patch can't
     // be applied.
@@ -162,7 +162,7 @@ final class ComposerPatchesValidator implements EventSubscriberInterface {
     }
 
     return [
-      is_string($installed_version),
+      \is_string($installed_version),
       $is_root_requirement,
       $exit_on_failure,
     ];

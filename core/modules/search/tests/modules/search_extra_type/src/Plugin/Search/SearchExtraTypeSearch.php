@@ -63,7 +63,7 @@ class SearchExtraTypeSearch extends ConfigurableSearchPluginBase {
         'title' => 'Dummy title',
         'snippet' => new FormattableMarkup("Dummy search snippet to display. Keywords: @keywords\n\nConditions: @search_parameters", [
           '@keywords' => $this->keywords,
-          '@search_parameters' => print_r($this->searchParameters, TRUE),
+          '@search_parameters' => \print_r($this->searchParameters, TRUE),
         ]),
       ],
     ];

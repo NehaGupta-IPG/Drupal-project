@@ -86,7 +86,7 @@ final class InputConfigurator {
    *   The typed data definitions, keyed by input name.
    */
   public function getDataDefinitions(): array {
-    return array_map(fn (TypedDataInterface $data) => $data->getDataDefinition(), $this->data);
+    return \array_map(fn (TypedDataInterface $data) => $data->getDataDefinition(), $this->data);
   }
 
   /**
@@ -110,7 +110,7 @@ final class InputConfigurator {
   public function describeAll(): array {
     $descriptions = [];
     foreach ($this->dependencies->recipes as $dependency) {
-      $descriptions = array_merge($descriptions, $dependency->input->describeAll());
+      $descriptions = \array_merge($descriptions, $dependency->input->describeAll());
     }
     foreach ($this->data as $data) {
       $name = $data->getName();
@@ -134,7 +134,7 @@ final class InputConfigurator {
    */
   public function collectAll(InputCollectorInterface $collector, array &$processed = []): void {
     // Don't bother collecting values for a recipe we've already seen.
-    if (in_array($this->prefix, $processed, TRUE) || is_array($this->values)) {
+    if (\in_array($this->prefix, $processed, TRUE) || \is_array($this->values)) {
       return;
     }
 
@@ -156,7 +156,7 @@ final class InputConfigurator {
       $data->setValue($value);
 
       $violations = $data->validate();
-      if (count($violations) > 0) {
+      if (\count($violations) > 0) {
         throw new ValidationFailedException($data, $violations);
       }
       $this->values[$key] = $data->getValue();
@@ -192,7 +192,7 @@ final class InputConfigurator {
       [$name, $key] = $settings['config'];
       $config = \Drupal::config($name);
       if ($config->isNew()) {
-        return array_key_exists('fallback', $settings)
+        return \array_key_exists('fallback', $settings)
           ? $settings['fallback']
           : throw new \RuntimeException("The '$name' config object does not exist.");
       }
@@ -206,14 +206,14 @@ final class InputConfigurator {
         throw new \RuntimeException("The name of the environment variable cannot be empty.");
       }
       $name = $settings['env'];
-      $value = getenv($name);
+      $value = \getenv($name);
       // If the variable is defined, getenv() will return it as a string.
       // Otherwise, try to return a fallback value, and if that fails, throw an
       // exception (to be consistent with the `config` behavior).
-      if (is_string($value)) {
+      if (\is_string($value)) {
         return $value;
       }
-      return array_key_exists('fallback', $settings)
+      return \array_key_exists('fallback', $settings)
         ? $settings['fallback']
         : throw new \RuntimeException("The '$name' environment variable is not defined.");
     }

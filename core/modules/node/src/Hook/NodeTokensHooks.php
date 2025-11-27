@@ -141,7 +141,7 @@ class NodeTokensHooks {
                     $settings = \Drupal::service('plugin.manager.field.formatter')->getDefaultSettings('text_summary_or_trimmed');
                     $length = $settings['trim_length'];
                   }
-                  $output = text_summary($output, $item->format, $length);
+                  $output = \text_summary($output, $item->format, $length);
                 }
               }
               // "processed" returns a \Drupal\Component\Render\MarkupInterface

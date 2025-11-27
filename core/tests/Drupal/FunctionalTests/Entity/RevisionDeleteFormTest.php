@@ -251,7 +251,7 @@ class RevisionDeleteFormTest extends BrowserTestBase {
    * @legacy-covers ::submitForm
    */
   protected function doTestSubmitForm(array $permissions, string $entityTypeId, string $entityLabel, int $totalRevisions, array $expectedLog, string $expectedMessage, $expectedDestination): void {
-    if (count($permissions) > 0) {
+    if (\count($permissions) > 0) {
       $this->drupalLogin($this->createUser($permissions));
     }
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
@@ -302,7 +302,7 @@ class RevisionDeleteFormTest extends BrowserTestBase {
     $logs = $this->getLogs($entity->getEntityType()->getProvider());
     $this->assertCount(1, $logs);
     $this->assertEquals("@type: deleted %title revision %revision.", $logs[0]->message);
-    $this->assertEquals($expectedLog, unserialize($logs[0]->variables));
+    $this->assertEquals($expectedLog, \unserialize($logs[0]->variables));
     // Messenger message.
     $this->assertSession()->pageTextContains($expectedMessage);
     \Drupal::database()->delete('watchdog')->execute();

@@ -63,10 +63,10 @@ final class CKEditor5ImageControllerTest extends UnitTestCase {
       $this->prophesize(CKEditor5PluginManagerInterface::class)->reveal(),
     );
     // We can't use vfsstream here because of how Symfony request works.
-    $file_uri = tempnam(sys_get_temp_dir(), 'tmp');
-    $fp = fopen($file_uri, 'w');
-    fwrite($fp, 'foo');
-    fclose($fp);
+    $file_uri = \tempnam(\sys_get_temp_dir(), 'tmp');
+    $fp = \fopen($file_uri, 'w');
+    \fwrite($fp, 'foo');
+    \fclose($fp);
     $request = Request::create('/', files: [
       'upload' => [
         'name' => 'foo.txt',

@@ -183,7 +183,7 @@ class Ckeditor5Hooks {
      */
     $add_listener = function (array &$plugins_config_form) use (&$add_listener) : void {
       $field_types = ['checkbox', 'select', 'radios', 'textarea'];
-      if (isset($plugins_config_form['#type']) && in_array($plugins_config_form['#type'], $field_types) && !isset($plugins_config_form['#ajax'])) {
+      if (isset($plugins_config_form['#type']) && \in_array($plugins_config_form['#type'], $field_types) && !isset($plugins_config_form['#ajax'])) {
         $plugins_config_form['#ajax'] = [
           'callback' => '_update_ckeditor5_html_filter',
           'trigger_as' => [
@@ -194,7 +194,7 @@ class Ckeditor5Hooks {
         ];
       }
       foreach ($plugins_config_form as $key => &$value) {
-        if (is_array($value) && !str_contains((string) $key, '#')) {
+        if (\is_array($value) && !\str_contains((string) $key, '#')) {
           $add_listener($value);
         }
       }
@@ -210,7 +210,7 @@ class Ckeditor5Hooks {
       'assessActiveTextEditorAfterBuild',
     ];
     $form['#validate'][] = [CKEditor5::class, 'validateSwitchingToCKEditor5'];
-    array_unshift($form['actions']['submit']['#submit'], 'ckeditor5_filter_format_edit_form_submit');
+    \array_unshift($form['actions']['submit']['#submit'], 'ckeditor5_filter_format_edit_form_submit');
   }
 
   /**
@@ -225,8 +225,8 @@ class Ckeditor5Hooks {
     if ($extension === 'ckeditor5') {
       // Add paths to stylesheets specified by a theme's ckeditor5-stylesheets
       // config property.
-      $css = _ckeditor5_theme_css();
-      $libraries['internal.drupal.ckeditor5.stylesheets'] = ['css' => ['theme' => array_fill_keys(array_values($css), [])]];
+      $css = \_ckeditor5_theme_css();
+      $libraries['internal.drupal.ckeditor5.stylesheets'] = ['css' => ['theme' => \array_fill_keys(\array_values($css), [])]];
     }
     if ($extension === 'core') {
       // CSS rule to resolve the conflict with z-index between CKEditor 5 and
@@ -242,7 +242,7 @@ class Ckeditor5Hooks {
       return;
     }
     // All possibles CKEditor 5 languages that can be used by Drupal.
-    $ckeditor_langcodes = array_values($this->languageMapper->getMappings());
+    $ckeditor_langcodes = \array_values($this->languageMapper->getMappings());
     if ($extension === 'core') {
       // Generate libraries for each of the CKEditor 5 translation files so that
       // the correct translation file can be attached depending on the current
@@ -277,7 +277,7 @@ class Ckeditor5Hooks {
     foreach ($libraries as &$library) {
       // The way to know if a library has a translation is to depend on the
       // special "core/ckeditor5.translations" library.
-      if (empty($library['js']) || empty($library['dependencies']) || !in_array('core/ckeditor5.translations', $library['dependencies'])) {
+      if (empty($library['js']) || empty($library['dependencies']) || !\in_array('core/ckeditor5.translations', $library['dependencies'])) {
         continue;
       }
       foreach ($library['js'] as $file => $options) {
@@ -286,11 +286,11 @@ class Ckeditor5Hooks {
           continue;
         }
         // Path relative to the current extension folder.
-        $dirname = dirname($file);
+        $dirname = \dirname($file);
         // Path of the folder in the filesystem relative to the Drupal root.
         $dir = $path . '/' . $dirname;
         // Exclude protocol-free URI.
-        if (str_starts_with($dirname, '//')) {
+        if (\str_starts_with($dirname, '//')) {
           continue;
         }
         // CKEditor 5 plugins are most likely added through composer and
@@ -299,12 +299,12 @@ class Ckeditor5Hooks {
         // Collect translations based on filename, and add all existing
         // translations files to the plugin library. Unnecessary translations
         // will be filtered in ckeditor5_js_alter() hook.
-        $files = scandir("{$dir}/translations");
+        $files = \scandir("{$dir}/translations");
         foreach ($files as $file) {
-          if (str_ends_with($file, '.js')) {
-            $langcode = basename($file, '.js');
+          if (\str_ends_with($file, '.js')) {
+            $langcode = \basename($file, '.js');
             // Only add languages that Drupal can understands.
-            if (in_array($langcode, $ckeditor_langcodes)) {
+            if (\in_array($langcode, $ckeditor_langcodes)) {
               $library['js']["{$dirname}/translations/{$langcode}.js"] = ['ckeditor5_langcode' => $langcode, 'minified' => TRUE, 'preprocess' => TRUE];
             }
           }
@@ -384,7 +384,7 @@ class Ckeditor5Hooks {
     // on host entity type, host entity bundle and host entity language.
     if (!empty($element['#type']) && $element['#type'] == 'text_format') {
       $items = $context['items'];
-      assert($items instanceof FieldItemListInterface);
+      \assert($items instanceof FieldItemListInterface);
       $host_entity = $items->getEntity();
       $element['#attributes']['data-ckeditor5-host-entity-type'] = $host_entity->getEntityTypeId();
       $element['#attributes']['data-ckeditor5-host-entity-bundle'] = $host_entity->bundle();
@@ -412,8 +412,8 @@ class Ckeditor5Hooks {
     if ($editor->getEditor() === 'ckeditor5') {
       $settings = $editor->getSettings();
       // @see ckeditor5_post_update_list_type()
-      if (array_key_exists('ckeditor5_list', $settings['plugins']) && array_key_exists('ckeditor5_sourceEditing', $settings['plugins'])) {
-        $source_edited = HTMLRestrictions::fromString(implode(' ', $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags']));
+      if (\array_key_exists('ckeditor5_list', $settings['plugins']) && \array_key_exists('ckeditor5_sourceEditing', $settings['plugins'])) {
+        $source_edited = HTMLRestrictions::fromString(\implode(' ', $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags']));
         $format_restrictions = HTMLRestrictions::fromTextFormat($editor->getFilterFormat());
 
         // If neither <ol type> or <ul type> are allowed through Source Editing
@@ -422,7 +422,7 @@ class Ckeditor5Hooks {
         // new "styles" setting for the List plugin to false.
         $ol_type = HTMLRestrictions::fromString('<ol type>');
         $ul_type = HTMLRestrictions::fromString('<ul type>');
-        if (!array_key_exists('styles', $settings['plugins']['ckeditor5_list']['properties'])) {
+        if (!\array_key_exists('styles', $settings['plugins']['ckeditor5_list']['properties'])) {
           $settings['plugins']['ckeditor5_list']['properties']['styles'] =
             $ol_type->diff($source_edited)->allowsNothing() ||
             $ul_type->diff($source_edited)->allowsNothing() ||

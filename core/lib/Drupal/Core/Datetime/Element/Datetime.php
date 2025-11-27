@@ -83,7 +83,7 @@ class Datetime extends DateElementBase {
         // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
         // 'html_datetime' is not a valid format to pass to
         // DrupalDateTime::createFromFormat()
-        [$date_input, $time_input] = explode('T', $input['date']);
+        [$date_input, $time_input] = \explode('T', $input['date']);
         $date_format = DateFormat::load('html_date')->getPattern();
         $time_format = DateFormat::load('html_time')->getPattern();
       }
@@ -382,7 +382,7 @@ class Datetime extends DateElementBase {
           $form_state->setError($element, $element['#required_error']);
         }
         else {
-          $form_state->setError($element, t('The %field date is required.', ['%field' => $title]));
+          $form_state->setError($element, \t('The %field date is required.', ['%field' => $title]));
         }
       }
       else {
@@ -397,7 +397,7 @@ class Datetime extends DateElementBase {
           if ($date->getTimestamp() < $min->getTimestamp() || $date->getTimestamp() >= $max->getTimestamp()) {
             $form_state->setError(
               $element,
-              t('The %field date is invalid. Date should be in the %min-%max year range.',
+              \t('The %field date is invalid. Date should be in the %min-%max year range.',
                 ['%field' => $title, '%min' => $range[0], '%max' => $range[1]])
             );
           }

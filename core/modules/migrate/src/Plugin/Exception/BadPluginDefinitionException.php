@@ -24,7 +24,7 @@ class BadPluginDefinitionException extends InvalidPluginDefinitionException {
    * @see \Exception
    */
   public function __construct($plugin_id, $property, $code = 0, ?\Throwable $previous = NULL) {
-    $message = sprintf('The %s plugin must define the %s property.', $plugin_id, $property);
+    $message = \sprintf('The %s plugin must define the %s property.', $plugin_id, $property);
     parent::__construct($plugin_id, $message, $code, $previous);
   }
 

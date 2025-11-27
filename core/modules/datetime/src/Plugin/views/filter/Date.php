@@ -113,7 +113,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     $input = $form_state->getValue($identifier);
 
     $values = [];
-    if (is_array($input)) {
+    if (\is_array($input)) {
       if (!empty($input['value'])) {
         $values[] = $input['value'];
       }

@@ -113,11 +113,11 @@ class TestDiscovery {
 
     // Expose tests provided by core recipes.
     $base_path = $this->root . '/core/recipes';
-    if ($handle = @opendir($base_path)) {
-      while (($recipe = readdir($handle)) !== FALSE) {
+    if ($handle = @\opendir($base_path)) {
+      while (($recipe = \readdir($handle)) !== FALSE) {
         $this->testNamespaces["Drupal\\FunctionalTests\\Recipe\\Core\\$recipe\\"][] = "$base_path/$recipe/tests/src/Functional";
       }
-      closedir($handle);
+      \closedir($handle);
     }
 
     foreach ($this->testNamespaces as $prefix => $paths) {
@@ -162,7 +162,7 @@ class TestDiscovery {
    * @see https://www.drupal.org/node/3447698
    */
   public function getTestClasses($extension = NULL, array $types = [], ?string $directory = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use PhpUnitTestDiscovery::getTestClasses() instead. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use PhpUnitTestDiscovery::getTestClasses() instead. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
     if (!isset($extension) && empty($types)) {
       if (!empty($this->testClasses)) {
         return $this->testClasses;
@@ -186,7 +186,7 @@ class TestDiscovery {
       }
       catch (MissingGroupException $e) {
         // If the class name ends in Test and is not a migrate table dump.
-        if (str_ends_with($classname, 'Test') && !str_contains($classname, 'migrate_drupal\Tests\Table')) {
+        if (\str_ends_with($classname, 'Test') && !\str_contains($classname, 'migrate_drupal\Tests\Table')) {
           $reflection = new \ReflectionClass($classname);
           $groupAttributes = $reflection->getAttributes(Group::class, \ReflectionAttribute::IS_INSTANCEOF);
           if (!empty($groupAttributes)) {
@@ -244,7 +244,7 @@ class TestDiscovery {
    * @see https://www.drupal.org/node/3447698
    */
   public function findAllClassFiles($extension = NULL, ?string $directory = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use PhpUnitTestDiscovery::findAllClassFiles() instead. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use PhpUnitTestDiscovery::findAllClassFiles() instead. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
     $classmap = [];
     $namespaces = $this->registerTestNamespaces();
     if (isset($extension)) {
@@ -290,8 +290,8 @@ class TestDiscovery {
    * @see https://www.drupal.org/node/3447698
    */
   public static function scanDirectory($namespace_prefix, $path) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
-    if (!str_ends_with($namespace_prefix, '\\')) {
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
+    if (!\str_ends_with($namespace_prefix, '\\')) {
       throw new \InvalidArgumentException("Namespace prefix for $path must contain a trailing namespace separator.");
     }
     $flags = \FilesystemIterator::UNIX_PATHS;
@@ -352,7 +352,7 @@ class TestDiscovery {
    * @see https://www.drupal.org/node/3447698
    */
   public static function getTestInfo($classname, $doc_comment = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
     if ($doc_comment === NULL) {
       $reflection = new \ReflectionClass($classname);
       $doc_comment = $reflection->getDocComment();
@@ -389,7 +389,7 @@ class TestDiscovery {
     $info['type'] = 'PHPUnit-' . static::getPhpunitTestSuite($classname);
 
     if (!empty($annotations['coversDefaultClass'])) {
-      $info['description'] = 'Tests ' . ltrim($annotations['coversDefaultClass']) . '.';
+      $info['description'] = 'Tests ' . \ltrim($annotations['coversDefaultClass']) . '.';
     }
     else {
       $info['description'] = static::parseTestClassSummary($doc_comment);
@@ -437,7 +437,7 @@ class TestDiscovery {
    *   The testsuite name or FALSE if its not a phpunit test.
    */
   public static function getPhpunitTestSuite($classname) {
-    if (preg_match('/Drupal\\\\Tests\\\\(\w+)\\\\(\w+)/', $classname, $matches)) {
+    if (\preg_match('/Drupal\\\\Tests\\\\(\w+)\\\\(\w+)/', $classname, $matches)) {
       if ($matches[1] === 'Component') {
         return 'Unit-Component';
       }

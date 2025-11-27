@@ -178,9 +178,9 @@ class DefaultTableMapping implements TableMappingInterface {
 
     // The ID and UUID key may point to the same field, so make sure the list is
     // unique.
-    $key_fields = array_values(array_unique(array_filter([$id_key, $revision_key, $bundle_key, $uuid_key, $langcode_key])));
-    $all_fields = array_keys($shared_table_definitions);
-    $revisionable_fields = array_keys(array_filter($shared_table_definitions, function (FieldStorageDefinitionInterface $definition) {
+    $key_fields = \array_values(\array_unique(\array_filter([$id_key, $revision_key, $bundle_key, $uuid_key, $langcode_key])));
+    $all_fields = \array_keys($shared_table_definitions);
+    $revisionable_fields = \array_keys(\array_filter($shared_table_definitions, function (FieldStorageDefinitionInterface $definition) {
       return $definition->isRevisionable();
     }));
     // Make sure the key fields come first in the list of fields.
@@ -212,7 +212,7 @@ class DefaultTableMapping implements TableMappingInterface {
       // key and the UUID key point to the same field.
       $table_mapping
         ->setFieldNames($table_mapping->baseTable, $key_fields)
-        ->setFieldNames($table_mapping->dataTable, array_values(array_unique(array_merge([$id_key], array_diff($all_fields, [$uuid_key])))));
+        ->setFieldNames($table_mapping->dataTable, \array_values(\array_unique(\array_merge([$id_key], \array_diff($all_fields, [$uuid_key])))));
     }
     elseif ($revisionable && $translatable) {
       // The revisionable multilingual layout stores key field values in the
@@ -227,7 +227,7 @@ class DefaultTableMapping implements TableMappingInterface {
       // Like in the multilingual, non-revisionable case the UUID is not
       // in the data table. Additionally, do not store revision metadata
       // fields in the data table.
-      $data_fields = array_values(array_unique(array_merge([$id_key], array_diff($all_fields, [$uuid_key], $revision_metadata_fields))));
+      $data_fields = \array_values(\array_unique(\array_merge([$id_key], \array_diff($all_fields, [$uuid_key], $revision_metadata_fields))));
       $table_mapping->setFieldNames($table_mapping->dataTable, $data_fields);
 
       $revision_base_fields = \array_merge([$id_key, $revision_key, $langcode_key], $revision_metadata_fields);

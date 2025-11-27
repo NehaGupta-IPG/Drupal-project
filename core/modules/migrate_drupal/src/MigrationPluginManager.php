@@ -93,7 +93,7 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
     // array of providers. If the source plugin uses attributes, then combine
     // the singular string provider with the providers for the plugin
     // dependencies.
-    if (is_array($source_definition['provider'])) {
+    if (\is_array($source_definition['provider'])) {
       $providers = $source_definition['provider'];
     }
     else {
@@ -103,7 +103,7 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
 
     // Check if the migration has any of the tags that trigger source_module
     // enforcement.
-    $has_enforced_tags = !empty(array_intersect(
+    $has_enforced_tags = !empty(\array_intersect(
       $definition['migration_tags'] ?? [],
       $this->getEnforcedSourceModuleTags(),
     ));
@@ -113,13 +113,13 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
     $has_source_module = !empty($definition['source']['source_module'])
       || !empty($source_definition['source_module']);
 
-    $requires_migrate_drupal = in_array('migrate_drupal', $providers, TRUE);
+    $requires_migrate_drupal = \in_array('migrate_drupal', $providers, TRUE);
     if ($requires_migrate_drupal && $has_enforced_tags && !$has_source_module) {
       throw new BadPluginDefinitionException($source_id, 'source_module');
     }
 
     if (!$requires_migrate_drupal && !$has_enforced_tags && $has_source_module) {
-      @trigger_error("Setting the source_module property without the expected tags is deprecated in drupal:11.2.0 and will trigger an error in drupal:12.0.0. See https://www.drupal.org/node/3306373", E_USER_DEPRECATED);
+      @\trigger_error("Setting the source_module property without the expected tags is deprecated in drupal:11.2.0 and will trigger an error in drupal:12.0.0. See https://www.drupal.org/node/3306373", E_USER_DEPRECATED);
     }
   }
 

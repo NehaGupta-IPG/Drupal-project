@@ -104,7 +104,7 @@ class EntityRouteEnhancer implements EnhancerInterface {
    */
   protected function enhanceEntityView(array $defaults, Request $request) {
     $defaults[RouteObjectInterface::CONTROLLER_NAME] = '\Drupal\Core\Entity\Controller\EntityViewController::view';
-    if (str_contains($defaults['_entity_view'], '.')) {
+    if (\str_contains($defaults['_entity_view'], '.')) {
       // The _entity_view entry is of the form entity_type.view_mode.
       [$entity_type, $view_mode] = \explode('.', $defaults['_entity_view']);
       $defaults['view_mode'] = $view_mode;

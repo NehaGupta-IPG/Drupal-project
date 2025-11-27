@@ -265,7 +265,7 @@ class FieldUiHooks {
       'media_type_add_form',
       'block_content_type_add_form',
     ];
-    if (!in_array($form_id, $forms)) {
+    if (!\in_array($form_id, $forms)) {
       return;
     }
     if ($form_state->getFormObject()->getEntity()->isNew()) {

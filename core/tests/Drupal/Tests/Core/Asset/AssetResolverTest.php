@@ -277,7 +277,7 @@ class AssetResolverTest extends UnitTestCase {
    * Test that order of scripts are correct.
    */
   public function testJsAssetsOrder(): void {
-    $time = time();
+    $time = \time();
     $assets_a = (new AttachedAssets())
       ->setAlreadyLoadedLibraries([])
       ->setLibraries(['core/drupal', 'core/ckeditor5', 'core/jquery', 'piggy/ckeditor'])

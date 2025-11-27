@@ -53,7 +53,7 @@ class HistoryController extends ControllerBase {
     // Update the history table, stating that this user viewed this node.
     \history_write($node->id());
 
-    return new JsonResponse((int) history_read($node->id()));
+    return new JsonResponse((int) \history_read($node->id()));
   }
 
   /**
@@ -84,7 +84,7 @@ class HistoryController extends ControllerBase {
     $field_name = $request->request->get('field_name');
 
     // Only handle up to 100 nodes.
-    $nids = array_slice($nids, 0, 100);
+    $nids = \array_slice($nids, 0, 100);
 
     $links = [];
     foreach ($nids as $nid) {

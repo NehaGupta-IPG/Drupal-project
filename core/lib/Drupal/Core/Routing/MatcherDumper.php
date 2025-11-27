@@ -143,7 +143,7 @@ class MatcherDumper implements MatcherDumperInterface {
       }
 
       // Split the aliases into chunks to avoid big INSERT queries.
-      $alias_chunks = array_chunk($this->routes->getAliases(), 50, TRUE);
+      $alias_chunks = \array_chunk($this->routes->getAliases(), 50, TRUE);
       foreach ($alias_chunks as $aliases) {
         $insert = $this->connection->insert($this->tableName)->fields([
           'name',
@@ -153,7 +153,7 @@ class MatcherDumper implements MatcherDumperInterface {
         foreach ($aliases as $name => $alias) {
           $insert->values([
             'name' => $name,
-            'route' => serialize($alias),
+            'route' => \serialize($alias),
             'alias' => $alias->getId(),
           ]);
         }

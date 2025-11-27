@@ -188,7 +188,7 @@ trait FieldUiTestTrait {
     $field_type_plugin_manager = \Drupal::service('plugin.manager.field.field_type');
     $grouped_field_types = $field_type_plugin_manager->getGroupedDefinitions($field_type_plugin_manager->getUiDefinitions());
     foreach ($grouped_field_types as $group => $field_types) {
-      if (array_key_exists($field_type, $field_types)) {
+      if (\array_key_exists($field_type, $field_types)) {
         return $group;
       }
     }
@@ -204,8 +204,8 @@ trait FieldUiTestTrait {
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   protected function assertFieldExistsOnOverview(string $label) {
-    $field_labels = array_map(
-      fn ($element): string => html_entity_decode($element->getHtml()),
+    $field_labels = \array_map(
+      fn ($element): string => \html_entity_decode($element->getHtml()),
       $this->getSession()->getPage()->findAll('css', 'table#field-overview tr td:first-child .field-label-text'),
     );
     $this->assertContains($label, $field_labels);

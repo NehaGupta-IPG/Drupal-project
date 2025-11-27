@@ -115,7 +115,7 @@ class GitExcluderTest extends PackageManagerKernelTestBase {
     $path = "$stage_dir/modules/unknown_to_composer_in_stage";
     $fs = new Filesystem();
     $fs->mkdir("$path/.git");
-    file_put_contents(
+    \file_put_contents(
       "$path/unknown_to_composer.info.yml",
       Yaml::encode([
         'name' => 'Unknown to composer in stage',
@@ -123,7 +123,7 @@ class GitExcluderTest extends PackageManagerKernelTestBase {
         'core_version_requirement' => '^9.7 || ^10',
       ])
     );
-    file_put_contents("$path/.git/excluded.txt", 'Phoenix!');
+    \file_put_contents("$path/.git/excluded.txt", 'Phoenix!');
 
     $stage->apply();
     /** @var \Drupal\package_manager_bypass\LoggingCommitter $committer */

@@ -82,11 +82,11 @@ class FilterID extends StaticMap implements ContainerFactoryPluginInterface {
       return $plugin_id;
     }
     else {
-      if (in_array(static::getSourceFilterType($value), [
+      if (\in_array(static::getSourceFilterType($value), [
         FilterInterface::TYPE_TRANSFORM_REVERSIBLE,
         FilterInterface::TYPE_TRANSFORM_IRREVERSIBLE,
       ], TRUE)) {
-        $message = sprintf('Filter %s could not be mapped to an existing filter plugin; omitted since it is a transformation-only filter. Install and configure a successor after the migration.', $plugin_id);
+        $message = \sprintf('Filter %s could not be mapped to an existing filter plugin; omitted since it is a transformation-only filter. Install and configure a successor after the migration.', $plugin_id);
         $migrate_executable->saveMessage($message, MigrationInterface::MESSAGE_INFORMATIONAL);
         $this->stopPipeline();
         return NULL;

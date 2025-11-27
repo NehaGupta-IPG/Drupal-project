@@ -128,7 +128,7 @@ class DatabaseBackend implements CacheBackendInterface {
     // ::select() is a much smaller proportion of the request.
     $result = [];
     try {
-      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)])->fetchAll();
+      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => \array_keys($cid_mapping)])->fetchAll();
     }
     catch (\Exception) {
       // Nothing to do.
@@ -140,10 +140,10 @@ class DatabaseBackend implements CacheBackendInterface {
       $tags_for_preload = [];
       foreach ($result as $item) {
         if ($item->tags) {
-          $tags_for_preload[] = explode(' ', $item->tags);
+          $tags_for_preload[] = \explode(' ', $item->tags);
         }
       }
-      $this->checksumProvider->registerCacheTagsForPreload(array_merge(...$tags_for_preload));
+      $this->checksumProvider->registerCacheTagsForPreload(\array_merge(...$tags_for_preload));
     }
     $cache = [];
     foreach ($result as $item) {
@@ -387,7 +387,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function invalidateAll() {
-    @trigger_error("CacheBackendInterface::invalidateAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use CacheBackendInterface::deleteAll() or cache tag invalidation instead. See https://www.drupal.org/node/3500622", E_USER_DEPRECATED);
+    @\trigger_error("CacheBackendInterface::invalidateAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use CacheBackendInterface::deleteAll() or cache tag invalidation instead. See https://www.drupal.org/node/3500622", E_USER_DEPRECATED);
     try {
       $this->connection->update($this->bin)
         ->fields(['expire' => $this->time->getRequestTime() - 1])
@@ -498,8 +498,8 @@ class DatabaseBackend implements CacheBackendInterface {
     // Additionally check for trailing spaces in the cache ID because MySQL
     // may or may not take these into account when making comparisons.
     // @see https://dev.mysql.com/doc/refman/9.0/en/char.html
-    $cid_is_ascii = mb_check_encoding($cid, 'ASCII');
-    if (strlen($cid) <= 255 && $cid_is_ascii && !str_ends_with($cid, ' ')) {
+    $cid_is_ascii = \mb_check_encoding($cid, 'ASCII');
+    if (\strlen($cid) <= 255 && $cid_is_ascii && !\str_ends_with($cid, ' ')) {
       return $cid;
     }
     // Return a string that uses as much as possible of the original cache ID

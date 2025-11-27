@@ -207,7 +207,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
    * @internal
    */
   protected function assertFieldValues(string $entity_name, array $referenced_entities, $assert_order = TRUE): void {
-    $entity = current($this->container->get('entity_type.manager')->getStorage(
+    $entity = \current($this->container->get('entity_type.manager')->getStorage(
     $this->entityType)->loadByProperties(['name' => $entity_name]));
 
     $this->assertNotEmpty($entity, "$this->entityType: Entity found in the database.");

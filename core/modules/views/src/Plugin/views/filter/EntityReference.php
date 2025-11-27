@@ -170,12 +170,12 @@ class EntityReference extends ManyToOne {
     $entity_type = $this->getReferencedEntityType();
     $selection_plugins = $this->selectionPluginManager->getSelectionGroups($entity_type->id());
     $this->handlerOptions = [];
-    foreach (array_keys($selection_plugins) as $selection_group_id) {
+    foreach (\array_keys($selection_plugins) as $selection_group_id) {
       // We only display base plugins (e.g. 'default', 'views', ...).
-      if (array_key_exists($selection_group_id, $selection_plugins[$selection_group_id])) {
+      if (\array_key_exists($selection_group_id, $selection_plugins[$selection_group_id])) {
         $this->handlerOptions[$selection_group_id] = (string) $selection_plugins[$selection_group_id][$selection_group_id]['label'];
       }
-      elseif (array_key_exists($selection_group_id . ':' . $entity_type->id(), $selection_plugins[$selection_group_id])) {
+      elseif (\array_key_exists($selection_group_id . ':' . $entity_type->id(), $selection_plugins[$selection_group_id])) {
         $selection_group_plugin = $selection_group_id . ':' . $entity_type->id();
         $this->handlerOptions[$selection_group_plugin] = (string) $selection_plugins[$selection_group_id][$selection_group_plugin]['base_plugin_label'];
       }
@@ -346,7 +346,7 @@ class EntityReference extends ManyToOne {
     $form_state->setValue(['options', 'sub_handler_settings'], $subform_options);
 
     // Remove options that are not from the selected sub_handler.
-    foreach (array_keys($this->getSubHandlerOptions()) as $sub_handler_option) {
+    foreach (\array_keys($this->getSubHandlerOptions()) as $sub_handler_option) {
       if (isset($options[static::SUBFORM_PREFIX . $sub_handler_option])) {
         $form_state->unsetValue(['options', static::SUBFORM_PREFIX . $sub_handler_option]);
       }
@@ -363,7 +363,7 @@ class EntityReference extends ManyToOne {
     // Unset sub handler settings that are not selected so they are not saved.
     // ConfigHandlerExtra::submitForm will set the selected sub handler's
     // settings.
-    foreach (array_keys($this->getSubHandlerOptions()) as $sub_handler_option) {
+    foreach (\array_keys($this->getSubHandlerOptions()) as $sub_handler_option) {
       $subform_key = static::SUBFORM_PREFIX . $sub_handler_option;
       if ($sub_handler_option !== $sub_handler && isset($this->options[$subform_key])) {
         unset($this->options[$subform_key]);
@@ -509,12 +509,12 @@ class EntityReference extends ManyToOne {
           $default_value = static::ALL_VALUE;
         }
         elseif (empty($default_value)) {
-          $keys = array_keys($options);
-          $default_value = array_shift($keys);
+          $keys = \array_keys($options);
+          $default_value = \array_shift($keys);
         }
         else {
           // Set the default value to be the first element of the array.
-          $default_value = reset($default_value);
+          $default_value = \reset($default_value);
         }
       }
     }
@@ -526,7 +526,7 @@ class EntityReference extends ManyToOne {
       '#multiple' => TRUE,
       '#options' => $options,
       // Set a minimum size to facilitate easier selection of entities.
-      '#size' => min(8, count($options)),
+      '#size' => \min(8, \count($options)),
       '#default_value' => $default_value,
     ];
 
@@ -654,7 +654,7 @@ class EntityReference extends ManyToOne {
     }
 
     $values = $form_state->getValue($identifier);
-    if (!is_array($values)) {
+    if (!\is_array($values)) {
       return;
     }
 

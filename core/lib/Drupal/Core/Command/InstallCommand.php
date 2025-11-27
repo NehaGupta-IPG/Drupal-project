@@ -236,9 +236,9 @@ class InstallCommand extends Command {
         $started = TRUE;
         // We've already done 1.
         $progress_bar->setFormat("%current%/%max% [%bar%]\n%message%\n");
-        $progress_bar->setMessage($this->t('Installing @drupal', ['@drupal' => drupal_install_profile_distribution_name()]));
-        $tasks = install_tasks($install_state);
-        $progress_bar->start(count($tasks) + 1);
+        $progress_bar->setMessage($this->t('Installing @drupal', ['@drupal' => \drupal_install_profile_distribution_name()]));
+        $tasks = \install_tasks($install_state);
+        $progress_bar->start(\count($tasks) + 1);
       }
       $tasks_to_perform = \install_tasks_to_perform($install_state);
       $task = \current($tasks_to_perform);
@@ -248,7 +248,7 @@ class InstallCommand extends Command {
       $progress_bar->advance();
     });
     $success_message = $this->t('Congratulations, you installed @drupal!', [
-      '@drupal' => drupal_install_profile_distribution_name(),
+      '@drupal' => \drupal_install_profile_distribution_name(),
       '@name' => 'admin',
       '@pass' => $password,
     ], ['langcode' => $langcode]);

@@ -24,7 +24,7 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   public function __construct($jail, $username, #[\SensitiveParameter] $password, $hostname = "localhost", $port = 22) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
     $this->username = $username;
     $this->password = $password;
@@ -64,7 +64,7 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   protected function copyFileJailed($source, $destination) {
-    if (!@ssh2_scp_send($this->connection, $source, $destination)) {
+    if (!@\ssh2_scp_send($this->connection, $source, $destination)) {
       throw new FileTransferException('Cannot copy @source_file to @destination_file.', 0, [
         '@source' => $source,
         '@destination' => $destination,

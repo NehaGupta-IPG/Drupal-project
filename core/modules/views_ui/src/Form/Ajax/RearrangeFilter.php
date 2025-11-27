@@ -259,7 +259,7 @@ class RearrangeFilter extends ViewsFormBase {
     }
 
     // Sort the array.
-    asort($order);
+    \asort($order);
 
     // Create a new list of fields in the new order.
     foreach (\array_keys($order) as $field) {

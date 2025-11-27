@@ -98,7 +98,7 @@ class TypeResolver {
         throw new \LogicException('`%type` can only used when immediately preceded by `%parent` in `' . $expression . '`');
       }
       $previous_name = $name;
-      if (!is_array($data) || !isset($data[$name])) {
+      if (!\is_array($data) || !isset($data[$name])) {
         // Key not found, return original value.
         return $expression;
       }

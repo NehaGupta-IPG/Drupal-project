@@ -28,7 +28,7 @@ class BlockSettings extends ProcessPluginBase implements ContainerFactoryPluginI
 
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ?BlockManagerInterface $blockManager = NULL) {
     if (empty($blockManager)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $blockManager parameter is deprecated in drupal:11.2.0 and must be provided in drupal:12.0.0. See https://www.drupal.org/node/3522023', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $blockManager parameter is deprecated in drupal:11.2.0 and must be provided in drupal:12.0.0. See https://www.drupal.org/node/3522023', E_USER_DEPRECATED);
       $blockManager = \Drupal::service(BlockManagerInterface::class);
     }
     $this->blockManager = $blockManager;

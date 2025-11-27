@@ -85,7 +85,7 @@ class RowPluginTest extends ViewsKernelTestBase {
           'body' => [
             [
               'value' => $this->randomMachineName(42),
-              'format' => filter_default_format(),
+              'format' => \filter_default_format(),
             ],
           ],
         ]
@@ -118,7 +118,7 @@ class RowPluginTest extends ViewsKernelTestBase {
     $output = (string) $renderer->renderRoot($output);
     foreach ($this->nodes as $node) {
       // Using 22 because <p> is being included.
-      $this->assertStringNotContainsString(substr($node->body->value, 22), $output);
+      $this->assertStringNotContainsString(\substr($node->body->value, 22), $output);
     }
   }
 

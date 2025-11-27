@@ -416,7 +416,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     }
     $data = $this->mapFromStorageRecords([$values]);
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
-    $entity = current($data);
+    $entity = \current($data);
     $entity->setOriginal(clone $entity);
     $entity->setSyncing($is_syncing);
     $entity->enforceIsNew();

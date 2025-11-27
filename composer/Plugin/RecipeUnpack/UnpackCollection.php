@@ -29,42 +29,42 @@ final class UnpackCollection implements \Iterator, \Countable {
    * {@inheritdoc}
    */
   public function rewind(): void {
-    reset($this->packagesToUnpack);
+    \reset($this->packagesToUnpack);
   }
 
   /**
    * {@inheritdoc}
    */
   public function current(): PackageInterface|false {
-    return current($this->packagesToUnpack);
+    return \current($this->packagesToUnpack);
   }
 
   /**
    * {@inheritdoc}
    */
   public function key(): ?string {
-    return key($this->packagesToUnpack);
+    return \key($this->packagesToUnpack);
   }
 
   /**
    * {@inheritdoc}
    */
   public function next(): void {
-    next($this->packagesToUnpack);
+    \next($this->packagesToUnpack);
   }
 
   /**
    * {@inheritdoc}
    */
   public function valid(): bool {
-    return current($this->packagesToUnpack) !== FALSE;
+    return \current($this->packagesToUnpack) !== FALSE;
   }
 
   /**
    * {@inheritdoc}
    */
   public function count(): int {
-    return count($this->packagesToUnpack);
+    return \count($this->packagesToUnpack);
   }
 
   /**

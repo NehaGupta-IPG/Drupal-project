@@ -55,9 +55,9 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     $component_id = $component->getPluginId();
     $emoji = static::emojiForString($component_id);
     if ($env->isDebug()) {
-      $print_nodes[] = new PrintNode(new ConstantExpression(sprintf('<!-- %s Component start: %s -->', $emoji, $component_id), $line), $line);
+      $print_nodes[] = new PrintNode(new ConstantExpression(\sprintf('<!-- %s Component start: %s -->', $emoji, $component_id), $line), $line);
       if (!empty($component->metadata->variants)) {
-        $print_nodes[] = new PrintNode(new ConstantExpression(sprintf('<!--     with variant: "'), $line), $line);
+        $print_nodes[] = new PrintNode(new ConstantExpression(\sprintf('<!--     with variant: "'), $line), $line);
         $print_nodes[] = new PrintNode(new ContextVariable('variant', $line), $line);
         $print_nodes[] = new PrintNode(new ConstantExpression('" -->', $line), $line);
       }
@@ -95,7 +95,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
       $node->setNode(
         'display_end',
         new Nodes([
-          new PrintNode(new ConstantExpression(sprintf('<!-- %s Component end: %s -->', $emoji, $component_id), $line), $line),
+          new PrintNode(new ConstantExpression(\sprintf('<!-- %s Component end: %s -->', $emoji, $component_id), $line), $line),
           $node->getNode('display_end'),
         ])
       );

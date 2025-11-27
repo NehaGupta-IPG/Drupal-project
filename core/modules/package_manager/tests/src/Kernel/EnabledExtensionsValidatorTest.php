@@ -35,7 +35,7 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
    *   The test cases.
    */
   public static function providerExtensionRemoved(): array {
-    $summary = t('The update cannot proceed because the following enabled Drupal extension was removed during the update.');
+    $summary = \t('The update cannot proceed because the following enabled Drupal extension was removed during the update.');
     return [
       'module' => [
         [
@@ -46,7 +46,7 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
           ],
         ],
         [
-          ValidationResult::createError([t("'test_module2' module (provided by <code>drupal/test_module2</code>)")], $summary),
+          ValidationResult::createError([\t("'test_module2' module (provided by <code>drupal/test_module2</code>)")], $summary),
         ],
       ],
       'module and theme' => [
@@ -64,9 +64,9 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
         ],
         [
           ValidationResult::createError([
-            t("'test_module1' module (provided by <code>drupal/test_module1</code>)"),
-            t("'test_theme' theme (provided by <code>drupal/test_theme</code>)"),
-          ], t('The update cannot proceed because the following enabled Drupal extensions were removed during the update.')),
+            \t("'test_module1' module (provided by <code>drupal/test_module1</code>)"),
+            \t("'test_theme' theme (provided by <code>drupal/test_theme</code>)"),
+          ], \t('The update cannot proceed because the following enabled Drupal extensions were removed during the update.')),
         ],
       ],
       'profile' => [
@@ -78,7 +78,7 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
           ],
         ],
         [
-          ValidationResult::createError([t("'test_profile' profile (provided by <code>drupal/test_profile</code>)")], $summary),
+          ValidationResult::createError([\t("'test_profile' profile (provided by <code>drupal/test_profile</code>)")], $summary),
         ],
       ],
       'theme' => [
@@ -90,7 +90,7 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
           ],
         ],
         [
-          ValidationResult::createError([t("'test_theme' theme (provided by <code>drupal/test_theme</code>)")], $summary),
+          ValidationResult::createError([\t("'test_theme' theme (provided by <code>drupal/test_theme</code>)")], $summary),
         ],
       ],
     ];
@@ -119,7 +119,7 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
     $active_manipulator->commitChanges();
 
     foreach ($packages as $package) {
-      $extension_name = str_replace('drupal/', '', $package['name']);
+      $extension_name = \str_replace('drupal/', '', $package['name']);
       $extension = self::createExtension($project_root, $package['type'], $extension_name);
 
       if ($extension->getType() === 'theme') {

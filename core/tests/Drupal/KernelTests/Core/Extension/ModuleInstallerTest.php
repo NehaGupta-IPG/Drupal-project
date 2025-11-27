@@ -303,7 +303,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
     // Fails the test if an error or more severe message is logged.
     $message = (string) $message;
     $placeholders = \Drupal::service('logger.log_message_parser')->parseMessagePlaceholders($message, $context);
-    $message = empty($placeholders) ? $message : strtr($message, $placeholders);
+    $message = empty($placeholders) ? $message : \strtr($message, $placeholders);
     $this->fail($message);
   }
 

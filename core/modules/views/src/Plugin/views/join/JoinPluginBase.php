@@ -399,8 +399,8 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
 
     // Convert a single-valued array of values to the single-value case,
     // and transform from IN() notation to = notation.
-    if (is_array($info['value']) && count($info['value']) == 1) {
-      $info['value'] = array_shift($info['value']);
+    if (\is_array($info['value']) && \count($info['value']) == 1) {
+      $info['value'] = \array_shift($info['value']);
     }
     if (\is_array($info['value'])) {
       // We use an SA-CORE-2014-005 conformant placeholder for our array

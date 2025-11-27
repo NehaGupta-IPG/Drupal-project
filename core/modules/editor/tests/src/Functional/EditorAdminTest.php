@@ -141,7 +141,7 @@ class EditorAdminTest extends BrowserTestBase {
     $this->drupalLogin($account);
 
     // The node edit page header.
-    $text = sprintf('<em>Edit %s</em> %s', Html::escape($node_type->label()), Html::escape($node->label()));
+    $text = \sprintf('<em>Edit %s</em> %s', Html::escape($node_type->label()), Html::escape($node->label()));
 
     // Go to node edit form.
     $this->drupalGet('node/' . $node->id() . '/edit');

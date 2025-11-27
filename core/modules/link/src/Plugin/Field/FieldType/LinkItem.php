@@ -130,11 +130,11 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
       $values['title'] = match ($link_title_visibility) {
         LinkTitleVisibility::Required => $random->sentences(4),
         // In case of optional title, randomize its generation.
-        LinkTitleVisibility::Optional => mt_rand(0, 1) ? $random->sentences(4) : '',
+        LinkTitleVisibility::Optional => \mt_rand(0, 1) ? $random->sentences(4) : '',
         // Disabled, or a value that does not translate to an enum case.
         default => '',
       };
-      $values['uri'] = 'https://www.' . $random->word($domain_length) . '.' . $tlds[mt_rand(0, (count($tlds) - 1))];
+      $values['uri'] = 'https://www.' . $random->word($domain_length) . '.' . $tlds[\mt_rand(0, (\count($tlds) - 1))];
     }
     else {
       $values['uri'] = 'base:' . $random->name(\mt_rand(1, 64));

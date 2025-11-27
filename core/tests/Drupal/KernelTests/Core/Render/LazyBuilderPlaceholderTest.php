@@ -62,16 +62,16 @@ class LazyBuilderPlaceholderTest extends KernelTestBase {
   protected function assertStringOrder(array $items, string $haystack): void {
     $strings = [];
     foreach ($items as $item) {
-      if (($pos = strpos($haystack, $item)) === FALSE) {
+      if (($pos = \strpos($haystack, $item)) === FALSE) {
         $this->fail("Cannot find '$item' in the page");
       }
       $strings[$pos] = $item;
     }
-    ksort($strings);
-    $ordered = implode(', ', array_map(function ($item) {
+    \ksort($strings);
+    $ordered = \implode(', ', \array_map(function ($item) {
       return "'$item'";
     }, $items));
-    $this->assertSame($items, array_values($strings), "Found strings, ordered as: $ordered.");
+    $this->assertSame($items, \array_values($strings), "Found strings, ordered as: $ordered.");
   }
 
   /**

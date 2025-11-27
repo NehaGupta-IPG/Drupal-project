@@ -154,8 +154,8 @@ class EntityListBuilderTest extends UnitTestCase {
     $this->assertArrayHasKey('title', $operations[$operation_name]);
 
     // Ensure the operations are in the correct relative order.
-    uasort($operations, SortArray::sortByWeightElement(...));
-    $this->assertSame([$operation_name, 'edit', 'delete', 'view'], array_keys($operations));
+    \uasort($operations, SortArray::sortByWeightElement(...));
+    $this->assertSame([$operation_name, 'edit', 'delete', 'view'], \array_keys($operations));
   }
 
   /**

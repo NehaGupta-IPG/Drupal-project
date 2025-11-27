@@ -46,9 +46,9 @@ final class EventLogSubscriber implements EventSubscriberInterface {
   public function logEventInfo(SandboxEvent $event): void {
     $log_file = \Drupal::service(PathLocator::class)->getProjectRoot() . '/' . self::LOG_FILE_NAME;
 
-    if (file_exists($log_file)) {
-      $log_data = file_get_contents($log_file);
-      $log_data = json_decode($log_data, TRUE, flags: JSON_THROW_ON_ERROR);
+    if (\file_exists($log_file)) {
+      $log_data = \file_get_contents($log_file);
+      $log_data = \json_decode($log_data, TRUE, flags: JSON_THROW_ON_ERROR);
     }
     else {
       $log_data = [];
@@ -58,7 +58,7 @@ final class EventLogSubscriber implements EventSubscriberInterface {
       'event' => $event::class,
       'stage' => $event->sandboxManager::class,
     ];
-    file_put_contents($log_file, json_encode($log_data, JSON_UNESCAPED_SLASHES));
+    \file_put_contents($log_file, \json_encode($log_data, JSON_UNESCAPED_SLASHES));
   }
 
   /**

@@ -47,7 +47,7 @@ class PhpUnitApiFindAllClassFilesTest extends KernelTestBase {
     // Downgrade results to make them comparable, working around bugs and
     // additions.
     // 1. TestDiscovery discovers non-test classes that PHPUnit does not.
-    $internalList = array_intersect_key($internalList, $phpUnitList);
+    $internalList = \array_intersect_key($internalList, $phpUnitList);
 
     $this->assertEquals($internalList, $phpUnitList);
   }

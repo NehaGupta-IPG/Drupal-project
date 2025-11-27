@@ -998,7 +998,7 @@ class FormBuilderTest extends FormTestBase {
     // - #method is set to 'GET' and #token is not a string. This means the GET
     //   form did not get a form token by default, and the form did not
     //   explicitly opt in.
-    if ($token === FALSE || ($method == 'get' && !is_string($token))) {
+    if ($token === FALSE || ($method == 'get' && !\is_string($token))) {
       $this->assertEquals($built_form['#cache'], ['tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form']]);
       $this->assertFalse(isset($built_form['form_token']));
     }

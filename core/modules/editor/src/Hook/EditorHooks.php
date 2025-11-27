@@ -91,18 +91,18 @@ class EditorHooks {
   public function formFilterAdminOverviewAlter(&$form, FormStateInterface $form_state) : void {
     // @todo Cleanup column injection: https://www.drupal.org/node/1876718.
     // Splice in the column for "Text editor" into the header.
-    $position = array_search('name', $form['formats']['#header']) + 1;
-    $start = array_splice($form['formats']['#header'], 0, $position, ['editor' => $this->t('Text editor')]);
-    $form['formats']['#header'] = array_merge($start, $form['formats']['#header']);
+    $position = \array_search('name', $form['formats']['#header']) + 1;
+    $start = \array_splice($form['formats']['#header'], 0, $position, ['editor' => $this->t('Text editor')]);
+    $form['formats']['#header'] = \array_merge($start, $form['formats']['#header']);
     // Then splice in the name of each text editor for each text format.
     $editors = \Drupal::service('plugin.manager.editor')->getDefinitions();
     foreach (Element::children($form['formats']) as $format_id) {
       $editor = \Drupal::entityTypeManager()->getStorage('editor')->load($format_id);
       $editor_name = $editor && isset($editors[$editor->getEditor()]) ? $editors[$editor->getEditor()]['label'] : '—';
       $editor_column['editor'] = ['#markup' => $editor_name];
-      $position = array_search('name', array_keys($form['formats'][$format_id])) + 1;
-      $start = array_splice($form['formats'][$format_id], 0, $position, $editor_column);
-      $form['formats'][$format_id] = array_merge($start, $form['formats'][$format_id]);
+      $position = \array_search('name', \array_keys($form['formats'][$format_id])) + 1;
+      $start = \array_splice($form['formats'][$format_id], 0, $position, $editor_column);
+      $form['formats'][$format_id] = \array_merge($start, $form['formats'][$format_id]);
     }
   }
 
@@ -194,9 +194,9 @@ class EditorHooks {
     if (!$entity instanceof FieldableEntityInterface) {
       return;
     }
-    $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+    $referenced_files_by_field = \_editor_get_file_uuids_by_field($entity);
     foreach ($referenced_files_by_field as $uuids) {
-      _editor_record_file_usage($uuids, $entity);
+      \_editor_record_file_usage($uuids, $entity);
     }
   }
 
@@ -212,25 +212,25 @@ class EditorHooks {
     // On new revisions, all files are considered to be a new usage and no
     // deletion of previous file usages are necessary.
     if ($entity->getOriginal() && $entity->getRevisionId() != $entity->getOriginal()->getRevisionId()) {
-      $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+      $referenced_files_by_field = \_editor_get_file_uuids_by_field($entity);
       foreach ($referenced_files_by_field as $uuids) {
-        _editor_record_file_usage($uuids, $entity);
+        \_editor_record_file_usage($uuids, $entity);
       }
     }
     else {
-      $original_uuids_by_field = !$entity->getOriginal() ? [] : _editor_get_file_uuids_by_field($entity->getOriginal());
-      $uuids_by_field = _editor_get_file_uuids_by_field($entity);
+      $original_uuids_by_field = !$entity->getOriginal() ? [] : \_editor_get_file_uuids_by_field($entity->getOriginal());
+      $uuids_by_field = \_editor_get_file_uuids_by_field($entity);
       // Detect file usages that should be incremented.
       foreach ($uuids_by_field as $field => $uuids) {
         $original_uuids = $original_uuids_by_field[$field] ?? [];
-        if ($added_files = array_diff($uuids_by_field[$field], $original_uuids)) {
-          _editor_record_file_usage($added_files, $entity);
+        if ($added_files = \array_diff($uuids_by_field[$field], $original_uuids)) {
+          \_editor_record_file_usage($added_files, $entity);
         }
       }
       // Detect file usages that should be decremented.
       foreach ($original_uuids_by_field as $field => $uuids) {
-        $removed_files = array_diff($original_uuids_by_field[$field], $uuids_by_field[$field]);
-        _editor_delete_file_usage($removed_files, $entity, 1);
+        $removed_files = \array_diff($original_uuids_by_field[$field], $uuids_by_field[$field]);
+        \_editor_delete_file_usage($removed_files, $entity, 1);
       }
     }
   }
@@ -244,9 +244,9 @@ class EditorHooks {
     if (!$entity instanceof FieldableEntityInterface) {
       return;
     }
-    $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+    $referenced_files_by_field = \_editor_get_file_uuids_by_field($entity);
     foreach ($referenced_files_by_field as $uuids) {
-      _editor_delete_file_usage($uuids, $entity, 0);
+      \_editor_delete_file_usage($uuids, $entity, 0);
     }
   }
 
@@ -259,9 +259,9 @@ class EditorHooks {
     if (!$entity instanceof FieldableEntityInterface) {
       return;
     }
-    $referenced_files_by_field = _editor_get_file_uuids_by_field($entity);
+    $referenced_files_by_field = \_editor_get_file_uuids_by_field($entity);
     foreach ($referenced_files_by_field as $uuids) {
-      _editor_delete_file_usage($uuids, $entity, 1);
+      \_editor_delete_file_usage($uuids, $entity, 1);
     }
   }
 
@@ -305,7 +305,7 @@ class EditorHooks {
       $referencing_entity_is_accessible = FALSE;
       $references = empty($usage_list['editor']) ? [] : $usage_list['editor'];
       foreach ($references as $entity_type => $entity_ids_usage_count) {
-        $referencing_entities = \Drupal::entityTypeManager()->getStorage($entity_type)->loadMultiple(array_keys($entity_ids_usage_count));
+        $referencing_entities = \Drupal::entityTypeManager()->getStorage($entity_type)->loadMultiple(\array_keys($entity_ids_usage_count));
         /** @var \Drupal\Core\Entity\EntityInterface $referencing_entity */
         foreach ($referencing_entities as $referencing_entity) {
           if ($referencing_entity->access('view', NULL, TRUE)->isAllowed()) {

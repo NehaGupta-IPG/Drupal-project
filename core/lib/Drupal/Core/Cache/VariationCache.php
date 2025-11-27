@@ -52,7 +52,7 @@ class VariationCache implements VariationCacheInterface {
    */
   public function get(array $keys, CacheableDependencyInterface $initial_cacheability) {
     $chain = $this->getRedirectChain($keys, $initial_cacheability);
-    return end($chain);
+    return \end($chain);
   }
 
   /**
@@ -75,7 +75,7 @@ class VariationCache implements VariationCacheInterface {
     foreach ($items as $index => [$keys, $cacheability]) {
       // Try to optimize based on the cached redirect chain.
       if ($chain = $this->getValidatedCachedRedirectChain($keys, $cacheability)) {
-        $last_item = end($chain);
+        $last_item = \end($chain);
 
         // Immediately skip processing the CID for cache misses.
         if ($last_item === FALSE) {
@@ -83,10 +83,10 @@ class VariationCache implements VariationCacheInterface {
         }
 
         // We do not need to calculate the initial CID as its part of the chain.
-        $initial_cid = array_key_first($chain);
+        $initial_cid = \array_key_first($chain);
 
         // Prime the CID map with the last known redirect for the initial CID.
-        assert($last_item->data instanceof CacheRedirect);
+        \assert($last_item->data instanceof CacheRedirect);
         $cid = $this->createCacheIdFast($keys, $last_item->data);
       }
       else {
@@ -107,7 +107,7 @@ class VariationCache implements VariationCacheInterface {
     while (!empty($cid_map)) {
       $new_cid_map = [];
 
-      $fetch_cids = array_keys($cid_map);
+      $fetch_cids = \array_keys($cid_map);
       foreach ($this->cacheBackend->getMultiple($fetch_cids) as $cid => $result) {
         $info = $cid_map[$cid];
 
@@ -143,10 +143,10 @@ class VariationCache implements VariationCacheInterface {
     $initial_contexts = $initial_cacheability->getCacheContexts();
     $contexts = $cacheability->getCacheContexts();
 
-    if ($missing_contexts = array_diff($initial_contexts, $contexts)) {
-      throw new \LogicException(sprintf(
+    if ($missing_contexts = \array_diff($initial_contexts, $contexts)) {
+      throw new \LogicException(\sprintf(
         'The complete set of cache contexts for a variation cache item must contain all of the initial cache contexts, missing: %s.',
-        implode(', ', $missing_contexts)
+        \implode(', ', $missing_contexts)
       ));
     }
 
@@ -204,7 +204,7 @@ class VariationCache implements VariationCacheInterface {
           if (\array_diff($result_contexts, $contexts)) {
             // Check whether we have an overlap scenario as we need to manually
             // create an extra redirect in that case.
-            $common_contexts = array_intersect($result_contexts, $contexts);
+            $common_contexts = \array_intersect($result_contexts, $contexts);
 
             // If the only common contexts are those we've seen before, it means
             // we are trying to set a redirect at an address that is completely
@@ -234,13 +234,13 @@ class VariationCache implements VariationCacheInterface {
             // result of one of the factory methods on AccessResult, without
             // adding the cacheability from previous access checks that did not
             // lead to a value being returned.
-            if (!array_diff($common_contexts, $previous_step_contexts)) {
-              trigger_error(sprintf(
+            if (!\array_diff($common_contexts, $previous_step_contexts)) {
+              \trigger_error(\sprintf(
                 'Trying to overwrite a cache redirect for "%s" with one that has nothing in common, old one at address "%s" was pointing to "%s", new one points to "%s".',
                 $chain_cid,
-                implode(', ', $previous_step_contexts),
-                implode(', ', array_diff($result_contexts, $previous_step_contexts)),
-                implode(', ', array_diff($contexts, $previous_step_contexts)),
+                \implode(', ', $previous_step_contexts),
+                \implode(', ', \array_diff($result_contexts, $previous_step_contexts)),
+                \implode(', ', \array_diff($contexts, $previous_step_contexts)),
               ), E_USER_WARNING);
             }
 
@@ -288,12 +288,12 @@ class VariationCache implements VariationCacheInterface {
     $chain = $this->getRedirectChain($keys, $initial_cacheability);
 
     // Don't need to delete what could not be found.
-    if (end($chain) === FALSE) {
+    if (\end($chain) === FALSE) {
       return;
     }
 
     unset($this->redirectChainCache[$this->createCacheIdFast($keys, $initial_cacheability)]);
-    $this->cacheBackend->delete(array_key_last($chain));
+    $this->cacheBackend->delete(\array_key_last($chain));
   }
 
   /**
@@ -303,12 +303,12 @@ class VariationCache implements VariationCacheInterface {
     $chain = $this->getRedirectChain($keys, $initial_cacheability);
 
     // Don't need to invalidate what could not be found.
-    if (end($chain) === FALSE) {
+    if (\end($chain) === FALSE) {
       return;
     }
 
     unset($this->redirectChainCache[$this->createCacheIdFast($keys, $initial_cacheability)]);
-    $this->cacheBackend->invalidate(array_key_last($chain));
+    $this->cacheBackend->invalidate(\array_key_last($chain));
   }
 
   /**
@@ -340,8 +340,8 @@ class VariationCache implements VariationCacheInterface {
     // in the chain or bypass the while loop below in case the chain ends in
     // FALSE, indicating a previous cache miss.
     else {
-      $initial_cid = array_key_first($chain);
-      $result = end($chain);
+      $initial_cid = \array_key_first($chain);
+      $result = \end($chain);
     }
 
     while ($result && $result->data instanceof CacheRedirect) {
@@ -354,7 +354,7 @@ class VariationCache implements VariationCacheInterface {
     // do store the rest of the chain because redirects can be reused safely.
     $chain_to_cache = $chain;
     if ($result !== FALSE) {
-      array_pop($chain_to_cache);
+      \array_pop($chain_to_cache);
     }
     $this->redirectChainCache[$initial_cid] = $chain_to_cache;
 
@@ -392,7 +392,7 @@ class VariationCache implements VariationCacheInterface {
     // to the validated chain because the only way a cached chain ends in a
     // redirect is if it led to a cache hit in ::getRedirectChain().
     $valid_parts = [];
-    $last_key = array_key_last($chain);
+    $last_key = \array_key_last($chain);
     foreach ($chain as $key => $result) {
       if ($result && $result->data instanceof CacheRedirect) {
         $cid = $this->createCacheIdFast($keys, $result->data);

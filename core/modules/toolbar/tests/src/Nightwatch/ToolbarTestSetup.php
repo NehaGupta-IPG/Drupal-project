@@ -19,7 +19,7 @@ class ToolbarTestSetup implements TestSetupInterface {
    */
   public function setup(): void {
     $module_installer = \Drupal::service('module_installer');
-    assert($module_installer instanceof ModuleInstallerInterface);
+    \assert($module_installer instanceof ModuleInstallerInterface);
     $module_installer->install(['toolbar']);
 
     $role = Role::load(RoleInterface::ANONYMOUS_ID);

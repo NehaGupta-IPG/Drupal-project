@@ -25,10 +25,10 @@ class FileLinkTarget implements EntityLinkTargetInterface {
    * {@inheritdoc}
    */
   public function getLinkTarget(EntityInterface $entity): GeneratedUrl {
-    assert($entity instanceof FileInterface);
+    \assert($entity instanceof FileInterface);
     $url = $entity->createFileUrl(TRUE);
     // The $url is a string, which provides no cacheability metadata.
-    assert(is_string($url));
+    \assert(\is_string($url));
     return (new GeneratedUrl())
       ->setGeneratedUrl($url)
       // No path & route processing means permanent cacheability.

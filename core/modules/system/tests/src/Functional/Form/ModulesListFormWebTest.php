@@ -98,7 +98,7 @@ class ModulesListFormWebTest extends BrowserTestBase {
    */
   public function testModulesListFormWithInvalidInfoFile(): void {
     $path = $this->root . '/' . \Drupal::getContainer()->getParameter('site.path') . "/modules/broken";
-    mkdir($path, 0777, TRUE);
+    \mkdir($path, 0777, TRUE);
     $file_path = "$path/broken.info.yml";
 
     $yml = <<<BROKEN

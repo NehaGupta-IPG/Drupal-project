@@ -342,7 +342,7 @@ class Block extends DisplayPluginBase {
    */
   public function blockSubmit(ViewsBlock $block, $form, FormStateInterface $form_state) {
     if ($items_per_page = $form_state->getValue(['override', 'items_per_page'])) {
-      $block->setConfigurationValue('items_per_page', $items_per_page === 'none' ? NULL : intval($items_per_page));
+      $block->setConfigurationValue('items_per_page', $items_per_page === 'none' ? NULL : \intval($items_per_page));
     }
     $form_state->unsetValue(['override', 'items_per_page']);
   }
@@ -355,9 +355,9 @@ class Block extends DisplayPluginBase {
    */
   public function preBlockBuild(ViewsBlock $block) {
     $config = $block->getConfiguration();
-    if (is_numeric($config['items_per_page']) && $config['items_per_page'] > 0) {
+    if (\is_numeric($config['items_per_page']) && $config['items_per_page'] > 0) {
       // @todo Delete the intval() in https://www.drupal.org/project/drupal/issues/3521221
-      $this->view->setItemsPerPage(intval($config['items_per_page']));
+      $this->view->setItemsPerPage(\intval($config['items_per_page']));
     }
   }
 

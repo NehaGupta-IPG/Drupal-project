@@ -276,7 +276,7 @@ class Row {
    *   TRUE if the property is an empty destination.
    */
   public function hasEmptyDestinationProperty(string $property): bool {
-    return in_array($property, $this->emptyDestinationProperties);
+    return \in_array($property, $this->emptyDestinationProperties);
   }
 
   /**
@@ -286,7 +286,7 @@ class Row {
    *   The name of the empty destination property.
    */
   public function removeEmptyDestinationProperty(string $property): void {
-    $this->emptyDestinationProperties = array_diff(
+    $this->emptyDestinationProperties = \array_diff(
       $this->emptyDestinationProperties,
       [$property],
     );

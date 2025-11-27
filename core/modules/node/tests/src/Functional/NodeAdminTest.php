@@ -258,7 +258,7 @@ class NodeAdminTest extends NodeTestBase {
   public function testContentAdminPageWithLimitedContentViewer(): void {
     \Drupal::service('module_installer')->install(['node_access_test']);
     $this->addPrivateField(NodeType::load('page'));
-    node_access_rebuild();
+    \node_access_rebuild();
 
     $role_id = $this->drupalCreateRole([
       'access content overview',
@@ -316,13 +316,13 @@ class NodeAdminTest extends NodeTestBase {
     // Confirm the current user has limited privileges.
     $admin_permissions = ['administer nodes', 'bypass node access'];
     foreach ($admin_permissions as $admin_permission) {
-      $this->assertFalse(\Drupal::service('current_user')->hasPermission($admin_permission), sprintf('The current user does not have "%s" permission.', $admin_permission));
+      $this->assertFalse(\Drupal::service('current_user')->hasPermission($admin_permission), \sprintf('The current user does not have "%s" permission.', $admin_permission));
     }
     // Confirm that the nodes are visible to the less privileged user.
     foreach ($nodes_visible as $node) {
       self::assertTrue($node->access('view', $viewer_user));
       $this->drupalGet('admin/content');
-      $this->assertSession()->linkByHrefExists('node/' . $node->id(), 0, sprintf('The "%s" node is visible on the admin/content page.', $node->getTitle()));
+      $this->assertSession()->linkByHrefExists('node/' . $node->id(), 0, \sprintf('The "%s" node is visible on the admin/content page.', $node->getTitle()));
     }
 
     // Without the "node test view" permission the unpublished page of the

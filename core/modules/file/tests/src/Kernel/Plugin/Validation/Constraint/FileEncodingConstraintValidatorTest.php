@@ -36,8 +36,8 @@ class FileEncodingConstraintValidatorTest extends FileValidatorTestBase {
   #[DataProvider('providerTestFileValidateEncodings')]
   public function testFileEncodings(array $file_properties, array $encodings, array $expected_errors): void {
     $data = 'Räme';
-    $data = mb_convert_encoding($data, $file_properties['encoding']);
-    file_put_contents($file_properties['uri'], $data);
+    $data = \mb_convert_encoding($data, $file_properties['encoding']);
+    \file_put_contents($file_properties['uri'], $data);
     $file = File::create($file_properties);
     // Test for failure.
     $validators = [

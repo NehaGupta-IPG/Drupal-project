@@ -212,7 +212,7 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     if ($exposed) {
       $identifier = $this->options['expose']['identifier'];
       if (empty($this->options['expose']['use_operator']) || empty($this->options['expose']['operator_id'])) {
-        $display_options = in_array($this->operator, $this->operatorValues(1)) ? 'value' : 'none';
+        $display_options = \in_array($this->operator, $this->operatorValues(1)) ? 'value' : 'none';
       }
       else {
         $source = ':input[name="' . $this->options['expose']['operator_id'] . '"]';
@@ -271,7 +271,7 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     if (empty($this->valueOptions)) {
       $this->getValueOptions();
     }
-    if (in_array($this->operator, $this->operatorValues(1), TRUE)) {
+    if (\in_array($this->operator, $this->operatorValues(1), TRUE)) {
       $this->getValueOptions();
       // Now that we have the valid options for this filter, just return the
       // human-readable label based on the current value.  The valueOptions

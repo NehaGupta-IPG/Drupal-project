@@ -239,7 +239,7 @@ abstract class Tasks {
     // of database servers should know what they're doing, whether Drupal warns
     // them or not.
     // @see https://www.php.net/manual/en/function.version-compare.php
-    if ($this->minimumVersion() && version_compare(Database::getConnection()->version(), $this->minimumVersion() . '-AnyName', '<')) {
+    if ($this->minimumVersion() && \version_compare(Database::getConnection()->version(), $this->minimumVersion() . '-AnyName', '<')) {
       $this->fail($this->t("The database server version %version is less than the minimum required version %minimum_version.", [
         '%version' => Database::getConnection()
           ->version(),
@@ -354,7 +354,7 @@ abstract class Tasks {
     $errors = [];
 
     // Verify the table prefix.
-    if (!empty($database['prefix']) && is_string($database['prefix']) && !preg_match('/^[A-Za-z0-9_.]+$/', $database['prefix'])) {
+    if (!empty($database['prefix']) && \is_string($database['prefix']) && !\preg_match('/^[A-Za-z0-9_.]+$/', $database['prefix'])) {
       $errors[$database['driver'] . '][prefix'] = $this->t('The database table prefix you have entered, %prefix, is invalid. The table prefix can only contain alphanumeric characters, periods, or underscores.', ['%prefix' => $database['prefix']]);
     }
 

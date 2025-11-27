@@ -37,7 +37,7 @@ trait ConfigFormBaseTrait {
    *   not.
    */
   protected function config($name) {
-    if (method_exists($this, 'configFactory')) {
+    if (\method_exists($this, 'configFactory')) {
       $config_factory = $this->configFactory();
     }
     elseif (\property_exists($this, 'configFactory')) {

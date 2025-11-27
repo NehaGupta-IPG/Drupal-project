@@ -182,12 +182,12 @@ class InstallHelper implements ContainerInjectionInterface {
 
     // Load all the content from any CSV files that exist for enabled languages.
     foreach ($translated_languages as $language) {
-      if (file_exists($default_content_path . "$language/$filename") &&
-      ($handle = fopen($default_content_path . "$language/$filename", 'r')) !== FALSE) {
-        $header = fgetcsv($handle, escape: '');
+      if (\file_exists($default_content_path . "$language/$filename") &&
+      ($handle = \fopen($default_content_path . "$language/$filename", 'r')) !== FALSE) {
+        $header = \fgetcsv($handle, escape: '');
         $line_counter = 0;
-        while (($content = fgetcsv($handle, escape: '')) !== FALSE) {
-          $keyed_content[$language][$line_counter] = array_combine($header, $content);
+        while (($content = \fgetcsv($handle, escape: '')) !== FALSE) {
+          $keyed_content[$language][$line_counter] = \array_combine($header, $content);
           $line_counter++;
         }
         \fclose($handle);
@@ -195,7 +195,7 @@ class InstallHelper implements ContainerInjectionInterface {
       else {
         // Language directory exists, but the file in this language was not
         // found, remove that language from list of languages to be translated.
-        $key = array_search($language, $translated_languages);
+        $key = \array_search($language, $translated_languages);
         unset($translated_languages[$key]);
       }
     }

@@ -377,7 +377,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
         // No definition for this level. Collapse multiple wildcards to a single
         // wildcard to see if there is a greedy match. For example,
         // "breakpoint.breakpoint.*.*" becomes "breakpoint.breakpoint.*".
-        $one_star = preg_replace('/\.([:\.\*]*)$/', '.*', $replaced);
+        $one_star = \preg_replace('/\.([:\.\*]*)$/', '.*', $replaced);
         if ($one_star != $replaced && isset($this->definitions[$one_star])) {
           return $one_star;
         }

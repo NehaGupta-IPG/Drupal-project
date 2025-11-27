@@ -212,9 +212,9 @@ class TextFormat extends RenderElementBase {
       '#weight' => 0,
     ];
 
-    $all_formats = filter_formats();
+    $all_formats = \filter_formats();
     $format_exists = isset($element['#format'], $all_formats[$element['#format']]);
-    $format_allowed = !isset($element['#allowed_formats']) || in_array($element['#format'], $element['#allowed_formats']);
+    $format_allowed = !isset($element['#allowed_formats']) || \in_array($element['#format'], $element['#allowed_formats']);
     $user_has_access = isset($element['#format'], $formats[$element['#format']]);
     $user_is_admin = $user->hasPermission('administer filters');
 

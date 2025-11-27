@@ -178,7 +178,7 @@ trait FunctionalTestSetupTrait {
       'tags' => [['name' => 'http_middleware', 'priority' => -1024]],
     ];
     $services['parameters']['drupal.test_wait_terminate'] = FALSE;
-    file_put_contents($directory . '/services.yml', $yaml->dump($services));
+    \file_put_contents($directory . '/services.yml', $yaml->dump($services));
     // Since Drupal is bootstrapped already, install_begin_request() will not
     // bootstrap again. Hence, we have to reload the newly written custom
     // settings.php manually.
@@ -599,7 +599,7 @@ trait FunctionalTestSetupTrait {
     ];
 
     // If we only have one db driver available, we cannot set the driver.
-    if (count(Database::getDriverList()->getInstallableList()) == 1) {
+    if (\count(Database::getDriverList()->getInstallableList()) == 1) {
       unset($parameters['forms']['install_settings_form']['driver']);
     }
     return $parameters;

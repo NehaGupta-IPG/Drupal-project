@@ -93,7 +93,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
       $strings[] = $item->getString();
     }
     // Remove any empty strings resulting from empty items.
-    return implode(', ', FilterArray::removeEmptyStrings($strings));
+    return \implode(', ', FilterArray::removeEmptyStrings($strings));
   }
 
   /**

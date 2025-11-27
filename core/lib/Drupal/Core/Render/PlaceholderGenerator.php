@@ -85,7 +85,7 @@ class PlaceholderGenerator implements PlaceholderGeneratorInterface {
    * {@inheritdoc}
    */
   public function createPlaceholder(array $element) {
-    $placeholder_render_array = array_intersect_key($element, \array_flip([
+    $placeholder_render_array = \array_intersect_key($element, \array_flip([
       // Placeholders are replaced with markup by executing the associated
       // #lazy_builder callback, which generates a render array, and which the
       // Renderer will render and replace the placeholder with.

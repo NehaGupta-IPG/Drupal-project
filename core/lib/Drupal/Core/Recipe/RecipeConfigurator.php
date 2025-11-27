@@ -63,11 +63,11 @@ final class RecipeConfigurator {
       $path = $include_path . "/$name/recipe.yml";
     }
 
-    if (array_key_exists($path, static::$cache)) {
+    if (\array_key_exists($path, static::$cache)) {
       return static::$cache[$path];
     }
-    if (file_exists($path)) {
-      return static::$cache[$path] = Recipe::createFromDirectory(dirname($path));
+    if (\file_exists($path)) {
+      return static::$cache[$path] = Recipe::createFromDirectory(\dirname($path));
     }
     $search_path = \dirname($path, 2);
     throw new UnknownRecipeException($name, $search_path, \sprintf("Can not find the %s recipe, search path: %s", $name, $search_path));

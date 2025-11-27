@@ -146,7 +146,7 @@ class Query extends QueryBase implements QueryInterface {
       // This improves the performance of
       // \Drupal\Core\Entity\ContentEntityStorageBase::getLatestRevisionId().
       $conditions = $this->condition->conditions();
-      if (count($conditions) === 1 && isset($conditions[0]['field']) && $conditions[0]['field'] === $id_field) {
+      if (\count($conditions) === 1 && isset($conditions[0]['field']) && $conditions[0]['field'] === $id_field) {
         $revision_subquery->condition($id_field, $conditions[0]['value'], $conditions[0]['operator']);
       }
 

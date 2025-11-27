@@ -129,7 +129,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
    * Tests translate link on vocabulary term list.
    */
   public function testTranslateLinkVocabularyAdminPage(): void {
-    $this->drupalLogin($this->drupalCreateUser(array_merge(parent::getTranslatorPermissions(), [
+    $this->drupalLogin($this->drupalCreateUser(\array_merge(parent::getTranslatorPermissions(), [
       'access administration pages',
       'administer taxonomy',
     ])));

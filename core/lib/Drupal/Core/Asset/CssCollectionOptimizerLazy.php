@@ -155,7 +155,7 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
       $is_minified = isset($css_asset['minified']) && $css_asset['minified'];
       $is_external = isset($css_asset['type']) && $css_asset['type'] === 'external';
       if ($is_minified && $is_external) {
-        $data .= file_get_contents($css_asset['data']);
+        $data .= \file_get_contents($css_asset['data']);
       }
       else {
         $data .= $this->optimizer->optimize($css_asset);

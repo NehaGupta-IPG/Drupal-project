@@ -42,21 +42,21 @@ class WritableFileSystemValidator implements EventSubscriberInterface {
     $web_root = $this->pathLocator->getWebRoot();
     if ($web_root) {
       $drupal_root = $project_root . DIRECTORY_SEPARATOR . $web_root;
-      if (!is_writable($drupal_root)) {
+      if (!\is_writable($drupal_root)) {
         $messages[] = $this->t('The Drupal directory "@dir" is not writable.', [
           '@dir' => $drupal_root,
         ]);
       }
     }
 
-    if (!is_writable($project_root)) {
+    if (!\is_writable($project_root)) {
       $messages[] = $this->t('The project root directory "@dir" is not writable.', [
         '@dir' => $project_root,
       ]);
     }
 
     $dir = $this->pathLocator->getVendorDirectory();
-    if (!is_writable($dir)) {
+    if (!\is_writable($dir)) {
       $messages[] = $this->t('The vendor directory "@dir" is not writable.', ['@dir' => $dir]);
     }
 
@@ -70,15 +70,15 @@ class WritableFileSystemValidator implements EventSubscriberInterface {
     // Ensure the staging root is writable. If it doesn't exist, ensure we will
     // be able to create it.
     $dir = $this->pathLocator->getStagingRoot();
-    if (!file_exists($dir)) {
-      $dir = dirname($dir);
-      if (!is_writable($dir)) {
+    if (!\file_exists($dir)) {
+      $dir = \dirname($dir);
+      if (!\is_writable($dir)) {
         $messages[] = $this->t('The stage root directory will not able to be created at "@dir".', [
           '@dir' => $dir,
         ]);
       }
     }
-    elseif (!is_writable($dir)) {
+    elseif (!\is_writable($dir)) {
       $messages[] = $this->t('The stage root directory "@dir" is not writable.', [
         '@dir' => $dir,
       ]);

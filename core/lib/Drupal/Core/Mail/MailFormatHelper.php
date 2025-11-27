@@ -63,12 +63,12 @@ class MailFormatHelper {
       // signature marker untouched (RFC 3676, Section 4.3).
       $text = \preg_replace('/(?(?<!^--) +\n|  +\n)/m', "\n", $text);
       // Wrap each line at the needed width.
-      $lines = explode("\n", $text);
-      array_walk($lines, '\Drupal\Core\Mail\MailFormatHelper::wrapMailLine', [
+      $lines = \explode("\n", $text);
+      \array_walk($lines, '\Drupal\Core\Mail\MailFormatHelper::wrapMailLine', [
         'soft' => $soft,
-        'length' => strlen($indent),
+        'length' => \strlen($indent),
       ]);
-      $text = implode("\n", $lines);
+      $text = \implode("\n", $lines);
     }
     else {
       // Wrap this line.
@@ -131,7 +131,7 @@ class MailFormatHelper {
     // 'See the Drupal site [1]' with the URL included as a footnote.
     static::htmlToMailUrls(NULL, TRUE);
     $pattern = '@(<a[^>]+?href="([^"]*)"[^>]*?>([^<]*)</a>)@i';
-    $string = preg_replace_callback($pattern, [static::class, 'htmlToMailUrls'], $string);
+    $string = \preg_replace_callback($pattern, [static::class, 'htmlToMailUrls'], $string);
     $urls = static::htmlToMailUrls();
     $footnotes = '';
     if (\count($urls)) {
@@ -342,9 +342,9 @@ class MailFormatHelper {
       if ($match) {
         [, , $url, $label] = $match;
         // Ensure all URLs are absolute.
-        static::$urls[] = strpos($url, '://') ? $url : preg_replace(static::$regexp, $base_url . '/', $url);
+        static::$urls[] = \strpos($url, '://') ? $url : \preg_replace(static::$regexp, $base_url . '/', $url);
         // Strip newlines and carriage returns from anchor text.
-        return preg_replace('/\r?\n|\r/', '', $label) . ' [' . count(static::$urls) . ']';
+        return \preg_replace('/\r?\n|\r/', '', $label) . ' [' . \count(static::$urls) . ']';
       }
     }
     return static::$urls;

@@ -144,7 +144,7 @@ abstract class MediaTestBase extends WebDriverTestBase {
         'status' => FALSE,
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },

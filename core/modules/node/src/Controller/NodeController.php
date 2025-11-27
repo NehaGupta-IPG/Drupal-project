@@ -90,8 +90,8 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     }
 
     // Bypass the node/add listing if only one content type is available.
-    if (count($content) == 1) {
-      $type = array_shift($content);
+    if (\count($content) == 1) {
+      $type = \array_shift($content);
       return $this->redirect('entity.node.add_form', ['node_type' => $type->id()]);
     }
 

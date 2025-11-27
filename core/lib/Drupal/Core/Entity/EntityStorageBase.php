@@ -287,14 +287,14 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
       $entities += $this->getFromStaticCache($ids);
       // If any entities were in the static cache remove them from the
       // remaining IDs.
-      $ids = array_diff($ids, array_keys($entities));
+      $ids = \array_diff($ids, \array_keys($entities));
 
       $fiber = \Fiber::getCurrent();
       if ($ids && $fiber !== NULL) {
         // Before suspending the fiber, add the IDs passed in to the full list
         // of entities to load, so that another call can load everything at
         // once.
-        $this->entityIdsToLoad = array_unique(array_merge($this->entityIdsToLoad, $ids));
+        $this->entityIdsToLoad = \array_unique(\array_merge($this->entityIdsToLoad, $ids));
         $fiber->suspend(FiberResumeType::Immediate);
 
         // If all the IDs we need to return have already been loaded into the
@@ -302,11 +302,11 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
         // deferring these may allow them to be loaded with more other entities
         // later.
         $entities += $this->getFromStaticCache($ids);
-        $ids = array_diff($ids, array_keys($entities));
+        $ids = \array_diff($ids, \array_keys($entities));
 
         // Otherwise load additional entities now.
         if ($ids && $this->entityIdsToLoad) {
-          $ids = array_unique(array_merge($ids, $this->entityIdsToLoad));
+          $ids = \array_unique(\array_merge($ids, $this->entityIdsToLoad));
           $this->entityIdsToLoad = [];
         }
       }
@@ -327,7 +327,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
 
       // If any entities were pre-loaded, remove them from the IDs still to
       // load.
-      $ids = array_diff($ids, array_keys($entities));
+      $ids = \array_diff($ids, \array_keys($entities));
 
       // Add pre-loaded entities to the cache.
       $this->setStaticCache($preloaded_entities);

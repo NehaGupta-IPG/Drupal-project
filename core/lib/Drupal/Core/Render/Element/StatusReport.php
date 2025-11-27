@@ -43,7 +43,7 @@ class StatusReport extends RenderElementBase {
       if (isset($requirement['severity'])) {
         $severity = $requirement['severity'] === RequirementSeverity::OK ? RequirementSeverity::Info : $requirement['severity'];
       }
-      elseif (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install') {
+      elseif (\defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install') {
         $severity = RequirementSeverity::OK;
       }
 
@@ -76,22 +76,22 @@ class StatusReport extends RenderElementBase {
    * @see https://www.drupal.org/node/3410939
    */
   public static function getSeverities() {
-    @trigger_error('Calling ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3410939', \E_USER_DEPRECATED);
+    @\trigger_error('Calling ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3410939', \E_USER_DEPRECATED);
     return [
       RequirementSeverity::Info->value => [
-        'title' => t('Checked', [], ['context' => 'Examined']),
+        'title' => \t('Checked', [], ['context' => 'Examined']),
         'status' => 'checked',
       ],
       RequirementSeverity::OK->value => [
-        'title' => t('OK'),
+        'title' => \t('OK'),
         'status' => 'ok',
       ],
       RequirementSeverity::Warning->value => [
-        'title' => t('Warnings found'),
+        'title' => \t('Warnings found'),
         'status' => 'warning',
       ],
       RequirementSeverity::Error->value => [
-        'title' => t('Errors found'),
+        'title' => \t('Errors found'),
         'status' => 'error',
       ],
     ];

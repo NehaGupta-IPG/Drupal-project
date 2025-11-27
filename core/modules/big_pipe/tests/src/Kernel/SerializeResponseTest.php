@@ -29,11 +29,11 @@ class SerializeResponseTest extends KernelTestBase {
    */
   public function testSerialize(): void {
     $response = new BigPipeResponse(new HtmlResponse());
-    $this->assertIsString(serialize($response));
+    $this->assertIsString(\serialize($response));
 
     // Checks that the response can be serialized after the big_pipe service is injected.
     $response->setBigPipeService($this->container->get('big_pipe'));
-    $this->assertIsString(serialize($response));
+    $this->assertIsString(\serialize($response));
   }
 
 }

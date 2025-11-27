@@ -275,7 +275,7 @@ class BulkDeleteTest extends FieldKernelTestBase {
         'uuid' => $deleted_field_storage->uuid(),
         'include_deleted' => TRUE,
       ]);
-    $deleted_field_storage = reset($field_storages);
+    $deleted_field_storage = \reset($field_storages);
 
     // Create the field again.
     $field_storage = FieldStorageConfig::create([

@@ -340,7 +340,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // warning if requested.
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
       if ($this->triggerWarningWhenUnpilingOnVoidTransaction) {
-        trigger_error('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', E_USER_WARNING);
+        \trigger_error('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', E_USER_WARNING);
       }
       return;
     }
@@ -409,7 +409,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // trigger a user warning.
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
       $this->connectionTransactionState = ClientConnectionTransactionState::RollbackFailed;
-      trigger_error('Transaction::rollBack() failed because of a prior execution of a DDL statement.', E_USER_WARNING);
+      \trigger_error('Transaction::rollBack() failed because of a prior execution of a DDL statement.', E_USER_WARNING);
       return;
     }
 

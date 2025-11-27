@@ -39,7 +39,7 @@ abstract class FileManagedTestBase extends BrowserTestBase {
     \Drupal::state()->resetCache();
 
     // Determine which hooks were called.
-    $actual = array_keys(array_filter(FileTestHelper::getAllCalls()));
+    $actual = \array_keys(\array_filter(FileTestHelper::getAllCalls()));
 
     // Determine if there were any expected that were not called.
     $uncalled = \array_diff($expected, $actual);
@@ -71,7 +71,7 @@ abstract class FileManagedTestBase extends BrowserTestBase {
    *   Optional translated string message.
    */
   public function assertFileHookCalled($hook, $expected_count = 1, $message = NULL) {
-    $actual_count = count(FileTestHelper::getCalls($hook));
+    $actual_count = \count(FileTestHelper::getCalls($hook));
 
     if (!isset($message)) {
       if ($actual_count == $expected_count) {

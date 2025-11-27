@@ -24,7 +24,7 @@ class BatchTestCallbacks {
     $batch_test_helper = new BatchTestHelper();
     // No-op, but ensure the batch takes a couple iterations.
     // Batch needs time to run for the test, so sleep a bit.
-    usleep($sleep);
+    \usleep($sleep);
     // Track execution, and store some result for post-processing in the
     // 'finished' callback.
     $batch_test_helper->stack("op 1 id $id");
@@ -49,7 +49,7 @@ class BatchTestCallbacks {
     for ($i = 0; $i < $limit && $context['sandbox']['count'] < $total; $i++) {
       // No-op, but ensure the batch takes a couple iterations.
       // Batch needs time to run for the test, so sleep a bit.
-      usleep($sleep);
+      \usleep($sleep);
       // Track execution, and store some result for post-processing in the
       // 'finished' callback.
       $id = $context['sandbox']['current'] + $i;
@@ -74,7 +74,7 @@ class BatchTestCallbacks {
     $batch_test_helper = new BatchTestHelper();
     // No-op, but ensure the batch takes a couple iterations.
     // Batch needs time to run for the test, so sleep a bit.
-    usleep($sleep);
+    \usleep($sleep);
     // Track execution, and store some result for post-processing in the
     // 'finished' callback.
     $batch_test_helper->stack("op 5 id $id");
@@ -92,7 +92,7 @@ class BatchTestCallbacks {
     $batch_test_helper = new BatchTestHelper();
     // No-op, but ensure the batch takes a couple iterations.
     // Batch needs time to run for the test, so sleep a bit.
-    usleep($sleep);
+    \usleep($sleep);
     // Track execution, and store some result for post-processing in the
     // 'finished' callback.
     $batch_test_helper->stack("op 6 id $id");
@@ -108,7 +108,7 @@ class BatchTestCallbacks {
     $batch_test_helper = new BatchTestHelper();
     // No-op, but ensure the batch takes a couple iterations.
     // Batch needs time to run for the test, so sleep a bit.
-    usleep($sleep);
+    \usleep($sleep);
     // Track execution, and store some result for post-processing in the
     // 'finished' callback.
     $batch_test_helper->stack("op 7 id $id");
@@ -121,7 +121,7 @@ class BatchTestCallbacks {
    * Performs a simple batch operation that optionally throws an exception.
    */
   public function callback8(bool $throw_exception): void {
-    usleep(500);
+    \usleep(500);
     if ($throw_exception) {
       throw new \Exception('Exception in batch');
     }
@@ -138,10 +138,10 @@ class BatchTestCallbacks {
     foreach ($batches as $batch) {
       $batch_test_helper->stack("setting up batch $batch");
       $function = 'batch' . $batch;
-      batch_set($batch_test_definitions->$function());
+      \batch_set($batch_test_definitions->$function());
     }
     \Drupal::state()
-      ->set('batch_test_nested_order_multiple_batches', batch_get());
+      ->set('batch_test_nested_order_multiple_batches', \batch_get());
   }
 
   /**
@@ -151,7 +151,7 @@ class BatchTestCallbacks {
     $messages = [];
     if ($results) {
       foreach ($results as $op => $op_results) {
-        $messages[] = 'op ' . Html::escape((string) $op) . ': processed ' . count($op_results) . ' elements';
+        $messages[] = 'op ' . Html::escape((string) $op) . ': processed ' . \count($op_results) . ' elements';
       }
     }
     else {
@@ -160,10 +160,10 @@ class BatchTestCallbacks {
 
     if (!$success) {
       // A fatal error occurred during the processing.
-      $error_operation = reset($operations);
+      $error_operation = \reset($operations);
       $messages[] = $this->t('An error occurred while processing @op with arguments:<br />@args', [
         '@op' => $error_operation[0],
-        '@args' => print_r($error_operation[1], TRUE),
+        '@args' => \print_r($error_operation[1], TRUE),
       ]);
     }
 

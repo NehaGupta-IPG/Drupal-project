@@ -393,8 +393,8 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     // Confirm the calculated entity dependencies before removing dependencies.
     $entity = $this->getMockEntityWithPluginCollection($instance);
     $collections = $entity->getPluginCollections();
-    $collection = reset($collections);
-    $this->assertEquals(1, count($collection));
+    $collection = \reset($collections);
+    $this->assertEquals(1, \count($collection));
     $entity->calculateDependencies();
     $calculated_dependencies = $entity->getDependencies();
     $this->assertEquals($dependencies, $calculated_dependencies);
@@ -407,7 +407,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     // If the plugin has been removed from the collection, then the collection
     // should be empty. Otherwise, there should be one plugin instance in the
     // collection.
-    $this->assertEquals($on_dependency_removal_status == RemovableDependentPluginReturn::Remove ? 0 : 1, count($collection));
+    $this->assertEquals($on_dependency_removal_status == RemovableDependentPluginReturn::Remove ? 0 : 1, \count($collection));
     $this->assertEquals($dependencies_after_removal, $recalculated_dependencies);
     $this->assertEquals($expectation, $changed);
   }

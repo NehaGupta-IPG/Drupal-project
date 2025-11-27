@@ -721,7 +721,7 @@ class FileUploadTest extends ResourceTestBase {
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'filename="example.txt"']);
     $expected = $this->getExpectedDocument(2, 'example.txt', TRUE);
     $expected['data']['attributes']['uri']['value'] = 'public://example.txt';
-    $expected['data']['attributes']['uri']['url'] = base_path() . $this->siteDirectory . '/files/example.txt';
+    $expected['data']['attributes']['uri']['url'] = \base_path() . $this->siteDirectory . '/files/example.txt';
 
     $this->assertResponseData($expected, $response);
     $this->assertFileExists('public://example.txt');
@@ -793,7 +793,7 @@ class FileUploadTest extends ResourceTestBase {
           'status' => $expected_status,
           'uri' => [
             'value' => 'public://foobar/' . $expected_filename,
-            'url' => base_path() . $this->siteDirectory . '/files/foobar/' . \rawurlencode($expected_filename),
+            'url' => \base_path() . $this->siteDirectory . '/files/foobar/' . \rawurlencode($expected_filename),
           ],
           'drupal_internal__fid' => (int) $file->id(),
         ],

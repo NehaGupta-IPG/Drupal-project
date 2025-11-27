@@ -146,7 +146,7 @@ class TimestampFormatterTest extends KernelTestBase {
    * Tests TimestampAgoFormatter.
    */
   public function testTimestampAgoFormatter(): void {
-    foreach (range(1, 7) as $granularity) {
+    foreach (\range(1, 7) as $granularity) {
       $request_time = \Drupal::requestStack()->getCurrentRequest()->server->get('REQUEST_TIME');
 
       // Test a timestamp in the past.

@@ -38,7 +38,7 @@ class MenuTestHooks {
    */
   #[Hook('menu_local_tasks_alter')]
   public function menuLocalTasksAlter(&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
-    if (in_array($route_name, ['menu_test.tasks_default'])) {
+    if (\in_array($route_name, ['menu_test.tasks_default'])) {
       $data['tabs'][0]['foo'] = [
         '#theme' => 'menu_local_task',
         '#link' => [

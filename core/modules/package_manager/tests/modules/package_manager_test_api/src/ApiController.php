@@ -126,8 +126,8 @@ class ApiController extends ControllerBase {
    */
   public function checkSetup(): Response {
     return new Response(
-      'max_execution_time=' . ini_get('max_execution_time') .
-      ':set_time_limit-exists=' . (function_exists('set_time_limit') ? 'yes' : 'no')
+      'max_execution_time=' . \ini_get('max_execution_time') .
+      ':set_time_limit-exists=' . (\function_exists('set_time_limit') ? 'yes' : 'no')
     );
   }
 

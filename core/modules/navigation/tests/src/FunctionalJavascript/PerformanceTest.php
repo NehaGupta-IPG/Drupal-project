@@ -56,7 +56,7 @@ class PerformanceTest extends PerformanceTestBase {
     // which requests complete so this ensures that the second request completes
     // after asset aggregates are served.
     $this->drupalGet('');
-    sleep(1);
+    \sleep(1);
     $this->drupalGet('');
     // Flush the dynamic page cache to simulate visiting a page that is not
     // already fully cached.

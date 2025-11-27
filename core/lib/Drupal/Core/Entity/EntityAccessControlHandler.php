@@ -423,8 +423,8 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
    *   The create access result cache ID, or null if uncacheable.
    */
   protected function buildCreateAccessCid(array $context, ?string $entity_bundle): ?string {
-    $extendedContext = array_filter($context, function ($key) {
-      return !(in_array($key, ['entity_type_id', 'langcode']));
+    $extendedContext = \array_filter($context, function ($key) {
+      return !(\in_array($key, ['entity_type_id', 'langcode']));
     }, ARRAY_FILTER_USE_KEY);
     if (empty($extendedContext)) {
       return $entity_bundle ? 'create:' . $entity_bundle : 'create';

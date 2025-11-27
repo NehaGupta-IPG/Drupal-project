@@ -38,15 +38,15 @@ class HookCollectorPassTest extends UnitTestCase {
     ];
     $file_data = [];
     foreach ($files as &$filename) {
-      NestedArray::setValue($file_data, explode('/', $filename), '');
+      NestedArray::setValue($file_data, \explode('/', $filename), '');
     }
     vfsStream::create($file_data);
     $module_filenames = [
       'test_module' => ['pathname' => 'vfs://drupal_root/modules/test_module/test_module_info.yml'],
     ];
     // This directory, however, should be included.
-    mkdir('vfs://drupal_root/modules/test_module/includes');
-    file_put_contents('vfs://drupal_root/modules/test_module/includes/test_module.inc', <<<__EOF__
+    \mkdir('vfs://drupal_root/modules/test_module/includes');
+    \file_put_contents('vfs://drupal_root/modules/test_module/includes/test_module.inc', <<<__EOF__
 <?php
 
 function test_module_test_hook();
@@ -54,7 +54,7 @@ function test_module_test_hook();
 __EOF__
     );
     // This is the not installed submodule.
-    file_put_contents('vfs://drupal_root/modules/test_module/test_sub_module/test_sub_module.module', <<<__EOF__
+    \file_put_contents('vfs://drupal_root/modules/test_module/test_sub_module/test_sub_module.module', <<<__EOF__
 <?php
 
 function test_module_should_be_skipped();
@@ -115,14 +115,14 @@ __EOF__
     ];
     $file_data = [];
     foreach ($files as &$filename) {
-      NestedArray::setValue($file_data, explode('/', $filename), '');
+      NestedArray::setValue($file_data, \explode('/', $filename), '');
     }
     vfsStream::create($file_data);
     $module_filenames = [
       'test_module' => ['pathname' => 'vfs://drupal_root/modules/test_module/test_module.info.yml'],
       'test_module_theme' => ['pathname' => 'vfs://drupal_root/modules/test_module_theme/test_module_theme.info.yml'],
     ];
-    file_put_contents('vfs://drupal_root/modules/test_module/test_module.module', <<<__EOF__
+    \file_put_contents('vfs://drupal_root/modules/test_module/test_module.module', <<<__EOF__
 <?php
 
 function test_module_theme_suggestions_alter();

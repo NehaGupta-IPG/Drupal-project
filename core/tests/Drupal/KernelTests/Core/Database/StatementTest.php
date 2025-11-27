@@ -213,7 +213,7 @@ class StatementTest extends DatabaseTestBase {
 
     $this->expectException(DatabaseExceptionWrapper::class);
     $this->expectExceptionMessage('Attempted rewinding a StatementInterface object when fetching has already started. Refactor your code to avoid rewinding statement objects.');
-    iterator_count($statement);
+    \iterator_count($statement);
   }
 
   /**

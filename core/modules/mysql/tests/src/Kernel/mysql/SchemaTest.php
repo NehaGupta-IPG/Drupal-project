@@ -188,7 +188,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     // Count the number of columns defined in the indexes.
     $column_count = 0;
     foreach ($table_specification_with_new_index['indexes'] as $index) {
-      $column_count += count($index);
+      $column_count += \count($index);
     }
     $test_count = 0;
     foreach ($results as $result) {

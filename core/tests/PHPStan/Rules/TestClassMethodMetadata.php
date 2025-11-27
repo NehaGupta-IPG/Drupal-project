@@ -102,7 +102,7 @@ final class TestClassMethodMetadata implements Rule {
     if ($resolvedPhpDoc) {
       foreach ($resolvedPhpDoc->getPhpDocNodes() as $phpDocNode) {
         foreach ($phpDocNode->getTags() as $tag) {
-          if (in_array($tag->name, $this->annotationTargets, TRUE)) {
+          if (\in_array($tag->name, $this->annotationTargets, TRUE)) {
             $fails[] = RuleErrorBuilder::message("Test method {$method->getName()} must not add annotation {$tag->name}.")
               ->identifier('testMethod.metadataForbidden')
               ->line($node->getStartLine())

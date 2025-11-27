@@ -125,7 +125,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Remove any modules that are already installed.
     $installed_modules = $extension_config->get('module') ?: [];
     // Only process currently uninstalled modules.
-    $module_list = array_diff($module_list, array_keys($installed_modules));
+    $module_list = \array_diff($module_list, \array_keys($installed_modules));
 
     if (empty($module_list)) {
       // Nothing to do. All modules already installed.
@@ -193,7 +193,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $sync_status = $config_installer->isSyncing();
     foreach ($module_list as $module) {
       // Throw an exception if the module name is too long.
-      if (strlen($module) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
+      if (\strlen($module) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
         throw new ExtensionNameLengthException("Module name '$module' is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters');
       }
 
@@ -274,8 +274,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Save this data without checking schema. This is a performance
     // improvement for module installation.
     $extension_config
-      ->set('module', module_config_sort(array_merge(
-        array_fill_keys($module_list, 0),
+      ->set('module', \module_config_sort(\array_merge(
+        \array_fill_keys($module_list, 0),
         $installed_modules
       )))
       ->save(TRUE);
@@ -291,8 +291,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // modules not contained in the configured enabled modules, we assume a
     // weight of 0.
     $current_module_filenames = $this->moduleHandler->getModuleList();
-    $current_modules = array_fill_keys(array_keys($current_module_filenames), 0);
-    $current_modules = module_config_sort(array_merge($current_modules, $extension_config->get('module')));
+    $current_modules = \array_fill_keys(\array_keys($current_module_filenames), 0);
+    $current_modules = \module_config_sort(\array_merge($current_modules, $extension_config->get('module')));
     $module_filenames = [];
     foreach ($current_modules as $name => $weight) {
       if (isset($current_module_filenames[$name])) {
@@ -302,7 +302,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         $module_path = \Drupal::service('extension.list.module')
           ->getPath($name);
         $pathname = "$module_path/$name.info.yml";
-        $filename = file_exists($module_path . "/$name.module") ? "$name.module" : NULL;
+        $filename = \file_exists($module_path . "/$name.module") ? "$name.module" : NULL;
         $module_filenames[$name] = new Extension($this->root, 'module', $pathname, $filename);
       }
     }
@@ -356,7 +356,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     foreach ($module_list as $module) {
       // Remove the module from the list of possible entity type providers to
       // install.
-      array_shift($entity_type_providers_to_install);
+      \array_shift($entity_type_providers_to_install);
 
       // Notify interested components that this module's entity types and
       // field storage definitions are new. For example, a SQL-based storage
@@ -378,7 +378,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
             $update_manager->installEntityType($entity_type);
           }
         }
-        elseif ($is_fieldable_entity_type && !in_array($entity_type->getProvider(), $entity_type_providers_to_install, TRUE)) {
+        elseif ($is_fieldable_entity_type && !\in_array($entity_type->getProvider(), $entity_type_providers_to_install, TRUE)) {
           // The module being installed may be adding new fields to existing
           // entity types. Field definitions for any entity type defined by
           // modules being installed are handled in the if branch.
@@ -409,14 +409,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
       $versions = $this->updateRegistry->getAvailableUpdates($module);
       if ($versions) {
-        $version = max(max($versions), $version);
+        $version = \max(\max($versions), $version);
       }
 
       // If the module has no current updates, but has some that were
       // previously removed, set the version to the value of
       // hook_update_last_removed().
       if ($last_removed = $this->invoke($module, 'update_last_removed')) {
-        $version = max($version, $last_removed);
+        $version = \max($version, $last_removed);
       }
       $this->updateRegistry->setInstalledVersion($module, $version);
     }
@@ -468,7 +468,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::SiteOptional);
     }
 
-    if (count($module_list) > 1) {
+    if (\count($module_list) > 1) {
       // Reset the container so static caches are rebuilt. This prevents static
       // caches like those in \Drupal\views\ViewsData() from having stale data.
       // @todo Adding this code fixed
@@ -826,7 +826,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function invoke(string $module, string $hook, array $args = []): mixed {
     $function = $module . '_' . $hook;
-    return function_exists($function) ? $function(... $args) : NULL;
+    return \function_exists($function) ? $function(... $args) : NULL;
   }
 
 }

@@ -26,7 +26,7 @@ class RenderArrayNonHtmlSubscriber implements EventSubscriberInterface {
     // generic controller and not one with a format. If the format requested is
     // not HTML though, we can also assume that the requested format is invalid
     // so we provide a 406 response.
-    if (is_array($result) && $request->getRequestFormat() !== 'html') {
+    if (\is_array($result) && $request->getRequestFormat() !== 'html') {
       throw new NotAcceptableHttpException('A route that returns a rendered array as its response only supports the HTML format.');
     }
   }

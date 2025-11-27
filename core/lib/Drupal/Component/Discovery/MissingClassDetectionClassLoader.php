@@ -44,9 +44,9 @@ final class MissingClassDetectionClassLoader {
    */
   public function loadClass(string $class): void {
     $this->missingClass = TRUE;
-    if (str_ends_with($class, 'Trait')) {
+    if (\str_ends_with($class, 'Trait')) {
       $this->missingTraits[] = $class;
-      class_alias(StubTrait::class, $class);
+      \class_alias(StubTrait::class, $class);
     }
   }
 

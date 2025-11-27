@@ -93,7 +93,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
       $this->prepareAnnotationDefinition($annotation, $class);
 
       $id = $annotation->getId();
-      $shortened_annotation_name = '@' . substr($this->pluginDefinitionAnnotationName, strrpos($this->pluginDefinitionAnnotationName, '\\') + 1);
+      $shortened_annotation_name = '@' . \substr($this->pluginDefinitionAnnotationName, \strrpos($this->pluginDefinitionAnnotationName, '\\') + 1);
       // phpcs:ignore
       @trigger_error(sprintf('Using %s annotation for plugin with ID %s is deprecated and is removed from drupal:13.0.0. Use a %s attribute instead. See https://www.drupal.org/node/3395575', $shortened_annotation_name, $id, $this->pluginDefinitionAttributeName), E_USER_DEPRECATED);
 

@@ -26,11 +26,11 @@ class ImplementationList {
     public readonly array $listeners,
     public readonly array $modules,
   ) {
-    assert(array_is_list($listeners));
-    assert(array_is_list($modules));
-    assert(count($listeners) === count($modules));
-    assert(array_filter($listeners, is_callable(...)) === $listeners);
-    assert(array_filter($modules, is_string(...)) === $modules, (new \Exception())->getTraceAsString());
+    \assert(\array_is_list($listeners));
+    \assert(\array_is_list($modules));
+    \assert(\count($listeners) === \count($modules));
+    \assert(\array_filter($listeners, \is_callable(...)) === $listeners);
+    \assert(\array_filter($modules, \is_string(...)) === $modules, (new \Exception())->getTraceAsString());
   }
 
   /**
@@ -56,9 +56,9 @@ class ImplementationList {
    *   Listeners for that module.
    */
   public function getForModule(string $module): array {
-    return array_values(array_intersect_key(
+    return \array_values(\array_intersect_key(
       $this->listeners,
-      array_intersect($this->modules, [$module]),
+      \array_intersect($this->modules, [$module]),
     ));
   }
 
@@ -82,7 +82,7 @@ class ImplementationList {
    *   TRUE if it has implementations for any of the modules, FALSE if not.
    */
   public function hasImplementationsForModules(array $modules): bool {
-    return (bool) array_intersect($this->modules, $modules);
+    return (bool) \array_intersect($this->modules, $modules);
   }
 
 }

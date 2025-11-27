@@ -99,7 +99,7 @@ class ModerationStateFieldItemList extends FieldItemList {
     // revision of the moderated entity is published by retrieving its
     // moderation state entity here.
     /** @var \Drupal\content_moderation\Entity\ContentModerationStateInterface $content_moderation_state */
-    $content_moderation_state = $content_moderation_storage->loadRevisionUnchanged(key($revisions));
+    $content_moderation_state = $content_moderation_storage->loadRevisionUnchanged(\key($revisions));
     if ($entity->getEntityType()->hasKey('langcode')) {
       $langcode = $entity->language()->getId();
       if (!$content_moderation_state->hasTranslation($langcode)) {

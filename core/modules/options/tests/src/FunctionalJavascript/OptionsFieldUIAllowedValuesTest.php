@@ -177,7 +177,7 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
     $page->pressButton('Save settings');
     $this->assertTrue($this->assertSession()->waitForText('Saved field_options_text configuration.'));
 
-    $option_labels = array_values($options);
+    $option_labels = \array_values($options);
     $this->assertCount(3, $option_labels);
 
     // Test the order of the option list on node form.
@@ -250,7 +250,7 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
    */
   protected function assertNodeFormOrder($expected) {
     $elements = $this->assertSession()->selectExists('field_options_text')->findAll('css', 'option');
-    $elements = array_map(function ($element) {
+    $elements = \array_map(function ($element) {
       return $element->getText();
     }, $elements);
     $this->assertSame($expected, $elements);
@@ -338,7 +338,7 @@ JS;
     $test_cases = [];
     foreach ($type_cases as $key => $type_case) {
       foreach (['Press button', 'Enter button', 'Enter element'] as $add_more_method) {
-        $test_cases["$key: $add_more_method"] = array_merge($type_case, [$add_more_method]);
+        $test_cases["$key: $add_more_method"] = \array_merge($type_case, [$add_more_method]);
       }
     }
     return $test_cases;

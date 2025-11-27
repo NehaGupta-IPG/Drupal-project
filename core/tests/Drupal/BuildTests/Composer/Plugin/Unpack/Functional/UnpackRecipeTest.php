@@ -70,7 +70,7 @@ class UnpackRecipeTest extends BuildTestBase {
   public function testAutomaticUnpack(): void {
     $root_project_path = $this->fixturesDir . '/composer-root';
 
-    copy($root_project_path . '/composer.json', $root_project_path . '/composer.json.original');
+    \copy($root_project_path . '/composer.json', $root_project_path . '/composer.json.original');
 
     // Run composer install and confirm the composer.lock was created.
     $this->runComposer('install');
@@ -92,8 +92,8 @@ class UnpackRecipeTest extends BuildTestBase {
     // Copy old composer.json back over and require recipe again to ensure it
     // is still unpacked. This tests that unpacking does not rely on composer
     // package events.
-    unlink($root_project_path . '/composer.json');
-    copy($root_project_path . '/composer.json.original', $root_project_path . '/composer.json');
+    \unlink($root_project_path . '/composer.json');
+    \copy($root_project_path . '/composer.json.original', $root_project_path . '/composer.json');
     $stdout = $this->runComposer('require fixtures/recipe-a');
     $this->doTestRecipeAUnpacked($root_project_path, $stdout);
   }
@@ -117,7 +117,7 @@ class UnpackRecipeTest extends BuildTestBase {
       'fixtures/module-a',
       'fixtures/module-b',
       'fixtures/theme-a',
-    ], array_keys($root_composer_json['require']));
+    ], \array_keys($root_composer_json['require']));
     // Ensure the resulting composer files are valid.
     $this->runComposer('validate');
     // Ensure the recipes exist.
@@ -136,7 +136,7 @@ class UnpackRecipeTest extends BuildTestBase {
       'fixtures/module-a',
       'fixtures/module-b',
       'fixtures/theme-a',
-    ], array_column($root_composer_lock['packages'], 'name'));
+    ], \array_column($root_composer_lock['packages'], 'name'));
   }
 
   /**
@@ -159,8 +159,8 @@ class UnpackRecipeTest extends BuildTestBase {
     $root_composer_json = $this->getFileContents($root_project_path . '/composer.json');
 
     // Assert the state of the root composer.json as no unpacking has occurred.
-    $this->assertSame(['fixtures/recipe-a'], array_keys($root_composer_json['require-dev']));
-    $this->assertSame(['composer/installers', 'drupal/core-recipe-unpack', 'ext-json', 'fixtures/module-a'], array_keys($root_composer_json['require']));
+    $this->assertSame(['fixtures/recipe-a'], \array_keys($root_composer_json['require-dev']));
+    $this->assertSame(['composer/installers', 'drupal/core-recipe-unpack', 'ext-json', 'fixtures/module-a'], \array_keys($root_composer_json['require']));
 
     // Ensure the resulting Composer files are valid.
     $this->runComposer('validate');
@@ -346,7 +346,7 @@ class UnpackRecipeTest extends BuildTestBase {
 
     // Ensure installed.json and installed.php are correct.
     $installed_json = $this->getFileContents($root_project_path . '/vendor/composer/installed.json');
-    $installed_packages = array_column($installed_json['packages'], 'name');
+    $installed_packages = \array_column($installed_json['packages'], 'name');
     $this->assertContains('fixtures/module-b', $installed_packages);
     $this->assertNotContains('fixtures/recipe-a', $installed_packages);
     $this->assertSame([], $installed_json['dev-package-names']);
@@ -390,11 +390,11 @@ class UnpackRecipeTest extends BuildTestBase {
 
     // Ensure recipe B is still in require-dev even though all it's dependencies
     // have been unpacked to require due to unpacking recipe A.
-    $this->assertSame(['fixtures/recipe-b'], array_keys($root_composer_json['require-dev']));
+    $this->assertSame(['fixtures/recipe-b'], \array_keys($root_composer_json['require-dev']));
 
     // Ensure recipe B is still list in installed.json.
     $installed_json = $this->getFileContents($root_project_path . '/vendor/composer/installed.json');
-    $installed_packages = array_column($installed_json['packages'], 'name');
+    $installed_packages = \array_column($installed_json['packages'], 'name');
     $this->assertContains('fixtures/recipe-b', $installed_packages);
     $this->assertContains('fixtures/recipe-b', $installed_json['dev-package-names']);
 
@@ -421,7 +421,7 @@ class UnpackRecipeTest extends BuildTestBase {
       'drupal/core-recipe-unpack',
       'ext-json',
       'fixtures/recipe-a',
-    ], array_keys($root_composer_json['require']));
+    ], \array_keys($root_composer_json['require']));
 
     // Removing the recipe should work as normal.
     $this->runComposer('remove fixtures/recipe-a');
@@ -430,7 +430,7 @@ class UnpackRecipeTest extends BuildTestBase {
       'composer/installers',
       'drupal/core-recipe-unpack',
       'ext-json',
-    ], array_keys($root_composer_json['require']));
+    ], \array_keys($root_composer_json['require']));
 
     // Ensure the resulting Composer files are valid.
     $this->runComposer('validate');
@@ -450,14 +450,14 @@ class UnpackRecipeTest extends BuildTestBase {
     // Install a recipe and ensure it does not get unpacked.
     $stdOut = $this->runComposer('require --verbose fixtures/recipe-a');
     $root_composer_json = $this->getFileContents($root_project_path . '/composer.json');
-    $this->assertSame("fixtures/recipe-a not unpacked because it is ignored.", trim($stdOut));
+    $this->assertSame("fixtures/recipe-a not unpacked because it is ignored.", \trim($stdOut));
 
     $this->assertSame([
       'composer/installers',
       'drupal/core-recipe-unpack',
       'ext-json',
       'fixtures/recipe-a',
-    ], array_keys($root_composer_json['require']));
+    ], \array_keys($root_composer_json['require']));
 
     // Ensure the resulting Composer files are valid.
     $this->runComposer('validate');
@@ -496,7 +496,7 @@ class UnpackRecipeTest extends BuildTestBase {
       'drupal/core-recipe-unpack',
       'fixtures/module-b',
       'fixtures/recipe-b',
-    ], array_keys($root_composer_json['require']));
+    ], \array_keys($root_composer_json['require']));
 
     // Ensure the resulting Composer files are valid.
     $this->runComposer('validate');
@@ -524,7 +524,7 @@ class UnpackRecipeTest extends BuildTestBase {
 
     // ...but it should NOT be in installed.json or installed.php.
     $installed_json = $this->getFileContents($root_project_path . '/vendor/composer/installed.json');
-    $installed_packages = array_column($installed_json['packages'], 'name');
+    $installed_packages = \array_column($installed_json['packages'], 'name');
     $this->assertContains('fixtures/module-b', $installed_packages);
     $this->assertNotContains('fixtures/recipe-b', $installed_packages);
     $installed_php = include_once $root_project_path . '/vendor/composer/installed.php';
@@ -544,13 +544,13 @@ class UnpackRecipeTest extends BuildTestBase {
     // physically installed.
     $stdOut = $this->runComposer('require --verbose --no-install fixtures/recipe-a');
     $root_composer_json = $this->getFileContents($root_project_path . '/composer.json');
-    $this->assertSame("Recipes are not unpacked when the --no-install option is used.", trim($stdOut));
+    $this->assertSame("Recipes are not unpacked when the --no-install option is used.", \trim($stdOut));
     $this->assertSame([
       'composer/installers',
       'drupal/core-recipe-unpack',
       'ext-json',
       'fixtures/recipe-a',
-    ], array_keys($root_composer_json['require']));
+    ], \array_keys($root_composer_json['require']));
     $this->assertFileDoesNotExist($root_project_path . '/recipes/recipe-a/recipe.yml');
 
     // After installing dependencies, the recipe should be installed, but still
@@ -562,7 +562,7 @@ class UnpackRecipeTest extends BuildTestBase {
       'drupal/core-recipe-unpack',
       'ext-json',
       'fixtures/recipe-a',
-    ], array_keys($root_composer_json['require']));
+    ], \array_keys($root_composer_json['require']));
     $this->assertFileExists($root_project_path . '/recipes/recipe-a/recipe.yml');
 
     // Ensure the resulting Composer files are valid.
@@ -595,7 +595,7 @@ class UnpackRecipeTest extends BuildTestBase {
     // merge plugin can include it.
     $merge_fixture_source = $this->fixturesDir . '/merge/composer.merge.json';
     $merge_fixture_dest = $root_project_path . '/composer.merge.json';
-    copy($merge_fixture_source, $merge_fixture_dest);
+    \copy($merge_fixture_source, $merge_fixture_dest);
 
     // Allow packagist since we need to require the merge plugin.
     $this->runComposer('config --unset repositories.packagist.org');
@@ -630,7 +630,7 @@ class UnpackRecipeTest extends BuildTestBase {
       'fixtures/module-c',
       'fixtures/theme-a',
       'wikimedia/composer-merge-plugin',
-    ], array_column($root_composer_lock['packages'], 'name'));
+    ], \array_column($root_composer_lock['packages'], 'name'));
   }
 
   /**
@@ -688,7 +688,7 @@ class UnpackRecipeTest extends BuildTestBase {
       'fixtures/module-a',
       'fixtures/module-b',
       'fixtures/theme-a',
-    ], array_column($root_composer_lock['packages'], 'name'));
+    ], \array_column($root_composer_lock['packages'], 'name'));
   }
 
   /**
@@ -725,8 +725,8 @@ class UnpackRecipeTest extends BuildTestBase {
    *   The contents of the file as an array.
    */
   private function getFileContents(string $path): array {
-    $file = file_get_contents($path);
-    return json_decode($file, TRUE, flags: JSON_THROW_ON_ERROR);
+    $file = \file_get_contents($path);
+    return \json_decode($file, TRUE, flags: JSON_THROW_ON_ERROR);
   }
 
 }

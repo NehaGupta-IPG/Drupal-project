@@ -74,7 +74,7 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
     foreach ($tree as $item) {
       if ($item->access->isAllowed()) {
         $plugin_id = $item->link->getPluginId();
-        $plugin_class = Html::getClass(str_replace('.', '_', $plugin_id));
+        $plugin_class = Html::getClass(\str_replace('.', '_', $plugin_id));
         $build['#items'][$plugin_id]['class'] = $plugin_class;
         $url = $build['#items'][$plugin_id]['url'];
         $icon_defaults = [

@@ -271,7 +271,7 @@ class Node extends WizardPluginBase {
     $tag_fields = [];
     foreach ($bundles as $bundle) {
       $display = $this->entityDisplayRepository->getFormDisplay($this->entityTypeId, $bundle);
-      $tag_fields += array_filter($this->entityFieldManager->getFieldDefinitions($this->entityTypeId, $bundle), function (FieldDefinitionInterface $field_definition) use ($display) {
+      $tag_fields += \array_filter($this->entityFieldManager->getFieldDefinitions($this->entityTypeId, $bundle), function (FieldDefinitionInterface $field_definition) use ($display) {
         if ($field_definition->getType() == 'entity_reference' && $field_definition->getSetting('target_type') == 'taxonomy_term') {
           $widget = $display->getComponent($field_definition->getName());
           return isset($widget['type']) && $widget['type'] == 'entity_reference_autocomplete_tags';

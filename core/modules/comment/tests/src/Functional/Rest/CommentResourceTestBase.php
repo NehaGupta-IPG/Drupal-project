@@ -61,7 +61,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
   #[Before]
   public function commentResourceTestBaseSkipTests(): void {
     if (static::$format === 'xml'
-      && in_array($this->name(), ['testPostDxWithoutCriticalBaseFields', 'testPostSkipCommentApproval'], TRUE)) {
+      && \in_array($this->name(), ['testPostDxWithoutCriticalBaseFields', 'testPostSkipCommentApproval'], TRUE)) {
       $this->markTestSkipped('Deserialization of the XML format is not supported.');
     }
   }
@@ -193,7 +193,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'pid' => [],
@@ -207,7 +207,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
           'target_id' => 1,
           'target_type' => 'entity_test',
           'target_uuid' => EntityTest::load(1)->uuid(),
-          'url' => base_path() . 'entity_test/1',
+          'url' => \base_path() . 'entity_test/1',
         ],
       ],
       'field_name' => [
@@ -275,7 +275,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getNormalizedPatchEntity() {
-    return array_diff_key(
+    return \array_diff_key(
       $this->getNormalizedPostEntity(),
       ['entity_type' => TRUE, 'entity_id' => TRUE, 'field_name' => TRUE],
     );

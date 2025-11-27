@@ -92,7 +92,7 @@ final class Recipe {
     $recipes = new RecipeConfigurator(\is_array($recipe_data['recipes']) ? $recipe_data['recipes'] : [], \dirname($path));
     $install = new InstallConfigurator($recipe_data['install'], \Drupal::service('extension.list.module'), \Drupal::service('extension.list.theme'));
     $config = new ConfigConfigurator($recipe_data['config'], $path, \Drupal::service('config.storage'));
-    $input = new InputConfigurator($recipe_data['input'] ?? [], $recipes, basename($path), \Drupal::typedDataManager());
+    $input = new InputConfigurator($recipe_data['input'] ?? [], $recipes, \basename($path), \Drupal::typedDataManager());
     $content = new Finder($path . '/content');
     return new static($recipe_data['name'], $recipe_data['description'], $recipe_data['type'], $recipes, $install, $config, $input, $content, $path, $recipe_data['extra'] ?? []);
   }
@@ -345,7 +345,7 @@ final class Recipe {
   public static function validateDefaultValueDefinition(array $definition, ExecutionContextInterface $context): void {
     $source = $definition['source'];
 
-    if (!array_key_exists($source, $definition)) {
+    if (!\array_key_exists($source, $definition)) {
       $context->addViolation("The '$source' key is required.");
     }
   }
@@ -403,15 +403,15 @@ final class Recipe {
    *   The recipe's include path.
    */
   private static function validateConfigActions(mixed $value, ExecutionContextInterface $context, string $include_path): void {
-    $config_name = str_replace(['[config][actions]', '[', ']'], '', $context->getPropertyPath());
+    $config_name = \str_replace(['[config][actions]', '[', ']'], '', $context->getPropertyPath());
     // If this set of config actions is optional, we don't need to validate that
     // it targets config belonging to a known extension -- the whole point of
     // optional config actions is that the targeted entity (or the extension
     // that provides it) might not exist, and that's okay.
-    if (str_starts_with($config_name, '?')) {
+    if (\str_starts_with($config_name, '?')) {
       return;
     }
-    [$config_provider] = explode('.', $config_name);
+    [$config_provider] = \explode('.', $config_name);
     if ($config_provider === 'core') {
       return;
     }
@@ -426,8 +426,8 @@ final class Recipe {
     // The config provider must either be an already-installed module or theme,
     // or an extension being installed by this recipe or a recipe it depends on.
     $all_extensions = [
-      ...array_keys($module_list->getAllInstalledInfo()),
-      ...array_keys(\Drupal::service('extension.list.theme')->getAllInstalledInfo()),
+      ...\array_keys($module_list->getAllInstalledInfo()),
+      ...\array_keys(\Drupal::service('extension.list.theme')->getAllInstalledInfo()),
       ...$recipe_being_validated['install'] ?? [],
       ...$configurator->listAllExtensions(),
     ];
@@ -460,9 +460,9 @@ final class Recipe {
    *   The validator execution context.
    */
   private static function validateKeysAreValidExtensionNames(array $value, ExecutionContextInterface $context): void {
-    $keys = array_keys($value);
+    $keys = \array_keys($value);
     foreach ($keys as $key) {
-      if (!preg_match(ExtensionDiscovery::PHP_FUNCTION_PATTERN, $key)) {
+      if (!\preg_match(ExtensionDiscovery::PHP_FUNCTION_PATTERN, $key)) {
         $context->addViolation('%name is not a valid extension name.', [
           '%name' => $key,
         ]);

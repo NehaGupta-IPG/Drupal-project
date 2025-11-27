@@ -22,7 +22,7 @@ class ConstraintFactory extends ContainerFactory {
     $plugin_definition = $this->discovery->getDefinition($plugin_id);
     $plugin_class = static::getPluginClass($plugin_id, $plugin_definition, $this->interface);
 
-    if (is_subclass_of($plugin_class, CompositeConstraintInterface::class)) {
+    if (\is_subclass_of($plugin_class, CompositeConstraintInterface::class)) {
       $composite_constraint_options = (array) $plugin_class::getCompositeOptionStatic();
       foreach ($composite_constraint_options as $option) {
         foreach ($configuration[$option] as $key => $value) {
@@ -39,7 +39,7 @@ class ConstraintFactory extends ContainerFactory {
     }
 
     // If the plugin is a Symfony Constraint, use the correct constructor.
-    if (is_subclass_of($plugin_class, Constraint::class)) {
+    if (\is_subclass_of($plugin_class, Constraint::class)) {
       $reflection_class = new \ReflectionClass($plugin_class);
       $reflection_constructor = $reflection_class->getConstructor();
       // If configuration is empty, an empty first parameter is passed to any
@@ -58,7 +58,7 @@ class ConstraintFactory extends ContainerFactory {
         // pass the values as named parameters.
         // @todo Trigger deprecation when $configuration is not an associative
         //   array in https://www.drupal.org/project/drupal/issues/3555134.
-        return array_is_list($configuration) ? new $plugin_class($configuration) : new $plugin_class(...$configuration);
+        return \array_is_list($configuration) ? new $plugin_class($configuration) : new $plugin_class(...$configuration);
       }
 
       return new $plugin_class($configuration);

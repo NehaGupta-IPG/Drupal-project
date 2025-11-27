@@ -59,7 +59,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-location', $value[0]);
     $this->assertEquals('https://www.example.test/common-test/destination', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -84,7 +84,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-location', $value[0]);
     $this->assertEquals(
       '{"path":"https:\/\/www.example.test\/common-test\/destination","source":"source-value","event":"event-value","headers":{"Header-one":"one"},"handler":"handler-value","target":"target-value","swap":"swap-value","select":"select-value","values":{"one":"1","two":"2"}}',
@@ -101,7 +101,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-push-url', $value[0]);
     $this->assertEquals('https://www.example.test/common-test/destination', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -115,7 +115,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-replace-url', $value[0]);
     $this->assertEquals('https://www.example.test/common-test/destination', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -129,7 +129,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-redirect', $value[0]);
     $this->assertEquals('https://www.example.test/common-test/destination', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -144,7 +144,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-refresh', $value[0]);
     $this->assertEquals('true', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -153,7 +153,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-refresh', $value[0]);
     $this->assertEquals('false', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -167,7 +167,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-reswap', $value[0]);
     $this->assertEquals('foo', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -181,7 +181,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-retarget', $value[0]);
     $this->assertEquals('foo', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -195,7 +195,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-reselect', $value[0]);
     $this->assertEquals('foo', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -209,7 +209,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-trigger', $value[0]);
     $this->assertEquals('foo', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -228,7 +228,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-trigger', $value[0]);
     $this->assertEquals('{"showMessage":{"level":"info","message":"Trigger Set"}}', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -242,7 +242,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-trigger-after-settle', $value[0]);
     $this->assertEquals('foo', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -261,7 +261,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-trigger-after-settle', $value[0]);
     $this->assertEquals('{"showMessage":{"level":"info","message":"Trigger Set"}}', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -275,7 +275,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-trigger-after-swap', $value[0]);
     $this->assertEquals('foo', $value[1]);
     $this->assertEquals(TRUE, $value[2]);
@@ -294,7 +294,7 @@ class HtmxHeadersTest extends UnitTestCase {
     $render = $this->apply();
     $this->assertTrue(isset($render['#attached']['http_header']));
     $this->assertIsArray($render['#attached']['http_header']);
-    $value = reset($render['#attached']['http_header']);
+    $value = \reset($render['#attached']['http_header']);
     $this->assertEquals('hx-trigger-after-swap', $value[0]);
     $this->assertEquals('{"showMessage":{"level":"info","message":"Trigger Set"}}', $value[1]);
     $this->assertEquals(TRUE, $value[2]);

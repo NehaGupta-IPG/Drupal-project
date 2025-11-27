@@ -170,7 +170,7 @@ abstract class CommentTestBase extends BrowserTestBase {
     }
     $match = [];
     // Get comment ID.
-    preg_match('/#comment-([0-9]+)/', $this->getURL(), $match);
+    \preg_match('/#comment-([0-9]+)/', $this->getURL(), $match);
 
     // Get comment.
     if ($contact !== TRUE) {
@@ -267,7 +267,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    */
   protected function setCommentPreview(CommentPreviewMode|int $mode, $field_name = 'comment') {
     if (!$mode instanceof CommentPreviewMode) {
-      @trigger_error('Calling ' . __METHOD__ . ' with an integer $mode parameter is deprecated in drupal:11.3.0 and it will be removed in drupal:13.0.0. Use the \Drupal\comment\CommentPreviewMode enum instead. See https://www.drupal.org/node/3538678', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' with an integer $mode parameter is deprecated in drupal:11.3.0 and it will be removed in drupal:13.0.0. Use the \Drupal\comment\CommentPreviewMode enum instead. See https://www.drupal.org/node/3538678', E_USER_DEPRECATED);
       $mode = CommentPreviewMode::from($mode);
     }
     $this->setCommentSettings('preview', $mode->value, '', $field_name);
@@ -339,7 +339,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Contact info is available.
    */
   protected function commentContactInfoAvailable(): bool {
-    return (bool) preg_match('/(input).*?(name="name").*?(input).*?(name="mail").*?(input).*?(name="homepage")/s', $this->getSession()->getPage()->getContent());
+    return (bool) \preg_match('/(input).*?(name="name").*?(input).*?(name="mail").*?(input).*?(name="homepage")/s', $this->getSession()->getPage()->getContent());
   }
 
   /**

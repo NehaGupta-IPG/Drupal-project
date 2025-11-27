@@ -151,11 +151,11 @@ trait CacheTagsChecksumTrait {
     // preload cache tags in a separate variable.
     $tags_with_preload = $tags;
     if ($this->preloadTags) {
-      $tags_with_preload = array_unique(array_merge($tags, $this->preloadTags));
+      $tags_with_preload = \array_unique(\array_merge($tags, $this->preloadTags));
       $this->preloadTags = [];
     }
 
-    $query_tags = array_diff($tags_with_preload, array_keys($this->tagCache));
+    $query_tags = \array_diff($tags_with_preload, \array_keys($this->tagCache));
     if ($query_tags) {
       $tag_invalidations = $this->getTagInvalidationCounts($query_tags);
       $this->tagCache += $tag_invalidations;
@@ -186,9 +186,9 @@ trait CacheTagsChecksumTrait {
       return;
     }
     // Don't preload delayed tags that are awaiting invalidation.
-    $preloadable_tags = array_diff($cache_tags, $this->delayedTags);
+    $preloadable_tags = \array_diff($cache_tags, $this->delayedTags);
     if ($preloadable_tags) {
-      $this->preloadTags = array_merge($this->preloadTags, $preloadable_tags);
+      $this->preloadTags = \array_merge($this->preloadTags, $preloadable_tags);
     }
   }
 

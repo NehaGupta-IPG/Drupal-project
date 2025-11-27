@@ -138,8 +138,8 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
       foreach ($type_dependencies as $dependency) {
         if (($provider = $this->getProviderFromNamespace($dependency)) &&
             ($provider !== $class_provider) &&
-            !in_array($provider, ['component', 'core']) &&
-            !in_array($provider, $providers)) {
+            !\in_array($provider, ['component', 'core']) &&
+            !\in_array($provider, $providers)) {
           $providers[] = $provider;
         }
       }
@@ -162,7 +162,7 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
     }
 
     // Convert providers to two-level namespaces to check for availability.
-    $dependencies['provider'] = array_map(static fn ($provider) => "Drupal\\$provider", $dependencies['provider']);
+    $dependencies['provider'] = \array_map(static fn ($provider) => "Drupal\\$provider", $dependencies['provider']);
     return parent::hasMissingDependencies($dependencies);
   }
 

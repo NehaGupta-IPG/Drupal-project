@@ -79,7 +79,7 @@ abstract class ContentTranslationPendingRevisionTestBase extends ContentTranslat
    * Enables content moderation for the test entity type and bundle.
    */
   protected function enableContentModeration() {
-    $perms = array_merge(parent::getAdministratorPermissions(), [
+    $perms = \array_merge(parent::getAdministratorPermissions(), [
       'administer workflows',
       'view latest version',
     ]);

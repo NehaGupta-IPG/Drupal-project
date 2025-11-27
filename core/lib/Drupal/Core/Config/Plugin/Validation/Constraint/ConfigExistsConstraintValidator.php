@@ -53,7 +53,7 @@ class ConfigExistsConstraintValidator extends ConstraintValidator implements Con
 
     $constraint->prefix = TypeResolver::resolveDynamicTypeName($constraint->prefix, $this->context->getObject());
 
-    if (!in_array($constraint->prefix . $name, $this->configFactory->listAll($constraint->prefix), TRUE)) {
+    if (!\in_array($constraint->prefix . $name, $this->configFactory->listAll($constraint->prefix), TRUE)) {
       $this->context->addViolation($constraint->message, ['@name' => $constraint->prefix . $name]);
     }
   }

@@ -203,7 +203,7 @@ class StatusTest extends BrowserTestBase {
     $elements = $this->xpath('//details[summary[contains(@class, "system-status-report__status-title") and normalize-space(text()) = "PHP APCu caching"]]/div[@class="system-status-report__entry__value"]/text()');
     // Ensure the status is not a warning if APCu size is greater than or equal
     // to the recommended size.
-    if (preg_match('/^Enabled \((.*)\)$/', $elements[0]->getText(), $matches)) {
+    if (\preg_match('/^Enabled \((.*)\)$/', $elements[0]->getText(), $matches)) {
       if (Bytes::toNumber($matches[1]) >= 1024 * 1024 * 32) {
         $this->assertFalse($elements[0]->find('xpath', '../../summary')->hasClass('system-status-report__status-icon--warning'));
       }

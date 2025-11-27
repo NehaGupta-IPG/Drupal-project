@@ -29,22 +29,22 @@ final class AttributeXss {
     $skip = FALSE;
     $skip_protocol_filtering = FALSE;
 
-    while (strlen($attributes) != 0) {
+    while (\strlen($attributes) != 0) {
       // Was the last operation successful?
       $working = 0;
 
       switch ($mode) {
         case 0:
           // Attribute name, href for instance.
-          if (preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
-            $attribute_name = strtolower($match[1]);
+          if (\preg_match('/^([-a-zA-Z][-a-zA-Z0-9]*)/', $attributes, $match)) {
+            $attribute_name = \strtolower($match[1]);
             $skip = (
               $attribute_name == 'style' ||
-              str_starts_with($attribute_name, 'on') ||
-              str_starts_with($attribute_name, '-') ||
+              \str_starts_with($attribute_name, 'on') ||
+              \str_starts_with($attribute_name, '-') ||
               // Ignore long attributes to avoid unnecessary processing
               // overhead.
-              strlen($attribute_name) > 96
+              \strlen($attribute_name) > 96
             );
 
             // Values for attributes of type URI should be filtered for
@@ -55,7 +55,7 @@ final class AttributeXss {
             // such attributes.
             // @see \Drupal\Component\Utility\UrlHelper::filterBadProtocol()
             // @see http://www.w3.org/TR/html4/index/attributes.html
-            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') || in_array($attribute_name, [
+            $skip_protocol_filtering = \str_starts_with($attribute_name, 'data-') || \in_array($attribute_name, [
               'title',
               'alt',
               'rel',
@@ -65,26 +65,26 @@ final class AttributeXss {
             ]);
 
             $working = $mode = 1;
-            $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);
+            $attributes = \preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);
           }
           break;
 
         case 1:
           // Equals sign or valueless ("selected").
-          if (preg_match('/^\s*=\s*/', $attributes)) {
+          if (\preg_match('/^\s*=\s*/', $attributes)) {
             $working = 1;
             $mode = 2;
-            $attributes = preg_replace('/^\s*=\s*/', '', $attributes);
+            $attributes = \preg_replace('/^\s*=\s*/', '', $attributes);
             break;
           }
 
-          if (preg_match('/^\s+/', $attributes)) {
+          if (\preg_match('/^\s+/', $attributes)) {
             $working = 1;
             $mode = 0;
             if (!$skip) {
               $attributes_array[$attribute_name] = $attribute_name;
             }
-            $attributes = preg_replace('/^\s+/', '', $attributes);
+            $attributes = \preg_replace('/^\s+/', '', $attributes);
           }
           break;
 
@@ -94,40 +94,40 @@ final class AttributeXss {
           $mode = 0;
           $working = 1;
           // Attribute value, a URL after href= for instance.
-          if (preg_match('/^"([^"]*)"(\s+|$)/', $attributes, $match)) {
+          if (\preg_match('/^"([^"]*)"(\s+|$)/', $attributes, $match)) {
             $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
 
             if (!$skip) {
               $attributes_array[$attribute_name] = $value;
             }
-            $attributes = preg_replace('/^"[^"]*"(\s+|$)/', '', $attributes);
+            $attributes = \preg_replace('/^"[^"]*"(\s+|$)/', '', $attributes);
             break;
           }
 
-          if (preg_match("/^'([^']*)'(\s+|$)/", $attributes, $match)) {
+          if (\preg_match("/^'([^']*)'(\s+|$)/", $attributes, $match)) {
             $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
 
             if (!$skip) {
               $attributes_array[$attribute_name] = $value;
             }
-            $attributes = preg_replace("/^'[^']*'(\s+|$)/", '', $attributes);
+            $attributes = \preg_replace("/^'[^']*'(\s+|$)/", '', $attributes);
             break;
           }
 
-          if (preg_match("%^([^\s\"']+)(\s+|$)%", $attributes, $match)) {
+          if (\preg_match("%^([^\s\"']+)(\s+|$)%", $attributes, $match)) {
             $value = $skip_protocol_filtering ? $match[1] : UrlHelper::filterBadProtocol($match[1]);
 
             if (!$skip) {
               $attributes_array[$attribute_name] = $value;
             }
-            $attributes = preg_replace("%^[^\s\"']+(\s+|$)%", '', $attributes);
+            $attributes = \preg_replace("%^[^\s\"']+(\s+|$)%", '', $attributes);
           }
           break;
       }
 
       if ($working == 0) {
         // Not well-formed; remove and try again.
-        $attributes = preg_replace('/
+        $attributes = \preg_replace('/
           ^
           (
           "[^"]*("|$)     # - a string that starts with a double quote, up until the next double quote or the end of the string

@@ -69,7 +69,7 @@ abstract class UserKernelTestBase extends ViewsKernelTestBase {
     // Setup a role with multiple permissions.
     $this->roleStorage->create(['id' => 'multiple_permissions', 'label' => 'Multiple permissions'])
       ->save();
-    user_role_grant_permissions(
+    \user_role_grant_permissions(
       'multiple_permissions',
       [
         'administer permissions',

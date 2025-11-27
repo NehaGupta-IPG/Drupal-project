@@ -74,7 +74,7 @@ class NodeThemeHooks {
   public function themeSuggestionsNode(array $variables): array {
     $suggestions = [];
     $node = $variables['elements']['#node'];
-    $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+    $sanitized_view_mode = \strtr($variables['elements']['#view_mode'], '.', '_');
 
     $suggestions[] = 'node__' . $sanitized_view_mode;
     $suggestions[] = 'node__' . $node->bundle();
@@ -96,7 +96,7 @@ class NodeThemeHooks {
       // Page title is always inline because it will be displayed inside <h1>.
       $variables['is_inline'] = TRUE;
     }
-    elseif (in_array($variables['field_name'], ['created', 'uid', 'title'], TRUE)) {
+    elseif (\in_array($variables['field_name'], ['created', 'uid', 'title'], TRUE)) {
       // Display created, uid and title fields inline because they will be
       // displayed inline by node.html.twig. Skip this if the field
       // display is configurable and skipping has been enabled.
@@ -179,7 +179,7 @@ class NodeThemeHooks {
     // - The view mode is 'full' and we are on the 'node.view' route.
     // - The node is in preview and view mode is either 'full' or 'default'.
     $variables['page'] = FALSE;
-    if ($variables['view_mode'] == 'full' && ($this->routeMatch->getRouteName() == 'entity.node.canonical' && $this->routeMatch->getRawParameter('node') == $node->id() || (isset($node->in_preview) && in_array($node->preview_view_mode, ['full', 'default'])))) {
+    if ($variables['view_mode'] == 'full' && ($this->routeMatch->getRouteName() == 'entity.node.canonical' && $this->routeMatch->getRawParameter('node') == $node->id() || (isset($node->in_preview) && \in_array($node->preview_view_mode, ['full', 'default'])))) {
       $variables['page'] = TRUE;
     }
 
@@ -275,7 +275,7 @@ class NodeThemeHooks {
     // Add 'Back to content editing' link on preview page.
     if ($this->routeMatch->getRouteName() == 'entity.node.preview') {
       $form_builder = ($this->formBuilderClosure)();
-      assert($form_builder instanceof FormBuilderInterface);
+      \assert($form_builder instanceof FormBuilderInterface);
       $page_top['node_preview'] = [
         '#type' => 'container',
         '#attributes' => [

@@ -238,7 +238,7 @@ class LinkWidget extends WidgetBase {
     // If the field is configured to allow only internal links, add a useful
     // element prefix and description.
     if (!$this->supportsExternalLinks()) {
-      $element['uri']['#field_prefix'] = rtrim(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), '/');
+      $element['uri']['#field_prefix'] = \rtrim(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), '/');
       $element['uri']['#description'] = $this->t('This must be an internal path such as %add-node. You can also start typing the title of a piece of content to select it. Enter %front to link to the front page. Enter %nolink to display link text only. Enter %button to display keyboard-accessible link text only.', [
         '%add-node' => '/node/add',
         '%front' => '<front>',
@@ -486,7 +486,7 @@ class LinkWidget extends WidgetBase {
   public function errorElement(array $element, ConstraintViolationInterface $violation, array $form, FormStateInterface $form_state) {
     $element = parent::errorElement($element, $violation, $form, $form_state);
 
-    $property_path_array = explode('.', $violation->getPropertyPath());
+    $property_path_array = \explode('.', $violation->getPropertyPath());
     return ($element === FALSE) ? FALSE : $element[$property_path_array[1]];
   }
 

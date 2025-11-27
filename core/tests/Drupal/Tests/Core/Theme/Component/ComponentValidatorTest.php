@@ -86,7 +86,7 @@ class ComponentValidatorTest extends UnitTestCaseTest {
     $cta_with_invalid_class['props']['properties']['attributes']['type'] = 'Drupal\Foo\Invalid';
     yield 'invalid class' => [$cta_with_invalid_class];
 
-    $cta_with_invalid_enum = array_merge(
+    $cta_with_invalid_enum = \array_merge(
       $valid_cta,
       ['extension_type' => 'invalid'],
     );

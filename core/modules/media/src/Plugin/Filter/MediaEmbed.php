@@ -543,8 +543,8 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
     // If view modes for media are deleted, remove the view mode from the plugin
     // settings and return that the plugin settings have changed.
     foreach ($dependencies['config'] as $config) {
-      if (($config instanceof EntityViewModeInterface) && str_starts_with($config->id(), 'media.')) {
-        $view_mode_id = substr_replace($config->id(), '', 0, 6);
+      if (($config instanceof EntityViewModeInterface) && \str_starts_with($config->id(), 'media.')) {
+        $view_mode_id = \substr_replace($config->id(), '', 0, 6);
         if (isset($this->settings['allowed_view_modes'][$view_mode_id])) {
           unset($this->settings['allowed_view_modes'][$view_mode_id]);
           $status = RemovableDependentPluginReturn::Changed;
@@ -556,7 +556,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
         if ($this->settings['default_view_mode'] === $view_mode_id) {
           $this->settings['default_view_mode'] = EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE;
           $this->settings['allowed_view_modes'] += [EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE => EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE];
-          ksort($this->settings['allowed_view_modes']);
+          \ksort($this->settings['allowed_view_modes']);
           $status = RemovableDependentPluginReturn::Changed;
         }
       }

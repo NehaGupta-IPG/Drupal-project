@@ -221,7 +221,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
   public function assertFileEntryExists($file, $message = NULL) {
     $this->container->get('entity_type.manager')->getStorage('file')->resetCache();
     $db_file = File::load($file->id());
-    $message = $message ?? sprintf('File %s exists in database at the correct path.', $file->getFileUri());
+    $message = $message ?? \sprintf('File %s exists in database at the correct path.', $file->getFileUri());
     $this->assertEquals($file->getFileUri(), $db_file->getFileUri(), $message);
   }
 
@@ -235,7 +235,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
    */
   public function assertFileEntryNotExists(FileInterface $file, ?string $message = NULL): void {
     $this->container->get('entity_type.manager')->getStorage('file')->resetCache();
-    $message = $message ?? sprintf('File %s exists in database at the correct path.', $file->getFileUri());
+    $message = $message ?? \sprintf('File %s exists in database at the correct path.', $file->getFileUri());
     $this->assertNull(File::load($file->id()), $message);
   }
 
@@ -243,7 +243,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
    * Asserts that a file's status is set to permanent in the database.
    */
   public function assertFileIsPermanent(FileInterface $file, $message = NULL) {
-    $message = $message ?? sprintf('File %s is permanent.', $file->getFileUri());
+    $message = $message ?? \sprintf('File %s is permanent.', $file->getFileUri());
     $this->assertTrue($file->isPermanent(), $message);
   }
 

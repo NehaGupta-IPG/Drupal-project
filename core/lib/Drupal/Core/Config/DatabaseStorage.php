@@ -268,8 +268,8 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function decode($raw) {
-    $data = @unserialize($raw, ['allowed_classes' => FALSE]);
-    return is_array($data) ? $data : FALSE;
+    $data = @\unserialize($raw, ['allowed_classes' => FALSE]);
+    return \is_array($data) ? $data : FALSE;
   }
 
   /**

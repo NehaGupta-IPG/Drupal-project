@@ -73,7 +73,7 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
     $html_response_attachments_processor = $this->prophesize(AttachmentsResponseProcessorInterface::class);
     $html_response_attachments_processor->processAttachments(Argument::that(function ($response) {
       return $response instanceof HtmlResponse
-        && empty(array_intersect(['big_pipe_placeholders', 'big_pipe_nojs_placeholders'], array_keys($response->getAttachments())));
+        && empty(\array_intersect(['big_pipe_placeholders', 'big_pipe_nojs_placeholders'], \array_keys($response->getAttachments())));
     }))
       ->will(function ($args) {
         /** @var \Symfony\Component\HttpFoundation\Response|\Drupal\Core\Render\AttachmentsInterface $response */

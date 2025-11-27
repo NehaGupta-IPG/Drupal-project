@@ -267,7 +267,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     $options = [];
     $this->assertSame('foo', $method->processOutbound('foo', $options, $request, $cacheability));
     $expected_cacheability = new BubbleableMetadata();
-    if ($expected_langcode !== FALSE && count($domains) > 1) {
+    if ($expected_langcode !== FALSE && \count($domains) > 1) {
       $expected_cacheability->setCacheMaxAge(
         Cache::PERMANENT)->setCacheContexts(['languages:' . LanguageInterface::TYPE_URL, 'url.site']);
     }

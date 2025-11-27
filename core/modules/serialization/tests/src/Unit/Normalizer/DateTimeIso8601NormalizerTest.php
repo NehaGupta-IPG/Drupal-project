@@ -276,7 +276,7 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
    */
   public static function jsonSchemaDataProvider(): array {
     $case = function (UnitTestCase $test) {
-      assert(in_array(JsonSchemaTestTrait::class, class_uses($test)));
+      \assert(\in_array(JsonSchemaTestTrait::class, \class_uses($test)));
       $field_item = $test->doProphesize(DateTimeItem::class);
       $data = $test->doProphesize(DateTimeIso8601::class);
 

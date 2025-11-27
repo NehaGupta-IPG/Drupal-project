@@ -116,8 +116,8 @@ final class RecipeRunner {
       $values = $recipe->input->getValues();
       // Wrap the replacement strings with `${` and `}`, which is a fairly
       // common style of placeholder.
-      $keys = array_map(fn ($k) => sprintf('${%s}', $k), array_keys($values));
-      $replace = array_combine($keys, $values);
+      $keys = \array_map(fn ($k) => \sprintf('${%s}', $k), \array_keys($values));
+      $replace = \array_combine($keys, $values);
 
       // Process the actions.
       /** @var \Drupal\Core\Config\Action\ConfigActionManager $config_action_manager */
@@ -125,10 +125,10 @@ final class RecipeRunner {
       foreach ($config->config['actions'] as $config_name => $actions) {
         // If this config name contains an input value, it must begin with the
         // config prefix of a known entity type.
-        if (str_contains($config_name, '${') && empty($config_manager->getEntityTypeIdByName($config_name))) {
+        if (\str_contains($config_name, '${') && empty($config_manager->getEntityTypeIdByName($config_name))) {
           throw new ConfigActionException("The entity type for the config name '$config_name' could not be identified.");
         }
-        $config_name = str_replace($keys, $replace, $config_name);
+        $config_name = \str_replace($keys, $replace, $config_name);
 
         foreach ($actions as $action_id => $data) {
           $config_action_manager->applyAction($action_id, $config_name, static::replaceInputValues($data, $replace));
@@ -318,7 +318,7 @@ final class RecipeRunner {
    */
   public static function installConfig(Recipe $recipe, ?array &$context = NULL): void {
     static::processConfiguration($recipe);
-    $context['message'] = t('Installed configuration for %recipe recipe.', ['%recipe' => $recipe->name]);
+    $context['message'] = \t('Installed configuration for %recipe recipe.', ['%recipe' => $recipe->name]);
     $context['results']['config'][] = $recipe->name;
   }
 
@@ -347,10 +347,10 @@ final class RecipeRunner {
    *   The passed data, with placeholders replaced.
    */
   private static function replaceInputValues(mixed $data, array $replace): mixed {
-    if (is_string($data)) {
-      $data = str_replace(array_keys($replace), $replace, $data);
+    if (\is_string($data)) {
+      $data = \str_replace(\array_keys($replace), $replace, $data);
     }
-    elseif (is_array($data)) {
+    elseif (\is_array($data)) {
       foreach ($data as $key => $value) {
         $data[$key] = static::replaceInputValues($value, $replace);
       }

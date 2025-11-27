@@ -65,7 +65,7 @@ class BatchTestChainedForm extends FormBase {
 
     $value = &$form_state->getValue('value');
     $value++;
-    batch_set($batch_test_definitions->batch1());
+    \batch_set($batch_test_definitions->batch1());
 
     $form_state->setRedirect('batch_test.redirect');
   }
@@ -81,7 +81,7 @@ class BatchTestChainedForm extends FormBase {
 
     $value = &$form_state->getValue('value');
     $value++;
-    batch_set($batch_test_definitions->batch2());
+    \batch_set($batch_test_definitions->batch2());
 
     $form_state->setRedirect('batch_test.redirect');
   }
@@ -111,7 +111,7 @@ class BatchTestChainedForm extends FormBase {
 
     $value = &$form_state->getValue('value');
     $value++;
-    batch_set($batch_test_definitions->batch3());
+    \batch_set($batch_test_definitions->batch3());
 
     $form_state->setRedirect('batch_test.redirect');
   }

@@ -82,7 +82,7 @@ class File extends MediaSourceBase {
 
       case self::METADATA_ATTRIBUTE_LINK_TARGET:
         $url = $file->createFileUrl(TRUE);
-        assert(is_string($url));
+        \assert(\is_string($url));
         return (new GeneratedUrl())
           ->setGeneratedUrl($url)
           ->setCacheMaxAge(Cache::PERMANENT)

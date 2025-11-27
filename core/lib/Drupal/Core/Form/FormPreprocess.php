@@ -138,7 +138,7 @@ class FormPreprocess {
     // Add label_display and label variables to template.
     $variables['label_display'] = $element['#title_display'];
     $variables['label'] = ['#theme' => 'form_element_label'];
-    $variables['label'] += array_intersect_key($element, array_flip(['#id', '#required', '#title', '#title_display']));
+    $variables['label'] += \array_intersect_key($element, \array_flip(['#id', '#required', '#title', '#title_display']));
     $variables['label']['#attributes'] = $element['#label_attributes'];
     if (!empty($element['#label_for'])) {
       $variables['label']['#for'] = $element['#label_for'];
@@ -272,7 +272,7 @@ class FormPreprocess {
     RenderElementBase::setAttributes($element, ['form-select']);
 
     $variables['attributes'] = $element['#attributes'];
-    $variables['options'] = form_select_options($element);
+    $variables['options'] = \form_select_options($element);
   }
 
   /**
@@ -354,7 +354,7 @@ class FormPreprocess {
     $variables['title'] = (!empty($element['#title'])) ? $element['#title'] : '';
     // If the element title is a string, wrap it a render array so that markup
     // will not be escaped (but XSS-filtered).
-    if (is_string($variables['title']) && $variables['title'] !== '') {
+    if (\is_string($variables['title']) && $variables['title'] !== '') {
       $variables['title'] = ['#markup' => $variables['title']];
     }
     $variables['description'] = (!empty($element['#description'])) ? $element['#description'] : '';

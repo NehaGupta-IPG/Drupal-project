@@ -127,7 +127,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     $this->configFactoryOverride = $config_override;
     $this->requestStack = $request_stack;
     if (!$cacheBackend) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $cacheBackend argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3497341', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __CLASS__ . ' constructor without the $cacheBackend argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3497341', E_USER_DEPRECATED);
       $this->cacheBackend = \Drupal::cache('bootstrap');
     }
   }
