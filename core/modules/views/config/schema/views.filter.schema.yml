@@ -96,6 +96,12 @@ views.filter.numeric:
         placeholder:
           type: label
           label: 'Placeholder'
+        min_label:
+          type: label
+          label: 'Min label'
+        max_label:
+          type: label
+          label: 'Max label'
 
 views.filter_value.numeric:
   type: mapping

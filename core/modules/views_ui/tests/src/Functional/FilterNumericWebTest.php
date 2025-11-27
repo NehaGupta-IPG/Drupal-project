@@ -113,6 +113,15 @@ class FilterNumericWebTest extends UITestBase {
     // Change the filter to a 'between' filter to test if the label and
     // description are set for the 'minimum' filter element.
     $this->drupalGet('admin/structure/views/nojs/handler/test_view/default/filter/age');
+    // Check the min label and max label configuration fields and
+    // it's default values.
+    $min_label_name = 'options[expose][min_label]';
+    $max_label_name = 'options[expose][max_label]';
+    $this->assertSession()->fieldExists($min_label_name);
+    $this->assertSession()->fieldExists($max_label_name);
+    $this->assertSession()->fieldValueEquals($min_label_name, 'Min');
+    $this->assertSession()->fieldValueEquals($max_label_name, 'Max');
+
     $edit = [];
     $edit['options[expose][label]'] = 'Age between';
     $edit['options[expose][description]'] = 'Description of the exposed filter';
@@ -132,6 +141,19 @@ class FilterNumericWebTest extends UITestBase {
     $this->assertSession()->elementsCount('xpath', '//fieldset[contains(@id, "edit-age-wrapper")]//label[contains(@for, "edit-age-max") and contains(text(), "Max")]', 1);
     // Check that the description is shown in the right place.
     $this->assertEquals('Description of the exposed filter', trim($this->cssSelect('#edit-age-wrapper--description')[0]->getText()));
+
+    // Change min and max label values and check.
+    $this->drupalGet('admin/structure/views/nojs/handler/test_view/default/filter/age');
+    $edit = [];
+    $edit[$min_label_name] = 'Test min label';
+    $edit[$max_label_name] = 'Test max label';
+    $this->submitForm($edit, 'Apply');
+    $this->drupalGet('admin/structure/views/view/test_view');
+    $this->submitForm([], 'Save');
+    $this->assertConfigSchemaByName('views.view.test_view');
+    $this->submitForm([], 'Update preview');
+    $this->assertSession()->elementsCount('xpath', '//fieldset[contains(@id, "edit-age-wrapper")]//label[contains(@for, "edit-age-min") and contains(text(), "Test min label")]', 1);
+    $this->assertSession()->elementsCount('xpath', '//fieldset[contains(@id, "edit-age-wrapper")]//label[contains(@for, "edit-age-max") and contains(text(), "Test max label")]', 1);
 
     // Change to an operation that only requires one form element ('>').
     $this->drupalGet('admin/structure/views/nojs/handler/test_view/default/filter/age');
