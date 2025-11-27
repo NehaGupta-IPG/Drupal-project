@@ -27,9 +27,9 @@ class SpecialAttributesRouteSubscriber extends RouteSubscriberBase {
       '_form',
     ];
     foreach ($collection->all() as $name => $route) {
-      if ($not_allowed_variables = array_intersect($route->compile()->getVariables(), $special_variables)) {
-        $reserved = implode(', ', $not_allowed_variables);
-        throw new \InvalidArgumentException(sprintf('Route %s uses reserved variable names: %s', $name, $reserved));
+      if ($not_allowed_variables = \array_intersect($route->compile()->getVariables(), $special_variables)) {
+        $reserved = \implode(', ', $not_allowed_variables);
+        throw new \InvalidArgumentException(\sprintf('Route %s uses reserved variable names: %s', $name, $reserved));
       }
     }
   }

@@ -265,7 +265,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
    * @internal
    */
   protected function assertResults(array $expected): void {
-    $expected_count = count($expected);
+    $expected_count = \count($expected);
     $this->assertCount($expected_count, $this->queryResults);
     foreach ($expected as $key) {
       $id = $this->entities[$key]->id();

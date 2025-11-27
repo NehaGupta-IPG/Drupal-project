@@ -703,11 +703,11 @@ class ValidatorsTest extends KernelTestBase {
       'enabled' => TRUE,
       'label' => 'View Mode 2',
     ])->save();
-    assert($text_editor instanceof EditorInterface);
+    \assert($text_editor instanceof EditorInterface);
     $text_format = FilterFormat::create([
       'filters' => $filters,
     ]);
-    assert($text_format instanceof FilterFormatInterface);
+    \assert($text_format instanceof FilterFormatInterface);
     // TRICKY: because we're validating using `editor.editor.*` as the config
     // name, TextEditorObjectDependentValidatorTrait will load the stored
     // filter format. That has not yet been updated at this point, so in order
@@ -917,7 +917,7 @@ class ValidatorsTest extends KernelTestBase {
       'editor_image_upload_settings' => [
         'status' => FALSE,
       ],
-      'filters' => array_diff_key(
+      'filters' => \array_diff_key(
         $restricted_html_format_filters,
         ['filter_autop' => TRUE, 'filter_url' => TRUE]
       ),
@@ -1001,7 +1001,7 @@ class ValidatorsTest extends KernelTestBase {
         ],
       ],
       'expected_violations' => [
-        'filters.filter_html' => sprintf(
+        'filters.filter_html' => \sprintf(
           'The current CKEditor 5 build requires the following elements and attributes: <br><code>%s</code><br>The following elements are not supported: <br><code>%s</code>',
           Html::escape('<br> <p> <* dir="ltr rtl" lang>'),
           Html::escape('<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol start type="1 A I"> <li> <dl> <dt> <dd> <h2 id="jump-*"> <h3 id> <h4 id> <h5 id> <h6 id>'),

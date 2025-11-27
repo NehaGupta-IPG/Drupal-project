@@ -57,25 +57,25 @@ trait DoTrustedCallbackTrait {
     $object_or_classname = $callback;
     $safe_callback = FALSE;
 
-    if (is_array($callback)) {
+    if (\is_array($callback)) {
       [$object_or_classname, $method_name] = $callback;
     }
-    elseif (is_string($callback) && str_contains($callback, '::')) {
-      [$object_or_classname, $method_name] = explode('::', $callback, 2);
+    elseif (\is_string($callback) && \str_contains($callback, '::')) {
+      [$object_or_classname, $method_name] = \explode('::', $callback, 2);
     }
 
     if (isset($method_name)) {
-      if ($extra_trusted_interface && is_subclass_of($object_or_classname, $extra_trusted_interface)) {
+      if ($extra_trusted_interface && \is_subclass_of($object_or_classname, $extra_trusted_interface)) {
         $safe_callback = TRUE;
       }
-      elseif (is_subclass_of($object_or_classname, TrustedCallbackInterface::class)) {
-        if (is_object($object_or_classname)) {
+      elseif (\is_subclass_of($object_or_classname, TrustedCallbackInterface::class)) {
+        if (\is_object($object_or_classname)) {
           $methods = $object_or_classname->trustedCallbacks();
         }
         else {
-          $methods = call_user_func($object_or_classname . '::trustedCallbacks');
+          $methods = \call_user_func($object_or_classname . '::trustedCallbacks');
         }
-        $safe_callback = in_array($method_name, $methods, TRUE);
+        $safe_callback = \in_array($method_name, $methods, TRUE);
       }
       if (!$safe_callback) {
         $method = new \ReflectionMethod($object_or_classname, $method_name);
@@ -88,15 +88,15 @@ trait DoTrustedCallbackTrait {
 
     if (!$safe_callback) {
       $description = $object_or_classname;
-      if (is_object($description)) {
-        $description = get_class($description);
+      if (\is_object($description)) {
+        $description = \get_class($description);
       }
       if (isset($method_name)) {
         $description .= '::' . $method_name;
       }
-      $message = sprintf($message, $description);
+      $message = \sprintf($message, $description);
       if ($error_type === TrustedCallbackInterface::TRIGGER_SILENCED_DEPRECATION) {
-        @trigger_error($message, E_USER_DEPRECATED);
+        @\trigger_error($message, E_USER_DEPRECATED);
       }
       else {
         throw new UntrustedCallbackException($message);
@@ -104,7 +104,7 @@ trait DoTrustedCallbackTrait {
     }
 
     // @todo Allow named arguments in https://www.drupal.org/node/3174150
-    return call_user_func_array($callback, array_values($args));
+    return \call_user_func_array($callback, \array_values($args));
   }
 
 }

@@ -262,7 +262,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
         ->accessCheck(FALSE)
         ->allRevisions()
         ->execute();
-      $revisions = $this->entityTypeManager->getStorage($this->entityTypeId)->loadMultipleRevisions(array_keys($revisions_result));
+      $revisions = $this->entityTypeManager->getStorage($this->entityTypeId)->loadMultipleRevisions(\array_keys($revisions_result));
       $this->assertCount(6, $revisions);
 
       foreach ($revisions as $revision) {
@@ -498,7 +498,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
    */
   protected function assertBackupTables(): void {
     $backups = \Drupal::keyValue('entity.update_backup')->getAll();
-    $backup = reset($backups);
+    $backup = \reset($backups);
 
     $schema = $this->database->schema();
     foreach ($backup['table_mapping']->getTableNames() as $table_name) {

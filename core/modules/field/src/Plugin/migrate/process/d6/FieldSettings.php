@@ -24,7 +24,7 @@ class FieldSettings extends ProcessPluginBase {
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     // To maintain backwards compatibility, ensure that $value contains at least
     // three elements.
-    if (count($value) == 2) {
+    if (\count($value) == 2) {
       $value[] = NULL;
     }
     [$field_type, $global_settings, $original_field_type] = $value;
@@ -49,15 +49,15 @@ class FieldSettings extends ProcessPluginBase {
     $max_length = empty($max_length) ? 255 : $max_length;
     $allowed_values = [];
     if (isset($global_settings['allowed_values'])) {
-      $list = explode("\n", $global_settings['allowed_values']);
-      $list = array_map('trim', $list);
+      $list = \explode("\n", $global_settings['allowed_values']);
+      $list = \array_map('trim', $list);
       $list = FilterArray::removeEmptyStrings($list);
       switch ($field_type) {
         case 'list_string':
         case 'list_integer':
         case 'list_float':
           foreach ($list as $value) {
-            $value = explode("|", $value);
+            $value = \explode("|", $value);
             $allowed_values[$value[0]] = $value[1] ?? $value[0];
           }
           break;

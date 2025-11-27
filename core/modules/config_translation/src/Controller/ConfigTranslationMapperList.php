@@ -61,17 +61,17 @@ class ConfigTranslationMapperList extends ControllerBase {
     }
 
     // Group by mapper weight and sort by label.
-    ksort($mappers);
+    \ksort($mappers);
     foreach ($mappers as $weight => $mapper) {
-      usort($mapper, function ($a, $b) {
+      \usort($mapper, function ($a, $b) {
         $a_title = (isset($a['label'])) ? $a['label'] : '';
         $b_title = (isset($b['label'])) ? $b['label'] : '';
-        return strnatcasecmp($a_title, $b_title);
+        return \strnatcasecmp($a_title, $b_title);
       });
       $mappers[$weight] = $mapper;
     }
 
-    $build['#rows'] = array_merge(...$mappers);
+    $build['#rows'] = \array_merge(...$mappers);
 
     return $build;
   }
@@ -117,7 +117,7 @@ class ConfigTranslationMapperList extends ControllerBase {
   protected function buildOperations(ConfigMapperInterface $mapper) {
     // Retrieve and sort operations.
     $operations = $mapper->getOperations();
-    uasort($operations, 'Drupal\Component\Utility\SortArray::sortByWeightElement');
+    \uasort($operations, 'Drupal\Component\Utility\SortArray::sortByWeightElement');
     $build = [
       '#type' => 'operations',
       '#links' => $operations,

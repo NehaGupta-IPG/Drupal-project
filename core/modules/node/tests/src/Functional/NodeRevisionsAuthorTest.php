@@ -49,7 +49,7 @@ class NodeRevisionsAuthorTest extends NodeTestBase {
     $revisedBody = $this->randomMachineName(32);
     $node->set('body', [
       'value' => $revisedBody,
-      'format' => filter_default_format(),
+      'format' => \filter_default_format(),
     ]);
     $node->setOwnerId($initialRevisionAuthor->id());
     $node->setRevisionUserId($initialRevisionUser->id());

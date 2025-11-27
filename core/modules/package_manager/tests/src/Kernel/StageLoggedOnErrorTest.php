@@ -96,7 +96,7 @@ class StageLoggedOnErrorTest extends PackageManagerKernelTestBase {
 
       $predicate = function (array $record) use ($e): bool {
         $context = $record['context'];
-        return $context['@message'] === $e->getMessage() && str_contains($context['@backtrace_string'], 'testLoggedOnError');
+        return $context['@message'] === $e->getMessage() && \str_contains($context['@backtrace_string'], 'testLoggedOnError');
       };
       $this->assertTrue($logger->hasRecordThatPasses($predicate, LogLevel::ERROR));
     }

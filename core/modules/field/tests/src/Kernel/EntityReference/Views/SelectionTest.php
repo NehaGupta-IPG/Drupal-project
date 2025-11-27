@@ -148,7 +148,7 @@ class SelectionTest extends KernelTestBase {
   public function testAnchorTagStripping(): void {
     $filtered_rendered_results_formatted = [];
     foreach ($this->selectionHandler->getReferenceableEntities() as $subresults) {
-      $filtered_rendered_results_formatted += array_map(fn(MarkupInterface $markup): string => (string) $markup, $subresults);
+      $filtered_rendered_results_formatted += \array_map(fn(MarkupInterface $markup): string => (string) $markup, $subresults);
     }
 
     // Note the missing <a> tags.
@@ -173,7 +173,7 @@ class SelectionTest extends KernelTestBase {
     foreach ($result as $node_type => $values) {
       foreach ($values as $nid => $label) {
         $this->assertSame($node_type, $this->nodes[$nid]->bundle());
-        $this->assertSame(trim(strip_tags((string) $label)), Html::escape($this->nodes[$nid]->label()));
+        $this->assertSame(\trim(\strip_tags((string) $label)), Html::escape($this->nodes[$nid]->label()));
       }
     }
   }

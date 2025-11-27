@@ -60,12 +60,12 @@ class WorkspaceTrackerTest extends KernelTestBase {
 
     $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
 
-    $permissions = array_intersect([
+    $permissions = \array_intersect([
       'administer nodes',
       'create workspace',
       'edit any workspace',
       'view any workspace',
-    ], array_keys($this->container->get('user.permissions')->getPermissions()));
+    ], \array_keys($this->container->get('user.permissions')->getPermissions()));
     $this->setCurrentUser($this->createUser($permissions));
 
     $this->workspaces['qa'] = Workspace::create(['id' => 'qa', 'label' => 'QA']);
@@ -220,11 +220,11 @@ class WorkspaceTrackerTest extends KernelTestBase {
 
     // The default behavior uses a pager with 50 items per page.
     $tracked_items = $workspace_tracker->getTrackedEntitiesForListing($this->workspaces['stage']->id());
-    $this->assertEquals(50, count($tracked_items[$entity_type_id]));
+    $this->assertEquals(50, \count($tracked_items[$entity_type_id]));
 
     // Verifies that all items are returned, not broken into pages.
     $tracked_items_no_pager = $workspace_tracker->getTrackedEntitiesForListing($this->workspaces['stage']->id(), NULL, FALSE);
-    $this->assertEquals(51, count($tracked_items_no_pager[$entity_type_id]));
+    $this->assertEquals(51, \count($tracked_items_no_pager[$entity_type_id]));
   }
 
   /**
@@ -246,17 +246,17 @@ class WorkspaceTrackerTest extends KernelTestBase {
     foreach ($expected_latest_revisions as $workspace_id => $expected_tracked_revision_ids) {
       $tracked_entities = $workspace_tracker->getTrackedEntities($workspace_id, $entity_type_id);
       $tracked_revision_ids = $tracked_entities[$entity_type_id] ?? [];
-      $this->assertEquals($expected_tracked_revision_ids, array_keys($tracked_revision_ids));
+      $this->assertEquals($expected_tracked_revision_ids, \array_keys($tracked_revision_ids));
     }
 
     foreach ($expected_all_revisions as $workspace_id => $expected_all_revision_ids) {
       $all_associated_revisions = $workspace_tracker->getAllTrackedRevisions($workspace_id, $entity_type_id);
-      $this->assertEquals($expected_all_revision_ids, array_keys($all_associated_revisions));
+      $this->assertEquals($expected_all_revision_ids, \array_keys($all_associated_revisions));
     }
 
     foreach ($expected_initial_revisions as $workspace_id => $expected_initial_revision_ids) {
       $initial_revisions = $workspace_tracker->getTrackedInitialRevisions($workspace_id, $entity_type_id);
-      $this->assertEquals($expected_initial_revision_ids, array_keys($initial_revisions));
+      $this->assertEquals($expected_initial_revision_ids, \array_keys($initial_revisions));
     }
   }
 
@@ -272,7 +272,7 @@ class WorkspaceTrackerTest extends KernelTestBase {
 
     // Get the workspace field name for later assertions.
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-    assert($entity_type instanceof ContentEntityTypeInterface);
+    \assert($entity_type instanceof ContentEntityTypeInterface);
     $workspace_field = $entity_type->getRevisionMetadataKey('workspace');
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
 
@@ -296,7 +296,7 @@ class WorkspaceTrackerTest extends KernelTestBase {
     $this->assertEquals($preview_revisions, $qa_revisions);
 
     // Verify the workspace field was updated on all revisions.
-    foreach ($storage->loadMultipleRevisions(array_keys($qa_revisions)) as $revision) {
+    foreach ($storage->loadMultipleRevisions(\array_keys($qa_revisions)) as $revision) {
       $this->assertEquals('qa', $revision->{$workspace_field}->target_id);
     }
   }

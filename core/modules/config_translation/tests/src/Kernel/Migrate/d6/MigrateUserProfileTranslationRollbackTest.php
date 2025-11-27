@@ -46,11 +46,11 @@ class MigrateUserProfileTranslationRollbackTest extends MigrateDrupal6TestBase {
     $migrations = $migration_plugin_manager->buildDependencyMigration($migrations, []);
 
     // Execute the import.
-    $ids = array_keys($migrations);
+    $ids = \array_keys($migrations);
     $this->executeMigrations($ids);
 
     // Execute the rollback.
-    $ids = array_reverse($ids);
+    $ids = \array_reverse($ids);
     try {
       foreach ($ids as $id) {
         // Language rollback tries to rollback the default language so skip it.

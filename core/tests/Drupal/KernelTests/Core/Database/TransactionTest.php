@@ -431,7 +431,7 @@ class TransactionTest extends DatabaseTestBase {
       $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
     }
     else {
-      set_error_handler(static function (int $errno, string $errstr): bool {
+      \set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
@@ -441,7 +441,7 @@ class TransactionTest extends DatabaseTestBase {
         $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
-        restore_error_handler();
+        \restore_error_handler();
       }
       $this->assertFalse($this->connection->inTransaction());
     }
@@ -450,7 +450,7 @@ class TransactionTest extends DatabaseTestBase {
       $transaction->commitOrRelease();
     }
     else {
-      set_error_handler(static function (int $errno, string $errstr): bool {
+      \set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
@@ -460,7 +460,7 @@ class TransactionTest extends DatabaseTestBase {
         $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
-        restore_error_handler();
+        \restore_error_handler();
       }
     }
     $this->assertRowPresent('David');
@@ -497,7 +497,7 @@ class TransactionTest extends DatabaseTestBase {
       $transaction->commitOrRelease();
     }
     else {
-      set_error_handler(static function (int $errno, string $errstr): bool {
+      \set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
@@ -507,7 +507,7 @@ class TransactionTest extends DatabaseTestBase {
         $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
-        restore_error_handler();
+        \restore_error_handler();
       }
     }
     $this->assertRowPresent('row');
@@ -521,7 +521,7 @@ class TransactionTest extends DatabaseTestBase {
       $transaction->commitOrRelease();
     }
     else {
-      set_error_handler(static function (int $errno, string $errstr): bool {
+      \set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
@@ -531,7 +531,7 @@ class TransactionTest extends DatabaseTestBase {
         $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
-        restore_error_handler();
+        \restore_error_handler();
       }
     }
     $this->assertRowPresent('row');
@@ -545,7 +545,7 @@ class TransactionTest extends DatabaseTestBase {
       $transaction2->commitOrRelease();
     }
     else {
-      set_error_handler(static function (int $errno, string $errstr): bool {
+      \set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
@@ -555,7 +555,7 @@ class TransactionTest extends DatabaseTestBase {
         $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
-        restore_error_handler();
+        \restore_error_handler();
       }
     }
     $transaction3 = $this->connection->startTransaction();
@@ -586,7 +586,7 @@ class TransactionTest extends DatabaseTestBase {
       $transaction2->commitOrRelease();
     }
     else {
-      set_error_handler(static function (int $errno, string $errstr): bool {
+      \set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
@@ -596,7 +596,7 @@ class TransactionTest extends DatabaseTestBase {
         $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
-        restore_error_handler();
+        \restore_error_handler();
       }
     }
     $transaction3 = $this->connection->startTransaction();
@@ -655,7 +655,7 @@ class TransactionTest extends DatabaseTestBase {
     // the DDL statement should commit the transaction stack.
     $this->cleanUp();
     $transaction = $this->createRootTransaction('', FALSE);
-    $reflectionMethod = new \ReflectionMethod(get_class($this->connection->transactionManager()), 'getConnectionTransactionState');
+    $reflectionMethod = new \ReflectionMethod(\get_class($this->connection->transactionManager()), 'getConnectionTransactionState');
     $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
     $this->assertEquals(ClientConnectionTransactionState::Active, $reflectionMethod->invoke($this->connection->transactionManager()));
     $this->insertRow('row');
@@ -665,7 +665,7 @@ class TransactionTest extends DatabaseTestBase {
 
     // Try to rollback the root transaction. Since the DDL already committed
     // it, it should fail.
-    set_error_handler(static function (int $errno, string $errstr): bool {
+    \set_error_handler(static function (int $errno, string $errstr): bool {
       throw new \ErrorException($errstr);
     });
     try {
@@ -675,7 +675,7 @@ class TransactionTest extends DatabaseTestBase {
       $this->assertSame('Transaction::rollBack() failed because of a prior execution of a DDL statement.', $e->getMessage());
     }
     finally {
-      restore_error_handler();
+      \restore_error_handler();
     }
 
     try {
@@ -915,7 +915,7 @@ class TransactionTest extends DatabaseTestBase {
       $transaction->commitOrRelease();
     }
     else {
-      set_error_handler(static function (int $errno, string $errstr): bool {
+      \set_error_handler(static function (int $errno, string $errstr): bool {
         throw new \ErrorException($errstr);
       });
       try {
@@ -925,7 +925,7 @@ class TransactionTest extends DatabaseTestBase {
         $this->assertSame('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', $e->getMessage());
       }
       finally {
-        restore_error_handler();
+        \restore_error_handler();
       }
     }
 
@@ -1205,7 +1205,7 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertRowAbsent('rtcRollback');
     $this->assertRowPresent('row');
 
-    set_error_handler(static function (int $errno, string $errstr): bool {
+    \set_error_handler(static function (int $errno, string $errstr): bool {
       throw new \ErrorException($errstr);
     });
     try {
@@ -1215,7 +1215,7 @@ class TransactionTest extends DatabaseTestBase {
       $this->assertSame('Transaction::rollBack() failed because of a prior execution of a DDL statement.', $e->getMessage());
     }
     finally {
-      restore_error_handler();
+      \restore_error_handler();
     }
 
     unset($transaction);

@@ -34,7 +34,7 @@ trait JsonApiJsonSchemaTestTrait {
     $uriRetriever = new UriRetriever();
     $uriRetriever->setTranslation(
       '|^' . JsonApiSpec::SUPPORTED_SPECIFICATION_JSON_SCHEMA . '#?|',
-      sprintf('file://%s/schema.json', realpath(__DIR__ . '/../../..'))
+      \sprintf('file://%s/schema.json', \realpath(__DIR__ . '/../../..'))
     );
     return new Validator(new Factory(
       uriRetriever: $uriRetriever,

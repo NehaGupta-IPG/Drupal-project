@@ -178,7 +178,7 @@ abstract class Connection {
    *   - Other driver-specific options.
    */
   public function __construct(object $connection, array $connection_options) {
-    assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
+    \assert(\count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     // Manage the table prefix.
     $connection_options['prefix'] = $connection_options['prefix'] ?? '';
@@ -226,7 +226,7 @@ abstract class Connection {
    */
   public function commitAll() {
     $manager = $this->transactionManager();
-    if ($manager->inTransaction() && method_exists($manager, 'commitAll')) {
+    if ($manager->inTransaction() && \method_exists($manager, 'commitAll')) {
       $this->transactionManager()->commitAll();
     }
   }
@@ -339,10 +339,10 @@ abstract class Connection {
    *   A single prefix.
    */
   protected function setPrefix($prefix) {
-    assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
+    \assert(\is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
     $this->prefix = $prefix;
     $this->tablePlaceholderReplacements = [
-      $this->identifierQuotes[0] . str_replace('.', $this->identifierQuotes[1] . '.' . $this->identifierQuotes[0], $prefix),
+      $this->identifierQuotes[0] . \str_replace('.', $this->identifierQuotes[1] . '.' . $this->identifierQuotes[0], $prefix),
       $this->identifierQuotes[1],
     ];
   }
@@ -362,7 +362,7 @@ abstract class Connection {
    *   The properly-prefixed string.
    */
   public function prefixTables($sql) {
-    return str_replace(['{', '}'], $this->tablePlaceholderReplacements, $sql);
+    return \str_replace(['{', '}'], $this->tablePlaceholderReplacements, $sql);
   }
 
   /**
@@ -386,7 +386,7 @@ abstract class Connection {
    *   This method should only be called by database API code.
    */
   public function quoteIdentifiers($sql) {
-    return str_replace(['[', ']'], $this->identifierQuotes, $sql);
+    return \str_replace(['[', ']'], $this->identifierQuotes, $sql);
   }
 
   /**
@@ -431,9 +431,9 @@ abstract class Connection {
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
-    assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    \assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
+    if (isset($options['fetch']) && \is_int($options['fetch'])) {
+      @\trigger_error("Passing the 'fetch' key as an integer to \$options in prepareStatement() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
     }
 
     try {
@@ -479,8 +479,8 @@ abstract class Connection {
     if (empty($options['allow_delimiter_in_query'])) {
       $trim_chars .= ';';
     }
-    $query = rtrim($query, $trim_chars);
-    if (str_contains($query, ';') && empty($options['allow_delimiter_in_query'])) {
+    $query = \rtrim($query, $trim_chars);
+    if (\str_contains($query, ';') && empty($options['allow_delimiter_in_query'])) {
       throw new \InvalidArgumentException('; is not supported in SQL strings. Use only one statement at a time.');
     }
 
@@ -580,7 +580,7 @@ abstract class Connection {
     }
 
     // Flatten the array of comments.
-    $comment = implode('. ', $comments);
+    $comment = \implode('. ', $comments);
 
     // Sanitize the comment string so as to avoid SQL injection attacks.
     return '/* ' . $this->filterComment($comment) . ' */ ';
@@ -619,7 +619,7 @@ abstract class Connection {
    */
   protected function filterComment($comment = '') {
     // Change semicolons to period to avoid triggering multi-statement check.
-    return strtr($comment, ['*' => ' * ', ';' => '.']);
+    return \strtr($comment, ['*' => ' * ', ';' => '.']);
   }
 
   /**
@@ -650,11 +650,11 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Connection::defaultOptions()
    */
   public function query($query, array $args = [], $options = []) {
-    assert(is_string($query), 'The \'$query\' argument to ' . __METHOD__ . '() must be a string');
-    assert(!isset($options['return']), 'Passing "return" option to query() has no effect. See https://www.drupal.org/node/3185520');
-    assert(!isset($options['target']), 'Passing "target" option to query() has no effect. See https://www.drupal.org/node/2993033');
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in query() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    \assert(\is_string($query), 'The \'$query\' argument to ' . __METHOD__ . '() must be a string');
+    \assert(!isset($options['return']), 'Passing "return" option to query() has no effect. See https://www.drupal.org/node/3185520');
+    \assert(!isset($options['target']), 'Passing "target" option to query() has no effect. See https://www.drupal.org/node/2993033');
+    if (isset($options['fetch']) && \is_int($options['fetch'])) {
+      @\trigger_error("Passing the 'fetch' key as an integer to \$options in query() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
     }
 
     // Use default values if not already set.
@@ -699,8 +699,8 @@ abstract class Connection {
     // If the placeholder indicated the value to use is an array,  we need to
     // expand it out into a comma-delimited set of placeholders.
     foreach ($args as $key => $data) {
-      $is_bracket_placeholder = str_ends_with($key, '[]');
-      $is_array_data = is_array($data);
+      $is_bracket_placeholder = \str_ends_with($key, '[]');
+      $is_array_data = \is_array($data);
       if ($is_bracket_placeholder && !$is_array_data) {
         throw new \InvalidArgumentException('Placeholders with a trailing [] can only be expanded with an array of values.');
       }
@@ -712,11 +712,11 @@ abstract class Connection {
         continue;
       }
       // Handle expansion of arrays.
-      $key_name = str_replace('[]', '__', $key);
+      $key_name = \str_replace('[]', '__', $key);
       $new_keys = [];
       // We require placeholders to have trailing brackets if the developer
       // intends them to be expanded to an array to make the intent explicit.
-      foreach (array_values($data) as $i => $value) {
+      foreach (\array_values($data) as $i => $value) {
         // This assumes that there are no other placeholders that use the same
         // name.  For example, if the array placeholder is defined as :example[]
         // and there is already an :example_2 placeholder, this will generate
@@ -726,7 +726,7 @@ abstract class Connection {
       }
 
       // Update the query with the new placeholders.
-      $query = str_replace($key, implode(', ', array_keys($new_keys)), $query);
+      $query = \str_replace($key, \implode(', ', \array_keys($new_keys)), $query);
 
       // Update the args array with the new placeholders.
       unset($args[$key]);
@@ -765,7 +765,7 @@ abstract class Connection {
     };
     if (empty($this->driverClasses[$class])) {
       $driver_class = $this->connectionOptions['namespace'] . '\\' . $class;
-      $this->driverClasses[$class] = class_exists($driver_class) ? $driver_class : $class;
+      $this->driverClasses[$class] = \class_exists($driver_class) ? $driver_class : $class;
     }
     return $this->driverClasses[$class];
   }
@@ -800,7 +800,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Query\Select
    */
   public function select($table, $alias = NULL, array $options = []) {
-    assert(is_string($alias) || $alias === NULL, 'The \'$alias\' argument to ' . __METHOD__ . '() must be a string or NULL');
+    \assert(\is_string($alias) || $alias === NULL, 'The \'$alias\' argument to ' . __METHOD__ . '() must be a string or NULL');
     return new Select($this, $table, $alias, $options);
   }
 
@@ -985,7 +985,7 @@ abstract class Connection {
    *   The sanitized database name.
    */
   public function escapeDatabase($database) {
-    $database = preg_replace('/[^A-Za-z0-9_]+/', '', $database);
+    $database = \preg_replace('/[^A-Za-z0-9_]+/', '', $database);
     [$start_quote, $end_quote] = $this->identifierQuotes;
     return $start_quote . $database . $end_quote;
   }
@@ -1009,7 +1009,7 @@ abstract class Connection {
    */
   public function escapeTable($table) {
     if (!isset($this->escapedTables[$table])) {
-      $this->escapedTables[$table] = preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
+      $this->escapedTables[$table] = \preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
     }
     return $this->escapedTables[$table];
   }
@@ -1029,11 +1029,11 @@ abstract class Connection {
    */
   public function escapeField($field) {
     if (!isset($this->escapedFields[$field])) {
-      $escaped = preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
+      $escaped = \preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
       [$start_quote, $end_quote] = $this->identifierQuotes;
       // Sometimes fields have the format table_alias.field. In such cases
       // both identifiers should be quoted, for example, "table_alias"."field".
-      $this->escapedFields[$field] = $start_quote . str_replace('.', $end_quote . '.' . $start_quote, $escaped) . $end_quote;
+      $this->escapedFields[$field] = $start_quote . \str_replace('.', $end_quote . '.' . $start_quote, $escaped) . $end_quote;
     }
     return $this->escapedFields[$field];
   }
@@ -1055,7 +1055,7 @@ abstract class Connection {
   public function escapeAlias($field) {
     if (!isset($this->escapedAliases[$field])) {
       [$start_quote, $end_quote] = $this->identifierQuotes;
-      $this->escapedAliases[$field] = $start_quote . preg_replace('/[^A-Za-z0-9_]+/', '', $field) . $end_quote;
+      $this->escapedAliases[$field] = $start_quote . \preg_replace('/[^A-Za-z0-9_]+/', '', $field) . $end_quote;
     }
     return $this->escapedAliases[$field];
   }
@@ -1086,7 +1086,7 @@ abstract class Connection {
    *   The escaped string.
    */
   public function escapeLike($string) {
-    return addcslashes($string, '\%_');
+    return \addcslashes($string, '\%_');
   }
 
   /**
@@ -1294,7 +1294,7 @@ abstract class Connection {
   protected static function getSQLState(\Exception $e) {
     // The PDOException code is not always reliable, try to see whether the
     // message has something usable.
-    if (preg_match('/^SQLSTATE\[(\w{5})\]/', $e->getMessage(), $matches)) {
+    if (\preg_match('/^SQLSTATE\[(\w{5})\]/', $e->getMessage(), $matches)) {
       return $matches[1];
     }
     else {
@@ -1333,10 +1333,10 @@ abstract class Connection {
    */
   public static function createConnectionOptionsFromUrl($url, $root) {
     if ($root !== NULL) {
-      @trigger_error("Passing the \$root value to " . __METHOD__ . "() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
+      @\trigger_error("Passing the \$root value to " . __METHOD__ . "() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
     }
 
-    $url_components = parse_url($url);
+    $url_components = \parse_url($url);
     if (!isset($url_components['scheme'], $url_components['host'], $url_components['path'])) {
       throw new \InvalidArgumentException("The database connection URL '$url' is invalid. The minimum requirement is: 'driver://host/database'");
     }
@@ -1349,7 +1349,7 @@ abstract class Connection {
 
     // Remove leading slash from the URL path.
     if ($url_components['path'][0] === '/') {
-      $url_components['path'] = substr($url_components['path'], 1);
+      $url_components['path'] = \substr($url_components['path'], 1);
     }
 
     // Use reflection to get the namespace of the class being called.
@@ -1440,14 +1440,14 @@ abstract class Connection {
    *   "core" when the driver is not provided as part of a module.
    */
   public function getProvider(): string {
-    [$first, $second] = explode('\\', $this->connectionOptions['namespace'], 3);
+    [$first, $second] = \explode('\\', $this->connectionOptions['namespace'], 3);
 
     // The namespace for Drupal modules is Drupal\MODULE_NAME, and the module
     // name must be all lowercase. Second-level namespaces containing uppercase
     // letters (e.g., "Core", "Component", "Driver") are not modules.
     // @see \Drupal\Core\DrupalKernel::getModuleNamespacesPsr4()
     // @see https://www.drupal.org/docs/8/creating-custom-modules/naming-and-placing-your-drupal-8-module#s-name-your-module
-    return ($first === 'Drupal' && strtolower($second) === $second) ? $second : 'core';
+    return ($first === 'Drupal' && \strtolower($second) === $second) ? $second : 'core';
   }
 
   /**
@@ -1502,7 +1502,7 @@ abstract class Connection {
    */
   public function enableEvents(array $eventNames): static {
     foreach ($eventNames as $eventName) {
-      assert(class_exists($eventName), "Event class {$eventName} does not exist");
+      \assert(\class_exists($eventName), "Event class {$eventName} does not exist");
       $this->enabledEvents[$eventName] = TRUE;
     }
     return $this;
@@ -1518,7 +1518,7 @@ abstract class Connection {
    */
   public function disableEvents(array $eventNames): static {
     foreach ($eventNames as $eventName) {
-      assert(class_exists($eventName), "Event class {$eventName} does not exist");
+      \assert(\class_exists($eventName), "Event class {$eventName} does not exist");
       $this->enabledEvents[$eventName] = FALSE;
     }
     return $this;
@@ -1570,7 +1570,7 @@ abstract class Connection {
     $stack = $this->removeDatabaseEntriesFromDebugBacktrace($this->getDebugBacktrace(), $this->getConnectionOptions()['namespace']);
     // Return the first function call whose stack entry has a 'file' key, that
     // is, it is not a callback or a closure.
-    for ($i = 0; $i < count($stack); $i++) {
+    for ($i = 0; $i < \count($stack); $i++) {
       if (!empty($stack[$i]['file'])) {
         return [
           'file' => $stack[$i]['file'],
@@ -1601,16 +1601,16 @@ abstract class Connection {
     // Starting from the very first entry processed during the request, find
     // the first function call that can be identified as a call to a
     // method/function in the database layer.
-    for ($n = count($backtrace) - 1; $n >= 0; $n--) {
+    for ($n = \count($backtrace) - 1; $n >= 0; $n--) {
       // If the call was made from a function, 'class' will be empty. We give
       // it a default empty string value in that case.
       $class = $backtrace[$n]['class'] ?? '';
-      if (str_starts_with($class, __NAMESPACE__) || str_starts_with($class, $driver_namespace)) {
+      if (\str_starts_with($class, __NAMESPACE__) || \str_starts_with($class, $driver_namespace)) {
         break;
       }
     }
 
-    return array_values(array_slice($backtrace, $n));
+    return \array_values(\array_slice($backtrace, $n));
   }
 
   /**
@@ -1625,7 +1625,7 @@ abstract class Connection {
   protected function getDebugBacktrace(): array {
     // @todo Allow a backtrace including all arguments as an option.
     //   https://www.drupal.org/project/drupal/issues/3401906
-    return debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    return \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
   }
 
 }

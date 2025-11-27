@@ -123,7 +123,7 @@ class LocaleStringTest extends KernelTestBase {
       ->execute()
       ->fetchAllAssoc('type');
     $this->assertCount(4, $rows);
-    $this->assertEquals(substr($location, 0, 255), $rows['path']->name);
+    $this->assertEquals(\substr($location, 0, 255), $rows['path']->name);
   }
 
   /**

@@ -35,7 +35,7 @@ class ConfigTranslationFormTest extends KernelTestBase {
     $this->installConfig(['config_translation_test']);
 
     $definitions = $this->container->get('plugin.manager.config_translation.mapper')->getDefinitions();
-    $plugin_id = key($definitions);
+    $plugin_id = \key($definitions);
     $langcode = 'xx';
 
     ConfigurableLanguage::create(['id' => $langcode, 'label' => 'XX'])->save();

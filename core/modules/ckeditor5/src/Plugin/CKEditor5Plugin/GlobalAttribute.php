@@ -26,7 +26,7 @@ class GlobalAttribute extends CKEditor5PluginDefault {
    */
   public function getDynamicPluginConfig(array $static_plugin_config, EditorInterface $editor): array {
     // This plugin is only loaded when filter_html is enabled.
-    assert($editor->getFilterFormat()->filters()->has('filter_html'));
+    \assert($editor->getFilterFormat()->filters()->has('filter_html'));
     $filter_html = $editor->getFilterFormat()->filters('filter_html');
     $restrictions = HTMLRestrictions::fromFilterPluginInstance($filter_html);
 
@@ -35,13 +35,13 @@ class GlobalAttribute extends CKEditor5PluginDefault {
     // now.
     $allowed_elements = $restrictions->getAllowedElements();
     unset($allowed_elements['*']);
-    $allowed_tags = array_keys($allowed_elements);
+    $allowed_tags = \array_keys($allowed_elements);
 
     // Update the static plugin configuration: generate a `name` regular
     // expression to match any of the HTML tags supported by filter_html.
     // @see https://ckeditor.com/docs/ckeditor5/latest/features/general-html-support.html#configuration
     $dynamic_plugin_config = $static_plugin_config;
-    $dynamic_plugin_config['htmlSupport']['allow'][0]['name']['regexp']['pattern'] = '/^(' . implode('|', $allowed_tags) . ')$/';
+    $dynamic_plugin_config['htmlSupport']['allow'][0]['name']['regexp']['pattern'] = '/^(' . \implode('|', $allowed_tags) . ')$/';
     return $dynamic_plugin_config;
   }
 

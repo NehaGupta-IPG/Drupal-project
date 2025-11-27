@@ -206,7 +206,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     $this->assertDrupalResponseCacheability('MISS', $expected_cacheability, $response);
     // Then ensure that the new menu link is in the response.
     $link_items = Json::decode((string) $response->getBody())['linkset'][0]['item'];
-    $titles = array_column($link_items, 'title');
+    $titles = \array_column($link_items, 'title');
     $this->assertContains($duplicate_title, $titles);
   }
 
@@ -236,11 +236,11 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     $this->assertDrupalResponseCacheability('HIT', $expected_cacheability, $response);
     // Ensure the "Our name" menu link is visible.
     $link_items = Json::decode((string) $response->getBody())['linkset'][0]['item'];
-    $titles = array_column($link_items, 'title');
+    $titles = \array_column($link_items, 'title');
     $this->assertContains('Our name', $titles);
     // Now, unpublish the target node.
     $our_name_page = Node::load(2);
-    assert($our_name_page instanceof NodeInterface);
+    \assert($our_name_page instanceof NodeInterface);
     $our_name_page->setUnpublished()->save();
     // Redo the request.
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/main/linkset'));
@@ -248,7 +248,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     $this->assertDrupalResponseCacheability('MISS', $expected_cacheability, $response);
     // Ensure the "Our name" menu link is no longer visible.
     $link_items = Json::decode((string) $response->getBody())['linkset'][0]['item'];
-    $titles = array_column($link_items, 'title');
+    $titles = \array_column($link_items, 'title');
     $this->assertNotContains('Our name', $titles);
     // Redo the request, but authenticate as the unpublished page's author.
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/main/linkset'), 200, $this->authorAccount);
@@ -264,7 +264,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     $this->assertDrupalResponseCacheability(FALSE, $expected_cacheability, $response);
     // Ensure the "Our name" menu link is visible.
     $link_items = Json::decode((string) $response->getBody())['linkset'][0]['item'];
-    $titles = array_column($link_items, 'title');
+    $titles = \array_column($link_items, 'title');
     $this->assertContains('Our name', $titles);
   }
 
@@ -288,7 +288,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/account/linkset'));
     $this->assertDrupalResponseCacheability('MISS', $expected_cacheability, $response);
     $link_items = Json::decode((string) $response->getBody())['linkset'][0]['item'];
-    $titles = array_column($link_items, 'title');
+    $titles = \array_column($link_items, 'title');
     $this->assertContains('Log in', $titles);
     $this->assertNotContains('Log out', $titles);
     $this->assertNotContains('My account', $titles);
@@ -303,7 +303,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     // isn't expected either.
     $this->assertDrupalResponseCacheability(FALSE, $expected_cacheability, $response);
     $link_items = Json::decode((string) $response->getBody())['linkset'][0]['item'];
-    $titles = array_column($link_items, 'title');
+    $titles = \array_column($link_items, 'title');
     $this->assertContains('Log out', $titles);
     $this->assertContains('My account', $titles);
     $this->assertNotContains('Log in', $titles);
@@ -317,7 +317,7 @@ final class LinksetControllerTest extends LinksetControllerTestBase {
     $this->assertTrue($this->container->get('module_installer')->install(['decoupled_menus_test'], TRUE), 'Installed modules.');
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/account/linkset'), 200, $this->authorAccount);
     $link_context_object = Json::decode((string) $response->getBody())['linkset'][0];
-    $this->assertContains('authenticated-as', array_keys($link_context_object));
+    $this->assertContains('authenticated-as', \array_keys($link_context_object));
     $my_account_link = $link_context_object['authenticated-as'][0];
     $this->assertSame('My account', $my_account_link['title']);
   }

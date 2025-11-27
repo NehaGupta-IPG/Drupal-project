@@ -102,11 +102,11 @@ class MediaLibraryTest extends WebDriverTestBase {
         ],
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))
@@ -258,18 +258,18 @@ class MediaLibraryTest extends WebDriverTestBase {
       $assert_session = $this->assertSession();
       $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-wrapper'));
 
-      if (empty($allowed_media_types) || count($allowed_media_types) === 2) {
+      if (empty($allowed_media_types) || \count($allowed_media_types) === 2) {
         $menu = $assert_session->elementExists('css', '.js-media-library-menu');
         $assert_session->elementExists('named', ['link', 'Image'], $menu);
         $assert_session->elementExists('named', ['link', 'Arrakis'], $menu);
         $assert_session->elementTextContains('css', '.js-media-library-item', 'Fear is the mind-killer');
       }
-      elseif (count($allowed_media_types) === 1 && !empty($allowed_media_types['image'])) {
+      elseif (\count($allowed_media_types) === 1 && !empty($allowed_media_types['image'])) {
         // No tabs should appear if there's only one media type available.
         $assert_session->elementNotExists('css', '.js-media-library-menu');
         $assert_session->elementTextContains('css', '.js-media-library-item', 'Fear is the mind-killer');
       }
-      elseif (count($allowed_media_types) === 1 && !empty($allowed_media_types['arrakis'])) {
+      elseif (\count($allowed_media_types) === 1 && !empty($allowed_media_types['arrakis'])) {
         // No tabs should appear if there's only one media type available.
         $assert_session->elementNotExists('css', '.js-media-library-menu');
         $assert_session->elementTextContains('css', '.js-media-library-item', 'Le baron Vladimir Harkonnen');

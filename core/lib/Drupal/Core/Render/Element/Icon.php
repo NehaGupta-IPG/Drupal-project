@@ -73,7 +73,7 @@ class Icon extends RenderElementBase {
       $context['source'] = $source;
     }
     // Silently ensure settings is an array.
-    if (!is_array($element['#settings'])) {
+    if (!\is_array($element['#settings'])) {
       $element['#settings'] = [];
     }
 
@@ -89,7 +89,7 @@ class Icon extends RenderElementBase {
       // Context include data from extractor and settings, priority on settings
       // from this element. Context as last value to be sure nothing override
       // icon_id or source if set.
-      '#context' => array_merge($extractor_data, $element['#settings'], $context),
+      '#context' => \array_merge($extractor_data, $element['#settings'], $context),
     ];
 
     if ($library = $icon->getLibrary()) {

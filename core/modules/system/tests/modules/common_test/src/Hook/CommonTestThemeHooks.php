@@ -93,7 +93,7 @@ class CommonTestThemeHooks {
   public function pageAttachmentsAlter(array &$page): void {
     // Remove a library that was added in common_test_page_attachments(), to
     // test that this hook can do what it claims to do.
-    if (isset($page['#attached']['library']) && ($index = array_search('core/bar', $page['#attached']['library'])) && $index !== FALSE) {
+    if (isset($page['#attached']['library']) && ($index = \array_search('core/bar', $page['#attached']['library'])) && $index !== FALSE) {
       unset($page['#attached']['library'][$index]);
     }
     $page['#attached']['library'][] = 'core/baz';
@@ -116,7 +116,7 @@ class CommonTestThemeHooks {
   public function jsAlter(&$javascript, AttachedAssetsInterface $assets, LanguageInterface $language): void {
     // Attach alter.js above tableselect.js.
     $alter_js = \Drupal::service('extension.list.module')->getPath('common_test') . '/alter.js';
-    if (array_key_exists($alter_js, $javascript) && array_key_exists('core/misc/tableselect.js', $javascript)) {
+    if (\array_key_exists($alter_js, $javascript) && \array_key_exists('core/misc/tableselect.js', $javascript)) {
       $javascript[$alter_js]['weight'] = $javascript['core/misc/tableselect.js']['weight'] - 1;
     }
   }
@@ -129,7 +129,7 @@ class CommonTestThemeHooks {
   #[Hook('js_settings_alter')]
   public function jsSettingsAlter(&$settings, AttachedAssetsInterface $assets): void {
     // Modify an existing setting.
-    if (array_key_exists('pluralDelimiter', $settings)) {
+    if (\array_key_exists('pluralDelimiter', $settings)) {
       $settings['pluralDelimiter'] = '☃';
     }
     // Add a setting.

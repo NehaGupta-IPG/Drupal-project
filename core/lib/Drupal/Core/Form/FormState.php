@@ -501,7 +501,7 @@ class FormState implements FormStateInterface {
    */
   public function setFormState(array $form_state_additions) {
     foreach ($form_state_additions as $key => $value) {
-      if (property_exists($this, $key)) {
+      if (\property_exists($this, $key)) {
         $this->{$key} = $value;
       }
       else {
@@ -548,7 +548,7 @@ class FormState implements FormStateInterface {
     // Persisting $form_state is a side-effect disallowed during a "safe" HTTP
     // method.
     if ($cache && $this->isRequestMethodSafe()) {
-      throw new \LogicException(sprintf('Form state caching on %s requests is not allowed.', $this->requestMethod));
+      throw new \LogicException(\sprintf('Form state caching on %s requests is not allowed.', $this->requestMethod));
     }
 
     $this->cache = (bool) $cache;
@@ -634,7 +634,7 @@ class FormState implements FormStateInterface {
    * {@inheritdoc}
    */
   public function setMethod($method) {
-    $this->method = strtoupper($method);
+    $this->method = \strtoupper($method);
     return $this;
   }
 
@@ -642,14 +642,14 @@ class FormState implements FormStateInterface {
    * {@inheritdoc}
    */
   public function isMethodType($method_type) {
-    return $this->method === strtoupper($method_type);
+    return $this->method === \strtoupper($method_type);
   }
 
   /**
    * {@inheritdoc}
    */
   public function setRequestMethod($method) {
-    $this->requestMethod = strtoupper($method);
+    $this->requestMethod = \strtoupper($method);
     return $this;
   }
 
@@ -667,7 +667,7 @@ class FormState implements FormStateInterface {
    * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
    */
   protected function isRequestMethodSafe() {
-    return in_array($this->requestMethod, ['GET', 'HEAD']);
+    return \in_array($this->requestMethod, ['GET', 'HEAD']);
   }
 
   /**
@@ -1135,7 +1135,7 @@ class FormState implements FormStateInterface {
           // valid, so errors for this element must be recorded. As the exploded
           // array will all be strings, we need to cast every value of the
           // section array to string.
-          if (array_slice(explode('][', $name), 0, count($section)) === array_map('strval', $section)) {
+          if (\array_slice(\explode('][', $name), 0, \count($section)) === \array_map('strval', $section)) {
             $record = TRUE;
             break;
           }
@@ -1155,7 +1155,7 @@ class FormState implements FormStateInterface {
    * {@inheritdoc}
    */
   public function setError(array &$element, $message = '') {
-    $this->setErrorByName(implode('][', $element['#parents']), $message);
+    $this->setErrorByName(\implode('][', $element['#parents']), $message);
     return $this;
   }
 
@@ -1175,7 +1175,7 @@ class FormState implements FormStateInterface {
       $parents = [];
       foreach ($element['#parents'] as $parent) {
         $parents[] = $parent;
-        $key = implode('][', $parents);
+        $key = \implode('][', $parents);
         if (isset($errors[$key])) {
           return $errors[$key];
         }
@@ -1209,8 +1209,8 @@ class FormState implements FormStateInterface {
    * {@inheritdoc}
    */
   public function prepareCallback($callback) {
-    if (is_string($callback) && str_starts_with($callback, '::')) {
-      $callback = [$this->getFormObject(), substr($callback, 2)];
+    if (\is_string($callback) && \str_starts_with($callback, '::')) {
+      $callback = [$this->getFormObject(), \substr($callback, 2)];
     }
     return $callback;
   }
@@ -1250,7 +1250,7 @@ class FormState implements FormStateInterface {
    */
   public function addCleanValueKey($cleanValueKey) {
     $keys = $this->getCleanValueKeys();
-    $this->setCleanValueKeys(array_merge((array) $keys, [$cleanValueKey]));
+    $this->setCleanValueKeys(\array_merge((array) $keys, [$cleanValueKey]));
     return $this;
   }
 
@@ -1290,10 +1290,10 @@ class FormState implements FormStateInterface {
       // self::getValue(['foo', 'bar']), which is the level where we
       // can unset 'baz' (that is stored in $last_parent).
       $parents = $button['#parents'];
-      $last_parent = array_pop($parents);
+      $last_parent = \array_pop($parents);
       $key_exists = NULL;
       $values = &NestedArray::getValue($this->getValues(), $parents, $key_exists);
-      if ($key_exists && is_array($values)) {
+      if ($key_exists && \is_array($values)) {
         unset($values[$last_parent]);
       }
     }

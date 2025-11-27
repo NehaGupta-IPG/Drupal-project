@@ -53,7 +53,7 @@ class BlockContentForm extends ContentEntityForm {
         '#type' => 'submit',
         '#value' => $this->t('Save and configure'),
         '#weight' => 20,
-        '#submit' => array_merge($element['submit']['#submit'], ['::configureBlock']),
+        '#submit' => \array_merge($element['submit']['#submit'], ['::configureBlock']),
       ];
     }
 

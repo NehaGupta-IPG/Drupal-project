@@ -76,13 +76,13 @@ final class FieldStorageCreateCheckSubscriber implements EventSubscriberInterfac
         $base_table = $storage->getTableMapping()->getBaseTable();
         if (!$this->schema->tableExists($base_table)) {
           if ($this->throwLogicExceptionOrDeprecationWarning) {
-            throw new \LogicException(sprintf('Creating the "%s" field storage definition without the entity schema "%s" being installed is not allowed.',
+            throw new \LogicException(\sprintf('Creating the "%s" field storage definition without the entity schema "%s" being installed is not allowed.',
               $event->getFieldStorageDefinition()->id(),
               $entity_type_id,
             ));
           }
           else {
-            @trigger_error('Creating the "' . $event->getFieldStorageDefinition()->id() . '" field storage definition without the entity schema "' . $entity_type_id . '" being installed is deprecated in drupal:11.2.0 and will be replaced by a LogicException in drupal:12.0.0. See https://www.drupal.org/node/3493981', E_USER_DEPRECATED);
+            @\trigger_error('Creating the "' . $event->getFieldStorageDefinition()->id() . '" field storage definition without the entity schema "' . $entity_type_id . '" being installed is deprecated in drupal:11.2.0 and will be replaced by a LogicException in drupal:12.0.0. See https://www.drupal.org/node/3493981', E_USER_DEPRECATED);
           }
         }
       }

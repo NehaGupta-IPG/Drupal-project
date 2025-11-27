@@ -63,11 +63,11 @@ class EntityDeleteMultipleAccessCheck implements AccessInterface {
    */
   public function access(AccountInterface $account, $entity_type_id) {
     $selection = $this->tempStore->get($account->id() . ':' . $entity_type_id);
-    if (empty($selection) || !is_array($selection)) {
+    if (empty($selection) || !\is_array($selection)) {
       return AccessResult::neutral();
     }
 
-    $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadMultiple(array_keys($selection));
+    $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadMultiple(\array_keys($selection));
     foreach ($entities as $entity) {
       // As long as the user has access to delete one entity allow access to the
       // delete form. Access will be checked again in

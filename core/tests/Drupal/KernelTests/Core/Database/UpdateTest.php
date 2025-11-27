@@ -113,7 +113,7 @@ class UpdateTest extends DatabaseTestBase {
       ->execute();
     $this->assertSame(4, $num_rows, 'Updated 4 records.');
 
-    $saved_name = $this->connection->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => pow(26, 2)])->fetchField();
+    $saved_name = $this->connection->query('SELECT [name] FROM {test} WHERE [age] = :age', [':age' => \pow(26, 2)])->fetchField();
     $this->assertSame('Paul', $saved_name, 'Successfully updated values using an algebraic expression.');
   }
 

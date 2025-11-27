@@ -28,7 +28,7 @@ class DateFormatAccessControlHandler extends EntityAccessControlHandler {
       return AccessResult::allowed();
     }
     // Locked date formats cannot be updated or deleted.
-    elseif (in_array($operation, ['update', 'delete'])) {
+    elseif (\in_array($operation, ['update', 'delete'])) {
       if ($entity->isLocked()) {
         return AccessResult::forbidden('The DateFormat config entity is locked.')->addCacheableDependency($entity);
       }

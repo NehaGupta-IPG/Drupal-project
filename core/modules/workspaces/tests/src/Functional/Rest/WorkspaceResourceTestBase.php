@@ -137,7 +137,7 @@ abstract class WorkspaceResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'uuid' => [
@@ -170,7 +170,7 @@ abstract class WorkspaceResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getNormalizedPatchEntity() {
-    return array_diff_key($this->getNormalizedPostEntity(), ['id' => TRUE]);
+    return \array_diff_key($this->getNormalizedPostEntity(), ['id' => TRUE]);
   }
 
   /**

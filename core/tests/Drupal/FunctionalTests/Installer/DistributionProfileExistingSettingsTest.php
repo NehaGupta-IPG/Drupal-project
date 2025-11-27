@@ -48,8 +48,8 @@ class DistributionProfileExistingSettingsTest extends InstallerTestBase {
     ];
     // File API functions are not available yet.
     $path = $this->siteDirectory . '/profiles/my_distribution';
-    mkdir($path, 0777, TRUE);
-    file_put_contents("$path/my_distribution.info.yml", Yaml::encode($this->info));
+    \mkdir($path, 0777, TRUE);
+    \file_put_contents("$path/my_distribution.info.yml", Yaml::encode($this->info));
 
     // Pre-configure hash salt.
     // Any string is valid, so simply use the class name of this test.
@@ -76,7 +76,7 @@ class DistributionProfileExistingSettingsTest extends InstallerTestBase {
       'value' => $site_path . '/files/config_staging',
       'required' => TRUE,
     ];
-    mkdir($this->settings['settings']['config_sync_directory']->value, 0777, TRUE);
+    \mkdir($this->settings['settings']['config_sync_directory']->value, 0777, TRUE);
   }
 
   /**
@@ -87,7 +87,7 @@ class DistributionProfileExistingSettingsTest extends InstallerTestBase {
     $filename = $this->siteDirectory . '/settings.php';
     // Make the settings file read-only.
     // Not using File API; a potential error must trigger a PHP warning.
-    chmod($filename, 0444);
+    \chmod($filename, 0444);
 
     // Verify that the distribution name appears.
     $this->assertSession()->pageTextContains($this->info['distribution']['name']);

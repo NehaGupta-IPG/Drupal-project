@@ -227,7 +227,7 @@ class DatabaseStorage extends StorageBase {
     while ($keys) {
       try {
         $this->connection->delete($this->table)
-          ->condition('name', array_splice($keys, 0, 1000), 'IN')
+          ->condition('name', \array_splice($keys, 0, 1000), 'IN')
           ->condition('collection', $this->collection)
           ->execute();
       }

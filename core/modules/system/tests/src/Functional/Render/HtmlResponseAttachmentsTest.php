@@ -128,7 +128,7 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
       'type' => 'application/rss+xml',
       'title' => 'Your RSS feed.',
     ];
-    $test_meta = reset($test_meta);
+    $test_meta = \reset($test_meta);
     if (empty($test_meta)) {
       $this->fail('Unable to find feed link.');
     }
@@ -149,7 +149,7 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
     $test_meta = $this->xpath('//head/meta[@test-attribute="test_value"]');
     $this->assertCount(1, $test_meta, 'There\'s only one test attribute.');
     // Grab the only DOM element.
-    $test_meta = reset($test_meta);
+    $test_meta = \reset($test_meta);
     if (empty($test_meta)) {
       $this->fail('Unable to find the head meta.');
     }

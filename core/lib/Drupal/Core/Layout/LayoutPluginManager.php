@@ -91,7 +91,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     parent::processDefinition($definition, $plugin_id);
 
     if (!$definition instanceof LayoutDefinition) {
-      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must extend %s', $plugin_id, LayoutDefinition::class));
+      throw new InvalidPluginDefinitionException($plugin_id, \sprintf('The "%s" layout definition must extend %s', $plugin_id, LayoutDefinition::class));
     }
 
     // Add the module or theme path to the 'path'.
@@ -118,7 +118,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     // Add a dependency on the provider of the library.
     if ($library = $definition->getLibrary()) {
       $config_dependencies = $definition->getConfigDependencies();
-      [$library_provider] = explode('/', $library, 2);
+      [$library_provider] = \explode('/', $library, 2);
       if ($this->moduleHandler->moduleExists($library_provider)) {
         $config_dependencies['module'][] = $library_provider;
       }
@@ -131,23 +131,23 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
     // If 'template' is set, then we'll derive 'template_path' and 'theme_hook'.
     $template = $definition->getTemplate();
     if (!empty($template)) {
-      $template_parts = explode('/', $template);
+      $template_parts = \explode('/', $template);
 
-      $template = array_pop($template_parts);
+      $template = \array_pop($template_parts);
       $template_path = $path;
-      if (count($template_parts) > 0) {
-        $template_path .= '/' . implode('/', $template_parts);
+      if (\count($template_parts) > 0) {
+        $template_path .= '/' . \implode('/', $template_parts);
       }
       $definition->setTemplate($template);
-      $definition->setThemeHook(strtr($template, '-', '_'));
+      $definition->setThemeHook(\strtr($template, '-', '_'));
       $definition->setTemplatePath($template_path);
     }
 
     if (!$definition->getDefaultRegion()) {
-      $definition->setDefaultRegion(key($definition->getRegions()));
+      $definition->setDefaultRegion(\key($definition->getRegions()));
     }
     // Makes sure region names are translatable.
-    $regions = array_map(function ($region) {
+    $regions = \array_map(function ($region) {
       if (!$region['label'] instanceof TranslatableMarkup) {
         // Region labels from YAML discovery needs translation.
         // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
@@ -187,10 +187,10 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    */
   public function getCategories() {
     // Fetch all categories from definitions and remove duplicates.
-    $categories = array_unique(array_values(array_map(function (LayoutDefinition $definition) {
+    $categories = \array_unique(\array_values(\array_map(function (LayoutDefinition $definition) {
       return $definition->getCategory();
     }, $this->getDefinitions())));
-    natcasesort($categories);
+    \natcasesort($categories);
     return $categories;
   }
 
@@ -203,11 +203,11 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
   public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
-    uasort($definitions, function (LayoutDefinition $a, LayoutDefinition $b) {
+    \uasort($definitions, function (LayoutDefinition $a, LayoutDefinition $b) {
       if ($a->getCategory() != $b->getCategory()) {
-        return strnatcasecmp($a->getCategory(), $b->getCategory());
+        return \strnatcasecmp($a->getCategory(), $b->getCategory());
       }
-      return strnatcasecmp($a->getLabel(), $b->getLabel());
+      return \strnatcasecmp($a->getLabel(), $b->getLabel());
     });
     return $definitions;
   }

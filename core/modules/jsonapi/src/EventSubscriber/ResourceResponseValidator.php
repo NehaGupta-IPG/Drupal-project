@@ -88,7 +88,7 @@ class ResourceResponseValidator implements EventSubscriberInterface {
     if ($validator) {
       $this->validator = $validator;
     }
-    elseif (class_exists(Validator::class)) {
+    elseif (\class_exists(Validator::class)) {
       $this->validator = new Validator();
     }
   }
@@ -101,12 +101,12 @@ class ResourceResponseValidator implements EventSubscriberInterface {
    */
   public function onResponse(ResponseEvent $event) {
     $response = $event->getResponse();
-    if (!str_contains($response->headers->get('Content-Type', ''), 'application/vnd.api+json')) {
+    if (!\str_contains($response->headers->get('Content-Type', ''), 'application/vnd.api+json')) {
       return;
     }
 
     // Wraps validation in an assert to prevent execution in production.
-    assert($this->validateResponse($response, $event->getRequest()), 'A JSON:API response failed validation (see the logs for details). Report this in the Drupal issue queue at https://www.drupal.org/project/issues/drupal');
+    \assert($this->validateResponse($response, $event->getRequest()), 'A JSON:API response failed validation (see the logs for details). Report this in the Drupal issue queue at https://www.drupal.org/project/issues/drupal');
   }
 
   /**
@@ -128,14 +128,14 @@ class ResourceResponseValidator implements EventSubscriberInterface {
 
     // Do not use Json::decode here since it coerces the response into an
     // associative array, which creates validation errors.
-    $response_data = json_decode($response->getContent());
+    $response_data = \json_decode($response->getContent());
     if (empty($response_data)) {
       return TRUE;
     }
 
-    $schema_ref = sprintf(
+    $schema_ref = \sprintf(
       'file://%s/schema.json',
-      implode('/', [
+      \implode('/', [
         $this->appRoot,
         $this->moduleHandler->getModule('jsonapi')->getPath(),
       ])

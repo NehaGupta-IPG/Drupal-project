@@ -175,7 +175,7 @@ class CommentController extends ControllerBase {
     $fields = $this->commentManager->getFields('node');
     // Legacy nodes only had a single comment field, so use the first comment
     // field on the entity.
-    if (!empty($fields) && ($field_names = array_keys($fields)) && ($field_name = reset($field_names))) {
+    if (!empty($fields) && ($field_names = \array_keys($fields)) && ($field_name = \reset($field_names))) {
       return $this->redirect('comment.reply', [
         'entity_type' => 'node',
         'entity' => $node->id(),
@@ -336,7 +336,7 @@ class CommentController extends ControllerBase {
    * @see https://www.drupal.org/node/3543039
    */
   public function renderNewCommentsNodeLinks(Request $request) {
-    @trigger_error(__FUNCTION__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\history\Controller\HistoryController::renderNewCommentsNodeLinks instead. See https://www.drupal.org/node/3543039', E_USER_DEPRECATED);
+    @\trigger_error(__FUNCTION__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\history\Controller\HistoryController::renderNewCommentsNodeLinks instead. See https://www.drupal.org/node/3543039', E_USER_DEPRECATED);
     if (!$this->moduleHandler()->moduleExists('history')) {
       throw new NotFoundHttpException();
     }

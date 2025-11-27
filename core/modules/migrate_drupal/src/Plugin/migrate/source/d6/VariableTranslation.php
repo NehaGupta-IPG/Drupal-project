@@ -78,7 +78,7 @@ class VariableTranslation extends DrupalSqlBase {
     foreach ($result as $i18n_variable) {
       foreach ($values as $key => $value) {
         if ($values[$key]['language'] === $i18n_variable->language) {
-          $values[$key][$i18n_variable->name] = unserialize($i18n_variable->value, ['allowed_classes' => FALSE]);
+          $values[$key][$i18n_variable->name] = \unserialize($i18n_variable->value, ['allowed_classes' => FALSE]);
           break;
         }
       }
@@ -97,7 +97,7 @@ class VariableTranslation extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function fields() {
-    return array_combine($this->variables, $this->variables);
+    return \array_combine($this->variables, $this->variables);
   }
 
   /**

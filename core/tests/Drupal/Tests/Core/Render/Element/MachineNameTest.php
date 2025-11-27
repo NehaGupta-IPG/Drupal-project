@@ -117,7 +117,7 @@ class MachineNameTest extends UnitTestCase {
       'suffix',
       'replace_token',
     ];
-    $this->assertEmpty(array_diff_key($settings, array_flip($allowed_options)));
+    $this->assertEmpty(\array_diff_key($settings, \array_flip($allowed_options)));
     foreach ($allowed_options as $key) {
       $this->assertArrayHasKey($key, $settings);
     }

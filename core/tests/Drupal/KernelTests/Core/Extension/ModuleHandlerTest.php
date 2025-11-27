@@ -60,7 +60,7 @@ class ModuleHandlerTest extends KernelTestBase {
     $moduleHandler = \Drupal::moduleHandler();
     $this->assertHasResetHookImplementations(TRUE, $moduleHandler);
     $backupModuleList = $moduleHandler->getModuleList();
-    $moduleListWithout = array_diff_key($backupModuleList, ['module_test' => TRUE]);
+    $moduleListWithout = \array_diff_key($backupModuleList, ['module_test' => TRUE]);
     $this->assertArrayHasKey('module_test', $backupModuleList);
 
     // Silently setting the property does not clear the hooks cache.

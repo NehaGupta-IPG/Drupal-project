@@ -61,7 +61,7 @@ class FilterThemeHooks {
     $format = $variables['format'];
     $variables['tips'] = [
       '#theme' => 'filter_tips',
-      '#tips' => _filter_tips($format->id(), FALSE),
+      '#tips' => \_filter_tips($format->id(), FALSE),
     ];
 
     // Add format id for filter.js.
@@ -128,7 +128,7 @@ class FilterThemeHooks {
       ];
     }
 
-    $variables['multiple'] = count($tips) > 1;
+    $variables['multiple'] = \count($tips) > 1;
   }
 
 }

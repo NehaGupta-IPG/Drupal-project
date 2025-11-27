@@ -29,11 +29,11 @@ class AnnounceTestController {
   public function setFeedConfig(string $json_name): JsonResponse|Response {
     $file = __DIR__ . "/../../../../announce_feed/$json_name.json";
     $headers = ['Content-Type' => 'application/json; charset=utf-8'];
-    if (!is_file($file)) {
+    if (!\is_file($file)) {
       // Return an empty response.
       return new Response('', 404, $headers);
     }
-    return new JsonResponse(file_get_contents($file), 200, $headers, TRUE);
+    return new JsonResponse(\file_get_contents($file), 200, $headers, TRUE);
   }
 
 }

@@ -104,8 +104,8 @@ abstract class OptionsWidgetBase extends WidgetBase {
     // an array of values keyed by delta first, then by column, while our
     // widgets return the opposite.
 
-    if (is_array($element['#value'])) {
-      $values = array_values($element['#value']);
+    if (\is_array($element['#value'])) {
+      $values = \array_values($element['#value']);
     }
     else {
       $values = [$element['#value']];
@@ -113,7 +113,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
 
     // Filter out the 'none' option. Use a strict comparison, because
     // 0 == 'any string'.
-    $index = array_search('_none', $values, TRUE);
+    $index = \array_search('_none', $values, TRUE);
     if ($index !== FALSE) {
       unset($values[$index]);
     }
@@ -156,7 +156,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
       ];
       $module_handler->alter('options_list', $options, $context);
 
-      array_walk_recursive($options, [$this, 'sanitizeLabel']);
+      \array_walk_recursive($options, [$this, 'sanitizeLabel']);
 
       // Options might be nested ("optgroups"). If the widget does not support
       // nested options, flatten the list.

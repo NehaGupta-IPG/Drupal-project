@@ -50,13 +50,13 @@ class FileExtensionFormatter extends BaseFieldFileFormatterBase {
   protected function viewValue(FieldItemInterface $item) {
     $filename = $item->value;
     if (!$this->getSetting('extension_detect_tar')) {
-      return pathinfo($filename, PATHINFO_EXTENSION);
+      return \pathinfo($filename, PATHINFO_EXTENSION);
     }
     else {
-      $file_parts = explode('.', basename($filename));
-      if (count($file_parts) > 1) {
-        $extension = array_pop($file_parts);
-        $last_part_in_name = array_pop($file_parts);
+      $file_parts = \explode('.', \basename($filename));
+      if (\count($file_parts) > 1) {
+        $extension = \array_pop($file_parts);
+        $last_part_in_name = \array_pop($file_parts);
         if ($last_part_in_name === 'tar') {
           $extension = 'tar.' . $extension;
         }

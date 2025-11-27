@@ -141,7 +141,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
         // the list after calling loadMultiple(). Note that the list may include
         // multiple IDs added earlier in each plugin's constructor.
         static::$entityIdsToLoad[$entity_id] = $entity_id;
-        $entities = $storage->loadMultiple(array_values(static::$entityIdsToLoad));
+        $entities = $storage->loadMultiple(\array_values(static::$entityIdsToLoad));
         $entity = $entities[$entity_id] ?? NULL;
         static::$entityIdsToLoad = [];
       }
@@ -221,7 +221,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
    */
   protected function getListBuilderOperations() {
 
-    if (is_null($this->listBuilderOperations)) {
+    if (\is_null($this->listBuilderOperations)) {
       $this->listBuilderOperations = $this->entityTypeManager
         ->getListBuilder($this->getEntity()->getEntityTypeId())
         ->getOperations($this->getEntity());
@@ -252,7 +252,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
    */
   public function updateLink(array $new_definition_values, $persist) {
     // Filter the list of updates to only those that are allowed.
-    $overrides = array_intersect_key($new_definition_values, $this->overrideAllowed);
+    $overrides = \array_intersect_key($new_definition_values, $this->overrideAllowed);
     // Update the definition.
     $this->pluginDefinition = $overrides + $this->getPluginDefinition();
     if ($persist) {

@@ -44,8 +44,8 @@ class SingleVisibleProfileTest extends InstallerTestBase {
       ];
       // File API functions are not available yet.
       $path = $this->siteDirectory . '/profiles/' . $profile;
-      mkdir($path, 0777, TRUE);
-      file_put_contents("$path/$profile.info.yml", Yaml::encode($info));
+      \mkdir($path, 0777, TRUE);
+      \file_put_contents("$path/$profile.info.yml", Yaml::encode($info));
     }
   }
 

@@ -82,7 +82,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
     $response = $event->getResponse();
 
     // Only care about HTML responses.
-    if (stripos($response->headers->get('Content-Type', ''), 'text/html') === FALSE) {
+    if (\stripos($response->headers->get('Content-Type', ''), 'text/html') === FALSE) {
       return;
     }
 
@@ -99,7 +99,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
     if ($content !== FALSE) {
       $response->setContent(static::setLinkActiveClass(
         $content,
-        ltrim($this->currentPath->getPath(), '/'),
+        \ltrim($this->currentPath->getPath(), '/'),
         $this->pathMatcher->isFrontPage(),
         $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)
           ->getId(),
@@ -138,7 +138,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
     $search_key_front = 'data-drupal-link-system-path="&lt;front&gt;"';
 
     // Receive the query in a standardized manner.
-    ksort($query);
+    \ksort($query);
 
     $offset = 0;
     // There are two distinct conditions that can make a link be marked active:
@@ -146,11 +146,11 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
     //    attribute.
     // 2. We are on the front page and a link has the special '<front>' value in
     //    its 'data-drupal-link-system-path' attribute.
-    while (str_contains(substr($html_markup, $offset), $search_key_current_path) || ($is_front && str_contains(substr($html_markup, $offset), $search_key_front))) {
-      $pos_current_path = strpos($html_markup, $search_key_current_path, $offset);
+    while (\str_contains(\substr($html_markup, $offset), $search_key_current_path) || ($is_front && \str_contains(\substr($html_markup, $offset), $search_key_front))) {
+      $pos_current_path = \strpos($html_markup, $search_key_current_path, $offset);
       // Only look for links with the special '<front>' system path if we are
       // actually on the front page.
-      $pos_front = $is_front ? strpos($html_markup, $search_key_front, $offset) : FALSE;
+      $pos_front = $is_front ? \strpos($html_markup, $search_key_front, $offset) : FALSE;
 
       // Determine which of the two values is the next match: the exact path, or
       // the <front> special case.
@@ -176,7 +176,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
         }
       }
       $pos_tag_end = NULL;
-      for ($i = $pos_match; $pos_tag_end === NULL && $i < strlen($html_markup); $i++) {
+      for ($i = $pos_match; $pos_tag_end === NULL && $i < \strlen($html_markup); $i++) {
         if ($html_markup[$i] === '>') {
           $pos_tag_end = $i;
         }
@@ -184,7 +184,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
 
       // Get the HTML: this will be the opening part of a single tag, e.g.:
       // '<a href="/" data-drupal-link-system-path="&lt;front&gt;">'.
-      $tag = substr($html_markup, $pos_tag_start ?? 0, $pos_tag_end - $pos_tag_start + 1);
+      $tag = \substr($html_markup, $pos_tag_start ?? 0, $pos_tag_end - $pos_tag_start + 1);
 
       // Parse it into a DOMDocument so we can reliably read and modify
       // attributes.
@@ -194,7 +194,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
 
       // Ensure we don't set the "active" class twice on the same element.
       $class = $node->getAttribute('class');
-      $add_active = !in_array('is-active', explode(' ', $class));
+      $add_active = !\in_array('is-active', \explode(' ', $class));
 
       // The language of an active link is equal to the current language.
       if ($add_active && $url_language) {
@@ -221,7 +221,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
       // Only if the path, the language and the query match, we set the
       // "is-active" class and add aria-current="page".
       if ($add_active) {
-        if (strlen($class) > 0) {
+        if (\strlen($class) > 0) {
           $class .= ' ';
         }
         $class .= 'is-active';
@@ -231,12 +231,12 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
         // Get the updated tag.
         $updated_tag = $dom->saveXML($node, LIBXML_NOEMPTYTAG);
         // saveXML() added a closing tag, remove it.
-        $updated_tag = substr($updated_tag, 0, strrpos($updated_tag, '<'));
+        $updated_tag = \substr($updated_tag, 0, \strrpos($updated_tag, '<'));
 
-        $html_markup = str_replace($tag, $updated_tag, $html_markup);
+        $html_markup = \str_replace($tag, $updated_tag, $html_markup);
 
         // Ensure we only search the remaining HTML.
-        $offset = $pos_tag_end - strlen($tag) + strlen($updated_tag);
+        $offset = $pos_tag_end - \strlen($tag) + \strlen($updated_tag);
       }
       else {
         // Ensure we only search the remaining HTML.

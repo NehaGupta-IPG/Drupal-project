@@ -71,7 +71,7 @@ class EntityFieldTest extends EntityKernelTestBase {
 
     // Create the test field.
     $this->container->get('module_handler')->loadInclude('entity_test', 'install');
-    entity_test_install();
+    \entity_test_install();
 
     // Install required default configuration for filter module.
     $this->installConfig(['system', 'filter']);
@@ -379,7 +379,7 @@ class EntityFieldTest extends EntityKernelTestBase {
     $this->assertTrue($entity->name[0]->isEmpty(), "$entity_type: Name item is empty.");
     $this->assertTrue($entity->name->isEmpty(), "$entity_type: Name field is empty.");
     $this->assertCount(1, $entity->name, "$entity_type: Empty item is considered when counting.");
-    $this->assertCount(1, iterator_to_array($entity->name->getIterator()), "$entity_type: Count matches iterator count.");
+    $this->assertCount(1, \iterator_to_array($entity->name->getIterator()), "$entity_type: Count matches iterator count.");
     $this->assertSame([0 => ['value' => NULL]], $entity->name->getValue(), "$entity_type: Name field value contains a NULL value.");
 
     // Test using filterEmptyItems().
@@ -591,14 +591,14 @@ class EntityFieldTest extends EntityKernelTestBase {
           $this->assertInstanceOf(TypedDataInterface::class, $value_property);
 
           $value = $value_property->getValue();
-          $this->assertTrue(!isset($value) || is_scalar($value) || $value instanceof EntityInterface, $entity_type . ": Value $value_name of item $delta of field $name is a primitive or an entity.");
+          $this->assertTrue(!isset($value) || \is_scalar($value) || $value instanceof EntityInterface, $entity_type . ": Value $value_name of item $delta of field $name is a primitive or an entity.");
         }
       }
     }
 
     $fields = $entity->getFields();
-    $this->assertEquals(array_keys($entity->getTypedData()->getDataDefinition()->getPropertyDefinitions()), array_keys($fields), "$entity_type: All fields returned.");
-    $this->assertEquals(iterator_to_array($entity->getIterator()), $fields, "$entity_type: Entity iterator iterates over all fields.");
+    $this->assertEquals(\array_keys($entity->getTypedData()->getDataDefinition()->getPropertyDefinitions()), \array_keys($fields), "$entity_type: All fields returned.");
+    $this->assertEquals(\iterator_to_array($entity->getIterator()), $fields, "$entity_type: Entity iterator iterates over all fields.");
   }
 
   /**
@@ -644,9 +644,9 @@ class EntityFieldTest extends EntityKernelTestBase {
       $target_strings[] = '';
     }
 
-    asort($strings);
-    asort($target_strings);
-    $this->assertEquals(array_values($target_strings), array_values($strings), "$entity_type: All contained strings found.");
+    \asort($strings);
+    \asort($target_strings);
+    $this->assertEquals(\array_values($target_strings), \array_values($strings), "$entity_type: All contained strings found.");
   }
 
   /**
@@ -970,7 +970,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   protected function doTestComputedProperties($entity_type): void {
     $entity = $this->createTestEntity($entity_type);
     $entity->field_test_text->value = "The <strong>text</strong> text to filter.";
-    $entity->field_test_text->format = filter_default_format();
+    $entity->field_test_text->format = \filter_default_format();
 
     $target = "<p>The &lt;strong&gt;text&lt;/strong&gt; text to filter.</p>\n";
     $this->assertSame($target, (string) $entity->field_test_text->processed, "$entity_type: Text is processed with the default filter.");

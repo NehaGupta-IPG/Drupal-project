@@ -31,12 +31,12 @@ trait DependencySerializationTrait {
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    $vars = get_object_vars($this);
+    $vars = \get_object_vars($this);
     try {
       $container = \Drupal::getContainer();
       $reverse_container = $container->get(ReverseContainer::class);
       foreach ($vars as $key => $value) {
-        if (!is_object($value) || $value instanceof TranslatableMarkup) {
+        if (!\is_object($value) || $value instanceof TranslatableMarkup) {
           // Ignore properties that cannot be services.
           continue;
         }
@@ -64,7 +64,7 @@ trait DependencySerializationTrait {
       // No container, no problem.
     }
 
-    return array_keys($vars);
+    return \array_keys($vars);
   }
 
   /**

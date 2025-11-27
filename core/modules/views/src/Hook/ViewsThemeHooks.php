@@ -152,12 +152,12 @@ class ViewsThemeHooks {
         $module_dir = $this->moduleExtensionList->getPath($def['provider']);
         $hooks[$def['theme']]['path'] = $module_dir;
         if (!empty($def['theme_file'])) {
-          @trigger_error('Providing a theme_file definition for plugin ' . $def['id'] . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Theme hook include files are deprecated. See https://www.drupal.org/node/3548325', E_USER_DEPRECATED);
+          @\trigger_error('Providing a theme_file definition for plugin ' . $def['id'] . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Theme hook include files are deprecated. See https://www.drupal.org/node/3548325', E_USER_DEPRECATED);
           $hooks[$def['theme']]['file'] = $def['theme_file'];
           // Whenever we have a theme file, we include it directly so we can
           // auto-detect the theme function.
           $include = \Drupal::root() . '/' . $module_dir . '/' . $def['theme_file'];
-          if (is_file($include)) {
+          if (\is_file($include)) {
             require_once $include;
           }
         }
@@ -165,7 +165,7 @@ class ViewsThemeHooks {
         $initial_preprocess_class = 'Drupal\\' . $def['provider'] . '\\Hook\\' . Container::camelize($def['provider']) . 'ThemeHooks';
         $initial_preprocess_method = 'preprocess' . Container::camelize($def['theme']);
 
-        if (method_exists($initial_preprocess_class, $initial_preprocess_method)) {
+        if (\method_exists($initial_preprocess_class, $initial_preprocess_method)) {
           $hooks[$def['theme']]['initial preprocess'] = $initial_preprocess_class . ':' . $initial_preprocess_method;
         }
 
@@ -254,10 +254,10 @@ class ViewsThemeHooks {
 
     $css_class = $view->display_handler->getOption('css_class');
     if (!empty($css_class)) {
-      $sanitized_classes = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', explode(' ', $css_class));
+      $sanitized_classes = \array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', \explode(' ', $css_class));
       // Merge the view display classes into any existing classes if they exist.
-      $variables['attributes']['class'] = !empty($variables['attributes']['class']) ? array_merge($variables['attributes']['class'], $sanitized_classes) : $sanitized_classes;
-      $variables['css_class'] = implode(' ', $sanitized_classes);
+      $variables['attributes']['class'] = !empty($variables['attributes']['class']) ? \array_merge($variables['attributes']['class'], $sanitized_classes) : $sanitized_classes;
+      $variables['css_class'] = \implode(' ', $sanitized_classes);
     }
 
     // \Drupal\contextual\Hook\ContextualThemeHooks::preprocess() only works on
@@ -482,7 +482,7 @@ class ViewsThemeHooks {
       // Could be an alias.
       Url::fromUserInput($currentPath)->toString(),
     ];
-    $active_urls = array_combine($active_urls, $active_urls);
+    $active_urls = \array_combine($active_urls, $active_urls);
 
     // Collect all arguments foreach row, to be able to alter them for example
     // by the validator. This is not done per single argument value, because
@@ -516,7 +516,7 @@ class ViewsThemeHooks {
           $parameters = $url->getRouteParameters();
 
           foreach ($route_variables as $variable_name) {
-            $parameters[$variable_name] = array_shift($args);
+            $parameters[$variable_name] = \array_shift($args);
           }
 
           $url->setRouteParameters($parameters);
@@ -530,7 +530,7 @@ class ViewsThemeHooks {
         $url = $view->getUrl($args)->setOptions($url_options);
       }
       $variables['rows'][$id]->url = $url->toString();
-      $variables['rows'][$id]->count = intval($row->{$argument->count_alias});
+      $variables['rows'][$id]->count = \intval($row->{$argument->count_alias});
       $variables['rows'][$id]->attributes = new Attribute($variables['rows'][$id]->attributes);
       $variables['rows'][$id]->active = isset($active_urls[$variables['rows'][$id]->url]);
     }
@@ -568,7 +568,7 @@ class ViewsThemeHooks {
       // Could be an alias.
       Url::fromUserInput($currentPath)->toString(),
     ];
-    $active_urls = array_combine($active_urls, $active_urls);
+    $active_urls = \array_combine($active_urls, $active_urls);
 
     // Collect all arguments for each row, to be able to alter them for example
     // by the validator. This is not done per single argument value, because
@@ -602,7 +602,7 @@ class ViewsThemeHooks {
           $parameters = $url->getRouteParameters();
 
           foreach ($route_variables as $variable_name) {
-            $parameters[$variable_name] = array_shift($args);
+            $parameters[$variable_name] = \array_shift($args);
           }
 
           $url->setRouteParameters($parameters);
@@ -616,7 +616,7 @@ class ViewsThemeHooks {
         $url = $view->getUrl($args)->setOptions($url_options);
       }
       $variables['rows'][$id]->url = $url->toString();
-      $variables['rows'][$id]->count = intval($row->{$argument->count_alias});
+      $variables['rows'][$id]->count = \intval($row->{$argument->count_alias});
       $variables['rows'][$id]->active = isset($active_urls[$variables['rows'][$id]->url]);
       $variables['rows'][$id]->attributes = new Attribute($variables['rows'][$id]->attributes);
     }
@@ -781,7 +781,7 @@ class ViewsThemeHooks {
         }
 
         if ($classes = $fields[$field]->elementClasses($num)) {
-          $column_reference['attributes']->addClass(preg_split('/\s+/', $classes));
+          $column_reference['attributes']->addClass(\preg_split('/\s+/', $classes));
         }
 
         // Add responsive header classes.
@@ -803,7 +803,7 @@ class ViewsThemeHooks {
 
           // Only bother with separators and stuff if the field shows up.
           // Place the field into the column, along with an optional separator.
-          if (trim($field_output) != '') {
+          if (\trim($field_output) != '') {
             if (!empty($column_reference['content']) && !empty($options['info'][$column]['separator'])) {
               $column_reference['content'][] = [
                 'separator' => ['#markup' => $options['info'][$column]['separator']],
@@ -854,7 +854,7 @@ class ViewsThemeHooks {
       $variables['rows'][0]['attributes'] = new Attribute(['class' => ['odd']]);
       // Calculate the amounts of rows with output.
       $variables['rows'][0]['columns'][0]['attributes'] = new Attribute([
-        'colspan' => count($variables['header']),
+        'colspan' => \count($variables['header']),
         'class' => ['views-empty'],
       ]);
     }
@@ -915,8 +915,8 @@ class ViewsThemeHooks {
 
     // Fetch classes from handler options.
     if ($handler->options['class']) {
-      $class = explode(' ', $handler->options['class']);
-      $variables['attributes']['class'] = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $class);
+      $class = \explode(' ', $handler->options['class']);
+      $variables['attributes']['class'] = \array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $class);
     }
   }
 
@@ -937,8 +937,8 @@ class ViewsThemeHooks {
     $col = 0;
     $row = 0;
     $items = [];
-    $remainders = count($variables['rows']) % $options['columns'];
-    $num_rows = floor(count($variables['rows']) / $options['columns']);
+    $remainders = \count($variables['rows']) % $options['columns'];
+    $num_rows = \floor(\count($variables['rows']) / $options['columns']);
 
     // Iterate over each rendered views result row.
     foreach ($variables['rows'] as $result_index => $item) {
@@ -955,9 +955,9 @@ class ViewsThemeHooks {
       if (!$horizontal || ($horizontal && empty($items[$row]['attributes']))) {
         $row_attributes = ['class' => []];
         // Add custom row classes.
-        $row_class = array_filter(explode(' ', $variables['view']->style_plugin->getCustomClass($result_index, 'row')));
+        $row_class = \array_filter(\explode(' ', $variables['view']->style_plugin->getCustomClass($result_index, 'row')));
         if (!empty($row_class)) {
-          $row_attributes['class'] = array_merge($row_attributes['class'], $row_class);
+          $row_attributes['class'] = \array_merge($row_attributes['class'], $row_class);
         }
         // Add row attributes to the item.
         if ($horizontal) {
@@ -973,9 +973,9 @@ class ViewsThemeHooks {
         $col_attributes = ['class' => []];
         // Add default views column classes.
         // Add custom column classes.
-        $col_class = array_filter(explode(' ', $variables['view']->style_plugin->getCustomClass($result_index, 'col')));
+        $col_class = \array_filter(\explode(' ', $variables['view']->style_plugin->getCustomClass($result_index, 'col')));
         if (!empty($col_class)) {
-          $col_attributes['class'] = array_merge($col_attributes['class'], $col_class);
+          $col_attributes['class'] = \array_merge($col_attributes['class'], $col_class);
         }
         // Add automatic width for columns.
         if ($options['automatic_width']) {
@@ -1094,8 +1094,8 @@ class ViewsThemeHooks {
     // Fetch classes from handler options.
     $variables['list']['attributes'] = new Attribute();
     if ($handler->options['class']) {
-      $class = explode(' ', $handler->options['class']);
-      $class = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $class);
+      $class = \explode(' ', $handler->options['class']);
+      $class = \array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $class);
 
       // Initialize a new attribute class for $class.
       $variables['list']['attributes']->addClass($class);
@@ -1110,8 +1110,8 @@ class ViewsThemeHooks {
 
     // Fetch wrapper classes from handler options.
     if ($handler->options['wrapper_class']) {
-      $wrapper_class = explode(' ', $handler->options['wrapper_class']);
-      $variables['attributes']['class'] = array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $wrapper_class);
+      $wrapper_class = \explode(' ', $handler->options['wrapper_class']);
+      $variables['attributes']['class'] = \array_map('\Drupal\Component\Utility\Html::cleanCssIdentifier', $wrapper_class);
     }
 
     $variables['list']['type'] = $type;
@@ -1139,7 +1139,7 @@ class ViewsThemeHooks {
     // The RSS 2.0 "spec" doesn't indicate HTML can be used in the description.
     // We strip all HTML tags, but need to prevent double encoding from properly
     // escaped source data (such as &amp becoming &amp;amp;).
-    $variables['description'] = Html::decodeEntities(strip_tags($style->getDescription()));
+    $variables['description'] = Html::decodeEntities(\strip_tags($style->getDescription()));
 
     if ($view->display_handler->getOption('sitename_title')) {
       $title = $config->get('name');
@@ -1176,13 +1176,13 @@ class ViewsThemeHooks {
     // @see https://validator.w3.org/feed/docs/rss2.html#hrelementsOfLtitemgt
     // If we have a render array, render it here and pass the result to the
     // template, letting Twig autoescape it.
-    if (isset($item->description) && is_array($item->description)) {
+    if (isset($item->description) && \is_array($item->description)) {
       $variables['description'] = (string) $this->renderer->render($item->description);
     }
 
     $variables['item_elements'] = [];
     foreach ($item->elements as $element) {
-      if (isset($element['attributes']) && is_array($element['attributes'])) {
+      if (isset($element['attributes']) && \is_array($element['attributes'])) {
         $element['attributes'] = new Attribute($element['attributes']);
       }
       $variables['item_elements'][] = $element;
@@ -1216,7 +1216,7 @@ class ViewsThemeHooks {
     }
     $variables['title'] = $title;
     $variables['items'] = $items;
-    $variables['updated'] = gmdate(DATE_RFC2822, $this->time->getRequestTime());
+    $variables['updated'] = \gmdate(DATE_RFC2822, $this->time->getRequestTime());
   }
 
   /**

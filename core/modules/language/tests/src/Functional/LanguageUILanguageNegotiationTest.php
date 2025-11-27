@@ -120,7 +120,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     \Drupal::service('file_system')->mkdir($this->privateFilesDirectory . '/test');
     $filepath = 'private://test/private-file-test.txt';
     $contents = "file_put_contents() doesn't seem to appreciate empty strings so let's put in some data.";
-    file_put_contents($filepath, $contents);
+    \file_put_contents($filepath, $contents);
     $file = File::create([
       'uri' => $filepath,
       'uid' => $this->adminUser->id(),
@@ -281,11 +281,11 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $definitions = \Drupal::languageManager()->getNegotiator()->getNegotiationMethods();
     // Enable only methods, which are either not limited to a specific language
     // type or are supporting the interface language type.
-    $language_interface_method_definitions = array_filter($definitions, function ($method_definition) {
-      return !isset($method_definition['types']) || (isset($method_definition['types']) && in_array(LanguageInterface::TYPE_INTERFACE, $method_definition['types']));
+    $language_interface_method_definitions = \array_filter($definitions, function ($method_definition) {
+      return !isset($method_definition['types']) || (isset($method_definition['types']) && \in_array(LanguageInterface::TYPE_INTERFACE, $method_definition['types']));
     });
     $this->config('language.types')
-      ->set('negotiation.' . LanguageInterface::TYPE_INTERFACE . '.enabled', array_flip(array_keys($language_interface_method_definitions)))
+      ->set('negotiation.' . LanguageInterface::TYPE_INTERFACE . '.enabled', \array_flip(\array_keys($language_interface_method_definitions)))
       ->save();
     $this->drupalGet("$langcode_unknown/admin/config", [], $http_header_browser_fallback);
     $this->assertSession()->statusCodeEquals(404);
@@ -426,7 +426,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
   protected function doRunTest($test): void {
     $test += ['path_options' => []];
     if (!empty($test['language_negotiation'])) {
-      $method_weights = array_flip($test['language_negotiation']);
+      $method_weights = \array_flip($test['language_negotiation']);
       $this->container->get('language_negotiator')->saveConfiguration(LanguageInterface::TYPE_INTERFACE, $method_weights);
     }
     if (!empty($test['language_negotiation_url_part'])) {
@@ -512,7 +512,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     global $base_url;
 
     // Get the current host URI we're running on.
-    $base_url_host = parse_url($base_url, PHP_URL_HOST);
+    $base_url_host = \parse_url($base_url, PHP_URL_HOST);
 
     // Add the Italian language.
     ConfigurableLanguage::createFromLangcode('it')->save();
@@ -559,7 +559,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     $this->assertSession()->statusMessageContains("The domain for Italian may only contain the domain name, not a trailing slash, protocol and/or port.", 'error');
 
     // Build the link we're going to test.
-    $link = 'it.example.com' . rtrim(base_path(), '/') . '/admin';
+    $link = 'it.example.com' . \rtrim(\base_path(), '/') . '/admin';
 
     // Test URL in another language: http://it.example.com/admin.
     // Base path gives problems on the testbot, so $correct_link is hard-coded.

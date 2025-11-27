@@ -72,7 +72,7 @@ class Random {
       }
       $str = '';
       for ($i = 0; $i < $length; $i++) {
-        $str .= chr(mt_rand(32, 126));
+        $str .= \chr(\mt_rand(32, 126));
       }
       $counter++;
 
@@ -80,10 +80,10 @@ class Random {
       if ($unique) {
         $continue = isset($this->strings[$str]);
       }
-      if (!$continue && is_callable($validator)) {
+      if (!$continue && \is_callable($validator)) {
         // If the validator callback returns FALSE generate another random
         // string.
-        $continue = !call_user_func($validator, $str);
+        $continue = !\call_user_func($validator, $str);
       }
     } while ($continue);
 
@@ -115,17 +115,17 @@ class Random {
    * @see \Drupal\Component\Utility\Random::string()
    */
   public function name($length = 8, $unique = FALSE) {
-    $values = array_merge(range(65, 90), range(97, 122), range(48, 57));
-    $max = count($values) - 1;
+    $values = \array_merge(\range(65, 90), \range(97, 122), \range(48, 57));
+    $max = \count($values) - 1;
     $counter = 0;
 
     do {
       if ($counter == static::MAXIMUM_TRIES) {
         throw new \RuntimeException('Unable to generate a unique random name');
       }
-      $str = chr(mt_rand(97, 122));
+      $str = \chr(\mt_rand(97, 122));
       for ($i = 1; $i < $length; $i++) {
-        $str .= chr($values[mt_rand(0, $max)]);
+        $str .= \chr($values[\mt_rand(0, $max)]);
       }
       $counter++;
     } while ($unique && isset($this->names[$str]));
@@ -160,17 +160,17 @@ class Random {
    * @see \Drupal\Component\Utility\Random::string()
    */
   public function machineName(int $length = 8, bool $unique = FALSE): string {
-    $values = array_merge(range('a', 'z'), range(0, 9));
-    $start_characters = range('a', 'z');
+    $values = \array_merge(\range('a', 'z'), \range(0, 9));
+    $start_characters = \range('a', 'z');
     $counter = 0;
 
     do {
       if ($counter == static::MAXIMUM_TRIES) {
         throw new \RuntimeException('Unable to generate a unique random machine name');
       }
-      $str = $start_characters[array_rand($start_characters)];
+      $str = $start_characters[\array_rand($start_characters)];
       for ($i = 1; $i < $length; $i++) {
-        $str .= $values[array_rand($values)];
+        $str .= $values[\array_rand($values)];
       }
       $counter++;
     } while ($unique && isset($this->machineNames[$str]));
@@ -201,15 +201,15 @@ class Random {
       "sl", "cl", "sh",
     ];
 
-    $num_vowels = count($vowels);
-    $num_cons = count($cons);
+    $num_vowels = \count($vowels);
+    $num_cons = \count($cons);
     $word = '';
 
-    while (strlen($word) < $length) {
-      $word .= $cons[mt_rand(0, $num_cons - 1)] . $vowels[mt_rand(0, $num_vowels - 1)];
+    while (\strlen($word) < $length) {
+      $word .= $cons[\mt_rand(0, $num_cons - 1)] . $vowels[\mt_rand(0, $num_vowels - 1)];
     }
 
-    return substr($word, 0, $length);
+    return \substr($word, 0, $length);
   }
 
   /**
@@ -279,26 +279,26 @@ class Random {
       "zelus",
     ];
     // cSpell:enable
-    $dictionary_flipped = array_flip($dictionary);
+    $dictionary_flipped = \array_flip($dictionary);
     $greeking = '';
 
     if (!$capitalize) {
       $words_remaining = $min_word_count;
       while ($words_remaining > 0) {
-        $sentence_length = mt_rand(3, 10);
-        $words = array_rand($dictionary_flipped, $sentence_length);
-        $sentence = implode(' ', $words);
-        $greeking .= ucfirst($sentence) . '. ';
+        $sentence_length = \mt_rand(3, 10);
+        $words = \array_rand($dictionary_flipped, $sentence_length);
+        $sentence = \implode(' ', $words);
+        $greeking .= \ucfirst($sentence) . '. ';
         $words_remaining -= $sentence_length;
       }
     }
     else {
       // Use slightly different method for titles.
-      $words = array_rand($dictionary_flipped, $min_word_count);
-      $words = is_array($words) ? implode(' ', $words) : $words;
-      $greeking = ucwords($words);
+      $words = \array_rand($dictionary_flipped, $min_word_count);
+      $words = \is_array($words) ? \implode(' ', $words) : $words;
+      $greeking = \ucwords($words);
     }
-    return trim($greeking);
+    return \trim($greeking);
   }
 
   /**
@@ -313,7 +313,7 @@ class Random {
   public function paragraphs($paragraph_count = 12) {
     $output = '';
     for ($i = 1; $i <= $paragraph_count; $i++) {
-      $output .= $this->sentences(mt_rand(20, 60)) . "\n\n";
+      $output .= $this->sentences(\mt_rand(20, 60)) . "\n\n";
     }
     return $output;
   }
@@ -332,26 +332,26 @@ class Random {
    *   Path to image file.
    */
   public function image($destination, $min_resolution, $max_resolution) {
-    $extension = pathinfo($destination, PATHINFO_EXTENSION);
-    $min = explode('x', $min_resolution);
-    $max = explode('x', $max_resolution);
+    $extension = \pathinfo($destination, PATHINFO_EXTENSION);
+    $min = \explode('x', $min_resolution);
+    $max = \explode('x', $max_resolution);
 
-    $width = rand((int) $min[0], (int) $max[0]);
-    $height = rand((int) $min[1], (int) $max[1]);
+    $width = \rand((int) $min[0], (int) $max[0]);
+    $height = \rand((int) $min[1], (int) $max[1]);
 
     // Make an image split into 4 sections with random colors.
-    $im = imagecreate($width, $height);
+    $im = \imagecreate($width, $height);
     for ($n = 0; $n < 4; $n++) {
-      $color = imagecolorallocate($im, rand(0, 255), rand(0, 255), rand(0, 255));
+      $color = \imagecolorallocate($im, \rand(0, 255), \rand(0, 255), \rand(0, 255));
       $x = $width / 2 * ($n % 2);
       $y = $height / 2 * (int) ($n >= 2);
-      imagefilledrectangle($im, (int) $x, (int) $y, (int) ($x + $width / 2), (int) ($y + $height / 2), $color);
+      \imagefilledrectangle($im, (int) $x, (int) $y, (int) ($x + $width / 2), (int) ($y + $height / 2), $color);
     }
 
     // Make a perfect circle in the image middle.
-    $color = imagecolorallocate($im, rand(0, 255), rand(0, 255), rand(0, 255));
-    $smaller_dimension = min($width, $height);
-    imageellipse($im, (int) ($width / 2), (int) ($height / 2), $smaller_dimension, $smaller_dimension, $color);
+    $color = \imagecolorallocate($im, \rand(0, 255), \rand(0, 255), \rand(0, 255));
+    $smaller_dimension = \min($width, $height);
+    \imageellipse($im, (int) ($width / 2), (int) ($height / 2), $smaller_dimension, $smaller_dimension, $color);
 
     $save_function = 'image' . ($extension == 'jpg' ? 'jpeg' : $extension);
     $save_function($im, $destination);

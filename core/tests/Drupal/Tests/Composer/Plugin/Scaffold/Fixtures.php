@@ -20,14 +20,14 @@ class Fixtures extends FixturesBase {
    * {@inheritdoc}
    */
   public function projectRoot(): string {
-    return realpath(__DIR__) . '/../../../../../../../composer/Plugin/Scaffold';
+    return \realpath(__DIR__) . '/../../../../../../../composer/Plugin/Scaffold';
   }
 
   /**
    * {@inheritdoc}
    */
   public function allFixturesDir(): string {
-    return realpath(__DIR__ . '/fixtures');
+    return \realpath(__DIR__ . '/fixtures');
   }
 
   /**
@@ -146,7 +146,7 @@ class Fixtures extends FixturesBase {
    *   Output captured from tests that write to Fixtures::io().
    */
   public function runScaffold($cwd) {
-    chdir($cwd);
+    \chdir($cwd);
     $handler = new Handler($this->getComposer(), $this->io());
     $handler->scaffold();
     return $this->getOutput();

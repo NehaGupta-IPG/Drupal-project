@@ -32,12 +32,12 @@ class FileUriItemTest extends FileManagedUnitTestBase {
       'filemime' => 'text/plain',
     ]);
     $file->setPermanent();
-    file_put_contents($file->getFileUri(), 'hello world');
+    \file_put_contents($file->getFileUri(), 'hello world');
 
     $file->save();
 
     $this->assertSame($uri, $file->uri->value);
-    $expected_url = base_path() . $this->siteDirectory . '/files/druplicon.txt';
+    $expected_url = \base_path() . $this->siteDirectory . '/files/druplicon.txt';
     $this->assertSame($expected_url, $file->uri->url);
   }
 

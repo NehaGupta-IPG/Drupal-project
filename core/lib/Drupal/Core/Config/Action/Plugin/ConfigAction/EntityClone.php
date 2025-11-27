@@ -43,13 +43,13 @@ final class EntityClone implements ConfigActionPluginInterface, ContainerFactory
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
-    if (!is_array($value)) {
+    if (!\is_array($value)) {
       $value = ['id' => $value];
     }
-    assert(is_string($value['id']));
+    \assert(\is_string($value['id']));
 
     $value += ['fail_if_exists' => FALSE];
-    assert(is_bool($value['fail_if_exists']));
+    \assert(\is_bool($value['fail_if_exists']));
 
     // If the original doesn't exist, there's nothing to clone.
     $original = $this->configManager->loadConfigEntityByName($configName);
@@ -63,13 +63,13 @@ final class EntityClone implements ConfigActionPluginInterface, ContainerFactory
     // with the ID `node.foo.teaser`, and the clone's ID is
     // `node.%.search_result`, the final ID of the clone will be
     // `node.foo.search_result`.
-    $original_id_parts = explode('.', $original->id());
-    $clone_id_parts = explode('.', $value['id']);
-    assert(count($original_id_parts) === count($clone_id_parts));
+    $original_id_parts = \explode('.', $original->id());
+    $clone_id_parts = \explode('.', $value['id']);
+    \assert(\count($original_id_parts) === \count($clone_id_parts));
     foreach ($clone_id_parts as $index => $part) {
       $clone_id_parts[$index] = $part === '%' ? $original_id_parts[$index] : $part;
     }
-    $value['id'] = implode('.', $clone_id_parts);
+    $value['id'] = \implode('.', $clone_id_parts);
 
     $clone = $original->createDuplicate();
     $clone->set($original->getEntityType()->getKey('id'), $value['id']);

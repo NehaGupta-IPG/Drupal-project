@@ -55,10 +55,10 @@ class CKEditor5Plugin extends Plugin {
    * @see \Drupal\Component\Annotation\Plugin\Discovery\AnnotationBridgeDecorator::getDefinitions()
    */
   public function __construct($values) {
-    if (isset($values['ckeditor5']) && is_array($values['ckeditor5'])) {
+    if (isset($values['ckeditor5']) && \is_array($values['ckeditor5'])) {
       $values['ckeditor5'] = new CKEditor5AspectsOfCKEditor5Plugin($values['ckeditor5']);
     }
-    if (isset($values['drupal']) && is_array($values['drupal'])) {
+    if (isset($values['drupal']) && \is_array($values['drupal'])) {
       $values['drupal'] = new DrupalAspectsOfCKEditor5Plugin($values['drupal']);
     }
     parent::__construct($values);

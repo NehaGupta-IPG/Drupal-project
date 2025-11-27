@@ -197,19 +197,19 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
     $edited_fields = [];
     if ($limit_validation_errors = $form_state->getLimitValidationErrors()) {
       foreach ($limit_validation_errors as $section) {
-        $field_name = reset($section);
+        $field_name = \reset($section);
         if ($entity->hasField($field_name)) {
           $edited_fields[] = $field_name;
         }
       }
-      $edited_fields = array_unique($edited_fields);
+      $edited_fields = \array_unique($edited_fields);
     }
     else {
       $edited_fields = $this->getEditedFieldNames($form_state);
     }
 
     // Remove violations for fields that are not edited.
-    $violations->filterByFields(array_diff(array_keys($entity->getFieldDefinitions()), $edited_fields));
+    $violations->filterByFields(\array_diff(\array_keys($entity->getFieldDefinitions()), $edited_fields));
 
     $this->flagViolations($violations, $form, $form_state);
 
@@ -234,7 +234,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    *   An array of field names.
    */
   protected function getEditedFieldNames(FormStateInterface $form_state) {
-    return array_keys($this->getFormDisplay($form_state)->getComponents());
+    return \array_keys($this->getFormDisplay($form_state)->getComponents());
   }
 
   /**
@@ -262,7 +262,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
     // Flag entity level violations.
     foreach ($violations->getEntityViolations() as $violation) {
       /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
-      $form_state->setErrorByName(str_replace('.', '][', $violation->getPropertyPath()), $violation->getMessage());
+      $form_state->setErrorByName(\str_replace('.', '][', $violation->getPropertyPath()), $violation->getMessage());
     }
     // Let the form display flag violations of its fields.
     $this->getFormDisplay($form_state)->flagWidgetsErrorsFromViolations($violations, $form, $form_state);

@@ -36,14 +36,14 @@ class Breadcrumb404Test extends BrowserTestBase {
 
     // Prime the cache first.
     $this->drupalGet('/not-found-1');
-    $base_count = count($this->getBreadcrumbCacheEntries());
+    $base_count = \count($this->getBreadcrumbCacheEntries());
 
     $this->drupalGet('/not-found-2');
-    $next_count = count($this->getBreadcrumbCacheEntries());
+    $next_count = \count($this->getBreadcrumbCacheEntries());
     $this->assertEquals($base_count, $next_count);
 
     $this->drupalGet('/not-found-3');
-    $next_count = count($this->getBreadcrumbCacheEntries());
+    $next_count = \count($this->getBreadcrumbCacheEntries());
     $this->assertEquals($base_count, $next_count);
   }
 

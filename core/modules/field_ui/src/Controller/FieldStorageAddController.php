@@ -197,7 +197,7 @@ final class FieldStorageAddController extends ControllerBase {
         $field_type_options_radios[$id]['#attached']['library'] = $libraries;
       }
     }
-    uasort($field_type_options_radios, [SortArray::class, 'sortByWeightProperty']);
+    \uasort($field_type_options_radios, [SortArray::class, 'sortByWeightProperty']);
     $build['add']['new_storage_type'] = $field_type_options_radios;
     $build['#attached']['library'][] = 'field_ui/drupal.field_ui';
     $build['#attached']['library'][] = 'field_ui/drupal.field_ui.manage_fields';

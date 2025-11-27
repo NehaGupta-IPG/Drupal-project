@@ -50,7 +50,7 @@ class AttachedAssets implements AttachedAssetsInterface {
    * {@inheritdoc}
    */
   public function setLibraries(array $libraries) {
-    $this->libraries = array_unique($libraries);
+    $this->libraries = \array_unique($libraries);
     return $this;
   }
 

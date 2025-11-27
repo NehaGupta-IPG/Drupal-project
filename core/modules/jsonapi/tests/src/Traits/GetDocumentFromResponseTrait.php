@@ -28,7 +28,7 @@ trait GetDocumentFromResponseTrait {
    *   Thrown when the document does not pass basic validation against the spec.
    */
   protected function getDocumentFromResponse(ResponseInterface $response, bool $validate = TRUE): ?array {
-    assert($this instanceof TestCase);
+    \assert($this instanceof TestCase);
 
     $document = Json::decode((string) $response->getBody());
 
@@ -42,7 +42,7 @@ trait GetDocumentFromResponseTrait {
         foreach ($document['errors'] as $error) {
           $errors[] = $error['title'] . ' (' . $error['status'] . '): ' . $error['detail'];
         }
-        $this->fail('Missing expected data member in document. Error(s): ' . PHP_EOL . '  ' . implode('  ' . PHP_EOL, $errors));
+        $this->fail('Missing expected data member in document. Error(s): ' . PHP_EOL . '  ' . \implode('  ' . PHP_EOL, $errors));
       }
       $this->fail('Missing both data and errors members in document; either is required. Response body: ' . PHP_EOL . '  ' . $response->getBody());
     }

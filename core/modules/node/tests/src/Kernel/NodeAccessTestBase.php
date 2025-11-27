@@ -138,7 +138,7 @@ abstract class NodeAccessTestBase extends KernelTestBase {
    *   about the node access permission test that was performed.
    */
   public function nodeAccessAssertMessage($operation, $result, $langcode = NULL) {
-    return sprintf(
+    return \sprintf(
      'Node access returns %s with operation %s, language code %s.',
      $result ? 'true' : 'false',
      $operation,

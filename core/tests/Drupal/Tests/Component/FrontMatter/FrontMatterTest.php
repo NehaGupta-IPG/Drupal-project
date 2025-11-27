@@ -38,8 +38,8 @@ class FrontMatterTest extends TestCase {
   public static function createFrontMatterSource(?array $yaml, string $content = self::SOURCE): string {
     // Encode YAML and wrap in a front matter block.
     $frontMatter = '';
-    if (is_array($yaml)) {
-      $yaml = $yaml ? trim(Yaml::encode($yaml)) . "\n" : '';
+    if (\is_array($yaml)) {
+      $yaml = $yaml ? \trim(Yaml::encode($yaml)) . "\n" : '';
       $frontMatter = FrontMatter::SEPARATOR . "\n$yaml" . FrontMatter::SEPARATOR . "\n";
     }
     return $frontMatter . $content;

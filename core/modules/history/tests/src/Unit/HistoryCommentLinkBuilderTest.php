@@ -142,7 +142,7 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
     if (!empty($expected)) {
       if (!empty($links)) {
         foreach ($expected as $link => $detail) {
-          if (is_array($detail)) {
+          if (\is_array($detail)) {
             // Array of link attributes.
             foreach ($detail as $key => $value) {
               $this->assertEquals($value, $links['comment__comment']['#links'][$link][$key]);
@@ -290,7 +290,7 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
       ->willReturn($has_field);
 
     if (empty($this->timestamp)) {
-      $this->timestamp = time();
+      $this->timestamp = \time();
     }
     $field_item = (object) [
       'status' => $comment_status,
@@ -336,7 +336,7 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
 
 namespace Drupal\history;
 
-if (!function_exists('history_read')) {
+if (!\function_exists('history_read')) {
 
   /**
    * Gets a timestamp for the current user's last view of a specified node.

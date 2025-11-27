@@ -90,15 +90,15 @@ class Combine extends StringFilter {
       // Using the CONCAT_WS operator with a single field is not a problem for
       // the by core supported databases. Only the MS SQL Server requires the
       // CONCAT_WS operator to be used with at least three arguments.
-      if (count($fields) == 1) {
-        $expression = reset($fields);
+      if (\count($fields) == 1) {
+        $expression = \reset($fields);
       }
       else {
         // Multiple fields are separated by 3 spaces so that so that search
         // strings that contain spaces are still only matched to single field
         // values and not to multi-field values that exist only because we do
         // the concatenation/LIKE trick.
-        $expression = implode(", ' ', ", $fields);
+        $expression = \implode(", ' ', ", $fields);
         $expression = "CONCAT_WS(' ', $expression)";
       }
       $info = $this->operators();
@@ -186,7 +186,7 @@ class Combine extends StringFilter {
 
     // Match all words separated by spaces or sentences encapsulated by double
     // quotes.
-    preg_match_all(static::WORDS_PATTERN, ' ' . $this->value, $matches, PREG_SET_ORDER);
+    \preg_match_all(static::WORDS_PATTERN, ' ' . $this->value, $matches, PREG_SET_ORDER);
 
     // Switch between the 'word' and 'allwords' operator.
     $type = $this->operator == 'word' ? 'OR' : 'AND';
@@ -196,7 +196,7 @@ class Combine extends StringFilter {
     foreach ($matches as $match_key => $match) {
       $temp_placeholder = $placeholder . '_' . $match_key;
       // Clean up the user input and remove the sentence delimiters.
-      $word = trim($match[2], ',?!();:-"');
+      $word = \trim($match[2], ',?!();:-"');
       $this->query->addWhereExpression($group, "$expression $operator $temp_placeholder", [$temp_placeholder => '%' . $this->connection->escapeLike($word) . '%']);
     }
   }

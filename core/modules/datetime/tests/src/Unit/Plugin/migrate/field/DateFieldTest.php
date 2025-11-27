@@ -42,7 +42,7 @@ class DateFieldTest extends UnitTestCase {
 
     // If there is a todate then add a process for the end value.
     if (isset($data['field_definition']['data'])) {
-      $tmp = is_string($data['field_definition']['data']) ? unserialize($data['field_definition']['data']) : '';
+      $tmp = \is_string($data['field_definition']['data']) ? \unserialize($data['field_definition']['data']) : '';
       $todate = $tmp['settings']['todate'] ?? NULL;
       if (!empty($todate)) {
         $pipeline['process']['end_value'] = [
@@ -74,7 +74,7 @@ class DateFieldTest extends UnitTestCase {
         [
           'type' => 'datetime',
           'field_definition' => [
-            'data' => serialize([
+            'data' => \serialize([
               'settings' => [
                 'granularity' => [
                   'hour' => 0,
@@ -92,7 +92,7 @@ class DateFieldTest extends UnitTestCase {
         [
           'type' => 'date',
           'field_definition' => [
-            'data' => serialize([
+            'data' => \serialize([
               'settings' => [
                 'granularity' => [
                   0 => 'year',
@@ -110,7 +110,7 @@ class DateFieldTest extends UnitTestCase {
         [
           'type' => 'datetime',
           'field_definition' => [
-            'data' => serialize([
+            'data' => \serialize([
               'settings' => [
                 'granularity' => [
                   'hour' => 0,

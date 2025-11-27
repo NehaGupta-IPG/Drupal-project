@@ -53,7 +53,7 @@ class AssetDumper implements AssetDumperUriInterface {
     // Create the CSS or JS file.
     $this->fileSystem->prepareDirectory($path, FileSystemInterface::CREATE_DIRECTORY);
     try {
-      if (!file_exists($uri) && !$this->fileSystem->saveData($data, $uri, FileExists::Replace)) {
+      if (!\file_exists($uri) && !$this->fileSystem->saveData($data, $uri, FileExists::Replace)) {
         return FALSE;
       }
     }
@@ -69,7 +69,7 @@ class AssetDumper implements AssetDumperUriInterface {
     // order to skip generating a file that won't be used.
     if (\Drupal::config('system.performance')->get($file_extension . '.gzip')) {
       try {
-        if (!file_exists($uri . '.gz') && !$this->fileSystem->saveData(gzencode($data, 9, FORCE_GZIP), $uri . '.gz', FileExists::Replace)) {
+        if (!\file_exists($uri . '.gz') && !$this->fileSystem->saveData(\gzencode($data, 9, FORCE_GZIP), $uri . '.gz', FileExists::Replace)) {
           return FALSE;
         }
       }

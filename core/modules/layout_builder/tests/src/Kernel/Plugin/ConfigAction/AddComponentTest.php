@@ -69,7 +69,7 @@ class AddComponentTest extends KernelTestBase {
     $view_display = $this->container->get(EntityTypeManagerInterface::class)
       ->getStorage('entity_view_display')
       ->load('entity_test.bundle_with_extra_fields.default');
-    assert($view_display instanceof SectionListInterface);
+    \assert($view_display instanceof SectionListInterface);
     $view_display->insertSection(1, new Section('layout_onecol'));
     $view_display->insertSection(2, new Section('layout_threecol_25_50_25'));
     $view_display->save();
@@ -95,7 +95,7 @@ class AddComponentTest extends KernelTestBase {
       ->load('entity_test.bundle_with_extra_fields.default');
     $this->plugin->setContextValue('display', $view_display);
     $components = $this->plugin->getSection(0)->getComponents();
-    $uuid = end($components)->getUuid();
+    $uuid = \end($components)->getUuid();
 
     // If we pass the same existing UUID, we replace it.
     $is_replacing = $added_component_expected_weight === $existing_component_expected_weight;
@@ -376,7 +376,7 @@ class AddComponentTest extends KernelTestBase {
     $this->assertCount(1, $this->plugin->getSection(2)->getComponents());
 
     $components = $this->plugin->getSection(2)->getComponents();
-    $uuid = end($components)->getUuid();
+    $uuid = \end($components)->getUuid();
 
     $this->assertSame('bottom', $components[$uuid]->getRegion());
     $this->assertSame(0, $components[$uuid]->getWeight());
@@ -417,9 +417,9 @@ class AddComponentTest extends KernelTestBase {
     $this->assertTrue($plural['multiple']);
 
     // There should only be two derivatives (the singular and the plural).
-    $definitions = array_filter(
-      array_keys($this->configActionManager->getDefinitions()),
-      fn (string $id): bool => str_starts_with($id, 'add_layout_component:'),
+    $definitions = \array_filter(
+      \array_keys($this->configActionManager->getDefinitions()),
+      fn (string $id): bool => \str_starts_with($id, 'add_layout_component:'),
     );
     $this->assertCount(2, $definitions);
   }

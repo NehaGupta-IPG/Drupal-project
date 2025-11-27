@@ -64,7 +64,7 @@ class Boolean extends FieldPluginBase {
     ];
     $output_formats = $this->definition['output formats'] ?? [];
     $custom_format = ['custom' => [$this->t('Custom')]];
-    $this->formats = array_merge($default_formats, $output_formats, $custom_format);
+    $this->formats = \array_merge($default_formats, $output_formats, $custom_format);
   }
 
   /**
@@ -72,7 +72,7 @@ class Boolean extends FieldPluginBase {
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     foreach ($this->formats as $key => $item) {
-      $options[$key] = implode('/', $item);
+      $options[$key] = \implode('/', $item);
     }
 
     $form['type'] = [

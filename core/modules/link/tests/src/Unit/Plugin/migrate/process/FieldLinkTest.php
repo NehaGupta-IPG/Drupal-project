@@ -27,7 +27,7 @@ class FieldLinkTest extends UnitTestCase {
     $transformed = $link_plugin->transform([
       'url' => $url,
       'title' => '',
-      'attributes' => serialize([]),
+      'attributes' => \serialize([]),
     ], $this->createMock(MigrateExecutableInterface::class), $this->getMockBuilder(Row::class)->disableOriginalConstructor()->getMock(), NULL);
     $this->assertEquals($expected, $transformed['uri']);
   }
@@ -120,14 +120,14 @@ class FieldLinkTest extends UnitTestCase {
     $transformed = $link_plugin->transform([
       'url' => '',
       'title' => '',
-      'attributes' => serialize(serialize(['not too deep'])),
+      'attributes' => \serialize(\serialize(['not too deep'])),
     ], $migrate_executable, $row, NULL);
     $this->assertEquals(['not too deep'], $transformed['options']['attributes']);
 
     $transformed = $link_plugin->transform([
       'url' => '',
       'title' => '',
-      'attributes' => serialize(serialize(serialize(['too deep']))),
+      'attributes' => \serialize(\serialize(\serialize(['too deep']))),
     ], $migrate_executable, $row, NULL);
     $this->assertEmpty($transformed['options']['attributes']);
   }

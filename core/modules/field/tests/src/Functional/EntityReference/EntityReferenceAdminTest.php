@@ -424,7 +424,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
    */
   protected function assertFieldSelectOptions(string $name, array $expected_options): void {
     $options = $this->assertSession()->selectExists($name)->findAll('xpath', 'option');
-    array_walk($options, function (NodeElement &$option) {
+    \array_walk($options, function (NodeElement &$option) {
       $option = $option->getValue();
     });
     $this->assertEqualsCanonicalizing($expected_options, $options);

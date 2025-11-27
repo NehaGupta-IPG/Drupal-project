@@ -74,7 +74,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
     $this->sourceDatabase = Database::getConnection('default', 'migrate');
     // Attach the original test prefix as a database, for SQLite to attach its
     // database file.
-    $this->sourceDatabase->attachDatabase(substr($this->sourceDatabase->getConnectionOptions()['prefix'], 0, -1));
+    $this->sourceDatabase->attachDatabase(\substr($this->sourceDatabase->getConnectionOptions()['prefix'], 0, -1));
   }
 
   /**
@@ -144,7 +144,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
         $id_map->setMessage($this);
         $source_ids = $migration->getSourcePlugin()->getIds();
         foreach ($data as $id_mapping) {
-          $row = new Row(array_combine(array_keys($source_ids), $id_mapping[0]), $source_ids);
+          $row = new Row(\array_combine(\array_keys($source_ids), $id_mapping[0]), $source_ids);
           $id_map->saveIdMapping($row, $id_mapping[1]);
         }
       }
@@ -168,7 +168,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    *   The migration to execute, or its ID.
    */
   protected function executeMigration($migration) {
-    if (is_string($migration)) {
+    if (\is_string($migration)) {
       $this->migration = $this->getMigration($migration);
     }
     else {
@@ -192,7 +192,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
   protected function executeMigrations(array $ids) {
     $manager = $this->container->get('plugin.manager.migration');
     $instances = $manager->createInstances($ids);
-    array_walk($instances, [$this, 'executeMigration']);
+    \array_walk($instances, [$this, 'executeMigration']);
   }
 
   /**
@@ -237,11 +237,11 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    *   MigrateIdMapInterface::STATUS_FAILED.
    */
   protected function mockFailure($migration, array $row, $status = MigrateIdMapInterface::STATUS_FAILED) {
-    if (is_string($migration)) {
+    if (\is_string($migration)) {
       $migration = $this->getMigration($migration);
     }
     /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
-    $destination = array_map(function () {
+    $destination = \array_map(function () {
       return NULL;
     }, $migration->getDestinationPlugin()->getIds());
     $row = new Row($row, $migration->getSourcePlugin()->getIds());

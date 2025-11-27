@@ -43,7 +43,7 @@ class DefaultLanguageItem extends LanguageItem {
    *   A string language code.
    */
   public function getDefaultLangcode(EntityInterface $entity) {
-    return language_get_default_langcode($entity->getEntityTypeId(), $entity->bundle());
+    return \language_get_default_langcode($entity->getEntityTypeId(), $entity->bundle());
   }
 
 }

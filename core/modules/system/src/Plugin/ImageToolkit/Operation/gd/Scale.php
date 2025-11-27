@@ -56,15 +56,15 @@ class Scale extends Resize {
     // calculated to be bigger than its target.
     $aspect = $this->getToolkit()->getHeight() / $this->getToolkit()->getWidth();
     if (($arguments['width'] && !$arguments['height']) || ($arguments['width'] && $arguments['height'] && $aspect < $arguments['height'] / $arguments['width'])) {
-      $arguments['height'] = (int) round($arguments['width'] * $aspect);
+      $arguments['height'] = (int) \round($arguments['width'] * $aspect);
     }
     else {
-      $arguments['width'] = (int) round($arguments['height'] / $aspect);
+      $arguments['width'] = (int) \round($arguments['height'] / $aspect);
     }
 
     // Assure integers for all arguments.
-    $arguments['width'] = (int) round($arguments['width']);
-    $arguments['height'] = (int) round($arguments['height']);
+    $arguments['width'] = (int) \round($arguments['width']);
+    $arguments['height'] = (int) \round($arguments['height']);
 
     // Fail when width or height are 0 or negative.
     if ($arguments['width'] <= 0) {

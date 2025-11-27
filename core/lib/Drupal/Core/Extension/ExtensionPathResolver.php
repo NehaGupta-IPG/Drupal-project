@@ -52,7 +52,7 @@ class ExtensionPathResolver {
       return 'core/core.info.yml';
     }
     if (!isset($this->extensionLists[$type])) {
-      throw new UnknownExtensionTypeException(sprintf('Extension type %s is unknown.', $type));
+      throw new UnknownExtensionTypeException(\sprintf('Extension type %s is unknown.', $type));
     }
     try {
       return $this->extensionLists[$type]->getPathname($name);
@@ -60,7 +60,7 @@ class ExtensionPathResolver {
     catch (UnknownExtensionException) {
       // Catch the exception. This will result in triggering an error.
       // If the filename is still unknown, create a user-level error message.
-      trigger_error(sprintf('The following %s is missing from the file system: %s', $type, $name), E_USER_WARNING);
+      \trigger_error(\sprintf('The following %s is missing from the file system: %s', $type, $name), E_USER_WARNING);
       return NULL;
     }
   }
@@ -82,7 +82,7 @@ class ExtensionPathResolver {
    *   If the extension is unknown.
    */
   public function getPath(string $type, string $name): string {
-    return dirname($this->getPathname($type, $name));
+    return \dirname($this->getPathname($type, $name));
   }
 
 }

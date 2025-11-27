@@ -28,19 +28,19 @@ trait JsonSchemaReflectionTrait {
    */
   protected function getJsonSchemaForMethod(mixed $object, string $method, array $fallback = [], bool $nullable = FALSE): array {
     $schemas = [];
-    if ((is_object($object) || class_exists($object)) && method_exists($object, $method)) {
+    if ((\is_object($object) || \class_exists($object)) && \method_exists($object, $method)) {
       $reflection = new \ReflectionMethod($object, $method);
       $schemas = $reflection->getAttributes(JsonSchema::class);
     }
-    if (count($schemas) === 0) {
+    if (\count($schemas) === 0) {
       return $fallback;
     }
-    $schemas = array_values(array_filter([
-      ...array_map(fn ($schema) => $schema->newInstance()->getJsonSchema(), $schemas),
+    $schemas = \array_values(\array_filter([
+      ...\array_map(fn ($schema) => $schema->newInstance()->getJsonSchema(), $schemas),
       $nullable ? ['type' => 'null'] : NULL,
     ]));
-    return count($schemas) === 1
-      ? current($schemas)
+    return \count($schemas) === 1
+      ? \current($schemas)
       : ['oneOf' => $schemas];
   }
 

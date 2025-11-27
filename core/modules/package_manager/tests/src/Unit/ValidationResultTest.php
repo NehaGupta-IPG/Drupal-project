@@ -30,7 +30,7 @@ class ValidationResultTest extends UnitTestCase {
   #[DataProvider('providerValidConstructorArguments')]
   public function testCreateWarningResult(array $messages, ?string $summary): void {
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString, DrupalPractice.Objects.GlobalFunction
-    $summary = $summary ? t($summary) : NULL;
+    $summary = $summary ? \t($summary) : NULL;
     $result = ValidationResult::createWarning($messages, $summary);
     $this->assertResultValid($result, $messages, $summary, RequirementSeverity::Warning->value);
   }
@@ -44,20 +44,20 @@ class ValidationResultTest extends UnitTestCase {
     // An error and a warning should be counted as an error.
     $results = [
       // phpcs:disable DrupalPractice.Objects.GlobalFunction
-      ValidationResult::createError([t('Boo!')]),
-      ValidationResult::createWarning([t('Moo!')]),
+      ValidationResult::createError([\t('Boo!')]),
+      ValidationResult::createWarning([\t('Moo!')]),
       // phpcs:enable DrupalPractice.Objects.GlobalFunction
     ];
     $this->assertSame(RequirementSeverity::Error->value, ValidationResult::getOverallSeverity($results));
 
     // If there are no results, but no errors, the results should be counted as
     // a warning.
-    array_shift($results);
+    \array_shift($results);
     $this->assertSame(RequirementSeverity::Warning->value, ValidationResult::getOverallSeverity($results));
 
     // If there are just plain no results, we should get
     // RequirementSeverity::OK.
-    array_shift($results);
+    \array_shift($results);
     $this->assertSame(RequirementSeverity::OK->value, ValidationResult::getOverallSeverity($results));
   }
 
@@ -69,7 +69,7 @@ class ValidationResultTest extends UnitTestCase {
   #[DataProvider('providerValidConstructorArguments')]
   public function testCreateErrorResult(array $messages, ?string $summary): void {
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString, DrupalPractice.Objects.GlobalFunction
-    $summary = $summary ? t($summary) : NULL;
+    $summary = $summary ? \t($summary) : NULL;
     $result = ValidationResult::createError($messages, $summary);
     $this->assertResultValid($result, $messages, $summary, RequirementSeverity::Error->value);
   }
@@ -132,7 +132,7 @@ class ValidationResultTest extends UnitTestCase {
   public static function providerCreateExceptions(): array {
     return [
       '2 messages, no summary' => [
-        [t('Something is wrong'), t('Something else is also wrong')],
+        [\t('Something is wrong'), \t('Something else is also wrong')],
         'If more than one message is provided, a summary is required.',
       ],
       'no messages' => [
@@ -151,13 +151,13 @@ class ValidationResultTest extends UnitTestCase {
   public static function providerValidConstructorArguments(): array {
     return [
       '1 message no summary' => [
-        'messages' => [t('Something is wrong')],
+        'messages' => [\t('Something is wrong')],
         'summary' => NULL,
       ],
       '2 messages has summary' => [
         'messages' => [
-          t('Something is wrong'),
-          t('Something else is also wrong'),
+          \t('Something is wrong'),
+          \t('Something else is also wrong'),
         ],
         'summary' => 'This sums it up.',
       ],

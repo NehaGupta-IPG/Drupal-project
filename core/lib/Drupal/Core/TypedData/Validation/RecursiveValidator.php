@@ -108,7 +108,7 @@ class RecursiveValidator implements ValidatorInterface {
    */
   public function validatePropertyValue($objectOrClass, $propertyName, $value, $groups = NULL): ConstraintViolationListInterface {
     // Just passing a class name is not supported.
-    if (!is_object($objectOrClass)) {
+    if (!\is_object($objectOrClass)) {
       throw new \LogicException('Typed data validation does not support passing the class name only.');
     }
     return $this->startContext($objectOrClass)

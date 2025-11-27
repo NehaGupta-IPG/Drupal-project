@@ -34,7 +34,7 @@ class EntityDisplayModeController extends ControllerBase {
       }
     }
     // Move content at the top.
-    array_splice($entity_types, 0, 0, array_splice($entity_types, array_search('node', array_keys($entity_types)), 1));
+    \array_splice($entity_types, 0, 0, \array_splice($entity_types, \array_search('node', \array_keys($entity_types)), 1));
     return [
       '#theme' => 'admin_block_content',
       '#content' => $entity_types,
@@ -69,7 +69,7 @@ class EntityDisplayModeController extends ControllerBase {
       }
     }
     // Move content at the top.
-    array_splice($entity_types, 0, 0, array_splice($entity_types, array_search('node', array_keys($entity_types)), 1));
+    \array_splice($entity_types, 0, 0, \array_splice($entity_types, \array_search('node', \array_keys($entity_types)), 1));
     return [
       '#theme' => 'admin_block_content',
       '#content' => $entity_types,

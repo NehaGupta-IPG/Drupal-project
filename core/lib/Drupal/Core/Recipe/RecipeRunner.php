@@ -52,7 +52,7 @@ final class RecipeRunner {
   public static function triggerEvent(Recipe $recipe, ?array &$context = NULL): void {
     $event = new RecipeAppliedEvent($recipe);
     \Drupal::service(EventDispatcherInterface::class)->dispatch($event);
-    $context['message'] = t('Applied %recipe recipe.', ['%recipe' => $recipe->name]);
+    $context['message'] = \t('Applied %recipe recipe.', ['%recipe' => $recipe->name]);
     $context['results']['recipe'][] = $recipe->name;
   }
 
@@ -116,8 +116,8 @@ final class RecipeRunner {
       $values = $recipe->input->getValues();
       // Wrap the replacement strings with `${` and `}`, which is a fairly
       // common style of placeholder.
-      $keys = array_map(fn ($k) => sprintf('${%s}', $k), array_keys($values));
-      $replace = array_combine($keys, $values);
+      $keys = \array_map(fn ($k) => \sprintf('${%s}', $k), \array_keys($values));
+      $replace = \array_combine($keys, $values);
 
       // Process the actions.
       /** @var \Drupal\Core\Config\Action\ConfigActionManager $config_action_manager */
@@ -125,10 +125,10 @@ final class RecipeRunner {
       foreach ($config->config['actions'] as $config_name => $actions) {
         // If this config name contains an input value, it must begin with the
         // config prefix of a known entity type.
-        if (str_contains($config_name, '${') && empty($config_manager->getEntityTypeIdByName($config_name))) {
+        if (\str_contains($config_name, '${') && empty($config_manager->getEntityTypeIdByName($config_name))) {
           throw new ConfigActionException("The entity type for the config name '$config_name' could not be identified.");
         }
-        $config_name = str_replace($keys, $replace, $config_name);
+        $config_name = \str_replace($keys, $replace, $config_name);
 
         foreach ($actions as $action_id => $data) {
           $config_action_manager->applyAction($action_id, $config_name, static::replaceInputValues($data, $replace));
@@ -191,16 +191,16 @@ final class RecipeRunner {
    *   pass to the callable.
    */
   protected static function toBatchOperationsRecipe(Recipe $recipe, array $recipes, array &$modules, array &$themes): array {
-    if (in_array($recipe->path, $recipes, TRUE)) {
+    if (\in_array($recipe->path, $recipes, TRUE)) {
       return [];
     }
     $steps = [];
     $recipes[] = $recipe->path;
 
     foreach ($recipe->recipes->recipes as $sub_recipe) {
-      $steps = array_merge($steps, static::toBatchOperationsRecipe($sub_recipe, $recipes, $modules, $themes));
+      $steps = \array_merge($steps, static::toBatchOperationsRecipe($sub_recipe, $recipes, $modules, $themes));
     }
-    $steps = array_merge($steps, static::toBatchOperationsInstall($recipe, $modules, $themes));
+    $steps = \array_merge($steps, static::toBatchOperationsInstall($recipe, $modules, $themes));
     if ($recipe->config->hasTasks()) {
       $steps[] = [[RecipeRunner::class, 'installConfig'], [$recipe]];
     }
@@ -231,14 +231,14 @@ final class RecipeRunner {
    */
   protected static function toBatchOperationsInstall(Recipe $recipe, array &$modules, array &$themes): array {
     foreach ($recipe->install->modules as $name) {
-      if (in_array($name, $modules, TRUE)) {
+      if (\in_array($name, $modules, TRUE)) {
         continue;
       }
       $modules[] = $name;
       $steps[] = [[RecipeRunner::class, 'installModule'], [$name, $recipe]];
     }
     foreach ($recipe->install->themes as $name) {
-      if (in_array($name, $themes, TRUE)) {
+      if (\in_array($name, $themes, TRUE)) {
         continue;
       }
       $themes[] = $name;
@@ -274,7 +274,7 @@ final class RecipeRunner {
 
     \Drupal::service('module_installer')->install([$module]);
     \Drupal::service('config.installer')->setSyncing(FALSE);
-    $context['message'] = t('Installed %module module.', ['%module' => \Drupal::service('extension.list.module')->getName($module)]);
+    $context['message'] = \t('Installed %module module.', ['%module' => \Drupal::service('extension.list.module')->getName($module)]);
     $context['results']['module'][] = $module;
   }
 
@@ -304,7 +304,7 @@ final class RecipeRunner {
 
     \Drupal::service('theme_installer')->install([$theme]);
     \Drupal::service('config.installer')->setSyncing(FALSE);
-    $context['message'] = t('Installed %theme theme.', ['%theme' => \Drupal::service('extension.list.theme')->getName($theme)]);
+    $context['message'] = \t('Installed %theme theme.', ['%theme' => \Drupal::service('extension.list.theme')->getName($theme)]);
     $context['results']['theme'][] = $theme;
   }
 
@@ -318,7 +318,7 @@ final class RecipeRunner {
    */
   public static function installConfig(Recipe $recipe, ?array &$context = NULL): void {
     static::processConfiguration($recipe);
-    $context['message'] = t('Installed configuration for %recipe recipe.', ['%recipe' => $recipe->name]);
+    $context['message'] = \t('Installed configuration for %recipe recipe.', ['%recipe' => $recipe->name]);
     $context['results']['config'][] = $recipe->name;
   }
 
@@ -332,7 +332,7 @@ final class RecipeRunner {
    */
   public static function installContent(Recipe $recipe, ?array &$context = NULL): void {
     static::processContent($recipe->content);
-    $context['message'] = t('Created content for %recipe recipe.', ['%recipe' => $recipe->name]);
+    $context['message'] = \t('Created content for %recipe recipe.', ['%recipe' => $recipe->name]);
     $context['results']['content'][] = $recipe->name;
   }
 
@@ -347,10 +347,10 @@ final class RecipeRunner {
    *   The passed data, with placeholders replaced.
    */
   private static function replaceInputValues(mixed $data, array $replace): mixed {
-    if (is_string($data)) {
-      $data = str_replace(array_keys($replace), $replace, $data);
+    if (\is_string($data)) {
+      $data = \str_replace(\array_keys($replace), $replace, $data);
     }
-    elseif (is_array($data)) {
+    elseif (\is_array($data)) {
       foreach ($data as $key => $value) {
         $data[$key] = static::replaceInputValues($value, $replace);
       }

@@ -113,8 +113,8 @@ class TestSubscriber implements EventSubscriberInterface {
    *   The state key under which to store the results for the given event.
    */
   protected static function getStateKey(string $event): string {
-    $key = hash('sha256', static::class . $event);
-    return static::STATE_KEY . substr($key, 0, 8);
+    $key = \hash('sha256', static::class . $event);
+    return static::STATE_KEY . \substr($key, 0, 8);
   }
 
   /**
@@ -124,10 +124,10 @@ class TestSubscriber implements EventSubscriberInterface {
    *   The event object.
    */
   public function handleEvent(SandboxEvent $event): void {
-    $results = $this->state->get(self::getStateKey(get_class($event)), []);
+    $results = $this->state->get(self::getStateKey(\get_class($event)), []);
 
     // Record that value of maintenance mode for each event.
-    $this->state->set(get_class($event) . '.system.maintenance_mode', $this->state->get('system.maintenance_mode'));
+    $this->state->set(\get_class($event) . '.system.maintenance_mode', $this->state->get('system.maintenance_mode'));
 
     if ($results instanceof \Throwable) {
       throw $results;
@@ -135,7 +135,7 @@ class TestSubscriber implements EventSubscriberInterface {
     elseif ($results === 'exit') {
       exit();
     }
-    elseif (is_string($results)) {
+    elseif (\is_string($results)) {
       \Drupal::messenger()->addStatus($results);
       return;
     }

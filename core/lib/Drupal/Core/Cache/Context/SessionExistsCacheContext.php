@@ -44,7 +44,7 @@ class SessionExistsCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Session exists');
+    return \t('Session exists');
   }
 
   /**

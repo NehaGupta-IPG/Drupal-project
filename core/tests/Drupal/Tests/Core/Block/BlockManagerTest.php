@@ -90,7 +90,7 @@ class BlockManagerTest extends UnitTestCase {
    */
   public function testDefinitions(): void {
     $definitions = $this->blockManager->getDefinitions();
-    $this->assertSame(['broken', 'block1', 'block2', 'block3'], array_keys($definitions));
+    $this->assertSame(['broken', 'block1', 'block2', 'block3'], \array_keys($definitions));
   }
 
   /**
@@ -100,7 +100,7 @@ class BlockManagerTest extends UnitTestCase {
    */
   public function testSortedDefinitions(): void {
     $definitions = $this->blockManager->getSortedDefinitions();
-    $this->assertSame(['block2', 'block3', 'block1'], array_keys($definitions));
+    $this->assertSame(['block2', 'block3', 'block1'], \array_keys($definitions));
   }
 
   /**
@@ -110,9 +110,9 @@ class BlockManagerTest extends UnitTestCase {
    */
   public function testGroupedDefinitions(): void {
     $definitions = $this->blockManager->getGroupedDefinitions();
-    $this->assertSame(['Group 1', 'Group 2'], array_keys($definitions));
-    $this->assertSame(['block2'], array_keys($definitions['Group 1']));
-    $this->assertSame(['block3', 'block1'], array_keys($definitions['Group 2']));
+    $this->assertSame(['Group 1', 'Group 2'], \array_keys($definitions));
+    $this->assertSame(['block2'], \array_keys($definitions['Group 1']));
+    $this->assertSame(['block3', 'block1'], \array_keys($definitions['Group 2']));
   }
 
   /**

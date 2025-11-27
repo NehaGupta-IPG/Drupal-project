@@ -183,12 +183,12 @@ class EntityDisplayModeTest extends BrowserTestBase {
     // if viewing the site in English and if no changes have been made. We will
     // verify this first.
     $page_text = $this->getTextContent();
-    $start = strpos($page_text, 'view modes');
+    $start = \strpos($page_text, 'view modes');
     $pos = $start;
     $list = ['Full content', 'RSS', 'Search index', 'Search result', 'Teaser'];
     // Verify that the order of the view modes is correct on the page.
     foreach ($list as $name) {
-      $new_pos = strpos($page_text, $name, $start);
+      $new_pos = \strpos($page_text, $name, $start);
       $this->assertGreaterThan($pos, $new_pos);
       $pos = $new_pos;
     }
@@ -208,12 +208,12 @@ class EntityDisplayModeTest extends BrowserTestBase {
     // content".
     $this->drupalGet('admin/structure/types/manage/article/display');
     $page_text = $this->getTextContent();
-    $start = strpos($page_text, 'view modes');
+    $start = \strpos($page_text, 'view modes');
     $pos = $start;
     $list = ['Breezier', 'Full content'];
     // Verify that the order of the view modes is correct on the page.
     foreach ($list as $name) {
-      $new_pos = strpos($page_text, $name, $start);
+      $new_pos = \strpos($page_text, $name, $start);
       $this->assertGreaterThan($pos, $new_pos);
       $pos = $new_pos;
     }

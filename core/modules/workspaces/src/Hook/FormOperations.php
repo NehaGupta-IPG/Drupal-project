@@ -130,7 +130,7 @@ class FormOperations {
     }
 
     if (isset($element['#ajax']) && !isset($element['#ajax']['options']['query']['workspace'])) {
-      $element['#ajax']['options']['query'] = array_merge_recursive(
+      $element['#ajax']['options']['query'] = \array_merge_recursive(
         $url_query_options,
         $element['#ajax']['options']['query'] ?? [],
       );

@@ -193,7 +193,7 @@ class ContentTranslationHooks {
   #[Hook('language_content_settings_insert')]
   public function languageContentSettingsInsert(ContentLanguageSettingsInterface $settings): void {
     if ($settings->getThirdPartySetting('content_translation', 'enabled', FALSE)) {
-      _content_translation_install_field_storage_definitions($settings->getTargetEntityTypeId());
+      \_content_translation_install_field_storage_definitions($settings->getTargetEntityTypeId());
     }
     \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
   }
@@ -214,7 +214,7 @@ class ContentTranslationHooks {
   public function languageContentSettingsUpdate(ContentLanguageSettingsInterface $settings): void {
     $original_settings = $settings->getOriginal();
     if ($settings->getThirdPartySetting('content_translation', 'enabled', FALSE) && !$original_settings->getThirdPartySetting('content_translation', 'enabled', FALSE)) {
-      _content_translation_install_field_storage_definitions($settings->getTargetEntityTypeId());
+      \_content_translation_install_field_storage_definitions($settings->getTargetEntityTypeId());
     }
     \Drupal::service('entity_type.bundle.info')->clearCachedBundles();
   }
@@ -275,7 +275,7 @@ class ContentTranslationHooks {
       // @todo Re-evaluate this approach and consider removing field storage
       //   definitions and the related field data if the entity type has no
       //   bundle enabled for translation. See https://www.drupal.org/i/2907777
-      if ($manager->isEnabled($entity_type_id) || array_intersect_key($definitions, $installed_storage_definitions)) {
+      if ($manager->isEnabled($entity_type_id) || \array_intersect_key($definitions, $installed_storage_definitions)) {
         $info = $definitions;
       }
     }
@@ -318,7 +318,7 @@ class ContentTranslationHooks {
   #[Hook('entity_operation')]
   public function entityOperation(EntityInterface $entity): array {
     $operations = [];
-    if ($entity->hasLinkTemplate('drupal:content-translation-overview') && content_translation_translate_access($entity)->isAllowed()) {
+    if ($entity->hasLinkTemplate('drupal:content-translation-overview') && \content_translation_translate_access($entity)->isAllowed()) {
       $operations['translate'] = [
         'title' => $this->t('Translate'),
         'url' => $entity->toUrl('drupal:content-translation-overview'),
@@ -377,7 +377,7 @@ class ContentTranslationHooks {
     // Let the content translation handler alter the content entity form. This
     // can be the 'add' or 'edit' form. It also tries a 'default' form in case
     // neither of the aforementioned forms are defined.
-    if ($entity instanceof ContentEntityInterface && $entity->isTranslatable() && count($entity->getTranslationLanguages()) > 1 && in_array($op, ['edit', 'add', 'default'], TRUE)) {
+    if ($entity instanceof ContentEntityInterface && $entity->isTranslatable() && \count($entity->getTranslationLanguages()) > 1 && \in_array($op, ['edit', 'add', 'default'], TRUE)) {
       $controller = \Drupal::entityTypeManager()->getHandler($entity->getEntityTypeId(), 'translation');
       $controller->entityFormAlter($form, $form_state, $entity);
       // @todo Move the following lines to the code generating the property form
@@ -386,7 +386,7 @@ class ContentTranslationHooks {
       $form_langcode = $form_object->getFormLangcode($form_state);
       // Handle fields shared between translations when there is at least one
       // translation available or a new one is being created.
-      if (!$entity->isNew() && (!isset($translations[$form_langcode]) || count($translations) > 1)) {
+      if (!$entity->isNew() && (!isset($translations[$form_langcode]) || \count($translations) > 1)) {
         foreach ($entity->getFieldDefinitions() as $field_name => $definition) {
           // Allow the widget to define if it should be treated as multilingual
           // by respecting an already set #multilingual key.
@@ -481,7 +481,7 @@ class ContentTranslationHooks {
     }
     if ($field->isTranslatable()) {
       \Drupal::moduleHandler()->loadInclude('content_translation', 'inc', 'content_translation.admin');
-      $element = content_translation_field_sync_widget($field);
+      $element = \content_translation_field_sync_widget($field);
       if ($element) {
         $form['third_party_settings']['content_translation']['translation_sync'] = $element;
         $form['third_party_settings']['content_translation']['translation_sync']['#weight'] = -10;
@@ -522,7 +522,7 @@ class ContentTranslationHooks {
   #[Hook('form_language_content_settings_form_alter')]
   public function formLanguageContentSettingsFormAlter(array &$form, FormStateInterface $form_state) : void {
     \Drupal::moduleHandler()->loadInclude('content_translation', 'inc', 'content_translation.admin');
-    _content_translation_form_language_content_settings_form_alter($form, $form_state);
+    \_content_translation_form_language_content_settings_form_alter($form, $form_state);
   }
 
   /**
@@ -539,7 +539,7 @@ class ContentTranslationHooks {
     $is_front = \Drupal::service('path.matcher')->isFrontPage();
     // Determine if the current route represents an entity.
     foreach ($parameters as $name => $options) {
-      if (!isset($options['type']) || !str_starts_with($options['type'], 'entity:')) {
+      if (!isset($options['type']) || !\str_starts_with($options['type'], 'entity:')) {
         continue;
       }
       $entity = $route_match->getParameter($name);

@@ -191,7 +191,7 @@ class UrlGeneratorTest extends UnitTestCase {
    *   The alias for the given path, or the path itself if no alias is defined.
    */
   public function aliasManagerCallback() {
-    $args = func_get_args();
+    $args = \func_get_args();
     switch ($args[0]) {
       case '/test/one':
         return '/hello/world';

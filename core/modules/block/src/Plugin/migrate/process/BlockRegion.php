@@ -60,7 +60,7 @@ class BlockRegion extends StaticMap implements ContainerFactoryPluginInterface {
 
     // Theme is the same on both source and destination, so ensure that the
     // region exists in the destination theme.
-    if (strtolower($source_theme) == strtolower($destination_theme)) {
+    if (\strtolower($source_theme) == \strtolower($destination_theme)) {
       if (isset($this->regions[$destination_theme][$region])) {
         return $region;
       }

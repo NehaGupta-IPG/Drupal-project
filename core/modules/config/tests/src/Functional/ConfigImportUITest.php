@@ -93,11 +93,11 @@ class ConfigImportUITest extends BrowserTestBase {
     $core_extension = $this->config('core.extension')->get();
     $core_extension['module']['automated_cron'] = 0;
     $core_extension['module']['config_install_schema_test'] = 0;
-    $core_extension['module'] = module_config_sort($core_extension['module']);
+    $core_extension['module'] = \module_config_sort($core_extension['module']);
     $core_extension['theme']['olivero'] = 0;
     $sync->write('core.extension', $core_extension);
     // Olivero ships with configuration.
-    $sync->write('olivero.settings', Yaml::decode(file_get_contents('core/themes/olivero/config/install/olivero.settings.yml')));
+    $sync->write('olivero.settings', Yaml::decode(\file_get_contents('core/themes/olivero/config/install/olivero.settings.yml')));
 
     // Use the install storage so that we can read configuration from modules
     // and themes that are not installed.

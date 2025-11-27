@@ -209,7 +209,7 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
         'bin' => $this->cacheBin,
       ];
 
-      if ($entity instanceof TranslatableDataInterface && count($entity->getTranslationLanguages()) > 1) {
+      if ($entity instanceof TranslatableDataInterface && \count($entity->getTranslationLanguages()) > 1) {
         $build['#cache']['keys'][] = $entity->language()->getId();
       }
     }
@@ -281,7 +281,7 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
     foreach ($view_modes as $view_mode => $view_mode_entities) {
       $displays = EntityViewDisplay::collectRenderDisplays($view_mode_entities, $view_mode);
       $this->buildComponents($build_list, $view_mode_entities, $displays, $view_mode);
-      foreach (array_keys($view_mode_entities) as $key) {
+      foreach (\array_keys($view_mode_entities) as $key) {
         // Allow for alterations while building, before rendering.
         $entity = $build_list[$key][$entity_type_key];
         $display = $displays[$entity->bundle()];
@@ -505,12 +505,12 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
    *   The EntityViewDisplay objects created for individual field rendering.
    */
   protected function getSingleFieldDisplay($entity, $field_name, $display_options) {
-    if (is_string($display_options)) {
+    if (\is_string($display_options)) {
       // View mode: use the Display configured for the view mode.
       $view_mode = $display_options;
       $display = EntityViewDisplay::collectRenderDisplay($entity, $view_mode);
       // Hide all fields except the current one.
-      foreach (array_keys($entity->getFieldDefinitions()) as $name) {
+      foreach (\array_keys($entity->getFieldDefinitions()) as $name) {
         if ($name != $field_name) {
           $display->removeComponent($name);
         }
@@ -523,7 +523,7 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
       // series of fields individually for cases such as views tables.
       $entity_type_id = $entity->getEntityTypeId();
       $bundle = $entity->bundle();
-      $key = $entity_type_id . ':' . $bundle . ':' . $field_name . ':' . Crypt::hashBase64(serialize($display_options));
+      $key = $entity_type_id . ':' . $bundle . ':' . $field_name . ':' . Crypt::hashBase64(\serialize($display_options));
       if (!isset($this->singleFieldDisplays[$key])) {
         $this->singleFieldDisplays[$key] = EntityViewDisplay::create([
           'targetEntityType' => $entity_type_id,

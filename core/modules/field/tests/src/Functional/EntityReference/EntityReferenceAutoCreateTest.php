@@ -140,7 +140,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $query = clone $base_query;
     $result = $query->execute();
     $this->assertNotEmpty($result, 'Referenced node was created.');
-    $referenced_nid = key($result);
+    $referenced_nid = \key($result);
     $referenced_node = Node::load($referenced_nid);
 
     // Assert the referenced node is associated with referencing node.
@@ -149,7 +149,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
       ->condition('type', $this->referencingType)
       ->execute();
 
-    $referencing_nid = key($result);
+    $referencing_nid = \key($result);
     $referencing_node = Node::load($referencing_nid);
     $this->assertEquals($referenced_nid, $referencing_node->test_field->target_id, 'Newly created node is referenced from the referencing node.');
 
@@ -207,7 +207,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
     /** @var \Drupal\taxonomy\Entity\Term $term */
     $term = $term_storage->loadByProperties(['name' => $term_name]);
-    $term = reset($term);
+    $term = \reset($term);
 
     // The new term is expected to be stored in the second vocabulary.
     $this->assertEquals($vocabularies[1]->id(), $term->bundle());
@@ -232,7 +232,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     /** @var \Drupal\taxonomy\Entity\Term $term */
     $term = $term_storage->loadByProperties(['name' => $term_name]);
-    $term = reset($term);
+    $term = \reset($term);
 
     // The second term is expected to be stored in the first vocabulary.
     $this->assertEquals($vocabularies[0]->id(), $term->bundle());
@@ -293,7 +293,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
       ->condition('name', $name)
       ->execute();
     $this->assertNotEmpty($result, 'Referenced entity was created.');
-    $referenced_id = key($result);
+    $referenced_id = \key($result);
 
     // Assert the referenced entity is associated with referencing node.
     $result = \Drupal::entityQuery('node')
@@ -301,7 +301,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
       ->condition('type', $this->referencingType)
       ->execute();
     $this->assertCount(1, $result);
-    $referencing_nid = key($result);
+    $referencing_nid = \key($result);
     $referencing_node = Node::load($referencing_nid);
     $this->assertEquals($referenced_id, $referencing_node->$field_name->target_id, 'Newly created node is referenced from the referencing entity.');
   }

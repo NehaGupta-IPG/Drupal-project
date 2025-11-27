@@ -58,7 +58,7 @@ abstract class ComponentKernelTestBase extends KernelTestBase {
     $this->installConfig('system');
 
     $system_theme_config = $this->container->get('config.factory')->getEditable('system.theme');
-    $theme_name = reset(static::$themes);
+    $theme_name = \reset(static::$themes);
     $system_theme_config
       ->set('default', $theme_name)
       ->save();

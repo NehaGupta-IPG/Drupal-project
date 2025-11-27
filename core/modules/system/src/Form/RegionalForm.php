@@ -125,7 +125,7 @@ class RegionalForm extends ConfigFormBase {
    *   The value of the form element.
    */
   public static function loadDefaultTimeZone(?string $value): string {
-    return $value ?: date_default_timezone_get();
+    return $value ?: \date_default_timezone_get();
   }
 
 }

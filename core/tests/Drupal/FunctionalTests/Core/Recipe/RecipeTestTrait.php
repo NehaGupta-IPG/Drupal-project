@@ -28,18 +28,18 @@ trait RecipeTestTrait {
    *   The recipe object.
    */
   protected function createRecipe(string|array $data, ?string $machine_name = NULL): Recipe {
-    if (is_array($data)) {
+    if (\is_array($data)) {
       $data = Yaml::encode($data);
     }
     $recipes_dir = $this->siteDirectory . '/recipes';
     if ($machine_name === NULL) {
-      $dir = uniqid($recipes_dir . '/');
+      $dir = \uniqid($recipes_dir . '/');
     }
     else {
       $dir = $recipes_dir . '/' . $machine_name;
     }
-    mkdir($dir, recursive: TRUE);
-    file_put_contents($dir . '/recipe.yml', $data);
+    \mkdir($dir, recursive: TRUE);
+    \file_put_contents($dir . '/recipe.yml', $data);
 
     return Recipe::createFromDirectory($dir);
   }
@@ -68,7 +68,7 @@ trait RecipeTestTrait {
       ...$options,
       $path,
     ]);
-    $this->assertSame($expected_exit_code, $process->getExitCode(), sprintf("Process exit code mismatch.\nExpected: %d\nActual: %d\n\nSTDOUT:\n%s\n\nSTDERR:\n%s", $expected_exit_code, $process->getExitCode(), $process->getOutput(), $process->getErrorOutput()));
+    $this->assertSame($expected_exit_code, $process->getExitCode(), \sprintf("Process exit code mismatch.\nExpected: %d\nActual: %d\n\nSTDOUT:\n%s\n\nSTDERR:\n%s", $expected_exit_code, $process->getExitCode(), $process->getOutput(), $process->getErrorOutput()));
     // Applying a recipe:
     // - creates new checkpoints, hence the "state" service in the test runner
     //   is outdated
@@ -77,7 +77,7 @@ trait RecipeTestTrait {
     // Hence the entire environment must be rebuilt for assertions to target the
     // actual post-recipe-application result.
     // @see \Drupal\Core\Config\Checkpoint\LinearHistory::__construct()
-    assert($this instanceof BrowserTestBase);
+    \assert($this instanceof BrowserTestBase);
     $this->rebuildAll();
     return $process;
   }
@@ -95,9 +95,9 @@ trait RecipeTestTrait {
    *   The started process.
    */
   protected function runDrupalCommand(array $arguments, int $timeout = 500): Process {
-    assert($this instanceof BrowserTestBase);
+    \assert($this instanceof BrowserTestBase);
 
-    array_unshift($arguments, (new PhpExecutableFinder())->find(), 'core/scripts/drupal');
+    \array_unshift($arguments, (new PhpExecutableFinder())->find(), 'core/scripts/drupal');
 
     $process = (new Process($arguments))
       ->setWorkingDirectory($this->getDrupalRoot())
@@ -106,7 +106,7 @@ trait RecipeTestTrait {
         // Ensure that the command boots Drupal into a state where it knows it's
         // a test site.
         // @see drupal_valid_test_ua()
-        'HTTP_USER_AGENT' => drupal_generate_test_ua($this->databasePrefix),
+        'HTTP_USER_AGENT' => \drupal_generate_test_ua($this->databasePrefix),
       ])
       ->setTimeout($timeout);
 
@@ -126,10 +126,10 @@ trait RecipeTestTrait {
   protected function alterRecipe(string $path, callable $alter): void {
     $file = $path . '/recipe.yml';
     $this->assertFileExists($file);
-    $contents = file_get_contents($file);
+    $contents = \file_get_contents($file);
     $contents = Yaml::decode($contents);
     $contents = $alter($contents);
-    file_put_contents($file, Yaml::encode($contents));
+    \file_put_contents($file, Yaml::encode($contents));
   }
 
 }

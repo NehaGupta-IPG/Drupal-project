@@ -19,9 +19,9 @@ class VersionTest extends UnitTestCase {
    * Ensure that CKEditor5 versions are aligned.
    */
   public function testVersionAlignment(): void {
-    $package_json = json_decode(file_get_contents(__DIR__ . '/../../../../../package.json'), TRUE);
-    $ckeditor_dependencies = array_filter($package_json['devDependencies'], fn ($key) => str_starts_with($key, '@ckeditor/ckeditor5-'), ARRAY_FILTER_USE_KEY);
-    $this->assertCount(1, array_unique($ckeditor_dependencies));
+    $package_json = \json_decode(\file_get_contents(__DIR__ . '/../../../../../package.json'), TRUE);
+    $ckeditor_dependencies = \array_filter($package_json['devDependencies'], fn ($key) => \str_starts_with($key, '@ckeditor/ckeditor5-'), ARRAY_FILTER_USE_KEY);
+    $this->assertCount(1, \array_unique($ckeditor_dependencies));
   }
 
 }

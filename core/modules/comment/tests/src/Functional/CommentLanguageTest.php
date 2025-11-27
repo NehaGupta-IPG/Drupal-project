@@ -151,7 +151,7 @@ class CommentLanguageTest extends BrowserTestBase {
           ->sort('cid', 'DESC')
           ->range(0, 1)
           ->execute();
-        $comment = Comment::load(reset($cids));
+        $comment = Comment::load(\reset($cids));
         $this->assertEquals($langcode, $comment->langcode->value, "The comment posted with content language $langcode and belonging to the node with language $node_langcode has language {$comment->langcode->value}");
         $this->assertEquals($comment_values[$node_langcode][$langcode], $comment->comment_body->value, 'Comment body correctly stored.');
       }

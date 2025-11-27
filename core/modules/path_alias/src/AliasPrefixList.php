@@ -92,7 +92,7 @@ class AliasPrefixList extends CacheCollector implements AliasPrefixListInterface
         return TRUE;
       }
     }
-    elseif (array_key_exists($offset, $this->storage)) {
+    elseif (\array_key_exists($offset, $this->storage)) {
       return $this->resolveCacheMiss($offset);
     }
   }

@@ -74,7 +74,7 @@ class ProviderRepositoryTest extends UnitTestCase {
     $key_value_factory = new KeyValueMemoryFactory();
     $this->keyValue = $key_value_factory->get('media');
 
-    $this->currentTime = time();
+    $this->currentTime = \time();
     $time = $this->prophesize('\Drupal\Component\Datetime\TimeInterface');
     $time->getCurrentTime()->willReturn($this->currentTime);
 

@@ -135,7 +135,7 @@ class FieldInstance extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    foreach (unserialize($row->getSourceProperty('data')) as $key => $value) {
+    foreach (\unserialize($row->getSourceProperty('data')) as $key => $value) {
       $row->setSourceProperty($key, $value);
     }
 
@@ -162,14 +162,14 @@ class FieldInstance extends DrupalSqlBase {
     else {
       // This is not a node entity. Get the translatable value from the source
       // field_config table.
-      $field_data = unserialize($field_definition['data']);
+      $field_data = \unserialize($field_definition['data']);
       $translatable = $field_data['translatable'];
     }
 
     // Check if this is an i18n synchronized field.
     $synchronized_fields = $this->variableGet('i18n_sync_node_type_' . $row->getSourceProperty('bundle'), NULL);
     if ($synchronized_fields) {
-      if (in_array($row->getSourceProperty('field_name'), $synchronized_fields)) {
+      if (\in_array($row->getSourceProperty('field_name'), $synchronized_fields)) {
         $translatable = FALSE;
       }
     }
@@ -179,7 +179,7 @@ class FieldInstance extends DrupalSqlBase {
     // which is used in a migration_lookup in the process pipeline.
     if ($row->getSourceProperty('type') == 'taxonomy_term_reference') {
       $vocabulary = [];
-      $data = unserialize($field_definition['data']);
+      $data = \unserialize($field_definition['data']);
       foreach ($data['settings']['allowed_values'] as $allowed_value) {
         $vocabulary[] = $allowed_value['vocabulary'];
       }
@@ -220,7 +220,7 @@ class FieldInstance extends DrupalSqlBase {
 
     // Get the user roles for user reference fields.
     if ($row->getSourceProperty('type') == 'user_reference') {
-      $data = unserialize($field_definition['data']);
+      $data = \unserialize($field_definition['data']);
       if (!empty($data['settings']['referenceable_roles'])) {
         $rid = $data['settings']['referenceable_roles'];
         $query = $this->select('role', 'r')->fields('r')

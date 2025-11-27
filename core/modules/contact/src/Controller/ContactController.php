@@ -52,7 +52,7 @@ class ContactController extends ControllerBase {
     if (empty($contact_form)) {
       $default_form = $config->get('default_form');
       // Load the default form, if configured.
-      if (!is_null($default_form)) {
+      if (!\is_null($default_form)) {
         $contact_form = $this->entityTypeManager()
           ->getStorage('contact_form')
           ->load($default_form);

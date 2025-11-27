@@ -32,10 +32,10 @@ class PhpExtensionsValidatorTest extends PackageManagerKernelTestBase {
    */
   public static function providerPhpExtensionsValidation(): array {
     $openssl_error = ValidationResult::createError([
-      t('The OpenSSL extension is not enabled, which is a security risk. See <a href="https://www.php.net/manual/en/openssl.installation.php">the PHP documentation</a> for information on how to enable this extension.'),
+      \t('The OpenSSL extension is not enabled, which is a security risk. See <a href="https://www.php.net/manual/en/openssl.installation.php">the PHP documentation</a> for information on how to enable this extension.'),
     ]);
     $xdebug_warning = ValidationResult::createWarning([
-      t('Xdebug is enabled, which may have a negative performance impact on Package Manager and any modules that use it.'),
+      \t('Xdebug is enabled, which may have a negative performance impact on Package Manager and any modules that use it.'),
     ]);
     return [
       'xdebug enabled, openssl installed' => [

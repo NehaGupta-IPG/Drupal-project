@@ -50,7 +50,7 @@ class Query extends QueryBase {
     foreach ($this->sort as $sort) {
       $direction = $sort['direction'] == 'ASC' ? -1 : 1;
       $field = $sort['field'];
-      uasort($result, function ($a, $b) use ($field, $direction) {
+      \uasort($result, function ($a, $b) use ($field, $direction) {
         return ($a[$field] <= $b[$field]) ? $direction : -$direction;
       });
     }
@@ -59,15 +59,15 @@ class Query extends QueryBase {
     $this->initializePager();
 
     if ($this->range) {
-      $result = array_slice($result, $this->range['start'], $this->range['length'], TRUE);
+      $result = \array_slice($result, $this->range['start'], $this->range['length'], TRUE);
     }
     if ($this->count) {
-      return count($result);
+      return \count($result);
     }
 
     // Create the expected structure of entity_id => entity_id.
-    $entity_ids = array_keys($result);
-    return array_combine($entity_ids, $entity_ids);
+    $entity_ids = \array_keys($result);
+    return \array_combine($entity_ids, $entity_ids);
   }
 
 }

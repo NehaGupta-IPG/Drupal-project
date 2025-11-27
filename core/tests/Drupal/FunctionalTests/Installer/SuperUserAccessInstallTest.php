@@ -46,14 +46,14 @@ class SuperUserAccessInstallTest extends InstallerTestBase {
     ];
     // File API functions are not available yet.
     $path = $this->siteDirectory . '/profiles/superuser';
-    mkdir($path, 0777, TRUE);
-    file_put_contents("$path/superuser.info.yml", Yaml::encode($info));
+    \mkdir($path, 0777, TRUE);
+    \file_put_contents("$path/superuser.info.yml", Yaml::encode($info));
 
-    file_put_contents("$path/superuser.install", $this->providedData()['install_code']);
+    \file_put_contents("$path/superuser.install", $this->providedData()['install_code']);
 
-    $services = Yaml::decode(file_get_contents(DRUPAL_ROOT . '/sites/default/default.services.yml'));
+    $services = Yaml::decode(\file_get_contents(DRUPAL_ROOT . '/sites/default/default.services.yml'));
     $services['parameters']['security.enable_super_user'] = $this->providedData()['super_user_policy'];
-    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/services.yml', Yaml::encode($services));
+    \file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/services.yml', Yaml::encode($services));
   }
 
   /**
@@ -79,7 +79,7 @@ class SuperUserAccessInstallTest extends InstallerTestBase {
     $user = User::load(1);
     $this->assertSame($expected_runtime_has_permission, $user->hasPermission('administer software updates'));
     $this->assertTrue(\Drupal::state()->get('admin_permission_in_installer'));
-    $message = sprintf(static::NO_ACCESS_MESSAGE, $this->rootUser->getDisplayName());
+    $message = \sprintf(static::NO_ACCESS_MESSAGE, $this->rootUser->getDisplayName());
     if ($expected_no_access_message) {
       $this->assertSession()->pageTextContains($message);
     }

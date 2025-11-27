@@ -256,7 +256,7 @@ class AssetResolverTest extends UnitTestCase {
   }
 
   public static function providerAttachedJsAssets() {
-    $time = time();
+    $time = \time();
     return [
       'same libraries, different timestamps' => [
         (new AttachedAssets())->setAlreadyLoadedLibraries([])->setLibraries(['core/drupal'])->setSettings(['currentTime' => $time]),
@@ -277,7 +277,7 @@ class AssetResolverTest extends UnitTestCase {
    * Test that order of scripts are correct.
    */
   public function testJsAssetsOrder(): void {
-    $time = time();
+    $time = \time();
     $assets_a = (new AttachedAssets())
       ->setAlreadyLoadedLibraries([])
       ->setLibraries(['core/drupal', 'core/ckeditor5', 'core/jquery', 'piggy/ckeditor'])
@@ -301,12 +301,12 @@ class AssetResolverTest extends UnitTestCase {
 
 }
 
-if (!defined('CSS_AGGREGATE_DEFAULT')) {
-  define('CSS_AGGREGATE_DEFAULT', 0);
+if (!\defined('CSS_AGGREGATE_DEFAULT')) {
+  \define('CSS_AGGREGATE_DEFAULT', 0);
 }
 
-if (!defined('JS_DEFAULT')) {
-  define('JS_DEFAULT', 0);
+if (!\defined('JS_DEFAULT')) {
+  \define('JS_DEFAULT', 0);
 }
 
 /**
@@ -315,7 +315,7 @@ if (!defined('JS_DEFAULT')) {
 class TestMemoryBackend extends MemoryBackend {
 
   public function getAllCids() {
-    return array_keys($this->cache);
+    return \array_keys($this->cache);
   }
 
 }

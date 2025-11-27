@@ -78,10 +78,10 @@ class HookAlterOrderTest extends KernelTestBase {
     // 'procedural_alter' and 'procedural_subtype_alter' hooks.
     ModuleImplementsAlter::set(
       function (array &$implementations, string $hook) use ($modules, $move_b_down): void {
-        if (!in_array($hook, ['procedural_alter', 'procedural_subtype_alter'])) {
+        if (!\in_array($hook, ['procedural_alter', 'procedural_subtype_alter'])) {
           return;
         }
-        $this->assertSame($modules, array_keys($implementations));
+        $this->assertSame($modules, \array_keys($implementations));
         $move_b_down($implementations);
       },
     );
@@ -120,10 +120,10 @@ class HookAlterOrderTest extends KernelTestBase {
     // Test with module bbb_hook_order_test moved to the end for the main hook.
     ModuleImplementsAlter::set(
       function (array &$implementations, string $hook) use ($modules, $move_b_down): void {
-        if (!in_array($hook, ['procedural_alter', 'procedural_subtype_alter'])) {
+        if (!\in_array($hook, ['procedural_alter', 'procedural_subtype_alter'])) {
           return;
         }
-        $this->assertSame($modules, array_keys($implementations));
+        $this->assertSame($modules, \array_keys($implementations));
         if ($hook !== 'procedural_alter') {
           return;
         }
@@ -140,10 +140,10 @@ class HookAlterOrderTest extends KernelTestBase {
     // hook.
     ModuleImplementsAlter::set(
       function (array &$implementations, string $hook) use ($modules, $move_b_down): void {
-        if (!in_array($hook, ['procedural_alter', 'procedural_subtype_alter'])) {
+        if (!\in_array($hook, ['procedural_alter', 'procedural_subtype_alter'])) {
           return;
         }
-        $this->assertSameCallList($modules, array_keys($implementations));
+        $this->assertSameCallList($modules, \array_keys($implementations));
         if ($hook !== 'procedural_subtype_alter') {
           return;
         }

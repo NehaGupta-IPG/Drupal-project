@@ -36,7 +36,7 @@ class InstallerTranslationExistingFileTest extends InstallerTestBase {
    */
   protected function setUpLanguage(): void {
     // Place custom local translations in the translations directory.
-    mkdir(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
+    \mkdir(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
     $po_contents = <<<PO
 msgid ""
 msgstr ""
@@ -44,7 +44,7 @@ PO;
     // Create a misnamed translation file that
     // \Drupal\Core\StringTranslation\Translator\FileTranslation::findTranslationFiles()
     // will not find.
-    file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0-DEV.xx-lolspeak.po', $po_contents);
+    \file_put_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations/drupal-8.0.0-DEV.xx-lolspeak.po', $po_contents);
     parent::setUpLanguage();
   }
 

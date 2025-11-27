@@ -31,17 +31,17 @@ trait HookOrderTestTrait {
       if (!$strings) {
         return '[]';
       }
-      $parts = array_map(
+      $parts = \array_map(
         static function (string $call_string) {
-          if (preg_match('@^(\w+\\\\)*(\w+)::(\w+)@', $call_string, $matches)) {
+          if (\preg_match('@^(\w+\\\\)*(\w+)::(\w+)@', $call_string, $matches)) {
             [,, $class_shortname, $method] = $matches;
-            return $class_shortname . '::class . ' . var_export('::' . $method, TRUE);
+            return $class_shortname . '::class . ' . \var_export('::' . $method, TRUE);
           }
-          return var_export($call_string, TRUE);
+          return \var_export($call_string, TRUE);
         },
         $strings,
       );
-      return "[\n  " . implode(",\n  ", $parts) . ",\n]";
+      return "[\n  " . \implode(",\n  ", $parts) . ",\n]";
     };
     $this->assertSame(
       $format($expected),

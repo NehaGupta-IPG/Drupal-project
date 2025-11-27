@@ -51,8 +51,8 @@ trait FixtureUtilityTrait {
     // Loop through files and rename them.
     foreach (new \RecursiveIteratorIterator($it) as $file) {
       if ($file->getExtension() == 'hide') {
-        rename($file->getPathname(), $dir . DIRECTORY_SEPARATOR .
-          $file->getRelativePath() . DIRECTORY_SEPARATOR . str_replace(".hide", "", $file->getFilename()));
+        \rename($file->getPathname(), $dir . DIRECTORY_SEPARATOR .
+          $file->getRelativePath() . DIRECTORY_SEPARATOR . \str_replace(".hide", "", $file->getFilename()));
       }
     }
   }
@@ -72,7 +72,7 @@ trait FixtureUtilityTrait {
     /** @var \Symfony\Component\Finder\SplFileInfo $file */
     foreach ($iter as $file) {
       if ($file->isDir() && $file->getFilename() === '_git' && $file->getRelativePathname()) {
-        rename(
+        \rename(
           $file->getPathname(),
           $file->getPath() . DIRECTORY_SEPARATOR . '.git'
         );

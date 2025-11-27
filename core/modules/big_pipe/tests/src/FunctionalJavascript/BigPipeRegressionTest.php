@@ -69,7 +69,7 @@ JS;
     // </html> tags.
     $this->assertSession()
       ->responseContains(BigPipe::STOP_SIGNAL . "\n\n\n</body></html>");
-    $js_code_until_closing_body_tag = substr(BigPipeRegressionTestController::MARKER_2678662, 0, strpos(BigPipeRegressionTestController::MARKER_2678662, '</body>'));
+    $js_code_until_closing_body_tag = \substr(BigPipeRegressionTestController::MARKER_2678662, 0, \strpos(BigPipeRegressionTestController::MARKER_2678662, '</body>'));
     // The BigPipe start signal does NOT start at the closing </body> tag string
     // in an inline script.
     $this->assertSession()

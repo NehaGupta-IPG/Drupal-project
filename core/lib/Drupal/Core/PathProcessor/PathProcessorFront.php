@@ -39,14 +39,14 @@ class PathProcessorFront implements InboundPathProcessorInterface {
         // might be broken so stop execution.
         throw new NotFoundHttpException();
       }
-      $components = parse_url($path);
+      $components = \parse_url($path);
       // Remove query string and fragment.
       $path = $components['path'];
       // Merge query parameters from front page configuration value
       // with URL query, so that actual URL takes precedence.
       if (!empty($components['query'])) {
-        parse_str($components['query'], $parameters);
-        $parameters = array_replace($parameters, $request->query->all());
+        \parse_str($components['query'], $parameters);
+        $parameters = \array_replace($parameters, $request->query->all());
         $request->query->replace($parameters);
       }
     }

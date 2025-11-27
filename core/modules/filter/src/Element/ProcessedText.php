@@ -96,13 +96,13 @@ class ProcessedText extends RenderElementBase {
       $enabled = $filter->status === TRUE;
       $type = $filter->getType();
       // Prevent FilterInterface::TYPE_HTML_RESTRICTOR from being skipped.
-      $filter_type_must_be_applied = $type == FilterInterface::TYPE_HTML_RESTRICTOR || !in_array($type, $filter_types_to_skip);
+      $filter_type_must_be_applied = $type == FilterInterface::TYPE_HTML_RESTRICTOR || !\in_array($type, $filter_types_to_skip);
       return $enabled && $filter_type_must_be_applied;
     };
 
     // Convert all Windows and Mac newlines to a single newline, so filters only
     // need to deal with one possibility.
-    $text = str_replace(["\r\n", "\r"], "\n", $text);
+    $text = \str_replace(["\r\n", "\r"], "\n", $text);
 
     // Get a complete list of filters, ordered properly.
     /** @var \Drupal\filter\Plugin\FilterInterface[] $filters **/

@@ -63,11 +63,11 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
    */
   public static function validChoices(): array {
     $cke5_plugin_manager = \Drupal::service('plugin.manager.ckeditor5.plugin');
-    assert($cke5_plugin_manager instanceof CKEditor5PluginManagerInterface);
+    \assert($cke5_plugin_manager instanceof CKEditor5PluginManagerInterface);
     $plugin_definition = $cke5_plugin_manager->getDefinition('ckeditor5_heading');
-    assert($plugin_definition->getClass() === static::class);
-    return array_diff(
-      array_column($plugin_definition->getCKEditor5Config()['heading']['options'], 'model'),
+    \assert($plugin_definition->getClass() === static::class);
+    return \array_diff(
+      \array_column($plugin_definition->getCKEditor5Config()['heading']['options'], 'model'),
       static::ALWAYS_ENABLED_HEADINGS
     );
   }
@@ -80,7 +80,7 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
    *   configuration plus the headings that are always enabled.
    */
   private function getEnabledHeadings(): array {
-    return array_merge(
+    return \array_merge(
       self::ALWAYS_ENABLED_HEADINGS,
       $this->configuration['enabled_headings']
     );
@@ -101,7 +101,7 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
     foreach ($this->getPluginDefinition()->getCKEditor5Config()['heading']['options'] as $heading_option) {
       $model = $heading_option['model'];
 
-      if (in_array($model, self::ALWAYS_ENABLED_HEADINGS, TRUE)) {
+      if (\in_array($model, self::ALWAYS_ENABLED_HEADINGS, TRUE)) {
         continue;
       }
 
@@ -110,7 +110,7 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
       // @see https://ckeditor.com/docs/ckeditor5/latest/framework/guides/support/error-codes.html#error-schema-cannot-register-item-twice
       // @see https://ckeditor.com/docs/ckeditor5/latest/features/headings.html#configuring-custom-heading-elements
       $form['enabled_headings'][$model] = self::generateCheckboxForHeadingOption($heading_option);
-      $form['enabled_headings'][$model]['#default_value'] = in_array($model, $this->configuration['enabled_headings'], TRUE) ? $model : NULL;
+      $form['enabled_headings'][$model]['#default_value'] = \in_array($model, $this->configuration['enabled_headings'], TRUE) ? $model : NULL;
     }
 
     return $form;
@@ -122,7 +122,7 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     // Match the config schema structure at ckeditor5.plugin.ckeditor5_heading.
     $form_value = $form_state->getValue('enabled_headings');
-    $config_value = array_values(array_filter($form_value));
+    $config_value = \array_values(\array_filter($form_value));
     $form_state->setValue('enabled_headings', $config_value);
   }
 
@@ -148,8 +148,8 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
   private static function generateCheckboxForHeadingOption(array $heading_option): array {
     // This requires the `title` and `model` properties. The `class` property is
     // optional. The `view` property is not used.
-    assert(array_key_exists('title', $heading_option));
-    assert(array_key_exists('model', $heading_option));
+    \assert(\array_key_exists('title', $heading_option));
+    \assert(\array_key_exists('model', $heading_option));
 
     $checkbox = [
       '#type' => 'checkbox',
@@ -173,13 +173,13 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
     $enabled_headings = $this->getEnabledHeadings();
     $all_heading_options = $static_plugin_config['heading']['options'];
 
-    $configured_heading_options = array_filter($all_heading_options, function ($option) use ($enabled_headings) {
-      return in_array($option['model'], $enabled_headings, TRUE);
+    $configured_heading_options = \array_filter($all_heading_options, function ($option) use ($enabled_headings) {
+      return \in_array($option['model'], $enabled_headings, TRUE);
     });
 
     return [
       'heading' => [
-        'options' => array_values($configured_heading_options),
+        'options' => \array_values($configured_heading_options),
       ],
     ];
   }
@@ -214,7 +214,7 @@ class Heading extends CKEditor5PluginDefault implements CKEditor5PluginConfigura
     foreach ($enabled_headings as $model) {
       if (isset($heading_keyed_by_model[$model]) && isset($heading_keyed_by_model[$model]['view'])) {
         $element_as_tag = "<{$heading_keyed_by_model[$model]['view']}>";
-        if (in_array($element_as_tag, $elements, TRUE)) {
+        if (\in_array($element_as_tag, $elements, TRUE)) {
           $tags_to_return[] = "<{$heading_keyed_by_model[$model]['view']}>";
         }
       }

@@ -42,7 +42,7 @@ class LayoutBuilderIsActiveCacheContext implements CalculatedCacheContextInterfa
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Layout Builder');
+    return \t('Layout Builder');
   }
 
   /**

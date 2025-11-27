@@ -520,7 +520,7 @@ class RendererTest extends RendererTestBase {
     $output = (string) $this->renderer->renderRoot($elements);
 
     // The lowest weight element should appear last in $output.
-    $this->assertGreaterThan(strpos($output, $first), strpos($output, $second));
+    $this->assertGreaterThan(\strpos($output, $first), \strpos($output, $second));
 
     // Confirm that the $elements array has '#sorted' set to TRUE.
     $this->assertTrue($elements['#sorted'], "'#sorted' => TRUE was added to the array");
@@ -530,8 +530,8 @@ class RendererTest extends RendererTestBase {
     // \Drupal::service('renderer')->render() will return an empty string if
     // used on the same array in the same request.
     $children = Element::children($elements);
-    $this->assertSame('first', array_shift($children), 'Child found in the correct order.');
-    $this->assertSame('second', array_shift($children), 'Child found in the correct order.');
+    $this->assertSame('first', \array_shift($children), 'Child found in the correct order.');
+    $this->assertSame('second', \array_shift($children), 'Child found in the correct order.');
   }
 
   /**
@@ -558,7 +558,7 @@ class RendererTest extends RendererTestBase {
     $output = (string) $this->renderer->renderRoot($elements);
 
     // The elements should appear in output in the same order as the array.
-    $this->assertLessThan(strpos($output, $first), strpos($output, $second));
+    $this->assertLessThan(\strpos($output, $first), \strpos($output, $second));
   }
 
   /**
@@ -997,7 +997,7 @@ class RendererTest extends RendererTestBase {
         'keys' => ['render_cache_test'],
       ],
       // Collect expected property names.
-      '#cache_properties' => array_keys(array_filter($expected_results)),
+      '#cache_properties' => \array_keys(\array_filter($expected_results)),
       'child1' => ['#markup' => Markup::create('1')],
       'child2' => ['#markup' => Markup::create('2')],
       // Mark the value as safe.
@@ -1023,7 +1023,7 @@ class RendererTest extends RendererTestBase {
       }
     }
     // #custom_property_array can not be a safe_cache_property.
-    $safe_cache_properties = array_diff(Element::properties(array_filter($expected_results)), ['#custom_property_array']);
+    $safe_cache_properties = \array_diff(Element::properties(\array_filter($expected_results)), ['#custom_property_array']);
     foreach ($safe_cache_properties as $cache_property) {
       $this->assertInstanceOf(MarkupInterface::class, $data[$cache_property]);
     }

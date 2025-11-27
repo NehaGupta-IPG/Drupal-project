@@ -41,9 +41,9 @@ class ChangedTestItem extends ChangedItem {
       // @todo mock the time service in https://www.drupal.org/node/2908210.
       if ($this->getEntity()->language()->isDefault()) {
         // Wait 1.1 seconds because time_sleep_until() is not reliable.
-        time_sleep_until(time() + 1.1);
+        \time_sleep_until(\time() + 1.1);
       }
-      $this->value = time();
+      $this->value = \time();
     }
   }
 

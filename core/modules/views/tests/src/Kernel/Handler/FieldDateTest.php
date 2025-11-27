@@ -63,7 +63,7 @@ class FieldDateTest extends ViewsKernelTestBase {
   public function dataSet() {
     $data_set = parent::dataSet();
     foreach ($data_set as $i => $data) {
-      $data_set[$i]['destroyed'] = gmmktime(0, 0, 0, 1, 1, 2050);
+      $data_set[$i]['destroyed'] = \gmmktime(0, 0, 0, 1, 1, 2050);
     }
     return $data_set;
   }
@@ -92,7 +92,7 @@ class FieldDateTest extends ViewsKernelTestBase {
         'custom_date_format' => 'c',
       ],
     ]);
-    $time = gmmktime(0, 0, 0, 1, 1, 2000);
+    $time = \gmmktime(0, 0, 0, 1, 1, 2000);
 
     $this->executeView($view);
 
@@ -136,7 +136,7 @@ class FieldDateTest extends ViewsKernelTestBase {
     $this->assertRenderedDatesEqual($view, $intervals);
 
     // Check times in the future.
-    $time = gmmktime(0, 0, 0, 1, 1, 2050);
+    $time = \gmmktime(0, 0, 0, 1, 1, 2050);
     $formatted = $date_formatter->formatTimeDiffUntil($time);
     $intervals = [
       'raw time span' => "-$formatted",
@@ -168,7 +168,7 @@ class FieldDateTest extends ViewsKernelTestBase {
         $message = "$date_format format matches.";
       }
       $actual_result = (string) $view->field['created']->advancedRender($view->result[0]);
-      $this->assertEquals($expected_result, strip_tags($actual_result), $message);
+      $this->assertEquals($expected_result, \strip_tags($actual_result), $message);
     }
   }
 
@@ -186,7 +186,7 @@ class FieldDateTest extends ViewsKernelTestBase {
     foreach ($map as $format => $result) {
       $view->field['destroyed']->options['date_format'] = $format;
       $view_result = (string) $view->field['destroyed']->advancedRender($view->result[0]);
-      $this->assertEquals($result, strip_tags($view_result), "$format format matches.");
+      $this->assertEquals($result, \strip_tags($view_result), "$format format matches.");
     }
   }
 

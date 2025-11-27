@@ -50,7 +50,7 @@ class ConfigDraggableListBuilderTest extends BrowserTestBase {
 
     // Count the number of rows in table.
     $rows = $this->xpath('//form[@class="user-admin-roles-form"]/table/tbody/tr');
-    $this->assertGreaterThan(50, count($rows));
+    $this->assertGreaterThan(50, \count($rows));
     for ($i = 0; $i < 51; $i++) {
       $this->assertSession()->pageTextContains("Role $i");
     }

@@ -20,7 +20,7 @@ class EntityContextDefinition extends ContextDefinition {
   public function __construct($data_type = 'any', $label = NULL, $required = TRUE, $multiple = FALSE, $description = NULL, $default_value = NULL, array $constraints = []) {
     // Prefix the data type with 'entity:' so that this class can be constructed
     // like so: new EntityContextDefinition('node')
-    if (!str_starts_with($data_type, 'entity:')) {
+    if (!\str_starts_with($data_type, 'entity:')) {
       $data_type = "entity:$data_type";
     }
     parent::__construct($data_type, $label, $required, $multiple, $description, $default_value, $constraints);
@@ -34,7 +34,7 @@ class EntityContextDefinition extends ContextDefinition {
    */
   protected function getEntityTypeId() {
     // The data type is the entity type ID prefixed by 'entity:' (7 characters).
-    return substr($this->getDataType(), 7);
+    return \substr($this->getDataType(), 7);
   }
 
   /**

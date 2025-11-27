@@ -41,7 +41,7 @@ class BundleConstraint extends SymfonyConstraint {
    */
   public function getBundleOption() {
     // Support passing the bundle as string, but force it to be an array.
-    if (!is_array($this->bundle)) {
+    if (!\is_array($this->bundle)) {
       $this->bundle = [$this->bundle];
     }
     return $this->bundle;

@@ -33,8 +33,8 @@ class EntityTestMapField extends EntityTest {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['data'] = BaseFieldDefinition::create('map')
-      ->setLabel(t('Data'))
-      ->setDescription(t('A serialized array of additional data.'));
+      ->setLabel(\t('Data'))
+      ->setDescription(\t('A serialized array of additional data.'));
 
     return $fields;
   }

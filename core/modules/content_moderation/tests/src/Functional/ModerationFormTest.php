@@ -37,7 +37,7 @@ class ModerationFormTest extends ModerationStateTestBase {
    * {@inheritdoc}
    */
   protected function getAdministratorPermissions(): array {
-    return array_merge($this->permissions, [
+    return \array_merge($this->permissions, [
       'administer entity_test content',
       'view test entity',
       'translate any entity',
@@ -84,9 +84,9 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->submitForm(['moderation_state[0][state]' => 'draft'], 'Save');
 
     $node = $this->drupalGetNodeByTitle('Some moderated content');
-    $canonical_path = sprintf('node/%d', $node->id());
-    $edit_path = sprintf('node/%d/edit', $node->id());
-    $latest_version_path = sprintf('node/%d/latest', $node->id());
+    $canonical_path = \sprintf('node/%d', $node->id());
+    $edit_path = \sprintf('node/%d/edit', $node->id());
+    $latest_version_path = \sprintf('node/%d/latest', $node->id());
 
     $this->assertTrue($this->adminUser->hasPermission('edit any moderated_content content'));
 
@@ -276,10 +276,10 @@ class ModerationFormTest extends ModerationStateTestBase {
     $another_user = $this->drupalCreateUser($this->permissions);
     $this->grantUserPermissionToCreateContentOfType($another_user, 'moderated_content');
     $this->drupalLogin($another_user);
-    $this->drupalGet(sprintf('node/%d/latest', $node->id()));
+    $this->drupalGet(\sprintf('node/%d/latest', $node->id()));
     $this->submitForm(['new_state' => 'published'], 'Apply');
 
-    $this->drupalGet(sprintf('node/%d/revisions', $node->id()));
+    $this->drupalGet(\sprintf('node/%d/revisions', $node->id()));
     $this->assertSession()->pageTextContains('by ' . $another_user->getAccountName());
 
     // Verify the revision creation time has been updated.
@@ -314,9 +314,9 @@ class ModerationFormTest extends ModerationStateTestBase {
 
     $node = $this->drupalGetNodeByTitle('Some moderated content');
     $this->assertNotEmpty($node->language(), 'en');
-    $edit_path = sprintf('node/%d/edit', $node->id());
-    $translate_path = sprintf('node/%d/translations/add/en/fr', $node->id());
-    $latest_version_path = sprintf('node/%d/latest', $node->id());
+    $edit_path = \sprintf('node/%d/edit', $node->id());
+    $translate_path = \sprintf('node/%d/translations/add/en/fr', $node->id());
+    $latest_version_path = \sprintf('node/%d/latest', $node->id());
     $french = \Drupal::languageManager()->getLanguage('fr');
 
     $this->drupalGet($latest_version_path);
@@ -442,8 +442,8 @@ class ModerationFormTest extends ModerationStateTestBase {
 
     $node = $this->drupalGetNodeByTitle('Third moderated content');
     $this->assertNotEmpty($node->language(), 'en');
-    $edit_path = sprintf('node/%d/edit', $node->id());
-    $translate_path = sprintf('node/%d/translations/add/en/fr', $node->id());
+    $edit_path = \sprintf('node/%d/edit', $node->id());
+    $translate_path = \sprintf('node/%d/translations/add/en/fr', $node->id());
 
     // Translate it, without updating data (revision 2).
     $this->drupalGet($translate_path);

@@ -115,8 +115,8 @@ class BlockContentHooks {
     }
     if ($query instanceof SelectInterface && $query->getMetaData('entity_type') === 'block_content' && $query->hasTag('block_content_access')) {
       $data_table = \Drupal::entityTypeManager()->getDefinition('block_content')->getDataTable();
-      if (array_key_exists($data_table, $query->getTables()) && !_block_content_has_reusable_condition($query->conditions(), $query->getTables())) {
-        @trigger_error('Automatically filtering block_content entity reference selection queries to only reusable blocks is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Either add the condition manually in buildEntityQuery, or extend \Drupal\block_content\Plugin\EntityReferenceSelection\BlockContentSelection. See https://www.drupal.org/node/3521459', E_USER_DEPRECATED);
+      if (\array_key_exists($data_table, $query->getTables()) && !\_block_content_has_reusable_condition($query->conditions(), $query->getTables())) {
+        @\trigger_error('Automatically filtering block_content entity reference selection queries to only reusable blocks is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Either add the condition manually in buildEntityQuery, or extend \Drupal\block_content\Plugin\EntityReferenceSelection\BlockContentSelection. See https://www.drupal.org/node/3521459', E_USER_DEPRECATED);
         $query->condition("{$data_table}.reusable", TRUE);
       }
     }
@@ -132,7 +132,7 @@ class BlockContentHooks {
     $block_content = $variables['elements']['content']['#block_content'] ?? NULL;
     if ($block_content instanceof BlockContentInterface) {
       $bundle = $content['#block_content']->bundle();
-      $view_mode = strtr($variables['elements']['content']['#view_mode'], '.', '_');
+      $view_mode = \strtr($variables['elements']['content']['#view_mode'], '.', '_');
       $suggestions_new[] = 'block__block_content__view__' . $view_mode;
       $suggestions_new[] = 'block__block_content__type__' . $bundle;
       $suggestions_new[] = 'block__block_content__view_type__' . $bundle . '__' . $view_mode;
@@ -141,8 +141,8 @@ class BlockContentHooks {
         $suggestions_new[] = 'block__block_content__id_view__' . $variables['elements']['#id'] . '__' . $view_mode;
       }
       // Remove duplicate block__block_content.
-      $suggestions = array_unique($suggestions);
-      array_splice($suggestions, 1, 0, $suggestions_new);
+      $suggestions = \array_unique($suggestions);
+      \array_splice($suggestions, 1, 0, $suggestions_new);
     }
   }
 
@@ -156,7 +156,7 @@ class BlockContentHooks {
       $plugin = $entity->getPlugin();
       if ($plugin->getBaseId() === 'block_content') {
         $custom_block = \Drupal::entityTypeManager()->getStorage('block_content')->loadByProperties(['uuid' => $plugin->getDerivativeId()]);
-        $custom_block = reset($custom_block);
+        $custom_block = \reset($custom_block);
         if ($custom_block && $custom_block->access('update')) {
           $operations['block-edit'] = [
             'title' => $this->t('Edit block'),

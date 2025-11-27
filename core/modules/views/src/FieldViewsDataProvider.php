@@ -239,7 +239,7 @@ class FieldViewsDataProvider {
     $bundles_names = $field_storage->getBundles();
     // Build the list of additional fields to add to queries.
     $add_fields = ['delta', 'langcode', 'bundle'];
-    foreach (array_keys($field_columns) as $column) {
+    foreach (\array_keys($field_columns) as $column) {
       $add_fields[] = $table_mapping->getFieldColumnName($field_storage, $column);
     }
     // Determine the label to use for the field. We don't have a label available
@@ -265,7 +265,7 @@ class FieldViewsDataProvider {
         'group' => $group,
         'title' => $label,
         'title short' => $label,
-        'help' => $this->t('Appears in: @bundles.', ['@bundles' => implode(', ', $bundles_names)]),
+        'help' => $this->t('Appears in: @bundles.', ['@bundles' => \implode(', ', $bundles_names)]),
       ];
 
       // Go through and create a list of aliases for all possible combinations
@@ -305,11 +305,11 @@ class FieldViewsDataProvider {
         // Considering the dual use of this help data (both as metadata and as
         // help text), other patterns such as use of #markup would not be
         // correct here.
-        $data[$table_alias][$field_alias]['help'] = Markup::create($data[$table_alias][$field_alias]['help'] . ' ' . $this->t('Also known as:') . ' ' . implode(', ', $also_known));
+        $data[$table_alias][$field_alias]['help'] = Markup::create($data[$table_alias][$field_alias]['help'] . ' ' . $this->t('Also known as:') . ' ' . \implode(', ', $also_known));
       }
 
-      $keys = array_keys($field_columns);
-      $real_field = reset($keys);
+      $keys = \array_keys($field_columns);
+      $real_field = \reset($keys);
       $data[$table_alias][$field_alias]['field'] = [
         'table' => $table,
         'id' => 'field',
@@ -356,7 +356,7 @@ class FieldViewsDataProvider {
           break;
       }
 
-      if (count($field_columns) == 1 || $column == 'value') {
+      if (\count($field_columns) == 1 || $column == 'value') {
         $title = $this->t('@label (@name)', ['@label' => $label, '@name' => $field_name]);
         $title_short = $label;
       }
@@ -385,7 +385,7 @@ class FieldViewsDataProvider {
           'group' => $group,
           'title' => $title,
           'title short' => $title_short,
-          'help' => $this->t('Appears in: @bundles.', ['@bundles' => implode(', ', $bundles_names)]),
+          'help' => $this->t('Appears in: @bundles.', ['@bundles' => \implode(', ', $bundles_names)]),
         ];
 
         // Go through and create a list of aliases for all possible combinations
@@ -394,7 +394,7 @@ class FieldViewsDataProvider {
         $also_known = [];
         foreach ($all_labels as $label_name => $true) {
           if ($label != $label_name) {
-            if (count($field_columns) == 1 || $column == 'value') {
+            if (\count($field_columns) == 1 || $column == 'value') {
               $alias_title = $this->t('@label (@name)', ['@label' => $label_name, '@name' => $field_name]);
             }
             else {
@@ -419,7 +419,7 @@ class FieldViewsDataProvider {
           // Considering the dual use of this help data (both as metadata and as
           // help text), other patterns such as use of #markup would not be
           // correct here.
-          $data[$table_alias][$column_real_name]['help'] = Markup::create($data[$table_alias][$column_real_name]['help'] . ' ' . $this->t('Also known as:') . ' ' . implode(', ', $also_known));
+          $data[$table_alias][$column_real_name]['help'] = Markup::create($data[$table_alias][$column_real_name]['help'] . ' ' . $this->t('Also known as:') . ' ' . \implode(', ', $also_known));
         }
 
         $data[$table_alias][$column_real_name]['argument'] = [
@@ -465,7 +465,7 @@ class FieldViewsDataProvider {
             'group' => $group,
             'title' => $title_delta,
             'title short' => $title_short_delta,
-            'help' => $this->t('Delta - Appears in: @bundles.', ['@bundles' => implode(', ', $bundles_names)]),
+            'help' => $this->t('Delta - Appears in: @bundles.', ['@bundles' => \implode(', ', $bundles_names)]),
           ];
           $data[$table_alias]['delta']['field'] = [
             'id' => 'numeric',

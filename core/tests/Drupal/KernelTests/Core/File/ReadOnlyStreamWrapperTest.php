@@ -44,7 +44,7 @@ class ReadOnlyStreamWrapperTest extends FileTestBase {
     $filename = $this->randomMachineName();
     $site_path = $this->container->getParameter('site.path');
     $filepath = $site_path . '/files/' . $filename;
-    file_put_contents($filepath, $filename);
+    \file_put_contents($filepath, $filename);
 
     // Generate a read-only stream wrapper instance.
     $uri = $this->scheme . '://' . $filename;
@@ -52,38 +52,38 @@ class ReadOnlyStreamWrapperTest extends FileTestBase {
 
     $file_system = \Drupal::service('file_system');
     // Attempt to open a file in read/write mode.
-    $handle = @fopen($uri, 'r+');
+    $handle = @\fopen($uri, 'r+');
     $this->assertFalse($handle, 'Unable to open a file for reading and writing with the read-only stream wrapper.');
     // Attempt to open a file in binary read mode.
-    $handle = fopen($uri, 'rb');
+    $handle = \fopen($uri, 'rb');
     $this->assertNotFalse($handle, 'Able to open a file for reading in binary mode with the read-only stream wrapper.');
-    $this->assertTrue(fclose($handle), 'Able to close file opened in binary mode using the read_only stream wrapper.');
+    $this->assertTrue(\fclose($handle), 'Able to close file opened in binary mode using the read_only stream wrapper.');
     // Attempt to open a file in text read mode.
-    $handle = fopen($uri, 'rt');
+    $handle = \fopen($uri, 'rt');
     $this->assertNotFalse($handle, 'Able to open a file for reading in text mode with the read-only stream wrapper.');
-    $this->assertTrue(fclose($handle), 'Able to close file opened in text mode using the read_only stream wrapper.');
+    $this->assertTrue(\fclose($handle), 'Able to close file opened in text mode using the read_only stream wrapper.');
     // Attempt to open a file in read mode.
-    $handle = fopen($uri, 'r');
+    $handle = \fopen($uri, 'r');
     $this->assertNotFalse($handle, 'Able to open a file for reading with the read-only stream wrapper.');
     // Attempt to change file permissions.
-    $this->assertFalse(@chmod($uri, 0777), 'Unable to change file permissions when using read-only stream wrapper.');
+    $this->assertFalse(@\chmod($uri, 0777), 'Unable to change file permissions when using read-only stream wrapper.');
     // Attempt to acquire an exclusive lock for writing.
-    $this->assertFalse(@flock($handle, LOCK_EX | LOCK_NB), 'Unable to acquire an exclusive lock using the read-only stream wrapper.');
+    $this->assertFalse(@\flock($handle, LOCK_EX | LOCK_NB), 'Unable to acquire an exclusive lock using the read-only stream wrapper.');
     // Attempt to obtain a shared lock.
-    $this->assertTrue(flock($handle, LOCK_SH | LOCK_NB), 'Able to acquire a shared lock using the read-only stream wrapper.');
+    $this->assertTrue(\flock($handle, LOCK_SH | LOCK_NB), 'Able to acquire a shared lock using the read-only stream wrapper.');
     // Attempt to release a shared lock.
-    $this->assertTrue(flock($handle, LOCK_UN | LOCK_NB), 'Able to release a shared lock using the read-only stream wrapper.');
+    $this->assertTrue(\flock($handle, LOCK_UN | LOCK_NB), 'Able to release a shared lock using the read-only stream wrapper.');
     // Attempt to truncate the file.
-    $this->assertFalse(@ftruncate($handle, 0), 'Unable to truncate using the read-only stream wrapper.');
+    $this->assertFalse(@\ftruncate($handle, 0), 'Unable to truncate using the read-only stream wrapper.');
     // Attempt to write to the file.
-    $this->assertEquals(0, @fwrite($handle, $this->randomMachineName()), 'Unable to write to file using the read-only stream wrapper.');
+    $this->assertEquals(0, @\fwrite($handle, $this->randomMachineName()), 'Unable to write to file using the read-only stream wrapper.');
     // Attempt to flush output to the file.
-    $this->assertFalse(@fflush($handle), 'Unable to flush output to file using the read-only stream wrapper.');
+    $this->assertFalse(@\fflush($handle), 'Unable to flush output to file using the read-only stream wrapper.');
     // Attempt to close the stream.  (Suppress errors, as fclose triggers
     // fflush.)
-    $this->assertTrue(fclose($handle), 'Able to close file using the read_only stream wrapper.');
+    $this->assertTrue(\fclose($handle), 'Able to close file using the read_only stream wrapper.');
     // Test the rename() function.
-    $this->assertFalse(@rename($uri, $this->scheme . '://new_name.txt'), 'Unable to rename files using the read-only stream wrapper.');
+    $this->assertFalse(@\rename($uri, $this->scheme . '://new_name.txt'), 'Unable to rename files using the read-only stream wrapper.');
     // Test the unlink() function.
     $this->assertTrue(@$file_system->unlink($uri), 'Able to unlink file using read-only stream wrapper.');
     $this->assertFileExists($filepath);

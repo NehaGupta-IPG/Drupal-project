@@ -75,7 +75,7 @@ class PostgresqlDateSql implements DateSqlInterface {
    * {@inheritdoc}
    */
   public function getDateFormat($field, $format) {
-    $format = strtr($format, static::$replace);
+    $format = \strtr($format, static::$replace);
     return "TO_CHAR($field, '$format')";
   }
 

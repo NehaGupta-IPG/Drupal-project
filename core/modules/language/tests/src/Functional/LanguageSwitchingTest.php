@@ -248,8 +248,8 @@ class LanguageSwitchingTest extends BrowserTestBase {
       }
 
       $link = $list_item->find('xpath', 'a');
-      $anchor_classes = explode(" ", $link->getAttribute('class'));
-      if (in_array('is-active', $anchor_classes)) {
+      $anchor_classes = \explode(" ", $link->getAttribute('class'));
+      if (\in_array('is-active', $anchor_classes)) {
         $anchors['active'][] = $langcode;
       }
       else {
@@ -675,7 +675,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     // hook_language_switch_links_alter() to allow alternatives to be provided.
     $languages = \Drupal::languageManager()->getNativeLanguages();
     $links_for_alter = \Drupal::state()->get('language_test.language_switch_link_ids');
-    $this->assertSame(array_keys($languages), $links_for_alter);
+    $this->assertSame(\array_keys($languages), $links_for_alter);
   }
 
   /**

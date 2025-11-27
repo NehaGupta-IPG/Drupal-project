@@ -96,7 +96,7 @@ abstract class Tasks {
    *   TRUE if the PDO driver is supported, otherwise FALSE.
    */
   protected function hasPdoDriver() {
-    return in_array($this->pdoDriver, \PDO::getAvailableDrivers());
+    return \in_array($this->pdoDriver, \PDO::getAvailableDrivers());
   }
 
   /**
@@ -155,9 +155,9 @@ abstract class Tasks {
         if (!isset($task['function'])) {
           $task['function'] = 'runTestQuery';
         }
-        if (method_exists($this, $task['function'])) {
+        if (\method_exists($this, $task['function'])) {
           // Returning false is fatal. No other tasks can run.
-          if (FALSE === call_user_func_array([$this, $task['function']], $task['arguments'])) {
+          if (FALSE === \call_user_func_array([$this, $task['function']], $task['arguments'])) {
             break;
           }
         }
@@ -239,7 +239,7 @@ abstract class Tasks {
     // of database servers should know what they're doing, whether Drupal warns
     // them or not.
     // @see https://www.php.net/manual/en/function.version-compare.php
-    if ($this->minimumVersion() && version_compare(Database::getConnection()->version(), $this->minimumVersion() . '-AnyName', '<')) {
+    if ($this->minimumVersion() && \version_compare(Database::getConnection()->version(), $this->minimumVersion() . '-AnyName', '<')) {
       $this->fail($this->t("The database server version %version is less than the minimum required version %minimum_version.", [
         '%version' => Database::getConnection()
           ->version(),
@@ -262,8 +262,8 @@ abstract class Tasks {
     // @todo https:///www.drupal.org/node/3123240 Provide a better way to get
     //   the driver name.
     $reflection = new \ReflectionClass($this);
-    $dir_parts = explode(DIRECTORY_SEPARATOR, dirname($reflection->getFileName(), 2));
-    $driver = array_pop($dir_parts);
+    $dir_parts = \explode(DIRECTORY_SEPARATOR, \dirname($reflection->getFileName(), 2));
+    $driver = \array_pop($dir_parts);
 
     $form['database'] = [
       '#type' => 'textfield',
@@ -354,7 +354,7 @@ abstract class Tasks {
     $errors = [];
 
     // Verify the table prefix.
-    if (!empty($database['prefix']) && is_string($database['prefix']) && !preg_match('/^[A-Za-z0-9_.]+$/', $database['prefix'])) {
+    if (!empty($database['prefix']) && \is_string($database['prefix']) && !\preg_match('/^[A-Za-z0-9_.]+$/', $database['prefix'])) {
       $errors[$database['driver'] . '][prefix'] = $this->t('The database table prefix you have entered, %prefix, is invalid. The table prefix can only contain alphanumeric characters, periods, or underscores.', ['%prefix' => $database['prefix']]);
     }
 

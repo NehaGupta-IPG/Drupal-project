@@ -113,7 +113,7 @@ class BlockVisibility extends ProcessPluginBase implements ContainerFactoryPlugi
         }
       }
 
-      $visibility['user_role']['roles'] = array_combine($roles, $roles);
+      $visibility['user_role']['roles'] = \array_combine($roles, $roles);
     }
 
     if ($pages) {
@@ -132,18 +132,18 @@ class BlockVisibility extends ProcessPluginBase implements ContainerFactoryPlugi
         // anything else -- the block will simply have no PHP or request_path
         // visibility configuration.
         elseif ($this->skipPHP) {
-          throw new MigrateSkipRowException(sprintf("The block with bid '%d' from module '%s' will have no PHP or request_path visibility configuration.", $row->getSourceProperty('bid'), $row->getSourceProperty('module')));
+          throw new MigrateSkipRowException(\sprintf("The block with bid '%d' from module '%s' will have no PHP or request_path visibility configuration.", $row->getSourceProperty('bid'), $row->getSourceProperty('module')));
         }
       }
       else {
-        $paths = preg_split("(\r\n?|\n)", $pages);
+        $paths = \preg_split("(\r\n?|\n)", $pages);
         foreach ($paths as $key => $path) {
-          $paths[$key] = $path === '<front>' ? $path : '/' . ltrim($path, '/');
+          $paths[$key] = $path === '<front>' ? $path : '/' . \ltrim($path, '/');
         }
         $visibility['request_path'] = [
           'id' => 'request_path',
           'negate' => !$old_visibility,
-          'pages' => implode("\n", $paths),
+          'pages' => \implode("\n", $paths),
         ];
       }
     }

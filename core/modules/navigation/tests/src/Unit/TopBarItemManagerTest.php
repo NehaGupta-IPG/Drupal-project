@@ -79,7 +79,7 @@ class TopBarItemManagerTest extends UnitTestCase {
    */
   public function testDefinitions(): void {
     $definitions = $this->manager->getDefinitions();
-    $this->assertSame(['tools', 'context', 'actions', 'more_actions'], array_keys($definitions));
+    $this->assertSame(['tools', 'context', 'actions', 'more_actions'], \array_keys($definitions));
   }
 
   /**
@@ -89,11 +89,11 @@ class TopBarItemManagerTest extends UnitTestCase {
    */
   public function testGetDefinitionsByRegion(): void {
     $tools = $this->manager->getDefinitionsByRegion(TopBarRegion::Tools);
-    $this->assertSame(['tools'], array_keys($tools));
+    $this->assertSame(['tools'], \array_keys($tools));
     $context = $this->manager->getDefinitionsByRegion(TopBarRegion::Context);
-    $this->assertSame(['context'], array_keys($context));
+    $this->assertSame(['context'], \array_keys($context));
     $actions = $this->manager->getDefinitionsByRegion(TopBarRegion::Actions);
-    $this->assertSame(['actions', 'more_actions'], array_keys($actions));
+    $this->assertSame(['actions', 'more_actions'], \array_keys($actions));
   }
 
 }

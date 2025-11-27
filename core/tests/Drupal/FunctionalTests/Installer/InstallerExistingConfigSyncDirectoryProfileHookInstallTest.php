@@ -41,7 +41,7 @@ class InstallerExistingConfigSyncDirectoryProfileHookInstallTest extends Install
 function testing_config_install_multilingual_install() {
 }
 EOF;
-    file_put_contents("$path/{$this->profile}.install", $contents);
+    \file_put_contents("$path/{$this->profile}.install", $contents);
     parent::visitInstaller();
   }
 
@@ -90,7 +90,7 @@ EOF;
 
     // Remove the install hook and the option to install from existing
     // configuration will be available.
-    unlink("{$this->siteDirectory}/profiles/{$this->profile}/{$this->profile}.install");
+    \unlink("{$this->siteDirectory}/profiles/{$this->profile}/{$this->profile}.install");
     $this->getSession()->reload();
     $this->assertSession()->titleEquals('Select an installation profile | Drupal');
     $this->assertSession()->responseContains('Use existing configuration');

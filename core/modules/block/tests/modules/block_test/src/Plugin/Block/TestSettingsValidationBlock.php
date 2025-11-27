@@ -29,7 +29,7 @@ class TestSettingsValidationBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function blockValidate($form, FormStateInterface $form_state) {
-    if (!ctype_digit($form_state->getValue('digits'))) {
+    if (!\ctype_digit($form_state->getValue('digits'))) {
       $form_state->setErrorByName('digits', $this->t('Only digits are allowed'));
     }
   }

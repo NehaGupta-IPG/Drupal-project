@@ -46,7 +46,7 @@ abstract readonly class RelativeOrderBase implements OrderInterface {
     return new BeforeOrAfter(
       $identifier,
       $this->modules,
-      array_map(
+      \array_map(
         static function (array $class_and_method): string {
           if ($class_and_method[0] === ProceduralCall::class) {
             return $class_and_method[1];

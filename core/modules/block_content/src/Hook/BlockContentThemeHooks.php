@@ -29,7 +29,7 @@ class BlockContentThemeHooks {
   #[Hook('preprocess_entity_add_list')]
   public function preprocessEntityAddList(&$variables): void {
     $query = $this->requestStack->getCurrentRequest()->query->all();
-    if (count($query) === 0) {
+    if (\count($query) === 0) {
       return;
     }
 

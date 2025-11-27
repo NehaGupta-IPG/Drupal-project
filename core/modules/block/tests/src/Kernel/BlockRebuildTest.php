@@ -121,7 +121,7 @@ class BlockRebuildTest extends KernelTestBase {
     ];
     $this->assertEquals($expected, $messages);
 
-    $default_region = system_default_region('stark');
+    $default_region = \system_default_region('stark');
     $this->assertSame($default_region, $block1->getRegion());
     $this->assertFalse($block1->status());
     $this->assertSame($default_region, $block2->getRegion());

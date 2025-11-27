@@ -33,7 +33,7 @@ class ThemeCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Theme');
+    return \t('Theme');
   }
 
   /**

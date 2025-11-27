@@ -50,10 +50,10 @@ final class AddToAllBundles implements ConfigActionPluginInterface, ContainerFac
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
-    assert(is_array($value));
+    \assert(\is_array($value));
 
     $field_storage = $this->configManager->loadConfigEntityByName($configName);
-    assert($field_storage instanceof FieldStorageConfigInterface);
+    \assert($field_storage instanceof FieldStorageConfigInterface);
 
     $storage = $this->entityTypeManager->getStorage('field_config');
 
@@ -66,14 +66,14 @@ final class AddToAllBundles implements ConfigActionPluginInterface, ContainerFac
       ->execute();
 
     // Get all bundles of the target entity type.
-    $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
+    $bundles = \array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
     foreach ($bundles as $bundle) {
       $id = "$entity_type_id.$bundle.$field_name";
-      if (in_array($id, $existing_fields, TRUE)) {
+      if (\in_array($id, $existing_fields, TRUE)) {
         if (empty($value['fail_if_exists'])) {
           continue;
         }
-        throw new ConfigActionException(sprintf('Field %s already exists.', $id));
+        throw new ConfigActionException(\sprintf('Field %s already exists.', $id));
       }
       $storage->create([
         'label' => $value['label'],

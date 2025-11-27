@@ -68,7 +68,7 @@ class DbImportCommandTest extends KernelTestBase {
     foreach ($this->tables as $table) {
       $this->assertTrue($connection
         ->schema()
-        ->tableExists($table), strtr('Table @table created by the database script.', ['@table' => $table]));
+        ->tableExists($table), \strtr('Table @table created by the database script.', ['@table' => $table]));
     }
   }
 

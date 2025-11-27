@@ -98,7 +98,7 @@ class ExtensionAvailableConstraintValidatorTest extends KernelTestBase {
 
     $this->assertEquals($expected_violations, $violationMessages);
 
-    $expected = count($expected_violations);
+    $expected = \count($expected_violations);
     $this->assertCount($expected, $violations, 'Expected violations count matches actual violations count.');
   }
 

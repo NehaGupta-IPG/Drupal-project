@@ -38,7 +38,7 @@ class FieldFileTest extends UnitTestCase {
     $value = [
       'fid' => 1,
       'list' => TRUE,
-      'data' => serialize($options),
+      'data' => \serialize($options),
     ];
 
     $transformed = $plugin->transform($value, $executable, $row, 'foo');

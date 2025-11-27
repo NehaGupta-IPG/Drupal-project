@@ -235,7 +235,7 @@ class ContentModerationHooks {
     // state for the workflow.
     if ($entity instanceof WorkflowInterface) {
       $configuration = $entity->getTypePlugin()->getConfiguration();
-      if (!empty($configuration['default_moderation_state']) && $operation === sprintf('delete-state:%s', $configuration['default_moderation_state'])) {
+      if (!empty($configuration['default_moderation_state']) && $operation === \sprintf('delete-state:%s', $configuration['default_moderation_state'])) {
         return AccessResult::forbidden()->addCacheableDependency($entity);
       }
     }
@@ -371,7 +371,7 @@ class ContentModerationHooks {
     // @todo Remove this once broken handlers in views configuration result in
     //   a view no longer returning results. https://www.drupal.org/i/2907954.
     foreach ($view->filter as $id => $filter) {
-      if (str_starts_with($id, 'moderation_state') && $filter instanceof Broken) {
+      if (\str_starts_with($id, 'moderation_state') && $filter instanceof Broken) {
         $view->result = [];
         break;
       }

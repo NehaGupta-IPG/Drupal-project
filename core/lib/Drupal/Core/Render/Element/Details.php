@@ -85,7 +85,7 @@ class Details extends RenderElementBase {
 
     // Do not render optional details elements if there are no children.
     if (isset($element['#parents'])) {
-      $group = implode('][', $element['#parents']);
+      $group = \implode('][', $element['#parents']);
       if (!empty($element['#optional']) && !Element::getVisibleChildren($element['#groups'][$group])) {
         $element['#printed'] = TRUE;
       }

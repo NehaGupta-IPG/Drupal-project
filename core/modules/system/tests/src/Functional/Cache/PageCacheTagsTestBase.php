@@ -39,14 +39,14 @@ abstract class PageCacheTagsTestBase extends BrowserTestBase {
     $this->drupalGet($url);
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', $hit_or_miss);
 
-    if ($hit_or_miss === 'HIT' && is_array($tags)) {
+    if ($hit_or_miss === 'HIT' && \is_array($tags)) {
       $absolute_url = $url->setAbsolute()->toString();
       $cid_parts = [$absolute_url, ''];
-      $cid = implode(':', $cid_parts);
+      $cid = \implode(':', $cid_parts);
       $cache_entry = \Drupal::cache('page')->get($cid);
-      sort($cache_entry->tags);
-      $tags = array_unique($tags);
-      sort($tags);
+      \sort($cache_entry->tags);
+      $tags = \array_unique($tags);
+      \sort($tags);
       $this->assertSame($cache_entry->tags, $tags);
     }
   }

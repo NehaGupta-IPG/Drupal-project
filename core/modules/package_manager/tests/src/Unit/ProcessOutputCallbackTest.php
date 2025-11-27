@@ -77,11 +77,11 @@ class ProcessOutputCallbackTest extends UnitTestCase {
       'another value' => 'I have another value!',
       'one' => 1,
     ];
-    $json = json_encode($data, JSON_PRETTY_PRINT);
+    $json = \json_encode($data, JSON_PRETTY_PRINT);
     // Ensure the JSON is a multi-line string.
-    $this->assertGreaterThan(1, substr_count($json, "\n"));
+    $this->assertGreaterThan(1, \substr_count($json, "\n"));
     $expected_output = [];
-    foreach (explode("\n", $json) as $line) {
+    foreach (\explode("\n", $json) as $line) {
       $callback(OutputTypeEnum::OUT, "$line\n");
       $expected_output[] = "$line\n";
     }
@@ -111,7 +111,7 @@ class ProcessOutputCallbackTest extends UnitTestCase {
     // The output buffer will no longer be valid JSON, so don't try to parse it.
     $this->assertSame($expected_output, $callback->getOutput());
     $this->assertSame($expected_error, $callback->getErrorOutput());
-    $this->assertTrue($logger->hasWarning(implode('', $expected_error)));
+    $this->assertTrue($logger->hasWarning(\implode('', $expected_error)));
     // The previously logged error output should still be there.
     $this->assertTrue($logger->hasWarning('Oh no, what happened?Really what happened?!'));
 

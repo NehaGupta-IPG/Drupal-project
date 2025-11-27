@@ -151,7 +151,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
    */
   public function open() {
     if (!empty($this->uri)) {
-      $this->fd = fopen($this->uri, 'rb');
+      $this->fd = \fopen($this->uri, 'rb');
       $this->readHeader();
     }
     else {
@@ -167,7 +167,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
    */
   public function close() {
     if ($this->fd) {
-      fclose($this->fd);
+      \fclose($this->fd);
     }
     else {
       throw new \Exception('Cannot close stream that is not open.');
@@ -182,7 +182,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
     $this->lastItem = NULL;
 
     // Read until finished with the stream or a complete item was identified.
-    while (!$this->finished && is_null($this->lastItem)) {
+    while (!$this->finished && \is_null($this->lastItem)) {
       $this->readLine();
     }
 
@@ -196,14 +196,14 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
    *   The new seek position to set.
    */
   public function setSeek($seek) {
-    fseek($this->fd, $seek);
+    \fseek($this->fd, $seek);
   }
 
   /**
    * Gets the pointer position of the current PO stream.
    */
   public function getSeek() {
-    return ftell($this->fd);
+    return \ftell($this->fd);
   }
 
   /**
@@ -220,7 +220,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
       return;
     }
     $header = new PoHeader();
-    $header->setFromString(trim($item->getTranslation()));
+    $header->setFromString(\trim($item->getTranslation()));
     $this->header = $header;
   }
 
@@ -245,14 +245,14 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
   private function readLine() {
     // Read a line and set the stream finished indicator if it was not
     // possible anymore.
-    $line = fgets($this->fd);
+    $line = \fgets($this->fd);
     $this->finished = ($line === FALSE);
 
     if (!$this->finished) {
 
       if ($this->lineNumber == 0) {
         // The first line might come with a UTF-8 BOM, which should be removed.
-        $line = str_replace("\xEF\xBB\xBF", '', $line);
+        $line = \str_replace("\xEF\xBB\xBF", '', $line);
         // Current plurality for 'msgstr[]'.
         $this->currentPluralIndex = 0;
       }
@@ -268,14 +268,14 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
 
       // Trim away the linefeed. \\n might appear at the end of the string if
       // another line continuing the same string follows. We can remove that.
-      $line = trim(strtr($line, ["\\\n" => ""]));
+      $line = \trim(\strtr($line, ["\\\n" => ""]));
 
-      if (!strncmp('#', $line, 1)) {
+      if (!\strncmp('#', $line, 1)) {
         // Lines starting with '#' are comments.
 
         if ($this->context == 'COMMENT') {
           // Already in comment context, add to current comment.
-          $this->currentItem['#'][] = substr($line, 1);
+          $this->currentItem['#'][] = \substr($line, 1);
         }
         elseif (($this->context == 'MSGSTR') || ($this->context == 'MSGSTR_ARR')) {
           // We are currently in string context, save current item.
@@ -283,7 +283,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
 
           // Start a new entry for the comment.
           $this->currentItem = [];
-          $this->currentItem['#'][] = substr($line, 1);
+          $this->currentItem['#'][] = \substr($line, 1);
 
           $this->context = 'COMMENT';
           return;
@@ -295,7 +295,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         }
         return;
       }
-      elseif (!strncmp('msgid_plural', $line, 12)) {
+      elseif (!\strncmp('msgid_plural', $line, 12)) {
         // A plural form for the current source string.
 
         if ($this->context != 'MSGID') {
@@ -305,7 +305,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         }
 
         // Remove 'msgid_plural' and trim away whitespace.
-        $line = trim(substr($line, 12));
+        $line = \trim(\substr($line, 12));
 
         // Only the plural source string is left, parse it.
         $quoted = $this->parseQuoted($line);
@@ -316,7 +316,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         }
 
         // Append the plural source to the current entry.
-        if (is_string($this->currentItem['msgid'])) {
+        if (\is_string($this->currentItem['msgid'])) {
           // The first value was stored as string. Now we know the context is
           // plural, it is converted to array.
           $this->currentItem['msgid'] = [$this->currentItem['msgid']];
@@ -326,7 +326,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         $this->context = 'MSGID_PLURAL';
         return;
       }
-      elseif (!strncmp('msgid', $line, 5)) {
+      elseif (!\strncmp('msgid', $line, 5)) {
         // Starting a new message.
 
         if (($this->context == 'MSGSTR') || ($this->context == 'MSGSTR_ARR')) {
@@ -344,7 +344,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         }
 
         // Remove 'msgid' and trim away whitespace.
-        $line = trim(substr($line, 5));
+        $line = \trim(\substr($line, 5));
 
         // Only the message id string is left, parse it.
         $quoted = $this->parseQuoted($line);
@@ -358,7 +358,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         $this->context = 'MSGID';
         return;
       }
-      elseif (!strncmp('msgctxt', $line, 7)) {
+      elseif (!\strncmp('msgctxt', $line, 7)) {
         // Starting a new context.
 
         if (($this->context == 'MSGSTR') || ($this->context == 'MSGSTR_ARR')) {
@@ -373,7 +373,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         }
 
         // Remove 'msgctxt' and trim away whitespaces.
-        $line = trim(substr($line, 7));
+        $line = \trim(\substr($line, 7));
 
         // Only the msgctxt string is left, parse it.
         $quoted = $this->parseQuoted($line);
@@ -388,7 +388,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         $this->context = 'MSGCTXT';
         return;
       }
-      elseif (!strncmp('msgstr[', $line, 7)) {
+      elseif (!\strncmp('msgstr[', $line, 7)) {
         // A message string for a specific plurality.
 
         if (($this->context != 'MSGID') &&
@@ -402,18 +402,18 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         }
 
         // Ensure the plurality is terminated.
-        if (!str_contains($line, ']')) {
+        if (!\str_contains($line, ']')) {
           $this->errors[] = new FormattableMarkup('The translation stream %uri contains an error: invalid format for "msgstr[]" on line %line.', $log_vars);
           return FALSE;
         }
 
         // Extract the plurality.
-        $from_bracket = strstr($line, '[');
-        $this->currentPluralIndex = substr($from_bracket, 1, strpos($from_bracket, ']') - 1);
+        $from_bracket = \strstr($line, '[');
+        $this->currentPluralIndex = \substr($from_bracket, 1, \strpos($from_bracket, ']') - 1);
 
         // Skip to the next whitespace and trim away any further whitespace,
         // bringing $line to the message text only.
-        $line = trim(strstr($line, " "));
+        $line = \trim(\strstr($line, " "));
 
         $quoted = $this->parseQuoted($line);
         if ($quoted === FALSE) {
@@ -421,7 +421,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
           $this->errors[] = new FormattableMarkup('The translation stream %uri contains an error: invalid format for "msgstr[]" on line %line.', $log_vars);
           return FALSE;
         }
-        if (!isset($this->currentItem['msgstr']) || !is_array($this->currentItem['msgstr'])) {
+        if (!isset($this->currentItem['msgstr']) || !\is_array($this->currentItem['msgstr'])) {
           $this->currentItem['msgstr'] = [];
         }
 
@@ -430,7 +430,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         $this->context = 'MSGSTR_ARR';
         return;
       }
-      elseif (!strncmp("msgstr", $line, 6)) {
+      elseif (!\strncmp("msgstr", $line, 6)) {
         // A string pair for an msgid (with optional context).
 
         if (($this->context != 'MSGID') && ($this->context != 'MSGCTXT')) {
@@ -440,7 +440,7 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
         }
 
         // Remove 'msgstr' and trim away whitespaces.
-        $line = trim(substr($line, 6));
+        $line = \trim(\substr($line, 6));
 
         // Only the msgstr string is left, parse it.
         $quoted = $this->parseQuoted($line);
@@ -468,9 +468,9 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
 
         // Append the string to the current item.
         if (($this->context == 'MSGID') || ($this->context == 'MSGID_PLURAL')) {
-          if (is_array($this->currentItem['msgid'])) {
+          if (\is_array($this->currentItem['msgid'])) {
             // Add string to last array element for plural sources.
-            $last_index = count($this->currentItem['msgid']) - 1;
+            $last_index = \count($this->currentItem['msgid']) - 1;
             $this->currentItem['msgid'][$last_index] .= $quoted;
           }
           else {
@@ -521,9 +521,9 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
       $comments = $this->shortenComments($value['#']);
     }
 
-    if (is_array($value['msgstr'])) {
+    if (\is_array($value['msgstr'])) {
       // Sort plural variants by their form index.
-      ksort($value['msgstr']);
+      \ksort($value['msgstr']);
       $plural = TRUE;
     }
 
@@ -551,15 +551,15 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
    *   invalid.
    */
   public function parseQuoted($string) {
-    if (substr($string, 0, 1) != substr($string, -1, 1)) {
+    if (\substr($string, 0, 1) != \substr($string, -1, 1)) {
       // Start and end quotes must be the same.
       return FALSE;
     }
-    $quote = substr($string, 0, 1);
-    $string = substr($string, 1, -1);
+    $quote = \substr($string, 0, 1);
+    $string = \substr($string, 1, -1);
     if ($quote == '"') {
       // Double quotes: strip slashes.
-      return stripcslashes($string);
+      return \stripcslashes($string);
     }
     elseif ($quote == "'") {
       // Simple quote: return as-is.
@@ -582,16 +582,16 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
    */
   private function shortenComments($comment) {
     $comm = '';
-    while (count($comment)) {
-      $test = $comm . substr(array_shift($comment), 1) . ', ';
-      if (strlen($comm) < 130) {
+    while (\count($comment)) {
+      $test = $comm . \substr(\array_shift($comment), 1) . ', ';
+      if (\strlen($comm) < 130) {
         $comm = $test;
       }
       else {
         break;
       }
     }
-    return trim(substr($comm, 0, -2));
+    return \trim(\substr($comm, 0, -2));
   }
 
 }

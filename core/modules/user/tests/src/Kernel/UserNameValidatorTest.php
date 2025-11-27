@@ -85,10 +85,10 @@ class UserNameValidatorTest extends KernelTestBase {
       'empty string' => ['', 'You must enter a username.'],
       'invalid chars' => ['foo/', 'The username contains an illegal character.'],
       // NULL.
-      'contains chr(0)' => ['foo' . chr(0) . 'bar', 'The username contains an illegal character.'],
+      'contains chr(0)' => ['foo' . \chr(0) . 'bar', 'The username contains an illegal character.'],
       // CR.
-      'contains chr(13)' => ['foo' . chr(13) . 'bar', 'The username contains an illegal character.'],
-      'excessively long' => [str_repeat('x', UserInterface::USERNAME_MAX_LENGTH + 1),
+      'contains chr(13)' => ['foo' . \chr(13) . 'bar', 'The username contains an illegal character.'],
+      'excessively long' => [\str_repeat('x', UserInterface::USERNAME_MAX_LENGTH + 1),
         'The username xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is too long: it must be 60 characters or less.',
       ],
     ];

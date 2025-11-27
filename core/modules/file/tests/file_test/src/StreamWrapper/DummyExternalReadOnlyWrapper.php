@@ -39,7 +39,7 @@ class DummyExternalReadOnlyWrapper extends ReadOnlyStream {
    * {@inheritdoc}
    */
   public function getExternalUrl() {
-    [, $target] = explode('://', $this->uri, 2);
+    [, $target] = \explode('://', $this->uri, 2);
     return 'https://www.dummy-external-readonly.com/' . $target;
   }
 

@@ -205,16 +205,16 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
     $actual = $this->nodeStorage->loadRevision($revision['vid'])
       ->getTranslation($revision['langcode']);
     $this->assertInstanceOf(NodeInterface::class, $actual);
-    $this->assertSame($revision['title'], $actual->getTitle(), sprintf("Title '%s' does not match actual '%s' for revision '%d' langcode '%s'", $revision['title'], $actual->getTitle(), $revision['vid'], $revision['langcode']));
-    $this->assertSame($revision['revision_translation_affected'], $actual->get('revision_translation_affected')->value, sprintf("revision_translation_affected '%s' does not match actual '%s' for revision '%d' langcode '%s'", $revision['revision_translation_affected'], $actual->get('revision_translation_affected')->value, $revision['vid'], $revision['langcode']));
+    $this->assertSame($revision['title'], $actual->getTitle(), \sprintf("Title '%s' does not match actual '%s' for revision '%d' langcode '%s'", $revision['title'], $actual->getTitle(), $revision['vid'], $revision['langcode']));
+    $this->assertSame($revision['revision_translation_affected'], $actual->get('revision_translation_affected')->value, \sprintf("revision_translation_affected '%s' does not match actual '%s' for revision '%d' langcode '%s'", $revision['revision_translation_affected'], $actual->get('revision_translation_affected')->value, $revision['vid'], $revision['langcode']));
 
-    $this->assertSame($data['revision_created'], $actual->getRevisionCreationTime(), sprintf("Creation time '%s' does not match actual '%s' for revision '%d' langcode '%s'", $data['revision_created'], $actual->getRevisionCreationTime(), $revision['vid'], $revision['langcode']));
-    $this->assertSame($data['log'], $actual->getRevisionLogMessage(), sprintf("Revision log '%s' does not match actual '%s' for revision '%d' langcode '%s'", var_export($data['log'], TRUE), $actual->getRevisionLogMessage(), $revision['vid'], $revision['langcode']));
+    $this->assertSame($data['revision_created'], $actual->getRevisionCreationTime(), \sprintf("Creation time '%s' does not match actual '%s' for revision '%d' langcode '%s'", $data['revision_created'], $actual->getRevisionCreationTime(), $revision['vid'], $revision['langcode']));
+    $this->assertSame($data['log'], $actual->getRevisionLogMessage(), \sprintf("Revision log '%s' does not match actual '%s' for revision '%d' langcode '%s'", \var_export($data['log'], TRUE), $actual->getRevisionLogMessage(), $revision['vid'], $revision['langcode']));
     if (isset($data['field_text_long_plain'])) {
-      $this->assertSame($data['field_text_long_plain'], $actual->field_text_long_plain->value, sprintf("field_text_long_plain value '%s' does not match actual '%s' for revision '%d' langcode '%s'", var_export($data['field_text_long_plain'], TRUE), $actual->field_text_long_plain->value, $revision['vid'], $revision['langcode']));
+      $this->assertSame($data['field_text_long_plain'], $actual->field_text_long_plain->value, \sprintf("field_text_long_plain value '%s' does not match actual '%s' for revision '%d' langcode '%s'", \var_export($data['field_text_long_plain'], TRUE), $actual->field_text_long_plain->value, $revision['vid'], $revision['langcode']));
     }
     if (isset($data['field_tree'])) {
-      $this->assertSame($data['field_tree'], $actual->field_tree->value, sprintf("field_tree value '%s' does not match actual '%s' for revision '%d' langcode '%s'", var_export($data['field_tree'], TRUE), $actual->field_tree->value, $revision['vid'], $revision['langcode']));
+      $this->assertSame($data['field_tree'], $actual->field_tree->value, \sprintf("field_tree value '%s' does not match actual '%s' for revision '%d' langcode '%s'", \var_export($data['field_tree'], TRUE), $actual->field_tree->value, $revision['vid'], $revision['langcode']));
     }
 
   }

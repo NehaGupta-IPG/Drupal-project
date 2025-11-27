@@ -89,7 +89,7 @@ class ViewsUIController extends ControllerBase {
     }
 
     // Sort rows by field name.
-    ksort($rows);
+    \ksort($rows);
     $output = [
       '#type' => 'table',
       '#header' => $header,
@@ -123,7 +123,7 @@ class ViewsUIController extends ControllerBase {
     }
 
     // Sort rows by field name.
-    ksort($rows);
+    \ksort($rows);
     return [
       '#type' => 'table',
       '#header' => [$this->t('Type'), $this->t('Name'), $this->t('Provided by'), $this->t('Used in')],
@@ -181,11 +181,11 @@ class ViewsUIController extends ControllerBase {
     foreach ($views as $view) {
       $view_tag = $view->get('tag');
       foreach (Tags::explode($view_tag) as $tag) {
-        if ($tag && !in_array($tag, $tags, TRUE)) {
+        if ($tag && !\in_array($tag, $tags, TRUE)) {
           $tags[] = $tag;
-          if (mb_stripos($tag, $string) !== FALSE) {
+          if (\mb_stripos($tag, $string) !== FALSE) {
             $matches[] = ['value' => $tag, 'label' => Html::escape($tag)];
-            if (count($matches) >= 10) {
+            if (\count($matches) >= 10) {
               break 2;
             }
           }

@@ -79,12 +79,12 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->drupalLogin($this->account);
 
     $image_files = $this->drupalGetTestFiles('image');
-    $this->image = File::create((array) current($image_files));
+    $this->image = File::create((array) \current($image_files));
 
-    [, $this->imageExtension] = explode('.', $this->image->getFilename());
+    [, $this->imageExtension] = \explode('.', $this->image->getFilename());
     $this->assertFileExists($this->image->getFileUri());
 
-    $this->phpFile = current($this->drupalGetTestFiles('php'));
+    $this->phpFile = \current($this->drupalGetTestFiles('php'));
     $this->assertFileExists($this->phpFile->uri);
 
     $this->maxFidBefore = (int) \Drupal::entityQueryAggregate('file')
@@ -122,13 +122,13 @@ class SaveUploadTest extends FileManagedTestBase {
     $file1 = File::load($max_fid_after);
     $this->assertInstanceOf(File::class, $file1);
     // MIME type of the uploaded image may be either image/jpeg or image/png.
-    $this->assertEquals('image', substr($file1->getMimeType(), 0, 5), 'A MIME type was set.');
+    $this->assertEquals('image', \substr($file1->getMimeType(), 0, 5), 'A MIME type was set.');
 
     // Reset the hook counters to get rid of the 'load' we just called.
     FileTestHelper::reset();
 
     // Upload a second file.
-    $image2 = current($this->drupalGetTestFiles('image'));
+    $image2 = \current($this->drupalGetTestFiles('image'));
     $edit = ['files[file_test_upload]' => \Drupal::service('file_system')->realpath($image2->uri)];
     $this->drupalGet('file-test/upload');
     $this->submitForm($edit, 'Submit');
@@ -145,7 +145,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $file2 = File::load($max_fid_after);
     $this->assertInstanceOf(File::class, $file2);
     // MIME type of the uploaded image may be either image/jpeg or image/png.
-    $this->assertEquals('image', substr($file2->getMimeType(), 0, 5), 'A MIME type was set.');
+    $this->assertEquals('image', \substr($file2->getMimeType(), 0, 5), 'A MIME type was set.');
 
     // Load both files using File::loadMultiple().
     $files = File::loadMultiple([$file1->id(), $file2->id()]);
@@ -153,7 +153,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->assertTrue(isset($files[$file2->id()]), 'File was loaded successfully');
 
     // Upload a third file to a subdirectory.
-    $image3 = current($this->drupalGetTestFiles('image'));
+    $image3 = \current($this->drupalGetTestFiles('image'));
     $image3_realpath = \Drupal::service('file_system')->realpath($image3->uri);
     $dir = $this->randomMachineName();
     $edit = [
@@ -164,7 +164,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("You WIN!");
-    $this->assertFileExists('temporary://' . $dir . '/' . trim(basename($image3_realpath)));
+    $this->assertFileExists('temporary://' . $dir . '/' . \trim(\basename($image3_realpath)));
   }
 
   /**
@@ -172,7 +172,7 @@ class SaveUploadTest extends FileManagedTestBase {
    */
   public function testDuplicate(): void {
     // It should not be possible to create two managed files with the same URI.
-    $image1 = current($this->drupalGetTestFiles('image'));
+    $image1 = \current($this->drupalGetTestFiles('image'));
     $edit = ['files[file_test_upload]' => \Drupal::service('file_system')->realpath($image1->uri)];
     $this->drupalGet('file-test/upload');
     $this->submitForm($edit, 'Submit');
@@ -186,7 +186,7 @@ class SaveUploadTest extends FileManagedTestBase {
     // time, by removing the first uploaded file from disk (leaving the entry in
     // the file_managed table) before trying to upload another file with the
     // same name.
-    unlink(\Drupal::service('file_system')->realpath($file1->getFileUri()));
+    \unlink(\Drupal::service('file_system')->realpath($file1->getFileUri()));
 
     $image2 = $image1;
     $edit = ['files[file_test_upload]' => \Drupal::service('file_system')->realpath($image2->uri)];
@@ -386,7 +386,7 @@ class SaveUploadTest extends FileManagedTestBase {
    */
   public function testHandleDotFile(): void {
     $dot_file = $this->siteDirectory . '/.test';
-    file_put_contents($dot_file, 'This is a test');
+    \file_put_contents($dot_file, 'This is a test');
     $config = $this->config('system.file');
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
@@ -459,7 +459,7 @@ class SaveUploadTest extends FileManagedTestBase {
     ];
 
     $munged_filename = $this->image->getFilename();
-    $munged_filename = substr($munged_filename, 0, strrpos($munged_filename, '.'));
+    $munged_filename = \substr($munged_filename, 0, \strrpos($munged_filename, '.'));
     $munged_filename .= '_.' . $this->imageExtension;
 
     $this->drupalGet('file-test/upload');
@@ -759,7 +759,7 @@ class SaveUploadTest extends FileManagedTestBase {
     $this->assertSession()->responseContains('field is required');
 
     // Confirm that uploading another file works.
-    $image = current($this->drupalGetTestFiles('image'));
+    $image = \current($this->drupalGetTestFiles('image'));
     $edit = ['files[file_test_upload]' => \Drupal::service('file_system')->realpath($image->uri)];
     $this->drupalGet('file-test/upload_required');
     $this->submitForm($edit, 'Submit');

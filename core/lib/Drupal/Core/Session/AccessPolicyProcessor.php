@@ -64,7 +64,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     $switch_account = FALSE;
     if ($this->currentUser->id() !== $account->id()) {
       foreach ($persistent_cache_contexts as $cache_context) {
-        [$cache_context_root] = explode('.', $cache_context, 2);
+        [$cache_context_root] = \explode('.', $cache_context, 2);
         if ($cache_context_root === 'user') {
           $switch_account = TRUE;
           $this->accountSwitcher->switchTo($account);
@@ -106,7 +106,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
 
         $policy_permissions = $access_policy->calculatePermissions($account, $scope);
         if (!$this->validateScope($scope, $policy_permissions)) {
-          throw new AccessPolicyScopeException(sprintf('The access policy "%s" returned permissions for scopes other than "%s".', get_class($access_policy), $scope));
+          throw new AccessPolicyScopeException(\sprintf('The access policy "%s" returned permissions for scopes other than "%s".', \get_class($access_policy), $scope));
         }
 
         $calculated_permissions = $calculated_permissions->merge($policy_permissions);
@@ -120,7 +120,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
 
         $access_policy->alterPermissions($account, $scope, $calculated_permissions);
         if (!$this->validateScope($scope, $calculated_permissions)) {
-          throw new AccessPolicyScopeException(sprintf('The access policy "%s" altered permissions in a scope other than "%s".', get_class($access_policy), $scope));
+          throw new AccessPolicyScopeException(\sprintf('The access policy "%s" altered permissions in a scope other than "%s".', \get_class($access_policy), $scope));
         }
       }
 
@@ -179,7 +179,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
         $contexts[] = $access_policy->getPersistentCacheContexts();
       }
     }
-    $contexts = array_merge(...$contexts);
+    $contexts = \array_merge(...$contexts);
 
     // Store the contexts in the regular static cache.
     $this->static->set($cid, $contexts);

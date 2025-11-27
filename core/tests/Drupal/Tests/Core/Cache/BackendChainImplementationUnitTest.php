@@ -205,7 +205,7 @@ class BackendChainImplementationUnitTest extends UnitTestCase {
   public function testDeleteAllPropagation(): void {
     // Set both expiring and permanent keys.
     $this->chain->set('test1', 1, Cache::PERMANENT);
-    $this->chain->set('test2', 3, time() + 1000);
+    $this->chain->set('test2', 3, \time() + 1000);
     $this->chain->deleteAll();
 
     $this->assertFalse($this->firstBackend->get('test1'), 'First key has been deleted in first backend.');

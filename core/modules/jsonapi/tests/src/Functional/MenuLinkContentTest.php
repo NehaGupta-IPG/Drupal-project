@@ -94,7 +94,7 @@ class MenuLinkContentTest extends ResourceTestBase {
     $self_url = clone $base_url;
     $version_identifier = 'id:' . $this->entity->getRevisionId();
     $self_url = $self_url->setOption('query', ['resourceVersion' => $version_identifier]);
-    $version_query_string = '?resourceVersion=' . urlencode($version_identifier);
+    $version_query_string = '?resourceVersion=' . \urlencode($version_identifier);
     return [
       'jsonapi' => [
         'meta' => [
@@ -203,7 +203,7 @@ class MenuLinkContentTest extends ResourceTestBase {
 
     $document = $this->getPostDocument();
     $document['data']['attributes']['link']['options'] = "O:44:\"Symfony\\Component\\Process\\Pipes\\WindowsPipes\":8:{s:51:\"\\Symfony\\Component\\Process\\Pipes\\WindowsPipes\0files\";a:1:{i:0;s:3:\"foo\";}s:57:\"\0Symfony\\Component\\Process\\Pipes\\WindowsPipes\0fileHandles\";a:0:{}s:55:\"\0Symfony\\Component\\Process\\Pipes\\WindowsPipes\0readBytes\";a:2:{i:1;i:0;i:2;i:0;}s:59:\"\0Symfony\\Component\\Process\\Pipes\\WindowsPipes\0disableOutput\";b:0;s:5:\"pipes\";a:0:{}s:58:\"\0Symfony\\Component\\Process\\Pipes\\AbstractPipes\0inputBuffer\";s:0:\"\";s:52:\"\0Symfony\\Component\\Process\\Pipes\\AbstractPipes\0input\";N;s:54:\"\0Symfony\\Component\\Process\\Pipes\\AbstractPipes\0blocked\";b:1;}";
-    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
+    $url = Url::fromRoute(\sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';
@@ -235,7 +235,7 @@ class MenuLinkContentTest extends ResourceTestBase {
 
     // Fetch the link.
     unset($request_options[RequestOptions::BODY]);
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $document['data']['id']]);
+    $url = Url::fromRoute(\sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $document['data']['id']]);
     $response = $this->request('GET', $url, $request_options);
     $response_body = (string) $response->getBody();
 

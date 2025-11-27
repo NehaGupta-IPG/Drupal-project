@@ -27,9 +27,9 @@ class RegexDirectoryIteratorTest extends TestCase {
     $iterator = new RegexDirectoryIterator(vfsStream::url('root'), $regex);
 
     // Create an array of filenames to assert against.
-    $file_list = array_map(function (\SplFileInfo $file) {
+    $file_list = \array_map(function (\SplFileInfo $file) {
       return $file->getFilename();
-    }, array_values(iterator_to_array($iterator)));
+    }, \array_values(\iterator_to_array($iterator)));
 
     $this->assertSame($expected, $file_list);
   }

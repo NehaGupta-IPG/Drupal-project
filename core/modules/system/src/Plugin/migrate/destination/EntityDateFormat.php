@@ -17,7 +17,7 @@ class EntityDateFormat extends EntityConfigBase {
    * {@inheritdoc}
    */
   protected function updateEntityProperty(EntityInterface $entity, array $parents, $value) {
-    assert($entity instanceof DateFormatInterface);
+    \assert($entity instanceof DateFormatInterface);
     if ($parents[0] == 'pattern') {
       $entity->setPattern($value);
     }

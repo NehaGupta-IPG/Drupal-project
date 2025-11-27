@@ -83,11 +83,11 @@ class UserRolesAccessPolicyTest extends UnitTestCase {
   #[DataProvider('calculatePermissionsProvider')]
   public function testCalculatePermissions(array $roles, bool $expect_admin_rights): void {
     $account = $this->prophesize(AccountInterface::class);
-    $account->getRoles()->willReturn(array_keys($roles));
+    $account->getRoles()->willReturn(\array_keys($roles));
 
     $total_permissions = $cache_tags = $mocked_roles = [];
     foreach ($roles as $role_id => $role) {
-      $total_permissions = array_merge($total_permissions, $role['permissions']);
+      $total_permissions = \array_merge($total_permissions, $role['permissions']);
       $cache_tags[] = "config:user.role.$role_id";
 
       $mocked_role = $this->prophesize(RoleInterface::class);
@@ -100,7 +100,7 @@ class UserRolesAccessPolicyTest extends UnitTestCase {
     }
 
     $role_storage = $this->prophesize(RoleStorageInterface::class);
-    $role_storage->loadMultiple(array_keys($roles))->willReturn($mocked_roles);
+    $role_storage->loadMultiple(\array_keys($roles))->willReturn($mocked_roles);
     $this->entityTypeManager->getStorage('user_role')->willReturn($role_storage->reveal());
 
     $calculated_permissions = $this->accessPolicy->calculatePermissions($account->reveal(), AccessPolicyInterface::SCOPE_DRUPAL);

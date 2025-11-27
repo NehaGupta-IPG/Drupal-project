@@ -52,13 +52,13 @@ class CreateNew extends GDImageToolkitOperationBase {
    */
   protected function validateArguments(array $arguments) {
     // Assure extension is supported.
-    if (!in_array($arguments['extension'], $this->getToolkit()->getSupportedExtensions())) {
+    if (!\in_array($arguments['extension'], $this->getToolkit()->getSupportedExtensions())) {
       throw new \InvalidArgumentException("Invalid extension ('{$arguments['extension']}') specified for the image 'create_new' operation");
     }
 
     // Assure integers for width and height.
-    $arguments['width'] = (int) round($arguments['width']);
-    $arguments['height'] = (int) round($arguments['height']);
+    $arguments['width'] = (int) \round($arguments['width']);
+    $arguments['height'] = (int) \round($arguments['height']);
 
     // Fail when width or height are 0 or negative.
     if ($arguments['width'] <= 0) {
@@ -84,7 +84,7 @@ class CreateNew extends GDImageToolkitOperationBase {
     $type = $this->getToolkit()->extensionToImageType($arguments['extension']);
 
     // Create the image.
-    if (!$image = imagecreatetruecolor($arguments['width'], $arguments['height'])) {
+    if (!$image = \imagecreatetruecolor($arguments['width'], $arguments['height'])) {
       return FALSE;
     }
 
@@ -93,28 +93,28 @@ class CreateNew extends GDImageToolkitOperationBase {
       case IMAGETYPE_PNG:
       case IMAGETYPE_WEBP:
       case IMAGETYPE_AVIF:
-        imagealphablending($image, FALSE);
-        $transparency = imagecolorallocatealpha($image, 0, 0, 0, 127);
-        imagefill($image, 0, 0, $transparency);
-        imagealphablending($image, TRUE);
-        imagesavealpha($image, TRUE);
+        \imagealphablending($image, FALSE);
+        $transparency = \imagecolorallocatealpha($image, 0, 0, 0, 127);
+        \imagefill($image, 0, 0, $transparency);
+        \imagealphablending($image, TRUE);
+        \imagesavealpha($image, TRUE);
         break;
 
       case IMAGETYPE_GIF:
         if (empty($arguments['transparent_color'])) {
           // No transparency color specified, fill white transparent.
-          $fill_color = imagecolorallocatealpha($image, 255, 255, 255, 127);
+          $fill_color = \imagecolorallocatealpha($image, 255, 255, 255, 127);
         }
         else {
           $fill_rgb = Color::hexToRgb($arguments['transparent_color']);
-          $fill_color = imagecolorallocatealpha($image, $fill_rgb['red'], $fill_rgb['green'], $fill_rgb['blue'], 127);
-          imagecolortransparent($image, $fill_color);
+          $fill_color = \imagecolorallocatealpha($image, $fill_rgb['red'], $fill_rgb['green'], $fill_rgb['blue'], 127);
+          \imagecolortransparent($image, $fill_color);
         }
-        imagefill($image, 0, 0, $fill_color);
+        \imagefill($image, 0, 0, $fill_color);
         break;
 
       case IMAGETYPE_JPEG:
-        imagefill($image, 0, 0, imagecolorallocate($image, 255, 255, 255));
+        \imagefill($image, 0, 0, \imagecolorallocate($image, 255, 255, 255));
         break;
 
     }

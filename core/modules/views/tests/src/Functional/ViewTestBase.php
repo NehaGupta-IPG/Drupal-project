@@ -66,7 +66,7 @@ abstract class ViewTestBase extends BrowserTestBase {
     // Load the test dataset.
     $data_set = $this->dataSet();
     $query = Database::getConnection()->insert('views_test_data')
-      ->fields(array_keys($data_set[0]));
+      ->fields(\array_keys($data_set[0]));
     foreach ($data_set as $record) {
       $query->values($record);
     }
@@ -90,7 +90,7 @@ abstract class ViewTestBase extends BrowserTestBase {
    */
   protected function orderResultSet($result_set, $column, $reverse = FALSE) {
     $order = $reverse ? -1 : 1;
-    usort($result_set, function ($a, $b) use ($column, $order) {
+    \usort($result_set, function ($a, $b) use ($column, $order) {
       return $order * ($a[$column] <=> $b[$column]);
     });
     return $result_set;

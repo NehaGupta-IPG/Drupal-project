@@ -64,11 +64,11 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
     TranslationInterface|ModuleHandlerInterface $string_translation,
   ) {
     if ($string_translation instanceof ModuleHandlerInterface) {
-      @trigger_error('Passing the $module_handler argument to ' . __METHOD__ . '() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3544527', E_USER_DEPRECATED);
+      @\trigger_error('Passing the $module_handler argument to ' . __METHOD__ . '() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3544527', E_USER_DEPRECATED);
       $string_translation = \Drupal::service(TranslationInterface::class);
     }
-    if (array_any(func_get_args(), fn ($arg) => $arg instanceof EntityTypeManagerInterface)) {
-      @trigger_error('Passing the $entity_type_manager argument to ' . __METHOD__ . '() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3544527', E_USER_DEPRECATED);
+    if (\array_any(\func_get_args(), fn ($arg) => $arg instanceof EntityTypeManagerInterface)) {
+      @\trigger_error('Passing the $entity_type_manager argument to ' . __METHOD__ . '() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3544527', E_USER_DEPRECATED);
     }
     $this->currentUser = $current_user;
     $this->commentManager = $comment_manager;

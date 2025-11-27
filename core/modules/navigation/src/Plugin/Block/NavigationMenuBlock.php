@@ -58,7 +58,7 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
   public function blockForm($form, FormStateInterface $form_state): array {
     $form = parent::blockForm($form, $form_state);
     unset($form['menu_levels']['expand_all_items']);
-    $form['menu_levels']['depth']['#options'] = range(1, static::NAVIGATION_MAX_DEPTH);
+    $form['menu_levels']['depth']['#options'] = \range(1, static::NAVIGATION_MAX_DEPTH);
 
     return $form;
   }
@@ -81,7 +81,7 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
     $parameters = new MenuTreeParameters();
     $parameters
       ->setMinDepth($level)
-      ->setMaxDepth(min($level + $depth, $this->menuTree->maxDepth()))
+      ->setMaxDepth(\min($level + $depth, $this->menuTree->maxDepth()))
       ->onlyEnabledLinks();
     $tree = $this->menuTree->load($menu_name, $parameters);
     $manipulators = [
@@ -114,7 +114,7 @@ final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFact
    */
   public function getCacheContexts(): array {
     // We don't use menu active trails here.
-    return array_filter(parent::getCacheContexts(), static fn (string $tag) => !str_starts_with($tag, 'route.menu_active_trails'));
+    return \array_filter(parent::getCacheContexts(), static fn (string $tag) => !\str_starts_with($tag, 'route.menu_active_trails'));
   }
 
 }

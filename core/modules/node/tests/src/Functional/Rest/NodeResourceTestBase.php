@@ -187,7 +187,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'revision_uid' => [
@@ -195,7 +195,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'path' => [
@@ -272,7 +272,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
     // Create node PATCH request.
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Content-Type'] = static::$mimeType;
-    $request_options = array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('PATCH'));
+    $request_options = \array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('PATCH'));
     $request_options[RequestOptions::BODY] = $this->serializer->encode($normalization, static::$format);
 
     // PATCH request: 403 when creating URL aliases unauthorized. Before

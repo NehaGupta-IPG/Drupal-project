@@ -76,7 +76,7 @@ class RevisionUserTest extends ViewsKernelTestBase {
     $this->installConfig(['field', 'system', 'image', 'file', 'media']);
 
     if ($import_test_views) {
-      ViewTestData::createTestViews(get_class($this), ['media_test_views']);
+      ViewTestData::createTestViews(\get_class($this), ['media_test_views']);
     }
 
     $this->testMediaType = $this->createMediaType('test');

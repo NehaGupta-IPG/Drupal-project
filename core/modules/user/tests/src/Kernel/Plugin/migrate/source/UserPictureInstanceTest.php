@@ -33,15 +33,15 @@ class UserPictureInstanceTest extends MigrateSqlSourceTestBase {
     $tests[0]['source_data']['variable'] = [
       [
         'name' => 'file_directory',
-        'value' => serialize(NULL),
+        'value' => \serialize(NULL),
       ],
       [
         'name' => 'user_picture_file_size',
-        'value' => serialize(128),
+        'value' => \serialize(128),
       ],
       [
         'name' => 'user_picture_dimensions',
-        'value' => serialize('128x128'),
+        'value' => \serialize('128x128'),
       ],
     ];
 

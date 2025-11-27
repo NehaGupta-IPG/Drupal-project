@@ -71,7 +71,7 @@ class D7NodeDeriver extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
-    if (in_array('translation', $base_plugin_definition['migration_tags']) && !$this->includeTranslations) {
+    if (\in_array('translation', $base_plugin_definition['migration_tags']) && !$this->includeTranslations) {
       // Refuse to generate anything.
       return $this->derivatives;
     }
@@ -111,7 +111,7 @@ class D7NodeDeriver extends DeriverBase implements ContainerDeriverInterface {
         // If this migration is based on the d7_node_revision migration or
         // is for translations of nodes, it should explicitly depend on the
         // corresponding d7_node variant.
-        if ($base_plugin_definition['id'] == ['d7_node_revision'] || in_array('translation', $base_plugin_definition['migration_tags'])) {
+        if ($base_plugin_definition['id'] == ['d7_node_revision'] || \in_array('translation', $base_plugin_definition['migration_tags'])) {
           $values['migration_dependencies']['required'][] = 'd7_node:' . $node_type;
         }
 

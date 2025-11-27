@@ -227,7 +227,7 @@ abstract class CachePluginBase extends PluginBase {
       ];
       $key_data += \Drupal::service('cache_contexts_manager')->convertTokensToKeys($this->displayHandler->getCacheMetadata()->getCacheContexts())->getKeys();
 
-      $this->resultsKey = $this->view->storage->id() . ':' . $this->displayHandler->display['id'] . ':results:' . hash('sha256', serialize($key_data));
+      $this->resultsKey = $this->view->storage->id() . ':' . $this->displayHandler->display['id'] . ':results:' . \hash('sha256', \serialize($key_data));
     }
 
     return $this->resultsKey;
@@ -365,16 +365,16 @@ abstract class CachePluginBase extends PluginBase {
     // entity data, since serializing entity objects is very expensive. Instead
     // we include entity cache tags, which are enough to identify all the
     // entities associated with the row.
-    $row_data = array_diff_key((array) $row, array_flip(['index', '_entity', '_relationship_entities'])) + $this->getRowCacheTags($row);
+    $row_data = \array_diff_key((array) $row, \array_flip(['index', '_entity', '_relationship_entities'])) + $this->getRowCacheTags($row);
 
     // This ensures that we get a unique identifier taking field handler access
     // into account: users having access to different sets of fields will get
     // different row identifiers.
-    $field_ids = array_keys($this->view->field);
-    $row_data += array_flip($field_ids);
+    $field_ids = \array_keys($this->view->field);
+    $row_data += \array_flip($field_ids);
 
     // Finally we compute a hash of row data and return it as row identifier.
-    return hash('sha256', serialize($row_data));
+    return \hash('sha256', \serialize($row_data));
   }
 
 }

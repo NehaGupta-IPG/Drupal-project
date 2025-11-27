@@ -72,7 +72,7 @@ class FieldStorageConfigEditForm extends EntityForm {
   public function buildForm(array $form, FormStateInterface $form_state, FieldConfigInterface|string|null $field_config = NULL) {
     if ($field_config) {
       $field = $field_config;
-      if (is_string($field)) {
+      if (\is_string($field)) {
         $field = FieldConfig::load($field_config);
       }
       $form_state->set('field_config', $field);
@@ -110,7 +110,7 @@ class FieldStorageConfigEditForm extends EntityForm {
       'bundle' => $form_state->get('bundle'),
       'entity_id' => NULL,
     ];
-    $entity = _field_create_entity_from_ids($ids);
+    $entity = \_field_create_entity_from_ids($ids);
     if (!$this->entity->isNew()) {
       $items = $entity->get($this->entity->getName());
     }

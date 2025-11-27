@@ -85,19 +85,19 @@ class MigrationConfigurationTraitTest extends UnitTestCase {
       ],
       'D8' => [
         'expected_version_string' => FALSE,
-        'schema_version' => serialize('8976'),
+        'schema_version' => \serialize('8976'),
         'exception' => NULL,
         'system_table_exists' => FALSE,
       ],
       'D9' => [
         'expected_version_string' => FALSE,
-        'schema_version' => serialize('9270'),
+        'schema_version' => \serialize('9270'),
         'exception' => NULL,
         'system_table_exists' => FALSE,
       ],
       'D10' => [
         'expected_version_string' => FALSE,
-        'schema_version' => serialize('10101'),
+        'schema_version' => \serialize('10101'),
         'exception' => NULL,
         'system_table_exists' => FALSE,
       ],

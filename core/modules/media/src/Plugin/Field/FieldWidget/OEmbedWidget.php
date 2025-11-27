@@ -33,7 +33,7 @@ class OEmbedWidget extends StringTextfieldWidget {
 
     /** @var \Drupal\media\Plugin\media\Source\OEmbedInterface $source */
     $source = $items->getEntity()->getSource();
-    $message = $this->t('You can link to media from the following services: @providers', ['@providers' => implode(', ', $source->getProviders())]);
+    $message = $this->t('You can link to media from the following services: @providers', ['@providers' => \implode(', ', $source->getProviders())]);
 
     if (!empty($element['value']['#description'])) {
       $element['value']['#description'] = [

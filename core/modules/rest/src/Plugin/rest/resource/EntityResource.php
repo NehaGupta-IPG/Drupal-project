@@ -195,7 +195,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
       // body. These responses are not cacheable, so we add no cacheability
       // metadata here.
       $headers = [];
-      if (in_array('canonical', $entity->uriRelationships(), TRUE)) {
+      if (\in_array('canonical', $entity->uriRelationships(), TRUE)) {
         $url = $entity->toUrl('canonical', ['absolute' => TRUE])->toString(TRUE);
         $headers['Location'] = $url->getGeneratedUrl();
       }
@@ -415,7 +415,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
       // Currently only GET is supported for Config Entities.
       // @todo Remove when supported https://www.drupal.org/node/2300677
       $unsupported_methods = ['POST', 'PUT', 'DELETE', 'PATCH'];
-      $methods = array_diff($methods, $unsupported_methods);
+      $methods = \array_diff($methods, $unsupported_methods);
     }
     return $methods;
   }

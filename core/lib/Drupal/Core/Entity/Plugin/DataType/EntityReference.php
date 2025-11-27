@@ -104,7 +104,7 @@ class EntityReference extends DataReferenceBase {
     elseif ($value instanceof EntityInterface) {
       $this->target = $value->getTypedData();
     }
-    elseif (!is_scalar($value) || $this->getTargetDefinition()->getEntityTypeId() === NULL) {
+    elseif (!\is_scalar($value) || $this->getTargetDefinition()->getEntityTypeId() === NULL) {
       throw new \InvalidArgumentException('Value is not a valid entity.');
     }
     else {

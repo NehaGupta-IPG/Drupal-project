@@ -82,12 +82,12 @@ class Mini extends SqlBase {
   public function postExecute(&$result) {
     // Only modify the result if we didn't do a total row count.
     if (!$this->view->get_total_rows) {
-      $this->total_items = $this->getCurrentPage() * $this->getItemsPerPage() + count($result);
+      $this->total_items = $this->getCurrentPage() * $this->getItemsPerPage() + \count($result);
       // query() checks if we need a next link by setting limit 1 record past
       // this page If we got the extra record we need to remove it before we
       // render the result.
-      if ($this->getItemsPerPage() > 0 && count($result) > $this->getItemsPerPage()) {
-        array_pop($result);
+      if ($this->getItemsPerPage() > 0 && \count($result) > $this->getItemsPerPage()) {
+        \array_pop($result);
       }
     }
   }

@@ -108,14 +108,14 @@ abstract class ContentTranslationTestBase extends BrowserTestBase {
     foreach ($this->langcodes as $langcode) {
       ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
-    array_unshift($this->langcodes, \Drupal::languageManager()->getDefaultLanguage()->getId());
+    \array_unshift($this->langcodes, \Drupal::languageManager()->getDefaultLanguage()->getId());
   }
 
   /**
    * Returns an array of permissions needed for the translator.
    */
   protected function getTranslatorPermissions() {
-    return array_filter([
+    return \array_filter([
       $this->getTranslatePermission(),
       'create content translations',
       'update content translations',
@@ -145,7 +145,7 @@ abstract class ContentTranslationTestBase extends BrowserTestBase {
    * Returns an array of permissions needed for the administrator.
    */
   protected function getAdministratorPermissions() {
-    return array_merge(
+    return \array_merge(
       $this->getEditorPermissions(),
       $this->getTranslatorPermissions(),
       ['administer languages', 'administer content translation'],
@@ -233,7 +233,7 @@ abstract class ContentTranslationTestBase extends BrowserTestBase {
     $storage = $this->container->get('entity_type.manager')->getStorage($this->entityTypeId);
     if (!($storage instanceof SqlContentEntityStorage)) {
       foreach ($values as $property => $value) {
-        if (is_array($value)) {
+        if (\is_array($value)) {
           $entity_values[$property] = [$langcode => $value];
         }
       }

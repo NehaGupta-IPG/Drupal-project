@@ -144,13 +144,13 @@ class UpdateProcessor implements UpdateProcessorInterface {
    * {@inheritdoc}
    */
   public function fetchData() {
-    $end = time() + $this->updateSettings->get('fetch.timeout');
+    $end = \time() + $this->updateSettings->get('fetch.timeout');
     if ($this->fetchQueue->numberOfItems()) {
       // Delete any stored project data as that needs refreshing when
       // update_calculate_project_data() is called.
       $this->tempStore->delete('update_project_data');
     }
-    while (time() < $end && ($item = $this->fetchQueue->claimItem())) {
+    while (\time() < $end && ($item = $this->fetchQueue->claimItem())) {
       $this->processFetchTask($item->data);
       $this->fetchQueue->deleteItem($item);
     }

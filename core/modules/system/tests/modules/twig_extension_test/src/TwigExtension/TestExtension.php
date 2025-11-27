@@ -85,10 +85,10 @@ class TestExtension extends AbstractExtension {
   public static function testFunction($upperCase = FALSE) {
     $string = "The quick brown box jumps over the lazy dog 123.";
     if ($upperCase == TRUE) {
-      return strtoupper($string);
+      return \strtoupper($string);
     }
     else {
-      return strtolower($string);
+      return \strtolower($string);
     }
   }
 
@@ -104,7 +104,7 @@ class TestExtension extends AbstractExtension {
    * @see \Drupal\system\Tests\Theme\TwigExtensionTest::testTwigExtensionFilter()
    */
   public static function testFilter($string) {
-    return str_replace(['animal'], ['plant'], $string);
+    return \str_replace(['animal'], ['plant'], $string);
   }
 
 }

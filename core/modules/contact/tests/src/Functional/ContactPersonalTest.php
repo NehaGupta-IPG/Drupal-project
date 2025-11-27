@@ -175,7 +175,7 @@ class ContactPersonalTest extends BrowserTestBase {
 
     // Test that anonymous users can access the contact form.
     $this->drupalLogout();
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access user contact forms']);
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access user contact forms']);
     $this->drupalGet('user/' . $this->contactUser->id() . '/contact');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -185,7 +185,7 @@ class ContactPersonalTest extends BrowserTestBase {
     $this->assertCacheContext('user');
 
     // Revoke the personal contact permission for the anonymous user.
-    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access user contact forms']);
+    \user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access user contact forms']);
     $this->drupalGet('user/' . $this->contactUser->id() . '/contact');
     $this->assertSession()->statusCodeEquals(403);
     $this->assertCacheContext('user');
@@ -278,7 +278,7 @@ class ContactPersonalTest extends BrowserTestBase {
    * Tests the personal contact form based access when an admin adds users.
    */
   public function testAdminContact(): void {
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access user contact forms']);
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access user contact forms']);
     $this->checkContactAccess(200);
     $this->checkContactAccess(403, FALSE);
     $config = $this->config('contact.settings');
@@ -317,7 +317,7 @@ class ContactPersonalTest extends BrowserTestBase {
     }
     $this->drupalGet('admin/people/create');
     $this->submitForm($edit, 'Create new account');
-    $user = user_load_by_name($name);
+    $user = \user_load_by_name($name);
     $this->drupalLogout();
 
     $this->drupalGet('user/' . $user->id() . '/contact');

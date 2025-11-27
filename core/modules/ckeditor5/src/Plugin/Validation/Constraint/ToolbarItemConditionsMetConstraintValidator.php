@@ -83,16 +83,16 @@ class ToolbarItemConditionsMetConstraintValidator extends ConstraintValidator im
 
         case 'plugins':
           $enabled_definitions = $this->pluginManager->getEnabledDefinitions($text_editor);
-          if (!array_key_exists($definition->id(), $enabled_definitions)) {
+          if (!\array_key_exists($definition->id(), $enabled_definitions)) {
             $required_plugin_ids = $definition->getConditions()['plugins'];
-            $missing_plugin_ids = array_diff($required_plugin_ids, array_keys($enabled_definitions));
+            $missing_plugin_ids = \array_diff($required_plugin_ids, \array_keys($enabled_definitions));
             $all_plugins = $this->pluginManager->getDefinitions();
-            $missing_plugin_labels = array_map(function (string $plugin_id) use ($all_plugins): TranslatableMarkup {
-              return !array_key_exists($plugin_id, $all_plugins)
+            $missing_plugin_labels = \array_map(function (string $plugin_id) use ($all_plugins): TranslatableMarkup {
+              return !\array_key_exists($plugin_id, $all_plugins)
                 ? $plugin_id
                 : $all_plugins[$plugin_id]->label();
             }, $missing_plugin_ids);
-            if (count($missing_plugin_ids) === 1) {
+            if (\count($missing_plugin_ids) === 1) {
               $message = $constraint->singleMissingRequiredPluginMessage;
               $parameter = '%plugin';
             }
@@ -102,7 +102,7 @@ class ToolbarItemConditionsMetConstraintValidator extends ConstraintValidator im
             }
             $this->context->buildViolation($message)
               ->setParameter('%toolbar_item', (string) $toolbar_item_label)
-              ->setParameter($parameter, implode(', ', $missing_plugin_labels))
+              ->setParameter($parameter, \implode(', ', $missing_plugin_labels))
               ->setInvalidValue($toolbar_item)
               ->addViolation();
           }
@@ -125,7 +125,7 @@ class ToolbarItemConditionsMetConstraintValidator extends ConstraintValidator im
   protected function findDefinitionForToolbarItem(string $toolbar_item): CKEditor5PluginDefinition {
     $definitions = $this->pluginManager->getDefinitions();
     foreach ($definitions as $definition) {
-      if (array_key_exists($toolbar_item, $definition->getToolbarItems())) {
+      if (\array_key_exists($toolbar_item, $definition->getToolbarItems())) {
         return $definition;
       }
     }

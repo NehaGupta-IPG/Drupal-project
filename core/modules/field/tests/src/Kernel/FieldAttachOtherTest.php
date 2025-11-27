@@ -323,11 +323,11 @@ class FieldAttachOtherTest extends FieldKernelTestBase {
     $values = [];
     $weights = [];
     for ($delta = 0; $delta < $this->fieldTestData->field_storage->getCardinality(); $delta++) {
-      $values[$delta]['value'] = mt_rand(1, 127);
+      $values[$delta]['value'] = \mt_rand(1, 127);
       // Assign random weight.
       do {
-        $weight = mt_rand(0, $this->fieldTestData->field_storage->getCardinality());
-      } while (in_array($weight, $weights));
+        $weight = \mt_rand(0, $this->fieldTestData->field_storage->getCardinality());
+      } while (\in_array($weight, $weights));
       $weights[$delta] = $weight;
       $values[$delta]['_weight'] = $weight;
     }
@@ -337,11 +337,11 @@ class FieldAttachOtherTest extends FieldKernelTestBase {
     $values_2 = [];
     $weights_2 = [];
     for ($delta = 0; $delta < $this->fieldTestData->field_storage_2->getCardinality(); $delta++) {
-      $values_2[$delta]['value'] = mt_rand(1, 127);
+      $values_2[$delta]['value'] = \mt_rand(1, 127);
       // Assign random weight.
       do {
-        $weight = mt_rand(0, $this->fieldTestData->field_storage_2->getCardinality());
-      } while (in_array($weight, $weights_2));
+        $weight = \mt_rand(0, $this->fieldTestData->field_storage_2->getCardinality());
+      } while (\in_array($weight, $weights_2));
       $weights_2[$delta] = $weight;
       $values_2[$delta]['_weight'] = $weight;
     }
@@ -359,8 +359,8 @@ class FieldAttachOtherTest extends FieldKernelTestBase {
     $entity = clone($entity_init);
     $display->extractFormValues($entity, $form, $form_state);
 
-    asort($weights);
-    asort($weights_2);
+    \asort($weights);
+    \asort($weights_2);
     $expected_values = [];
     $expected_values_2 = [];
     foreach ($weights as $key => $value) {

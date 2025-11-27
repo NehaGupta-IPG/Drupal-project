@@ -108,13 +108,13 @@ class Search extends ArgumentPluginBase {
       $condition_conditions =& $conditions->conditions();
       foreach ($condition_conditions as $key => &$condition) {
         // Make sure we just look at real conditions.
-        if (is_numeric($key)) {
+        if (\is_numeric($key)) {
           // Replace the conditions with the table alias of views.
           $this->searchQuery->conditionReplaceString('d.', "$search_dataset.", $condition);
         }
       }
       $search_conditions =& $search_condition->conditions();
-      $search_conditions = array_merge($search_conditions, $condition_conditions);
+      $search_conditions = \array_merge($search_conditions, $condition_conditions);
 
       // Add the keyword conditions, as is done in
       // SearchQuery::prepareAndNormalize(), but simplified because we are

@@ -132,7 +132,7 @@ class ContextualLinksTest extends WebDriverTestBase {
     $this->drupalGet('user');
     $this->assertSession()->waitForElement('css', '.contextual button');
     $expected_destination_value = (string) $this->loggedInUser->toUrl()->toString();
-    $contextual_link_url_parsed = parse_url($this->getSession()->getPage()->findLink('Configure block')->getAttribute('href'));
+    $contextual_link_url_parsed = \parse_url($this->getSession()->getPage()->findLink('Configure block')->getAttribute('href'));
     $this->assertEquals("destination=$expected_destination_value", $contextual_link_url_parsed['query']);
   }
 
@@ -148,7 +148,7 @@ class ContextualLinksTest extends WebDriverTestBase {
     $this->drupalGet('admin/structure/block', ['query' => ['foo' => 'bar']]);
     $this->assertSession()->waitForElement('css', '.contextual button');
     $expected_destination_value = Url::fromRoute('block.admin_display')->toString();
-    $contextual_link_url_parsed = parse_url($this->getSession()->getPage()->findLink('Configure block')->getAttribute('href'));
+    $contextual_link_url_parsed = \parse_url($this->getSession()->getPage()->findLink('Configure block')->getAttribute('href'));
     $this->assertEquals("destination=$expected_destination_value%3Ffoo%3Dbar", $contextual_link_url_parsed['query']);
   }
 

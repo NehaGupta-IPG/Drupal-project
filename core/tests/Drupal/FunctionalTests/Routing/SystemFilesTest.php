@@ -31,13 +31,13 @@ class SystemFilesTest extends BrowserTestBase {
     // wrappers.
     $services_file = $this->siteDirectory . '/services.yml';
     $this->assertFileExists($services_file);
-    $services = file_get_contents($services_file);
+    $services = \file_get_contents($services_file);
     $services = Yaml::decode($services);
     $services['parameters']['stream_wrapper.allowed_file_extensions'] = [
       'module' => ['yml'],
       'theme' => ['yml'],
     ];
-    file_put_contents($services_file, Yaml::encode($services));
+    \file_put_contents($services_file, Yaml::encode($services));
   }
 
   /**

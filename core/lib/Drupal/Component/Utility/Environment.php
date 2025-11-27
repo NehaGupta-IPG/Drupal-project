@@ -26,7 +26,7 @@ class Environment {
    */
   public static function checkMemoryLimit($required, $memory_limit = NULL) {
     if (!isset($memory_limit)) {
-      $memory_limit = ini_get('memory_limit');
+      $memory_limit = \ini_get('memory_limit');
     }
 
     // There is sufficient memory if:
@@ -63,11 +63,11 @@ class Environment {
    *   Whether set_time_limit() was successful or not.
    */
   public static function setTimeLimit($time_limit) {
-    if (function_exists('set_time_limit')) {
-      $current = ini_get('max_execution_time');
+    if (\function_exists('set_time_limit')) {
+      $current = \ini_get('max_execution_time');
       // Do not set time limit if it is currently unlimited.
       if ($current != 0) {
-        return set_time_limit($time_limit);
+        return \set_time_limit($time_limit);
       }
     }
     return FALSE;
@@ -85,11 +85,11 @@ class Environment {
 
     if ($max_size < 0) {
       // Start with post_max_size.
-      $max_size = Bytes::toNumber(ini_get('post_max_size'));
+      $max_size = Bytes::toNumber(\ini_get('post_max_size'));
 
       // If upload_max_size is less, then reduce. Except if upload_max_size is
       // zero, which indicates no limit.
-      $upload_max = Bytes::toNumber(ini_get('upload_max_filesize'));
+      $upload_max = Bytes::toNumber(\ini_get('upload_max_filesize'));
       if ($upload_max > 0 && $upload_max < $max_size) {
         $max_size = $upload_max;
       }

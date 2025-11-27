@@ -76,7 +76,7 @@ class SiteConfigurationExcluderTest extends PackageManagerKernelTestBase {
     // A new file added to the site directory in the stage directory should be
     // copied to the active directory.
     $file = "$stage_dir/sites/default/new.txt";
-    touch($file);
+    \touch($file);
     $stage->apply();
     $this->assertFileExists("$active_dir/sites/default/new.txt");
 
@@ -93,25 +93,25 @@ class SiteConfigurationExcluderTest extends PackageManagerKernelTestBase {
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
     $live_dir = $project_root . '/sites/default';
-    chmod($live_dir, 0555);
+    \chmod($live_dir, 0555);
     $this->assertDirectoryIsNotWritable($live_dir);
     // Record the permissions of the directory now, so we can be sure those
     // permissions are restored after apply.
-    $original_permissions = fileperms($live_dir);
+    $original_permissions = \fileperms($live_dir);
     $this->assertIsInt($original_permissions);
 
     $stage = $this->createStage();
     $stage->create();
     // The staged `sites/default` will be made world-writable, because we want
     // to ensure the scaffold plugin can copy certain files into there.
-    $staged_dir = str_replace($project_root, $stage->getSandboxDirectory(), $live_dir);
+    $staged_dir = \str_replace($project_root, $stage->getSandboxDirectory(), $live_dir);
     $this->assertDirectoryIsWritable($staged_dir);
 
     $stage->require(['ext-json:*']);
     $stage->apply();
     // After applying, the live directory should NOT inherit the staged
     // directory's world-writable permissions.
-    $this->assertSame($original_permissions, fileperms($live_dir));
+    $this->assertSame($original_permissions, \fileperms($live_dir));
   }
 
 }

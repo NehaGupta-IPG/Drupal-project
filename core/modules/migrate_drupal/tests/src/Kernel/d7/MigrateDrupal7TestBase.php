@@ -55,7 +55,7 @@ abstract class MigrateDrupal7TestBase extends MigrateDrupalTestBase {
     if ($include_pictures) {
       // Prepare to migrate user pictures as well.
       $this->installEntitySchema('file');
-      $migrations = array_merge([
+      $migrations = \array_merge([
         'user_picture_field',
         'user_picture_field_instance',
       ], $migrations);

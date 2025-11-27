@@ -142,7 +142,7 @@ class ConfigTranslationController extends ControllerBase {
     $page['#title'] = $this->t('Translations for %label', ['%label' => $mapper->getTitle()]);
 
     $languages = $this->languageManager->getLanguages();
-    if (count($languages) == 1) {
+    if (\count($languages) == 1) {
       $this->messenger()->addWarning($this->t('In order to translate configuration, the website must have at least two <a href=":url">languages</a>.', [':url' => Url::fromRoute('entity.configurable_language.collection')->toString()]));
     }
 

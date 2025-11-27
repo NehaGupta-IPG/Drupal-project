@@ -141,7 +141,7 @@ class SearchPageRepositoryTest extends UnitTestCase {
 
     $result = $this->searchPageRepository->getIndexableSearchPages();
     $this->assertCount(1, $result);
-    $this->assertSame($entities['test'], reset($result));
+    $this->assertSame($entities['test'], \reset($result));
   }
 
   /**
@@ -308,7 +308,7 @@ class SearchPageRepositoryTest extends UnitTestCase {
     $expected = [$entity_test1, $entity_test2, $entity_test3, $entity_test4];
 
     $sorted_entities = $this->searchPageRepository->sortSearchPages($unsorted_entities);
-    $this->assertSame($expected, array_values($sorted_entities));
+    $this->assertSame($expected, \array_values($sorted_entities));
   }
 
 }

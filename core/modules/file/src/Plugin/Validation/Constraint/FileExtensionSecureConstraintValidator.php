@@ -43,7 +43,7 @@ class FileExtensionSecureConstraintValidator extends BaseFileConstraintValidator
     }
 
     $allowInsecureUploads = $this->configFactory->get('system.file')->get('allow_insecure_uploads');
-    if (!$allowInsecureUploads && preg_match(FileSystemInterface::INSECURE_EXTENSION_REGEX, $file->getFilename())) {
+    if (!$allowInsecureUploads && \preg_match(FileSystemInterface::INSECURE_EXTENSION_REGEX, $file->getFilename())) {
       $this->context->addViolation($constraint->message);
     }
   }

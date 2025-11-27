@@ -48,7 +48,7 @@ abstract class FilterFormatFormBase extends EntityForm {
     $form['roles'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Roles'),
-      '#options' => array_map(fn(RoleInterface $role) => Html::escape($role->label()), Role::loadMultiple()),
+      '#options' => \array_map(fn(RoleInterface $role) => Html::escape($role->label()), Role::loadMultiple()),
       '#disabled' => $is_fallback,
       '#weight' => -10,
     ];
@@ -57,7 +57,7 @@ abstract class FilterFormatFormBase extends EntityForm {
     }
     if (!$format->isNew()) {
       // If editing an existing text format, pre-select its current permissions.
-      $form['roles']['#default_value'] = array_keys(filter_get_roles_by_format($format));
+      $form['roles']['#default_value'] = \array_keys(\filter_get_roles_by_format($format));
     }
 
     // Create filter plugin instances for all available filters, including both
@@ -192,8 +192,8 @@ abstract class FilterFormatFormBase extends EntityForm {
     parent::validateForm($form, $form_state);
 
     // @todo Move trimming upstream.
-    $format_format = trim($form_state->getValue('format'));
-    $format_name = trim($form_state->getValue('name'));
+    $format_format = \trim($form_state->getValue('format'));
+    $format_name = \trim($form_state->getValue('name'));
 
     // Ensure that the values to be saved later are exactly the ones validated.
     $form_state->setValueForElement($form['format'], $format_format);
@@ -233,7 +233,7 @@ abstract class FilterFormatFormBase extends EntityForm {
     // Save user permissions.
     if ($permission = $format->getPermissionName()) {
       foreach ($form_state->getValue('roles') as $rid => $enabled) {
-        user_role_change_permissions($rid, [$permission => $enabled]);
+        \user_role_change_permissions($rid, [$permission => $enabled]);
       }
     }
 

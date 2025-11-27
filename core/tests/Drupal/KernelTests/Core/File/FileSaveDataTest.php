@@ -29,8 +29,8 @@ class FileSaveDataTest extends FileTestBase {
     // Provide a filename.
     $filepath = $file_system->saveData($contents, 'public://asdf.txt', FileExists::Replace);
     $this->assertNotFalse($filepath, 'Unnamed file saved correctly.');
-    $this->assertEquals('asdf.txt', basename($filepath), 'File was named correctly.');
-    $this->assertEquals($contents, file_get_contents($filepath), 'Contents of the file are correct.');
+    $this->assertEquals('asdf.txt', \basename($filepath), 'File was named correctly.');
+    $this->assertEquals($contents, \file_get_contents($filepath), 'Contents of the file are correct.');
     $this->assertFilePermissions($filepath, 0777);
   }
 

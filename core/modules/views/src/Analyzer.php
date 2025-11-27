@@ -77,7 +77,7 @@ class Analyzer {
     foreach ($types as $type => $messages) {
       $type .= ' messages';
       $message = '';
-      if (count($messages) > 1) {
+      if (\count($messages) > 1) {
         $item_list = [
           '#theme' => 'item_list',
           '#items' => $messages,
@@ -85,7 +85,7 @@ class Analyzer {
         $message = \Drupal::service('renderer')->render($item_list);
       }
       elseif ($messages) {
-        $message = array_shift($messages);
+        $message = \array_shift($messages);
       }
 
       if ($message) {

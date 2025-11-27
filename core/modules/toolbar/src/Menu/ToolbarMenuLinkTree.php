@@ -20,13 +20,13 @@ class ToolbarMenuLinkTree extends MenuLinkTree {
       $build = parent::build($tree);
 
       /** @var \Drupal\Core\Menu\MenuLinkInterface $link */
-      $first_link = reset($tree)->link;
+      $first_link = \reset($tree)->link;
       // Get the menu name of the first link.
       $menu_name = $first_link->getMenuName();
       // Add a more specific theme suggestion to differentiate this rendered
       // menu from others.
       $build['#menu_name'] = $menu_name;
-      $build['#theme'] = 'menu__toolbar__' . strtr($menu_name, '-', '_');
+      $build['#theme'] = 'menu__toolbar__' . \strtr($menu_name, '-', '_');
       return $build;
     }
     else {

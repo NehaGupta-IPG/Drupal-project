@@ -179,9 +179,9 @@ class IconPackManagerKernelTest extends KernelTestBase {
     $this->pluginManagerIconPack->getExtractorPluginForms($form, $form_state);
 
     // @see core/modules/system/tests/modules/icon_test/icon_test.icons.yml
-    $this->assertCount(4, array_keys($form));
+    $this->assertCount(4, \array_keys($form));
     $expected = ['test_path', 'test_svg', 'test_svg_sprite', 'test_settings'];
-    $this->assertSame($expected, array_keys($form));
+    $this->assertSame($expected, \array_keys($form));
 
     $expected = [
       '#type',
@@ -190,7 +190,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
       'height',
       'title',
     ];
-    $this->assertSame($expected, array_keys($form['test_path']));
+    $this->assertSame($expected, \array_keys($form['test_path']));
 
     $expected = [
       '#type',
@@ -198,7 +198,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
       'width',
       'height',
     ];
-    $this->assertSame($expected, array_keys($form['test_svg_sprite']));
+    $this->assertSame($expected, \array_keys($form['test_svg_sprite']));
 
     $expected = [
       '#type',
@@ -213,7 +213,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
       'decimal',
       'number',
     ];
-    $this->assertSame($expected, array_keys($form['test_settings']));
+    $this->assertSame($expected, \array_keys($form['test_settings']));
 
     // No form if no settings.
     $this->assertArrayNotHasKey('test_no_settings', $form);
@@ -314,7 +314,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
 
     $this->assertEquals($relative_path, $definition['relative_path']);
 
-    $absolute_path = sprintf('%s/%s', $this->appRoot, $relative_path);
+    $absolute_path = \sprintf('%s/%s', $this->appRoot, $relative_path);
     $this->assertEquals($absolute_path, $definition['absolute_path']);
 
     $this->assertArrayHasKey('icons', $definition);

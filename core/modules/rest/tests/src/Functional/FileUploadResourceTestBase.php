@@ -192,7 +192,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example.txt'));
 
     // Test the file again but using 'filename' in the Content-Disposition
     // header with no 'file' prefix.
@@ -202,7 +202,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example_0.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example_0.txt'));
     $this->assertTrue($this->fileStorage->loadUnchanged(1)->isTemporary());
 
     // Verify that we can create an entity that references the uploaded file.
@@ -269,7 +269,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
 
     // The wrong content type header should return a 415 code.
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Type' => static::$mimeType]);
-    $this->assertResourceErrorResponse(415, sprintf('No route found that matches "Content-Type: %s"', static::$mimeType), $response);
+    $this->assertResourceErrorResponse(415, \sprintf('No route found that matches "Content-Type: %s"', static::$mimeType), $response);
 
     // An empty Content-Disposition header should return a 400.
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => FALSE]);
@@ -325,7 +325,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example_0.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example_0.txt'));
   }
 
   /**
@@ -352,7 +352,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     // time, by removing the first uploaded file from disk (leaving the entry in
     // the file_managed table) before trying to upload another file with the
     // same name.
-    unlink(\Drupal::service('file_system')->realpath('public://foobar/example.txt'));
+    \unlink(\Drupal::service('file_system')->realpath('public://foobar/example.txt'));
 
     // Make the same request again. The upload should fail validation.
     $response = $this->fileRequest($uri, $this->testFileData);
@@ -380,7 +380,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
 
     // Check the actual file data. It should have been written to the configured
     // directory, not /foobar/directory/example.txt.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example.txt'));
 
     $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'file; filename="../../example_2.txt"']);
     $this->assertSame(201, $response->getStatusCode());
@@ -389,7 +389,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
 
     // Check the actual file data. It should have been written to the configured
     // directory, not /foobar/directory/example.txt.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/example_2.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/example_2.txt'));
     $this->assertFileDoesNotExist('../../example_2.txt');
 
     // Check a path from the root. Extensions have to be empty to allow a file
@@ -407,7 +407,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
 
     // Check the actual file data. It should have been written to the configured
     // directory, not /foobar/directory/example.txt.
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/passwd'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/passwd'));
   }
 
   /**
@@ -428,7 +428,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $this->assertSame(201, $response->getStatusCode());
     $expected = $this->getExpectedNormalizedEntity(1, 'Èxample-✓.txt', TRUE);
     $this->assertResponseData($expected, $response);
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/Èxample-✓.txt'));
+    $this->assertSame($this->testFileData, \file_get_contents('public://foobar/Èxample-✓.txt'));
   }
 
   /**
@@ -452,7 +452,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $this->assertResponseData($expected, $response);
 
     // Check the actual file data.
-    $this->assertSame('', file_get_contents('public://foobar/example.txt'));
+    $this->assertSame('', \file_get_contents('public://foobar/example.txt'));
   }
 
   /**
@@ -526,7 +526,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     // extension to apache.
     $expected = $this->getExpectedNormalizedEntity(1, 'example.php_.txt', TRUE);
     // Override the expected filesize.
-    $expected['filesize'][0]['value'] = strlen($php_string);
+    $expected['filesize'][0]['value'] = \strlen($php_string);
     $this->assertResponseData($expected, $response);
     $this->assertFileExists('public://foobar/example.php_.txt');
 
@@ -538,7 +538,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_2.php"']);
     $expected = $this->getExpectedNormalizedEntity(2, 'example_2.php_.txt', TRUE);
     // Override the expected filesize.
-    $expected['filesize'][0]['value'] = strlen($php_string);
+    $expected['filesize'][0]['value'] = \strlen($php_string);
     $this->assertResponseData($expected, $response);
     $this->assertFileExists('public://foobar/example_2.php_.txt');
     $this->assertFileDoesNotExist('public://foobar/example_2.php');
@@ -553,7 +553,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     // The filename is munged.
     $expected = $this->getExpectedNormalizedEntity(3, 'example_3.php_.doc', TRUE);
     // Override the expected filesize.
-    $expected['filesize'][0]['value'] = strlen($php_string);
+    $expected['filesize'][0]['value'] = \strlen($php_string);
     // The file mime should be 'application/msword'.
     $expected['filemime'][0]['value'] = 'application/msword';
     $this->assertResponseData($expected, $response);
@@ -570,7 +570,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     // The filename is munged.
     $expected = $this->getExpectedNormalizedEntity(4, 'example_4.php_.doc', TRUE);
     // Override the expected filesize.
-    $expected['filesize'][0]['value'] = strlen($php_string);
+    $expected['filesize'][0]['value'] = \strlen($php_string);
     // The file mime should be 'application/msword'.
     $expected['filemime'][0]['value'] = 'application/msword';
     $this->assertResponseData($expected, $response);
@@ -583,7 +583,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_5.php.png"']);
     $expected = $this->getExpectedNormalizedEntity(5, 'example_5.php_.png', TRUE);
     // Override the expected filesize.
-    $expected['filesize'][0]['value'] = strlen($php_string);
+    $expected['filesize'][0]['value'] = \strlen($php_string);
     // The file mime should still see this as a PNG image.
     $expected['filemime'][0]['value'] = 'image/png';
     $this->assertResponseData($expected, $response);
@@ -593,7 +593,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_6.cgi.png.txt"']);
     $expected = $this->getExpectedNormalizedEntity(6, 'example_6.cgi_.png_.txt', TRUE);
     // Override the expected filesize.
-    $expected['filesize'][0]['value'] = strlen($php_string);
+    $expected['filesize'][0]['value'] = \strlen($php_string);
     // The file mime should also now be text.
     $expected['filemime'][0]['value'] = 'text/plain';
     $this->assertResponseData($expected, $response);
@@ -623,7 +623,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
     $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example_7.php"']);
     $expected = $this->getExpectedNormalizedEntity(7, 'example_7.php', TRUE);
     // Override the expected filesize.
-    $expected['filesize'][0]['value'] = strlen($php_string);
+    $expected['filesize'][0]['value'] = \strlen($php_string);
     // The file mime should also now be PHP.
     $expected['filemime'][0]['value'] = 'application/x-httpd-php';
     $this->assertResponseData($expected, $response);
@@ -708,7 +708,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'filename' => [
@@ -719,7 +719,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
       'uri' => [
         [
           'value' => 'public://foobar/' . $expected_filename,
-          'url' => base_path() . $this->siteDirectory . '/files/foobar/' . rawurlencode($expected_filename),
+          'url' => \base_path() . $this->siteDirectory . '/files/foobar/' . \rawurlencode($expected_filename),
         ],
       ],
       'filemime' => [
@@ -729,7 +729,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
       ],
       'filesize' => [
         [
-          'value' => strlen($this->testFileData),
+          'value' => \strlen($this->testFileData),
         ],
       ],
       'status' => [
@@ -782,7 +782,7 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
       // Set the required Content-Disposition header for the file name.
       'Content-Disposition' => 'file; filename="example.txt"',
     ];
-    $request_options[RequestOptions::HEADERS] = array_filter($headers, function ($value) {
+    $request_options[RequestOptions::HEADERS] = \array_filter($headers, function ($value) {
       return $value !== FALSE;
     });
     $request_options[RequestOptions::BODY] = $file_contents;

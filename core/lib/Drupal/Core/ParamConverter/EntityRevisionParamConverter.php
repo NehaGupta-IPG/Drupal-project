@@ -78,7 +78,7 @@ class EntityRevisionParamConverter implements ParamConverterInterface {
    * {@inheritdoc}
    */
   public function applies($definition, $name, Route $route) {
-    return isset($definition['type']) && str_contains($definition['type'], 'entity_revision:');
+    return isset($definition['type']) && \str_contains($definition['type'], 'entity_revision:');
   }
 
 }

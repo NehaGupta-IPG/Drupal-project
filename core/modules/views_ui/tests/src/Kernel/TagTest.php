@@ -48,11 +48,11 @@ class TagTest extends ViewsKernelTestBase {
     $request = $this->container->get('request_stack')->getCurrentRequest();
     $request->query->set('q', 'autocomplete_tag_test');
     $result = $controller->autocompleteTag($request);
-    $matches = (array) json_decode($result->getContent(), TRUE);
+    $matches = (array) \json_decode($result->getContent(), TRUE);
     $this->assertCount(10, $matches, 'Make sure the maximum amount of tag results is 10.');
 
     // Make sure the returned array has the proper format.
-    $suggestions = array_map(function ($tag) {
+    $suggestions = \array_map(function ($tag) {
       return ['value' => $tag, 'label' => Html::escape($tag)];
     }, $tags);
     foreach ($matches as $match) {
@@ -62,7 +62,7 @@ class TagTest extends ViewsKernelTestBase {
     // Make sure that matching by a certain prefix works.
     $request->query->set('q', 'autocomplete_tag_test_even');
     $result = $controller->autocompleteTag($request);
-    $matches = (array) json_decode($result->getContent(), TRUE);
+    $matches = (array) \json_decode($result->getContent(), TRUE);
     $this->assertCount(8, $matches, 'Make sure that only a subset is returned.');
     foreach ($matches as $tag) {
       $this->assertContains($tag['value'], $tags);
@@ -71,7 +71,7 @@ class TagTest extends ViewsKernelTestBase {
     // Make sure an invalid result doesn't return anything.
     $request->query->set('q', $this->randomMachineName());
     $result = $controller->autocompleteTag($request);
-    $matches = (array) json_decode($result->getContent());
+    $matches = (array) \json_decode($result->getContent());
     $this->assertCount(0, $matches, "Make sure an invalid tag doesn't return anything.");
   }
 
@@ -90,7 +90,7 @@ class TagTest extends ViewsKernelTestBase {
     ])->save();
     $request->query->set('q', $search_string);
     $result = $controller->autocompleteTag($request);
-    $matches = (array) json_decode($result->getContent());
+    $matches = (array) \json_decode($result->getContent());
     $this->assertCount(1, $matches);
     $this->assertSame($expected_tag, $matches[0]->value);
   }

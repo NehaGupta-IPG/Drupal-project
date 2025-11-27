@@ -204,7 +204,7 @@ class Page extends PathPluginBase {
     // And the title, which is much easier.
     // @todo Figure out how to support custom response objects. Maybe for pages
     //   it should be dropped.
-    if (is_array($render)) {
+    if (\is_array($render)) {
       $render += [
         '#title' => ['#markup' => $this->view->getTitle(), '#allowed_tags' => Xss::getHtmlTagList()],
       ];
@@ -219,7 +219,7 @@ class Page extends PathPluginBase {
     parent::optionsSummary($categories, $options);
 
     $menu = $this->getOption('menu');
-    if (!is_array($menu)) {
+    if (!\is_array($menu)) {
       $menu = ['type' => 'none'];
     }
     switch ($menu['type']) {
@@ -254,7 +254,7 @@ class Page extends PathPluginBase {
     // If the display path starts with 'admin/' the page will be rendered with
     // the Administration theme regardless of the 'use_admin_theme' option
     // therefore, we need to set the summary message to reflect this.
-    if (str_starts_with($this->getOption('path') ?? '', 'admin/')) {
+    if (\str_starts_with($this->getOption('path') ?? '', 'admin/')) {
       $admin_theme_text = $this->t('Yes (admin path)');
     }
     elseif ($this->getOption('use_admin_theme')) {
@@ -483,7 +483,7 @@ class Page extends PathPluginBase {
           '#title' => $this->t('Use the administration theme'),
           '#default_value' => $this->getOption('use_admin_theme'),
         ];
-        if (str_starts_with($this->getOption('path') ?? '', 'admin/')) {
+        if (\str_starts_with($this->getOption('path') ?? '', 'admin/')) {
           $form['use_admin_theme']['#description'] = $this->t('Paths starting with "@admin" always use the administration theme.', ['@admin' => 'admin/']);
           $form['use_admin_theme']['#default_value'] = TRUE;
           $form['use_admin_theme']['#attributes'] = ['disabled' => 'disabled'];
@@ -501,13 +501,13 @@ class Page extends PathPluginBase {
     if ($form_state->get('section') == 'menu') {
       $path = $this->getOption('path');
       $menu_type = $form_state->getValue(['menu', 'type']);
-      if ($menu_type == 'normal' && str_contains($path, '%')) {
+      if ($menu_type == 'normal' && \str_contains($path, '%')) {
         $form_state->setError($form['menu']['type'], $this->t('Views cannot create normal menu links for paths with a % in them.'));
       }
 
       if ($menu_type == 'default tab' || $menu_type == 'tab') {
-        $bits = explode('/', $path);
-        $last = array_pop($bits);
+        $bits = \explode('/', $path);
+        $last = \array_pop($bits);
         if ($last == '%') {
           $form_state->setError($form['menu']['type'], $this->t('A display whose path ends with a % cannot be a tab.'));
         }
@@ -528,7 +528,7 @@ class Page extends PathPluginBase {
     switch ($form_state->get('section')) {
       case 'menu':
         $menu = $form_state->getValue('menu');
-        [$menu['menu_name'], $menu['parent']] = explode(':', $menu['parent'], 2);
+        [$menu['menu_name'], $menu['parent']] = \explode(':', $menu['parent'], 2);
         $this->setOption('menu', $menu);
         // Send ajax form to options page if we use it.
         if ($form_state->getValue(['menu', 'type']) == 'default tab') {

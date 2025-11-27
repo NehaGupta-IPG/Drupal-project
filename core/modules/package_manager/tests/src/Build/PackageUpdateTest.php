@@ -60,13 +60,13 @@ class PackageUpdateTest extends TemplateProjectTestBase {
     ];
     foreach ($expected_versions as $module_name => $expected_version) {
       $path = "/modules/contrib/$module_name/composer.json";
-      $module_composer_json = json_decode(file_get_contents($this->getWebRoot() . "/$path"));
+      $module_composer_json = \json_decode(\file_get_contents($this->getWebRoot() . "/$path"));
       $this->assertSame($expected_version, $module_composer_json?->version);
     }
     // The post-apply event subscriber in updated_module 1.1.0 should have
     // created this file.
     // @see \Drupal\updated_module\PostApplySubscriber::postApply()
-    $this->assertSame('Bravo!', file_get_contents($this->getWorkspaceDirectory() . '/project/bravo.txt'));
+    $this->assertSame('Bravo!', \file_get_contents($this->getWorkspaceDirectory() . '/project/bravo.txt'));
 
     $this->assertExpectedStageEventsFired(ControllerSandboxManager::class);
     $this->assertRequestedChangesWereLogged(['Update drupal/updated_module from 1.0.0 to 1.1.0']);

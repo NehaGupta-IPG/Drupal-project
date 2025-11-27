@@ -57,11 +57,11 @@ class UpdateRemovedPostUpdateTest extends BrowserTestBase {
       ->condition('name', 'core.extension')
       ->execute()
       ->fetchField();
-    $extensions = unserialize($extensions);
+    $extensions = \unserialize($extensions);
     $extensions['module']['update_test_postupdate'] = 8000;
     $connection->update('config')
       ->fields([
-        'data' => serialize($extensions),
+        'data' => \serialize($extensions),
       ])
       ->condition('collection', '')
       ->condition('name', 'core.extension')
@@ -93,7 +93,7 @@ class UpdateRemovedPostUpdateTest extends BrowserTestBase {
       'update_test_postupdate_post_update_test0',
       'update_test_postupdate_post_update_foo',
     ];
-    $key_value->get('post_update')->set('existing_updates', array_merge($existing_updates, $post_updates));
+    $key_value->get('post_update')->set('existing_updates', \array_merge($existing_updates, $post_updates));
 
     // The message should inform us we've skipped two major versions.
     $this->drupalLogin($this->updateUser);
@@ -116,7 +116,7 @@ class UpdateRemovedPostUpdateTest extends BrowserTestBase {
       'update_test_postupdate_post_update_foo',
       'update_test_postupdate_post_update_bar',
     ];
-    $key_value->get('post_update')->set('existing_updates', array_merge($existing_updates, $post_updates));
+    $key_value->get('post_update')->set('existing_updates', \array_merge($existing_updates, $post_updates));
     // Now the message should inform us we've skipped one version.
     $this->drupalGet($this->updateUrl);
     $assert_session = $this->assertSession();
@@ -136,7 +136,7 @@ class UpdateRemovedPostUpdateTest extends BrowserTestBase {
       'update_test_postupdate_post_update_bar',
       'update_test_postupdate_post_update_pub',
     ];
-    $key_value->get('post_update')->set('existing_updates', array_merge($existing_updates, $post_updates));
+    $key_value->get('post_update')->set('existing_updates', \array_merge($existing_updates, $post_updates));
     $this->drupalGet($this->updateUrl);
     $assert_session = $this->assertSession();
     $assert_session->pageTextContains('Requirements problem');

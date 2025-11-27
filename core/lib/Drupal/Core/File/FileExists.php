@@ -30,7 +30,7 @@ enum FileExists {
    * @see https://www.drupal.org/node/3426517
    */
   public static function fromLegacyInt(int $legacyInt, string $methodName): self {
-    @trigger_error("Passing the \$fileExists argument as an integer to $methodName() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\File\FileExists enum instead. See https://www.drupal.org/node/3426517", E_USER_DEPRECATED);
+    @\trigger_error("Passing the \$fileExists argument as an integer to $methodName() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\File\FileExists enum instead. See https://www.drupal.org/node/3426517", E_USER_DEPRECATED);
     return match ($legacyInt) {
       0 => FileExists::Rename,
       2 => FileExists::Error,

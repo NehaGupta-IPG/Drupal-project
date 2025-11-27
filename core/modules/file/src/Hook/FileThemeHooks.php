@@ -111,7 +111,7 @@ class FileThemeHooks {
     $classes = [
       'file',
       // Add a specific class for each and every mime type.
-      'file--mime-' . strtr($mime_type, ['/' => '-', '.' => '-']),
+      'file--mime-' . \strtr($mime_type, ['/' => '-', '.' => '-']),
       // Add a more general class for groups of well known MIME types.
       'file--' . IconMimeTypes::getIconClass($mime_type),
     ];
@@ -240,10 +240,10 @@ class FileThemeHooks {
     foreach (Element::children($element) as $key) {
       $widgets[] = &$element[$key];
     }
-    usort($widgets, function ($a, $b) {
+    \usort($widgets, function ($a, $b) {
       // Sorts using ['_weight']['#value'].
-      $a_weight = (is_array($a) && isset($a['_weight']['#value']) ? $a['_weight']['#value'] : 0);
-      $b_weight = (is_array($b) && isset($b['_weight']['#value']) ? $b['_weight']['#value'] : 0);
+      $a_weight = (\is_array($a) && isset($a['_weight']['#value']) ? $a['_weight']['#value'] : 0);
+      $b_weight = (\is_array($b) && isset($b['_weight']['#value']) ? $b['_weight']['#value'] : 0);
       return $a_weight - $b_weight;
     });
 
@@ -261,7 +261,7 @@ class FileThemeHooks {
       $operations_elements = [];
       foreach (Element::children($widget) as $key) {
         if (isset($widget[$key]['#type']) && $widget[$key]['#type'] == 'submit') {
-          hide($widget[$key]);
+          \hide($widget[$key]);
           $operations_elements[] = &$widget[$key];
         }
       }
@@ -269,9 +269,9 @@ class FileThemeHooks {
       // Delay rendering of the "Display" option and the weight selector, so
       // that each can be rendered later in its own column.
       if ($element['#display_field']) {
-        hide($widget['display']);
+        \hide($widget['display']);
       }
-      hide($widget['_weight']);
+      \hide($widget['_weight']);
       $widget['_weight']['#attributes']['class'] = [$weight_class];
 
       // Render everything else together in a column, without the normal
@@ -295,14 +295,14 @@ class FileThemeHooks {
       // Show the buttons that had previously been marked as hidden in this
       // preprocess function. We use show() to undo the earlier hide().
       foreach (Element::children($operations_elements) as $key) {
-        show($operations_elements[$key]);
+        \show($operations_elements[$key]);
       }
       $row[] = [
         'data' => $operations_elements,
       ];
       $rows[] = [
         'data' => $row,
-        'class' => isset($widget['#attributes']['class']) ? array_merge($widget['#attributes']['class'], ['draggable']) : ['draggable'],
+        'class' => isset($widget['#attributes']['class']) ? \array_merge($widget['#attributes']['class'], ['draggable']) : ['draggable'],
       ];
     }
 

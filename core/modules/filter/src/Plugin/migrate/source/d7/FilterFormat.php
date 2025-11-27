@@ -54,7 +54,7 @@ class FilterFormat extends DrupalSqlBase {
       ->fetchAllAssoc('name');
 
     foreach ($filters as $id => $filter) {
-      $filters[$id]['settings'] = unserialize($filter['settings']);
+      $filters[$id]['settings'] = \unserialize($filter['settings']);
     }
     $row->setSourceProperty('filters', $filters);
 

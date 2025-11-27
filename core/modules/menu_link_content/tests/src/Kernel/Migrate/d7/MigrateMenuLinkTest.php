@@ -164,7 +164,7 @@ class MigrateMenuLinkTest extends MigrateDrupal7TestBase {
     foreach ($tree as $menu_link_tree_element) {
       $children += $menu_link_tree_element->hasChildren;
       if ($menu_link_tree_element->link->getUrlObject()->toString() == 'http://bing.com') {
-        $this->assertEquals('http://google.com', reset($menu_link_tree_element->subtree)->link->getUrlObject()->toString());
+        $this->assertEquals('http://google.com', \reset($menu_link_tree_element->subtree)->link->getUrlObject()->toString());
         $google_found = TRUE;
       }
     }

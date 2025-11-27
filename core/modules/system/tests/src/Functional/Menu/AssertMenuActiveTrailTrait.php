@@ -28,8 +28,8 @@ trait AssertMenuActiveTrailTrait {
    *   (optional) The class of the active element. Defaults to 'is-active'.
    */
   protected function assertMenuActiveTrail($tree, $last_active, $active_trail_class = 'menu-item--active-trail', $active_class = 'is-active') {
-    $active_link_path = array_key_last($tree);
-    $active_link_title = array_pop($tree);
+    $active_link_path = \array_key_last($tree);
+    $active_link_title = \array_pop($tree);
     $xpath = '';
     if ($tree) {
       $i = 0;

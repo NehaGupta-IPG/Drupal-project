@@ -72,7 +72,7 @@ class EntityTestUuidId extends EntityTest {
    */
   public static function generateUuid(): string {
     $uuid = \Drupal::service('uuid');
-    assert($uuid instanceof UuidInterface);
+    \assert($uuid instanceof UuidInterface);
     return $uuid->generate();
   }
 

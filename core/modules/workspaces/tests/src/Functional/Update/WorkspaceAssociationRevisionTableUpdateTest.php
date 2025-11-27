@@ -88,7 +88,7 @@ class WorkspaceAssociationRevisionTableUpdateTest extends UpdatePathTestBase {
     foreach ($expected_revisions as $workspace_id => $entity_types) {
       foreach ($entity_types as $entity_type_id => $expected_result) {
         $actual_result = $workspace_tracker->getAllTrackedRevisions($workspace_id, $entity_type_id);
-        $this->assertEquals($expected_result, $actual_result, sprintf(
+        $this->assertEquals($expected_result, $actual_result, \sprintf(
           'Associated revisions match for workspace %s, entity type %s',
           $workspace_id, $entity_type_id
         ));
@@ -99,7 +99,7 @@ class WorkspaceAssociationRevisionTableUpdateTest extends UpdatePathTestBase {
     foreach ($expected_initial_revisions as $workspace_id => $entity_types) {
       foreach ($entity_types as $entity_type_id => $expected_result) {
         $actual_result = $workspace_tracker->getTrackedInitialRevisions($workspace_id, $entity_type_id);
-        $this->assertEquals($expected_result, $actual_result, sprintf(
+        $this->assertEquals($expected_result, $actual_result, \sprintf(
           'Associated initial revisions match for workspace %s, entity type %s',
           $workspace_id, $entity_type_id
         ));

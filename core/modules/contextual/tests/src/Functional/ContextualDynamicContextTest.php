@@ -111,7 +111,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
 
     // Editor user: can access contextual links and can edit articles.
     $this->drupalGet('node');
-    for ($i = 0; $i < count($ids); $i++) {
+    for ($i = 0; $i < \count($ids); $i++) {
       $this->assertContextualLinkPlaceHolder($ids[$i]);
     }
     $response = $this->renderContextualLinks([], 'node');
@@ -120,9 +120,9 @@ class ContextualDynamicContextTest extends BrowserTestBase {
     $response = $this->renderContextualLinks($ids, 'node');
     $this->assertSame(200, $response->getStatusCode());
     $json = Json::decode((string) $response->getBody());
-    $this->assertSame('<ul class="contextual-links"><li><a href="' . base_path() . 'node/1/edit">Edit</a></li></ul>', $json[$ids[0]]);
+    $this->assertSame('<ul class="contextual-links"><li><a href="' . \base_path() . 'node/1/edit">Edit</a></li></ul>', $json[$ids[0]]);
     $this->assertSame('', $json[$ids[1]]);
-    $this->assertSame('<ul class="contextual-links"><li><a href="' . base_path() . 'node/3/edit">Edit</a></li></ul>', $json[$ids[2]]);
+    $this->assertSame('<ul class="contextual-links"><li><a href="' . \base_path() . 'node/3/edit">Edit</a></li></ul>', $json[$ids[2]]);
     $this->assertSame('', $json[$ids[3]]);
 
     // Verify that link language is properly handled.
@@ -137,7 +137,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
     // Authenticated user: can access contextual links, cannot edit articles.
     $this->drupalLogin($this->authenticatedUser);
     $this->drupalGet('node');
-    for ($i = 0; $i < count($ids); $i++) {
+    for ($i = 0; $i < \count($ids); $i++) {
       $this->assertContextualLinkPlaceHolder($ids[$i]);
     }
     $response = $this->renderContextualLinks([], 'node');
@@ -154,7 +154,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
     // Anonymous user: cannot access contextual links.
     $this->drupalLogin($this->anonymousUser);
     $this->drupalGet('node');
-    for ($i = 0; $i < count($ids); $i++) {
+    for ($i = 0; $i < \count($ids); $i++) {
       $this->assertNoContextualLinkPlaceHolder($ids[$i]);
     }
     $response = $this->renderContextualLinks([], 'node');
@@ -165,12 +165,12 @@ class ContextualDynamicContextTest extends BrowserTestBase {
     // Get a page where contextual links are directly rendered.
     $this->drupalGet(Url::fromRoute('menu_test.contextual_test'));
     $this->assertSession()->assertEscaped("<script>alert('Welcome to the jungle!')</script>");
-    $this->assertSession()->responseContains('<li><a href="' . base_path() . 'menu-test-contextual/1/edit" class="use-ajax" data-dialog-type="modal" data-is-something>Edit menu - contextual</a></li>');
+    $this->assertSession()->responseContains('<li><a href="' . \base_path() . 'menu-test-contextual/1/edit" class="use-ajax" data-dialog-type="modal" data-is-something>Edit menu - contextual</a></li>');
     // Test contextual links respects the weight set in *.links.contextual.yml.
     $firstLink = $this->assertSession()->elementExists('css', 'ul.contextual-links li:nth-of-type(1) a');
     $secondLink = $this->assertSession()->elementExists('css', 'ul.contextual-links li:nth-of-type(2) a');
-    $this->assertEquals(base_path() . 'menu-test-contextual/1/edit', $firstLink->getAttribute('href'));
-    $this->assertEquals(base_path() . 'menu-test-contextual/1', $secondLink->getAttribute('href'));
+    $this->assertEquals(\base_path() . 'menu-test-contextual/1/edit', $firstLink->getAttribute('href'));
+    $this->assertEquals(\base_path() . 'menu-test-contextual/1', $secondLink->getAttribute('href'));
   }
 
   /**
@@ -271,7 +271,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
    *   The response object.
    */
   protected function renderContextualLinks($ids, $current_path): ResponseInterface {
-    $tokens = array_map([$this, 'createContextualIdToken'], $ids);
+    $tokens = \array_map([$this, 'createContextualIdToken'], $ids);
     $http_client = $this->getHttpClient();
     $url = Url::fromRoute('contextual.render', [], [
       'query' => [

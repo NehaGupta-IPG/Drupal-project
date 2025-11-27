@@ -105,7 +105,7 @@ class ConfigTest extends UnitTestCase {
       ],
       // Maximum length.
       [
-        'test.' . str_repeat('a', Config::MAX_NAME_LENGTH - 5),
+        'test.' . \str_repeat('a', Config::MAX_NAME_LENGTH - 5),
       ],
     ];
   }
@@ -231,7 +231,7 @@ class ConfigTest extends UnitTestCase {
 
     // Set module overrides again to ensure override order is correct.
     $this->config->setModuleOverride($module_data);
-    $merged_overrides = array_merge($module_data, $setting_data);
+    $merged_overrides = \array_merge($module_data, $setting_data);
 
     // Setting data should be overriding module data.
     $this->assertConfigDataEquals($setting_data);
@@ -478,8 +478,8 @@ class ConfigTest extends UnitTestCase {
       ],
       // Exceeds length (max length plus an extra dot).
       [
-        str_repeat('a', Config::MAX_NAME_LENGTH) . ".",
-        'Config object name ' . str_repeat('a', Config::MAX_NAME_LENGTH) . '. exceeds maximum allowed length of ' . Config::MAX_NAME_LENGTH . ' characters.',
+        \str_repeat('a', Config::MAX_NAME_LENGTH) . ".",
+        'Config object name ' . \str_repeat('a', Config::MAX_NAME_LENGTH) . '. exceeds maximum allowed length of ' . Config::MAX_NAME_LENGTH . ' characters.',
       ],
     ];
     // Name must not contain ":", "?", "*", "<", ">", """, "'", "/", or "\".
@@ -685,30 +685,30 @@ class ConfigTest extends UnitTestCase {
       $this->assertTrue($this->config->hasOverrides());
       foreach ($overridden_data as $key => $value) {
         // If there are nested overrides test a keys at every level.
-        if (is_array($value)) {
+        if (\is_array($value)) {
           $nested_key = $key;
           $nested_value = $overridden_data[$key];
-          while (is_array($nested_value)) {
-            $nested_key .= '.' . key($nested_value);
+          while (\is_array($nested_value)) {
+            $nested_key .= '.' . \key($nested_value);
             $this->assertTrue($this->config->hasOverrides($nested_key));
-            $nested_value = array_pop($nested_value);
+            $nested_value = \array_pop($nested_value);
           }
         }
         $this->assertTrue($this->config->hasOverrides($key));
       }
     }
 
-    $non_overridden_keys = array_diff(array_keys($data), array_keys($overridden_data));
+    $non_overridden_keys = \array_diff(\array_keys($data), \array_keys($overridden_data));
     foreach ($non_overridden_keys as $non_overridden_key) {
       $this->assertFalse($this->config->hasOverrides($non_overridden_key));
       // If there are nested overrides test keys at every level.
-      if (is_array($data[$non_overridden_key])) {
+      if (\is_array($data[$non_overridden_key])) {
         $nested_key = $non_overridden_key;
         $nested_value = $data[$non_overridden_key];
-        while (is_array($nested_value)) {
-          $nested_key .= '.' . key($nested_value);
+        while (\is_array($nested_value)) {
+          $nested_key .= '.' . \key($nested_value);
           $this->assertFalse($this->config->hasOverrides($nested_key));
-          $nested_value = array_pop($nested_value);
+          $nested_value = \array_pop($nested_value);
         }
       }
     }

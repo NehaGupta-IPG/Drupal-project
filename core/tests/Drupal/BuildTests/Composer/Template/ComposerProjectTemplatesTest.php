@@ -91,7 +91,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     // Ensure that static::MINIMUM_STABILITY is not less stable than the
     // current core stability. For example, if we've already released a beta on
     // the branch, ensure that we no longer allow alpha dependencies.
-    $this->assertGreaterThanOrEqual(array_search($this->getCoreStability(), static::STABILITY_ORDER), array_search(static::MINIMUM_STABILITY, static::STABILITY_ORDER));
+    $this->assertGreaterThanOrEqual(\array_search($this->getCoreStability(), static::STABILITY_ORDER), \array_search(static::MINIMUM_STABILITY, static::STABILITY_ORDER));
 
     // Ensure that static::MINIMUM_STABILITY is the same as the least stable
     // dependency.
@@ -103,10 +103,10 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     $root = $this->getDrupalRoot();
     $process = $this->executeCommand("composer --working-dir=$root info --format=json");
     $this->assertCommandSuccessful();
-    $installed = json_decode($process->getOutput(), TRUE);
+    $installed = \json_decode($process->getOutput(), TRUE);
 
     // A lookup of the numerical position of each of the stability terms.
-    $stability_order_indexes = array_flip(static::STABILITY_ORDER);
+    $stability_order_indexes = \array_flip(static::STABILITY_ORDER);
 
     $minimum_stability_order_index = $stability_order_indexes[static::MINIMUM_STABILITY];
 
@@ -121,21 +121,21 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
       // Exclude dependencies that are required with "self.version", since
       // those stabilities will automatically match the corresponding Drupal
       // release.
-      if (in_array($project['name'], $exclude, TRUE)) {
+      if (\in_array($project['name'], $exclude, TRUE)) {
         continue;
       }
 
       // VersionParser::parseStability doesn't play nice with (mostly dev-)
       // versions ending with the first seven characters of the commit ID as
       // returned by "composer info". Let's strip those suffixes here.
-      $version = preg_replace('/ [0-9a-f]{7}$/i', '', $project['version']);
+      $version = \preg_replace('/ [0-9a-f]{7}$/i', '', $project['version']);
 
       $project_stability = VersionParser::parseStability($version);
       $project_stability_order_index = $stability_order_indexes[$project_stability];
 
       $project_stabilities[$project['name']] = $project_stability;
 
-      $this->assertGreaterThanOrEqual($minimum_stability_order_index, $project_stability_order_index, sprintf(
+      $this->assertGreaterThanOrEqual($minimum_stability_order_index, $project_stability_order_index, \sprintf(
         "Dependency %s with stability %s does not meet minimum stability %s.",
         $project['name'],
         $project_stability,
@@ -179,9 +179,9 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
   public function testTemplateCreateProject($project, $package_dir, $docroot_dir): void {
     // Make a working COMPOSER_HOME directory for setting global composer config.
     $composer_home = $this->getWorkspaceDirectory() . '/composer-home';
-    mkdir($composer_home);
+    \mkdir($composer_home);
     // Create an empty global composer.json file, just to avoid warnings.
-    file_put_contents("$composer_home/composer.json", '{}');
+    \file_put_contents("$composer_home/composer.json", '{}');
 
     // Disable packagist globally (but only in our own custom COMPOSER_HOME).
     // It is necessary to do this globally rather than in our SUT composer.json
@@ -204,7 +204,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     // if/when we make such a release.
     $simulated_core_version = \Drupal::VERSION;
     $simulated_core_version_suffix = (static::MINIMUM_STABILITY === 'stable' ? '' : '-' . static::MINIMUM_STABILITY . '99');
-    $simulated_core_version = str_replace('-dev', $simulated_core_version_suffix, $simulated_core_version);
+    $simulated_core_version = \str_replace('-dev', $simulated_core_version_suffix, $simulated_core_version);
     Composer::setDrupalVersion($this->getWorkspaceDirectory(), $simulated_core_version);
     $this->assertDrupalVersion($simulated_core_version, $this->getWorkspaceDirectory());
 
@@ -212,16 +212,16 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     // from the SUT's repositories section. There is no way to do this via
     // `composer config --unset`, so we read and rewrite composer.json.
     $composer_json_path = $this->getWorkspaceDirectory() . "/$package_dir/composer.json";
-    $composer_json = json_decode(file_get_contents($composer_json_path), TRUE);
+    $composer_json = \json_decode(\file_get_contents($composer_json_path), TRUE);
     unset($composer_json['repositories']);
-    $json = json_encode($composer_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    file_put_contents($composer_json_path, $json);
+    $json = \json_encode($composer_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    \file_put_contents($composer_json_path, $json);
 
     // Set up the template to use our path repos. Inclusion of metapackages is
     // reported differently, so we load up a separate set for them.
     $metapackage_path_repos = $this->getPathReposForType($this->getWorkspaceDirectory(), 'Metapackage');
     $this->assertArrayHasKey('drupal/core-recommended', $metapackage_path_repos);
-    $path_repos = array_merge($metapackage_path_repos, $this->getPathReposForType($this->getWorkspaceDirectory(), 'Plugin'));
+    $path_repos = \array_merge($metapackage_path_repos, $this->getPathReposForType($this->getWorkspaceDirectory(), 'Plugin'));
     // Always add drupal/core as a path repo.
     $path_repos['drupal/core'] = $this->getWorkspaceDirectory() . '/core';
     foreach ($path_repos as $name => $path) {
@@ -276,7 +276,7 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     // Verify that the minimum stability in the installed composer.json file
     // matches the stability of the simulated core version.
     $this->assertFileExists($installed_composer_json);
-    $composer_json_contents = file_get_contents($installed_composer_json);
+    $composer_json_contents = \file_get_contents($installed_composer_json);
     $this->assertStringContainsString('"minimum-stability": "' . static::MINIMUM_STABILITY . '"', $composer_json_contents);
 
     // In order to verify that Composer used the path repos for our project, we
@@ -289,16 +289,16 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
     // Get the require and require-dev information, and ensure that our
     // requirements are not erroneously empty.
     $this->assertNotEmpty(
-      $require = array_merge($template_json['require'] ?? [], $template_json['require-dev'] ?? [])
+      $require = \array_merge($template_json['require'] ?? [], $template_json['require-dev'] ?? [])
     );
     // Verify that path repo packages were installed.
-    $path_repos = array_keys($path_repos);
-    foreach (array_keys($require) as $package_name) {
-      if (in_array($package_name, $path_repos)) {
+    $path_repos = \array_keys($path_repos);
+    foreach (\array_keys($require) as $package_name) {
+      if (\in_array($package_name, $path_repos)) {
         // Metapackages do not report that they were installed as symlinks, but
         // we still must check that their installed version matches
         // COMPOSER_CORE_VERSION.
-        if (array_key_exists($package_name, $metapackage_path_repos)) {
+        if (\array_key_exists($package_name, $metapackage_path_repos)) {
           $this->assertErrorOutputContains("Installing $package_name ($simulated_core_version)");
         }
         else {
@@ -345,8 +345,8 @@ class ComposerProjectTemplatesTest extends ComposerBuildTestBase {
   }
 }
 JSON;
-    mkdir(dirname($repository_path));
-    file_put_contents($repository_path, $json);
+    \mkdir(\dirname($repository_path));
+    \file_put_contents($repository_path, $json);
   }
 
   /**
@@ -359,7 +359,7 @@ JSON;
     $root = $this->getDrupalRoot();
     $process = $this->executeCommand("composer --working-dir=$root info --format=json");
     $this->assertCommandSuccessful();
-    $installed = json_decode($process->getOutput(), TRUE);
+    $installed = \json_decode($process->getOutput(), TRUE);
 
     // Build out package definitions for everything installed in
     // the vendor directory.
@@ -374,7 +374,7 @@ JSON;
       // Also skip the projects that are symlinked in vendor. These are in our
       // metapackage. They will be represented as path repositories in the test
       // project's composer.json.
-      if (is_dir($full_path) && !is_link($full_path)) {
+      if (\is_dir($full_path) && !\is_link($full_path)) {
         $packages['packages'][$name] = [
           $version => [
             "name" => $name,
@@ -386,7 +386,7 @@ JSON;
           ],
         ];
         // Ensure composer plugins are registered correctly.
-        $package_json = json_decode(file_get_contents($full_path . '/composer.json'), TRUE);
+        $package_json = \json_decode(\file_get_contents($full_path . '/composer.json'), TRUE);
         if (isset($package_json['type']) && $package_json['type'] === 'composer-plugin') {
           $packages['packages'][$name][$version]['type'] = $package_json['type'];
           $packages['packages'][$name][$version]['require'] = $package_json['require'];
@@ -398,9 +398,9 @@ JSON;
       }
     }
 
-    $json = json_encode($packages, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    mkdir(dirname($repository_path));
-    file_put_contents($repository_path, $json);
+    $json = \json_encode($packages, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    \mkdir(\dirname($repository_path));
+    \file_put_contents($repository_path, $json);
   }
 
   /**
@@ -428,15 +428,15 @@ JSON;
     $version = \Drupal::VERSION;
     // If the current version is x.y-dev then this is the equivalent of the main
     // branch and should be treated as a dev release.
-    if (preg_match('/^(\d)+\.(\d)+-dev$/', $version)) {
+    if (\preg_match('/^(\d)+\.(\d)+-dev$/', $version)) {
       return 'dev';
     }
     $stability = VersionParser::parseStability($version);
     if ($stability === 'dev') {
       // Strip off "-dev".
-      $version_towards = substr($version, 0, -4);
+      $version_towards = \substr($version, 0, -4);
 
-      if (!str_ends_with($version_towards, '.0')) {
+      if (!\str_ends_with($version_towards, '.0')) {
         // If the current version is developing towards an x.y.z release where
         // z is not 0, it means that the x.y.0 has already been released, and
         // only stable changes are permitted on the branch.
@@ -461,7 +461,7 @@ JSON;
         // - A tag should not be of "dev" stability.
         // - After a "stable" release is made, \Drupal::VERSION is incremented,
         //   so there should not be a stable release on that new version.
-        $stability = VersionParser::parseStability(trim($process->getOutput()));
+        $stability = VersionParser::parseStability(\trim($process->getOutput()));
         $this->assertContains($stability, ['alpha', 'beta', 'RC']);
       }
     }

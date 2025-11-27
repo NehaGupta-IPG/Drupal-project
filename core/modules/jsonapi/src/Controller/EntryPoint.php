@@ -77,15 +77,15 @@ class EntryPoint extends ControllerBase {
       ->addCacheTags(['jsonapi_resource_types']);
 
     // Only build URLs for exposed resources.
-    $resources = array_filter($this->resourceTypeRepository->all(), function ($resource) {
+    $resources = \array_filter($this->resourceTypeRepository->all(), function ($resource) {
       return !$resource->isInternal();
     });
 
     $self_link = new Link(new CacheableMetadata(), Url::fromRoute('jsonapi.resource_list'), 'self');
-    $urls = array_reduce($resources, function (LinkCollection $carry, ResourceType $resource_type) {
+    $urls = \array_reduce($resources, function (LinkCollection $carry, ResourceType $resource_type) {
       if ($resource_type->isLocatable() || $resource_type->isMutable()) {
         $route_suffix = $resource_type->isLocatable() ? 'collection' : 'collection.post';
-        $url = Url::fromRoute(sprintf('jsonapi.%s.%s', $resource_type->getTypeName(), $route_suffix))->setAbsolute();
+        $url = Url::fromRoute(\sprintf('jsonapi.%s.%s', $resource_type->getTypeName(), $route_suffix))->setAbsolute();
         // Using a resource type name in place of a link relation type is not
         // technically valid. However, since it matches the link key, it will
         // not actually be serialized since the rel is omitted if it matches the

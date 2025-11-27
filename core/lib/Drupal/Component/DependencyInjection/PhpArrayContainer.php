@@ -52,7 +52,7 @@ class PhpArrayContainer extends Container {
     //   parent class to avoid resolving services and parameters when it is
     //   known from dumping that there is nothing to resolve.
     if (isset($definition['synthetic']) && $definition['synthetic'] === TRUE) {
-      throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The service container does not know how to construct this service. The service will need to be set before it is first used.', $id));
+      throw new RuntimeException(\sprintf('You have requested a synthetic service ("%s"). The service container does not know how to construct this service. The service will need to be set before it is first used.', $id));
     }
 
     $arguments = [];
@@ -61,23 +61,23 @@ class PhpArrayContainer extends Container {
     }
 
     if (isset($definition['file'])) {
-      $file = $this->frozen ? $definition['file'] : current($this->resolveServicesAndParameters([$definition['file']]));
+      $file = $this->frozen ? $definition['file'] : \current($this->resolveServicesAndParameters([$definition['file']]));
       require_once $file;
     }
 
     if (isset($definition['factory'])) {
       $factory = $definition['factory'];
-      if (is_array($factory)) {
+      if (\is_array($factory)) {
         $factory = $this->resolveServicesAndParameters([$factory[0], $factory[1]]);
       }
-      elseif (!is_string($factory)) {
-        throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
+      elseif (!\is_string($factory)) {
+        throw new RuntimeException(\sprintf('Cannot create service "%s" because of invalid factory', $id));
       }
 
-      $service = call_user_func_array($factory, $arguments);
+      $service = \call_user_func_array($factory, $arguments);
     }
     else {
-      $class = $this->frozen ? $definition['class'] : current($this->resolveServicesAndParameters([$definition['class']]));
+      $class = $this->frozen ? $definition['class'] : \current($this->resolveServicesAndParameters([$definition['class']]));
       $service = new $class(...$arguments);
     }
 
@@ -93,7 +93,7 @@ class PhpArrayContainer extends Container {
           $arguments = $call[1];
           $arguments = $this->resolveServicesAndParameters($arguments);
         }
-        call_user_func_array([$service, $method], $arguments);
+        \call_user_func_array([$service, $method], $arguments);
       }
     }
 
@@ -106,15 +106,15 @@ class PhpArrayContainer extends Container {
 
     if (isset($definition['configurator'])) {
       $callable = $definition['configurator'];
-      if (is_array($callable)) {
+      if (\is_array($callable)) {
         $callable = $this->resolveServicesAndParameters($callable);
       }
 
-      if (!is_callable($callable)) {
-        throw new InvalidArgumentException(sprintf('The configurator for class "%s" is not a callable.', get_class($service)));
+      if (!\is_callable($callable)) {
+        throw new InvalidArgumentException(\sprintf('The configurator for class "%s" is not a callable.', \get_class($service)));
       }
 
-      call_user_func($callable, $service);
+      \call_user_func($callable, $service);
     }
 
     return $service;
@@ -181,7 +181,7 @@ class PhpArrayContainer extends Container {
             foreach ($services as $key => $service) {
               yield $key => $this->resolveServicesAndParameters([$service])[0];
             }
-          }, count($services));
+          }, \count($services));
           continue;
         }
 
@@ -190,18 +190,18 @@ class PhpArrayContainer extends Container {
         }
       }
 
-      if (is_array($argument)) {
+      if (\is_array($argument)) {
         $arguments[$key] = $this->resolveServicesAndParameters($argument);
         continue;
       }
 
-      if (!is_string($argument)) {
+      if (!\is_string($argument)) {
         continue;
       }
 
       // Resolve parameters.
       if ($argument[0] === '%') {
-        $name = substr($argument, 1, -1);
+        $name = \substr($argument, 1, -1);
         if (!isset($this->parameters[$name])) {
           $arguments[$key] = $this->getParameter($name);
           // This can never be reached as getParameter() throws an Exception,
@@ -213,10 +213,10 @@ class PhpArrayContainer extends Container {
 
       // Resolve services.
       if ($argument[0] === '@') {
-        $id = substr($argument, 1);
+        $id = \substr($argument, 1);
         $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
         if ($id[0] === '?') {
-          $id = substr($id, 1);
+          $id = \substr($id, 1);
           $invalid_behavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
         }
         if (isset($this->services[$id])) {

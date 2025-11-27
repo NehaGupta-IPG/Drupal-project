@@ -68,9 +68,9 @@ class NodeRequirements {
       $views_storage = $this->entityTypeManager->getStorage('view');
       foreach ($views_storage->loadMultiple($active_view_ids) as $view) {
         foreach ($view->get('display') as $display_id => $display) {
-          if (array_key_exists('filters', $display['display_options'])) {
+          if (\array_key_exists('filters', $display['display_options'])) {
             foreach ($display['display_options']['filters'] as $filter) {
-              if (array_key_exists('plugin_id', $filter) && $filter['plugin_id'] === 'node_status') {
+              if (\array_key_exists('plugin_id', $filter) && $filter['plugin_id'] === 'node_status') {
                 $node_status_filter_problematic_views[$view->id()][$display_id] = [
                   'view_label' => $view->label(),
                   'display_name' => $display['display_title'] ?? $display_id,
@@ -93,7 +93,7 @@ class NodeRequirements {
             }
           );
         }
-        uasort($node_access_implementations, 'strnatcasecmp');
+        \uasort($node_access_implementations, 'strnatcasecmp');
         $views_ui_enabled = $this->moduleHandler->moduleExists('views_ui');
         $node_status_filter_problematic_views_list = [];
         foreach ($node_status_filter_problematic_views as $view_id => $displays) {
@@ -117,9 +117,9 @@ class NodeRequirements {
           }
         }
 
-        $node_status_filter_problematic_views_count = count($node_status_filter_problematic_views_list);
+        $node_status_filter_problematic_views_count = \count($node_status_filter_problematic_views_list);
         $node_status_filter_description_arguments = [
-          '%modules' => implode(', ', $node_access_implementations),
+          '%modules' => \implode(', ', $node_access_implementations),
           '%status_filter' => $this->t('Published status or admin user'),
         ];
 
@@ -131,7 +131,7 @@ class NodeRequirements {
           $node_status_filter_description_arguments['@views'] = \Drupal::service('renderer')->renderInIsolation($node_status_filter_problematic_views_list);
         }
         else {
-          $node_status_filter_description_arguments['%view'] = reset($node_status_filter_problematic_views_list);
+          $node_status_filter_description_arguments['%view'] = \reset($node_status_filter_problematic_views_list);
         }
 
         $node_status_filter_description = new PluralTranslatableMarkup(

@@ -28,7 +28,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->getEntity();
     if ($entity->isDefaultTranslation()) {
-      if (count($entity->getTranslationLanguages()) > 1) {
+      if (\count($entity->getTranslationLanguages()) > 1) {
         $languages = [];
         foreach ($entity->getTranslationLanguages() as $language) {
           $languages[] = $language->getName();

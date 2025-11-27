@@ -33,7 +33,7 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
    * {@inheritdoc}
    */
   protected function getAdministratorPermissions(): array {
-    return array_merge($this->permissions, [
+    return \array_merge($this->permissions, [
       'bypass node access',
       'administer workspaces',
     ]);

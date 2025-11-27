@@ -92,8 +92,8 @@ abstract class ConfigFactoryOverrideBase implements EventSubscriberInterface {
         unset($override_data[$key]);
         $changed = TRUE;
       }
-      elseif (is_array($override_data[$key])) {
-        if (is_array($original_data[$key])) {
+      elseif (\is_array($override_data[$key])) {
+        if (\is_array($original_data[$key])) {
           // Do the filtering one level deeper.
           // Ensure that we track $changed along the way.
           if ($this->filterNestedArray($original_data[$key], $override_data[$key])) {

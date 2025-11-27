@@ -74,7 +74,7 @@ final class AddComponent implements ConfigActionPluginInterface, ContainerFactor
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    assert(is_array($plugin_definition));
+    \assert(\is_array($plugin_definition));
     return new static(
       $container->get(ConfigManagerInterface::class),
       $container->get(UuidInterface::class),
@@ -87,10 +87,10 @@ final class AddComponent implements ConfigActionPluginInterface, ContainerFactor
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $values): void {
-    assert(is_array($values));
+    \assert(\is_array($values));
 
     if ($this->multiple) {
-      assert(array_is_list($values));
+      \assert(\array_is_list($values));
     }
     else {
       $values = [$values];
@@ -118,13 +118,13 @@ final class AddComponent implements ConfigActionPluginInterface, ContainerFactor
     $section_delta = $value['section'];
     $position = $value['position'];
 
-    assert(is_int($section_delta));
-    assert(is_int($position));
+    \assert(\is_int($section_delta));
+    \assert(\is_int($position));
 
     $section = $entity->getSection($section_delta);
     $component = $value['component'];
     $region = $component['default_region'] ?? NULL;
-    if (array_key_exists('region', $component) && is_array($component['region'])) {
+    if (\array_key_exists('region', $component) && \is_array($component['region'])) {
       // Since the recipe author might not know ahead of time what layout the
       // section is using, they should supply a map whose keys are layout IDs
       // and values are region names, so we know where to place this component.
@@ -148,7 +148,7 @@ final class AddComponent implements ConfigActionPluginInterface, ContainerFactor
     $component = new SectionComponent($uuid, $region, $component['configuration'], $component['additional'] ?? []);
     // If the position is higher than the number of components, just put it last
     // instead of failing.
-    $position = min($position, count($section->getComponentsByRegion($region)));
+    $position = \min($position, \count($section->getComponentsByRegion($region)));
     $section->insertComponent($position, $component);
     $entity->setSection($section_delta, $section);
   }

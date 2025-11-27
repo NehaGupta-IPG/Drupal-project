@@ -40,59 +40,59 @@ class CommentTypeTest extends MigrateSqlSourceTestBase {
     $comment_variable_rows = [
       [
         'name' => 'comment_anonymous_page',
-        'value' => serialize(0),
+        'value' => \serialize(0),
       ],
       [
         'name' => 'comment_anonymous_story',
-        'value' => serialize(1),
+        'value' => \serialize(1),
       ],
       [
         'name' => 'comment_default_mode_page',
-        'value' => serialize(0),
+        'value' => \serialize(0),
       ],
       [
         'name' => 'comment_default_mode_story',
-        'value' => serialize(1),
+        'value' => \serialize(1),
       ],
       [
         'name' => 'comment_default_per_page_page',
-        'value' => serialize('10'),
+        'value' => \serialize('10'),
       ],
       [
         'name' => 'comment_default_per_page_story',
-        'value' => serialize('20'),
+        'value' => \serialize('20'),
       ],
       [
         'name' => 'comment_form_location_page',
-        'value' => serialize(0),
+        'value' => \serialize(0),
       ],
       [
         'name' => 'comment_form_location_story',
-        'value' => serialize(1),
+        'value' => \serialize(1),
       ],
       [
         'name' => 'comment_page',
-        'value' => serialize('0'),
+        'value' => \serialize('0'),
       ],
       [
         'name' => 'comment_preview_page',
-        'value' => serialize('0'),
+        'value' => \serialize('0'),
       ],
       [
         'name' => 'comment_preview_story',
-        'value' => serialize('1'),
+        'value' => \serialize('1'),
       ],
       [
         'name' => 'comment_story',
-        'value' => serialize('1'),
+        'value' => \serialize('1'),
       ],
       [
         'name' => 'comment_subject_field_page',
-        'value' => serialize(0),
+        'value' => \serialize(0),
       ],
       [
         'name' => 'comment_subject_field_story',
-        'value' => serialize(1),
+        'value' => \serialize(1),
       ],
     ];
 
@@ -133,7 +133,7 @@ class CommentTypeTest extends MigrateSqlSourceTestBase {
           'variable' => [
             [
               'name' => 'css_js_query_string',
-              'value' => serialize('foobar'),
+              'value' => \serialize('foobar'),
             ],
           ],
         ],

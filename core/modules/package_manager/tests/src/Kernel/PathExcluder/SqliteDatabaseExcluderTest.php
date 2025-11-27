@@ -126,7 +126,7 @@ class SqliteDatabaseExcluderTest extends PackageManagerKernelTestBase {
       $web_root,
       $path_locator->getStagingRoot(),
     );
-    $db_path = str_replace('<PROJECT_ROOT>', $project_root, $db_path);
+    $db_path = \str_replace('<PROJECT_ROOT>', $project_root, $db_path);
     $this->mockDatabase->getConnectionOptions()
       ->willReturn(['database' => $db_path])
       ->shouldBeCalled();
@@ -140,18 +140,18 @@ class SqliteDatabaseExcluderTest extends PackageManagerKernelTestBase {
       ->dispatch($event)
       ->getAll();
 
-    if (is_string($expected_excluded_path)) {
+    if (\is_string($expected_excluded_path)) {
       $expected_exclusions = [
         $expected_excluded_path,
         $expected_excluded_path . '-shm',
         $expected_excluded_path . '-wal',
       ];
-      $this->assertEmpty(array_diff($expected_exclusions, $actual_excluded_paths));
+      $this->assertEmpty(\array_diff($expected_exclusions, $actual_excluded_paths));
     }
     else {
       // The path of the database should not appear anywhere in the list of
       // excluded paths.
-      $this->assertStringNotContainsString($db_path, serialize($actual_excluded_paths));
+      $this->assertStringNotContainsString($db_path, \serialize($actual_excluded_paths));
     }
   }
 

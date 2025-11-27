@@ -52,7 +52,7 @@ class ThemeSettingsTest extends MigrateSqlSourceTestBase {
     $tests[0]['source_data']['variable'] = [
       [
         'name' => 'theme_olivero_settings',
-        'value' => serialize($value),
+        'value' => \serialize($value),
       ],
     ];
 

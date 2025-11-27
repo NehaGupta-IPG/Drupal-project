@@ -51,7 +51,7 @@ class ViewsData {
   public function getViewsData() {
     $data = [];
 
-    $entity_types_with_moderation = array_filter($this->entityTypeManager->getDefinitions(), function (EntityTypeInterface $type) {
+    $entity_types_with_moderation = \array_filter($this->entityTypeManager->getDefinitions(), function (EntityTypeInterface $type) {
       return $this->moderationInformation->isModeratedEntityType($type);
     });
 

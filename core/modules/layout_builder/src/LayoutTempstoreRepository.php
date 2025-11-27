@@ -50,7 +50,7 @@ class LayoutTempstoreRepository implements LayoutTempstoreRepositoryInterface {
       $section_storage = $tempstore['section_storage'];
 
       if (!($section_storage instanceof SectionStorageInterface)) {
-        throw new \UnexpectedValueException(sprintf('The entry with storage type "%s" and ID "%s" is invalid', $storage_type, $key));
+        throw new \UnexpectedValueException(\sprintf('The entry with storage type "%s" and ID "%s" is invalid', $storage_type, $key));
       }
 
       // Set the storage in the static cache.

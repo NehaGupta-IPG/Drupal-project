@@ -101,9 +101,9 @@ class ModerationStateFilter extends InOperator implements DependentWithRemovalPl
     foreach ($this->workflowStorage->loadByProperties(['type' => 'content_moderation']) as $workflow) {
       /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModerationInterface $workflow_type */
       $workflow_type = $workflow->getTypePlugin();
-      if (in_array($this->getEntityType(), $workflow_type->getEntityTypes(), TRUE)) {
+      if (\in_array($this->getEntityType(), $workflow_type->getEntityTypes(), TRUE)) {
         foreach ($workflow_type->getStates() as $state_id => $state) {
-          $this->valueOptions[$workflow->label()][implode('-', [$workflow->id(), $state_id])] = $state->label();
+          $this->valueOptions[$workflow->label()][\implode('-', [$workflow->id(), $state_id])] = $state->label();
         }
       }
     }
@@ -129,7 +129,7 @@ class ModerationStateFilter extends InOperator implements DependentWithRemovalPl
       $workflow_ids = $this->getWorkflowIds();
       $moderated_bundles = [];
       foreach ($this->bundleInfo->getBundleInfo($this->getEntityType()) as $bundle_id => $bundle) {
-        if (isset($bundle['workflow']) && in_array($bundle['workflow'], $workflow_ids, TRUE)) {
+        if (isset($bundle['workflow']) && \in_array($bundle['workflow'], $workflow_ids, TRUE)) {
           $moderated_bundles[] = $bundle_id;
         }
       }
@@ -178,7 +178,7 @@ class ModerationStateFilter extends InOperator implements DependentWithRemovalPl
     // we need to create a complex WHERE condition.
     $field = $this->view->query->getConnection()->condition('OR');
     foreach ((array) $this->value as $value) {
-      [$workflow_id, $state_id] = explode('-', $value, 2);
+      [$workflow_id, $state_id] = \explode('-', $value, 2);
 
       $and = $this->view->query->getConnection()->condition('AND');
       $and
@@ -228,7 +228,7 @@ class ModerationStateFilter extends InOperator implements DependentWithRemovalPl
       // Check if any of the handler dependencies match the dependencies being
       // removed.
       foreach ($dependency_list as $config_key) {
-        if (isset($dependencies[$group]) && array_key_exists($config_key, $dependencies[$group])) {
+        if (isset($dependencies[$group]) && \array_key_exists($config_key, $dependencies[$group])) {
           // This handlers dependency matches a dependency being removed,
           // indicate that this handler needs to be removed.
           $remove = TRUE;
@@ -248,11 +248,11 @@ class ModerationStateFilter extends InOperator implements DependentWithRemovalPl
   protected function getWorkflowIds() {
     $workflow_ids = [];
     foreach ((array) $this->value as $value) {
-      [$workflow_id] = explode('-', $value, 2);
+      [$workflow_id] = \explode('-', $value, 2);
       $workflow_ids[] = $workflow_id;
     }
 
-    return array_unique($workflow_ids);
+    return \array_unique($workflow_ids);
   }
 
 }

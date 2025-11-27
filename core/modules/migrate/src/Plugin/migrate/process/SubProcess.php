@@ -203,10 +203,10 @@ class SubProcess extends ProcessPluginBase {
       $source[$key] = $row->getSource();
     }
 
-    if (is_iterable($value)) {
+    if (\is_iterable($value)) {
       foreach ($value as $key => $new_value) {
-        if (!is_array($new_value)) {
-          throw new MigrateException(sprintf("Input array should hold elements of type array, instead element was of type '%s'", gettype($new_value)));
+        if (!\is_array($new_value)) {
+          throw new MigrateException(\sprintf("Input array should hold elements of type array, instead element was of type '%s'", \gettype($new_value)));
         }
         $new_row = new Row($new_value + $source);
         try {
@@ -216,7 +216,7 @@ class SubProcess extends ProcessPluginBase {
           continue;
         }
         $destination = $new_row->getDestination();
-        if (array_key_exists('key', $this->configuration)) {
+        if (\array_key_exists('key', $this->configuration)) {
           $key = $this->transformKey($key, $migrate_executable, $new_row);
         }
         // Do not save the result if the key is NULL. The configured process

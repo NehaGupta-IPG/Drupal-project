@@ -74,16 +74,16 @@ class FakeSiteFixtureTest extends PackageManagerKernelTestBase {
     $inspector = $this->container->get(ComposerInspector::class);
     $active_dir = $this->container->get(PathLocator::class)->getProjectRoot();
     $expected_packages = self::getExpectedFakeSitePackages();
-    $actual_packages = array_keys($inspector->getInstalledPackagesList($active_dir)->getArrayCopy());
-    sort($actual_packages);
+    $actual_packages = \array_keys($inspector->getInstalledPackagesList($active_dir)->getArrayCopy());
+    \sort($actual_packages);
     $this->assertSame($expected_packages, $actual_packages);
     foreach (self::getExpectedFakeSitePackages() as $package_name) {
       (new ActiveFixtureManipulator())
         ->removePackage($package_name, $package_name === 'drupal/core-dev')
         ->commitChanges();
-      array_shift($expected_packages);
-      $actual_package_names = array_keys($inspector->getInstalledPackagesList($active_dir)->getArrayCopy());
-      sort($actual_package_names);
+      \array_shift($expected_packages);
+      $actual_package_names = \array_keys($inspector->getInstalledPackagesList($active_dir)->getArrayCopy());
+      \sort($actual_package_names);
       $this->assertSame($expected_packages, $actual_package_names);
     }
 
@@ -98,8 +98,8 @@ class FakeSiteFixtureTest extends PackageManagerKernelTestBase {
     $installed_packages = $this->container->get(ComposerInspector::class)
       ->getInstalledPackagesList($project_root)
       ->getArrayCopy();
-    ksort($installed_packages);
-    $this->assertSame($this->getExpectedFakeSitePackages(), array_keys($installed_packages));
+    \ksort($installed_packages);
+    $this->assertSame($this->getExpectedFakeSitePackages(), \array_keys($installed_packages));
   }
 
   /**
@@ -114,7 +114,7 @@ class FakeSiteFixtureTest extends PackageManagerKernelTestBase {
       'drupal/core-recommended',
       'drupal/core-dev',
     ];
-    sort($packages);
+    \sort($packages);
     return $packages;
   }
 
@@ -135,12 +135,12 @@ class FakeSiteFixtureTest extends PackageManagerKernelTestBase {
     if ($error = $process->getErrorOutput()) {
       $this->fail('Process error: ' . $error);
     }
-    $output = json_decode($process->getOutput(), TRUE);
-    $package_names = array_map(fn (array $package) => $package['name'], $output['installed']);
-    $this->assertTrue(asort($package_names));
+    $output = \json_decode($process->getOutput(), TRUE);
+    $package_names = \array_map(fn (array $package) => $package['name'], $output['installed']);
+    $this->assertTrue(\asort($package_names));
     $this->assertSame(['any-org/any-package', 'drupal/core', 'drupal/core-dev', 'drupal/core-recommended'], $package_names);
     $list = $this->container->get(ComposerInspector::class)->getInstalledPackagesList($active_dir);
-    $list_packages_names = array_keys($list->getArrayCopy());
+    $list_packages_names = \array_keys($list->getArrayCopy());
     $this->assertSame(['any-org/any-package', 'drupal/core', 'drupal/core-dev', 'drupal/core-recommended'], $list_packages_names);
   }
 

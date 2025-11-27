@@ -554,7 +554,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
    */
   public function testPluginDefinition(): void {
     $plugin_manager = \Drupal::service('plugin.manager.sdc');
-    assert($plugin_manager instanceof ComponentPluginManager);
+    \assert($plugin_manager instanceof ComponentPluginManager);
     $definition = $plugin_manager->getDefinition('sdc_test:my-banner');
     $this->assertSame('my-banner', $definition['machineName']);
     $this->assertStringEndsWith('system/tests/modules/sdc_test/components/my-banner', $definition['path']);

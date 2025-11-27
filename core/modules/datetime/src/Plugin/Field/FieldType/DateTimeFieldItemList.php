@@ -65,7 +65,7 @@ class DateTimeFieldItemList extends FieldItemList {
    */
   public function defaultValuesFormValidate(array $element, array &$form, FormStateInterface $form_state) {
     if ($form_state->getValue(['default_value_input', 'default_date_type']) == static::DEFAULT_VALUE_CUSTOM) {
-      $is_strtotime = @strtotime($form_state->getValue(['default_value_input', 'default_date']));
+      $is_strtotime = @\strtotime($form_state->getValue(['default_value_input', 'default_date']));
       if (!$is_strtotime) {
         $form_state->setErrorByName('default_value_input][default_date', $this->t('The relative date value entered is invalid.'));
       }
@@ -95,7 +95,7 @@ class DateTimeFieldItemList extends FieldItemList {
       if ($definition->getSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATE) {
         // A default date only value should be in the format used for date
         // storage but in the user's local timezone.
-        $date = new DrupalDateTime($default_value[0]['default_date'], date_default_timezone_get());
+        $date = new DrupalDateTime($default_value[0]['default_date'], \date_default_timezone_get());
         $format = DateTimeItemInterface::DATE_STORAGE_FORMAT;
       }
       else {

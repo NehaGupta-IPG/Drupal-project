@@ -33,11 +33,11 @@ class SearchTextProcessorTest extends KernelTestBase {
     // their own lines). So the even-numbered lines should simplify to nothing,
     // and the odd-numbered lines we need to split into shorter chunks and
     // verify that text processing doesn't lose any characters.
-    $input = file_get_contents($this->root . '/core/modules/search/tests/UnicodeTest.txt');
-    $base_strings = explode(chr(10), $input);
+    $input = \file_get_contents($this->root . '/core/modules/search/tests/UnicodeTest.txt');
+    $base_strings = \explode(\chr(10), $input);
     $strings = [];
     $text_processor = \Drupal::service('search.text_processor');
-    assert($text_processor instanceof SearchTextProcessorInterface);
+    \assert($text_processor instanceof SearchTextProcessorInterface);
     foreach ($base_strings as $key => $string) {
       if ($key % 2) {
         // Even line - should simplify down to a space.
@@ -50,12 +50,12 @@ class SearchTextProcessorTest extends KernelTestBase {
         // truncation in
         // \Drupal\search\SearchTextProcessorInterface::analyze().
         $start = 0;
-        while ($start < mb_strlen($string)) {
-          $new_string = mb_substr($string, $start, 30);
+        while ($start < \mb_strlen($string)) {
+          $new_string = \mb_substr($string, $start, 30);
           // Special case: leading zeros are removed from numeric strings,
           // and there's one string in this file that is numbers starting with
           // zero, so prepend a 1 on that string.
-          if (preg_match('/^[0-9]+$/', $new_string)) {
+          if (\preg_match('/^[0-9]+$/', $new_string)) {
             $new_string = '1' . $new_string;
           }
           $strings[] = $new_string;
@@ -65,14 +65,14 @@ class SearchTextProcessorTest extends KernelTestBase {
     }
     foreach ($strings as $key => $string) {
       $simplified = $text_processor->analyze($string);
-      $this->assertGreaterThanOrEqual(mb_strlen($string), mb_strlen($simplified), "Nothing is removed from string $key.");
+      $this->assertGreaterThanOrEqual(\mb_strlen($string), \mb_strlen($simplified), "Nothing is removed from string $key.");
     }
 
     // Test the low-numbered ASCII control characters separately. They are not
     // in the text file because they are problematic for diff, especially \0.
     $string = '';
     for ($i = 0; $i < 32; $i++) {
-      $string .= chr($i);
+      $string .= \chr($i);
     }
     $this->assertSame(' ', $text_processor->analyze($string), 'Search simplify works for ASCII control characters.');
   }
@@ -89,9 +89,9 @@ class SearchTextProcessorTest extends KernelTestBase {
     ];
 
     $text_processor = \Drupal::service('search.text_processor');
-    assert($text_processor instanceof SearchTextProcessorInterface);
+    \assert($text_processor instanceof SearchTextProcessorInterface);
     foreach ($cases as $case) {
-      $out = trim($text_processor->analyze($case[0]));
+      $out = \trim($text_processor->analyze($case[0]));
       $this->assertEquals($case[1], $out, $case[2]);
     }
   }

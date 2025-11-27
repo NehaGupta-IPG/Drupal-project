@@ -35,7 +35,7 @@ class NodeAccessLanguageTest extends NodeAccessTestBase {
     $this->addPrivateField(NodeType::load('page'));
 
     // After enabling a node access module, the access table has to be rebuild.
-    node_access_rebuild();
+    \node_access_rebuild();
 
     // Enable the private node feature of the node_access_test module.
     \Drupal::state()->set('node_access_test.private', TRUE);

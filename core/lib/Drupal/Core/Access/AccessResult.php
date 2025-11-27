@@ -37,7 +37,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *   isNeutral() will be TRUE.
    */
   public static function neutral($reason = NULL) {
-    assert(is_string($reason) || is_null($reason));
+    \assert(\is_string($reason) || \is_null($reason));
     return new AccessResultNeutral($reason);
   }
 
@@ -62,7 +62,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *   isForbidden() will be TRUE.
    */
   public static function forbidden($reason = NULL) {
-    assert(is_string($reason) || is_null($reason));
+    \assert(\is_string($reason) || \is_null($reason));
     return new AccessResultForbidden($reason);
   }
 
@@ -161,14 +161,14 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
     $access_result = static::allowedIf($access)->addCacheContexts(empty($permissions) ? [] : ['user.permissions']);
 
     if ($access_result instanceof AccessResultReasonInterface) {
-      if (count($permissions) === 1) {
+      if (\count($permissions) === 1) {
         $access_result->setReason("The '$permission' permission is required.");
       }
-      elseif (count($permissions) > 1) {
+      elseif (\count($permissions) > 1) {
         $quote = function ($s) {
           return "'$s'";
         };
-        $access_result->setReason(sprintf("The following permissions are required: %s.", implode(" $conjunction ", array_map($quote, $permissions))));
+        $access_result->setReason(\sprintf("The following permissions are required: %s.", \implode(" $conjunction ", \array_map($quote, $permissions))));
       }
     }
 

@@ -104,7 +104,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
    */
   public function getUrlObject() {
     $url = $this->link->first()->getUrl();
-    assert($url instanceof Url);
+    \assert($url instanceof Url);
     if ($attributes = $url->getOption('attributes')) {
       $url->setOption('attributes', AttributeXss::sanitizeAttributes($attributes));
     }
@@ -212,7 +212,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
-    if (parse_url($this->link->uri, PHP_URL_SCHEME) === 'internal') {
+    if (\parse_url($this->link->uri, PHP_URL_SCHEME) === 'internal') {
       $this->setRequiresRediscovery(TRUE);
     }
     else {
@@ -288,20 +288,20 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     // Add the publishing status field.
     $fields += static::publishedBaseFieldDefinitions($entity_type);
 
-    $fields['id']->setLabel(t('Entity ID'))
-      ->setDescription(t('The entity ID for this menu link content entity.'));
+    $fields['id']->setLabel(\t('Entity ID'))
+      ->setDescription(\t('The entity ID for this menu link content entity.'));
 
-    $fields['uuid']->setDescription(t('The content menu link UUID.'));
+    $fields['uuid']->setDescription(\t('The content menu link UUID.'));
 
-    $fields['langcode']->setDescription(t('The menu link language code.'));
+    $fields['langcode']->setDescription(\t('The menu link language code.'));
 
     $fields['bundle']
-      ->setDescription(t('The content menu link bundle.'))
+      ->setDescription(\t('The content menu link bundle.'))
       ->setSetting('max_length', EntityTypeInterface::BUNDLE_MAX_LENGTH)
       ->setSetting('is_ascii', TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Menu link title'))
+      ->setLabel(\t('Menu link title'))
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
@@ -318,8 +318,8 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Description'))
-      ->setDescription(t('Shown when hovering over the menu link.'))
+      ->setLabel(\t('Description'))
+      ->setDescription(\t('Shown when hovering over the menu link.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setSetting('max_length', 255)
@@ -334,13 +334,13 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
       ]);
 
     $fields['menu_name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Menu name'))
-      ->setDescription(t('The menu name. All links with the same menu name (such as "tools") are part of the same menu.'))
+      ->setLabel(\t('Menu name'))
+      ->setDescription(\t('The menu name. All links with the same menu name (such as "tools") are part of the same menu.'))
       ->setDefaultValue('tools')
       ->setSetting('is_ascii', TRUE);
 
     $fields['link'] = BaseFieldDefinition::create('link')
-      ->setLabel(t('Link'))
+      ->setLabel(\t('Link'))
       ->setRevisionable(TRUE)
       ->setRequired(TRUE)
       ->setSettings([
@@ -353,18 +353,18 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
       ]);
 
     $fields['external'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('External'))
-      ->setDescription(t('A flag to indicate if the link points to a full URL starting with a protocol, like http:// (1 = external, 0 = internal).'))
+      ->setLabel(\t('External'))
+      ->setDescription(\t('A flag to indicate if the link points to a full URL starting with a protocol, like http:// (1 = external, 0 = internal).'))
       ->setDefaultValue(FALSE)
       ->setRevisionable(TRUE);
 
     $fields['rediscover'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Indicates whether the menu link should be rediscovered'))
+      ->setLabel(\t('Indicates whether the menu link should be rediscovered'))
       ->setDefaultValue(FALSE);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Weight'))
-      ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
+      ->setLabel(\t('Weight'))
+      ->setDescription(\t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
       ->setDefaultValue(0)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -377,8 +377,8 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
       ]);
 
     $fields['expanded'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Show as expanded'))
-      ->setDescription(t('If selected and this menu link has children, the menu will always appear expanded. This option may be overridden for the entire menu tree when placing a menu block.'))
+      ->setLabel(\t('Show as expanded'))
+      ->setDescription(\t('If selected and this menu link has children, the menu will always appear expanded. This option may be overridden for the entire menu tree when placing a menu block.'))
       ->setDefaultValue(FALSE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
@@ -392,8 +392,8 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
 
     // Override some properties of the published field added by
     // \Drupal\Core\Entity\EntityPublishedTrait::publishedBaseFieldDefinitions().
-    $fields['enabled']->setLabel(t('Enabled'));
-    $fields['enabled']->setDescription(t('A flag for whether the link should be enabled in menus or hidden.'));
+    $fields['enabled']->setLabel(\t('Enabled'));
+    $fields['enabled']->setDescription(\t('A flag for whether the link should be enabled in menus or hidden.'));
     $fields['enabled']->setTranslatable(FALSE);
     $fields['enabled']->setDisplayOptions('view', [
       'label' => 'hidden',
@@ -406,12 +406,12 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     ]);
 
     $fields['parent'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Parent plugin ID'))
-      ->setDescription(t('The ID of the parent menu link plugin, or empty string when at the top level of the hierarchy.'));
+      ->setLabel(\t('Parent plugin ID'))
+      ->setDescription(\t('The ID of the parent menu link plugin, or empty string when at the top level of the hierarchy.'));
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the menu link was last edited.'))
+      ->setLabel(\t('Changed'))
+      ->setDescription(\t('The time that the menu link was last edited.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
 

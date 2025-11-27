@@ -56,11 +56,11 @@ class SearchIndex implements SearchIndexInterface {
 
     // Strip off all ignored tags to speed up processing, but insert space
     // before and after them to keep word boundaries.
-    $text = str_replace(['<', '>'], [' <', '> '], $text);
-    $text = strip_tags($text, '<' . implode('><', array_keys($tags)) . '>');
+    $text = \str_replace(['<', '>'], [' <', '> '], $text);
+    $text = \strip_tags($text, '<' . \implode('><', \array_keys($tags)) . '>');
 
     // Split HTML tags from plain text.
-    $split = preg_split('/\s*<([^>]+?)>\s*/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $split = \preg_split('/\s*<([^>]+?)>\s*/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
     // Note: PHP ensures the array consists of alternating delimiters and
     // literals and begins and ends with a literal (inserting $null as
     // required).
@@ -83,20 +83,20 @@ class SearchIndex implements SearchIndexInterface {
     foreach ($split as $value) {
       if ($tag) {
         // Increase or decrease score per word based on tag.
-        [$tagname] = explode(' ', $value, 2);
-        $tagname = mb_strtolower($tagname);
+        [$tagname] = \explode(' ', $value, 2);
+        $tagname = \mb_strtolower($tagname);
         // Closing or opening tag?
         if ($tagname[0] == '/') {
-          $tagname = substr($tagname, 1);
+          $tagname = \substr($tagname, 1);
           // If we encounter unexpected tags, reset score to avoid incorrect
           // boosting.
-          if (!count($tag_stack) || $tag_stack[0] != $tagname) {
+          if (!\count($tag_stack) || $tag_stack[0] != $tagname) {
             $tag_stack = [];
             $score = 1;
           }
           else {
             // Remove from tag stack and decrement score.
-            $score = max(1, $score - $tags[array_shift($tag_stack)]);
+            $score = \max(1, $score - $tags[\array_shift($tag_stack)]);
           }
         }
         else {
@@ -108,7 +108,7 @@ class SearchIndex implements SearchIndexInterface {
           }
           else {
             // Add to open tag stack and increment score.
-            array_unshift($tag_stack, $tagname);
+            \array_unshift($tag_stack, $tagname);
             $score += $tags[$tagname];
           }
         }
@@ -124,7 +124,7 @@ class SearchIndex implements SearchIndexInterface {
             // Add word to accumulator.
             $accumulator .= $word . ' ';
             // Check word length.
-            if (is_numeric($word) || mb_strlen($word) >= $minimum_word_size) {
+            if (\is_numeric($word) || \mb_strlen($word) >= $minimum_word_size) {
               if (!isset($scored_words[$word])) {
                 $scored_words[$word] = 0;
               }
@@ -132,12 +132,12 @@ class SearchIndex implements SearchIndexInterface {
               // Focus is a decaying value in terms of the amount of unique
               // words up to this point. From 100 words and more, it decays, to
               // e.g. 0.5 at 500 words and 0.3 at 1000 words.
-              $focus = min(1, .01 + 3.5 / (2 + count($scored_words) * .015));
+              $focus = \min(1, .01 + 3.5 / (2 + \count($scored_words) * .015));
             }
             $tag_words++;
             // Too many words inside a single tag probably mean a tag was
             // accidentally left open.
-            if (count($tag_stack) && $tag_words >= 15) {
+            if (\count($tag_stack) && $tag_words >= 15) {
               $tag_stack = [];
               $score = 1;
             }
@@ -262,13 +262,13 @@ class SearchIndex implements SearchIndexInterface {
     try {
       // Update word IDF (Inverse Document Frequency) counts for new/changed
       // words.
-      $words = array_keys($words);
+      $words = \array_keys($words);
       foreach ($words as $word) {
         // Get total count.
         $total = $this->replica->query("SELECT SUM([score]) FROM {search_index} WHERE [word] = :word", [':word' => $word])
           ->fetchField();
         // Apply Zipf's law to equalize the probability distribution.
-        $total = log10(1 + 1 / (max(1, $total)));
+        $total = \log10(1 + 1 / (\max(1, $total)));
         $this->connection->merge('search_total')
           ->key('word', $word)
           ->fields(['count' => $total])
@@ -282,7 +282,7 @@ class SearchIndex implements SearchIndexInterface {
       foreach ($result as $word) {
         $or->condition('word', $word->realword);
       }
-      if (count($or) > 0) {
+      if (\count($or) > 0) {
         $this->connection->delete('search_total')
           ->condition($or)
           ->execute();

@@ -39,7 +39,7 @@ class PostApplySubscriber implements EventSubscriberInterface {
    */
   public function postApply(): void {
     $dir = $this->pathLocator->getProjectRoot();
-    file_put_contents("$dir/bravo.txt", 'Bravo!');
+    \file_put_contents("$dir/bravo.txt", 'Bravo!');
   }
 
   /**

@@ -134,7 +134,7 @@ trait ImageTestBaselineTrait {
     $original_body_value = $this->host->body->value;
     foreach ($this->providerLinkability() as $data) {
       [$image_type, $unrestricted] = $data;
-      assert($image_type === 'inline' || $image_type === 'block');
+      \assert($image_type === 'inline' || $image_type === 'block');
 
       $format_config = $unrestricted ? ['status' => FALSE] : $original_config;
 
@@ -161,7 +161,7 @@ trait ImageTestBaselineTrait {
       $this->assertNotEmpty($drupalimage);
       $this->assertFalse($drupalimage->hasClass('.ck-widget_selected'));
 
-      $src = basename($this->imageAttributes()['src']);
+      $src = \basename($this->imageAttributes()['src']);
       // Assert the "editingDowncast" HTML before making changes.
       $assert_session->elementExists('css', '.ck-content .ck-widget.' . $expected_widget_class . ' > img[src*="' . $src . '"][alt="drupalimage test image"]');
 
@@ -216,7 +216,7 @@ trait ImageTestBaselineTrait {
       $this->pressEditorButton('Source');
       $source_text_area = $assert_session->waitForElement('css', '.ck-source-editing-area textarea');
       $this->assertNotEmpty($source_text_area);
-      $new_value = str_replace('<a ', '<a class="trusted" ', $source_text_area->getValue());
+      $new_value = \str_replace('<a ', '<a class="trusted" ', $source_text_area->getValue());
       $source_text_area->setValue('<p>temp</p>');
       $source_text_area->setValue($new_value);
       $this->pressEditorButton('Source');

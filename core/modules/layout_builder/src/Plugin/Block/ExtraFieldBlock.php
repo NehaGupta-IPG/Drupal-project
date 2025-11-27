@@ -73,8 +73,8 @@ class ExtraFieldBlock extends BlockBase implements ContextAwarePluginInterface, 
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
     // Get field name from the plugin ID.
-    [, , , $field_name] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 4);
-    assert(!empty($field_name));
+    [, , , $field_name] = \explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 4);
+    \assert(!empty($field_name));
     $this->fieldName = $field_name;
 
     parent::__construct($configuration, $plugin_id, $plugin_definition);

@@ -145,7 +145,7 @@ class ImageStyleEditForm extends ImageStyleFormBase {
     // Build the new image effect addition form and add it to the effect list.
     $new_effect_options = [];
     $effects = $this->imageEffectManager->getDefinitions();
-    uasort($effects, function ($a, $b) {
+    \uasort($effects, function ($a, $b) {
       return Unicode::strcasecmp($a['label'], $b['label']);
     });
     foreach ($effects as $effect => $definition) {
@@ -182,7 +182,7 @@ class ImageStyleEditForm extends ImageStyleFormBase {
       '#type' => 'weight',
       '#title' => $this->t('Weight for new effect'),
       '#title_display' => 'invisible',
-      '#default_value' => count($this->entity->getEffects()) + 1,
+      '#default_value' => \count($this->entity->getEffects()) + 1,
       '#attributes' => ['class' => ['image-effect-order-weight']],
     ];
     $form['effects']['new']['operations'] = [
@@ -211,7 +211,7 @@ class ImageStyleEditForm extends ImageStyleFormBase {
     $effect = $this->imageEffectManager->getDefinition($form_state->getValue('new'));
 
     // Load the configuration form for this option.
-    if (is_subclass_of($effect['class'], '\Drupal\image\ConfigurableImageEffectInterface')) {
+    if (\is_subclass_of($effect['class'], '\Drupal\image\ConfigurableImageEffectInterface')) {
       $form_state->setRedirect(
         'image.effect_add_form',
         [

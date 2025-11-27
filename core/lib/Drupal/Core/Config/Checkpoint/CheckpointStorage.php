@@ -91,7 +91,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
    * {@inheritdoc}
    */
   public function exists($name) {
-    if (count($this->checkpoints) === 0) {
+    if (\count($this->checkpoints) === 0) {
       throw new NoCheckpointsException();
     }
 
@@ -117,18 +117,18 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
    * {@inheritdoc}
    */
   public function readMultiple(array $names) {
-    if (count($this->checkpoints) === 0) {
+    if (\count($this->checkpoints) === 0) {
       throw new NoCheckpointsException();
     }
     $return = [];
 
     foreach ($this->getCheckpointsToReadFrom() as $checkpoint) {
-      $return = array_merge(
+      $return = \array_merge(
         $return,
         $this->getKeyValue($checkpoint->id, $this->collection)->getMultiple($names)
       );
       // Remove the read names from the list to fetch.
-      $names = array_diff($names, array_keys($return));
+      $names = \array_diff($names, \array_keys($return));
       if (empty($names)) {
         // All the configuration has been read. Nothing more to do.
         break;
@@ -138,7 +138,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
     // Names not found in the checkpoints have not been modified: read from
     // active storage.
     if (!empty($names)) {
-      $return = array_merge(
+      $return = \array_merge(
         $return,
         $this->activeStorage->readMultiple($names)
       );
@@ -148,7 +148,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
     // these operations in the checkpoint).
     // @see ::onConfigRename()
     // @see ::onConfigSaveAndDelete()
-    return array_filter($return);
+    return \array_filter($return);
   }
 
   /**
@@ -169,24 +169,24 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
    * {@inheritdoc}
    */
   public function listAll($prefix = '') {
-    if (count($this->checkpoints) === 0) {
+    if (\count($this->checkpoints) === 0) {
       throw new NoCheckpointsException();
     }
 
     $names = $new_configuration = [];
 
     foreach ($this->getCheckpointsToReadFrom() as $checkpoint) {
-      $checkpoint_names = array_keys(array_filter($this->getKeyValue($checkpoint->id, $this->collection)->getAll(), function (mixed $value, string $name) use (&$new_configuration, $prefix) {
+      $checkpoint_names = \array_keys(\array_filter($this->getKeyValue($checkpoint->id, $this->collection)->getAll(), function (mixed $value, string $name) use (&$new_configuration, $prefix) {
         if ($name === static::CONFIG_COLLECTION_KEY) {
           return FALSE;
         }
         // Remove any that don't start with the prefix.
-        if ($prefix !== '' && !str_starts_with($name, $prefix)) {
+        if ($prefix !== '' && !\str_starts_with($name, $prefix)) {
           return FALSE;
         }
         // We've determined in a previous checkpoint that the configuration did
         // not exist.
-        if (in_array($name, $new_configuration, TRUE)) {
+        if (\in_array($name, $new_configuration, TRUE)) {
           return FALSE;
         }
         // If the value is FALSE then the configuration was created after the
@@ -197,14 +197,14 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
         }
         return TRUE;
       }, ARRAY_FILTER_USE_BOTH));
-      $names = array_merge($names, $checkpoint_names);
+      $names = \array_merge($names, $checkpoint_names);
     }
 
     // Remove any names that did not exist prior to the checkpoint.
-    $active_names = array_diff($this->activeStorage->listAll($prefix), $new_configuration);
+    $active_names = \array_diff($this->activeStorage->listAll($prefix), $new_configuration);
 
-    $names = array_unique(array_merge($names, $active_names));
-    sort($names);
+    $names = \array_unique(\array_merge($names, $active_names));
+    \sort($names);
     return $names;
   }
 
@@ -231,12 +231,12 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
   public function getAllCollectionNames() {
     $names = [];
     foreach ($this->getCheckpointsToReadFrom() as $checkpoint) {
-      $names = array_merge(
+      $names = \array_merge(
         $names,
         $this->getKeyValue($checkpoint->id, StorageInterface::DEFAULT_COLLECTION)->get(static::CONFIG_COLLECTION_KEY, [])
       );
     }
-    return array_unique(array_merge($this->activeStorage->getAllCollectionNames(), $names));
+    return \array_unique(\array_merge($this->activeStorage->getAllCollectionNames(), $names));
   }
 
   /**
@@ -255,7 +255,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
     if (!$active_checkpoint instanceof Checkpoint) {
       // @todo https://www.drupal.org/i/3408525 Consider options for generating
       //   a real fingerprint.
-      $id = hash('sha1', random_bytes(32));
+      $id = \hash('sha1', \random_bytes(32));
       return $this->checkpoints->add($id, $label);
     }
 
@@ -277,7 +277,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
     if (!empty($current_checkpoint_data)) {
       // Use json_encode() here because it is both quicker and results in
       // smaller output than serialize().
-      $id = hash('sha1', ($active_checkpoint->parent ?? '') . json_encode($current_checkpoint_data));
+      $id = \hash('sha1', ($active_checkpoint->parent ?? '') . \json_encode($current_checkpoint_data));
       return $this->checkpoints->add($id, $label);
     }
 
@@ -331,7 +331,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
     if ($checkpoint->id !== $this->readFromCheckpoint?->id) {
       // Follow ancestors to find the checkpoint to start reading from.
       foreach ($this->checkpoints->getParents($checkpoint->id) as $checkpoint) {
-        array_unshift($checkpoints_to_read_from, $checkpoint);
+        \array_unshift($checkpoints_to_read_from, $checkpoint);
         if ($checkpoint->id === $this->readFromCheckpoint?->id) {
           break;
         }
@@ -442,8 +442,8 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
 
     $key_value = $this->getKeyValue($this->checkpoints->getActiveCheckpoint()->id, StorageInterface::DEFAULT_COLLECTION);
     $collections = $key_value->get(static::CONFIG_COLLECTION_KEY, []);
-    assert(is_array($collections));
-    if (in_array($collection, $collections, TRUE)) {
+    \assert(\is_array($collections));
+    if (\in_array($collection, $collections, TRUE)) {
       return;
     }
     $collections[] = $collection;

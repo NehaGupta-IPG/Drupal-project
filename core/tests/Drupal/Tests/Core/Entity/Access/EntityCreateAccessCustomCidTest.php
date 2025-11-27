@@ -70,10 +70,10 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
       ->getMock();
     $this->account->expects($this->any())
       ->method('id')
-      ->willReturn(rand());
+      ->willReturn(\rand());
 
-    $language_ids = array_keys(LanguageManager::getStandardLanguageList());
-    $this->langcode = $language_ids[array_rand($language_ids)];
+    $language_ids = \array_keys(LanguageManager::getStandardLanguageList());
+    $this->langcode = $language_ids[\array_rand($language_ids)];
 
     $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
     $this->moduleHandler->expects($this->any())

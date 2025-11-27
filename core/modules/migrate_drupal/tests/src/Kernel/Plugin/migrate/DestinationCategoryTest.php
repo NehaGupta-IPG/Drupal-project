@@ -40,7 +40,7 @@ class DestinationCategoryTest extends MigrateDrupalTestBase {
    */
   protected function setUp(): void {
     // Enable all modules.
-    self::$modules = array_keys($this->coreModuleListDataProvider());
+    self::$modules = \array_keys($this->coreModuleListDataProvider());
     parent::setUp();
     $this->migrationManager = \Drupal::service('plugin.manager.migration');
   }
@@ -74,16 +74,16 @@ class DestinationCategoryTest extends MigrateDrupalTestBase {
    */
   protected function assertCategories(array $migrations): void {
     foreach ($migrations as $id => $migration) {
-      $object_classes = class_parents($migration->getDestinationPlugin());
-      $object_classes[] = get_class($migration->getDestinationPlugin());
+      $object_classes = \class_parents($migration->getDestinationPlugin());
+      $object_classes[] = \get_class($migration->getDestinationPlugin());
 
       // Ensure that the destination plugin is an instance of at least one of
       // the expected classes.
-      if (in_array('Configuration', $migration->getMigrationTags(), TRUE)) {
-        $this->assertNotEmpty(array_intersect($object_classes, $this->getConfigurationClasses()), "The migration $id is tagged as Configuration.");
+      if (\in_array('Configuration', $migration->getMigrationTags(), TRUE)) {
+        $this->assertNotEmpty(\array_intersect($object_classes, $this->getConfigurationClasses()), "The migration $id is tagged as Configuration.");
       }
-      elseif (in_array('Content', $migration->getMigrationTags(), TRUE)) {
-        $this->assertNotEmpty(array_intersect($object_classes, $this->getContentClasses()), "The migration $id is tagged as Content.");
+      elseif (\in_array('Content', $migration->getMigrationTags(), TRUE)) {
+        $this->assertNotEmpty(\array_intersect($object_classes, $this->getContentClasses()), "The migration $id is tagged as Content.");
       }
       else {
         $this->fail("The migration $id is not tagged as either 'Content' or 'Configuration'.");

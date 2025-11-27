@@ -68,7 +68,7 @@ class EntityType extends Plugin {
     // Use the specified entity type class, and remove it before instantiating.
     $class = $this->entity_type_class;
 
-    $values = array_filter(get_object_vars($this) + [
+    $values = \array_filter(\get_object_vars($this) + [
       'class' => $this->getClass(),
       'provider' => $this->getProvider(),
     ], function ($value, $key) {

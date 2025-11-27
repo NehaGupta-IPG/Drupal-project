@@ -40,7 +40,7 @@ class TransportServiceFactoryTest extends BrowserTestBase {
    */
   public function testDefaultTestMailFactory(): void {
     $response = $this->drupalGet('mailer-transport-factory-functional-test/transport-info');
-    $actual = json_decode($response, TRUE);
+    $actual = \json_decode($response, TRUE);
 
     $expected = [
       'mailerDsn' => [

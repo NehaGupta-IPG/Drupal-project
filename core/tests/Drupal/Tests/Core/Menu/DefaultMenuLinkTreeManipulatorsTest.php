@@ -285,8 +285,8 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
   public function testFlatten(): void {
     $this->mockTree();
     $tree = $this->defaultMenuTreeManipulators->flatten($this->originalTree);
-    $this->assertEquals([1, 2, 5, 6, 8, 9], array_keys($this->originalTree));
-    $this->assertEquals([1, 2, 5, 6, 8, 9, 3, 4, 7], array_keys($tree));
+    $this->assertEquals([1, 2, 5, 6, 8, 9], \array_keys($this->originalTree));
+    $this->assertEquals([1, 2, 5, 6, 8, 9, 3, 4, 7], \array_keys($tree));
   }
 
   /**

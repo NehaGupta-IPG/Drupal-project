@@ -173,7 +173,7 @@ class PoDatabaseWriter implements PoWriterInterface {
       throw new \Exception('Langcode should be set before assigning a PoHeader.');
     }
 
-    if (array_sum($overwrite_options) || empty($locale_plurals[$langcode]['plurals'])) {
+    if (\array_sum($overwrite_options) || empty($locale_plurals[$langcode]['plurals'])) {
       // Get and store the plural formula if available.
       $plural = $header->getPluralForms();
       if (isset($plural) && $p = $header->parsePluralForms($plural)) {
@@ -188,8 +188,8 @@ class PoDatabaseWriter implements PoWriterInterface {
    */
   public function writeItem(PoItem $item) {
     if ($item->isPlural()) {
-      $item->setSource(implode(PoItem::DELIMITER, $item->getSource()));
-      $item->setTranslation(implode(PoItem::DELIMITER, $item->getTranslation()));
+      $item->setSource(\implode(PoItem::DELIMITER, $item->getSource()));
+      $item->setTranslation(\implode(PoItem::DELIMITER, $item->getTranslation()));
     }
     $this->importString($item);
   }
@@ -237,11 +237,11 @@ class PoDatabaseWriter implements PoWriterInterface {
       'source' => $source,
       'context' => $context,
     ]);
-    $string = reset($strings);
+    $string = \reset($strings);
 
     if (!empty($translation)) {
       // Skip this string unless it passes a check for dangerous code.
-      if (!locale_string_is_safe($translation)) {
+      if (!\locale_string_is_safe($translation)) {
         \Drupal::logger('locale')->error('Import of string "%string" was skipped because of disallowed or malformed HTML.', ['%string' => $translation]);
         $this->report['skips']++;
         return 0;

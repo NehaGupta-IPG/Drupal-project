@@ -112,7 +112,7 @@ class PhpBackend implements CacheBackendInterface {
       }
     }
 
-    $cids = array_diff($cids, array_keys($ret));
+    $cids = \array_diff($cids, \array_keys($ret));
 
     return $ret;
   }
@@ -156,14 +156,14 @@ class PhpBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []) {
-    assert(Inspector::assertAllStrings($tags), 'Cache Tags must be strings.');
+    \assert(Inspector::assertAllStrings($tags), 'Cache Tags must be strings.');
 
     $item = (object) [
       'cid' => $cid,
       'data' => $data,
-      'created' => round(microtime(TRUE), 3),
+      'created' => \round(\microtime(TRUE), 3),
       'expire' => $expire,
-      'tags' => array_unique($tags),
+      'tags' => \array_unique($tags),
       'checksum' => $this->checksumProvider->getCurrentChecksum($tags),
     ];
     $this->writeItem($this->normalizeCid($cid), $item);
@@ -225,7 +225,7 @@ class PhpBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function invalidateAll() {
-    @trigger_error("CacheBackendInterface::invalidateAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use CacheBackendInterface::deleteAll() or cache tag invalidation instead. See https://www.drupal.org/node/3500622", E_USER_DEPRECATED);
+    @\trigger_error("CacheBackendInterface::invalidateAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use CacheBackendInterface::deleteAll() or cache tag invalidation instead. See https://www.drupal.org/node/3500622", E_USER_DEPRECATED);
     foreach ($this->storage()->listAll() as $cidhash) {
       $this->invalidateByHash($cidhash);
     }
@@ -254,7 +254,7 @@ class PhpBackend implements CacheBackendInterface {
    *   The cache item to store.
    */
   protected function writeItem($cidhash, \stdClass $item) {
-    $content = '<?php return unserialize(' . var_export(serialize($item), TRUE) . ');';
+    $content = '<?php return unserialize(' . \var_export(\serialize($item), TRUE) . ');';
     $this->storage()->save($cidhash, $content);
   }
 

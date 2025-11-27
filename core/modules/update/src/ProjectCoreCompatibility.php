@@ -86,9 +86,9 @@ final class ProjectCoreCompatibility {
       // versions after the existing version.
       return [];
     }
-    $supported_versions = array_filter(array_keys($core_releases), function ($version) use ($supported_branches) {
+    $supported_versions = \array_filter(\array_keys($core_releases), function ($version) use ($supported_branches) {
       foreach ($supported_branches as $supported_branch) {
-        if (strpos($version, $supported_branch) === 0) {
+        if (\strpos($version, $supported_branch) === 0) {
           return TRUE;
         }
       }
@@ -96,7 +96,7 @@ final class ProjectCoreCompatibility {
     });
     $possible_core_update_versions = Semver::satisfiedBy($supported_versions, '>= ' . $this->existingCoreVersion);
     $possible_core_update_versions = Semver::sort($possible_core_update_versions);
-    $possible_core_update_versions = array_filter($possible_core_update_versions, function ($version) {
+    $possible_core_update_versions = \array_filter($possible_core_update_versions, function ($version) {
       return VersionParser::parseStability($version) === 'stable';
     });
     return $possible_core_update_versions;
@@ -138,7 +138,7 @@ final class ProjectCoreCompatibility {
       $versions[] = $project_data['latest_version'];
     }
     if (!empty($project_data['also'])) {
-      $versions = array_merge($versions, $project_data['also']);
+      $versions = \array_merge($versions, $project_data['also']);
     }
     foreach ($versions as $version) {
       if (isset($project_data['releases'][$version])) {
@@ -191,14 +191,14 @@ final class ProjectCoreCompatibility {
       $core_compatibility_ranges = $this->getCompatibilityRanges($core_compatibility_constraint);
       $range_messages = [];
       foreach ($core_compatibility_ranges as $core_compatibility_range) {
-        if (count($core_compatibility_range) === 2) {
+        if (\count($core_compatibility_range) === 2) {
           $range_messages[] = $this->t('@low_version_number to @high_version_number', ['@low_version_number' => $core_compatibility_range[0], '@high_version_number' => $core_compatibility_range[1]]);
         }
         else {
           $range_messages[] = $core_compatibility_range[0];
         }
       }
-      $this->compatibilityMessages[$core_compatibility_constraint] = $this->t('Requires Drupal core:') . ' ' . implode(', ', $range_messages);
+      $this->compatibilityMessages[$core_compatibility_constraint] = $this->t('Requires Drupal core:') . ' ' . \implode(', ', $range_messages);
     }
     return $this->compatibilityMessages[$core_compatibility_constraint];
   }

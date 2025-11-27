@@ -11,10 +11,10 @@ class ClassFinder implements ClassFinderInterface {
    * {@inheritdoc}
    */
   public function findFile($class) {
-    $loaders = spl_autoload_functions();
+    $loaders = \spl_autoload_functions();
     foreach ($loaders as $loader) {
-      if (is_array($loader) && isset($loader[0]) && is_object($loader[0]) && method_exists($loader[0], 'findFile')) {
-        $file = call_user_func_array([$loader[0], 'findFile'], [$class]);
+      if (\is_array($loader) && isset($loader[0]) && \is_object($loader[0]) && \method_exists($loader[0], 'findFile')) {
+        $file = \call_user_func_array([$loader[0], 'findFile'], [$class]);
         // Different implementations return different empty values. For example,
         // \Composer\Autoload\ClassLoader::findFile() returns FALSE whilst
         // \Drupal\Component\ClassFinder\ClassFinderInterface::findFile()

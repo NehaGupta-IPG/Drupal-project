@@ -40,7 +40,7 @@ class DiskSpaceValidator implements EventSubscriberInterface {
    *   If the amount of free space could not be determined.
    */
   protected function freeSpace(string $path): float {
-    $free_space = disk_free_space($path);
+    $free_space = \disk_free_space($path);
     if ($free_space === FALSE) {
       throw new \RuntimeException("Cannot get disk information for $path.");
     }
@@ -60,7 +60,7 @@ class DiskSpaceValidator implements EventSubscriberInterface {
    *   If the statistics could not be determined.
    */
   protected function stat(string $path): array {
-    $stat = stat($path);
+    $stat = \stat($path);
     if ($stat === FALSE) {
       throw new \RuntimeException("Cannot get information for $path.");
     }
@@ -105,7 +105,7 @@ class DiskSpaceValidator implements EventSubscriberInterface {
           '@space' => $minimum_mb,
         ]);
       }
-      if (is_dir($vendor_path) && $this->freeSpace($vendor_path) < $minimum_bytes) {
+      if (\is_dir($vendor_path) && $this->freeSpace($vendor_path) < $minimum_bytes) {
         $messages[] = $this->t('Vendor filesystem "@vendor" has insufficient space. There must be at least @space megabytes free.', [
           '@vendor' => $vendor_path,
           '@space' => $minimum_mb,
@@ -127,7 +127,7 @@ class DiskSpaceValidator implements EventSubscriberInterface {
     }
 
     if ($messages) {
-      $summary = count($messages) > 1
+      $summary = \count($messages) > 1
         ? $this->t("There is not enough disk space to create a stage directory.")
         : NULL;
       $event->addError($messages, $summary);

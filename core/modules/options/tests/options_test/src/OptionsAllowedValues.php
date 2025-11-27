@@ -54,7 +54,7 @@ class OptionsAllowedValues {
       ];
     }
     // We need the values of the entity as keys.
-    return array_combine($values, $values);
+    return \array_combine($values, $values);
   }
 
 }

@@ -22,7 +22,7 @@ class ConfigValidation {
    *   The validation execution context.
    */
   public static function validateLlama($string, ExecutionContextInterface $context) {
-    if (!in_array($string, ['llama', 'alpaca', 'guanaco', 'vicuña'], TRUE)) {
+    if (!\in_array($string, ['llama', 'alpaca', 'guanaco', 'vicuña'], TRUE)) {
       $context->addViolation('no valid llama');
     }
   }
@@ -36,7 +36,7 @@ class ConfigValidation {
    *   The validation execution context.
    */
   public static function validateCats($string, ExecutionContextInterface $context) {
-    if (!in_array($string, ['kitten', 'cats', 'nyans'])) {
+    if (!\in_array($string, ['kitten', 'cats', 'nyans'])) {
       $context->addViolation('no valid cat');
     }
   }
@@ -64,7 +64,7 @@ class ConfigValidation {
    *   The validation execution context.
    */
   public static function validateGiraffes($string, ExecutionContextInterface $context) {
-    if (!str_starts_with($string, 'hum')) {
+    if (!\str_starts_with($string, 'hum')) {
       $context->addViolation('Giraffes just hum');
     }
   }
@@ -81,8 +81,8 @@ class ConfigValidation {
     // Ensure we are validating the entire mapping by diffing against all the
     // keys.
     $mapping_schema = \Drupal::service('config.typed')->get('config_test.validation')->getValue();
-    if ($diff = array_diff_key($mapping, $mapping_schema)) {
-      $context->addViolation('Unexpected keys: ' . implode(', ', array_keys($diff)));
+    if ($diff = \array_diff_key($mapping, $mapping_schema)) {
+      $context->addViolation('Unexpected keys: ' . \implode(', ', \array_keys($diff)));
     }
   }
 

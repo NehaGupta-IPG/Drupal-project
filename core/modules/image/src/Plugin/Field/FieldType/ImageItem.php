@@ -218,7 +218,7 @@ class ImageItem extends FileItem {
     $settings = $this->getSettings();
 
     // Add maximum and minimum dimensions settings.
-    $max_resolution = explode('x', $settings['max_resolution']) + ['', ''];
+    $max_resolution = \explode('x', $settings['max_resolution']) + ['', ''];
     $element['max_resolution'] = [
       '#type' => 'item',
       '#title' => $this->t('Maximum image dimensions'),
@@ -245,7 +245,7 @@ class ImageItem extends FileItem {
       '#suffix' => '</div>',
     ];
 
-    $min_resolution = explode('x', $settings['min_resolution']) + ['', ''];
+    $min_resolution = \explode('x', $settings['min_resolution']) + ['', ''];
     $element['min_resolution'] = [
       '#type' => 'item',
       '#title' => $this->t('Minimum image dimensions'),
@@ -355,21 +355,21 @@ class ImageItem extends FileItem {
 
     $min_resolution = empty($settings['min_resolution']) ? '100x100' : $settings['min_resolution'];
     $max_resolution = empty($settings['max_resolution']) ? '600x600' : $settings['max_resolution'];
-    $extensions = array_intersect(explode(' ', $settings['file_extensions']), ['png', 'gif', 'jpg', 'jpeg']);
-    $extension = array_rand(array_combine($extensions, $extensions));
+    $extensions = \array_intersect(\explode(' ', $settings['file_extensions']), ['png', 'gif', 'jpg', 'jpeg']);
+    $extension = \array_rand(\array_combine($extensions, $extensions));
 
-    $min = explode('x', $min_resolution);
-    $max = explode('x', $max_resolution);
-    if (intval($min[0]) > intval($max[0])) {
+    $min = \explode('x', $min_resolution);
+    $max = \explode('x', $max_resolution);
+    if (\intval($min[0]) > \intval($max[0])) {
       $max[0] = $min[0];
     }
-    if (intval($min[1]) > intval($max[1])) {
+    if (\intval($min[1]) > \intval($max[1])) {
       $max[1] = $min[1];
     }
     $max_resolution = "$max[0]x$max[1]";
 
     // Generate a max of 5 different images.
-    if (!isset($images[$extension][$min_resolution][$max_resolution]) || count($images[$extension][$min_resolution][$max_resolution]) <= 5) {
+    if (!isset($images[$extension][$min_resolution][$max_resolution]) || \count($images[$extension][$min_resolution][$max_resolution]) <= 5) {
       /** @var \Drupal\Core\File\FileSystemInterface $file_system */
       $file_system = \Drupal::service('file_system');
       $tmp_file = $file_system->tempnam('temporary://', 'generateImage_');
@@ -386,12 +386,12 @@ class ImageItem extends FileItem {
         $image->setOwnerId(\Drupal::currentUser()->id());
         $guesser = \Drupal::service('file.mime_type.guesser');
         $image->setMimeType($guesser->guessMimeType($path));
-        $image->setFileName(basename($path));
+        $image->setFileName(\basename($path));
         $destination_dir = static::doGetUploadLocation($settings);
         $file_system->prepareDirectory($destination_dir, FileSystemInterface::CREATE_DIRECTORY);
         // Ensure directory ends with a slash.
-        $destination_dir .= str_ends_with($destination_dir, '/') ? '' : '/';
-        $destination = $destination_dir . basename($path);
+        $destination_dir .= \str_ends_with($destination_dir, '/') ? '' : '/';
+        $destination = $destination_dir . \basename($path);
         $file = \Drupal::service('file.repository')->move($image, $destination);
         $images[$extension][$min_resolution][$max_resolution][$file->id()] = $file;
       }
@@ -401,11 +401,11 @@ class ImageItem extends FileItem {
     }
     else {
       // Select one of the images we've already generated for this field.
-      $image_index = array_rand($images[$extension][$min_resolution][$max_resolution]);
+      $image_index = \array_rand($images[$extension][$min_resolution][$max_resolution]);
       $file = $images[$extension][$min_resolution][$max_resolution][$image_index];
     }
 
-    [$width, $height] = getimagesize($file->getFileUri());
+    [$width, $height] = \getimagesize($file->getFileUri());
     $values = [
       'target_id' => $file->id(),
       'alt' => $random->sentences(4),

@@ -36,7 +36,7 @@ class BatchControllerTest extends UnitTestCase {
     $this->assertSame('', $controller->batchPageTitle(new Request(['id' => 1234])));
     $this->assertSame('foobar', $controller->batchPageTitle(new Request(['id' => 1234])));
     // Test batch returned by &batch_get() call.
-    $batch = &batch_get();
+    $batch = &\batch_get();
     $batch['sets']['0']['title'] = 'Updated title';
     $this->assertSame('Updated title', $controller->batchPageTitle(new Request(['id' => 1234])));
   }

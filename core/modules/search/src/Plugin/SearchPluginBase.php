@@ -134,7 +134,7 @@ abstract class SearchPluginBase extends PluginBase implements ContainerFactoryPl
    */
   public function buildSearchUrlQuery(FormStateInterface $form_state) {
     // Grab the keywords entered in the form and put them as 'keys' in the GET.
-    $keys = trim($form_state->getValue('keys'));
+    $keys = \trim($form_state->getValue('keys'));
     $query = ['keys' => $keys];
 
     return $query;

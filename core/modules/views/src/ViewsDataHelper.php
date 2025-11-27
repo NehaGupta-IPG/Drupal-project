@@ -71,7 +71,7 @@ class ViewsDataHelper {
           if ($field == 'table') {
             // Calculate what tables this table can join to.
             if (!empty($info['join'])) {
-              $bases = array_keys($info['join']);
+              $bases = \array_keys($info['join']);
             }
             // And it obviously joins to itself.
             $bases[] = $table;
@@ -82,7 +82,7 @@ class ViewsDataHelper {
               if ($grouping && !empty($info[$key]['no group by'])) {
                 continue;
               }
-              if ($sub_type && isset($info[$key]['sub_type']) && (!in_array($sub_type, (array) $info[$key]['sub_type']))) {
+              if ($sub_type && isset($info[$key]['sub_type']) && (!\in_array($sub_type, (array) $info[$key]['sub_type']))) {
                 continue;
               }
               if (!empty($info[$key]['skip base'])) {
@@ -141,19 +141,19 @@ class ViewsDataHelper {
     // If we have an array of base tables available, go through them
     // all and add them together. Duplicate keys will be lost and that's
     // Just Fine.
-    if (is_array($base)) {
+    if (\is_array($base)) {
       $strings = [];
       foreach ($base as $base_table) {
         if (isset($this->fields[$base_table][$type])) {
           $strings += $this->fields[$base_table][$type];
         }
       }
-      uasort($strings, [$this, 'fetchedFieldSort']);
+      \uasort($strings, [$this, 'fetchedFieldSort']);
       return $strings;
     }
 
     if (isset($this->fields[$base][$type])) {
-      uasort($this->fields[$base][$type], [$this, 'fetchedFieldSort']);
+      \uasort($this->fields[$base][$type], [$this, 'fetchedFieldSort']);
       return $this->fields[$base][$type];
     }
     return [];
@@ -173,14 +173,14 @@ class ViewsDataHelper {
    *   decided.
    */
   protected static function fetchedFieldSort($a, $b) {
-    $a_group = mb_strtolower($a['group']);
-    $b_group = mb_strtolower($b['group']);
+    $a_group = \mb_strtolower($a['group']);
+    $b_group = \mb_strtolower($b['group']);
     if ($a_group != $b_group) {
       return $a_group <=> $b_group;
     }
 
-    $a_title = mb_strtolower($a['title']);
-    $b_title = mb_strtolower($b['title']);
+    $a_title = \mb_strtolower($a['title']);
+    $b_title = \mb_strtolower($b['title']);
     return $a_title <=> $b_title;
   }
 

@@ -108,9 +108,9 @@ class ModuleExtensionList extends ExtensionList {
     $discovery->setProfileDirectories([]);
     $all_profiles = $discovery->scan('profile');
     $active_profile = $all_profiles[$this->installProfile];
-    $profiles = array_intersect_key($all_profiles, $this->configFactory->get('core.extension')->get('module') ?: [$active_profile->getName() => 0]);
+    $profiles = \array_intersect_key($all_profiles, $this->configFactory->get('core.extension')->get('module') ?: [$active_profile->getName() => 0]);
 
-    $profile_directories = array_map(function (Extension $profile) {
+    $profile_directories = \array_map(function (Extension $profile) {
       return $profile->getPath();
     }, $profiles);
     return $profile_directories;
@@ -195,7 +195,7 @@ class ModuleExtensionList extends ExtensionList {
    * {@inheritdoc}
    */
   protected function getInstalledExtensionNames() {
-    return array_keys($this->moduleHandler->getModuleList());
+    return \array_keys($this->moduleHandler->getModuleList());
   }
 
   /**

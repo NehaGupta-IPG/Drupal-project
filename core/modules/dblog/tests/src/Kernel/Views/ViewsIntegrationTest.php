@@ -68,7 +68,7 @@ class ViewsIntegrationTest extends ViewsKernelTestBase {
       }
       $message_vars = $entry['variables'];
       unset($message_vars['link']);
-      $this->assertEquals(strtr($entry['message'], $message_vars), $view->style_plugin->getField($index, 'message'));
+      $this->assertEquals(\strtr($entry['message'], $message_vars), $view->style_plugin->getField($index, 'message'));
       $link_field = $view->style_plugin->getField($index, 'link');
       // The 3rd entry contains some unsafe markup that needs to get filtered.
       if ($index == 2) {

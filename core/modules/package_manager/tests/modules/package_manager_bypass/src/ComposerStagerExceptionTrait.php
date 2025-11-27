@@ -21,7 +21,7 @@ trait ComposerStagerExceptionTrait {
    */
   public static function setException(?string $class = \Exception::class, mixed ...$arguments): void {
     if ($class) {
-      \Drupal::state()->set(static::class . '-exception', func_get_args());
+      \Drupal::state()->set(static::class . '-exception', \func_get_args());
     }
     else {
       \Drupal::state()->delete(static::class . '-exception');
@@ -33,7 +33,7 @@ trait ComposerStagerExceptionTrait {
    */
   private function throwExceptionIfSet(): void {
     if ($exception = $this->state->get(static::class . '-exception')) {
-      $class = array_shift($exception);
+      $class = \array_shift($exception);
       throw new $class(...$exception);
     }
   }

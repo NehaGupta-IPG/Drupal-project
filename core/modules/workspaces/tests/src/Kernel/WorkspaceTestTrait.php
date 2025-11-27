@@ -43,7 +43,7 @@ trait WorkspaceTestTrait {
 
     // Install the entity schema for supported entity types to ensure that the
     // 'workspace' revision metadata field gets created.
-    foreach (array_keys(\Drupal::service('workspaces.information')->getSupportedEntityTypes()) as $entity_type_id) {
+    foreach (\array_keys(\Drupal::service('workspaces.information')->getSupportedEntityTypes()) as $entity_type_id) {
       $this->installEntitySchema($entity_type_id);
     }
 
@@ -53,12 +53,12 @@ trait WorkspaceTestTrait {
     $this->workspaces['stage'] = Workspace::create(['id' => 'stage', 'label' => 'Stage']);
     $this->workspaces['stage']->save();
 
-    $permissions = array_intersect([
+    $permissions = \array_intersect([
       'administer nodes',
       'create workspace',
       'edit any workspace',
       'view any workspace',
-    ], array_keys($this->container->get('user.permissions')->getPermissions()));
+    ], \array_keys($this->container->get('user.permissions')->getPermissions()));
     $this->setCurrentUser($this->createUser($permissions));
   }
 
@@ -118,7 +118,7 @@ trait WorkspaceTestTrait {
     foreach ($expected as $workspace_id => $expected_tracked_revision_ids) {
       $tracked_entities = $workspace_tracker->getTrackedEntities($workspace_id, $entity_type_id);
       $tracked_revision_ids = $tracked_entities[$entity_type_id] ?? [];
-      $this->assertEquals($expected_tracked_revision_ids, array_keys($tracked_revision_ids));
+      $this->assertEquals($expected_tracked_revision_ids, \array_keys($tracked_revision_ids));
     }
   }
 

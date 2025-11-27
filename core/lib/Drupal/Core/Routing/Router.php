@@ -111,12 +111,12 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   public function matchRequest(Request $request): array {
     $collection = $this->getInitialRouteCollection($request);
     if ($collection->count() === 0) {
-      throw new ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath()));
+      throw new ResourceNotFoundException(\sprintf('No routes found for "%s".', $this->currentPath->getPath()));
     }
     $collection = $this->applyRouteFilters($collection, $request);
     $collection = $this->applyFitOrder($collection);
 
-    $ret = $this->matchCollection(rawurldecode($this->currentPath->getPath($request)), $collection);
+    $ret = $this->matchCollection(\rawurldecode($this->currentPath->getPath($request)), $collection);
     return $this->applyRouteEnhancers($ret, $request);
   }
 
@@ -131,9 +131,9 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
       $match = $this->doMatchCollection($pathinfo, $routes, FALSE);
     }
     if ($match === NULL) {
-      throw 0 < count($this->allow)
-        ? new MethodNotAllowedException(array_unique($this->allow))
-        : new ResourceNotFoundException(sprintf('No routes found for "%s".', $this->currentPath->getPath()));
+      throw 0 < \count($this->allow)
+        ? new MethodNotAllowedException(\array_unique($this->allow))
+        : new ResourceNotFoundException(\sprintf('No routes found for "%s".', $this->currentPath->getPath()));
     }
     return $match;
   }
@@ -168,12 +168,12 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
       if (!$case_sensitive) {
         $regex = $regex . 'i';
       }
-      if (!preg_match($regex, $pathinfo, $matches)) {
+      if (!\preg_match($regex, $pathinfo, $matches)) {
         continue;
       }
 
       $hostMatches = [];
-      if ($compiledRoute->getHostRegex() && !preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
+      if ($compiledRoute->getHostRegex() && !\preg_match($compiledRoute->getHostRegex(), $this->context->getHost(), $hostMatches)) {
         $routes->remove($name);
         continue;
       }
@@ -185,14 +185,14 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
           $method = 'GET';
         }
 
-        if (!in_array($method, $requiredMethods)) {
-          $this->allow = array_merge($this->allow, $requiredMethods);
+        if (!\in_array($method, $requiredMethods)) {
+          $this->allow = \array_merge($this->allow, $requiredMethods);
           $routes->remove($name);
           continue;
         }
       }
 
-      $attributes = $this->getAttributes($route, $name, array_replace($matches, $hostMatches));
+      $attributes = $this->getAttributes($route, $name, \array_replace($matches, $hostMatches));
 
       $status = $this->handleRouteRequirements($pathinfo, $name, $route, $attributes);
 
@@ -291,9 +291,9 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
       $buckets += [$fit => []];
       $buckets[$fit][] = [$name, $route];
     }
-    krsort($buckets);
+    \krsort($buckets);
 
-    $flattened = array_reduce($buckets, 'array_merge', []);
+    $flattened = \array_reduce($buckets, 'array_merge', []);
 
     // Add them back onto a new route collection.
     $collection = new RouteCollection();

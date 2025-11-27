@@ -32,7 +32,7 @@ class CodeBlock extends CKEditor5PluginDefault implements CKEditor5PluginConfigu
     if (!empty($this->configuration['languages'])) {
       $as_selectors = '';
       foreach ($this->configuration['languages'] as $language) {
-        $as_selectors .= sprintf("%s|%s\n", $language['language'], $language['label']);
+        $as_selectors .= \sprintf("%s|%s\n", $language['language'], $language['label']);
       }
       $form['languages']['#default_value'] = $as_selectors;
     }
@@ -47,14 +47,14 @@ class CodeBlock extends CKEditor5PluginDefault implements CKEditor5PluginConfigu
     $form_value = $form_state->getValue('languages');
     [$styles, $not_parseable_lines] = self::parseLanguagesFromValue($form_value);
     if (!empty($not_parseable_lines)) {
-      $line_numbers = array_keys($not_parseable_lines);
+      $line_numbers = \array_keys($not_parseable_lines);
       $form_state->setError($form['languages'], $this->formatPlural(
-        count($not_parseable_lines),
+        \count($not_parseable_lines),
         'Line @line-number does not contain a valid value. Enter a valid language key followed by a pipe symbol and a label.',
         'Lines @line-numbers do not contain a valid value. Enter a valid language key followed by a pipe symbol and a label.',
         [
-          '@line-number' => reset($line_numbers),
-          '@line-numbers' => implode(', ', $line_numbers),
+          '@line-number' => \reset($line_numbers),
+          '@line-numbers' => \implode(', ', $line_numbers),
         ]
       ));
     }
@@ -75,15 +75,15 @@ class CodeBlock extends CKEditor5PluginDefault implements CKEditor5PluginConfigu
   protected static function parseLanguagesFromValue(string $form_value): array {
     $not_parseable_lines = [];
 
-    $lines = explode("\n", $form_value);
+    $lines = \explode("\n", $form_value);
     $languages = [];
     foreach ($lines as $line) {
-      if (empty(trim($line))) {
+      if (empty(\trim($line))) {
         continue;
       }
 
       // Parse the line.
-      [$language, $label] = array_map('trim', explode('|', $line));
+      [$language, $label] = \array_map('trim', \explode('|', $line));
 
       $languages[] = [
         'label' => $label,

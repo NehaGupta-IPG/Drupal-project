@@ -45,7 +45,7 @@ class FileSaveHtaccessLoggingTest extends BrowserTestBase {
     $this->clickLink("Security warning: Couldn't write .htaccess file.");
 
     $lines = FileSecurity::htaccessLines(TRUE);
-    foreach (array_filter(explode("\n", $lines)) as $line) {
+    foreach (\array_filter(\explode("\n", $lines)) as $line) {
       $this->assertSession()->assertEscaped($line);
     }
   }

@@ -28,7 +28,7 @@ final class FileProcessOutputCallback implements OutputCallbackInterface {
     string $path,
     private readonly ?OutputCallbackInterface $decorated = NULL,
   ) {
-    $this->handle = fopen($path, 'a');
+    $this->handle = \fopen($path, 'a');
     if (empty($this->handle)) {
       throw new \RuntimeException("Could not open or create '$path' for writing.");
     }
@@ -66,7 +66,7 @@ final class FileProcessOutputCallback implements OutputCallbackInterface {
    * {@inheritdoc}
    */
   public function __invoke(OutputTypeEnum $type, string $buffer): void {
-    fwrite($this->handle, $buffer);
+    \fwrite($this->handle, $buffer);
 
     if ($this->decorated) {
       ($this->decorated)($type, $buffer);

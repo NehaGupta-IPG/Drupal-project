@@ -54,7 +54,7 @@ class EntityUuidConverter extends EntityConverter {
       if (!$entities = $storage->loadByProperties([$uuid_key => $value])) {
         return NULL;
       }
-      $entity = reset($entities);
+      $entity = \reset($entities);
       // If the entity type is translatable, ensure we return the proper
       // translation object for the current context.
       if ($entity instanceof TranslatableInterface && $entity->isTranslatable()) {
@@ -62,14 +62,14 @@ class EntityUuidConverter extends EntityConverter {
         $entity = $this->entityRepository->getTranslationFromContext($entity, NULL, ['operation' => 'entity_upcast']);
         // JSON:API always has only one method per route.
         $method = $defaults[RouteObjectInterface::ROUTE_OBJECT]->getMethods()[0];
-        if (in_array($method, ['PATCH', 'DELETE'], TRUE)) {
+        if (\in_array($method, ['PATCH', 'DELETE'], TRUE)) {
           $current_content_language = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
           if ($method === 'DELETE' && (!$entity->isDefaultTranslation() || $entity->language()->getId() !== $current_content_language)) {
             throw new MethodNotAllowedHttpException(['GET'], 'Deleting a resource object translation is not yet supported. See https://www.drupal.org/docs/8/modules/jsonapi/translations.');
           }
           if ($method === 'PATCH' && $entity->language()->getId() !== $current_content_language) {
-            $available_translations = implode(', ', array_keys($entity->getTranslationLanguages()));
-            throw new MethodNotAllowedHttpException(['GET'], sprintf('The requested translation of the resource object does not exist, instead modify one of the translations that do exist: %s.', $available_translations));
+            $available_translations = \implode(', ', \array_keys($entity->getTranslationLanguages()));
+            throw new MethodNotAllowedHttpException(['GET'], \sprintf('The requested translation of the resource object does not exist, instead modify one of the translations that do exist: %s.', $available_translations));
           }
         }
       }
@@ -84,7 +84,7 @@ class EntityUuidConverter extends EntityConverter {
   public function applies($definition, $name, Route $route) {
     return (
       (bool) Routes::getResourceTypeNameFromParameters($route->getDefaults()) &&
-      !empty($definition['type']) && str_starts_with($definition['type'], 'entity')
+      !empty($definition['type']) && \str_starts_with($definition['type'], 'entity')
     );
   }
 

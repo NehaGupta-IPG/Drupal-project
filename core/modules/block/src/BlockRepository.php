@@ -55,7 +55,7 @@ class BlockRepository implements BlockRepositoryInterface {
   public function getVisibleBlocksPerRegion(array &$cacheable_metadata = []) {
     $active_theme = $this->themeManager->getActiveTheme();
     // Build an array of the region names in the right order.
-    $empty = array_fill_keys($active_theme->getRegions(), []);
+    $empty = \array_fill_keys($active_theme->getRegions(), []);
 
     $full = [];
     foreach ($this->blockStorage->loadByProperties(['theme' => $active_theme->getName()]) as $block_id => $block) {
@@ -76,9 +76,9 @@ class BlockRepository implements BlockRepositoryInterface {
     }
 
     // Merge it with the actual values to maintain the region ordering.
-    $assignments = array_intersect_key(array_merge($empty, $full), $empty);
+    $assignments = \array_intersect_key(\array_merge($empty, $full), $empty);
     foreach ($assignments as &$assignment) {
-      uasort($assignment, 'Drupal\block\Entity\Block::sort');
+      \uasort($assignment, 'Drupal\block\Entity\Block::sort');
     }
     return $assignments;
   }
@@ -96,16 +96,16 @@ class BlockRepository implements BlockRepositoryInterface {
     $query->condition('id', $suggestion, 'CONTAINS');
     $block_ids = $query->execute();
 
-    $block_ids = array_map(function ($block_id) {
-      $parts = explode('.', $block_id);
-      return end($parts);
+    $block_ids = \array_map(function ($block_id) {
+      $parts = \explode('.', $block_id);
+      return \end($parts);
     }, $block_ids);
 
     // Iterate through potential IDs until we get a new one. E.g.
     // For example, 'plugin', 'plugin_2', 'plugin_3', etc.
     $count = 1;
     $machine_default = $suggestion;
-    while (in_array($machine_default, $block_ids)) {
+    while (\in_array($machine_default, $block_ids)) {
       $machine_default = $suggestion . '_' . ++$count;
     }
     return $machine_default;

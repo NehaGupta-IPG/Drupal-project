@@ -166,7 +166,7 @@ class EntityTestComputedFieldTest extends ResourceTestBase {
   protected function getSparseFieldSets(): array {
     // EntityTest's owner field name is `user_id`, not `uid`, which breaks
     // nested sparse fieldset tests.
-    return array_diff_key(parent::getSparseFieldSets(), array_flip([
+    return \array_diff_key(parent::getSparseFieldSets(), \array_flip([
       'nested_empty_fieldset',
       'nested_fieldset_with_owner_fieldset',
     ]));
@@ -177,7 +177,7 @@ class EntityTestComputedFieldTest extends ResourceTestBase {
    */
   protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     $cache_contexts = parent::getExpectedCacheContexts($sparse_fieldset);
-    if ($sparse_fieldset === NULL || in_array('computed_test_cacheable_string_field', $sparse_fieldset)) {
+    if ($sparse_fieldset === NULL || \in_array('computed_test_cacheable_string_field', $sparse_fieldset)) {
       $cache_contexts = Cache::mergeContexts($cache_contexts, ['url.query_args']);
     }
 
@@ -189,7 +189,7 @@ class EntityTestComputedFieldTest extends ResourceTestBase {
    */
   protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
     $expected_cache_tags = parent::getExpectedCacheTags($sparse_fieldset);
-    if ($sparse_fieldset === NULL || in_array('computed_test_cacheable_string_field', $sparse_fieldset)) {
+    if ($sparse_fieldset === NULL || \in_array('computed_test_cacheable_string_field', $sparse_fieldset)) {
       $expected_cache_tags = Cache::mergeTags($expected_cache_tags, ['field:computed_test_cacheable_string_field']);
     }
 

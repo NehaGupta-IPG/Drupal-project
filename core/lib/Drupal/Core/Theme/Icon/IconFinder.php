@@ -112,14 +112,14 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    * {@inheritdoc}
    */
   public function getFileContents(string $uri): string|bool {
-    $url = parse_url($uri);
+    $url = \parse_url($uri);
     if (isset($url['scheme']) || isset($url['host'])) {
       return FALSE;
     }
-    if (!file_exists($uri)) {
+    if (!\file_exists($uri)) {
       return FALSE;
     }
-    return file_get_contents($uri);
+    return \file_get_contents($uri);
   }
 
   /**
@@ -130,12 +130,12 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
     foreach ($sources as $source) {
       // Detect if source is path or remote, parse_url will have no scheme for
       // a path.
-      $url = parse_url($source);
+      $url = \parse_url($source);
       if (isset($url['scheme']) && isset($url['path'])) {
-        $result = array_merge($result, $this->getFileFromUrl($url['scheme'], $url['path'], $source));
+        $result = \array_merge($result, $this->getFileFromUrl($url['scheme'], $url['path'], $source));
         continue;
       }
-      $result = array_merge($result, $this->getFilesFromPath($source, $relative_path));
+      $result = \array_merge($result, $this->getFilesFromPath($source, $relative_path));
     }
 
     return $result;
@@ -158,13 +158,13 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    *   The file discovered.
    */
   private function getFileFromUrl(string $scheme, string $path, string $source): array {
-    if (!in_array($scheme, UrlHelper::getAllowedProtocols(), TRUE)) {
+    if (!\in_array($scheme, UrlHelper::getAllowedProtocols(), TRUE)) {
       $this->logger->warning('Invalid icon source: @source', ['@source' => $source]);
       return [];
     }
 
     // Decode url to have cleaner filename.
-    $icon_id = pathinfo(urldecode($path), PATHINFO_FILENAME);
+    $icon_id = \pathinfo(\urldecode($path), PATHINFO_FILENAME);
 
     // Icon ID is used as index to avoid duplicates.
     return [
@@ -192,7 +192,7 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    *   The file discovered.
    */
   private function getFilesFromPath(string $source, string $relative_path): array {
-    $path_info = pathinfo($source);
+    $path_info = \pathinfo($source);
     $dirname = $path_info['dirname'] ?? '';
     $extension = $path_info['extension'] ?? '';
     $filename = $path_info['filename'] ?? '';
@@ -204,7 +204,7 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
     // Set extension to wildcard if empty, and validate against allowed
     // extensions.
     $extension = empty($extension) ? '*' : $extension;
-    if ('*' !== $extension && !in_array($extension, self::ALLOWED_EXTENSION, TRUE)) {
+    if ('*' !== $extension && !\in_array($extension, self::ALLOWED_EXTENSION, TRUE)) {
       $this->logger->warning('Invalid icon path extension @filename.@extension in source: @source', [
         '@filename' => $filename,
         '@extension' => $extension,
@@ -214,10 +214,10 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
     }
 
     // Use allowed extension bracket for Finder if wildcard.
-    $extension = '*' === $extension ? '{' . implode(',', self::ALLOWED_EXTENSION) . '}' : $extension;
+    $extension = '*' === $extension ? '{' . \implode(',', self::ALLOWED_EXTENSION) . '}' : $extension;
 
     // Prepare filename wildcard if empty or with {icon_id} pattern.
-    $filename_wildcard = empty($filename) ? '*' : str_replace(self::ICON_ID_PATTERN, '*', $filename);
+    $filename_wildcard = empty($filename) ? '*' : \str_replace(self::ICON_ID_PATTERN, '*', $filename);
 
     // If icons are in the same folder dirname is 'dot'.
     if ('.' === $dirname) {
@@ -225,19 +225,19 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
     }
 
     // Prepare path to search for icons for Finder::in().
-    $path = str_starts_with($source, '/') ?
+    $path = \str_starts_with($source, '/') ?
       $this->appRoot . $dirname :
-      sprintf('%s/%s/%s', $this->appRoot, $relative_path, $dirname);
+      \sprintf('%s/%s/%s', $this->appRoot, $relative_path, $dirname);
 
     // Prepare file names for Finder::name().
-    $names = sprintf('%s.%s', $filename_wildcard, $extension);
+    $names = \sprintf('%s.%s', $filename_wildcard, $extension);
 
     if (!$finder = $this->findFiles($path, $names)) {
       return [];
     }
 
     // Wildcard around filename are ignored for extractIconIdFromFilename.
-    $filename = str_replace('*', '', $filename);
+    $filename = \str_replace('*', '', $filename);
 
     return $this->processFoundFiles($finder, $source, $filename, self::determineGroupPosition($path));
   }
@@ -254,7 +254,7 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    *   The configured Finder instance.
    */
   private function findFiles(string $path, string $names): ?Finder {
-    $path = str_replace(self::GROUP_PATTERN, '*', $path);
+    $path = \str_replace(self::GROUP_PATTERN, '*', $path);
     $finder = new Finder();
     try {
       $finder
@@ -308,7 +308,7 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
       // Icon ID is used as index to avoid duplicates.
       $result[$icon_id] = [
         'icon_id' => $icon_id,
-        'source' => $this->fileUrlGenerator->generateString(str_replace($this->appRoot, '', $file_absolute_path)),
+        'source' => $this->fileUrlGenerator->generateString(\str_replace($this->appRoot, '', $file_absolute_path)),
         'absolute_path' => $file_absolute_path,
         'group' => $group_position === NULL ? NULL : self::extractGroupFromPath($file->getPath(), $group_position),
       ];
@@ -329,8 +329,8 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    *   The extracted icon ID or the original filename.
    */
   private static function extractIconIdFromFilename(string $filename, string $filename_pattern): string {
-    $pattern = str_replace(self::ICON_ID_PATTERN, '(?<icon_id>.+)?', $filename_pattern);
-    if (preg_match('@' . $pattern . '@', $filename, $matches)) {
+    $pattern = \str_replace(self::ICON_ID_PATTERN, '(?<icon_id>.+)?', $filename_pattern);
+    if (\preg_match('@' . $pattern . '@', $filename, $matches)) {
       return $matches['icon_id'] ?? $filename;
     }
 
@@ -349,7 +349,7 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    *   The extracted group, or null if not found.
    */
   private static function extractGroupFromPath(string $path, int $group_position): ?string {
-    $parts = explode('/', trim($path, '/'));
+    $parts = \explode('/', \trim($path, '/'));
     return $parts[$group_position] ?? NULL;
   }
 
@@ -366,8 +366,8 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    *   The determined group position.
    */
   private static function determineGroupPosition(string $source): ?int {
-    $parts = explode('/', trim($source, '/'));
-    if ($result = array_search(self::GROUP_PATTERN, $parts, TRUE)) {
+    $parts = \explode('/', \trim($source, '/'));
+    if ($result = \array_search(self::GROUP_PATTERN, $parts, TRUE)) {
       return (int) $result;
     }
 

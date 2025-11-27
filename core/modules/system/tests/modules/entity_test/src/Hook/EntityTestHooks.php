@@ -146,7 +146,7 @@ class EntityTestHooks {
     $entity_types = \Drupal::entityTypeManager()->getDefinitions();
     foreach ($entity_types as $entity_type_id => $entity_type) {
       if ($entity_type->getProvider() == 'entity_test'
-        && !in_array($entity_type_id, ['entity_test_with_bundle', 'entity_test_mul_with_bundle'], TRUE)) {
+        && !\in_array($entity_type_id, ['entity_test_with_bundle', 'entity_test_mul_with_bundle'], TRUE)) {
         $bundles[$entity_type_id] = \Drupal::state()->get($entity_type_id . '.bundles', [$entity_type_id => ['label' => 'Entity Test Bundle']]);
       }
     }
@@ -424,7 +424,7 @@ class EntityTestHooks {
     }
 
     $valid_entity_type_ids = ['user_role', 'block'];
-    if (in_array($entity->getEntityTypeId(), $valid_entity_type_ids)) {
+    if (\in_array($entity->getEntityTypeId(), $valid_entity_type_ids)) {
       if (\Drupal::service('router.route_provider')->getRouteByName("entity.{$entity->getEntityTypeId()}.test_operation")) {
         $operations['test_operation'] = [
           'title' => new FormattableMarkup('Test Operation: @label', [
@@ -745,7 +745,7 @@ class EntityTestHooks {
    */
   #[Hook('entity_duplicate')]
   public function entityDuplicateAlter(EntityInterface $duplicate, EntityInterface $entity) : void {
-    if ($duplicate instanceof ContentEntityInterface && str_contains($duplicate->label(), 'UUID CRUD test entity') && $duplicate->hasField('name')) {
+    if ($duplicate instanceof ContentEntityInterface && \str_contains($duplicate->label(), 'UUID CRUD test entity') && $duplicate->hasField('name')) {
       $duplicate->set('name', $duplicate->label() . ' duplicate');
     }
   }
@@ -755,7 +755,7 @@ class EntityTestHooks {
    */
   #[Hook('entity_test_duplicate')]
   public function entityTestDuplicate(EntityTest $duplicate, EntityTest $entity) : void {
-    if (str_contains($duplicate->label(), 'UUID CRUD test entity') && $duplicate->hasField('name')) {
+    if (\str_contains($duplicate->label(), 'UUID CRUD test entity') && $duplicate->hasField('name')) {
       $duplicate->set('name', 'prefix ' . $duplicate->label());
     }
   }

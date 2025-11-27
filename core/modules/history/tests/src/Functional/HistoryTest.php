@@ -126,7 +126,7 @@ class HistoryTest extends BrowserTestBase {
     $this->assertCacheContext('user.roles:authenticated');
     // JavaScript present to record the node read.
     $settings = $this->getDrupalSettings();
-    $libraries = explode(',', $settings['ajaxPageState']['libraries']);
+    $libraries = \explode(',', $settings['ajaxPageState']['libraries']);
     $this->assertContains('history/mark-as-read', $libraries, 'history/mark-as-read library is present.');
     $this->assertEquals([$nid => TRUE], $settings['history']['nodesToMarkAsRead'], 'drupalSettings to mark node as read are present.');
 

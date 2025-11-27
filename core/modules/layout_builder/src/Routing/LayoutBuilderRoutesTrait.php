@@ -78,7 +78,7 @@ trait LayoutBuilderRoutesTrait {
       ->setOptions($options);
     $collection->add("$route_name_prefix.discard_changes", $route);
 
-    if (is_subclass_of($definition->getClass(), OverridesSectionStorageInterface::class)) {
+    if (\is_subclass_of($definition->getClass(), OverridesSectionStorageInterface::class)) {
       $revert_defaults = $defaults;
       $revert_defaults['_form'] = '\Drupal\layout_builder\Form\RevertOverridesForm';
       $route = (new Route("$path/revert"))
@@ -87,7 +87,7 @@ trait LayoutBuilderRoutesTrait {
         ->setOptions($options);
       $collection->add("$route_name_prefix.revert", $route);
     }
-    elseif (is_subclass_of($definition->getClass(), DefaultsSectionStorageInterface::class)) {
+    elseif (\is_subclass_of($definition->getClass(), DefaultsSectionStorageInterface::class)) {
       $disable_defaults = $defaults;
       $disable_defaults['_form'] = '\Drupal\layout_builder\Form\LayoutBuilderDisableForm';
       $disable_options = $options;

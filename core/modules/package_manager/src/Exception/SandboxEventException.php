@@ -45,9 +45,9 @@ class SandboxEventException extends SandboxException {
         $messages = $result->messages;
         $summary = $result->summary;
         if ($summary) {
-          array_unshift($messages, $summary);
+          \array_unshift($messages, $summary);
         }
-        $text .= implode("\n", $messages) . "\n";
+        $text .= \implode("\n", $messages) . "\n";
       }
     }
     return $text;

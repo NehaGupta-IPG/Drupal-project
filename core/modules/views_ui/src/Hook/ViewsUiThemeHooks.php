@@ -129,7 +129,7 @@ class ViewsUiThemeHooks {
    */
   public function preprocessDisplayTabSetting(array &$variables): void {
     // Put the primary link to the left side.
-    array_unshift($variables['settings_links'], $variables['link']);
+    \array_unshift($variables['settings_links'], $variables['link']);
 
     if (!empty($variables['overridden'])) {
       $variables['attributes']['title'][] = $this->t('Overridden');
@@ -303,7 +303,7 @@ class ViewsUiThemeHooks {
     $form = &$variables['form'];
     $rows = $ungroupable_rows = [];
     // Enable grouping only if > 1 group.
-    $variables['grouping'] = count(array_keys($form['#group_options'])) > 1;
+    $variables['grouping'] = \count(\array_keys($form['#group_options'])) > 1;
 
     foreach ($form['#group_renders'] as $group_id => $contents) {
       // Header row for the group.
@@ -317,7 +317,7 @@ class ViewsUiThemeHooks {
           'group' => 'views-group-select',
           'subgroup' => 'views-group-select-' . $group_id,
         ];
-        drupal_attach_tabledrag($form['override'], $options);
+        \drupal_attach_tabledrag($form['override'], $options);
 
         // Title row, spanning all columns.
         $row = [];
@@ -325,7 +325,7 @@ class ViewsUiThemeHooks {
         $row[] = [
           'class' => ['group', 'group-operator', 'container-inline'],
           'data' => $form['filter_groups']['groups'][$group_id],
-          'rowspan' => max([2, count($contents) + 1]),
+          'rowspan' => \max([2, \count($contents) + 1]),
         ];
         // Title.
         $row[] = [
@@ -345,7 +345,7 @@ class ViewsUiThemeHooks {
 
         // Row which will only appear if the group has nothing in it.
         $row = [];
-        $class = 'group-' . (count($contents) ? 'populated' : 'empty');
+        $class = 'group-' . (\count($contents) ? 'populated' : 'empty');
         $instructions = '<span>' . $this->t('No filters have been added.') . '</span> <span class="js-only">' . $this->t('Drag to add filters.') . '</span>';
         // When JavaScript is enabled, the button for removing the group (if
         // it's present) should be hidden, since it will be replaced by a link
@@ -776,11 +776,11 @@ class ViewsUiThemeHooks {
    */
   protected function viewPreviewSectionRowsLinks(ViewExecutable $view): array {
     $links = [];
-    $links = array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'filter', TRUE));
-    $links = array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'field', TRUE));
-    $links = array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'sort', TRUE));
-    $links = array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'argument', TRUE));
-    $links = array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'relationship', TRUE));
+    $links = \array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'filter', TRUE));
+    $links = \array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'field', TRUE));
+    $links = \array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'sort', TRUE));
+    $links = \array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'argument', TRUE));
+    $links = \array_merge($links, $this->viewPreviewSectionHandlerLinks($view, 'relationship', TRUE));
 
     return $links;
   }

@@ -93,17 +93,17 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
    */
   public static function validateName($name) {
     // The name must be namespaced by owner.
-    if (!str_contains($name, '.')) {
+    if (!\str_contains($name, '.')) {
       throw new ConfigNameException("Missing namespace in Config object name $name.");
     }
     // The name must be shorter than Config::MAX_NAME_LENGTH characters.
-    if (strlen($name) > self::MAX_NAME_LENGTH) {
+    if (\strlen($name) > self::MAX_NAME_LENGTH) {
       throw new ConfigNameException("Config object name $name exceeds maximum allowed length of " . static::MAX_NAME_LENGTH . " characters.");
     }
 
     // The name must not contain any of the following characters:
     // : ? * < > ' " / \
-    if (preg_match('/[:?*<>"\'\/\\\\]/', $name)) {
+    if (\preg_match('/[:?*<>"\'\/\\\\]/', $name)) {
       throw new ConfigNameException("Invalid character in Config object name $name.");
     }
   }
@@ -133,8 +133,8 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
       return $this->data;
     }
     else {
-      $parts = explode('.', $key);
-      if (count($parts) == 1) {
+      $parts = \explode('.', $key);
+      if (\count($parts) == 1) {
         return $this->data[$key] ?? NULL;
       }
       else {
@@ -181,11 +181,11 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
     $value = $this->castSafeStrings($value);
     // The dot/period is a reserved character; it may appear between keys, but
     // not within keys.
-    if (is_array($value)) {
+    if (\is_array($value)) {
       $this->validateKeys($value);
     }
-    $parts = explode('.', $key);
-    if (count($parts) == 1) {
+    $parts = \explode('.', $key);
+    if (\count($parts) == 1) {
       $this->data[$key] = $value;
     }
     else {
@@ -205,10 +205,10 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
    */
   protected function validateKeys(array $data) {
     foreach ($data as $key => $value) {
-      if (str_contains($key, '.')) {
+      if (\str_contains($key, '.')) {
         throw new ConfigValueException("$key key contains a dot which is not supported.");
       }
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $this->validateKeys($value);
       }
     }
@@ -224,8 +224,8 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
    *   The configuration object.
    */
   public function clear($key) {
-    $parts = explode('.', $key);
-    if (count($parts) == 1) {
+    $parts = \explode('.', $key);
+    if (\count($parts) == 1) {
       unset($this->data[$key]);
     }
     else {
@@ -283,8 +283,8 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
     if ($data instanceof MarkupInterface) {
       $data = (string) $data;
     }
-    elseif (is_array($data)) {
-      array_walk_recursive($data, function (&$value) {
+    elseif (\is_array($data)) {
+      \array_walk_recursive($data, function (&$value) {
         if ($value instanceof MarkupInterface) {
           $value = (string) $value;
         }

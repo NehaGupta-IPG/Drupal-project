@@ -71,8 +71,8 @@ class SearchThemeHooks {
     if (!empty($result['date'])) {
       $info['date'] = $this->dateFormatter->format($result['date'], 'short');
     }
-    if (isset($result['extra']) && is_array($result['extra'])) {
-      $info = array_merge($info, $result['extra']);
+    if (isset($result['extra']) && \is_array($result['extra'])) {
+      $info = \array_merge($info, $result['extra']);
     }
     // Check for existence. User search does not include snippets.
     $variables['snippet'] = $result['snippet'] ?? '';

@@ -78,7 +78,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // If the table already exists, add any columns which are in the map array,
     // but don't yet exist in the table. Yay, flexibility!
     if ($schema->tableExists($table)) {
-      foreach (array_keys($map) as $field) {
+      foreach (\array_keys($map) as $field) {
         if (!$schema->fieldExists($table, $field)) {
           $schema->addField($table, $field, ['type' => 'text']);
         }
@@ -463,19 +463,19 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    */
   protected function setupRows($source_keys, $dest_keys, $rows) {
     $this->database = $this->getDatabase([]);
-    $this->sourceIds = array_fill_keys($source_keys, []);
-    $this->destinationIds = array_fill_keys($dest_keys, []);
+    $this->sourceIds = \array_fill_keys($source_keys, []);
+    $this->destinationIds = \array_fill_keys($dest_keys, []);
 
     $db_keys = [];
-    foreach (array_keys($source_keys) as $i) {
+    foreach (\array_keys($source_keys) as $i) {
       $db_keys[] = 'sourceid' . ($i + 1);
     }
-    foreach (array_keys($dest_keys) as $i) {
+    foreach (\array_keys($dest_keys) as $i) {
       $db_keys[] = 'destid' . ($i + 1);
     }
     foreach ($rows as $row) {
-      $values = array_combine($db_keys, $row);
-      $source_values = array_slice($row, 0, count($source_keys));
+      $values = \array_combine($db_keys, $row);
+      $source_values = \array_slice($row, 0, \count($source_keys));
       $values['source_ids_hash'] = $this->getIdMap()->getSourceIdsHash($source_values);
       $this->saveMap($values);
     }
@@ -564,7 +564,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $id_map->getDatabase()->update($id_map->mapTableName())
       ->condition('sourceid1', 1)
       ->condition('sourceid2', 'en')
-      ->fields([TestSqlIdMap::SOURCE_IDS_HASH => uniqid()])
+      ->fields([TestSqlIdMap::SOURCE_IDS_HASH => \uniqid()])
       ->execute();
     $this->assertNotEquals([[101, 'en']], $id_map->lookupDestinationIds([1, 'en']));
   }
@@ -794,7 +794,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       }
     }
     // Assert multiple rows have been processed.
-    $this->assertSame(count($row_statuses), $id_map->processedCount());
+    $this->assertSame(\count($row_statuses), $id_map->processedCount());
   }
 
   /**
@@ -1042,11 +1042,11 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       $row['source_ids_hash'] = $this->getIdMap()->getSourceIdsHash(['source_id_property' => $row['sourceid1']]);
       $row['destid1'] = "destination_id_value_$i";
       $row['source_row_status'] = MigrateIdMapInterface::STATUS_IMPORTED;
-      $expected_results[serialize(['sourceid1' => $row['sourceid1']])] = ['destid1' => $row['destid1']];
+      $expected_results[\serialize(['sourceid1' => $row['sourceid1']])] = ['destid1' => $row['destid1']];
       $this->saveMap($row);
     }
 
-    $this->assertSame(iterator_to_array($this->getIdMap()), $expected_results);
+    $this->assertSame(\iterator_to_array($this->getIdMap()), $expected_results);
   }
 
   /**
@@ -1110,7 +1110,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $this->sourceIds = $destination_ids;
     $this->destinationIds = $destination_ids;
     $db_keys = [];
-    $dest_id_count = count($destination_ids);
+    $dest_id_count = \count($destination_ids);
     for ($i = 1; $i <= $dest_id_count; $i++) {
       $db_keys[$i] = "sourceid$i";
     }
@@ -1119,8 +1119,8 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     }
     $id_map = $this->getIdMap();
     foreach ($rows as $row) {
-      $values = array_combine($db_keys, $row);
-      $source_values = array_slice($row, 0, $dest_id_count);
+      $values = \array_combine($db_keys, $row);
+      $source_values = \array_slice($row, 0, $dest_id_count);
       $values['source_ids_hash'] = $id_map->getSourceIdsHash($source_values);
       $this->saveMap($values);
     }

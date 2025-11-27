@@ -29,8 +29,8 @@ class LayoutBuilderTestPluginHooks {
     foreach ($definitions as $plugin_id => $definition) {
       // Field block IDs are in the form 'field_block:{entity}:{bundle}:{name}',
       // for example 'field_block:node:article:revision_timestamp'.
-      preg_match('/field_block:.*:.*:(.*)/', $plugin_id, $parts);
-      if (isset($parts[1]) && in_array($parts[1], $disallowed_fields, TRUE)) {
+      \preg_match('/field_block:.*:.*:(.*)/', $plugin_id, $parts);
+      if (isset($parts[1]) && \in_array($parts[1], $disallowed_fields, TRUE)) {
         // Unset any field blocks that match our predefined list.
         unset($definitions[$plugin_id]);
       }

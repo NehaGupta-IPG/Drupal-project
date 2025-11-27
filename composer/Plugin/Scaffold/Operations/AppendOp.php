@@ -92,18 +92,18 @@ class AppendOp extends AbstractOperation {
     // Fetch the prepend contents, if provided.
     $prepend_contents = '';
     if (!empty($this->prepend)) {
-      $prepend_contents = file_get_contents($this->prepend->fullPath()) . "\n";
+      $prepend_contents = \file_get_contents($this->prepend->fullPath()) . "\n";
     }
     // Fetch the append contents, if provided.
     $append_contents = '';
     if (!empty($this->append)) {
-      $append_contents = "\n" . file_get_contents($this->append->fullPath());
+      $append_contents = "\n" . \file_get_contents($this->append->fullPath());
     }
 
     // Get the original contents, or the default data if the original is empty.
     $original_contents = $this->originalContents;
     if (empty($original_contents) && !empty($this->default)) {
-      $original_contents = file_get_contents($this->default->fullPath());
+      $original_contents = \file_get_contents($this->default->fullPath());
     }
 
     // Attach it all together.
@@ -122,7 +122,7 @@ class AppendOp extends AbstractOperation {
     // OperationFactory will make a SkipOp instead, and we will not get here.
     if (!$this->managed) {
       $message = '  - <info>NOTICE</info> Modifying existing file at <info>[dest-rel-path]</info>.';
-      if (!file_exists($destination_path)) {
+      if (!\file_exists($destination_path)) {
         $message = '  - <info>NOTICE</info> Creating a new file at <info>[dest-rel-path]</info>.';
       }
       $message .= ' Examine the contents and ensure that it came out correctly.';
@@ -141,7 +141,7 @@ class AppendOp extends AbstractOperation {
     }
 
     // Write the resulting data.
-    file_put_contents($destination_path, $this->contents());
+    \file_put_contents($destination_path, $this->contents());
 
     // Return a ScaffoldResult with knowledge of whether this file is managed.
     return new ScaffoldResult($destination, $this->managed);
@@ -171,7 +171,7 @@ class AppendOp extends AbstractOperation {
 
     // If the target file does not exist, then we will allow the append to
     // happen if we have default data to provide for it.
-    if (!file_exists($destination->fullPath())) {
+    if (!\file_exists($destination->fullPath())) {
       if (!empty($this->default)) {
         return $this;
       }
@@ -181,7 +181,7 @@ class AppendOp extends AbstractOperation {
 
     // If the target file DOES exist, and it already contains the append/prepend
     // data, then we will skip the operation.
-    $existingData = file_get_contents($destination->fullPath());
+    $existingData = \file_get_contents($destination->fullPath());
     if ($this->existingFileHasData($existingData, $this->append) || $this->existingFileHasData($existingData, $this->prepend)) {
       $message = "  - Skip <info>[dest-rel-path]</info>: the file already has the append/prepend data.";
       return new SkipOp($message);
@@ -208,9 +208,9 @@ class AppendOp extends AbstractOperation {
     if (empty($data_path)) {
       return FALSE;
     }
-    $data = file_get_contents($data_path->fullPath());
+    $data = \file_get_contents($data_path->fullPath());
 
-    return str_contains($contents, $data);
+    return \str_contains($contents, $data);
   }
 
 }

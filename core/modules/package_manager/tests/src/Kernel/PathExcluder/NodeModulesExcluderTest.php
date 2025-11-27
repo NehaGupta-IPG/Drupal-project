@@ -38,8 +38,8 @@ class NodeModulesExcluderTest extends PackageManagerKernelTestBase {
       'modules/example/node_modules/exclude.txt',
     ];
     foreach ($excluded as $path) {
-      mkdir(dirname("$active_dir/$path"), 0777, TRUE);
-      file_put_contents("$active_dir/$path", "This file should never be staged.");
+      \mkdir(\dirname("$active_dir/$path"), 0777, TRUE);
+      \file_put_contents("$active_dir/$path", "This file should never be staged.");
     }
 
     $stage = $this->createStage();

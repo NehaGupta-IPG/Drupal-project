@@ -132,7 +132,7 @@ class LayoutPluginManagerTest extends UnitTestCase {
     ];
 
     $layout_definitions = $this->layoutPluginManager->getDefinitions();
-    $this->assertEquals($expected, array_keys($layout_definitions));
+    $this->assertEquals($expected, \array_keys($layout_definitions));
     $this->assertContainsOnlyInstancesOf(LayoutDefinition::class, $layout_definitions);
   }
 
@@ -349,7 +349,7 @@ EOS;
     ];
 
     $layout_definitions = $this->layoutPluginManager->getSortedDefinitions();
-    $this->assertEquals($expected, array_keys($layout_definitions));
+    $this->assertEquals($expected, \array_keys($layout_definitions));
     $this->assertContainsOnlyInstancesOf(LayoutDefinition::class, $layout_definitions);
   }
 
@@ -371,10 +371,10 @@ EOS;
     ];
 
     $definitions = $this->layoutPluginManager->getGroupedDefinitions();
-    $this->assertEquals(array_keys($category_expected), array_keys($definitions));
+    $this->assertEquals(\array_keys($category_expected), \array_keys($definitions));
     foreach ($category_expected as $category => $expected) {
       $this->assertArrayHasKey($category, $definitions);
-      $this->assertEquals($expected, array_keys($definitions[$category]));
+      $this->assertEquals($expected, \array_keys($definitions[$category]));
       $this->assertContainsOnlyInstancesOf(LayoutDefinition::class, $definitions[$category]);
     }
   }

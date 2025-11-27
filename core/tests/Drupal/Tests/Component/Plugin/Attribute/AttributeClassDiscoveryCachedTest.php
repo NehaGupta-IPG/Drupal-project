@@ -76,12 +76,12 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
     $this->assertEquals([
       'id' => 'discovery_test_1',
       'class' => 'com\example\PluginNamespace\AttributeDiscoveryTest1',
-    ], unserialize($file_cache->get($file_path)['content']));
+    ], \unserialize($file_cache->get($file_path)['content']));
 
     // The plugins that extend a missing class, implement a missing interface,
     // and use a missing trait should not be cached.
     foreach ($non_discoverable_file_paths as $non_discoverable_file_path) {
-      $this->assertTrue(file_exists($non_discoverable_file_path));
+      $this->assertTrue(\file_exists($non_discoverable_file_path));
       $this->assertNull($file_cache->get($non_discoverable_file_path));
     }
 
@@ -90,7 +90,7 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
     // content to test against.
     $file_cache->set($file_path, [
       'id' => 'wrong_id',
-      'content' => serialize(['an' => 'array']),
+      'content' => \serialize(['an' => 'array']),
     ]);
 
     // Now perform the same query and check for the cached results.
@@ -132,7 +132,7 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
     // The plugins that extend a missing class, implement a missing interface,
     // and use a missing trait should not be cached.
     foreach ($non_discoverable_file_paths as $non_discoverable_file_path) {
-      $this->assertTrue(file_exists($non_discoverable_file_path));
+      $this->assertTrue(\file_exists($non_discoverable_file_path));
       $this->assertNull($file_cache->get($non_discoverable_file_path));
     }
 
@@ -156,7 +156,7 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
     // and use a missing trait should not be cached. This is the case even for
     // the plugin that was just discovered.
     foreach ($non_discoverable_file_paths as $non_discoverable_file_path) {
-      $this->assertTrue(file_exists($non_discoverable_file_path));
+      $this->assertTrue(\file_exists($non_discoverable_file_path));
       $this->assertNull($file_cache->get($non_discoverable_file_path));
     }
   }

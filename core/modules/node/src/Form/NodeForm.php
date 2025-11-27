@@ -240,7 +240,7 @@ class NodeForm extends ContentEntityForm {
       '#submit' => ['::submitForm', '::preview'],
     ];
 
-    if (array_key_exists('delete', $element)) {
+    if (\array_key_exists('delete', $element)) {
       $element['delete']['#weight'] = 100;
     }
 

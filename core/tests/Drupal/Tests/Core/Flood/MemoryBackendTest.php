@@ -72,7 +72,7 @@ class MemoryBackendTest extends UnitTestCase {
     $window_expired = -1;
 
     $this->flood->register('test_event', $window_expired);
-    usleep(2);
+    \usleep(2);
     $this->flood->register('test_event', $window_expired);
 
     $this->assertFalse($this->flood->isAllowed('test_event', $threshold));
@@ -89,7 +89,7 @@ class MemoryBackendTest extends UnitTestCase {
     $threshold = 2;
 
     $this->flood->register('test_event', 1);
-    usleep(3);
+    \usleep(3);
     $this->flood->register('test_event', 1);
 
     $this->assertFalse($this->flood->isAllowed('test_event', $threshold));

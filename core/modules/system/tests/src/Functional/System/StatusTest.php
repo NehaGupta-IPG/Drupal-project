@@ -64,9 +64,9 @@ class StatusTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Verify that the PHP version is shown on the page.
-    $this->assertSession()->pageTextContains(phpversion());
+    $this->assertSession()->pageTextContains(\phpversion());
 
-    if (function_exists('phpinfo')) {
+    if (\function_exists('phpinfo')) {
       $this->assertSession()->linkByHrefExists(Url::fromRoute('system.php')->toString());
     }
     else {
@@ -203,7 +203,7 @@ class StatusTest extends BrowserTestBase {
     $elements = $this->xpath('//details[summary[contains(@class, "system-status-report__status-title") and normalize-space(text()) = "PHP APCu caching"]]/div[@class="system-status-report__entry__value"]/text()');
     // Ensure the status is not a warning if APCu size is greater than or equal
     // to the recommended size.
-    if (preg_match('/^Enabled \((.*)\)$/', $elements[0]->getText(), $matches)) {
+    if (\preg_match('/^Enabled \((.*)\)$/', $elements[0]->getText(), $matches)) {
       if (Bytes::toNumber($matches[1]) >= 1024 * 1024 * 32) {
         $this->assertFalse($elements[0]->find('xpath', '../../summary')->hasClass('system-status-report__status-icon--warning'));
       }
@@ -224,9 +224,9 @@ class StatusTest extends BrowserTestBase {
     $this->drupalGet('admin/reports/status');
 
     $error_elements = $this->cssSelect('.system-status-report__status-icon--error');
-    $this->assertNotEquals(count($error_elements), 0, 'Errors are listed on the page.');
-    $expected_text = new PluralTranslatableMarkup(count($error_elements), 'Error', 'Errors');
-    $expected_text = count($error_elements) . ' ' . $expected_text;
+    $this->assertNotEquals(\count($error_elements), 0, 'Errors are listed on the page.');
+    $expected_text = new PluralTranslatableMarkup(\count($error_elements), 'Error', 'Errors');
+    $expected_text = \count($error_elements) . ' ' . $expected_text;
     $this->assertSession()->responseContains((string) $expected_text);
   }
 
@@ -244,9 +244,9 @@ class StatusTest extends BrowserTestBase {
     $this->drupalGet('admin/reports/status');
 
     $warning_elements = $this->cssSelect('.system-status-report__status-icon--warning');
-    $this->assertNotEquals(count($warning_elements), 0, 'Warnings are listed on the page.');
-    $expected_text = new PluralTranslatableMarkup(count($warning_elements), 'Warning', 'Warnings');
-    $expected_text = count($warning_elements) . ' ' . $expected_text;
+    $this->assertNotEquals(\count($warning_elements), 0, 'Warnings are listed on the page.');
+    $expected_text = new PluralTranslatableMarkup(\count($warning_elements), 'Warning', 'Warnings');
+    $expected_text = \count($warning_elements) . ' ' . $expected_text;
     $this->assertSession()->responseContains((string) $expected_text);
   }
 

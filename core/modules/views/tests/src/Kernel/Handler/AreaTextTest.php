@@ -69,16 +69,16 @@ class AreaTextTest extends ViewsKernelTestBase {
     $build = $view->display_handler->handlers['header']['area']->render();
     $this->assertEquals('', $renderer->renderRoot($build), 'Nonexistent format should return empty markup.');
 
-    $view->display_handler->handlers['header']['area']->options['content']['format'] = filter_default_format();
+    $view->display_handler->handlers['header']['area']->options['content']['format'] = \filter_default_format();
     $build = $view->display_handler->handlers['header']['area']->render();
-    $this->assertEquals(check_markup($string), $renderer->renderRoot($build), 'Existent format should return something');
+    $this->assertEquals(\check_markup($string), $renderer->renderRoot($build), 'Existent format should return something');
 
     // Empty results, and it shouldn't be displayed .
     $this->assertEquals([], $view->display_handler->handlers['header']['area']->render(TRUE), 'No result should lead to no header');
     // Empty results, and it should be displayed.
     $view->display_handler->handlers['header']['area']->options['empty'] = TRUE;
     $build = $view->display_handler->handlers['header']['area']->render(TRUE);
-    $this->assertEquals(check_markup($string), $renderer->renderRoot($build), 'No result, but empty enabled lead to a full header');
+    $this->assertEquals(\check_markup($string), $renderer->renderRoot($build), 'No result, but empty enabled lead to a full header');
   }
 
 }

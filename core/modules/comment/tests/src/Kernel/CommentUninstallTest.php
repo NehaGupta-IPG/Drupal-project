@@ -93,7 +93,7 @@ class CommentUninstallTest extends KernelTestBase {
     $field_storage = FieldStorageConfig::loadByName('node', 'comment');
     $this->assertNull($field_storage);
 
-    field_purge_batch(10);
+    \field_purge_batch(10);
     // Ensure that uninstall succeeds even if the field has already been deleted
     // manually beforehand.
     $this->container->get('module_installer')->uninstall(['comment']);

@@ -37,7 +37,7 @@ class FileCopyTest extends FileTestBase {
 
     // Copying with rename.
     $desired_filepath = 'public://' . $this->randomMachineName();
-    $this->assertNotFalse(file_put_contents($desired_filepath, ' '), 'Created a file so a rename will have to happen.');
+    $this->assertNotFalse(\file_put_contents($desired_filepath, ' '), 'Created a file so a rename will have to happen.');
     $newer_filepath = \Drupal::service('file_system')->copy($uri, $desired_filepath, FileExists::Rename);
     $this->assertNotFalse($newer_filepath, 'Copy was successful.');
     $this->assertNotEquals($desired_filepath, $newer_filepath, 'Returned expected filepath.');

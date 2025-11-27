@@ -82,7 +82,7 @@ class PreviewTest extends WebDriverTestBase {
     // Load the test dataset.
     $data_set = $this->dataSet();
     $query = Database::getConnection()->insert('views_test_data')
-      ->fields(array_keys($data_set[0]));
+      ->fields(\array_keys($data_set[0]));
     foreach ($data_set as $record) {
       $query->values($record);
     }
@@ -202,7 +202,7 @@ class PreviewTest extends WebDriverTestBase {
     // Verify elements and links to pages.
     // We expect to find current pages element with no link, next page element
     // with a link, and not to find previous page element.
-    $this->assertEquals('Page 1', trim($elements[0]->getHtml()), 'Element for current page is not a link.');
+    $this->assertEquals('Page 1', \trim($elements[0]->getHtml()), 'Element for current page is not a link.');
 
     $next_page_link = $elements[1]->find('css', 'a');
     $this->assertNotEmpty($next_page_link, 'Link to next page found.');
@@ -222,7 +222,7 @@ class PreviewTest extends WebDriverTestBase {
     $this->assertNotEmpty($previous_page_link, 'Link to previous page found.');
     $this->assertEquals('Go to previous page', $previous_page_link->getAttribute('title'));
 
-    $this->assertEquals('Page 2', trim($elements[1]->getHtml()), 'Element for current page is not a link.');
+    $this->assertEquals('Page 2', \trim($elements[1]->getHtml()), 'Element for current page is not a link.');
 
     $next_page_link = $elements[2]->find('css', 'a');
     $this->assertNotEmpty($next_page_link, 'Link to next page found.');

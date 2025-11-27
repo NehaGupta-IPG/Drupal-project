@@ -107,20 +107,20 @@ class MediaLibraryHooks {
   #[Hook('views_pre_render')]
   public function viewsPreRender(ViewExecutable $view): void {
     $add_classes = function (&$option, array $classes_to_add) {
-      $classes = $option ? preg_split('/\s+/', trim($option)) : [];
-      $classes = array_filter($classes);
-      $classes = array_merge($classes, $classes_to_add);
-      $option = implode(' ', array_unique($classes));
+      $classes = $option ? \preg_split('/\s+/', \trim($option)) : [];
+      $classes = \array_filter($classes);
+      $classes = \array_merge($classes, $classes_to_add);
+      $option = \implode(' ', \array_unique($classes));
     };
     if ($view->id() === 'media_library') {
       if ($view->current_display === 'page') {
         $add_classes($view->style_plugin->options['row_class'], ['js-media-library-item', 'js-click-to-select']);
-        if (array_key_exists('media_bulk_form', $view->field)) {
+        if (\array_key_exists('media_bulk_form', $view->field)) {
           $add_classes($view->field['media_bulk_form']->options['element_class'], ['js-click-to-select-checkbox']);
         }
       }
-      elseif (str_starts_with($view->current_display, 'widget')) {
-        if (array_key_exists('media_library_select_form', $view->field)) {
+      elseif (\str_starts_with($view->current_display, 'widget')) {
+        if (\array_key_exists('media_library_select_form', $view->field)) {
           $add_classes($view->field['media_library_select_form']->options['element_wrapper_class'], ['js-click-to-select-checkbox']);
         }
         $add_classes($view->display_handler->options['css_class'], ['js-media-library-view']);
@@ -142,7 +142,7 @@ class MediaLibraryHooks {
   public function viewsPostRender(ViewExecutable $view, &$output, CachePluginBase $cache): void {
     if ($view->id() === 'media_library') {
       $output['#attached']['library'][] = 'media_library/view';
-      if (str_starts_with($view->current_display, 'widget')) {
+      if (\str_starts_with($view->current_display, 'widget')) {
         try {
           $query = MediaLibraryState::fromRequest($view->getRequest())->all();
         }
@@ -166,7 +166,7 @@ class MediaLibraryHooks {
         if (!empty($query)) {
           $ajax_path =& $output['#attached']['drupalSettings']['views']['ajax_path'];
           $parsed_url = UrlHelper::parse($ajax_path);
-          $query = array_merge($query, $parsed_url['query']);
+          $query = \array_merge($query, $parsed_url['query']);
           // Reset the pager so that the user starts on the first page.
           unset($query['page']);
           $ajax_path = $parsed_url['path'] . '?' . UrlHelper::buildQuery($query);
@@ -182,7 +182,7 @@ class MediaLibraryHooks {
   public function formAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
     // Add a process callback to ensure that the media library view's exposed
     // filters submit button is not moved to the modal dialog's button area.
-    if ($form_id === 'views_exposed_form' && str_starts_with($form['#id'], 'views-exposed-form-media-library-widget')) {
+    if ($form_id === 'views_exposed_form' && \str_starts_with($form['#id'], 'views-exposed-form-media-library-widget')) {
       $form['#after_build'][] = '_media_library_views_form_media_library_after_build';
     }
     // Configures media_library displays when a type is submitted.
@@ -223,7 +223,7 @@ class MediaLibraryHooks {
   public function fieldUiPreconfiguredOptionsAlter(array &$options, $field_type): void {
     // If the field is not an "entity_reference"-based field, bail out.
     $class = \Drupal::service('plugin.manager.field.field_type')->getPluginClass($field_type);
-    if (!is_a($class, EntityReferenceItem::class, TRUE)) {
+    if (!\is_a($class, EntityReferenceItem::class, TRUE)) {
       return;
     }
     // Set the default field widget for media to be the Media library.

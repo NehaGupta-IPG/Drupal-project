@@ -38,7 +38,7 @@ class RequestFormatRouteFilterTest extends UnitTestCase {
     $collection = $route_filter->filter($collection, $request);
 
     $this->assertSameSize($expected_filtered_collection, $collection);
-    $this->assertSame($expected_filtered_collection, array_keys($collection->all()));
+    $this->assertSame($expected_filtered_collection, \array_keys($collection->all()));
   }
 
   public static function filterProvider() {

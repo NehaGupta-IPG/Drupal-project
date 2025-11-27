@@ -57,7 +57,7 @@ final class BootstrapErrorHandler {
 
     // We collect a deprecation no matter what.
     if (E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) {
-      $prefix = (error_reporting() & $errorNumber) ? 'Unsilenced deprecation: ' : '';
+      $prefix = (\error_reporting() & $errorNumber) ? 'Unsilenced deprecation: ' : '';
       DeprecationHandler::collectActualDeprecation($prefix . $errorString);
     }
 
@@ -71,7 +71,7 @@ final class BootstrapErrorHandler {
     // fall back to PHPUnit's error handler, an instance of which was created
     // when this error handler was created.
     try {
-      call_user_func($this->phpUnitErrorHandler, $errorNumber, $errorString, $errorFile, $errorLine);
+      \call_user_func($this->phpUnitErrorHandler, $errorNumber, $errorString, $errorFile, $errorLine);
     }
     catch (NoTestCaseObjectOnCallStackException) {
       // If we end up here, it's likely because a test's processing has

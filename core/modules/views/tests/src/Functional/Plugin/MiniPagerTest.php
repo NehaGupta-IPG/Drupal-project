@@ -92,12 +92,12 @@ class MiniPagerTest extends ViewTestBase {
     $view->setDisplay('page_4');
     $this->executeView($view);
     $this->assertTrue($view->get_total_rows, 'The query was set to calculate the total number of rows.');
-    $this->assertSame(count($this->nodes), (int) $view->total_rows, 'The total row count is equal to the number of nodes.');
+    $this->assertSame(\count($this->nodes), (int) $view->total_rows, 'The total row count is equal to the number of nodes.');
 
     $this->drupalGet('test_mini_pager_total', ['query' => ['page' => 1]]);
-    $this->assertSession()->pageTextContains('of ' . count($this->nodes));
+    $this->assertSession()->pageTextContains('of ' . \count($this->nodes));
     $this->drupalGet('test_mini_pager_total', ['query' => ['page' => 6]]);
-    $this->assertSession()->pageTextContains('of ' . count($this->nodes));
+    $this->assertSession()->pageTextContains('of ' . \count($this->nodes));
 
     // Test a mini pager with just one item per page.
     $this->drupalGet('test_mini_pager_one');
@@ -123,7 +123,7 @@ class MiniPagerTest extends ViewTestBase {
     $this->assertSession()->pageTextNotContains('Page 1');
     $this->assertSession()->pageTextNotContains('test ››');
     // Verify that all rows appear on the page.
-    $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", count($this->nodes));
+    $this->assertSession()->elementsCount('xpath', "//div[contains(@class, 'views-row')]", \count($this->nodes));
 
     // Remove all items beside 1, so there should be no links shown.
     for ($i = 0; $i < 19; $i++) {

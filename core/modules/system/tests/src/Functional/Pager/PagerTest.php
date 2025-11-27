@@ -74,9 +74,9 @@ class PagerTest extends BrowserTestBase {
 
     // Verify last page.
     $element = $this->assertSession()->elementExists('xpath', '//li[contains(@class, "pager__item--last")]/a');
-    preg_match('@page=(\d+)@', $element->getAttribute('href'), $matches);
+    \preg_match('@page=(\d+)@', $element->getAttribute('href'), $matches);
     $current_page = (int) $matches[1];
-    $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $element->getAttribute('href')), ['external' => TRUE]);
+    $this->drupalGet($this->getAbsoluteUrl(\parse_url($this->getUrl())['path'] . $element->getAttribute('href')), ['external' => TRUE]);
     $this->assertPagerItems($current_page);
 
     // Verify the pager does not render on a list without pagination.
@@ -183,11 +183,11 @@ class PagerTest extends BrowserTestBase {
     // that the active page for each pager element has the expected page
     // (1-indexed) and resulting query parameter.
     foreach ($test_data as $data) {
-      $input_query = str_replace(' ', '%20', $data['input_query']);
-      $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
+      $input_query = \str_replace(' ', '%20', $data['input_query']);
+      $this->drupalGet($this->getAbsoluteUrl(\parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
       foreach ([0, 1, 4] as $pager_element) {
         $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['expected_page'][$pager_element]}')");
-        $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
+        $destination = \str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
         $this->assertStringEndsWith($data['expected_query'], $destination);
       }
     }
@@ -234,18 +234,18 @@ class PagerTest extends BrowserTestBase {
     // Extract first/previous and next/last items.
     // first/previous only exist, if the current page is not the first.
     if ($current_page > 1) {
-      $first = array_shift($elements);
-      $previous = array_shift($elements);
+      $first = \array_shift($elements);
+      $previous = \array_shift($elements);
     }
     // next/last always exist, unless the current page is the last.
-    if ($current_page != count($elements)) {
-      $last = array_pop($elements);
-      $next = array_pop($elements);
+    if ($current_page != \count($elements)) {
+      $last = \array_pop($elements);
+      $next = \array_pop($elements);
     }
 
     // We remove elements from the $elements array in the following code, so
     // we store the total number of pages for verifying the "last" link.
-    $total_pages = count($elements);
+    $total_pages = \count($elements);
 
     // Verify items and links to pages.
     foreach ($elements as $page => $element) {

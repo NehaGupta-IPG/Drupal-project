@@ -34,7 +34,7 @@ class ImageStyleFlushTest extends ImageFieldTestBase {
 
     if (!isset($file)) {
       $files = $this->drupalGetTestFiles('image');
-      $file = reset($files);
+      $file = \reset($files);
     }
 
     // Make sure we have an image in our wrapper testing file directory.
@@ -51,8 +51,8 @@ class ImageStyleFlushTest extends ImageFieldTestBase {
    */
   public function getImageCount($style, $wrapper) {
     $count = 0;
-    if (is_dir($wrapper . '://styles/' . $style->id())) {
-      $count = count(\Drupal::service('file_system')->scanDirectory($wrapper . '://styles/' . $style->id(), '/.*/'));
+    if (\is_dir($wrapper . '://styles/' . $style->id())) {
+      $count = \count(\Drupal::service('file_system')->scanDirectory($wrapper . '://styles/' . $style->id(), '/.*/'));
     }
     return $count;
   }

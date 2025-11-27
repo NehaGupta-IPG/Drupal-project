@@ -67,7 +67,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
           ':keys[]' => $keys,
           ':collection' => $this->collection,
         ])->fetchAllKeyed();
-      return array_map([$this->serializer, 'decode'], $values);
+      return \array_map([$this->serializer, 'decode'], $values);
     }
     catch (\Exception $e) {
       // @todo Perhaps if the database is never going to be available,
@@ -90,7 +90,7 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
           ':collection' => $this->collection,
           ':now' => $this->time->getRequestTime(),
         ])->fetchAllKeyed();
-      return array_map([$this->serializer, 'decode'], $values);
+      return \array_map([$this->serializer, 'decode'], $values);
     }
     catch (\Exception $e) {
       $this->catchException($e);

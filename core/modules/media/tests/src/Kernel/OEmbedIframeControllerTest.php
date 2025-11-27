@@ -105,7 +105,7 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
     $response = $this->container->get('html_response.attachments_processor')
       ->processAttachments(OEmbedIframeController::create($this->container)
         ->render($request));
-    assert($response instanceof HtmlResponse);
+    \assert($response instanceof HtmlResponse);
     $content = $response->getContent();
 
     // This query parameter is added by

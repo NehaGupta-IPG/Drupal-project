@@ -57,7 +57,7 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
     $plugin_definition_annotation_name = 'Drupal\views\Annotation\Views' . Container::camelize($handler_type);
     // Special handling until all views plugins have attribute classes.
     $attribute_name_candidate = 'Drupal\views\Attribute\Views' . Container::camelize($handler_type);
-    $plugin_definition_attribute_name = class_exists($attribute_name_candidate) ? $attribute_name_candidate : Plugin::class;
+    $plugin_definition_attribute_name = \class_exists($attribute_name_candidate) ? $attribute_name_candidate : Plugin::class;
     $plugin_interface = ViewsHandlerInterface::class;
     if ($handler_type == 'join') {
       $plugin_interface = JoinPluginInterface::class;
@@ -131,7 +131,7 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
       $plugin_id = $override_plugin_id ?: $definition['id'];
       // Try to use the overridden handler.
       $handler = $this->createInstance($plugin_id, $definition);
-      if ($override_plugin_id && method_exists($handler, 'broken') && $handler->broken()) {
+      if ($override_plugin_id && \method_exists($handler, 'broken') && $handler->broken()) {
         $handler = $this->createInstance($definition['id'], $definition);
       }
       return $handler;

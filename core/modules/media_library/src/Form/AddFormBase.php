@@ -169,7 +169,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
         '#type' => 'inline_template',
         '#template' => '<p>{{ text }}</p>',
         '#context' => [
-          'text' => $this->formatPlural(count($added_media), 'The media item has been created but has not yet been saved. Fill in any required fields and save to add it to the media library.', 'The media items have been created but have not yet been saved. Fill in any required fields and save to add them to the media library.'),
+          'text' => $this->formatPlural(\count($added_media), 'The media item has been created but has not yet been saved. Fill in any required fields and save to add it to the media library.', 'The media items have been created but have not yet been saved. Fill in any required fields and save to add them to the media library.'),
         ],
       ];
 
@@ -258,7 +258,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     // removed.
     // @see ::removeButtonSubmit()
     $parents = $form['#parents'] ?? [];
-    $id_suffix = $parents ? '-' . implode('-', $parents) : '';
+    $id_suffix = $parents ? '-' . \implode('-', $parents) : '';
 
     $element = [
       '#wrapper_attributes' => [
@@ -500,17 +500,17 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     $media_type = $this->getMediaType($form_state);
     $media_storage = $this->entityTypeManager->getStorage('media');
     $source_field_name = $this->getSourceFieldName($media_type);
-    $media = array_map(function ($source_field_value) use ($media_type, $media_storage, $source_field_name) {
+    $media = \array_map(function ($source_field_value) use ($media_type, $media_storage, $source_field_name) {
       return $this->createMediaFromValue($media_type, $media_storage, $source_field_name, $source_field_value);
     }, $source_field_values);
     // Re-key the media items before setting them in the form state.
-    $form_state->set('media', array_values($media));
+    $form_state->set('media', \array_values($media));
     // Save the selected items in the form state so they are remembered when an
     // item is removed.
     $media = $this->entityTypeManager->getStorage('media')
-      ->loadMultiple(explode(',', $form_state->getValue('current_selection')));
+      ->loadMultiple(\explode(',', $form_state->getValue('current_selection')));
     // Any ID can be passed to the form, so we have to check access.
-    $form_state->set('current_selection', array_filter($media, function ($media_item) {
+    $form_state->set('current_selection', \array_filter($media, function ($media_item) {
       return $media_item->access('view');
     }));
     $form_state->setRebuild();
@@ -562,7 +562,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     // Retrieve the delta of the media item from the parents of the remove
     // button.
     $triggering_element = $form_state->getTriggeringElement();
-    $delta = array_slice($triggering_element['#array_parents'], -2, 1)[0];
+    $delta = \array_slice($triggering_element['#array_parents'], -2, 1)[0];
 
     $added_media = $form_state->get('media');
     $removed_media = $added_media[$delta];
@@ -605,7 +605,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     }
 
     // Check if the remove button is clicked.
-    if (end($triggering_element['#parents']) === 'remove_button') {
+    if (\end($triggering_element['#parents']) === 'remove_button') {
       // When the list of added media is empty, return to the media library and
       // shift focus back to the first tabbable element (which should be the
       // source field).
@@ -622,7 +622,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
         // Find the delta of the next media item. If there is no item with a
         // bigger delta, we automatically use the delta of the previous item and
         // shift the focus there.
-        $removed_delta = array_slice($triggering_element['#array_parents'], -2, 1)[0];
+        $removed_delta = \array_slice($triggering_element['#array_parents'], -2, 1)[0];
         $delta_to_focus = 0;
         foreach ($added_media as $delta => $media) {
           $delta_to_focus = $delta;
@@ -698,7 +698,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
       return $form;
     }
 
-    $media_ids = array_map(function (MediaInterface $media) {
+    $media_ids = \array_map(function (MediaInterface $media) {
       return $media->id();
     }, $this->getAddedMediaItems($form_state));
 
@@ -706,7 +706,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
 
     $response = new AjaxResponse();
     $response->addCommand(new UpdateSelectionCommand($media_ids));
-    $media_id_to_focus = array_pop($media_ids);
+    $media_id_to_focus = \array_pop($media_ids);
     $response->addCommand(new ReplaceCommand('#media-library-add-form-wrapper', $this->buildMediaLibraryUi($form_state)));
     $response->addCommand(new InvokeCommand("#media-library-content [value=$media_id_to_focus]", 'focus'));
     $available_slots = $this->getMediaLibraryState($form_state)->getAvailableSlots();
@@ -763,7 +763,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     // The added media items get an ID when they are saved in ::submitForm().
     // For that reason the added media items are keyed by delta in the form
     // state and we have to do an array map to get each media ID.
-    $media_ids = array_map(function (MediaInterface $media) {
+    $media_ids = \array_map(function (MediaInterface $media) {
       return $media->id();
     }, $this->getCurrentMediaItems($form_state));
 
@@ -794,9 +794,9 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *   The number of media currently selected.
    */
   private function getSelectedMediaItemCount(array $media_ids, FormStateInterface $form_state): int {
-    $selected_count = count($media_ids);
+    $selected_count = \count($media_ids);
     if ($current_selection = $form_state->getValue('current_selection')) {
-      $selected_count += count(explode(',', $current_selection));
+      $selected_count += \count(\explode(',', $current_selection));
     }
     return $selected_count;
   }
@@ -879,7 +879,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
     $pre_selected_media = $this->getPreSelectedMediaItems($form_state);
     $added_media = $this->getAddedMediaItems($form_state);
     // Using array_merge will renumber the numeric keys.
-    return array_merge($pre_selected_media, $added_media);
+    return \array_merge($pre_selected_media, $added_media);
   }
 
   /**

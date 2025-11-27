@@ -58,7 +58,7 @@ class ClaroModalDisplayTest extends MediaLibraryTestBase {
     $assert_session = $this->assertSession();
 
     foreach ($this->getTestFiles('image') as $image) {
-      $extension = pathinfo($image->filename, PATHINFO_EXTENSION);
+      $extension = \pathinfo($image->filename, PATHINFO_EXTENSION);
       if ($extension === 'jpg') {
         $jpg_image = $image;
       }

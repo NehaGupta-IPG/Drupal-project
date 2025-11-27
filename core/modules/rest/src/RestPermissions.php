@@ -62,7 +62,7 @@ class RestPermissions implements ContainerInjectionInterface {
 
       // Add the rest resource configuration entity as a dependency to the
       // permissions.
-      $permissions += array_map(function (array $permission_info) use ($resource_config) {
+      $permissions += \array_map(function (array $permission_info) use ($resource_config) {
         $merge_info['dependencies'][$resource_config->getConfigDependencyKey()] = [
           $resource_config->getConfigDependencyName(),
         ];

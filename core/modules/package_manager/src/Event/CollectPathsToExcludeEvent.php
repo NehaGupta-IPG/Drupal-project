@@ -53,7 +53,7 @@ final class CollectPathsToExcludeEvent extends SandboxEvent implements PathListI
    * {@inheritdoc}
    */
   public function getAll(): array {
-    return array_unique($this->pathList->getAll());
+    return \array_unique($this->pathList->getAll());
   }
 
   /**
@@ -93,14 +93,14 @@ final class CollectPathsToExcludeEvent extends SandboxEvent implements PathListI
 
     foreach ($paths as $path) {
       if ($this->pathFactory->create($path)->isAbsolute()) {
-        if (!str_starts_with($path, $project_root)) {
+        if (!\str_starts_with($path, $project_root)) {
           throw new \LogicException("$path is not inside the project root: $project_root.");
         }
       }
 
       // Make absolute paths relative to the project root.
-      $path = str_replace($project_root, '', $path);
-      $path = ltrim($path, '/');
+      $path = \str_replace($project_root, '', $path);
+      $path = \ltrim($path, '/');
       $this->add($path);
     }
   }
@@ -122,7 +122,7 @@ final class CollectPathsToExcludeEvent extends SandboxEvent implements PathListI
     $matched_directories = new \CallbackFilterIterator($filtered_directories,
       fn (\RecursiveDirectoryIterator $current) => $current->isDir() && $current->getFilename() === $directory_name
     );
-    return array_keys(iterator_to_array($matched_directories));
+    return \array_keys(\iterator_to_array($matched_directories));
   }
 
 }

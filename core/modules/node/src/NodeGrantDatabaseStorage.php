@@ -33,7 +33,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     protected MemoryCacheInterface $memoryCache,
   ) {
     if (!$memoryCache) {
-      @trigger_error('Calling NodeGrantDatabaseStorage::__construct() without the $memoryCache argument is deprecated in drupal:11.3.0 and the $memoryCache argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
+      @\trigger_error('Calling NodeGrantDatabaseStorage::__construct() without the $memoryCache argument is deprecated in drupal:11.3.0 and the $memoryCache argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
       $this->memoryCache = \Drupal::service('node.view_all_nodes_memory_cache');
     }
     $this->hasNodeGrantsImplementations = $this->moduleHandler->hasImplementations('node_grants');
@@ -44,7 +44,7 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    */
   public function access(NodeInterface $node, $operation, AccountInterface $account) {
     // Grants only support these operations.
-    if (!in_array($operation, ['view', 'update', 'delete'])) {
+    if (!\in_array($operation, ['view', 'update', 'delete'])) {
       return AccessResult::neutral();
     }
 
@@ -91,9 +91,9 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     $query->condition($nids);
     $query->range(0, 1);
 
-    $grants = $this->buildGrantsQueryCondition(node_access_grants($operation, $account));
+    $grants = $this->buildGrantsQueryCondition(\node_access_grants($operation, $account));
 
-    if (count($grants) > 0) {
+    if (\count($grants) > 0) {
       $query->condition($grants);
     }
     if ($query->execute()->fetchField()) {
@@ -136,9 +136,9 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
       ->condition('nid', 0)
       ->condition('grant_view', 1, '>=');
 
-    $grants = $this->buildGrantsQueryCondition(node_access_grants('view', $account));
+    $grants = $this->buildGrantsQueryCondition(\node_access_grants('view', $account));
 
-    if (count($grants) > 0) {
+    if (\count($grants) > 0) {
       $query->condition($grants);
     }
     $access = $query->execute()->fetchField();
@@ -157,11 +157,11 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     // Find all instances of the base table being joined which could appear
     // more than once in the query, and could be aliased. Join each one to
     // the node_access table.
-    $grants = node_access_grants($operation, $account);
+    $grants = \node_access_grants($operation, $account);
     // If any grant exists for the specified user, then user has access to the
     // node for the specified operation.
     $grant_conditions = $this->buildGrantsQueryCondition($grants);
-    $grants_exist = count($grant_conditions->conditions()) > 0;
+    $grants_exist = \count($grant_conditions->conditions()) > 0;
 
     $is_multilingual = \Drupal::languageManager()->isMultilingual();
     foreach ($tables as $table_alias => $tableinfo) {

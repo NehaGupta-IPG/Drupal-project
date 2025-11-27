@@ -80,7 +80,7 @@ class SystemTestHooks {
     if ($file->getName() == 'system_dependencies_test') {
       $info['hidden'] = FALSE;
     }
-    if (in_array($file->getName(), [
+    if (\in_array($file->getName(), [
       'system_incompatible_module_version_dependencies_test',
       'system_incompatible_core_version_dependencies_test',
       'system_incompatible_module_version_test',

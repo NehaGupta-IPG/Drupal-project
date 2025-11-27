@@ -95,7 +95,7 @@ abstract class MediaKernelTestBase extends KernelTestBase {
       'sites' => [
         'default' => [
           'files' => [
-            $filename => str_repeat('a', 3000),
+            $filename => \str_repeat('a', 3000),
           ],
         ],
       ],

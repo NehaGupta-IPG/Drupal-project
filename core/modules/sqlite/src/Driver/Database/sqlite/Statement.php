@@ -27,24 +27,24 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
    * See http://bugs.php.net/bug.php?id=45259 for more details.
    */
   protected function getStatement(string $query, ?array &$args = []): object {
-    if (is_array($args) && !empty($args)) {
+    if (\is_array($args) && !empty($args)) {
       // Check if $args is a simple numeric array.
-      if (range(0, count($args) - 1) === array_keys($args)) {
+      if (\range(0, \count($args) - 1) === \array_keys($args)) {
         // In that case, we have unnamed placeholders.
         $count = 0;
         $new_args = [];
         foreach ($args as $value) {
-          if (is_float($value) || is_int($value)) {
-            if (is_float($value)) {
+          if (\is_float($value) || \is_int($value)) {
+            if (\is_float($value)) {
               // Force the conversion to float so as not to loose precision
               // in the automatic cast.
-              $value = sprintf('%F', $value);
+              $value = \sprintf('%F', $value);
             }
-            $query = substr_replace($query, $value, strpos($query, '?'), 1);
+            $query = \substr_replace($query, $value, \strpos($query, '?'), 1);
           }
           else {
             $placeholder = ':db_statement_placeholder_' . $count++;
-            $query = substr_replace($query, $placeholder, strpos($query, '?'), 1);
+            $query = \substr_replace($query, $placeholder, \strpos($query, '?'), 1);
             $new_args[$placeholder] = $value;
           }
         }
@@ -53,11 +53,11 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
       else {
         // Else, this is using named placeholders.
         foreach ($args as $placeholder => $value) {
-          if (is_float($value) || is_int($value)) {
-            if (is_float($value)) {
+          if (\is_float($value) || \is_int($value)) {
+            if (\is_float($value)) {
               // Force the conversion to float so as not to loose precision
               // in the automatic cast.
-              $value = sprintf('%F', $value);
+              $value = \sprintf('%F', $value);
             }
 
             // We will remove this placeholder from the query as PDO throws an
@@ -73,7 +73,7 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
             // When replacing the placeholders, make sure we search for the
             // exact placeholder. For example, if searching for
             // ':db_placeholder_1', do not replace ':db_placeholder_11'.
-            $query = preg_replace('/' . preg_quote($placeholder, NULL) . '\b/', $value, $query);
+            $query = \preg_replace('/' . \preg_quote($placeholder, NULL) . '\b/', $value, $query);
           }
         }
       }
@@ -86,8 +86,8 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
    * {@inheritdoc}
    */
   public function execute($args = [], $options = []) {
-    if (isset($options['fetch']) && is_int($options['fetch'])) {
-      @trigger_error("Passing the 'fetch' key as an integer to \$options in execute() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+    if (isset($options['fetch']) && \is_int($options['fetch'])) {
+      @\trigger_error("Passing the 'fetch' key as an integer to \$options in execute() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
     }
 
     try {

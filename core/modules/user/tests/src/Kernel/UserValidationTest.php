@@ -65,16 +65,16 @@ class UserValidationTest extends KernelTestBase {
       ''                       => ['Invalid empty username', 'assertNotNull'],
       'foo/'                   => ['Invalid username containing invalid chars', 'assertNotNull'],
       // NULL.
-      'foo' . chr(0) . 'bar'   => ['Invalid username containing chr(0)', 'assertNotNull'],
+      'foo' . \chr(0) . 'bar'   => ['Invalid username containing chr(0)', 'assertNotNull'],
       // CR.
-      'foo' . chr(13) . 'bar'  => ['Invalid username containing chr(13)', 'assertNotNull'],
-      str_repeat('x', UserInterface::USERNAME_MAX_LENGTH + 1) => ['Invalid excessively long username', 'assertNotNull'],
+      'foo' . \chr(13) . 'bar'  => ['Invalid username containing chr(13)', 'assertNotNull'],
+      \str_repeat('x', UserInterface::USERNAME_MAX_LENGTH + 1) => ['Invalid excessively long username', 'assertNotNull'],
     ];
     $this->expectDeprecation('user_validate_name() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\user\UserNameValidator::validateName() instead. See https://www.drupal.org/node/3431205');
     // cSpell:enable
     foreach ($test_cases as $name => $test_case) {
       [$description, $test] = $test_case;
-      $result = user_validate_name($name);
+      $result = \user_validate_name($name);
       $this->$test($result, $description . ' (' . $name . ')');
     }
   }
@@ -97,7 +97,7 @@ class UserValidationTest extends KernelTestBase {
     $violations = $user->validate();
     $this->assertCount(1, $violations, 'Violation found when name is too long.');
     $this->assertEquals('name', $violations[0]->getPropertyPath());
-    $this->assertEquals(sprintf('The username %s is too long: it must be 60 characters or less.', $name), $violations[0]->getMessage());
+    $this->assertEquals(\sprintf('The username %s is too long: it must be 60 characters or less.', $name), $violations[0]->getMessage());
 
     // Create a second test user to provoke a name collision.
     $user2 = User::create([
@@ -129,7 +129,7 @@ class UserValidationTest extends KernelTestBase {
     //   https://www.drupal.org/node/2023465.
     $this->assertCount(2, $violations, 'Violations found when email is too long');
     $this->assertEquals('mail.0.value', $violations[0]->getPropertyPath());
-    $this->assertEquals(sprintf('%s: the email address can not be longer than %s characters.', $user->get('mail')->getFieldDefinition()->getLabel(), Email::EMAIL_MAX_LENGTH), $violations[0]->getMessage());
+    $this->assertEquals(\sprintf('%s: the email address can not be longer than %s characters.', $user->get('mail')->getFieldDefinition()->getLabel(), Email::EMAIL_MAX_LENGTH), $violations[0]->getMessage());
     $this->assertEquals('mail.0.value', $violations[1]->getPropertyPath());
     $this->assertEquals('This value is not a valid email address.', $violations[1]->getMessage());
 
@@ -151,7 +151,7 @@ class UserValidationTest extends KernelTestBase {
     $violations = $user->validate();
     $this->assertCount(1, $violations, 'Email addresses may not be removed');
     $this->assertEquals('mail', $violations[0]->getPropertyPath());
-    $this->assertEquals(sprintf('%s field is required.', $user->getFieldDefinition('mail')->getLabel()), $violations[0]->getMessage());
+    $this->assertEquals(\sprintf('%s field is required.', $user->getFieldDefinition('mail')->getLabel()), $violations[0]->getMessage());
     $user->set('mail', 'someone@example.com');
 
     $user->set('timezone', $this->randomString(33));
@@ -218,7 +218,7 @@ class UserValidationTest extends KernelTestBase {
     $this->assertCount($count, $violations, "Violation found when $field_name is too long.");
     $this->assertEquals("{$field_name}.0.value", $violations[$expected_index]->getPropertyPath());
     $field_label = $entity->get($field_name)->getFieldDefinition()->getLabel();
-    $this->assertEquals(sprintf('%s: may not be longer than %s characters.', $field_label, $length), $violations[$expected_index]->getMessage());
+    $this->assertEquals(\sprintf('%s: may not be longer than %s characters.', $field_label, $length), $violations[$expected_index]->getMessage());
   }
 
   /**

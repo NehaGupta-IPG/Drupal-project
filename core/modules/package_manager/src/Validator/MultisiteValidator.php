@@ -49,7 +49,7 @@ final class MultisiteValidator implements EventSubscriberInterface {
     }
     $sites_php_path = $this->pathLocator->getProjectRoot() . '/' . $web_root . 'sites/sites.php';
 
-    if (!file_exists($sites_php_path)) {
+    if (!\file_exists($sites_php_path)) {
       return FALSE;
     }
 
@@ -57,7 +57,7 @@ final class MultisiteValidator implements EventSubscriberInterface {
     $sites = [];
     include $sites_php_path;
     // @see example.sites.php
-    return count(array_unique($sites)) > 1;
+    return \count(\array_unique($sites)) > 1;
   }
 
 }

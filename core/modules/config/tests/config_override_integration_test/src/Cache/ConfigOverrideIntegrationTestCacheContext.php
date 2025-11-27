@@ -18,7 +18,7 @@ class ConfigOverrideIntegrationTestCacheContext implements CacheContextInterface
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Config override integration test');
+    return \t('Config override integration test');
   }
 
   /**

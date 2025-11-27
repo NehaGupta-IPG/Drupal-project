@@ -675,19 +675,19 @@ class EntityQueryAggregateTest extends EntityKernelTestBase {
    */
   protected function assertResults(array $expected, bool $sorted = FALSE): void {
     $found = TRUE;
-    $expected_keys = array_keys($expected);
+    $expected_keys = \array_keys($expected);
     foreach ($this->queryResult as $key => $row) {
       $keys = $sorted ? [$key] : $expected_keys;
       foreach ($keys as $key) {
         $expected_row = $expected[$key];
-        if (!array_diff_assoc($row, $expected_row) && !array_diff_assoc($expected_row, $row)) {
+        if (!\array_diff_assoc($row, $expected_row) && !\array_diff_assoc($expected_row, $row)) {
           continue 2;
         }
       }
       $found = FALSE;
       break;
     }
-    $this->assertTrue($found, strtr('!expected expected, !found found', ['!expected' => print_r($expected, TRUE), '!found' => print_r($this->queryResult, TRUE)]));
+    $this->assertTrue($found, \strtr('!expected expected, !found found', ['!expected' => \print_r($expected, TRUE), '!found' => \print_r($this->queryResult, TRUE)]));
   }
 
   /**

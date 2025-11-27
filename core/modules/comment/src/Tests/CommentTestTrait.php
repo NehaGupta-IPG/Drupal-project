@@ -60,7 +60,7 @@ trait CommentTestTrait {
 
     // Add a comment field to the host entity type. Create the field storage if
     // needed.
-    if (!array_key_exists($field_name, $entity_field_manager->getFieldStorageDefinitions($entity_type))) {
+    if (!\array_key_exists($field_name, $entity_field_manager->getFieldStorageDefinitions($entity_type))) {
       $entity_type_manager->getStorage('field_storage_config')->create([
         'entity_type' => $entity_type,
         'field_name' => $field_name,
@@ -72,7 +72,7 @@ trait CommentTestTrait {
       ])->save();
     }
     // Create the field if needed, and configure its form and view displays.
-    if (!array_key_exists($field_name, $entity_field_manager->getFieldDefinitions($entity_type, $bundle))) {
+    if (!\array_key_exists($field_name, $entity_field_manager->getFieldDefinitions($entity_type, $bundle))) {
       $entity_type_manager->getStorage('field_config')->create([
         'label' => 'Comments',
         'description' => '',

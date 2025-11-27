@@ -97,7 +97,7 @@ class BlockContentTypeForm extends BundleEntityFormBase {
    */
   protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
     // An empty description violates config schema.
-    if (trim($form_state->getValue('description', '')) === '') {
+    if (\trim($form_state->getValue('description', '')) === '') {
       $form_state->unsetValue('description');
     }
     parent::copyFormValuesToEntity($entity, $form, $form_state);

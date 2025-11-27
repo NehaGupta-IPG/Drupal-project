@@ -155,11 +155,11 @@ JS;
 
     $node = $assert_session->fieldExists($field, $container);
     $actual = $node->getValue();
-    $regex = '/^' . preg_quote($value, '/') . '$/ui';
+    $regex = '/^' . \preg_quote($value, '/') . '$/ui';
 
-    $message = sprintf('The field "%s" value is "%s", but "%s" expected.', $field, htmlspecialchars($actual), htmlspecialchars($value));
+    $message = \sprintf('The field "%s" value is "%s", but "%s" expected.', $field, \htmlspecialchars($actual), \htmlspecialchars($value));
 
-    $assert_session->assert((bool) preg_match($regex, $actual), $message);
+    $assert_session->assert((bool) \preg_match($regex, $actual), $message);
   }
 
   /**

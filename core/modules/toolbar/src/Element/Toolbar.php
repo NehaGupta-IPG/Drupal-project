@@ -78,10 +78,10 @@ class Toolbar extends RenderElementBase {
     // Allow for altering of hook_toolbar().
     $module_handler->alter('toolbar', $items);
     // Sort the children.
-    uasort($items, ['\Drupal\Component\Utility\SortArray', 'sortByWeightProperty']);
+    \uasort($items, ['\Drupal\Component\Utility\SortArray', 'sortByWeightProperty']);
 
     // Merge in the original toolbar values.
-    $element = array_merge($element, $items);
+    $element = \array_merge($element, $items);
 
     // Assign each item a unique ID, based on its key.
     foreach (Element::children($element) as $key) {

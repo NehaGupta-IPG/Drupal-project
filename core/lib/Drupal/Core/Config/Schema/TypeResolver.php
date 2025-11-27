@@ -32,13 +32,13 @@ class TypeResolver {
    *   Configuration type name with all expressions resolved.
    */
   public static function resolveDynamicTypeName(string $name, mixed $data): string {
-    if (preg_match_all("/\[(.*)\]/U", $name, $matches)) {
+    if (\preg_match_all("/\[(.*)\]/U", $name, $matches)) {
       // Build our list of '[value]' => replacement.
       $replace = [];
-      foreach (array_combine($matches[0], $matches[1]) as $key => $value) {
+      foreach (\array_combine($matches[0], $matches[1]) as $key => $value) {
         $replace[$key] = self::resolveExpression($value, $data);
       }
-      return strtr($name, $replace);
+      return \strtr($name, $replace);
     }
     return $name;
   }
@@ -87,24 +87,24 @@ class TypeResolver {
       ];
     }
 
-    $parts = explode('.', $expression);
+    $parts = \explode('.', $expression);
     $previous_name = NULL;
     // Process each value part, one at a time.
-    while ($name = array_shift($parts)) {
-      if (str_starts_with($name, '%') && !in_array($name, ['%parent', '%key', '%type'], TRUE)) {
+    while ($name = \array_shift($parts)) {
+      if (\str_starts_with($name, '%') && !\in_array($name, ['%parent', '%key', '%type'], TRUE)) {
         throw new \LogicException('`' . $expression . '` is not a valid dynamic type expression. Dynamic type expressions must contain at least `%parent`, `%key`, or `%type`.`');
       }
       if ($name === '%type' && $previous_name !== '%parent') {
         throw new \LogicException('`%type` can only used when immediately preceded by `%parent` in `' . $expression . '`');
       }
       $previous_name = $name;
-      if (!is_array($data) || !isset($data[$name])) {
+      if (!\is_array($data) || !isset($data[$name])) {
         // Key not found, return original value.
         return $expression;
       }
       if (!$parts) {
         $expression = $data[$name];
-        if (is_bool($expression)) {
+        if (\is_bool($expression)) {
           $expression = (int) $expression;
         }
         // If no more parts left, this is the final property.

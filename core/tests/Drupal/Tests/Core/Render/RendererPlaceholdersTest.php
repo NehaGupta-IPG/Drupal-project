@@ -76,10 +76,10 @@ class RendererPlaceholdersTest extends RendererTestBase {
       $token_render_array = [
         '#lazy_builder' => ['Drupal\Tests\Core\Render\PlaceholdersTest::callback', $args],
       ];
-      if (is_array($cache_keys)) {
+      if (\is_array($cache_keys)) {
         $token_render_array['#cache']['keys'] = $cache_keys;
       }
-      $token = Crypt::hashBase64(serialize($token_render_array));
+      $token = Crypt::hashBase64(\serialize($token_render_array));
       // \Drupal\Core\Render\Markup::create() is necessary as the render
       // system would mangle this markup. As this is exactly what happens at
       // runtime this is a valid use-case.
@@ -87,7 +87,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
     };
 
     $extract_placeholder_render_array = function ($placeholder_render_array) {
-      return array_intersect_key($placeholder_render_array, ['#lazy_builder' => TRUE, '#cache' => TRUE]);
+      return \array_intersect_key($placeholder_render_array, ['#lazy_builder' => TRUE, '#cache' => TRUE]);
     };
 
     // Note the presence of '#create_placeholder'.
@@ -611,7 +611,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
 
     $this->setUpRequest('GET');
 
-    $token = Crypt::hashBase64(serialize($expected_placeholder_render_array));
+    $token = Crypt::hashBase64(\serialize($expected_placeholder_render_array));
     $placeholder_callback = $expected_placeholder_render_array['#lazy_builder'][0];
     $expected_placeholder_markup = '<drupal-render-placeholder callback="' . $placeholder_callback . '" arguments="0=' . $args[0] . '" token="' . $token . '"></drupal-render-placeholder>';
     $this->assertSame($expected_placeholder_markup, Html::normalize($expected_placeholder_markup), 'Placeholder unaltered by Html::normalize() which is used by FilterHtmlCorrector.');
@@ -1189,7 +1189,7 @@ HTML;
   <div class="details-wrapper">{{ children }}</div>
 </details>
 EOS;
-        $output = str_replace([
+        $output = \str_replace([
           '{{ title }}',
           '{{ children }}',
         ], [$vars['#title'], $vars['#children']], $output);

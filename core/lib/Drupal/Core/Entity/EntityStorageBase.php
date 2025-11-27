@@ -263,7 +263,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    * {@inheritdoc}
    */
   public function load($id) {
-    assert(!is_null($id), sprintf('Cannot load the "%s" entity with NULL ID.', $this->entityTypeId));
+    \assert(!\is_null($id), \sprintf('Cannot load the "%s" entity with NULL ID.', $this->entityTypeId));
     $entities = $this->loadMultiple([$id]);
     return $entities[$id] ?? NULL;
   }
@@ -280,21 +280,21 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     // were passed. The $ids array is reduced as items are loaded from cache,
     // and we need to know if it is empty for this reason to avoid querying the
     // database when all requested entities are loaded from cache.
-    $flipped_ids = $ids ? array_flip($ids) : FALSE;
+    $flipped_ids = $ids ? \array_flip($ids) : FALSE;
     // Try to load entities from the static cache, if the entity type supports
     // static caching.
     if ($ids && $this->entityType->isStaticallyCacheable()) {
       $entities += $this->getFromStaticCache($ids);
       // If any entities were in the static cache remove them from the
       // remaining IDs.
-      $ids = array_diff($ids, array_keys($entities));
+      $ids = \array_diff($ids, \array_keys($entities));
 
       $fiber = \Fiber::getCurrent();
       if ($ids && $fiber !== NULL) {
         // Before suspending the fiber, add the IDs passed in to the full list
         // of entities to load, so that another call can load everything at
         // once.
-        $this->entityIdsToLoad = array_unique(array_merge($this->entityIdsToLoad, $ids));
+        $this->entityIdsToLoad = \array_unique(\array_merge($this->entityIdsToLoad, $ids));
         $fiber->suspend(FiberResumeType::Immediate);
 
         // If all the IDs we need to return have already been loaded into the
@@ -302,11 +302,11 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
         // deferring these may allow them to be loaded with more other entities
         // later.
         $entities += $this->getFromStaticCache($ids);
-        $ids = array_diff($ids, array_keys($entities));
+        $ids = \array_diff($ids, \array_keys($entities));
 
         // Otherwise load additional entities now.
         if ($ids && $this->entityIdsToLoad) {
-          $ids = array_unique(array_merge($ids, $this->entityIdsToLoad));
+          $ids = \array_unique(\array_merge($ids, $this->entityIdsToLoad));
           $this->entityIdsToLoad = [];
         }
       }
@@ -327,7 +327,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
 
       // If any entities were pre-loaded, remove them from the IDs still to
       // load.
-      $ids = array_diff($ids, array_keys($entities));
+      $ids = \array_diff($ids, \array_keys($entities));
 
       // Add pre-loaded entities to the cache.
       $this->setStaticCache($preloaded_entities);
@@ -419,8 +419,8 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
     // sorts the array to enforce role weights. We have to let it manipulate the
     // final array, not a subarray. However if there are multiple bundle classes
     // involved, we only want to pass each one the entities that match.
-    if (count($entities_by_class) === 1) {
-      $entity_class = array_key_first($entities_by_class);
+    if (\count($entities_by_class) === 1) {
+      $entity_class = \array_key_first($entities_by_class);
       $entity_class::postLoad($this, $entities);
     }
     else {
@@ -493,7 +493,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
 
       // Perform the delete and reset the static cache for the deleted entities.
       $this->doDelete($items);
-      $this->resetCache(array_keys($items));
+      $this->resetCache(\array_keys($items));
 
       // Allow code to run after deleting.
       $entity_class::postDelete($this, $items);
@@ -691,7 +691,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   protected function getEntitiesByClass(array $entities): array {
     $entity_classes = [];
     foreach ($entities as $entity) {
-      $entity_classes[get_class($entity)][$entity->id()] = $entity;
+      $entity_classes[\get_class($entity)][$entity->id()] = $entity;
     }
     return $entity_classes;
   }

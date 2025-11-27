@@ -52,7 +52,7 @@ class BaseFieldOverrideTest extends KernelTestBase {
       $base_field->setClass($base_field_class);
     }
     $override = BaseFieldOverride::createFromBaseFieldDefinition($base_field, 'test_bundle');
-    $this->assertEquals($expected_override_class, ltrim($override->getClass(), '\\'));
+    $this->assertEquals($expected_override_class, \ltrim($override->getClass(), '\\'));
   }
 
   /**

@@ -104,7 +104,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
       $node = $node_storage->load($nid);
       $node_file = File::load($node->{$field_name}->target_id);
       $this->assertFileExists($node_file->getFileUri());
-      $this->assertFileEntryExists($node_file, sprintf('File entry exists after uploading a file (%s) under the max limit (%s).', ByteSizeMarkup::create($small_file->getSize()), $max_filesize));
+      $this->assertFileEntryExists($node_file, \sprintf('File entry exists after uploading a file (%s) under the max limit (%s).', ByteSizeMarkup::create($small_file->getSize()), $max_filesize));
 
       // Check that uploading the large file fails (1M limit).
       $this->uploadNodeFile($large_file, $field_name, $type_name);
@@ -121,7 +121,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
     $node = $node_storage->load($nid);
     $node_file = File::load($node->{$field_name}->target_id);
     $this->assertFileExists($node_file->getFileUri());
-    $this->assertFileEntryExists($node_file, sprintf('File entry exists after uploading a file (%s) with no max limit.', ByteSizeMarkup::create($large_file->getSize())));
+    $this->assertFileEntryExists($node_file, \sprintf('File entry exists after uploading a file (%s) with no max limit.', ByteSizeMarkup::create($large_file->getSize())));
   }
 
   /**
@@ -134,7 +134,7 @@ class FileFieldValidateTest extends FileFieldTestBase {
     $this->createFileField($field_name, 'node', $type_name);
 
     $test_file = $this->getTestFile('image');
-    [, $test_file_extension] = explode('.', $test_file->getFilename());
+    [, $test_file_extension] = \explode('.', $test_file->getFilename());
 
     // Disable extension checking.
     $this->updateFileField($field_name, $type_name, ['file_extensions' => '']);

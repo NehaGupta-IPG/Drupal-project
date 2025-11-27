@@ -94,7 +94,7 @@ class NumericField extends FieldPluginBase {
       '#default_value' => $this->options['format_plural_string'],
     ];
 
-    $plural_array = explode(PoItem::DELIMITER, $this->options['format_plural_string']);
+    $plural_array = \explode(PoItem::DELIMITER, $this->options['format_plural_string']);
     $plurals = $this->getNumberOfPlurals($this->view->storage->get('langcode'));
     for ($i = 0; $i < $plurals; $i++) {
       $form['format_plural_values'][$i] = [
@@ -140,7 +140,7 @@ class NumericField extends FieldPluginBase {
     // Merge plural format options into one string and drop the individual
     // option values.
     $options = &$form_state->getValue('options');
-    $options['format_plural_string'] = implode(PoItem::DELIMITER, $options['format_plural_values']);
+    $options['format_plural_string'] = \implode(PoItem::DELIMITER, $options['format_plural_values']);
     unset($options['format_plural_values']);
     parent::submitOptionsForm($form, $form_state);
   }
@@ -162,21 +162,21 @@ class NumericField extends FieldPluginBase {
     if (!empty($this->options['set_precision'])) {
       $precision = $this->options['precision'];
     }
-    elseif ($decimal_position = strpos($value, '.')) {
-      $precision = strlen($value) - $decimal_position - 1;
+    elseif ($decimal_position = \strpos($value, '.')) {
+      $precision = \strlen($value) - $decimal_position - 1;
     }
     else {
       $precision = 0;
     }
 
     // Use round first to avoid negative zeros.
-    $value = round($value, $precision);
+    $value = \round($value, $precision);
     // Test against both integer zero and float zero.
     if ($this->options['empty_zero'] && ($value === 0 || $value === 0.0)) {
       return '';
     }
 
-    $value = number_format($value, $precision, $this->options['decimal'], $this->options['separator']);
+    $value = \number_format($value, $precision, $this->options['decimal'], $this->options['separator']);
 
     // If we should format as plural, take the (possibly) translated plural
     // setting and format with the current language.

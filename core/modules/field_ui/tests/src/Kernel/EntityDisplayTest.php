@@ -148,7 +148,7 @@ class EntityDisplayTest extends KernelTestBase {
     $display->setComponent('component_1');
     $display->setComponent('component_2');
     $display->save();
-    $components = array_keys($display->getComponents());
+    $components = \array_keys($display->getComponents());
     // The name field is not configurable so will be added automatically.
     $expected = [0 => 'component_1', 1 => 'component_2', 2 => 'component_3', 'name'];
     $this->assertSame($expected, $components);
@@ -662,7 +662,7 @@ class EntityDisplayTest extends KernelTestBase {
       ->condition('message', "@display '@id': Component '@name' was disabled because its settings depend on removed dependencies.")
       ->execute()
       ->fetchField();
-    $this->assertEquals($arguments, unserialize($variables));
+    $this->assertEquals($arguments, \unserialize($variables));
   }
 
   /**
@@ -715,7 +715,7 @@ class EntityDisplayTest extends KernelTestBase {
     $all_dependencies = $display->getDependencies();
     $dependencies = !empty($all_dependencies[$type]) ? $all_dependencies[$type] : [];
     $context = $display instanceof EntityViewDisplayInterface ? 'View' : 'Form';
-    $value = $assertion ? in_array($key, $dependencies) : !in_array($key, $dependencies);
+    $value = $assertion ? \in_array($key, $dependencies) : !\in_array($key, $dependencies);
     $display_id = $display->id();
     $message = $assertion ? "$context display '$display_id' depends on $type '$key'." : "$context display '$display_id' do not depend on $type '$key'.";
     $this->assertTrue($value, $message);

@@ -53,8 +53,8 @@ final class PendingUpdatesValidator implements EventSubscriberInterface {
     require_once $this->appRoot . '/core/includes/install.inc';
     require_once $this->appRoot . '/core/includes/update.inc';
 
-    drupal_load_updates();
-    $hook_updates = update_get_update_list();
+    \drupal_load_updates();
+    $hook_updates = \update_get_update_list();
     $post_updates = $this->updateRegistry->getPendingUpdateFunctions();
 
     return $hook_updates || $post_updates;

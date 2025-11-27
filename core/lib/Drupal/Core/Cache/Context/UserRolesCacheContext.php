@@ -20,7 +20,7 @@ class UserRolesCacheContext extends UserCacheContextBase implements CalculatedCa
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t("User's roles");
+    return \t("User's roles");
   }
 
   /**
@@ -28,10 +28,10 @@ class UserRolesCacheContext extends UserCacheContextBase implements CalculatedCa
    */
   public function getContext($role = NULL) {
     if ($role === NULL) {
-      return implode(',', $this->user->getRoles());
+      return \implode(',', $this->user->getRoles());
     }
 
-    return in_array($role, $this->user->getRoles(), TRUE) ? 'true' : 'false';
+    return \in_array($role, $this->user->getRoles(), TRUE) ? 'true' : 'false';
   }
 
   /**

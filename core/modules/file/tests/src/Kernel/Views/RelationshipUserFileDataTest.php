@@ -87,7 +87,7 @@ class RelationshipUserFileDataTest extends ViewsKernelTestBase {
       'changed' => 1,
     ]);
     $file->enforceIsNew()->setPermanent();
-    file_put_contents($file->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file->save();
 
     $account = $this->createUser();
@@ -126,7 +126,7 @@ class RelationshipUserFileDataTest extends ViewsKernelTestBase {
       'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file1->enforceIsNew();
-    file_put_contents($file1->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file1->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file1->save();
 
     $file2 = File::create([
@@ -138,7 +138,7 @@ class RelationshipUserFileDataTest extends ViewsKernelTestBase {
       'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file2->enforceIsNew();
-    file_put_contents($file2->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file2->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file2->save();
 
     User::create([
@@ -181,7 +181,7 @@ class RelationshipUserFileDataTest extends ViewsKernelTestBase {
       'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file1->enforceIsNew();
-    file_put_contents($file1->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file1->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file1->save();
 
     $file2 = File::create([
@@ -193,7 +193,7 @@ class RelationshipUserFileDataTest extends ViewsKernelTestBase {
       'status' => FileInterface::STATUS_PERMANENT,
     ]);
     $file2->enforceIsNew();
-    file_put_contents($file2->getFileUri(), file_get_contents('core/tests/fixtures/files/image-1.png'));
+    \file_put_contents($file2->getFileUri(), \file_get_contents('core/tests/fixtures/files/image-1.png'));
     $file2->save();
 
     User::create([

@@ -146,7 +146,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
       '#title' => $this->t('View mode'),
       '#description' => $this->t('The view mode in which to render the block.'),
       '#default_value' => $this->configuration['view_mode'],
-      '#access' => count($options) > 1,
+      '#access' => \count($options) > 1,
     ];
     return $form;
   }
@@ -200,7 +200,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     $complete_form_state = $form_state instanceof SubformStateInterface ? $form_state->getCompleteFormState() : $form_state;
     $form_display->extractFormValues($block, $block_form, $complete_form_state);
     $block->setInfo($this->configuration['label']);
-    $this->configuration['block_serialized'] = serialize($block);
+    $this->configuration['block_serialized'] = \serialize($block);
   }
 
   /**
@@ -230,7 +230,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   protected function getEntity() {
     if (!isset($this->blockContent)) {
       if (!empty($this->configuration['block_serialized'])) {
-        $this->blockContent = unserialize($this->configuration['block_serialized']);
+        $this->blockContent = \unserialize($this->configuration['block_serialized']);
       }
       elseif (!empty($this->configuration['block_revision_id'])) {
         $entity = $this->entityTypeManager->getStorage('block_content')->loadRevision($this->configuration['block_revision_id']);
@@ -274,7 +274,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     /** @var \Drupal\block_content\BlockContentInterface $block */
     $block = NULL;
     if (!empty($this->configuration['block_serialized'])) {
-      $block = unserialize($this->configuration['block_serialized']);
+      $block = \unserialize($this->configuration['block_serialized']);
     }
     if ($duplicate_block) {
       if (empty($block) && !empty($this->configuration['block_revision_id'])) {

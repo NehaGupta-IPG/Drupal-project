@@ -26,7 +26,7 @@ trait BundlePermissionHandlerTrait {
   protected function generatePermissions(array $bundles, callable $permission_builder) {
     $permissions = [];
     foreach ($bundles as $bundle) {
-      $permissions += array_map(
+      $permissions += \array_map(
         function (array $perm) use ($bundle) {
           // This permission is generated on behalf of a bundle, therefore
           // add the bundle as a config dependency.

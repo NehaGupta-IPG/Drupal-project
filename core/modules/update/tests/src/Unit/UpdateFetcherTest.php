@@ -142,7 +142,7 @@ class UpdateFetcherTest extends UnitTestCase {
     $project['project_type'] = '';
     $expected = "http://www.example.com/{$project['name']}/current";
     $expected .= '?site_key=site_key';
-    $expected .= '&list=' . rawurlencode('module1,module2');
+    $expected .= '&list=' . \rawurlencode('module1,module2');
 
     $data[] = [$project, $site_key, $expected];
 
@@ -150,7 +150,7 @@ class UpdateFetcherTest extends UnitTestCase {
     $project['info']['project status url'] = 'http://www.example.com/?project=';
     $expected = "http://www.example.com/?project=/{$project['name']}/current";
     $expected .= '&site_key=site_key';
-    $expected .= '&list=' . rawurlencode('module1,module2');
+    $expected .= '&list=' . \rawurlencode('module1,module2');
 
     $data[] = [$project, $site_key, $expected];
 

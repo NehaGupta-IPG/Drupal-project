@@ -127,7 +127,7 @@ class TranslatableMarkup extends FormattableMarkup {
    * @ingroup sanitization
    */
   public function __construct($string, array $arguments = [], array $options = [], ?TranslationInterface $string_translation = NULL) {
-    if (!is_string($string)) {
+    if (!\is_string($string)) {
       $message = $string instanceof TranslatableMarkup ? '$string ("' . $string->getUntranslatedString() . '") must be a string.' : '$string ("' . (string) $string . '") must be a string.';
       throw new \InvalidArgumentException($message);
     }
@@ -225,7 +225,7 @@ class TranslatableMarkup extends FormattableMarkup {
    *   The length of the string.
    */
   public function count(): int {
-    return mb_strlen($this->render());
+    return \mb_strlen($this->render());
   }
 
 }

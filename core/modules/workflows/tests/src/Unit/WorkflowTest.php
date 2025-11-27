@@ -109,24 +109,24 @@ class WorkflowTest extends UnitTestCase {
       'archived',
       'draft',
       'published',
-    ], array_keys($workflow->getTypePlugin()->getConfiguration()['states']));
+    ], \array_keys($workflow->getTypePlugin()->getConfiguration()['states']));
 
     // Ensure we're returning state objects.
     $this->assertInstanceOf(State::class, $workflow->getTypePlugin()->getStates()['draft']);
 
     // Passing in no IDs returns all states.
-    $this->assertEquals(['draft', 'published', 'archived'], array_keys($workflow->getTypePlugin()->getStates()));
+    $this->assertEquals(['draft', 'published', 'archived'], \array_keys($workflow->getTypePlugin()->getStates()));
 
     // The order of states is by weight.
     $workflow->getTypePlugin()->setStateWeight('published', -1);
-    $this->assertEquals(['published', 'draft', 'archived'], array_keys($workflow->getTypePlugin()->getStates()));
+    $this->assertEquals(['published', 'draft', 'archived'], \array_keys($workflow->getTypePlugin()->getStates()));
 
     // The label is also used for sorting if weights are equal.
     $workflow->getTypePlugin()->setStateWeight('archived', 0);
-    $this->assertEquals(['published', 'archived', 'draft'], array_keys($workflow->getTypePlugin()->getStates()));
+    $this->assertEquals(['published', 'archived', 'draft'], \array_keys($workflow->getTypePlugin()->getStates()));
 
     // You can limit the states returned by passing in states IDs.
-    $this->assertEquals(['archived', 'draft'], array_keys($workflow->getTypePlugin()->getStates(['draft', 'archived'])));
+    $this->assertEquals(['archived', 'draft'], \array_keys($workflow->getTypePlugin()->getStates(['draft', 'archived'])));
 
     // An empty array does not load all states.
     $this->assertSame([], $workflow->getTypePlugin()->getStates([]));
@@ -150,7 +150,7 @@ class WorkflowTest extends UnitTestCase {
     $workflow_type->setStateWeight('4', 3);
 
     // Ensure numeric states are correctly sorted by weight first, label second.
-    $this->assertEquals([1, 2, 4, 3], array_keys($workflow_type->getStates()));
+    $this->assertEquals([1, 2, 4, 3], \array_keys($workflow_type->getStates()));
   }
 
   /**
@@ -457,26 +457,26 @@ class WorkflowTest extends UnitTestCase {
       ->addTransition('a_a', 'A to A', ['a'], 'a');
 
     // Transitions are stored in alphabetical key order in configuration.
-    $this->assertEquals(['a_a', 'a_b'], array_keys($workflow->getTypePlugin()->getConfiguration()['transitions']));
+    $this->assertEquals(['a_a', 'a_b'], \array_keys($workflow->getTypePlugin()->getConfiguration()['transitions']));
 
     // Ensure we're returning transition objects.
     $this->assertInstanceOf(Transition::class, $workflow->getTypePlugin()->getTransitions()['a_a']);
 
     // Passing in no IDs returns all transitions.
-    $this->assertEquals(['a_b', 'a_a'], array_keys($workflow->getTypePlugin()->getTransitions()));
+    $this->assertEquals(['a_b', 'a_a'], \array_keys($workflow->getTypePlugin()->getTransitions()));
 
     // The order of states is by weight.
     $workflow->getTypePlugin()->setTransitionWeight('a_a', -1);
-    $this->assertEquals(['a_a', 'a_b'], array_keys($workflow->getTypePlugin()->getTransitions()));
+    $this->assertEquals(['a_a', 'a_b'], \array_keys($workflow->getTypePlugin()->getTransitions()));
 
     // If all weights are equal it will fallback to labels.
     $workflow->getTypePlugin()->setTransitionWeight('a_a', 0);
-    $this->assertEquals(['a_a', 'a_b'], array_keys($workflow->getTypePlugin()->getTransitions()));
+    $this->assertEquals(['a_a', 'a_b'], \array_keys($workflow->getTypePlugin()->getTransitions()));
     $workflow->getTypePlugin()->setTransitionLabel('a_b', 'A B');
-    $this->assertEquals(['a_b', 'a_a'], array_keys($workflow->getTypePlugin()->getTransitions()));
+    $this->assertEquals(['a_b', 'a_a'], \array_keys($workflow->getTypePlugin()->getTransitions()));
 
     // You can limit the states returned by passing in states IDs.
-    $this->assertEquals(['a_a'], array_keys($workflow->getTypePlugin()->getTransitions(['a_a'])));
+    $this->assertEquals(['a_a'], \array_keys($workflow->getTypePlugin()->getTransitions(['a_a'])));
 
     // An empty array does not load all states.
     $this->assertSame([], $workflow->getTypePlugin()->getTransitions([]));
@@ -537,12 +537,12 @@ class WorkflowTest extends UnitTestCase {
       ->addTransition('publish', 'Publish', ['draft', 'published'], 'published')
       ->addTransition('archive', 'Archive', ['published'], 'archived');
 
-    $this->assertEquals(['create_new_draft', 'publish'], array_keys($workflow->getTypePlugin()->getTransitionsForState('draft')));
-    $this->assertEquals(['create_new_draft'], array_keys($workflow->getTypePlugin()->getTransitionsForState('draft', 'to')));
-    $this->assertEquals(['publish', 'archive'], array_keys($workflow->getTypePlugin()->getTransitionsForState('published')));
-    $this->assertEquals(['publish'], array_keys($workflow->getTypePlugin()->getTransitionsForState('published', 'to')));
-    $this->assertEquals(['create_new_draft'], array_keys($workflow->getTypePlugin()->getTransitionsForState('archived', 'from')));
-    $this->assertEquals(['archive'], array_keys($workflow->getTypePlugin()->getTransitionsForState('archived', 'to')));
+    $this->assertEquals(['create_new_draft', 'publish'], \array_keys($workflow->getTypePlugin()->getTransitionsForState('draft')));
+    $this->assertEquals(['create_new_draft'], \array_keys($workflow->getTypePlugin()->getTransitionsForState('draft', 'to')));
+    $this->assertEquals(['publish', 'archive'], \array_keys($workflow->getTypePlugin()->getTransitionsForState('published')));
+    $this->assertEquals(['publish'], \array_keys($workflow->getTypePlugin()->getTransitionsForState('published', 'to')));
+    $this->assertEquals(['create_new_draft'], \array_keys($workflow->getTypePlugin()->getTransitionsForState('archived', 'from')));
+    $this->assertEquals(['archive'], \array_keys($workflow->getTypePlugin()->getTransitionsForState('archived', 'to')));
   }
 
   /**

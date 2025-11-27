@@ -31,7 +31,7 @@ class UpdateCompilerPass implements CompilerPassInterface {
         foreach ($definition->getArguments() as $argument) {
           if ($this->isArgumentMissingService($argument, $container)) {
             $container->removeDefinition($key);
-            $container->log($this, sprintf('Removed service "%s"; reason: depends on non-existent service "%s".', $key, (string) $argument));
+            $container->log($this, \sprintf('Removed service "%s"; reason: depends on non-existent service "%s".', $key, (string) $argument));
             $has_changed = TRUE;
             $process_aliases = TRUE;
             // Process the next definition.
@@ -44,7 +44,7 @@ class UpdateCompilerPass implements CompilerPassInterface {
           foreach ($call[1] as $argument) {
             if ($this->isArgumentMissingService($argument, $container)) {
               $container->removeDefinition($key);
-              $container->log($this, sprintf('Removed service "%s"; reason: method call "%s" depends on non-existent service "%s".', $key, $call[0], (string) $argument));
+              $container->log($this, \sprintf('Removed service "%s"; reason: method call "%s" depends on non-existent service "%s".', $key, $call[0], (string) $argument));
               $has_changed = TRUE;
               $process_aliases = TRUE;
               // Process the next definition.
@@ -64,7 +64,7 @@ class UpdateCompilerPass implements CompilerPassInterface {
         $id = (string) $alias;
         if (!$container->has($id)) {
           $container->removeAlias($key);
-          $container->log($this, sprintf('Removed alias "%s"; reason: alias to non-existent service "%s".', $key, $id));
+          $container->log($this, \sprintf('Removed alias "%s"; reason: alias to non-existent service "%s".', $key, $id));
         }
       }
     }

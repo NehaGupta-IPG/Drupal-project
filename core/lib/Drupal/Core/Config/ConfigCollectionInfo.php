@@ -49,10 +49,10 @@ class ConfigCollectionInfo extends Event {
    *   The list of possible collection names.
    */
   public function getCollectionNames($include_default = TRUE) {
-    $collection_names = array_keys($this->collections);
-    sort($collection_names);
+    $collection_names = \array_keys($this->collections);
+    \sort($collection_names);
     if ($include_default) {
-      array_unshift($collection_names, StorageInterface::DEFAULT_COLLECTION);
+      \array_unshift($collection_names, StorageInterface::DEFAULT_COLLECTION);
     }
     return $collection_names;
   }

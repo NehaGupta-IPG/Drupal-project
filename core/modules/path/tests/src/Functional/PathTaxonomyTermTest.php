@@ -66,7 +66,7 @@ class PathTaxonomyTermTest extends PathTestBase {
       ->condition('name', $edit['name[0][value]'])
       ->condition('default_langcode', 1)
       ->execute();
-    $tid = reset($tids);
+    $tid = \reset($tids);
 
     // Confirm that the alias works.
     $this->drupalGet($edit['path[0][alias]']);
@@ -83,11 +83,11 @@ class PathTaxonomyTermTest extends PathTestBase {
     $this->submitForm($edit2, 'Save');
 
     // Confirm that the changed alias works.
-    $this->drupalGet(trim($edit2['path[0][alias]'], '/'));
+    $this->drupalGet(\trim($edit2['path[0][alias]'], '/'));
     $this->assertSession()->pageTextContains($description);
 
     // Confirm that the old alias no longer works.
-    $this->drupalGet(trim($edit['path[0][alias]'], '/'));
+    $this->drupalGet(\trim($edit['path[0][alias]'], '/'));
     $this->assertSession()->pageTextNotContains($description);
     $this->assertSession()->statusCodeEquals(404);
 
@@ -98,7 +98,7 @@ class PathTaxonomyTermTest extends PathTestBase {
     $this->submitForm($edit3, 'Save');
 
     // Confirm that the alias no longer works.
-    $this->drupalGet(trim($edit2['path[0][alias]'], '/'));
+    $this->drupalGet(\trim($edit2['path[0][alias]'], '/'));
     $this->assertSession()->pageTextNotContains($description);
     $this->assertSession()->statusCodeEquals(404);
   }

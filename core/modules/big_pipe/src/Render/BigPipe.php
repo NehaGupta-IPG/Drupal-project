@@ -209,14 +209,14 @@ class BigPipe {
    *   metadata or attachments to merge.
    */
   protected function sendChunk($chunk) {
-    assert(is_string($chunk) || $chunk instanceof HtmlResponse);
+    \assert(\is_string($chunk) || $chunk instanceof HtmlResponse);
     if ($chunk instanceof HtmlResponse) {
       print $chunk->getContent();
     }
     else {
       print $chunk;
     }
-    flush();
+    \flush();
   }
 
   /**
@@ -248,9 +248,9 @@ class BigPipe {
     // Find the closing </body> tag and get the strings before and after. But be
     // careful to use the latest occurrence of the string "</body>", to ensure
     // that strings in inline JavaScript or CDATA sections aren't used instead.
-    $parts = explode('</body>', $content);
-    $post_body = array_pop($parts);
-    $pre_body = implode('</body>', $parts);
+    $parts = \explode('</body>', $content);
+    $post_body = \array_pop($parts);
+    $pre_body = \implode('</body>', $parts);
 
     $this->sendPreBody($pre_body, $nojs_placeholders, $cumulative_assets);
     $this->sendPlaceholders($placeholders, $this->getPlaceholderOrder($pre_body, $placeholders), $cumulative_assets);
@@ -281,7 +281,7 @@ class BigPipe {
     // Extract the scripts_bottom markup: the no-JS BigPipe placeholders that we
     // will render may attach additional asset libraries, and if so, it will be
     // necessary to re-render scripts_bottom.
-    [$pre_scripts_bottom, $scripts_bottom, $post_scripts_bottom] = explode('<drupal-big-pipe-scripts-bottom-marker>', $pre_body, 3);
+    [$pre_scripts_bottom, $scripts_bottom, $post_scripts_bottom] = \explode('<drupal-big-pipe-scripts-bottom-marker>', $pre_body, 3);
     $cumulative_assets_initial = clone $cumulative_assets;
 
     $this->sendNoJsPlaceholders($pre_scripts_bottom . $post_scripts_bottom, $no_js_placeholders, $cumulative_assets);
@@ -340,11 +340,11 @@ class BigPipe {
    */
   protected function sendNoJsPlaceholders($html, $no_js_placeholders, AttachedAssetsInterface $cumulative_assets) {
     // Split the HTML on every no-JS placeholder string.
-    $placeholder_strings = array_keys($no_js_placeholders);
+    $placeholder_strings = \array_keys($no_js_placeholders);
     $fragments = static::splitHtmlOnPlaceholders($html, $placeholder_strings);
 
     // Determine how many occurrences there are of each no-JS placeholder.
-    $placeholder_occurrences = array_count_values(array_intersect($fragments, $placeholder_strings));
+    $placeholder_occurrences = \array_count_values(\array_intersect($fragments, $placeholder_strings));
 
     // Set up a variable to store the content of placeholders that have multiple
     // occurrences.
@@ -368,7 +368,7 @@ class BigPipe {
       }
 
       $placeholder = $fragment;
-      assert(isset($no_js_placeholders[$placeholder]));
+      \assert(isset($no_js_placeholders[$placeholder]));
       $token = Crypt::randomBytesBase64(55);
 
       // Render the placeholder, but include the cumulative settings assets, so
@@ -389,7 +389,7 @@ class BigPipe {
           throw $e;
         }
         else {
-          trigger_error($e, E_USER_WARNING);
+          \trigger_error($e, E_USER_WARNING);
           continue;
         }
       }
@@ -416,7 +416,7 @@ class BigPipe {
       // - the HTML to load the CSS can be rendered.
       // - the HTML to load the JS (at the top) can be rendered.
       $fake_request = $this->requestStack->getMainRequest()->duplicate();
-      $fake_request->query->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())]);
+      $fake_request->query->set('ajax_page_state', ['libraries' => \implode(',', $cumulative_assets->getAlreadyLoadedLibraries())]);
       try {
         $html_response = $this->filterEmbeddedResponse($fake_request, $html_response);
       }
@@ -425,7 +425,7 @@ class BigPipe {
           throw $e;
         }
         else {
-          trigger_error($e, E_USER_WARNING);
+          \trigger_error($e, E_USER_WARNING);
           continue;
         }
       }
@@ -436,7 +436,7 @@ class BigPipe {
       // Another placeholder was rendered and sent, track the set of asset
       // libraries sent so far. Any new settings also need to be tracked, so
       // they can be sent in ::sendPreBody().
-      $cumulative_assets->setAlreadyLoadedLibraries(array_merge($cumulative_assets->getAlreadyLoadedLibraries(), $html_response->getAttachments()['library']));
+      $cumulative_assets->setAlreadyLoadedLibraries(\array_merge($cumulative_assets->getAlreadyLoadedLibraries(), $html_response->getAttachments()['library']));
       $cumulative_assets->setSettings($html_response->getAttachments()['drupalSettings']);
 
       // If there are multiple occurrences of this particular placeholder, track
@@ -500,7 +500,7 @@ class BigPipe {
       $fibers[$placeholder_id] = new \Fiber(fn() => $this->renderPlaceholder($placeholder_id, $placeholder_render_array));
     }
     $iterations = 0;
-    while (count($fibers) > 0) {
+    while (\count($fibers) > 0) {
       foreach ($fibers as $placeholder_id => $fiber) {
         try {
           if (!$fiber->isStarted()) {
@@ -537,7 +537,7 @@ class BigPipe {
           // placeholder ID (which has HTML entities encoded since we use it to
           // find the placeholders).
           $big_pipe_js_placeholder_id = Html::decodeEntities($placeholder_id);
-          $ajax_response->addCommand(new ReplaceCommand(sprintf('[data-big-pipe-placeholder-id="%s"]', $big_pipe_js_placeholder_id), $elements['#markup']));
+          $ajax_response->addCommand(new ReplaceCommand(\sprintf('[data-big-pipe-placeholder-id="%s"]', $big_pipe_js_placeholder_id), $elements['#markup']));
           $ajax_response->setAttachments($elements['#attached']);
 
           // Delete all messages that were generated during the rendering of
@@ -560,7 +560,7 @@ class BigPipe {
           // which allows us to track the total set of asset libraries sent in
           // the initial HTML response plus all embedded AJAX responses sent so
           // far.
-          $fake_request->query->set('ajax_page_state', ['libraries' => implode(',', $cumulative_assets->getAlreadyLoadedLibraries())] + $cumulative_assets->getSettings()['ajaxPageState']);
+          $fake_request->query->set('ajax_page_state', ['libraries' => \implode(',', $cumulative_assets->getAlreadyLoadedLibraries())] + $cumulative_assets->getSettings()['ajaxPageState']);
           $ajax_response = $this->filterEmbeddedResponse($fake_request, $ajax_response);
           // Send this embedded AJAX response.
           $json = $ajax_response->getContent();
@@ -575,7 +575,7 @@ EOF;
           // libraries sent so far. Any new settings are already sent; we
           // don't need to track those.
           if (isset($ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries'])) {
-            $cumulative_assets->setAlreadyLoadedLibraries(explode(',', $ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries']));
+            $cumulative_assets->setAlreadyLoadedLibraries(\explode(',', $ajax_response->getAttachments()['drupalSettings']['ajaxPageState']['libraries']));
           }
         }
         // Handle enforced redirect responses.
@@ -631,7 +631,7 @@ EOF;
             throw $e;
           }
           else {
-            trigger_error($e, E_USER_WARNING);
+            \trigger_error($e, E_USER_WARNING);
           }
         }
       }
@@ -639,8 +639,8 @@ EOF;
     }
 
     if ($this->debugCacheabilityHeaders) {
-      $this->sendChunk("\n<!-- big_pipe cache tags: " . implode(' ', $cacheable_metadata->getCacheTags()) . " -->\n");
-      $this->sendChunk("\n<!-- big_pipe cache contexts: " . implode(' ', $cacheable_metadata->getCacheContexts()) . " -->\n");
+      $this->sendChunk("\n<!-- big_pipe cache tags: " . \implode(' ', $cacheable_metadata->getCacheTags()) . " -->\n");
+      $this->sendChunk("\n<!-- big_pipe cache contexts: " . \implode(' ', $cacheable_metadata->getCacheContexts()) . " -->\n");
     }
 
     // Send the stop signal.
@@ -663,7 +663,7 @@ EOF;
    *   AJAX page state.
    */
   protected function filterEmbeddedResponse(Request $fake_request, Response $embedded_response) {
-    assert($embedded_response instanceof HtmlResponse || $embedded_response instanceof AjaxResponse);
+    \assert($embedded_response instanceof HtmlResponse || $embedded_response instanceof AjaxResponse);
     return $this->filterResponse($fake_request, HttpKernelInterface::SUB_REQUEST, $embedded_response);
   }
 
@@ -683,7 +683,7 @@ EOF;
    *   The filtered response.
    */
   protected function filterResponse(Request $request, $request_type, Response $response) {
-    assert($request_type === HttpKernelInterface::MAIN_REQUEST || $request_type === HttpKernelInterface::SUB_REQUEST);
+    \assert($request_type === HttpKernelInterface::MAIN_REQUEST || $request_type === HttpKernelInterface::SUB_REQUEST);
     $this->requestStack->push($request);
     $event = new ResponseEvent($this->httpKernel, $request, $request_type, $response);
     $this->eventDispatcher->dispatch($event, KernelEvents::RESPONSE);
@@ -753,8 +753,8 @@ EOF;
    *   first occurrence.
    */
   protected function getPlaceholderOrder($html, $placeholders) {
-    if (preg_match_all('/<span data-big-pipe-placeholder-id="([^"]*)">/', $html, $matches)) {
-      return array_unique($matches[1]);
+    if (\preg_match_all('/<span data-big-pipe-placeholder-id="([^"]*)">/', $html, $matches)) {
+      return \array_unique($matches[1]);
     }
     return [];
   }
@@ -775,21 +775,21 @@ EOF;
    */
   private static function splitHtmlOnPlaceholders($html_string, array $html_placeholders) {
     $prepare_for_preg_split = function ($placeholder_string) {
-      return '(' . preg_quote($placeholder_string, '/') . ')';
+      return '(' . \preg_quote($placeholder_string, '/') . ')';
     };
-    $preg_placeholder_strings = array_map($prepare_for_preg_split, $html_placeholders);
-    $pattern = '/' . implode('|', $preg_placeholder_strings) . '/';
-    if (strlen($pattern) < 31000) {
+    $preg_placeholder_strings = \array_map($prepare_for_preg_split, $html_placeholders);
+    $pattern = '/' . \implode('|', $preg_placeholder_strings) . '/';
+    if (\strlen($pattern) < 31000) {
       // Only small (<31K characters) patterns can be handled by preg_split().
       $flags = PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE;
-      $result = preg_split($pattern, $html_string, 0, $flags);
+      $result = \preg_split($pattern, $html_string, 0, $flags);
     }
     else {
       // For large amounts of placeholders we use a simpler but slower approach.
       foreach ($html_placeholders as $placeholder) {
-        $html_string = str_replace($placeholder, "\x1F" . $placeholder . "\x1F", $html_string);
+        $html_string = \str_replace($placeholder, "\x1F" . $placeholder . "\x1F", $html_string);
       }
-      $result = array_filter(explode("\x1F", $html_string));
+      $result = \array_filter(\explode("\x1F", $html_string));
     }
     return $result;
   }

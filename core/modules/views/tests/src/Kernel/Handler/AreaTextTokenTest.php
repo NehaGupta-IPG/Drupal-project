@@ -68,8 +68,8 @@ class AreaTextTokenTest extends ViewsKernelTestBase {
 
     $build = $view->display_handler->handlers['header']['area']->render();
     $replaced_token = \Drupal::token()->replace('[site:url]');
-    $desired_output = str_replace('[site:url]', $replaced_token, $string);
-    $this->assertEquals(check_markup($desired_output), $renderer->renderRoot($build), 'Global token assessed in href');
+    $desired_output = \str_replace('[site:url]', $replaced_token, $string);
+    $this->assertEquals(\check_markup($desired_output), $renderer->renderRoot($build), 'Global token assessed in href');
   }
 
 }

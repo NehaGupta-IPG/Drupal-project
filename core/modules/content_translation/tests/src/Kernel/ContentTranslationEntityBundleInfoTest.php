@@ -76,7 +76,7 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
       'content_translation_test',
       'content_translation',
     ];
-    $actual_modules = array_keys(array_intersect_key($module_list, array_flip($expected_modules)));
+    $actual_modules = \array_keys(\array_intersect_key($module_list, \array_flip($expected_modules)));
     $this->assertEquals($expected_modules, $actual_modules);
 
     // Check that the "content_translation_test" hook implementation has access

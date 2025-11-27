@@ -141,7 +141,7 @@ class ContentModeration extends WorkflowTypeBase implements ContentModerationInt
    * {@inheritdoc}
    */
   public function getEntityTypes() {
-    return array_keys($this->configuration['entity_types']);
+    return \array_keys($this->configuration['entity_types']);
   }
 
   /**
@@ -155,7 +155,7 @@ class ContentModeration extends WorkflowTypeBase implements ContentModerationInt
    * {@inheritdoc}
    */
   public function appliesToEntityTypeAndBundle($entity_type_id, $bundle_id) {
-    return in_array($bundle_id, $this->getBundlesForEntityType($entity_type_id), TRUE);
+    return \in_array($bundle_id, $this->getBundlesForEntityType($entity_type_id), TRUE);
   }
 
   /**
@@ -165,14 +165,14 @@ class ContentModeration extends WorkflowTypeBase implements ContentModerationInt
     if (!isset($this->configuration['entity_types'][$entity_type_id])) {
       return;
     }
-    $key = array_search($bundle_id, $this->configuration['entity_types'][$entity_type_id], TRUE);
+    $key = \array_search($bundle_id, $this->configuration['entity_types'][$entity_type_id], TRUE);
     if ($key !== FALSE) {
       unset($this->configuration['entity_types'][$entity_type_id][$key]);
       if (empty($this->configuration['entity_types'][$entity_type_id])) {
         unset($this->configuration['entity_types'][$entity_type_id]);
       }
       else {
-        $this->configuration['entity_types'][$entity_type_id] = array_values($this->configuration['entity_types'][$entity_type_id]);
+        $this->configuration['entity_types'][$entity_type_id] = \array_values($this->configuration['entity_types'][$entity_type_id]);
       }
     }
   }
@@ -183,8 +183,8 @@ class ContentModeration extends WorkflowTypeBase implements ContentModerationInt
   public function addEntityTypeAndBundle($entity_type_id, $bundle_id) {
     if (!$this->appliesToEntityTypeAndBundle($entity_type_id, $bundle_id)) {
       $this->configuration['entity_types'][$entity_type_id][] = $bundle_id;
-      sort($this->configuration['entity_types'][$entity_type_id]);
-      ksort($this->configuration['entity_types']);
+      \sort($this->configuration['entity_types'][$entity_type_id]);
+      \ksort($this->configuration['entity_types']);
     }
   }
 
@@ -269,7 +269,7 @@ class ContentModeration extends WorkflowTypeBase implements ContentModerationInt
       // are being removed.
       $module_entity_definitions = [];
       foreach ($this->entityTypeManager->getDefinitions() as $entity_definition) {
-        if (in_array($entity_definition->getProvider(), $dependencies['module'])) {
+        if (\in_array($entity_definition->getProvider(), $dependencies['module'])) {
           $module_entity_definitions[] = $entity_definition;
         }
       }
@@ -293,8 +293,8 @@ class ContentModeration extends WorkflowTypeBase implements ContentModerationInt
   public function getConfiguration() {
     $configuration = parent::getConfiguration();
     // Ensure that states and entity types are ordered consistently.
-    ksort($configuration['states']);
-    ksort($configuration['entity_types']);
+    \ksort($configuration['states']);
+    \ksort($configuration['entity_types']);
     return $configuration;
   }
 

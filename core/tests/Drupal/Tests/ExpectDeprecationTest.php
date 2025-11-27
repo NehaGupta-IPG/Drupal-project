@@ -25,7 +25,7 @@ class ExpectDeprecationTest extends TestCase {
   public function testExpectDeprecation(): void {
     $this->expectDeprecation('Test deprecation');
     // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-    @trigger_error('Test deprecation', E_USER_DEPRECATED);
+    @\trigger_error('Test deprecation', E_USER_DEPRECATED);
   }
 
   /**
@@ -36,7 +36,7 @@ class ExpectDeprecationTest extends TestCase {
   public function testExpectDeprecationInIsolation(): void {
     $this->expectDeprecation('Test isolated deprecation');
     // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-    @trigger_error('Test isolated deprecation', E_USER_DEPRECATED);
+    @\trigger_error('Test isolated deprecation', E_USER_DEPRECATED);
   }
 
 }

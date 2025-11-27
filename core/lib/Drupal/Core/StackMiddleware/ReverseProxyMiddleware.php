@@ -60,7 +60,7 @@ class ReverseProxyMiddleware implements HttpKernelInterface {
     // Initialize proxy settings.
     if ($settings->get('reverse_proxy', FALSE)) {
       $proxies = $settings->get('reverse_proxy_addresses', []);
-      if (count($proxies) > 0) {
+      if (\count($proxies) > 0) {
         // Set the default value. This is the most relaxed setting possible and
         // not recommended for production.
         $trusted_header_set = Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO | Request::HEADER_FORWARDED;

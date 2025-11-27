@@ -74,9 +74,9 @@ class ComponentsIsolatedBuildTest extends ComposerBuildTestBase {
   protected function addExpectedRepositories(string $working_dir): void {
     foreach ($this->provideComponentPaths() as $path) {
       $path = $path[0];
-      $package_name = 'drupal/core' . strtolower(preg_replace('/[A-Z]/', '-$0', substr($path, 1)));
+      $package_name = 'drupal/core' . \strtolower(\preg_replace('/[A-Z]/', '-$0', \substr($path, 1)));
       $path_repo = $this->getWorkingPath() . static::$componentsPath . $path;
-      $repo_name = strtolower($path);
+      $repo_name = \strtolower($path);
       // Add path repositories with the current version number to the current
       // package under test.
       $drupal_version = Composer::drupalVersionBranch();

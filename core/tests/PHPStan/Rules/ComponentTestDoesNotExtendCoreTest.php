@@ -43,7 +43,7 @@ final class ComponentTestDoesNotExtendCoreTest implements Rule {
   public function processNode(Node $node, Scope $scope): array {
     $class = $node->getClassReflection();
 
-    if (!str_starts_with($class->getName(), 'Drupal\Tests\Component')) {
+    if (!\str_starts_with($class->getName(), 'Drupal\Tests\Component')) {
       return [];
     }
 

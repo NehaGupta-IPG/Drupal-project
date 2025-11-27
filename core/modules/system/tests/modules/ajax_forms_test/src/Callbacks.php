@@ -44,7 +44,7 @@ class Callbacks {
   public static function dateCallback($form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
     $date = $form_state->getValue('date');
-    $response->addCommand(new HtmlCommand('#ajax_date_value', sprintf('<div>%s</div>', $date)));
+    $response->addCommand(new HtmlCommand('#ajax_date_value', \sprintf('<div>%s</div>', $date)));
     $response->addCommand(new DataCommand('#ajax_date_value', 'form_state_value_date', $form_state->getValue('date')));
     return $response;
   }
@@ -56,7 +56,7 @@ class Callbacks {
     $datetime = $form_state->getValue('datetime')['date'] . ' ' . $form_state->getValue('datetime')['time'];
 
     $response = new AjaxResponse();
-    $response->addCommand(new HtmlCommand('#ajax_datetime_value', sprintf('<div>%s</div>', $datetime)));
+    $response->addCommand(new HtmlCommand('#ajax_datetime_value', \sprintf('<div>%s</div>', $datetime)));
     $response->addCommand(new DataCommand('#ajax_datetime_value', 'form_state_value_datetime', $datetime));
     return $response;
   }
@@ -284,11 +284,11 @@ class Callbacks {
   public static function validationFormCallback($form, FormStateInterface $form_state): array {
     \Drupal::messenger()->addStatus("ajax_forms_test_validation_form_callback invoked");
     \Drupal::messenger()
-      ->addStatus(t("Callback: driver_text=%driver_text, spare_required_field=%spare_required_field", [
+      ->addStatus(\t("Callback: driver_text=%driver_text, spare_required_field=%spare_required_field", [
         '%driver_text' => $form_state->getValue('driver_text'),
         '%spare_required_field' => $form_state->getValue('spare_required_field'),
       ]));
-    return ['#markup' => '<div id="message_area">ajax_forms_test_validation_form_callback at ' . date('c') . '</div>'];
+    return ['#markup' => '<div id="message_area">ajax_forms_test_validation_form_callback at ' . \date('c') . '</div>'];
   }
 
   /**
@@ -297,11 +297,11 @@ class Callbacks {
   public static function validationNumberFormCallback($form, FormStateInterface $form_state): array {
     \Drupal::messenger()->addStatus("ajax_forms_test_validation_number_form_callback invoked");
     \Drupal::messenger()
-      ->addStatus(t("Callback: driver_number=%driver_number, spare_required_field=%spare_required_field", [
+      ->addStatus(\t("Callback: driver_number=%driver_number, spare_required_field=%spare_required_field", [
         '%driver_number' => $form_state->getValue('driver_number'),
         '%spare_required_field' => $form_state->getValue('spare_required_field'),
       ]));
-    return ['#markup' => '<div id="message_area_number">ajax_forms_test_validation_number_form_callback at ' . date('c') . '</div>'];
+    return ['#markup' => '<div id="message_area_number">ajax_forms_test_validation_number_form_callback at ' . \date('c') . '</div>'];
   }
 
   /**

@@ -34,7 +34,7 @@ class GenerateThemeTest extends QuickStartTestBase {
    */
   protected function setUp(): void {
     $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
-    if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
+    if (\version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
     }
     parent::setUp();
@@ -42,7 +42,7 @@ class GenerateThemeTest extends QuickStartTestBase {
     $this->php = $php_executable_finder->find();
     $this->copyCodebase();
     $this->executeCommand('COMPOSER_DISCARD_CHANGES=true composer install --no-dev --no-interaction');
-    chdir($this->getWorkingPath());
+    \chdir($this->getWorkingPath());
   }
 
   /**
@@ -76,10 +76,10 @@ class GenerateThemeTest extends QuickStartTestBase {
    */
   private function assertThemeExists(string $theme_path_relative): array {
     $theme_path_absolute = $this->getWorkspaceDirectory() . "/$theme_path_relative";
-    $theme_name = basename($theme_path_relative);
+    $theme_name = \basename($theme_path_relative);
     $info_yml_filename = "$theme_name.info.yml";
     $this->assertFileExists($theme_path_absolute . '/' . $info_yml_filename);
-    $info = Yaml::decode(file_get_contents($theme_path_absolute . '/' . $info_yml_filename));
+    $info = Yaml::decode(\file_get_contents($theme_path_absolute . '/' . $info_yml_filename));
     return $info;
   }
 
@@ -90,13 +90,13 @@ class GenerateThemeTest extends QuickStartTestBase {
     // Do not rely on \Drupal::VERSION: change the version to a concrete version
     // number, to simulate using a tagged core release.
     $starterkit_info_yml = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.info.yml';
-    $info = Yaml::decode(file_get_contents($starterkit_info_yml));
+    $info = Yaml::decode(\file_get_contents($starterkit_info_yml));
     $info['version'] = '9.4.0';
-    file_put_contents($starterkit_info_yml, Yaml::encode($info));
+    \file_put_contents($starterkit_info_yml, Yaml::encode($info));
 
     $process = $this->generateThemeFromStarterkit();
     $result = $process->run();
-    $this->assertStringContainsString('Theme generated successfully to themes/test_custom_theme', trim($process->getOutput()), $process->getErrorOutput());
+    $this->assertStringContainsString('Theme generated successfully to themes/test_custom_theme', \trim($process->getOutput()), $process->getErrorOutput());
     $this->assertSame(0, $result);
 
     $theme_path_relative = 'themes/test_custom_theme';
@@ -107,7 +107,7 @@ class GenerateThemeTest extends QuickStartTestBase {
 
     // Confirm readme is rewritten.
     $readme_file = $this->getWorkspaceDirectory() . "/$theme_path_relative/README.md";
-    $this->assertSame('"Test custom starterkit theme" theme, generated from starterkit_theme. Additional information on generating themes can be found in the [Starterkit documentation](https://www.drupal.org/docs/core-modules-and-themes/core-themes/starterkit-theme).', file_get_contents($readme_file));
+    $this->assertSame('"Test custom starterkit theme" theme, generated from starterkit_theme. Additional information on generating themes can be found in the [Starterkit documentation](https://www.drupal.org/docs/core-modules-and-themes/core-themes/starterkit-theme).', \file_get_contents($readme_file));
 
     // Ensure that the generated theme can be installed.
     $this->installQuickStart('minimal');
@@ -122,7 +122,7 @@ class GenerateThemeTest extends QuickStartTestBase {
     // directory already exists.
     $theme_path_absolute = $this->getWorkspaceDirectory() . "/$theme_path_relative";
     $this->assertFileExists($theme_path_absolute . '/test_custom_theme.theme');
-    unlink($theme_path_absolute . '/test_custom_theme.theme');
+    \unlink($theme_path_absolute . '/test_custom_theme.theme');
     $process = $this->generateThemeFromStarterkit();
     $result = $process->run();
     $this->assertStringContainsString('Theme could not be generated because the destination directory', $process->getErrorOutput());
@@ -138,16 +138,16 @@ class GenerateThemeTest extends QuickStartTestBase {
     // Do not rely on \Drupal::VERSION: change the version to a concrete version
     // number, to simulate using a tagged core release.
     $starterkit_info_yml = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.info.yml';
-    $info = Yaml::decode(file_get_contents($starterkit_info_yml));
+    $info = Yaml::decode(\file_get_contents($starterkit_info_yml));
     $info['version'] = '9.4.0';
-    file_put_contents($starterkit_info_yml, Yaml::encode($info));
+    \file_put_contents($starterkit_info_yml, Yaml::encode($info));
 
     $process = $this->generateThemeFromStarterkit();
     $exit_code = $process->run();
-    $this->assertStringContainsString('Theme generated successfully to themes/test_custom_theme', trim($process->getOutput()), $process->getErrorOutput());
+    $this->assertStringContainsString('Theme generated successfully to themes/test_custom_theme', \trim($process->getOutput()), $process->getErrorOutput());
     $this->assertSame(0, $exit_code);
 
-    file_put_contents($this->getWorkspaceDirectory() . '/themes/test_custom_theme/test_custom_theme.starterkit.yml', <<<YAML
+    \file_put_contents($this->getWorkspaceDirectory() . '/themes/test_custom_theme/test_custom_theme.starterkit.yml', <<<YAML
 delete: []
 no_edit: []
 no_rename: []
@@ -167,12 +167,12 @@ YAML
     ];
     $process = new Process($install_command);
     $exit_code = $process->run();
-    $this->assertStringContainsString('Theme generated successfully to themes/generated_from_another_theme', trim($process->getOutput()), $process->getErrorOutput());
+    $this->assertStringContainsString('Theme generated successfully to themes/generated_from_another_theme', \trim($process->getOutput()), $process->getErrorOutput());
     $this->assertSame(0, $exit_code);
 
     // Confirm new .theme file.
     $dot_theme_file = $this->getWorkspaceDirectory() . '/themes/generated_from_another_theme/generated_from_another_theme.theme';
-    $this->assertStringContainsString('function generated_from_another_theme_preprocess_image_widget(array &$variables): void {', file_get_contents($dot_theme_file));
+    $this->assertStringContainsString('function generated_from_another_theme_preprocess_image_widget(array &$variables): void {', \file_get_contents($dot_theme_file));
   }
 
   /**
@@ -182,13 +182,13 @@ YAML
     // Do not rely on \Drupal::VERSION: change the version to a development
     // snapshot version number, to simulate using a branch snapshot of core.
     $starterkit_info_yml = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.info.yml';
-    $info = Yaml::decode(file_get_contents($starterkit_info_yml));
+    $info = Yaml::decode(\file_get_contents($starterkit_info_yml));
     $info['version'] = '9.4.0-dev';
-    file_put_contents($starterkit_info_yml, Yaml::encode($info));
+    \file_put_contents($starterkit_info_yml, Yaml::encode($info));
 
     $process = $this->generateThemeFromStarterkit();
     $result = $process->run();
-    $this->assertStringContainsString('Theme generated successfully to themes/test_custom_theme', trim($process->getOutput()), $process->getErrorOutput());
+    $this->assertStringContainsString('Theme generated successfully to themes/test_custom_theme', \trim($process->getOutput()), $process->getErrorOutput());
     $this->assertSame(0, $result);
 
     $theme_path_relative = 'themes/test_custom_theme';
@@ -205,13 +205,13 @@ YAML
     // Change the version to a concrete version number, to simulate using a
     // contrib theme as the starterkit.
     $starterkit_info_yml = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.info.yml';
-    $info = Yaml::decode(file_get_contents($starterkit_info_yml));
+    $info = Yaml::decode(\file_get_contents($starterkit_info_yml));
     $info['version'] = '1.20';
-    file_put_contents($starterkit_info_yml, Yaml::encode($info));
+    \file_put_contents($starterkit_info_yml, Yaml::encode($info));
 
     $process = $this->generateThemeFromStarterkit();
     $result = $process->run();
-    $this->assertStringContainsString('Theme generated successfully to themes/test_custom_theme', trim($process->getOutput()), $process->getErrorOutput());
+    $this->assertStringContainsString('Theme generated successfully to themes/test_custom_theme', \trim($process->getOutput()), $process->getErrorOutput());
     $this->assertSame(0, $result);
     $info = $this->assertThemeExists('themes/test_custom_theme');
     self::assertArrayNotHasKey('hidden', $info);
@@ -226,10 +226,10 @@ YAML
     // Change the version to a development snapshot version number, to simulate
     // using a contrib theme as the starterkit.
     $starterkit_info_yml = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.info.yml';
-    $info = Yaml::decode(file_get_contents($starterkit_info_yml));
+    $info = Yaml::decode(\file_get_contents($starterkit_info_yml));
     $info['core_version_requirement'] = '*';
     $info['version'] = '7.x-dev';
-    file_put_contents($starterkit_info_yml, Yaml::encode($info));
+    \file_put_contents($starterkit_info_yml, Yaml::encode($info));
 
     // Avoid the core git commit from being considered the source theme's: move
     // it out of core.
@@ -237,7 +237,7 @@ YAML
 
     $process = $this->generateThemeFromStarterkit();
     $result = $process->run();
-    $this->assertStringContainsString("The source theme starterkit_theme has a development version number (7.x-dev). Because it is not a git checkout, a specific commit could not be identified. This makes tracking changes in the source theme difficult. Are you sure you want to continue? (yes/no) [yes]:\n > Theme generated successfully to themes/test_custom_theme", trim($process->getOutput()), $process->getErrorOutput());
+    $this->assertStringContainsString("The source theme starterkit_theme has a development version number (7.x-dev). Because it is not a git checkout, a specific commit could not be identified. This makes tracking changes in the source theme difficult. Are you sure you want to continue? (yes/no) [yes]:\n > Theme generated successfully to themes/test_custom_theme", \trim($process->getOutput()), $process->getErrorOutput());
     $this->assertSame(0, $result);
     $info = $this->assertThemeExists('themes/test_custom_theme');
     self::assertArrayNotHasKey('hidden', $info);
@@ -252,10 +252,10 @@ YAML
     // Change the version to a development snapshot version number, to simulate
     // using a contrib theme as the starterkit.
     $starterkit_info_yml = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.info.yml';
-    $info = Yaml::decode(file_get_contents($starterkit_info_yml));
+    $info = Yaml::decode(\file_get_contents($starterkit_info_yml));
     $info['core_version_requirement'] = '*';
     $info['version'] = '7.x-dev';
-    file_put_contents($starterkit_info_yml, Yaml::encode($info));
+    \file_put_contents($starterkit_info_yml, Yaml::encode($info));
 
     // Avoid the core git commit from being considered the source theme's: move
     // it out of core.
@@ -263,33 +263,33 @@ YAML
 
     // Confirm that 'git' is available.
     $output = [];
-    exec('git --help', $output, $status);
+    \exec('git --help', $output, $status);
     $this->assertEquals(0, $status);
     // Modify our $PATH so that it begins with a path that contains an
     // executable script named 'git' that always exits with 127, as if git were
     // not found. Note that we run our tests using process isolation, so we do
     // not need to restore the PATH when we are done.
     $unavailableGitPath = $this->getWorkspaceDirectory() . '/bin';
-    putenv('PATH=' . $unavailableGitPath . ':' . getenv('PATH'));
-    mkdir($unavailableGitPath);
+    \putenv('PATH=' . $unavailableGitPath . ':' . \getenv('PATH'));
+    \mkdir($unavailableGitPath);
     $bash = <<<SH
 #!/bin/bash
 exit 127
 
 SH;
-    file_put_contents($unavailableGitPath . '/git', $bash);
-    chmod($unavailableGitPath . '/git', 0755);
+    \file_put_contents($unavailableGitPath . '/git', $bash);
+    \chmod($unavailableGitPath . '/git', 0755);
     // Confirm that 'git' is no longer available.
     $process = new Process(['git', '--help']);
     $process->run();
     $this->assertEquals(127, $process->getExitCode(), 'Fake git used by process.');
 
     $process = $this->generateThemeFromStarterkit([
-      'PATH' => getenv('PATH'),
+      'PATH' => \getenv('PATH'),
       'COLUMNS' => 80,
     ]);
     $result = $process->run();
-    $this->assertEquals("[ERROR] The source theme starterkit_theme has a development version number     \n         (7.x-dev). Determining a specific commit is not possible because git is\n         not installed. Either install git or use a tagged release to generate a\n         theme.", trim($process->getErrorOutput()), $process->getErrorOutput());
+    $this->assertEquals("[ERROR] The source theme starterkit_theme has a development version number     \n         (7.x-dev). Determining a specific commit is not possible because git is\n         not installed. Either install git or use a tagged release to generate a\n         theme.", \trim($process->getErrorOutput()), $process->getErrorOutput());
     $this->assertSame(1, $result);
     $this->assertFileDoesNotExist($this->getWorkspaceDirectory() . "/themes/test_custom_theme");
   }
@@ -300,13 +300,13 @@ SH;
   public function testCustomStarterkit(): void {
     // Omit the version, to simulate using a custom theme as the starterkit.
     $starterkit_info_yml = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.info.yml';
-    $info = Yaml::decode(file_get_contents($starterkit_info_yml));
+    $info = Yaml::decode(\file_get_contents($starterkit_info_yml));
     unset($info['version']);
-    file_put_contents($starterkit_info_yml, Yaml::encode($info));
+    \file_put_contents($starterkit_info_yml, Yaml::encode($info));
 
     $process = $this->generateThemeFromStarterkit();
     $result = $process->run();
-    $this->assertStringContainsString("The source theme starterkit_theme does not have a version specified. This makes tracking changes in the source theme difficult. Are you sure you want to continue? (yes/no) [yes]:\n > Theme generated successfully to themes/test_custom_theme", trim($process->getOutput()), $process->getErrorOutput());
+    $this->assertStringContainsString("The source theme starterkit_theme does not have a version specified. This makes tracking changes in the source theme difficult. Are you sure you want to continue? (yes/no) [yes]:\n > Theme generated successfully to themes/test_custom_theme", \trim($process->getOutput()), $process->getErrorOutput());
     $this->assertSame(0, $result);
     $info = $this->assertThemeExists('themes/test_custom_theme');
     self::assertArrayNotHasKey('hidden', $info);
@@ -331,7 +331,7 @@ SH;
     $process = new Process($install_command, NULL);
     $process->setTimeout(60);
     $result = $process->run();
-    $this->assertStringContainsString('Theme source theme foobar cannot be found.', trim($process->getErrorOutput()));
+    $this->assertStringContainsString('Theme source theme foobar cannot be found.', \trim($process->getErrorOutput()));
     $this->assertSame(1, $result);
   }
 
@@ -353,7 +353,7 @@ SH;
     $process = new Process($install_command, NULL);
     $process->setTimeout(60);
     $result = $process->run();
-    $this->assertStringContainsString('Theme source theme stark is not a valid starter kit.', trim($process->getErrorOutput()));
+    $this->assertStringContainsString('Theme source theme stark is not a valid starter kit.', \trim($process->getErrorOutput()));
     $this->assertSame(1, $result);
 
     // Has not defined `starterkit`.
@@ -370,7 +370,7 @@ SH;
     $process = new Process($install_command, NULL);
     $process->setTimeout(60);
     $result = $process->run();
-    $this->assertStringContainsString('Theme source theme olivero is not a valid starter kit.', trim($process->getErrorOutput()));
+    $this->assertStringContainsString('Theme source theme olivero is not a valid starter kit.', \trim($process->getErrorOutput()));
     $this->assertSame(1, $result);
   }
 
@@ -413,8 +413,8 @@ SH;
       ]
     );
 
-    self::assertThat($tester->getStatusCode(), self::logicalNot(new CommandIsSuccessful()), trim($tester->getDisplay()));
-    self::assertEquals('[ERROR] Paths were defined `no_edit` but no files found.', trim($tester->getErrorOutput()));
+    self::assertThat($tester->getStatusCode(), self::logicalNot(new CommandIsSuccessful()), \trim($tester->getDisplay()));
+    self::assertEquals('[ERROR] Paths were defined `no_edit` but no files found.', \trim($tester->getErrorOutput()));
     $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
     self::assertDirectoryDoesNotExist($theme_path_absolute);
   }
@@ -434,8 +434,8 @@ SH;
       ]
     );
 
-    self::assertThat($tester->getStatusCode(), self::logicalNot(new CommandIsSuccessful()), trim($tester->getDisplay()));
-    self::assertEquals('[ERROR] Paths were defined `no_rename` but no files found.', trim($tester->getErrorOutput()));
+    self::assertThat($tester->getStatusCode(), self::logicalNot(new CommandIsSuccessful()), \trim($tester->getDisplay()));
+    self::assertEquals('[ERROR] Paths were defined `no_rename` but no files found.', \trim($tester->getErrorOutput()));
     $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
     self::assertDirectoryDoesNotExist($theme_path_absolute);
   }
@@ -449,11 +449,11 @@ SH;
       ],
     ]);
 
-    mkdir($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js');
-    mkdir($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js/baz');
-    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js/starterkit_theme.js', '');
-    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js/starterkit_theme.foo.js', '');
-    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js/baz/starterkit_theme.bar.js', '');
+    \mkdir($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js');
+    \mkdir($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js/baz');
+    \file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js/starterkit_theme.js', '');
+    \file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js/starterkit_theme.foo.js', '');
+    \file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/js/baz/starterkit_theme.bar.js', '');
 
     $tester = $this->runCommand(
       [
@@ -488,9 +488,9 @@ StarterkitTheme
 StarterkitTheme
 FIXTURE;
 
-    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/edit_fixture.txt', $fixture);
-    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/no_edit_fixture.txt', $fixture);
-    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/src/StarterkitThemePreRender.php', <<<PHP
+    \file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/edit_fixture.txt', $fixture);
+    \file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/no_edit_fixture.txt', $fixture);
+    \file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/src/StarterkitThemePreRender.php', <<<PHP
 <?php
 
 namespace Drupal\starterkit_theme;
@@ -520,7 +520,7 @@ PHP);
     $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
 
     self::assertFileExists($theme_path_absolute . '/no_edit_fixture.txt');
-    self::assertEquals($fixture, file_get_contents($theme_path_absolute . '/no_edit_fixture.txt'));
+    self::assertEquals($fixture, \file_get_contents($theme_path_absolute . '/no_edit_fixture.txt'));
     self::assertFileExists($theme_path_absolute . '/edit_fixture.txt');
     self::assertEquals(<<<EDITED
 # machine_name
@@ -531,7 +531,7 @@ Test custom starterkit theme
 TestCustomTheme
 # label_class_name
 TestCustomTheme
-EDITED, file_get_contents($theme_path_absolute . '/edit_fixture.txt'));
+EDITED, \file_get_contents($theme_path_absolute . '/edit_fixture.txt'));
 
     self::assertEquals(<<<EDITED
 <?php
@@ -548,15 +548,15 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 class TestCustomThemePreRender implements TrustedCallbackInterface {
 
 }
-EDITED, file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender.php'));
+EDITED, \file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender.php'));
   }
 
   public function testInfoOverrides(): void {
     // Force `base theme` to be `false.
     $starterkit_info_yml = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.info.yml';
-    $info = Yaml::decode(file_get_contents($starterkit_info_yml));
+    $info = Yaml::decode(\file_get_contents($starterkit_info_yml));
     $info['base theme'] = FALSE;
-    file_put_contents($starterkit_info_yml, Yaml::encode($info));
+    \file_put_contents($starterkit_info_yml, Yaml::encode($info));
     $this->writeStarterkitConfig([
       'info' => [
         'libraries' => [
@@ -582,7 +582,7 @@ EDITED, file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender.
   }
 
   public function testIncludeDotFiles(): void {
-    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/.gitignore', '*.map');
+    \file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/.gitignore', '*.map');
     $tester = $this->runCommand(
       [
         'machine-name' => 'test_custom_theme',
@@ -601,9 +601,9 @@ EDITED, file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender.
 
   private function writeStarterkitConfig(array $config): void {
     $starterkit_yml = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/starterkit_theme.starterkit.yml';
-    $starterkit_config = Yaml::decode(file_get_contents($starterkit_yml));
-    $starterkit_config = array_replace_recursive($starterkit_config, $config);
-    file_put_contents($starterkit_yml, Yaml::encode($starterkit_config));
+    $starterkit_config = Yaml::decode(\file_get_contents($starterkit_yml));
+    $starterkit_config = \array_replace_recursive($starterkit_config, $config);
+    \file_put_contents($starterkit_yml, Yaml::encode($starterkit_config));
   }
 
   private function runCommand(array $input): CommandTester {

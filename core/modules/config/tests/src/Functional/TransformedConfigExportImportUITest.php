@@ -82,7 +82,7 @@ class TransformedConfigExportImportUITest extends BrowserTestBase {
 
     // Import the configuration from the tarball.
     $filename = 'temporary://' . $this->randomMachineName();
-    file_put_contents($filename, $tarball);
+    \file_put_contents($filename, $tarball);
     $this->drupalGet('admin/config/development/configuration/full/import');
     $this->submitForm(['files[import_tarball]' => $filename], 'Upload');
 

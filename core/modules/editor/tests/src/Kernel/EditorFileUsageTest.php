@@ -133,7 +133,7 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     foreach ($image_paths as $key => $image_path) {
       $image = File::create();
       $image->setFileUri($image_path);
-      $image->setFilename(basename($image->getFileUri()));
+      $image->setFilename(\basename($image->getFileUri()));
       $image->save();
 
       $file_usage = $this->container->get('file.usage');
@@ -193,9 +193,9 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     // Test hook_entity_update(): decrement, by modifying the last revision:
     // remove the data-entity-type attribute from the body field.
     $original_values = [];
-    for ($i = 0; $i < count($image_entities); $i++) {
+    for ($i = 0; $i < \count($image_entities); $i++) {
       $original_value = $node->body[$i]->value;
-      $new_value = str_replace('data-entity-type', 'data-entity-type-modified', $original_value);
+      $new_value = \str_replace('data-entity-type', 'data-entity-type-modified', $original_value);
       $node->body[$i]->value = $new_value;
       $original_values[$i] = $original_value;
     }
@@ -219,7 +219,7 @@ class EditorFileUsageTest extends EntityKernelTestBase {
     // remove the data-entity-uuid attribute from the body field.
     foreach ($original_values as $key => $original_value) {
       $original_value = $node->body[$key]->value;
-      $new_value = str_replace('data-entity-type', 'data-entity-type-modified', $original_value);
+      $new_value = \str_replace('data-entity-type', 'data-entity-type-modified', $original_value);
       $node->body[$key]->value = $new_value;
     }
     $node->save();

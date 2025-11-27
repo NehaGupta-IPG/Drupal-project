@@ -46,7 +46,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     // response tasks run in different orders each time.
     $this->drupalGet('node/1');
     // Allow time for image style and aggregate requests to finish.
-    sleep(2);
+    \sleep(2);
     $this->drupalGet('node/1');
     $this->clearCaches();
     $performance_data = $this->collectPerformanceData(function () {
@@ -141,11 +141,11 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     // First of all visit the node page to ensure the image style exists.
     $this->drupalGet('node/1');
     // Allow time for the image style and asset aggregate requests to finish.
-    sleep(1);
+    \sleep(1);
     $this->clearCaches();
     // Now visit a different node page to warm non-path-specific caches.
     $this->drupalGet('node/2');
-    sleep(1);
+    \sleep(1);
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'umamiNodePageWarmCache');

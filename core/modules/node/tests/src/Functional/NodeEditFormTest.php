@@ -147,7 +147,7 @@ class NodeEditFormTest extends NodeTestBase {
     // This invalid date will trigger an error.
     $edit['created[0][value][date]'] = $this->randomMachineName(8);
     // Get the current amount of open details elements.
-    $open_details_elements = count($this->cssSelect('details[open="open"]'));
+    $open_details_elements = \count($this->cssSelect('details[open="open"]'));
     $this->submitForm($edit, 'Save');
     // The node author details must be open.
     $this->assertSession()->responseContains('<details class="node-form-author js-form-wrapper form-wrapper" data-drupal-selector="edit-author" id="edit-author" open="open">');

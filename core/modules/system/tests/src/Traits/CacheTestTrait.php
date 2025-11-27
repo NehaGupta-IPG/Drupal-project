@@ -81,8 +81,8 @@ trait CacheTestTrait {
   private function verifyCache(VariationCacheInterface $cache_bin, array $keys, array $tags, CacheableDependencyInterface $cacheability): void {
     $cache_entry = $cache_bin->get($keys, $cacheability);
     $this->assertInstanceOf(\stdClass::class, $cache_entry);
-    sort($cache_entry->tags);
-    sort($tags);
+    \sort($cache_entry->tags);
+    \sort($tags);
     $this->assertSame($cache_entry->tags, $tags);
   }
 

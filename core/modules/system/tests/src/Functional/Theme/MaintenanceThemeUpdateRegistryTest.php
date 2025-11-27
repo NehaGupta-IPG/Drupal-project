@@ -53,15 +53,15 @@ class MaintenanceThemeUpdateRegistryTest extends BrowserTestBase {
     ];
     // Create an install profile that uses the test theme.
     $path = $this->siteDirectory . '/profiles/theme_test_profile';
-    mkdir($path, 0777, TRUE);
-    file_put_contents("$path/theme_test_profile.info.yml", Yaml::encode($info));
+    \mkdir($path, 0777, TRUE);
+    \file_put_contents("$path/theme_test_profile.info.yml", Yaml::encode($info));
 
     // Create a system.theme.yml file for the profile so the test theme is used.
     $path = $this->siteDirectory . '/profiles/theme_test_profile/config/install';
-    mkdir($path, 0777, TRUE);
-    $theme_config = Yaml::decode(file_get_contents($this->root . '/core/modules/system/config/install/system.theme.yml'));
+    \mkdir($path, 0777, TRUE);
+    $theme_config = Yaml::decode(\file_get_contents($this->root . '/core/modules/system/config/install/system.theme.yml'));
     $theme_config['default'] = 'test_theme_updates';
-    file_put_contents("$path/system.theme.yml", Yaml::encode($theme_config));
+    \file_put_contents("$path/system.theme.yml", Yaml::encode($theme_config));
   }
 
   /**

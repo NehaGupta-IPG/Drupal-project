@@ -146,7 +146,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     // At least, we should parse out the parameters and see if there are any
     // keyword matches in that case, rather than just printing out the
     // "Enter keywords" message.
-    return !empty($this->keywords) || (isset($this->searchParameters['f']) && count($this->searchParameters['f']));
+    return !empty($this->keywords) || (isset($this->searchParameters['f']) && \count($this->searchParameters['f']));
   }
 
   /**
@@ -202,13 +202,13 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     // We need to parse this out into query conditions, some of which go into
     // the keywords string, and some of which are separate conditions.
     $parameters = $this->getParameters();
-    if (!empty($parameters['f']) && is_array($parameters['f'])) {
+    if (!empty($parameters['f']) && \is_array($parameters['f'])) {
       $filters = [];
       // Match any query value that is an expected option and a value
       // separated by ':' like 'term:27'.
-      $pattern = '/^(' . implode('|', array_keys($this->advanced)) . '):([^ ]*)/i';
+      $pattern = '/^(' . \implode('|', \array_keys($this->advanced)) . '):([^ ]*)/i';
       foreach ($parameters['f'] as $item) {
-        if (preg_match($pattern, $item, $m)) {
+        if (\preg_match($pattern, $item, $m)) {
           // Use the matched value as the array key to eliminate duplicates.
           $filters[$m[1]][$m[2]] = $m[2];
         }
@@ -311,7 +311,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
         'node' => $node,
         'extra' => $extra,
         'score' => $item->calculated_score,
-        'snippet' => search_excerpt($keys, $rendered, $item->langcode),
+        'snippet' => \search_excerpt($keys, $rendered, $item->langcode),
         'langcode' => $node->language()->getId(),
       ];
 
@@ -550,7 +550,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     ];
 
     // Add node types.
-    $types = array_map(['\Drupal\Component\Utility\Html', 'escape'], $this->entityTypeBundleInfo->getBundleLabels('node'));
+    $types = \array_map(['\Drupal\Component\Utility\Html', 'escape'], $this->entityTypeBundleInfo->getBundleLabels('node'));
     $form['advanced']['types-fieldset'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Types'),
@@ -579,7 +579,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       // Make locked languages appear special in the list.
       $language_options[$langcode] = $language->isLocked() ? $this->t('- @name -', ['@name' => $language->getName()]) : $language->getName();
     }
-    if (count($language_options) > 1) {
+    if (\count($language_options) > 1) {
       $form['advanced']['lang-fieldset'] = [
         '#type' => 'fieldset',
         '#title' => $this->t('Languages'),
@@ -601,12 +601,12 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
   public function buildSearchUrlQuery(FormStateInterface $form_state) {
     // Read keyword and advanced search information from the form values,
     // and put these into the GET parameters.
-    $keys = trim($form_state->getValue('keys'));
+    $keys = \trim($form_state->getValue('keys'));
     $advanced = FALSE;
 
     // Collect extra filters.
     $filters = [];
-    if ($form_state->hasValue('type') && is_array($form_state->getValue('type'))) {
+    if ($form_state->hasValue('type') && \is_array($form_state->getValue('type'))) {
       // Retrieve selected types - Form API sets the value of unselected
       // checkboxes to 0.
       foreach ($form_state->getValue('type') as $type) {
@@ -617,13 +617,13 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       }
     }
 
-    if ($form_state->hasValue('term') && is_array($form_state->getValue('term'))) {
+    if ($form_state->hasValue('term') && \is_array($form_state->getValue('term'))) {
       foreach ($form_state->getValue('term') as $term) {
         $filters[] = 'term:' . $term;
         $advanced = TRUE;
       }
     }
-    if ($form_state->hasValue('language') && is_array($form_state->getValue('language'))) {
+    if ($form_state->hasValue('language') && \is_array($form_state->getValue('language'))) {
       foreach ($form_state->getValue('language') as $language) {
         if ($language) {
           $advanced = TRUE;
@@ -632,22 +632,22 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       }
     }
     if ($form_state->getValue('or') != '') {
-      if (preg_match_all('/ ("[^"]+"|[^" ]+)/i', ' ' . $form_state->getValue('or'), $matches)) {
-        $keys .= ' ' . implode(' OR ', $matches[1]);
+      if (\preg_match_all('/ ("[^"]+"|[^" ]+)/i', ' ' . $form_state->getValue('or'), $matches)) {
+        $keys .= ' ' . \implode(' OR ', $matches[1]);
         $advanced = TRUE;
       }
     }
     if ($form_state->getValue('negative') != '') {
-      if (preg_match_all('/ ("[^"]+"|[^" ]+)/i', ' ' . $form_state->getValue('negative'), $matches)) {
-        $keys .= ' -' . implode(' -', $matches[1]);
+      if (\preg_match_all('/ ("[^"]+"|[^" ]+)/i', ' ' . $form_state->getValue('negative'), $matches)) {
+        $keys .= ' -' . \implode(' -', $matches[1]);
         $advanced = TRUE;
       }
     }
     if ($form_state->getValue('phrase') != '') {
-      $keys .= ' "' . str_replace('"', ' ', $form_state->getValue('phrase')) . '"';
+      $keys .= ' "' . \str_replace('"', ' ', $form_state->getValue('phrase')) . '"';
       $advanced = TRUE;
     }
-    $keys = trim($keys);
+    $keys = \trim($keys);
 
     // Put the keywords and advanced parameters into GET parameters. Make sure
     // to put keywords into the query even if it is empty, because the page
@@ -683,7 +683,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
 
     // Split out the advanced search parameters.
     foreach ($f as $advanced) {
-      [$key, $value] = explode(':', $advanced, 2);
+      [$key, $value] = \explode(':', $advanced, 2);
       if (!isset($defaults[$key])) {
         $defaults[$key] = [];
       }
@@ -695,26 +695,26 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     // For phrases, the form only supports one phrase.
     $matches = [];
     $keys = ' ' . $keys . ' ';
-    if (preg_match('/ "([^"]+)" /', $keys, $matches)) {
-      $keys = str_replace($matches[0], ' ', $keys);
+    if (\preg_match('/ "([^"]+)" /', $keys, $matches)) {
+      $keys = \str_replace($matches[0], ' ', $keys);
       $defaults['phrase'] = $matches[1];
     }
 
     // Negative keywords: pull all of them out.
-    if (preg_match_all('/ -([^ ]+)/', $keys, $matches)) {
-      $keys = str_replace($matches[0], ' ', $keys);
-      $defaults['negative'] = implode(' ', $matches[1]);
+    if (\preg_match_all('/ -([^ ]+)/', $keys, $matches)) {
+      $keys = \str_replace($matches[0], ' ', $keys);
+      $defaults['negative'] = \implode(' ', $matches[1]);
     }
 
     // OR keywords: pull up to one set of them out of the query.
-    if (preg_match('/ [^ ]+( OR [^ ]+)+ /', $keys, $matches)) {
-      $keys = str_replace($matches[0], ' ', $keys);
-      $words = explode(' OR ', trim($matches[0]));
-      $defaults['or'] = implode(' ', $words);
+    if (\preg_match('/ [^ ]+( OR [^ ]+)+ /', $keys, $matches)) {
+      $keys = \str_replace($matches[0], ' ', $keys);
+      $words = \explode(' OR ', \trim($matches[0]));
+      $defaults['or'] = \implode(' ', $words);
     }
 
     // Put remaining keywords string back into keywords.
-    $defaults['keys'] = trim($keys);
+    $defaults['keys'] = \trim($keys);
 
     return $defaults;
   }
@@ -764,8 +764,8 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     ];
 
     // Note: reversed to reflect that higher number = higher ranking.
-    $range = range(0, 10);
-    $options = array_combine($range, $range);
+    $range = \range(0, 10);
+    $options = \array_combine($range, $range);
     foreach ($this->getRankings() as $var => $values) {
       $form['content_ranking']['rankings'][$var]['name'] = [
         '#markup' => $values['title'],

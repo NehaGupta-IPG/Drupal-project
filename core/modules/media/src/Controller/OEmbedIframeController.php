@@ -126,8 +126,8 @@ class OEmbedIframeController implements ContainerInjectionInterface {
     // @todo Move domain check logic to a separate method.
     $allowed_domain = \Drupal::config('media.settings')->get('iframe_domain');
     if ($allowed_domain) {
-      $allowed_host = parse_url($allowed_domain, PHP_URL_HOST);
-      $host = parse_url($request->getSchemeAndHttpHost(), PHP_URL_HOST);
+      $allowed_host = \parse_url($allowed_domain, PHP_URL_HOST);
+      $host = \parse_url($request->getSchemeAndHttpHost(), PHP_URL_HOST);
       if ($allowed_host !== $host) {
         throw new BadRequestHttpException('This resource is not available');
       }
@@ -140,7 +140,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
     // Hash the URL and max dimensions, and ensure it is equal to the hash
     // parameter passed in the query string.
     $hash = $this->iFrameUrlHelper->getHash($url, $max_width, $max_height);
-    if (!hash_equals($hash, $request->query->get('hash', ''))) {
+    if (!\hash_equals($hash, $request->query->get('hash', ''))) {
       throw new BadRequestHttpException('This resource is not available');
     }
 
@@ -200,7 +200,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
       // @see \Drupal\Core\Theme\ThemeManager::render()
       if (!$context->isEmpty()) {
         $bubbleable_metadata = $context->pop();
-        assert($bubbleable_metadata instanceof BubbleableMetadata);
+        \assert($bubbleable_metadata instanceof BubbleableMetadata);
         $response->addCacheableDependency($bubbleable_metadata);
         $response->addAttachments($bubbleable_metadata->getAttachments());
       }

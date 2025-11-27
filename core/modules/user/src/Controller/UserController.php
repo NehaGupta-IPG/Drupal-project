@@ -129,7 +129,7 @@ class UserController extends ControllerBase {
     if ($account->isAuthenticated()) {
       // The current user is already logged in.
       if ($account->id() == $uid) {
-        user_logout();
+        \user_logout();
         // We need to begin the redirect process again because logging out will
         // destroy the session.
         return $this->redirect(
@@ -258,7 +258,7 @@ class UserController extends ControllerBase {
     $this->flood->clear('user.failed_login_user', $identifier);
     $this->flood->clear('user.http_login', $identifier);
 
-    user_login_finalize($user);
+    \user_login_finalize($user);
     $this->logger->info('User %name used one-time login link at time %timestamp.', ['%name' => $user->getDisplayName(), '%timestamp' => $timestamp]);
     $this->messenger()->addStatus($this->t('You have used a one-time login link. You can set your new password now.'));
     // Let the user's password be changed without the current password
@@ -342,7 +342,7 @@ class UserController extends ControllerBase {
   protected function validatePathParameters(UserInterface $user, int $timestamp, string $hash, int $timeout = 0): bool {
     $current = \Drupal::time()->getRequestTime();
     $timeout_valid = ((!empty($timeout) && $current - $timestamp < $timeout) || empty($timeout));
-    return ($timestamp >= $user->getLastLoginTime()) && $timestamp <= $current && $timeout_valid && hash_equals($hash, user_pass_rehash($user, $timestamp));
+    return ($timestamp >= $user->getLastLoginTime()) && $timestamp <= $current && $timeout_valid && \hash_equals($hash, \user_pass_rehash($user, $timestamp));
   }
 
   /**
@@ -395,7 +395,7 @@ class UserController extends ControllerBase {
    */
   public function logout() {
     if ($this->currentUser()->isAuthenticated()) {
-      user_logout();
+      \user_logout();
     }
     return $this->redirect('<front>');
   }
@@ -425,11 +425,11 @@ class UserController extends ControllerBase {
         $edit = [
           'user_cancel_notify' => $account_data['cancel_notify'] ?? $this->config('user.settings')->get('notify.status_canceled'),
         ];
-        user_cancel($edit, $user->id(), $account_data['cancel_method']);
+        \user_cancel($edit, $user->id(), $account_data['cancel_method']);
         // Since user_cancel() is not invoked via Form API, batch processing
         // needs to be invoked manually and should redirect to the front page
         // after completion.
-        return batch_process('<front>');
+        return \batch_process('<front>');
       }
       else {
         $this->messenger()->addError($this->t('You have tried to use an account cancellation link that has expired. Request a new one using the form below.'));

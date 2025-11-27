@@ -38,11 +38,11 @@ final class CreateForEachBundleDeriver extends DeriverBase implements ContainerD
     // The action should only be available for entity types that are bundles of
     // another entity type, such as node types, media types, taxonomy
     // vocabularies, and so forth.
-    $bundle_entity_types = array_filter(
+    $bundle_entity_types = \array_filter(
       $this->entityTypeManager->getDefinitions(),
-      fn (EntityTypeInterface $entity_type) => is_string($entity_type->getBundleOf()),
+      fn (EntityTypeInterface $entity_type) => \is_string($entity_type->getBundleOf()),
     );
-    $base_plugin_definition['entity_types'] = array_keys($bundle_entity_types);
+    $base_plugin_definition['entity_types'] = \array_keys($bundle_entity_types);
 
     $this->derivatives['createForEachIfNotExists'] = $base_plugin_definition + [
       'create_action' => 'createIfNotExists',

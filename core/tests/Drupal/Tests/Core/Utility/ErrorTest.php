@@ -58,7 +58,7 @@ class ErrorTest extends UnitTestCase {
     foreach (['debug', '_drupal_error_handler', '_drupal_exception_handler'] as $function) {
       $two_items = $single_item;
       // Push to the start of the backtrace.
-      array_unshift($two_items, self::createBacktraceItem($function));
+      \array_unshift($two_items, self::createBacktraceItem($function));
       $data[] = [$single_item, self::createBacktraceItem('main()')];
     }
 

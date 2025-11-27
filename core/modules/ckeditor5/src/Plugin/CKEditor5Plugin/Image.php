@@ -54,7 +54,7 @@ class Image extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form_state->loadInclude('editor', 'admin.inc');
-    return editor_image_upload_settings_form($form_state->get('editor'));
+    return \editor_image_upload_settings_form($form_state->get('editor'));
   }
 
   /**
@@ -63,13 +63,13 @@ class Image extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     $form_state->setValue('status', (bool) $form_state->getValue('status'));
     $directory = $form_state->getValue(['directory']);
-    $form_state->setValue(['directory'], trim($directory) === '' ? NULL : $directory);
+    $form_state->setValue(['directory'], \trim($directory) === '' ? NULL : $directory);
     $max_size = $form_state->getValue(['max_size']);
-    $form_state->setValue(['max_size'], trim($max_size) === '' ? NULL : $max_size);
+    $form_state->setValue(['max_size'], \trim($max_size) === '' ? NULL : $max_size);
     $max_width = $form_state->getValue(['max_dimensions', 'width']);
-    $form_state->setValue(['max_dimensions', 'width'], trim($max_width) === '' ? NULL : (int) $max_width);
+    $form_state->setValue(['max_dimensions', 'width'], \trim($max_width) === '' ? NULL : (int) $max_width);
     $max_height = $form_state->getValue(['max_dimensions', 'height']);
-    $form_state->setValue(['max_dimensions', 'height'], trim($max_height) === '' ? NULL : (int) $max_height);
+    $form_state->setValue(['max_dimensions', 'height'], \trim($max_height) === '' ? NULL : (int) $max_height);
   }
 
   /**

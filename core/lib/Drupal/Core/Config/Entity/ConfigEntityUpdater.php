@@ -120,7 +120,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
       }
       $sandbox[self::SANDBOX_KEY]['entity_type'] = $entity_type_id;
       $sandbox[self::SANDBOX_KEY]['entities'] = $storage->getQuery()->accessCheck(FALSE)->execute();
-      $sandbox[self::SANDBOX_KEY]['count'] = count($sandbox[self::SANDBOX_KEY]['entities']);
+      $sandbox[self::SANDBOX_KEY]['count'] = \count($sandbox[self::SANDBOX_KEY]['entities']);
       $sandbox[self::SANDBOX_KEY]['failed_entity_ids'] = [];
     }
 
@@ -134,7 +134,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
     }
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
-    $entities = $storage->loadMultiple(array_splice($sandbox[self::SANDBOX_KEY]['entities'], 0, $this->batchSize));
+    $entities = $storage->loadMultiple(\array_splice($sandbox[self::SANDBOX_KEY]['entities'], 0, $this->batchSize));
     foreach ($entities as $entity) {
       try {
         if ($continue_on_error) {
@@ -160,20 +160,20 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
       }
     }
 
-    $sandbox['#finished'] = empty($sandbox[self::SANDBOX_KEY]['entities']) ? 1 : ($sandbox[self::SANDBOX_KEY]['count'] - count($sandbox[self::SANDBOX_KEY]['entities'])) / $sandbox[self::SANDBOX_KEY]['count'];
+    $sandbox['#finished'] = empty($sandbox[self::SANDBOX_KEY]['entities']) ? 1 : ($sandbox[self::SANDBOX_KEY]['count'] - \count($sandbox[self::SANDBOX_KEY]['entities'])) / $sandbox[self::SANDBOX_KEY]['count'];
     if (!empty($sandbox[self::SANDBOX_KEY]['failed_entity_ids'])) {
       $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
       if (\Drupal::moduleHandler()->moduleExists('dblog')) {
         return new TranslatableMarkup('Updates failed for the entity type %entity_type, for %entity_ids. <a href=":url">Check the logs</a>.', [
           '%entity_type' => $entity_type->getLabel(),
-          '%entity_ids' => implode(', ', $sandbox[self::SANDBOX_KEY]['failed_entity_ids']),
+          '%entity_ids' => \implode(', ', $sandbox[self::SANDBOX_KEY]['failed_entity_ids']),
           ':url' => Url::fromRoute('dblog.overview')->toString(),
         ]);
       }
       else {
         return new TranslatableMarkup("Updates failed for the entity type %entity_type, for %entity_ids. Check the logs.", [
           '%entity_type' => $entity_type->getLabel(),
-          '%entity_ids' => implode(', ', $sandbox[self::SANDBOX_KEY]['failed_entity_ids']),
+          '%entity_ids' => \implode(', ', $sandbox[self::SANDBOX_KEY]['failed_entity_ids']),
         ]);
       }
     }
@@ -188,7 +188,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
    *   The callback to apply.
    */
   protected function doOne(ConfigEntityInterface $entity, callable $callback) {
-    if (call_user_func($callback, $entity)) {
+    if (\call_user_func($callback, $entity)) {
       $entity->trustData();
       $entity->save();
     }

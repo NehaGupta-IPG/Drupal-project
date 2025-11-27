@@ -146,7 +146,7 @@ class ContentEntityFormFieldValidationFilteringTest extends BrowserTestBase {
     // Now try to upload a file. This tests the '#limit_validation_errors'
     // property set by
     // \Drupal\file\Plugin\Field\FieldWidget\FileWidget::process().
-    $text_file = current($this->getTestFiles('text'));
+    $text_file = \current($this->getTestFiles('text'));
     $edit = [
       'files[test_file_0]' => \Drupal::service('file_system')->realpath($text_file->uri),
     ];

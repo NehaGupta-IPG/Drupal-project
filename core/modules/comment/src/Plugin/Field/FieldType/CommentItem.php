@@ -205,7 +205,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       CommentItemInterface::OPEN,
     ];
     return [
-      'status' => $statuses[mt_rand(0, count($statuses) - 1)],
+      'status' => $statuses[\mt_rand(0, \count($statuses) - 1)],
     ];
   }
 

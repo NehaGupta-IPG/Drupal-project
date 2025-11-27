@@ -25,7 +25,7 @@ class User extends DrupalSqlBase {
    */
   public function query() {
     return $this->select('users', 'u')
-      ->fields('u', array_keys($this->baseFields()))
+      ->fields('u', \array_keys($this->baseFields()))
       ->condition('u.uid', 0, '>');
   }
 
@@ -71,7 +71,7 @@ class User extends DrupalSqlBase {
     // Unserialize Data.
     $data = $row->getSourceProperty('data');
     if ($data !== NULL) {
-      $row->setSourceProperty('data', unserialize($row->getSourceProperty('data')));
+      $row->setSourceProperty('data', \unserialize($row->getSourceProperty('data')));
     }
 
     return parent::prepareRow($row);

@@ -57,23 +57,23 @@ class FormHelper {
   protected static function processStatesArray(array &$conditions, $search, $replace) {
     // Retrieve the keys to make it easy to rename a key without changing the
     // order of an array.
-    $keys = array_keys($conditions);
+    $keys = \array_keys($conditions);
     $update_keys = FALSE;
     foreach ($conditions as $id => $values) {
-      if (str_contains($id, $search)) {
+      if (\str_contains($id, $search)) {
         $update_keys = TRUE;
-        $new_id = str_replace($search, $replace, $id);
+        $new_id = \str_replace($search, $replace, $id);
         // Replace the key and keep the array in the same order.
-        $index = array_search($id, $keys, TRUE);
+        $index = \array_search($id, $keys, TRUE);
         $keys[$index] = $new_id;
       }
-      elseif (is_array($values)) {
+      elseif (\is_array($values)) {
         static::processStatesArray($conditions[$id], $search, $replace);
       }
     }
     // Updates the states conditions keys if necessary.
     if ($update_keys) {
-      $conditions = array_combine($keys, array_values($conditions));
+      $conditions = \array_combine($keys, \array_values($conditions));
     }
   }
 

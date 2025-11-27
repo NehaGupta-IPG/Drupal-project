@@ -77,12 +77,12 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $output = Json::decode($this->drupalGet('/ca/jsonapi/node/article/' . $this->nodes[0]->uuid(), ['query' => ['include' => 'field_tags,field_image'] + $default_sort]));
     $this->assertEquals($this->nodes[0]->getTranslation('ca')->getTitle(), $output['data']['attributes']['title']);
     $this->assertSame('ca', $output['data']['attributes']['langcode']);
-    $included_tags = array_filter($output['included'], function ($entry) {
+    $included_tags = \array_filter($output['included'], function ($entry) {
       return $entry['type'] === 'taxonomy_term--tags';
     });
     $tag_name = $this->nodes[0]->get('field_tags')->entity
       ->getTranslation('ca')->getName();
-    $this->assertEquals($tag_name, reset($included_tags)['attributes']['name']);
+    $this->assertEquals($tag_name, \reset($included_tags)['attributes']['name']);
     $alt = $this->nodes[0]->getTranslation('ca')->get('field_image')->alt;
     $this->assertSame($alt, $output['data']['relationships']['field_image']['data']['meta']['alt']);
 
@@ -277,7 +277,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $this->assertSame(201, $response->getStatusCode());
     $this->assertSame($title, $document['data']['attributes']['title']);
     $this->assertSame('en', $document['data']['attributes']['langcode']);
-    $this->assertSame(['en'], array_keys(Node::load($document['data']['attributes']['drupal_internal__nid'])->getTranslationLanguages()));
+    $this->assertSame(['en'], \array_keys(Node::load($document['data']['attributes']['drupal_internal__nid'])->getTranslationLanguages()));
 
     // Specifying a langcode is allowed once configured to be alterable. Now an
     // entity can be created with the specified langcode.
@@ -291,7 +291,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $this->assertSame(201, $response->getStatusCode());
     $this->assertSame($title, $document['data']['attributes']['title']);
     $this->assertSame('ca', $document['data']['attributes']['langcode']);
-    $this->assertSame(['ca'], array_keys(Node::load($document['data']['attributes']['drupal_internal__nid'])->getTranslationLanguages()));
+    $this->assertSame(['ca'], \array_keys(Node::load($document['data']['attributes']['drupal_internal__nid'])->getTranslationLanguages()));
 
     // Same request, but sent to the URL without the language prefix.
     $response = $this->request('POST', Url::fromUri('base:/jsonapi/node/article/'), $request_options);
@@ -299,7 +299,7 @@ class JsonApiFunctionalMultilingualTest extends JsonApiFunctionalTestBase {
     $this->assertSame(201, $response->getStatusCode());
     $this->assertSame($title, $document['data']['attributes']['title']);
     $this->assertSame('ca', $document['data']['attributes']['langcode']);
-    $this->assertSame(['ca'], array_keys(Node::load($document['data']['attributes']['drupal_internal__nid'])->getTranslationLanguages()));
+    $this->assertSame(['ca'], \array_keys(Node::load($document['data']['attributes']['drupal_internal__nid'])->getTranslationLanguages()));
   }
 
   /**

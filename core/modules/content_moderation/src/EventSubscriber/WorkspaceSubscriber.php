@@ -47,8 +47,8 @@ class WorkspaceSubscriber implements EventSubscriberInterface {
       $workflow_type = $workflow->getTypePlugin();
       // Find all workflows which are moderating entity types of the same type
       // to those that are tracked by the workspace.
-      if (array_intersect($workflow_type->getEntityTypes(), array_keys($tracked_revisions))) {
-        $workflow_non_default_states[$workflow->id()] = array_filter(array_map(function (ContentModerationState $state) {
+      if (\array_intersect($workflow_type->getEntityTypes(), \array_keys($tracked_revisions))) {
+        $workflow_non_default_states[$workflow->id()] = \array_filter(\array_map(function (ContentModerationState $state) {
           return !$state->isDefaultRevisionState() ? $state->id() : NULL;
         }, $workflow_type->getStates()));
       }
@@ -69,7 +69,7 @@ class WorkspaceSubscriber implements EventSubscriberInterface {
     foreach ($tracked_revisions as $tracked_type => $tracked_revision_ids) {
       $entity_type_group = $query->andConditionGroup()
         ->condition('content_entity_type_id', $tracked_type)
-        ->condition('content_entity_revision_id', array_keys($tracked_revision_ids), 'IN');
+        ->condition('content_entity_revision_id', \array_keys($tracked_revision_ids), 'IN');
 
       $tracked_revisions_condition_group->condition($entity_type_group);
     }

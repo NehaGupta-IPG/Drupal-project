@@ -28,7 +28,7 @@ class JUnitConverter {
    * @internal
    */
   public static function xmlToRows($test_id, $phpunit_xml_file) {
-    $contents = @file_get_contents($phpunit_xml_file);
+    $contents = @\file_get_contents($phpunit_xml_file);
     if (!$contents) {
       return [];
     }
@@ -81,7 +81,7 @@ class JUnitConverter {
       $test_cases[] = static::findTestCases($child, $element);
     }
 
-    return array_merge(...$test_cases);
+    return \array_merge(...$test_cases);
   }
 
   /**

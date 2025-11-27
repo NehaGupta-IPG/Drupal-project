@@ -28,9 +28,9 @@ trait InstalledPackagesListTrait {
   private function assertPackageListsEqual(InstalledPackagesList $expected_list, InstalledPackagesList $actual_list): void {
     $expected_array = $expected_list->getArrayCopy();
     $actual_array = $actual_list->getArrayCopy();
-    ksort($expected_array);
-    ksort($actual_array);
-    $this->assertSame(array_keys($expected_array), array_keys($actual_array));
+    \ksort($expected_array);
+    \ksort($actual_array);
+    $this->assertSame(\array_keys($expected_array), \array_keys($actual_array));
     foreach ($expected_list as $package_name => $expected_package) {
       $this->assertInstanceOf(InstalledPackage::class, $expected_package);
       $actual_package = $actual_list[$package_name];

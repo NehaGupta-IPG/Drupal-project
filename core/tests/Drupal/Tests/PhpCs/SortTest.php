@@ -39,12 +39,12 @@ class SortTest extends TestCase {
    * Tests that the phpcs.xml.dist file is properly sorted.
    */
   public function testSorted(): void {
-    $content = file_get_contents($this->filePath);
+    $content = \file_get_contents($this->filePath);
     $xml_encoder = new XmlEncoder();
     $xml_encoded = $xml_encoder->decode($content, 'xml');
     $this->assertIsArray($xml_encoded);
 
-    $top_level_keys = array_keys($xml_encoded);
+    $top_level_keys = \array_keys($xml_encoded);
     $this->assertSorted($top_level_keys);
 
     $this->assertArrayHasKey('file', $xml_encoded);
@@ -60,10 +60,10 @@ class SortTest extends TestCase {
     $this->assertSorted($rules, '@ref');
 
     foreach ($rules as $item) {
-      if (array_key_exists('exclude', $item)) {
+      if (\array_key_exists('exclude', $item)) {
         $excluded = $item['exclude'];
-        $excluded = array_filter($excluded, static function ($item) {
-          return is_array($item) && array_key_exists('@name', $item);
+        $excluded = \array_filter($excluded, static function ($item) {
+          return \is_array($item) && \array_key_exists('@name', $item);
         });
         $this->assertSorted($excluded, '@name');
       }
@@ -85,13 +85,13 @@ class SortTest extends TestCase {
     $input_sorted = $input;
 
     if ($column === NULL) {
-      usort($input_sorted, static function ($a, $b) {
-        return strcmp($a, $b);
+      \usort($input_sorted, static function ($a, $b) {
+        return \strcmp($a, $b);
       });
     }
     else {
-      usort($input_sorted, static function ($a, $b) use ($column) {
-        return strcmp($a[$column], $b[$column]);
+      \usort($input_sorted, static function ($a, $b) use ($column) {
+        return \strcmp($a[$column], $b[$column]);
       });
     }
 

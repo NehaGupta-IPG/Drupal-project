@@ -276,7 +276,7 @@ class FilterInOperatorTest extends ViewsKernelTestBase {
     ];
     $reduced_values = $operator->reduceValueOptions($input_options);
 
-    $this->assertSame(['foo', 'baz'], array_keys($reduced_values));
+    $this->assertSame(['foo', 'baz'], \array_keys($reduced_values));
     $this->assertInstanceOf(TranslatableMarkup::class, $reduced_values['baz']);
     $this->assertSame('qux', (string) $reduced_values['baz']);
     $this->assertSame('bar', $reduced_values['foo']);

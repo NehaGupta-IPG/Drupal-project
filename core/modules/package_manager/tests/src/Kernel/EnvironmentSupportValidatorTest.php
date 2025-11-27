@@ -30,7 +30,7 @@ class EnvironmentSupportValidatorTest extends PackageManagerKernelTestBase {
    * Tests handling of an invalid URL in the environment support variable.
    */
   public function testInvalidUrl(): void {
-    putenv(EnvironmentSupportValidator::VARIABLE_NAME . '=broken/url.org');
+    \putenv(EnvironmentSupportValidator::VARIABLE_NAME . '=broken/url.org');
 
     $result = ValidationResult::createError([
       $this->t('Package Manager is not supported by your environment.'),
@@ -52,7 +52,7 @@ class EnvironmentSupportValidatorTest extends PackageManagerKernelTestBase {
    */
   public function testInvalidUrlDuringPreApply(): void {
     $this->addEventTestListener(function (): void {
-      putenv(EnvironmentSupportValidator::VARIABLE_NAME . '=broken/url.org');
+      \putenv(EnvironmentSupportValidator::VARIABLE_NAME . '=broken/url.org');
     });
 
     $result = ValidationResult::createError([
@@ -70,7 +70,7 @@ class EnvironmentSupportValidatorTest extends PackageManagerKernelTestBase {
    */
   public function testValidUrl(): void {
     $url = 'http://www.example.com';
-    putenv(EnvironmentSupportValidator::VARIABLE_NAME . '=' . $url);
+    \putenv(EnvironmentSupportValidator::VARIABLE_NAME . '=' . $url);
 
     $result = ValidationResult::createError([
       $this->t('<a href=":url">Package Manager is not supported by your environment.</a>', [':url' => $url]),
@@ -85,7 +85,7 @@ class EnvironmentSupportValidatorTest extends PackageManagerKernelTestBase {
   public function testValidUrlDuringPreApply(): void {
     $url = 'http://www.example.com';
     $this->addEventTestListener(function () use ($url): void {
-      putenv(EnvironmentSupportValidator::VARIABLE_NAME . '=' . $url);
+      \putenv(EnvironmentSupportValidator::VARIABLE_NAME . '=' . $url);
     });
 
     $result = ValidationResult::createError([

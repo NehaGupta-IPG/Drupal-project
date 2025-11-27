@@ -34,8 +34,8 @@ class ConfigConfiguratorTest extends KernelTestBase {
    * Tests creating an existing configuration with a difference key order.
    */
   public function testExistingConfigWithKeysInDifferentOrder(): void {
-    $recipe_dir = uniqid('public://recipe_test_');
-    mkdir($recipe_dir . '/config', recursive: TRUE);
+    $recipe_dir = \uniqid('public://recipe_test_');
+    \mkdir($recipe_dir . '/config', recursive: TRUE);
 
     $this->enableModules(['system']);
     $this->installConfig('system');
@@ -45,15 +45,15 @@ class ConfigConfiguratorTest extends KernelTestBase {
     unset($original_data['uuid'], $original_data['_core']);
     $recipe_data = $original_data;
     // Reorder an inner array, to ensure keys are sorted recursively.
-    $recipe_data['page'] = array_reverse($original_data['page'], TRUE);
+    $recipe_data['page'] = \array_reverse($original_data['page'], TRUE);
     $this->assertNotSame($original_data, $recipe_data);
-    file_put_contents($recipe_dir . '/config/system.site.yml', Yaml::encode($recipe_data));
+    \file_put_contents($recipe_dir . '/config/system.site.yml', Yaml::encode($recipe_data));
 
     $recipe = [
       'name' => 'Same config, different order',
       'type' => 'Testing',
     ];
-    file_put_contents($recipe_dir . '/recipe.yml', Yaml::encode($recipe));
+    \file_put_contents($recipe_dir . '/recipe.yml', Yaml::encode($recipe));
 
     // If there was a conflict with the pre-existing config, ConfigConfigurator
     // would throw an exception and the recipe would not be created. So all we
@@ -172,9 +172,9 @@ class ConfigConfiguratorTest extends KernelTestBase {
    */
   private function cloneRecipe(string $original_dir): string {
     // Clone the recipe into the virtual file system.
-    $name = uniqid();
+    $name = \uniqid();
     $clone_dir = $this->vfsRoot->url() . '/' . $name;
-    mkdir($clone_dir);
+    \mkdir($clone_dir);
     $clone_dir = $this->vfsRoot->getChild($name);
     vfsStream::copyFromFileSystem($original_dir, $clone_dir);
     return $clone_dir->url();

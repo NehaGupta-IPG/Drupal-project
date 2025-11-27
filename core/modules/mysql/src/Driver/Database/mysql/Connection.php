@@ -71,7 +71,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   public function __construct(\PDO $connection, array $connection_options) {
     // @phpstan-ignore class.notFound
-    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Mysql : TRUE);
+    \assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Mysql : TRUE);
     // If the SQL mode doesn't include 'ANSI_QUOTES' (explicitly or via a
     // combination mode), then MySQL doesn't interpret a double quote as an
     // identifier quote, in which case use the non-ANSI-standard backtick.
@@ -84,7 +84,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
         // None of the modes in $ansi_quotes_modes are substrings of other modes
         // that are not in $ansi_quotes_modes, so a simple stripos() does not
         // return false positives.
-        if (stripos($connection_options['init_commands']['sql_mode'], $mode) !== FALSE) {
+        if (\stripos($connection_options['init_commands']['sql_mode'], $mode) !== FALSE) {
           $is_ansi_quotes_mode = TRUE;
           break;
         }
@@ -162,7 +162,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
             $message .= ' This message normally means that there is no MySQL server running on the system or that you are using an incorrect Unix socket file name when trying to connect to the server.';
             throw new DatabaseConnectionRefusedException($e->getMessage() . ' [Tip: ' . $message . '] ', $e->getCode(), $e);
           }
-          if (isset($connection_options['host']) && in_array(strtolower($connection_options['host']), ['', 'localhost'], TRUE)) {
+          if (isset($connection_options['host']) && \in_array(\strtolower($connection_options['host']), ['', 'localhost'], TRUE)) {
             // Show message for socket connection via 'host' option.
             $message = 'Drupal was attempting to connect to the database server via a socket, but the socket file could not be found.';
             $message .= ' A Unix socket file is used if you do not specify a host name or if you specify the special host name localhost.';
@@ -214,7 +214,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     ];
     if (!empty($connection_options['isolation_level'])) {
       $connection_options['init_commands'] += [
-        'isolation_level' => 'SET SESSION TRANSACTION ISOLATION LEVEL ' . strtoupper($connection_options['isolation_level']),
+        'isolation_level' => 'SET SESSION TRANSACTION ISOLATION LEVEL ' . \strtoupper($connection_options['isolation_level']),
       ];
     }
 
@@ -237,7 +237,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . uniqid();
+    $tablename = 'db_temporary_' . \uniqid();
     $this->query('CREATE TEMPORARY TABLE {' . $tablename . '} Engine=MEMORY ' . $query, $args, $options);
     return $tablename;
   }
@@ -282,7 +282,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // @see https://github.com/MariaDB/server/blob/f6633bf058802ad7da8196d01fd19d75c53f7274/include/mysql_com.h#L42.
     $regex = '/^(?:5\.5\.5-)?(\d+\.\d+\.\d+.*-mariadb.*)/i';
 
-    preg_match($regex, $this->getServerVersion(), $matches);
+    \preg_match($regex, $this->getServerVersion(), $matches);
     return (empty($matches[1])) ? NULL : $matches[1];
   }
 

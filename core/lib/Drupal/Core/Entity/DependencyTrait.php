@@ -31,15 +31,15 @@ trait DependencyTrait {
   protected function addDependency($type, $name) {
     if (empty($this->dependencies[$type])) {
       $this->dependencies[$type] = [$name];
-      if (count($this->dependencies) > 1) {
+      if (\count($this->dependencies) > 1) {
         // Ensure a consistent order of type keys.
-        ksort($this->dependencies);
+        \ksort($this->dependencies);
       }
     }
-    elseif (!in_array($name, $this->dependencies[$type])) {
+    elseif (!\in_array($name, $this->dependencies[$type])) {
       $this->dependencies[$type][] = $name;
       // Ensure a consistent order of dependency names.
-      sort($this->dependencies[$type], SORT_FLAG_CASE);
+      \sort($this->dependencies[$type], SORT_FLAG_CASE);
     }
     return $this;
   }

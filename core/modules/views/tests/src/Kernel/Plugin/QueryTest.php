@@ -79,7 +79,7 @@ class QueryTest extends ViewsKernelTestBase {
 
     $view->initQuery();
     $this->assertNull($view->query->getLimit(), 'Default to an empty limit.');
-    $rand_number = rand(5, 10);
+    $rand_number = \rand(5, 10);
     $view->query->setLimit($rand_number);
     $this->assertEquals($rand_number, $view->query->getLimit(), 'set_limit adapts the amount of items.');
   }

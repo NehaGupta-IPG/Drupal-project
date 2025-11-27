@@ -79,7 +79,7 @@ abstract class OptionsDynamicValuesTestBase extends FieldTestBase {
     // Create an entity and prepare test data that will be used by
     // \Drupal\options_test\OptionsAllowedValues::dynamicValues().
     $values = [
-      'user_id' => mt_rand(1, 10),
+      'user_id' => \mt_rand(1, 10),
       'name' => $this->randomMachineName(),
     ];
     $this->entity = EntityTestRev::create($values);

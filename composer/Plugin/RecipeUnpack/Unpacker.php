@@ -82,7 +82,7 @@ final readonly class Unpacker {
         else {
           // This recipe should not be unpacked. But it might need to be added
           // to the root composer.json
-          $this->io->write(sprintf('<info>%s</info> not unpacked because it is ignored.', $package->getName()), verbosity: IOInterface::VERBOSE);
+          $this->io->write(\sprintf('<info>%s</info> not unpacked because it is ignored.', $package->getName()), verbosity: IOInterface::VERBOSE);
         }
       }
 
@@ -133,26 +133,26 @@ final readonly class Unpacker {
           $recipe_constraint_string,
           $sort_packages,
       )) {
-        throw new \RuntimeException(sprintf('Unable to manipulate composer.json during the unpack of %s',
+        throw new \RuntimeException(\sprintf('Unable to manipulate composer.json during the unpack of %s',
           $dependency_name,
         ));
       }
       $link = new Link($root_package->getName(), $dependency_name, $this->versionParser->parseConstraints($recipe_constraint_string), Link::TYPE_REQUIRE, $recipe_constraint_string);
       $root_requires[$dependency_name] = $link;
       unset($root_dev_requires[$dependency_name]);
-      $this->io->write(sprintf('Adding <info>%s</info> (<comment>%s</comment>) to composer.json during the unpack of <info>%s</info>', $dependency_name, $recipe_constraint_string, $this->package->getName()), verbosity: IOInterface::VERBOSE);
+      $this->io->write(\sprintf('Adding <info>%s</info> (<comment>%s</comment>) to composer.json during the unpack of <info>%s</info>', $dependency_name, $recipe_constraint_string, $this->package->getName()), verbosity: IOInterface::VERBOSE);
     }
 
     // Ensure the written packages are no longer in the dev package names.
     $local_repo = $this->composer->getRepositoryManager()->getLocalRepository();
-    $local_repo->setDevPackageNames(array_diff($local_repo->getDevPackageNames(), array_keys($root_requires)));
+    $local_repo->setDevPackageNames(\array_diff($local_repo->getDevPackageNames(), \array_keys($root_requires)));
 
     // Update the root package to reflect the changes.
     $root_package->setDevRequires($root_dev_requires);
     $root_package->setRequires($root_requires);
 
     $composer_manipulator->removeSubNode(UnpackManager::isDevRequirement($this->package) ? 'require-dev' : 'require', $this->package->getName());
-    $this->io->write(sprintf('Removing <info>%s</info> from composer.json', $this->package->getName()), verbosity: IOInterface::VERBOSE);
+    $this->io->write(\sprintf('Removing <info>%s</info> from composer.json', $this->package->getName()), verbosity: IOInterface::VERBOSE);
 
     $composer_manipulator->removeMainKeyIfEmpty('require-dev');
   }
@@ -191,7 +191,7 @@ final readonly class Unpacker {
         break;
       }
     }
-    $local_repo->setDevPackageNames(array_diff($local_repo->getDevPackageNames(), [$this->package->getName()]));
+    $local_repo->setDevPackageNames(\array_diff($local_repo->getDevPackageNames(), [$this->package->getName()]));
     $local_repo->removePackage($this->package);
     if (isset($root_dev_requires[$this->package->getName()])) {
       unset($root_dev_requires[$this->package->getName()]);

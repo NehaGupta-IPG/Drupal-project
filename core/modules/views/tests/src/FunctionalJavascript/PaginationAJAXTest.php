@@ -87,7 +87,7 @@ class PaginationAJAXTest extends WebDriverTestBase {
 
     // Make sure that the view_path is set correctly.
     $expected_view_path = '/test-content-ajax';
-    $this->assertEquals($expected_view_path, current($settings['views']['ajaxViews'])['view_path']);
+    $this->assertEquals($expected_view_path, \current($settings['views']['ajaxViews'])['view_path']);
 
     // Set the number of items displayed per page to 5 using the exposed pager.
     $page->selectFieldOption('edit-items-per-page', '5');
@@ -146,7 +146,7 @@ class PaginationAJAXTest extends WebDriverTestBase {
 
     // Make sure the AJAX calls don't change the view_path.
     $settings = $this->getDrupalSettings();
-    $this->assertEquals($expected_view_path, current($settings['views']['ajaxViews'])['view_path']);
+    $this->assertEquals($expected_view_path, \current($settings['views']['ajaxViews'])['view_path']);
   }
 
   /**
@@ -171,7 +171,7 @@ class PaginationAJAXTest extends WebDriverTestBase {
 
     // Make sure that the view_path is set correctly.
     $expected_view_path = '/test-content-ajax';
-    $this->assertEquals($expected_view_path, current($settings['views']['ajaxViews'])['view_path']);
+    $this->assertEquals($expected_view_path, \current($settings['views']['ajaxViews'])['view_path']);
 
     // Set the number of items displayed per page to 5 using the exposed pager.
     $page->selectFieldOption('edit-items-per-page', '5');
@@ -244,7 +244,7 @@ class PaginationAJAXTest extends WebDriverTestBase {
 
     // Make sure the AJAX calls don't change the view_path.
     $settings = $this->getDrupalSettings();
-    $this->assertEquals($expected_view_path, current($settings['views']['ajaxViews'])['view_path']);
+    $this->assertEquals($expected_view_path, \current($settings['views']['ajaxViews'])['view_path']);
   }
 
   /**

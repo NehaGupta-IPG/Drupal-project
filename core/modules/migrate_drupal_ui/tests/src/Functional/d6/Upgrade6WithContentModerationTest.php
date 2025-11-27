@@ -43,10 +43,10 @@ class Upgrade6WithContentModerationTest extends Upgrade6Test {
       $this->drupalCreateContentType(['type' => $type]);
     }
     $editorial = Workflow::load('editorial');
-    assert($editorial instanceof WorkflowInterface);
+    \assert($editorial instanceof WorkflowInterface);
     $type_settings = $editorial->getTypePlugin()->getConfiguration();
     $type_settings['default_moderation_state'] = 'published';
-    $type_settings['entity_types']['node'] = array_merge(
+    $type_settings['entity_types']['node'] = \array_merge(
       ['page'],
       $types
     );

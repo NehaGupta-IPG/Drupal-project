@@ -18,9 +18,9 @@ class TestingRequirementsRequirements implements InstallRequirementsInterface {
   public static function getRequirements(): array {
     $requirements = [];
     $requirements['testing_requirements'] = [
-      'title' => t('Testing requirements'),
+      'title' => \t('Testing requirements'),
       'severity' => RequirementSeverity::Error,
-      'description' => t('Testing requirements failed requirements.'),
+      'description' => \t('Testing requirements failed requirements.'),
     ];
 
     return $requirements;

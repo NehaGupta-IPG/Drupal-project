@@ -60,7 +60,7 @@ class Counter extends FieldPluginBase {
   public function getValue(ResultRow $values, $field = NULL) {
     // Note:  1 is subtracted from the counter start value below because the
     // counter value is incremented by 1 at the end of this function.
-    $count = is_numeric($this->options['counter_start']) ? $this->options['counter_start'] - 1 : 0;
+    $count = \is_numeric($this->options['counter_start']) ? $this->options['counter_start'] - 1 : 0;
     $pager = $this->view->pager;
     // Get the base count of the pager.
     if ($pager->usePager()) {

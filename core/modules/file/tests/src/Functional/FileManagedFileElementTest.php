@@ -141,13 +141,13 @@ class FileManagedFileElementTest extends FileFieldTestBase {
     // Save the entire form.
     $this->submitForm([], 'Save');
     // Check that two files are saved into a single multiple file element.
-    $this->assertSession()->pageTextContains("The file ids are " . implode(',', $fid_list) . ".");
+    $this->assertSession()->pageTextContains("The file ids are " . \implode(',', $fid_list) . ".");
 
     // Delete only the first file.
     $edit = [
       'nested[file][file_' . $fid_list[0] . '][selected]' => '1',
     ];
-    $this->drupalGet($path . '/' . implode(',', $fid_list));
+    $this->drupalGet($path . '/' . \implode(',', $fid_list));
     $this->submitForm($edit, 'Remove selected');
 
     // Check that the first file has been deleted but not the second.
@@ -180,7 +180,7 @@ class FileManagedFileElementTest extends FileFieldTestBase {
    * Tests file names have leading . removed.
    */
   public function testFileNameTrim(): void {
-    file_put_contents('public://.leading-period.txt', $this->randomString(32));
+    \file_put_contents('public://.leading-period.txt', $this->randomString(32));
     $last_fid_prior = $this->getLastFileId();
     $this->drupalGet('file/test/0/0/0');
     $this->submitForm(['files[file]' => \Drupal::service('file_system')->realpath('public://.leading-period.txt')], 'Save');

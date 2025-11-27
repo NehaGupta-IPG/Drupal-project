@@ -32,8 +32,8 @@ final class Destructable implements DestructableInterface {
    * {@inheritdoc}
    */
   public function destruct() {
-    sleep(3);
-    file_put_contents($this->semaphore, 'ran');
+    \sleep(3);
+    \file_put_contents($this->semaphore, 'ran');
   }
 
 }

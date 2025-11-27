@@ -206,7 +206,7 @@ abstract class StylePluginBase extends PluginBase {
   public function usesTokens() {
     if ($this->usesRowClass()) {
       $class = $this->options['row_class'];
-      if (str_contains($class, '{{')) {
+      if (\str_contains($class, '{{')) {
         return TRUE;
       }
     }
@@ -229,14 +229,14 @@ abstract class StylePluginBase extends PluginBase {
     if ($this->usesRowClass()) {
       $class = $this->options['row_class'];
       if ($this->usesFields() && $this->view->field) {
-        $class = strip_tags($this->tokenizeValue($class, $row_index));
+        $class = \strip_tags($this->tokenizeValue($class, $row_index));
       }
 
-      $classes = explode(' ', $class);
+      $classes = \explode(' ', $class);
       foreach ($classes as &$class) {
         $class = Html::cleanCssIdentifier($class);
       }
-      return implode(' ', $classes);
+      return \implode(' ', $classes);
     }
   }
 
@@ -244,7 +244,7 @@ abstract class StylePluginBase extends PluginBase {
    * Take a value and apply token replacement logic to it.
    */
   public function tokenizeValue($value, $row_index) {
-    if (str_contains($value, '{{')) {
+    if (\str_contains($value, '{{')) {
       // Row tokens might be empty, for example for node row style.
       $tokens = $this->rowTokens[$row_index] ?? [];
       if (!empty($this->view->build_info['substitutions'])) {
@@ -297,20 +297,20 @@ abstract class StylePluginBase extends PluginBase {
       $field_labels = $this->displayHandler->getFieldLabels(TRUE);
       $options += $field_labels;
       // If there are no fields, we can't group on them.
-      if (count($options) > 1) {
+      if (\count($options) > 1) {
         // This is for backward compatibility, when there was just a single
         // select form.
-        if (is_string($this->options['grouping'])) {
+        if (\is_string($this->options['grouping'])) {
           $grouping = $this->options['grouping'];
           $this->options['grouping'] = [];
           $this->options['grouping'][0]['field'] = $grouping;
         }
-        if (isset($this->options['group_rendered']) && is_string($this->options['group_rendered'])) {
+        if (isset($this->options['group_rendered']) && \is_string($this->options['group_rendered'])) {
           $this->options['grouping'][0]['rendered'] = $this->options['group_rendered'];
           unset($this->options['group_rendered']);
         }
 
-        $c = count($this->options['grouping']);
+        $c = \count($this->options['grouping']);
         // Add a form for every grouping, plus one.
         for ($i = 0; $i <= $c; $i++) {
           $grouping = !empty($this->options['grouping'][$i]) ? $this->options['grouping'][$i] : [];
@@ -495,9 +495,9 @@ abstract class StylePluginBase extends PluginBase {
     foreach ($sets as $set) {
       $level = $set['level'] ?? 0;
 
-      $row = reset($set['rows']);
+      $row = \reset($set['rows']);
       // Render as a grouping set.
-      if (is_array($row) && isset($row['group'])) {
+      if (\is_array($row) && isset($row['group'])) {
         $single_output = [
           '#theme' => $theme_functions,
           '#view' => $this->view,
@@ -570,7 +570,7 @@ abstract class StylePluginBase extends PluginBase {
   public function renderGrouping($records, $groupings = [], $group_rendered = NULL) {
     // This is for backward compatibility, when $groupings was a string
     // containing the ID of a single field.
-    if (is_string($groupings)) {
+    if (\is_string($groupings)) {
       $rendered = $group_rendered ?? TRUE;
       $groupings = [['field' => $groupings, 'rendered' => $rendered]];
     }
@@ -602,15 +602,15 @@ abstract class StylePluginBase extends PluginBase {
             if ($rendered) {
               $grouping = (string) $group_content;
               if ($rendered_strip) {
-                $group_content = $grouping = strip_tags(htmlspecialchars_decode($group_content));
+                $group_content = $grouping = \strip_tags(\htmlspecialchars_decode($group_content));
               }
             }
             else {
               $grouping = $this->getFieldValue($index, $field);
               // Not all field handlers return a scalar value,
               // e.g. views_handler_field_field.
-              if (!is_scalar($grouping)) {
-                $grouping = hash('sha256', serialize($grouping));
+              if (!\is_scalar($grouping)) {
+                $grouping = \hash('sha256', \serialize($grouping));
               }
             }
           }
@@ -667,12 +667,12 @@ abstract class StylePluginBase extends PluginBase {
     if (!isset($this->rendered_fields)) {
       $this->rendered_fields = [];
       $this->view->row_index = 0;
-      $field_ids = array_keys($this->view->field);
+      $field_ids = \array_keys($this->view->field);
 
       // Only tokens relating to field handlers preceding the one we invoke
       // ::getRenderTokens() on are returned, so here we need to pick the last
       // available field handler.
-      $render_tokens_field_id = end($field_ids);
+      $render_tokens_field_id = \end($field_ids);
 
       // If all fields have a field::access FALSE there might be no fields, so
       // there is no reason to execute this code.
@@ -735,12 +735,12 @@ abstract class StylePluginBase extends PluginBase {
 
           // Replace post-render tokens.
           if ($post_render_tokens) {
-            $placeholders = array_keys($post_render_tokens);
-            $values = array_values($post_render_tokens);
+            $placeholders = \array_keys($post_render_tokens);
+            $values = \array_values($post_render_tokens);
             foreach ($this->rendered_fields[$index] as &$rendered_field) {
               // Placeholders and rendered fields have been processed by the
               // render system and are therefore safe.
-              $rendered_field = ViewsRenderPipelineMarkup::create(str_replace($placeholders, $values, $rendered_field));
+              $rendered_field = ViewsRenderPipelineMarkup::create(\str_replace($placeholders, $values, $rendered_field));
             }
           }
         }
@@ -829,8 +829,8 @@ abstract class StylePluginBase extends PluginBase {
       }
       else {
         $result = $plugin->validate();
-        if (!empty($result) && is_array($result)) {
-          $errors = array_merge($errors, $result);
+        if (!empty($result) && \is_array($result)) {
+          $errors = \array_merge($errors, $result);
         }
       }
     }

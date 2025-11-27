@@ -37,10 +37,10 @@ class PhpArrayDumperTest extends OptimizedPhpArrayDumperTest {
    */
   protected static function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): string {
     if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-      return sprintf('@?%s', $id);
+      return \sprintf('@?%s', $id);
     }
 
-    return sprintf('@%s', $id);
+    return \sprintf('@%s', $id);
   }
 
   /**

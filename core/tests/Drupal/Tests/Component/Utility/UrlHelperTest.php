@@ -124,14 +124,14 @@ class UrlHelperTest extends TestCase {
    */
   public function testCompressUncompress(): void {
     $data = [];
-    while (count($data) < 30) {
-      $data[] = 'drupal/drupal' . count($data);
+    while (\count($data) < 30) {
+      $data[] = 'drupal/drupal' . \count($data);
     }
-    $data = implode(',', $data);
+    $data = \implode(',', $data);
     $compressed = UrlHelper::compressQueryParameter($data);
     $uncompressed = UrlHelper::uncompressQueryParameter($compressed);
     $this->assertEquals($data, $uncompressed);
-    $this->assertLessThan(strlen($uncompressed), strlen($compressed));
+    $this->assertLessThan(\strlen($uncompressed), \strlen($compressed));
   }
 
   /**
@@ -472,10 +472,10 @@ class UrlHelperTest extends TestCase {
       ["\x1F//www.example.com", TRUE],
       ["\n//www.example.com", TRUE],
       // JSON supports decoding directly from UTF-8 code points.
-      [json_decode('"\u00AD"') . "//www.example.com", TRUE],
-      [json_decode('"\u200E"') . "//www.example.com", TRUE],
-      [json_decode('"\uE0020"') . "//www.example.com", TRUE],
-      [json_decode('"\uE000"') . "//www.example.com", TRUE],
+      [\json_decode('"\u00AD"') . "//www.example.com", TRUE],
+      [\json_decode('"\u200E"') . "//www.example.com", TRUE],
+      [\json_decode('"\uE0020"') . "//www.example.com", TRUE],
+      [\json_decode('"\uE000"') . "//www.example.com", TRUE],
       // Backslashes should be normalized to forward.
       ['\\\\example.com', TRUE],
       // Local URLs.

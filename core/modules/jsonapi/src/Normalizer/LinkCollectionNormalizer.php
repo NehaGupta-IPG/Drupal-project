@@ -82,15 +82,15 @@ class LinkCollectionNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
-    assert($object instanceof LinkCollection);
+    \assert($object instanceof LinkCollection);
     $normalized = [];
     /** @var \Drupal\jsonapi\JsonApiResource\Link $link */
     foreach ($object as $key => $links) {
-      $is_multiple = count($links) > 1;
+      $is_multiple = \count($links) > 1;
       foreach ($links as $link) {
-        $link_key = $is_multiple ? sprintf('%s--%s', $key, $this->hashByHref($link)) : $key;
+        $link_key = $is_multiple ? \sprintf('%s--%s', $key, $this->hashByHref($link)) : $key;
         $attributes = $link->getTargetAttributes();
-        $normalization = array_merge(['href' => $link->getHref()], !empty($attributes) ? ['meta' => $attributes] : []);
+        $normalization = \array_merge(['href' => $link->getHref()], !empty($attributes) ? ['meta' => $attributes] : []);
         // Checking access on links is not about access to the link itself;
         // it is about whether the current user has access to the route that is
         // *targeted* by the link. This is done on a "best effort" basis. That
@@ -136,13 +136,13 @@ class LinkCollectionNormalizer extends NormalizerBase {
     ] + $link->getTargetAttributes();
     // Serialize the dictionary into a string.
     foreach ($link_parameters as $name => $value) {
-      $serialized_parameters[] = sprintf('%s="%s"', $name, implode(' ', (array) $value));
+      $serialized_parameters[] = \sprintf('%s="%s"', $name, \implode(' ', (array) $value));
     }
     // Hash the string.
-    $b64_hash = Crypt::hashBase64($this->hashSalt . implode('; ', $serialized_parameters));
+    $b64_hash = Crypt::hashBase64($this->hashSalt . \implode('; ', $serialized_parameters));
     // Remove any dashes and underscores from the base64 hash and then return
     // the first 7 characters.
-    return substr(str_replace(['-', '_'], '', $b64_hash), 0, 7);
+    return \substr(\str_replace(['-', '_'], '', $b64_hash), 0, 7);
   }
 
   /**

@@ -27,7 +27,7 @@ abstract class StyleTestBase extends ViewsKernelTestBase {
     if ($htmlDom) {
       // It's much easier to work with simplexml than DOM, luckily enough
       // we can just simply import our DOM tree.
-      $this->elements = simplexml_import_dom($htmlDom);
+      $this->elements = \simplexml_import_dom($htmlDom);
     }
   }
 

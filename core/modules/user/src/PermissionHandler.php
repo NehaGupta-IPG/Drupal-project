@@ -154,11 +154,11 @@ class PermissionHandler implements PermissionHandlerInterface {
       if (isset($permissions['permission_callbacks'])) {
         foreach ($permissions['permission_callbacks'] as $permission_callback) {
           $callback = $this->callableResolver->getCallableFromDefinition($permission_callback);
-          if ($callback_permissions = call_user_func($callback)) {
+          if ($callback_permissions = \call_user_func($callback)) {
             // Add any callback permissions to the array of permissions. Any
             // defaults can then get processed below.
             foreach ($callback_permissions as $name => $callback_permission) {
-              if (!is_array($callback_permission)) {
+              if (!\is_array($callback_permission)) {
                 $callback_permission = [
                   'title' => $callback_permission,
                 ];
@@ -178,7 +178,7 @@ class PermissionHandler implements PermissionHandlerInterface {
       }
 
       foreach ($permissions as &$permission) {
-        if (!is_array($permission)) {
+        if (!\is_array($permission)) {
           $permission = [
             'title' => $permission,
           ];
@@ -213,7 +213,7 @@ class PermissionHandler implements PermissionHandlerInterface {
     // display name.
     $modules = $this->getModuleNames();
 
-    uasort($all_permissions, function (array $permission_a, array $permission_b) use ($modules) {
+    \uasort($all_permissions, function (array $permission_a, array $permission_b) use ($modules) {
       if ($modules[$permission_a['provider']] == $modules[$permission_b['provider']]) {
         return $permission_a['title'] <=> $permission_b['title'];
       }
@@ -232,10 +232,10 @@ class PermissionHandler implements PermissionHandlerInterface {
    */
   protected function getModuleNames() {
     $modules = [];
-    foreach (array_keys($this->moduleHandler->getModuleList()) as $module) {
+    foreach (\array_keys($this->moduleHandler->getModuleList()) as $module) {
       $modules[$module] = $this->moduleExtensionList->getName($module);
     }
-    asort($modules);
+    \asort($modules);
     return $modules;
   }
 

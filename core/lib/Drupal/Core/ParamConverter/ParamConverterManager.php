@@ -36,7 +36,7 @@ class ParamConverterManager implements ParamConverterManagerInterface {
       return $this->converters[$converter];
     }
     else {
-      throw new \InvalidArgumentException(sprintf('No converter has been registered for %s', $converter));
+      throw new \InvalidArgumentException(\sprintf('No converter has been registered for %s', $converter));
     }
   }
 
@@ -57,7 +57,7 @@ class ParamConverterManager implements ParamConverterManagerInterface {
           continue;
         }
 
-        foreach (array_keys($this->converters) as $converter) {
+        foreach (\array_keys($this->converters) as $converter) {
           if ($this->getConverter($converter)->applies($definition, $name, $route)) {
             $definition['converter'] = $converter;
             break;
@@ -101,7 +101,7 @@ class ParamConverterManager implements ParamConverterManagerInterface {
       if (!isset($defaults[$name])) {
         $message = 'The "%s" parameter was not converted for the path "%s" (route name: "%s")';
         $route_name = $defaults[RouteObjectInterface::ROUTE_NAME];
-        throw new ParamNotConvertedException(sprintf($message, $name, $route->getPath(), $route_name), 0, NULL, $route_name, [$name => $value]);
+        throw new ParamNotConvertedException(\sprintf($message, $name, $route->getPath(), $route_name), 0, NULL, $route_name, [$name => $value]);
       }
     }
 

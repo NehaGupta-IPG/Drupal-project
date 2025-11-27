@@ -108,7 +108,7 @@ class MachineName extends Textfield {
     if ($input !== FALSE && $input !== NULL) {
       // This should be a string, but allow other scalars since they might be
       // valid input in programmatic form submissions.
-      return is_scalar($input) ? (string) $input : '';
+      return \is_scalar($input) ? (string) $input : '';
     }
     return NULL;
   }
@@ -132,8 +132,8 @@ class MachineName extends Textfield {
 
     // Apply default form element properties.
     $element += [
-      '#title' => t('Machine-readable name'),
-      '#description' => t('A unique machine-readable name. Can only contain lowercase letters, numbers, and underscores.'),
+      '#title' => \t('Machine-readable name'),
+      '#description' => \t('A unique machine-readable name. Can only contain lowercase letters, numbers, and underscores.'),
       '#machine_name' => [],
       '#field_prefix' => '',
       '#field_suffix' => '',
@@ -146,7 +146,7 @@ class MachineName extends Textfield {
     $element['#machine_name'] += [
       'source' => ['label'],
       'target' => '#' . $element['#id'],
-      'label' => t('Machine name'),
+      'label' => \t('Machine name'),
       'replace_pattern' => '[^a-z0-9_]+',
       'replace' => '_',
       'standalone' => FALSE,
@@ -160,7 +160,7 @@ class MachineName extends Textfield {
     $initial_values = $form_state->get('machine_name.initial_values') ?: [];
     // Store the initial values in an array so we can differentiate between a
     // NULL default value and a new machine name element.
-    if (!array_key_exists($element['#name'], $initial_values)) {
+    if (!\array_key_exists($element['#name'], $initial_values)) {
       $initial_values[$element['#name']] = $element['#default_value'];
       $form_state->set('machine_name.initial_values', $initial_values);
     }
@@ -188,9 +188,9 @@ class MachineName extends Textfield {
 
     // The source element must be defined before the machine name element.
     if (!isset($source['#id'])) {
-      $element_parents = implode('][', $element['#array_parents']);
-      $source_parents = implode('][', $element['#machine_name']['source']);
-      throw new \LogicException(sprintf('The machine name element "%s" is defined before the source element "%s", it must be defined after or the source element must specify an id.', $element_parents, $source_parents));
+      $element_parents = \implode('][', $element['#array_parents']);
+      $source_parents = \implode('][', $element['#machine_name']['source']);
+      throw new \LogicException(\sprintf('The machine name element "%s" is defined before the source element "%s", it must be defined after or the source element must specify an id.', $element_parents, $source_parents));
     }
 
     $suffix_id = $source['#id'] . '-machine-name-suffix';
@@ -205,7 +205,7 @@ class MachineName extends Textfield {
       $source += ['#field_suffix' => ''];
       $source['#field_suffix'] = $source['#field_suffix'] . ' <small id="' . $suffix_id . '">&nbsp;</small>';
 
-      $parents = array_merge($element['#machine_name']['source'], ['#field_suffix']);
+      $parents = \array_merge($element['#machine_name']['source'], ['#field_suffix']);
       NestedArray::setValue($form_state->getCompleteForm(), $parents, $source['#field_suffix']);
     }
 
@@ -226,7 +226,7 @@ class MachineName extends Textfield {
     $token_generator = \Drupal::service('csrf_token');
     $element['#machine_name']['replace_token'] = $token_generator->get($element['#machine_name']['replace_pattern']);
 
-    $element['#attached']['drupalSettings']['machineName']['#' . $source['#id']] = array_intersect_key($element['#machine_name'], array_flip($options));
+    $element['#attached']['drupalSettings']['machineName']['#' . $source['#id']] = \array_intersect_key($element['#machine_name'], \array_flip($options));
     $element['#attached']['drupalSettings']['langcode'] = $language->getId();
     $element['#attached']['drupalSettings']['transliteration_language_overrides'] = static::getTransliterationLanguageOverrides($language);
 
@@ -247,21 +247,21 @@ class MachineName extends Textfield {
    */
   public static function validateMachineName(&$element, FormStateInterface $form_state, &$complete_form) {
     // Verify that the machine name not only consists of replacement tokens.
-    if (preg_match('@^' . $element['#machine_name']['replace'] . '+$@', $element['#value'])) {
-      $form_state->setError($element, t('The machine-readable name must contain unique characters.'));
+    if (\preg_match('@^' . $element['#machine_name']['replace'] . '+$@', $element['#value'])) {
+      $form_state->setError($element, \t('The machine-readable name must contain unique characters.'));
     }
 
     // Verify that the machine name contains no disallowed characters.
-    if (preg_match('@' . $element['#machine_name']['replace_pattern'] . '@', $element['#value'])) {
+    if (\preg_match('@' . $element['#machine_name']['replace_pattern'] . '@', $element['#value'])) {
       if (!isset($element['#machine_name']['error'])) {
         // Since a hyphen is the most common alternative replacement character,
         // a corresponding validation error message is supported here.
         if ($element['#machine_name']['replace'] == '-') {
-          $form_state->setError($element, t('The machine-readable name must contain only lowercase letters, numbers, and hyphens.'));
+          $form_state->setError($element, \t('The machine-readable name must contain only lowercase letters, numbers, and hyphens.'));
         }
         // Otherwise, we assume the default (underscore).
         else {
-          $form_state->setError($element, t('The machine-readable name must contain only lowercase letters, numbers, and underscores.'));
+          $form_state->setError($element, \t('The machine-readable name must contain only lowercase letters, numbers, and underscores.'));
         }
       }
       else {
@@ -273,10 +273,10 @@ class MachineName extends Textfield {
     // default value then it does not need to be validated as the machine name
     // element assumes the form is editing the existing value.
     $initial_values = $form_state->get('machine_name.initial_values') ?: [];
-    if (!array_key_exists($element['#name'], $initial_values) || $initial_values[$element['#name']] !== $element['#value']) {
+    if (!\array_key_exists($element['#name'], $initial_values) || $initial_values[$element['#name']] !== $element['#value']) {
       $function = $element['#machine_name']['exists'];
-      if (call_user_func($function, $element['#value'], $element, $form_state)) {
-        $form_state->setError($element, t('The machine-readable name is already in use. It must be unique.'));
+      if (\call_user_func($function, $element['#value'], $element, $form_state)) {
+        $form_state->setError($element, \t('The machine-readable name is already in use. It must be unique.'));
       }
     }
   }
@@ -297,10 +297,10 @@ class MachineName extends Textfield {
       return $overrides[$langcode];
     }
 
-    $file = dirname(__DIR__, 3) . '/Component/Transliteration/data/' . preg_replace('/[^a-zA-Z\-]/', '', $langcode) . '.php';
+    $file = \dirname(__DIR__, 3) . '/Component/Transliteration/data/' . \preg_replace('/[^a-zA-Z\-]/', '', $langcode) . '.php';
 
     $overrides[$langcode] = [];
-    if (is_file($file)) {
+    if (\is_file($file)) {
       include $file;
     }
 

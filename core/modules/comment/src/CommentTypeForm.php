@@ -173,7 +173,7 @@ class CommentTypeForm extends EntityForm {
    *   TRUE if entity-type uses integer IDs.
    */
   protected function entityTypeSupportsComments(EntityTypeInterface $entity_type) {
-    return $entity_type->entityClassImplements(FieldableEntityInterface::class) && _comment_entity_uses_integer_id($entity_type->id());
+    return $entity_type->entityClassImplements(FieldableEntityInterface::class) && \_comment_entity_uses_integer_id($entity_type->id());
   }
 
   /**

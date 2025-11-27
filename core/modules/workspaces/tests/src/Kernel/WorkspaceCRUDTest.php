@@ -193,7 +193,7 @@ class WorkspaceCRUDTest extends KernelTestBase {
 
     // Check that the actual node revisions were deleted as well.
     $node_storage = $this->entityTypeManager->getStorage('node');
-    $this->assertEmpty($node_storage->loadMultipleRevisions(array_keys($associated_revisions)));
+    $this->assertEmpty($node_storage->loadMultipleRevisions(\array_keys($associated_revisions)));
 
     // 'workspace_2 'is empty now.
     $associated_revisions = $workspace_tracker->getAllTrackedRevisions($workspace_2->id(), 'node', [$workspace_2_node_1->id()]);

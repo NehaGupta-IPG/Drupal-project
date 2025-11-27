@@ -68,12 +68,12 @@ class MTimeProtectedFastFileStorage extends FileStorage {
     // Write the file out to a temporary location. Prepend with a '.' to keep it
     // hidden from listings and web servers.
     $temporary_path = $this->tempnam($this->directory, '.');
-    if (!$temporary_path || !@file_put_contents($temporary_path, $data)) {
+    if (!$temporary_path || !@\file_put_contents($temporary_path, $data)) {
       return FALSE;
     }
     // The file will not be chmod() in the future so this is the final
     // permission.
-    chmod($temporary_path, 0444);
+    \chmod($temporary_path, 0444);
 
     // Determine the exact modification time of the file.
     $mtime = $this->getUncachedMTime($temporary_path);
@@ -85,7 +85,7 @@ class MTimeProtectedFastFileStorage extends FileStorage {
     $directory = $this->getContainingDirectoryFullPath($name);
     $this->ensureDirectory($directory);
     $full_path = $this->getFullPath($name, $directory, $mtime);
-    $result = rename($temporary_path, $full_path);
+    $result = \rename($temporary_path, $full_path);
 
     // Finally reset the modification time of the directory to match the one of
     // the newly created file. In order to prevent the creation of a file if the
@@ -97,7 +97,7 @@ class MTimeProtectedFastFileStorage extends FileStorage {
     // Hence updating the mtime here is comparable to pointing a symbolic link
     // at a new target, i.e., the newly created file.
     if ($result) {
-      $result &= touch($directory . '/', $mtime);
+      $result &= \touch($directory . '/', $mtime);
     }
 
     return (bool) $result;
@@ -130,7 +130,7 @@ class MTimeProtectedFastFileStorage extends FileStorage {
       $directory = $this->getContainingDirectoryFullPath($name);
     }
     if (!isset($directory_mtime)) {
-      $directory_mtime = file_exists($directory) ? filemtime($directory) : 0;
+      $directory_mtime = \file_exists($directory) ? \filemtime($directory) : 0;
     }
     return $directory . '/' . Crypt::hmacBase64($name, $this->secret . $directory_mtime) . '.php';
   }
@@ -140,7 +140,7 @@ class MTimeProtectedFastFileStorage extends FileStorage {
    */
   public function delete($name) {
     $path = $this->getContainingDirectoryFullPath($name);
-    if (file_exists($path)) {
+    if (\file_exists($path)) {
       return $this->unlink($path);
     }
     return FALSE;
@@ -165,12 +165,12 @@ class MTimeProtectedFastFileStorage extends FileStorage {
       }
 
       $directory_unlink = TRUE;
-      $directory_mtime = filemtime($directory);
+      $directory_mtime = \filemtime($directory);
       foreach ($dir_iterator as $fileinfo) {
         if ($directory_mtime > $fileinfo->getMTime()) {
           // Ensure the folder is writable.
-          @chmod($directory, 0777);
-          @unlink($fileinfo->getPathName());
+          @\chmod($directory, 0777);
+          @\unlink($fileinfo->getPathName());
         }
         else {
           // The directory still contains valid files.
@@ -200,18 +200,18 @@ class MTimeProtectedFastFileStorage extends FileStorage {
     // file. Thus, when switching between MTimeProtectedFastFileStorage and
     // FileStorage, the subdirectory or the file cannot be created in case the
     // other file type exists already.
-    if (str_ends_with($name, '.php')) {
-      $name = substr($name, 0, -4);
+    if (\str_ends_with($name, '.php')) {
+      $name = \substr($name, 0, -4);
     }
-    return $this->directory . '/' . str_replace('/', '#', $name);
+    return $this->directory . '/' . \str_replace('/', '#', $name);
   }
 
   /**
    * Clears PHP's stat cache and returns the directory's mtime.
    */
   protected function getUncachedMTime($directory) {
-    clearstatcache(TRUE, $directory);
-    return filemtime($directory);
+    \clearstatcache(TRUE, $directory);
+    return \filemtime($directory);
   }
 
   /**
@@ -228,7 +228,7 @@ class MTimeProtectedFastFileStorage extends FileStorage {
   protected function tempnam($directory, $prefix) {
     do {
       $path = $directory . '/' . $prefix . Crypt::randomBytesBase64(20);
-    } while (file_exists($path));
+    } while (\file_exists($path));
     return $path;
   }
 

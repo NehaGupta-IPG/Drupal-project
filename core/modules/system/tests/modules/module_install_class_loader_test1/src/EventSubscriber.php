@@ -24,7 +24,7 @@ class EventSubscriber implements EventSubscriberInterface {
     // are enabled in the same request the class_exists() will cause a crash.
     // This is because \Composer\Autoload\ClassLoader maintains a negative
     // cache.
-    if (class_exists('\Drupal\module_install_class_loader_test2\EventSubscriber')) {
+    if (\class_exists('\Drupal\module_install_class_loader_test2\EventSubscriber')) {
       $events = [];
     }
     return $events;

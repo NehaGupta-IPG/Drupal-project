@@ -120,7 +120,7 @@ class EarlyRenderingControllerWrapperSubscriber implements EventSubscriberInterf
 
     $response = $this->renderer->executeInRenderContext($context, function () use ($controller, $arguments) {
       // Now call the actual controller, just like HttpKernel does.
-      return call_user_func_array($controller, $arguments);
+      return \call_user_func_array($controller, $arguments);
     });
 
     // If early rendering happened, i.e. if code in the controller called
@@ -132,7 +132,7 @@ class EarlyRenderingControllerWrapperSubscriber implements EventSubscriberInterf
 
       // If a render array or AjaxResponse is returned by the controller, merge
       // the "lost" bubbleable metadata.
-      if (is_array($response)) {
+      if (\is_array($response)) {
         BubbleableMetadata::createFromRenderArray($response)
           ->merge($early_rendering_bubbleable_metadata)
           ->applyTo($response);
@@ -154,7 +154,7 @@ class EarlyRenderingControllerWrapperSubscriber implements EventSubscriberInterf
       // is not permitted in that case. It is the developer's responsibility
       // to not use early rendering.
       elseif ($response instanceof AttachmentsInterface || $response instanceof CacheableDependencyInterface) {
-        throw new \LogicException(sprintf('The controller result claims to be providing relevant cache metadata, but leaked metadata was detected. Ensure you are not rendering content too early. Returned object class: %s.', get_class($response)));
+        throw new \LogicException(\sprintf('The controller result claims to be providing relevant cache metadata, but leaked metadata was detected. Ensure you are not rendering content too early. Returned object class: %s.', \get_class($response)));
       }
       else {
         // A Response or domain object is returned that does not care about

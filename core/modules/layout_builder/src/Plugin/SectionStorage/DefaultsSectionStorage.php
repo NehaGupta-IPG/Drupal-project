@@ -168,7 +168,7 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
       $defaults['entity_type_id'] = $entity_type_id;
       // If the entity type has no bundles and it doesn't use {bundle} in its
       // admin path, use the entity type.
-      if (!str_contains($path, '{bundle}')) {
+      if (!\str_contains($path, '{bundle}')) {
         if (!$entity_type->hasKey('bundle')) {
           $defaults['bundle'] = $entity_type_id;
         }
@@ -219,7 +219,7 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
    *   An array of entity types.
    */
   protected function getEntityTypes() {
-    return array_filter($this->entityTypeManager->getDefinitions(), function (EntityTypeInterface $entity_type) {
+    return \array_filter($this->entityTypeManager->getDefinitions(), function (EntityTypeInterface $entity_type) {
       return $entity_type->entityClassImplements(FieldableEntityInterface::class) && $entity_type->hasHandlerClass('form', 'layout_builder') && $entity_type->hasViewBuilderClass() && $entity_type->get('field_ui_base_route');
     });
   }
@@ -271,8 +271,8 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
       $defaults['bundle'] = $defaults[$defaults['bundle_key']];
     }
 
-    if (is_string($value) && str_contains($value, '.')) {
-      [$entity_type_id, $bundle, $view_mode] = explode('.', $value, 3);
+    if (\is_string($value) && \str_contains($value, '.')) {
+      [$entity_type_id, $bundle, $view_mode] = \explode('.', $value, 3);
     }
     elseif (!empty($defaults['entity_type_id']) && !empty($defaults['bundle']) && !empty($defaults['view_mode_name'])) {
       $entity_type_id = $defaults['entity_type_id'];

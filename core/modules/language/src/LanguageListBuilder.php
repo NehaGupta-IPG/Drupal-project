@@ -87,7 +87,7 @@ class LanguageListBuilder extends DraggableListBuilder {
 
     // Sort the entities using the entity class's sort() method.
     // See \Drupal\Core\Config\Entity\ConfigEntityBase::sort().
-    uasort($entities, [$this->entityType->getClass(), 'sort']);
+    \uasort($entities, [$this->entityType->getClass(), 'sort']);
     return $entities;
   }
 

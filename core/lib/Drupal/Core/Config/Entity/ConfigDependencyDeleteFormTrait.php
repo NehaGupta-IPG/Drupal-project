@@ -71,12 +71,12 @@ trait ConfigDependencyDeleteFormTrait {
       $form['entity_updates']['#access'] = TRUE;
 
       // Add a weight key to the entity type sections.
-      asort($entity_types, SORT_FLAG_CASE);
+      \asort($entity_types, SORT_FLAG_CASE);
       $weight = 0;
       foreach ($entity_types as $entity_type_id => $label) {
         $form['entity_updates'][$entity_type_id]['#weight'] = $weight;
         // Sort the list of entity labels alphabetically.
-        ksort($form['entity_updates'][$entity_type_id]['#items'], SORT_FLAG_CASE);
+        \ksort($form['entity_updates'][$entity_type_id]['#items'], SORT_FLAG_CASE);
         $weight++;
       }
     }
@@ -108,13 +108,13 @@ trait ConfigDependencyDeleteFormTrait {
       $form['entity_deletes']['#access'] = TRUE;
 
       // Add a weight key to the entity type sections.
-      asort($entity_types, SORT_FLAG_CASE);
+      \asort($entity_types, SORT_FLAG_CASE);
       $weight = 0;
       foreach ($entity_types as $entity_type_id => $label) {
         if (isset($form['entity_deletes'][$entity_type_id])) {
           $form['entity_deletes'][$entity_type_id]['#weight'] = $weight;
           // Sort the list of entity labels alphabetically.
-          ksort($form['entity_deletes'][$entity_type_id]['#items'], SORT_FLAG_CASE);
+          \ksort($form['entity_deletes'][$entity_type_id]['#items'], SORT_FLAG_CASE);
           $weight++;
         }
       }

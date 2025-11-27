@@ -17,7 +17,7 @@ class TypedDataInternalPropertiesHelper {
    *   The non-internal properties, keyed by property name.
    */
   public static function getNonInternalProperties(ComplexDataInterface $data) {
-    return array_filter($data->getProperties(TRUE), function (TypedDataInterface $property) {
+    return \array_filter($data->getProperties(TRUE), function (TypedDataInterface $property) {
       return !$property->getDataDefinition()->isInternal();
     });
   }

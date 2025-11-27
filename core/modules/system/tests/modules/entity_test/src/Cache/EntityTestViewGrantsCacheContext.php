@@ -20,7 +20,7 @@ class EntityTestViewGrantsCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t("Entity test view grants");
+    return \t("Entity test view grants");
   }
 
   /**

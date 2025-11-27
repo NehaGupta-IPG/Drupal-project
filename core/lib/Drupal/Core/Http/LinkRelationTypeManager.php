@@ -52,7 +52,7 @@ class LinkRelationTypeManager extends DefaultPluginManager {
   protected function getDiscovery() {
     if (!$this->discovery) {
       $directories = ['core' => $this->root . '/core'];
-      $directories += array_map(function (Extension $extension) {
+      $directories += \array_map(function (Extension $extension) {
         return $this->root . '/' . $extension->getPath();
       }, $this->moduleHandler->getModuleList());
       $this->discovery = new YamlDiscovery('link_relation_types', $directories);

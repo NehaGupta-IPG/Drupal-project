@@ -80,7 +80,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
    */
   public function insertLogEntry(TestRun $test_run, array $entry): bool {
     $entry['test_id'] = $test_run->id();
-    $entry = array_merge([
+    $entry = \array_merge([
       'function' => 'Unknown',
       'line' => 0,
       'file' => 'Unknown',

@@ -199,7 +199,7 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
         $self = TRUE;
       }
       if (isset($this->configuration['source_ids'][$lookup_migration_id])) {
-        $lookup_value = array_values($row->getMultiple($this->configuration['source_ids'][$lookup_migration_id]));
+        $lookup_value = \array_values($row->getMultiple($this->configuration['source_ids'][$lookup_migration_id]));
       }
       $lookup_value = (array) $lookup_value;
       $this->skipInvalid($lookup_value);
@@ -220,11 +220,11 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
         throw $e;
       }
       catch (\Exception $e) {
-        throw new MigrateException(sprintf('A %s was thrown while processing this migration lookup', gettype($e)), $e->getCode(), $e);
+        throw new MigrateException(\sprintf('A %s was thrown while processing this migration lookup', \gettype($e)), $e->getCode(), $e);
       }
 
       if ($destination_id_array) {
-        $destination_ids = array_values(reset($destination_id_array));
+        $destination_ids = \array_values(\reset($destination_id_array));
         break;
       }
     }
@@ -233,7 +233,7 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
       return NULL;
     }
 
-    if (!$destination_ids && ($self || isset($this->configuration['stub_id']) || count($lookup_migration_ids) == 1)) {
+    if (!$destination_ids && ($self || isset($this->configuration['stub_id']) || \count($lookup_migration_ids) == 1)) {
       // If the lookup didn't succeed, figure out which migration will do the
       // stubbing.
       if ($self) {
@@ -243,7 +243,7 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
         $stub_migration = $this->configuration['stub_id'];
       }
       else {
-        $stub_migration = reset($lookup_migration_ids);
+        $stub_migration = \reset($lookup_migration_ids);
       }
       // Rethrow any exception as a MigrateException so the executable can shut
       // down the migration.
@@ -264,14 +264,14 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
         // Build a new message.
         $skip_row_exception_message = $e->getMessage();
         if (empty($skip_row_exception_message)) {
-          $new_message = sprintf("Migration lookup for value '%s' and destination '%s' attempted to create a stub using migration %s, which resulted in a row skip",
+          $new_message = \sprintf("Migration lookup for value '%s' and destination '%s' attempted to create a stub using migration %s, which resulted in a row skip",
             $value,
             $destination_property,
             $stub_migration,
           );
         }
         else {
-          $new_message = sprintf("Migration lookup for value '%s' and destination '%s' attempted to create a stub using migration %s, which resulted in a row skip, with message '%s'",
+          $new_message = \sprintf("Migration lookup for value '%s' and destination '%s' attempted to create a stub using migration %s, which resulted in a row skip, with message '%s'",
             $value,
             $destination_property,
             $stub_migration,
@@ -281,12 +281,12 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
         throw new MigrateSkipRowException($new_message, 0);
       }
       catch (\Exception $e) {
-        throw new MigrateException(sprintf('%s was thrown while attempting to stub: %s', get_class($e), $e->getMessage()), $e->getCode(), $e);
+        throw new MigrateException(\sprintf('%s was thrown while attempting to stub: %s', \get_class($e), $e->getMessage()), $e->getCode(), $e);
       }
     }
     if ($destination_ids) {
-      if (count($destination_ids) == 1) {
-        return reset($destination_ids);
+      if (\count($destination_ids) == 1) {
+        return \reset($destination_ids);
       }
       else {
         return $destination_ids;
@@ -301,7 +301,7 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
    *   The incoming value to check.
    */
   protected function skipInvalid(array $value) {
-    if (!array_filter($value, [$this, 'isValid'])) {
+    if (!\array_filter($value, [$this, 'isValid'])) {
       $this->stopPipeline();
     }
   }
@@ -318,7 +318,7 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
    *   Return true if the value is valid.
    */
   protected function isValid($value) {
-    return !in_array($value, [NULL, FALSE, [], ""], TRUE);
+    return !\in_array($value, [NULL, FALSE, [], ""], TRUE);
   }
 
 }

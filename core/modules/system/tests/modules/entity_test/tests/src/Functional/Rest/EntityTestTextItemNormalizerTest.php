@@ -49,7 +49,7 @@ class EntityTestTextItemNormalizerTest extends EntityTestResourceTestBase {
    */
   protected function setUpAuthorization($method) {
     parent::setUpAuthorization($method);
-    if (in_array($method, ['POST', 'PATCH'], TRUE)) {
+    if (\in_array($method, ['POST', 'PATCH'], TRUE)) {
       $this->grantPermissionsToTestedRole(['use text format my_text_format']);
     }
   }
@@ -186,7 +186,7 @@ class EntityTestTextItemNormalizerTest extends EntityTestResourceTestBase {
     $this->setUpAuthorization('GET');
     $response = $this->request('GET', $url, $request_options);
     $expected_cache_tags = Cache::mergeTags($expected_cache_tags, parent::getExpectedCacheTags());
-    $this->assertEqualsCanonicalizing($expected_cache_tags, explode(' ', $response->getHeader('X-Drupal-Cache-Tags')[0]));
+    $this->assertEqualsCanonicalizing($expected_cache_tags, \explode(' ', $response->getHeader('X-Drupal-Cache-Tags')[0]));
   }
 
   /**

@@ -60,8 +60,8 @@ class NodeSaveTest extends NodeTestBase {
       ->sort('nid', 'DESC')
       ->range(0, 1)
       ->execute();
-    $max_nid = reset($nids);
-    $test_nid = $max_nid + mt_rand(1000, 1000000);
+    $max_nid = \reset($nids);
+    $test_nid = $max_nid + \mt_rand(1000, 1000000);
     $title = $this->randomMachineName(8);
     $node = [
       'title' => $title,

@@ -118,8 +118,8 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
   public function setValue($values, $notify = TRUE) {
     // Treat the values as property value of the first property, if no array is
     // given.
-    if (isset($values) && !is_array($values)) {
-      $keys = array_keys($this->definition->getPropertyDefinitions());
+    if (isset($values) && !\is_array($values)) {
+      $keys = \array_keys($this->definition->getPropertyDefinitions());
       $values = [$keys[0] => $values];
     }
     parent::setValue($values, $notify);

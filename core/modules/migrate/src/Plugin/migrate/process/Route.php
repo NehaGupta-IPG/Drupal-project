@@ -96,7 +96,7 @@ class Route extends ProcessPluginBase implements ContainerFactoryPluginInterface
    * Set the destination route information based on the source link_path.
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    if (is_string($value)) {
+    if (\is_string($value)) {
       $link_path = $value;
       $options = [];
     }
@@ -122,8 +122,8 @@ class Route extends ProcessPluginBase implements ContainerFactoryPluginInterface
         if (isset($options['query'])) {
           // If the querystring is stored as a string (as in D6), convert it
           // into an array.
-          if (is_string($options['query'])) {
-            parse_str($options['query'], $old_query);
+          if (\is_string($options['query'])) {
+            \parse_str($options['query'], $old_query);
           }
           else {
             $old_query = $options['query'];

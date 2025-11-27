@@ -516,7 +516,7 @@ class ViewExecutable {
     $this->viewsData = $views_data;
     $this->routeProvider = $route_provider;
     if ($this->displayPluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $displayPluginManager argument is deprecated in drupal:10.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410349', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . ' without the $displayPluginManager argument is deprecated in drupal:10.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410349', E_USER_DEPRECATED);
       $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
     }
 
@@ -549,7 +549,7 @@ class ViewExecutable {
   public function setArguments(array $args) {
     // The array keys of the arguments will be incorrect if set by
     // views_embed_view() or \Drupal\views\ViewExecutable:preview().
-    $this->args = array_values($args);
+    $this->args = \array_values($args);
   }
 
   /**
@@ -798,7 +798,7 @@ class ViewExecutable {
    *   The first accessible display id, at least default.
    */
   public function chooseDisplay($displays) {
-    if (!is_array($displays)) {
+    if (!\is_array($displays)) {
       return $displays;
     }
 
@@ -1175,7 +1175,7 @@ class ViewExecutable {
         $substitutions["{{ arguments.$id }}"] = $arg_title;
         // Since argument validator plugins can potentially transform the value,
         // use whatever value the argument handler now has, not the raw value.
-        $substitutions["{{ raw_arguments.$id }}"] = strip_tags(Html::decodeEntities($argument->getValue()));
+        $substitutions["{{ raw_arguments.$id }}"] = \strip_tags(Html::decodeEntities($argument->getValue()));
 
         // Test to see if we should use this argument's title.
         if (!empty($argument->options['title_enable']) && !empty($argument->options['title'])) {
@@ -1225,7 +1225,7 @@ class ViewExecutable {
    */
   public function initQuery() {
     if (!empty($this->query)) {
-      $class = get_class($this->query);
+      $class = \get_class($this->query);
       if ($class && $class != 'stdClass') {
         // Return if query is already initialized.
         return TRUE;
@@ -1271,7 +1271,7 @@ class ViewExecutable {
     // Attempt to load from cache.
     // @todo Load a build_info from cache.
 
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     // If that fails, let's build!
     $this->build_info = [
       'query' => '',
@@ -1326,7 +1326,7 @@ class ViewExecutable {
 
     // Arguments can, in fact, cause this whole thing to abort.
     if (!$this->_buildArguments()) {
-      $this->build_time = microtime(TRUE) - $start;
+      $this->build_time = \microtime(TRUE) - $start;
       $this->attachDisplays();
       return $this->built;
     }
@@ -1383,7 +1383,7 @@ class ViewExecutable {
     }
 
     $this->built = TRUE;
-    $this->build_time = microtime(TRUE) - $start;
+    $this->build_time = \microtime(TRUE) - $start;
 
     // Attach displays.
     $this->attachDisplays();
@@ -1409,7 +1409,7 @@ class ViewExecutable {
     $handlers = &$this->$key;
     foreach ($handlers as $id => $data) {
 
-      if (!empty($handlers[$id]) && is_object($handlers[$id])) {
+      if (!empty($handlers[$id]) && \is_object($handlers[$id])) {
         $multiple_exposed_input = [0 => NULL];
         if ($handlers[$id]->multipleExposedInput()) {
           $multiple_exposed_input = $handlers[$id]->groupMultipleExposedInput($this->exposed_data);
@@ -1488,7 +1488,7 @@ class ViewExecutable {
       $this->query->execute($this);
       // Enforce the array key rule as documented in
       // views_plugin_query::execute().
-      $this->result = array_values($this->result);
+      $this->result = \array_values($this->result);
       $this->_postExecute();
       $cache->cacheSet('results');
     }
@@ -1728,8 +1728,8 @@ class ViewExecutable {
    *   An array of arguments from the URL that can be used by the view.
    */
   public function preExecute($args = []) {
-    $this->old_view[] = views_get_current_view();
-    views_set_current_view($this);
+    $this->old_view[] = \views_get_current_view();
+    \views_set_current_view($this);
     $display_id = $this->current_display;
 
     // Prepare the view with the information we have, but only if we were
@@ -1742,7 +1742,7 @@ class ViewExecutable {
     \Drupal::moduleHandler()->invokeAll('views_pre_view', [$this, $display_id, &$this->args]);
 
     // Allow hook_views_pre_view() to set the dom_id, then ensure it is set.
-    $this->dom_id = !empty($this->dom_id) ? $this->dom_id : hash('sha256', $this->storage->id() . \Drupal::time()->getRequestTime() . mt_rand());
+    $this->dom_id = !empty($this->dom_id) ? $this->dom_id : \hash('sha256', $this->storage->id() . \Drupal::time()->getRequestTime() . \mt_rand());
 
     // Allow the display handler to set up for execution.
     $this->display_handler->preExecute();
@@ -1756,10 +1756,10 @@ class ViewExecutable {
     // Return the previous value in case we're an attachment.
 
     if ($this->old_view) {
-      $old_view = array_pop($this->old_view);
+      $old_view = \array_pop($this->old_view);
     }
 
-    views_set_current_view($old_view ?? FALSE);
+    \views_set_current_view($old_view ?? FALSE);
   }
 
   /**
@@ -2001,12 +2001,12 @@ class ViewExecutable {
     $path = $this->getPath();
 
     // Don't bother working if there's nothing to do:
-    if (empty($path) || (empty($args) && !str_contains($path, '%'))) {
+    if (empty($path) || (empty($args) && !\str_contains($path, '%'))) {
       return $display_handler->getUrlInfo();
     }
 
-    $argument_keys = isset($this->argument) ? array_keys($this->argument) : [];
-    $id = current($argument_keys);
+    $argument_keys = isset($this->argument) ? \array_keys($this->argument) : [];
+    $id = \current($argument_keys);
 
     /** @var \Drupal\Core\Url $url */
     $url = $display_handler->getUrlInfo();
@@ -2027,11 +2027,11 @@ class ViewExecutable {
         }
       }
       else {
-        $parameters[$variable_name] = array_shift($args);
+        $parameters[$variable_name] = \array_shift($args);
       }
 
       if ($id) {
-        $id = next($argument_keys);
+        $id = \next($argument_keys);
       }
     }
 
@@ -2155,7 +2155,7 @@ class ViewExecutable {
         }
 
         $result = $this->displayHandlers->get($id)->validate();
-        if (!empty($result) && is_array($result)) {
+        if (!empty($result) && \is_array($result)) {
           $errors[$id] = $result;
         }
       }
@@ -2473,7 +2473,7 @@ class ViewExecutable {
       $themes[] = $hook . '__' . $display['id'];
       // Add theme suggestions for each single tag.
       foreach (Tags::explode($this->storage->get('tag')) as $tag) {
-        $themes[] = $hook . '__' . preg_replace('/[^a-z0-9]/', '_', strtolower($tag));
+        $themes[] = $hook . '__' . \preg_replace('/[^a-z0-9]/', '_', \strtolower($tag));
       }
 
       if ($display['id'] != $display['display_plugin']) {
@@ -2497,15 +2497,15 @@ class ViewExecutable {
   public function hasFormElements() {
     if ($this->getDisplay()->usesFields()) {
       foreach ($this->field as $field) {
-        if (method_exists($field, 'viewsForm')) {
+        if (\method_exists($field, 'viewsForm')) {
           return TRUE;
         }
       }
     }
-    $area_handlers = array_merge(array_values($this->header), array_values($this->footer));
+    $area_handlers = \array_merge(\array_values($this->header), \array_values($this->footer));
     $empty = empty($this->result);
     foreach ($area_handlers as $area) {
-      if (method_exists($area, 'viewsForm') && !$area->viewsFormEmpty($empty)) {
+      if (\method_exists($area, 'viewsForm') && !$area->viewsFormEmpty($empty)) {
         return TRUE;
       }
     }

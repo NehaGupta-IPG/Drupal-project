@@ -149,7 +149,7 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
     foreach ($values as $key => $value) {
       // The entity_autocomplete form element returns an array when an entity
       // was "autocreated", so we need to move it up a level.
-      if (is_array($value['target_id'])) {
+      if (\is_array($value['target_id'])) {
         unset($values[$key]['target_id']);
         $values[$key] += $value['target_id'];
       }
@@ -174,15 +174,15 @@ class EntityReferenceAutocompleteWidget extends WidgetBase {
         $bundle = $this->getFieldSetting('target_type');
       }
       // If there's only one target bundle, use it.
-      elseif (count($target_bundles) == 1) {
-        $bundle = reset($target_bundles);
+      elseif (\count($target_bundles) == 1) {
+        $bundle = \reset($target_bundles);
       }
       // If there's more than one target bundle, use the autocreate bundle
       // stored in selection handler settings.
       elseif (!$bundle = $this->getSelectionHandlerSetting('auto_create_bundle')) {
         // If no bundle has been set as auto create target means that there is
         // an inconsistency in entity reference field settings.
-        trigger_error(sprintf(
+        \trigger_error(\sprintf(
           "The 'Create referenced entities if they don't already exist' option is enabled but a specific destination bundle is not set. You should re-visit and fix the settings of the '%s' (%s) field.",
           $this->fieldDefinition->getLabel(),
           $this->fieldDefinition->getName()

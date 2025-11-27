@@ -90,7 +90,7 @@ class NumberFieldTest extends BrowserTestBase {
       "{$field_name}[0][value]" => $value,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
     $this->assertSession()->responseContains($value);
@@ -136,8 +136,8 @@ class NumberFieldTest extends BrowserTestBase {
    * Tests integer field.
    */
   public function testNumberIntegerField(): void {
-    $minimum = rand(-4000, -2000);
-    $maximum = rand(2000, 4000);
+    $minimum = \rand(-4000, -2000);
+    $maximum = \rand(2000, 4000);
 
     // Create a field with settings to validate.
     $field_name = $this->randomMachineName();
@@ -200,12 +200,12 @@ class NumberFieldTest extends BrowserTestBase {
     $this->assertSession()->responseContains('placeholder="4"');
 
     // Submit a valid integer.
-    $value = rand($minimum, $maximum);
+    $value = \rand($minimum, $maximum);
     $edit = [
       "{$field_name}[0][value]" => $value,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -254,7 +254,7 @@ class NumberFieldTest extends BrowserTestBase {
         "{$field_name}[0][value]" => $valid_entry,
       ];
       $this->submitForm($edit, 'Save');
-      preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+      \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
       $id = $match[1];
       $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
       $this->assertSession()->responseContains($valid_entry);
@@ -279,7 +279,7 @@ class NumberFieldTest extends BrowserTestBase {
       "{$field_name}[0][value]" => $integer_value,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
     $this->drupalGet('entity_test/' . $id);
@@ -346,14 +346,14 @@ class NumberFieldTest extends BrowserTestBase {
       "{$field_name}[0][value]" => $value,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
     // Ensure that the 'number_decimal' formatter displays the number with the
     // expected rounding.
     $this->drupalGet('entity_test/' . $id);
-    $this->assertSession()->responseContains(round($value, 2));
+    $this->assertSession()->responseContains(\round($value, 2));
 
     // Try to create entries with more than one decimal separator; assert fail.
     $wrong_entries = [

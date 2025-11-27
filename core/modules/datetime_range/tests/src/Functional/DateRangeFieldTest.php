@@ -96,7 +96,7 @@ class DateRangeFieldTest extends DateTestBase {
         "{$field_name}[0][end_value][date]" => $end_date->format($date_format),
       ];
       $this->submitForm($edit, 'Save');
-      preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+      \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
       $id = $match[1];
       $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
       $this->assertSession()->responseContains($start_date->format($date_format));
@@ -203,7 +203,7 @@ class DateRangeFieldTest extends DateTestBase {
       ];
 
       $this->submitForm($edit, 'Save');
-      preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+      \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
       $id = $match[1];
       $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -285,8 +285,8 @@ class DateRangeFieldTest extends DateTestBase {
     $end_date = new DrupalDateTime($end_value, 'UTC');
 
     // Update the timezone to the system default.
-    $start_date->setTimezone(timezone_open(date_default_timezone_get()));
-    $end_date->setTimezone(timezone_open(date_default_timezone_get()));
+    $start_date->setTimezone(\timezone_open(\date_default_timezone_get()));
+    $end_date->setTimezone(\timezone_open(\date_default_timezone_get()));
 
     // Submit a valid date and ensure it is accepted.
     $date_format = DateFormat::load('html_date')->getPattern();
@@ -299,7 +299,7 @@ class DateRangeFieldTest extends DateTestBase {
       "{$field_name}[0][end_value][time]" => $end_date->format($time_format),
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
     $this->assertSession()->responseContains($start_date->format($date_format));
@@ -371,7 +371,7 @@ class DateRangeFieldTest extends DateTestBase {
     $this->drupalGet('entity_test/add');
     $value = '2012-12-31 00:00:00';
     $start_date = new DrupalDateTime($value, 'UTC');
-    $start_date->setTimezone(timezone_open(date_default_timezone_get()));
+    $start_date->setTimezone(\timezone_open(\date_default_timezone_get()));
 
     $date_format = DateFormat::load('html_date')->getPattern();
     $time_format = DateFormat::load('html_time')->getPattern();
@@ -384,7 +384,7 @@ class DateRangeFieldTest extends DateTestBase {
     ];
 
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -459,9 +459,9 @@ class DateRangeFieldTest extends DateTestBase {
 
     // Build up dates in the proper timezone.
     $value = '2012-12-31 00:00:00';
-    $start_date = new DrupalDateTime($value, timezone_open(date_default_timezone_get()));
+    $start_date = new DrupalDateTime($value, \timezone_open(\date_default_timezone_get()));
     $end_value = '2013-06-06 23:59:59';
-    $end_date = new DrupalDateTime($end_value, timezone_open(date_default_timezone_get()));
+    $end_date = new DrupalDateTime($end_value, \timezone_open(\date_default_timezone_get()));
 
     // Submit a valid date and ensure it is accepted.
     $date_format = DateFormat::load('html_date')->getPattern();
@@ -472,7 +472,7 @@ class DateRangeFieldTest extends DateTestBase {
       "{$field_name}[0][end_value][date]" => $end_date->format($date_format),
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
     $this->assertSession()->responseContains($start_date->format($date_format));
@@ -544,9 +544,9 @@ class DateRangeFieldTest extends DateTestBase {
     $this->drupalGet('entity_test/add');
 
     $value = '2012-12-31 00:00:00';
-    $start_date = new DrupalDateTime($value, timezone_open(date_default_timezone_get()));
+    $start_date = new DrupalDateTime($value, \timezone_open(\date_default_timezone_get()));
     $end_value = '2012-12-31 23:59:59';
-    $end_date = new DrupalDateTime($end_value, timezone_open(date_default_timezone_get()));
+    $end_date = new DrupalDateTime($end_value, \timezone_open(\date_default_timezone_get()));
 
     $date_format = DateFormat::load('html_date')->getPattern();
     $time_format = DateFormat::load('html_time')->getPattern();
@@ -556,7 +556,7 @@ class DateRangeFieldTest extends DateTestBase {
       "{$field_name}[0][end_value][date]" => $start_date->format($date_format),
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -744,7 +744,7 @@ class DateRangeFieldTest extends DateTestBase {
     }
 
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -799,7 +799,7 @@ class DateRangeFieldTest extends DateTestBase {
     }
 
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -866,7 +866,7 @@ class DateRangeFieldTest extends DateTestBase {
 
     $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
 
@@ -1462,9 +1462,9 @@ class DateRangeFieldTest extends DateTestBase {
 
     $this->drupalGet('entity_test/add');
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
-    $this->assertSession()->pageTextContains(sprintf('entity_test %d has been created.', $id));
+    $this->assertSession()->pageTextContains(\sprintf('entity_test %d has been created.', $id));
 
     // Now set display options.
     $this->displayOptions = [

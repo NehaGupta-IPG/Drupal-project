@@ -78,9 +78,9 @@ class MigrateDrupalHooks {
           if ($translation_active) {
             $plugin_ids[] = 'd6_term_node_translation:' . $source_vid;
           }
-          foreach (array_intersect($plugin_ids, array_keys($definitions)) as $plugin_id) {
+          foreach (\array_intersect($plugin_ids, \array_keys($definitions)) as $plugin_id) {
             // Match the field name derivation in d6_vocabulary_field.yml.
-            $field_name = substr('field_' . $row->getDestinationProperty('vid'), 0, 32);
+            $field_name = \substr('field_' . $row->getDestinationProperty('vid'), 0, 32);
             // The Forum module is expecting 'taxonomy_forums' as the field name
             // for the forum nodes. The 'forum_vocabulary' source property is
             // evaluated in Drupal\taxonomy\Plugin\migrate\source\d6\Vocabulary
@@ -128,14 +128,14 @@ class MigrateDrupalHooks {
     if (NodeMigrateType::getNodeMigrateType($connection, $version ?? FALSE) === NodeMigrateType::NODE_MIGRATE_TYPE_COMPLETE) {
       $classic_migration_match = '/d([67])_(node|node_translation|node_revision|node_entity_translation)($|:.*)/';
       $replace_with_complete_migration = function (&$value, $key, $classic_migration_match) {
-        if (is_string($value)) {
-          $value = preg_replace($classic_migration_match, 'd$1_node_complete$3', $value);
+        if (\is_string($value)) {
+          $value = \preg_replace($classic_migration_match, 'd$1_node_complete$3', $value);
         }
       };
       foreach ($definitions as &$definition) {
-        $is_node_classic_migration = preg_match($classic_migration_match, $definition['id']);
+        $is_node_classic_migration = \preg_match($classic_migration_match, $definition['id']);
         if (!$is_node_classic_migration && isset($definition['migration_dependencies'])) {
-          array_walk_recursive($definition['migration_dependencies'], $replace_with_complete_migration, $classic_migration_match);
+          \array_walk_recursive($definition['migration_dependencies'], $replace_with_complete_migration, $classic_migration_match);
         }
       }
     }

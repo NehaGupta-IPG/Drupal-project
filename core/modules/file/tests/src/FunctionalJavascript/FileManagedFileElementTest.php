@@ -60,7 +60,7 @@ class FileManagedFileElementTest extends WebDriverTestBase {
     // Perform the tests with all permutations of $form['#tree'],
     // $element['#extended'], and $element['#multiple'].
     $filename = \Drupal::service('file_system')->tempnam('temporary://', "testManagedFile") . '.txt';
-    file_put_contents($filename, $this->randomString(128));
+    \file_put_contents($filename, $this->randomString(128));
     foreach ([0, 1] as $tree) {
       foreach ([0, 1] as $extended) {
         foreach ([0, 1] as $multiple) {

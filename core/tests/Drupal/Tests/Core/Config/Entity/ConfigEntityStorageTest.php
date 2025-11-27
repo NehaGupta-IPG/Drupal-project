@@ -114,7 +114,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
 
     $entity_type = new ConfigEntityType([
       'id' => $this->entityTypeId,
-      'class' => get_class($this->getMockEntity()),
+      'class' => \get_class($this->getMockEntity()),
       'provider' => 'the_provider',
       'config_prefix' => 'the_config_prefix',
       'entity_keys' => [
@@ -599,7 +599,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
     $this->assertSame('foo', $entity->id());
 
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage(sprintf('Cannot load the "%s" entity with NULL ID.', $this->entityTypeId));
+    $this->expectExceptionMessage(\sprintf('Cannot load the "%s" entity with NULL ID.', $this->entityTypeId));
     $this->entityStorage->load(NULL);
   }
 
@@ -753,9 +753,9 @@ class ConfigEntityStorageTest extends UnitTestCase {
 
 namespace Drupal\Core\Config\Entity;
 
-if (!defined('SAVED_NEW')) {
-  define('SAVED_NEW', 1);
+if (!\defined('SAVED_NEW')) {
+  \define('SAVED_NEW', 1);
 }
-if (!defined('SAVED_UPDATED')) {
-  define('SAVED_UPDATED', 2);
+if (!\defined('SAVED_UPDATED')) {
+  \define('SAVED_UPDATED', 2);
 }

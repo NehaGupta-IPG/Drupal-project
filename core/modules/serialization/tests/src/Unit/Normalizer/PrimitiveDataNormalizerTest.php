@@ -142,7 +142,7 @@ class PrimitiveDataNormalizerTest extends UnitTestCase {
       'uri' => [$uri],
       'decimal' => [$decimal],
       'duration' => [$duration],
-      ...array_map(fn ($value) => [$value[0]], static::dataProviderPrimitiveData()),
+      ...\array_map(fn ($value) => [$value[0]], static::dataProviderPrimitiveData()),
     ];
   }
 

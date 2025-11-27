@@ -75,11 +75,11 @@ abstract class ImageTestTestBase extends ImageTestBase {
         'max_dimensions' => ['width' => 100, 'height' => 100],
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))

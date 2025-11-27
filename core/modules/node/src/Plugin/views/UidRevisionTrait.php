@@ -26,7 +26,7 @@ trait UidRevisionTrait {
     $placeholder_1 = $this->placeholder() . '[]';
     $placeholder_2 = $this->placeholder() . '[]';
 
-    $args = array_values($uids);
+    $args = \array_values($uids);
 
     $this->query->addWhereExpression($group, "$this->tableAlias.uid IN ($placeholder_1) OR
       EXISTS (SELECT 1 FROM {node_revision} nr WHERE nr.revision_uid IN ($placeholder_2) AND nr.nid = $this->tableAlias.nid)", [

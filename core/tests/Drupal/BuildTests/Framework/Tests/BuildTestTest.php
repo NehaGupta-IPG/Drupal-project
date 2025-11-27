@@ -122,8 +122,8 @@ class BuildTestTest extends BuildTestBase {
     // Use scandir() to determine if our target directory is empty. It should
     // only contain the system dot directories.
     $this->assertTrue(
-      ($files = @scandir($full_path)) && count($files) <= 2,
-      'Directory is not empty: ' . implode(', ', $files)
+      ($files = @\scandir($full_path)) && \count($files) <= 2,
+      'Directory is not empty: ' . \implode(', ', $files)
     );
 
     $base->tearDown();

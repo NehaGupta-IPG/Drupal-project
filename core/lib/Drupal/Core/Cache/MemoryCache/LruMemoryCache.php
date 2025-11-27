@@ -57,7 +57,7 @@ class LruMemoryCache extends MemoryCache {
    *   An array of cache items keyed by cid.
    */
   private function handleCacheHits(array $items): void {
-    $last_key = array_key_last($this->cache);
+    $last_key = \array_key_last($this->cache);
     foreach ($items as $cid => $cached) {
       if ($cached->valid && $cid !== $last_key) {
         // Move valid items to the end of the array, so they will be removed
@@ -77,12 +77,12 @@ class LruMemoryCache extends MemoryCache {
       // If the item is already in the cache, move it to end of the array.
       unset($this->cache[$cid]);
     }
-    elseif (count($this->cache) > $this->allowedSlots - 1) {
+    elseif (\count($this->cache) > $this->allowedSlots - 1) {
       // Remove one item from the cache to ensure we remain within the allowed
       // number of slots. Avoid using array_slice() because it makes a copy of
       // the array, and avoid using array_splice() or array_shift() because they
       // re-index numeric keys.
-      unset($this->cache[array_key_first($this->cache)]);
+      unset($this->cache[\array_key_first($this->cache)]);
     }
 
     parent::set($cid, $data, $expire, $tags);
@@ -115,7 +115,7 @@ class LruMemoryCache extends MemoryCache {
   public function invalidateTags(array $tags): void {
     $items = [];
     foreach ($this->cache as $cid => $item) {
-      if (array_intersect($tags, $item->tags)) {
+      if (\array_intersect($tags, $item->tags)) {
         parent::invalidate($cid);
         $items[$cid] = $this->cache[$cid];
       }

@@ -67,10 +67,10 @@ trait JsonSchemaTestTrait {
     $validator = $this->getValidator();
     // Ensure the schema contains a meaningful type construct.
     if (!$accept_no_schema_type) {
-      $this->assertFalse(empty(array_filter(array_keys($defined_schema), fn($key) => in_array($key, ['type', 'allOf', 'oneOf', 'anyOf', 'not', '$ref']))));
+      $this->assertFalse(empty(\array_filter(\array_keys($defined_schema), fn($key) => \in_array($key, ['type', 'allOf', 'oneOf', 'anyOf', 'not', '$ref']))));
     }
     // All associative arrays must be encoded as objects.
-    $schema = json_decode(json_encode($defined_schema));
+    $schema = \json_decode(\json_encode($defined_schema));
     $validator->validate(
       $schema,
       // Schemas must be compatible with draft 2020-12, however the validation
@@ -106,7 +106,7 @@ trait JsonSchemaTestTrait {
    *   Supported types for which to test schema generation.
    */
   public static function supportedTypesDataProvider(): array {
-    return array_map(fn ($type) => [$type], array_keys((new PrimitiveDataNormalizer())->getSupportedTypes(NULL)));
+    return \array_map(fn ($type) => [$type], \array_keys((new PrimitiveDataNormalizer())->getSupportedTypes(NULL)));
   }
 
   /**
@@ -124,9 +124,9 @@ trait JsonSchemaTestTrait {
     $validator = $this->getValidator();
     // Test the value validates to the schema.
     // All associative arrays must be encoded as objects.
-    $normalized = json_decode(json_encode($this->getNormalizationForValue($value)));
+    $normalized = \json_decode(\json_encode($this->getNormalizationForValue($value)));
     $validator->validate($normalized, $schema);
-    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . print_r($normalized, TRUE) . ' with schema ' . print_r($schema, TRUE));
+    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . \print_r($normalized, TRUE) . ' with schema ' . \print_r($schema, TRUE));
   }
 
   /**

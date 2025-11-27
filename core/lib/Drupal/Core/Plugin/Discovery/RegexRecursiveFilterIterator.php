@@ -31,7 +31,7 @@ class RegexRecursiveFilterIterator extends \RecursiveFilterIterator {
       return TRUE;
     }
     // Return if file matches regular expression.
-    return $file_info->isFile() && preg_match($this->regex, $file_info->getFilename());
+    return $file_info->isFile() && \preg_match($this->regex, $file_info->getFilename());
   }
 
   /**

@@ -79,7 +79,7 @@ class BlockContentController extends ControllerBase {
     $block = $this->blockContentStorage->create([
       'type' => $block_content_type->id(),
     ]);
-    if (($theme = $request->query->get('theme')) && in_array($theme, array_keys($this->themeHandler->listInfo()))) {
+    if (($theme = $request->query->get('theme')) && \in_array($theme, \array_keys($this->themeHandler->listInfo()))) {
       // We have navigated to this page from the block library and will keep
       // track of the theme for redirecting the user to the configuration page
       // for the newly created block in the given theme.

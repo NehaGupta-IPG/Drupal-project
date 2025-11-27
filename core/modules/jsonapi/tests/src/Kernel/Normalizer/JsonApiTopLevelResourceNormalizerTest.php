@@ -535,7 +535,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
       )->getNormalization();
     $this->assertNotEmpty($jsonapi_doc_object['meta']['omitted']);
     foreach ($jsonapi_doc_object['meta']['omitted']['links'] as $key => $link) {
-      if (str_starts_with($key, 'item--')) {
+      if (\str_starts_with($key, 'item--')) {
         // Ensure that resource link contains URL with the alias field.
         $resource_link = Url::fromUri('internal:/jsonapi/user/user/' . $user->uuid() . '/user_roles')->setAbsolute()->toString(TRUE);
         $this->assertEquals($resource_link->getGeneratedUrl(), $link['href']);
@@ -567,7 +567,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
         ],
       ]);
     $normalized = $jsonapi_doc_object->getNormalization();
-    $this->assertSame(['description', 'display_submitted'], array_keys($normalized['data']['attributes']));
+    $this->assertSame(['description', 'display_submitted'], \array_keys($normalized['data']['attributes']));
     $this->assertSame($normalized['data']['id'], NodeType::load('article')->uuid());
     $this->assertSame($normalized['data']['type'], 'node_type--node_type');
     // Make sure that the cache tags for the includes and the requested entities
@@ -887,14 +887,14 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     $format = $this->getJsonSchemaTestNormalizationFormat();
     $schema = $serializer->normalize($resource_object, 'json_schema', $context);
     $this->doCheckSchemaAgainstMetaSchema($schema);
-    $normalized = json_decode(json_encode($serializer->normalize(
+    $normalized = \json_decode(\json_encode($serializer->normalize(
       $resource_object,
       $format,
       $context
     )->getNormalization()));
     $validator = $this->getValidator();
-    $validator->validate($normalized, json_decode(json_encode($schema)));
-    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . print_r($normalized, TRUE) . ' with schema ' . print_r($schema, TRUE));
+    $validator->validate($normalized, \json_decode(\json_encode($schema)));
+    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . \print_r($normalized, TRUE) . ' with schema ' . \print_r($schema, TRUE));
   }
 
   /**
@@ -910,14 +910,14 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     $format = $this->getJsonSchemaTestNormalizationFormat();
     $schema = $serializer->normalize($resource_object, 'json_schema', $context);
     $this->doCheckSchemaAgainstMetaSchema($schema);
-    $normalized = json_decode(json_encode($serializer->normalize(
+    $normalized = \json_decode(\json_encode($serializer->normalize(
       $resource_object,
       $format,
       $context
     )->getNormalization()));
     $validator = $this->getValidator();
-    $validator->validate($normalized, json_decode(json_encode($schema)));
-    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . print_r($normalized, TRUE) . ' with schema ' . print_r($schema, TRUE));
+    $validator->validate($normalized, \json_decode(\json_encode($schema)));
+    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . \print_r($normalized, TRUE) . ' with schema ' . \print_r($schema, TRUE));
   }
 
   /**
@@ -935,14 +935,14 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
     );
     $schema = $serializer->normalize($topLevel, 'json_schema', $context);
     $this->doCheckSchemaAgainstMetaSchema($schema);
-    $normalized = json_decode(json_encode($serializer->normalize(
+    $normalized = \json_decode(\json_encode($serializer->normalize(
       $topLevel,
       $format,
       $context
     )->getNormalization()));
     $validator = $this->getValidator();
-    $validator->validate($normalized, json_decode(json_encode($schema)));
-    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . print_r($normalized, TRUE) . ' with schema ' . print_r($schema, TRUE));
+    $validator->validate($normalized, \json_decode(\json_encode($schema)));
+    $this->assertSame([], $validator->getErrors(), 'Validation errors on object ' . \print_r($normalized, TRUE) . ' with schema ' . \print_r($schema, TRUE));
   }
 
 }

@@ -42,7 +42,7 @@ trait EntityResourceValidationTrait {
 
     if ($fields_to_validate) {
       // Filter violations by explicitly provided array of field names.
-      $violations->filterByFields(array_diff(array_keys($entity->getFieldDefinitions()), $fields_to_validate));
+      $violations->filterByFields(\array_diff(\array_keys($entity->getFieldDefinitions()), $fields_to_validate));
     }
 
     if ($violations->count() > 0) {

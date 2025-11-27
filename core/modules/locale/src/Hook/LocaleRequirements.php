@@ -25,11 +25,11 @@ class LocaleRequirements {
     $requirements = [];
     $available_updates = [];
     $untranslated = [];
-    $languages = locale_translatable_language_list();
+    $languages = \locale_translatable_language_list();
 
     if ($languages) {
       // Determine the status of the translation updates per language.
-      $status = locale_translation_get_status();
+      $status = \locale_translation_get_status();
       if ($status) {
         foreach ($status as $project) {
           foreach ($project as $langcode => $project_info) {
@@ -48,7 +48,7 @@ class LocaleRequirements {
               'title' => $this->t('Translation update status'),
               'value' => Link::fromTextAndUrl($this->t('Updates available'), Url::fromRoute('locale.translate_status'))->toString(),
               'severity' => RequirementSeverity::Warning,
-              'description' => $this->t('Updates available for: @languages. See the <a href=":updates">Available translation updates</a> page for more information.', ['@languages' => implode(', ', $available_updates), ':updates' => Url::fromRoute('locale.translate_status')->toString()]),
+              'description' => $this->t('Updates available for: @languages. See the <a href=":updates">Available translation updates</a> page for more information.', ['@languages' => \implode(', ', $available_updates), ':updates' => Url::fromRoute('locale.translate_status')->toString()]),
             ];
           }
           else {
@@ -56,7 +56,7 @@ class LocaleRequirements {
               'title' => $this->t('Translation update status'),
               'value' => $this->t('Missing translations'),
               'severity' => RequirementSeverity::Info,
-              'description' => $this->t('Missing translations for: @languages. See the <a href=":updates">Available translation updates</a> page for more information.', ['@languages' => implode(', ', $untranslated), ':updates' => Url::fromRoute('locale.translate_status')->toString()]),
+              'description' => $this->t('Missing translations for: @languages. See the <a href=":updates">Available translation updates</a> page for more information.', ['@languages' => \implode(', ', $untranslated), ':updates' => Url::fromRoute('locale.translate_status')->toString()]),
             ];
           }
         }

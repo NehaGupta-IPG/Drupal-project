@@ -19,7 +19,7 @@ class TypedDataNormalizer extends NormalizerBase {
     $this->addCacheableDependency($context, $object);
     $value = $object->getValue();
     // Support for stringable value objects: avoid numerous custom normalizers.
-    if (is_object($value) && method_exists($value, '__toString')) {
+    if (\is_object($value) && \method_exists($value, '__toString')) {
       $value = (string) $value;
     }
     return $value;
@@ -29,11 +29,11 @@ class TypedDataNormalizer extends NormalizerBase {
    * {@inheritdoc}
    */
   protected function getNormalizationSchema(mixed $object, array $context = []): array {
-    assert($object instanceof TypedDataInterface);
+    \assert($object instanceof TypedDataInterface);
     $value = $object->getValue();
     $nullable = !$object->getDataDefinition()->isRequired();
     // Match the special-cased logic in ::normalize().
-    if (is_object($value) && method_exists($value, '__toString')) {
+    if (\is_object($value) && \method_exists($value, '__toString')) {
       return $nullable
         ? ['oneOf' => ['string', 'null']]
         : ['type' => 'string'];

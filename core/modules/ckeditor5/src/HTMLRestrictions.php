@@ -97,9 +97,9 @@ final class HTMLRestrictions {
     // Note: `<*>` also allows specifying disallowed attributes, but no other
     // tags are allowed to do this. Consequently, simplification is only needed
     // if >=1 allowed attribute is present on `<*>`.
-    if (count($elements) >= 2 && array_key_exists('*', $elements) && array_filter($elements['*'])) {
+    if (\count($elements) >= 2 && \array_key_exists('*', $elements) && \array_filter($elements['*'])) {
       // @see \Drupal\ckeditor5\HTMLRestrictions::validateAllowedRestrictionsPhase4()
-      $globally_allowed_attribute_restrictions = array_filter($elements['*']);
+      $globally_allowed_attribute_restrictions = \array_filter($elements['*']);
 
       // Prepare to compare the restrictions of all tags with those on the
       // global attribute tag `<*>`.
@@ -149,15 +149,15 @@ final class HTMLRestrictions {
    * @throws \InvalidArgumentException
    */
   private static function validateAllowedRestrictionsPhase1(array $elements): void {
-    if (!is_array($elements) || !Inspector::assertAllStrings(array_keys($elements))) {
+    if (!\is_array($elements) || !Inspector::assertAllStrings(\array_keys($elements))) {
       throw new \InvalidArgumentException('An array of key-value pairs must be provided, with HTML tag names as keys.');
     }
-    foreach (array_keys($elements) as $html_tag_name) {
-      if (trim($html_tag_name) !== $html_tag_name) {
-        throw new \InvalidArgumentException(sprintf('The "%s" HTML tag contains trailing or leading whitespace.', $html_tag_name));
+    foreach (\array_keys($elements) as $html_tag_name) {
+      if (\trim($html_tag_name) !== $html_tag_name) {
+        throw new \InvalidArgumentException(\sprintf('The "%s" HTML tag contains trailing or leading whitespace.', $html_tag_name));
       }
       if ($html_tag_name[0] === '<' || $html_tag_name[-1] === '>') {
-        throw new \InvalidArgumentException(sprintf('"%s" is not a HTML tag name, it is an actual HTML tag. Omit the angular brackets.', $html_tag_name));
+        throw new \InvalidArgumentException(\sprintf('"%s" is not a HTML tag name, it is an actual HTML tag. Omit the angular brackets.', $html_tag_name));
       }
       if (self::isWildcardTag($html_tag_name)) {
         continue;
@@ -173,8 +173,8 @@ final class HTMLRestrictions {
       // HTML elements must have a valid tag name.
       // @see https://html.spec.whatwg.org/multipage/syntax.html#syntax-tag-name
       // @see https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name
-      if (!preg_match('/^[a-z][0-9a-z\-]*$/', strtolower($html_tag_name))) {
-        throw new \InvalidArgumentException(sprintf('"%s" is not a valid HTML tag name.', $html_tag_name));
+      if (!\preg_match('/^[a-z][0-9a-z\-]*$/', \strtolower($html_tag_name))) {
+        throw new \InvalidArgumentException(\sprintf('"%s" is not a valid HTML tag name.', $html_tag_name));
       }
     }
   }
@@ -197,8 +197,8 @@ final class HTMLRestrictions {
       // @see https://html.spec.whatwg.org/multipage/dom.html#global-attributes
       // @see validateAllowedRestrictionsPhase4()
       // @see validateAllowedRestrictionsPhase5()
-      if ($html_tag_name === '*' && !is_array($html_tag_restrictions)) {
-        throw new \InvalidArgumentException(sprintf('The value for the special "*" global attribute HTML tag must be an array of attribute restrictions.'));
+      if ($html_tag_name === '*' && !\is_array($html_tag_restrictions)) {
+        throw new \InvalidArgumentException(\sprintf('The value for the special "*" global attribute HTML tag must be an array of attribute restrictions.'));
       }
 
       // The value must be either a boolean (FALSE means no attributes are
@@ -207,14 +207,14 @@ final class HTMLRestrictions {
       // - An array of allowed attribute names OR
       // - A boolean (where FALSE means no attributes are allowed, and TRUE
       //   means all attributes are allowed).
-      if (is_bool($html_tag_restrictions)) {
+      if (\is_bool($html_tag_restrictions)) {
         continue;
       }
-      if (!is_array($html_tag_restrictions)) {
-        throw new \InvalidArgumentException(sprintf('The value for the "%s" HTML tag is neither a boolean nor an array of attribute restrictions.', $html_tag_name));
+      if (!\is_array($html_tag_restrictions)) {
+        throw new \InvalidArgumentException(\sprintf('The value for the "%s" HTML tag is neither a boolean nor an array of attribute restrictions.', $html_tag_name));
       }
       if ($html_tag_restrictions === []) {
-        throw new \InvalidArgumentException(sprintf('The value for the "%s" HTML tag is an empty array. This is not permitted, specify FALSE instead to indicate no attributes are allowed. Otherwise, list allowed attributes.', $html_tag_name));
+        throw new \InvalidArgumentException(\sprintf('The value for the "%s" HTML tag is an empty array. This is not permitted, specify FALSE instead to indicate no attributes are allowed. Otherwise, list allowed attributes.', $html_tag_name));
       }
     }
   }
@@ -229,19 +229,19 @@ final class HTMLRestrictions {
    */
   private static function validateAllowedRestrictionsPhase3(array $elements): void {
     foreach ($elements as $html_tag_name => $html_tag_restrictions) {
-      if (!is_array($html_tag_restrictions)) {
+      if (!\is_array($html_tag_restrictions)) {
         continue;
       }
-      if (!Inspector::assertAllStrings(array_keys($html_tag_restrictions))) {
-        throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has attribute restrictions, but it is not an array of key-value pairs, with HTML tag attribute names as keys.', $html_tag_name));
+      if (!Inspector::assertAllStrings(\array_keys($html_tag_restrictions))) {
+        throw new \InvalidArgumentException(\sprintf('The "%s" HTML tag has attribute restrictions, but it is not an array of key-value pairs, with HTML tag attribute names as keys.', $html_tag_name));
       }
 
       foreach ($html_tag_restrictions as $html_tag_attribute_name => $html_tag_attribute_restrictions) {
-        if (trim($html_tag_attribute_name) !== $html_tag_attribute_name) {
-          throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has an attribute restriction "%s" which contains whitespace. Omit the whitespace.', $html_tag_name, $html_tag_attribute_name));
+        if (\trim($html_tag_attribute_name) !== $html_tag_attribute_name) {
+          throw new \InvalidArgumentException(\sprintf('The "%s" HTML tag has an attribute restriction "%s" which contains whitespace. Omit the whitespace.', $html_tag_name, $html_tag_attribute_name));
         }
         if ($html_tag_attribute_name === '*') {
-          throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has an attribute restriction "*". This implies all attributes are allowed. Remove the attribute restriction instead, or use a prefix (`*-foo`), infix (`*-foo-*`) or suffix (`foo-*`) wildcard restriction instead.', $html_tag_name));
+          throw new \InvalidArgumentException(\sprintf('The "%s" HTML tag has an attribute restriction "*". This implies all attributes are allowed. Remove the attribute restriction instead, or use a prefix (`*-foo`), infix (`*-foo-*`) or suffix (`foo-*`) wildcard restriction instead.', $html_tag_name));
         }
       }
     }
@@ -257,7 +257,7 @@ final class HTMLRestrictions {
    */
   private static function validateAllowedRestrictionsPhase4(array $elements): void {
     foreach ($elements as $html_tag_name => $html_tag_restrictions) {
-      if (!is_array($html_tag_restrictions)) {
+      if (!\is_array($html_tag_restrictions)) {
         continue;
       }
 
@@ -279,18 +279,18 @@ final class HTMLRestrictions {
         if ($html_tag_name === '*' && $html_tag_attribute_restrictions === FALSE) {
           continue;
         }
-        if (!is_array($html_tag_attribute_restrictions)) {
-          throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has an attribute restriction "%s" which is neither TRUE nor an array of attribute value restrictions.', $html_tag_name, $html_tag_attribute_name));
+        if (!\is_array($html_tag_attribute_restrictions)) {
+          throw new \InvalidArgumentException(\sprintf('The "%s" HTML tag has an attribute restriction "%s" which is neither TRUE nor an array of attribute value restrictions.', $html_tag_name, $html_tag_attribute_name));
         }
         if ($html_tag_attribute_restrictions === []) {
-          throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has an attribute restriction "%s" which is set to the empty array. This is not permitted, specify either TRUE to allow all attribute values, or list the attribute value restrictions.', $html_tag_name, $html_tag_attribute_name));
+          throw new \InvalidArgumentException(\sprintf('The "%s" HTML tag has an attribute restriction "%s" which is set to the empty array. This is not permitted, specify either TRUE to allow all attribute values, or list the attribute value restrictions.', $html_tag_name, $html_tag_attribute_name));
         }
-        if (array_key_exists('*', $html_tag_attribute_restrictions)) {
-          throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has an attribute restriction "%s" with a "*" allowed attribute value. This implies all attributes values are allowed. Remove the attribute value restriction instead, or use a prefix (`*-foo`), infix (`*-foo-*`) or suffix (`foo-*`) wildcard restriction instead.', $html_tag_name, $html_tag_attribute_name));
+        if (\array_key_exists('*', $html_tag_attribute_restrictions)) {
+          throw new \InvalidArgumentException(\sprintf('The "%s" HTML tag has an attribute restriction "%s" with a "*" allowed attribute value. This implies all attributes values are allowed. Remove the attribute value restriction instead, or use a prefix (`*-foo`), infix (`*-foo-*`) or suffix (`foo-*`) wildcard restriction instead.', $html_tag_name, $html_tag_attribute_name));
         }
         // @codingStandardsIgnoreLine
         if (!Inspector::assertAll(function ($v) { return $v === TRUE; }, $html_tag_attribute_restrictions)) {
-          throw new \InvalidArgumentException(sprintf('The "%s" HTML tag has attribute restriction "%s", but it is not an array of key-value pairs, with HTML tag attribute values as keys and TRUE as values.', $html_tag_name, $html_tag_attribute_name));
+          throw new \InvalidArgumentException(\sprintf('The "%s" HTML tag has attribute restriction "%s", but it is not an array of key-value pairs, with HTML tag attribute values as keys and TRUE as values.', $html_tag_name, $html_tag_attribute_name));
         }
       }
     }
@@ -317,10 +317,10 @@ final class HTMLRestrictions {
     $conflict = self::findElementsOverridingGloballyDisallowedAttributes($elements);
     if ($conflict) {
       [$globally_disallowed_attribute_restrictions, $elements_overriding_globally_disallowed_attributes] = $conflict;
-      throw new \InvalidArgumentException(sprintf(
+      throw new \InvalidArgumentException(\sprintf(
         'The attribute restrictions in "%s" are allowing attributes "%s" that are disallowed by the special "*" global attribute restrictions.',
-        implode(' ', (new self($elements_overriding_globally_disallowed_attributes))->toCKEditor5ElementsArray()),
-        implode('", "', array_keys($globally_disallowed_attribute_restrictions))
+        \implode(' ', (new self($elements_overriding_globally_disallowed_attributes))->toCKEditor5ElementsArray()),
+        \implode('", "', \array_keys($globally_disallowed_attribute_restrictions))
       ));
     }
   }
@@ -341,9 +341,9 @@ final class HTMLRestrictions {
     // For example: `['*' => ['style' => FALSE, 'foo' => TRUE, 'bar' => FALSE]`
     // has two globally disallowed attributes, the code below will extract
     // `['*' => ['style' => FALSE, 'bar' => FALSE']]`.
-    $globally_disallowed_attribute_restrictions = !array_key_exists('*', $elements)
+    $globally_disallowed_attribute_restrictions = !\array_key_exists('*', $elements)
       ? []
-      : array_filter($elements['*'], function ($global_attribute_restrictions): bool {
+      : \array_filter($elements['*'], function ($global_attribute_restrictions): bool {
         return $global_attribute_restrictions === FALSE;
       });
     if (empty($globally_disallowed_attribute_restrictions)) {
@@ -352,8 +352,8 @@ final class HTMLRestrictions {
     }
 
     // The elements which could potentially have a conflicting override.
-    $elements_with_attribute_level_restrictions = array_filter($elements, function ($attribute_restrictions, string $attribute_name): bool {
-      return is_array($attribute_restrictions) && $attribute_name !== '*';
+    $elements_with_attribute_level_restrictions = \array_filter($elements, function ($attribute_restrictions, string $attribute_name): bool {
+      return \is_array($attribute_restrictions) && $attribute_name !== '*';
     }, ARRAY_FILTER_USE_BOTH);
     if (empty($elements_with_attribute_level_restrictions)) {
       // No conflict possible.
@@ -368,18 +368,18 @@ final class HTMLRestrictions {
     // Construct a HTMLRestrictions object that contains the globally disallowed
     // attribute restrictions, but pretends they are allowed. This allows using
     // ::intersect() to detect a conflict.
-    $conflicting_restrictions = new self(array_fill_keys(
-      array_keys($elements_with_attribute_level_restrictions),
+    $conflicting_restrictions = new self(\array_fill_keys(
+      \array_keys($elements_with_attribute_level_restrictions),
       // The disallowed attributes converted to allowed, to allow using the
       // ::intersect() method to detect a conflict.
       // In the example: `['style' => TRUE', 'bar' => TRUE]`.
-      array_fill_keys(array_keys($globally_disallowed_attribute_restrictions), TRUE)
+      \array_fill_keys(\array_keys($globally_disallowed_attribute_restrictions), TRUE)
     ));
 
     // When there is a non-empty intersection at the attribute level, an
     // override of a globally disallowed attribute was found.
     $conflict = $potentially_overriding->intersect($conflicting_restrictions);
-    $elements_overriding_globally_disallowed_attributes = array_filter($conflict->getAllowedElements());
+    $elements_overriding_globally_disallowed_attributes = \array_filter($conflict->getAllowedElements());
 
     // No conflict found.
     if (empty($elements_overriding_globally_disallowed_attributes)) {
@@ -418,10 +418,10 @@ final class HTMLRestrictions {
    * @see ::emptySet()
    */
   public function allowsNothing(): bool {
-    return count($this->elements) === 0
+    return \count($this->elements) === 0
       // If there are only forbidden attributes on the global attribute `*` HTML
       // tag, that is equivalent to the set of restrictions being empty.
-      || count($this->elements) === 1 && isset($this->elements['*']) && empty(array_filter($this->elements['*']));
+      || \count($this->elements) === 1 && isset($this->elements['*']) && empty(\array_filter($this->elements['*']));
   }
 
   /**
@@ -482,7 +482,7 @@ final class HTMLRestrictions {
    * @see ::fromTextFormat()
    */
   private static function fromObjectWithHtmlRestrictions(object $object): HTMLRestrictions {
-    if (!method_exists($object, 'getHTMLRestrictions')) {
+    if (!\method_exists($object, 'getHTMLRestrictions')) {
       throw new \InvalidArgumentException();
     }
 
@@ -495,7 +495,7 @@ final class HTMLRestrictions {
     // "['tag' => ['*'=> TRUE]]" to "['tag' => TRUE]".
     $allowed = $restrictions['allowed'];
     foreach ($allowed as $element => $attributes) {
-      if (is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
+      if (\is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
         $allowed[$element] = TRUE;
       }
     }
@@ -519,7 +519,7 @@ final class HTMLRestrictions {
     if ($conflict) {
       [, $elements_overriding_globally_disallowed_attributes] = $conflict;
       foreach ($elements_overriding_globally_disallowed_attributes as $element => $attributes) {
-        foreach (array_keys($attributes) as $attribute_name) {
+        foreach (\array_keys($attributes) as $attribute_name) {
           unset($allowed[$element][$attribute_name]);
         }
         if ($allowed[$element] === []) {
@@ -549,11 +549,11 @@ final class HTMLRestrictions {
     // Note: unknown wildcard tags will trigger a validation error in
     // ::validateAllowedRestrictionsPhase1().
     $replaced_wildcard_tags = [];
-    $elements_string = preg_replace_callback('/<(\$[a-z][0-9a-z\-]*|\*)/', function ($matches) use (&$replaced_wildcard_tags) {
+    $elements_string = \preg_replace_callback('/<(\$[a-z][0-9a-z\-]*|\*)/', function ($matches) use (&$replaced_wildcard_tags) {
       $wildcard_tag_name = $matches[1];
       $replacement = $wildcard_tag_name === '*'
         ? 'preprocessed-global-attribute__'
-        : sprintf("preprocessed-wildcard-%s__", substr($wildcard_tag_name, 1));
+        : \sprintf("preprocessed-wildcard-%s__", \substr($wildcard_tag_name, 1));
       $replaced_wildcard_tags[$replacement] = $wildcard_tag_name;
       return "<$replacement";
     }, $elements_string);
@@ -582,7 +582,7 @@ final class HTMLRestrictions {
     // When allowing all tags on an attribute, transform FilterHtml output from
     // "['tag' => ['*'=> TRUE]]" to "['tag' => TRUE]".
     foreach ($allowed_elements as $element => $attributes) {
-      if (is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
+      if (\is_array($attributes) && isset($attributes['*']) && $attributes['*'] === TRUE) {
         $allowed_elements[$element] = TRUE;
       }
     }
@@ -615,7 +615,7 @@ final class HTMLRestrictions {
    *   are not allowed in $other.
    */
   private function doDiff(HTMLRestrictions $other): HTMLRestrictions {
-    $diff_elements = array_filter(
+    $diff_elements = \array_filter(
       DiffArray::diffAssocRecursive($this->elements, $other->elements),
       // DiffArray::diffAssocRecursive() provides a good start, but additional
       // filtering is necessary due to the specific semantics of an HTML
@@ -631,7 +631,7 @@ final class HTMLRestrictions {
       function ($value, string $tag) use ($other) {
         // If this HTML restrictions object contains a tag that the other did
         // not contain at all: keep the DiffArray result.
-        if (!array_key_exists($tag, $other->elements)) {
+        if (!\array_key_exists($tag, $other->elements)) {
           return TRUE;
         }
 
@@ -653,7 +653,7 @@ final class HTMLRestrictions {
         // Otherwise, this HTML restrictions object allows specific attributes
         // only. DiffArray only knows to compare arrays. When the other object
         // has a non-array value for this tag, interpret those values correctly.
-        assert(is_array($value));
+        \assert(\is_array($value));
         // The other object is more restrictive regarding allowed attributes
         // for this tag: keep the DiffArray result.
         if ($other->elements[$tag] === FALSE) {
@@ -668,7 +668,7 @@ final class HTMLRestrictions {
         // result and apply postprocessing after this array_filter() call,
         // because this can only affect tag-level differences.
         // @see ::validateAllowedRestrictionsPhase3()
-        assert(is_array($other->elements[$tag]));
+        \assert(\is_array($other->elements[$tag]));
         return TRUE;
       },
       ARRAY_FILTER_USE_BOTH
@@ -681,7 +681,7 @@ final class HTMLRestrictions {
     foreach ($diff_elements as $tag => $tag_config) {
       // If there are no per-attribute restrictions for this tag in either
       // operand, then no postprocessing is needed.
-      if (!is_array($tag_config) || !(isset($other->elements[$tag]) && is_array($other->elements[$tag]))) {
+      if (!\is_array($tag_config) || !(isset($other->elements[$tag]) && \is_array($other->elements[$tag]))) {
         continue;
       }
 
@@ -690,7 +690,7 @@ final class HTMLRestrictions {
       // - prefix wildcard, f.e. `*-foo`
       // - infix wildcard, f.e. `*-entity-*`
       // - suffix wildcard, f.e. `data-*`, to match `data-foo`, `data-bar`, etc.
-      $wildcard_attributes = array_filter(array_keys($other->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
+      $wildcard_attributes = \array_filter(\array_keys($other->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
       foreach ($wildcard_attributes as $wildcard_attribute_name) {
         $regex = self::getRegExForWildCardAttributeName($wildcard_attribute_name);
         foreach ($tag_config as $html_tag_attribute_name => $html_tag_attribute_restrictions) {
@@ -699,7 +699,7 @@ final class HTMLRestrictions {
           // attribute values or an array of specific allowed attribute values),
           // then all concrete matches (f.e. `data-foo`, `data-bar`, etc.) are
           // allowed and should be explicitly omitted from the difference.
-          if ($html_tag_attribute_restrictions === $other->elements[$tag][$wildcard_attribute_name] && preg_match($regex, $html_tag_attribute_name) === 1) {
+          if ($html_tag_attribute_restrictions === $other->elements[$tag][$wildcard_attribute_name] && \preg_match($regex, $html_tag_attribute_name) === 1) {
             unset($tag_config[$html_tag_attribute_name]);
           }
         }
@@ -707,7 +707,7 @@ final class HTMLRestrictions {
 
       // Attribute value restrictions in $this, all values allowed in $other.
       foreach ($tag_config as $html_tag_attribute_name => $html_tag_attribute_restrictions) {
-        if (is_array($html_tag_attribute_restrictions) && isset($other->elements[$tag][$html_tag_attribute_name]) && $other->elements[$tag][$html_tag_attribute_name] === TRUE) {
+        if (\is_array($html_tag_attribute_restrictions) && isset($other->elements[$tag][$html_tag_attribute_name]) && $other->elements[$tag][$html_tag_attribute_name] === TRUE) {
           unset($tag_config[$html_tag_attribute_name]);
         }
       }
@@ -750,12 +750,12 @@ final class HTMLRestrictions {
    *   are also allowed in $other.
    */
   public function doIntersect(HTMLRestrictions $other): HTMLRestrictions {
-    $intersection_based_on_tags = array_intersect_key($this->elements, $other->elements);
+    $intersection_based_on_tags = \array_intersect_key($this->elements, $other->elements);
     $intersection = [];
     // Additional filtering is necessary beyond the array_intersect_key that
     // computed $intersection_based_on_tags because tag configuration can have
     // boolean values that have different logic than array values.
-    foreach (array_keys($intersection_based_on_tags) as $tag) {
+    foreach (\array_keys($intersection_based_on_tags) as $tag) {
       // If either does not allow attributes, neither does the intersection.
       if ($this->elements[$tag] === FALSE || $other->elements[$tag] === FALSE) {
         $intersection[$tag] = FALSE;
@@ -779,11 +779,11 @@ final class HTMLRestrictions {
       // In all other cases, we need to return the most restrictive
       // intersection of per-attribute restrictions.
       // @see ::validateAllowedRestrictionsPhase3()
-      assert(is_array($this->elements[$tag]));
-      assert(is_array($other->elements[$tag]));
+      \assert(\is_array($this->elements[$tag]));
+      \assert(\is_array($other->elements[$tag]));
       $intersection[$tag] = [];
-      $attributes_intersection = array_intersect_key($this->elements[$tag], $other->elements[$tag]);
-      foreach (array_keys($attributes_intersection) as $attr) {
+      $attributes_intersection = \array_intersect_key($this->elements[$tag], $other->elements[$tag]);
+      foreach (\array_keys($attributes_intersection) as $attr) {
         // If both allow all attribute values, so does the intersection.
         if ($this->elements[$tag][$attr] === TRUE && $other->elements[$tag][$attr] === TRUE) {
           $intersection[$tag][$attr] = TRUE;
@@ -805,13 +805,13 @@ final class HTMLRestrictions {
           // @see https://html.spec.whatwg.org/multipage/dom.html#global-attributes
           // @see validateAllowedRestrictionsPhase2()
           // @see validateAllowedRestrictionsPhase4()
-          assert($tag === '*');
+          \assert($tag === '*');
           $intersection[$tag][$attr] = FALSE;
           continue;
         }
-        assert(is_array($this->elements[$tag][$attr]));
-        assert(is_array($other->elements[$tag][$attr]));
-        $intersection[$tag][$attr] = array_intersect_key($this->elements[$tag][$attr], $other->elements[$tag][$attr]);
+        \assert(\is_array($this->elements[$tag][$attr]));
+        \assert(\is_array($other->elements[$tag][$attr]));
+        $intersection[$tag][$attr] = \array_intersect_key($this->elements[$tag][$attr], $other->elements[$tag][$attr]);
         // It is not permitted to specify an empty attribute value
         // restrictions array.
         if (empty($intersection[$tag][$attr])) {
@@ -840,18 +840,18 @@ final class HTMLRestrictions {
     foreach ($intersection as $tag => $tag_config) {
       // If there are no per-attribute restrictions for this tag in either
       // operand, then no wildcard attribute postprocessing is needed.
-      if (!(is_array($this->elements[$tag]) && is_array($other->elements[$tag]))) {
+      if (!(\is_array($this->elements[$tag]) && \is_array($other->elements[$tag]))) {
         continue;
       }
-      $other_wildcard_attributes = array_filter(array_keys($other->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
-      $this_wildcard_attributes = array_filter(array_keys($this->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
+      $other_wildcard_attributes = \array_filter(\array_keys($other->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
+      $this_wildcard_attributes = \array_filter(\array_keys($this->elements[$tag]), [__CLASS__, 'isWildcardAttributeName']);
 
       // If the same wildcard attribute restrictions are present in both or
       // neither, no adjustment necessary: the intersection is already correct.
-      $in_both = array_intersect($other_wildcard_attributes, $this_wildcard_attributes);
-      $other_wildcard_attributes = array_diff($other_wildcard_attributes, $in_both);
-      $this_wildcard_attributes = array_diff($this_wildcard_attributes, $in_both);
-      $wildcard_attributes_to_analyze = array_merge($other_wildcard_attributes, $this_wildcard_attributes);
+      $in_both = \array_intersect($other_wildcard_attributes, $this_wildcard_attributes);
+      $other_wildcard_attributes = \array_diff($other_wildcard_attributes, $in_both);
+      $this_wildcard_attributes = \array_diff($this_wildcard_attributes, $in_both);
+      $wildcard_attributes_to_analyze = \array_merge($other_wildcard_attributes, $this_wildcard_attributes);
       if (empty($wildcard_attributes_to_analyze)) {
         continue;
       }
@@ -869,7 +869,7 @@ final class HTMLRestrictions {
         $wildcard_attribute_restriction = $wildcard_operand->elements[$tag][$wildcard_attribute_name];
         $regex = self::getRegExForWildCardAttributeName($wildcard_attribute_name);
         foreach ($concrete_tag_config as $html_tag_attribute_name => $html_tag_attribute_restrictions) {
-          if ($html_tag_attribute_restrictions === $wildcard_attribute_restriction && preg_match($regex, $html_tag_attribute_name) === 1) {
+          if ($html_tag_attribute_restrictions === $wildcard_attribute_restriction && \preg_match($regex, $html_tag_attribute_name) === 1) {
             $tag_config = $tag_config === FALSE ? [] : $tag_config;
             $tag_config[$html_tag_attribute_name] = $html_tag_attribute_restrictions;
           }
@@ -894,27 +894,27 @@ final class HTMLRestrictions {
    */
   private static function mergeAllowedElementsLevel(array $array1, array $array2): array {
     $union = [];
-    $array1_keys = array_keys($array1);
-    $array2_keys = array_keys($array2);
-    $common_keys = array_intersect($array1_keys, $array2_keys);
-    if (count($common_keys) === 0) {
+    $array1_keys = \array_keys($array1);
+    $array2_keys = \array_keys($array2);
+    $common_keys = \array_intersect($array1_keys, $array2_keys);
+    if (\count($common_keys) === 0) {
       // There are no keys in common, simply append the arrays.
       $union = $array1 + $array2;
     }
     else {
       // For all the distinct keys, append them to the result.
-      $filter_keys = array_flip($common_keys);
+      $filter_keys = \array_flip($common_keys);
       // Add all unique keys from $array1.
-      $union += array_diff_key($array1, $filter_keys);
+      $union += \array_diff_key($array1, $filter_keys);
       // Add all unique keys from $array2.
-      $union += array_diff_key($array2, $filter_keys);
+      $union += \array_diff_key($array2, $filter_keys);
 
       // There are some keys in common that need to be merged.
       foreach ($common_keys as $key) {
         $value1 = $array1[$key];
         $value2 = $array2[$key];
-        $value1_is_bool = is_bool($value1);
-        $value2_is_bool = is_bool($value2);
+        $value1_is_bool = \is_bool($value1);
+        $value2_is_bool = \is_bool($value2);
 
         // When both values are boolean, combine the two.
         if ($value1_is_bool && $value2_is_bool) {
@@ -931,7 +931,7 @@ final class HTMLRestrictions {
         }
         // Process nested arrays, in this case it correspond to tag attributes
         // configuration.
-        elseif (is_array($value1) && is_array($value2)) {
+        elseif (\is_array($value1) && \is_array($value2)) {
           $union[$key] = self::mergeAllowedElementsLevel($value1, $value2);
         }
       }
@@ -939,7 +939,7 @@ final class HTMLRestrictions {
     // Make sure the order of the union array matches the order of the keys in
     // the arrays provided.
     $ordered = [];
-    foreach (array_merge($array1_keys, $array2_keys) as $key) {
+    foreach (\array_merge($array1_keys, $array2_keys) as $key) {
       $ordered[$key] = $union[$key];
     }
     return $ordered;
@@ -966,10 +966,10 @@ final class HTMLRestrictions {
     foreach ($union as $tag => $tag_config) {
       // If there are no per-attribute restrictions for this tag, then no
       // wildcard attribute postprocessing is needed.
-      if (!is_array($tag_config)) {
+      if (!\is_array($tag_config)) {
         continue;
       }
-      $wildcard_attributes = array_filter(array_keys($tag_config), [__CLASS__, 'isWildcardAttributeName']);
+      $wildcard_attributes = \array_filter(\array_keys($tag_config), [__CLASS__, 'isWildcardAttributeName']);
       foreach ($wildcard_attributes as $wildcard_attribute_name) {
         $regex = self::getRegExForWildCardAttributeName($wildcard_attribute_name);
         foreach ($tag_config as $html_tag_attribute_name => $html_tag_attribute_restrictions) {
@@ -982,7 +982,7 @@ final class HTMLRestrictions {
           // wildcard attribute value restrictions (f.e. `data-*`), we must
           // explicitly drop the concrete attribute restriction in favor of the
           // wildcard one.
-          if ($html_tag_attribute_restrictions === $tag_config[$wildcard_attribute_name] && preg_match($regex, $html_tag_attribute_name) === 1) {
+          if ($html_tag_attribute_restrictions === $tag_config[$wildcard_attribute_name] && \preg_match($regex, $html_tag_attribute_name) === 1) {
             unset($tag_config[$html_tag_attribute_name]);
           }
         }
@@ -1014,7 +1014,7 @@ final class HTMLRestrictions {
     $wildcard_op_result = $a_wildcard->$operation_method_name($b_wildcard);
 
     // Early return if both operands contain only wildcard tags.
-    if (count($a_wildcard->elements) === count($a->elements) && count($b_wildcard->elements) === count($b->elements)) {
+    if (\count($a_wildcard->elements) === \count($a->elements) && \count($b_wildcard->elements) === \count($b->elements)) {
       return $wildcard_op_result;
     }
 
@@ -1047,8 +1047,8 @@ final class HTMLRestrictions {
    */
   private static function isWildcardAttributeName(string $attribute_name): bool {
     // @see ::validateAllowedRestrictionsPhase3()
-    assert($attribute_name !== '*');
-    return str_contains($attribute_name, '*');
+    \assert($attribute_name !== '*');
+    return \str_contains($attribute_name, '*');
   }
 
   /**
@@ -1061,8 +1061,8 @@ final class HTMLRestrictions {
    *   The computed regular expression.
    */
   private static function getRegExForWildCardAttributeName(string $wildcard_attribute_name): string {
-    assert(self::isWildcardAttributeName($wildcard_attribute_name));
-    return '/^' . str_replace('*', '.*', $wildcard_attribute_name) . '$/';
+    \assert(self::isWildcardAttributeName($wildcard_attribute_name));
+    return '/^' . \str_replace('*', '.*', $wildcard_attribute_name) . '$/';
   }
 
   /**
@@ -1072,7 +1072,7 @@ final class HTMLRestrictions {
    *   The subset of the given set of HTML restrictions.
    */
   public function getWildcardSubset(): HTMLRestrictions {
-    return new self(array_filter($this->elements, [__CLASS__, 'isWildcardTag'], ARRAY_FILTER_USE_KEY));
+    return new self(\array_filter($this->elements, [__CLASS__, 'isWildcardTag'], ARRAY_FILTER_USE_KEY));
   }
 
   /**
@@ -1082,7 +1082,7 @@ final class HTMLRestrictions {
    *   The subset of the given set of HTML restrictions.
    */
   public function getConcreteSubset(): HTMLRestrictions {
-    return new self(array_filter($this->elements, function (string $tag_name) {
+    return new self(\array_filter($this->elements, function (string $tag_name) {
       return !self::isWildcardTag($tag_name);
     }, ARRAY_FILTER_USE_KEY));
   }
@@ -1096,7 +1096,7 @@ final class HTMLRestrictions {
   public function getPlainTagsSubset(): HTMLRestrictions {
     // This implicitly excludes wildcard tags and the global attribute `*` tag
     // because they always have attributes specified.
-    return new self(array_filter($this->elements, function ($value) {
+    return new self(\array_filter($this->elements, function ($value) {
       return $value === FALSE;
     }));
   }
@@ -1110,8 +1110,8 @@ final class HTMLRestrictions {
   public function extractPlainTagsSubset(): HTMLRestrictions {
     // Ignore the global attribute `*` HTML tag: that is by definition not a
     // plain tag.
-    $plain_tags = array_diff(array_keys($this->getConcreteSubset()->getAllowedElements()), ['*']);
-    return new self(array_fill_keys($plain_tags, FALSE));
+    $plain_tags = \array_diff(\array_keys($this->getConcreteSubset()->getAllowedElements()), ['*']);
+    return new self(\array_fill_keys($plain_tags, FALSE));
   }
 
   /**
@@ -1124,7 +1124,7 @@ final class HTMLRestrictions {
    *   TRUE if it is a wildcard, otherwise FALSE.
    */
   private static function isWildcardTag(string $tag_name): bool {
-    return str_starts_with($tag_name, '$') && array_key_exists($tag_name, self::WILDCARD_ELEMENT_METHODS);
+    return \str_starts_with($tag_name, '$') && \array_key_exists($tag_name, self::WILDCARD_ELEMENT_METHODS);
   }
 
   /**
@@ -1213,10 +1213,10 @@ final class HTMLRestrictions {
     $readable = [];
     foreach ($this->elements as $tag => $attributes) {
       $attribute_string = '';
-      if (is_array($attributes)) {
+      if (\is_array($attributes)) {
         foreach ($attributes as $attribute_name => $attribute_values) {
-          if (is_array($attribute_values)) {
-            $attribute_values_string = implode(' ', array_keys($attribute_values));
+          if (\is_array($attribute_values)) {
+            $attribute_values_string = \implode(' ', \array_keys($attribute_values));
             $attribute_string .= "$attribute_name=\"$attribute_values_string\" ";
           }
           else {
@@ -1225,7 +1225,7 @@ final class HTMLRestrictions {
             // @see validateAllowedRestrictionsPhase2()
             // @see validateAllowedRestrictionsPhase4()
             if ($attribute_values === FALSE) {
-              assert($tag === '*');
+              \assert($tag === '*');
               continue;
             }
             $attribute_string .= "$attribute_name ";
@@ -1237,14 +1237,14 @@ final class HTMLRestrictions {
       // @see https://html.spec.whatwg.org/multipage/dom.html#global-attributes
       // @see validateAllowedRestrictionsPhase2()
       // @see validateAllowedRestrictionsPhase4()
-      if ($tag === '*' && empty(array_filter($attributes))) {
+      if ($tag === '*' && empty(\array_filter($attributes))) {
         continue;
       }
 
-      $joined = '<' . $tag . (!empty($attribute_string) ? ' ' . trim($attribute_string) : '') . '>';
-      array_push($readable, $joined);
+      $joined = '<' . $tag . (!empty($attribute_string) ? ' ' . \trim($attribute_string) : '') . '>';
+      \array_push($readable, $joined);
     }
-    assert(Inspector::assertAllStrings($readable));
+    \assert(Inspector::assertAllStrings($readable));
     return $readable;
   }
 
@@ -1264,8 +1264,8 @@ final class HTMLRestrictions {
     $concrete = self::resolveWildcards($this);
     // The filter_html plugin does not allow configuring additional globally
     // allowed or disallowed attributes. It uses a hardcoded list.
-    $concrete = new HTMLRestrictions(array_diff_key($concrete->getAllowedElements(FALSE), ['*' => NULL]));
-    return implode(' ', $concrete->toCKEditor5ElementsArray());
+    $concrete = new HTMLRestrictions(\array_diff_key($concrete->getAllowedElements(FALSE), ['*' => NULL]));
+    return \implode(' ', $concrete->toCKEditor5ElementsArray());
   }
 
   /**
@@ -1286,17 +1286,17 @@ final class HTMLRestrictions {
     $elements = self::resolveWildcards($this)->getAllowedElements();
     foreach ($elements as $tag => $attributes) {
       $to_allow = ['name' => $tag];
-      assert($attributes === FALSE || is_array($attributes));
-      if (is_array($attributes)) {
+      \assert($attributes === FALSE || \is_array($attributes));
+      if (\is_array($attributes)) {
         foreach ($attributes as $name => $value) {
           // Convert the `'hreflang' => ['en' => TRUE, 'fr' => TRUE]` structure
           // that this class expects to the `['en', 'fr']` structure that the
           // GHS functionality in CKEditor 5 expects.
-          if (is_array($value)) {
+          if (\is_array($value)) {
             // Ensure that all values are strings, this is necessary since PHP
             // transforms the "1" string into 1 the number when it is used as
             // an array key.
-            $value = array_map('strval', array_keys($value));
+            $value = \array_map('strval', \array_keys($value));
           }
           // Drupal never allows style attributes due to security concerns.
           // @see \Drupal\Component\Utility\Xss
@@ -1307,14 +1307,14 @@ final class HTMLRestrictions {
           // @see https://html.spec.whatwg.org/multipage/dom.html#global-attributes
           // @see validateAllowedRestrictionsPhase2()
           // @see validateAllowedRestrictionsPhase4()
-          assert($value === TRUE || Inspector::assertAllStrings($value) || ($tag === '*' && $value === FALSE));
+          \assert($value === TRUE || Inspector::assertAllStrings($value) || ($tag === '*' && $value === FALSE));
           // If a single attribute value is allowed, it must be TRUE (see the
           // assertion above). Otherwise, it must be an array of strings (see
           // the assertion above), which lists all allowed attribute values. To
           // be able to configure GHS to a range of values, we need to use a
           // regular expression.
-          $allowed_attribute_value = is_array($value)
-            ? ['regexp' => ['pattern' => '/^(' . implode('|', str_replace('*', '.*', $value)) . ')$/']]
+          $allowed_attribute_value = \is_array($value)
+            ? ['regexp' => ['pattern' => '/^(' . \implode('|', \str_replace('*', '.*', $value)) . ')$/']]
             : $value;
           if ($name === 'class') {
             $to_allow['classes'] = $allowed_attribute_value;
@@ -1324,7 +1324,7 @@ final class HTMLRestrictions {
           // the attribute name contains a partial wildcard, more complex syntax
           // is needed.
           $to_allow['attributes'][] = [
-            'key' => !str_contains($name, '*') ? $name : ['regexp' => ['pattern' => self::getRegExForWildCardAttributeName($name)]],
+            'key' => !\str_contains($name, '*') ? $name : ['regexp' => ['pattern' => self::getRegExForWildCardAttributeName($name)]],
             'value' => $allowed_attribute_value,
           ];
         }
@@ -1380,7 +1380,7 @@ final class HTMLRestrictions {
    *   An array of HTML5 element tags.
    */
   private static function getHtml5ElementList(): array {
-    return array_keys(Elements::$html5);
+    return \array_keys(Elements::$html5);
   }
 
   /**
@@ -1400,7 +1400,7 @@ final class HTMLRestrictions {
    */
   private static function getWildcardTags(string $wildcard): array {
     $wildcard_element_method = self::WILDCARD_ELEMENT_METHODS[$wildcard];
-    return call_user_func([self::class, $wildcard_element_method]);
+    return \call_user_func([self::class, $wildcard_element_method]);
   }
 
 }

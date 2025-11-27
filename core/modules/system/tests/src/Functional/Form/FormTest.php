@@ -47,7 +47,7 @@ class FormTest extends BrowserTestBase {
     $filtered_html_format->save();
 
     $filtered_html_permission = $filtered_html_format->getPermissionName();
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [$filtered_html_permission]);
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [$filtered_html_permission]);
   }
 
   /**
@@ -183,7 +183,7 @@ class FormTest extends BrowserTestBase {
               // Select elements are going to have validation errors with empty
               // input, since those are not allowed choices. Just make sure the
               // error is not "field is required".
-              $this->assertTrue((empty($errors[$element]) || !str_contains('field is required', (string) $errors[$element])), "Optional '$type' field '$element' is not treated as a required element");
+              $this->assertTrue((empty($errors[$element]) || !\str_contains('field is required', (string) $errors[$element])), "Optional '$type' field '$element' is not treated as a required element");
             }
             else {
               // Make sure there is *no* form error for this element. We're
@@ -234,7 +234,7 @@ class FormTest extends BrowserTestBase {
     // Check the page for error messages.
     $errors = $this->xpath('//div[contains(@class, "error")]//li');
     foreach ($errors as $error) {
-      $expected_key = array_search($error->getText(), $expected);
+      $expected_key = \array_search($error->getText(), $expected);
       // If the error message is not one of the expected messages, fail.
       if ($expected_key === FALSE) {
         $this->fail("Unexpected error message: " . $error[0]);
@@ -341,7 +341,7 @@ class FormTest extends BrowserTestBase {
     $edit = [
       // We choose a random value which is higher than the default value,
       // so we don't accidentally generate the default value.
-      'integer_step' => mt_rand(6, 100),
+      'integer_step' => \mt_rand(6, 100),
     ];
     $this->submitForm($edit, 'Submit');
     // Verify that the error message is displayed with invalid token even when
@@ -436,7 +436,7 @@ class FormTest extends BrowserTestBase {
       'zero_checkbox_off' => 0,
     ];
     foreach ($expected_values as $widget => $expected_value) {
-      $this->assertSame($values[$widget], $expected_value, sprintf('Checkbox %s returns expected value (expected: %s, got: %s)', var_export($widget, TRUE), var_export($expected_value, TRUE), var_export($values[$widget], TRUE)));
+      $this->assertSame($values[$widget], $expected_value, \sprintf('Checkbox %s returns expected value (expected: %s, got: %s)', \var_export($widget, TRUE), \var_export($expected_value, TRUE), \var_export($values[$widget], TRUE)));
     }
   }
 
@@ -509,7 +509,7 @@ class FormTest extends BrowserTestBase {
       'multiple_no_default_required' => ['three' => 'three'],
     ];
     foreach ($expected as $key => $value) {
-      $this->assertSame($value, $values[$key], sprintf('%s: %s is equal to %s.', $key, var_export($values[$key], TRUE), var_export($value, TRUE)));
+      $this->assertSame($value, $values[$key], \sprintf('%s: %s is equal to %s.', $key, \var_export($values[$key], TRUE), \var_export($value, TRUE)));
     }
   }
 
@@ -638,7 +638,7 @@ class FormTest extends BrowserTestBase {
       ->findField($select)
       ->findAll('css', 'option, optgroup');
 
-    $options = array_map($option_map_function, $option_nodes);
+    $options = \array_map($option_map_function, $option_nodes);
     $this->assertSame($order, $options);
   }
 
@@ -710,7 +710,7 @@ class FormTest extends BrowserTestBase {
   public function testRange(): void {
     $this->drupalGet('form-test/range');
     $this->submitForm([], 'Submit');
-    $values = json_decode($this->getSession()->getPage()->getContent());
+    $values = \json_decode($this->getSession()->getPage()->getContent());
     $this->assertEquals(18, $values->with_default_value);
     $this->assertEquals(10.5, $values->float);
     $this->assertEquals(6, $values->integer);
@@ -744,7 +744,7 @@ class FormTest extends BrowserTestBase {
       ];
       $this->drupalGet('form-test/color');
       $this->submitForm($edit, 'Submit');
-      $result = json_decode($this->getSession()->getPage()->getContent());
+      $result = \json_decode($this->getSession()->getPage()->getContent());
       $this->assertEquals($expected, $result->color);
     }
 
@@ -776,7 +776,7 @@ class FormTest extends BrowserTestBase {
     $edit = [];
     foreach (Element::children($form) as $key) {
       if (isset($form[$key]['#test_hijack_value'])) {
-        if (is_array($form[$key]['#test_hijack_value'])) {
+        if (\is_array($form[$key]['#test_hijack_value'])) {
           foreach ($form[$key]['#test_hijack_value'] as $subkey => $value) {
             $edit[$key . '[' . $subkey . ']'] = $value;
           }
@@ -805,9 +805,9 @@ class FormTest extends BrowserTestBase {
 
     // All the elements should be marked as disabled, including the ones below
     // the disabled container.
-    $actual_count = count($disabled_elements);
+    $actual_count = \count($disabled_elements);
     $expected_count = 44;
-    $this->assertEquals($expected_count, $actual_count, sprintf('Found %s elements with disabled property (expected %s).', count($disabled_elements), $expected_count));
+    $this->assertEquals($expected_count, $actual_count, \sprintf('Found %s elements with disabled property (expected %s).', \count($disabled_elements), $expected_count));
 
     // Mink does not "see" hidden elements, so we need to set the value of the
     // hidden element directly.
@@ -840,11 +840,11 @@ class FormTest extends BrowserTestBase {
           $expected_value = $form[$key]['#default_value'];
         }
 
-        if (in_array($key, ['checkboxes_multiple', 'checkboxes_single_select', 'checkboxes_single_unselect'], TRUE)) {
+        if (\in_array($key, ['checkboxes_multiple', 'checkboxes_single_select', 'checkboxes_single_unselect'], TRUE)) {
           // Checkboxes values are not filtered out.
-          $values[$key] = array_filter($values[$key]);
+          $values[$key] = \array_filter($values[$key]);
         }
-        $this->assertSame($expected_value, $values[$key], sprintf('Default value for %s: expected %s, returned %s.', $key, var_export($expected_value, TRUE), var_export($values[$key], TRUE)));
+        $this->assertSame($expected_value, $values[$key], \sprintf('Default value for %s: expected %s, returned %s.', $key, \var_export($expected_value, TRUE), \var_export($values[$key], TRUE)));
       }
 
       // Recurse children.
@@ -869,15 +869,15 @@ class FormTest extends BrowserTestBase {
 
     foreach ($form as $name => $item) {
       // Skip special #types.
-      if (!isset($item['#type']) || in_array($item['#type'], ['hidden', 'text_format'])) {
+      if (!isset($item['#type']) || \in_array($item['#type'], ['hidden', 'text_format'])) {
         continue;
       }
       // Setup XPath and CSS class depending on #type.
-      if (in_array($item['#type'], ['button', 'submit'])) {
+      if (\in_array($item['#type'], ['button', 'submit'])) {
         $path = "//!type[contains(@class, :div-class) and @value=:value]";
         $class = 'is-disabled';
       }
-      elseif (in_array($item['#type'], ['image_button'])) {
+      elseif (\in_array($item['#type'], ['image_button'])) {
         $path = "//!type[contains(@class, :div-class) and @value=:value]";
         $class = 'is-disabled';
       }
@@ -891,10 +891,10 @@ class FormTest extends BrowserTestBase {
       if (isset($type_map[$item['#type']])) {
         $type = $type_map[$item['#type']];
       }
-      if (isset($item['#value']) && is_object($item['#value'])) {
+      if (isset($item['#value']) && \is_object($item['#value'])) {
         $item['#value'] = (string) $item['#value'];
       }
-      $path = strtr($path, ['!type' => $type]);
+      $path = \strtr($path, ['!type' => $type]);
       // Verify that the element exists.
       $this->assertSession()->elementExists('xpath', $this->assertSession()->buildXPathQuery($path, [
         ':name' => Html::escape($name),

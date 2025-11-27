@@ -112,7 +112,7 @@ class LinkFieldUITest extends BrowserTestBase {
           foreach ([TRUE, FALSE] as $label_provided) {
             // Generate a unique machine name for the field so it can be
             // identified in the test.
-            $id = implode('_', [
+            $id = \implode('_', [
               'link',
               $cardinality,
               $link_type,
@@ -180,7 +180,7 @@ class LinkFieldUITest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Link text trimmed to 80 characters');
 
     // Make the fields visible in the form display.
-    $form_display_id = implode('.', ['node', $this->contentType->id(), 'default']);
+    $form_display_id = \implode('.', ['node', $this->contentType->id(), 'default']);
     $form_display = EntityFormDisplay::load($form_display_id);
     $form_display->setComponent($field_name, ['region' => 'content']);
     $form_display->save();
@@ -195,7 +195,7 @@ class LinkFieldUITest extends BrowserTestBase {
     $expected_help_texts = [
       LinkItemInterface::LINK_EXTERNAL => 'This must be an external URL such as <em class="placeholder">https://example.com</em>.',
       LinkItemInterface::LINK_GENERIC => 'You can also enter an internal path such as <em class="placeholder">/node/add</em> or an external URL such as <em class="placeholder">https://example.com</em>. Enter <em class="placeholder">&lt;front&gt;</em> to link to the front page. Enter <em class="placeholder">&lt;nolink&gt;</em> to display link text only',
-      LinkItemInterface::LINK_INTERNAL => rtrim(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), '/'),
+      LinkItemInterface::LINK_INTERNAL => \rtrim(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), '/'),
     ];
 
     // Check that the help texts we assume should be there, is there.
@@ -227,7 +227,7 @@ class LinkFieldUITest extends BrowserTestBase {
    * @internal
    */
   protected function assertFieldContainsRawText(string $field_name, string $text): void {
-    $this->assertTrue((bool) preg_match('/' . preg_quote($text, '/') . '/ui', $this->getFieldHtml($field_name)));
+    $this->assertTrue((bool) \preg_match('/' . \preg_quote($text, '/') . '/ui', $this->getFieldHtml($field_name)));
   }
 
   /**
@@ -241,7 +241,7 @@ class LinkFieldUITest extends BrowserTestBase {
    * @internal
    */
   protected function assertNoFieldContainsRawText(string $field_name, string $text): void {
-    $this->assertFalse((bool) preg_match('/' . preg_quote($text, '/') . '/ui', $this->getFieldHtml($field_name)));
+    $this->assertFalse((bool) \preg_match('/' . \preg_quote($text, '/') . '/ui', $this->getFieldHtml($field_name)));
   }
 
   /**

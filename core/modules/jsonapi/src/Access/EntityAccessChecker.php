@@ -160,13 +160,13 @@ class EntityAccessChecker {
     if ($entity->getEntityType()->isRevisionable()) {
       $access = AccessResult::neutral()->addCacheContexts(['url.query_args:' . JsonApiSpec::VERSION_QUERY_PARAMETER])->orIf($access);
       if (!$entity->isDefaultRevision()) {
-        assert($operation === 'view', 'JSON:API does not yet support mutable operations on revisions.');
+        \assert($operation === 'view', 'JSON:API does not yet support mutable operations on revisions.');
         $revision_access = $this->checkRevisionViewAccess($entity, $account);
         $access = $access->andIf($revision_access);
         // The revision access reason should trump the primary access reason.
         if (!$access->isAllowed()) {
           $reason = $access instanceof AccessResultReasonInterface ? $access->getReason() : '';
-          $access->setReason(trim('The user does not have access to the requested version. ' . $reason));
+          $access->setReason(\trim('The user does not have access to the requested version. ' . $reason));
         }
       }
     }
@@ -191,8 +191,8 @@ class EntityAccessChecker {
    *   The access check result.
    */
   protected function checkRevisionViewAccess(EntityInterface $entity, AccountInterface $account) {
-    assert($entity instanceof RevisionableInterface);
-    assert(!$entity->isDefaultRevision(), 'It is not necessary to check revision access when the entity is the default revision.');
+    \assert($entity instanceof RevisionableInterface);
+    \assert(!$entity->isDefaultRevision(), 'It is not necessary to check revision access when the entity is the default revision.');
     $entity_type = $entity->getEntityType();
     $access = $entity->access('view all revisions', $account, TRUE);
     // Apply content_moderation's additional access logic.
@@ -202,7 +202,7 @@ class EntityAccessChecker {
       // routing system, which makes it necessary to fake a route match.
       $routes = $this->router->getRouteCollection();
       $resource_type = $this->resourceTypeRepository->get($entity->getEntityTypeId(), $entity->bundle());
-      $route_name = sprintf('jsonapi.%s.individual', $resource_type->getTypeName());
+      $route_name = \sprintf('jsonapi.%s.individual', $resource_type->getTypeName());
       $route = $routes->get($route_name);
       $route->setOption('_content_moderation_entity_type', 'entity');
       $route_match = new RouteMatch($route_name, $route, ['entity' => $entity], ['entity' => $entity->uuid()]);

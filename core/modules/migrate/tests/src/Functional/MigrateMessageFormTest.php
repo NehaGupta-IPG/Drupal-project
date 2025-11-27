@@ -44,7 +44,7 @@ class MigrateMessageFormTest extends MigrateMessageTestBase {
       $edit['severity[]'] = $level;
       $this->submitForm($edit, 'Filter');
       $count = $this->getLevelCounts($expected);
-      $this->assertEquals($expected_count, $count[$level], sprintf('Count for level %s failed', $level));
+      $this->assertEquals($expected_count, $count[$level], \sprintf('Count for level %s failed', $level));
     }
 
     // Reset the filter.
@@ -64,9 +64,9 @@ class MigrateMessageFormTest extends MigrateMessageTestBase {
    */
   protected function getLevelCounts(array $levels): array {
     $entries = $this->getMessages();
-    $count = array_fill(1, count($levels), 0);
+    $count = \array_fill(1, \count($levels), 0);
     foreach ($entries as $entry) {
-      if (array_key_exists($entry['severity'], $levels)) {
+      if (\array_key_exists($entry['severity'], $levels)) {
         $count[$entry['severity']]++;
       }
     }
@@ -93,7 +93,7 @@ class MigrateMessageFormTest extends MigrateMessageTestBase {
     $table = $this->xpath('.//table[@id="admin-migrate-msg"]/tbody/tr');
     foreach ($table as $row) {
       $cells = $row->findAll('css', 'td');
-      if (count($cells) === 3) {
+      if (\count($cells) === 3) {
         $entries[] = [
           'msg_id' => $cells[0]->getText(),
           'severity' => $levels[$cells[1]->getText()],

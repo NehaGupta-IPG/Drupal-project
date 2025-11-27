@@ -20,7 +20,7 @@ class DrupalComponentTest extends TestCase {
    * Tests that classes in Component do not use any Core class.
    */
   public function testNoCoreInComponent(): void {
-    $component_path = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__))) . '/lib/Drupal/Component';
+    $component_path = \dirname(\substr(__DIR__, 0, -\strlen(__NAMESPACE__))) . '/lib/Drupal/Component';
     foreach ($this->findPhpClasses($component_path) as $class) {
       $this->assertNoCoreUsage($class);
     }
@@ -30,7 +30,7 @@ class DrupalComponentTest extends TestCase {
    * Tests that classes in Component Tests do not use any Core class.
    */
   public function testNoCoreInComponentTests(): void {
-    $component_path = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__))) . '/tests/Drupal/Tests/Component';
+    $component_path = \dirname(\substr(__DIR__, 0, -\strlen(__NAMESPACE__))) . '/tests/Drupal/Tests/Component';
     foreach ($this->findPhpClasses($component_path) as $class) {
       $this->assertNoCoreUsage($class);
     }
@@ -45,7 +45,7 @@ class DrupalComponentTest extends TestCase {
   #[DataProvider('getComponents')]
   public function testComponentLicense(string $component_path): void {
     $this->assertFileExists($component_path . DIRECTORY_SEPARATOR . 'LICENSE.txt');
-    $this->assertSame('e84dac1d9fbb5a4a69e38654ce644cea769aa76b', hash_file('sha1', $component_path . DIRECTORY_SEPARATOR . 'LICENSE.txt'));
+    $this->assertSame('e84dac1d9fbb5a4a69e38654ce644cea769aa76b', \hash_file('sha1', $component_path . DIRECTORY_SEPARATOR . 'LICENSE.txt'));
   }
 
   /**
@@ -56,7 +56,7 @@ class DrupalComponentTest extends TestCase {
    *   are arrays containing the corresponding component path.
    */
   public static function getComponents(): array {
-    $root_component_path = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__))) . '/lib/Drupal/Component';
+    $root_component_path = \dirname(\substr(__DIR__, 0, -\strlen(__NAMESPACE__))) . '/lib/Drupal/Component';
     $component_paths = [];
     foreach (new \DirectoryIterator($root_component_path) as $file) {
       if ($file->isDir() && !$file->isDot()) {
@@ -79,7 +79,7 @@ class DrupalComponentTest extends TestCase {
     $classes = [];
     foreach (new \DirectoryIterator($dir) as $file) {
       if ($file->isDir() && !$file->isDot()) {
-        $classes = array_merge($classes, $this->findPhpClasses($file->getPathname()));
+        $classes = \array_merge($classes, $this->findPhpClasses($file->getPathname()));
       }
       elseif ($file->getExtension() == 'php') {
         $classes[] = $file->getPathname();
@@ -98,11 +98,11 @@ class DrupalComponentTest extends TestCase {
    * @internal
    */
   protected function assertNoCoreUsage(string $class_path): void {
-    $contents = file_get_contents($class_path);
-    preg_match_all('/^.*Drupal\\\Core.*$/m', $contents, $matches);
-    $matches = array_filter($matches[0], function ($line) {
+    $contents = \file_get_contents($class_path);
+    \preg_match_all('/^.*Drupal\\\Core.*$/m', $contents, $matches);
+    $matches = \array_filter($matches[0], function ($line) {
       // Filter references that don't really matter.
-      return preg_match('/@see|E_USER_DEPRECATED|expectDeprecation/', $line) === 0;
+      return \preg_match('/@see|E_USER_DEPRECATED|expectDeprecation/', $line) === 0;
     });
     $this->assertEmpty($matches, "Checking for illegal reference to 'Drupal\\Core' namespace in $class_path");
   }

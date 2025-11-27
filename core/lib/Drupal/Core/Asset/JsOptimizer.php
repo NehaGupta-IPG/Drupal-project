@@ -38,9 +38,9 @@ class JsOptimizer implements AssetOptimizerInterface {
 
     // If a BOM is found, convert the file to UTF-8, then use substr() to
     // remove the BOM from the result.
-    $data = file_get_contents($js_asset['data']);
+    $data = \file_get_contents($js_asset['data']);
     if ($encoding = (Unicode::encodingFromBOM($data))) {
-      $data = mb_substr(Unicode::convertToUtf8($data, $encoding), 1);
+      $data = \mb_substr(Unicode::convertToUtf8($data, $encoding), 1);
     }
     // If no BOM is found, check for the charset attribute.
     elseif (isset($js_asset['attributes']['charset'])) {
@@ -81,7 +81,7 @@ class JsOptimizer implements AssetOptimizerInterface {
    */
   public function clean($contents) {
     // Remove JS source and source mapping URLs or these may cause 404 errors.
-    $contents = preg_replace('/\/\/(#|@)\s(sourceURL|sourceMappingURL)=\s*(\S*?)\s*$/m', '', $contents);
+    $contents = \preg_replace('/\/\/(#|@)\s(sourceURL|sourceMappingURL)=\s*(\S*?)\s*$/m', '', $contents);
 
     return $contents;
   }

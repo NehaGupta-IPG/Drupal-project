@@ -62,7 +62,7 @@ class Roles extends ManyToOne {
       $roles = $this->roleStorage->loadMultiple();
       unset($roles[RoleInterface::ANONYMOUS_ID]);
       unset($roles[RoleInterface::AUTHENTICATED_ID]);
-      $this->valueOptions = array_map(fn(RoleInterface $role) => $role->label(), $roles);
+      $this->valueOptions = \array_map(fn(RoleInterface $role) => $role->label(), $roles);
     }
     return $this->valueOptions;
 
@@ -87,7 +87,7 @@ class Roles extends ManyToOne {
   public function calculateDependencies() {
     $dependencies = [];
 
-    if (in_array($this->operator, ['empty', 'not empty'])) {
+    if (\in_array($this->operator, ['empty', 'not empty'])) {
       return $dependencies;
     }
 
@@ -95,7 +95,7 @@ class Roles extends ManyToOne {
     // field data, and subsequently the incorrect config schema object and
     // value. In the empty case stop early. Otherwise we cast it to an array
     // later.
-    if (is_string($this->value) && $this->value === '') {
+    if (\is_string($this->value) && $this->value === '') {
       return [];
     }
 

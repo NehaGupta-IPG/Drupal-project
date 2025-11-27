@@ -97,7 +97,7 @@ class SiteConfigureForm extends ConfigFormBase {
     // distract from the message that the Drupal installation has completed
     // successfully.)
     $post_params = $this->getRequest()->request->all();
-    if (empty($post_params) && (Settings::get('skip_permissions_hardening') || !drupal_verify_install_file($this->root . '/' . $settings_file, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE) || !drupal_verify_install_file($this->root . '/' . $settings_dir, FILE_NOT_WRITABLE, 'dir'))) {
+    if (empty($post_params) && (Settings::get('skip_permissions_hardening') || !\drupal_verify_install_file($this->root . '/' . $settings_file, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE) || !\drupal_verify_install_file($this->root . '/' . $settings_dir, FILE_NOT_WRITABLE, 'dir'))) {
       $this->messenger()
         ->addWarning($this->t('All necessary changes to %dir and %file have been made, so you should remove write permissions to them now in order to avoid security risks. If you are unsure how to do so, consult the <a href=":handbook_url">online handbook</a>.', [
           '%dir' => $settings_dir,
@@ -129,7 +129,7 @@ class SiteConfigureForm extends ConfigFormBase {
     ];
     // Use the default site mail if one is already configured, or fall back to
     // PHP's configured sendmail_from.
-    $default_site_mail = $this->config('system.site')->get('mail') ?: ini_get('sendmail_from');
+    $default_site_mail = $this->config('system.site')->get('mail') ?: \ini_get('sendmail_from');
     $form['site_information']['site_mail'] = [
       '#type' => 'email',
       '#title' => $this->t('Site email address'),
@@ -140,7 +140,7 @@ class SiteConfigureForm extends ConfigFormBase {
       '#access' => empty($install_state['config_install_path']),
     ];
 
-    if (count($this->getAdminRoles()) === 0 && $this->superUserAccessPolicy === FALSE) {
+    if (\count($this->getAdminRoles()) === 0 && $this->superUserAccessPolicy === FALSE) {
       $account_label = $this->t('Site account');
     }
     else {
@@ -181,7 +181,7 @@ class SiteConfigureForm extends ConfigFormBase {
     // Use the default site timezone if one is already configured, or fall back
     // to the system timezone if set (and avoid throwing a warning in
     // PHP >=5.4).
-    $default_timezone = $this->config('system.date')->get('timezone.default') ?: @date_default_timezone_get();
+    $default_timezone = $this->config('system.date')->get('timezone.default') ?: @\date_default_timezone_get();
     $form['regional_settings']['date_default_timezone'] = [
       '#type' => 'select',
       '#title' => $this->t('Default time zone'),
@@ -285,8 +285,8 @@ class SiteConfigureForm extends ConfigFormBase {
     // Ensure user 1 has an administrator role if one exists.
     /** @var \Drupal\user\RoleInterface[] $admin_roles */
     $admin_roles = $this->getAdminRoles();
-    if (count(array_intersect($account->getRoles(), array_keys($admin_roles))) === 0) {
-      if (count($admin_roles) > 0) {
+    if (\count(\array_intersect($account->getRoles(), \array_keys($admin_roles))) === 0) {
+      if (\count($admin_roles) > 0) {
         foreach ($admin_roles as $role) {
           $account->addRole($role->id());
         }

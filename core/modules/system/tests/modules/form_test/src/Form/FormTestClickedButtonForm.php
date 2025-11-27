@@ -36,7 +36,7 @@ class FormTestClickedButtonForm extends FormBase {
     ];
 
     // Get button configurations, filter out NULL values.
-    $args = array_filter([$first, $second, $third]);
+    $args = \array_filter([$first, $second, $third]);
 
     // Define button types for each argument.
     $button_types = [
@@ -70,7 +70,7 @@ class FormTestClickedButtonForm extends FormBase {
         }
         // 'r' for restricted, so we can test that button click detection code
         // correctly takes #access security into account.
-        if (str_contains($arg, 'r')) {
+        if (\str_contains($arg, 'r')) {
           $form[$name]['#access'] = FALSE;
         }
       }

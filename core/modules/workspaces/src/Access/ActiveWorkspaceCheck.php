@@ -43,7 +43,7 @@ class ActiveWorkspaceCheck implements AccessInterface {
       return AccessResult::neutral();
     }
 
-    $required_value = filter_var($route->getRequirement('_has_active_workspace'), FILTER_VALIDATE_BOOLEAN);
+    $required_value = \filter_var($route->getRequirement('_has_active_workspace'), FILTER_VALIDATE_BOOLEAN);
     return AccessResult::allowedIf($required_value === $this->workspaceManager->hasActiveWorkspace())->addCacheContexts(['workspace']);
   }
 

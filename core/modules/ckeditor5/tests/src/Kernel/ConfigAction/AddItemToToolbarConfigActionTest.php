@@ -101,7 +101,7 @@ class AddItemToToolbarConfigActionTest extends KernelTestBase {
     $this->assertSame($expected_toolbar_items, $settings['toolbar']['items']);
 
     // The plugin's default settings should have been added.
-    if (in_array('sourceEditing', $expected_toolbar_items, TRUE)) {
+    if (\in_array('sourceEditing', $expected_toolbar_items, TRUE)) {
       $this->assertSame([], $settings['plugins']['ckeditor5_sourceEditing']['allowed_tags']);
     }
   }

@@ -86,20 +86,20 @@ class ViewAjaxController implements ContainerInjectionInterface {
     $display_id = $request->get('view_display_id');
     if (isset($name) && isset($display_id)) {
       $args = $request->get('view_args', '');
-      $args = $args !== '' ? explode('/', Html::decodeEntities($args)) : [];
+      $args = $args !== '' ? \explode('/', Html::decodeEntities($args)) : [];
 
       // Arguments can be empty, make sure they are passed on as NULL so that
       // argument validation is not triggered.
-      $args = array_map(function ($arg) {
+      $args = \array_map(function ($arg) {
         return ($arg == '' ? NULL : $arg);
       }, $args);
 
       $path = $request->get('view_path');
       $target_url = $this->pathValidator->getUrlIfValid($path ?? '');
       $dom_id = $request->get('view_dom_id');
-      $dom_id = isset($dom_id) ? preg_replace('/[^a-zA-Z0-9_-]+/', '-', $dom_id) : NULL;
+      $dom_id = isset($dom_id) ? \preg_replace('/[^a-zA-Z0-9_-]+/', '-', $dom_id) : NULL;
       $pager_element = $request->get('pager_element');
-      $pager_element = isset($pager_element) ? intval($pager_element) : NULL;
+      $pager_element = isset($pager_element) ? \intval($pager_element) : NULL;
 
       $response = new ViewAjaxResponse();
 
@@ -124,7 +124,7 @@ class ViewAjaxController implements ContainerInjectionInterface {
         $response->setView($view);
         // Fix the current path for paging.
         if (!empty($path)) {
-          $this->currentPath->setPath('/' . ltrim($path, '/'), $request);
+          $this->currentPath->setPath('/' . \ltrim($path, '/'), $request);
         }
 
         // Create a clone of the request object to avoid mutating the request
@@ -138,7 +138,7 @@ class ViewAjaxController implements ContainerInjectionInterface {
 
         // Overwrite the destination.
         // @see the redirect.destination service.
-        $origin_destination = $request_clone->getBasePath() . '/' . ltrim($path ?? '/', '/');
+        $origin_destination = $request_clone->getBasePath() . '/' . \ltrim($path ?? '/', '/');
 
         $used_query_parameters = $request_clone->query->all();
         $query = UrlHelper::buildQuery($used_query_parameters);
@@ -162,8 +162,8 @@ class ViewAjaxController implements ContainerInjectionInterface {
           'theme' => TRUE,
           'theme_token' => TRUE,
         ];
-        if (is_array($existing_page_state) &&
-            ($temp_attributes = array_intersect_key($existing_page_state, $theme_keys))) {
+        if (\is_array($existing_page_state) &&
+            ($temp_attributes = \array_intersect_key($existing_page_state, $theme_keys))) {
           $request->attributes->set('ajax_page_state', $temp_attributes);
         }
         $preview = $view->preview($display_id, $args);

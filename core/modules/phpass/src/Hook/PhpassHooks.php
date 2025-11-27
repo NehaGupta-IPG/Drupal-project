@@ -40,7 +40,7 @@ class PhpassHooks {
   #[Hook('form_system_modules_uninstall_confirm_form_alter')]
   public function formSystemModulesUninstallConfirmFormAlter(array &$form, FormStateInterface $form_state) : void {
     $modules = \Drupal::keyValueExpirable('modules_uninstall')->get(\Drupal::currentUser()->id());
-    if (!in_array('phpass', $modules)) {
+    if (!\in_array('phpass', $modules)) {
       return;
     }
     \Drupal::messenger()->addWarning($this->t('Make sure that you can log in before uninstalling the Password Compatibility module. For more information, see the <a href=":phpass">online documentation for the Password Compatibility module</a>.', [

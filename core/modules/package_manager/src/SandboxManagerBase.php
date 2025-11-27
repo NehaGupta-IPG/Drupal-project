@@ -430,12 +430,12 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
     // the installed packages yet.
     if ($runtime) {
       self::validateRequirements($runtime);
-      $command = array_merge(['require', '--no-update'], $runtime);
+      $command = \array_merge(['require', '--no-update'], $runtime);
       $do_stage($command);
     }
     if ($dev) {
       self::validateRequirements($dev);
-      $command = array_merge(['require', '--dev', '--no-update'], $dev);
+      $command = \array_merge(['require', '--dev', '--no-update'], $dev);
       $do_stage($command);
     }
 
@@ -549,7 +549,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
     }
     // Rebuild the container and clear all caches, to ensure that new services
     // are picked up.
-    drupal_flush_all_caches();
+    \drupal_flush_all_caches();
     // Refresh the event dispatcher so that new or changed event subscribers
     // will be called. The other services we depend on are either stateless or
     // unlikely to call newly added code during the current request.
@@ -687,7 +687,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
       )->render());
     }
 
-    if (array_slice($stored_lock, 0, 3) === [$unique_id, static::class, $this->getType()]) {
+    if (\array_slice($stored_lock, 0, 3) === [$unique_id, static::class, $this->getType()]) {
       $this->lock = $stored_lock;
 
       if ($this->isDirectWrite()) {
@@ -796,7 +796,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    */
   public function sandboxDirectoryExists(): bool {
     try {
-      return is_dir($this->getSandboxDirectory());
+      return \is_dir($this->getSandboxDirectory());
     }
     catch (\LogicException) {
       return FALSE;
@@ -848,13 +848,13 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
     $version_parser = new VersionParser();
 
     foreach ($requirements as $requirement) {
-      $parts = explode(':', $requirement, 2);
+      $parts = \explode(':', $requirement, 2);
       $name = $parts[0];
 
-      if (!preg_match(self::COMPOSER_PLATFORM_PACKAGE_REGEX, $name) && !preg_match(self::COMPOSER_PACKAGE_REGEX, $name)) {
+      if (!\preg_match(self::COMPOSER_PLATFORM_PACKAGE_REGEX, $name) && !\preg_match(self::COMPOSER_PACKAGE_REGEX, $name)) {
         throw new \InvalidArgumentException("Invalid package name '$name'.");
       }
-      if (count($parts) > 1) {
+      if (\count($parts) > 1) {
         $version_parser->parseConstraints($parts[1]);
       }
     }

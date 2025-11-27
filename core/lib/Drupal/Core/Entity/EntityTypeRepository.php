@@ -53,7 +53,7 @@ class EntityTypeRepository implements EntityTypeRepositoryInterface {
     if ($group) {
       foreach ($options as &$group_options) {
         // Sort the list alphabetically by group label.
-        array_multisort($group_options, SORT_ASC, SORT_NATURAL);
+        \array_multisort($group_options, SORT_ASC, SORT_NATURAL);
       }
 
       // Make sure that the 'Content' group is situated at the top.

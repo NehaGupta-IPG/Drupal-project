@@ -55,7 +55,7 @@ abstract class SecuredRedirectResponse extends RedirectResponse {
    */
   public function setTargetUrl($url): static {
     if (!$this->isSafe($url)) {
-      throw new \InvalidArgumentException(sprintf('It is not safe to redirect to %s', $url));
+      throw new \InvalidArgumentException(\sprintf('It is not safe to redirect to %s', $url));
     }
     return parent::setTargetUrl($url);
   }

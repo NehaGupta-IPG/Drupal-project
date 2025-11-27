@@ -38,7 +38,7 @@ class InstallerIsolationLevelNoDatabaseSettingsTest extends InstallerTestBase {
    * Verifies that the isolation_level was added to the database settings.
    */
   public function testInstaller(): void {
-    $contents = file_get_contents($this->container->getParameter('app.root') . '/' . $this->siteDirectory . '/settings.php');
+    $contents = \file_get_contents($this->container->getParameter('app.root') . '/' . $this->siteDirectory . '/settings.php');
 
     // Test that isolation_level was set to "READ COMMITTED".
     $this->assertStringContainsString("'isolation_level' => 'READ COMMITTED',", $contents);

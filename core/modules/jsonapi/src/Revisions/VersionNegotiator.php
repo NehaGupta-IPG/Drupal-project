@@ -43,7 +43,7 @@ class VersionNegotiator {
    *   The name of the negotiation strategy used by the version negotiator.
    */
   public function addVersionNegotiator(VersionNegotiatorInterface $version_negotiator, $negotiator_name) {
-    assert(str_starts_with(get_class($version_negotiator), 'Drupal\\jsonapi\\'), 'Version negotiators are not a public API.');
+    \assert(\str_starts_with(\get_class($version_negotiator), 'Drupal\\jsonapi\\'), 'Version negotiators are not a public API.');
     $this->negotiators[$negotiator_name] = $version_negotiator;
   }
 
@@ -65,7 +65,7 @@ class VersionNegotiator {
    */
   public function getRevision(EntityInterface $entity, $resource_version_identifier) {
     try {
-      [$version_negotiator_name, $version_argument] = explode(VersionNegotiator::SEPARATOR, $resource_version_identifier, 2);
+      [$version_negotiator_name, $version_argument] = \explode(VersionNegotiator::SEPARATOR, $resource_version_identifier, 2);
       if (!isset($this->negotiators[$version_negotiator_name])) {
         static::throwBadRequestHttpException($resource_version_identifier);
       }
@@ -91,7 +91,7 @@ class VersionNegotiator {
    */
   protected static function throwNotFoundHttpException(EntityInterface $entity, $resource_version_identifier) {
     $cacheability = CacheableMetadata::createFromObject($entity)->addCacheContexts(['url.path', 'url.query_args:' . ResourceVersionRouteEnhancer::RESOURCE_VERSION_QUERY_PARAMETER]);
-    $reason = sprintf('The requested version, identified by `%s`, could not be found.', $resource_version_identifier);
+    $reason = \sprintf('The requested version, identified by `%s`, could not be found.', $resource_version_identifier);
     throw new CacheableNotFoundHttpException($cacheability, $reason);
   }
 
@@ -105,7 +105,7 @@ class VersionNegotiator {
    */
   protected static function throwBadRequestHttpException($resource_version_identifier) {
     $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:' . ResourceVersionRouteEnhancer::RESOURCE_VERSION_QUERY_PARAMETER]);
-    $message = sprintf('An invalid resource version identifier, `%s`, was provided.', $resource_version_identifier);
+    $message = \sprintf('An invalid resource version identifier, `%s`, was provided.', $resource_version_identifier);
     throw new CacheableBadRequestHttpException($cacheability, $message);
   }
 

@@ -64,7 +64,7 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
     $description = $this->randomMachineName();
     $this->drupalGet('admin/structure/media/add');
     $page->fillField('label', $name);
-    $machine_name = strtolower($name);
+    $machine_name = \strtolower($name);
     $this->assertJsCondition("jQuery('.machine-name-value').html() == '$machine_name'");
     $page->selectFieldOption('source', 'test');
     $this->assertJsCondition("jQuery('.form-item-source-configuration-test-config-value').length > 0");
@@ -97,7 +97,7 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
 
     /** @var \Drupal\media\MediaTypeInterface $media_type_storage */
     $media_type_storage = $this->container->get('entity_type.manager')->getStorage('media_type');
-    $this->testMediaType = $media_type_storage->load(strtolower($name));
+    $this->testMediaType = $media_type_storage->load(\strtolower($name));
 
     // Check if all action links exist.
     $assert_session->linkByHrefExists('admin/structure/media/add');

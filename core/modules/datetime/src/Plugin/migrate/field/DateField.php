@@ -57,13 +57,13 @@ class DateField extends FieldPluginBase {
   public function defineValueProcessPipeline(MigrationInterface $migration, $field_name, $data) {
     $to_format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT;
     if (isset($data['field_definition']['data'])) {
-      $field_data = unserialize($data['field_definition']['data']);
+      $field_data = \unserialize($data['field_definition']['data']);
       if (isset($field_data['settings']['granularity'])) {
         $granularity = $field_data['settings']['granularity'];
-        $collected_date_attributes = is_numeric(array_keys($granularity)[0])
+        $collected_date_attributes = \is_numeric(\array_keys($granularity)[0])
           ? $granularity
-          : array_keys(array_filter($granularity));
-        if (empty(array_intersect($collected_date_attributes, ['hour', 'minute', 'second']))) {
+          : \array_keys(\array_filter($granularity));
+        if (empty(\array_intersect($collected_date_attributes, ['hour', 'minute', 'second']))) {
           $to_format = DateTimeItemInterface::DATE_STORAGE_FORMAT;
         }
       }
@@ -84,7 +84,7 @@ class DateField extends FieldPluginBase {
         break;
 
       default:
-        throw new MigrateException(sprintf('Field %s of type %s is an unknown date field type.', $field_name, var_export($data['type'], TRUE)));
+        throw new MigrateException(\sprintf('Field %s of type %s is an unknown date field type.', $field_name, \var_export($data['type'], TRUE)));
     }
     $process = [
       'value' => [
@@ -125,7 +125,7 @@ class DateField extends FieldPluginBase {
         return 'daterange';
       }
       else {
-        throw new MigrateException(sprintf("Can't migrate field '%s' with 'todate' settings. Enable the datetime_range module. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#datetime", $row->get('field_name')));
+        throw new MigrateException(\sprintf("Can't migrate field '%s' with 'todate' settings. Enable the datetime_range module. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#datetime", $row->get('field_name')));
       }
     }
 

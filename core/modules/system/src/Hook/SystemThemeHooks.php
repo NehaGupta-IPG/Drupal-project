@@ -134,7 +134,7 @@ class SystemThemeHooks {
       ],
     ];
 
-    return array_merge($themeCommonElements, $systemTheme);
+    return \array_merge($themeCommonElements, $systemTheme);
   }
 
   /**
@@ -162,8 +162,8 @@ class SystemThemeHooks {
    */
   #[Hook('theme_suggestions_html')]
   public function themeSuggestionsHtml(array $variables): array {
-    $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
-    return theme_get_suggestions($path_args, 'html');
+    $path_args = \explode('/', \trim(\Drupal::service('path.current')->getPath(), '/'));
+    return \theme_get_suggestions($path_args, 'html');
   }
 
   /**
@@ -171,15 +171,15 @@ class SystemThemeHooks {
    */
   #[Hook('theme_suggestions_page')]
   public function themeSuggestionsPage(array $variables): array {
-    $path_args = explode('/', trim(\Drupal::service('path.current')->getPath(), '/'));
-    $suggestions = theme_get_suggestions($path_args, 'page');
+    $path_args = \explode('/', \trim(\Drupal::service('path.current')->getPath(), '/'));
+    $suggestions = \theme_get_suggestions($path_args, 'page');
     $supported_http_error_codes = [
       401,
       403,
       404,
     ];
     $exception = \Drupal::requestStack()->getCurrentRequest()->attributes->get('exception');
-    if ($exception instanceof HttpExceptionInterface && in_array($exception->getStatusCode(), $supported_http_error_codes, TRUE)) {
+    if ($exception instanceof HttpExceptionInterface && \in_array($exception->getStatusCode(), $supported_http_error_codes, TRUE)) {
       $suggestions[] = 'page__4xx';
       $suggestions[] = 'page__' . $exception->getStatusCode();
     }
@@ -194,7 +194,7 @@ class SystemThemeHooks {
     $suggestions = [];
     // Dead databases will show error messages so supplying this template will
     // allow themers to override the page and the content completely.
-    $offline = defined('MAINTENANCE_MODE');
+    $offline = \defined('MAINTENANCE_MODE');
     try {
       \Drupal::service('path.matcher')->isFrontPage();
     }
@@ -276,9 +276,9 @@ class SystemThemeHooks {
     $variables['#cache']['tags'][] = 'config:system.theme';
     // If Claro is the admin theme but not the active theme, still include
     // Claro's toolbar preprocessing.
-    if (_system_is_claro_admin_and_not_active()) {
+    if (\_system_is_claro_admin_and_not_active()) {
       require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_preprocess_toolbar($variables, $hook, $info);
+      \claro_preprocess_toolbar($variables, $hook, $info);
     }
   }
 

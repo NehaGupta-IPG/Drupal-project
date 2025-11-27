@@ -103,7 +103,7 @@ class UploadedFileConstraintValidatorTest extends KernelTestBase {
     $this->assertCount(1, $violations);
     $violation = $violations->get(0);
     $this->assertInstanceOf(TranslatableMarkup::class, $violation->getMessage());
-    $this->assertEquals(sprintf($message, $this->filename), $violation->getMessage());
+    $this->assertEquals(\sprintf($message, $this->filename), $violation->getMessage());
     $this->assertEquals($errorCode, $violation->getCode());
   }
 

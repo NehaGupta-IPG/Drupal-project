@@ -93,12 +93,12 @@ class WorkflowTransitionEditForm extends EntityForm {
 
     // @todo https://www.drupal.org/node/2830584 Add some ajax to ensure that
     //   only valid transitions are selectable.
-    $states = array_map([State::class, 'labelCallback'], $workflow->getTypePlugin()->getStates());
+    $states = \array_map([State::class, 'labelCallback'], $workflow->getTypePlugin()->getStates());
     $form['from'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('From'),
       '#required' => TRUE,
-      '#default_value' => array_keys($transition->from()),
+      '#default_value' => \array_keys($transition->from()),
       '#options' => $states,
     ];
     $form['to'] = [
@@ -135,7 +135,7 @@ class WorkflowTransitionEditForm extends EntityForm {
     $transition = $workflow_type->getTransition($this->transitionId);
 
     $values = $form_state->getValues();
-    foreach (array_filter($values['from']) as $from_state_id) {
+    foreach (\array_filter($values['from']) as $from_state_id) {
       if ($workflow_type->hasTransitionFromStateToState($from_state_id, $values['to'])) {
         $existing_transition = $workflow_type->getTransitionFromStateToState($from_state_id, $values['to']);
         if ($existing_transition->id() !== $values['id']) {
@@ -177,7 +177,7 @@ class WorkflowTransitionEditForm extends EntityForm {
     $values = $form_state->getValues();
     $form_state->set('created_transition', FALSE);
     $entity->getTypePlugin()->setTransitionLabel($values['id'], $values['label']);
-    $entity->getTypePlugin()->setTransitionFromStates($values['id'], array_filter($values['from']));
+    $entity->getTypePlugin()->setTransitionFromStates($values['id'], \array_filter($values['from']));
   }
 
   /**

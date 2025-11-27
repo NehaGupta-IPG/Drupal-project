@@ -151,7 +151,7 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
           'allow-plugins.' . PhpTufValidator::PLUGIN_NAME => FALSE,
         ],
         [
-          t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
+          \t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
         ],
       ],
       'all plugins disallowed' => [
@@ -159,7 +159,7 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
           'allow-plugins' => FALSE,
         ],
         [
-          t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
+          \t('The <code>php-tuf/composer-integration</code> plugin is not listed as an allowed plugin.'),
         ],
       ],
       'packages.drupal.org not using TUF' => [
@@ -170,7 +170,7 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
           ],
         ],
         [
-          t('TUF is not enabled for the <code>https://packages.drupal.org/8</code> repository.'),
+          \t('TUF is not enabled for the <code>https://packages.drupal.org/8</code> repository.'),
         ],
       ],
     ];
@@ -187,7 +187,7 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
       $arguments[] = PreRequireEvent::class;
       yield "$name on pre-require" => $arguments;
 
-      array_splice($arguments, -1, NULL, PreApplyEvent::class);
+      \array_splice($arguments, -1, NULL, PreApplyEvent::class);
       yield "$name on pre-apply" => $arguments;
     }
   }

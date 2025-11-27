@@ -85,8 +85,8 @@ class FieldInstancePerViewModeTest extends MigrateSqlSourceTestBase {
     // The source data.
     foreach ($tests[0]['expected_data'] as $k => $field_view_mode) {
       // These are stored as serialized strings.
-      $field_view_mode['display_settings'] = serialize($field_view_mode['display_settings']);
-      $field_view_mode['widget_settings'] = serialize($field_view_mode['widget_settings']);
+      $field_view_mode['display_settings'] = \serialize($field_view_mode['display_settings']);
+      $field_view_mode['widget_settings'] = \serialize($field_view_mode['widget_settings']);
 
       $tests[0]['source_data']['content_node_field'][] = [
         'field_name' => $field_view_mode['field_name'],

@@ -101,7 +101,7 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
     if ($new_entities) {
       if ($handler instanceof SelectionWithAutocreateInterface) {
         $valid_new_entities = $handler->validateReferenceableNewEntities($new_entities);
-        $invalid_new_entities = array_diff_key($new_entities, $valid_new_entities);
+        $invalid_new_entities = \array_diff_key($new_entities, $valid_new_entities);
       }
       else {
         // If the selection handler does not support referencing newly created
@@ -122,7 +122,7 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
     // Add violations on deltas with a target_id that is not valid.
     if ($target_ids) {
       $valid_target_ids = $handler->validateReferenceableEntities($target_ids);
-      if ($invalid_target_ids = array_diff($target_ids, $valid_target_ids)) {
+      if ($invalid_target_ids = \array_diff($target_ids, $valid_target_ids)) {
         // Get a list of pre-existing references.
         $previously_referenced_ids = [];
         if ($entity && !$entity->isNew()) {

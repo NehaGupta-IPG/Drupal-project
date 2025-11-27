@@ -65,7 +65,7 @@ class FileSaveUploadTest extends KernelTestBase {
   public function testFileSaveUploadEmptyExtensions(): void {
     // Allow all extensions.
     $validators = ['FileExtension' => []];
-    $files = file_save_upload('file', $validators);
+    $files = \file_save_upload('file', $validators);
     $this->assertCount(1, $files);
     $file = $files[0];
     // @todo work out why move_uploaded_file() is failing.

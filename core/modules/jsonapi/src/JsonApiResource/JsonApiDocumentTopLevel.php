@@ -67,8 +67,8 @@ class JsonApiDocumentTopLevel {
    *   (optional) The metadata to normalize.
    */
   public function __construct($data, IncludedData $includes, LinkCollection $links, array $meta = []) {
-    assert($data instanceof TopLevelDataInterface || $data instanceof ErrorCollection);
-    assert(!$data instanceof ErrorCollection || $includes instanceof NullIncludedData);
+    \assert($data instanceof TopLevelDataInterface || $data instanceof ErrorCollection);
+    \assert(!$data instanceof ErrorCollection || $includes instanceof NullIncludedData);
     $this->data = $data instanceof TopLevelDataInterface ? $data->getData() : $data;
     $this->includes = $includes->getData();
     $this->links = $data instanceof TopLevelDataInterface ? $data->getMergedLinks($links->withContext($this)) : $links->withContext($this);

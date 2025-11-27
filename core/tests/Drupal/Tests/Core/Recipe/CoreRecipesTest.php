@@ -24,7 +24,7 @@ class CoreRecipesTest extends UnitTestCase {
   public static function providerRecipeHasGenericTest(): iterable {
     $finder = Finder::create()
       ->in([
-        dirname(__DIR__, 5) . '/recipes',
+        \dirname(__DIR__, 5) . '/recipes',
       ])
       ->directories()
       // Recipes can't contain other recipes, so we don't need to search in
@@ -32,7 +32,7 @@ class CoreRecipesTest extends UnitTestCase {
       ->depth(0)
       // The Example recipe is for documentation only, and cannot be applied.
       ->notName(['example']);
-    static::assertGreaterThan(0, count($finder), 'No core recipes were found.');
+    static::assertGreaterThan(0, \count($finder), 'No core recipes were found.');
 
     $scenarios = [];
     /** @var \Symfony\Component\Finder\SplFileInfo $recipe */

@@ -149,18 +149,18 @@ class Views {
 
     foreach ($definitions as $id => $plugin) {
       // Skip plugins that don't conform to our key, if they have one.
-      if ($key && isset($plugin['display_types']) && !in_array($key, $plugin['display_types'])) {
+      if ($key && isset($plugin['display_types']) && !\in_array($key, $plugin['display_types'])) {
         continue;
       }
 
-      if (empty($plugin['no_ui']) && (empty($base) || empty($plugin['base']) || array_intersect($base, $plugin['base']))) {
+      if (empty($plugin['no_ui']) && (empty($base) || empty($plugin['base']) || \array_intersect($base, $plugin['base']))) {
         $plugins[$id] = $plugin['title'];
       }
     }
 
     if (!empty($plugins)) {
-      uasort($plugins, static function ($a, $b) {
-        return strcmp((string) $a, (string) $b);
+      \uasort($plugins, static function ($a, $b) {
+        return \strcmp((string) $a, (string) $b);
       });
     }
 
@@ -186,9 +186,9 @@ class Views {
    * Gets enabled display extenders.
    */
   public static function getEnabledDisplayExtenders() {
-    $enabled = array_filter((array) \Drupal::config('views.settings')->get('display_extenders'));
+    $enabled = \array_filter((array) \Drupal::config('views.settings')->get('display_extenders'));
 
-    return array_combine($enabled, $enabled);
+    return \array_combine($enabled, $enabled);
   }
 
   /**
@@ -232,9 +232,9 @@ class Views {
 
       foreach ($view->get('display') as $id => $display) {
         // If the key doesn't exist, enabled is assumed.
-        $enabled = !empty($display['display_options']['enabled']) || !array_key_exists('enabled', $display['display_options']);
+        $enabled = !empty($display['display_options']['enabled']) || !\array_key_exists('enabled', $display['display_options']);
 
-        if ($enabled && in_array($display['display_plugin'], $plugin_ids)) {
+        if ($enabled && \in_array($display['display_plugin'], $plugin_ids)) {
           $result[] = [$view->id(), $id];
         }
       }
@@ -314,8 +314,8 @@ class Views {
       case 'all':
       case 'disabled':
       case 'enabled':
-        $filter = ucfirst($filter);
-        $views = call_user_func(static::class . "::get{$filter}Views");
+        $filter = \ucfirst($filter);
+        $views = \call_user_func(static::class . "::get{$filter}Views");
         break;
 
       default:
@@ -327,14 +327,14 @@ class Views {
       $exclude_view_name = '';
       $exclude_view_display = '';
     }
-    elseif (is_object($exclude_view)) {
+    elseif (\is_object($exclude_view)) {
       $exclude_view_name = $exclude_view->storage->id();
       $exclude_view_display = $exclude_view->current_display;
     }
     else {
       // Append a ':' to the $exclude_view string so we always have more than
       // one item to explode.
-      [$exclude_view_name, $exclude_view_display] = explode(':', "$exclude_view:");
+      [$exclude_view_name, $exclude_view_display] = \explode(':', "$exclude_view:");
     }
 
     $options = [];
@@ -349,17 +349,17 @@ class Views {
         foreach ($view->get('display') as $display_id => $display) {
           if (!($id == $exclude_view_name && $display_id == $exclude_view_display)) {
             if ($optgroup) {
-              $options[$id][$id . ':' . $display['id']] = t('@view : @display', ['@view' => $id, '@display' => $display['id']]);
+              $options[$id][$id . ':' . $display['id']] = \t('@view : @display', ['@view' => $id, '@display' => $display['id']]);
             }
             else {
-              $options[$id . ':' . $display['id']] = t('View: @view - Display: @display', ['@view' => $id, '@display' => $display['id']]);
+              $options[$id . ':' . $display['id']] = \t('View: @view - Display: @display', ['@view' => $id, '@display' => $display['id']]);
             }
           }
         }
       }
     }
     if ($sort) {
-      ksort($options);
+      \ksort($options);
     }
     return $options;
   }
@@ -516,14 +516,14 @@ class Views {
    */
   public static function getPluginTypes($type = NULL) {
     if ($type === NULL) {
-      return array_keys(static::$plugins);
+      return \array_keys(static::$plugins);
     }
 
-    if (!in_array($type, ['plugin', 'handler'])) {
+    if (!\in_array($type, ['plugin', 'handler'])) {
       throw new \Exception('Invalid plugin type used. Valid types are "plugin" or "handler".');
     }
 
-    return array_keys(array_filter(static::$plugins, function ($plugin_type) use ($type) {
+    return \array_keys(\array_filter(static::$plugins, function ($plugin_type) use ($type) {
       return $plugin_type == $type;
     }));
   }

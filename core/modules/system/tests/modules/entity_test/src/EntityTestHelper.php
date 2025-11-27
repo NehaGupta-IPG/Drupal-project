@@ -51,7 +51,7 @@ class EntityTestHelper {
     $types[] = 'entity_test_mulrev';
     $types[] = 'entity_test_mulrev_changed';
 
-    return array_combine($types, $types);
+    return \array_combine($types, $types);
   }
 
   /**

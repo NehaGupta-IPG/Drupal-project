@@ -81,7 +81,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    */
   public function processDefinition(&$definition, $plugin_id) {
     if (!$definition instanceof CKEditor5PluginDefinition) {
-      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" CKEditor 5 plugin definition must extend %s', $plugin_id, CKEditor5PluginDefinition::class));
+      throw new InvalidPluginDefinitionException($plugin_id, \sprintf('The "%s" CKEditor 5 plugin definition must extend %s', $plugin_id, CKEditor5PluginDefinition::class));
     }
 
     // A derived plugin will still have the ID of the derivative, rather than
@@ -94,10 +94,10 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
       $definition = new CKEditor5PluginDefinition(['id' => $plugin_id] + $definition->toArray());
     }
 
-    $expected_prefix = sprintf("%s_", $definition->getProvider());
+    $expected_prefix = \sprintf("%s_", $definition->getProvider());
     $id = $definition->id();
-    if (!str_starts_with($id, $expected_prefix)) {
-      throw new InvalidPluginDefinitionException($id, sprintf('The "%s" CKEditor 5 plugin definition must have a plugin ID that starts with "%s".', $id, $expected_prefix));
+    if (!\str_starts_with($id, $expected_prefix)) {
+      throw new InvalidPluginDefinitionException($id, \sprintf('The "%s" CKEditor 5 plugin definition must have a plugin ID that starts with "%s".', $id, $expected_prefix));
     }
 
     try {
@@ -110,7 +110,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
       // Re-throw the exception, but tweak the language for DX: clarify it is
       // for a derived plugin definition.
       if ($is_derived) {
-        throw new InvalidPluginDefinitionException($e->getPluginId(), str_replace('plugin definition', 'derived plugin definition', $e->getMessage()));
+        throw new InvalidPluginDefinitionException($e->getPluginId(), \str_replace('plugin definition', 'derived plugin definition', $e->getMessage()));
       }
       // Otherwise, the exception was appropriate: re-throw it.
       throw $e;
@@ -163,7 +163,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
   public function getAdminLibraries(): array {
     $list = $this->mergeDefinitionValues('getAdminLibrary', $this->getDefinitions());
     // Include main admin library.
-    array_unshift($list, 'ckeditor5/internal.admin');
+    \array_unshift($list, 'ckeditor5/internal.admin');
     return $list;
   }
 
@@ -172,10 +172,10 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    */
   public function getEnabledLibraries(EditorInterface $editor): array {
     $list = $this->mergeDefinitionValues('getLibrary', $this->getEnabledDefinitions($editor));
-    $list = array_unique($list);
+    $list = \array_unique($list);
     // Include main library.
-    array_unshift($list, 'ckeditor5/internal.drupal.ckeditor5');
-    sort($list);
+    \array_unshift($list, 'ckeditor5/internal.drupal.ckeditor5');
+    \sort($list);
     return $list;
   }
 
@@ -184,7 +184,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    */
   public function getEnabledDefinitions(EditorInterface $editor): array {
     $definitions = $this->getDefinitions();
-    ksort($definitions);
+    \ksort($definitions);
 
     $definitions_with_plugins_condition = [];
 
@@ -199,7 +199,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
           // The `plugins` condition can only be evaluated at the end of
           // gathering enabled definitions. ::isPluginDisabled() did not yet
           // evaluate that condition.
-          if (array_key_exists('plugins', $definition->getConditions())) {
+          if (\array_key_exists('plugins', $definition->getConditions())) {
             $definitions_with_plugins_condition[$plugin_id] = $definition;
           }
         }
@@ -207,7 +207,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
       // Otherwise, only remove the definition if the plugin has buttons and
       // none of its buttons are active.
       elseif ($definition->hasToolbarItems()) {
-        if (empty(array_intersect($editor->getSettings()['toolbar']['items'], array_keys($definition->getToolbarItems())))) {
+        if (empty(\array_intersect($editor->getSettings()['toolbar']['items'], \array_keys($definition->getToolbarItems())))) {
           unset($definitions[$plugin_id]);
         }
       }
@@ -223,13 +223,13 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
 
     // Evaluate `plugins` condition.
     foreach ($definitions_with_plugins_condition as $plugin_id => $definition) {
-      if (!empty(array_diff($definition->getConditions()['plugins'], array_keys($definitions)))) {
+      if (!empty(\array_diff($definition->getConditions()['plugins'], \array_keys($definitions)))) {
         unset($definitions[$plugin_id]);
       }
     }
 
     if (!isset($definitions['ckeditor5_arbitraryHtmlSupport'])) {
-      $restrictions = new HTMLRestrictions($this->getProvidedElements(array_keys($definitions), $editor, FALSE));
+      $restrictions = new HTMLRestrictions($this->getProvidedElements(\array_keys($definitions), $editor, FALSE));
       if ($restrictions->getWildcardSubset()->allowsNothing()) {
         // This is only reached if arbitrary HTML is not enabled. If wildcard
         // tags (such as $text-container) are present, they need to
@@ -261,7 +261,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
       $provided_elements = $this->getProvidedElements([$id]);
 
       // Multiple plugins may support the $tag being searched for.
-      if (array_key_exists($tag, $provided_elements)) {
+      if (\array_key_exists($tag, $provided_elements)) {
         // Skip plugins with conditions as those plugins can't be guaranteed to
         // provide a given tag without additional criteria being met. In the
         // future we could possibly add support for automatically enabling
@@ -282,20 +282,20 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
         // True if a plugin supporting $tag has been selected but does not allow
         // any attributes while the plugin currently being checked does support
         // attributes.
-        $adds_attribute_config = is_array($provided_elements[$tag]) && $selected_plugin && !is_array($selected_config);
+        $adds_attribute_config = \is_array($provided_elements[$tag]) && $selected_plugin && !\is_array($selected_config);
         $broader_attribute_config = FALSE;
 
         // If the selected plugin and the plugin being checked both have arrays
         // for $tag configuration, they both have attribute configuration. Check
         // which attribute configuration is more permissive.
-        if ($selected_plugin && is_array($selected_config) && is_array($provided_elements[$tag])) {
-          $selected_plugin_full_attributes = array_filter($selected_config, function ($attribute_config) {
-            return !is_array($attribute_config);
+        if ($selected_plugin && \is_array($selected_config) && \is_array($provided_elements[$tag])) {
+          $selected_plugin_full_attributes = \array_filter($selected_config, function ($attribute_config) {
+            return !\is_array($attribute_config);
           });
-          $being_checked_plugin_full_attributes = array_filter($provided_elements[$tag], function ($attribute_config) {
-            return !is_array($attribute_config);
+          $being_checked_plugin_full_attributes = \array_filter($provided_elements[$tag], function ($attribute_config) {
+            return !\is_array($attribute_config);
           });
-          if (count($being_checked_plugin_full_attributes) > count($selected_plugin_full_attributes)) {
+          if (\count($being_checked_plugin_full_attributes) > \count($selected_plugin_full_attributes)) {
             $broader_attribute_config = TRUE;
           }
         }
@@ -331,7 +331,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
     // necessary, and only when necessary.
     // @see \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getEnabledDefinitions()
     if (isset($definitions['ckeditor5_wildcardHtmlSupport'])) {
-      $allowed_elements = new HTMLRestrictions($this->getProvidedElements(array_keys($definitions), $editor, FALSE));
+      $allowed_elements = new HTMLRestrictions($this->getProvidedElements(\array_keys($definitions), $editor, FALSE));
       // Compute the net new elements that the wildcard tags resolve into.
       $concrete_allowed_elements = $allowed_elements->getConcreteSubset();
       $net_new_elements = $allowed_elements->diff($concrete_allowed_elements);
@@ -354,7 +354,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
   public function getProvidedElements(array $plugin_ids = [], ?EditorInterface $editor = NULL, bool $resolve_wildcards = TRUE, bool $creatable_elements_only = FALSE): array {
     $plugins = $this->getDefinitions();
     if (!empty($plugin_ids)) {
-      $plugins = array_intersect_key($plugins, array_flip($plugin_ids));
+      $plugins = \array_intersect_key($plugins, \array_flip($plugin_ids));
     }
     $elements = HTMLRestrictions::emptySet();
 
@@ -366,7 +366,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
       }
 
       $defined_elements = $definition->getElements();
-      if (is_a($definition->getClass(), CKEditor5PluginElementsSubsetInterface::class, TRUE)) {
+      if (\is_a($definition->getClass(), CKEditor5PluginElementsSubsetInterface::class, TRUE)) {
         // ckeditor5_sourceEditing is the edge case here: it is the only plugin
         // that is allowed to return a superset. It's a special case because it
         // is through configuring this particular plugin that additional HTML
@@ -382,8 +382,8 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
         // work: otherwise it would not be able to know which plugins to enable.
         elseif (isset($editor)) {
           $subset = $this->getPlugin($id, $editor)->getElementsSubset();
-          $subset_restrictions = HTMLRestrictions::fromString(implode($subset));
-          $defined_restrictions = HTMLRestrictions::fromString(implode($defined_elements));
+          $subset_restrictions = HTMLRestrictions::fromString(\implode($subset));
+          $defined_restrictions = HTMLRestrictions::fromString(\implode($defined_elements));
           // Determine max supported elements by resolving wildcards in the
           // restrictions defined by the plugin.
           $max_supported = $defined_restrictions;
@@ -400,15 +400,15 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
               $subset = [];
             }
             else {
-              throw new \LogicException(sprintf('The "%s" CKEditor 5 plugin implements ::getElementsSubset() and did not return a subset, the following tags are absent from the plugin definition: "%s".', $id, implode(' ', $not_in_max_supported->toCKEditor5ElementsArray())));
+              throw new \LogicException(\sprintf('The "%s" CKEditor 5 plugin implements ::getElementsSubset() and did not return a subset, the following tags are absent from the plugin definition: "%s".', $id, \implode(' ', $not_in_max_supported->toCKEditor5ElementsArray())));
             }
           }
 
           // Also detect what is technically a valid subset, but has lost the
           // ability to create tags that are still in the subset. This points to
           // a bug in the plugin's ::getElementsSubset() logic.
-          $defined_creatable = HTMLRestrictions::fromString(implode($definition->getCreatableElements()));
-          $subset_creatable_actual = HTMLRestrictions::fromString(implode(array_filter($subset, [
+          $defined_creatable = HTMLRestrictions::fromString(\implode($definition->getCreatableElements()));
+          $subset_creatable_actual = HTMLRestrictions::fromString(\implode(\array_filter($subset, [
             CKEditor5PluginDefinition::class,
             'isCreatableElement',
           ])));
@@ -416,16 +416,16 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
             ->intersect($defined_creatable);
           $missing_creatable_for_subset = $subset_creatable_needed->diff($subset_creatable_actual);
           if (!$missing_creatable_for_subset->allowsNothing()) {
-            throw new \LogicException(sprintf('The "%s" CKEditor 5 plugin implements ::getElementsSubset() and did return a subset ("%s") but the following tags can no longer be created: "%s".', $id, implode($subset_restrictions->toCKEditor5ElementsArray()), implode($missing_creatable_for_subset->toCKEditor5ElementsArray())));
+            throw new \LogicException(\sprintf('The "%s" CKEditor 5 plugin implements ::getElementsSubset() and did return a subset ("%s") but the following tags can no longer be created: "%s".', $id, \implode($subset_restrictions->toCKEditor5ElementsArray()), \implode($missing_creatable_for_subset->toCKEditor5ElementsArray())));
           }
 
           $defined_elements = $subset;
         }
       }
-      assert(Inspector::assertAllStrings($defined_elements));
+      \assert(Inspector::assertAllStrings($defined_elements));
       if ($creatable_elements_only) {
         // @see \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition::getCreatableElements()
-        $defined_elements = array_filter($defined_elements, [CKEditor5PluginDefinition::class, 'isCreatableElement']);
+        $defined_elements = \array_filter($defined_elements, [CKEditor5PluginDefinition::class, 'isCreatableElement']);
       }
       foreach ($defined_elements as $element) {
         $additional_elements = HTMLRestrictions::fromString($element);
@@ -448,20 +448,20 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    *   List of merged values for the given plugin definition method.
    */
   protected function mergeDefinitionValues(string $get_method, array $definitions): array {
-    assert(method_exists(CKEditor5PluginDefinition::class, $get_method));
-    $has_method = 'has' . substr($get_method, 3);
-    assert(method_exists(CKEditor5PluginDefinition::class, $has_method));
-    $per_plugin = array_filter(array_map(function (CKEditor5PluginDefinition $definition) use ($get_method, $has_method) {
+    \assert(\method_exists(CKEditor5PluginDefinition::class, $get_method));
+    $has_method = 'has' . \substr($get_method, 3);
+    \assert(\method_exists(CKEditor5PluginDefinition::class, $has_method));
+    $per_plugin = \array_filter(\array_map(function (CKEditor5PluginDefinition $definition) use ($get_method, $has_method) {
       if ($definition->$has_method()) {
         return $definition->$get_method();
       }
     }, $definitions));
-    return array_reduce($per_plugin, function (array $result, $current): array {
-      return is_array($current) && is_array(reset($current))
+    return \array_reduce($per_plugin, function (array $result, $current): array {
+      return \is_array($current) && \is_array(\reset($current))
         // Merge nested arrays using their keys.
         ? $result + $current
         // Merge everything else by appending.
-        : array_merge($result, (array) $current);
+        : \array_merge($result, (array) $current);
     }, []);
   }
 
@@ -477,11 +477,11 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    *   Whether the plugin is disabled due to unmet conditions.
    */
   protected function isPluginDisabled(CKEditor5PluginInterface $plugin, EditorInterface $editor): bool {
-    assert($plugin->getPluginDefinition()->hasConditions());
+    \assert($plugin->getPluginDefinition()->hasConditions());
     foreach ($plugin->getPluginDefinition()->getConditions() as $condition_type => $required_value) {
       switch ($condition_type) {
         case 'toolbarItem':
-          if (!in_array($required_value, $editor->getSettings()['toolbar']['items'])) {
+          if (!\in_array($required_value, $editor->getSettings()['toolbar']['items'])) {
             return TRUE;
           }
           break;
@@ -492,14 +492,14 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
 
         case 'filter':
           $filters = $editor->getFilterFormat()->filters();
-          assert($filters instanceof FilterPluginCollection);
+          \assert($filters instanceof FilterPluginCollection);
           if (!$filters->has($required_value) || !$filters->get($required_value)->status) {
             return TRUE;
           }
           break;
 
         case 'requiresConfiguration':
-          $intersection = array_intersect($plugin->getConfiguration(), $required_value);
+          $intersection = \array_intersect($plugin->getConfiguration(), $required_value);
           return $intersection !== $required_value;
 
         case 'plugins':

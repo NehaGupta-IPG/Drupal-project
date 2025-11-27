@@ -57,7 +57,7 @@ class MediaSourceFileTest extends MediaSourceTestBase {
 
     $test_filename = $this->randomMachineName() . '.txt';
     $test_filepath = 'public://' . $test_filename;
-    file_put_contents($test_filepath, $this->randomMachineName());
+    \file_put_contents($test_filepath, $this->randomMachineName());
 
     // Create a media item.
     $this->drupalGet("media/add/{$media_type_id}");
@@ -102,7 +102,7 @@ class MediaSourceFileTest extends MediaSourceTestBase {
     // Check if the mapped name is automatically updated.
     $new_filename = $this->randomMachineName() . '.txt';
     $new_filepath = 'public://' . $new_filename;
-    file_put_contents($new_filepath, $this->randomMachineName());
+    \file_put_contents($new_filepath, $this->randomMachineName());
     $this->drupalGet("media/1/edit");
     $page->pressButton('Remove');
     $result = $assert_session->waitForField("files[{$source_field_id}_0]");

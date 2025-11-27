@@ -84,7 +84,7 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
     $permissions = [];
     $definition = $this->getPluginDefinition();
     foreach ($this->availableMethods() as $method) {
-      $lowered_method = strtolower($method);
+      $lowered_method = \strtolower($method);
       $permissions["restful $lowered_method $this->pluginId"] = [
         'title' => $this->t('Access @method on %label resource', [
           '@method' => $method,
@@ -102,10 +102,10 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
     $collection = new RouteCollection();
 
     $definition = $this->getPluginDefinition();
-    $canonical_path = $definition['uri_paths']['canonical'] ?? '/' . strtr($this->pluginId, ':', '/') . '/{id}';
-    $create_path = $definition['uri_paths']['create'] ?? '/' . strtr($this->pluginId, ':', '/');
+    $canonical_path = $definition['uri_paths']['canonical'] ?? '/' . \strtr($this->pluginId, ':', '/') . '/{id}';
+    $create_path = $definition['uri_paths']['create'] ?? '/' . \strtr($this->pluginId, ':', '/');
 
-    $route_name = strtr($this->pluginId, ':', '.');
+    $route_name = \strtr($this->pluginId, ':', '.');
 
     $methods = $this->availableMethods();
     foreach ($methods as $method) {
@@ -153,7 +153,7 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
     $available = [];
     foreach ($methods as $method) {
       // Only expose methods where the HTTP request method exists on the plugin.
-      if (method_exists($this, strtolower($method))) {
+      if (\method_exists($this, \strtolower($method))) {
         $available[] = $method;
       }
     }
@@ -194,7 +194,7 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
    *   An array of requirements for parameters.
    */
   protected function getBaseRouteRequirements($method) {
-    $lower_method = strtolower($method);
+    $lower_method = \strtolower($method);
     // Every route MUST have requirements that result in the access manager
     // having access checks to check. If it does not, the route is made
     // inaccessible. So, we default to granting access to everyone. If a

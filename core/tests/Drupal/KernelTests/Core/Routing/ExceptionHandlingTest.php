@@ -209,7 +209,7 @@ class ExceptionHandlingTest extends KernelTestBase {
     $this->assertNoRaw('<p> <br> <h3>');
 
     $string = '<script>alert(123);</script>';
-    $request = Request::create('/router_test/test2?_format=json' . urlencode($string), 'GET');
+    $request = Request::create('/router_test/test2?_format=json' . \urlencode($string), 'GET');
 
     $kernel = \Drupal::getContainer()->get('http_kernel');
     $response = $kernel->handle($request)->prepare($request);

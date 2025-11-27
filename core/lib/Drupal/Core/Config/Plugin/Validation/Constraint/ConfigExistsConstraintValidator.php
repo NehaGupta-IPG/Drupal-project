@@ -44,7 +44,7 @@ class ConfigExistsConstraintValidator extends ConstraintValidator implements Con
    * {@inheritdoc}
    */
   public function validate(mixed $name, Constraint $constraint): void {
-    assert($constraint instanceof ConfigExistsConstraint);
+    \assert($constraint instanceof ConfigExistsConstraint);
 
     // This constraint may be used to validate nullable (optional) values.
     if ($name === NULL) {
@@ -53,7 +53,7 @@ class ConfigExistsConstraintValidator extends ConstraintValidator implements Con
 
     $constraint->prefix = TypeResolver::resolveDynamicTypeName($constraint->prefix, $this->context->getObject());
 
-    if (!in_array($constraint->prefix . $name, $this->configFactory->listAll($constraint->prefix), TRUE)) {
+    if (!\in_array($constraint->prefix . $name, $this->configFactory->listAll($constraint->prefix), TRUE)) {
       $this->context->addViolation($constraint->message, ['@name' => $constraint->prefix . $name]);
     }
   }

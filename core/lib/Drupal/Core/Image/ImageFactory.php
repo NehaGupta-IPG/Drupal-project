@@ -102,7 +102,7 @@ class ImageFactory {
   public function getSupportedExtensions($toolkit_id = NULL) {
     $toolkit_id = $toolkit_id ?: $this->getToolkitId();
     $definition = $this->toolkitManager->getDefinition($toolkit_id);
-    return call_user_func($definition['class'] . '::getSupportedExtensions');
+    return \call_user_func($definition['class'] . '::getSupportedExtensions');
   }
 
 }

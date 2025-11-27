@@ -79,7 +79,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     $content = [];
 
     $types = $this->entityTypeManager()->getStorage('node_type')->loadMultiple();
-    uasort($types, [$definition->getClass(), 'sort']);
+    \uasort($types, [$definition->getClass(), 'sort']);
     // Only use node types the user has access to.
     foreach ($types as $type) {
       $access = $this->entityTypeManager()->getAccessControlHandler('node')->createAccess($type->id(), NULL, [], TRUE);
@@ -90,8 +90,8 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     }
 
     // Bypass the node/add listing if only one content type is available.
-    if (count($content) == 1) {
-      $type = array_shift($content);
+    if (\count($content) == 1) {
+      $type = \array_shift($content);
       return $this->redirect('entity.node.add_form', ['node_type' => $type->id()]);
     }
 
@@ -134,7 +134,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     $langcode = $node->language()->getId();
     $language_name = $node->language()->getName();
     $languages = $node->getTranslationLanguages();
-    $has_translations = (count($languages) > 1);
+    $has_translations = (\count($languages) > 1);
     $node_storage = $this->entityTypeManager()->getStorage('node');
 
     $build['#title'] = $has_translations ? $this->t('@language_name revisions for %title', ['@language_name' => $language_name, '%title' => $node->label()]) : $this->t('Revisions for %title', ['%title' => $node->label()]);
@@ -279,7 +279,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
       ->sort($node->getEntityType()->getKey('revision'), 'DESC')
       ->pager(50)
       ->execute();
-    return array_keys($result);
+    return \array_keys($result);
   }
 
 }

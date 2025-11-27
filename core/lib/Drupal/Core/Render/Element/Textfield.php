@@ -69,10 +69,10 @@ class Textfield extends FormElementBase {
     if ($input !== FALSE && $input !== NULL) {
       // This should be a string, but allow other scalars since they might be
       // valid input in programmatic form submissions.
-      if (!is_scalar($input)) {
+      if (!\is_scalar($input)) {
         $input = '';
       }
-      return str_replace(["\r", "\n"], '', $input);
+      return \str_replace(["\r", "\n"], '', $input);
     }
     return NULL;
   }

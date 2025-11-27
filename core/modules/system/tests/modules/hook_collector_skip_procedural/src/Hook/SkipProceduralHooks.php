@@ -17,7 +17,7 @@ class SkipProceduralHooks {
   #[Hook('cache_flush')]
   public function cacheFlush(): void {
     // Set a global value we can check in test code.
-    hook_collector_skip_procedural_custom_function();
+    \hook_collector_skip_procedural_custom_function();
     $GLOBALS['skipped_procedural_oop_cache_flush'] = 'skipped_procedural_oop_cache_flush';
   }
 

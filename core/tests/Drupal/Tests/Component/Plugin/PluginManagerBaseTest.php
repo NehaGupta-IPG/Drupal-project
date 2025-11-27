@@ -25,7 +25,7 @@ class PluginManagerBaseTest extends TestCase {
    * A callback method for mocking FactoryInterface objects.
    */
   public function createInstanceCallback() {
-    $args = func_get_args();
+    $args = \func_get_args();
     $plugin_id = $args[0];
     $configuration = $args[1];
     if ('invalid' == $plugin_id) {
@@ -123,7 +123,7 @@ class PluginManagerBaseTest extends TestCase {
     $manager = new StubPluginManagerBase();
     // Set the expected exception thrown by ::getInstance.
     $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage(sprintf('%s does not support this method unless %s::$mapper is set.', get_class($manager), get_class($manager)));
+    $this->expectExceptionMessage(\sprintf('%s does not support this method unless %s::$mapper is set.', \get_class($manager), \get_class($manager)));
     $manager->getInstance($options);
   }
 

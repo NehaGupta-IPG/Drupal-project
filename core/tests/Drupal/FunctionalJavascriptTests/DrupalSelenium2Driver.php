@@ -37,23 +37,23 @@ class DrupalSelenium2Driver extends Selenium2Driver {
    *   When a known error occurred during file upload.
    */
   public function uploadFileAndGetRemoteFilePath($path) {
-    if (!is_file($path)) {
+    if (!\is_file($path)) {
       throw new DriverException('File does not exist locally and cannot be uploaded to the remote instance.');
     }
 
-    if (!class_exists('ZipArchive')) {
+    if (!\class_exists('ZipArchive')) {
       throw new DriverException('Could not compress file, PHP is compiled without zip support.');
     }
 
     // Selenium only accepts uploads that are compressed as a Zip archive.
-    $tempFilename = tempnam('', 'WebDriverZip');
+    $tempFilename = \tempnam('', 'WebDriverZip');
 
     $archive = new \ZipArchive();
     $result = $archive->open($tempFilename, \ZipArchive::OVERWRITE);
     if (!$result) {
       throw new DriverException('Zip archive could not be created. Error ' . $result);
     }
-    $result = $archive->addFile($path, basename($path));
+    $result = $archive->addFile($path, \basename($path));
     if (!$result) {
       throw new DriverException('File could not be added to zip archive.');
     }
@@ -63,7 +63,7 @@ class DrupalSelenium2Driver extends Selenium2Driver {
     }
 
     try {
-      $remotePath = $this->getWebDriverSession()->file(['file' => base64_encode(file_get_contents($tempFilename))]);
+      $remotePath = $this->getWebDriverSession()->file(['file' => \base64_encode(\file_get_contents($tempFilename))]);
 
       // If no path is returned the file upload failed silently.
       if (empty($remotePath)) {
@@ -74,7 +74,7 @@ class DrupalSelenium2Driver extends Selenium2Driver {
       throw $e;
     }
     finally {
-      unlink($tempFilename);
+      \unlink($tempFilename);
     }
 
     return $remotePath;
@@ -135,8 +135,8 @@ if (typeof Drupal !== 'undefined') {
   };
 }
 JS);
-        if (!is_string($value) && strtolower($element->name()) === 'input' &&
-          in_array(strtolower($element->attribute('type')), ['text', 'number', 'radio'], TRUE)) {
+        if (!\is_string($value) && \strtolower($element->name()) === 'input' &&
+          \in_array(\strtolower($element->attribute('type')), ['text', 'number', 'radio'], TRUE)) {
           // @todo Trigger deprecation in
           //   https://www.drupal.org/project/drupal/issues/3421105.
           $value = (string) $value;
@@ -146,7 +146,7 @@ JS);
         return TRUE;
       }
       catch (Exception $exception) {
-        if (!JSWebAssert::isExceptionNotClickable($exception) && !str_contains($exception->getMessage(), 'invalid element state')) {
+        if (!JSWebAssert::isExceptionNotClickable($exception) && !\str_contains($exception->getMessage(), 'invalid element state')) {
           // Rethrow any unexpected exceptions.
           throw $exception;
         }
@@ -172,18 +172,18 @@ JS);
    *   The result of the callback.
    */
   private function waitFor($timeout, callable $callback) {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $end = $start + $timeout;
 
     do {
-      $result = call_user_func($callback, $this);
+      $result = \call_user_func($callback, $this);
 
       if ($result) {
         break;
       }
 
-      usleep(10000);
-    } while (microtime(TRUE) < $end);
+      \usleep(10000);
+    } while (\microtime(TRUE) < $end);
 
     return $result;
   }
@@ -220,7 +220,7 @@ JS);
    *   The result of executing the script.
    */
   private function executeJsOnElement(Element $element, string $script) {
-    $script = str_replace('{{ELEMENT}}', 'arguments[0]', $script);
+    $script = \str_replace('{{ELEMENT}}', 'arguments[0]', $script);
 
     $options = [
       'script' => $script,

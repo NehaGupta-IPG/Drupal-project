@@ -79,7 +79,7 @@ trait RecipeInputFormTrait {
           // checkboxes, in which case the `#required` behavior doesn't make
           // a lot of sense because it forces the user to check the box.
           $element['#required'] ??= ($element['#type'] !== 'checkbox');
-          NestedArray::setValue($this->form, explode('.', $name, 2), $element);
+          NestedArray::setValue($this->form, \explode('.', $name, 2), $element);
 
           // Always return the input elements as a tree.
           $this->form['#tree'] = TRUE;
@@ -112,7 +112,7 @@ trait RecipeInputFormTrait {
       $data = $e->getValue();
 
       if ($data instanceof TypedDataInterface) {
-        $element = NestedArray::getValue($form, explode('.', $data->getName(), 2));
+        $element = NestedArray::getValue($form, \explode('.', $data->getName(), 2));
         $form_state->setError($element, $e->getMessage());
       }
       else {
@@ -142,7 +142,7 @@ trait RecipeInputFormTrait {
        * {@inheritdoc}
        */
       public function collectValue(string $name, DataDefinitionInterface $definition, mixed $default_value): mixed {
-        return $this->formState->getValue(explode('.', $name, 2), $default_value);
+        return $this->formState->getValue(\explode('.', $name, 2), $default_value);
       }
 
     });

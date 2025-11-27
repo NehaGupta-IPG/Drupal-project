@@ -73,7 +73,7 @@ class TwigIncludeTest extends KernelTestBase {
     /** @var \Drupal\Core\Template\Loader\FilesystemLoader $loader */
     $loader = \Drupal::service('twig.loader.filesystem');
     $source = $loader->getSourceContext('@__main__\/core/tests/fixtures/files/sql-2.sql');
-    $this->assertSame(file_get_contents('core/tests/fixtures/files/sql-2.sql'), $source->getCode());
+    $this->assertSame(\file_get_contents('core/tests/fixtures/files/sql-2.sql'), $source->getCode());
 
     // Test the fallback to the default list of extensions provided by the
     // class.
@@ -96,7 +96,7 @@ class TwigIncludeTest extends KernelTestBase {
     }
 
     // Test a file with no extension.
-    file_put_contents($this->siteDirectory . '/test_file', 'This is a test!');
+    \file_put_contents($this->siteDirectory . '/test_file', 'This is a test!');
     /** @var \Drupal\Core\Template\Loader\FilesystemLoader $loader */
     $loader = \Drupal::service('twig.loader.filesystem');
     try {
@@ -148,10 +148,10 @@ class TwigIncludeTest extends KernelTestBase {
     $public_file_directory = $this->siteDirectory . '/files';
     $private_file_directory = $this->siteDirectory . '/private';
 
-    mkdir($this->siteDirectory, 0775);
-    mkdir($this->siteDirectory . '/files', 0775);
-    mkdir($this->siteDirectory . '/private', 0775);
-    mkdir($this->siteDirectory . '/files/config/sync', 0775, TRUE);
+    \mkdir($this->siteDirectory, 0775);
+    \mkdir($this->siteDirectory . '/files', 0775);
+    \mkdir($this->siteDirectory . '/private', 0775);
+    \mkdir($this->siteDirectory . '/files/config/sync', 0775, TRUE);
 
     $this->setSetting('file_public_path', $public_file_directory);
     $this->setSetting('file_private_path', $private_file_directory);

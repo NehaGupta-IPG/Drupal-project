@@ -23,7 +23,7 @@ class MediaStorage extends SqlContentEntityStorage {
     //   method doesn't exist. See
     //   https://www.drupal.org/project/drupal/issues/2992426 for further
     //   discussion.
-    if (method_exists($media, 'prepareSave')) {
+    if (\method_exists($media, 'prepareSave')) {
       $media->prepareSave();
     }
     return parent::save($media);

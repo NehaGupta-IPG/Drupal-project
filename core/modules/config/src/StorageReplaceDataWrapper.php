@@ -129,17 +129,17 @@ class StorageReplaceDataWrapper implements StorageInterface {
     $names = $this->storage->listAll($prefix);
     $additional_names = [];
     if ($prefix === '') {
-      $additional_names = array_keys($this->replacementData[$this->collection]);
+      $additional_names = \array_keys($this->replacementData[$this->collection]);
     }
     else {
-      foreach (array_keys($this->replacementData[$this->collection]) as $name) {
-        if (str_starts_with($name, $prefix)) {
+      foreach (\array_keys($this->replacementData[$this->collection]) as $name) {
+        if (\str_starts_with($name, $prefix)) {
           $additional_names[] = $name;
         }
       }
     }
     if (!empty($additional_names)) {
-      $names = array_unique(array_merge($names, $additional_names));
+      $names = \array_unique(\array_merge($names, $additional_names));
     }
     return $names;
   }
@@ -152,8 +152,8 @@ class StorageReplaceDataWrapper implements StorageInterface {
       $this->replacementData[$this->collection] = [];
     }
     else {
-      foreach (array_keys($this->replacementData[$this->collection]) as $name) {
-        if (str_starts_with($name, $prefix)) {
+      foreach (\array_keys($this->replacementData[$this->collection]) as $name) {
+        if (\str_starts_with($name, $prefix)) {
           unset($this->replacementData[$this->collection][$name]);
         }
       }

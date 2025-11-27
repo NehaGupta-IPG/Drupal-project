@@ -31,17 +31,17 @@ class DocParserIgnoredClassesTest extends TestCase {
     // Register our class loader which will fail if the parser tries to
     // autoload disallowed annotations.
     $autoloader = function ($class_name) use ($annotation) {
-      $name_array = explode('\\', $class_name);
-      $name = array_pop($name_array);
+      $name_array = \explode('\\', $class_name);
+      $name = \array_pop($name_array);
       if ($name == $annotation) {
         $this->fail('Attempted to autoload an ignored annotation: ' . $name);
       }
     };
-    spl_autoload_register($autoloader, TRUE, TRUE);
+    \spl_autoload_register($autoloader, TRUE, TRUE);
     // Perform the parse.
     $this->assertEmpty($parser->parse('@neverReflectThis'));
     // Clean up after ourselves.
-    spl_autoload_unregister($autoloader);
+    \spl_autoload_unregister($autoloader);
   }
 
 }

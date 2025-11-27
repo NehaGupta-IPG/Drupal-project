@@ -66,7 +66,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
       $this->getSession()->getPage()->pressButton('Ajax refresh');
       $this->assertTrue($page->waitFor(10, function ($page) {
         $ajax_value = $page->find('css', '#ajax-value')->getText();
-        return (bool) preg_match('/^Ajax value [0-9.]+ [0-9.]+$/', $ajax_value);
+        return (bool) \preg_match('/^Ajax value [0-9.]+ [0-9.]+$/', $ajax_value);
       }));
       $page->pressButton('Update effect');
       $assert->statusMessageContains('The image effect was successfully applied.', 'status');
@@ -76,7 +76,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     // Edit the 1st effect, multiple AJAX calls before updating.
     $style = ImageStyle::load($style_name);
-    $uuid = array_values($style->getEffects()->getInstanceIds())[0];
+    $uuid = \array_values($style->getEffects()->getInstanceIds())[0];
     $this->drupalGet($admin_path . '/manage/' . $style_name . '/effects/' . $uuid);
     $this->assertSession()->fieldValueEquals('data[test_parameter]', '111');
     $field = $page->findField('data[test_parameter]');

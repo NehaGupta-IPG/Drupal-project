@@ -188,7 +188,7 @@ class StringArgument extends ArgumentPluginBase {
    * $this->ensureMyTable() MUST have been called prior to this.
    */
   public function getFormula() {
-    $formula = "SUBSTRING($this->tableAlias.$this->realField, 1, " . intval($this->options['limit']) . ")";
+    $formula = "SUBSTRING($this->tableAlias.$this->realField, 1, " . \intval($this->options['limit']) . ")";
 
     if ($this->options['case'] != 'none') {
       // Support case-insensitive substring comparisons for SQLite by using the
@@ -213,7 +213,7 @@ class StringArgument extends ArgumentPluginBase {
   public function query($group_by = FALSE) {
     $argument = $this->argument;
     if (!empty($this->options['transform_dash'])) {
-      $argument = strtr($argument, '-', ' ');
+      $argument = \strtr($argument, '-', ' ');
     }
 
     if (!empty($this->options['break_phrase'])) {
@@ -228,7 +228,7 @@ class StringArgument extends ArgumentPluginBase {
     // converting the arguments to lowercase.
     if ($this->options['case'] != 'none' && Database::getConnection()->databaseType() == 'pgsql') {
       foreach ($this->value as $key => $value) {
-        $this->value[$key] = mb_strtolower($value);
+        $this->value[$key] = \mb_strtolower($value);
       }
     }
 
@@ -251,7 +251,7 @@ class StringArgument extends ArgumentPluginBase {
       $field = $this->getFormula();
     }
 
-    if (count($this->value) > 1) {
+    if (\count($this->value) > 1) {
       $operator = 'IN';
       $argument = $this->value;
     }
@@ -283,7 +283,7 @@ class StringArgument extends ArgumentPluginBase {
   public function summaryArgument($data) {
     $value = $this->caseTransform($data->{$this->base_alias}, $this->options['path_case']);
     if (!empty($this->options['transform_dash'])) {
-      $value = strtr($value, ' ', '-');
+      $value = \strtr($value, ' ', '-');
     }
     return $value;
   }
@@ -307,7 +307,7 @@ class StringArgument extends ArgumentPluginBase {
 
     $this->argument = $this->caseTransform($this->argument, $this->options['case']);
     if (!empty($this->options['transform_dash'])) {
-      $this->argument = strtr($this->argument, '-', ' ');
+      $this->argument = \strtr($this->argument, '-', ' ');
     }
 
     if (!empty($this->options['break_phrase'])) {
@@ -326,7 +326,7 @@ class StringArgument extends ArgumentPluginBase {
       return !empty($this->definition['invalid input']) ? $this->definition['invalid input'] : $this->t('Invalid input');
     }
 
-    return implode($this->operator == 'or' ? ' + ' : ', ', $this->titleQuery());
+    return \implode($this->operator == 'or' ? ' + ' : ', ', $this->titleQuery());
   }
 
   /**

@@ -105,7 +105,7 @@ class TwigTransTokenParser extends AbstractTokenParser {
       ) {
         continue;
       }
-      throw new SyntaxError(sprintf('The text to be translated with "trans" can only contain references to simple variables'), $lineno);
+      throw new SyntaxError(\sprintf('The text to be translated with "trans" can only contain references to simple variables'), $lineno);
     }
   }
 

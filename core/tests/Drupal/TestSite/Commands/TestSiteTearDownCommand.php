@@ -29,7 +29,7 @@ class TestSiteTearDownCommand extends Command {
       ->setDescription('Removes a test site added by the install command')
       ->setHelp('All the database tables and files will be removed.')
       ->addArgument('db-prefix', InputArgument::REQUIRED, 'The database prefix for the test site.')
-      ->addOption('db-url', NULL, InputOption::VALUE_OPTIONAL, 'URL for database. Defaults to the environment variable SIMPLETEST_DB.', getenv('SIMPLETEST_DB'))
+      ->addOption('db-url', NULL, InputOption::VALUE_OPTIONAL, 'URL for database. Defaults to the environment variable SIMPLETEST_DB.', \getenv('SIMPLETEST_DB'))
       ->addOption('keep-lock', NULL, InputOption::VALUE_NONE, 'Keeps the database prefix lock. Useful for ensuring test isolation when running concurrent tests.')
       ->addUsage('test12345678')
       ->addUsage('test12345678 --db-url "mysql://username:password@localhost/database_name#table_prefix"')
@@ -40,8 +40,8 @@ class TestSiteTearDownCommand extends Command {
    * {@inheritdoc}
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
-    $root = dirname(__DIR__, 5);
-    chdir($root);
+    $root = \dirname(__DIR__, 5);
+    \chdir($root);
     $db_prefix = $input->getArgument('db-prefix');
     // Validate the db_prefix argument.
     try {
@@ -51,12 +51,12 @@ class TestSiteTearDownCommand extends Command {
       $io = new SymfonyStyle($input, $output);
       $io->getErrorStyle()->error("Invalid database prefix: $db_prefix\n\nValid database prefixes match the regular expression '/test(\d+)$/'. For example, 'test12345678'.");
       // Display the synopsis of the command like Composer does.
-      $output->writeln(sprintf('<info>%s</info>', sprintf($this->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
+      $output->writeln(\sprintf('<info>%s</info>', \sprintf($this->getSynopsis(), $this->getName())), OutputInterface::VERBOSITY_QUIET);
       return 1;
     }
 
     $db_url = $input->getOption('db-url');
-    putenv("SIMPLETEST_DB=$db_url");
+    \putenv("SIMPLETEST_DB=$db_url");
 
     // Handle the cleanup of the test site.
     $this->tearDown($test_database, $db_url);
@@ -83,7 +83,7 @@ class TestSiteTearDownCommand extends Command {
    */
   protected function tearDown(TestDatabase $test_database, $db_url): void {
     // Connect to the test database.
-    $root = dirname(__DIR__, 5);
+    $root = \dirname(__DIR__, 5);
     $database = Database::convertDbUrlToConnectionInfo($db_url);
     $database['prefix'] = $test_database->getDatabasePrefix();
     Database::addConnectionInfo(__CLASS__, 'default', $database);
@@ -91,7 +91,7 @@ class TestSiteTearDownCommand extends Command {
     // Remove all the tables.
     $schema = Database::getConnection('default', __CLASS__)->schema();
     $tables = $schema->findTables('%');
-    array_walk($tables, [$schema, 'dropTable']);
+    \array_walk($tables, [$schema, 'dropTable']);
 
     // Delete test site directory.
     $this->fileUnmanagedDeleteRecursive($root . DIRECTORY_SEPARATOR . $test_database->getTestSitePath(), [BrowserTestBase::class, 'filePreDeleteCallback']);
@@ -118,10 +118,10 @@ class TestSiteTearDownCommand extends Command {
    */
   protected function fileUnmanagedDeleteRecursive($path, $callback = NULL): bool {
     if (isset($callback)) {
-      call_user_func($callback, $path);
+      \call_user_func($callback, $path);
     }
-    if (is_dir($path)) {
-      $dir = dir($path);
+    if (\is_dir($path)) {
+      $dir = \dir($path);
       while (($entry = $dir->read()) !== FALSE) {
         if ($entry == '.' || $entry == '..') {
           continue;
@@ -131,9 +131,9 @@ class TestSiteTearDownCommand extends Command {
       }
       $dir->close();
 
-      return rmdir($path);
+      return \rmdir($path);
     }
-    return unlink($path);
+    return \unlink($path);
   }
 
 }

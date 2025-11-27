@@ -26,7 +26,7 @@ class UrlPlainFormatter extends FileFormatterBase {
     $elements = [];
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
-      assert($file instanceof FileInterface);
+      \assert($file instanceof FileInterface);
       $elements[$delta] = [
         '#markup' => $file->createFileUrl(),
         '#cache' => [

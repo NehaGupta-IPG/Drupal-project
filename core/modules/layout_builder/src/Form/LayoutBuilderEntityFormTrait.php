@@ -37,7 +37,7 @@ trait LayoutBuilderEntityFormTrait {
       '#attributes' => [
         'class' => [
           'layout-builder__message',
-          sprintf('layout-builder__message--%s', $type),
+          \sprintf('layout-builder__message--%s', $type),
         ],
       ],
       'message' => [

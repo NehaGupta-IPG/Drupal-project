@@ -52,7 +52,7 @@ class EntityAutocompleteMatcher implements EntityAutocompleteMatcherInterface {
           $key = "$label ($entity_id)";
           // Strip things like starting/trailing white spaces, line breaks and
           // tags.
-          $key = preg_replace('/\s\s+/', ' ', str_replace("\n", '', trim(Html::decodeEntities(strip_tags($key)))));
+          $key = \preg_replace('/\s\s+/', ' ', \str_replace("\n", '', \trim(Html::decodeEntities(\strip_tags($key)))));
           // Names containing commas or quotes must be wrapped in quotes.
           $key = Tags::encode($key);
           $matches[] = ['value' => $key, 'label' => $label];

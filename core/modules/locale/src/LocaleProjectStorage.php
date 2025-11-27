@@ -67,7 +67,7 @@ class LocaleProjectStorage implements LocaleProjectStorageInterface {
         $values[$key] = $this->cache[$key];
       }
       // Load the value if we don't have an explicit NULL value.
-      elseif (!array_key_exists($key, $this->cache)) {
+      elseif (!\array_key_exists($key, $this->cache)) {
         $load[] = $key;
       }
     }
@@ -146,7 +146,7 @@ class LocaleProjectStorage implements LocaleProjectStorageInterface {
    */
   public function disableAll() {
     $projects = $this->keyValueStore->getAll();
-    foreach (array_keys($projects) as $key) {
+    foreach (\array_keys($projects) as $key) {
       $projects[$key]['status'] = 0;
       if (isset($this->cache[$key])) {
         $this->cache[$key] = $projects[$key];
@@ -160,7 +160,7 @@ class LocaleProjectStorage implements LocaleProjectStorageInterface {
    * {@inheritdoc}
    */
   public function countProjects() {
-    return count($this->getAll());
+    return \count($this->getAll());
   }
 
   /**
@@ -175,18 +175,18 @@ class LocaleProjectStorage implements LocaleProjectStorageInterface {
       // Work around PHP 8.3.0 - 8.3.3 bug by assigning $this->cache to a local
       // variable, see https://github.com/php/php-src/pull/13285.
       $cache = $this->cache;
-      uksort($this->cache, function ($a, $b) use ($cache) {
+      \uksort($this->cache, function ($a, $b) use ($cache) {
         // Sort by weight, if available, and then by key. This allows locale
         // projects to set a weight, if required, and keeps the order consistent
         // regardless of whether the list is built from code or retrieve from
         // the database.
         $sort = (int) ($cache[$a]['weight'] ?? 0) <=> (int) ($cache[$b]['weight'] ?? 0);
-        return $sort ?: strcmp($a, $b);
+        return $sort ?: \strcmp($a, $b);
       });
       $this->sorted = TRUE;
     }
     // Remove any NULL values as these are not valid projects.
-    return array_filter($this->cache, fn ($value) => $value !== NULL);
+    return \array_filter($this->cache, fn ($value) => $value !== NULL);
   }
 
 }

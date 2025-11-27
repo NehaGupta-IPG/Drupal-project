@@ -71,7 +71,7 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
    * {@inheritdoc}
    */
   public function loadOverride($id) {
-    assert(is_string($id), 'Menu link plugin ID should be a string.');
+    \assert(\is_string($id), 'Menu link plugin ID should be a string.');
     $all_overrides = $this->getConfig()->get('definitions');
     $id = static::encodeId($id);
     return $all_overrides[$id] ?? [];
@@ -133,7 +133,7 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
       'enabled' => FALSE,
     ];
     // Filter the overrides to only those that are expected.
-    $definition = array_intersect_key($definition, $expected);
+    $definition = \array_intersect_key($definition, $expected);
     // Ensure all values are set.
     $definition = $definition + $expected;
     if ($definition) {
@@ -150,7 +150,7 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
       $all_overrides[$id] = $definition + $this->loadOverride($id);
       $this->getConfig()->set('definitions', $all_overrides)->save(TRUE);
     }
-    return array_keys($definition);
+    return \array_keys($definition);
   }
 
   /**
@@ -174,7 +174,7 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
    *   The menu plugin ID with double underscore instead of dots.
    */
   protected static function encodeId($id) {
-    return strtr($id, ['.' => '__', '__' => '___']);
+    return \strtr($id, ['.' => '__', '__' => '___']);
   }
 
 }

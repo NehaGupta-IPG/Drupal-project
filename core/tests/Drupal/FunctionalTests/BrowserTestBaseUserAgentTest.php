@@ -36,8 +36,8 @@ class BrowserTestBaseUserAgentTest extends BrowserTestBase {
     $http_path = $system_path . '/tests/http.php/user/login';
     $https_path = $system_path . '/tests/https.php/user/login';
     // Generate a valid test User-Agent to pass validation.
-    $this->assertNotFalse(preg_match('/test\d+/', $this->databasePrefix, $matches), 'Database prefix contains test prefix.');
-    $this->agent = drupal_generate_test_ua($matches[0]);
+    $this->assertNotFalse(\preg_match('/test\d+/', $this->databasePrefix, $matches), 'Database prefix contains test prefix.');
+    $this->agent = \drupal_generate_test_ua($matches[0]);
 
     // Test pages only available for testing.
     $this->drupalGet($http_path);
@@ -70,7 +70,7 @@ class BrowserTestBaseUserAgentTest extends BrowserTestBase {
       $session->setCookie('SIMPLETEST_USER_AGENT', $this->agent);
     }
     else {
-      $session->setCookie('SIMPLETEST_USER_AGENT', drupal_generate_test_ua($this->databasePrefix));
+      $session->setCookie('SIMPLETEST_USER_AGENT', \drupal_generate_test_ua($this->databasePrefix));
     }
   }
 

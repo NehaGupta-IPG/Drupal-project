@@ -188,7 +188,7 @@ class MediaTypeForm extends EntityForm {
         }
       }
 
-      natcasesort($options);
+      \natcasesort($options);
 
       $field_map = $this->entity->getFieldMap();
       foreach ($source->getMetadataAttributes() as $metadata_attribute_name => $metadata_attribute_label) {
@@ -263,8 +263,8 @@ class MediaTypeForm extends EntityForm {
       'queue_thumbnail_downloads' => $this->entity->thumbnailDownloadsAreQueued(),
     ];
     // Prepare workflow options to be used for 'checkboxes' form element.
-    $keys = array_keys(array_filter($workflow_options));
-    return array_combine($keys, $keys);
+    $keys = \array_keys(\array_filter($workflow_options));
+    return \array_combine($keys, $keys);
   }
 
   /**
@@ -300,7 +300,7 @@ class MediaTypeForm extends EntityForm {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $form_state->setValue('field_map', array_filter(
+    $form_state->setValue('field_map', \array_filter(
       $form_state->getValue('field_map', []),
       function ($item) {
         return $item != MediaSourceInterface::METADATA_FIELD_EMPTY;
@@ -373,7 +373,7 @@ class MediaTypeForm extends EntityForm {
         $display = $this->entityDisplayRepository->getViewDisplay('media', $media_type->id());
 
         // Remove all default components.
-        foreach (array_keys($display->getComponents()) as $name) {
+        foreach (\array_keys($display->getComponents()) as $name) {
           $display->removeComponent($name);
         }
         $source->prepareViewDisplay($media_type, $display);

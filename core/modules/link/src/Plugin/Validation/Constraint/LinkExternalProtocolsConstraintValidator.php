@@ -25,7 +25,7 @@ class LinkExternalProtocolsConstraintValidator extends ConstraintValidator {
         return;
       }
       // Disallow external URLs using untrusted protocols.
-      if ($url->isExternal() && !in_array(parse_url($url->getUri(), PHP_URL_SCHEME), UrlHelper::getAllowedProtocols())) {
+      if ($url->isExternal() && !\in_array(\parse_url($url->getUri(), PHP_URL_SCHEME), UrlHelper::getAllowedProtocols())) {
         $this->context->buildViolation($constraint->message, ['@uri' => $value->uri])
           ->atPath('uri')
           ->addViolation();

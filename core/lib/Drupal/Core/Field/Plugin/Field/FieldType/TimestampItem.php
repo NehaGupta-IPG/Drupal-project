@@ -41,7 +41,7 @@ class TimestampItem extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('timestamp')
-      ->setLabel(t('Timestamp value'))
+      ->setLabel(\t('Timestamp value'))
       ->setRequired(TRUE);
     return $properties;
   }
@@ -64,7 +64,7 @@ class TimestampItem extends FieldItemBase {
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     // Pick a random timestamp in the past year.
-    $timestamp = \Drupal::time()->getRequestTime() - mt_rand(0, 86400 * 365);
+    $timestamp = \Drupal::time()->getRequestTime() - \mt_rand(0, 86400 * 365);
     $values['value'] = $timestamp;
     return $values;
   }

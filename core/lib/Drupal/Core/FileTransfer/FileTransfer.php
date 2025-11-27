@@ -74,7 +74,7 @@ abstract class FileTransfer {
    *   able to touch other parts of the filesystem.
    */
   public function __construct($jail) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
     $this->jail = $jail;
   }
@@ -272,7 +272,7 @@ abstract class FileTransfer {
   final protected function checkPath($path) {
     $full_jail = $this->chroot . $this->jail;
     $full_path = \Drupal::service('file_system')
-      ->realpath(substr($this->chroot . $path, 0, strlen($full_jail)));
+      ->realpath(\substr($this->chroot . $path, 0, \strlen($full_jail)));
     $full_path = $this->fixRemotePath($full_path, FALSE);
     if ($full_jail !== $full_path) {
       throw new FileTransferException('@directory is outside of the @jail', 0, [
@@ -300,10 +300,10 @@ abstract class FileTransfer {
   final protected function fixRemotePath($path, $strip_chroot = TRUE) {
     $path = $this->sanitizePath($path);
     // Strip out windows drive letter if its there.
-    $path = preg_replace('|^([a-z]{1}):|i', '', $path);
+    $path = \preg_replace('|^([a-z]{1}):|i', '', $path);
     if ($strip_chroot) {
-      if ($this->chroot && str_starts_with($path, $this->chroot)) {
-        $path = ($path == $this->chroot) ? '' : substr($path, strlen($this->chroot));
+      if ($this->chroot && \str_starts_with($path, $this->chroot)) {
+        $path = ($path == $this->chroot) ? '' : \substr($path, \strlen($this->chroot));
       }
     }
     return $path;
@@ -320,9 +320,9 @@ abstract class FileTransfer {
    */
   public function sanitizePath($path) {
     // Windows path sanitization.
-    $path = str_replace('\\', '/', $path);
-    if (str_ends_with($path, '/')) {
-      $path = substr($path, 0, -1);
+    $path = \str_replace('\\', '/', $path);
+    if (\str_ends_with($path, '/')) {
+      $path = \substr($path, 0, -1);
     }
     return $path;
   }
@@ -339,11 +339,11 @@ abstract class FileTransfer {
    */
   protected function copyDirectoryJailed($source, $destination) {
     if ($this->isDirectory($destination)) {
-      $destination = $destination . '/' . basename($source);
+      $destination = $destination . '/' . \basename($source);
     }
     $this->createDirectory($destination);
     foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST) as $filename => $file) {
-      $relative_path = substr($filename, strlen($source));
+      $relative_path = \substr($filename, \strlen($source));
       if ($file->isDir()) {
         $this->createDirectory($destination . $relative_path);
       }
@@ -427,15 +427,15 @@ abstract class FileTransfer {
 
     $path = __DIR__;
     $path = $this->fixRemotePath($path, FALSE);
-    $parts = explode('/', $path);
+    $parts = \explode('/', $path);
     $chroot = '';
-    while (count($parts)) {
-      $check = implode('/', $parts);
-      if ($this->isFile($check . '/' . basename(__FILE__))) {
+    while (\count($parts)) {
+      $check = \implode('/', $parts);
+      if ($this->isFile($check . '/' . \basename(__FILE__))) {
         // Remove the trailing slash.
-        return substr($chroot, 0, -1);
+        return \substr($chroot, 0, -1);
       }
-      $chroot .= array_shift($parts) . '/';
+      $chroot .= \array_shift($parts) . '/';
     }
     return FALSE;
   }

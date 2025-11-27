@@ -79,7 +79,7 @@ class HookHelpSection extends HelpSectionPluginBase implements ContainerFactoryP
     );
 
     // Sort topics by title, which is the array key above.
-    ksort($topics);
+    \ksort($topics);
     return $topics;
   }
 

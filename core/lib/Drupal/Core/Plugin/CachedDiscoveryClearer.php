@@ -33,7 +33,7 @@ class CachedDiscoveryClearer implements CachedDiscoveryClearerInterface {
    * @see https://www.drupal.org/node/3442229
    */
   public function addCachedDiscovery(CachedDiscoveryInterface $cached_discovery) {
-    @trigger_error('The ' . __METHOD__ . ' method is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Pass the full set of services to the constructor instead. See https://www.drupal.org/node/3442229', E_USER_DEPRECATED);
+    @\trigger_error('The ' . __METHOD__ . ' method is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Pass the full set of services to the constructor instead. See https://www.drupal.org/node/3442229', E_USER_DEPRECATED);
     $this->legacyCachedDiscoveries[] = $cached_discovery;
   }
 

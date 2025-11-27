@@ -35,20 +35,20 @@ class ModuleHandlerTest extends KernelTestBase {
     if ($database_module !== 'core') {
       $module_list[] = $database_module;
     }
-    sort($module_list);
+    \sort($module_list);
     $this->assertModuleList($module_list, 'Initial');
 
     // Try to install a new module.
     $this->moduleInstaller()->install(['dependency_foo_test']);
     $module_list[] = 'dependency_foo_test';
-    sort($module_list);
+    \sort($module_list);
     $this->assertModuleList($module_list, 'After adding a module');
 
     // Try to mess with the module weights.
-    module_set_weight('dependency_foo_test', 20);
+    \module_set_weight('dependency_foo_test', 20);
 
     // Move dependency_foo_test to the end of the array.
-    unset($module_list[array_search('dependency_foo_test', $module_list)]);
+    unset($module_list[\array_search('dependency_foo_test', $module_list)]);
     $module_list[] = 'dependency_foo_test';
     $this->assertModuleList($module_list, 'After changing weights');
 
@@ -58,7 +58,7 @@ class ModuleHandlerTest extends KernelTestBase {
       'menu' => 'core/modules/menu/menu.module',
     ];
     $this->moduleHandler()->setModuleList($fixed_list);
-    $new_module_list = array_combine(array_keys($fixed_list), array_keys($fixed_list));
+    $new_module_list = \array_combine(\array_keys($fixed_list), \array_keys($fixed_list));
     $this->assertModuleList($new_module_list, 'When using a fixed list');
   }
 
@@ -73,8 +73,8 @@ class ModuleHandlerTest extends KernelTestBase {
    * @internal
    */
   protected function assertModuleList(array $expected_values, string $condition): void {
-    $expected_values = array_values(array_unique($expected_values));
-    $enabled_modules = array_keys($this->container->get('module_handler')->getModuleList());
+    $expected_values = \array_values(\array_unique($expected_values));
+    $enabled_modules = \array_keys($this->container->get('module_handler')->getModuleList());
     $this->assertEquals($expected_values, $enabled_modules, "$condition: extension handler returns correct results");
   }
 
@@ -181,7 +181,7 @@ class ModuleHandlerTest extends KernelTestBase {
     // any cached way to retrieve its location.
     // @todo Remove as part of https://www.drupal.org/node/2186491
     $profile_list = \Drupal::service('extension.list.profile');
-    assert($profile_list instanceof ProfileExtensionList);
+    \assert($profile_list instanceof ProfileExtensionList);
     $profile_list->setPathname($profile, 'core/profiles/tests/' . $profile . '/' . $profile . '.info.yml');
     $this->enableModules(['module_test', $profile]);
 
@@ -240,7 +240,7 @@ class ModuleHandlerTest extends KernelTestBase {
     // any cached way to retrieve its location.
     // @todo Remove as part of https://www.drupal.org/node/2186491
     $profile_list = \Drupal::service('extension.list.profile');
-    assert($profile_list instanceof ProfileExtensionList);
+    \assert($profile_list instanceof ProfileExtensionList);
     $profile_list->setPathname($profile, 'core/profiles/tests/' . $profile . '/' . $profile . '.info.yml');
     $this->enableModules(['module_test', $profile]);
 
@@ -342,7 +342,7 @@ class ModuleHandlerTest extends KernelTestBase {
     // Verify that the stream wrapper is available even without calling
     // \Drupal::service('stream_wrapper_manager')->getWrappers() again.
     // If the stream wrapper is not available file_exists() will raise a notice.
-    file_exists('dummy://');
+    \file_exists('dummy://');
     $stream_wrappers = \Drupal::service('stream_wrapper_manager')->getWrappers();
     $this->assertTrue(isset($stream_wrappers['dummy']));
     $this->assertTrue(isset($stream_wrappers['dummy1']));

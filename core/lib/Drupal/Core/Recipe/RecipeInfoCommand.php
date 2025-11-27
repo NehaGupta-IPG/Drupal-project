@@ -42,8 +42,8 @@ final class RecipeInfoCommand extends Command {
     $io = new SymfonyStyle($input, $output);
 
     $recipe_path = $input->getArgument('path');
-    if (!is_string($recipe_path) || !is_dir($recipe_path)) {
-      $io->error(sprintf('The supplied path %s is not a directory', $recipe_path));
+    if (!\is_string($recipe_path) || !\is_dir($recipe_path)) {
+      $io->error(\sprintf('The supplied path %s is not a directory', $recipe_path));
       return 1;
     }
     $this->boot();
@@ -58,7 +58,7 @@ final class RecipeInfoCommand extends Command {
       // Passing NULL as the callable to array_map() makes it act like a Python
       // zip() operation.
       // @see https://docs.python.org/3.8/library/functions.html#zip
-      $rows = array_map(NULL, array_keys($descriptions), $descriptions);
+      $rows = \array_map(NULL, \array_keys($descriptions), $descriptions);
       $io->table(['Name', 'Description'], $rows);
     }
     else {

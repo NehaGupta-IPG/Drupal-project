@@ -13,7 +13,7 @@ class RouteNameCacheContext extends RouteCacheContext {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Route name');
+    return \t('Route name');
   }
 
   /**

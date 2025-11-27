@@ -132,7 +132,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
             'target_id' => 2,
             'target_type' => 'taxonomy_term',
             'target_uuid' => Term::load(2)->uuid(),
-            'url' => base_path() . 'taxonomy/term/2',
+            'url' => \base_path() . 'taxonomy/term/2',
           ],
         ];
         break;
@@ -146,7 +146,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
             'target_id' => 2,
             'target_type' => 'taxonomy_term',
             'target_uuid' => Term::load(2)->uuid(),
-            'url' => base_path() . 'taxonomy/term/2',
+            'url' => \base_path() . 'taxonomy/term/2',
           ],
         ];
         break;
@@ -157,13 +157,13 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
             'target_id' => 3,
             'target_type' => 'taxonomy_term',
             'target_uuid' => Term::load(3)->uuid(),
-            'url' => base_path() . 'taxonomy/term/3',
+            'url' => \base_path() . 'taxonomy/term/3',
           ],
           [
             'target_id' => 2,
             'target_type' => 'taxonomy_term',
             'target_uuid' => Term::load(2)->uuid(),
-            'url' => base_path() . 'taxonomy/term/2',
+            'url' => \base_path() . 'taxonomy/term/2',
           ],
         ];
         break;
@@ -316,7 +316,7 @@ abstract class TermResourceTestBase extends EntityResourceTestBase {
     // Create term PATCH request.
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Content-Type'] = static::$mimeType;
-    $request_options = array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('PATCH'));
+    $request_options = \array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('PATCH'));
     $request_options[RequestOptions::BODY] = $this->serializer->encode($normalization, static::$format);
 
     // PATCH request: 200.

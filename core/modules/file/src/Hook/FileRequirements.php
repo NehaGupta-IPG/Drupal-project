@@ -21,12 +21,12 @@ class FileRequirements {
     $server_software = \Drupal::request()->server->get('SERVER_SOFTWARE', '');
 
     // Get the web server identity.
-    $is_nginx = preg_match("/Nginx/i", $server_software);
-    $is_apache = preg_match("/Apache/i", $server_software);
-    $fastcgi = $is_apache && ((str_contains($server_software, 'mod_fastcgi') || str_contains($server_software, 'mod_fcgi')));
+    $is_nginx = \preg_match("/Nginx/i", $server_software);
+    $is_apache = \preg_match("/Apache/i", $server_software);
+    $fastcgi = $is_apache && ((\str_contains($server_software, 'mod_fastcgi') || \str_contains($server_software, 'mod_fcgi')));
 
     // Check the uploadprogress extension is loaded.
-    if (extension_loaded('uploadprogress')) {
+    if (\extension_loaded('uploadprogress')) {
       $value = $this->t('Enabled (<a href="https://github.com/php/pecl-php-uploadprogress#uploadprogress">PECL uploadprogress</a>)');
       $description = NULL;
     }

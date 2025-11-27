@@ -24,7 +24,7 @@ class FieldOptionTranslation extends ProcessPluginBase {
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     [$type, $data] = $value;
 
-    $data = unserialize($data);
+    $data = \unserialize($data);
     $new_allowed_values = '';
     $translation_key = $row->getSourceProperty('property');
     if (isset($data['settings']['allowed_values'])) {
@@ -36,7 +36,7 @@ class FieldOptionTranslation extends ProcessPluginBase {
         case 'list_text':
           if (isset($allowed_values[$translation_key])) {
             $new_allowed_values = ['label' => $row->getSourceProperty('translation')];
-            $translation_key = array_search($translation_key, array_keys($allowed_values));
+            $translation_key = \array_search($translation_key, \array_keys($allowed_values));
             break;
           }
           break;

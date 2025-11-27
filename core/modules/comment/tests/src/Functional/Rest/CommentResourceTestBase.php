@@ -61,7 +61,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
   #[Before]
   public function commentResourceTestBaseSkipTests(): void {
     if (static::$format === 'xml'
-      && in_array($this->name(), ['testPostDxWithoutCriticalBaseFields', 'testPostSkipCommentApproval'], TRUE)) {
+      && \in_array($this->name(), ['testPostDxWithoutCriticalBaseFields', 'testPostSkipCommentApproval'], TRUE)) {
       $this->markTestSkipped('Deserialization of the XML format is not supported.');
     }
   }
@@ -193,7 +193,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'pid' => [],
@@ -207,7 +207,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
           'target_id' => 1,
           'target_type' => 'entity_test',
           'target_uuid' => EntityTest::load(1)->uuid(),
-          'url' => base_path() . 'entity_test/1',
+          'url' => \base_path() . 'entity_test/1',
         ],
       ],
       'field_name' => [
@@ -275,7 +275,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getNormalizedPatchEntity() {
-    return array_diff_key(
+    return \array_diff_key(
       $this->getNormalizedPostEntity(),
       ['entity_type' => TRUE, 'entity_id' => TRUE, 'field_name' => TRUE],
     );
@@ -317,20 +317,20 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = static::$mimeType;
     $request_options[RequestOptions::HEADERS]['Content-Type'] = static::$mimeType;
-    $request_options = array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('POST'));
+    $request_options = \array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('POST'));
 
     // DX: 422 when missing 'entity_type' field.
-    $request_options[RequestOptions::BODY] = $this->serializer->encode(array_diff_key($this->getNormalizedPostEntity(), ['entity_type' => TRUE]), static::$format);
+    $request_options[RequestOptions::BODY] = $this->serializer->encode(\array_diff_key($this->getNormalizedPostEntity(), ['entity_type' => TRUE]), static::$format);
     $response = $this->request('POST', $url, $request_options);
     $this->assertResourceErrorResponse(422, "Unprocessable Entity: validation failed.\nentity_type: This value should not be null.\n", $response);
 
     // DX: 422 when missing 'entity_id' field.
-    $request_options[RequestOptions::BODY] = $this->serializer->encode(array_diff_key($this->getNormalizedPostEntity(), ['entity_id' => TRUE]), static::$format);
+    $request_options[RequestOptions::BODY] = $this->serializer->encode(\array_diff_key($this->getNormalizedPostEntity(), ['entity_id' => TRUE]), static::$format);
     $response = $this->request('POST', $url, $request_options);
     $this->assertResourceErrorResponse(422, "Unprocessable Entity: validation failed.\nentity_id: This value should not be null.\n", $response);
 
     // DX: 422 when missing 'field_name' field.
-    $request_options[RequestOptions::BODY] = $this->serializer->encode(array_diff_key($this->getNormalizedPostEntity(), ['field_name' => TRUE]), static::$format);
+    $request_options[RequestOptions::BODY] = $this->serializer->encode(\array_diff_key($this->getNormalizedPostEntity(), ['field_name' => TRUE]), static::$format);
     $response = $this->request('POST', $url, $request_options);
     $this->assertResourceErrorResponse(422, "Unprocessable Entity: validation failed.\nfield_name: This value should not be null.\n", $response);
   }
@@ -369,14 +369,14 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = static::$mimeType;
     $request_options[RequestOptions::HEADERS]['Content-Type'] = static::$mimeType;
-    $request_options = array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('POST'));
+    $request_options = \array_merge_recursive($request_options, $this->getAuthenticationRequestOptions('POST'));
     $request_options[RequestOptions::BODY] = $this->serializer->encode($this->getNormalizedPostEntity(), static::$format);
 
     $url = $this->getEntityResourcePostUrl()->setOption('query', ['_format' => static::$format]);
 
     // Status should be FALSE when posting as anonymous.
     $response = $this->request('POST', $url, $request_options);
-    $unserialized = $this->serializer->deserialize((string) $response->getBody(), get_class($this->entity), static::$format);
+    $unserialized = $this->serializer->deserialize((string) $response->getBody(), \get_class($this->entity), static::$format);
     $this->assertResourceResponse(201, FALSE, $response);
     $this->assertFalse($unserialized->isPublished());
 
@@ -389,7 +389,7 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
     // Status should be TRUE when posting as anonymous and skip comment
     // approval.
     $response = $this->request('POST', $url, $request_options);
-    $unserialized = $this->serializer->deserialize((string) $response->getBody(), get_class($this->entity), static::$format);
+    $unserialized = $this->serializer->deserialize((string) $response->getBody(), \get_class($this->entity), static::$format);
     $this->assertResourceResponse(201, FALSE, $response);
     $this->assertTrue($unserialized->isPublished());
   }

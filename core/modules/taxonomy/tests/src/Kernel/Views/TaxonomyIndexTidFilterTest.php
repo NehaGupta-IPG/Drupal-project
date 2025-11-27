@@ -72,7 +72,7 @@ class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
       $this->terms[3]->getConfigDependencyName(),
       $this->terms[4]->getConfigDependencyName(),
     ];
-    sort($content_dependencies);
+    \sort($content_dependencies);
 
     $this->assertEquals([
       'config' => [

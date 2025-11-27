@@ -55,7 +55,7 @@ class UserPermissionsForm extends FormBase {
     $this->roleStorage = $role_storage;
     $this->moduleHandler = $module_handler;
     if ($this->moduleExtensionList === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $this->moduleExtensionList = \Drupal::service('extension.list.module');
     }
   }
@@ -109,12 +109,12 @@ class UserPermissionsForm extends FormBase {
       // Insert 'access content' before the 'view own unpublished content' key
       // in order to maintain the UI even though the permission is provided by
       // the system module.
-      $keys = array_keys($permissions_by_provider['node']);
-      $offset = (int) array_search('view own unpublished content', $keys);
-      $permissions_by_provider['node'] = array_merge(
-        array_slice($permissions_by_provider['node'], 0, $offset),
+      $keys = \array_keys($permissions_by_provider['node']);
+      $offset = (int) \array_search('view own unpublished content', $keys);
+      $permissions_by_provider['node'] = \array_merge(
+        \array_slice($permissions_by_provider['node'], 0, $offset),
         ['access content' => $permissions_by_provider['system']['access content']],
-        array_slice($permissions_by_provider['node'], $offset)
+        \array_slice($permissions_by_provider['node'], $offset)
       );
       unset($permissions_by_provider['system']['access content']);
     }
@@ -143,7 +143,7 @@ class UserPermissionsForm extends FormBase {
       '#value' => $role_names,
     ];
     // Render role/permission overview:
-    $hide_descriptions = system_admin_compact_mode();
+    $hide_descriptions = \system_admin_compact_mode();
 
     $form['system_compact_link'] = [
       '#id' => FALSE,
@@ -191,7 +191,7 @@ class UserPermissionsForm extends FormBase {
       $form['permissions']['module_' . $provider] = [
         [
           '#wrapper_attributes' => [
-            'colspan' => count($role_names) + 1,
+            'colspan' => \count($role_names) + 1,
             'class' => ['module'],
             'id' => 'module-' . $provider,
           ],
@@ -225,7 +225,7 @@ class UserPermissionsForm extends FormBase {
               'class' => ['checkbox'],
             ],
             '#type' => 'checkbox',
-            '#default_value' => in_array($perm, $role_permissions[$rid]) ? 1 : 0,
+            '#default_value' => \in_array($perm, $role_permissions[$rid]) ? 1 : 0,
             '#attributes' => ['class' => ['rid-' . $rid, 'js-rid-' . $rid]],
             '#parents' => [$rid, $perm],
           ];
@@ -255,7 +255,7 @@ class UserPermissionsForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     foreach ($form_state->getValue('role_names') as $role_name => $name) {
-      user_role_change_permissions($role_name, (array) $form_state->getValue($role_name));
+      \user_role_change_permissions($role_name, (array) $form_state->getValue($role_name));
     }
 
     $this->messenger()->addStatus($this->t('The changes have been saved.'));

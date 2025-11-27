@@ -57,7 +57,7 @@ class ValidSequenceKeysValidatorTest extends KernelTestBase {
     $definition = $this->typedData->createDataDefinition('map');
     $definition->setPropertyDefinition('keys', $this->typedConfigManager->createDataDefinition('sequence'));
 
-    if (count($extra_constraints) > 0) {
+    if (\count($extra_constraints) > 0) {
       foreach ($extra_constraints as $name => $settings) {
         $definition->addConstraint($name, $settings);
       }

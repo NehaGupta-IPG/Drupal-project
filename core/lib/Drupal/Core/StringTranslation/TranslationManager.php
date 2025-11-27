@@ -77,8 +77,8 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    *   A sorted array of translator objects.
    */
   protected function sortTranslators() {
-    krsort($this->translators);
-    return array_merge(...$this->translators);
+    \krsort($this->translators);
+    return \array_merge(...$this->translators);
   }
 
   /**
@@ -129,7 +129,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    */
   protected function doTranslate($string, array $options = []) {
     // If a NULL langcode has been provided, unset it.
-    if (!isset($options['langcode']) && array_key_exists('langcode', $options)) {
+    if (!isset($options['langcode']) && \array_key_exists('langcode', $options)) {
       unset($options['langcode']);
     }
 

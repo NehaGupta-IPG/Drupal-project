@@ -83,7 +83,7 @@ class HttpExceptionNormalizer extends NormalizerBase {
     // "Link" header, use that, otherwise fall back to the HTTP spec section
     // covering the exception's status code.
     $headers = $exception->getHeaders();
-    if (isset($headers['Link']) && !is_array($headers['Link'])) {
+    if (isset($headers['Link']) && !\is_array($headers['Link'])) {
       $error['links']['info']['href'] = $headers['Link'];
     }
     elseif ($info_url = $this->getInfoUrl($status_code)) {

@@ -37,7 +37,7 @@ class HtmlToTextTest extends UnitTestCase {
    */
   protected function stringToHtml($text): string {
     return '"' .
-      str_replace(
+      \str_replace(
         ["\n", ' '],
         ['\n', '&nbsp;'],
         Html::escape($text)
@@ -61,8 +61,8 @@ class HtmlToTextTest extends UnitTestCase {
    * @internal
    */
   protected function assertHtmlToText(string $html, string $text, string $message, ?array $allowed_tags = NULL): void {
-    preg_match_all('/<([a-z0-6]+)/', mb_strtolower($html), $matches);
-    $tested_tags = implode(', ', array_unique($matches[1]));
+    \preg_match_all('/<([a-z0-6]+)/', \mb_strtolower($html), $matches);
+    $tested_tags = \implode(', ', \array_unique($matches[1]));
     $message .= ' (' . $tested_tags . ')';
     $result = MailFormatHelper::htmlToText($html, $allowed_tags);
     $this->assertEquals($text, $result, Html::escape($message));
@@ -246,11 +246,11 @@ class HtmlToTextTest extends UnitTestCase {
 <li>[li-ul]</li></ul>
 [text]
 EOT;
-    $input = str_replace(["\r", "\n"], '', $input);
+    $input = \str_replace(["\r", "\n"], '', $input);
     $output = MailFormatHelper::htmlToText($input);
     $this->assertDoesNotMatchRegularExpression('/\][^\n]*\[/s', $output, 'Block-level HTML tags should force newlines');
-    $output_upper = mb_strtoupper($output);
-    $upper_input = mb_strtoupper($input);
+    $output_upper = \mb_strtoupper($output);
+    $upper_input = \mb_strtoupper($input);
     $upper_output = MailFormatHelper::htmlToText($upper_input);
     $this->assertEquals($output_upper, $upper_output, 'Tag recognition should be case-insensitive');
   }
@@ -291,7 +291,7 @@ EOT;
 <br /><a href="{$base_path}node/1">Path, no host</a>
 <br /><a href="node/1">Relative path</a>
 EOT;
-    $source = str_replace(["\r", "\n"], '', $source);
+    $source = \str_replace(["\r", "\n"], '', $source);
     // @todo Footnote URLs should be absolute.
     // @todo The last two references should be combined.
     $text = <<<EOT
@@ -342,15 +342,15 @@ EOT;
    * <CRLF> is 1000 characters."
    */
   public function testVeryLongLineWrap(): void {
-    $input = 'Drupal<br /><p>' . str_repeat('x', 2100) . '</p><br />Drupal';
+    $input = 'Drupal<br /><p>' . \str_repeat('x', 2100) . '</p><br />Drupal';
     $output = MailFormatHelper::htmlToText($input);
     $eol = Settings::get('mail_line_endings', PHP_EOL);
 
     $maximum_line_length = 0;
-    foreach (explode($eol, $output) as $line) {
+    foreach (\explode($eol, $output) as $line) {
       // We must use strlen() rather than mb_strlen() in order to count octets
       // rather than characters.
-      $maximum_line_length = max($maximum_line_length, strlen($line . $eol));
+      $maximum_line_length = \max($maximum_line_length, \strlen($line . $eol));
     }
     // Verify that the maximum line length found was less than or equal to 1000
     // characters as per RFC 821.
@@ -364,8 +364,8 @@ EOT;
    */
   public function testRemoveTrailingWhitespace(): void {
     $text = "Hi there! \nEarth";
-    $mail_lines = explode("\n", MailFormatHelper::wrapMail($text));
-    $this->assertNotEquals(" ", substr($mail_lines[0], -1), 'Trailing whitespace removed.');
+    $mail_lines = \explode("\n", MailFormatHelper::wrapMail($text));
+    $this->assertNotEquals(" ", \substr($mail_lines[0], -1), 'Trailing whitespace removed.');
   }
 
   /**
@@ -378,11 +378,11 @@ EOT;
    */
   public function testUsenetSignature(): void {
     $text = "Hi there!\n-- \nEarth";
-    $mail_lines = explode("\n", MailFormatHelper::wrapMail($text));
+    $mail_lines = \explode("\n", MailFormatHelper::wrapMail($text));
     $this->assertEquals("-- ", $mail_lines[1], 'Trailing whitespace not removed for dash-dash-space signatures.');
 
     $text = "Hi there!\n--  \nEarth";
-    $mail_lines = explode("\n", MailFormatHelper::wrapMail($text));
+    $mail_lines = \explode("\n", MailFormatHelper::wrapMail($text));
     $this->assertEquals("--", $mail_lines[1], 'Trailing whitespace removed for incorrect dash-dash-space signatures.');
   }
 

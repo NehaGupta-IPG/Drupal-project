@@ -136,7 +136,7 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
           // Process the path as an inbound path. This will remove any language
           // prefixes and other path components that inbound processing would
           // clear out, so we can attempt to load the route clearly.
-          $path = $this->pathProcessorManager->processInbound(urldecode(rtrim($cloned_request->getPathInfo(), '/')), $cloned_request);
+          $path = $this->pathProcessorManager->processInbound(\urldecode(\rtrim($cloned_request->getPathInfo(), '/')), $cloned_request);
           $attributes = $this->router->match($path);
         }
         catch (ExceptionInterface | HttpException) {

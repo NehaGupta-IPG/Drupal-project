@@ -16,7 +16,7 @@ class ConfirmDeleteMultiple extends EntityDeleteMultipleForm {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->formatPlural(count($this->selection), 'Are you sure you want to delete this comment and all its children?', 'Are you sure you want to delete these comments and all their children?');
+    return $this->formatPlural(\count($this->selection), 'Are you sure you want to delete this comment and all its children?', 'Are you sure you want to delete these comments and all their children?');
   }
 
   /**

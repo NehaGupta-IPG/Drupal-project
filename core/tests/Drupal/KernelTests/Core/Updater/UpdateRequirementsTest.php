@@ -32,7 +32,7 @@ class UpdateRequirementsTest extends KernelTestBase {
       'description' => 'Update Error.',
       'severity' => RequirementSeverity::Error,
     ];
-    $requirements = update_check_requirements()['test.update.error'];
+    $requirements = \update_check_requirements()['test.update.error'];
     $this->assertEquals($testRequirements, $requirements);
 
     $testAlterRequirements = [
@@ -41,7 +41,7 @@ class UpdateRequirementsTest extends KernelTestBase {
       'description' => 'Update Warning.',
       'severity' => RequirementSeverity::Warning,
     ];
-    $alterRequirements = update_check_requirements()['test.update.error.alter'];
+    $alterRequirements = \update_check_requirements()['test.update.error.alter'];
     $this->assertEquals($testAlterRequirements, $alterRequirements);
   }
 

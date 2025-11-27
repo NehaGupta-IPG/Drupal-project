@@ -210,7 +210,7 @@ class PagePreviewTest extends NodeTestBase {
     $edit[$term_key] = $this->term->getName();
 
     // Upload an image.
-    $test_image = current($this->drupalGetTestFiles('image', 39325));
+    $test_image = \current($this->drupalGetTestFiles('image', 39325));
     $edit['files[field_image_0][]'] = \Drupal::service('file_system')->realpath($test_image->uri);
     $this->drupalGet('node/add/page');
     $this->submitForm($edit, 'Upload');
@@ -230,10 +230,10 @@ class PagePreviewTest extends NodeTestBase {
     $this->assertSession()->elementExists('xpath', "//body[contains(@class, 'page-node-type-page')]");
 
     // Get the UUID.
-    $url = parse_url($this->getUrl());
-    $paths = explode('/', $url['path']);
-    array_pop($paths);
-    $uuid = array_pop($paths);
+    $url = \parse_url($this->getUrl());
+    $paths = \explode('/', $url['path']);
+    \array_pop($paths);
+    $uuid = \array_pop($paths);
 
     // Switch view mode. We'll remove the body from the teaser view mode.
     \Drupal::service('entity_display.repository')
@@ -374,9 +374,9 @@ class PagePreviewTest extends NodeTestBase {
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     // Assert multiple items can be added and are not lost when previewing.
-    $test_image_1 = current($this->drupalGetTestFiles('image', 39325));
+    $test_image_1 = \current($this->drupalGetTestFiles('image', 39325));
     $edit_image_1['files[field_image_0][]'] = $file_system->realpath($test_image_1->uri);
-    $test_image_2 = current($this->drupalGetTestFiles('image', 39325));
+    $test_image_2 = \current($this->drupalGetTestFiles('image', 39325));
     $edit_image_2['files[field_image_1][]'] = $file_system->realpath($test_image_2->uri);
     $edit['field_image[0][alt]'] = 'Alt 1';
 
@@ -539,7 +539,7 @@ class PagePreviewTest extends NodeTestBase {
     \Drupal::service('module_installer')->uninstall(['node_test']);
     $this->drupalLogout();
     $title_key = 'title[0][value]';
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['create page content', 'access content']);
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['create page content', 'access content']);
     $edit = [
       $title_key => $this->randomMachineName(8),
     ];

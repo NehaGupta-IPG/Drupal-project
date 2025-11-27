@@ -134,7 +134,7 @@ class MenuUiHooks {
     // descendants).
     // @todo This must be handled in a #process handler.
     $node = $form_state->getFormObject()->getEntity();
-    $defaults = menu_ui_get_menu_link_defaults($node);
+    $defaults = \menu_ui_get_menu_link_defaults($node);
     /** @var \Drupal\node\NodeTypeInterface $node_type */
     $node_type = $node->type->entity;
     /** @var \Drupal\Core\Menu\MenuParentFormSelectorInterface $menu_parent_selector */
@@ -223,7 +223,7 @@ class MenuUiHooks {
       '#default_value' => $defaults['weight'],
       '#description' => $this->t('Menu links with lower weights are displayed before links with higher weights.'),
     ];
-    foreach (array_keys($form['actions']) as $action) {
+    foreach (\array_keys($form['actions']) as $action) {
       if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
         $form['actions'][$action]['#submit'][] = 'menu_ui_form_node_form_submit';
       }
@@ -243,10 +243,10 @@ class MenuUiHooks {
   public function formNodeTypeFormAlter(&$form, FormStateInterface $form_state) : void {
     /** @var \Drupal\Core\Menu\MenuParentFormSelectorInterface $menu_parent_selector */
     $menu_parent_selector = \Drupal::service('menu.parent_form_selector');
-    $menu_options = array_map(function (MenuInterface $menu) {
+    $menu_options = \array_map(function (MenuInterface $menu) {
         return $menu->label();
     }, Menu::loadMultiple());
-    asort($menu_options);
+    \asort($menu_options);
     /** @var \Drupal\node\NodeTypeInterface $type */
     $type = $form_state->getFormObject()->getEntity();
     $form['menu'] = [
@@ -307,14 +307,14 @@ class MenuUiHooks {
     $storage = $this->entityTypeManager->getStorage('node_type');
     foreach ($storage->loadMultiple() as $content_type) {
       $third_party_settings = $original_third_party_settings = $content_type->getThirdPartySettings('menu_ui');
-      if (isset($third_party_settings['available_menus']) && in_array($menu_id, $third_party_settings['available_menus'])) {
-        $key = array_search($menu_id, $third_party_settings['available_menus']);
+      if (isset($third_party_settings['available_menus']) && \in_array($menu_id, $third_party_settings['available_menus'])) {
+        $key = \array_search($menu_id, $third_party_settings['available_menus']);
         if ($key !== FALSE) {
           unset($third_party_settings['available_menus'][$key]);
         }
         $content_type->setThirdPartySetting('menu_ui', 'available_menus', $third_party_settings['available_menus']);
       }
-      if (isset($third_party_settings['parent']) && substr($third_party_settings['parent'], 0, strlen($parent_prefix)) == $parent_prefix) {
+      if (isset($third_party_settings['parent']) && \substr($third_party_settings['parent'], 0, \strlen($parent_prefix)) == $parent_prefix) {
         $third_party_settings['parent'] = '';
         $content_type->setThirdPartySetting('menu_ui', 'parent', $third_party_settings['parent']);
       }

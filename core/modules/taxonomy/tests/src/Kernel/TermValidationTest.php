@@ -48,7 +48,7 @@ class TermValidationTest extends EntityKernelTestBase {
     $this->assertCount(1, $violations, 'Violation found when name is too long.');
     $this->assertEquals('name.0.value', $violations[0]->getPropertyPath());
     $field_label = $term->get('name')->getFieldDefinition()->getLabel();
-    $this->assertEquals(sprintf('%s: may not be longer than 255 characters.', $field_label), $violations[0]->getMessage());
+    $this->assertEquals(\sprintf('%s: may not be longer than 255 characters.', $field_label), $violations[0]->getMessage());
 
     $term->set('name', NULL);
     $violations = $term->validate();

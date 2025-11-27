@@ -70,10 +70,10 @@ abstract class FileTestBase extends KernelTestBase {
     $public_file_directory = $this->siteDirectory . '/files';
     $private_file_directory = $this->siteDirectory . '/private';
 
-    mkdir($this->siteDirectory, 0775);
-    mkdir($this->siteDirectory . '/files', 0775);
-    mkdir($this->siteDirectory . '/private', 0775);
-    mkdir($this->siteDirectory . '/files/config/sync', 0775, TRUE);
+    \mkdir($this->siteDirectory, 0775);
+    \mkdir($this->siteDirectory . '/files', 0775);
+    \mkdir($this->siteDirectory . '/private', 0775);
+    \mkdir($this->siteDirectory . '/files/config/sync', 0775, TRUE);
 
     $this->setSetting('file_public_path', $public_file_directory);
     $this->setSetting('file_private_path', $private_file_directory);
@@ -92,17 +92,17 @@ abstract class FileTestBase extends KernelTestBase {
    */
   public function assertFilePermissions($filepath, $expected_mode, $message = NULL) {
     // Clear out PHP's file stat cache to be sure we see the current value.
-    clearstatcache(TRUE, $filepath);
+    \clearstatcache(TRUE, $filepath);
 
     // Mask out all but the last three octets.
-    $actual_mode = fileperms($filepath) & 0777;
+    $actual_mode = \fileperms($filepath) & 0777;
 
     // PHP on Windows has limited support for file permissions. Usually each of
     // "user", "group" and "other" use one octal digit (3 bits) to represent the
     // read/write/execute bits. On Windows, chmod() ignores the "group" and
     // "other" bits, and fileperms() returns the "user" bits in all three
     // positions. $expected_mode is updated to reflect this.
-    if (str_starts_with(PHP_OS, 'WIN')) {
+    if (\str_starts_with(PHP_OS, 'WIN')) {
       // Reset the "group" and "other" bits.
       $expected_mode = $expected_mode & 0700;
       // Shift the "user" bits to the "group" and "other" positions also.
@@ -110,7 +110,7 @@ abstract class FileTestBase extends KernelTestBase {
     }
 
     if (!isset($message)) {
-      $message = sprintf('Expected file permission to be %s, actually were %s.', decoct($actual_mode), decoct($expected_mode));
+      $message = \sprintf('Expected file permission to be %s, actually were %s.', \decoct($actual_mode), \decoct($expected_mode));
     }
     $this->assertEquals($expected_mode, $actual_mode, $message);
   }
@@ -127,10 +127,10 @@ abstract class FileTestBase extends KernelTestBase {
    */
   public function assertDirectoryPermissions($directory, $expected_mode, $message = NULL) {
     // Clear out PHP's file stat cache to be sure we see the current value.
-    clearstatcache(TRUE, $directory);
+    \clearstatcache(TRUE, $directory);
 
     // Mask out all but the last three octets.
-    $actual_mode = fileperms($directory) & 0777;
+    $actual_mode = \fileperms($directory) & 0777;
     $expected_mode = $expected_mode & 0777;
 
     // PHP on Windows has limited support for file permissions. Usually each of
@@ -138,7 +138,7 @@ abstract class FileTestBase extends KernelTestBase {
     // read/write/execute bits. On Windows, chmod() ignores the "group" and
     // "other" bits, and fileperms() returns the "user" bits in all three
     // positions. $expected_mode is updated to reflect this.
-    if (str_starts_with(PHP_OS, 'WIN')) {
+    if (\str_starts_with(PHP_OS, 'WIN')) {
       // Reset the "group" and "other" bits.
       $expected_mode = $expected_mode & 0700;
       // Shift the "user" bits to the "group" and "other" positions also.
@@ -146,7 +146,7 @@ abstract class FileTestBase extends KernelTestBase {
     }
 
     if (!isset($message)) {
-      $message = sprintf('Expected directory permission to be %s, actually were %s.', decoct($expected_mode), decoct($actual_mode));
+      $message = \sprintf('Expected directory permission to be %s, actually were %s.', \decoct($expected_mode), \decoct($actual_mode));
     }
     $this->assertEquals($expected_mode, $actual_mode, $message);
   }
@@ -203,7 +203,7 @@ abstract class FileTestBase extends KernelTestBase {
       $contents = "file_put_contents() doesn't seem to appreciate empty strings so let's put in some data.";
     }
 
-    file_put_contents($filepath, $contents);
+    \file_put_contents($filepath, $contents);
     $this->assertFileExists($filepath);
     return $filepath;
   }

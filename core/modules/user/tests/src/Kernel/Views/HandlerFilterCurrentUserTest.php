@@ -73,7 +73,7 @@ class HandlerFilterCurrentUserTest extends UserKernelTestBase {
    */
   public function testFilterCurrentUserAsUser(): void {
     $column_map = ['uid' => 'uid'];
-    $user = reset($this->users);
+    $user = \reset($this->users);
     $this->currentUser->setAccount($user);
 
     $view = Views::getView('test_filter_current_user');

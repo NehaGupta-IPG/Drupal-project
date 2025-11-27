@@ -62,11 +62,11 @@ abstract class FileFieldTestBase extends BrowserTestBase {
    */
   public function getTestFile($type_name, $size = NULL) {
     // Get a file to upload.
-    $file = current($this->drupalGetTestFiles($type_name, $size));
+    $file = \current($this->drupalGetTestFiles($type_name, $size));
 
     // Add a filesize property to files as would be read by
     // \Drupal\file\Entity\File::load().
-    $file->filesize = filesize($file->uri);
+    $file->filesize = \filesize($file->uri);
 
     return File::create((array) $file);
   }
@@ -86,7 +86,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
    */
   public function updateFileField($name, $type_name, $field_settings = [], $widget_settings = []) {
     $field = FieldConfig::loadByName('node', $type_name, $name);
-    $field->setSettings(array_merge($field->getSettings(), $field_settings));
+    $field->setSettings(\array_merge($field->getSettings(), $field_settings));
     $field->save();
 
     \Drupal::service('entity_display.repository')->getFormDisplay('node', $type_name)
@@ -143,7 +143,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
     ];
 
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    if (is_numeric($nid_or_type)) {
+    if (\is_numeric($nid_or_type)) {
       $nid = $nid_or_type;
       $node = $node_storage->load($nid);
     }
@@ -164,7 +164,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
     // Attach files to the node.
     $field_storage = FieldStorageConfig::loadByName('node', $field_name);
     // File input name depends on number of files already uploaded.
-    $field_num = count($node->{$field_name});
+    $field_num = \count($node->{$field_name});
     foreach ($files as $i => $file) {
       $delta = $field_num + $i;
       $file_path = $this->container->get('file_system')->realpath($file->getFileUri());
@@ -172,7 +172,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
       if ($field_storage->getCardinality() != 1) {
         $name .= '[]';
       }
-      if (count($files) == 1) {
+      if (\count($files) == 1) {
         $edit[$name] = $file_path;
       }
       else {
@@ -221,7 +221,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
   public function assertFileEntryExists($file, $message = NULL) {
     $this->container->get('entity_type.manager')->getStorage('file')->resetCache();
     $db_file = File::load($file->id());
-    $message = $message ?? sprintf('File %s exists in database at the correct path.', $file->getFileUri());
+    $message = $message ?? \sprintf('File %s exists in database at the correct path.', $file->getFileUri());
     $this->assertEquals($file->getFileUri(), $db_file->getFileUri(), $message);
   }
 
@@ -235,7 +235,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
    */
   public function assertFileEntryNotExists(FileInterface $file, ?string $message = NULL): void {
     $this->container->get('entity_type.manager')->getStorage('file')->resetCache();
-    $message = $message ?? sprintf('File %s exists in database at the correct path.', $file->getFileUri());
+    $message = $message ?? \sprintf('File %s exists in database at the correct path.', $file->getFileUri());
     $this->assertNull(File::load($file->id()), $message);
   }
 
@@ -243,7 +243,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
    * Asserts that a file's status is set to permanent in the database.
    */
   public function assertFileIsPermanent(FileInterface $file, $message = NULL) {
-    $message = $message ?? sprintf('File %s is permanent.', $file->getFileUri());
+    $message = $message ?? \sprintf('File %s is permanent.', $file->getFileUri());
     $this->assertTrue($file->isPermanent(), $message);
   }
 

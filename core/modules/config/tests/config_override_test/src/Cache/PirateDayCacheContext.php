@@ -31,7 +31,7 @@ class PirateDayCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Pirate day');
+    return \t('Pirate day');
   }
 
   /**

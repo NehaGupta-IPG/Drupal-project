@@ -45,8 +45,8 @@ class EntityWorkspaceConflictConstraintValidator extends ConstraintValidator imp
       // If the entity is tracked in a workspace, it can only be edited in
       // that workspace or one of its descendants.
       if ($tracking_workspace_ids = $this->workspaceTracker->getEntityTrackingWorkspaceIds($entity, TRUE)) {
-        if (!$active_workspace || !in_array($active_workspace->id(), $tracking_workspace_ids, TRUE)) {
-          $first_tracking_workspace_id = reset($tracking_workspace_ids);
+        if (!$active_workspace || !\in_array($active_workspace->id(), $tracking_workspace_ids, TRUE)) {
+          $first_tracking_workspace_id = \reset($tracking_workspace_ids);
           $workspace = $this->entityTypeManager->getStorage('workspace')
             ->load($first_tracking_workspace_id);
 

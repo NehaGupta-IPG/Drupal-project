@@ -92,7 +92,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     // Install every entity type's schema that wasn't installed in the parent
     // method.
-    foreach (array_diff_key($this->entityTypeManager->getDefinitions(), array_flip(['user', 'entity_test'])) as $entity_type_id => $entity_type) {
+    foreach (\array_diff_key($this->entityTypeManager->getDefinitions(), \array_flip(['user', 'entity_test'])) as $entity_type_id => $entity_type) {
       if ($entity_type instanceof ContentEntityTypeInterface) {
         $this->installEntitySchema($entity_type_id);
       }
@@ -562,11 +562,11 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
    * @internal
    */
   protected function assertUpdatedViews(array $updated_view_ids): void {
-    $all_view_ids = array_keys($this->entityTypeManager->getStorage('view')->loadMultiple());
+    $all_view_ids = \array_keys($this->entityTypeManager->getStorage('view')->loadMultiple());
 
     $view_save_count = \Drupal::state()->get('views_test_data.view_save_count', []);
     foreach ($all_view_ids as $view_id) {
-      if (in_array($view_id, $updated_view_ids, TRUE)) {
+      if (\in_array($view_id, $updated_view_ids, TRUE)) {
         $this->assertTrue(isset($view_save_count[$view_id]), "The $view_id view has been updated.");
       }
       else {
@@ -576,7 +576,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     // Check that all test cases are updating only a subset of all the available
     // views.
-    $this->assertGreaterThan(count($updated_view_ids), count($all_view_ids));
+    $this->assertGreaterThan(\count($updated_view_ids), \count($all_view_ids));
   }
 
 }

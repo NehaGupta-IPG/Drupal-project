@@ -47,8 +47,8 @@ class DeprecatedElementTest extends KernelTestBase {
     ], $info_manager->getInfo('deprecated_extends_form'));
 
     // Ensure the constructor is triggering a deprecation error.
-    $previous_error_handler = get_error_handler();
-    set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
+    $previous_error_handler = \get_error_handler();
+    \set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
       // Convert deprecation error into a catchable exception.
       if ($severity === E_USER_DEPRECATED) {
         throw new \ErrorException($message, 0, $severity, $file, $line);
@@ -82,15 +82,15 @@ class DeprecatedElementTest extends KernelTestBase {
       $this->assertSame('\Drupal\Core\Render\Element\RenderElement is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Render\Element\RenderElementBase instead. See https://www.drupal.org/node/3436275', $e->getMessage());
     }
 
-    restore_error_handler();
+    \restore_error_handler();
   }
 
   /**
    * Test use of static methods trigger deprecations.
    */
   public function testDeprecatedStaticMethods(): void {
-    $previous_error_handler = get_error_handler();
-    set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
+    $previous_error_handler = \get_error_handler();
+    \set_error_handler(function ($severity, $message, $file, $line) use (&$previous_error_handler) {
       // Convert deprecation error into a catchable exception.
       if ($severity === E_USER_DEPRECATED) {
         throw new \ErrorException($message, 0, $severity, $file, $line);
@@ -129,7 +129,7 @@ class DeprecatedElementTest extends KernelTestBase {
           $this->fail('No deprecation error triggered.');
         }
         catch (\ErrorException $e) {
-          $parent_class = get_parent_class($class_name);
+          $parent_class = \get_parent_class($class_name);
           $this->assertSame("\\{$parent_class}::{$method_name}() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \\{$parent_class}Base::{$method_name}() instead. See https://www.drupal.org/node/3436275", $e->getMessage());
         }
       }
@@ -144,7 +144,7 @@ class DeprecatedElementTest extends KernelTestBase {
       }
     }
 
-    restore_error_handler();
+    \restore_error_handler();
   }
 
 }

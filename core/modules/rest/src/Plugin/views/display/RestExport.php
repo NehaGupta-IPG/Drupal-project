@@ -131,7 +131,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
     // and as such it is an array, with authentication providers (cookie,
     // basic_auth) as keys and modules providing those as values (user,
     // basic_auth).
-    $this->authenticationProviderIds = array_keys($authentication_providers);
+    $this->authenticationProviderIds = \array_keys($authentication_providers);
     $this->formatProviders = $serializer_format_providers;
   }
 
@@ -160,7 +160,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
     // If the default 'json' format is not selected as a format option in the
     // view display, fallback to the first format available for the default.
     if (!empty($options['style']['options']['formats']) && !isset($options['style']['options']['formats'][$this->getContentType()])) {
-      $default_format = reset($options['style']['options']['formats']);
+      $default_format = \reset($options['style']['options']['formats']);
       $this->setContentType($default_format);
     }
 
@@ -246,7 +246,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *   An array to use as value for "#options" in the form element.
    */
   public function getAuthOptions() {
-    return array_combine($this->authenticationProviderIds, $this->authenticationProviderIds);
+    return \array_combine($this->authenticationProviderIds, $this->authenticationProviderIds);
   }
 
   /**
@@ -280,7 +280,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
     parent::optionsSummary($categories, $options);
 
     // Authentication.
-    $auth = $this->getOption('auth') ? implode(', ', $this->getOption('auth')) : $this->t('No authentication is set');
+    $auth = $this->getOption('auth') ? \implode(', ', $this->getOption('auth')) : $this->t('No authentication is set');
 
     unset($categories['page'], $categories['exposed']);
     // Hide some settings, as they aren't useful for pure data output.
@@ -333,7 +333,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
     parent::submitOptionsForm($form, $form_state);
 
     if ($form_state->get('section') == 'auth') {
-      $this->setOption('auth', array_keys(array_filter($form_state->getValue('auth'))));
+      $this->setOption('auth', \array_keys(\array_filter($form_state->getValue('auth'))));
     }
   }
 
@@ -360,7 +360,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
       }
 
       // Format as a string using pipes as a delimiter.
-      $route->setRequirement('_format', implode('|', $formats));
+      $route->setRequirement('_format', \implode('|', $formats));
 
       // Add authentication to the route if it was set. If no authentication was
       // set, the default authentication will be used, which is cookie based by
@@ -387,10 +387,10 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    */
   protected function overrideApplies($view_path, Route $view_route, Route $route) {
     $route_has_format = $route->hasRequirement('_format');
-    $route_formats = $route_has_format ? explode('|', $route->getRequirement('_format')) : [];
-    $view_route_formats = $view_route->hasRequirement('_format') ? explode('|', $view_route->getRequirement('_format')) : [];
+    $route_formats = $route_has_format ? \explode('|', $route->getRequirement('_format')) : [];
+    $view_route_formats = $view_route->hasRequirement('_format') ? \explode('|', $view_route->getRequirement('_format')) : [];
     return $this->overrideAppliesPathAndMethod($view_path, $view_route, $route)
-      && (!$route_has_format || array_intersect($route_formats, $view_route_formats) != []);
+      && (!$route_has_format || \array_intersect($route_formats, $view_route_formats) != []);
   }
 
   /**
@@ -482,8 +482,8 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *   An array of format options. Both key and value are the same.
    */
   protected function getFormatOptions() {
-    $formats = array_keys($this->formatProviders);
-    return array_combine($formats, $formats);
+    $formats = \array_keys($this->formatProviders);
+    return \array_combine($formats, $formats);
   }
 
 }

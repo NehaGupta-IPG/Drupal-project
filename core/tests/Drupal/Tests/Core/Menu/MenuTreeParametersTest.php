@@ -159,7 +159,7 @@ class MenuTreeParametersTest extends UnitTestCase {
     $parameters->addExpandedParents(['', 'foo']);
     $parameters->setActiveTrail(['', 'bar']);
 
-    $after_serialize = unserialize(serialize($parameters));
+    $after_serialize = \unserialize(\serialize($parameters));
     $this->assertSame('1', $after_serialize->root);
     $this->assertSame(2, $after_serialize->minDepth);
     $this->assertSame(9, $after_serialize->maxDepth);

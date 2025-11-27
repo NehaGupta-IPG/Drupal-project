@@ -26,13 +26,13 @@ class Crypt {
     // results of the hash function if they are not scalar values. As this
     // function is used in security-critical contexts like token validation it
     // is important that it never returns an empty string.
-    if (!is_scalar($data) || !is_scalar($key)) {
+    if (!\is_scalar($data) || !\is_scalar($key)) {
       throw new \InvalidArgumentException('Both parameters passed to \Drupal\Component\Utility\Crypt::hmacBase64 must be scalar values.');
     }
 
-    $hmac = base64_encode(hash_hmac('sha256', $data, $key, TRUE));
+    $hmac = \base64_encode(\hash_hmac('sha256', $data, $key, TRUE));
     // Modify the hmac so it's safe to use in URLs.
-    return str_replace(['+', '/', '='], ['-', '_', ''], $hmac);
+    return \str_replace(['+', '/', '='], ['-', '_', ''], $hmac);
   }
 
   /**
@@ -46,9 +46,9 @@ class Crypt {
    *   any = padding characters removed.
    */
   public static function hashBase64($data) {
-    $hash = base64_encode(hash('sha256', $data, TRUE));
+    $hash = \base64_encode(\hash('sha256', $data, TRUE));
     // Modify the hash so it's safe to use in URLs.
-    return str_replace(['+', '/', '='], ['-', '_', ''], $hash);
+    return \str_replace(['+', '/', '='], ['-', '_', ''], $hash);
   }
 
   /**
@@ -62,7 +62,7 @@ class Crypt {
    *   padding characters removed.
    */
   public static function randomBytesBase64($count = 32) {
-    return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(random_bytes($count)));
+    return \str_replace(['+', '/', '='], ['-', '_', ''], \base64_encode(\random_bytes($count)));
   }
 
 }

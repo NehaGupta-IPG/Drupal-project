@@ -19,7 +19,7 @@ trait RequirementsPageTrait {
     $links = $this->getSession()->getPage()->findAll('named', ['link', 'try again']);
 
     // Get the default Drupal core PHP requirements.
-    if ($links && version_compare(phpversion(), PhpRequirements::getMinimumSupportedPhp()) < 0) {
+    if ($links && \version_compare(\phpversion(), PhpRequirements::getMinimumSupportedPhp()) < 0) {
       $this->assertSession()->pageTextNotContains('Errors found');
       $this->assertWarningSummaries(['PHP']);
       $this->clickLink('try again');
@@ -86,7 +86,7 @@ trait RequirementsPageTrait {
    */
   protected function assertRequirementSummaries(array $summaries, string $type): void {
     // The selectors are different for Claro.
-    $is_claro = stripos($this->getSession()->getPage()->getContent(), 'claro/css/theme/maintenance-page.css') !== FALSE;
+    $is_claro = \stripos($this->getSession()->getPage()->getContent(), 'claro/css/theme/maintenance-page.css') !== FALSE;
 
     $selectors = [];
     if ($is_claro) {
@@ -109,16 +109,16 @@ trait RequirementsPageTrait {
       // there isn't any other requirement message before clicking the link.
       // @todo Make this more reliable in
       //   https://www.drupal.org/project/drupal/issues/2927345.
-      for ($i = 0; $i <= count($summaries); $i++) {
-        $selectors[] = 'h3#' . $type . implode('', array_fill(0, $i + 1, '+details')) . ' summary';
+      for ($i = 0; $i <= \count($summaries); $i++) {
+        $selectors[] = 'h3#' . $type . \implode('', \array_fill(0, $i + 1, '+details')) . ' summary';
       }
     }
-    $elements = $this->cssSelect(implode(', ', $selectors));
+    $elements = $this->cssSelect(\implode(', ', $selectors));
 
     // Confirm that there are only the expected requirements.
     $requirements = [];
     foreach ($elements as $requirement) {
-      $requirements[] = trim($requirement->getText());
+      $requirements[] = \trim($requirement->getText());
     }
     $this->assertEquals($summaries, $requirements);
   }

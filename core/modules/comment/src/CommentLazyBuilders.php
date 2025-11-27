@@ -235,7 +235,7 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
    * Wraps content_translation_translate_access.
    */
   protected function access(EntityInterface $entity) {
-    return content_translation_translate_access($entity);
+    return \content_translation_translate_access($entity);
   }
 
   /**

@@ -15,7 +15,7 @@ class UserCacheContext extends UserCacheContextBase implements CacheContextInter
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('User');
+    return \t('User');
   }
 
   /**

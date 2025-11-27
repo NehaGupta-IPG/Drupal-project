@@ -192,7 +192,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     if (isset($this->moduleList[$name])) {
       return $this->moduleList[$name];
     }
-    throw new UnknownExtensionException(sprintf('The module %s does not exist.', $name));
+    throw new UnknownExtensionException(\sprintf('The module %s does not exist.', $name));
   }
 
   /**
@@ -209,14 +209,14 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function addModule($name, $path) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method does nothing. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method does nothing. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
   }
 
   /**
    * {@inheritdoc}
    */
   public function addProfile($name, $path) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method does nothing. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method does nothing. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
   }
 
   /**
@@ -234,7 +234,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * @see https://www.drupal.org/node/3491200
    */
   protected function add($type, $name, $path) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. This method does nothing. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. This method does nothing. There is no direct replacement. See https://www.drupal.org/node/3491200', E_USER_DEPRECATED);
   }
 
   /**
@@ -243,7 +243,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   public function buildModuleDependencies(array $modules) {
     foreach ($modules as $module) {
       $graph[$module->getName()]['edges'] = [];
-      if (isset($module->info['dependencies']) && is_array($module->info['dependencies'])) {
+      if (isset($module->info['dependencies']) && \is_array($module->info['dependencies'])) {
         foreach ($module->info['dependencies'] as $dependency) {
           $dependency_data = Dependency::createFromString($dependency);
           $graph[$module->getName()]['edges'][$dependency_data->getName()] = $dependency_data;
@@ -271,7 +271,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function loadAllIncludes($type, $name = NULL) {
-    @trigger_error("ModuleHandler::loadAllIncludes() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3536432", E_USER_DEPRECATED);
+    @\trigger_error("ModuleHandler::loadAllIncludes() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3536432", E_USER_DEPRECATED);
     foreach ($this->moduleList as $module => $filename) {
       $this->loadInclude($module, $type, $name);
     }
@@ -293,7 +293,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     }
     if (isset($this->moduleList[$module])) {
       $file = $this->root . '/' . $this->moduleList[$module]->getPath() . "/$name.$type";
-      if (is_file($file)) {
+      if (\is_file($file)) {
         require_once $file;
         $this->includeFileKeys[$key] = $file;
         return $file;
@@ -348,10 +348,10 @@ class ModuleHandler implements ModuleHandlerInterface {
     $list = $this->getHookImplementationList($hook);
     $listeners = $list->getForModule($module);
     if ($listeners) {
-      if (count($listeners) > 1) {
+      if (\count($listeners) > 1) {
         throw new \LogicException("Module $module should not implement $hook more than once");
       }
-      return reset($listeners)(... $args);
+      return \reset($listeners)(... $args);
     }
 
     return $this->legacyInvoke($module, $hook, $args);
@@ -373,7 +373,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected function legacyInvoke($module, $hook, array $args = []) {
     $this->load($module);
     $function = $module . '_' . $hook;
-    if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class)) {
+    if (\function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyHook::class)) {
       return $function(... $args);
     }
 
@@ -386,8 +386,8 @@ class ModuleHandler implements ModuleHandlerInterface {
   public function invokeAll($hook, array $args = []) {
     $return = [];
     $this->invokeAllWith($hook, function (callable $hook, string $module) use ($args, &$return) {
-      $result = call_user_func_array($hook, $args);
-      if (isset($result) && is_array($result)) {
+      $result = \call_user_func_array($hook, $args);
+      if (isset($result) && \is_array($result)) {
         $return = NestedArray::mergeDeep($return, $result);
       }
       elseif (isset($result)) {
@@ -425,10 +425,10 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   private function triggerDeprecationError($description, $hook) {
     $list = $this->getHookImplementationList($hook);
-    $modules = array_unique($list->modules);
+    $modules = \array_unique($list->modules);
     if (!empty($modules)) {
       $message = 'The deprecated hook hook_' . $hook . '() is implemented in these modules: ';
-      @trigger_error($message . implode(', ', $modules) . '. ' . $description, E_USER_DEPRECATED);
+      @\trigger_error($message . \implode(', ', $modules) . '. ' . $description, E_USER_DEPRECATED);
     }
   }
 
@@ -440,8 +440,8 @@ class ModuleHandler implements ModuleHandlerInterface {
     // normalize it to that. When passed as an array, usually the first item in
     // the array is a generic type, and additional items in the array are more
     // specific variants of it, as in the case of ['form', 'form_FORM_ID'].
-    if (is_array($type)) {
-      $cid = implode(',', $type);
+    if (\is_array($type)) {
+      $cid = \implode(',', $type);
     }
     else {
       $cid = $type;
@@ -451,8 +451,8 @@ class ModuleHandler implements ModuleHandlerInterface {
     // list of listeners to call, and on subsequent calls, iterate through them
     // quickly.
     if (!isset($this->alterHookListeners[$cid])) {
-      $hooks = is_array($type)
-        ? array_map(static fn (string $type) => $type . '_alter', $type)
+      $hooks = \is_array($type)
+        ? \array_map(static fn (string $type) => $type . '_alter', $type)
         : [$type . '_alter'];
       $this->alterHookListeners[$cid] = $this->getCombinedListeners($hooks);
     }
@@ -473,15 +473,15 @@ class ModuleHandler implements ModuleHandlerInterface {
   protected function getCombinedListeners(array $hooks): array {
     // Get implementation lists for each hook.
     /** @var list<\Drupal\Core\Hook\ImplementationList> $lists */
-    $lists = array_map($this->getHookImplementationList(...), $hooks);
+    $lists = \array_map($this->getHookImplementationList(...), $hooks);
     // Remove empty lists.
     /** @var array<int, \Drupal\Core\Hook\ImplementationList> $lists */
-    $lists = array_filter($lists, fn (ImplementationList $list) => $list->hasImplementations());
+    $lists = \array_filter($lists, fn (ImplementationList $list) => $list->hasImplementations());
     if (!$lists) {
       // No implementations exist.
       return [];
     }
-    if (array_keys($lists) === [0]) {
+    if (\array_keys($lists) === [0]) {
       // Only the first hook has implementations.
       return $lists[0]->listeners;
     }
@@ -491,8 +491,8 @@ class ModuleHandler implements ModuleHandlerInterface {
     $identifiers_by_module = [];
     foreach ($lists as $list) {
       foreach ($list->iterateByModule() as $module => $listener) {
-        $identifier = is_array($listener)
-          ? get_class($listener[0]) . '::' . $listener[1]
+        $identifier = \is_array($listener)
+          ? \get_class($listener[0]) . '::' . $listener[1]
           : $listener;
         $other_module = $modules_by_identifier[$identifier] ?? NULL;
         if ($other_module !== NULL) {
@@ -514,10 +514,10 @@ class ModuleHandler implements ModuleHandlerInterface {
     // First we get the the modules in moduleList order, this order is module
     // weight then alphabetical. Then we apply legacy ordering using
     // hook_module_implements_alter(). Finally we order using order attributes.
-    $modules = array_keys($identifiers_by_module);
+    $modules = \array_keys($identifiers_by_module);
     $modules = $this->reOrderModulesForAlter($modules, $hooks[0]);
     // Create a flat list of identifiers, using the new module order.
-    $identifiers = array_merge(...array_map(
+    $identifiers = \array_merge(...\array_map(
       fn (string $module) => $identifiers_by_module[$module],
       $modules,
     ));
@@ -528,13 +528,13 @@ class ModuleHandler implements ModuleHandlerInterface {
         // - Insert duplicate keys.
         // - Change the array to be not a list.
         // - Add or remove values.
-        assert($identifiers === array_unique($identifiers));
-        assert(array_is_list($identifiers));
-        assert(!array_diff($identifiers, array_keys($modules_by_identifier)));
-        assert(!array_diff(array_keys($modules_by_identifier), $identifiers));
+        \assert($identifiers === \array_unique($identifiers));
+        \assert(\array_is_list($identifiers));
+        \assert(!\array_diff($identifiers, \array_keys($modules_by_identifier)));
+        \assert(!\array_diff(\array_keys($modules_by_identifier), $identifiers));
       }
     }
-    return array_map(
+    return \array_map(
       static fn (string $identifier) => $listeners_by_identifier[$identifier],
       $identifiers,
     );
@@ -559,10 +559,10 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   protected function triggerErrorForDuplicateAlterHookListener(array $hooks, string $module, string $other_module, callable $listener, string $identifier): void {
     $log_message_replacements = [
-      '@implementation' => is_array($listener)
+      '@implementation' => \is_array($listener)
         ? ('method ' . $identifier . '()')
         : ('function ' . $listener[1] . '()'),
-      '@hooks' => "['" . implode("', '", $hooks) . "']",
+      '@hooks' => "['" . \implode("', '", $hooks) . "']",
     ];
     if ($other_module !== $module) {
       // There is conflicting information about which module this
@@ -572,7 +572,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       // unclear if the intention is to execute the code multiple times. This
       // can be resolved by using a separate method for alter hooks that
       // implement on behalf of other modules.
-      trigger_error((string) new FormattableMarkup(
+      \trigger_error((string) new FormattableMarkup(
         'The @implementation is registered for more than one of the alter hooks @hooks from the current ->alter() call, on behalf of different modules @module and @other_module. Only one instance will be part of the implementation list for this hook combination. For the purpose of ordering, the module @module will be used.',
         [
           ...$log_message_replacements,
@@ -584,7 +584,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     else {
       // There is no conflict, but probably one or more redundant #[Hook]
       // attributes should be removed.
-      trigger_error((string) new FormattableMarkup(
+      \trigger_error((string) new FormattableMarkup(
         'The @implementation is registered for more than one of the alter hooks @hooks from the current ->alter() call. Only one instance will be part of the implementation list for this hook combination.',
         $log_message_replacements,
       ), E_USER_NOTICE);
@@ -601,7 +601,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   List of order operations for the hook.
    */
   protected function getHookOrderingRules(string $hook): array {
-    return $this->orderingRules[$hook] ??= array_map(
+    return $this->orderingRules[$hook] ??= \array_map(
       OrderOperation::unpack(...),
       $this->packedOrderOperations[$hook] ?? [],
     );
@@ -621,16 +621,16 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   protected function reOrderModulesForAlter(array $modules, string $hook): array {
     // Order by module order first.
-    $modules = array_intersect(array_keys($this->moduleList), $modules);
+    $modules = \array_intersect(\array_keys($this->moduleList), $modules);
     // Alter expects the module list to be in the keys.
-    $implementations = array_fill_keys($modules, FALSE);
+    $implementations = \array_fill_keys($modules, FALSE);
     // Let modules adjust the order solely based on the primary hook. This
     // ensures the same module order regardless of whether this block
     // runs. Calling $this->alter() recursively in this way does not
     // result in an infinite loop, because this call is for a single
     // $type, so we won't end up in this method again.
     $this->alter('module_implements', $implementations, $hook);
-    return array_keys($implementations);
+    return \array_keys($implementations);
   }
 
   /**
@@ -644,23 +644,23 @@ class ModuleHandler implements ModuleHandlerInterface {
     // internally, but we have to extract the proper $cid in order to discover
     // implementations.
     $cid = $type;
-    if (is_array($type)) {
-      $cid = implode(',', $type);
+    if (\is_array($type)) {
+      $cid = \implode(',', $type);
       $extra_types = $type;
-      $type = array_shift($extra_types);
+      $type = \array_shift($extra_types);
     }
     if (!empty($this->alterHookListeners[$cid])) {
       $functions = [];
       foreach ($this->alterHookListeners[$cid] as $listener) {
-        if (is_string($listener)) {
+        if (\is_string($listener)) {
           $functions[] = $listener;
         }
         else {
-          $functions[] = get_class($listener[0]) . '::' . $listener[1];
+          $functions[] = \get_class($listener[0]) . '::' . $listener[1];
         }
       }
-      $message = 'The deprecated alter hook hook_' . $type . '_alter() is implemented in these locations: ' . implode(', ', $functions) . '.';
-      @trigger_error($message . ' ' . $description, E_USER_DEPRECATED);
+      $message = 'The deprecated alter hook hook_' . $type . '_alter() is implemented in these locations: ' . \implode(', ', $functions) . '.';
+      @\trigger_error($message . ' ' . $description, E_USER_DEPRECATED);
     }
   }
 
@@ -679,7 +679,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function getName($module) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Extension\ModuleExtensionList::getName($module) instead. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Extension\ModuleExtensionList::getName($module) instead. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
     return \Drupal::service('extension.list.module')->getName($module);
   }
 
@@ -687,7 +687,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function writeCache() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no need to call this method so there is no replacement. See https://www.drupal.org/node/3442349', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no need to call this method so there is no replacement. See https://www.drupal.org/node/3442349', E_USER_DEPRECATED);
   }
 
   /**
@@ -728,7 +728,7 @@ class ModuleHandler implements ModuleHandlerInterface {
           include_once $include;
         }
         foreach ($this->hookGroupIncludes[$hook] ?? [] as $include) {
-          @trigger_error('Autoloading hooks in the file (' . $include . ') is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765', E_USER_DEPRECATED);
+          @\trigger_error('Autoloading hooks in the file (' . $include . ') is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Move the functions in this file to either the .module file or other appropriate location. See https://www.drupal.org/node/3489765', E_USER_DEPRECATED);
           include_once $include;
         }
 

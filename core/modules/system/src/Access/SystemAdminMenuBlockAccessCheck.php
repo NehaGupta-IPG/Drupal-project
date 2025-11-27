@@ -65,14 +65,14 @@ class SystemAdminMenuBlockAccessCheck implements AccessInterface {
     // @todo Remove this fallback in https://drupal.org/i/3359511.
     if (empty($links)) {
 
-      $parameters_without_defaults = array_filter($parameters, fn ($key) => !$route->hasDefault($key) || $route->getDefault($key) !== $parameters[$key], ARRAY_FILTER_USE_KEY);
+      $parameters_without_defaults = \array_filter($parameters, fn ($key) => !$route->hasDefault($key) || $route->getDefault($key) !== $parameters[$key], ARRAY_FILTER_USE_KEY);
       $links = $this->menuLinkManager->loadLinksByRoute($route_match->getRouteName(), $parameters_without_defaults, 'admin');
     }
     if (empty($links)) {
       // If we did not find a link then we have no opinion on access.
       return AccessResult::neutral();
     }
-    return $this->hasAccessToChildMenuItems(reset($links), $account)->cachePerPermissions();
+    return $this->hasAccessToChildMenuItems(\reset($links), $account)->cachePerPermissions();
   }
 
   /**

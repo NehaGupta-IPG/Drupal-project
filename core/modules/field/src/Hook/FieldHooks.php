@@ -117,11 +117,11 @@ class FieldHooks {
         $field_types = \Drupal::service('plugin.manager.field.field_type')->getUiDefinitions();
         $formatters = \Drupal::service('plugin.manager.field.formatter')->getDefinitions();
         $providers = [];
-        foreach (array_merge($field_types, $widgets, $formatters) as $plugin) {
+        foreach (\array_merge($field_types, $widgets, $formatters) as $plugin) {
           $providers[] = $plugin['provider'];
         }
-        $providers = array_unique($providers);
-        sort($providers);
+        $providers = \array_unique($providers);
+        \sort($providers);
         $module_extension_list = \Drupal::service('extension.list.module');
         foreach ($providers as $provider) {
           // Skip plugins provided by core components as they do not implement
@@ -180,7 +180,7 @@ class FieldHooks {
   public function cron(): void {
     // Do a pass of purging on deleted Field API data, if any exists.
     $limit = \Drupal::config('field.settings')->get('purge_batch_size');
-    field_purge_batch($limit);
+    \field_purge_batch($limit);
   }
 
   /**
@@ -224,7 +224,7 @@ class FieldHooks {
           $fields[$field_instance->getTargetBundle()][] = $field_instance->id();
         }
         $this->memoryCache->set($cid, $fields, Cache::PERMANENT, ['entity_field_info']);
-        $field_configs = array_filter($field_configs, static fn(FieldConfigInterface $field_instance) => $field_instance->getTargetBundle() === $bundle);
+        $field_configs = \array_filter($field_configs, static fn(FieldConfigInterface $field_instance) => $field_instance->getTargetBundle() === $bundle);
       }
       if (isset($fields[$bundle])) {
         // Rely on the entity static cache for the field config entity loading
@@ -299,7 +299,7 @@ class FieldHooks {
       // Add a step to the beginning of the configuration synchronization
       // process to purge field data where the module that provides the field is
       // being uninstalled.
-      array_unshift($sync_steps, ['\Drupal\field\ConfigImporterFieldPurger', 'process']);
+      \array_unshift($sync_steps, ['\Drupal\field\ConfigImporterFieldPurger', 'process']);
     }
   }
 
@@ -323,7 +323,7 @@ class FieldHooks {
         foreach ($field_storages as $field) {
           $field_labels[] = $field->label();
         }
-        \Drupal::messenger()->addWarning(\Drupal::translation()->formatPlural(count($field_storages), 'This synchronization will delete data from the field %fields.', 'This synchronization will delete data from the fields: %fields.', ['%fields' => implode(', ', $field_labels)]));
+        \Drupal::messenger()->addWarning(\Drupal::translation()->formatPlural(\count($field_storages), 'This synchronization will delete data from the field %fields.', 'This synchronization will delete data from the fields: %fields.', ['%fields' => \implode(', ', $field_labels)]));
       }
     }
   }
@@ -360,7 +360,7 @@ class FieldHooks {
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $item_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
     $class = $field_type_manager->getPluginClass($field_storage->getType());
-    if ($class !== $item_class && !is_subclass_of($class, $item_class)) {
+    if ($class !== $item_class && !\is_subclass_of($class, $item_class)) {
       return;
     }
     // If target_type changed, reset the handler in the fields using that
@@ -392,7 +392,7 @@ class FieldHooks {
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $item_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
     $class = $field_type_manager->getPluginClass($field->getType());
-    if ($class !== $item_class && !is_subclass_of($class, $item_class)) {
+    if ($class !== $item_class && !\is_subclass_of($class, $item_class)) {
       return;
     }
     // If we don't know the target type yet, there's nothing else we can do.
@@ -403,7 +403,7 @@ class FieldHooks {
     // Make sure the selection handler plugin is the correct derivative for the
     // target entity type.
     $selection_manager = \Drupal::service('plugin.manager.entity_reference_selection');
-    [$current_handler] = explode(':', $field->getSetting('handler'), 2);
+    [$current_handler] = \explode(':', $field->getSetting('handler'), 2);
     $field->setSetting('handler', $selection_manager->getPluginId($target_type, $current_handler));
   }
 
@@ -424,7 +424,7 @@ class FieldHooks {
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $item_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
     $class = $field_type_manager->getPluginClass($field->getType());
-    if ($class !== $item_class && !is_subclass_of($class, $item_class)) {
+    if ($class !== $item_class && !\is_subclass_of($class, $item_class)) {
       return;
     }
     // In case we removed all the target bundles allowed by the field in

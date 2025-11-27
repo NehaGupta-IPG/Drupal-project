@@ -39,7 +39,7 @@ class SearchRequirements {
     $done = $total - $remaining;
     // Use floor() to calculate the percentage, so if it is not quite 100%, it
     // will show as 99%, to indicate "almost done".
-    $percent = ($total > 0 ? floor(100 * $done / $total) : 100);
+    $percent = ($total > 0 ? \floor(100 * $done / $total) : 100);
     $requirements['search_status'] = [
       'title' => $this->t('Search index progress'),
       'value' => $this->t('@percent% (@remaining remaining)', ['@percent' => $percent, '@remaining' => $remaining]),

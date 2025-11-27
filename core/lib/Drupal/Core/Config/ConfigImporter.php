@@ -298,7 +298,7 @@ class ConfigImporter {
   public function hasUnprocessedConfigurationChanges() {
     foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
       foreach (['delete', 'create', 'rename', 'update'] as $op) {
-        if (count($this->getUnprocessedConfiguration($op, $collection))) {
+        if (\count($this->getUnprocessedConfiguration($op, $collection))) {
           return TRUE;
         }
       }
@@ -348,7 +348,7 @@ class ConfigImporter {
    *   An array of configuration names.
    */
   public function getUnprocessedConfiguration($op, $collection = StorageInterface::DEFAULT_COLLECTION) {
-    return array_diff($this->storageComparer->getChangelist($op, $collection), $this->processedConfiguration[$collection][$op]);
+    return \array_diff($this->storageComparer->getChangelist($op, $collection), $this->processedConfiguration[$collection][$op]);
   }
 
   /**
@@ -373,7 +373,7 @@ class ConfigImporter {
    */
   protected function setProcessedExtension($type, $op, $name) {
     $name = (array) $name;
-    $this->processedExtensions[$type][$op] = array_merge($this->processedExtensions[$type][$op], $name);
+    $this->processedExtensions[$type][$op] = \array_merge($this->processedExtensions[$type][$op], $name);
   }
 
   /**
@@ -399,13 +399,13 @@ class ConfigImporter {
     // Get a list of modules with dependency weights as values.
     $module_data = $this->moduleExtensionList->getList();
     // Use the actual module weights.
-    $module_list = array_combine(array_keys($module_data), array_keys($module_data));
-    $module_list = array_map(function ($module) use ($module_data) {
+    $module_list = \array_combine(\array_keys($module_data), \array_keys($module_data));
+    $module_list = \array_map(function ($module) use ($module_data) {
       return $module_data[$module]->sort;
     }, $module_list);
 
     // Determine which modules to uninstall.
-    $uninstall = array_keys(array_diff_key($current_extensions['module'], $new_extensions['module']));
+    $uninstall = \array_keys(\array_diff_key($current_extensions['module'], $new_extensions['module']));
     // Sort the list of newly uninstalled extensions by their weights, so that
     // dependencies are uninstalled last. Extensions of the same weight are
     // sorted in reverse alphabetical order, to ensure the order is exactly
@@ -424,11 +424,11 @@ class ConfigImporter {
     // 3.  0 0 ban
     // 4.  0 1 actions
     // @todo Move this sorting functionality to the extension system.
-    array_multisort(array_values($module_list), SORT_ASC, array_keys($module_list), SORT_DESC, $module_list);
-    $this->extensionChangelist['module']['uninstall'] = array_intersect(array_keys($module_list), $uninstall);
+    \array_multisort(\array_values($module_list), SORT_ASC, \array_keys($module_list), SORT_DESC, $module_list);
+    $this->extensionChangelist['module']['uninstall'] = \array_intersect(\array_keys($module_list), $uninstall);
 
     // Determine which modules to install.
-    $install = array_keys(array_diff_key($new_extensions['module'], $current_extensions['module']));
+    $install = \array_keys(\array_diff_key($new_extensions['module'], $current_extensions['module']));
     // Always install required modules first. Respect the dependencies between
     // the modules.
     $install_required = [];
@@ -449,16 +449,16 @@ class ConfigImporter {
     // Ensure that installed modules are sorted in exactly the reverse order
     // (with dependencies installed first, and modules of the same weight sorted
     // in alphabetical order).
-    arsort($install_required);
-    arsort($install_non_required);
+    \arsort($install_required);
+    \arsort($install_non_required);
 
-    $this->extensionChangelist['module']['install'] = array_keys($install_required + $install_non_required);
+    $this->extensionChangelist['module']['install'] = \array_keys($install_required + $install_non_required);
 
     // If we're installing the install profile ensure it comes last in the
     // list of modules to be installed. This will occur when installing a site
     // from configuration.
     if (isset($new_extensions['profile'])) {
-      $install_profile_key = array_search($new_extensions['profile'], $this->extensionChangelist['module']['install'], TRUE);
+      $install_profile_key = \array_search($new_extensions['profile'], $this->extensionChangelist['module']['install'], TRUE);
       // If the profile is not in the list of modules to be installed this will
       // generate a validation error. See
       // \Drupal\Core\EventSubscriber\ConfigImportSubscriber::validateModules().
@@ -471,21 +471,21 @@ class ConfigImporter {
     // Get a list of themes with dependency weights as values.
     $theme_data = $this->themeExtensionList->getList();
     // Use the actual theme weights.
-    $theme_list = array_combine(array_keys($theme_data), array_keys($theme_data));
-    $theme_list = array_map(function ($theme) use ($theme_data) {
+    $theme_list = \array_combine(\array_keys($theme_data), \array_keys($theme_data));
+    $theme_list = \array_map(function ($theme) use ($theme_data) {
       return $theme_data[$theme]->sort;
     }, $theme_list);
-    array_multisort(array_values($theme_list), SORT_ASC, array_keys($theme_list), SORT_DESC, $theme_list);
+    \array_multisort(\array_values($theme_list), SORT_ASC, \array_keys($theme_list), SORT_DESC, $theme_list);
 
     // Work out what themes to install and to uninstall.
-    $uninstall = array_keys(array_diff_key($current_extensions['theme'], $new_extensions['theme']));
-    $this->extensionChangelist['theme']['uninstall'] = array_intersect(array_keys($theme_list), $uninstall);
+    $uninstall = \array_keys(\array_diff_key($current_extensions['theme'], $new_extensions['theme']));
+    $this->extensionChangelist['theme']['uninstall'] = \array_intersect(\array_keys($theme_list), $uninstall);
     // Ensure that installed themes are sorted in exactly the reverse order
     // (with dependencies installed first, and themes of the same weight sorted
     // in alphabetical order).
-    $install = array_keys(array_diff_key($new_extensions['theme'], $current_extensions['theme']));
-    $theme_list = array_reverse($theme_list);
-    $this->extensionChangelist['theme']['install'] = array_intersect(array_keys($theme_list), $install);
+    $install = \array_keys(\array_diff_key($new_extensions['theme'], $current_extensions['theme']));
+    $theme_list = \array_reverse($theme_list);
+    $this->extensionChangelist['theme']['install'] = \array_intersect(\array_keys($theme_list), $install);
   }
 
   /**
@@ -519,8 +519,8 @@ class ConfigImporter {
   protected function getUnprocessedExtensions($type) {
     $changelist = $this->getExtensionChangelist($type);
     return [
-      'install' => array_diff($changelist['install'], $this->processedExtensions[$type]['install']),
-      'uninstall' => array_diff($changelist['uninstall'], $this->processedExtensions[$type]['uninstall']),
+      'install' => \array_diff($changelist['install'], $this->processedExtensions[$type]['install']),
+      'uninstall' => \array_diff($changelist['uninstall'], $this->processedExtensions[$type]['uninstall']),
     ];
   }
 
@@ -564,11 +564,11 @@ class ConfigImporter {
     if ($this->validated) {
       $this->storageComparer->writeMode();
     }
-    if (is_string($sync_step) && method_exists($this, $sync_step)) {
+    if (\is_string($sync_step) && \method_exists($this, $sync_step)) {
       \Drupal::service('config.installer')->setSyncing(TRUE);
       $this->$sync_step($context);
     }
-    elseif (is_callable($sync_step)) {
+    elseif (\is_callable($sync_step)) {
       \Drupal::service('config.installer')->setSyncing(TRUE);
       $sync_step($context, $this);
     }
@@ -595,17 +595,17 @@ class ConfigImporter {
 
     if (!$this->lock->acquire(static::LOCK_NAME)) {
       // Another process is synchronizing configuration.
-      throw new ConfigImporterException(sprintf('%s is already importing', static::LOCK_NAME));
+      throw new ConfigImporterException(\sprintf('%s is already importing', static::LOCK_NAME));
     }
 
     $sync_steps = [];
     $modules = $this->getUnprocessedExtensions('module');
     foreach (['install', 'uninstall'] as $op) {
-      $this->totalExtensionsToProcess += count($modules[$op]);
+      $this->totalExtensionsToProcess += \count($modules[$op]);
     }
     $themes = $this->getUnprocessedExtensions('theme');
     foreach (['install', 'uninstall'] as $op) {
-      $this->totalExtensionsToProcess += count($themes[$op]);
+      $this->totalExtensionsToProcess += \count($themes[$op]);
     }
 
     // We have extensions to process.
@@ -630,13 +630,13 @@ class ConfigImporter {
     $operation = $this->getNextExtensionOperation();
     if (!empty($operation)) {
       $this->processExtension($operation['type'], $operation['op'], $operation['name']);
-      $names = implode(', ', (array) $operation['name']);
+      $names = \implode(', ', (array) $operation['name']);
       $context['message'] = match ($operation['op']) {
         'install' => $this->t('Synchronizing extensions: installed @name.', ['@name' => $names]),
         'uninstall' => $this->t('Synchronizing extensions: uninstalled @name.', ['@name' => $names]),
       };
-      $processed_count = count($this->processedExtensions['module']['install']) + count($this->processedExtensions['module']['uninstall']);
-      $processed_count += count($this->processedExtensions['theme']['uninstall']) + count($this->processedExtensions['theme']['install']);
+      $processed_count = \count($this->processedExtensions['module']['install']) + \count($this->processedExtensions['module']['uninstall']);
+      $processed_count += \count($this->processedExtensions['theme']['uninstall']) + \count($this->processedExtensions['theme']['install']);
       $context['finished'] = $processed_count / $this->totalExtensionsToProcess;
     }
     else {
@@ -659,7 +659,7 @@ class ConfigImporter {
       $this->storageComparer->reset();
       foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
         foreach (['delete', 'create', 'rename', 'update'] as $op) {
-          $this->totalConfigurationToProcess += count($this->getUnprocessedConfiguration($op, $collection));
+          $this->totalConfigurationToProcess += \count($this->getUnprocessedConfiguration($op, $collection));
         }
       }
 
@@ -690,7 +690,7 @@ class ConfigImporter {
       $processed_count = 0;
       foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
         foreach (['delete', 'create', 'rename', 'update'] as $op) {
-          $processed_count += count($this->processedConfiguration[$collection][$op]);
+          $processed_count += \count($this->processedConfiguration[$collection][$op]);
         }
       }
       $context['finished'] = $processed_count / $this->totalConfigurationToProcess;
@@ -711,7 +711,7 @@ class ConfigImporter {
     if (!isset($sandbox['missing_content'])) {
       $missing_content = $this->configManager->findMissingContentDependencies();
       $sandbox['missing_content']['data'] = $missing_content;
-      $sandbox['missing_content']['total'] = count($missing_content);
+      $sandbox['missing_content']['total'] = \count($missing_content);
     }
     else {
       $missing_content = $sandbox['missing_content']['data'];
@@ -722,7 +722,7 @@ class ConfigImporter {
       $this->eventDispatcher->dispatch($event, ConfigEvents::IMPORT_MISSING_CONTENT);
       $sandbox['missing_content']['data'] = $event->getMissingContent();
     }
-    $current_count = count($sandbox['missing_content']['data']);
+    $current_count = \count($sandbox['missing_content']['data']);
     if ($current_count) {
       $context['message'] = $this->t('Resolving missing content');
       $context['finished'] = ($sandbox['missing_content']['total'] - $current_count) / $sandbox['missing_content']['total'];
@@ -765,10 +765,10 @@ class ConfigImporter {
         $unprocessed = $this->getUnprocessedExtensions($type);
         if (!empty($unprocessed[$op])) {
           if ($type === 'module' && $op === 'install') {
-            $name = array_slice($unprocessed[$op], 0, Settings::get('core.multi_module_install_batch_size', 20));
+            $name = \array_slice($unprocessed[$op], 0, Settings::get('core.multi_module_install_batch_size', 20));
           }
           else {
-            $name = array_shift($unprocessed[$op]);
+            $name = \array_shift($unprocessed[$op]);
           }
           return [
             'op' => $op,
@@ -797,7 +797,7 @@ class ConfigImporter {
         if (!empty($config_names)) {
           return [
             'op' => $op,
-            'name' => array_shift($config_names),
+            'name' => \array_shift($config_names),
             'collection' => $collection,
           ];
         }
@@ -842,9 +842,9 @@ class ConfigImporter {
         }
       }
       $this->eventDispatcher->dispatch(new ConfigImporterEvent($this), ConfigEvents::IMPORT_VALIDATE);
-      if (count($this->getErrors())) {
-        $errors = array_merge(['There were errors validating the config synchronization.'], $this->getErrors());
-        throw new ConfigImporterException(implode(PHP_EOL, $errors));
+      if (\count($this->getErrors())) {
+        $errors = \array_merge(['There were errors validating the config synchronization.'], $this->getErrors());
+        throw new ConfigImporterException(\implode(PHP_EOL, $errors));
       }
       else {
         $this->validated = TRUE;
@@ -1086,12 +1086,12 @@ class ConfigImporter {
         $new_config->setData($data);
       }
 
-      $method = 'import' . ucfirst($op);
+      $method = 'import' . \ucfirst($op);
       $entity_storage = $this->configManager->getEntityTypeManager()->getStorage($entity_type);
       // Call to the configuration entity's storage to handle the configuration
       // change.
       if (!($entity_storage instanceof ImportableEntityStorageInterface)) {
-        throw new EntityStorageException(sprintf('The entity storage "%s" for the "%s" entity type does not support imports', get_class($entity_storage), $entity_type));
+        throw new EntityStorageException(\sprintf('The entity storage "%s" for the "%s" entity type does not support imports', \get_class($entity_storage), $entity_type));
       }
       $entity_storage->$method($name, $new_config, $old_config);
       $this->setProcessedConfiguration($collection, $op, $name);
@@ -1137,7 +1137,7 @@ class ConfigImporter {
     // Call to the configuration entity's storage to handle the configuration
     // change.
     if (!($entity_storage instanceof ImportableEntityStorageInterface)) {
-      throw new EntityStorageException(sprintf("The entity storage '%s' for the '%s' entity type does not support imports", get_class($entity_storage), $entity_type_id));
+      throw new EntityStorageException(\sprintf("The entity storage '%s' for the '%s' entity type does not support imports", \get_class($entity_storage), $entity_type_id));
     }
     $entity_storage->importRename($names['old_name'], $new_config, $old_config);
     $this->setProcessedConfiguration($collection, 'rename', $rename_name);

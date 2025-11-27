@@ -27,7 +27,7 @@ class TestObjectItem extends FieldItemBase {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('any')
-      ->setLabel(t('Value'))
+      ->setLabel(\t('Value'))
       ->setRequired(TRUE);
 
     return $properties;

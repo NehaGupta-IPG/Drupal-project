@@ -54,13 +54,13 @@ class WorkflowAccessControlHandler extends EntityAccessControlHandler implements
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\workflows\Entity\Workflow $entity */
     $workflow_type = $entity->getTypePlugin();
-    if (str_starts_with($operation, 'delete-state')) {
-      [, $state_id] = explode(':', $operation, 2);
+    if (\str_starts_with($operation, 'delete-state')) {
+      [, $state_id] = \explode(':', $operation, 2);
       // Deleting a state is editing a workflow, but also we should forbid
       // access if there is only one state.
-      return AccessResult::allowedIf(count($entity->getTypePlugin()->getStates()) > 1)
+      return AccessResult::allowedIf(\count($entity->getTypePlugin()->getStates()) > 1)
         ->andIf(parent::checkAccess($entity, 'edit', $account))
-        ->andIf(AccessResult::allowedIf(!in_array($state_id, $workflow_type->getRequiredStates(), TRUE)))
+        ->andIf(AccessResult::allowedIf(!\in_array($state_id, $workflow_type->getRequiredStates(), TRUE)))
         ->addCacheableDependency($entity);
     }
 
@@ -71,7 +71,7 @@ class WorkflowAccessControlHandler extends EntityAccessControlHandler implements
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    $workflow_types_count = count($this->workflowTypeManager->getDefinitions());
+    $workflow_types_count = \count($this->workflowTypeManager->getDefinitions());
     $admin_access = parent::checkCreateAccess($account, $context, $entity_bundle);
     // Allow access if there is at least one workflow type. Since workflow types
     // are provided by modules this is cacheable until extensions change.

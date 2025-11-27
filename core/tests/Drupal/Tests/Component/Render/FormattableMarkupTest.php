@@ -53,7 +53,7 @@ class FormattableMarkupTest extends TestCase {
   public function testCount(): void {
     $string = 'Can I have a @replacement';
     $formattable_string = new FormattableMarkup($string, ['@replacement' => 'kitten']);
-    $this->assertEquals(strlen($string), $formattable_string->count());
+    $this->assertEquals(\strlen($string), $formattable_string->count());
   }
 
   /**
@@ -80,12 +80,12 @@ class FormattableMarkupTest extends TestCase {
   public function testUnexpectedPlaceholder($string, $arguments, $error_number, $error_message): void {
     // We set a custom error handler because of
     // https://github.com/sebastianbergmann/phpunit/issues/487
-    set_error_handler([$this, 'errorHandler']);
+    \set_error_handler([$this, 'errorHandler']);
     // We want this to trigger an error.
     $markup = new FormattableMarkup($string, $arguments);
     // Cast it to a string which will generate the errors.
     $output = (string) $markup;
-    restore_error_handler();
+    \restore_error_handler();
     // The string should not change.
     $this->assertEquals($string, $output);
     $this->assertEquals($error_number, $this->lastErrorNumber);

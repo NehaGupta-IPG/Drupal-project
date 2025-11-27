@@ -117,9 +117,9 @@ class ImageStyleDownloadController extends FileDownloadController {
     if ($this->streamWrapperManager->isValidScheme($scheme)) {
       $normalized_target = $this->streamWrapperManager->getTarget($image_uri);
       if ($normalized_target !== FALSE) {
-        if (!in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
-          $parts = explode('/', $normalized_target);
-          if (array_intersect($parts, ['.', '..'])) {
+        if (!\in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
+          $parts = \explode('/', $normalized_target);
+          if (\array_intersect($parts, ['.', '..'])) {
             throw new NotFoundHttpException();
           }
         }
@@ -140,9 +140,9 @@ class ImageStyleDownloadController extends FileDownloadController {
     // styles/<style_name>/... as structure, so we check if the $target variable
     // starts with styles/.
     $token = $request->query->get(IMAGE_DERIVATIVE_TOKEN, '');
-    $token_is_valid = hash_equals($image_style->getPathToken($image_uri), $token)
-      || hash_equals($image_style->getPathToken($scheme . '://' . $target), $token);
-    if (!$this->config('image.settings')->get('allow_insecure_derivatives') || str_starts_with(ltrim($target, '\/'), 'styles/')) {
+    $token_is_valid = \hash_equals($image_style->getPathToken($image_uri), $token)
+      || \hash_equals($image_style->getPathToken($scheme . '://' . $target), $token);
+    if (!$this->config('image.settings')->get('allow_insecure_derivatives') || \str_starts_with(\ltrim($target, '\/'), 'styles/')) {
       $valid = $valid && $token_is_valid;
     }
 
@@ -166,9 +166,9 @@ class ImageStyleDownloadController extends FileDownloadController {
     }
     else {
       $core_schemes = ['public', 'private', 'temporary'];
-      $additional_public_schemes = array_diff(Settings::get('file_additional_public_schemes', []), $core_schemes);
-      $public_schemes = array_merge(['public'], $additional_public_schemes);
-      $is_public = in_array($derivative_scheme, $public_schemes, TRUE);
+      $additional_public_schemes = \array_diff(Settings::get('file_additional_public_schemes', []), $core_schemes);
+      $public_schemes = \array_merge(['public'], $additional_public_schemes);
+      $is_public = \in_array($derivative_scheme, $public_schemes, TRUE);
     }
 
     $headers = [];
@@ -195,7 +195,7 @@ class ImageStyleDownloadController extends FileDownloadController {
     // control access to the file.
     if (!$is_public) {
       $headers = $this->moduleHandler()->invokeAll('file_download', [$image_uri]);
-      if (in_array(-1, $headers) || empty($headers)) {
+      if (\in_array(-1, $headers) || empty($headers)) {
         throw new AccessDeniedHttpException();
       }
     }
@@ -209,7 +209,7 @@ class ImageStyleDownloadController extends FileDownloadController {
 
     // Don't start generating the image if the derivative already exists or if
     // generation is in progress in another thread.
-    if (!file_exists($derivative_uri)) {
+    if (!\file_exists($derivative_uri)) {
       $lock_name = 'image_style_deliver:' . $image_style->id() . ':' . Crypt::hashBase64($image_uri);
       $lock_acquired = $this->lock->acquire($lock_name);
       if (!$lock_acquired) {
@@ -221,7 +221,7 @@ class ImageStyleDownloadController extends FileDownloadController {
 
     // Try to generate the image, unless another thread just did it while we
     // were acquiring the lock.
-    $success = file_exists($derivative_uri) || $image_style->createDerivative($image_uri, $derivative_uri);
+    $success = \file_exists($derivative_uri) || $image_style->createDerivative($image_uri, $derivative_uri);
 
     if (!empty($lock_acquired)) {
       $this->lock->release($lock_name);
@@ -258,7 +258,7 @@ class ImageStyleDownloadController extends FileDownloadController {
    *   Whether the source image exists.
    */
   private function sourceImageExists(string $image_uri, bool $token_is_valid): bool {
-    $exists = file_exists($image_uri);
+    $exists = \file_exists($image_uri);
 
     // If the file doesn't exist, we can stop here.
     if (!$exists) {
@@ -276,8 +276,8 @@ class ImageStyleDownloadController extends FileDownloadController {
     $image_path = $this->fileSystem->realpath($image_uri);
     $private_path = Settings::get('file_private_path');
     if ($private_path) {
-      $private_path = realpath($private_path);
-      if ($private_path && str_starts_with($image_path, $private_path)) {
+      $private_path = \realpath($private_path);
+      if ($private_path && \str_starts_with($image_path, $private_path)) {
         return FALSE;
       }
     }
@@ -299,9 +299,9 @@ class ImageStyleDownloadController extends FileDownloadController {
    */
   public static function getUriWithoutConvertedExtension(string $uri): string {
     $original_uri = $uri;
-    $path_info = pathinfo(StreamWrapperManager::getTarget($uri));
+    $path_info = \pathinfo(StreamWrapperManager::getTarget($uri));
     // Only convert the URI when the filename still has an extension.
-    if (!empty($path_info['filename']) && pathinfo($path_info['filename'], PATHINFO_EXTENSION)) {
+    if (!empty($path_info['filename']) && \pathinfo($path_info['filename'], PATHINFO_EXTENSION)) {
       $original_uri = StreamWrapperManager::getScheme($uri) . '://';
       if (!empty($path_info['dirname']) && $path_info['dirname'] !== '.') {
         $original_uri .= $path_info['dirname'] . DIRECTORY_SEPARATOR;

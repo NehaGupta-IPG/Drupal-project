@@ -50,7 +50,7 @@ class BootableCommandTraitTest extends UnitTestCase {
       'database' => ':memory:',
     ]);
     $class_loaders = ClassLoader::getRegisteredLoaders();
-    $this->classLoader = reset($class_loaders);
+    $this->classLoader = \reset($class_loaders);
     $this->application = new Application('drupal', \Drupal::VERSION);
   }
 
@@ -77,8 +77,8 @@ class BootableCommandTraitTest extends UnitTestCase {
 
         // Symfony Console apparently changes the error and exception handlers,
         // which will anger PHPUnit.
-        restore_error_handler();
-        restore_exception_handler();
+        \restore_error_handler();
+        \restore_exception_handler();
 
         return 0;
       }

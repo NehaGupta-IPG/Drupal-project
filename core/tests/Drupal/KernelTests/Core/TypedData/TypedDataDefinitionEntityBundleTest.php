@@ -46,7 +46,7 @@ class TypedDataDefinitionEntityBundleTest extends KernelTestBase {
     $this->typedDataManager = $this->container->get('typed_data_manager');
 
     $entityTypeManager = $this->container->get('entity_type.manager');
-    assert($entityTypeManager instanceof EntityTypeManagerInterface);
+    \assert($entityTypeManager instanceof EntityTypeManagerInterface);
     $this->entityTestBundleStorage = $entityTypeManager->getStorage('entity_test_bundle');
   }
 
@@ -57,21 +57,21 @@ class TypedDataDefinitionEntityBundleTest extends KernelTestBase {
    */
   public function testEntityBundleDefinitions(): void {
     // Start without any bundles and no bundle-specific data type.
-    $dataTypes = array_keys($this->typedDataManager->getDefinitions());
+    $dataTypes = \array_keys($this->typedDataManager->getDefinitions());
     $this->assertContains('entity:entity_test_with_bundle', $dataTypes);
     $this->assertNotContains('entity:entity_test_with_bundle:test', $dataTypes);
 
     // Add a bundle and make sure the bundle-specific data type is registered.
     $bundle = $this->entityTestBundleStorage->create(['id' => 'test']);
     $bundle->save();
-    $dataTypes = array_keys($this->typedDataManager->getDefinitions());
+    $dataTypes = \array_keys($this->typedDataManager->getDefinitions());
     $this->assertContains('entity:entity_test_with_bundle', $dataTypes);
     $this->assertContains('entity:entity_test_with_bundle:test', $dataTypes);
 
     // Delete the bundle and make sure the bundle-specific data type is no
     // longer returned.
     $bundle->delete();
-    $dataTypes = array_keys($this->typedDataManager->getDefinitions());
+    $dataTypes = \array_keys($this->typedDataManager->getDefinitions());
     $this->assertContains('entity:entity_test_with_bundle', $dataTypes);
     $this->assertNotContains('entity:entity_test_with_bundle:test', $dataTypes);
   }

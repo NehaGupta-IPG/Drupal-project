@@ -242,13 +242,13 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     // Only accept integer values.
     $error = FALSE;
     $exposed_options = $form_state->getValue(['pager_options', 'expose', 'items_per_page_options']);
-    if (str_contains($exposed_options, '.')) {
+    if (\str_contains($exposed_options, '.')) {
       $error = TRUE;
     }
-    $options = explode(',', $exposed_options);
-    if (!$error && is_array($options)) {
+    $options = \explode(',', $exposed_options);
+    if (!$error && \is_array($options)) {
       foreach ($options as $option) {
-        if (!is_numeric($option) || intval($option) == 0) {
+        if (!\is_numeric($option) || \intval($option) == 0) {
           $error = TRUE;
         }
       }
@@ -264,7 +264,7 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
     if (!$form_state->isValueEmpty(['pager_options', 'expose', 'items_per_page'])
       && !$form_state->isValueEmpty(['pager_options', 'items_per_page'])) {
       $items_per_page = $form_state->getValue(['pager_options', 'items_per_page']);
-      if (array_search($items_per_page, $options) === FALSE) {
+      if (\array_search($items_per_page, $options) === FALSE) {
         $form_state->setErrorByName('pager_options][expose][items_per_page_options', $this->t("The <em>Exposed items per page</em> field's options must include the value from the <em>Items per page</em> field (@items_per_page).",
           ['@items_per_page' => $items_per_page])
         );
@@ -316,19 +316,19 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
    */
   public function setCurrentPage($number = NULL) {
     if (isset($number)) {
-      $this->current_page = max(0, $number);
+      $this->current_page = \max(0, $number);
       return;
     }
 
-    $this->current_page = max(0, $this->pagerParameters->findPage($this->options['id']));
+    $this->current_page = \max(0, $this->pagerParameters->findPage($this->options['id']));
   }
 
   /**
    * Gets the total number of pages.
    */
   public function getPagerTotal() {
-    if ($items_per_page = intval($this->getItemsPerPage())) {
-      return ceil($this->total_items / $items_per_page);
+    if ($items_per_page = \intval($this->getItemsPerPage())) {
+      return \ceil($this->total_items / $items_per_page);
     }
     else {
       return 1;
@@ -386,11 +386,11 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
    */
   public function exposedFormAlter(&$form, FormStateInterface $form_state) {
     if ($this->itemsPerPageExposed()) {
-      $options = explode(',', $this->options['expose']['items_per_page_options']);
+      $options = \explode(',', $this->options['expose']['items_per_page_options']);
       $sanitized_options = [];
-      if (is_array($options)) {
+      if (\is_array($options)) {
         foreach ($options as $option) {
-          $sanitized_options[intval($option)] = intval($option);
+          $sanitized_options[\intval($option)] = \intval($option);
         }
         if (!empty($this->options['expose']['items_per_page_options_all']) && !empty($this->options['expose']['items_per_page_options_all_label'])) {
           $sanitized_options['All'] = $this->options['expose']['items_per_page_options_all_label'];
@@ -419,8 +419,8 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
    * {@inheritdoc}
    */
   public function exposedFormValidate(&$form, FormStateInterface $form_state) {
-    if (!$form_state->isValueEmpty('offset') && trim($form_state->getValue('offset'))) {
-      if (!is_numeric($form_state->getValue('offset')) || $form_state->getValue('offset') < 0) {
+    if (!$form_state->isValueEmpty('offset') && \trim($form_state->getValue('offset'))) {
+      if (!\is_numeric($form_state->getValue('offset')) || $form_state->getValue('offset') < 0) {
         $form_state->setErrorByName('offset', $this->t('Offset must be a number greater than or equal to 0.'));
       }
     }

@@ -70,10 +70,10 @@ class Serialized extends FieldPluginBase {
     $value = $values->{$this->field_alias};
 
     if ($this->options['format'] == 'unserialized') {
-      return $this->sanitizeValue(print_r(unserialize($value), TRUE));
+      return $this->sanitizeValue(\print_r(\unserialize($value), TRUE));
     }
     elseif ($this->options['format'] == 'key' && !empty($this->options['key'])) {
-      $value = (array) unserialize($value);
+      $value = (array) \unserialize($value);
       return $this->sanitizeValue($value[$this->options['key']]);
     }
 

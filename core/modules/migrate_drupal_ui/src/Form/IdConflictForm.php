@@ -34,7 +34,7 @@ class IdConflictForm extends MigrateUpgradeFormBase {
       return $this->restartUpgradeForm();
     }
 
-    $migration_ids = array_keys($migrations);
+    $migration_ids = \array_keys($migrations);
     // Check if there are conflicts. If none, just skip this form!
     $migrations = $this->migrationPluginManager->createInstances($migration_ids);
 
@@ -126,9 +126,9 @@ class IdConflictForm extends MigrateUpgradeFormBase {
       $id = $definition['id'];
       $items[$id] = $definition['label'];
     }
-    sort($items, SORT_STRING);
+    \sort($items, SORT_STRING);
 
-    return array_unique($items);
+    return \array_unique($items);
   }
 
   /**

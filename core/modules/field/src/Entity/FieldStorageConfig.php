@@ -267,7 +267,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     if (empty($values['field_name'])) {
       throw new FieldException('Attempt to create a field storage without a field name.');
     }
-    if (!preg_match('/^[_a-z]+[_a-z0-9]*$/', $values['field_name'])) {
+    if (!\preg_match('/^[_a-z]+[_a-z0-9]*$/', $values['field_name'])) {
       throw new FieldException("Attempt to create a field storage {$values['field_name']} with invalid characters. Only lowercase alphanumeric characters and underscores are allowed, and only lowercase letters and underscore are allowed as the first character");
     }
     if (empty($values['type'])) {
@@ -305,7 +305,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
       ->getDefaultStorageSettings($this->getType());
 
     // Filter out any unknown (unsupported) settings.
-    $supported_settings = array_intersect_key($this->getSettings(), $default_settings);
+    $supported_settings = \array_intersect_key($this->getSettings(), $default_settings);
     $this->set('settings', $supported_settings + $default_settings);
   }
 
@@ -326,7 +326,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     // written to config.
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $default_settings = $field_type_manager->getDefaultStorageSettings($this->type);
-    $this->settings = array_intersect_key($this->settings, $default_settings) + $default_settings;
+    $this->settings = \array_intersect_key($this->settings, $default_settings) + $default_settings;
 
     if ($this->isNew()) {
       $this->preSaveNew($storage);
@@ -356,13 +356,13 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     // Field name cannot be longer than FieldStorageConfig::NAME_MAX_LENGTH
     // characters. We use mb_strlen() because the DB layer assumes that column
     // widths are given in characters rather than bytes.
-    if (mb_strlen($this->getName()) > static::NAME_MAX_LENGTH) {
+    if (\mb_strlen($this->getName()) > static::NAME_MAX_LENGTH) {
       throw new FieldException('Attempt to create a field storage with an name longer than ' . static::NAME_MAX_LENGTH . ' characters: ' . $this->getName());
     }
 
     // Disallow reserved field names.
-    $disallowed_field_names = array_keys($entity_field_manager->getBaseFieldDefinitions($this->getTargetEntityTypeId()));
-    if (in_array($this->getName(), $disallowed_field_names)) {
+    $disallowed_field_names = \array_keys($entity_field_manager->getBaseFieldDefinitions($this->getTargetEntityTypeId()));
+    if (\in_array($this->getName(), $disallowed_field_names)) {
       throw new FieldException("Attempt to create field storage {$this->getName()} which is reserved by entity type {$this->getTargetEntityTypeId()}.");
     }
 
@@ -399,10 +399,10 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
 
     // Some updates are always disallowed.
     if ($this->getType() != $this->getOriginal()->getType()) {
-      throw new FieldException(sprintf('Cannot change the field type for an existing field storage. The field storage %s has the type %s.', $this->id(), $this->getOriginal()->getType()));
+      throw new FieldException(\sprintf('Cannot change the field type for an existing field storage. The field storage %s has the type %s.', $this->id(), $this->getOriginal()->getType()));
     }
     if ($this->getTargetEntityTypeId() != $this->getOriginal()->getTargetEntityTypeId()) {
-      throw new FieldException(sprintf('Cannot change the entity type for an existing field storage. The field storage %s has the type %s.', $this->id(), $this->getOriginal()->getTargetEntityTypeId()));
+      throw new FieldException(\sprintf('Cannot change the entity type for an existing field storage. The field storage %s has the type %s.', $this->id(), $this->getOriginal()->getTargetEntityTypeId()));
     }
 
     // See if any module forbids the update by throwing an exception. This
@@ -583,11 +583,11 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     // @todo See getSettings() about potentially statically caching this.
     // We assume here that one call to array_key_exists() is more efficient
     // than calling getSettings() when all we need is a single setting.
-    if (array_key_exists($setting_name, $this->settings)) {
+    if (\array_key_exists($setting_name, $this->settings)) {
       return $this->settings[$setting_name];
     }
     $settings = $this->getSettings();
-    if (array_key_exists($setting_name, $settings)) {
+    if (\array_key_exists($setting_name, $settings)) {
       return $settings[$setting_name];
     }
     else {
@@ -687,7 +687,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     // If the field item class implements the interface, create an orphaned
     // runtime item object, so that it can be used as the options provider
     // without modifying the entity being worked on.
-    if (is_subclass_of($this->getFieldItemClass(), OptionsProviderInterface::class)) {
+    if (\is_subclass_of($this->getFieldItemClass(), OptionsProviderInterface::class)) {
       try {
         $items = $entity->get($this->getName());
       }
@@ -758,9 +758,9 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   public function __sleep(): array {
     // Only serialize necessary properties, excluding those that can be
     // recalculated.
-    $properties = get_object_vars($this);
+    $properties = \get_object_vars($this);
     unset($properties['schema'], $properties['propertyDefinitions'], $properties['original']);
-    return array_keys($properties);
+    return \array_keys($properties);
   }
 
   /**
@@ -781,8 +781,8 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * {@inheritdoc}
    */
   public function getPropertyDefinition(/* string */ $name) {
-    if (!is_string($name)) {
-      @trigger_error('Calling ' . __CLASS__ . '::getPropertyDefinition() with a non-string $name is deprecated in drupal:11.3.0 and throws an exception in drupal:12.0.0. See https://www.drupal.org/node/3557373', E_USER_DEPRECATED);
+    if (!\is_string($name)) {
+      @\trigger_error('Calling ' . __CLASS__ . '::getPropertyDefinition() with a non-string $name is deprecated in drupal:11.3.0 and throws an exception in drupal:12.0.0. See https://www.drupal.org/node/3557373', E_USER_DEPRECATED);
     }
     if (!isset($this->propertyDefinitions)) {
       $this->getPropertyDefinitions();
@@ -807,7 +807,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * {@inheritdoc}
    */
   public function getPropertyNames() {
-    return array_keys($this->getPropertyDefinitions());
+    return \array_keys($this->getPropertyDefinitions());
   }
 
   /**
@@ -857,7 +857,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
     // The field storage is not deleted, is configured to be removed when there
     // are no fields, the field storage has no bundles, and field storages are
     // not in the process of being deleted.
-    return !$this->deleted && !$this->persist_with_no_fields && count($this->getBundles()) == 0 && !static::$inDeletion;
+    return !$this->deleted && !$this->persist_with_no_fields && \count($this->getBundles()) == 0 && !static::$inDeletion;
   }
 
   /**

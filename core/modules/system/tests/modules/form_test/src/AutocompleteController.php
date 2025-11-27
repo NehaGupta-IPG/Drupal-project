@@ -21,7 +21,7 @@ class AutocompleteController {
    *   A JSON response.
    */
   public function delayed_autocomplete() {
-    sleep(1);
+    \sleep(1);
     return new JsonResponse([['value' => 'value', 'label' => 'label']]);
   }
 

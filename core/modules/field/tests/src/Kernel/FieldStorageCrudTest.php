@@ -328,7 +328,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
 
     // Test that the first field is not deleted, and then delete it.
     $field_storage_config_storage = \Drupal::entityTypeManager()->getStorage('field_storage_config');
-    $field_storage = current($field_storage_config_storage->loadByProperties([
+    $field_storage = \current($field_storage_config_storage->loadByProperties([
       'field_name' => $field_storage_definition['field_name'],
       'include_deleted' => TRUE,
     ]));
@@ -379,7 +379,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
 
     // Save an entity with data for the field.
     $entity = EntityTest::create();
-    $values[0]['value'] = mt_rand(1, 127);
+    $values[0]['value'] = \mt_rand(1, 127);
     $entity->{$field_storage->getName()}->value = $values[0]['value'];
     $entity = $this->entitySaveReload($entity);
 

@@ -81,7 +81,7 @@ class CKEditor5MediaAndFilterSettingsInSyncConstraintValidator extends Constrain
 
       // Whenever the CKEditor 5 plugin is configured to allow overrides, the
       // filter must be configured to allow 2 or more view modes.
-      if ($cke5_plugin_overrides_allowed && count($filter_allowed_view_modes) < 2) {
+      if ($cke5_plugin_overrides_allowed && \count($filter_allowed_view_modes) < 2) {
         $this->context->addViolation($constraint->message, [
           '%cke5_media_plugin_label' => $this->t('Media'),
           '%cke5_allow_view_mode_override_label' => $this->t('Allow the user to override the default view mode'),

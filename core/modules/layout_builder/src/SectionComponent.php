@@ -103,7 +103,7 @@ class SectionComponent {
    *   The value for that property, or NULL if the property does not exist.
    */
   public function get($property) {
-    if (property_exists($this, $property)) {
+    if (\property_exists($this, $property)) {
       $value = $this->{$property} ?? NULL;
     }
     else {
@@ -123,7 +123,7 @@ class SectionComponent {
    * @return $this
    */
   public function set($property, $value) {
-    if (property_exists($this, $property)) {
+    if (\property_exists($this, $property)) {
       $this->{$property} = $value;
     }
     else {
@@ -215,7 +215,7 @@ class SectionComponent {
    */
   public function getPluginId() {
     if (empty($this->configuration['id'])) {
-      throw new PluginException(sprintf('No plugin ID specified for component with "%s" UUID', $this->uuid));
+      throw new PluginException(\sprintf('No plugin ID specified for component with "%s" UUID', $this->uuid));
     }
     return $this->configuration['id'];
   }

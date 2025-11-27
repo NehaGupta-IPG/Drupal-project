@@ -87,7 +87,7 @@ class ViewElementTest extends ViewsKernelTestBase {
     $this->setRawContent($renderer->renderRoot($render));
 
     // Ensure that the render array can be serialized.
-    serialize($render);
+    \serialize($render);
 
     $xpath = $this->xpath('//div[@class="views-element-container"]');
     $this->assertNotEmpty($xpath, 'The view container has been found in the rendered output.');

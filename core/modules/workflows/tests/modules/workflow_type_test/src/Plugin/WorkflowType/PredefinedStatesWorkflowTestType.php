@@ -28,13 +28,13 @@ class PredefinedStatesWorkflowTestType extends WorkflowTypeBase {
    * {@inheritdoc}
    */
   public function getStates($state_ids = NULL) {
-    return array_filter([
+    return \array_filter([
       'pay_blinds' => new State($this, 'pay_blinds', 'Pay Blinds'),
       'bet' => new State($this, 'bet', 'Bet'),
       'raise' => new State($this, 'raise', 'Raise'),
       'fold' => new State($this, 'fold', 'Fold'),
     ], function ($state) use ($state_ids) {
-        return is_array($state_ids) ? in_array($state->id(), $state_ids) : TRUE;
+        return \is_array($state_ids) ? \in_array($state->id(), $state_ids) : TRUE;
     });
   }
 

@@ -65,11 +65,11 @@ class FormErrorHandlerTest extends UnitTestCase {
       'this missing element is invalid',
     ];
 
-    $this->messenger->expects($this->exactly(count($messages)))
+    $this->messenger->expects($this->exactly(\count($messages)))
       ->method('addMessage')
       ->with(
         $this->callback(function (string $message) use (&$messages): bool {
-          return array_shift($messages) === $message;
+          return \array_shift($messages) === $message;
         }),
         'error',
       );

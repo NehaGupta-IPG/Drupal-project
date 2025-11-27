@@ -41,7 +41,7 @@ trait BasicAuthTestTrait {
    */
   protected function getBasicAuthHeaders($username, $password): array {
     // Set up Curl to use basic authentication with the test user's credentials.
-    return ['Authorization' => 'Basic ' . base64_encode("$username:$password")];
+    return ['Authorization' => 'Basic ' . \base64_encode("$username:$password")];
   }
 
 }

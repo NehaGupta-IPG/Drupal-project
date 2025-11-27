@@ -61,7 +61,7 @@ class EntityLink extends FieldPluginBase {
       $entities[$entity->id()] = $entity;
     }
     if ($entities) {
-      $entityTypeId = reset($entities)->getEntityTypeId();
+      $entityTypeId = \reset($entities)->getEntityTypeId();
       $viewMode = $this->options['teaser'] ? 'teaser' : 'full';
       $this->build = \Drupal::entityTypeManager()
         ->getViewBuilder($entityTypeId)

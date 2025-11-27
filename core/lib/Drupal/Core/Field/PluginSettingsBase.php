@@ -58,7 +58,7 @@ abstract class PluginSettingsBase extends PluginBase implements PluginSettingsIn
    */
   public function getSetting($key) {
     // Merge defaults if we have no value for the key.
-    if (!$this->defaultSettingsMerged && !array_key_exists($key, $this->settings)) {
+    if (!$this->defaultSettingsMerged && !\array_key_exists($key, $this->settings)) {
       $this->mergeDefaults();
     }
     return $this->settings[$key] ?? NULL;
@@ -131,7 +131,7 @@ abstract class PluginSettingsBase extends PluginBase implements PluginSettingsIn
    * {@inheritdoc}
    */
   public function getThirdPartyProviders() {
-    return array_keys($this->thirdPartySettings);
+    return \array_keys($this->thirdPartySettings);
   }
 
   /**
@@ -141,7 +141,7 @@ abstract class PluginSettingsBase extends PluginBase implements PluginSettingsIn
     if (!empty($this->thirdPartySettings)) {
       // Create dependencies on any modules providing third party settings.
       return [
-        'module' => array_keys($this->thirdPartySettings),
+        'module' => \array_keys($this->thirdPartySettings),
       ];
     }
     return [];
@@ -153,9 +153,9 @@ abstract class PluginSettingsBase extends PluginBase implements PluginSettingsIn
   public function onDependencyRemoval(array $dependencies) {
     $changed = FALSE;
     if (!empty($this->thirdPartySettings) && !empty($dependencies['module'])) {
-      $old_count = count($this->thirdPartySettings);
-      $this->thirdPartySettings = array_diff_key($this->thirdPartySettings, array_flip($dependencies['module']));
-      $changed = $old_count != count($this->thirdPartySettings);
+      $old_count = \count($this->thirdPartySettings);
+      $this->thirdPartySettings = \array_diff_key($this->thirdPartySettings, \array_flip($dependencies['module']));
+      $changed = $old_count != \count($this->thirdPartySettings);
     }
     return $changed;
   }

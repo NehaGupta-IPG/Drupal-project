@@ -67,7 +67,7 @@ class GeneratedLink extends BubbleableMetadata implements MarkupInterface, \Coun
    * {@inheritdoc}
    */
   public function count(): int {
-    return mb_strlen($this->__toString());
+    return \mb_strlen($this->__toString());
   }
 
 }

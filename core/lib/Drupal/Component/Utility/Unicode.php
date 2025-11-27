@@ -123,16 +123,16 @@ EOD;
    */
   public static function check() {
     // Set appropriate configuration.
-    mb_internal_encoding('utf-8');
-    mb_language('uni');
+    \mb_internal_encoding('utf-8');
+    \mb_language('uni');
 
     // Check for mbstring extension.
-    if (!extension_loaded('mbstring')) {
+    if (!\extension_loaded('mbstring')) {
       return 'mb_strlen';
     }
 
     // Check mbstring configuration.
-    if (ini_get('mbstring.encoding_translation') != 0) {
+    if (\ini_get('mbstring.encoding_translation') != 0) {
       return 'mbstring.encoding_translation';
     }
 
@@ -164,7 +164,7 @@ EOD;
     ];
 
     foreach ($bomMap as $bom => $encoding) {
-      if (str_starts_with($data, $bom)) {
+      if (\str_starts_with($data, $bom)) {
         return $encoding;
       }
     }
@@ -185,7 +185,7 @@ EOD;
    *   Converted data or FALSE.
    */
   public static function convertToUtf8($data, $encoding) {
-    return @iconv($encoding, 'utf-8', $data);
+    return @\iconv($encoding, 'utf-8', $data);
   }
 
   /**
@@ -208,18 +208,18 @@ EOD;
    *   The truncated string.
    */
   public static function truncateBytes($string, $len) {
-    if (strlen($string) <= $len) {
+    if (\strlen($string) <= $len) {
       return $string;
     }
-    if ((ord($string[$len]) < 0x80) || (ord($string[$len]) >= 0xC0)) {
-      return substr($string, 0, $len);
+    if ((\ord($string[$len]) < 0x80) || (\ord($string[$len]) >= 0xC0)) {
+      return \substr($string, 0, $len);
     }
     // Scan backwards to beginning of the byte sequence.
     // @todo Make the code more readable in https://www.drupal.org/node/2911497.
-    while (--$len >= 0 && ord($string[$len]) >= 0x80 && ord($string[$len]) < 0xC0) {
+    while (--$len >= 0 && \ord($string[$len]) >= 0x80 && \ord($string[$len]) < 0xC0) {
     }
 
-    return substr($string, 0, $len);
+    return \substr($string, 0, $len);
   }
 
   /**
@@ -232,7 +232,7 @@ EOD;
    *   The string with the first character as uppercase.
    */
   public static function ucfirst($text) {
-    return mb_strtoupper(mb_substr($text, 0, 1)) . mb_substr($text, 1);
+    return \mb_strtoupper(\mb_substr($text, 0, 1)) . \mb_substr($text, 1);
   }
 
   /**
@@ -248,7 +248,7 @@ EOD;
    */
   public static function lcfirst($text) {
     // Note: no mbstring equivalent!
-    return mb_strtolower(mb_substr($text, 0, 1)) . mb_substr($text, 1);
+    return \mb_strtolower(\mb_substr($text, 0, 1)) . \mb_substr($text, 1);
   }
 
   /**
@@ -264,8 +264,8 @@ EOD;
    */
   public static function ucwords($text) {
     $regex = '/(^|[' . static::PREG_CLASS_WORD_BOUNDARY . '])([^' . static::PREG_CLASS_WORD_BOUNDARY . '])/u';
-    return preg_replace_callback($regex, function (array $matches) {
-      return $matches[1] . mb_strtoupper($matches[2]);
+    return \preg_replace_callback($regex, function (array $matches) {
+      return $matches[1] . \mb_strtoupper($matches[2]);
     }, $text);
   }
 
@@ -310,19 +310,19 @@ EOD;
    */
   public static function truncate($string, $max_length, $wordsafe = FALSE, $add_ellipsis = FALSE, $min_wordsafe_length = 1) {
     $ellipsis = '';
-    $max_length = max($max_length, 0);
-    $min_wordsafe_length = max($min_wordsafe_length, 0);
+    $max_length = \max($max_length, 0);
+    $min_wordsafe_length = \max($min_wordsafe_length, 0);
 
-    if (mb_strlen($string) <= $max_length) {
+    if (\mb_strlen($string) <= $max_length) {
       // No truncation needed, so don't add ellipsis, just return.
       return $string;
     }
 
     if ($add_ellipsis) {
       // Truncate ellipsis in case $max_length is small.
-      $ellipsis = mb_substr('…', 0, $max_length);
-      $max_length -= mb_strlen($ellipsis);
-      $max_length = max($max_length, 0);
+      $ellipsis = \mb_substr('…', 0, $max_length);
+      $max_length -= \mb_strlen($ellipsis);
+      $max_length = \max($max_length, 0);
     }
 
     if ($max_length <= $min_wordsafe_length) {
@@ -335,21 +335,21 @@ EOD;
       // Find the last word boundary, if there is one within
       // $min_wordsafe_length to $max_length characters. preg_match() is always
       // greedy, so it will find the longest string possible.
-      $found = preg_match('/^(.{' . $min_wordsafe_length . ',' . $max_length . '})[' . Unicode::PREG_CLASS_WORD_BOUNDARY . ']/us', $string, $matches);
+      $found = \preg_match('/^(.{' . $min_wordsafe_length . ',' . $max_length . '})[' . Unicode::PREG_CLASS_WORD_BOUNDARY . ']/us', $string, $matches);
       if ($found) {
         $string = $matches[1];
       }
       else {
-        $string = mb_substr($string, 0, $max_length);
+        $string = \mb_substr($string, 0, $max_length);
       }
     }
     else {
-      $string = mb_substr($string, 0, $max_length);
+      $string = \mb_substr($string, 0, $max_length);
     }
 
     if ($add_ellipsis) {
       // If we're adding an ellipsis, remove any trailing periods.
-      $string = rtrim($string, '.');
+      $string = \rtrim($string, '.');
 
       $string .= $ellipsis;
     }
@@ -370,7 +370,7 @@ EOD;
    *   $str2, and 0 if they are equal.
    */
   public static function strcasecmp($str1, $str2) {
-    return strcmp(mb_strtoupper($str1), mb_strtoupper($str2));
+    return \strcmp(\mb_strtoupper($str1), \mb_strtoupper($str2));
   }
 
   /**
@@ -398,13 +398,13 @@ EOD;
    *   TRUE if the text is valid UTF-8, FALSE if not.
    */
   public static function validateUtf8($text) {
-    if (strlen($text) == 0) {
+    if (\strlen($text) == 0) {
       return TRUE;
     }
     // With the PCRE_UTF8 modifier 'u', preg_match() fails silently on strings
     // containing invalid UTF-8 byte sequences. It does not reject character
     // codes above U+10FFFF (represented by 4 or more octets), though.
-    return (preg_match('/^./us', $text) == 1);
+    return (\preg_match('/^./us', $text) == 1);
   }
 
 }

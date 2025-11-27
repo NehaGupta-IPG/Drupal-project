@@ -132,9 +132,9 @@ class ContentExportTest extends BrowserTestBase {
       // need to account for that.
       if ($entity->getEntityTypeId() === 'file') {
         $imported_uri = $entity->getFileUri();
-        $extension = strlen('.' . pathinfo($imported_uri, PATHINFO_EXTENSION));
-        $imported_uri = substr($imported_uri, 0, -$extension);
-        $exported_uri = substr($exported_data['default']['uri'][0]['value'], 0, -$extension);
+        $extension = \strlen('.' . \pathinfo($imported_uri, PATHINFO_EXTENSION));
+        $imported_uri = \substr($imported_uri, 0, -$extension);
+        $exported_uri = \substr($exported_data['default']['uri'][0]['value'], 0, -$extension);
         $this->assertStringStartsWith($imported_uri, $exported_uri);
         // We know they match; no need to consider them further.
         unset(
@@ -186,8 +186,8 @@ class ContentExportTest extends BrowserTestBase {
     ]);
     $this->assertSame(0, $process->wait());
     $dir = 'public://user-content';
-    mkdir($dir);
-    file_put_contents($dir . '/user.yml', $process->getOutput());
+    \mkdir($dir);
+    \file_put_contents($dir . '/user.yml', $process->getOutput());
 
     // Delete the account and re-import it.
     $account->delete();
@@ -196,7 +196,7 @@ class ContentExportTest extends BrowserTestBase {
     // Ensure the import succeeded, and that we can log in with the imported
     // account. We want to use the standard login form, rather than a one-time
     // login link, to ensure the password is preserved.
-    $this->assertIsObject(user_load_by_name($account->getAccountName()));
+    $this->assertIsObject(\user_load_by_name($account->getAccountName()));
     $this->useOneTimeLoginLinks = FALSE;
     $this->drupalLogin($account);
     $this->assertSession()->addressMatches('/\/user\/[0-9]+$/');
@@ -228,7 +228,7 @@ class ContentExportTest extends BrowserTestBase {
    */
   protected function doTestExportWithDependencies(): void {
     $image_uri = $this->getRandomGenerator()
-      ->image(uniqid('public://') . '.png', '200x200', '300x300');
+      ->image(\uniqid('public://') . '.png', '200x200', '300x300');
     $file = File::create(['uri' => $image_uri]);
     $file->save();
 
@@ -267,11 +267,11 @@ class ContentExportTest extends BrowserTestBase {
     $this->assertFileExists($expected_output_dir . '/user/' . $node->getOwner()->uuid() . '.yml');
 
     // The physical file should have been copied too.
-    $original_file_hash = hash_file('sha256', $file->getFileUri());
+    $original_file_hash = \hash_file('sha256', $file->getFileUri());
     $this->assertIsString($original_file_hash);
-    $exported_file_hash = hash_file('sha256', $expected_output_dir . '/file/' . $file->getFilename());
+    $exported_file_hash = \hash_file('sha256', $expected_output_dir . '/file/' . $file->getFilename());
     $this->assertIsString($exported_file_hash);
-    $this->assertTrue(hash_equals($original_file_hash, $exported_file_hash));
+    $this->assertTrue(\hash_equals($original_file_hash, $exported_file_hash));
   }
 
   /**
@@ -415,7 +415,7 @@ class ContentExportTest extends BrowserTestBase {
     $this->assertSame(0, $process->wait());
     $expected_output_dir = $this->container->get(FileSystemInterface::class)
       ->realpath('public://content');
-    $this->assertStringContainsString(count($content) . ' entities were exported to ', $process->getOutput());
+    $this->assertStringContainsString(\count($content) . ' entities were exported to ', $process->getOutput());
 
     /** @var \Drupal\node\NodeInterface $node */
     foreach ($content as $node) {

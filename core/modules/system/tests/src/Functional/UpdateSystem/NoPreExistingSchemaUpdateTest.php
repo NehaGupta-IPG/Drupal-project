@@ -39,10 +39,10 @@ class NoPreExistingSchemaUpdateTest extends BrowserTestBase {
       ->condition('name', 'core.extension')
       ->execute()
       ->fetchField();
-    $extensions = unserialize($extensions);
+    $extensions = \unserialize($extensions);
     $connection->update('config')
       ->fields([
-        'data' => serialize(array_merge_recursive($extensions, ['module' => ['update_test_no_preexisting' => 0]])),
+        'data' => \serialize(\array_merge_recursive($extensions, ['module' => ['update_test_no_preexisting' => 0]])),
       ])
       ->condition('name', 'core.extension')
       ->execute();

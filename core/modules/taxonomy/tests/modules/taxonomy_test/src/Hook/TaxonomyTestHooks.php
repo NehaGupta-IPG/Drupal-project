@@ -24,8 +24,8 @@ class TaxonomyTestHooks {
   #[Hook('entity_access')]
   public function entityAccess(EntityInterface $entity, string $operation, AccountInterface $account) : AccessResultInterface {
     if ($entity instanceof TermInterface) {
-      $parts = explode(' ', (string) $entity->label());
-      if (in_array('Inaccessible', $parts, TRUE) && in_array($operation, $parts, TRUE)) {
+      $parts = \explode(' ', (string) $entity->label());
+      if (\in_array('Inaccessible', $parts, TRUE) && \in_array($operation, $parts, TRUE)) {
         return AccessResult::forbidden();
       }
     }
@@ -82,9 +82,9 @@ class TaxonomyTestHooks {
   public function taxonomyTermLoad($entities): void {
     $value = \Drupal::state()->get('taxonomy_test_taxonomy_term_load');
     // Only record loaded terms is the test has set this to an empty array.
-    if (is_array($value)) {
-      $value = array_merge($value, array_keys($entities));
-      \Drupal::state()->set('taxonomy_test_taxonomy_term_load', array_unique($value));
+    if (\is_array($value)) {
+      $value = \array_merge($value, \array_keys($entities));
+      \Drupal::state()->set('taxonomy_test_taxonomy_term_load', \array_unique($value));
     }
   }
 

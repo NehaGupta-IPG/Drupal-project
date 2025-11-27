@@ -50,9 +50,9 @@ final class SemVer {
     }
     $constraint = Intervals::compactConstraint(new MultiConstraint([$constraint_object_a, $constraint_object_b]));
     if ($constraint instanceof MatchNoneConstraint) {
-      throw new \LogicException(sprintf('The constraints "%s" and "%s" do not intersect and cannot be minimized.', $constraint_a, $constraint_b));
+      throw new \LogicException(\sprintf('The constraints "%s" and "%s" do not intersect and cannot be minimized.', $constraint_a, $constraint_b));
     }
-    return sprintf(
+    return \sprintf(
       '%s%s, %s%s',
       $constraint->getLowerBound()->isInclusive() ? '>=' : '>',
       $constraint->getLowerBound()->getVersion(),

@@ -44,7 +44,7 @@ class FileIsImageConstraintValidator extends BaseFileConstraintValidator impleme
     $image = $this->imageFactory->get($file->getFileUri());
     if (!$image->isValid()) {
       $supportedExtensions = $this->imageFactory->getSupportedExtensions();
-      $this->context->addViolation($constraint->message, ['%types' => implode(', ', $supportedExtensions)]);
+      $this->context->addViolation($constraint->message, ['%types' => \implode(', ', $supportedExtensions)]);
     }
   }
 

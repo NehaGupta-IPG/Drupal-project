@@ -48,17 +48,17 @@ class ScaleAndCrop extends GDImageToolkitOperationBase {
     $actualWidth = $this->getToolkit()->getWidth();
     $actualHeight = $this->getToolkit()->getHeight();
 
-    $scaleFactor = max($arguments['width'] / $actualWidth, $arguments['height'] / $actualHeight);
+    $scaleFactor = \max($arguments['width'] / $actualWidth, $arguments['height'] / $actualHeight);
 
     $arguments['x'] = isset($arguments['x']) ?
-      (int) round($arguments['x']) :
-      (int) round(($actualWidth * $scaleFactor - $arguments['width']) / 2);
+      (int) \round($arguments['x']) :
+      (int) \round(($actualWidth * $scaleFactor - $arguments['width']) / 2);
     $arguments['y'] = isset($arguments['y']) ?
-      (int) round($arguments['y']) :
-      (int) round(($actualHeight * $scaleFactor - $arguments['height']) / 2);
+      (int) \round($arguments['y']) :
+      (int) \round(($actualHeight * $scaleFactor - $arguments['height']) / 2);
     $arguments['resize'] = [
-      'width' => (int) round($actualWidth * $scaleFactor),
-      'height' => (int) round($actualHeight * $scaleFactor),
+      'width' => (int) \round($actualWidth * $scaleFactor),
+      'height' => (int) \round($actualHeight * $scaleFactor),
     ];
 
     // Fail when width or height are 0 or negative.

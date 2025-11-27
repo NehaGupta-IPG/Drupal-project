@@ -141,7 +141,7 @@ class StringDatabaseStorage implements StringStorageInterface {
       foreach ($locations as $type => $location) {
         foreach ($location as $name => $lid) {
           // Make sure that the name isn't longer than 255 characters.
-          $name = substr($name, 0, 255);
+          $name = \substr($name, 0, 255);
           if (!$lid) {
             $this->dbDelete('locales_location', ['sid' => $string->getId(), 'type' => $type, 'name' => $name])
               ->execute();
@@ -251,10 +251,10 @@ class StringDatabaseStorage implements StringStorageInterface {
    *     table fields)
    */
   protected function dbFieldTable($field) {
-    if (in_array($field, ['language', 'translation', 'customized'])) {
+    if (\in_array($field, ['language', 'translation', 'customized'])) {
       return 't';
     }
-    elseif (in_array($field, ['type', 'name'])) {
+    elseif (\in_array($field, ['type', 'name'])) {
       return 'l';
     }
     else {
@@ -297,7 +297,7 @@ class StringDatabaseStorage implements StringStorageInterface {
     elseif ($string->isTranslation()) {
       $keys = ['lid', 'language'];
     }
-    if (!empty($keys) && ($values = $string->getValues($keys)) && count($keys) == count($values)) {
+    if (!empty($keys) && ($values = $string->getValues($keys)) && \count($keys) == \count($values)) {
       return $values;
     }
     else {
@@ -412,7 +412,7 @@ class StringDatabaseStorage implements StringStorageInterface {
     foreach ($conditions as $field => $value) {
       $table_alias = $this->dbFieldTable($field);
       $field_alias = $table_alias . '.' . $field;
-      if (is_null($value)) {
+      if (\is_null($value)) {
         $query->isNull($field_alias);
       }
       elseif ($table_alias == 't' && $join === 'leftJoin') {
@@ -430,7 +430,7 @@ class StringDatabaseStorage implements StringStorageInterface {
 
     // Process other options, string filter, query limit, etc.
     if (!empty($options['filters'])) {
-      if (count($options['filters']) > 1) {
+      if (\count($options['filters']) > 1) {
         $filter = $this->connection->condition('OR');
         $query->condition($filter);
       }
@@ -527,7 +527,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   protected function dbDelete($table, $keys) {
     $query = $this->connection->delete($table, $this->options);
     foreach ($keys as $field => $value) {
-      if (!is_array($value)) {
+      if (!\is_array($value)) {
         $value = [$value];
       }
       $query->condition($field, $value, 'IN');

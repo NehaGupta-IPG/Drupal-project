@@ -25,7 +25,7 @@ class IncludedData extends ResourceObjectData {
    * @see \Drupal\jsonapi\JsonApiResource\Data::__construct
    */
   public function __construct($data) {
-    assert(Inspector::assertAllObjects($data, ResourceObject::class, EntityAccessDeniedHttpException::class));
+    \assert(Inspector::assertAllObjects($data, ResourceObject::class, EntityAccessDeniedHttpException::class));
     parent::__construct($data, -1);
   }
 

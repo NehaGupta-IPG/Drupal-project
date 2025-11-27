@@ -55,9 +55,9 @@ class Schema extends DatabaseSchema {
     if ($add_prefix) {
       $table = $info['prefix'] . $table;
     }
-    if (($pos = strpos($table, '.')) !== FALSE) {
-      $info['database'] = substr($table, 0, $pos);
-      $info['table'] = substr($table, ++$pos);
+    if (($pos = \strpos($table, '.')) !== FALSE) {
+      $info['database'] = \substr($table, 0, $pos);
+      $info['table'] = \substr($table, ++$pos);
     }
     else {
       $info['database'] = $this->connection->getConnectionOptions()['database'];
@@ -103,16 +103,16 @@ class Schema extends DatabaseSchema {
     }
 
     // Process keys & indexes.
-    if (!empty($table['primary key']) && is_array($table['primary key'])) {
+    if (!empty($table['primary key']) && \is_array($table['primary key'])) {
       $this->ensureNotNullPrimaryKey($table['primary key'], $table['fields']);
     }
     $keys = $this->createKeysSql($table);
-    if (count($keys)) {
-      $sql .= implode(", \n", $keys) . ", \n";
+    if (\count($keys)) {
+      $sql .= \implode(", \n", $keys) . ", \n";
     }
 
     // Remove the last comma and space.
-    $sql = substr($sql, 0, -3) . "\n) ";
+    $sql = \substr($sql, 0, -3) . "\n) ";
 
     $sql .= 'ENGINE = ' . $table['mysql_engine'] . ' DEFAULT CHARACTER SET ' . $table['mysql_character_set'];
     // By default, MySQL uses the default collation for new tables, which is
@@ -143,7 +143,7 @@ class Schema extends DatabaseSchema {
   protected function createFieldSql($name, $spec) {
     $sql = "[" . $name . "] " . $spec['mysql_type'];
 
-    if (in_array($spec['mysql_type'], $this->mysqlStringTypes)) {
+    if (\in_array($spec['mysql_type'], $this->mysqlStringTypes)) {
       if (isset($spec['length'])) {
         $sql .= '(' . $spec['length'] . ')';
       }
@@ -180,7 +180,7 @@ class Schema extends DatabaseSchema {
     }
 
     // $spec['default'] can be NULL, so we explicitly check for the key here.
-    if (array_key_exists('default', $spec)) {
+    if (\array_key_exists('default', $spec)) {
       $sql .= ' DEFAULT ' . $this->escapeDefaultValue($spec['default']);
     }
 
@@ -211,7 +211,7 @@ class Schema extends DatabaseSchema {
     // Set the correct database-engine specific datatype.
     // In case one is already provided, force it to uppercase.
     if (isset($field['mysql_type'])) {
-      $field['mysql_type'] = mb_strtoupper($field['mysql_type']);
+      $field['mysql_type'] = \mb_strtoupper($field['mysql_type']);
     }
     else {
       $map = $this->getFieldTypeMap();
@@ -315,12 +315,12 @@ class Schema extends DatabaseSchema {
     foreach ($indexes as $index_name => $index_fields) {
       foreach ($index_fields as $index_key => $index_field) {
         // Get the name of the field from the index specification.
-        $field_name = is_array($index_field) ? $index_field[0] : $index_field;
+        $field_name = \is_array($index_field) ? $index_field[0] : $index_field;
         // Check whether the field is defined in the table specification.
         if (isset($spec['fields'][$field_name])) {
           // Get the MySQL type from the processed field.
           $mysql_field = $this->processField($spec['fields'][$field_name]);
-          if (in_array($mysql_field['mysql_type'], $this->mysqlStringTypes)) {
+          if (\in_array($mysql_field['mysql_type'], $this->mysqlStringTypes)) {
             // Check whether we need to shorten the index.
             if ((!isset($mysql_field['type']) || $mysql_field['type'] != 'varchar_ascii') && (!isset($mysql_field['length']) || $mysql_field['length'] > 191)) {
               // Limit the index length to 191 characters.
@@ -348,7 +348,7 @@ class Schema extends DatabaseSchema {
    * @see Drupal\mysql\Driver\Database\mysql\Schema::normalizeIndexes()
    */
   protected function shortenIndex(&$index) {
-    if (is_array($index)) {
+    if (\is_array($index)) {
       if ($index[1] > 191) {
         $index[1] = 191;
       }
@@ -364,14 +364,14 @@ class Schema extends DatabaseSchema {
   protected function createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {
-      if (is_array($field)) {
+      if (\is_array($field)) {
         $return[] = '[' . $field[0] . '] (' . $field[1] . ')';
       }
       else {
         $return[] = '[' . $field . ']';
       }
     }
-    return implode(', ', $return);
+    return \implode(', ', $return);
   }
 
   /**
@@ -413,7 +413,7 @@ class Schema extends DatabaseSchema {
     }
 
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
-    $is_primary_key = isset($keys_new['primary key']) && in_array($field, $keys_new['primary key'], TRUE);
+    $is_primary_key = isset($keys_new['primary key']) && \in_array($field, $keys_new['primary key'], TRUE);
     if ($is_primary_key) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field => $spec]);
     }
@@ -433,7 +433,7 @@ class Schema extends DatabaseSchema {
         $query .= ', DROP PRIMARY KEY';
       }
 
-      $query .= ', ADD ' . implode(', ADD ', $keys_sql);
+      $query .= ', ADD ' . \implode(', ADD ', $keys_sql);
     }
     try {
       $this->executeDdlStatement($query);
@@ -490,7 +490,7 @@ class Schema extends DatabaseSchema {
     // consistent with PostgreSQL.
     // @see https://mariadb.com/kb/en/library/alter-table
     $primary_key = $this->findPrimaryKeyColumns($table);
-    if ((count($primary_key) > 1) && in_array($field, $primary_key, TRUE)) {
+    if ((\count($primary_key) > 1) && \in_array($field, $primary_key, TRUE)) {
       $this->dropPrimaryKey($table);
     }
 
@@ -542,7 +542,7 @@ class Schema extends DatabaseSchema {
       return FALSE;
     }
     $result = $this->connection->query("SHOW KEYS FROM {" . $table . "} WHERE Key_name = 'PRIMARY'")->fetchAllAssoc('Column_name');
-    return array_keys($result);
+    return \array_keys($result);
   }
 
   /**
@@ -640,13 +640,13 @@ class Schema extends DatabaseSchema {
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
-    if (isset($keys_new['primary key']) && in_array($field_new, $keys_new['primary key'], TRUE)) {
+    if (isset($keys_new['primary key']) && \in_array($field_new, $keys_new['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
     }
 
     $sql = 'ALTER TABLE {' . $table . '} CHANGE [' . $field . '] ' . $this->createFieldSql($field_new, $this->processField($spec));
     if ($keys_sql = $this->createKeysSql($keys_new)) {
-      $sql .= ', ADD ' . implode(', ADD ', $keys_sql);
+      $sql .= ', ADD ' . \implode(', ADD ', $keys_sql);
     }
     $this->executeDdlStatement($sql);
 
@@ -666,7 +666,7 @@ class Schema extends DatabaseSchema {
       $comment = Unicode::truncate($this->connection->prefixTables($comment), $length, TRUE, TRUE);
     }
     // Remove semicolons to avoid triggering multi-statement check.
-    $comment = strtr($comment, [';' => '.']);
+    $comment = \strtr($comment, [';' => '.']);
     return $this->connection->quote($comment);
   }
 

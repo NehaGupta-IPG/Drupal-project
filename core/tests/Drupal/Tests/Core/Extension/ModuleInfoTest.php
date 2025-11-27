@@ -24,7 +24,7 @@ class ModuleInfoTest extends UnitTestCase {
   #[DataProvider('coreModuleListDataProvider')]
   public function testModuleInfo($module): void {
     $module_directory = __DIR__ . '/../../../../../modules/' . $module;
-    $info = Yaml::decode(file_get_contents($module_directory . '/' . $module . '.info.yml'));
+    $info = Yaml::decode(\file_get_contents($module_directory . '/' . $module . '.info.yml'));
     $this->assertArrayHasKey('version', $info);
     $this->assertEquals('VERSION', $info['version']);
   }

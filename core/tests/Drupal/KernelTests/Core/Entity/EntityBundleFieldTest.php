@@ -112,7 +112,7 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
 
     // Purge field data, and check that the storage definition has been
     // completely removed once the data is purged.
-    field_purge_batch(10);
+    \field_purge_batch(10);
     $this->assertFalse($this->database->schema()->tableExists($table), 'Custom field table was deleted');
   }
 

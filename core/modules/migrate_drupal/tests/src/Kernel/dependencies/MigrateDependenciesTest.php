@@ -29,7 +29,7 @@ class MigrateDependenciesTest extends MigrateDrupal6TestBase {
     /** @var \Drupal\migrate\Plugin\RequirementsInterface[] $migrations */
     $migrations = $this->container->get('plugin.manager.migration')->createInstances($migration_items);
     $expected_order = ['d6_filter_format', 'd6_node:page', 'd6_comment'];
-    $this->assertSame(array_keys($migrations), $expected_order);
+    $this->assertSame(\array_keys($migrations), $expected_order);
 
     // Migration dependencies for comment include dependencies for node
     // migration as well. checkRequirements does not include migrations with

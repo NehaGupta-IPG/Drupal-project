@@ -76,7 +76,7 @@ class EditModeTest extends WebDriverTestBase {
     // Get the page twice to ensure edit mode remains enabled after a new page
     // request.
     $this->drupalGet('user');
-    $expected_restricted_tab_count = 1 + count($page->findAll('css', '[data-contextual-id]'));
+    $expected_restricted_tab_count = 1 + \count($page->findAll('css', '[data-contextual-id]'));
 
     // After the page loaded we need to additionally wait until the settings
     // tray Ajax activity is done.
@@ -107,7 +107,7 @@ class EditModeTest extends WebDriverTestBase {
     // no contextual links.
     $this->drupalGet('admin/structure/block');
     $web_assert->elementContains('css', 'h1.page-title', 'Block layout');
-    $this->assertEquals(0, count($page->findAll('css', '[data-contextual-id]')));
+    $this->assertEquals(0, \count($page->findAll('css', '[data-contextual-id]')));
     $this->assertGreaterThan(0, $this->getTabbableElementsCount());
   }
 
@@ -158,7 +158,7 @@ class EditModeTest extends WebDriverTestBase {
     // Mark all tabbable elements.
     $this->getSession()->executeScript("jQuery(window.tabbable.tabbable(document.body)).attr('data-marked', '');");
     // Count all marked elements.
-    $count = count($this->getSession()->getPage()->findAll('css', "[data-marked]"));
+    $count = \count($this->getSession()->getPage()->findAll('css', "[data-marked]"));
     // Remove set attributes.
     $this->getSession()->executeScript("jQuery('[data-marked]').removeAttr('data-marked');");
     return $count;

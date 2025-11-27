@@ -107,7 +107,7 @@ class UpdateThemeHooks {
    *   - data: An array of data about each project's status.
    */
   public function preprocessUpdateReport(array &$variables): void {
-    $data = isset($variables['data']) && is_array($variables['data']) ? $variables['data'] : [];
+    $data = isset($variables['data']) && \is_array($variables['data']) ? $variables['data'] : [];
 
     $last = $this->state->get('update.last_check', 0);
 
@@ -124,7 +124,7 @@ class UpdateThemeHooks {
 
     // For no project update data, populate no data message.
     if (empty($data)) {
-      $variables['no_updates_message'] = _update_no_data();
+      $variables['no_updates_message'] = \_update_no_data();
     }
 
     $rows = [];
@@ -142,7 +142,7 @@ class UpdateThemeHooks {
           '#attributes' => ['class' => ['update']],
         ];
       }
-      $row_key = !empty($project['title']) ? mb_strtolower($project['title']) : mb_strtolower($project['name']);
+      $row_key = !empty($project['title']) ? \mb_strtolower($project['title']) : \mb_strtolower($project['name']);
 
       // Add the project status row and details.
       $rows[$project['project_type']][$row_key]['status'] = $project_status;
@@ -181,7 +181,7 @@ class UpdateThemeHooks {
     $variables['project_types'] = [];
     foreach ($project_types as $type_name => $type_label) {
       if (!empty($rows[$type_name])) {
-        ksort($rows[$type_name]);
+        \ksort($rows[$type_name]);
         $variables['project_types'][] = [
           'label' => $type_label,
           'table' => $rows[$type_name],
@@ -255,7 +255,7 @@ class UpdateThemeHooks {
         // recommending, give it the same CSS class as if it was recommended,
         // but don't print out a separate "Recommended" line for this project.
         if (!empty($project['security updates'])
-          && count($project['security updates']) == 1
+          && \count($project['security updates']) == 1
           && $project['security updates'][0]['version'] === $project['recommended']
         ) {
           $security_class[] = 'project-update__version--recommended';
@@ -335,11 +335,11 @@ class UpdateThemeHooks {
     }
 
     if (!empty($project['disabled'])) {
-      sort($project['disabled']);
+      \sort($project['disabled']);
       $variables['disabled'] = $project['disabled'];
     }
 
-    sort($project['includes']);
+    \sort($project['includes']);
     $variables['includes'] = $project['includes'];
 
     $variables['extras'] = [];

@@ -163,7 +163,7 @@ class MediaTest extends ResourceTestBase {
     $self_url = clone $base_url;
     $version_identifier = 'id:' . $this->entity->getRevisionId();
     $self_url = $self_url->setOption('query', ['resourceVersion' => $version_identifier]);
-    $version_query_string = '?resourceVersion=' . urlencode($version_identifier);
+    $version_query_string = '?resourceVersion=' . \urlencode($version_identifier);
     return [
       'jsonapi' => [
         'meta' => [
@@ -347,7 +347,7 @@ class MediaTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   protected function getEditorialPermissions(): array {
-    return array_merge(parent::getEditorialPermissions(), ['view any unpublished content']);
+    return \array_merge(parent::getEditorialPermissions(), ['view any unpublished content']);
   }
 
   /**

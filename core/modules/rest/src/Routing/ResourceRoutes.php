@@ -114,11 +114,11 @@ class ResourceRoutes implements EventSubscriberInterface {
         // - set the allowed request body content types/formats for methods that
         //   allow request bodies to be sent (unless hardcoded by the plugin)
         // - set the allowed authentication providers
-        if (in_array($method, ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'], TRUE) && !$route->hasRequirement('_format')) {
-          $route->addRequirements(['_format' => implode('|', $rest_resource_config->getFormats($method))]);
+        if (\in_array($method, ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'], TRUE) && !$route->hasRequirement('_format')) {
+          $route->addRequirements(['_format' => \implode('|', $rest_resource_config->getFormats($method))]);
         }
-        if (in_array($method, ['POST', 'PATCH', 'PUT'], TRUE) && !$route->hasRequirement('_content_type_format')) {
-          $route->addRequirements(['_content_type_format' => implode('|', $rest_resource_config->getFormats($method))]);
+        if (\in_array($method, ['POST', 'PATCH', 'PUT'], TRUE) && !$route->hasRequirement('_content_type_format')) {
+          $route->addRequirements(['_content_type_format' => \implode('|', $rest_resource_config->getFormats($method))]);
         }
         $route->setOption('_auth', $rest_resource_config->getAuthenticationProviders($method));
         $route->setDefault('_rest_resource_config', $rest_resource_config->id());

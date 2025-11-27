@@ -105,7 +105,7 @@ class LoggerChannel implements LoggerChannelInterface {
       'request_uri' => '',
       'referer' => '',
       'ip' => '',
-      'timestamp' => time(),
+      'timestamp' => \time(),
     ];
     // Some context values are only available when in a request context.
     if ($this->requestStack && $request = $this->requestStack->getCurrentRequest()) {
@@ -118,7 +118,7 @@ class LoggerChannel implements LoggerChannelInterface {
       }
     }
 
-    if (is_string($level)) {
+    if (\is_string($level)) {
       // Convert to integer equivalent for consistency with RFC 5424.
       $level = $this->levelTranslation[$level];
     }
@@ -165,8 +165,8 @@ class LoggerChannel implements LoggerChannelInterface {
    *   An array of sorted loggers by priority.
    */
   protected function sortLoggers() {
-    krsort($this->loggers);
-    return array_merge(...$this->loggers);
+    \krsort($this->loggers);
+    return \array_merge(...$this->loggers);
   }
 
 }

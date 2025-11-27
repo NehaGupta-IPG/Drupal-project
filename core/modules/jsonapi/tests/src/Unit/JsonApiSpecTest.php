@@ -93,9 +93,9 @@ class JsonApiSpecTest extends UnitTestCase {
 
     // The ASCII control characters are in the range 0x00 to 0x1F plus 0x7F.
     for ($ascii = 0; $ascii <= 0x1F; $ascii++) {
-      $data['unsafe-ascii-control-' . $ascii] = ['kitt' . chr($ascii) . 'ens', FALSE];
+      $data['unsafe-ascii-control-' . $ascii] = ['kitt' . \chr($ascii) . 'ens', FALSE];
     }
-    $data['unsafe-ascii-control-' . 0x7F] = ['kitt' . chr(0x7F) . 'ens', FALSE];
+    $data['unsafe-ascii-control-' . 0x7F] = ['kitt' . \chr(0x7F) . 'ens', FALSE];
 
     return $data;
   }

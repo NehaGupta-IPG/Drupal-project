@@ -79,7 +79,7 @@ class ViewsTest extends UnitTestCase {
     $executable = Views::getView('test_view');
     $this->assertInstanceOf('Drupal\views\ViewExecutable', $executable);
     $this->assertEquals($view->id(), $executable->storage->id());
-    $this->assertEquals(spl_object_hash($view), spl_object_hash($executable->storage));
+    $this->assertEquals(\spl_object_hash($view), \spl_object_hash($executable->storage));
   }
 
   /**

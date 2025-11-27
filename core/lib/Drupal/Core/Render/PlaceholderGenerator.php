@@ -70,11 +70,11 @@ class PlaceholderGenerator implements PlaceholderGeneratorInterface {
     $cacheability->addCacheableDependency($this->cacheContextsManager->convertTokensToKeys($cacheability->getCacheContexts()));
     $cacheability->setCacheContexts($this->cacheContextsManager->optimizeTokens($cacheability->getCacheContexts()));
 
-    if (array_intersect($cacheability->getCacheContexts(), $conditions['contexts'])) {
+    if (\array_intersect($cacheability->getCacheContexts(), $conditions['contexts'])) {
       return TRUE;
     }
 
-    if (array_intersect($cacheability->getCacheTags(), $conditions['tags'])) {
+    if (\array_intersect($cacheability->getCacheTags(), $conditions['tags'])) {
       return TRUE;
     }
 
@@ -85,7 +85,7 @@ class PlaceholderGenerator implements PlaceholderGeneratorInterface {
    * {@inheritdoc}
    */
   public function createPlaceholder(array $element) {
-    $placeholder_render_array = array_intersect_key($element, \array_flip([
+    $placeholder_render_array = \array_intersect_key($element, \array_flip([
       // Placeholders are replaced with markup by executing the associated
       // #lazy_builder callback, which generates a render array, and which the
       // Renderer will render and replace the placeholder with.
@@ -106,10 +106,10 @@ class PlaceholderGenerator implements PlaceholderGeneratorInterface {
     // making hash. Issue #3225328 removes sort from contexts and tags arrays
     // for performances reasons.
     if (isset($placeholder_render_array['#cache']['contexts'])) {
-      sort($placeholder_render_array['#cache']['contexts']);
+      \sort($placeholder_render_array['#cache']['contexts']);
     }
     if (isset($placeholder_render_array['#cache']['tags'])) {
-      sort($placeholder_render_array['#cache']['tags']);
+      \sort($placeholder_render_array['#cache']['tags']);
     }
 
     // Generate placeholder markup. Note that the only requirement is that this
@@ -119,7 +119,7 @@ class PlaceholderGenerator implements PlaceholderGeneratorInterface {
     $placeholder_markup = static::createPlaceholderTag('drupal-render-placeholder', [
       'callback' => $placeholder_render_array['#lazy_builder'][0],
       'arguments' => UrlHelper::buildQuery($placeholder_render_array['#lazy_builder'][1]),
-      'token' => Crypt::hashBase64(serialize($placeholder_render_array)),
+      'token' => Crypt::hashBase64(\serialize($placeholder_render_array)),
     ]);
 
     // Build the placeholder element to return.

@@ -25,13 +25,13 @@ class TimerTest extends TestCase {
    */
   public function testTimer(): void {
     Timer::start('test');
-    usleep(5000);
+    \usleep(5000);
     $value = Timer::read('test');
-    usleep(5000);
+    \usleep(5000);
     $value2 = Timer::read('test');
-    usleep(5000);
+    \usleep(5000);
     $value3 = Timer::read('test');
-    usleep(5000);
+    \usleep(5000);
     $value4 = Timer::read('test');
 
     // Although we sleep for 5 milliseconds, we should test that at least 4 ms
@@ -57,7 +57,7 @@ class TimerTest extends TestCase {
 
     // Restart.
     Timer::start('test');
-    usleep(5000);
+    \usleep(5000);
     $value7 = Timer::read('test');
     $this->assertGreaterThanOrEqual($value6 + 4, $value7, 'Timer failed to measure at least 16 milliseconds of sleeping while running.');
 

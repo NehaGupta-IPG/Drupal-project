@@ -17,13 +17,13 @@ class BackwardsCompatibilityClassLoaderPass implements CompilerPassInterface {
    */
   public function process(ContainerBuilder $container): void {
     $moved_classes = $container->hasParameter('core.moved_classes') ? $container->getParameter('core.moved_classes') : [];
-    $modules = array_keys($container->getParameter('container.modules'));
+    $modules = \array_keys($container->getParameter('container.modules'));
     foreach ($modules as $module) {
       $parameter_name = $module . '.moved_classes';
       if ($container->hasParameter($parameter_name)) {
         $module_moved = $container->getParameter($parameter_name);
-        \assert(is_array($module_moved));
-        \assert(count($module_moved) === count(array_column($module_moved, 'class')), 'Missing class key for moved classes in ' . $module);
+        \assert(\is_array($module_moved));
+        \assert(\count($module_moved) === \count(\array_column($module_moved, 'class')), 'Missing class key for moved classes in ' . $module);
         $moved_classes = $moved_classes + $module_moved;
       }
     }

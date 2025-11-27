@@ -17,7 +17,7 @@ class EntityCommentType extends EntityConfigBase {
    */
   public function import(Row $row, array $old_destination_id_values = []) {
     $entity_ids = parent::import($row, $old_destination_id_values);
-    \Drupal::service('comment.manager')->addBodyField(reset($entity_ids));
+    \Drupal::service('comment.manager')->addBodyField(\reset($entity_ids));
     return $entity_ids;
   }
 

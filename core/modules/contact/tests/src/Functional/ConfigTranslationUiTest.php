@@ -30,7 +30,7 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
   protected function setUp(): void {
     parent::setUp();
     $admin_roles = $this->adminUser->getRoles(TRUE);
-    assert(count($admin_roles) === 1);
+    \assert(\count($admin_roles) === 1);
     Role::load($admin_roles[0])
       ->grantPermission('administer contact forms')
       ->grantPermission('access site-wide contact form')
@@ -121,9 +121,9 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
     // original text all appear in any translated page on the translation
     // forms.
     foreach ($this->langcodes as $langcode) {
-      $langcode_prefixes = array_merge([''], $this->langcodes);
+      $langcode_prefixes = \array_merge([''], $this->langcodes);
       foreach ($langcode_prefixes as $langcode_prefix) {
-        $this->drupalGet(ltrim("$langcode_prefix/$translation_base_url/$langcode/edit", '/'));
+        $this->drupalGet(\ltrim("$langcode_prefix/$translation_base_url/$langcode/edit", '/'));
         $this->assertSession()->fieldValueEquals('translation[config_names][contact.form.feedback][label]', 'Website feedback - ' . $langcode);
         $this->assertSession()->pageTextContains($label);
       }
@@ -136,7 +136,7 @@ class ConfigTranslationUiTest extends ConfigTranslationUiTestBase {
     foreach ($captured_emails as $email) {
       if ($email['id'] == 'contact_page_autoreply') {
         // Trim because we get an added newline for the body.
-        $this->assertEquals('Thank you for your mail - ' . $email['langcode'], trim($email['body']));
+        $this->assertEquals('Thank you for your mail - ' . $email['langcode'], \trim($email['body']));
       }
     }
 

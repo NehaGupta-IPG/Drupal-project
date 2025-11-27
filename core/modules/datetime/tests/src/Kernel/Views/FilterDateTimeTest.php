@@ -45,7 +45,7 @@ class FilterDateTimeTest extends DateTimeHandlerTestBase {
     static::$date = \Drupal::time()->getRequestTime() + 86400;
 
     // Set the timezone.
-    date_default_timezone_set(static::$timezone);
+    \date_default_timezone_set(static::$timezone);
     $this->config('system.date')
       ->set('timezone.default', static::$timezone)
       ->save();

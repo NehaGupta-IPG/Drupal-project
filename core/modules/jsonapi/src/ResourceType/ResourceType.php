@@ -235,7 +235,7 @@ class ResourceType {
    *   otherwise.
    */
   public function hasField($field_name) {
-    return array_key_exists($field_name, $this->fields);
+    return \array_key_exists($field_name, $this->fields);
   }
 
   /**
@@ -365,7 +365,7 @@ class ResourceType {
         : $this->entityTypeId . self::TYPE_NAME_URI_PATH_SEPARATOR . $this->bundle;
     }
 
-    $this->fieldMapping = array_flip(array_map(function (ResourceTypeField $field) {
+    $this->fieldMapping = \array_flip(\array_map(function (ResourceTypeField $field) {
       return $field->getPublicName();
     }, $this->fields));
   }
@@ -380,13 +380,13 @@ class ResourceType {
    *   across resource types across fields, but not within a field.
    */
   public function setRelatableResourceTypes(array $relatable_resource_types) {
-    $this->fields = array_reduce(array_keys($relatable_resource_types), function ($fields, $public_field_name) use ($relatable_resource_types) {
+    $this->fields = \array_reduce(\array_keys($relatable_resource_types), function ($fields, $public_field_name) use ($relatable_resource_types) {
       if (!isset($this->fieldMapping[$public_field_name])) {
         throw new \LogicException('A field must exist for relatable resource types to be set on it.');
       }
       $internal_field_name = $this->fieldMapping[$public_field_name];
       $field = $fields[$internal_field_name];
-      assert($field instanceof ResourceTypeRelationship);
+      \assert($field instanceof ResourceTypeRelationship);
       $fields[$internal_field_name] = $field->withRelatableResourceTypes($relatable_resource_types[$public_field_name]);
       return $fields;
     }, $this->fields);
@@ -402,9 +402,9 @@ class ResourceType {
    */
   public function getRelatableResourceTypes() {
     if (!isset($this->relatableResourceTypesByField)) {
-      $this->relatableResourceTypesByField = array_reduce(array_map(function (ResourceTypeRelationship $field) {
+      $this->relatableResourceTypesByField = \array_reduce(\array_map(function (ResourceTypeRelationship $field) {
         return [$field->getPublicName() => $field->getRelatableResourceTypes()];
-      }, array_filter($this->fields, function (ResourceTypeField $field) {
+      }, \array_filter($this->fields, function (ResourceTypeField $field) {
         return $field instanceof ResourceTypeRelationship && $field->isFieldEnabled();
       })), 'array_merge', []);
     }
@@ -440,7 +440,7 @@ class ResourceType {
    * @see jsonapi.base_path
    */
   public function getPath() {
-    return '/' . implode('/', explode(self::TYPE_NAME_URI_PATH_SEPARATOR, $this->typeName));
+    return '/' . \implode('/', \explode(self::TYPE_NAME_URI_PATH_SEPARATOR, $this->typeName));
   }
 
 }

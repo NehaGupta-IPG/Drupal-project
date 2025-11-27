@@ -37,7 +37,7 @@ class WorkspacesHtmlEntityFormController extends FormController {
     $form_arg = $this->getFormArgument($route_match);
     // If no operation is provided, use 'default'.
     $form_arg .= '.default';
-    [$entity_type_id, $operation] = explode('.', $form_arg);
+    [$entity_type_id, $operation] = \explode('.', $form_arg);
 
     if ($route_match->getRawParameter($entity_type_id) !== NULL) {
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
@@ -54,7 +54,7 @@ class WorkspacesHtmlEntityFormController extends FormController {
 
       // Prevent entities from being edited if they're tracked in workspace.
       if ($operation !== 'delete') {
-        $constraints = array_values(array_filter($entity->getTypedData()->getConstraints(), function ($constraint) {
+        $constraints = \array_values(\array_filter($entity->getTypedData()->getConstraints(), function ($constraint) {
           return $constraint instanceof EntityWorkspaceConflictConstraint;
         }));
 
@@ -63,7 +63,7 @@ class WorkspacesHtmlEntityFormController extends FormController {
             $entity->getTypedData(),
             $constraints[0]
           );
-          if (count($violations)) {
+          if (\count($violations)) {
             $build['#markup'] = $violations->get(0)->getMessage();
 
             return $build;

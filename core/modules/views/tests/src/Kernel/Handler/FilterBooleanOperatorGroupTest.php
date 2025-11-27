@@ -91,7 +91,7 @@ class FilterBooleanOperatorGroupTest extends ViewsKernelTestBase {
     $view->setDisplay('page_1');
     $view->setExposedInput(['field_test_boolean_field_value' => 'All']);
     $view->execute();
-    $this->assertEquals(2, count($view->result));
+    $this->assertEquals(2, \count($view->result));
 
     $build = $view->rowPlugin->render($view->result[0]);
     $output = \Drupal::service('renderer')->renderRoot($build);
@@ -105,7 +105,7 @@ class FilterBooleanOperatorGroupTest extends ViewsKernelTestBase {
     $view->setDisplay('page_1');
     $view->setExposedInput(['field_test_boolean_field_value' => 1]);
     $view->execute();
-    $this->assertEquals(1, count($view->result));
+    $this->assertEquals(1, \count($view->result));
     $build = $view->rowPlugin->render($view->result[0]);
     $output = \Drupal::service('renderer')->renderRoot($build);
     $this->assertStringContainsString('Checked', $output->__toString());
@@ -114,7 +114,7 @@ class FilterBooleanOperatorGroupTest extends ViewsKernelTestBase {
     $view->setDisplay('page_1');
     $view->setExposedInput(['field_test_boolean_field_value' => '2']);
     $view->execute();
-    $this->assertEquals(1, count($view->result));
+    $this->assertEquals(1, \count($view->result));
     $build = $view->rowPlugin->render($view->result[0]);
     $output = \Drupal::service('renderer')->renderRoot($build);
     $this->assertStringContainsString('Un-checked', $output->__toString());

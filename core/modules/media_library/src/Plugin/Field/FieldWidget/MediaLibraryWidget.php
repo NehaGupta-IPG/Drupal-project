@@ -160,14 +160,14 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // been added that we don't yet know about. We need to make sure new media
     // types are added to the list and remove media types that are no longer
     // configured for the field.
-    $new_media_type_ids = array_diff($allowed_media_type_ids, $sorted_media_type_ids);
+    $new_media_type_ids = \array_diff($allowed_media_type_ids, $sorted_media_type_ids);
     // Add new media type IDs to the list.
-    $sorted_media_type_ids = array_merge($sorted_media_type_ids, array_values($new_media_type_ids));
+    $sorted_media_type_ids = \array_merge($sorted_media_type_ids, \array_values($new_media_type_ids));
     // Remove media types that are no longer available.
-    $sorted_media_type_ids = array_intersect($sorted_media_type_ids, $allowed_media_type_ids);
+    $sorted_media_type_ids = \array_intersect($sorted_media_type_ids, $allowed_media_type_ids);
 
     // Make sure the keys are numeric.
-    return array_values($sorted_media_type_ids);
+    return \array_values($sorted_media_type_ids);
   }
 
   /**
@@ -177,7 +177,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $elements = [];
     $media_type_ids = $this->getAllowedMediaTypeIdsSorted();
 
-    if (count($media_type_ids) <= 1) {
+    if (\count($media_type_ids) <= 1) {
       return $elements;
     }
 
@@ -242,8 +242,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     }
 
     // Sort the media types by weight value and set the value in the form state.
-    uasort($input, 'Drupal\Component\Utility\SortArray::sortByWeightElement');
-    $sorted_media_type_ids = array_keys($input);
+    \uasort($input, 'Drupal\Component\Utility\SortArray::sortByWeightElement');
+    $sorted_media_type_ids = \array_keys($input);
     $form_state->setValue($element['#parents'], $sorted_media_type_ids);
 
     // We have to unset the child elements containing the weight fields for each
@@ -263,11 +263,11 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $summary = [];
     $media_type_labels = [];
     $media_types = $this->entityTypeManager->getStorage('media_type')->loadMultiple($this->getAllowedMediaTypeIdsSorted());
-    if (count($media_types) !== 1) {
+    if (\count($media_types) !== 1) {
       foreach ($media_types as $media_type) {
         $media_type_labels[] = $media_type->label();
       }
-      $summary[] = $this->t('Tab order: @order', ['@order' => implode(', ', $media_type_labels)]);
+      $summary[] = $this->t('Tab order: @order', ['@order' => \implode(', ', $media_type_labels)]);
     }
     return $summary;
   }
@@ -279,7 +279,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // Load the items for form rebuilds from the field state.
     $field_state = static::getWidgetState($form['#parents'], $this->fieldDefinition->getName(), $form_state);
     if (isset($field_state['items'])) {
-      usort($field_state['items'], [SortArray::class, 'sortByWeightElement']);
+      \usort($field_state['items'], [SortArray::class, 'sortByWeightElement']);
       $items->setValue($field_state['items']);
     }
 
@@ -312,10 +312,10 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $field_name = $this->fieldDefinition->getName();
     $parents = $form['#parents'];
     // Create an ID suffix from the parents to make sure each widget is unique.
-    $id_suffix = $parents ? '-' . implode('-', $parents) : '';
-    $field_widget_id = implode(':', array_filter([$field_name, $id_suffix]));
+    $id_suffix = $parents ? '-' . \implode('-', $parents) : '';
+    $field_widget_id = \implode(':', \array_filter([$field_name, $id_suffix]));
     $wrapper_id = $field_name . '-media-library-wrapper' . $id_suffix;
-    $limit_validation_errors = [array_merge($parents, [$field_name])];
+    $limit_validation_errors = [\array_merge($parents, [$field_name])];
 
     $settings = $this->getFieldSetting('handler_settings');
     $element += [
@@ -362,7 +362,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     }
     else {
       // @todo Use a <button> link here.
-      $multiple_items = count($referenced_entities) > 1;
+      $multiple_items = \count($referenced_entities) > 1;
       $element['#field_prefix']['weight_toggle'] = [
         '#type' => 'html_tag',
         '#tag' => 'button',
@@ -463,7 +463,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     }
 
     $cardinality_unlimited = ($element['#cardinality'] === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
-    $remaining = $element['#cardinality'] - count($referenced_entities);
+    $remaining = $element['#cardinality'] - \count($referenced_entities);
 
     // Inform the user of how many items are remaining.
     if (!$cardinality_unlimited) {
@@ -482,7 +482,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     }
 
     // Create a new media library URL with the correct state parameters.
-    $selected_type_id = reset($allowed_media_type_ids);
+    $selected_type_id = \reset($allowed_media_type_ids);
     $remaining = $cardinality_unlimited ? FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED : $remaining;
     // This particular media library opener needs some extra metadata for its
     // \Drupal\media_library\MediaLibraryOpenerInterface::getSelectionResponse()
@@ -538,7 +538,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // @see Drupal.behaviors.MediaLibraryWidgetDisableButton
     if (!$cardinality_unlimited && $remaining === 0) {
       $triggering_element = $form_state->getTriggeringElement();
-      if ($triggering_element && ($trigger_parents = $triggering_element['#array_parents']) && end($trigger_parents) === 'media_library_update_widget') {
+      if ($triggering_element && ($trigger_parents = $triggering_element['#array_parents']) && \end($trigger_parents) === 'media_library_update_widget') {
         // The widget is being rebuilt from a selection change.
         $element['open_button']['#attributes']['data-disabled-focus'] = 'true';
         $element['open_button']['#attributes']['class'][] = 'visually-hidden';
@@ -669,7 +669,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     if (isset($values['selection'])) {
-      usort($values['selection'], [SortArray::class, 'sortByWeightElement']);
+      \usort($values['selection'], [SortArray::class, 'sortByWeightElement']);
       return $values['selection'];
     }
     return [];
@@ -692,12 +692,12 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
 
     // This callback is either invoked from the remove button or the update
     // button, which have different nesting levels.
-    $is_remove_button = end($triggering_element['#parents']) === 'remove_button';
+    $is_remove_button = \end($triggering_element['#parents']) === 'remove_button';
     $length = $is_remove_button ? -3 : -1;
-    if (count($triggering_element['#array_parents']) < abs($length)) {
-      throw new \LogicException('The element that triggered the widget update was at an unexpected depth. Triggering element parents were: ' . implode(',', $triggering_element['#array_parents']));
+    if (\count($triggering_element['#array_parents']) < \abs($length)) {
+      throw new \LogicException('The element that triggered the widget update was at an unexpected depth. Triggering element parents were: ' . \implode(',', $triggering_element['#array_parents']));
     }
-    $parents = array_slice($triggering_element['#array_parents'], 0, $length);
+    $parents = \array_slice($triggering_element['#array_parents'], 0, $length);
     $element = NestedArray::getValue($form, $parents);
 
     // Always clear the textfield selection to prevent duplicate additions.
@@ -711,7 +711,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
       $announcement = $media_item->access('view label') ? new TranslatableMarkup('@label has been removed.', ['@label' => $media_item->label()]) : new TranslatableMarkup('Media has been removed.');
     }
     else {
-      $new_items = count(static::getNewMediaItems($element, $form_state));
+      $new_items = \count(static::getNewMediaItems($element, $form_state));
       $announcement = \Drupal::translation()->formatPlural($new_items, 'Added one media item.', 'Added @count media items.');
     }
 
@@ -722,7 +722,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // When the remove button is clicked, shift focus to the next remove button.
     // When the last item is deleted, we no longer have a selection and shift
     // the focus to the open button.
-    $removed_last = $is_remove_button && !count($field_state['items']);
+    $removed_last = $is_remove_button && !\count($field_state['items']);
     if ($is_remove_button && !$removed_last) {
       // Find the next media item by weight. The weight of the removed item is
       // added to the field state when it is removed in ::removeItem(). If there
@@ -774,14 +774,14 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // so nothing is lost in doing this.
     // @see Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::extractFormValues
     $triggering_element = $form_state->getTriggeringElement();
-    $parents = array_slice($triggering_element['#parents'], 0, -2);
+    $parents = \array_slice($triggering_element['#parents'], 0, -2);
     NestedArray::setValue($form_state->getUserInput(), $parents, NULL);
 
     // Get the parents required to find the top-level widget element.
-    if (count($triggering_element['#array_parents']) < 4) {
-      throw new \LogicException('Expected the remove button to be more than four levels deep in the form. Triggering element parents were: ' . implode(',', $triggering_element['#array_parents']));
+    if (\count($triggering_element['#array_parents']) < 4) {
+      throw new \LogicException('Expected the remove button to be more than four levels deep in the form. Triggering element parents were: ' . \implode(',', $triggering_element['#array_parents']));
     }
-    $parents = array_slice($triggering_element['#array_parents'], 0, -3);
+    $parents = \array_slice($triggering_element['#array_parents'], 0, -3);
     $element = NestedArray::getValue($form, $parents);
 
     // Get the field state.
@@ -790,7 +790,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $field_state = static::getFieldState($element, $form_state);
 
     // Get the delta of the item being removed.
-    $delta = array_slice($triggering_element['#array_parents'], -2, 1)[0];
+    $delta = \array_slice($triggering_element['#array_parents'], -2, 1)[0];
     if (isset($values['selection'][$delta])) {
       // Add the weight of the removed item to the field state so we can shift
       // focus to the next/previous item in an easy way.
@@ -836,7 +836,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public static function validateItems(array $form, FormStateInterface $form_state) {
     $button = $form_state->getTriggeringElement();
-    $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $element = NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -1));
 
     $field_state = static::getFieldState($element, $form_state);
     $media = static::getNewMediaItems($element, $form_state);
@@ -846,18 +846,18 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
 
     // Check if more items were selected than we allow.
     $cardinality_unlimited = ($element['#cardinality'] === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
-    $selection = count($field_state['items']) + count($media);
+    $selection = \count($field_state['items']) + \count($media);
     if (!$cardinality_unlimited && ($selection > $element['#cardinality'])) {
       $form_state->setError($element, \Drupal::translation()->formatPlural($element['#cardinality'], 'Only one item can be selected.', 'Only @count items can be selected.'));
     }
 
     // Validate that each selected media is of an allowed bundle.
-    $bundle_labels = array_intersect_key(\Drupal::service('entity_type.bundle.info')->getBundleLabels('media'), $element['#target_bundles']);
+    $bundle_labels = \array_intersect_key(\Drupal::service('entity_type.bundle.info')->getBundleLabels('media'), $element['#target_bundles']);
     foreach ($media as $media_item) {
-      if ($element['#target_bundles'] && !in_array($media_item->bundle(), $element['#target_bundles'], TRUE)) {
+      if ($element['#target_bundles'] && !\in_array($media_item->bundle(), $element['#target_bundles'], TRUE)) {
         $form_state->setError($element, new TranslatableMarkup('The media item "@label" is not of an accepted type. Allowed types: @types', [
           '@label' => $media_item->label(),
-          '@types' => implode(', ', $bundle_labels),
+          '@types' => \implode(', ', $bundle_labels),
         ]));
       }
     }
@@ -879,18 +879,18 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // so nothing is lost in doing this.
     // @see Drupal\media_library\Plugin\Field\FieldWidget\MediaLibraryWidget::extractFormValues
     $button = $form_state->getTriggeringElement();
-    $parents = array_slice($button['#parents'], 0, -1);
+    $parents = \array_slice($button['#parents'], 0, -1);
     $parents[] = 'selection';
     NestedArray::setValue($form_state->getUserInput(), $parents, NULL);
 
-    $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $element = NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -1));
 
     $field_state = static::getFieldState($element, $form_state);
 
     $media = static::getNewMediaItems($element, $form_state);
     if (!empty($media)) {
       // Get the weight of the last items and count from there.
-      $last_element = end($field_state['items']);
+      $last_element = \end($field_state['items']);
       $weight = $last_element ? $last_element['weight'] : 0;
       foreach ($media as $media_item) {
         // Any ID can be passed to the widget, so we have to check access.
@@ -928,8 +928,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     $value = NestedArray::getValue($values, $path);
 
     if (!empty($value['media_library_selection'])) {
-      $ids = explode(',', $value['media_library_selection']);
-      $ids = array_filter($ids, 'is_numeric');
+      $ids = \explode(',', $value['media_library_selection']);
+      $ids = \array_filter($ids, 'is_numeric');
       if (!empty($ids)) {
         return Media::loadMultiple($ids);
       }
@@ -994,7 +994,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    */
   public static function validateRequired(array $element, FormStateInterface $form_state, array $form) {
     // If a remove button triggered submit, this validation isn't needed.
-    if (in_array([static::class, 'removeItem'], $form_state->getSubmitHandlers(), TRUE)) {
+    if (\in_array([static::class, 'removeItem'], $form_state->getSubmitHandlers(), TRUE)) {
       return;
     }
 
@@ -1007,7 +1007,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
     // Trigger error if the field is required and no media is present. Although
     // the Form API's default validation would also catch this, the validation
     // error message is too vague, so a more precise one is provided here.
-    if (count($field_state['items']) === 0) {
+    if (\count($field_state['items']) === 0) {
       $form_state->setError($element, new TranslatableMarkup('@name field is required.', ['@name' => $element['#title']]));
     }
   }

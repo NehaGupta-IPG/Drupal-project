@@ -84,7 +84,7 @@ class BigPipeInterfacePreviewThemeSuggestionsTest extends KernelTestBase {
     $variables['arguments'] = $build['#lazy_builder'][1];
     $module_handler = $this->container->get('module_handler');
     $suggestions = $module_handler->invoke('big_pipe', 'theme_suggestions_big_pipe_interface_preview', [$variables]);
-    $suggested_id = preg_replace('/[^a-zA-Z0-9]/', '_', $block->id());
+    $suggested_id = \preg_replace('/[^a-zA-Z0-9]/', '_', $block->id());
     $this->assertSame([
       'big_pipe_interface_preview__block',
       'big_pipe_interface_preview__block__' . $suggested_id,

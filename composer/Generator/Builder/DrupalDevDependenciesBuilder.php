@@ -25,7 +25,7 @@ class DrupalDevDependenciesBuilder extends DrupalPackageBuilder {
     $composer['require'] = $this->drupalCoreInfo->getRequireDev();
 
     // Sort our required packages by key.
-    ksort($composer['require']);
+    \ksort($composer['require']);
 
     return $composer;
   }

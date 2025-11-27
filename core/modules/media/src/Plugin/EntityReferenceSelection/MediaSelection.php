@@ -52,7 +52,7 @@ class MediaSelection extends DefaultSelection {
     $entities = parent::validateReferenceableNewEntities($entities);
     // Mirror the conditions checked in buildEntityQuery().
     if (!$this->currentUser->hasPermission('administer media')) {
-      $entities = array_filter($entities, function ($media) {
+      $entities = \array_filter($entities, function ($media) {
         /** @var \Drupal\media\MediaInterface $media */
         return $media->isPublished();
       });

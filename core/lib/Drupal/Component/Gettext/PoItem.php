@@ -204,10 +204,10 @@ class PoItem {
     if (isset($values['comment'])) {
       $this->setComment($values['comment']);
     }
-    if (isset($this->source) && str_contains($this->source, self::DELIMITER)) {
-      $this->setSource(explode(self::DELIMITER, $this->source));
-      $this->setTranslation(explode(self::DELIMITER, $this->translation ?? ''));
-      $this->setPlural(count($this->source) > 1);
+    if (isset($this->source) && \str_contains($this->source, self::DELIMITER)) {
+      $this->setSource(\explode(self::DELIMITER, $this->source));
+      $this->setTranslation(\explode(self::DELIMITER, $this->translation ?? ''));
+      $this->setPlural(\count($this->source) > 1);
     }
   }
 
@@ -280,17 +280,17 @@ class PoItem {
    */
   private function formatString($string) {
     // Escape characters for processing.
-    $string = addcslashes($string, "\0..\37\\\"");
+    $string = \addcslashes($string, "\0..\37\\\"");
 
     // Always include a line break after the explicit \n line breaks from
     // the source string. Otherwise wrap at 70 chars to accommodate the extra
     // format overhead too.
-    $parts = explode("\n", wordwrap(str_replace('\n', "\\n\n", $string), 70, " \n"));
+    $parts = \explode("\n", \wordwrap(\str_replace('\n', "\\n\n", $string), 70, " \n"));
 
     // Multiline string should be exported starting with a "" and newline to
     // have all lines aligned on the same column.
-    if (count($parts) > 1) {
-      return "\"\"\n\"" . implode("\"\n\"", $parts) . "\"\n";
+    if (\count($parts) > 1) {
+      return "\"\"\n\"" . \implode("\"\n\"", $parts) . "\"\n";
     }
     // Single line strings are output on the same line.
     else {

@@ -43,7 +43,7 @@ class BatchUserAction extends ActionBase {
         'operations' => $operations,
         'finished' => [static::class, 'finishBatch'],
       ];
-      batch_set($batch);
+      \batch_set($batch);
     }
   }
 
@@ -51,7 +51,7 @@ class BatchUserAction extends ActionBase {
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
-    assert($entity instanceof ContentEntityInterface);
+    \assert($entity instanceof ContentEntityInterface);
     $this->executeMultiple([$entity]);
   }
 

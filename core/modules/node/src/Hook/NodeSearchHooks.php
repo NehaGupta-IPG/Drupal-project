@@ -77,7 +77,7 @@ class NodeSearchHooks {
         'score' => 'EXP(-5 * (1 - (n.created - :node_oldest) / :node_range))',
         'arguments' => [
           ':node_oldest' => $node_min_max['min_created'],
-          ':node_range' => max($node_min_max['max_created'] - $node_min_max['min_created'], 1),
+          ':node_range' => \max($node_min_max['max_created'] - $node_min_max['min_created'], 1),
         ],
       ];
     }

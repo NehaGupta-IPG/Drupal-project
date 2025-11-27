@@ -175,7 +175,7 @@ class DatabaseDriver extends Extension {
       $dependencyData = Dependency::createFromString($dependency);
       $dependencyName = $dependencyData->getName();
       if (empty($this->discoveredModules[$dependencyName])) {
-        throw new \RuntimeException(sprintf("Cannot find the module '%s' that is required by module '%s'", $dependencyName, $this->getModule()->getName()));
+        throw new \RuntimeException(\sprintf("Cannot find the module '%s' that is required by module '%s'", $dependencyName, $this->getModule()->getName()));
       }
       $autoloadInfo['dependencies'][$dependencyName] = [
         'namespace' => "Drupal\\{$dependencyName}",

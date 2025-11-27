@@ -43,7 +43,7 @@ final class ContentDispositionFilenameParser {
     // Parse the header value. This regex does not allow an empty filename.
     // i.e. 'filename=""'. This also matches on a word boundary so other keys
     // like 'not_a_filename' don't work.
-    if (!preg_match(static::REQUEST_HEADER_FILENAME_REGEX, $content_disposition, $matches)) {
+    if (!\preg_match(static::REQUEST_HEADER_FILENAME_REGEX, $content_disposition, $matches)) {
       throw new BadRequestHttpException('No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided.');
     }
 

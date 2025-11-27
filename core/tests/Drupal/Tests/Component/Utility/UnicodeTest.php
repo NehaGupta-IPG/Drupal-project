@@ -275,9 +275,9 @@ EOF;
       // Simple text string.
       ['Simple text.', TRUE, 'A simple ASCII text string did not validate.'],
       // Invalid UTF-8, overlong 5 byte encoding.
-      [chr(0xF8) . chr(0x80) . chr(0x80) . chr(0x80) . chr(0x80), FALSE, 'Invalid UTF-8 was validated.'],
+      [\chr(0xF8) . \chr(0x80) . \chr(0x80) . \chr(0x80) . \chr(0x80), FALSE, 'Invalid UTF-8 was validated.'],
       // High code-point without trailing characters.
-      [chr(0xD0) . chr(0x01), FALSE, 'Invalid UTF-8 was validated.'],
+      [\chr(0xD0) . \chr(0x01), FALSE, 'Invalid UTF-8 was validated.'],
     ];
   }
 
@@ -307,9 +307,9 @@ EOF;
    */
   public static function providerTestConvertToUtf8() {
     return [
-      [chr(0x97), 'Windows-1252', '—'],
-      [chr(0x99), 'Windows-1252', '™'],
-      [chr(0x80), 'Windows-1252', '€'],
+      [\chr(0x97), 'Windows-1252', '—'],
+      [\chr(0x99), 'Windows-1252', '™'],
+      [\chr(0x80), 'Windows-1252', '€'],
     ];
   }
 

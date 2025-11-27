@@ -29,7 +29,7 @@ class FileUriItem extends UriItem {
     $properties = parent::propertyDefinitions($field_definition);
 
     $properties['url'] = DataDefinition::create('string')
-      ->setLabel(t('Root-relative file URL'))
+      ->setLabel(\t('Root-relative file URL'))
       ->setComputed(TRUE)
       ->setInternal(FALSE)
       ->setClass(ComputedFileUrl::class);

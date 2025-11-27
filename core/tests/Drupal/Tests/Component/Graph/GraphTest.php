@@ -118,9 +118,9 @@ class GraphTest extends TestCase {
   protected function assertPaths(array $graph, array $expected_paths): void {
     foreach ($expected_paths as $vertex => $paths) {
       // Build an array with keys = $paths and values = TRUE.
-      $expected = array_fill_keys($paths, TRUE);
+      $expected = \array_fill_keys($paths, TRUE);
       $result = $graph[$vertex]['paths'] ?? [];
-      $this->assertEquals($expected, $result, sprintf('Expected paths for vertex %s: %s, got %s', $vertex, $this->displayArray($expected, TRUE), $this->displayArray($result, TRUE)));
+      $this->assertEquals($expected, $result, \sprintf('Expected paths for vertex %s: %s, got %s', $vertex, $this->displayArray($expected, TRUE), $this->displayArray($result, TRUE)));
     }
   }
 
@@ -138,9 +138,9 @@ class GraphTest extends TestCase {
   protected function assertReversePaths(array $graph, array $expected_reverse_paths): void {
     foreach ($expected_reverse_paths as $vertex => $paths) {
       // Build an array with keys = $paths and values = TRUE.
-      $expected = array_fill_keys($paths, TRUE);
+      $expected = \array_fill_keys($paths, TRUE);
       $result = $graph[$vertex]['reverse_paths'] ?? [];
-      $this->assertEquals($expected, $result, sprintf('Expected reverse paths for vertex %s: %s, got %s', $vertex, $this->displayArray($expected, TRUE), $this->displayArray($result, TRUE)));
+      $this->assertEquals($expected, $result, \sprintf('Expected reverse paths for vertex %s: %s, got %s', $vertex, $this->displayArray($expected, TRUE), $this->displayArray($result, TRUE)));
     }
   }
 
@@ -156,16 +156,16 @@ class GraphTest extends TestCase {
    * @internal
    */
   protected function assertComponents(array $graph, array $expected_components): void {
-    $unassigned_vertices = array_fill_keys(array_keys($graph), TRUE);
+    $unassigned_vertices = \array_fill_keys(\array_keys($graph), TRUE);
     foreach ($expected_components as $component) {
       $result_components = [];
       foreach ($component as $vertex) {
         $result_components[] = $graph[$vertex]['component'];
         unset($unassigned_vertices[$vertex]);
       }
-      $this->assertCount(1, array_unique($result_components), sprintf('Expected one unique component for vertices %s, got %s', $this->displayArray($component), $this->displayArray($result_components)));
+      $this->assertCount(1, \array_unique($result_components), \sprintf('Expected one unique component for vertices %s, got %s', $this->displayArray($component), $this->displayArray($result_components)));
     }
-    $this->assertEquals([], $unassigned_vertices, sprintf('Vertices not assigned to a component: %s', $this->displayArray($unassigned_vertices, TRUE)));
+    $this->assertEquals([], $unassigned_vertices, \sprintf('Vertices not assigned to a component: %s', $this->displayArray($unassigned_vertices, TRUE)));
   }
 
   /**
@@ -180,9 +180,9 @@ class GraphTest extends TestCase {
    */
   protected function assertWeights(array $graph, array $expected_orders): void {
     foreach ($expected_orders as $order) {
-      $previous_vertex = array_shift($order);
+      $previous_vertex = \array_shift($order);
       foreach ($order as $vertex) {
-        $this->assertLessThan($graph[$vertex]['weight'], $graph[$previous_vertex]['weight'], sprintf("Weight of vertex %s should be less than vertex %s.", $previous_vertex, $vertex));
+        $this->assertLessThan($graph[$vertex]['weight'], $graph[$previous_vertex]['weight'], \sprintf("Weight of vertex %s should be less than vertex %s.", $previous_vertex, $vertex));
       }
     }
   }
@@ -197,7 +197,7 @@ class GraphTest extends TestCase {
    */
   protected function displayArray($paths, $keys = FALSE): string {
     if (!empty($paths)) {
-      return implode(', ', $keys ? array_keys($paths) : $paths);
+      return \implode(', ', $keys ? \array_keys($paths) : $paths);
     }
     else {
       return '(empty)';

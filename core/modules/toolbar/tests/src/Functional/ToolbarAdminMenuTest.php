@@ -190,8 +190,8 @@ class ToolbarAdminMenuTest extends BrowserTestBase {
   public function testUserRoleUpdateSubtreesHashCacheClear(): void {
     // Find the new role ID.
     $all_rids = $this->adminUser->getRoles();
-    unset($all_rids[array_search(RoleInterface::AUTHENTICATED_ID, $all_rids)]);
-    $rid = reset($all_rids);
+    unset($all_rids[\array_search(RoleInterface::AUTHENTICATED_ID, $all_rids)]);
+    $rid = \reset($all_rids);
 
     $edit = [];
     $edit[$rid . '[administer taxonomy]'] = FALSE;
@@ -389,7 +389,7 @@ class ToolbarAdminMenuTest extends BrowserTestBase {
     $subtrees_hash = $this->getSubtreesHash();
 
     $this->drupalGet('toolbar/subtrees/' . $subtrees_hash, ['query' => [MainContentViewSubscriber::WRAPPER_FORMAT => 'drupal_ajax']], ['X-Requested-With' => 'XMLHttpRequest']);
-    $ajax_result = json_decode($this->getSession()->getPage()->getContent(), TRUE);
+    $ajax_result = \json_decode($this->getSession()->getPage()->getContent(), TRUE);
     $this->assertEquals('setToolbarSubtrees', $ajax_result[0]['command'], 'Subtrees response uses the correct command.');
     $this->assertEquals([
       'system-admin_content',
@@ -399,7 +399,7 @@ class ToolbarAdminMenuTest extends BrowserTestBase {
       'system-admin_config',
       'entity-user-collection',
       'front',
-    ], array_keys($ajax_result[0]['subtrees']), 'Correct subtrees returned.');
+    ], \array_keys($ajax_result[0]['subtrees']), 'Correct subtrees returned.');
   }
 
   /**

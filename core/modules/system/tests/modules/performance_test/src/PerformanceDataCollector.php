@@ -87,9 +87,9 @@ class PerformanceDataCollector implements EventSubscriberInterface, Destructable
       'cache_operations' => [],
       'cache_tag_operations' => [],
     ];
-    $existing_data['database_events'] = array_merge($existing_data['database_events'], $database_events);
-    $existing_data['cache_operations'] = array_merge($existing_data['cache_operations'], $this->cacheOperations);
-    $existing_data['cache_tag_operations'] = array_merge($existing_data['cache_tag_operations'], $this->cacheTagOperations);
+    $existing_data['database_events'] = \array_merge($existing_data['database_events'], $database_events);
+    $existing_data['cache_operations'] = \array_merge($existing_data['cache_operations'], $this->cacheOperations);
+    $existing_data['cache_tag_operations'] = \array_merge($existing_data['cache_tag_operations'], $this->cacheTagOperations);
     $collection->set('performance_test_data', $existing_data);
     $lock->release('performance_test');
   }

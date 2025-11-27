@@ -87,7 +87,7 @@ class RecursiveExtensionFilterCallback {
    *   are applied.
    */
   public function __construct(array $skipped_folders = [], bool $accept_tests = FALSE) {
-    $this->skippedFolders = array_merge($this->skippedFolders, $skipped_folders);
+    $this->skippedFolders = \array_merge($this->skippedFolders, $skipped_folders);
     if (!$accept_tests) {
       $this->skippedFolders[] = 'tests';
     }
@@ -116,7 +116,7 @@ class RecursiveExtensionFilterCallback {
       // recurse into the whole filesystem tree that possibly contains other
       // files aside from Drupal.
       if ($filesystem_directory->getSubPath() === '') {
-        return in_array($name, $this->allowedExtensionTypes, TRUE);
+        return \in_array($name, $this->allowedExtensionTypes, TRUE);
       }
       // 'config' directories are special-cased here, because every extension
       // contains one. However, those default configuration directories cannot
@@ -127,13 +127,13 @@ class RecursiveExtensionFilterCallback {
       // config module to be overridden/replaced in a profile/site directory
       // (whereas it must be located directly in a modules directory).
       if ($name === 'config') {
-        return str_ends_with($filesystem_directory->getPathname(), 'modules/config');
+        return \str_ends_with($filesystem_directory->getPathname(), 'modules/config');
       }
       // Accept the directory unless the folder is skipped.
-      return !in_array($name, $this->skippedFolders, TRUE);
+      return !\in_array($name, $this->skippedFolders, TRUE);
     }
     // Only accept extension info files.
-    return str_ends_with($name, '.info.yml');
+    return \str_ends_with($name, '.info.yml');
   }
 
 }

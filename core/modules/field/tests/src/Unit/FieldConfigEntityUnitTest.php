@@ -276,7 +276,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
     $this->entityType->expects($this->once())
       ->method('getPropertiesToExport')
       ->with('test_entity_type.test_bundle.field_test')
-      ->willReturn(array_combine(array_keys($expected), array_keys($expected)));
+      ->willReturn(\array_combine(\array_keys($expected), \array_keys($expected)));
 
     $export = $field->toArray();
     $this->assertEquals($expected, $export);

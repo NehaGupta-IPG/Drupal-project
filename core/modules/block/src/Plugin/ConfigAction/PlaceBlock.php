@@ -52,12 +52,12 @@ final class PlaceBlock implements ConfigActionPluginInterface, ContainerFactoryP
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
-    assert(is_array($value));
+    \assert(\is_array($value));
 
     $theme = $this->configFactory->get('system.theme')->get($this->whichTheme);
     $value['theme'] = $theme;
 
-    if (array_key_exists('region', $value) && is_array($value['region'])) {
+    if (\array_key_exists('region', $value) && \is_array($value['region'])) {
       // Since the recipe author might not know ahead of time what theme the
       // block is in, they should supply a map whose keys are theme names and
       // values are region names, so we know where to place this block. If the
@@ -68,7 +68,7 @@ final class PlaceBlock implements ConfigActionPluginInterface, ContainerFactoryP
 
     // Allow the recipe author to position the block in the region without
     // needing to know exact weights.
-    if (array_key_exists('position', $value)) {
+    if (\array_key_exists('position', $value)) {
       $blocks = $this->blockStorage->loadByProperties([
         'theme' => $theme,
         'region' => $value['region'],
@@ -78,11 +78,11 @@ final class PlaceBlock implements ConfigActionPluginInterface, ContainerFactoryP
         // \Drupal\block\Entity\Block::sort() here because it seems to be
         // intended to sort blocks in the UI, where we really just want to get
         // the weights right in this situation.
-        uasort($blocks, fn (BlockInterface $a, BlockInterface $b) => $a->getWeight() <=> $b->getWeight());
+        \uasort($blocks, fn (BlockInterface $a, BlockInterface $b) => $a->getWeight() <=> $b->getWeight());
 
         $value['weight'] = match ($value['position']) {
-          'first' => reset($blocks)->getWeight() - 1,
-          'last' => end($blocks)->getWeight() + 1,
+          'first' => \reset($blocks)->getWeight() - 1,
+          'last' => \end($blocks)->getWeight() + 1,
         };
       }
     }

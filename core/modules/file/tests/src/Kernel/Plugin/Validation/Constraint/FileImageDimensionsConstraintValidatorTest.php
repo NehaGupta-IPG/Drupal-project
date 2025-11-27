@@ -42,12 +42,12 @@ class FileImageDimensionsConstraintValidatorTest extends FileValidatorTestBase {
 
     $this->image = File::create();
     $this->image->setFileUri('core/misc/druplicon.png');
-    $this->image->setFilename(basename($this->image->getFileUri()));
-    $this->image->setSize(@filesize($this->image->getFileUri()));
+    $this->image->setFilename(\basename($this->image->getFileUri()));
+    $this->image->setSize(@\filesize($this->image->getFileUri()));
 
     $this->nonImage = File::create();
     $this->nonImage->setFileUri('core/assets/scaffold/README.txt');
-    $this->nonImage->setFilename(basename($this->nonImage->getFileUri()));
+    $this->nonImage->setFilename(\basename($this->nonImage->getFileUri()));
   }
 
   /**
@@ -108,7 +108,7 @@ class FileImageDimensionsConstraintValidatorTest extends FileValidatorTestBase {
     // Maximum size.
     if ($this->container->get('image.factory')->getToolkitId()) {
       // Copy the image so that the original doesn't get resized.
-      copy('core/misc/druplicon.png', 'temporary://druplicon.png');
+      \copy('core/misc/druplicon.png', 'temporary://druplicon.png');
       $this->image->setFileUri('temporary://druplicon.png');
 
       $validators = [
@@ -128,7 +128,7 @@ class FileImageDimensionsConstraintValidatorTest extends FileValidatorTestBase {
       $this->assertEquals($this->image->getSize(), $image->getFileSize());
 
       // Once again, now with negative width and height to force an error.
-      copy('core/misc/druplicon.png', 'temporary://druplicon.png');
+      \copy('core/misc/druplicon.png', 'temporary://druplicon.png');
       $this->image->setFileUri('temporary://druplicon.png');
       $validators = [
         'FileImageDimensions' => [

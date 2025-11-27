@@ -55,7 +55,7 @@ class Memory implements QueueInterface {
    * {@inheritdoc}
    */
   public function numberOfItems() {
-    return count($this->queue);
+    return \count($this->queue);
   }
 
   /**

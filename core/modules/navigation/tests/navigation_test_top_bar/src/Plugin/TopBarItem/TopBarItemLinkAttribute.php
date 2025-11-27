@@ -39,7 +39,7 @@ class TopBarItemLinkAttribute extends TopBarItemBase {
             'title' => $this->t('Test link with attributes'),
             'class' => ['use-ajax'],
             'data-dialog-type' => 'modal',
-            'data-dialog-options' => json_encode(['width' => 700]),
+            'data-dialog-options' => \json_encode(['width' => 700]),
           ],
         ],
       ],

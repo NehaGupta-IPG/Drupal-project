@@ -84,20 +84,20 @@ trait TestFileCreationTrait {
 
     $files = [];
     // Make sure type is valid.
-    if (in_array($type, ['binary', 'html', 'image', 'javascript', 'php', 'sql', 'text'])) {
+    if (\in_array($type, ['binary', 'html', 'image', 'javascript', 'php', 'sql', 'text'])) {
       $files = $file_system->scanDirectory('public://', '/' . $type . '\-.*/');
 
       // If size is set then remove any files that are not of that size.
       if ($size !== NULL) {
         foreach ($files as $file) {
-          $stats = stat($file->uri);
+          $stats = \stat($file->uri);
           if ($stats['size'] != $size) {
             unset($files[$file->uri]);
           }
         }
       }
     }
-    usort($files, [$this, 'compareFiles']);
+    \usort($files, [$this, 'compareFiles']);
     return $files;
   }
 
@@ -115,14 +115,14 @@ trait TestFileCreationTrait {
    *   -1 if $file1 is smaller than $file2, 0 if they are the same size, and 1
    */
   protected function compareFiles($file1, $file2): int {
-    $compare_size = filesize($file1->uri) - filesize($file2->uri);
+    $compare_size = \filesize($file1->uri) - \filesize($file2->uri);
     if ($compare_size) {
       // Sort by file size.
       return $compare_size;
     }
     else {
       // The files were the same size, so sort alphabetically.
-      return strnatcmp($file1->name, $file2->name);
+      return \strnatcmp($file1->name, $file2->name);
     }
   }
 
@@ -155,16 +155,16 @@ trait TestFileCreationTrait {
       for ($j = 0; $j < $width - 1; $j++) {
         switch ($type) {
           case 'text':
-            $text .= chr(rand(32, 126));
+            $text .= \chr(\rand(32, 126));
             break;
 
           case 'binary':
-            $text .= chr(rand(0, 31));
+            $text .= \chr(\rand(0, 31));
             break;
 
           case 'binary-text':
           default:
-            $text .= rand(0, 1);
+            $text .= \rand(0, 1);
             break;
         }
       }
@@ -173,7 +173,7 @@ trait TestFileCreationTrait {
 
     // Create filename.
     $filename = 'public://' . $filename . '.txt';
-    file_put_contents($filename, $text);
+    \file_put_contents($filename, $text);
     return $filename;
   }
 

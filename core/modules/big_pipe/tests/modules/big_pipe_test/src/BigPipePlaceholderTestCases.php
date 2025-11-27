@@ -130,7 +130,7 @@ class BigPipePlaceholderTestCases {
       ],
     ];
     if ($container) {
-      $form_action->embeddedHtmlResponse = '<form class="big-pipe-test-form" data-drupal-selector="big-pipe-test-form" action="' . base_path() . 'big_pipe_test"';
+      $form_action->embeddedHtmlResponse = '<form class="big-pipe-test-form" data-drupal-selector="big-pipe-test-form" action="' . \base_path() . 'big_pipe_test"';
     }
 
     // 3. Real-world example of HTML attribute value subset placeholder: CSRF

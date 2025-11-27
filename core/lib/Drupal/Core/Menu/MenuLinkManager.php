@@ -151,7 +151,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
   public function rebuild() {
     $definitions = $this->getDefinitions();
     // Apply overrides from config.
-    $overrides = $this->overrides->loadMultipleOverrides(array_keys($definitions));
+    $overrides = $this->overrides->loadMultipleOverrides(\array_keys($definitions));
     foreach ($overrides as $id => $changes) {
       if (!empty($definitions[$id])) {
         $definitions[$id] = $changes + $definitions[$id];

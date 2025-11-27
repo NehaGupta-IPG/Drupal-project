@@ -81,7 +81,7 @@ class DbLogTest extends KernelTestBase {
       ->range(0, 1)
       ->execute()
       ->fetchField();
-    $this->assertSame(serialize(['@string' => '']), $variables);
+    $this->assertSame(\serialize(['@string' => '']), $variables);
   }
 
   /**

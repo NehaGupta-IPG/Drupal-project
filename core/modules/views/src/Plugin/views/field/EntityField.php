@@ -234,7 +234,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
       // Otherwise, we only limit values if the user hasn't selected "all", 0,
       // or the value matching field cardinality.
-      if ((($this->options['delta_limit'] > 0) && ($this->options['delta_limit'] != $cardinality)) || intval($this->options['delta_offset'])) {
+      if ((($this->options['delta_limit'] > 0) && ($this->options['delta_limit'] != $cardinality)) || \intval($this->options['delta_offset'])) {
         $this->limit_values = TRUE;
       }
     }
@@ -257,7 +257,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   public function query($use_group_by = FALSE) {
     $fields = $this->additional_fields;
     // No need to add the entity type.
-    $entity_type_key = array_search('entity_type', $fields);
+    $entity_type_key = \array_search('entity_type', $fields);
     if ($entity_type_key !== FALSE) {
       unset($fields[$entity_type_key]);
     }
@@ -268,7 +268,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       if ($this->options['group_column'] != 'entity_id') {
         $options = [$this->options['group_column'] => $this->options['group_column']];
       }
-      $options += is_array($this->options['group_columns']) ? $this->options['group_columns'] : [];
+      $options += \is_array($this->options['group_columns']) ? $this->options['group_columns'] : [];
 
       // Go through the list and determine the actual column name from field
       // api.
@@ -406,13 +406,13 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
     $field_storage_definition = $this->getFieldStorageDefinition();
     $field_type = $this->fieldTypePluginManager->getDefinition($field_storage_definition->getType());
-    $column_names = array_keys($field_storage_definition->getColumns());
+    $column_names = \array_keys($field_storage_definition->getColumns());
     $default_column = '';
     // Try to determine a sensible default.
-    if (count($column_names) == 1) {
+    if (\count($column_names) == 1) {
       $default_column = $column_names[0];
     }
-    elseif (in_array('value', $column_names)) {
+    elseif (\in_array('value', $column_names)) {
       $default_column = 'value';
     }
 
@@ -482,7 +482,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
     $field = $this->getFieldDefinition();
     $formatters = $this->formatterPluginManager->getOptions($field->getType());
-    $column_names = array_keys($field->getColumns());
+    $column_names = \array_keys($field->getColumns());
 
     // If this is a multiple value field, add its options.
     if ($this->multiple) {
@@ -490,7 +490,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     }
 
     // No need to ask the user anything if the field has only one column.
-    if (count($field->getColumns()) == 1) {
+    if (\count($field->getColumns()) == 1) {
       $form['click_sort_column'] = [
         '#type' => 'value',
         '#value' => $column_names[0] ?? '',
@@ -500,7 +500,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       $form['click_sort_column'] = [
         '#type' => 'select',
         '#title' => $this->t('Column used for click sorting'),
-        '#options' => array_combine($column_names, $column_names),
+        '#options' => \array_combine($column_names, $column_names),
         '#default_value' => $this->options['click_sort_column'],
         '#description' => $this->t('Used by Style: Table to determine the actual column to click sort the field on. The default is usually fine.'),
       ];
@@ -512,7 +512,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       '#options' => $formatters,
       '#default_value' => $this->options['type'],
       '#ajax' => [
-        'url' => views_ui_build_form_url($form_state),
+        'url' => \views_ui_build_form_url($form_state),
       ],
       '#submit' => [[$this, 'submitTemporaryForm']],
       '#executes_submit_callback' => TRUE,
@@ -579,7 +579,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
     // Make the string translatable by keeping it as a whole rather than
     // translating prefix and suffix separately.
-    [$prefix, $suffix] = explode('@count', $this->t('Display @count value(s)'));
+    [$prefix, $suffix] = \explode('@count', $this->t('Display @count value(s)'));
 
     if ($field->getCardinality() == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
       $type = 'textfield';
@@ -588,8 +588,8 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     }
     else {
       $type = 'select';
-      $range = range(1, $field->getCardinality());
-      $options = array_combine($range, $range);
+      $range = \range(1, $field->getCardinality());
+      $options = \array_combine($range, $range);
       $size = 1;
     }
     $form['multi_type'] = [
@@ -638,7 +638,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       '#fieldset' => 'multiple_field_settings',
     ];
 
-    [$prefix, $suffix] = explode('@count', $this->t('starting from @count'));
+    [$prefix, $suffix] = \explode('@count', $this->t('starting from @count'));
     $form['delta_offset'] = [
       '#type' => 'textfield',
       '#size' => 5,
@@ -688,10 +688,10 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     // With "field API" fields, the column target of the grouping function
     // and any additional grouping columns must be specified.
 
-    $field_columns = array_keys($this->getFieldDefinition()->getColumns());
+    $field_columns = \array_keys($this->getFieldDefinition()->getColumns());
     $group_columns = [
       'entity_id' => $this->t('Entity ID'),
-    ] + array_map('ucfirst', array_combine($field_columns, $field_columns));
+    ] + \array_map('ucfirst', \array_combine($field_columns, $field_columns));
 
     $form['group_column'] = [
       '#type' => 'select',
@@ -725,7 +725,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
     // Add settings for "field API" fields.
     $item['group_column'] = $form_state->getValue(['options', 'group_column']);
-    $item['group_columns'] = array_filter($form_state->getValue(['options', 'group_columns']));
+    $item['group_columns'] = \array_filter($form_state->getValue(['options', 'group_columns']));
   }
 
   /**
@@ -771,7 +771,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    */
   protected function prepareItemsByDelta(array $all_values) {
     if ($this->options['delta_reversed']) {
-      $all_values = array_reverse($all_values);
+      $all_values = \array_reverse($all_values);
     }
 
     // We are supposed to show only certain deltas.
@@ -792,12 +792,12 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       }
       else {
         $delta_limit = (int) $this->options['delta_limit'];
-        $offset = intval($this->options['delta_offset']);
+        $offset = \intval($this->options['delta_offset']);
 
         // We should only get here in this case if there is an offset, and in
         // that case we are limiting to all values after the offset.
         if ($delta_limit === 0) {
-          $delta_limit = count($all_values) - $offset;
+          $delta_limit = \count($all_values) - $offset;
         }
       }
 
@@ -950,7 +950,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       // affect it. Other side effects could happen similarly.
       $data = FALSE;
       foreach ($this->group_fields as $field_name => $column) {
-        if (property_exists($row, $this->aliases[$column])) {
+        if (\property_exists($row, $this->aliases[$column])) {
           $base_value[$field_name] = $row->{$this->aliases[$column]};
           if (isset($base_value[$field_name])) {
             $data = TRUE;
@@ -1001,8 +1001,8 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       if (isset($item['raw'])) {
         $raw = $item['raw'];
 
-        if (is_array($raw)) {
-          if (isset($raw[$id]) && is_scalar($raw[$id])) {
+        if (\is_array($raw)) {
+          if (isset($raw[$id]) && \is_scalar($raw[$id])) {
             $tokens['{{ ' . $this->options['id'] . '__' . $id . ' }}'] = $raw[$id];
           }
           else {
@@ -1011,7 +1011,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
           }
         }
 
-        if (is_object($raw)) {
+        if (\is_object($raw)) {
           $property = $raw->get($id);
           // Check if TypedDataInterface is implemented so we know how to render
           // the item as a string.
@@ -1154,7 +1154,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       }
     }
     if ($field_item_definition->getFieldStorageDefinition()->getCardinality() == 1) {
-      return reset($values);
+      return \reset($values);
     }
     else {
       return $values;
@@ -1175,7 +1175,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       // Check if any of the handler dependencies match the dependencies being
       // removed.
       foreach ($dependency_list as $config_key) {
-        if (isset($dependencies[$group]) && array_key_exists($config_key, $dependencies[$group])) {
+        if (isset($dependencies[$group]) && \array_key_exists($config_key, $dependencies[$group])) {
           // This handlers dependency matches a dependency being removed,
           // indicate that this handler needs to be removed.
           $remove = TRUE;

@@ -63,7 +63,7 @@ class CommentStorageSchema extends SqlContentEntityStorageSchema {
 
         case 'entity_type':
         case 'field_name':
-          assert($storage_definition instanceof RequiredFieldStorageDefinitionInterface);
+          \assert($storage_definition instanceof RequiredFieldStorageDefinitionInterface);
           if ($storage_definition->isStorageRequired()) {
             // The 'entity_type' and 'field_name' are required so they also need
             // to be marked as NOT NULL.

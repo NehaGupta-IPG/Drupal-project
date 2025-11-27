@@ -124,7 +124,7 @@ class AlterTest extends DatabaseTestBase {
     $query->range(0, 2);
     $query->addTag('database_test_alter_remove_range');
 
-    $num_records = count($query->execute()->fetchAll());
+    $num_records = \count($query->execute()->fetchAll());
 
     $this->assertEquals(4, $num_records, 'Returned the correct number of rows.');
   }

@@ -207,7 +207,7 @@ abstract class SortPluginBase extends HandlerBase implements CacheableDependency
     // prior to rendering. That's why the preRender for it needs to run first,
     // so that when the next preRender (the one for fieldsets) runs, it gets
     // the flattened data.
-    array_unshift($form['#pre_render'], [static::class, 'preRenderFlattenData']);
+    \array_unshift($form['#pre_render'], [static::class, 'preRenderFlattenData']);
     $form['expose']['#flatten'] = TRUE;
 
     $form['expose']['label'] = [
@@ -238,7 +238,7 @@ abstract class SortPluginBase extends HandlerBase implements CacheableDependency
       'expose',
       'field_identifier',
     ]);
-    if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_~.\-]*$/', $field_identifier)) {
+    if (!\preg_match('/^[a-zA-Z][a-zA-Z0-9_~.\-]*$/', $field_identifier)) {
       $form_state->setErrorByName('expose][field_identifier', $this->t('This identifier has illegal characters.'));
       return;
     }

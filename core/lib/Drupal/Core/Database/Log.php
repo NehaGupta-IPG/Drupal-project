@@ -112,7 +112,7 @@ class Log {
    *   The statement execution event.
    */
   public function logFromEvent(StatementExecutionEndEvent $event): void {
-    foreach (array_keys($this->queryLog) as $key) {
+    foreach (\array_keys($this->queryLog) as $key) {
       $this->queryLog[$key][] = [
         'query' => $event->queryString,
         'args' => $event->args,

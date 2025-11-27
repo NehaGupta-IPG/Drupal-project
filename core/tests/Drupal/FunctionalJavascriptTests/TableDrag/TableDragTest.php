@@ -66,7 +66,7 @@ class TableDragTest extends WebDriverTestBase {
    * Tests row weight switch.
    */
   public function testRowWeightSwitch(): void {
-    $this->state->set('tabledrag_test_table', array_flip(range(1, 3)));
+    $this->state->set('tabledrag_test_table', \array_flip(\range(1, 3)));
 
     $this->drupalGet('tabledrag_test');
 
@@ -103,7 +103,7 @@ class TableDragTest extends WebDriverTestBase {
    * Tests draggable table drag'n'drop.
    */
   public function testDragAndDrop(): void {
-    $this->state->set('tabledrag_test_table', array_flip(range(1, 3)));
+    $this->state->set('tabledrag_test_table', \array_flip(\range(1, 3)));
     $this->drupalGet('tabledrag_test');
 
     $session = $this->getSession();
@@ -174,7 +174,7 @@ class TableDragTest extends WebDriverTestBase {
       ['id' => '5', 'weight' => 0, 'parent' => '', 'indentation' => 0, 'changed' => FALSE],
     ];
     if (!empty($drupal_path)) {
-      $this->state->set('tabledrag_test_table', array_flip(range(1, 5)));
+      $this->state->set('tabledrag_test_table', \array_flip(\range(1, 5)));
       $this->drupalGet($drupal_path);
     }
     $this->assertDraggableTable($expected_table);
@@ -337,20 +337,20 @@ class TableDragTest extends WebDriverTestBase {
     $text = $session->getPage()->getHtml();
     $strings = [];
     foreach ($items as $item) {
-      if (($pos = strpos($text, $item)) === FALSE) {
+      if (($pos = \strpos($text, $item)) === FALSE) {
         throw new ExpectationException("Cannot find '$item' in the page", $session->getDriver());
       }
       $strings[$pos] = $item;
     }
-    ksort($strings);
-    $this->assertSame($items, array_values($strings), "Strings found on the page but incorrectly ordered.");
+    \ksort($strings);
+    $this->assertSame($items, \array_values($strings), "Strings found on the page but incorrectly ordered.");
   }
 
   /**
    * Tests nested draggable tables through keyboard.
    */
   public function testNestedDraggableTables(): void {
-    $this->state->set('tabledrag_test_table', array_flip(range(1, 5)));
+    $this->state->set('tabledrag_test_table', \array_flip(\range(1, 5)));
     $this->drupalGet('tabledrag_test_nested');
     $this->assertKeyboardAccessibility('');
 
@@ -499,7 +499,7 @@ class TableDragTest extends WebDriverTestBase {
    */
   protected function assertDraggableTable(array $structure, string $table_id = 'tabledrag-test-table', bool $skip_missing = FALSE): void {
     $rows = $this->getSession()->getPage()->findAll('xpath', "//table[@id='$table_id']/tbody/tr");
-    $this->assertSession()->elementsCount('xpath', "//table[@id='$table_id']/tbody/tr", count($structure));
+    $this->assertSession()->elementsCount('xpath', "//table[@id='$table_id']/tbody/tr", \count($structure));
 
     foreach ($structure as $delta => $expected) {
       $this->assertTableRow($rows[$delta], $expected['id'], $expected['weight'], $expected['parent'], $expected['indentation'], $expected['changed'], $skip_missing);
@@ -642,7 +642,7 @@ JS;
     });
 
     if (!$has_class) {
-      throw new \Exception(sprintf('Dragging css class was not added on handle "%s".', $handle->getXpath()));
+      throw new \Exception(\sprintf('Dragging css class was not added on handle "%s".', $handle->getXpath()));
     }
   }
 
@@ -661,7 +661,7 @@ JS;
     });
 
     if (!$class_removed) {
-      throw new \Exception(sprintf('Dragging operations did not complete on time on handle %s', $handle->getXpath()));
+      throw new \Exception(\sprintf('Dragging operations did not complete on time on handle %s', $handle->getXpath()));
     }
   }
 

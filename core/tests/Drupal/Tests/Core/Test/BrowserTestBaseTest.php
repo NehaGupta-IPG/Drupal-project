@@ -61,7 +61,7 @@ class BrowserTestBaseTest extends UnitTestCase {
 
     $reflected_get_http_client = new \ReflectionMethod($btb, 'getHttpClient');
 
-    $this->assertSame(get_class($expected), get_class($reflected_get_http_client->invoke($btb)));
+    $this->assertSame(\get_class($expected), \get_class($reflected_get_http_client->invoke($btb)));
   }
 
   /**
@@ -88,7 +88,7 @@ class BrowserTestBaseTest extends UnitTestCase {
    */
   public function testTearDownWithoutSetUp(): void {
     $method = 'cleanupEnvironment';
-    $this->assertTrue(method_exists(BrowserTestBase::class, $method));
+    $this->assertTrue(\method_exists(BrowserTestBase::class, $method));
     $btb = $this->getMockBuilder(BrowserTestBaseMockableClassTest::class)
       ->disableOriginalConstructor()
       ->onlyMethods([$method])

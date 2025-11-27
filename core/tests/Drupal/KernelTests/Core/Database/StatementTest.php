@@ -208,12 +208,12 @@ class StatementTest extends DatabaseTestBase {
    */
   public function testStatementCountTwice(): void {
     $statement = $this->connection->query('SELECT * FROM {test}');
-    $rowCount = iterator_count($statement);
+    $rowCount = \iterator_count($statement);
     $this->assertSame(4, $rowCount);
 
     $this->expectException(DatabaseExceptionWrapper::class);
     $this->expectExceptionMessage('Attempted rewinding a StatementInterface object when fetching has already started. Refactor your code to avoid rewinding statement objects.');
-    iterator_count($statement);
+    \iterator_count($statement);
   }
 
   /**
@@ -224,9 +224,9 @@ class StatementTest extends DatabaseTestBase {
    */
   public function testEmptyStatementCountTwice(): void {
     $statement = $this->connection->query('SELECT * FROM {test} WHERE 1 = 0');
-    $rowCount = iterator_count($statement);
+    $rowCount = \iterator_count($statement);
     $this->assertSame(0, $rowCount);
-    $rowCount = iterator_count($statement);
+    $rowCount = \iterator_count($statement);
     $this->assertSame(0, $rowCount);
   }
 

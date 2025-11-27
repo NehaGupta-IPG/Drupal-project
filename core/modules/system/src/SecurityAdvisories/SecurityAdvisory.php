@@ -141,7 +141,7 @@ final class SecurityAdvisory {
       foreach ($violations as $violation) {
         $violation_messages[] = "Field " . $violation->getPropertyPath() . ": " . $violation->getMessage();
       }
-      throw new \UnexpectedValueException('Malformed security advisory: ' . implode(",\n", $violation_messages));
+      throw new \UnexpectedValueException('Malformed security advisory: ' . \implode(",\n", $violation_messages));
     }
   }
 

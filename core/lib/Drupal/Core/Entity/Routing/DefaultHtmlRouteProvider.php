@@ -315,7 +315,7 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
     // If the entity type does not provide either an admin or collection
     // permission, there is no way to control access, so we cannot provide
     // a route in a sensible way.
-    $permissions = array_filter([
+    $permissions = \array_filter([
       $entity_type->getAdminPermission(),
       $entity_type->getCollectionPermission(),
     ]);
@@ -331,7 +331,7 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
           '_title_arguments' => $label->getArguments(),
           '_title_context' => $label->getOption('context'),
         ])
-        ->setRequirement('_permission', implode('+', $permissions));
+        ->setRequirement('_permission', \implode('+', $permissions));
 
       return $route;
     }

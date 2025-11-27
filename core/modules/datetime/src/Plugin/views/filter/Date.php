@@ -113,7 +113,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     $input = $form_state->getValue($identifier);
 
     $values = [];
-    if (is_array($input)) {
+    if (\is_array($input)) {
       if (!empty($input['value'])) {
         $values[] = $input['value'];
       }
@@ -168,7 +168,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     $b = $this->query->getDateFormat($this->query->getDateField("'" . $this->dateFormatter->format($b->getTimestamp() + $origin_offset, 'custom', DateTimeItemInterface::DATETIME_STORAGE_FORMAT, DateTimeItemInterface::STORAGE_TIMEZONE) . "'", TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
 
     // This is safe because we are manually scrubbing the values.
-    $operator = strtoupper($this->operator);
+    $operator = \strtoupper($this->operator);
     $field = $this->query->getDateFormat($this->query->getDateField($field, TRUE, $this->calculateOffset), $this->dateFormat, TRUE);
     $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
   }
@@ -202,7 +202,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
   protected function getTimezone() {
     return $this->dateFormat === DateTimeItemInterface::DATE_STORAGE_FORMAT
       ? DateTimeItemInterface::STORAGE_TIMEZONE
-      : date_default_timezone_get();
+      : \date_default_timezone_get();
   }
 
   /**
@@ -224,7 +224,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
     // the user's offset from UTC for use in the query.
     $origin_offset = 0;
     if ($this->dateFormat === DateTimeItemInterface::DATE_STORAGE_FORMAT && $this->value['type'] === 'offset') {
-      $origin_offset = $origin_offset + timezone_offset_get(new \DateTimeZone(date_default_timezone_get()), new \DateTime($time, new \DateTimeZone($timezone)));
+      $origin_offset = $origin_offset + \timezone_offset_get(new \DateTimeZone(\date_default_timezone_get()), new \DateTime($time, new \DateTimeZone($timezone)));
     }
 
     return $origin_offset;

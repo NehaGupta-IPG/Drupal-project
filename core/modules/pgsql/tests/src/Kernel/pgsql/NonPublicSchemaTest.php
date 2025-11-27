@@ -376,7 +376,7 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
     $this->assertSame($this->testingFakeConnection->getPrefix() . 'faking_table', $results[0]->tablename);
     $this->assertStringContainsString('USING btree (id)', $results[0]->indexdef);
 
-    $find_primary_keys_columns = new \ReflectionMethod(get_class($this->testingFakeConnection->schema()), 'findPrimaryKeyColumns');
+    $find_primary_keys_columns = new \ReflectionMethod(\get_class($this->testingFakeConnection->schema()), 'findPrimaryKeyColumns');
     $results = $find_primary_keys_columns->invoke($this->testingFakeConnection->schema(), 'faking_table');
 
     $this->assertCount(1, $results);
@@ -400,7 +400,7 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
     $this->assertTrue($this->testingFakeConnection->schema()->tableExists('new_faking_table'));
     $this->assertEquals($this->testingFakeConnection->getPrefix() . 'new_faking_table', $result[0]->table_name);
     $this->assertEquals('testing_fake', $result[0]->table_schema);
-    sort($tables);
+    \sort($tables);
     $this->assertEquals(['new_faking_table'], $tables);
 
     $this->testingFakeConnection->schema()->dropTable('new_faking_table');

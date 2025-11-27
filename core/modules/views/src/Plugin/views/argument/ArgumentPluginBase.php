@@ -440,7 +440,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
       }
     }
 
-    asort($validate_types);
+    \asort($validate_types);
     $form['validate']['type']['#options'] = $validate_types;
 
     $form['validate']['fail'] = [
@@ -477,7 +477,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
       $output[] = [
         '#markup' => '<p>' . $this->t("The following replacement tokens are available for this argument.") . '</p>',
       ];
-      foreach (array_keys($options) as $type) {
+      foreach (\array_keys($options) as $type) {
         if (!empty($options[$type])) {
           $items = [];
           foreach ($options[$type] as $key => $value) {
@@ -700,7 +700,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
       }
     }
 
-    asort($options);
+    \asort($options);
     $form['default_argument_type']['#options'] = $options;
   }
 
@@ -714,7 +714,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     $summary_plugins = [];
     $format_options = [];
     foreach ($style_plugins as $key => $plugin) {
-      if (isset($plugin['display_types']) && in_array('summary', $plugin['display_types'])) {
+      if (isset($plugin['display_types']) && \in_array('summary', $plugin['display_types'])) {
         $summary_plugins[$key] = $plugin;
         $format_options[$key] = $plugin['title'];
       }
@@ -809,7 +809,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     }
 
     if (!empty($info['method args'])) {
-      return call_user_func_array([&$this, $info['method']], $info['method args']);
+      return \call_user_func_array([&$this, $info['method']], $info['method args']);
     }
     else {
       return $this->{$info['method']}();
@@ -1252,12 +1252,12 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    * @see \Drupal\Core\Render\Element\Radios::processRadios()
    */
   public static function processContainerRadios($element) {
-    if (count($element['#options']) > 0) {
+    if (\count($element['#options']) > 0) {
       foreach ($element['#options'] as $key => $choice) {
         $element += [$key => []];
         // Generate the parents as the autogenerator does, so we will have a
         // unique id for each radio button.
-        $parents_for_id = array_merge($element['#parents'], [$key]);
+        $parents_for_id = \array_merge($element['#parents'], [$key]);
 
         $element[$key] += [
           '#type' => 'radio',
@@ -1268,7 +1268,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
           '#default_value' => $element['#default_value'] ?? NULL,
           '#attributes' => $element['#attributes'],
           '#parents' => $element['#parents'],
-          '#id' => Html::getUniqueId('edit-' . implode('-', $parents_for_id)),
+          '#id' => Html::getUniqueId('edit-' . \implode('-', $parents_for_id)),
           '#ajax' => $element['#ajax'] ?? NULL,
         ];
         $element[$key . '_options'] = [
@@ -1321,7 +1321,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    * @see decodeValidatorId()
    */
   public static function encodeValidatorId($id) {
-    return str_replace(':', '---', $id);
+    return \str_replace(':', '---', $id);
   }
 
   /**
@@ -1334,7 +1334,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    *   The original identifier.
    */
   public static function decodeValidatorId($id) {
-    return str_replace('---', ':', $id);
+    return \str_replace('---', ':', $id);
   }
 
   /**

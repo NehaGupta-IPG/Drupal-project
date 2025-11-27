@@ -104,7 +104,7 @@ class RecipeCommandTest extends BrowserTestBase {
     $process = $this->applyRecipe('core/tests/fixtures/recipes/does_not_exist', 1);
 
     // The directory error should be the only error visible.
-    $output = trim(preg_replace('/\s+/', ' ', $process->getOutput()));
+    $output = \trim(\preg_replace('/\s+/', ' ', $process->getOutput()));
     $this->assertSame('[ERROR] The supplied path core/tests/fixtures/recipes/does_not_exist is not a directory', $output);
     $this->assertEmpty($process->getErrorOutput());
   }
@@ -118,8 +118,8 @@ class RecipeCommandTest extends BrowserTestBase {
    */
   private function assertCheckpointsExist(array $expected_labels): void {
     $checkpoints = \Drupal::service('config.checkpoints');
-    $labels = array_map(fn (Checkpoint $c) => $c->label, iterator_to_array($checkpoints));
-    $this->assertSame($expected_labels, array_values($labels));
+    $labels = \array_map(fn (Checkpoint $c) => $c->label, \iterator_to_array($checkpoints));
+    $this->assertSame($expected_labels, \array_values($labels));
   }
 
   public function testPassInput(): void {

@@ -60,18 +60,18 @@ final class SettingsEditor {
       }
       $variable_names['$' . $setting] = $setting;
     }
-    $contents = file_get_contents($settings_file);
+    $contents = \file_get_contents($settings_file);
     if ($contents !== FALSE) {
       // Initialize the contents for the settings.php file if it is empty.
-      if (trim($contents) === '') {
+      if (\trim($contents) === '') {
         $contents = "<?php\n";
       }
       // Step through each token in settings.php and replace any variables that
       // are in the passed-in array.
       $buffer = '';
       $state = 'default';
-      foreach (token_get_all($contents) as $token) {
-        if (is_array($token)) {
+      foreach (\token_get_all($contents) as $token) {
+        if (\is_array($token)) {
           [$type, $value] = $token;
         }
         else {
@@ -79,7 +79,7 @@ final class SettingsEditor {
           $value = $token;
         }
         // Do not operate on whitespace.
-        if (!in_array($type, [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], TRUE)) {
+        if (!\in_array($type, [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], TRUE)) {
           switch ($state) {
             case 'default':
               if ($type === T_VARIABLE && isset($variable_names[$value])) {
@@ -104,7 +104,7 @@ final class SettingsEditor {
 
             case 'array_index':
               if (self::isArrayIndex($type)) {
-                $index = trim($value, '\'"');
+                $index = \trim($value, '\'"');
                 $state = 'right_bracket';
               }
               else {
@@ -171,7 +171,7 @@ final class SettingsEditor {
       }
 
       // Write the new settings file.
-      if (file_put_contents($settings_file, $buffer) === FALSE) {
+      if (\file_put_contents($settings_file, $buffer) === FALSE) {
         throw new \Exception("Failed to modify '$settings_file'. Verify the file permissions.");
       }
       // In case any $settings variables were written, import them into the
@@ -208,8 +208,8 @@ final class SettingsEditor {
     $is_integer = $type === T_LNUMBER;
     $is_float = $type === T_DNUMBER;
     $is_string = $type === T_CONSTANT_ENCAPSED_STRING;
-    $is_boolean_or_null = $type === T_STRING && in_array(
-      strtoupper($value),
+    $is_boolean_or_null = $type === T_STRING && \in_array(
+      \strtoupper($value),
       ['TRUE', 'FALSE', 'NULL']
     );
     return $is_integer || $is_float || $is_string || $is_boolean_or_null;
@@ -242,7 +242,7 @@ final class SettingsEditor {
    *   The nested value of the setting being copied.
    */
   private static function setGlobal(mixed &$ref, array|object $variable): void {
-    if (is_object($variable)) {
+    if (\is_object($variable)) {
       $ref = $variable->value;
     }
     else {
@@ -266,7 +266,7 @@ final class SettingsEditor {
    */
   private static function exportSettingsToPhp(array|object $variable, string $variable_name): string {
     $return = '';
-    if (is_object($variable)) {
+    if (\is_object($variable)) {
       if (!empty($variable->required)) {
         $return .= self::exportSingleSettingToPhp($variable, "$variable_name = ", "\n");
       }
@@ -294,7 +294,7 @@ final class SettingsEditor {
    *   into settings.php.
    */
   private static function exportSingleSettingToPhp(object $variable, string $prefix = '', string $suffix = ''): string {
-    $return = $prefix . var_export($variable->value, TRUE) . ';';
+    $return = $prefix . \var_export($variable->value, TRUE) . ';';
     if (!empty($variable->comment)) {
       $return .= ' // ' . $variable->comment;
     }

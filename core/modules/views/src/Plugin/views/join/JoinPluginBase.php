@@ -286,7 +286,7 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
       $this->adjusted = $configuration['adjusted'];
     }
 
-    $this->extraOperator = strtoupper($configuration['extra_operator']);
+    $this->extraOperator = \strtoupper($configuration['extra_operator']);
     $this->type = $configuration['type'];
   }
 
@@ -338,22 +338,22 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
    *   The left table.
    */
   protected function joinAddExtra(&$arguments, &$condition, $table, SelectInterface $select_query, $left_table = NULL) {
-    if (is_array($this->extra)) {
+    if (\is_array($this->extra)) {
       $extras = [];
       foreach ($this->extra as $info) {
         $extras[] = $this->buildExtra($info, $arguments, $table, $select_query, $left_table);
       }
 
       if ($extras) {
-        if (count($extras) == 1) {
-          $condition .= ' AND ' . array_shift($extras);
+        if (\count($extras) == 1) {
+          $condition .= ' AND ' . \array_shift($extras);
         }
         else {
-          $condition .= ' AND (' . implode(' ' . $this->extraOperator . ' ', $extras) . ')';
+          $condition .= ' AND (' . \implode(' ' . $this->extraOperator . ' ', $extras) . ')';
         }
       }
     }
-    elseif ($this->extra && is_string($this->extra)) {
+    elseif ($this->extra && \is_string($this->extra)) {
       $condition .= " AND ($this->extra)";
     }
   }
@@ -383,7 +383,7 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
     // Figure out the table name. Remember, only use aliases provided
     // if at all possible.
     $join_table = '';
-    if (!array_key_exists('table', $info)) {
+    if (!\array_key_exists('table', $info)) {
       $join_table = $table['alias'] . '.';
     }
     elseif (isset($info['table'])) {
@@ -399,10 +399,10 @@ class JoinPluginBase extends PluginBase implements JoinPluginInterface {
 
     // Convert a single-valued array of values to the single-value case,
     // and transform from IN() notation to = notation.
-    if (is_array($info['value']) && count($info['value']) == 1) {
-      $info['value'] = array_shift($info['value']);
+    if (\is_array($info['value']) && \count($info['value']) == 1) {
+      $info['value'] = \array_shift($info['value']);
     }
-    if (is_array($info['value'])) {
+    if (\is_array($info['value'])) {
       // We use an SA-CORE-2014-005 conformant placeholder for our array
       // of values. Also, note that the 'IN' operator is implicit.
       // @see https://www.drupal.org/node/2401615.

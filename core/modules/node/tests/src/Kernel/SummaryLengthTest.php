@@ -92,7 +92,7 @@ class SummaryLengthTest extends KernelTestBase {
 
     // Render the node as a teaser.
     $content = $this->drupalBuildEntityView($node, 'teaser');
-    $this->assertLessThan(600, strlen($content['body'][0]['#markup']));
+    $this->assertLessThan(600, \strlen($content['body'][0]['#markup']));
     $this->setRawContent($renderer->renderRoot($content));
     // The string 'What is a Drupalism?' is between the 200th and 600th
     // characters of the node body, so it should be included if the summary is
@@ -111,7 +111,7 @@ class SummaryLengthTest extends KernelTestBase {
     // Render the node as a teaser again and check that the summary is now only
     // 200 characters in length and so does not include 'What is a Drupalism?'.
     $content = $this->drupalBuildEntityView($node, 'teaser');
-    $this->assertLessThan(200, strlen($content['body'][0]['#markup']));
+    $this->assertLessThan(200, \strlen($content['body'][0]['#markup']));
     $this->setRawContent($renderer->renderRoot($content));
     $this->assertText($node->label());
     $this->assertNoRaw($expected);

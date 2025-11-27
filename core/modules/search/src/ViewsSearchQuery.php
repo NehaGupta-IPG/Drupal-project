@@ -73,7 +73,7 @@ class ViewsSearchQuery extends SearchQuery {
     if ($condition['field'] instanceof ConditionInterface) {
       $conditions =& $condition['field']->conditions();
       foreach ($conditions as $key => &$subcondition) {
-        if (is_numeric($key)) {
+        if (\is_numeric($key)) {
           // As conditions can be nested, the function has to be called
           // recursively.
           $this->conditionReplaceString($search, $replace, $subcondition);
@@ -81,7 +81,7 @@ class ViewsSearchQuery extends SearchQuery {
       }
     }
     else {
-      $condition['field'] = str_replace($search, $replace, $condition['field']);
+      $condition['field'] = \str_replace($search, $replace, $condition['field']);
     }
   }
 

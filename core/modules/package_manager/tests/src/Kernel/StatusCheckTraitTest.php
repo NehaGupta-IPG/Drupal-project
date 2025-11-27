@@ -54,7 +54,7 @@ class StatusCheckTraitTest extends PackageManagerKernelTestBase {
 
     $excluded_paths_are_null = FALSE;
     $listener = function (StatusCheckEvent $event) use (&$excluded_paths_are_null): void {
-      $excluded_paths_are_null = is_null($event->excludedPaths);
+      $excluded_paths_are_null = \is_null($event->excludedPaths);
     };
     $this->addEventTestListener($listener, StatusCheckEvent::class);
 

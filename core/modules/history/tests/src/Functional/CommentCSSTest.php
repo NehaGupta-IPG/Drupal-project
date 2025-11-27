@@ -41,7 +41,7 @@ class CommentCSSTest extends CommentTestBase {
     parent::setUp();
 
     // Allow anonymous users to see comments.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments',
       'access content',
     ]);
@@ -112,7 +112,7 @@ class CommentCSSTest extends CommentTestBase {
         $this->assertSession()->elementsCount('xpath', '//*[contains(@class, "comment")]/*[@data-comment-timestamp="' . $comment->getChangedTime() . '"]', 1);
         $expectedJS = ($case['user'] !== 'anonymous');
         $settings = $this->getDrupalSettings();
-        $this->assertSame($expectedJS, isset($settings['ajaxPageState']['libraries']) && in_array('history/drupal.comment-new-indicator', explode(',', $settings['ajaxPageState']['libraries'])), 'drupal.comment-new-indicator library is present.');
+        $this->assertSame($expectedJS, isset($settings['ajaxPageState']['libraries']) && \in_array('history/drupal.comment-new-indicator', \explode(',', $settings['ajaxPageState']['libraries'])), 'drupal.comment-new-indicator library is present.');
       }
     }
   }

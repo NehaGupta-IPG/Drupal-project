@@ -80,7 +80,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
 
     // Make sure the information provided by a violation is correct.
     $violation = $violations[0];
-    $this->assertEquals(sprintf('The referenced entity (user: %s) does not exist.', $entity->id()), $violation->getMessage(), 'The message for invalid value is correct.');
+    $this->assertEquals(\sprintf('The referenced entity (user: %s) does not exist.', $entity->id()), $violation->getMessage(), 'The message for invalid value is correct.');
     $this->assertEquals($typed_data, $violation->getRoot(), 'Violation root is correct.');
   }
 
@@ -169,7 +169,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
 
     $violations = $referencing_entity->field_test->validate();
     $this->assertCount(1, $violations);
-    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $unpublished_node->id()), $violations[0]->getMessage());
+    $this->assertEquals(\sprintf('This entity (node: %s) cannot be referenced.', $unpublished_node->id()), $violations[0]->getMessage());
 
     // Now save the referencing entity which will create a pre-existing state
     // for it and repeat the checks. This time, the user without access should
@@ -218,7 +218,7 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
     $this->container->get('entity.memory_cache')->reset();
     $violations = $referencing_entity->field_test->validate();
     $this->assertCount(1, $violations);
-    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
+    $this->assertEquals(\sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
 
     // An invalid target was found, so the referencing entity had to be reloaded.
     $this->assertNotFalse($this->container->get('entity.memory_cache')->get('values:' . $referencing_entity->getEntityTypeId() . ':' . $referencing_entity->id()));
@@ -229,8 +229,8 @@ class ValidReferenceConstraintValidatorTest extends EntityKernelTestBase {
 
     $violations = $referencing_entity->field_test->validate();
     $this->assertCount(2, $violations);
-    $this->assertEquals(sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
-    $this->assertEquals(sprintf('The referenced entity (node: %s) does not exist.', $deleted_node->id()), $violations[1]->getMessage());
+    $this->assertEquals(\sprintf('This entity (node: %s) cannot be referenced.', $different_bundle_node->id()), $violations[0]->getMessage());
+    $this->assertEquals(\sprintf('The referenced entity (node: %s) does not exist.', $deleted_node->id()), $violations[1]->getMessage());
   }
 
 }

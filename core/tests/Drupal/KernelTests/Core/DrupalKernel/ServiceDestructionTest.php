@@ -71,7 +71,7 @@ class ServiceDestructionTest extends KernelTestBase {
     $this->enableModules(['service_provider_test']);
     $services = $this->container->getParameter('kernel.destructable_services');
     // Remove the core registered services for clarity.
-    $testable_services = array_values(array_diff($services, $core_services));
+    $testable_services = \array_values(\array_diff($services, $core_services));
 
     $this->assertSame([
       // Priority 100.

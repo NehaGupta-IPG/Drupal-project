@@ -7,7 +7,6 @@ namespace Drupal\Tests\Core\Render;
 use Drupal\Core\Render\Renderer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use function preg_replace;
 
 /**
  * Tests Drupal\Core\Render\Renderer.
@@ -73,7 +72,7 @@ class RendererDebugTest extends RendererTestBase {
 Test 1
 <!-- END RENDERER -->
 EOF;
-    $this->assertSame($expected, preg_replace('/RENDERING TIME: \d{1}.\d{9}/', 'RENDERING TIME: 0.123456789', $markup->__toString()));
+    $this->assertSame($expected, \preg_replace('/RENDERING TIME: \d{1}.\d{9}/', 'RENDERING TIME: 0.123456789', $markup->__toString()));
 
     $element = [
       '#cache' => [

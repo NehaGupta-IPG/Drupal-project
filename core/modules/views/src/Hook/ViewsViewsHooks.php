@@ -145,7 +145,7 @@ class ViewsViewsHooks {
     // Registers an action bulk form per entity.
     $all_actions = \Drupal::entityTypeManager()->getStorage('action')->loadMultiple();
     foreach (\Drupal::entityTypeManager()->getDefinitions() as $entity_type => $entity_info) {
-      $actions = array_filter($all_actions, function (ActionConfigEntityInterface $action) use ($entity_type) {
+      $actions = \array_filter($all_actions, function (ActionConfigEntityInterface $action) use ($entity_type) {
           return $action->getType() == $entity_type;
       });
       if (empty($actions)) {
@@ -181,7 +181,7 @@ class ViewsViewsHooks {
             $result = \Drupal::service('views.field_data_provider')->defaultFieldImplementation($field_storage);
           }
           $module_handler->alter('field_views_data', $result, $field_storage);
-          if (is_array($result)) {
+          if (\is_array($result)) {
             $data = NestedArray::mergeDeep($result, $data);
           }
           \Drupal::moduleHandler()->invoke($field_storage->getTypeProvider(), 'field_views_data_views_data_alter', [&$data, $field_storage]);
@@ -227,7 +227,7 @@ class ViewsViewsHooks {
           'label' => $this->t('@field_name: @label', $args),
           'group' => $entity_type->getLabel(),
           'help' => $this->t('Appears in: @bundles.', [
-            '@bundles' => implode(', ', $field_storage->getBundles()),
+            '@bundles' => \implode(', ', $field_storage->getBundles()),
           ]),
           'id' => 'standard',
           'base' => $target_base_table,

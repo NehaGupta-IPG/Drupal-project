@@ -251,7 +251,7 @@ class MockContainerInjection implements ContainerInjectionInterface {
 class NoInstantiationMockStaticCallable {
 
   public function __construct() {
-    throw new \Exception(sprintf('The class %s should not require instantiation for the static method to be called.', __CLASS__));
+    throw new \Exception(\sprintf('The class %s should not require instantiation for the static method to be called.', __CLASS__));
   }
 
   public static function staticMethod($suffix) {

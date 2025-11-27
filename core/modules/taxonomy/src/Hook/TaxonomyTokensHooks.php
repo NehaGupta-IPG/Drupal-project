@@ -142,7 +142,7 @@ class TaxonomyTokensHooks {
           case 'parent':
             $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
             if ($parents = $taxonomy_storage->loadParents($term->id())) {
-              $parent = array_pop($parents);
+              $parent = \array_pop($parents);
               $bubbleable_metadata->addCacheableDependency($parent);
               $replacements[$original] = $parent->getName();
             }
@@ -162,7 +162,7 @@ class TaxonomyTokensHooks {
       if ($vocabulary_tokens = $token_service->findWithPrefix($tokens, 'parent')) {
         $taxonomy_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
         if ($parents = $taxonomy_storage->loadParents($term->id())) {
-          $parent = array_pop($parents);
+          $parent = \array_pop($parents);
           $replacements += $token_service->generate('term', $vocabulary_tokens, ['term' => $parent], $options, $bubbleable_metadata);
         }
       }

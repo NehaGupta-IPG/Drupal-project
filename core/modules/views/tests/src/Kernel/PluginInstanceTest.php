@@ -88,7 +88,7 @@ class PluginInstanceTest extends ViewsKernelTestBase {
     }
 
     // Tests that the plugin list has not missed any types.
-    $diff = array_diff(array_keys($this->definitions), $this->pluginTypes);
+    $diff = \array_diff(\array_keys($this->definitions), $this->pluginTypes);
     $this->assertEmpty($diff, 'All plugins were found and matched.');
   }
 
@@ -115,7 +115,7 @@ class PluginInstanceTest extends ViewsKernelTestBase {
       // Get a plugin manager for this type.
       $manager = $this->container->get("plugin.manager.views.$type");
       foreach ($plugins as $id => $definition) {
-        if ($test_deprecated !== in_array($definition['class'], $this->deprecatedPlugins)) {
+        if ($test_deprecated !== \in_array($definition['class'], $this->deprecatedPlugins)) {
           continue;
         }
         // Get a reflection class for this plugin.

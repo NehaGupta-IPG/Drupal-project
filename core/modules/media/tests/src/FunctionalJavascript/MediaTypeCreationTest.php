@@ -30,7 +30,7 @@ class MediaTypeCreationTest extends MediaJavascriptTestBase {
     $assert_session = $this->assertSession();
 
     $label = 'Type with Default Field';
-    $mediaTypeMachineName = str_replace(' ', '_', strtolower($label));
+    $mediaTypeMachineName = \str_replace(' ', '_', \strtolower($label));
 
     $this->drupalGet('admin/structure/media/add');
 
@@ -69,7 +69,7 @@ class MediaTypeCreationTest extends MediaJavascriptTestBase {
     $assert_session = $this->assertSession();
 
     $label = 'Type with Default Field';
-    $mediaTypeMachineName = str_replace(' ', '_', strtolower($label));
+    $mediaTypeMachineName = \str_replace(' ', '_', \strtolower($label));
 
     $this->drupalGet('admin/structure/media/add');
 
@@ -113,7 +113,7 @@ class MediaTypeCreationTest extends MediaJavascriptTestBase {
     // Check that the field map options are sorted alphabetically.
     // Source field should not be included.
     $options = $this->xpath('//select[@name="field_map[attribute_1]"]/option');
-    $this->assertGreaterThanOrEqual(2, count($options));
+    $this->assertGreaterThanOrEqual(2, \count($options));
     $this->assertSame('- Skip field -', $options[0]->getText());
     $this->assertSame('Name', $options[1]->getText());
     // It should not be possible to map the source field.
@@ -135,10 +135,10 @@ class MediaTypeCreationTest extends MediaJavascriptTestBase {
     $vertical_tabs = $assert_session->elementExists('css', '.vertical-tabs', $form)->getOuterHtml();
     $date_field = $assert_session->fieldExists('Date', $form)->getOuterHtml();
     $published_checkbox = $assert_session->fieldExists('Published', $form)->getOuterHtml();
-    $this->assertGreaterThan(strpos($form_html, $name_field), strpos($form_html, $test_source_field));
-    $this->assertGreaterThan(strpos($form_html, $test_source_field), strpos($form_html, $vertical_tabs));
+    $this->assertGreaterThan(\strpos($form_html, $name_field), \strpos($form_html, $test_source_field));
+    $this->assertGreaterThan(\strpos($form_html, $test_source_field), \strpos($form_html, $vertical_tabs));
     // The "Published" checkbox should be the last element.
-    $this->assertGreaterThan(strpos($form_html, $date_field), strpos($form_html, $published_checkbox));
+    $this->assertGreaterThan(\strpos($form_html, $date_field), \strpos($form_html, $published_checkbox));
 
     // Check that a new type with the same machine name cannot be created.
     $this->drupalGet('admin/structure/media/add');
@@ -169,7 +169,7 @@ class MediaTypeCreationTest extends MediaJavascriptTestBase {
     $page->pressButton('Save');
 
     $label = 'Type reusing Default Field';
-    $mediaTypeMachineName = str_replace(' ', '_', strtolower($label));
+    $mediaTypeMachineName = \str_replace(' ', '_', \strtolower($label));
 
     $this->drupalGet('admin/structure/media/add');
 

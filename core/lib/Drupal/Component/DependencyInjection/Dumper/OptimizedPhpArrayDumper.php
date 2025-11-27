@@ -59,7 +59,7 @@ class OptimizedPhpArrayDumper extends Dumper {
    * {@inheritdoc}
    */
   public function dump(array $options = []): string|array {
-    return serialize($this->getArray());
+    return \serialize($this->getArray());
   }
 
   /**
@@ -134,7 +134,7 @@ class OptimizedPhpArrayDumper extends Dumper {
       // services are handled in ::getReferenceCall().
       if ($definition->isPublic()) {
         $service_definition = $this->getServiceDefinition($definition);
-        $services[$id] = $this->serialize ? serialize($service_definition) : $service_definition;
+        $services[$id] = $this->serialize ? \serialize($service_definition) : $service_definition;
       }
     }
 
@@ -155,7 +155,7 @@ class OptimizedPhpArrayDumper extends Dumper {
   protected function prepareParameters(array $parameters, $escape = TRUE) {
     $filtered = [];
     foreach ($parameters as $key => $value) {
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $value = $this->prepareParameters($value, $escape);
       }
 
@@ -178,11 +178,11 @@ class OptimizedPhpArrayDumper extends Dumper {
     $args = [];
 
     foreach ($parameters as $key => $value) {
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $args[$key] = $this->escape($value);
       }
-      elseif (is_string($value)) {
-        $args[$key] = str_replace('%', '%%', $value);
+      elseif (\is_string($value)) {
+        $args[$key] = \str_replace('%', '%%', $value);
       }
       else {
         $args[$key] = $value;
@@ -230,7 +230,7 @@ class OptimizedPhpArrayDumper extends Dumper {
     if ($definition->getArguments()) {
       $arguments = $definition->getArguments();
       $service['arguments'] = $this->dumpCollection($arguments);
-      $service['arguments_count'] = count($arguments);
+      $service['arguments_count'] = \count($arguments);
     }
     else {
       $service['arguments_count'] = 0;
@@ -306,7 +306,7 @@ class OptimizedPhpArrayDumper extends Dumper {
     $code = [];
 
     foreach ($collection as $key => $value) {
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $resolve_collection = FALSE;
         $code[$key] = $this->dumpCollection($value, $resolve_collection);
 
@@ -316,7 +316,7 @@ class OptimizedPhpArrayDumper extends Dumper {
       }
       else {
         $code[$key] = $this->dumpValue($value);
-        if (is_object($code[$key])) {
+        if (\is_object($code[$key])) {
           $resolve = TRUE;
         }
       }
@@ -342,7 +342,7 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   The processed callable.
    */
   protected function dumpCallable($callable) {
-    if (is_array($callable)) {
+    if (\is_array($callable)) {
       $callable[0] = $this->dumpValue($callable[0]);
       $callable = [$callable[0], $callable[1]];
     }
@@ -367,7 +367,7 @@ class OptimizedPhpArrayDumper extends Dumper {
   protected function getPrivateServiceCall($id, Definition $definition, $shared = FALSE) {
     $service_definition = $this->getServiceDefinition($definition);
     if (!$id) {
-      $hash = Crypt::hashBase64(serialize($service_definition));
+      $hash = Crypt::hashBase64(\serialize($service_definition));
       $id = 'private__' . $hash;
     }
     return (object) [
@@ -391,7 +391,7 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   When trying to dump object or resource.
    */
   protected function dumpValue($value) {
-    if (is_array($value)) {
+    if (\is_array($value)) {
       $code = [];
       foreach ($value as $k => $v) {
         $code[$k] = $this->dumpValue($v);
@@ -408,8 +408,8 @@ class OptimizedPhpArrayDumper extends Dumper {
     elseif ($value instanceof Parameter) {
       return $this->getParameterCall((string) $value);
     }
-    elseif (is_string($value) && str_contains($value, '%')) {
-      if (preg_match('/^%([^%]+)%$/', $value, $matches)) {
+    elseif (\is_string($value) && \str_contains($value, '%')) {
+      if (\preg_match('/^%([^%]+)%$/', $value, $matches)) {
         return $this->getParameterCall($matches[1]);
       }
       else {
@@ -421,7 +421,7 @@ class OptimizedPhpArrayDumper extends Dumper {
         // potentially not always be resolved in the dumpCollection() method.
         return (object) [
           'type' => 'raw',
-          'value' => str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $value)),
+          'value' => \str_replace('%%', '%', \preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $value)),
         ];
       }
     }
@@ -431,17 +431,17 @@ class OptimizedPhpArrayDumper extends Dumper {
     elseif ($value instanceof ServiceClosureArgument) {
       $reference = $value->getValues();
       /** @var \Symfony\Component\DependencyInjection\Reference $reference */
-      $reference = reset($reference);
+      $reference = \reset($reference);
 
       return $this->getServiceClosureCall((string) $reference, $reference->getInvalidBehavior());
     }
     elseif ($value instanceof IteratorArgument) {
       return $this->getIterator($value);
     }
-    elseif (is_object($value)) {
+    elseif (\is_object($value)) {
       throw new RuntimeException('Unable to dump a service container if a parameter is an object.');
     }
-    elseif (is_resource($value)) {
+    elseif (\is_resource($value)) {
       throw new RuntimeException('Unable to dump a service container if a parameter is a resource.');
     }
 
@@ -562,7 +562,7 @@ class OptimizedPhpArrayDumper extends Dumper {
   protected function getIterator(IteratorArgument $iterator) {
     return (object) [
       'type' => 'iterator',
-      'value' => array_map($this->dumpValue(...), $iterator->getValues()),
+      'value' => \array_map($this->dumpValue(...), $iterator->getValues()),
     ];
   }
 

@@ -79,7 +79,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
         'created',
         'date',
       ];
-      if (in_array($field_definition->getName(), $administrative_fields, TRUE)) {
+      if (\in_array($field_definition->getName(), $administrative_fields, TRUE)) {
         return AccessResult::allowedIfHasPermission($account, 'administer comments');
       }
 
@@ -102,7 +102,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
       /** @var \Drupal\comment\CommentInterface|null $entity */
       $entity = $items ? $items->getEntity() : NULL;
       $commented_entity = $entity ? $entity->getCommentedEntity() : NULL;
-      if ($entity && $entity->isNew() && in_array($field_definition->getName(), $create_only_fields, TRUE)) {
+      if ($entity && $entity->isNew() && \in_array($field_definition->getName(), $create_only_fields, TRUE)) {
         $access_result = AccessResult::allowedIfHasPermission($account, 'post comments')
           ->addCacheableDependency($entity);
         $comment_field_name = $entity->get('field_name')->value;
@@ -118,15 +118,15 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
       }
       // We are editing an existing comment - create only fields are now read
       // only.
-      $read_only_fields = array_merge($read_only_fields, $create_only_fields);
-      if (in_array($field_definition->getName(), $read_only_fields, TRUE)) {
+      $read_only_fields = \array_merge($read_only_fields, $create_only_fields);
+      if (\in_array($field_definition->getName(), $read_only_fields, TRUE)) {
         return AccessResult::forbidden();
       }
 
       // If the field is configured to accept anonymous contact details - admins
       // can edit name, homepage and mail. Anonymous users can also fill in the
       // fields on comment creation.
-      if (in_array($field_definition->getName(), ['name', 'mail', 'homepage'], TRUE)) {
+      if (\in_array($field_definition->getName(), ['name', 'mail', 'homepage'], TRUE)) {
         if (!$items) {
           // We cannot make a decision about access to edit these fields if we
           // don't have any items and therefore cannot determine the Comment

@@ -122,18 +122,18 @@ class SystemManager {
   public function listRequirements() {
     // Load .install files.
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
-    drupal_load_updates();
+    \drupal_load_updates();
 
     // Check run-time requirements and status information.
     $requirements = $this->moduleHandler->invokeAll('requirements', ['runtime']);
     $runtime_requirements = $this->moduleHandler->invokeAll('runtime_requirements');
-    $requirements = array_merge($requirements, $runtime_requirements);
+    $requirements = \array_merge($requirements, $runtime_requirements);
     $this->moduleHandler->alter('requirements', $requirements);
     $this->moduleHandler->alter('runtime_requirements', $requirements);
-    uasort($requirements, function ($a, $b) {
+    \uasort($requirements, function ($a, $b) {
       if (!isset($a['weight'])) {
         if (!isset($b['weight'])) {
-          return strcasecmp($a['title'], $b['title']);
+          return \strcasecmp($a['title'], $b['title']);
         }
         return -$b['weight'];
       }
@@ -160,7 +160,7 @@ class SystemManager {
    * @see https://www.drupal.org/node/3410939
    */
   public function getMaxSeverity(&$requirements) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . RequirementSeverity::class . '::maxSeverityFromRequirements() instead. See https://www.drupal.org/node/3410939', \E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . RequirementSeverity::class . '::maxSeverityFromRequirements() instead. See https://www.drupal.org/node/3410939', \E_USER_DEPRECATED);
     return RequirementSeverity::maxSeverityFromRequirements($requirements)->value;
   }
 
@@ -231,7 +231,7 @@ class SystemManager {
       $content[$key]['description'] = $link->getDescription();
       $content[$key]['url'] = $link->getUrlObject();
     }
-    ksort($content);
+    \ksort($content);
     return $content;
   }
 

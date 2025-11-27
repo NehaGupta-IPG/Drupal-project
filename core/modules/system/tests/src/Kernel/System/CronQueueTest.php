@@ -82,7 +82,7 @@ class CronQueueTest extends KernelTestBase {
     $this->assertEquals($this->currentTime, \Drupal::time()->getRequestTime());
 
     $realQueueFactory = $this->container->get('queue');
-    $queue_factory = $this->prophesize(get_class($realQueueFactory));
+    $queue_factory = $this->prophesize(\get_class($realQueueFactory));
     $database = new DatabaseQueue('cron_queue_test_database_delay_exception', $this->connection);
     $memory = new Memory('cron_queue_test_memory_delay_exception');
     $queue_factory->get('cron_queue_test_database_delay_exception', Argument::cetera())->willReturn($database);
@@ -137,7 +137,7 @@ class CronQueueTest extends KernelTestBase {
     // DelayedRequeueException has been thrown.
     $property = (new \ReflectionClass($memory))->getProperty('queue');
     $memory_queue_internal = $property->getValue($memory);
-    $this->assertEquals($this->currentTime + $memory_lease_time, reset($memory_queue_internal)->expire);
+    $this->assertEquals($this->currentTime + $memory_lease_time, \reset($memory_queue_internal)->expire);
   }
 
   /**
@@ -333,7 +333,7 @@ class CronQueueTest extends KernelTestBase {
    */
   public function testQueueWorkerDeriver(): void {
     $this->assertEquals(0, \Drupal::state()->get(CronQueueTestDeriverQueue::PLUGIN_ID, 0));
-    $queue = \Drupal::queue(sprintf('%s:foo', CronQueueTestDeriverQueue::PLUGIN_ID));
+    $queue = \Drupal::queue(\sprintf('%s:foo', CronQueueTestDeriverQueue::PLUGIN_ID));
     $queue->createItem('foo');
 
     $this->cron->run();
@@ -346,7 +346,7 @@ class CronQueueTest extends KernelTestBase {
    */
   public function register(ContainerBuilder $container): void {
     parent::register($container);
-    $container->register('test_logger', get_class($this->logger->reveal()))
+    $container->register('test_logger', \get_class($this->logger->reveal()))
       ->addTag('logger');
     $container->set('test_logger', $this->logger->reveal());
   }

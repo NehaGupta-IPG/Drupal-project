@@ -209,7 +209,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       // If the key matches an existing property set the value to the property
       // to set properties like isDefaultRevision.
       // @todo Should this be converted somehow?
-      if (property_exists($this, $key) && isset($value[LanguageInterface::LANGCODE_DEFAULT])) {
+      if (\property_exists($this, $key) && isset($value[LanguageInterface::LANGCODE_DEFAULT])) {
         $this->$key = $value[LanguageInterface::LANGCODE_DEFAULT];
       }
     }
@@ -217,12 +217,12 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $this->values = $values;
     foreach ($this->getEntityType()->getKeys() as $key => $field_name) {
       if (isset($this->values[$field_name])) {
-        if (is_array($this->values[$field_name])) {
+        if (\is_array($this->values[$field_name])) {
           // We store untranslatable fields into an entity key without using a
           // langcode key.
           if (!$this->getFieldDefinition($field_name)->isTranslatable()) {
             if (isset($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
-              if (is_array($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
+              if (\is_array($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT])) {
                 if (isset($this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT][0]['value'])) {
                   $this->entityKeys[$key] = $this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT][0]['value'];
                 }
@@ -238,7 +238,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
             // optimization, so we don't have to go through TypedData when we
             // need these values.
             foreach ($this->values[$field_name] as $langcode => $field_value) {
-              if (is_array($this->values[$field_name][$langcode])) {
+              if (\is_array($this->values[$field_name][$langcode])) {
                 if (isset($this->values[$field_name][$langcode][0]['value'])) {
                   $this->translatableEntityKeys[$key][$langcode] = $this->values[$field_name][$langcode][0]['value'];
                 }
@@ -501,7 +501,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         $data['status'] = static::TRANSLATION_EXISTING;
       }
     }
-    $this->translations = array_diff_key($this->translations, $removed);
+    $this->translations = \array_diff_key($this->translations, $removed);
 
     // Reset the new revision flag.
     $this->newRevision = FALSE;
@@ -824,7 +824,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // those values are currently cached, if so, reset it. Exclude the bundle
     // from that check, as it ready only and must not change, unsetting it could
     // lead to recursions.
-    foreach (array_keys($this->getEntityType()->getKeys(), $name, TRUE) as $key) {
+    foreach (\array_keys($this->getEntityType()->getKeys(), $name, TRUE) as $key) {
       if ($key != 'bundle') {
         if (isset($this->entityKeys[$key])) {
           unset($this->entityKeys[$key]);
@@ -1050,7 +1050,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function getTranslationLanguages($include_default = TRUE) {
-    $translations = array_filter($this->translations, function ($translation) {
+    $translations = \array_filter($this->translations, function ($translation) {
       return $translation['status'];
     });
     unset($translations[LanguageInterface::LANGCODE_DEFAULT]);
@@ -1060,7 +1060,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     }
 
     // Now load language objects based upon translation langcodes.
-    return array_intersect_key($this->getLanguages(), $translations);
+    return \array_intersect_key($this->getLanguages(), $translations);
   }
 
   /**
@@ -1312,8 +1312,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       // object keyed by language. To avoid creating different field objects
       // we retain just the original value, as references will be recreated
       // later as needed.
-      if (!$definitions[$name]->isTranslatable() && count($fields_by_langcode) > 1) {
-        $fields_by_langcode = array_intersect_key($fields_by_langcode, [LanguageInterface::LANGCODE_DEFAULT => TRUE]);
+      if (!$definitions[$name]->isTranslatable() && \count($fields_by_langcode) > 1) {
+        $fields_by_langcode = \array_intersect_key($fields_by_langcode, [LanguageInterface::LANGCODE_DEFAULT => TRUE]);
       }
       foreach ($fields_by_langcode as $langcode => $items) {
         $this->fields[$name][$langcode] = clone $items;
@@ -1494,7 +1494,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     }
 
     // If the current translation has just been added, we have a change.
-    $translated = count($this->translations) > 1;
+    $translated = \count($this->translations) > 1;
     if ($translated && !$original->hasTranslation($this->activeLangcode)) {
       return TRUE;
     }
@@ -1520,7 +1520,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     foreach ($this->getFieldDefinitions() as $field_name => $definition) {
       // @todo Avoid special-casing the following fields. See
       //   https://www.drupal.org/node/2329253.
-      if (in_array($field_name, $skip_fields, TRUE) || ($skip_untranslatable_fields && !$definition->isTranslatable())) {
+      if (\in_array($field_name, $skip_fields, TRUE) || ($skip_untranslatable_fields && !$definition->isTranslatable())) {
         continue;
       }
       $items = $this->get($field_name)->filterEmptyItems();

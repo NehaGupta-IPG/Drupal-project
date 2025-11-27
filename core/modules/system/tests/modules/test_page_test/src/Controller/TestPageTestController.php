@@ -35,7 +35,7 @@ class TestPageTestController {
    */
   public function testPageVarDump() {
     $role = Role::create(['id' => 'test_role', 'label' => 'Test role']);
-    dump($role);
+    \dump($role);
     return [
       '#title' => $this->t('Test page with var dump'),
       '#markup' => $this->t('Test page text.'),

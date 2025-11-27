@@ -30,7 +30,7 @@ class CommentTestBaseField extends EntityTest {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['test_comment'] = BaseFieldDefinition::create('comment')
-      ->setLabel(t('A comment field'))
+      ->setLabel(\t('A comment field'))
       ->setSetting('comment_type', 'test_comment_type')
       ->setDefaultValue([
         'status' => CommentItemInterface::OPEN,

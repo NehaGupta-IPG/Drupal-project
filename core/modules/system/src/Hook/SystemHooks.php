@@ -184,12 +184,12 @@ class SystemHooks {
   public function filetransferInfo(): array {
     $backends = [];
     // This is the default, will be available on most systems.
-    if (function_exists('ftp_connect')) {
+    if (\function_exists('ftp_connect')) {
       $backends['ftp'] = ['title' => $this->t('FTP'), 'class' => 'Drupal\Core\FileTransfer\FTP', 'weight' => 0];
     }
     // SSH2 lib connection is only available if the proper PHP extension is
     // installed.
-    if (function_exists('ssh2_connect')) {
+    if (\function_exists('ssh2_connect')) {
       $backends['ssh'] = ['title' => $this->t('SSH'), 'class' => 'Drupal\Core\FileTransfer\SSH', 'weight' => 20];
     }
     return $backends;
@@ -214,7 +214,7 @@ class SystemHooks {
     //   are being added in this AJAX Response.
     /** @var \Drupal\Core\Asset\LibraryDependencyResolver $library_dependency_resolver */
     $library_dependency_resolver = \Drupal::service('library.dependency_resolver');
-    if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()))) {
+    if (isset($settings['ajaxPageState']) || \in_array('core/drupal.ajax', $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries()))) {
       // Provide the page with information about the theme that's used, so that
       // a later AJAX request can be rendered using the same theme.
       // @see \Drupal\Core\Theme\AjaxBasePageNegotiator
@@ -256,7 +256,7 @@ class SystemHooks {
       'currentLanguage' => \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId(),
     ];
     if (!empty($current_query)) {
-      ksort($current_query);
+      \ksort($current_query);
       $path_settings['currentQuery'] = (object) $current_query;
     }
     // Only set core/drupalSettings values that haven't been set already.
@@ -276,8 +276,8 @@ class SystemHooks {
     if (!isset($settings['ajaxPageState'])) {
       $loaded_libraries = $library_dependency_resolver->getLibrariesWithDependencies($assets->getAlreadyLoadedLibraries());
     }
-    if (isset($settings['ajaxPageState']) || in_array('core/drupal.ajax', $loaded_libraries) || in_array('core/drupal.htmx', $loaded_libraries)) {
-      if (!defined('MAINTENANCE_MODE')) {
+    if (isset($settings['ajaxPageState']) || \in_array('core/drupal.ajax', $loaded_libraries) || \in_array('core/drupal.htmx', $loaded_libraries)) {
+      if (!\defined('MAINTENANCE_MODE')) {
         // The theme token is only validated when the theme requested is not the
         // default, so don't generate it unless necessary.
         // @see \Drupal\Core\Theme\AjaxBasePageNegotiator::determineActiveTheme()
@@ -288,9 +288,9 @@ class SystemHooks {
       }
       // Provide the page with information about the individual asset libraries
       // used, information not otherwise available when aggregation is enabled.
-      $minimal_libraries = $library_dependency_resolver->getMinimalRepresentativeSubset(array_unique(array_merge($assets->getLibraries(), $assets->getAlreadyLoadedLibraries())));
-      sort($minimal_libraries);
-      $settings['ajaxPageState']['libraries'] = implode(',', $minimal_libraries);
+      $minimal_libraries = $library_dependency_resolver->getMinimalRepresentativeSubset(\array_unique(\array_merge($assets->getLibraries(), $assets->getAlreadyLoadedLibraries())));
+      \sort($minimal_libraries);
+      $settings['ajaxPageState']['libraries'] = \implode(',', $minimal_libraries);
     }
   }
 
@@ -328,7 +328,7 @@ class SystemHooks {
     // Clean up any garbage in the queue service.
     $queue_worker_manager = \Drupal::service('plugin.manager.queue_worker');
     $queue_factory = \Drupal::service('queue');
-    foreach (array_keys($queue_worker_manager->getDefinitions()) as $queue_name) {
+    foreach (\array_keys($queue_worker_manager->getDefinitions()) as $queue_name) {
       $queue = $queue_factory->get($queue_name);
       if ($queue instanceof QueueGarbageCollectionInterface) {
         $queue->garbageCollection();
@@ -355,7 +355,7 @@ class SystemHooks {
     $context = $params['context'];
     $subject = PlainTextOutput::renderFromHtml($token_service->replace($context['subject'], $context));
     $body = $token_service->replace($context['message'], $context);
-    $message['subject'] .= str_replace(["\r", "\n"], '', $subject);
+    $message['subject'] .= \str_replace(["\r", "\n"], '', $subject);
     $message['body'][] = $body;
   }
 
@@ -405,7 +405,7 @@ class SystemHooks {
     // @todo Remove this when modules are able to maintain their revision metadata
     //   keys.
     //   @see https://www.drupal.org/project/drupal/issues/3074333
-    if (!in_array('workspaces', $modules, TRUE)) {
+    if (!\in_array('workspaces', $modules, TRUE)) {
       return;
     }
     $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
@@ -424,9 +424,9 @@ class SystemHooks {
   public function libraryInfoAlter(&$libraries, $extension): void {
     // If Claro is the admin theme but not the active theme, grant Claro the
     // ability to override the toolbar library with its own assets.
-    if ($extension === 'toolbar' && _system_is_claro_admin_and_not_active()) {
+    if ($extension === 'toolbar' && \_system_is_claro_admin_and_not_active()) {
       require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_system_module_invoked_library_info_alter($libraries, $extension);
+      \claro_system_module_invoked_library_info_alter($libraries, $extension);
     }
   }
 
@@ -437,9 +437,9 @@ class SystemHooks {
   public function themeRegistryAlter(array &$theme_registry): void {
     // If Claro is the admin theme but not the active theme, use Claro's toolbar
     // templates.
-    if (_system_is_claro_admin_and_not_active()) {
+    if (\_system_is_claro_admin_and_not_active()) {
       require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_system_module_invoked_theme_registry_alter($theme_registry);
+      \claro_system_module_invoked_theme_registry_alter($theme_registry);
     }
   }
 
@@ -499,25 +499,25 @@ class SystemHooks {
     if ($stream_wrapper_manager->isValidScheme($scheme)) {
       $target = $stream_wrapper_manager->getTarget($uri);
       if ($target !== FALSE) {
-        if (!in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
+        if (!\in_array($scheme, Settings::get('file_sa_core_2023_005_schemes', []))) {
           if (DIRECTORY_SEPARATOR !== '/') {
             $class = $stream_wrapper_manager->getClass($scheme);
-            if (is_subclass_of($class, LocalStream::class)) {
-              $target = str_replace(DIRECTORY_SEPARATOR, '/', $target);
+            if (\is_subclass_of($class, LocalStream::class)) {
+              $target = \str_replace(DIRECTORY_SEPARATOR, '/', $target);
             }
           }
-          $parts = explode('/', $target);
-          if (array_intersect($parts, ['.', '..'])) {
+          $parts = \explode('/', $target);
+          if (\array_intersect($parts, ['.', '..'])) {
             return -1;
           }
         }
       }
     }
     $core_schemes = ['public', 'private', 'temporary'];
-    $additional_public_schemes = array_diff(Settings::get('file_additional_public_schemes', []), $core_schemes);
+    $additional_public_schemes = \array_diff(Settings::get('file_additional_public_schemes', []), $core_schemes);
     if ($additional_public_schemes) {
       $scheme = StreamWrapperManager::getScheme($uri);
-      if (in_array($scheme, $additional_public_schemes, TRUE)) {
+      if (\in_array($scheme, $additional_public_schemes, TRUE)) {
         return ['Cache-Control' => 'public'];
       }
     }
@@ -529,7 +529,7 @@ class SystemHooks {
    */
   #[Hook('archiver_info_alter')]
   public function archiverInfoAlter(&$info): void {
-    if (!class_exists(\ZipArchive::class)) {
+    if (!\class_exists(\ZipArchive::class)) {
       // PHP Zip extension is missing.
       unset($info['Zip']);
     }
@@ -542,8 +542,8 @@ class SystemHooks {
    */
   #[Hook('entity_form_mode_presave')]
   public function systemEntityFormModePresave(EntityInterface $entity): void {
-    if ($entity->get('description') !== NULL && trim($entity->get('description')) === '') {
-      @trigger_error("Setting description to an empty string is deprecated in drupal:11.2.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452144", E_USER_DEPRECATED);
+    if ($entity->get('description') !== NULL && \trim($entity->get('description')) === '') {
+      @\trigger_error("Setting description to an empty string is deprecated in drupal:11.2.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452144", E_USER_DEPRECATED);
       $entity->set('description', NULL);
     }
   }

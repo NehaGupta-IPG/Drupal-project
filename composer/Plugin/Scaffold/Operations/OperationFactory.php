@@ -133,7 +133,7 @@ class OperationFactory {
       return FALSE;
     }
     $path = $file->fullPath();
-    return is_file($path) && (filesize($path) > 0);
+    return \is_file($path) && (\filesize($path) > 0);
   }
 
   /**
@@ -154,7 +154,7 @@ class OperationFactory {
       // This will respect the --working-dir option if Composer is invoked with
       // it. There is no API or method to determine the filesystem path of
       // a package's composer.json file.
-      return getcwd();
+      return \getcwd();
     }
     return $this->composer->getInstallationManager()->getInstallPath($package);
   }

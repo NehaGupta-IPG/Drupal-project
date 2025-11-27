@@ -48,7 +48,7 @@ class ComponentGenerator {
    * ComponentGenerator constructor.
    */
   public function __construct() {
-    $this->componentBaseDir = dirname(__DIR__, 2) . '/' . static::$relativeComponentPath;
+    $this->componentBaseDir = \dirname(__DIR__, 2) . '/' . static::$relativeComponentPath;
   }
 
   /**
@@ -108,14 +108,14 @@ class ComponentGenerator {
   protected function generateComponentPackage(Event $event, string $component_pathname): bool {
     $io = $event->getIO();
     $composer_json_path = $this->componentBaseDir . '/' . $component_pathname;
-    $original_composer_json = file_exists($composer_json_path) ? file_get_contents($composer_json_path) : '';
+    $original_composer_json = \file_exists($composer_json_path) ? \file_get_contents($composer_json_path) : '';
 
     // Modify the original data.
     $composer_json_data = $this->getPackage($io, $original_composer_json);
     $updated_composer_json = static::encode($composer_json_data);
 
     // Exit early if nothing changed.
-    if (trim($original_composer_json, " \t\r\0\x0B") === trim($updated_composer_json, " \t\r\0\x0B")) {
+    if (\trim($original_composer_json, " \t\r\0\x0B") === \trim($updated_composer_json, " \t\r\0\x0B")) {
       return FALSE;
     }
 
@@ -125,8 +125,8 @@ class ComponentGenerator {
 
     // Write the composer.json file back to disk.
     $fs = new Filesystem();
-    $fs->ensureDirectoryExists(dirname($composer_json_path));
-    file_put_contents($composer_json_path, $updated_composer_json);
+    $fs->ensureDirectoryExists(\dirname($composer_json_path));
+    \file_put_contents($composer_json_path, $updated_composer_json);
 
     return TRUE;
   }
@@ -143,8 +143,8 @@ class ComponentGenerator {
    *   Structured data to be turned back into JSON.
    */
   protected function getPackage(IOInterface $io, string $original_json): array {
-    $original_data = json_decode($original_json, TRUE);
-    $package_data = array_merge($original_data, $this->initialPackageMetadata());
+    $original_data = \json_decode($original_json, TRUE);
+    $package_data = \array_merge($original_data, $this->initialPackageMetadata());
 
     $core_info = $this->drupalCoreInfo->rootComposerJson();
 
@@ -154,7 +154,7 @@ class ComponentGenerator {
     $not_in_core = [];
 
     // Traverse required packages.
-    foreach (array_keys($original_data['require'] ?? []) as $package_name) {
+    foreach (\array_keys($original_data['require'] ?? []) as $package_name) {
       // Reconcile locked constraints from drupal/drupal. We might have a locked
       // version of a dependency that's not present in drupal/core.
       if ($info = $this->drupalProjectInfo->packageLockInfo($package_name)) {
@@ -162,7 +162,7 @@ class ComponentGenerator {
       }
       // The package wasn't in the lock file, which means we need to tell the
       // user. But there are some packages we want to exclude from this list.
-      elseif ($package_name !== 'php' && !str_contains($package_name, 'drupal/core-')) {
+      elseif ($package_name !== 'php' && !\str_contains($package_name, 'drupal/core-')) {
         $not_in_core[$package_name] = $package_name;
       }
 
@@ -174,7 +174,7 @@ class ComponentGenerator {
 
       // Reconcile dependencies on other Drupal components, so we can set the
       // constraint to our current version.
-      if (str_contains($package_name, 'drupal/core-')) {
+      if (\str_contains($package_name, 'drupal/core-')) {
         if ($stability === 'stable') {
           // Set the constraint to ^maj.min.
           $package_data['require'][$package_name] = SemanticVersion::majorMinorConstraint(\Drupal::VERSION);
@@ -192,7 +192,7 @@ class ComponentGenerator {
       }
     }
     if ($not_in_core) {
-      $io->error($package_data['name'] . ' requires packages not present in drupal/drupal: ' . implode(', ', $not_in_core));
+      $io->error($package_data['name'] . ' requires packages not present in drupal/drupal: ' . \implode(', ', $not_in_core));
     }
 
     return $package_data;
@@ -208,7 +208,7 @@ class ComponentGenerator {
    *   Encoded version of provided json data.
    */
   public static function encode(array $composer_json_data): string {
-    return json_encode($composer_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+    return \json_encode($composer_json_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
   }
 
   /**

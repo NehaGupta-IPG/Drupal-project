@@ -122,7 +122,7 @@ class WhoIsOnlineBlockTest extends KernelTestBase {
     $this->assertNoText($user3->getAccountName(), 'Inactive user not found in online list.');
     // Verify that online users are ordered correctly.
     $raw_content = (string) $this->getRawContent();
-    $this->assertGreaterThan(strpos($raw_content, $user2->getAccountName()), strpos($raw_content, $user1->getAccountName()));
+    $this->assertGreaterThan(\strpos($raw_content, $user2->getAccountName()), \strpos($raw_content, $user1->getAccountName()));
   }
 
 }

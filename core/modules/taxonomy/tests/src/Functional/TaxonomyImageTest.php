@@ -78,7 +78,7 @@ class TaxonomyImageTest extends TaxonomyTestBase {
     $this->drupalLogin($user);
 
     $files = $this->drupalGetTestFiles('image');
-    $image = array_pop($files);
+    $image = \array_pop($files);
 
     // Ensure that a file can be uploaded before taxonomy term has a name.
     $edit = [

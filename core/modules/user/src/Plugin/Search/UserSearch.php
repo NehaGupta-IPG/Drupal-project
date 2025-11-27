@@ -116,7 +116,7 @@ class UserSearch extends SearchPluginBase implements AccessibleInterface {
     // Escape for LIKE matching.
     $keys = $this->database->escapeLike($keys);
     // Replace wildcards with MySQL/PostgreSQL wildcards.
-    $keys = preg_replace('!\*+!', '%', $keys);
+    $keys = \preg_replace('!\*+!', '%', $keys);
 
     // Run the query to find matching users.
     $query = $this->database

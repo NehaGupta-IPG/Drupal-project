@@ -67,13 +67,13 @@ class InstallCommand extends Command {
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
     $io = new SymfonyStyle($input, $output);
-    if (!extension_loaded('pdo_sqlite')) {
+    if (!\extension_loaded('pdo_sqlite')) {
       $io->getErrorStyle()->error('You must have the pdo_sqlite PHP extension installed. See core/INSTALL.sqlite.txt for instructions.');
       return 1;
     }
 
     // Change the directory to the Drupal root.
-    chdir(dirname(__DIR__, 5));
+    \chdir(\dirname(__DIR__, 5));
 
     // Check whether there is already an installation.
     if ($this->isDrupalInstalled()) {
@@ -99,20 +99,20 @@ class InstallCommand extends Command {
       $recipe = $install_profile_or_recipe;
     }
     else {
-      $error_msg = sprintf("'%s' is not a valid install profile or recipe.", $install_profile_or_recipe);
+      $error_msg = \sprintf("'%s' is not a valid install profile or recipe.", $install_profile_or_recipe);
 
       // If it does not look like a path make suggestions based upon available
       // profiles.
-      if (!str_contains('/', $install_profile_or_recipe)) {
+      if (!\str_contains('/', $install_profile_or_recipe)) {
         $alternatives = [];
-        foreach (array_keys($this->getProfiles(TRUE, FALSE)) as $profile_name) {
-          $lev = levenshtein($install_profile_or_recipe, $profile_name);
-          if ($lev <= strlen($profile_name) / 4 || str_contains($profile_name, $install_profile_or_recipe)) {
+        foreach (\array_keys($this->getProfiles(TRUE, FALSE)) as $profile_name) {
+          $lev = \levenshtein($install_profile_or_recipe, $profile_name);
+          if ($lev <= \strlen($profile_name) / 4 || \str_contains($profile_name, $install_profile_or_recipe)) {
             $alternatives[] = $profile_name;
           }
         }
         if (!empty($alternatives)) {
-          $error_msg .= sprintf(" Did you mean '%s'?", implode("' or '", $alternatives));
+          $error_msg .= \sprintf(" Did you mean '%s'?", \implode("' or '", $alternatives));
         }
       }
       $io->getErrorStyle()->error($error_msg);
@@ -210,19 +210,19 @@ class InstallCommand extends Command {
 
     // Create the directory and settings.php if not there so that the installer
     // works.
-    if (!is_dir($site_path)) {
+    if (!\is_dir($site_path)) {
       if ($io->isVerbose()) {
         $io->writeln("Creating directory: $site_path");
       }
-      if (!mkdir($site_path, 0775)) {
+      if (!\mkdir($site_path, 0775)) {
         throw new \RuntimeException("Failed to create directory $site_path");
       }
     }
-    if (!file_exists("{$site_path}/settings.php")) {
+    if (!\file_exists("{$site_path}/settings.php")) {
       if ($io->isVerbose()) {
         $io->writeln("Creating file: {$site_path}/settings.php");
       }
-      if (!copy('sites/default/default.settings.php', "{$site_path}/settings.php")) {
+      if (!\copy('sites/default/default.settings.php', "{$site_path}/settings.php")) {
         throw new \RuntimeException("Copying sites/default/default.settings.php to {$site_path}/settings.php failed.");
       }
     }
@@ -230,25 +230,25 @@ class InstallCommand extends Command {
     require_once 'core/includes/install.core.inc';
 
     $progress_bar = $io->createProgressBar();
-    install_drupal($class_loader, $parameters, function ($install_state) use ($progress_bar) {
+    \install_drupal($class_loader, $parameters, function ($install_state) use ($progress_bar) {
       static $started = FALSE;
       if (!$started) {
         $started = TRUE;
         // We've already done 1.
         $progress_bar->setFormat("%current%/%max% [%bar%]\n%message%\n");
-        $progress_bar->setMessage($this->t('Installing @drupal', ['@drupal' => drupal_install_profile_distribution_name()]));
-        $tasks = install_tasks($install_state);
-        $progress_bar->start(count($tasks) + 1);
+        $progress_bar->setMessage($this->t('Installing @drupal', ['@drupal' => \drupal_install_profile_distribution_name()]));
+        $tasks = \install_tasks($install_state);
+        $progress_bar->start(\count($tasks) + 1);
       }
-      $tasks_to_perform = install_tasks_to_perform($install_state);
-      $task = current($tasks_to_perform);
+      $tasks_to_perform = \install_tasks_to_perform($install_state);
+      $task = \current($tasks_to_perform);
       if (isset($task['display_name'])) {
         $progress_bar->setMessage($task['display_name']);
       }
       $progress_bar->advance();
     });
     $success_message = $this->t('Congratulations, you installed @drupal!', [
-      '@drupal' => drupal_install_profile_distribution_name(),
+      '@drupal' => \drupal_install_profile_distribution_name(),
       '@name' => 'admin',
       '@pass' => $password,
     ], ['langcode' => $langcode]);
@@ -271,7 +271,7 @@ class InstallCommand extends Command {
    *   The site path to use.
    */
   protected function getSitePath() {
-    return getenv('DRUPAL_DEV_SITE_PATH') ?: 'sites/default';
+    return \getenv('DRUPAL_DEV_SITE_PATH') ?: 'sites/default';
   }
 
   /**
@@ -290,12 +290,12 @@ class InstallCommand extends Command {
     $profiles = $this->getProfiles();
 
     // If there is a distribution there will be only one profile.
-    if (count($profiles) == 1) {
-      return key($profiles);
+    if (\count($profiles) == 1) {
+      return \key($profiles);
     }
     // Display alphabetically by human-readable name, but always put the core
     // profiles first (if they are present in the filesystem).
-    natcasesort($profiles);
+    \natcasesort($profiles);
     if (isset($profiles['minimal'])) {
       // If the expert ("Minimal") core profile is present, put it in front of
       // any non-core profiles rather than including it with them
@@ -309,8 +309,8 @@ class InstallCommand extends Command {
       // so we want it to always appear at the top.
       $profiles = ['standard' => $profiles['standard']] + $profiles;
     }
-    reset($profiles);
-    return $io->choice('Select an installation profile', $profiles, current($profiles));
+    \reset($profiles);
+    return $io->choice('Select an installation profile', $profiles, \current($profiles));
   }
 
   /**
@@ -325,7 +325,7 @@ class InstallCommand extends Command {
   protected function validateProfile($install_profile): bool {
     // Allow people to install hidden and non-distribution profiles if they
     // supply the argument.
-    return array_key_exists($install_profile, $this->getProfiles(TRUE, FALSE));
+    return \array_key_exists($install_profile, $this->getProfiles(TRUE, FALSE));
   }
 
   /**
@@ -340,7 +340,7 @@ class InstallCommand extends Command {
   protected function validateRecipe(string $recipe): bool {
     // It is impossible to validate a recipe fully at this point because that
     // requires a container.
-    if (!is_dir($recipe) || !is_file($recipe . '/recipe.yml')) {
+    if (!\is_dir($recipe) || !\is_file($recipe . '/recipe.yml')) {
       return FALSE;
     }
     return TRUE;
@@ -359,10 +359,10 @@ class InstallCommand extends Command {
    */
   protected function getProfiles($include_hidden = FALSE, $auto_select_distributions = TRUE) {
     // Build a list of all available profiles.
-    $listing = new ExtensionDiscovery(getcwd(), FALSE);
+    $listing = new ExtensionDiscovery(\getcwd(), FALSE);
     $listing->setProfileDirectories([]);
     $profiles = [];
-    $info_parser = new InfoParserDynamic(getcwd());
+    $info_parser = new InfoParserDynamic(\getcwd());
     foreach ($listing->scan('profile') as $profile) {
       $details = $info_parser->parse($profile->getPathname());
       // Don't show hidden profiles.

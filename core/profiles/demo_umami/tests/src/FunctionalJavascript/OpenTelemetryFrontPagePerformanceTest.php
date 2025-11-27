@@ -44,7 +44,7 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     // response tasks run in different orders each time.
     $this->drupalGet('<front>');
     $this->drupalGet('<front>');
-    sleep(2);
+    \sleep(2);
     $this->clearCaches();
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('<front>');
@@ -113,7 +113,7 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
   protected function testFrontPageCoolCache(): void {
     // First of all visit the front page to ensure the image style exists.
     $this->drupalGet('<front>');
-    sleep(2);
+    \sleep(2);
     $this->clearCaches();
     // Now visit a different page to warm non-route-specific caches.
     $this->drupalGet('user/login');

@@ -33,21 +33,21 @@ abstract class DateElementBase extends FormElementBase {
   protected static function datetimeRangeYears($string, $date = NULL) {
     $datetime = new DrupalDateTime();
     $this_year = $datetime->format('Y');
-    [$min_year, $max_year] = explode(':', $string);
+    [$min_year, $max_year] = \explode(':', $string);
 
     // Valid patterns would be -5:+5, 0:+1, 2008:2010.
     $plus_pattern = '@[\+|\-][0-9]{1,4}@';
     $year_pattern = '@^[0-9]{4}@';
-    if (!preg_match($year_pattern, $min_year, $matches)) {
-      if (preg_match($plus_pattern, $min_year, $matches)) {
+    if (!\preg_match($year_pattern, $min_year, $matches)) {
+      if (\preg_match($plus_pattern, $min_year, $matches)) {
         $min_year = $this_year + $matches[0];
       }
       else {
         $min_year = $this_year;
       }
     }
-    if (!preg_match($year_pattern, $max_year, $matches)) {
-      if (preg_match($plus_pattern, $max_year, $matches)) {
+    if (!\preg_match($year_pattern, $max_year, $matches)) {
+      if (\preg_match($plus_pattern, $max_year, $matches)) {
         $max_year = $this_year + $matches[0];
       }
       else {
@@ -64,8 +64,8 @@ abstract class DateElementBase extends FormElementBase {
     // If there is a current value, stretch the range to include it.
     $value_year = $date instanceof DrupalDateTime ? $date->format('Y') : '';
     if (!empty($value_year)) {
-      $min_year = min($value_year, $min_year);
-      $max_year = max($value_year, $max_year);
+      $min_year = \min($value_year, $min_year);
+      $max_year = \max($value_year, $max_year);
     }
     return [$min_year, $max_year];
   }
@@ -92,7 +92,7 @@ abstract class DateElementBase extends FormElementBase {
     }
     else {
       $parents = $element['#array_parents'];
-      array_pop($parents);
+      \array_pop($parents);
       $parent_element = NestedArray::getValue($complete_form, $parents);
       if (!empty($parent_element['#title'])) {
         $title = $parent_element['#title'];

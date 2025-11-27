@@ -241,7 +241,7 @@ class VariationCacheTest extends UnitTestCase {
     ];
 
     foreach ($possible_outcomes as $cache_context_values => $data) {
-      [$this->housingType, $this->gardenType, $this->houseOrientation] = explode('|', $cache_context_values . '||');
+      [$this->housingType, $this->gardenType, $this->houseOrientation] = \explode('|', $cache_context_values . '||');
 
       $cacheability = $this->housingTypeCacheability;
       if (!empty($this->houseOrientation)) {
@@ -292,7 +292,7 @@ class VariationCacheTest extends UnitTestCase {
     ];
 
     foreach ($possible_outcomes as $cache_context_values => $data) {
-      [$this->housingType, $this->gardenType, $this->houseOrientation] = explode('|', $cache_context_values . '||');
+      [$this->housingType, $this->gardenType, $this->houseOrientation] = \explode('|', $cache_context_values . '||');
       $this->setVariationCacheItem($data, $this->houseOrientationCacheability, $this->housingTypeCacheability);
     }
 
@@ -308,7 +308,7 @@ class VariationCacheTest extends UnitTestCase {
 
     // Verify that the previously set outcomes are all inaccessible now.
     foreach ($possible_outcomes as $cache_context_values => $data) {
-      [$this->housingType, $this->gardenType, $this->houseOrientation] = explode('|', $cache_context_values . '||');
+      [$this->housingType, $this->gardenType, $this->houseOrientation] = \explode('|', $cache_context_values . '||');
       $this->assertVariationCacheMiss($this->housingTypeCacheability);
     }
 
@@ -317,7 +317,7 @@ class VariationCacheTest extends UnitTestCase {
 
     // Verify that the previously set outcomes are all accessible again.
     foreach ($possible_outcomes as $cache_context_values => $data) {
-      [$this->housingType, $this->gardenType, $this->houseOrientation] = explode('|', $cache_context_values . '||');
+      [$this->housingType, $this->gardenType, $this->houseOrientation] = \explode('|', $cache_context_values . '||');
       $this->assertVariationCacheItem($data, $this->houseOrientationCacheability, $this->housingTypeCacheability);
     }
 
@@ -434,7 +434,7 @@ class VariationCacheTest extends UnitTestCase {
   public function testIncompleteRedirectException(): void {
     // @todo Remove in Drupal 12.0.0. For more information, see:
     //   https://www.drupal.org/project/drupal/issues/3468921
-    set_error_handler(static function (int $errno, string $errstr): never {
+    \set_error_handler(static function (int $errno, string $errstr): never {
       throw new \LogicException($errstr, $errno);
     }, E_USER_WARNING);
 
@@ -464,7 +464,7 @@ class VariationCacheTest extends UnitTestCase {
       $this->setVariationCacheItem('You have a house with a baroque garden!', $garden_cacheability, $house_cacheability);
     }
     finally {
-      restore_error_handler();
+      \restore_error_handler();
     }
   }
 
@@ -477,7 +477,7 @@ class VariationCacheTest extends UnitTestCase {
   public function testIncompatibleRedirectsException(): void {
     // @todo Remove in Drupal 12.0.0. For more information, see:
     //   https://www.drupal.org/project/drupal/issues/3468921
-    set_error_handler(static function (int $errno, string $errstr): never {
+    \set_error_handler(static function (int $errno, string $errstr): never {
       throw new \LogicException($errstr, $errno);
     }, E_USER_WARNING);
 
@@ -506,7 +506,7 @@ class VariationCacheTest extends UnitTestCase {
       $this->setVariationCacheItem('You have a nice north-facing house!', $orientation_cacheability, $house_cacheability);
     }
     finally {
-      restore_error_handler();
+      \restore_error_handler();
     }
   }
 
@@ -520,7 +520,7 @@ class VariationCacheTest extends UnitTestCase {
   public function testIncompatibleChainedRedirectsException(): void {
     // @todo Remove in Drupal 12.0.0. For more information, see:
     //   https://www.drupal.org/project/drupal/issues/3468921
-    set_error_handler(static function (int $errno, string $errstr): never {
+    \set_error_handler(static function (int $errno, string $errstr): never {
       throw new \LogicException($errstr, $errno);
     }, E_USER_WARNING);
 
@@ -554,7 +554,7 @@ class VariationCacheTest extends UnitTestCase {
       $this->setVariationCacheItem('You have a nice house with solar panels and a garden!', $solar_cacheability, $house_cacheability);
     }
     finally {
-      restore_error_handler();
+      \restore_error_handler();
     }
   }
 
@@ -568,7 +568,7 @@ class VariationCacheTest extends UnitTestCase {
   public function testIncompatibleChainedRedirectsComplexException(): void {
     // @todo Remove in Drupal 12.0.0. For more information, see:
     //   https://www.drupal.org/project/drupal/issues/3468921
-    set_error_handler(static function (int $errno, string $errstr): never {
+    \set_error_handler(static function (int $errno, string $errstr): never {
       throw new \LogicException($errstr, $errno);
     }, E_USER_WARNING);
 
@@ -604,7 +604,7 @@ class VariationCacheTest extends UnitTestCase {
       $this->setVariationCacheItem('You have a nice house with solar panels and a garden!', $solar_cacheability, $house_cacheability);
     }
     finally {
-      restore_error_handler();
+      \restore_error_handler();
     }
   }
 
@@ -621,9 +621,9 @@ class VariationCacheTest extends UnitTestCase {
    *   The correct cache ID.
    */
   protected function getSortedCacheId($cache_id_parts): string {
-    sort($cache_id_parts);
-    array_unshift($cache_id_parts, $this->cacheIdBase);
-    return implode(':', $cache_id_parts);
+    \sort($cache_id_parts);
+    \array_unshift($cache_id_parts, $this->cacheIdBase);
+    return \implode(':', $cache_id_parts);
   }
 
   /**

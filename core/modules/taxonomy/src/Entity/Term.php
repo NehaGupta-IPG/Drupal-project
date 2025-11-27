@@ -153,10 +153,10 @@ class Term extends EditorialContentEntityBase implements TermInterface {
     //   https://www.drupal.org/project/drupal/issues/2936864.
     $fields['status']->getItemDefinition()->setClass(StatusItem::class);
 
-    $fields['tid']->setLabel(t('Term ID'))
-      ->setDescription(t('The term ID.'));
+    $fields['tid']->setLabel(\t('Term ID'))
+      ->setDescription(\t('The term ID.'));
 
-    $fields['uuid']->setDescription(t('The term UUID.'));
+    $fields['uuid']->setDescription(\t('The term UUID.'));
 
     $fields['status']
       ->setDisplayOptions('form', [
@@ -168,13 +168,13 @@ class Term extends EditorialContentEntityBase implements TermInterface {
       ])
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['vid']->setLabel(t('Vocabulary'))
-      ->setDescription(t('The vocabulary to which the term is assigned.'));
+    $fields['vid']->setLabel(\t('Vocabulary'))
+      ->setDescription(\t('The vocabulary to which the term is assigned.'));
 
-    $fields['langcode']->setDescription(t('The term language code.'));
+    $fields['langcode']->setDescription(\t('The term language code.'));
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
+      ->setLabel(\t('Name'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setRequired(TRUE)
@@ -191,7 +191,7 @@ class Term extends EditorialContentEntityBase implements TermInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['description'] = BaseFieldDefinition::create('text_long')
-      ->setLabel(t('Description'))
+      ->setLabel(\t('Description'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE)
       ->setDisplayOptions('view', [
@@ -207,19 +207,19 @@ class Term extends EditorialContentEntityBase implements TermInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Weight'))
-      ->setDescription(t('The weight of this term in relation to other terms.'))
+      ->setLabel(\t('Weight'))
+      ->setDescription(\t('The weight of this term in relation to other terms.'))
       ->setDefaultValue(0);
 
     $fields['parent'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Term Parents'))
-      ->setDescription(t('The parents of this term.'))
+      ->setLabel(\t('Term Parents'))
+      ->setDescription(\t('The parents of this term.'))
       ->setSetting('target_type', 'taxonomy_term')
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the term was last edited.'))
+      ->setLabel(\t('Changed'))
+      ->setDescription(\t('The time that the term was last edited.'))
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
 

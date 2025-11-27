@@ -91,8 +91,8 @@ class Query extends QueryBase implements QueryInterface {
     foreach ($this->sort as $sort) {
       $direction = $sort['direction'] == 'ASC' ? -1 : 1;
       $field = $sort['field'];
-      uasort($result, function ($a, $b) use ($field, $direction) {
-        $properties = explode('.', $field);
+      \uasort($result, function ($a, $b) use ($field, $direction) {
+        $properties = \explode('.', $field);
         foreach ($properties as $property) {
           if (isset($a[$property]) || isset($b[$property])) {
             $a = $a[$property] ?? NULL;
@@ -107,10 +107,10 @@ class Query extends QueryBase implements QueryInterface {
     $this->initializePager();
 
     if ($this->range) {
-      $result = array_slice($result, $this->range['start'], $this->range['length'], TRUE);
+      $result = \array_slice($result, $this->range['start'], $this->range['length'], TRUE);
     }
     if ($this->count) {
-      return count($result);
+      return \count($result);
     }
 
     // Create the expected structure of entity_id => entity_id. Config
@@ -129,7 +129,7 @@ class Query extends QueryBase implements QueryInterface {
    */
   protected function loadRecords() {
     $prefix = $this->entityType->getConfigPrefix() . '.';
-    $prefix_length = strlen($prefix);
+    $prefix_length = \strlen($prefix);
 
     // Search the conditions for restrictions on configuration object names.
     $filter_by_names = [];
@@ -140,22 +140,22 @@ class Query extends QueryBase implements QueryInterface {
       $lookup_keys = $this->entityType->getLookupKeys();
       $conditions = $this->condition->conditions();
       foreach ($conditions as $condition_key => $condition) {
-        $operator = $condition['operator'] ?: (is_array($condition['value']) ? 'IN' : '=');
-        if (is_string($condition['field']) && ($operator == 'IN' || $operator == '=')) {
+        $operator = $condition['operator'] ?: (\is_array($condition['value']) ? 'IN' : '=');
+        if (\is_string($condition['field']) && ($operator == 'IN' || $operator == '=')) {
           // Special case ID lookups.
           if ($condition['field'] == $id_key) {
             $has_added_restrictions = TRUE;
             $ids = (array) $condition['value'];
-            $filter_by_names[] = array_map(static function ($id) use ($prefix) {
+            $filter_by_names[] = \array_map(static function ($id) use ($prefix) {
               return $prefix . $id;
             }, $ids);
           }
-          elseif (in_array($condition['field'], $lookup_keys)) {
+          elseif (\in_array($condition['field'], $lookup_keys)) {
             $has_added_restrictions = TRUE;
             // If we don't find anything then there are no matches. No point in
             // listing anything.
             $keys = (array) $condition['value'];
-            $keys = array_map(static function ($value) use ($condition) {
+            $keys = \array_map(static function ($value) use ($condition) {
               return $condition['field'] . ':' . $value;
             }, $keys);
             foreach ($this->getConfigKeyStore()->getMultiple($keys) as $list) {
@@ -185,7 +185,7 @@ class Query extends QueryBase implements QueryInterface {
       $filter_by_names = $this->configFactory->listAll($prefix);
     }
     else {
-      $filter_by_names = array_merge(...$filter_by_names);
+      $filter_by_names = \array_merge(...$filter_by_names);
     }
     // In case we have an ID condition, try to narrow down the list of config
     // objects to load.
@@ -195,41 +195,41 @@ class Query extends QueryBase implements QueryInterface {
       switch ($id_condition['operator']) {
         case '<>':
           $filter = static function ($name) use ($value, $prefix_length) {
-            $id = substr($name, $prefix_length);
+            $id = \substr($name, $prefix_length);
             return $id !== $value;
           };
           break;
 
         case 'STARTS_WITH':
           $filter = static function ($name) use ($value, $prefix_length) {
-            $id = substr($name, $prefix_length);
-            return str_starts_with($id, $value);
+            $id = \substr($name, $prefix_length);
+            return \str_starts_with($id, $value);
           };
           break;
 
         case 'CONTAINS':
           $filter = static function ($name) use ($value, $prefix_length) {
-            $id = substr($name, $prefix_length);
-            return str_contains($id, $value);
+            $id = \substr($name, $prefix_length);
+            return \str_contains($id, $value);
           };
           break;
 
         case 'ENDS_WITH':
           $filter = static function ($name) use ($value, $prefix_length) {
-            $id = substr($name, $prefix_length);
-            return str_ends_with($id, $value);
+            $id = \substr($name, $prefix_length);
+            return \str_ends_with($id, $value);
           };
           break;
       }
       if ($filter) {
-        $filter_by_names = array_filter($filter_by_names, $filter);
+        $filter_by_names = \array_filter($filter_by_names, $filter);
       }
     }
 
     // Load the corresponding records.
     $records = [];
     foreach ($this->configFactory->loadMultiple($filter_by_names) as $config) {
-      $records[substr($config->getName(), $prefix_length)] = $config->get();
+      $records[\substr($config->getName(), $prefix_length)] = $config->get();
     }
     return $records;
   }

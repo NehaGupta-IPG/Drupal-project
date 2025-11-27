@@ -171,7 +171,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
     // that a complete field definition is passed to the various hooks and
     // written to config.
     $default_settings = $field_type_manager->getDefaultFieldSettings($storage_definition->getType());
-    $this->settings = array_intersect_key($this->settings, $default_settings) + $default_settings;
+    $this->settings = \array_intersect_key($this->settings, $default_settings) + $default_settings;
 
     if ($this->isNew()) {
       // Notify the entity storage.
@@ -238,7 +238,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
     parent::postDelete($storage, $fields);
     // If this is part of a configuration synchronization then the following
     // configuration updates are not necessary.
-    $entity = reset($fields);
+    $entity = \reset($fields);
     if ($entity->isSyncing()) {
       return;
     }

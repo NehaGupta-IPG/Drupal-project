@@ -39,7 +39,7 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
 
     $this->assertFalse($this->defaultPluginCollection->has($this->randomMachineName()), 'Nonexistent plugin found.');
 
-    foreach (array_keys($definitions) as $plugin_id) {
+    foreach (\array_keys($definitions) as $plugin_id) {
       $this->assertTrue($this->defaultPluginCollection->has($plugin_id));
     }
   }
@@ -115,18 +115,18 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
     $expected = ['banana', 'cherry', 'apple'];
 
     $config = $this->defaultPluginCollection->getConfiguration();
-    $this->assertSame($expected, array_keys($config), 'The order of the configuration is unchanged.');
+    $this->assertSame($expected, \array_keys($config), 'The order of the configuration is unchanged.');
 
     $ids = $this->defaultPluginCollection->getInstanceIds();
-    $this->assertSame($expected, array_keys($ids), 'The order of the instances is unchanged.');
+    $this->assertSame($expected, \array_keys($ids), 'The order of the instances is unchanged.');
 
     $this->defaultPluginCollection->sort();
     $config = $this->defaultPluginCollection->getConfiguration();
-    $this->assertSame($expected, array_keys($config), 'After sorting, the order of the configuration is unchanged.');
+    $this->assertSame($expected, \array_keys($config), 'After sorting, the order of the configuration is unchanged.');
 
     $ids = $this->defaultPluginCollection->getInstanceIds();
-    sort($expected);
-    $this->assertSame($expected, array_keys($ids), 'After sorting, the order of the instances is also sorted.');
+    \sort($expected);
+    $this->assertSame($expected, \array_keys($ids), 'After sorting, the order of the instances is also sorted.');
   }
 
   /**
@@ -144,7 +144,7 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
     $this->defaultPluginCollection->addInstanceId('apple');
     $result = $this->defaultPluginCollection->getInstanceIds();
     $this->assertSame($expected, $result);
-    $this->assertSame($expected, array_intersect_key($result, $this->defaultPluginCollection->getConfiguration()));
+    $this->assertSame($expected, \array_intersect_key($result, $this->defaultPluginCollection->getConfiguration()));
 
     $expected = [
       'cherry' => 'cherry',
@@ -156,7 +156,7 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
 
     $result = $this->defaultPluginCollection->getInstanceIds();
     $this->assertSame($expected, $result);
-    $this->assertSame($expected, array_intersect_key($result, $this->defaultPluginCollection->getConfiguration()));
+    $this->assertSame($expected, \array_intersect_key($result, $this->defaultPluginCollection->getConfiguration()));
   }
 
   /**
@@ -260,7 +260,7 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
       'cherry2',
     ];
     $config = $this->defaultPluginCollection->getConfiguration();
-    $this->assertSame($expected, array_keys($config));
+    $this->assertSame($expected, \array_keys($config));
   }
 
   /**

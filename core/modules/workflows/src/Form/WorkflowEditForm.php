@@ -110,7 +110,7 @@ class WorkflowEditForm extends EntityForm {
       );
     }
 
-    $state_weight_delta = round(count($states) / 2);
+    $state_weight_delta = \round(\count($states) / 2);
     foreach ($states as $state) {
       $links = [
         'edit' => [
@@ -176,7 +176,7 @@ class WorkflowEditForm extends EntityForm {
     ];
 
     $transitions = $workflow->getTypePlugin()->getTransitions();
-    $transition_weight_delta = round(count($transitions) / 2);
+    $transition_weight_delta = \round(\count($transitions) / 2);
     foreach ($transitions as $transition) {
       $links['edit'] = [
         'title' => $this->t('Edit'),
@@ -200,7 +200,7 @@ class WorkflowEditForm extends EntityForm {
         ],
         'from' => [
           '#theme' => 'item_list',
-          '#items' => array_map([State::class, 'labelCallback'], $transition->from()),
+          '#items' => \array_map([State::class, 'labelCallback'], $transition->from()),
           '#context' => ['list_style' => 'comma-list'],
         ],
         'to' => ['#markup' => $transition->to()->label()],

@@ -18,8 +18,8 @@ class BundleConstraintValidator extends ConstraintValidator {
       return;
     }
 
-    if (!in_array($entity->bundle(), $constraint->getBundleOption())) {
-      $this->context->addViolation($constraint->message, ['%bundle' => implode(', ', $constraint->getBundleOption())]);
+    if (!\in_array($entity->bundle(), $constraint->getBundleOption())) {
+      $this->context->addViolation($constraint->message, ['%bundle' => \implode(', ', $constraint->getBundleOption())]);
     }
   }
 

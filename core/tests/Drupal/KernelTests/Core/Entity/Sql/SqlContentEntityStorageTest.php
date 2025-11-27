@@ -99,11 +99,11 @@ class SqlContentEntityStorageTest extends KernelTestBase {
     $logger->end('default');
 
     // Filter queries to include only DELETE queries over each table.
-    $dedicatedTableDeleteQueries = array_filter($queries, static function ($query) {
-      return preg_match('/^DELETE FROM ".*dedicated_table"/', $query['query']);
+    $dedicatedTableDeleteQueries = \array_filter($queries, static function ($query) {
+      return \preg_match('/^DELETE FROM ".*dedicated_table"/', $query['query']);
     });
-    $dedicatedRevisionTableDeleteQueries = array_filter($queries, static function ($query) {
-      return preg_match('/^DELETE FROM ".*dedicated_revision_table"/', $query['query']);
+    $dedicatedRevisionTableDeleteQueries = \array_filter($queries, static function ($query) {
+      return \preg_match('/^DELETE FROM ".*dedicated_revision_table"/', $query['query']);
     });
 
     // Assert that exactly one DELETE query was executed on each table.

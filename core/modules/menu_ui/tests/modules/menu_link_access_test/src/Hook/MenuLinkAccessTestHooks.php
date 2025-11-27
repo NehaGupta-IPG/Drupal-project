@@ -20,7 +20,7 @@ class MenuLinkAccessTestHooks {
    */
   #[Hook('menu_link_content_access')]
   public function entityTestAccess(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
-    if (in_array($operation, ['update', 'delete'])) {
+    if (\in_array($operation, ['update', 'delete'])) {
       return AccessResult::forbidden();
     }
 

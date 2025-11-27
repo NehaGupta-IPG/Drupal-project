@@ -94,7 +94,7 @@ class PathValidator implements PathValidatorInterface {
    * Helper for getUrlIfValid() and getUrlIfValidWithoutAccessCheck().
    */
   protected function getUrl($path, $access_check) {
-    $path = ltrim($path, '/');
+    $path = \ltrim($path, '/');
 
     $parsed_url = UrlHelper::parse($path);
 

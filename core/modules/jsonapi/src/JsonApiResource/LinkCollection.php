@@ -45,16 +45,16 @@ final class LinkCollection implements \IteratorAggregate {
    *   a LinkCollection is passed into a context object.
    */
   public function __construct(array $links, $context = NULL) {
-    assert(Inspector::assertAll(function ($key) {
+    \assert(Inspector::assertAll(function ($key) {
       return static::validKey($key);
-    }, array_keys($links)));
-    assert(Inspector::assertAll(function ($link) {
-      return $link instanceof Link || is_array($link) && Inspector::assertAllObjects($link, Link::class);
+    }, \array_keys($links)));
+    \assert(Inspector::assertAll(function ($link) {
+      return $link instanceof Link || \is_array($link) && Inspector::assertAllObjects($link, Link::class);
     }, $links));
-    assert(is_null($context) || Inspector::assertAllObjects([$context], JsonApiDocumentTopLevel::class, ResourceObject::class, Relationship::class));
-    ksort($links);
-    $this->links = array_map(function ($link) {
-      return is_array($link) ? $link : [$link];
+    \assert(\is_null($context) || Inspector::assertAllObjects([$context], JsonApiDocumentTopLevel::class, ResourceObject::class, Relationship::class));
+    \ksort($links);
+    $this->links = \array_map(function ($link) {
+      return \is_array($link) ? $link : [$link];
     }, $links);
     $this->context = $context;
   }
@@ -63,7 +63,7 @@ final class LinkCollection implements \IteratorAggregate {
    * {@inheritdoc}
    */
   public function getIterator(): \ArrayIterator {
-    assert(!is_null($this->context), 'A LinkCollection is invalid unless a context has been established.');
+    \assert(!\is_null($this->context), 'A LinkCollection is invalid unless a context has been established.');
     return new \ArrayIterator($this->links);
   }
 
@@ -82,7 +82,7 @@ final class LinkCollection implements \IteratorAggregate {
    *   current set of links.
    */
   public function withLink($key, Link $new_link) {
-    assert(static::validKey($key));
+    \assert(static::validKey($key));
     $merged = $this->links;
     if (isset($merged[$key])) {
       foreach ($merged[$key] as $index => $existing_link) {
@@ -106,7 +106,7 @@ final class LinkCollection implements \IteratorAggregate {
    *   TRUE if a link with the given key exist, FALSE otherwise.
    */
   public function hasLinkWithKey($key) {
-    return array_key_exists($key, $this->links);
+    return \array_key_exists($key, $this->links);
   }
 
   /**
@@ -129,7 +129,7 @@ final class LinkCollection implements \IteratorAggregate {
    *   The LinkCollection's context.
    */
   public function getContext() {
-    assert(!is_null($this->context), 'A LinkCollection is invalid unless a context has been established.');
+    \assert(!\is_null($this->context), 'A LinkCollection is invalid unless a context has been established.');
     return $this->context;
   }
 
@@ -147,8 +147,8 @@ final class LinkCollection implements \IteratorAggregate {
    *   A new, filtered LinkCollection.
    */
   public function filter(callable $f) {
-    $links = iterator_to_array($this);
-    $filtered = array_reduce(array_keys($links), function ($filtered, $key) use ($links, $f) {
+    $links = \iterator_to_array($this);
+    $filtered = \array_reduce(\array_keys($links), function ($filtered, $key) use ($links, $f) {
       if ($f($key, $links[$key], $this->context)) {
         $filtered[$key] = $links[$key];
       }
@@ -169,15 +169,15 @@ final class LinkCollection implements \IteratorAggregate {
    *   A new LinkCollection with the links of both inputs.
    */
   public static function merge(LinkCollection $a, LinkCollection $b) {
-    assert($a->getContext() === $b->getContext());
+    \assert($a->getContext() === $b->getContext());
     $merged = new LinkCollection([], $a->getContext());
     foreach ($a as $key => $links) {
-      $merged = array_reduce($links, function (self $merged, Link $link) use ($key) {
+      $merged = \array_reduce($links, function (self $merged, Link $link) use ($key) {
         return $merged->withLink($key, $link);
       }, $merged);
     }
     foreach ($b as $key => $links) {
-      $merged = array_reduce($links, function (self $merged, Link $link) use ($key) {
+      $merged = \array_reduce($links, function (self $merged, Link $link) use ($key) {
         return $merged->withLink($key, $link);
       }, $merged);
     }
@@ -194,7 +194,7 @@ final class LinkCollection implements \IteratorAggregate {
    *   TRUE if the key is valid, FALSE otherwise.
    */
   protected static function validKey($key) {
-    return is_string($key) && !is_numeric($key) && !str_contains($key, ':');
+    return \is_string($key) && !\is_numeric($key) && !\str_contains($key, ':');
   }
 
 }

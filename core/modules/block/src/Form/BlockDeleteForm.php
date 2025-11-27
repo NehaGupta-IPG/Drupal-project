@@ -65,7 +65,7 @@ class BlockDeleteForm extends EntityDeleteForm {
    * Wraps system_region_list().
    */
   protected function systemRegionList($theme, $show = REGIONS_ALL) {
-    return system_region_list($theme, $show);
+    return \system_region_list($theme, $show);
   }
 
 }

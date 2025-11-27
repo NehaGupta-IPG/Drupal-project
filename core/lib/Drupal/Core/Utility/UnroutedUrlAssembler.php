@@ -59,7 +59,7 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
     // Note that UrlHelper::isExternal will return FALSE if the $uri has a
     // disallowed protocol.  This is later made safe since we always add at
     // least a leading slash.
-    if (parse_url($uri, PHP_URL_SCHEME) === 'base') {
+    if (\parse_url($uri, PHP_URL_SCHEME) === 'base') {
       return $this->buildLocalUrl($uri, $options, $collect_bubbleable_metadata);
     }
     elseif (UrlHelper::isExternal($uri)) {
@@ -93,10 +93,10 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
 
     if (isset($options['https'])) {
       if ($options['https'] === TRUE) {
-        $uri = str_replace('http://', 'https://', $uri);
+        $uri = \str_replace('http://', 'https://', $uri);
       }
       elseif ($options['https'] === FALSE) {
-        $uri = str_replace('https://', 'http://', $uri);
+        $uri = \str_replace('https://', 'http://', $uri);
       }
     }
     // Append the query.
@@ -120,7 +120,7 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
     // Remove the base: scheme.
     // @todo Consider using a class constant for this in
     //   https://www.drupal.org/node/2417459
-    $uri = substr($uri, 5);
+    $uri = \substr($uri, 5);
 
     // Allow (outbound) path processing, if needed. A valid use case is the path
     // alias overview form:
@@ -133,7 +133,7 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
     // Strip leading slashes from internal paths to prevent them becoming
     // external URLs without protocol. /example.com should not be turned into
     // //example.com.
-    $uri = ltrim($uri, '/');
+    $uri = \ltrim($uri, '/');
 
     // Add any subdirectory where Drupal is installed.
     $current_base_path = $request->getBasePath() . '/';
@@ -142,11 +142,11 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
       $current_base_url = $request->getSchemeAndHttpHost() . $current_base_path;
       if (isset($options['https'])) {
         if (!empty($options['https'])) {
-          $base = str_replace('http://', 'https://', $current_base_url);
+          $base = \str_replace('http://', 'https://', $current_base_url);
           $options['absolute'] = TRUE;
         }
         else {
-          $base = str_replace('https://', 'http://', $current_base_url);
+          $base = \str_replace('https://', 'http://', $current_base_url);
           $options['absolute'] = TRUE;
         }
       }
@@ -161,9 +161,9 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
       $base = $current_base_path;
     }
 
-    $prefix = empty($uri) ? rtrim($options['prefix'], '/') : $options['prefix'];
+    $prefix = empty($uri) ? \rtrim($options['prefix'], '/') : $options['prefix'];
 
-    $uri = str_replace('%2F', '/', rawurlencode($prefix . $uri));
+    $uri = \str_replace('%2F', '/', \rawurlencode($prefix . $uri));
     $query = $options['query'] ? ('?' . UrlHelper::buildQuery($options['query'])) : '';
     $url = $base . $options['script'] . $uri . $query . $options['fragment'];
     return $collect_bubbleable_metadata ? $generated_url->setGeneratedUrl($url) : $url;
@@ -186,8 +186,8 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
     // is added, to allow simple string concatenation with other parts.
     if (!empty($base_path_with_script)) {
       $script_name = $request->getScriptName();
-      if (str_contains($base_path_with_script, $script_name)) {
-        $current_script_path = ltrim(substr($script_name, strlen($current_base_path)), '/') . '/';
+      if (\str_contains($base_path_with_script, $script_name)) {
+        $current_script_path = \ltrim(\substr($script_name, \strlen($current_base_path)), '/') . '/';
       }
     }
 

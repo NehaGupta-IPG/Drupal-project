@@ -81,7 +81,7 @@ class SupportedReleaseValidatorTest extends PackageManagerKernelTestBase {
    */
   public static function providerException(): array {
     $release_fixture_folder = __DIR__ . '/../../fixtures/release-history';
-    $summary = t('Cannot update because the following project version is not in the list of installable releases.');
+    $summary = \t('Cannot update because the following project version is not in the list of installable releases.');
     return [
       'semver, supported update' => [
         [
@@ -106,7 +106,7 @@ class SupportedReleaseValidatorTest extends PackageManagerKernelTestBase {
           'type' => 'drupal-module',
         ],
         [
-          ValidationResult::createError([t('semver_test (drupal/semver_test) 8.2.0')], $summary),
+          ValidationResult::createError([\t('semver_test (drupal/semver_test) 8.2.0')], $summary),
         ],
       ],
       'legacy, supported update' => [
@@ -132,7 +132,7 @@ class SupportedReleaseValidatorTest extends PackageManagerKernelTestBase {
           'type' => 'drupal-module',
         ],
         [
-          ValidationResult::createError([t('aaa_update_test (drupal/aaa_update_test) 3.0.0')], $summary),
+          ValidationResult::createError([\t('aaa_update_test (drupal/aaa_update_test) 3.0.0')], $summary),
         ],
       ],
       'package_manager_test_update(not in active), update to unsupported branch' => [
@@ -146,7 +146,7 @@ class SupportedReleaseValidatorTest extends PackageManagerKernelTestBase {
           'type' => 'drupal-module',
         ],
         [
-          ValidationResult::createError([t('package_manager_test_update (drupal/package_manager_test_update) 7.0.1-dev')], $summary),
+          ValidationResult::createError([\t('package_manager_test_update (drupal/package_manager_test_update) 7.0.1-dev')], $summary),
         ],
       ],
       'package_manager_test_update(not in active), update to supported branch' => [
@@ -184,7 +184,7 @@ class SupportedReleaseValidatorTest extends PackageManagerKernelTestBase {
           'type' => 'drupal-theme',
         ],
         [
-          ValidationResult::createError([t('package_manager_theme (drupal/package_manager_theme) 8.2.0')], $summary),
+          ValidationResult::createError([\t('package_manager_theme (drupal/package_manager_theme) 8.2.0')], $summary),
         ],
       ],
       // For modules that don't start with 'drupal/' will not have update XML
@@ -209,7 +209,7 @@ class SupportedReleaseValidatorTest extends PackageManagerKernelTestBase {
           'type' => 'drupal-module',
         ],
         [
-          ValidationResult::createError([t('Cannot update because the following new or updated Drupal package does not have project information: drupal/module_no_project')]),
+          ValidationResult::createError([\t('Cannot update because the following new or updated Drupal package does not have project information: drupal/module_no_project')]),
         ],
       ],
     ];

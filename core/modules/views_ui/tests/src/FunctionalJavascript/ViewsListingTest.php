@@ -144,7 +144,7 @@ class ViewsListingTest extends WebDriverTestBase {
    *   The filtered array.
    */
   protected function filterVisibleElements($elements): array {
-    $elements = array_filter($elements, function ($element) {
+    $elements = \array_filter($elements, function ($element) {
       return $element->isVisible();
     });
     return $elements;

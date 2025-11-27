@@ -63,7 +63,7 @@ abstract class ModeratedNodeResourceTestBase extends NodeResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedNormalizedEntity() {
-    return array_merge(parent::getExpectedNormalizedEntity(), [
+    return \array_merge(parent::getExpectedNormalizedEntity(), [
       'moderation_state' => [
         [
           'value' => 'published',

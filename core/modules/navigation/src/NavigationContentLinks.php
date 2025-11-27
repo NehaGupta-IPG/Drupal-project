@@ -123,14 +123,14 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
     // Sort all types within an entity type alphabetically.
     $definition = $this->entityTypeManager->getDefinition($entity_type);
     $types = $this->entityTypeManager->getStorage($entity_type)->loadMultiple();
-    if (method_exists($definition->getClass(), 'sort')) {
-      uasort($types, [$definition->getClass(), 'sort']);
+    if (\method_exists($definition->getClass(), 'sort')) {
+      \uasort($types, [$definition->getClass(), 'sort']);
     }
 
     $add_content_links = [];
     foreach ($types as $type) {
       // Skip if the bundle is not in the allow list.
-      if (!empty($bundle_allow_list) && !in_array($type->id(), $bundle_allow_list)) {
+      if (!empty($bundle_allow_list) && !\in_array($type->id(), $bundle_allow_list)) {
         continue;
       }
       $add_content_links['navigation.content.' . $type->getEntityTypeId() . '.' . $type->id()] = [

@@ -122,8 +122,8 @@ class FileRepository implements FileRepositoryInterface {
       $file->setOwnerId($this->currentUser->id());
     }
 
-    if ($rename && is_file($destination)) {
-      $file->setFilename(basename($destination));
+    if ($rename && \is_file($destination)) {
+      $file->setFilename(\basename($destination));
     }
 
     $file->setPermanent();
@@ -155,11 +155,11 @@ class FileRepository implements FileRepositoryInterface {
 
       // If we are renaming around an existing file (rather than a directory),
       // use its basename for the filename.
-      if ($fileExists === FileExists::Rename && is_file($destination)) {
-        $file->setFilename(basename($destination));
+      if ($fileExists === FileExists::Rename && \is_file($destination)) {
+        $file->setFilename(\basename($destination));
       }
       else {
-        $file->setFilename(basename($uri));
+        $file->setFilename(\basename($uri));
       }
     }
     $file->save();
@@ -196,8 +196,8 @@ class FileRepository implements FileRepositoryInterface {
     }
     // If we are renaming around an existing file (rather than a directory),
     // use its basename for the filename.
-    elseif ($fileExists === FileExists::Rename && is_file($destination)) {
-      $file->setFilename(basename($destination));
+    elseif ($fileExists === FileExists::Rename && \is_file($destination)) {
+      $file->setFilename(\basename($destination));
     }
 
     $file->save();
@@ -220,7 +220,7 @@ class FileRepository implements FileRepositoryInterface {
     $fileStorage = $this->entityTypeManager->getStorage('file');
     /** @var \Drupal\file\FileInterface[] $files */
     $files = $fileStorage->loadByProperties(['uri' => $uri]);
-    if (count($files)) {
+    if (\count($files)) {
       foreach ($files as $item) {
         // Since some database servers sometimes use a case-insensitive
         // comparison by default, double check that the filename is an exact

@@ -65,7 +65,7 @@ final class ProjectInfo {
    */
   public function getProjectInfo(): ?array {
     $available_updates = $this->getAvailableProjects();
-    $project_data = update_calculate_project_data($available_updates);
+    $project_data = \update_calculate_project_data($available_updates);
     if (!isset($project_data[$this->name])) {
       return $available_updates[$this->name] ?? NULL;
     }
@@ -104,7 +104,7 @@ final class ProjectInfo {
       throw new \RuntimeException('There was a problem getting update information. Try again later.');
     }
 
-    $support_branches = explode(',', $available_updates['supported_branches']);
+    $support_branches = \explode(',', $available_updates['supported_branches']);
     $installable_releases = [];
     foreach ($available_updates['releases'] as $release_info) {
       try {
@@ -114,7 +114,7 @@ final class ProjectInfo {
         // Ignore releases that are in an invalid format. Although this is
         // unlikely we should still only process releases in the correct format.
         \Drupal::logger('package_manager')
-          ->error(sprintf('Invalid project format: %s', print_r($release_info, TRUE)), Error::decodeException($exception));
+          ->error(\sprintf('Invalid project format: %s', \print_r($release_info, TRUE)), Error::decodeException($exception));
         continue;
       }
 
@@ -144,7 +144,7 @@ final class ProjectInfo {
    */
   public function getInstalledVersion(): ?string {
     $project_data = $this->getProjectInfo();
-    if ($project_data && array_key_exists('existing_version', $project_data)) {
+    if ($project_data && \array_key_exists('existing_version', $project_data)) {
       $existing_version = $project_data['existing_version'];
       // Treat an unknown version the same as a project whose project
       // information is not available, so return NULL.
@@ -157,7 +157,7 @@ final class ProjectInfo {
       // \Drupal\update\UpdateManager::getProjects(), we cannot be certain that
       // we are actually receiving strings.
       // @see \Drupal\update\UpdateManager::getProjects()
-      if (!is_string($existing_version)) {
+      if (!\is_string($existing_version)) {
         return NULL;
       }
 
@@ -178,7 +178,7 @@ final class ProjectInfo {
    * @see \update_get_available()
    */
   private function getAvailableProjects(): array {
-    $available_projects = update_get_available(TRUE);
+    $available_projects = \update_get_available(TRUE);
     // update_get_available() will only returns projects that are in the active
     // codebase. If the project specified by ::name is not returned in
     // $available_projects, it means it is not in the active codebase, therefore
@@ -210,7 +210,7 @@ final class ProjectInfo {
         UpdateManagerInterface::NOT_SUPPORTED,
         UpdateManagerInterface::REVOKED,
       ];
-      return !in_array($project_data['status'], $unsafe, TRUE);
+      return !\in_array($project_data['status'], $unsafe, TRUE);
     }
     // If we couldn't get project data, assume the installed version is unsafe.
     return FALSE;
@@ -224,7 +224,7 @@ final class ProjectInfo {
    */
   public function getSupportedBranches(): array {
     $available_updates = $this->getAvailableProjects()[$this->name];
-    return isset($available_updates['supported_branches']) ? explode(',', $available_updates['supported_branches']) : [];
+    return isset($available_updates['supported_branches']) ? \explode(',', $available_updates['supported_branches']) : [];
   }
 
 }

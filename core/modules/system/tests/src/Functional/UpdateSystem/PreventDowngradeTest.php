@@ -74,13 +74,13 @@ class PreventDowngradeTest extends UpdatePathTestBase {
       ->condition('name', 'core.extension')
       ->execute()
       ->fetchField();
-    $extensions = unserialize($extensions);
+    $extensions = \unserialize($extensions);
 
     // Install the 'downgrade_prevention_test' module.
     $extensions['module']['downgrade_prevention_test'] = 0;
     $database->update('config')
       ->fields([
-        'data' => serialize($extensions),
+        'data' => \serialize($extensions),
       ])
       ->condition('collection', '')
       ->condition('name', 'core.extension')

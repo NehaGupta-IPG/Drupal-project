@@ -23,7 +23,7 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
    * {@inheritdoc}
    */
   public function setUri($uri): void {
-    if (!str_contains($uri, '://')) {
+    if (!\str_contains($uri, '://')) {
       throw new \InvalidArgumentException("Malformed extension URI: {$uri}");
     }
     $this->checkFileExtension($uri);
@@ -37,8 +37,8 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
    *   The extension name.
    */
   protected function getExtensionName(): string {
-    $uri_parts = explode('://', $this->uri, 2);
-    $extension_name = strtok($uri_parts[1], '/');
+    $uri_parts = \explode('://', $this->uri, 2);
+    $extension_name = \strtok($uri_parts[1], '/');
     // Any string that evaluates to empty is considered an invalid extension
     // name.
     if (empty($extension_name)) {
@@ -65,9 +65,9 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
    * {@inheritdoc}
    */
   protected function getTarget($uri = NULL): string {
-    if ($target = strstr(parent::getTarget($uri), '/')) {
+    if ($target = \strstr(parent::getTarget($uri), '/')) {
       $this->checkFileExtension($uri ?? $this->uri);
-      return trim($target, '/');
+      return \trim($target, '/');
     }
     return '';
   }
@@ -77,7 +77,7 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
    */
   public function getExternalUrl(): string {
     $dir = $this->getDirectoryPath();
-    return \Drupal::service(RequestContext::class)->getCompleteBaseUrl() . rtrim("/$dir/" . $this->getTarget(), '/');
+    return \Drupal::service(RequestContext::class)->getCompleteBaseUrl() . \rtrim("/$dir/" . $this->getTarget(), '/');
   }
 
   /**
@@ -90,9 +90,9 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
     else {
       $uri = $this->uri;
     }
-    [$scheme] = explode('://', $uri, 2);
-    $dirname = dirname($this->getTarget($uri));
-    $dirname = $dirname !== '.' ? rtrim("/$dirname", '/') : '';
+    [$scheme] = \explode('://', $uri, 2);
+    $dirname = \dirname($this->getTarget($uri));
+    $dirname = $dirname !== '.' ? \rtrim("/$dirname", '/') : '';
 
     // Call the getExtension() method to ensure the extension exists.
     $extension = $this->getExtension($this->getExtensionName());
@@ -123,13 +123,13 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
    *   container parameter.
    */
   protected function checkFileExtension(string $uri): void {
-    [$scheme] = explode('://', $uri, 2);
+    [$scheme] = \explode('://', $uri, 2);
 
     $allowed = \Drupal::getContainer()
       ->getParameter('stream_wrapper.allowed_file_extensions');
 
-    $extension = pathinfo($uri, PATHINFO_EXTENSION);
-    if (isset($allowed[$scheme]) && in_array(strtolower($extension), $allowed[$scheme], TRUE)) {
+    $extension = \pathinfo($uri, PATHINFO_EXTENSION);
+    if (isset($allowed[$scheme]) && \in_array(\strtolower($extension), $allowed[$scheme], TRUE)) {
       return;
     }
     throw new \InvalidArgumentException("The $scheme stream wrapper does not support the '$extension' file type.");

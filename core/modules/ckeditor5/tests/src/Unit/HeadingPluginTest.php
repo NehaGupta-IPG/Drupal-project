@@ -35,7 +35,7 @@ class HeadingPluginTest extends UnitTestCase {
       'class' => 'ck-heading_paragraph',
     ];
     $headings = [];
-    foreach (range(2, 6) as $number) {
+    foreach (\range(2, 6) as $number) {
       $headings[$number] = [
         'model' => 'heading' . $number,
         'view' => 'h' . $number,

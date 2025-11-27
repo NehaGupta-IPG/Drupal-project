@@ -32,7 +32,7 @@ class WorkspaceSwitchSubscriber implements EventSubscriberInterface {
   public function onWorkspaceSwitch(WorkspaceSwitchEvent $event): void {
     // Clear the static cache for supported entity types.
     $cache_tags_to_invalidate = [];
-    foreach (array_keys($this->workspaceInfo->getSupportedEntityTypes()) as $entity_type_id) {
+    foreach (\array_keys($this->workspaceInfo->getSupportedEntityTypes()) as $entity_type_id) {
       $cache_tags_to_invalidate[] = 'entity.memory_cache:' . $entity_type_id;
     }
     $this->entityMemoryCache->invalidateTags($cache_tags_to_invalidate);

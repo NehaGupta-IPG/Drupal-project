@@ -104,9 +104,9 @@ class EntityRouteEnhancer implements EnhancerInterface {
    */
   protected function enhanceEntityView(array $defaults, Request $request) {
     $defaults[RouteObjectInterface::CONTROLLER_NAME] = '\Drupal\Core\Entity\Controller\EntityViewController::view';
-    if (str_contains($defaults['_entity_view'], '.')) {
+    if (\str_contains($defaults['_entity_view'], '.')) {
       // The _entity_view entry is of the form entity_type.view_mode.
-      [$entity_type, $view_mode] = explode('.', $defaults['_entity_view']);
+      [$entity_type, $view_mode] = \explode('.', $defaults['_entity_view']);
       $defaults['view_mode'] = $view_mode;
     }
     else {
@@ -122,14 +122,14 @@ class EntityRouteEnhancer implements EnhancerInterface {
       // The entity is not keyed by its entity_type. Attempt to find it
       // using a converter.
       $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];
-      if ($route && is_object($route)) {
+      if ($route && \is_object($route)) {
         $options = $route->getOptions();
         if (isset($options['parameters'])) {
           foreach ($options['parameters'] as $name => $details) {
             if (!empty($details['type'])) {
               $type = $details['type'];
               // Type is of the form entity:{entity_type}.
-              $parameter_entity_type = substr($type, strlen('entity:'));
+              $parameter_entity_type = \substr($type, \strlen('entity:'));
               if ($entity_type == $parameter_entity_type) {
                 // We have the matching entity type. Set the '_entity' key
                 // to point to this named placeholder. The entity in this
@@ -140,11 +140,11 @@ class EntityRouteEnhancer implements EnhancerInterface {
           }
         }
         else {
-          throw new \RuntimeException(sprintf('Failed to find entity of type %s in route named %s', $entity_type, $defaults[RouteObjectInterface::ROUTE_NAME]));
+          throw new \RuntimeException(\sprintf('Failed to find entity of type %s in route named %s', $entity_type, $defaults[RouteObjectInterface::ROUTE_NAME]));
         }
       }
       else {
-        throw new \RuntimeException(sprintf('Failed to find entity of type %s in route named %s', $entity_type, $defaults[RouteObjectInterface::ROUTE_NAME]));
+        throw new \RuntimeException(\sprintf('Failed to find entity of type %s in route named %s', $entity_type, $defaults[RouteObjectInterface::ROUTE_NAME]));
       }
     }
     unset($defaults['_entity_view']);

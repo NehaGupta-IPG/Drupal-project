@@ -144,24 +144,24 @@ class Message extends ContentEntityBase implements MessageInterface {
     /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    $fields['contact_form']->setLabel(t('Form ID'))
-      ->setDescription(t('The ID of the associated form.'));
+    $fields['contact_form']->setLabel(\t('Form ID'))
+      ->setDescription(\t('The ID of the associated form.'));
 
-    $fields['uuid']->setDescription(t('The message UUID.'));
+    $fields['uuid']->setDescription(\t('The message UUID.'));
 
-    $fields['langcode']->setDescription(t('The message language code.'));
+    $fields['langcode']->setDescription(\t('The message language code.'));
 
     $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t("The sender's name"))
-      ->setDescription(t('The name of the person that is sending the contact message.'));
+      ->setLabel(\t("The sender's name"))
+      ->setDescription(\t('The name of the person that is sending the contact message.'));
 
     $fields['mail'] = BaseFieldDefinition::create('email')
-      ->setLabel(t("The sender's email"))
-      ->setDescription(t('The email of the person that is sending the contact message.'));
+      ->setLabel(\t("The sender's email"))
+      ->setDescription(\t('The email of the person that is sending the contact message.'));
 
     // The subject of the contact message.
     $fields['subject'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Subject'))
+      ->setLabel(\t('Subject'))
       ->setRequired(TRUE)
       ->setSetting('max_length', 100)
       ->setDisplayOptions('form', [
@@ -172,7 +172,7 @@ class Message extends ContentEntityBase implements MessageInterface {
 
     // The text of the contact message.
     $fields['message'] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Message'))
+      ->setLabel(\t('Message'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'string_textarea',
@@ -190,12 +190,12 @@ class Message extends ContentEntityBase implements MessageInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['copy'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Copy'))
-      ->setDescription(t('Whether to send a copy of the message to the sender.'));
+      ->setLabel(\t('Copy'))
+      ->setDescription(\t('Whether to send a copy of the message to the sender.'));
 
     $fields['recipient'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Recipient ID'))
-      ->setDescription(t('The ID of the recipient user for personal contact messages.'))
+      ->setLabel(\t('Recipient ID'))
+      ->setDescription(\t('The ID of the recipient user for personal contact messages.'))
       ->setSetting('target_type', 'user');
 
     return $fields;

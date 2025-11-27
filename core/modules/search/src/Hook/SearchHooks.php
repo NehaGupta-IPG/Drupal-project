@@ -115,7 +115,7 @@ class SearchHooks {
     if ($block->getPluginId() === 'search_form_block') {
       $settings = $block->get('settings');
       if ($settings['page_id'] === '') {
-        @trigger_error('Saving a search block with an empty page ID is deprecated in drupal:11.1.0 and removed in drupal:12.0.0. To use the default search page, use NULL. See https://www.drupal.org/node/3463132', E_USER_DEPRECATED);
+        @\trigger_error('Saving a search block with an empty page ID is deprecated in drupal:11.1.0 and removed in drupal:12.0.0. To use the default search page, use NULL. See https://www.drupal.org/node/3463132', E_USER_DEPRECATED);
         $settings['page_id'] = NULL;
         $block->set('settings', $settings);
       }

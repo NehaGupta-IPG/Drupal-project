@@ -49,7 +49,7 @@ class LayoutBuilderSampleEntityGenerator implements SampleEntityGeneratorInterfa
 
     $entity_storage = $this->entityTypeManager->getStorage($entity_type_id);
     if (!$entity_storage instanceof ContentEntityStorageInterface) {
-      throw new \InvalidArgumentException(sprintf('The "%s" entity storage is not supported', $entity_type_id));
+      throw new \InvalidArgumentException(\sprintf('The "%s" entity storage is not supported', $entity_type_id));
     }
 
     $entity = $entity_storage->createWithSampleValues($bundle_id);

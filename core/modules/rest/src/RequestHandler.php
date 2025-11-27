@@ -128,8 +128,8 @@ class RequestHandler implements ContainerInjectionInterface {
     // @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4
     // @see \Symfony\Component\Routing\Matcher\UrlMatcher::matchCollection()
     // @see \Symfony\Component\HttpFoundation\Response::prepare()
-    $method = strtolower($route_match->getRouteObject()->getMethods()[0]);
-    assert(count($route_match->getRouteObject()->getMethods()) === 1);
+    $method = \strtolower($route_match->getRouteObject()->getMethods()[0]);
+    \assert(\count($route_match->getRouteObject()->getMethods()) === 1);
     return $method;
   }
 
@@ -216,7 +216,7 @@ class RequestHandler implements ContainerInjectionInterface {
     $arguments = $argument_resolver->getArguments([$resource, $method]);
 
     // Invoke the operation on the resource plugin.
-    return call_user_func_array([$resource, $method], $arguments);
+    return \call_user_func_array([$resource, $method], $arguments);
   }
 
   /**
@@ -260,8 +260,8 @@ class RequestHandler implements ContainerInjectionInterface {
       }
     }
 
-    if (in_array($request->getMethod(), ['PATCH', 'POST'], TRUE)) {
-      if (is_object($unserialized)) {
+    if (\in_array($request->getMethod(), ['PATCH', 'POST'], TRUE)) {
+      if (\is_object($unserialized)) {
         $upcasted_route_arguments['entity'] = $unserialized;
         $upcasted_route_arguments['data'] = $unserialized;
         $upcasted_route_arguments['unserialized'] = $unserialized;

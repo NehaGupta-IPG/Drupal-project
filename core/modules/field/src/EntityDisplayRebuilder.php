@@ -79,16 +79,16 @@ class EntityDisplayRebuilder implements ContainerInjectionInterface {
     $form_modes = $this->entityDisplayRepository->getFormModeOptions($entity_type_id);
 
     // Save view mode displays.
-    $view_mode_ids = array_map(function ($view_mode) use ($entity_type_id, $bundle) {
+    $view_mode_ids = \array_map(function ($view_mode) use ($entity_type_id, $bundle) {
       return "$entity_type_id.$bundle.$view_mode";
-    }, array_keys($view_modes));
+    }, \array_keys($view_modes));
     foreach ($this->entityTypeManager->getStorage('entity_view_display')->loadMultiple($view_mode_ids) as $display) {
       $display->save();
     }
     // Save form mode displays.
-    $form_mode_ids = array_map(function ($form_mode) use ($entity_type_id, $bundle) {
+    $form_mode_ids = \array_map(function ($form_mode) use ($entity_type_id, $bundle) {
       return "$entity_type_id.$bundle.$form_mode";
-    }, array_keys($form_modes));
+    }, \array_keys($form_modes));
     foreach ($this->entityTypeManager->getStorage('entity_form_display')->loadMultiple($form_mode_ids) as $display) {
       $display->save();
     }

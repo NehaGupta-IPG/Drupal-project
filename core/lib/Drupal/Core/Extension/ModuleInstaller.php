@@ -113,7 +113,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * {@inheritdoc}
    */
   public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . ' is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595', E_USER_DEPRECATED);
   }
 
   /**
@@ -125,7 +125,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Remove any modules that are already installed.
     $installed_modules = $extension_config->get('module') ?: [];
     // Only process currently uninstalled modules.
-    $module_list = array_diff($module_list, array_keys($installed_modules));
+    $module_list = \array_diff($module_list, \array_keys($installed_modules));
 
     if (empty($module_list)) {
       // Nothing to do. All modules already installed.
@@ -146,20 +146,20 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
       if ($module_data[$module]->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
         // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-        @trigger_error("The module '$module' is deprecated. See " . $module_data[$module]->info['lifecycle_link'], E_USER_DEPRECATED);
+        @\trigger_error("The module '$module' is deprecated. See " . $module_data[$module]->info['lifecycle_link'], E_USER_DEPRECATED);
       }
     }
     if ($enable_dependencies) {
-      $module_list = $module_list ? array_combine($module_list, $module_list) : [];
-      if ($missing_modules = array_diff_key($module_list, $module_data)) {
+      $module_list = $module_list ? \array_combine($module_list, $module_list) : [];
+      if ($missing_modules = \array_diff_key($module_list, $module_data)) {
         // One or more of the given modules doesn't exist.
-        throw new MissingDependencyException(sprintf('Unable to install modules %s due to missing modules %s.', implode(', ', $module_list), implode(', ', $missing_modules)));
+        throw new MissingDependencyException(\sprintf('Unable to install modules %s due to missing modules %s.', \implode(', ', $module_list), \implode(', ', $missing_modules)));
       }
 
       // Add dependencies to the list. The new modules will be processed as
       // the foreach loop continues.
       foreach ($module_list as $module => $value) {
-        foreach (array_keys($module_data[$module]->requires) as $dependency) {
+        foreach (\array_keys($module_data[$module]->requires) as $dependency) {
           if (!isset($module_data[$dependency])) {
             // The dependency does not exist.
             throw new MissingDependencyException("Unable to install modules: module '$module' is missing its dependency module $dependency.");
@@ -176,13 +176,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
 
       // Set the actual module weights.
-      $module_list = array_map(function ($module) use ($module_data) {
+      $module_list = \array_map(function ($module) use ($module_data) {
         return $module_data[$module]->sort;
       }, $module_list);
 
       // Sort the module list by their weights (reverse).
-      arsort($module_list);
-      $module_list = array_keys($module_list);
+      \arsort($module_list);
+      $module_list = \array_keys($module_list);
     }
 
     // Required for module installation checks.
@@ -193,7 +193,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $sync_status = $config_installer->isSyncing();
     foreach ($module_list as $module) {
       // Throw an exception if the module name is too long.
-      if (strlen($module) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
+      if (\strlen($module) > DRUPAL_EXTENSION_NAME_MAX_LENGTH) {
         throw new ExtensionNameLengthException("Module name '$module' is over the maximum allowed length of " . DRUPAL_EXTENSION_NAME_MAX_LENGTH . ' characters');
       }
 
@@ -274,8 +274,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Save this data without checking schema. This is a performance
     // improvement for module installation.
     $extension_config
-      ->set('module', module_config_sort(array_merge(
-        array_fill_keys($module_list, 0),
+      ->set('module', \module_config_sort(\array_merge(
+        \array_fill_keys($module_list, 0),
         $installed_modules
       )))
       ->save(TRUE);
@@ -291,8 +291,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // modules not contained in the configured enabled modules, we assume a
     // weight of 0.
     $current_module_filenames = $this->moduleHandler->getModuleList();
-    $current_modules = array_fill_keys(array_keys($current_module_filenames), 0);
-    $current_modules = module_config_sort(array_merge($current_modules, $extension_config->get('module')));
+    $current_modules = \array_fill_keys(\array_keys($current_module_filenames), 0);
+    $current_modules = \module_config_sort(\array_merge($current_modules, $extension_config->get('module')));
     $module_filenames = [];
     foreach ($current_modules as $name => $weight) {
       if (isset($current_module_filenames[$name])) {
@@ -302,7 +302,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
         $module_path = \Drupal::service('extension.list.module')
           ->getPath($name);
         $pathname = "$module_path/$name.info.yml";
-        $filename = file_exists($module_path . "/$name.module") ? "$name.module" : NULL;
+        $filename = \file_exists($module_path . "/$name.module") ? "$name.module" : NULL;
         $module_filenames[$name] = new Extension($this->root, 'module', $pathname, $filename);
       }
     }
@@ -356,7 +356,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     foreach ($module_list as $module) {
       // Remove the module from the list of possible entity type providers to
       // install.
-      array_shift($entity_type_providers_to_install);
+      \array_shift($entity_type_providers_to_install);
 
       // Notify interested components that this module's entity types and
       // field storage definitions are new. For example, a SQL-based storage
@@ -378,7 +378,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
             $update_manager->installEntityType($entity_type);
           }
         }
-        elseif ($is_fieldable_entity_type && !in_array($entity_type->getProvider(), $entity_type_providers_to_install, TRUE)) {
+        elseif ($is_fieldable_entity_type && !\in_array($entity_type->getProvider(), $entity_type_providers_to_install, TRUE)) {
           // The module being installed may be adding new fields to existing
           // entity types. Field definitions for any entity type defined by
           // modules being installed are handled in the if branch.
@@ -409,14 +409,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
       $versions = $this->updateRegistry->getAvailableUpdates($module);
       if ($versions) {
-        $version = max(max($versions), $version);
+        $version = \max(\max($versions), $version);
       }
 
       // If the module has no current updates, but has some that were
       // previously removed, set the version to the value of
       // hook_update_last_removed().
       if ($last_removed = $this->invoke($module, 'update_last_removed')) {
-        $version = max($version, $last_removed);
+        $version = \max($version, $last_removed);
       }
       $this->updateRegistry->setInstalledVersion($module, $version);
     }
@@ -468,7 +468,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::SiteOptional);
     }
 
-    if (count($module_list) > 1) {
+    if (\count($module_list) > 1) {
       // Reset the container so static caches are rebuilt. This prevents static
       // caches like those in \Drupal\views\ViewsData() from having stale data.
       // @todo Adding this code fixed
@@ -496,15 +496,15 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Get all module data so we can find dependencies and sort.
     $module_data = \Drupal::service('extension.list.module')->getList();
     $sync_status = \Drupal::service('config.installer')->isSyncing();
-    $module_list = $module_list ? array_combine($module_list, $module_list) : [];
-    if (array_diff_key($module_list, $module_data)) {
+    $module_list = $module_list ? \array_combine($module_list, $module_list) : [];
+    if (\array_diff_key($module_list, $module_data)) {
       // One or more of the given modules doesn't exist.
       return FALSE;
     }
 
     $extension_config = \Drupal::configFactory()->getEditable('core.extension');
     $installed_modules = $extension_config->get('module') ?: [];
-    if (!$module_list = array_intersect_key($module_list, $installed_modules)) {
+    if (!$module_list = \array_intersect_key($module_list, $installed_modules)) {
       // Nothing to do. All modules already uninstalled.
       return TRUE;
     }
@@ -515,7 +515,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       // Add dependent modules to the list. The new modules will be processed as
       // the foreach loop continues.
       foreach ($module_list as $module => $value) {
-        foreach (array_keys($module_data[$module]->required_by) as $dependent) {
+        foreach (\array_keys($module_data[$module]->required_by) as $dependent) {
           if (!isset($module_data[$dependent]) && !isset($theme_list[$dependent])) {
             // The dependent module or theme does not exist.
             return FALSE;
@@ -532,18 +532,18 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Use the validators and throw an exception with the reasons.
     if ($reasons = $this->validateUninstall($module_list)) {
       foreach ($reasons as $reason) {
-        $reason_message[] = implode(', ', $reason);
+        $reason_message[] = \implode(', ', $reason);
       }
-      throw new ModuleUninstallValidatorException('The following reasons prevent the modules from being uninstalled: ' . implode('; ', $reason_message));
+      throw new ModuleUninstallValidatorException('The following reasons prevent the modules from being uninstalled: ' . \implode('; ', $reason_message));
     }
     // Set the actual module weights.
-    $module_list = array_map(function ($module) use ($module_data) {
+    $module_list = \array_map(function ($module) use ($module_data) {
       return $module_data[$module]->sort;
     }, $module_list);
 
     // Sort the module list by their weights.
-    asort($module_list);
-    $module_list = array_keys($module_list);
+    \asort($module_list);
+    $module_list = \array_keys($module_list);
 
     // Only process modules that are enabled. A module is only enabled if it is
     // configured as enabled. Custom or overridden module handlers might contain
@@ -558,7 +558,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
       foreach ($entity_type_manager->getDefinitions() as $entity_type_id => $entity_type) {
         if ($entity_type->getProvider() == $module) {
-          foreach (array_keys($entity_type_bundle_info->getBundleInfo($entity_type_id)) as $bundle) {
+          foreach (\array_keys($entity_type_bundle_info->getBundleInfo($entity_type_id)) as $bundle) {
             \Drupal::service('entity_bundle.listener')->onBundleDelete($bundle, $entity_type_id);
           }
         }
@@ -680,13 +680,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function removeCacheBins($module) {
     $service_yaml_file = \Drupal::service('extension.list.module')->getPath($module) . "/$module.services.yml";
-    if (!file_exists($service_yaml_file)) {
+    if (!\file_exists($service_yaml_file)) {
       return;
     }
 
-    $definitions = Yaml::decode(file_get_contents($service_yaml_file));
+    $definitions = Yaml::decode(\file_get_contents($service_yaml_file));
 
-    $cache_bin_services = array_filter(
+    $cache_bin_services = \array_filter(
       $definitions['services'] ?? [],
       function ($definition) {
         $tags = $definition['tags'] ?? [];
@@ -699,7 +699,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
     );
 
-    foreach (array_keys($cache_bin_services) as $service_id) {
+    foreach (\array_keys($cache_bin_services) as $service_id) {
       $backend = $this->kernel->getContainer()->get($service_id);
       if ($backend instanceof CacheBackendInterface) {
         $backend->removeBin();
@@ -759,7 +759,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
           if (!isset($reasons[$module])) {
             $reasons[$module] = [];
           }
-          $reasons[$module] = array_merge($reasons[$module], $validation_reasons);
+          $reasons[$module] = \array_merge($reasons[$module], $validation_reasons);
         }
       }
     }
@@ -793,7 +793,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
   protected function uninstallSchema(string $module): void {
     $tables = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
-    foreach (array_keys($tables) as $table) {
+    foreach (\array_keys($tables) as $table) {
       if ($schema->tableExists($table)) {
         $schema->dropTable($table);
       }
@@ -826,7 +826,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function invoke(string $module, string $hook, array $args = []): mixed {
     $function = $module . '_' . $hook;
-    return function_exists($function) ? $function(... $args) : NULL;
+    return \function_exists($function) ? $function(... $args) : NULL;
   }
 
 }

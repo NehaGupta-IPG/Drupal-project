@@ -41,7 +41,7 @@ final class EntityCreate implements ConfigActionPluginInterface, ContainerFactor
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    assert(is_array($plugin_definition) && is_array($plugin_definition['constructor_args']), '$plugin_definition contains the expected settings');
+    \assert(\is_array($plugin_definition) && \is_array($plugin_definition['constructor_args']), '$plugin_definition contains the expected settings');
     return new static($container->get('config.manager'), ...$plugin_definition['constructor_args']);
   }
 
@@ -49,8 +49,8 @@ final class EntityCreate implements ConfigActionPluginInterface, ContainerFactor
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
-    if (!is_array($value)) {
-      throw new ConfigActionException(sprintf("The value provided to create %s must be an array", $configName));
+    if (!\is_array($value)) {
+      throw new ConfigActionException(\sprintf("The value provided to create %s must be an array", $configName));
     }
 
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface|null $entity */
@@ -62,12 +62,12 @@ final class EntityCreate implements ConfigActionPluginInterface, ContainerFactor
     $entity_type_manager = $this->configManager->getEntityTypeManager();
     $entity_type_id = $this->configManager->getEntityTypeIdByName($configName);
     if ($entity_type_id === NULL) {
-      throw new ConfigActionException(sprintf("Cannot determine a config entity type from %s", $configName));
+      throw new ConfigActionException(\sprintf("Cannot determine a config entity type from %s", $configName));
     }
     /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type */
     $entity_type = $entity_type_manager->getDefinition($entity_type_id);
 
-    $id = substr($configName, strlen($entity_type->getConfigPrefix()) + 1);
+    $id = \substr($configName, \strlen($entity_type->getConfigPrefix()) + 1);
     $entity_type_manager
       ->getStorage($entity_type->id())
       ->create($value + [

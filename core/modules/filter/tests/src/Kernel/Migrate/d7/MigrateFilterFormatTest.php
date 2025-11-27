@@ -53,7 +53,7 @@ class MigrateFilterFormatTest extends MigrateDrupal7TestBase implements MigrateD
       'name' => 'image_resize_filter',
       'weight' => '0',
       'status' => '1',
-      'settings' => serialize([]),
+      'settings' => \serialize([]),
     ];
     $db->insert('filter')->fields($fields)->execute();
   }
@@ -80,7 +80,7 @@ class MigrateFilterFormatTest extends MigrateDrupal7TestBase implements MigrateD
     $this->assertInstanceOf(FilterFormatInterface::class, $entity);
     $this->assertSame($label, $entity->label());
     // get('filters') will return enabled filters only, not all of them.
-    $this->assertSame(array_keys($enabled_filters), array_keys($entity->get('filters')));
+    $this->assertSame(\array_keys($enabled_filters), \array_keys($entity->get('filters')));
     $this->assertSame($weight, $entity->get('weight'));
     $this->assertSame($status, $entity->status());
     foreach ($entity->get('filters') as $filter_id => $filter) {
@@ -130,11 +130,11 @@ class MigrateFilterFormatTest extends MigrateDrupal7TestBase implements MigrateD
     // For each filter that does not exist on the destination, there should be
     // a log message.
     $migration = $this->getMigration('d7_filter_format');
-    $errors = array_map(function ($message) {
+    $errors = \array_map(function ($message) {
       return $message->message;
-    }, iterator_to_array($migration->getIdMap()->getMessages()));
+    }, \iterator_to_array($migration->getIdMap()->getMessages()));
     $this->assertCount(2, $errors);
-    sort($errors);
+    \sort($errors);
     $message = 'Filter image_resize_filter could not be mapped to an existing filter plugin; omitted since it is a transformation-only filter. Install and configure a successor after the migration.';
     $this->assertEquals($errors[0], $message);
     $message = ('Filter php_code could not be mapped to an existing filter plugin; defaulting to filter_null and dropping all settings. Either redo the migration with the module installed that provides an equivalent filter, or modify the text format after the migration to remove this filter if it is no longer necessary.');

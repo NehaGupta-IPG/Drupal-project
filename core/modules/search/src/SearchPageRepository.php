@@ -61,7 +61,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
    * {@inheritdoc}
    */
   public function getIndexableSearchPages() {
-    return array_filter($this->getActiveSearchPages(), function (SearchPageInterface $search) {
+    return \array_filter($this->getActiveSearchPages(), function (SearchPageInterface $search) {
       return $search->isIndexable();
     });
   }
@@ -82,7 +82,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
     }
 
     // Otherwise, use the first active search page.
-    return is_array($search_pages) ? reset($search_pages) : FALSE;
+    return \is_array($search_pages) ? \reset($search_pages) : FALSE;
   }
 
   /**
@@ -105,7 +105,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
    */
   public function sortSearchPages($search_pages) {
     $entity_type = $this->storage->getEntityType();
-    uasort($search_pages, [$entity_type->getClass(), 'sort']);
+    \uasort($search_pages, [$entity_type->getClass(), 'sort']);
     return $search_pages;
   }
 

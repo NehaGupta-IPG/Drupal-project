@@ -20,7 +20,7 @@ class AuditException extends \RuntimeException {
    *   (optional) The previous exception.
    */
   public function __construct(MigrationInterface $migration, $message, ?\Throwable $previous = NULL) {
-    $message = sprintf('Cannot audit migration %s: %s', $migration->id(), $message);
+    $message = \sprintf('Cannot audit migration %s: %s', $migration->id(), $message);
     parent::__construct($message, 0, $previous);
   }
 

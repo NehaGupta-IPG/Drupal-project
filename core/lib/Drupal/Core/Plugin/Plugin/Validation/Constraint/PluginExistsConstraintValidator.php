@@ -18,7 +18,7 @@ class PluginExistsConstraintValidator extends ConstraintValidator {
    * {@inheritdoc}
    */
   public function validate(mixed $plugin_id, Constraint $constraint): void {
-    assert($constraint instanceof PluginExistsConstraint);
+    \assert($constraint instanceof PluginExistsConstraint);
 
     if ($plugin_id === NULL) {
       return;
@@ -46,7 +46,7 @@ class PluginExistsConstraintValidator extends ConstraintValidator {
       return;
     }
 
-    if (!is_a(DefaultFactory::getPluginClass($plugin_id, $definition), $constraint->interface, TRUE)) {
+    if (!\is_a(DefaultFactory::getPluginClass($plugin_id, $definition), $constraint->interface, TRUE)) {
       $this->context->addViolation($constraint->invalidInterfaceMessage, [
         '@plugin_id' => $plugin_id,
         '@interface' => $constraint->interface,

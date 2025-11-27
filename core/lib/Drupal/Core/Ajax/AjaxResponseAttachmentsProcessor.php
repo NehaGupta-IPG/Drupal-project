@@ -66,7 +66,7 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    * {@inheritdoc}
    */
   public function processAttachments(AttachmentsInterface $response) {
-    assert($response instanceof AjaxResponse, '\Drupal\Core\Ajax\AjaxResponse instance expected.');
+    \assert($response instanceof AjaxResponse, '\Drupal\Core\Ajax\AjaxResponse instance expected.');
 
     $request = $this->requestStack->getCurrentRequest();
 
@@ -90,7 +90,7 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    */
   protected function buildAttachmentsCommands(AjaxResponse $response, Request $request) {
     $ajax_page_state = $request->get('ajax_page_state');
-    $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
+    $maintenance_mode = \defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
 
     // Aggregate CSS/JS if necessary, but only during normal site operation.
     $optimize_css = !$maintenance_mode && $this->config->get('css.preprocess');
@@ -101,7 +101,7 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     // Resolve the attached libraries into asset collections.
     $assets = new AttachedAssets();
     $assets->setLibraries($attachments['library'] ?? [])
-      ->setAlreadyLoadedLibraries(isset($ajax_page_state['libraries']) ? explode(',', $ajax_page_state['libraries']) : [])
+      ->setAlreadyLoadedLibraries(isset($ajax_page_state['libraries']) ? \explode(',', $ajax_page_state['libraries']) : [])
       ->setSettings($attachments['drupalSettings'] ?? []);
     $css_assets = $this->assetResolver->getCssAssets($assets, $optimize_css, $this->languageManager->getCurrentLanguage());
     [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($assets, $optimize_js, $this->languageManager->getCurrentLanguage());
@@ -132,17 +132,17 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $resource_commands = [];
     if ($css_assets) {
       $css_render_array = $this->cssCollectionRenderer->render($css_assets);
-      $resource_commands[] = new AddCssCommand(array_column($css_render_array, '#attributes'));
+      $resource_commands[] = new AddCssCommand(\array_column($css_render_array, '#attributes'));
     }
     if ($js_assets_header) {
       $js_header_render_array = $this->jsCollectionRenderer->render($js_assets_header);
-      $resource_commands[] = new AddJsCommand(array_column($js_header_render_array, '#attributes'), 'head');
+      $resource_commands[] = new AddJsCommand(\array_column($js_header_render_array, '#attributes'), 'head');
     }
     if ($js_assets_footer) {
       $js_footer_render_array = $this->jsCollectionRenderer->render($js_assets_footer);
-      $resource_commands[] = new AddJsCommand(array_column($js_footer_render_array, '#attributes'));
+      $resource_commands[] = new AddJsCommand(\array_column($js_footer_render_array, '#attributes'));
     }
-    foreach (array_reverse($resource_commands) as $resource_command) {
+    foreach (\array_reverse($resource_commands) as $resource_command) {
       $response->addCommand($resource_command, TRUE);
     }
 

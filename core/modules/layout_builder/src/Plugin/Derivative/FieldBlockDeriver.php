@@ -187,11 +187,11 @@ class FieldBlockDeriver extends DeriverBase implements ContainerDeriverInterface
 
     // Process $field_map, removing any entity types which are not using Layout
     // Builder.
-    $field_map = array_intersect_key($field_map, $layout_bundles);
+    $field_map = \array_intersect_key($field_map, $layout_bundles);
 
     foreach ($field_map as $entity_type_id => $fields) {
       foreach ($fields as $field_name => $field_info) {
-        $field_map[$entity_type_id][$field_name]['bundles'] = array_intersect($field_info['bundles'], $layout_bundles[$entity_type_id]);
+        $field_map[$entity_type_id][$field_name]['bundles'] = \array_intersect($field_info['bundles'], $layout_bundles[$entity_type_id]);
 
         // If no bundles are using Layout Builder, remove this field from the
         // field map.

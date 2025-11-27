@@ -102,7 +102,7 @@ class ContactLinkTest extends ViewTestBase {
    * @internal
    */
   public function assertContactLinks(array $accounts, array $names): void {
-    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "views-field-contact")]//a', count($names));
+    $this->assertSession()->elementsCount('xpath', '//div[contains(@class, "views-field-contact")]//a', \count($names));
     foreach ($names as $name) {
       $account_url = $accounts[$name]->toUrl('contact-form')->toString();
       $this->assertSession()->elementExists('xpath', "//div[contains(@class, 'views-field-contact')]//a[contains(@href, '$account_url')]");

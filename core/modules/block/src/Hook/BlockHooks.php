@@ -164,9 +164,9 @@ class BlockHooks {
     // configuration exists, call block_theme_initialize() for all installed
     // themes.
     $profile = \Drupal::installProfile();
-    if (in_array($profile, $modules, TRUE)) {
+    if (\in_array($profile, $modules, TRUE)) {
       foreach (\Drupal::service('theme_handler')->listInfo() as $theme => $data) {
-        block_theme_initialize($theme);
+        \block_theme_initialize($theme);
       }
     }
   }
@@ -198,7 +198,7 @@ class BlockHooks {
     foreach ($theme_list as $theme) {
       // Don't initialize themes that are not displayed in the UI.
       if (\Drupal::service('theme_handler')->hasUi($theme)) {
-        block_theme_initialize($theme);
+        \block_theme_initialize($theme);
       }
     }
   }
@@ -210,7 +210,7 @@ class BlockHooks {
   public function rebuild(): void {
     foreach (\Drupal::service('theme_handler')->listInfo() as $theme => $data) {
       if ($data->status) {
-        $regions = system_region_list($theme);
+        $regions = \system_region_list($theme);
         /** @var \Drupal\block\BlockInterface[] $blocks */
         $blocks = \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['theme' => $theme]);
         foreach ($blocks as $block_id => $block) {
@@ -219,7 +219,7 @@ class BlockHooks {
             if ($block->status()) {
               \Drupal::messenger()->addWarning($this->t('The block %info was assigned to the invalid region %region and has been disabled.', ['%info' => $block_id, '%region' => $block->getRegion()]));
             }
-            $block->setRegion(system_default_region($theme))->disable()->save();
+            $block->setRegion(\system_default_region($theme))->disable()->save();
           }
         }
       }

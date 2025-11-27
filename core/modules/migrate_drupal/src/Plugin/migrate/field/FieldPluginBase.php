@@ -84,7 +84,7 @@ abstract class FieldPluginBase extends PluginBase implements MigrateFieldInterfa
     // Some migrate field plugin IDs are prefixed with 'd6_' or 'd7_'. Since the
     // plugin ID is used in the static map as the module name, we have to remove
     // this prefix from the plugin ID.
-    $plugin_id = preg_replace('/d[67]_/', '', $this->pluginId);
+    $plugin_id = \preg_replace('/d[67]_/', '', $this->pluginId);
     foreach ($this->getFieldFormatterMap() as $source_format => $destination_format) {
       $process[0]['map'][$plugin_id][$source_format] = $destination_format;
     }

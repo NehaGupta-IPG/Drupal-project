@@ -132,7 +132,7 @@ class ExtensionStreamTest extends KernelTestBase {
     $base_url = $this->container->get('router.request_context')->getCompleteBaseUrl();
     $this->enableModules(['image']);
 
-    [$scheme] = explode('://', $uri);
+    [$scheme] = \explode('://', $uri);
     $this->streamWrappers[$scheme]->setUri($uri);
 
     $this->assertSame($expected_dirname, $this->streamWrappers[$scheme]->dirname());
@@ -150,7 +150,7 @@ class ExtensionStreamTest extends KernelTestBase {
    */
   #[DataProvider('providerStreamWrapperMethodsOnMissingExtensions')]
   public function testStreamWrapperDirnameOnMissingExtensions(string $uri, string $expected_message): void {
-    [$scheme] = explode('://', $uri);
+    [$scheme] = \explode('://', $uri);
     $this->streamWrappers[$scheme]->setUri($uri);
 
     $this->expectException(UnknownExtensionException::class);
@@ -168,7 +168,7 @@ class ExtensionStreamTest extends KernelTestBase {
    */
   #[DataProvider('providerStreamWrapperMethodsOnMissingExtensions')]
   public function testStreamWrapperRealpathOnMissingExtensions(string $uri, string $expected_message): void {
-    [$scheme] = explode('://', $uri);
+    [$scheme] = \explode('://', $uri);
     $this->streamWrappers[$scheme]->setUri($uri);
 
     $this->expectException(UnknownExtensionException::class);
@@ -186,7 +186,7 @@ class ExtensionStreamTest extends KernelTestBase {
    */
   #[DataProvider('providerStreamWrapperMethodsOnMissingExtensions')]
   public function testStreamWrapperGetExternalUrlOnMissingExtensions(string $uri, string $expected_message): void {
-    [$scheme] = explode('://', $uri);
+    [$scheme] = \explode('://', $uri);
     $this->streamWrappers[$scheme]->setUri($uri);
 
     $this->expectException(UnknownExtensionException::class);
@@ -279,8 +279,8 @@ class ExtensionStreamTest extends KernelTestBase {
   #[TestWith(['theme://claro'])]
   #[TestWith(['theme://claro/claro.theme'])]
   public function testDisallowedFileExtensions(string $uri): void {
-    [$scheme] = explode('://', $uri);
-    $extension = pathinfo($uri, PATHINFO_EXTENSION);
+    [$scheme] = \explode('://', $uri);
+    $extension = \pathinfo($uri, PATHINFO_EXTENSION);
 
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage("The $scheme stream wrapper does not support the '$extension' file type.");
@@ -296,7 +296,7 @@ class ExtensionStreamTest extends KernelTestBase {
   public function testNoExtensionError(string $scheme): void {
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessage('Unable to determine the extension name.');
-    file_exists($scheme . '://');
+    \file_exists($scheme . '://');
   }
 
 }

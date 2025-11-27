@@ -44,12 +44,12 @@ class EntityTestUniqueConstraint extends EntityTest {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['field_test_text'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('unique_field_test'))
+      ->setLabel(\t('unique_field_test'))
       ->setCardinality(3)
       ->addConstraint('UniqueField');
 
     $fields['field_test_reference'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('unique_reference_test'))
+      ->setLabel(\t('unique_reference_test'))
       ->setCardinality(2)
       ->addConstraint('UniqueField')
       ->setSetting('target_type', 'user');

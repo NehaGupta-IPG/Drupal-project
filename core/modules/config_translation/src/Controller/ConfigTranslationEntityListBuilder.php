@@ -30,7 +30,7 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
     $build = parent::render();
     $filter = $this->getFilterLabels();
 
-    usort($build['table']['#rows'], [$this, 'sortRows']);
+    \usort($build['table']['#rows'], [$this, 'sortRows']);
 
     $build['filters'] = [
       '#type' => 'container',
@@ -82,7 +82,7 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
    */
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
-    foreach (array_keys($operations) as $operation) {
+    foreach (\array_keys($operations) as $operation) {
       // This is a translation UI for translators. Show the translation
       // operation only.
       if (!($operation == 'translate')) {
@@ -113,15 +113,15 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
    *   The comparison result for uasort().
    */
   protected function sortRowsMultiple($a, $b, $keys) {
-    $key = array_shift($keys);
-    $a_value = (is_array($a) && isset($a[$key]['data'])) ? $a[$key]['data'] : '';
-    $b_value = (is_array($b) && isset($b[$key]['data'])) ? $b[$key]['data'] : '';
+    $key = \array_shift($keys);
+    $a_value = (\is_array($a) && isset($a[$key]['data'])) ? $a[$key]['data'] : '';
+    $b_value = (\is_array($b) && isset($b[$key]['data'])) ? $b[$key]['data'] : '';
 
     if ($a_value == $b_value && !empty($keys)) {
       return $this->sortRowsMultiple($a, $b, $keys);
     }
 
-    return strnatcasecmp($a_value, $b_value);
+    return \strnatcasecmp($a_value, $b_value);
   }
 
   /**

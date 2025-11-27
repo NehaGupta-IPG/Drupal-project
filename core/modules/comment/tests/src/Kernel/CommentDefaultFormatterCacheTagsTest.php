@@ -41,7 +41,7 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
     $this->createUser([], NULL, FALSE, ['uid' => 1, 'name' => 'user1'])->save();
 
     $this->container->get('module_handler')->loadInclude('comment', 'install');
-    comment_install();
+    \comment_install();
 
     $session = new Session();
 

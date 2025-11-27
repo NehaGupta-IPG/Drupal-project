@@ -71,7 +71,7 @@ class JsMessageTest extends WebDriverTestBase {
     $messagesSelector = JSMessageTestController::getMessagesSelectors()[0];
     $current_messages = [];
     $types = JSMessageTestController::getTypes();
-    $nb_messages = count($types) * 2;
+    $nb_messages = \count($types) * 2;
     for ($i = 0; $i < $nb_messages; $i++) {
       $current_messages[] = "This is message number $i of the type, {$types[$i % count($types)]}. You be the judge of its importance.";
     }
@@ -87,7 +87,7 @@ class JsMessageTest extends WebDriverTestBase {
       $current_messages[] = "Msg-$i";
     }
     // The last message is of a different type and shouldn't get cleared.
-    $last_message = 'Msg-' . count($current_messages);
+    $last_message = 'Msg-' . \count($current_messages);
     $current_messages[] = $last_message;
     $this->click('[id="add-multiple-error"]');
     $this->assertCurrentMessages($current_messages, $messagesSelector);
@@ -116,7 +116,7 @@ class JsMessageTest extends WebDriverTestBase {
    * @internal
    */
   protected function assertCurrentMessages(array $expected_messages, string $messagesSelector): void {
-    $expected_messages = array_values($expected_messages);
+    $expected_messages = \array_values($expected_messages);
     $current_messages = [];
     if ($message_divs = $this->getSession()->getPage()->findAll('css', "$messagesSelector .messages")) {
       foreach ($message_divs as $message_div) {
@@ -125,10 +125,10 @@ class JsMessageTest extends WebDriverTestBase {
       }
     }
     // Check that each message text contains the expected text.
-    if (count($expected_messages) !== count($current_messages)) {
+    if (\count($expected_messages) !== \count($current_messages)) {
       $this->fail('The expected messages array contains a different number of values than the current messages array.');
     }
-    for ($i = 0; $i < count($expected_messages); $i++) {
+    for ($i = 0; $i < \count($expected_messages); $i++) {
       $this->assertStringContainsString($expected_messages[$i], $current_messages[$i]);
     }
   }

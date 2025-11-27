@@ -230,7 +230,7 @@ class MailManager extends DefaultPluginManager implements MailManagerInterface {
     $site_config = $this->configFactory->get('system.site');
     $site_mail = $site_config->get('mail');
     if (empty($site_mail)) {
-      $site_mail = ini_get('sendmail_from');
+      $site_mail = \ini_get('sendmail_from');
     }
 
     // Bundle up the variables into a structured array for altering.

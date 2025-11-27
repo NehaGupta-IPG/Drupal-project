@@ -70,7 +70,7 @@ class HandlerAllTest extends ViewsKernelTestBase {
     CommentType::create(['id' => 'comment', 'label' => 'Default comment', 'target_entity_type_id' => 'node'])->save();
     $this->addDefaultCommentField('node', 'article');
 
-    $object_types = array_keys(ViewExecutable::getHandlerTypes());
+    $object_types = \array_keys(ViewExecutable::getHandlerTypes());
     foreach ($this->container->get('views.views_data')->getAll() as $base_table => $info) {
       if (!isset($info['table']['base'])) {
         continue;
@@ -86,7 +86,7 @@ class HandlerAllTest extends ViewsKernelTestBase {
       // Go through all fields and there through all handler types.
       foreach ($info as $field => $field_info) {
         // Table is a reserved key for the meta-information.
-        if ($field != 'table' && !in_array("$base_table:$field", $exclude)) {
+        if ($field != 'table' && !\in_array("$base_table:$field", $exclude)) {
           $item = [
             'table' => $base_table,
             'field' => $field,

@@ -59,18 +59,18 @@ class ResourceFetcher implements ResourceFetcherInterface {
     [$format] = $response->getHeader('Content-Type');
     $content = (string) $response->getBody();
 
-    if (strstr($format, 'text/xml') || strstr($format, 'application/xml')) {
+    if (\strstr($format, 'text/xml') || \strstr($format, 'application/xml')) {
       $data = $this->parseResourceXml($content, $url);
     }
     // By default, try to parse the resource data as JSON.
     else {
       $data = Json::decode($content);
 
-      if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new ResourceException('Error decoding oEmbed resource: ' . json_last_error_msg(), $url);
+      if (\json_last_error() !== JSON_ERROR_NONE) {
+        throw new ResourceException('Error decoding oEmbed resource: ' . \json_last_error_msg(), $url);
       }
     }
-    if (empty($data) || !is_array($data)) {
+    if (empty($data) || !\is_array($data)) {
       throw new ResourceException('The oEmbed resource could not be decoded.', $url);
     }
 
@@ -205,16 +205,16 @@ class ResourceFetcher implements ResourceFetcherInterface {
    */
   protected function parseResourceXml($data, $url) {
     // Enable userspace error handling.
-    $was_using_internal_errors = libxml_use_internal_errors(TRUE);
-    libxml_clear_errors();
+    $was_using_internal_errors = \libxml_use_internal_errors(TRUE);
+    \libxml_clear_errors();
 
-    $content = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
+    $content = \simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
     // Restore the previous error handling behavior.
-    libxml_use_internal_errors($was_using_internal_errors);
+    \libxml_use_internal_errors($was_using_internal_errors);
 
-    $error = libxml_get_last_error();
+    $error = \libxml_get_last_error();
     if ($error) {
-      libxml_clear_errors();
+      \libxml_clear_errors();
       throw new ResourceException($error->message, $url);
     }
     elseif ($content === FALSE) {

@@ -122,7 +122,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
     $this->logger = $logger;
 
     // Get the entity type and field name from the plugin ID.
-    [, $entity_type_id, $bundle, $field_name] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 4);
+    [, $entity_type_id, $bundle, $field_name] = \explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 4);
     $this->entityTypeId = $entity_type_id;
     $this->bundle = $bundle;
     $this->fieldName = $field_name;
@@ -283,9 +283,9 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   public function formatterSettingsProcessCallback(array &$element, FormStateInterface $form_state, array &$complete_form) {
     if ($formatter = $this->getFormatter($element['#parents'], $form_state)) {
       $element['settings_wrapper']['settings'] = $formatter->settingsForm($complete_form, $form_state);
-      $element['settings_wrapper']['settings']['#parents'] = array_merge($element['#parents'], ['settings']);
+      $element['settings_wrapper']['settings']['#parents'] = \array_merge($element['#parents'], ['settings']);
       $element['settings_wrapper']['third_party_settings'] = $this->thirdPartySettingsForm($formatter, $this->getFieldDefinition(), $complete_form, $form_state);
-      $element['settings_wrapper']['third_party_settings']['#parents'] = array_merge($element['#parents'], ['third_party_settings']);
+      $element['settings_wrapper']['third_party_settings']['#parents'] = \array_merge($element['#parents'], ['third_party_settings']);
       FormHelper::rewriteStatesSelector($element['settings_wrapper'], "fields[$this->fieldName][settings_edit_form]", 'settings[formatter]');
 
       // Store the array parents for our element so that we can retrieve the
@@ -334,7 +334,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    */
   public static function formatterSettingsAjaxCallback(array $form, FormStateInterface $form_state) {
     $formatter_array_parents = $form_state->get('field_block_array_parents');
-    return NestedArray::getValue($form, array_merge($formatter_array_parents, ['settings_wrapper']));
+    return NestedArray::getValue($form, \array_merge($formatter_array_parents, ['settings_wrapper']));
   }
 
   /**

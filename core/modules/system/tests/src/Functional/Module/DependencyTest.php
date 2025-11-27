@@ -122,8 +122,8 @@ class DependencyTest extends ModuleTestBase {
       'name' => 'System no module version dependency test',
     ];
     $path = $this->siteDirectory . '/modules/system_no_module_version_dependency_test';
-    mkdir($path, 0777, TRUE);
-    file_put_contents("$path/system_no_module_version_dependency_test.info.yml", Yaml::encode($info));
+    \mkdir($path, 0777, TRUE);
+    \file_put_contents("$path/system_no_module_version_dependency_test.info.yml", Yaml::encode($info));
 
     // Include a version in the dependency definition, to test the 'incompatible
     // with version' message when no version is given in the required module.
@@ -134,8 +134,8 @@ class DependencyTest extends ModuleTestBase {
       'dependencies' => ['system_no_module_version_dependency_test(>1.x)'],
     ];
     $path = $this->siteDirectory . '/modules/system_no_module_version_test';
-    mkdir($path, 0777, TRUE);
-    file_put_contents("$path/system_no_module_version_test.info.yml", Yaml::encode($info));
+    \mkdir($path, 0777, TRUE);
+    \file_put_contents("$path/system_no_module_version_test.info.yml", Yaml::encode($info));
 
     // Ensure that the module list page is displayed without errors.
     $this->drupalGet('admin/modules');
@@ -153,7 +153,7 @@ class DependencyTest extends ModuleTestBase {
     ];
 
     $path = $this->siteDirectory . '/modules/system_no_module_version_test';
-    file_put_contents("$path/system_no_module_version_test.info.yml", Yaml::encode($info));
+    \file_put_contents("$path/system_no_module_version_test.info.yml", Yaml::encode($info));
 
     $this->drupalGet('admin/modules');
     $this->assertSession()->pageTextContains('System no module version dependency test');
@@ -177,7 +177,7 @@ class DependencyTest extends ModuleTestBase {
    */
   public function testIncompatiblePhpVersionDependency(): void {
     $this->drupalGet('admin/modules');
-    $this->assertSession()->pageTextContains('This module requires PHP version 6502.* and is incompatible with PHP version ' . phpversion() . '.');
+    $this->assertSession()->pageTextContains('This module requires PHP version 6502.* and is incompatible with PHP version ' . \phpversion() . '.');
     $this->assertSession()->fieldDisabled('modules[system_incompatible_php_version_test][enable]');
   }
 

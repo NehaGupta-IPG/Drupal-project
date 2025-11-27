@@ -206,7 +206,7 @@ class FilterDateTest extends ViewTestBase {
   protected function assertIds(array $expected_ids = []): void {
     // First verify the count.
     $elements = $this->cssSelect('.views-row .field-content');
-    $this->assertCount(count($expected_ids), $elements);
+    $this->assertCount(\count($expected_ids), $elements);
 
     $actual_ids = [];
     foreach ($elements as $element) {

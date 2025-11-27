@@ -233,7 +233,7 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
     // Specific expected help texts for the media field.
     $create_header = "Create new media";
     $use_header = "Use existing media";
-    $type_list = 'Allowed media types: ' . implode(", ", array_keys($media_types));
+    $type_list = 'Allowed media types: ' . \implode(", ", \array_keys($media_types));
 
     $fieldset_selector = '#edit-field-media-reference-wrapper fieldset';
     $fieldset = $assert_session->elementExists('css', $fieldset_selector);
@@ -246,7 +246,7 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
     // The entire section for creating new media should only be displayed if
     // the user can create at least one media of the type.
     if ($create_media_types) {
-      if (count($create_media_types) === 1) {
+      if (\count($create_media_types) === 1) {
         $url = Url::fromRoute('entity.media.add_form')->setRouteParameter('media_type', $create_media_types[0]);
       }
       else {
@@ -299,7 +299,7 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
     foreach ($texts as $text) {
       // We only want to escape single quotes, so use str_replace() rather than
       // addslashes().
-      $text = str_replace("'", "\'", $text);
+      $text = \str_replace("'", "\'", $text);
       if ($selector) {
         $assert_session->elementsCount('css', $selector . ":contains('$text')", 1);
       }

@@ -26,9 +26,9 @@ class FieldInstancePerViewMode extends FieldInstance {
 
     $rows = [];
     foreach ($instances->getArrayCopy() as $instance) {
-      $data = unserialize($instance['data']);
+      $data = \unserialize($instance['data']);
       foreach ($data['display'] as $view_mode => $formatter) {
-        $rows[] = array_merge($instance, [
+        $rows[] = \array_merge($instance, [
           'view_mode' => $view_mode,
           'formatter' => $formatter,
         ]);
@@ -41,7 +41,7 @@ class FieldInstancePerViewMode extends FieldInstance {
    * {@inheritdoc}
    */
   public function fields() {
-    return array_merge(parent::fields(), [
+    return \array_merge(parent::fields(), [
       'view_mode' => $this->t('The original machine name of the view mode.'),
       'formatter' => $this->t('The formatter settings.'),
     ]);

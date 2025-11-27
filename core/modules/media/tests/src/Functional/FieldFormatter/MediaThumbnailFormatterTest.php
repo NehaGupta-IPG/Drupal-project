@@ -76,7 +76,7 @@ class MediaThumbnailFormatterTest extends MediaFunctionalTestBase {
 
     // Create and upload a file to the media.
     $file = File::create([
-      'uri' => current($this->getTestFiles('image'))->uri,
+      'uri' => \current($this->getTestFiles('image'))->uri,
     ]);
     $file->save();
     $mediaImage = Media::create([

@@ -62,7 +62,7 @@ class UserPictureFile extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    $row->setSourceProperty('filename', basename($row->getSourceProperty('picture')));
+    $row->setSourceProperty('filename', \basename($row->getSourceProperty('picture')));
     $row->setSourceProperty('file_directory_path', $this->filePath);
     $row->setSourceProperty('temp_directory_path', $this->tempFilePath);
     return parent::prepareRow($row);

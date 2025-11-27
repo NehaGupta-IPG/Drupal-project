@@ -193,7 +193,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     $langcode = NULL;
     $method = $this->negotiatorManager->getDefinition($method_id);
 
-    if (!isset($method['types']) || in_array($type, $method['types'])) {
+    if (!isset($method['types']) || \in_array($type, $method['types'])) {
       $langcode = $this->getNegotiationMethodInstance($method_id)->getLangcode($this->requestStack->getCurrentRequest());
     }
 
@@ -212,7 +212,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     $definitions = $this->negotiatorManager->getDefinitions();
     if (isset($type)) {
       $enabled_methods = $this->getEnabledNegotiators($type);
-      $definitions = array_intersect_key($definitions, $enabled_methods);
+      $definitions = \array_intersect_key($definitions, $enabled_methods);
     }
     return $definitions;
   }
@@ -236,7 +236,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
    */
   public function getPrimaryNegotiationMethod($type) {
     $enabled_methods = $this->getEnabledNegotiators($type);
-    return empty($enabled_methods) ? LanguageNegotiatorInterface::METHOD_ID : key($enabled_methods);
+    return empty($enabled_methods) ? LanguageNegotiatorInterface::METHOD_ID : \key($enabled_methods);
   }
 
   /**
@@ -267,16 +267,16 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     $default_types = $this->languageManager->getLanguageTypes();
 
     // Ensure that the weights are integers.
-    $enabled_methods = array_map('intval', $enabled_methods);
+    $enabled_methods = \array_map('intval', $enabled_methods);
 
     // Order the language negotiation method list by weight.
-    asort($enabled_methods);
+    \asort($enabled_methods);
     foreach ($enabled_methods as $method_id => $weight) {
       if (isset($definitions[$method_id])) {
         $method = $definitions[$method_id];
         // If the language negotiation method does not express any preference
         // about types, make it available for any configurable type.
-        $types = array_flip(!empty($method['types']) ? $method['types'] : $default_types);
+        $types = \array_flip(!empty($method['types']) ? $method['types'] : $default_types);
         // Check whether the method is defined and has the right type.
         if (!isset($types[$type])) {
           unset($enabled_methods[$method_id]);
@@ -320,7 +320,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
     $method_definitions = $this->getNegotiationMethods();
 
     foreach ($language_types_info as $type => $info) {
-      $configurable = in_array($type, $types);
+      $configurable = \in_array($type, $types);
 
       // The default language negotiation settings, if available, are stored in
       // $info['fixed'].
@@ -335,7 +335,7 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
           // negotiated for the interface language which, should always be
           // available.
           $method_weights = [LanguageNegotiationUI::METHOD_ID];
-          $method_weights = array_flip($method_weights);
+          $method_weights = \array_flip($method_weights);
           $this->saveConfiguration($type, $method_weights);
         }
       }
@@ -370,8 +370,8 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
 
     // Store the language type configuration.
     $config = [
-      'configurable' => array_keys(array_filter($language_types)),
-      'all' => array_keys($language_types),
+      'configurable' => \array_keys(\array_filter($language_types)),
+      'all' => \array_keys($language_types),
     ];
     $this->languageManager->saveLanguageTypesConfiguration($config);
   }

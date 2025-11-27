@@ -50,11 +50,11 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
         return $values;
       }
 
-      $route_name = explode('.', $url->getRouteName());
+      $route_name = \explode('.', $url->getRouteName());
       // We can rely on this pattern because routed entity URLs are generated
       // in a consistent way with the `entity` scheme.
       // @see \Drupal\Core\Url::fromUri()
-      if (count($route_name) === 3 && $route_name[0] === 'entity' && $route_name[2] === 'canonical') {
+      if (\count($route_name) === 3 && $route_name[0] === 'entity' && $route_name[2] === 'canonical') {
         $target_entity_type_id = $route_name[1];
         $route_parameters = $url->getRouteParameters();
         $target_id = $route_parameters[$target_entity_type_id];

@@ -48,7 +48,7 @@ class UninstallTest extends BrowserTestBase {
     $this->container->get('module_installer')->uninstall(['module_test']);
 
     // Are the perms defined by module_test removed?
-    $roles = array_filter(Role::loadMultiple(), fn(RoleInterface $role) => $role->hasPermission('module_test perm'));
+    $roles = \array_filter(Role::loadMultiple(), fn(RoleInterface $role) => $role->hasPermission('module_test perm'));
     $this->assertEmpty($roles, 'Permissions were all removed.');
   }
 
@@ -105,8 +105,8 @@ class UninstallTest extends BrowserTestBase {
     $module_unstable_2 = $this->assertSession()->elementExists('xpath', "//label[./a[contains(@aria-label, 'View information on the Obsolete status of the module System obsolete status test')]]")->getOuterHtml();
 
     // Check that all unstable modules appear before the first stable module.
-    $this->assertGreaterThan(strpos($form_html, $module_unstable_1), strpos($form_html, $module_stable));
-    $this->assertGreaterThan(strpos($form_html, $module_unstable_2), strpos($form_html, $module_stable));
+    $this->assertGreaterThan(\strpos($form_html, $module_unstable_1), \strpos($form_html, $module_stable));
+    $this->assertGreaterThan(\strpos($form_html, $module_unstable_2), \strpos($form_html, $module_stable));
 
     foreach (\Drupal::service('extension.list.module')->getAllInstalledInfo() as $module => $info) {
       $field_name = "uninstall[$module]";
@@ -162,7 +162,7 @@ class UninstallTest extends BrowserTestBase {
       $this->assertSession()->pageTextContains($label);
       $entity_types[] = $entity->getEntityTypeId();
     }
-    $entity_types = array_unique($entity_types);
+    $entity_types = \array_unique($entity_types);
     foreach ($entity_types as $entity_type_id) {
       $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
       // Add h3's since the entity type label is often repeated in the entity

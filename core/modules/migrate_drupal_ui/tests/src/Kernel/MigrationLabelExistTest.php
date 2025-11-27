@@ -28,13 +28,13 @@ class MigrationLabelExistTest extends MigrateDrupalTestBase {
     $module_handler = $this->container->get('module_handler');
     $modules = $this->coreModuleListDataProvider();
     $modules_enabled = $module_handler->getModuleList();
-    $modules_to_enable = array_keys(array_diff_key($modules, $modules_enabled));
+    $modules_to_enable = \array_keys(\array_diff_key($modules, $modules_enabled));
     $this->enableModules($modules_to_enable);
 
     /** @var \Drupal\migrate\Plugin\MigrationPluginManager $plugin_manager */
     $plugin_manager = $this->container->get('plugin.manager.migration');
     // Get all the migrations.
-    $migrations = $plugin_manager->createInstances(array_keys($plugin_manager->getDefinitions()));
+    $migrations = $plugin_manager->createInstances(\array_keys($plugin_manager->getDefinitions()));
     /** @var \Drupal\migrate\Plugin\Migration $migration */
     foreach ($migrations as $migration) {
       $migration_id = $migration->getPluginId();

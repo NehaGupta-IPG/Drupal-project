@@ -64,7 +64,7 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
         }
       }
       if (!empty($used_in)) {
-        $reasons[] = $this->t('Provides a filter plugin that is in use in the following filter formats: %formats', ['%formats' => implode(', ', $used_in)]);
+        $reasons[] = $this->t('Provides a filter plugin that is in use in the following filter formats: %formats', ['%formats' => \implode(', ', $used_in)]);
       }
     }
     return $reasons;
@@ -80,7 +80,7 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
    *   The filter definitions for the specified provider.
    */
   protected function getFilterDefinitionsByProvider($provider) {
-    return array_filter($this->filterManager->getDefinitions(), function ($definition) use ($provider) {
+    return \array_filter($this->filterManager->getDefinitions(), function ($definition) use ($provider) {
       return $definition['provider'] == $provider;
     });
   }

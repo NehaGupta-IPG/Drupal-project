@@ -37,16 +37,16 @@ class LocaleBuildTest extends KernelTestBase {
     \Drupal::state()->set('locale.test_system_info_alter', TRUE);
 
     // Confirm the project name and core value before the module is altered.
-    $projects = locale_translation_build_projects();
+    $projects = \locale_translation_build_projects();
     $this->assertSame('locale_test', $projects['locale_test']->name);
     $this->assertSame('all', $projects['locale_test']->core);
 
     $projects['locale_test']->langcode = 'de';
-    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', locale_translation_build_server_pattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
+    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \locale_translation_build_server_pattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
 
     // Alter both the name and core value of the project.
     \Drupal::state()->set('locale.test_system_info_alter_name_core', TRUE);
-    drupal_static_reset('locale_translation_project_list');
+    \drupal_static_reset('locale_translation_project_list');
     $module_list->reset();
 
     // Confirm the name and core value are changed in $module->info.
@@ -56,12 +56,12 @@ class LocaleBuildTest extends KernelTestBase {
     $this->assertSame('locale_test', $module->getName());
 
     // Confirm the name and core value are not changed in the project.
-    $projects = locale_translation_build_projects();
+    $projects = \locale_translation_build_projects();
     $this->assertSame('locale_test', $projects['locale_test']->name);
     $this->assertSame('all', $projects['locale_test']->core);
 
     $projects['locale_test']->langcode = 'de';
-    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', locale_translation_build_server_pattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
+    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \locale_translation_build_server_pattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
   }
 
 }

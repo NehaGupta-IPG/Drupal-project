@@ -91,7 +91,7 @@ class ContentTranslationManager implements ContentTranslationManagerInterface, B
     $enabled = FALSE;
 
     if ($this->isSupported($entity_type_id)) {
-      $bundles = !empty($bundle) ? [$bundle] : array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
+      $bundles = !empty($bundle) ? [$bundle] : \array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id));
       foreach ($bundles as $bundle) {
         $config = $this->loadContentLanguageSettings($entity_type_id, $bundle);
         if ($config->getThirdPartySetting('content_translation', 'enabled', FALSE)) {

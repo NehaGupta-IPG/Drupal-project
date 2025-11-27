@@ -32,7 +32,7 @@ class EntityFile extends EntityContentBase {
     }
     $entity = $this->storage->loadByProperties(['uri' => $destination]);
     if ($entity) {
-      return reset($entity);
+      return \reset($entity);
     }
     else {
       return parent::getEntity($row, $old_destination_id_values);
@@ -53,13 +53,13 @@ class EntityFile extends EntityContentBase {
         throw new MigrateException('Stubbing failed, unable to generate value for field uri');
       }
       // generateSampleValue() wraps the value in an array.
-      $value = reset($value);
+      $value = \reset($value);
       // Make it into a proper public file uri, stripping off the existing
       // scheme if present.
-      $value = 'public://' . preg_replace('|^[a-z]+://|i', '', $value);
-      $value = mb_substr($value, 0, $field_definitions['uri']->getSetting('max_length'));
+      $value = 'public://' . \preg_replace('|^[a-z]+://|i', '', $value);
+      $value = \mb_substr($value, 0, $field_definitions['uri']->getSetting('max_length'));
       // Create a real file, so File::preSave() can do filesize() on it.
-      touch($value);
+      \touch($value);
       $row->setDestinationProperty('uri', $value);
     }
     parent::processStubRow($row);

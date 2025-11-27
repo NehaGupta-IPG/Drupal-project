@@ -55,7 +55,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    */
   public function __construct($count, $singular, $plural, array $args = [], array $options = [], ?TranslationInterface $string_translation = NULL) {
     $this->count = $count;
-    $translatable_string = implode(PoItem::DELIMITER, [$singular, $plural]);
+    $translatable_string = \implode(PoItem::DELIMITER, [$singular, $plural]);
     parent::__construct($translatable_string, $args, $options, $string_translation);
   }
 
@@ -105,10 +105,10 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
 
     $arguments = $this->getArguments();
     $arguments['@count'] = $this->count;
-    $translated_array = explode(PoItem::DELIMITER, $this->translatedString);
+    $translated_array = \explode(PoItem::DELIMITER, $this->translatedString);
 
     $index = $this->getPluralIndex();
-    if ($this->count == 1 || $index == 0 || count($translated_array) == 1) {
+    if ($this->count == 1 || $index == 0 || \count($translated_array) == 1) {
       // Singular form.
       $return = $translated_array[0];
     }
@@ -134,8 +134,8 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
     // locale installed but the child site does not.
     // @todo Refactor in https://www.drupal.org/node/2660338 so this code does
     // not depend on knowing that the Locale module exists.
-    if (function_exists('locale_get_plural') && \Drupal::hasService('locale.plural.formula')) {
-      return locale_get_plural($this->count, $this->getOption('langcode'));
+    if (\function_exists('locale_get_plural') && \Drupal::hasService('locale.plural.formula')) {
+      return \locale_get_plural($this->count, $this->getOption('langcode'));
     }
     return -1;
   }
@@ -144,7 +144,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    return array_merge(parent::__sleep(), ['count']);
+    return \array_merge(parent::__sleep(), ['count']);
   }
 
 }

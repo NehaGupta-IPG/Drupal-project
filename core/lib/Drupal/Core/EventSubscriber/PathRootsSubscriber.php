@@ -48,7 +48,7 @@ class PathRootsSubscriber implements EventSubscriberInterface {
   public function onRouteAlter(RouteBuildEvent $event) {
     $collection = $event->getRouteCollection();
     foreach ($collection->all() as $route) {
-      $bits = explode('/', ltrim($route->getPath(), '/'));
+      $bits = \explode('/', \ltrim($route->getPath(), '/'));
       $this->pathRoots[$bits[0]] = $bits[0];
     }
   }
@@ -57,7 +57,7 @@ class PathRootsSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public function onRouteFinished() {
-    $this->state->set('router.path_roots', array_keys($this->pathRoots));
+    $this->state->set('router.path_roots', \array_keys($this->pathRoots));
     $this->pathRoots = [];
   }
 

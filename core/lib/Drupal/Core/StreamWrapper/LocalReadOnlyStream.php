@@ -26,9 +26,9 @@ abstract class LocalReadOnlyStream extends LocalStream {
    * {@inheritdoc}
    */
   public function stream_open($uri, $mode, $options, &$opened_path) {
-    if (!in_array($mode, ['r', 'rb', 'rt'])) {
+    if (!\in_array($mode, ['r', 'rb', 'rt'])) {
       if ($options & STREAM_REPORT_ERRORS) {
-        trigger_error('stream_open() write modes not supported for read-only stream wrappers', E_USER_WARNING);
+        \trigger_error('stream_open() write modes not supported for read-only stream wrappers', E_USER_WARNING);
       }
       return FALSE;
     }
@@ -58,12 +58,12 @@ abstract class LocalReadOnlyStream extends LocalStream {
    */
   public function stream_lock($operation) {
     // Disallow exclusive lock or non-blocking lock requests.
-    if (in_array($operation, [LOCK_EX, LOCK_EX | LOCK_NB])) {
-      trigger_error('stream_lock() exclusive lock operations not supported for read-only stream wrappers', E_USER_WARNING);
+    if (\in_array($operation, [LOCK_EX, LOCK_EX | LOCK_NB])) {
+      \trigger_error('stream_lock() exclusive lock operations not supported for read-only stream wrappers', E_USER_WARNING);
       return FALSE;
     }
-    if (in_array($operation, [LOCK_SH, LOCK_UN, LOCK_SH | LOCK_NB])) {
-      return flock($this->handle, $operation);
+    if (\in_array($operation, [LOCK_SH, LOCK_UN, LOCK_SH | LOCK_NB])) {
+      return \flock($this->handle, $operation);
     }
 
     return TRUE;
@@ -83,7 +83,7 @@ abstract class LocalReadOnlyStream extends LocalStream {
    * @see http://php.net/manual/streamwrapper.stream-write.php
    */
   public function stream_write($data) {
-    trigger_error('stream_write() not supported for read-only stream wrappers', E_USER_WARNING);
+    \trigger_error('stream_write() not supported for read-only stream wrappers', E_USER_WARNING);
     return FALSE;
   }
 
@@ -109,7 +109,7 @@ abstract class LocalReadOnlyStream extends LocalStream {
    * Does not change meta data as this is a read-only stream wrapper.
    */
   public function stream_metadata($uri, $option, $value) {
-    trigger_error('stream_metadata() not supported for read-only stream wrappers', E_USER_WARNING);
+    \trigger_error('stream_metadata() not supported for read-only stream wrappers', E_USER_WARNING);
     return FALSE;
   }
 
@@ -117,7 +117,7 @@ abstract class LocalReadOnlyStream extends LocalStream {
    * {@inheritdoc}
    */
   public function stream_truncate($new_size) {
-    trigger_error('stream_truncate() not supported for read-only stream wrappers', E_USER_WARNING);
+    \trigger_error('stream_truncate() not supported for read-only stream wrappers', E_USER_WARNING);
     return FALSE;
   }
 
@@ -137,7 +137,7 @@ abstract class LocalReadOnlyStream extends LocalStream {
    * @see http://php.net/manual/streamwrapper.unlink.php
    */
   public function unlink($uri) {
-    trigger_error('unlink() not supported for read-only stream wrappers', E_USER_WARNING);
+    \trigger_error('unlink() not supported for read-only stream wrappers', E_USER_WARNING);
     return TRUE;
   }
 
@@ -157,7 +157,7 @@ abstract class LocalReadOnlyStream extends LocalStream {
    * @see http://php.net/manual/streamwrapper.rename.php
    */
   public function rename($from_uri, $to_uri) {
-    trigger_error('rename() not supported for read-only stream wrappers', E_USER_WARNING);
+    \trigger_error('rename() not supported for read-only stream wrappers', E_USER_WARNING);
     return FALSE;
   }
 
@@ -179,7 +179,7 @@ abstract class LocalReadOnlyStream extends LocalStream {
    * @see http://php.net/manual/streamwrapper.mkdir.php
    */
   public function mkdir($uri, $mode, $options) {
-    trigger_error('mkdir() not supported for read-only stream wrappers', E_USER_WARNING);
+    \trigger_error('mkdir() not supported for read-only stream wrappers', E_USER_WARNING);
     return FALSE;
   }
 
@@ -199,7 +199,7 @@ abstract class LocalReadOnlyStream extends LocalStream {
    * @see http://php.net/manual/streamwrapper.rmdir.php
    */
   public function rmdir($uri, $options) {
-    trigger_error('rmdir() not supported for read-only stream wrappers', E_USER_WARNING);
+    \trigger_error('rmdir() not supported for read-only stream wrappers', E_USER_WARNING);
     return FALSE;
   }
 

@@ -16,7 +16,7 @@ class AmbiguousEntityClassException extends \Exception {
    *   The entity parent class.
    */
   public function __construct($class) {
-    $message = sprintf('Multiple entity types found for %s.', $class);
+    $message = \sprintf('Multiple entity types found for %s.', $class);
     parent::__construct($message);
   }
 

@@ -67,7 +67,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     try {
       $this->connection
         ->insert($table)
-        ->fields(['id' => mt_rand(10, 20)])
+        ->fields(['id' => \mt_rand(10, 20)])
         ->execute();
       return TRUE;
     }
@@ -253,7 +253,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->addField('test_table', 'test_serial', ['type' => 'serial', 'not null' => TRUE], ['primary key' => ['test_serial']]);
 
     // Test the primary key columns.
-    $method = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
+    $method = new \ReflectionMethod(\get_class($this->schema), 'findPrimaryKeyColumns');
     $this->assertSame(['test_serial'], $method->invoke($this->schema, 'test_table'));
 
     $this->assertTrue($this->tryInsert(), 'Insert with a serial succeeded.');
@@ -304,13 +304,13 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     // SQLite does not have any limit. Use the lowest common value and create a
     // table name as long as possible in order to cover edge cases around
     // identifier names for the table's primary or unique key constraints.
-    $table_name = strtolower($this->getRandomGenerator()->name(63 - strlen($this->getDatabasePrefix())));
+    $table_name = \strtolower($this->getRandomGenerator()->name(63 - \strlen($this->getDatabasePrefix())));
     $this->schema->createTable($table_name, $table_specification);
 
     $this->assertIndexOnColumns($table_name, ['id'], 'primary');
     $this->assertIndexOnColumns($table_name, ['test_field'], 'unique');
 
-    $new_table_name = strtolower($this->getRandomGenerator()->name(63 - strlen($this->getDatabasePrefix())));
+    $new_table_name = \strtolower($this->getRandomGenerator()->name(63 - \strlen($this->getDatabasePrefix())));
     $this->assertNull($this->schema->renameTable($table_name, $new_table_name));
 
     // Test for renamed primary and unique keys.
@@ -370,8 +370,8 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       $variations = [
         ['not null' => FALSE],
         ['not null' => FALSE, 'default' => '7'],
-        ['not null' => FALSE, 'default' => substr('"thing"', 0, $length)],
-        ['not null' => FALSE, 'default' => substr("\"'hing", 0, $length)],
+        ['not null' => FALSE, 'default' => \substr('"thing"', 0, $length)],
+        ['not null' => FALSE, 'default' => \substr("\"'hing", 0, $length)],
         ['not null' => TRUE, 'initial' => 'd'],
         ['not null' => FALSE, 'default' => NULL],
         ['not null' => TRUE, 'initial' => 'd', 'default' => '7'],
@@ -587,7 +587,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    */
   #[DataProvider('providerTestSchemaCreateTablePrimaryKey')]
   public function testSchemaChangePrimaryKey(array $initial_primary_key, array $renamed_primary_key): void {
-    $find_primary_key_columns = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
+    $find_primary_key_columns = new \ReflectionMethod(\get_class($this->schema), 'findPrimaryKeyColumns');
 
     // Test making the field the primary key of the table upon creation.
     $table_name = 'test_table';
@@ -730,7 +730,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ->fields($table_name, ['test_field'])
       ->execute()
       ->fetchCol();
-    $this->assertEquals([1, 2, 3, 4, 6, 7, 8, 9], array_values($data));
+    $this->assertEquals([1, 2, 3, 4, 6, 7, 8, 9], \array_values($data));
 
     try {
       $this->connection
@@ -833,7 +833,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
         // Note if the serialized data contained an object this would fail on
         // Postgres.
         // @see https://www.drupal.org/node/1031122
-        $this->assertFieldChange($old_spec, $new_spec, serialize(['string' => "This \n has \\\\ some backslash \"*string action.\\n"]));
+        $this->assertFieldChange($old_spec, $new_spec, \serialize(['string' => "This \n has \\\\ some backslash \"*string action.\\n"]));
       }
     }
 
@@ -901,7 +901,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * @legacy-covers ::findPrimaryKeyColumns
    */
   public function testFindPrimaryKeyColumns(): void {
-    $method = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
+    $method = new \ReflectionMethod(\get_class($this->schema), 'findPrimaryKeyColumns');
 
     // Test with single column primary key.
     $this->schema->createTable('table_with_pk_0', [
@@ -1054,7 +1054,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Check the "all tables" syntax.
     $tables = $test_schema->findTables('%');
-    sort($tables);
+    \sort($tables);
     $expected = [
       // The 'config' table is added by
       // \Drupal\KernelTests\KernelTestBase::containerBuild().
@@ -1068,7 +1068,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Check the restrictive syntax.
     $tables = $test_schema->findTables('test_%');
-    sort($tables);
+    \sort($tables);
     $expected = [
       'test_1_table',
       'test_2_table',
@@ -1082,7 +1082,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $test_schema->createTable('test', $table_specification);
 
     $tables = $test_schema->findTables('test%');
-    sort($tables);
+    \sort($tables);
     $expected = [
       'test',
       'test3table',
@@ -1094,7 +1094,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertEquals($expected, $tables, 'All "test" prefixed tables were found.');
 
     $tables = $test_schema->findTables('test_%');
-    sort($tables);
+    \sort($tables);
     $expected = [
       'test3table',
       'test4',
@@ -1105,7 +1105,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertEquals($expected, $tables, 'All "/^test..*?/" tables were found.');
 
     $tables = $test_schema->findTables('test%table');
-    sort($tables);
+    \sort($tables);
     $expected = [
       'test3table',
       'testTable',
@@ -1115,7 +1115,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertEquals($expected, $tables, 'All "/^test.*?table/" tables were found.');
 
     $tables = $test_schema->findTables('test_%table');
-    sort($tables);
+    \sort($tables);
     $expected = [
       'test3table',
       'test_1_table',
@@ -1124,7 +1124,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertEquals($expected, $tables, 'All "/^test..*?table/" tables were found.');
 
     $tables = $test_schema->findTables('test_');
-    sort($tables);
+    \sort($tables);
     $expected = [
       'test4',
     ];
@@ -1182,7 +1182,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertFalse($this->schema->tableExists('test_view'), 'View is not checked by tableExists() method');
 
     // Test \Drupal\Core\Database\Schema::findTables().
-    $tables = array_values($test_schema->findTables('t%'));
+    $tables = \array_values($test_schema->findTables('t%'));
     $this->assertEquals(['test_table'], $tables, 'All tables were found.');
 
     // Test \Drupal\Core\Database\Schema::getComment().
@@ -1302,7 +1302,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Finding all tables.
     $tables = $this->schema->findTables('%');
-    sort($tables);
+    \sort($tables);
     $this->assertEquals(['config', 'select'], $tables);
 
     // Renaming a table.
@@ -1323,7 +1323,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->addPrimaryKey($table_name_new, [$field_name]);
 
     // Check the primary key columns.
-    $find_primary_key_columns = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
+    $find_primary_key_columns = new \ReflectionMethod(\get_class($this->schema), 'findPrimaryKeyColumns');
     $this->assertEquals([$field_name], $find_primary_key_columns->invoke($this->schema, $table_name_new));
 
     // Dropping a primary key.
@@ -1340,7 +1340,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->addUniqueKey($table_name_new, $unique_key_name, [$field_name_new]);
 
     // Check the unique key columns.
-    $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
+    $introspect_index_schema = new \ReflectionMethod(\get_class($this->schema), 'introspectIndexSchema');
     $this->assertEquals([$field_name_new], $introspect_index_schema->invoke($this->schema, $table_name_new)['unique keys'][$unique_key_introspect_name]);
 
     // Dropping an unique key.

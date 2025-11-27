@@ -61,7 +61,7 @@ class StatusReportPage extends RenderElementBase {
         case 'php_memory_limit':
           $element['#general_info']['#' . $key] = $requirement;
           if (isset($requirement['severity']) &&
-            in_array($requirement['severity'], [RequirementSeverity::Info, RequirementSeverity::OK], TRUE)
+            \in_array($requirement['severity'], [RequirementSeverity::Info, RequirementSeverity::OK], TRUE)
           ) {
             unset($element['#requirements'][$key]);
           }
@@ -80,18 +80,18 @@ class StatusReportPage extends RenderElementBase {
     $counters = [
       'error' => [
         'amount' => 0,
-        'text' => t('Error'),
-        'text_plural' => t('Errors'),
+        'text' => \t('Error'),
+        'text_plural' => \t('Errors'),
       ],
       'warning' => [
         'amount' => 0,
-        'text' => t('Warning'),
-        'text_plural' => t('Warnings'),
+        'text' => \t('Warning'),
+        'text_plural' => \t('Warnings'),
       ],
       'checked' => [
         'amount' => 0,
-        'text' => t('Checked', [], ['context' => 'Examined']),
-        'text_plural' => t('Checked', [], ['context' => 'Examined']),
+        'text' => \t('Checked', [], ['context' => 'Examined']),
+        'text_plural' => \t('Checked', [], ['context' => 'Examined']),
       ],
     ];
 
@@ -101,7 +101,7 @@ class StatusReportPage extends RenderElementBase {
       if (isset($requirement['severity'])) {
         $severity = $requirement['severity'];
       }
-      elseif (defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install') {
+      elseif (\defined('MAINTENANCE_MODE') && MAINTENANCE_MODE == 'install') {
         $severity = RequirementSeverity::OK;
       }
 

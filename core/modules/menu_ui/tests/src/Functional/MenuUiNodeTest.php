@@ -225,7 +225,7 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->assertSession()->responseMatches('/<input .* id="edit-menu-description" .* maxlength="' . $description_max_length . '" .* \/>/');
 
     // Disable the menu link, then edit the node--the link should stay disabled.
-    $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
+    $link_id = \menu_ui_get_menu_link_defaults($node)['entity_id'];
     /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
     $link = MenuLinkContent::load($link_id);
     $link->set('enabled', FALSE);
@@ -295,7 +295,7 @@ class MenuUiNodeTest extends BrowserTestBase {
     foreach ($langcodes as $langcode) {
       static::createLanguageFromLangcode($langcode);
     }
-    array_unshift($langcodes, \Drupal::languageManager()->getDefaultLanguage()->getId());
+    \array_unshift($langcodes, \Drupal::languageManager()->getDefaultLanguage()->getId());
 
     $config = \Drupal::service('config.factory')->getEditable('language.negotiation');
     // Ensure path prefix is used to determine the language.
@@ -387,7 +387,7 @@ class MenuUiNodeTest extends BrowserTestBase {
    */
   public function testMenuNodeWithGrantsFormWidget(): void {
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \node_access_rebuild();
     $this->assertTrue(\Drupal::moduleHandler()->hasImplementations('node_grants'));
 
     $admin_user = $this->drupalCreateUser([
@@ -413,7 +413,7 @@ class MenuUiNodeTest extends BrowserTestBase {
     $node = $this->drupalGetNodeByTitle($node_title);
     $this->assertTrue($node->access('view', $admin_user));
     $this->drupalGet('node/add/page');
-    $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
+    $link_id = \menu_ui_get_menu_link_defaults($node)['entity_id'];
     /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
     $link = MenuLinkContent::load($link_id);
     $this->assertSession()->optionExists('edit-menu-menu-parent', 'main:' . $link->getPluginId());

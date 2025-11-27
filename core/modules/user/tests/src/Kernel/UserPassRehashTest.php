@@ -59,8 +59,8 @@ class UserPassRehashTest extends KernelTestBase {
     $user_a->setPassword('');
     $user_b->setPassword('');
 
-    $hash_a = user_pass_rehash($user_a, $timestamp);
-    $hash_b = user_pass_rehash($user_b, $timestamp);
+    $hash_a = \user_pass_rehash($user_a, $timestamp);
+    $hash_b = \user_pass_rehash($user_b, $timestamp);
 
     $this->assertNotEquals($hash_a, $hash_b);
   }

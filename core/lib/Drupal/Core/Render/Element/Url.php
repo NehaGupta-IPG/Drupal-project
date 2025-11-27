@@ -63,11 +63,11 @@ class Url extends FormElementBase {
    * already.
    */
   public static function validateUrl(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = trim($element['#value']);
+    $value = \trim($element['#value']);
     $form_state->setValueForElement($element, $value);
 
     if ($value !== '' && !UrlHelper::isValid($value, TRUE)) {
-      $form_state->setError($element, t('The URL %url is not valid.', ['%url' => $value]));
+      $form_state->setError($element, \t('The URL %url is not valid.', ['%url' => $value]));
     }
   }
 

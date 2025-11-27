@@ -144,11 +144,11 @@ class FormCache implements FormCacheInterface {
       $build_info = $form_state->getBuildInfo();
       $build_info += ['files' => []];
       foreach ($build_info['files'] as $file) {
-        if (is_array($file)) {
+        if (\is_array($file)) {
           $file += ['type' => 'inc', 'name' => $file['module']];
           $this->moduleHandler->loadInclude($file['module'], $file['type'], $file['name']);
         }
-        elseif (file_exists($file)) {
+        elseif (\file_exists($file)) {
           require_once $this->root . '/' . $file;
         }
       }

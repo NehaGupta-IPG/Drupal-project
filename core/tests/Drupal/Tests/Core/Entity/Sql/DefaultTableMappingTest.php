@@ -602,7 +602,7 @@ class DefaultTableMappingTest extends UnitTestCase {
       ->willReturn($name);
     $definition->expects($this->any())
       ->method('getColumns')
-      ->willReturn(array_fill_keys($column_names, []));
+      ->willReturn(\array_fill_keys($column_names, []));
     return $definition;
   }
 

@@ -71,7 +71,7 @@ class RoleTest extends MigrateSqlSourceTestBase {
     foreach ($roles as $role) {
       $tests[0]['source_data']['permission'][] = [
         'rid' => $role['rid'],
-        'perm' => implode(', ', $role['permissions']),
+        'perm' => \implode(', ', $role['permissions']),
       ];
       unset($role['permissions']);
       $tests[0]['source_data']['role'][] = $role;

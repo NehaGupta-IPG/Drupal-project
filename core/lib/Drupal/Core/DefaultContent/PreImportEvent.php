@@ -49,7 +49,7 @@ final class PreImportEvent extends Event {
    *   If the given UUID is not one of the ones being imported.
    */
   public function skip(string $uuid, string|\Stringable|null $reason = NULL): void {
-    if (array_key_exists($uuid, $this->finder->data)) {
+    if (\array_key_exists($uuid, $this->finder->data)) {
       $this->skip[$uuid] = $reason;
     }
     else {

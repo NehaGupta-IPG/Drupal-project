@@ -65,14 +65,14 @@ class CommentBundlesTest extends KernelTestBase {
   public function testEntityIdField(): void {
     $field_definitions = [];
 
-    foreach (array_keys($this->targetEntityTypes) as $id) {
+    foreach (\array_keys($this->targetEntityTypes) as $id) {
       $bundle = 'comment_on_' . $id;
       $field_definitions[$bundle] = $this->entityFieldManager
         ->getFieldDefinitions('comment', $bundle);
     }
     // Test that the value of the entity_id field for each bundle is correct.
     foreach ($field_definitions as $bundle => $definition) {
-      $entity_type_id = str_replace('comment_on_', '', $bundle);
+      $entity_type_id = \str_replace('comment_on_', '', $bundle);
       $target_type = $definition['entity_id']->getSetting('target_type');
       $this->assertEquals($entity_type_id, $target_type);
 

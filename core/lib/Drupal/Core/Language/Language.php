@@ -77,7 +77,7 @@ class Language implements LanguageInterface {
   public function __construct(array $values = []) {
     // Set all the provided properties for the language.
     foreach ($values as $key => $value) {
-      if (property_exists($this, $key)) {
+      if (\property_exists($this, $key)) {
         $this->{$key} = $value;
       }
     }
@@ -144,7 +144,7 @@ class Language implements LanguageInterface {
    *   The array of language objects keyed by langcode.
    */
   public static function sort(&$languages) {
-    uasort($languages, function (LanguageInterface $a, LanguageInterface $b) {
+    \uasort($languages, function (LanguageInterface $a, LanguageInterface $b) {
       $a_weight = $a->getWeight();
       $b_weight = $b->getWeight();
       if ($a_weight == $b_weight) {
@@ -158,7 +158,7 @@ class Language implements LanguageInterface {
           $a_name = $a->getId();
           $b_name = $b->getId();
         }
-        return strnatcasecmp($a_name, $b_name);
+        return \strnatcasecmp($a_name, $b_name);
       }
       return $a_weight <=> $b_weight;
     });

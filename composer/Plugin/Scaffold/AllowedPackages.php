@@ -123,7 +123,7 @@ class AllowedPackages implements PostPackageEventListenerInterface {
       'drupal/core',
     ];
     $top_level_packages = $this->manageOptions->getOptions()->allowedPackages();
-    return array_merge($implicit_packages, $top_level_packages);
+    return \array_merge($implicit_packages, $top_level_packages);
   }
 
   /**
@@ -164,7 +164,7 @@ class AllowedPackages implements PostPackageEventListenerInterface {
    */
   protected function evaluateNewPackages(array $allowed_packages) {
     foreach ($this->newPackages as $name => $newPackage) {
-      if (!array_key_exists($name, $allowed_packages)) {
+      if (!\array_key_exists($name, $allowed_packages)) {
         $this->io->write("Not scaffolding files for <comment>{$name}</comment>, because it is not listed in the element 'extra.drupal-scaffold.allowed-packages' in the root-level composer.json file.");
       }
       else {

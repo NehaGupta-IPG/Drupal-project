@@ -27,7 +27,7 @@ class NodeAccessTestAutoBubblingController extends ControllerBase implements Con
       ->sort('created', 'DESC')
       ->range(0, 3)
       ->execute();
-    return ['#markup' => $this->t('The three latest nodes are: @nids.', ['@nids' => implode(', ', $nids)])];
+    return ['#markup' => $this->t('The three latest nodes are: @nids.', ['@nids' => \implode(', ', $nids)])];
   }
 
   /**

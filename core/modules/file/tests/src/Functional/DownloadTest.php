@@ -57,7 +57,7 @@ class DownloadTest extends FileManagedTestBase {
     $url = $this->fileUrlGenerator->generateAbsoluteString($file->getFileUri());
     // URLs can't contain characters outside the ASCII set so $filename has to
     // be encoded.
-    $filename = $GLOBALS['base_url'] . '/' . \Drupal::service('stream_wrapper_manager')->getViaScheme('public')->getDirectoryPath() . '/' . rawurlencode($file->getFilename());
+    $filename = $GLOBALS['base_url'] . '/' . \Drupal::service('stream_wrapper_manager')->getViaScheme('public')->getDirectoryPath() . '/' . \rawurlencode($file->getFilename());
     $this->assertEquals($filename, $url, 'Correctly generated a URL for a created file.');
     $http_client = $this->getHttpClient();
     $response = $http_client->head($url);
@@ -204,7 +204,7 @@ class DownloadTest extends FileManagedTestBase {
     // supported by the filesystem, and create the file in the specified
     // directory.
     $filepath = \Drupal::service('file_system')->createFilename($filename, $directory);
-    $directory_uri = $scheme . '://' . dirname($filepath);
+    $directory_uri = $scheme . '://' . \dirname($filepath);
     \Drupal::service('file_system')->prepareDirectory($directory_uri, FileSystemInterface::CREATE_DIRECTORY);
     $file = $this->createFile($filepath, NULL, $scheme);
 
@@ -219,7 +219,7 @@ class DownloadTest extends FileManagedTestBase {
 
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseContains(file_get_contents($file->getFileUri()));
+    $this->assertSession()->responseContains(\file_get_contents($file->getFileUri()));
 
     $file->delete();
   }

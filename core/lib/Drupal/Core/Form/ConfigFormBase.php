@@ -103,9 +103,9 @@ abstract class ConfigFormBase extends FormBase {
    *   The form element, with its default value populated.
    */
   public function loadDefaultValuesFromConfig(array $element): array {
-    if (array_key_exists('#config_target', $element) && !array_key_exists('#default_value', $element)) {
+    if (\array_key_exists('#config_target', $element) && !\array_key_exists('#default_value', $element)) {
       $target = $element['#config_target'];
-      if (is_string($target)) {
+      if (\is_string($target)) {
         $target = ConfigTarget::fromString($target);
       }
 
@@ -164,12 +164,12 @@ abstract class ConfigFormBase extends FormBase {
    * @see \Drupal\Core\Form\ConfigFormBase::storeConfigKeyToFormElementMap()
    */
   protected function doStoreConfigMap(array $element, FormStateInterface $form_state): array {
-    if (array_key_exists('#config_target', $element)) {
+    if (\array_key_exists('#config_target', $element)) {
       $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP) ?? [];
 
       /** @var \Drupal\Core\Form\ConfigTarget|string $target */
       $target = $element['#config_target'];
-      if (is_string($target)) {
+      if (\is_string($target)) {
         $target = ConfigTarget::fromString($target);
       }
       elseif ($target->toConfig instanceof \Closure || $target->fromConfig instanceof \Closure) {
@@ -180,11 +180,11 @@ abstract class ConfigFormBase extends FormBase {
 
       foreach ($target->propertyPaths as $property_path) {
         if (isset($map[$target->configName][$property_path])) {
-          throw new \LogicException(sprintf('Two #config_targets both target "%s" in the "%s" config: `%s` and `%s`.',
+          throw new \LogicException(\sprintf('Two #config_targets both target "%s" in the "%s" config: `%s` and `%s`.',
             $property_path,
             $target->configName,
-            '$form[\'' . implode("']['", $map[$target->configName][$property_path]) . '\']',
-            '$form[\'' . implode("']['", $element['#array_parents']) . '\']',
+            '$form[\'' . \implode("']['", $map[$target->configName][$property_path]) . '\']',
+            '$form[\'' . \implode("']['", $element['#array_parents']) . '\']',
           ));
         }
         $map[$target->configName][$property_path] = $element['#array_parents'];
@@ -202,7 +202,7 @@ abstract class ConfigFormBase extends FormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP) ?? [];
-    foreach (array_keys($map) as $config_name) {
+    foreach (\array_keys($map) as $config_name) {
       $config = $this->configFactory()->getEditable($config_name);
       static::copyFormValuesToConfig($config, $form_state, $form);
       $typed_config = $this->typedConfigManager()->createFromNameAndData($config_name, $config->getRawData());
@@ -224,16 +224,16 @@ abstract class ConfigFormBase extends FormBase {
 
         // Detect if this is a sequence item property path, and if so, attempt
         // to fall back to the containing sequence's property path.
-        if (!isset($map[$config_name][$property_path]) && preg_match("/.*\.(\d+)$/", $property_path, $matches) === 1) {
-          $index = intval($matches[1]);
+        if (!isset($map[$config_name][$property_path]) && \preg_match("/.*\.(\d+)$/", $property_path, $matches) === 1) {
+          $index = \intval($matches[1]);
           // The property path as known in the config key-to-form element map
           // will not have the sequence index in it.
-          $property_path = rtrim($property_path, '0123456789.');
+          $property_path = \rtrim($property_path, '0123456789.');
         }
 
         if (isset($map[$config_name][$property_path])) {
           $config_target = ConfigTarget::fromForm($map[$config_name][$property_path], $form);
-          $form_element_name = implode('][', $config_target->elementParents);
+          $form_element_name = \implode('][', $config_target->elementParents);
         }
         else {
           // We cannot determine where to place the violation. The only option
@@ -249,8 +249,8 @@ abstract class ConfigFormBase extends FormBase {
       // @see \Drupal\Core\Form\FormState::setErrorByName()
       foreach ($violations_per_form_element as $form_element_name => $violations) {
         // When only a single message exists, just set it.
-        if (count($violations) === 1) {
-          $form_state->setErrorByName($form_element_name, reset($violations)->getMessage());
+        if (\count($violations) === 1) {
+          $form_state->setErrorByName($form_element_name, \reset($violations)->getMessage());
           continue;
         }
 
@@ -297,7 +297,7 @@ abstract class ConfigFormBase extends FormBase {
     }
     // We use \Drupal\Core\Render\Markup::create() here as it is safe,
     // rather than use t() because all input has been escaped by t().
-    return Markup::create(implode("\n", $transformed_message_parts));
+    return Markup::create(\implode("\n", $transformed_message_parts));
   }
 
   /**
@@ -305,7 +305,7 @@ abstract class ConfigFormBase extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP) ?? [];
-    foreach (array_keys($map) as $config_name) {
+    foreach (\array_keys($map) as $config_name) {
       $config = $this->configFactory()->getEditable($config_name);
       static::copyFormValuesToConfig($config, $form_state, $form);
       $config->save();
@@ -385,9 +385,9 @@ abstract class ConfigFormBase extends FormBase {
           ],
         ],
         // Ensure that the status message is at the top of the form.
-        '#weight' => array_reduce(
+        '#weight' => \array_reduce(
           Element::children($form),
-          fn (int $carry, string $key) => min(($form[$key]['#weight'] ?? 0), $carry),
+          fn (int $carry, string $key) => \min(($form[$key]['#weight'] ?? 0), $carry),
           0
         ) - 1,
       ];

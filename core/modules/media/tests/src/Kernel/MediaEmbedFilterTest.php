@@ -48,7 +48,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
     $this->assertEqualsCanonicalizing($expected_cacheability->getCacheTags(), $result->getCacheTags());
     $this->assertEqualsCanonicalizing($expected_cacheability->getCacheContexts(), $result->getCacheContexts());
     $this->assertSame($expected_cacheability->getCacheMaxAge(), $result->getCacheMaxAge());
-    $this->assertSame(['library'], array_keys($result->getAttachments()));
+    $this->assertSame(['library'], \array_keys($result->getAttachments()));
     $this->assertSame(['media/filter.caption'], $result->getAttachments()['library']);
   }
 
@@ -308,7 +308,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
     $this->setRawContent($result->getProcessedText());
     $this->assertCount(0, $this->cssSelect('div[data-media-embed-test-view-mode="foobar"]'));
     $this->assertCount(1, $this->cssSelect('div.this-error-message-is-themeable'));
-    if (in_array('filter_align', $filter_ids, TRUE) && !empty($additional_attributes['data-align'])) {
+    if (\in_array('filter_align', $filter_ids, TRUE) && !empty($additional_attributes['data-align'])) {
       $this->assertCount(1, $this->cssSelect('div.align-' . $additional_attributes['data-align']));
     }
 
@@ -374,7 +374,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
       'data-entity-type' => 'media',
       'data-entity-uuid' => $this->embeddedEntity->uuid(),
     ]);
-    $content = str_replace('drupal-media', 'drupal-entity', $content);
+    $content = \str_replace('drupal-media', 'drupal-entity', $content);
 
     $filter_result = $this->processText($content, 'en', ['media_embed']);
     // If input equals output, the filter didn't change anything.
@@ -431,7 +431,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
     ], $result->getCacheTags());
     $this->assertEqualsCanonicalizing(['timezone', 'user.permissions'], $result->getCacheContexts());
     $this->assertSame(Cache::PERMANENT, $result->getCacheMaxAge());
-    $this->assertSame(['library'], array_keys($result->getAttachments()));
+    $this->assertSame(['library'], \array_keys($result->getAttachments()));
     $this->assertSame($expected_asset_libraries, $result->getAttachments()['library']);
   }
 
@@ -538,7 +538,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
     $filter_format->save();
     $this->assertSame('foobar', $filter_format->get('filters')['media_embed']['settings']['default_view_mode']);
     $this->assertSame(['foobar' => 'foobar'], $filter_format->get('filters')['media_embed']['settings']['allowed_view_modes']);
-    $this->assertTrue(in_array('core.entity_view_mode.media.foobar', $filter_format->getDependencies()['config']));
+    $this->assertTrue(\in_array('core.entity_view_mode.media.foobar', $filter_format->getDependencies()['config']));
 
     $role = Role::load($role_id);
     $this->assertContains($filter_format->getPermissionName(), $role->getPermissions());

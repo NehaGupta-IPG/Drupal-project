@@ -148,23 +148,23 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertCount(1, $radios_all_disabled_value1);
     // We want to access the radio button directly for the rest of the test, so
     // take it out of the array we got back from xpath().
-    $radios_all_disabled_value1 = reset($radios_all_disabled_value1);
+    $radios_all_disabled_value1 = \reset($radios_all_disabled_value1);
     $radios_all_disabled_value2 = $this->xpath(
       '//input[@name=:name][@value=:value]',
       [':name' => 'radios_all_disabled_when_checkbox_trigger_checked', ':value' => 'value2']);
     $this->assertCount(1, $radios_all_disabled_value2);
-    $radios_all_disabled_value2 = reset($radios_all_disabled_value2);
+    $radios_all_disabled_value2 = \reset($radios_all_disabled_value2);
 
     $radios_some_disabled_value1 = $this->xpath(
       '//input[@name=:name][@value=:value]',
       [':name' => 'radios_some_disabled_when_checkbox_trigger_checked', ':value' => 'value1']);
     $this->assertCount(1, $radios_some_disabled_value1);
-    $radios_some_disabled_value1 = reset($radios_some_disabled_value1);
+    $radios_some_disabled_value1 = \reset($radios_some_disabled_value1);
     $radios_some_disabled_value2 = $this->xpath(
       '//input[@name=:name][@value=:value]',
       [':name' => 'radios_some_disabled_when_checkbox_trigger_checked', ':value' => 'value2']);
     $this->assertCount(1, $radios_some_disabled_value2);
-    $radios_some_disabled_value2 = reset($radios_some_disabled_value2);
+    $radios_some_disabled_value2 = \reset($radios_some_disabled_value2);
 
     // Verify initial state.
     $this->assertTrue($textfield_invisible_element->isVisible());

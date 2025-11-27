@@ -108,7 +108,7 @@ class DatabaseBackend implements CacheBackendInterface {
   public function get($cid, $allow_invalid = FALSE) {
     $cids = [$cid];
     $cache = $this->getMultiple($cids, $allow_invalid);
-    return reset($cache);
+    return \reset($cache);
   }
 
   /**
@@ -128,7 +128,7 @@ class DatabaseBackend implements CacheBackendInterface {
     // ::select() is a much smaller proportion of the request.
     $result = [];
     try {
-      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)])->fetchAll();
+      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => \array_keys($cid_mapping)])->fetchAll();
     }
     catch (\Exception) {
       // Nothing to do.
@@ -140,10 +140,10 @@ class DatabaseBackend implements CacheBackendInterface {
       $tags_for_preload = [];
       foreach ($result as $item) {
         if ($item->tags) {
-          $tags_for_preload[] = explode(' ', $item->tags);
+          $tags_for_preload[] = \explode(' ', $item->tags);
         }
       }
-      $this->checksumProvider->registerCacheTagsForPreload(array_merge(...$tags_for_preload));
+      $this->checksumProvider->registerCacheTagsForPreload(\array_merge(...$tags_for_preload));
     }
     $cache = [];
     foreach ($result as $item) {
@@ -154,7 +154,7 @@ class DatabaseBackend implements CacheBackendInterface {
         $cache[$item->cid] = $item;
       }
     }
-    $cids = array_diff($cids, array_keys($cache));
+    $cids = \array_diff($cids, \array_keys($cache));
     return $cache;
   }
 
@@ -178,7 +178,7 @@ class DatabaseBackend implements CacheBackendInterface {
       return FALSE;
     }
 
-    $cache->tags = $cache->tags ? explode(' ', $cache->tags) : [];
+    $cache->tags = $cache->tags ? \explode(' ', $cache->tags) : [];
 
     // Check expire time.
     $cache->valid = $cache->expire == Cache::PERMANENT || $cache->expire >= $this->time->getRequestTime();
@@ -247,7 +247,7 @@ class DatabaseBackend implements CacheBackendInterface {
   protected function doSetMultiple(array $items) {
     // Chunk the items as the database might not be able to receive thousands
     // of items in a single query.
-    $chunks = array_chunk($items, self::MAX_ITEMS_PER_CACHE_SET, TRUE);
+    $chunks = \array_chunk($items, self::MAX_ITEMS_PER_CACHE_SET, TRUE);
 
     foreach ($chunks as $chunk_items) {
       $values = [];
@@ -258,16 +258,16 @@ class DatabaseBackend implements CacheBackendInterface {
           'tags' => [],
         ];
 
-        assert(Inspector::assertAllStrings($item['tags']), 'Cache Tags must be strings.');
-        $item['tags'] = array_unique($item['tags']);
+        \assert(Inspector::assertAllStrings($item['tags']), 'Cache Tags must be strings.');
+        $item['tags'] = \array_unique($item['tags']);
         // Sort the cache tags so that they are stored consistently in the DB.
-        sort($item['tags']);
+        \sort($item['tags']);
 
         $fields = [
           'cid' => $this->normalizeCid($cid),
           'expire' => $item['expire'],
-          'created' => round(microtime(TRUE), 3),
-          'tags' => implode(' ', $item['tags']),
+          'created' => \round(\microtime(TRUE), 3),
+          'tags' => \implode(' ', $item['tags']),
           'checksum' => $this->checksumProvider->getCurrentChecksum($item['tags']),
         ];
 
@@ -276,7 +276,7 @@ class DatabaseBackend implements CacheBackendInterface {
           continue;
         }
 
-        if (!is_string($item['data'])) {
+        if (!\is_string($item['data'])) {
           $fields['data'] = $this->serializer->encode($item['data']);
           $fields['serialized'] = 1;
         }
@@ -288,7 +288,7 @@ class DatabaseBackend implements CacheBackendInterface {
       }
 
       // If all $items were useless writes, we may end up with zero writes.
-      if (count($values) === 0) {
+      if (\count($values) === 0) {
         return;
       }
 
@@ -302,7 +302,7 @@ class DatabaseBackend implements CacheBackendInterface {
         // Only pass the values since the order of $fields matches the order of
         // the insert fields. This is a performance optimization to avoid
         // unnecessary loops within the method.
-        $query->values(array_values($fields));
+        $query->values(\array_values($fields));
       }
 
       $query->execute();
@@ -320,10 +320,10 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function deleteMultiple(array $cids) {
-    $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
+    $cids = \array_values(\array_map([$this, 'normalizeCid'], $cids));
     try {
       // Delete in chunks when a large array is passed.
-      foreach (array_chunk($cids, 1000) as $cids_chunk) {
+      foreach (\array_chunk($cids, 1000) as $cids_chunk) {
         $this->connection->delete($this->bin)
           ->condition('cid', $cids_chunk, 'IN')
           ->execute();
@@ -367,11 +367,11 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function invalidateMultiple(array $cids) {
-    $cids = array_values(array_map([$this, 'normalizeCid'], $cids));
+    $cids = \array_values(\array_map([$this, 'normalizeCid'], $cids));
     try {
       // Update in chunks when a large array is passed.
       $requestTime = $this->time->getRequestTime();
-      foreach (array_chunk($cids, 1000) as $cids_chunk) {
+      foreach (\array_chunk($cids, 1000) as $cids_chunk) {
         $this->connection->update($this->bin)
           ->fields(['expire' => $requestTime - 1])
           ->condition('cid', $cids_chunk, 'IN')
@@ -387,7 +387,7 @@ class DatabaseBackend implements CacheBackendInterface {
    * {@inheritdoc}
    */
   public function invalidateAll() {
-    @trigger_error("CacheBackendInterface::invalidateAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use CacheBackendInterface::deleteAll() or cache tag invalidation instead. See https://www.drupal.org/node/3500622", E_USER_DEPRECATED);
+    @\trigger_error("CacheBackendInterface::invalidateAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use CacheBackendInterface::deleteAll() or cache tag invalidation instead. See https://www.drupal.org/node/3500622", E_USER_DEPRECATED);
     try {
       $this->connection->update($this->bin)
         ->fields(['expire' => $this->time->getRequestTime() - 1])
@@ -498,8 +498,8 @@ class DatabaseBackend implements CacheBackendInterface {
     // Additionally check for trailing spaces in the cache ID because MySQL
     // may or may not take these into account when making comparisons.
     // @see https://dev.mysql.com/doc/refman/9.0/en/char.html
-    $cid_is_ascii = mb_check_encoding($cid, 'ASCII');
-    if (strlen($cid) <= 255 && $cid_is_ascii && !str_ends_with($cid, ' ')) {
+    $cid_is_ascii = \mb_check_encoding($cid, 'ASCII');
+    if (\strlen($cid) <= 255 && $cid_is_ascii && !\str_ends_with($cid, ' ')) {
       return $cid;
     }
     // Return a string that uses as much as possible of the original cache ID
@@ -508,7 +508,7 @@ class DatabaseBackend implements CacheBackendInterface {
     if (!$cid_is_ascii) {
       return $hash;
     }
-    return substr($cid, 0, 255 - strlen($hash)) . $hash;
+    return \substr($cid, 0, 255 - \strlen($hash)) . $hash;
   }
 
   /**

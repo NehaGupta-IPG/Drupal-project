@@ -76,7 +76,7 @@ trait OEmbedTestTrait {
    */
   protected function hijackProviderEndpoints() {
     $providers = $this->getFixturesDirectory() . '/providers.json';
-    $providers = file_get_contents($providers);
+    $providers = \file_get_contents($providers);
     $providers = Json::decode($providers);
 
     $endpoint_url = Url::fromRoute('media_test_oembed.resource.get')

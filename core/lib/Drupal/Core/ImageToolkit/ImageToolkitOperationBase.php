@@ -106,7 +106,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
       $argument += ['required' => TRUE];
       // Check if the argument is required and, if so, has been provided.
       if ($argument['required']) {
-        if (!array_key_exists($id, $arguments)) {
+        if (!\array_key_exists($id, $arguments)) {
           // If the argument is required throw an exception.
           throw new \InvalidArgumentException("Argument '$id' expected by plugin '{$this->getPluginId()}' but not passed");
         }
@@ -115,14 +115,14 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
         // Optional arguments require a 'default' value.
         // We check this even if the argument is provided by the caller, as we
         // want to fail fast here, i.e. at development time.
-        if (!array_key_exists('default', $argument)) {
+        if (!\array_key_exists('default', $argument)) {
           // The plugin did not define a default, so throw a plugin exception,
           // not an invalid argument exception.
           throw new InvalidPluginDefinitionException("Default for argument '$id' expected by plugin '{$this->getPluginId()}' but not defined");
         }
 
         // Use the default value if the argument is not passed in.
-        if (!array_key_exists($id, $arguments)) {
+        if (!\array_key_exists($id, $arguments)) {
           $arguments[$id] = $argument['default'];
         }
       }

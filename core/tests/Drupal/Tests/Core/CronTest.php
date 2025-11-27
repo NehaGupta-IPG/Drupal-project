@@ -78,7 +78,7 @@ class CronTest extends UnitTestCase {
     $logger->info('Cron run completed.')->shouldBeCalled();
     // Set a flag to track when a message is logged by adding a callback
     // function for each logging method.
-    foreach (get_class_methods(LoggerInterface::class) as $logger_method) {
+    foreach (\get_class_methods(LoggerInterface::class) as $logger_method) {
       $logger->{$logger_method}(Argument::cetera())->will(function () {
         \Drupal::state()->set('cron_test.message_logged', TRUE);
       });
@@ -149,7 +149,7 @@ class CronTest extends UnitTestCase {
     $queue_worker_plugin->processItem('RequeueException')->will(function ($args, $mock, $method) {
       // Fetch the number of calls to this prophesied method. This value will
       // start at zero during the first call.
-      $method_calls = count($mock->findProphecyMethodCalls($method->getMethodName(), new ArgumentsWildcard($args)));
+      $method_calls = \count($mock->findProphecyMethodCalls($method->getMethodName(), new ArgumentsWildcard($args)));
 
       // Throw the expected exception on the first few calls.
       if ($method_calls < self::REQUEUE_COUNT) {

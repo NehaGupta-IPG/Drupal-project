@@ -67,7 +67,7 @@ class UpdateTestController extends ControllerBase {
 
     $file = __DIR__ . "/../../../../fixtures/release-history/$project_name.$availability_scenario.xml";
     $headers = ['Content-Type' => 'text/xml; charset=utf-8'];
-    if (!is_file($file)) {
+    if (!\is_file($file)) {
       // Return an empty response.
       return new Response('', 200, $headers);
     }

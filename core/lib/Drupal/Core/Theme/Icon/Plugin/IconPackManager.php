@@ -197,7 +197,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
       $this->validator = $validator;
       return;
     }
-    if (class_exists(Validator::class)) {
+    if (\class_exists(Validator::class)) {
       $this->validator = new Validator();
     }
   }
@@ -206,8 +206,8 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
    * {@inheritdoc}
    */
   public function processDefinition(&$definition, $plugin_id): void {
-    if (preg_match('@[^a-z0-9_]@', $plugin_id)) {
-      throw new IconPackConfigErrorException(sprintf('Invalid icon pack id in: %s, name: %s must contain only lowercase letters, numbers, and underscores.', $definition['provider'], $plugin_id));
+    if (\preg_match('@[^a-z0-9_]@', $plugin_id)) {
+      throw new IconPackConfigErrorException(\sprintf('Invalid icon pack id in: %s, name: %s must contain only lowercase letters, numbers, and underscores.', $definition['provider'], $plugin_id));
     }
 
     $this->validateDefinition($definition);
@@ -228,7 +228,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
 
     $definition['relative_path'] = $relative_path;
     // To avoid the need for appRoot in extractors.
-    $definition['absolute_path'] = sprintf('%s/%s', $this->appRoot, $relative_path);
+    $definition['absolute_path'] = \sprintf('%s/%s', $this->appRoot, $relative_path);
 
     // Load all discovered icon ids in the definition so they are cached.
     $definition['icons'] = $this->getIconsFromDefinition($definition);
@@ -245,10 +245,10 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
 
     $icons = [];
     foreach ($definitions as $definition) {
-      if ($allowed_icon_pack && !in_array($definition['id'], $allowed_icon_pack, TRUE)) {
+      if ($allowed_icon_pack && !\in_array($definition['id'], $allowed_icon_pack, TRUE)) {
         continue;
       }
-      $icons = array_merge($icons, $definition['icons'] ?? []);
+      $icons = \array_merge($icons, $definition['icons'] ?? []);
     }
 
     return $icons;
@@ -292,7 +292,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
     }
 
     if (!empty($allowed_icon_pack)) {
-      $icon_pack_definitions = array_intersect_key($icon_pack_definitions, $allowed_icon_pack);
+      $icon_pack_definitions = \array_intersect_key($icon_pack_definitions, $allowed_icon_pack);
     }
 
     $extractor_forms = $this->iconPackExtractorManager->getExtractorForms($icon_pack_definitions);
@@ -302,7 +302,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
 
     foreach ($icon_pack_definitions as $pack_id => $definition) {
       // Simply skip if no settings declared in definition.
-      if (count($definition['settings'] ?? []) === 0) {
+      if (\count($definition['settings'] ?? []) === 0) {
         continue;
       }
 
@@ -316,7 +316,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
       // Create the extractor form and set settings so we can build with values.
       $subform_state = SubformState::createForSubform($form[$pack_id], $form, $form_state);
       $subform_state->getCompleteFormState()->setValue('saved_values', $default_settings[$pack_id] ?? []);
-      if (is_a($extractor_forms[$pack_id], '\Drupal\Core\Plugin\PluginFormInterface')) {
+      if (\is_a($extractor_forms[$pack_id], '\Drupal\Core\Plugin\PluginFormInterface')) {
         $form[$pack_id] += $extractor_forms[$pack_id]->buildConfigurationForm($form[$pack_id], $subform_state);
       }
     }
@@ -339,12 +339,12 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
       }
       $label = $definition['label'] ?? $definition['id'];
       if ($include_description && isset($definition['description'])) {
-        $label = sprintf('%s - %s', $label, $definition['description']);
+        $label = \sprintf('%s - %s', $label, $definition['description']);
       }
-      $options[$definition['id']] = sprintf('%s (%u)', $label, count($definition['icons']));
+      $options[$definition['id']] = \sprintf('%s (%u)', $label, \count($definition['icons']));
     }
 
-    natsort($options);
+    \natsort($options);
     return $options;
   }
 
@@ -406,7 +406,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
       return TRUE;
     }
 
-    $schema_ref = sprintf(
+    $schema_ref = \sprintf(
       'file://%s/%s',
       $this->appRoot,
       self::SCHEMA_VALIDATE
@@ -421,14 +421,14 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
       return TRUE;
     }
 
-    $message_parts = array_map(
-      static fn (array $error): string => sprintf("[%s] %s", $error['property'], $error['message']),
+    $message_parts = \array_map(
+      static fn (array $error): string => \sprintf("[%s] %s", $error['property'], $error['message']),
       $this->validator->getErrors()
     );
-    $message = implode(", ", $message_parts);
+    $message = \implode(", ", $message_parts);
 
     throw new IconPackConfigErrorException(
-      sprintf(
+      \sprintf(
         '%s:%s Error in definition `%s`:%s',
         $definition['provider'],
         $definition['id'],

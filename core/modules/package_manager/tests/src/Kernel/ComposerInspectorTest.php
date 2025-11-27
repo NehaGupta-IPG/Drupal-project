@@ -76,7 +76,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     // If composer.json is removed, we should get an exception because
     // getConfig() should validate that $dir is Composer-ready.
-    unlink($dir . '/composer.json');
+    \unlink($dir . '/composer.json');
     $this->expectExceptionMessage("composer.json not found.");
     $inspector->getConfig('extra', $dir);
   }
@@ -159,7 +159,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     // If composer.lock is removed, we should get an exception because
     // getInstalledPackagesList() should validate that $project_root is
     // Composer-ready.
-    unlink($lock_file->getPath());
+    \unlink($lock_file->getPath());
     $this->expectExceptionMessage("composer.lock not found in $project_root.");
     $inspector->getInstalledPackagesList($project_root);
   }
@@ -215,7 +215,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
       ->getProjectRoot();
 
     $file_path = $project_root . '/' . $filename;
-    unlink($file_path);
+    \unlink($file_path);
 
     /** @var \Drupal\package_manager\ComposerInspector $inspector */
     $inspector = $this->container->get(ComposerInspector::class);
@@ -425,11 +425,11 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
       ->getProjectRoot();
 
     if ($install_path) {
-      $install_path = str_replace('<PROJECT_ROOT>', $project_root, $install_path);
+      $install_path = \str_replace('<PROJECT_ROOT>', $project_root, $install_path);
 
       // The install path must actually exist.
-      if (!is_dir($install_path)) {
-        $this->assertTrue(mkdir($install_path, 0777, TRUE));
+      if (!\is_dir($install_path)) {
+        $this->assertTrue(\mkdir($install_path, 0777, TRUE));
       }
       $inspector->packagePath = $install_path;
     }
@@ -443,13 +443,13 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     if ($exception_message) {
       $this->expectException(\UnexpectedValueException::class);
-      $exception_message = str_replace('<PROJECT_ROOT>', $project_root, $exception_message);
+      $exception_message = \str_replace('<PROJECT_ROOT>', $project_root, $exception_message);
       $this->expectExceptionMessage($exception_message);
     }
     $list = $inspector->getInstalledPackagesList($project_root);
     $this->assertArrayHasKey('test/package', $list);
     // If the package is a metapackage, its path should be NULL.
-    $this->assertSame($is_metapackage, is_null($list['test/package']->path));
+    $this->assertSame($is_metapackage, \is_null($list['test/package']->path));
   }
 
   /**
@@ -534,11 +534,11 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     $actual_value = $this->container->get(ComposerInspector::class)
       ->getAllowPluginsConfig($project_root);
 
-    if (is_array($expected_value)) {
-      ksort($expected_value);
+    if (\is_array($expected_value)) {
+      \ksort($expected_value);
     }
-    if (is_array($actual_value)) {
-      ksort($actual_value);
+    if (\is_array($actual_value)) {
+      \ksort($actual_value);
     }
     $this->assertSame($expected_value, $actual_value);
   }
@@ -563,8 +563,8 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
         ],
       ]);
 
-      $callback = end($arguments_passed_to_runner);
-      assert($callback instanceof OutputCallbackInterface);
+      $callback = \end($arguments_passed_to_runner);
+      \assert($callback instanceof OutputCallbackInterface);
       $callback(OutputTypeEnum::OUT, $command_output);
     };
 

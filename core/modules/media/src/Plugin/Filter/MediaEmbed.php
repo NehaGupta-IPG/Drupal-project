@@ -195,7 +195,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
   public static function validateOptions(array &$element, FormStateInterface $form_state) {
     // Filters the #value property so only selected values appear in the
     // config.
-    $form_state->setValueForElement($element, array_filter($element['#value']));
+    $form_state->setValueForElement($element, \array_filter($element['#value']));
   }
 
   /**
@@ -277,7 +277,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
   public function process($text, $langcode) {
     $result = new FilterProcessResult($text);
 
-    if (stristr($text, '<drupal-media') === FALSE) {
+    if (\stristr($text, '<drupal-media') === FALSE) {
       return $result;
     }
 
@@ -295,7 +295,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
       $node->removeAttribute('data-view-mode');
 
       $media = $this->entityRepository->loadEntityByUuid('media', $uuid);
-      assert($media === NULL || $media instanceof MediaInterface);
+      \assert($media === NULL || $media instanceof MediaInterface);
       if (!$media) {
         $this->loggerFactory->get('media')->error('During rendering of embedded media: the media item with UUID "@uuid" does not exist.', ['@uuid' => $uuid]);
       }
@@ -331,7 +331,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
           // indicator). But, we need to merge in CSS classes added by other
           // filters, such as filter_align, in order for those filters to work
           // properly.
-          $build['#attributes']['class'] = array_unique(array_merge($build['#attributes']['class'], explode(' ', $attribute->nodeValue)));
+          $build['#attributes']['class'] = \array_unique(\array_merge($build['#attributes']['class'], \explode(' ', $attribute->nodeValue)));
         }
         else {
           $build['#attributes'][$attribute->nodeName] = $attribute->nodeValue;
@@ -401,7 +401,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *   The text or HTML that will replace the contents of $node.
    */
   protected static function replaceNodeContent(\DOMNode &$node, $content) {
-    if (strlen($content)) {
+    if (\strlen($content)) {
       // Load the content into a new DOMDocument and retrieve the DOM nodes.
       $replacement_nodes = Html::load($content)->getElementsByTagName('body')
         ->item(0)
@@ -500,7 +500,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
     $field_definition = $media->getSource()
       ->getSourceFieldDefinition($media->bundle->entity);
     $item_class = $field_definition->getItemDefinition()->getClass();
-    if ($item_class == ImageItem::class || is_subclass_of($item_class, ImageItem::class)) {
+    if ($item_class == ImageItem::class || \is_subclass_of($item_class, ImageItem::class)) {
       return $field_definition->getName();
     }
     return NULL;
@@ -520,7 +520,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
     $dependencies = [];
     // Combine the view modes from both config parameters.
     $view_modes = $this->settings['allowed_view_modes'] + [$this->settings['default_view_mode']];
-    $view_modes = array_unique(array_values($view_modes));
+    $view_modes = \array_unique(\array_values($view_modes));
     $dependencies += ['config' => []];
     $storage = $this->entityTypeManager->getStorage('entity_view_mode');
     foreach ($view_modes as $view_mode) {
@@ -543,8 +543,8 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
     // If view modes for media are deleted, remove the view mode from the plugin
     // settings and return that the plugin settings have changed.
     foreach ($dependencies['config'] as $config) {
-      if (($config instanceof EntityViewModeInterface) && str_starts_with($config->id(), 'media.')) {
-        $view_mode_id = substr_replace($config->id(), '', 0, 6);
+      if (($config instanceof EntityViewModeInterface) && \str_starts_with($config->id(), 'media.')) {
+        $view_mode_id = \substr_replace($config->id(), '', 0, 6);
         if (isset($this->settings['allowed_view_modes'][$view_mode_id])) {
           unset($this->settings['allowed_view_modes'][$view_mode_id]);
           $status = RemovableDependentPluginReturn::Changed;
@@ -556,7 +556,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
         if ($this->settings['default_view_mode'] === $view_mode_id) {
           $this->settings['default_view_mode'] = EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE;
           $this->settings['allowed_view_modes'] += [EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE => EntityDisplayRepositoryInterface::DEFAULT_DISPLAY_MODE];
-          ksort($this->settings['allowed_view_modes']);
+          \ksort($this->settings['allowed_view_modes']);
           $status = RemovableDependentPluginReturn::Changed;
         }
       }

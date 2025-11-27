@@ -148,7 +148,7 @@ class MockBlockManager extends PluginManagerBase {
     // include ContextDefinition objects, and var_export() has problems
     // printing TranslatableMarkup objects.
     $class = ContextDefinition::class;
-    if (str_starts_with($data_type, 'entity:')) {
+    if (\str_starts_with($data_type, 'entity:')) {
       $class = EntityContextDefinition::class;
     }
     return new $class($data_type, (string) $label, $required);

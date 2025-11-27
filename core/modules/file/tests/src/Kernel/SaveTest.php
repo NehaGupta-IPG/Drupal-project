@@ -32,7 +32,7 @@ class SaveTest extends FileManagedUnitTestBase {
       'filemime' => 'text/plain',
     ]);
     $file->setPermanent();
-    file_put_contents($file->getFileUri(), 'hello world');
+    \file_put_contents($file->getFileUri(), 'hello world');
 
     // Save it, inserting a new record.
     $file->save();
@@ -45,7 +45,7 @@ class SaveTest extends FileManagedUnitTestBase {
     $loaded_file = File::load($file->id());
     $this->assertNotNull($loaded_file, 'Record exists in the database.');
     $this->assertEquals($file->isPermanent(), $loaded_file->isPermanent(), 'Status was saved correctly.');
-    $this->assertEquals(filesize($file->getFileUri()), $file->getSize(), 'File size was set correctly.');
+    $this->assertEquals(\filesize($file->getFileUri()), $file->getSize(), 'File size was set correctly.');
     // Verify that the new file size was set correctly.
     $this->assertGreaterThan(1, $file->getChangedTime());
     $this->assertEquals('en', $loaded_file->langcode->value, 'Langcode was defaulted correctly.');
@@ -77,17 +77,17 @@ class SaveTest extends FileManagedUnitTestBase {
     ];
     $file->setPermanent();
     $uppercase_file = File::create($uppercase_values);
-    file_put_contents($uppercase_file->getFileUri(), 'hello world');
+    \file_put_contents($uppercase_file->getFileUri(), 'hello world');
     $violations = $uppercase_file->validate();
     $this->assertCount(0, $violations, 'No violations when adding an URI with an existing filename in upper case.');
     $uppercase_file->save();
 
     // Ensure the database URI uniqueness constraint is triggered.
     $uppercase_file_duplicate = File::create($uppercase_values);
-    file_put_contents($uppercase_file_duplicate->getFileUri(), 'hello world');
+    \file_put_contents($uppercase_file_duplicate->getFileUri(), 'hello world');
     $violations = $uppercase_file_duplicate->validate();
     $this->assertCount(1, $violations);
-    $this->assertEquals(sprintf('The file %s already exists. Enter a unique file URI.', $uppercase_file_duplicate->getFileUri()), $violations[0]->getMessage());
+    $this->assertEquals(\sprintf('The file %s already exists. Enter a unique file URI.', $uppercase_file_duplicate->getFileUri()), $violations[0]->getMessage());
     // Ensure that file URI entity queries are case sensitive.
     $fids = \Drupal::entityQuery('file')
       ->accessCheck(FALSE)
@@ -106,7 +106,7 @@ class SaveTest extends FileManagedUnitTestBase {
     ]);
     $file->setPermanent();
 
-    file_put_contents($file->getFileUri(), '');
+    \file_put_contents($file->getFileUri(), '');
 
     // Save it, inserting a new record.
     $file->save();

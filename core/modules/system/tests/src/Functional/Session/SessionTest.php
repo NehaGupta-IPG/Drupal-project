@@ -63,7 +63,7 @@ class SessionTest extends BrowserTestBase {
     $user->save();
     $this->drupalGet('session-test/id');
     $matches = [];
-    preg_match('/\s*session_id:(.*)\n/', $this->getSession()->getPage()->getContent(), $matches);
+    \preg_match('/\s*session_id:(.*)\n/', $this->getSession()->getPage()->getContent(), $matches);
     $this->assertNotEmpty($matches[1], 'Found session ID before logging in.');
     $original_session = $matches[1];
 
@@ -80,7 +80,7 @@ class SessionTest extends BrowserTestBase {
 
     $this->drupalGet('session-test/id');
     $matches = [];
-    preg_match('/\s*session_id:(.*)\n/', $this->getSession()->getPage()->getContent(), $matches);
+    \preg_match('/\s*session_id:(.*)\n/', $this->getSession()->getPage()->getContent(), $matches);
     $this->assertNotEmpty($matches[1], 'Found session ID after logging in.');
     $this->assertNotSame($original_session, $matches[1], 'Session ID changed after login.');
   }
@@ -202,11 +202,11 @@ class SessionTest extends BrowserTestBase {
     $this->initFrontPage();
     // Session restart always resets all the cookies by design, so we
     // set an arbitrary session_id in the cookie for the next request.
-    $invalid_session_cookie_value = bin2hex($this->randomMachineName(13));
+    $invalid_session_cookie_value = \bin2hex($this->randomMachineName(13));
     $mink->setCookie($session_cookie_name, $invalid_session_cookie_value);
 
     // Make another request.
-    sleep(1);
+    \sleep(1);
     $this->drupalGet('session-test/set/bar');
 
     // Check returned cookie value.
@@ -335,21 +335,21 @@ class SessionTest extends BrowserTestBase {
     // is saved, its timestamp will change.
 
     // Modify the session.
-    sleep(1);
+    \sleep(1);
     $this->drupalGet('session-test/set/foo');
     $times2 = $query->execute()->fetchObject();
     $this->assertEquals($times1->access, $times2->access, 'Users table was not updated.');
     $this->assertNotEquals($times1->timestamp, $times2->timestamp, 'Sessions table was updated.');
 
     // Write the same value again, i.e. do not modify the session.
-    sleep(1);
+    \sleep(1);
     $this->drupalGet('session-test/set/foo');
     $times3 = $query->execute()->fetchObject();
     $this->assertEquals($times1->access, $times3->access, 'Users table was not updated.');
     $this->assertEquals($times2->timestamp, $times3->timestamp, 'Sessions table was not updated.');
 
     // Do not change the session.
-    sleep(1);
+    \sleep(1);
     $this->drupalGet('');
     $times4 = $query->execute()->fetchObject();
     $this->assertEquals($times3->access, $times4->access, 'Users table was not updated.');

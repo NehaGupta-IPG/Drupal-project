@@ -81,8 +81,8 @@ class FieldDataCountTest extends FieldKernelTestBase {
     // Create 12 entities to ensure that the purging works as expected.
     for ($i = 0; $i < 12; $i++) {
       $entity = EntityTest::create();
-      $entity->field_int[] = mt_rand(1, 99);
-      $entity->field_int[] = mt_rand(1, 99);
+      $entity->field_int[] = \mt_rand(1, 99);
+      $entity->field_int[] = \mt_rand(1, 99);
       $entity->name[] = $this->randomMachineName();
       $entity->save();
     }
@@ -108,7 +108,7 @@ class FieldDataCountTest extends FieldKernelTestBase {
     $this->assertTrue($field_storage->hasData(), 'There are entities with deleted field data.');
     $this->assertEquals(12, $this->storage->countFieldData($field_storage), 'There are 12 entities with deleted field data.');
 
-    field_purge_batch(6);
+    \field_purge_batch(6);
     $this->assertTrue($field_storage->hasData(), 'There are entities with deleted field data.');
     $this->assertEquals(6, $this->storage->countFieldData($field_storage), 'There are 6 entities with deleted field data.');
 

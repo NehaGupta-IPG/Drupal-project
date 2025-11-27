@@ -100,7 +100,7 @@ class MediaDisplayTest extends MediaJavascriptTestBase {
       ->accessCheck(FALSE)
       ->sort('mid', 'DESC')
       ->execute();
-    $image_media_id = reset($image_media_id);
+    $image_media_id = \reset($image_media_id);
 
     // Go to the media entity view.
     $this->drupalGet('/media/' . $image_media_id);
@@ -125,7 +125,7 @@ class MediaDisplayTest extends MediaJavascriptTestBase {
 
     $test_filename = $this->randomMachineName() . '.txt';
     $test_filepath = 'public://' . $test_filename;
-    file_put_contents($test_filepath, $this->randomMachineName());
+    \file_put_contents($test_filepath, $this->randomMachineName());
     $this->drupalGet("media/add/document");
     $page->attachFileToField("files[field_media_document_0]", \Drupal::service('file_system')->realpath($test_filepath));
     $result = $assert_session->waitForButton('Remove');

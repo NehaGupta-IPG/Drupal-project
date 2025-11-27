@@ -56,8 +56,8 @@ final class OverwriteExistingPackagesValidator implements EventSubscriberInterfa
         // Packages without a `path` cannot overwrite existing directories.
         continue;
       }
-      $relative_path = str_replace($stage_dir, '', $package->path);
-      if (is_dir($active_dir . DIRECTORY_SEPARATOR . $relative_path)) {
+      $relative_path = \str_replace($stage_dir, '', $package->path);
+      if (\is_dir($active_dir . DIRECTORY_SEPARATOR . $relative_path)) {
         $event->addError([
           $this->t('The new package @package will be installed in the directory @path, which already exists but is not managed by Composer.', [
             '@package' => $package->name,

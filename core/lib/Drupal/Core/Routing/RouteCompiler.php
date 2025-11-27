@@ -37,7 +37,7 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
     $pattern_outline = static::getPatternOutline($stripped_path);
     // We count the number of parts including any optional trailing parts. This
     // allows the RouteProvider to filter candidate routes more efficiently.
-    $num_parts = count(explode('/', trim($route->getPath(), '/')));
+    $num_parts = \count(\explode('/', \trim($route->getPath(), '/')));
 
     return new CompiledRoute(
       $fit,
@@ -74,7 +74,7 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
    *   The path pattern outline.
    */
   public static function getPatternOutline($path) {
-    return preg_replace('#\{\w+\}#', '%', $path);
+    return \preg_replace('#\{\w+\}#', '%', $path);
   }
 
   /**
@@ -87,8 +87,8 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
    *   The fitness of the path, as an integer.
    */
   public static function getFit($path) {
-    $parts = explode('/', trim($path, '/'));
-    $number_parts = count($parts);
+    $parts = \explode('/', \trim($path, '/'));
+    $number_parts = \count($parts);
     // We store the highest index of parts here to save some work in the fit
     // calculation loop.
     $slashes = $number_parts - 1;
@@ -98,7 +98,7 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
     // patterns we need to check in the RouteProvider.
     $fit = 0;
     foreach ($parts as $k => $part) {
-      if (!str_contains($part, '{')) {
+      if (!\str_contains($part, '{')) {
         $fit |= 1 << ($slashes - $k);
       }
     }
@@ -127,10 +127,10 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
 
     // Remove placeholders with default values from the outline, so that they
     // will still match.
-    $remove = array_map(function ($a) {
+    $remove = \array_map(function ($a) {
       return '/{' . $a . '}';
-    }, array_keys($defaults));
-    $path = str_replace($remove, '', $path);
+    }, \array_keys($defaults));
+    $path = \str_replace($remove, '', $path);
 
     return $path;
   }

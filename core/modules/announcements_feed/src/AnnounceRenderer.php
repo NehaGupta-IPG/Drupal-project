@@ -61,7 +61,7 @@ final class AnnounceRenderer {
 
     $build += [
       '#theme' => 'announcements_feed',
-      '#count' => count($announcements),
+      '#count' => \count($announcements),
       '#feed_link' => $this->feedLink,
       '#cache' => [
         'contexts' => [

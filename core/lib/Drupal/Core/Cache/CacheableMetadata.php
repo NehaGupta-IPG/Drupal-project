@@ -72,7 +72,7 @@ class CacheableMetadata implements RefinableCacheableDependencyInterface {
    *   If a non-integer value is supplied.
    */
   public function setCacheMaxAge($max_age) {
-    if (!is_int($max_age)) {
+    if (!\is_int($max_age)) {
       throw new \InvalidArgumentException('$max_age must be an integer');
     }
 

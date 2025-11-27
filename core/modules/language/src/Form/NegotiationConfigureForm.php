@@ -138,7 +138,7 @@ class NegotiationConfigureForm extends ConfigFormBase {
 
     foreach ($form['#language_types_info'] as $type => $info) {
       // Show locked language types only if they are configurable.
-      if (empty($info['locked']) || in_array($type, $configurable)) {
+      if (empty($info['locked']) || \in_array($type, $configurable)) {
         $form['#language_types'][] = $type;
       }
     }
@@ -168,7 +168,7 @@ class NegotiationConfigureForm extends ConfigFormBase {
     $method_weights_type = [];
 
     foreach ($configurable_types as $type) {
-      $customized[$type] = in_array($type, $stored_values);
+      $customized[$type] = \in_array($type, $stored_values);
       $method_weights = [];
       $enabled_methods = $form_state->getValue([$type, 'enabled']);
       $enabled_methods[LanguageNegotiationSelected::METHOD_ID] = TRUE;
@@ -189,7 +189,7 @@ class NegotiationConfigureForm extends ConfigFormBase {
 
     // Update non-configurable language types and the related language
     // negotiation configuration.
-    $this->negotiator->updateConfiguration(array_keys(array_filter($customized)));
+    $this->negotiator->updateConfiguration(\array_keys(\array_filter($customized)));
 
     // Update the language negotiations after setting the configurability.
     foreach ($method_weights_type as $type => $method_weights) {
@@ -201,7 +201,7 @@ class NegotiationConfigureForm extends ConfigFormBase {
     if ($this->blockStorage) {
       // If there is an active language switcher for a language type that has
       // been made not configurable, deactivate it first.
-      $non_configurable = array_keys(array_diff($customized, array_filter($customized)));
+      $non_configurable = \array_keys(\array_diff($customized, \array_filter($customized)));
       $this->disableLanguageSwitcher($non_configurable);
     }
     $this->blockManager->clearCachedDefinitions();
@@ -235,7 +235,7 @@ class NegotiationConfigureForm extends ConfigFormBase {
       $table_form['configurable'] = [
         '#type' => 'checkbox',
         '#title' => $this->t('Customize %language_name language detection to differ from Interface text language detection settings', ['%language_name' => $info['name']]),
-        '#default_value' => in_array($type, $configurable),
+        '#default_value' => \in_array($type, $configurable),
         '#attributes' => ['class' => ['language-customization-checkbox']],
         '#attached' => [
           'library' => [
@@ -257,7 +257,7 @@ class NegotiationConfigureForm extends ConfigFormBase {
     }
 
     // Order methods list by weight.
-    asort($methods_weight);
+    \asort($methods_weight);
 
     foreach ($methods_weight as $method_id => $weight) {
       // A language method might be no more available if the defining module has
@@ -271,7 +271,7 @@ class NegotiationConfigureForm extends ConfigFormBase {
 
       // List the method only if the current type is defined in its 'types' key.
       // If it is not defined default to all the configurable language types.
-      $types = array_flip($method['types'] ?? $form['#language_types']);
+      $types = \array_flip($method['types'] ?? $form['#language_types']);
 
       if (isset($types[$type])) {
         $table_form['#language_negotiation_info'][$method_id] = $method;
@@ -279,7 +279,7 @@ class NegotiationConfigureForm extends ConfigFormBase {
 
         $table_form['weight'][$method_id] = [
           '#type' => 'weight',
-          '#title' => $this->t('Weight for @title language detection method', ['@title' => mb_strtolower($method_name)]),
+          '#title' => $this->t('Weight for @title language detection method', ['@title' => \mb_strtolower($method_name)]),
           '#title_display' => 'invisible',
           '#default_value' => $weight,
           '#attributes' => ['class' => ["language-method-weight-$type"]],
@@ -290,7 +290,7 @@ class NegotiationConfigureForm extends ConfigFormBase {
 
         $table_form['enabled'][$method_id] = [
           '#type' => 'checkbox',
-          '#title' => $this->t('Enable @title language detection method', ['@title' => mb_strtolower($method_name)]),
+          '#title' => $this->t('Enable @title language detection method', ['@title' => \mb_strtolower($method_name)]),
           '#title_display' => 'invisible',
           '#default_value' => $enabled,
         ];

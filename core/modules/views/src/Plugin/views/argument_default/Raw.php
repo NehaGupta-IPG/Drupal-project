@@ -93,7 +93,7 @@ class Raw extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
       // range(1, 10) returns an array with:
       // - keys that count from 0 to match PHP array keys from explode().
       // - values that count from 1 for display to humans.
-      '#options' => range(1, 10),
+      '#options' => \range(1, 10),
       '#description' => $this->t('The numbering starts from 1, e.g. on the page admin/structure/types, the 3rd path component is "types".'),
     ];
     $form['use_alias'] = [
@@ -109,14 +109,14 @@ class Raw extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
    */
   public function getArgument() {
     // Don't trim the leading slash since getAliasByPath() requires it.
-    $path = rtrim($this->currentPath->getPath($this->view->getRequest()), '/');
+    $path = \rtrim($this->currentPath->getPath($this->view->getRequest()), '/');
     if ($this->options['use_alias']) {
       $path = $this->aliasManager->getAliasByPath($path);
     }
-    $args = explode('/', $path);
+    $args = \explode('/', $path);
     // Drop the empty first element created by the leading slash since the path
     // component index doesn't take it into account.
-    array_shift($args);
+    \array_shift($args);
     if (isset($args[$this->options['index']])) {
       return $args[$this->options['index']];
     }

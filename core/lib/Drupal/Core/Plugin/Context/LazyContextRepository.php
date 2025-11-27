@@ -58,10 +58,10 @@ class LazyContextRepository implements ContextRepositoryInterface {
         $contexts[$id] = $this->contexts[$id];
         continue;
       }
-      assert($id[0] === '@' && str_contains($id, ':'), 'You must provide the context IDs in the @{service_id}:{unqualified_context_id} format.');
-      list($service_id, $unqualified_context_id) = explode(':', $id, 2);
+      \assert($id[0] === '@' && \str_contains($id, ':'), 'You must provide the context IDs in the @{service_id}:{unqualified_context_id} format.');
+      list($service_id, $unqualified_context_id) = \explode(':', $id, 2);
       // Remove the leading '@'.
-      $service_id = substr($service_id, 1);
+      $service_id = \substr($service_id, 1);
       $context_ids_by_service[$service_id][] = $unqualified_context_id;
     }
 
@@ -70,7 +70,7 @@ class LazyContextRepository implements ContextRepositoryInterface {
     foreach ($context_ids_by_service as $service_id => $unqualified_context_ids) {
       $contexts_by_service = $this->container->get($service_id)->getRuntimeContexts($unqualified_context_ids);
 
-      $wanted_contexts = array_intersect_key($contexts_by_service, array_flip($unqualified_context_ids));
+      $wanted_contexts = \array_intersect_key($contexts_by_service, \array_flip($unqualified_context_ids));
       foreach ($wanted_contexts as $unqualified_context_id => $context) {
         $context_id = '@' . $service_id . ':' . $unqualified_context_id;
         $this->contexts[$context_id] = $contexts[$context_id] = $context;

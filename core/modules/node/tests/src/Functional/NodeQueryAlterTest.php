@@ -53,7 +53,7 @@ class NodeQueryAlterTest extends NodeTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    node_access_rebuild();
+    \node_access_rebuild();
 
     // Create some content.
     $this->drupalCreateNode();

@@ -69,12 +69,12 @@ class UserFloodEvent extends Event {
     $this->window = $window;
     $this->identifier = $identifier;
     // The identifier could be a uid or an IP, or a composite of both.
-    if (is_numeric($identifier)) {
+    if (\is_numeric($identifier)) {
       $this->uid = $identifier;
       return;
     }
-    if (str_contains($identifier, '-')) {
-      [$uid, $ip] = explode('-', $identifier);
+    if (\str_contains($identifier, '-')) {
+      [$uid, $ip] = \explode('-', $identifier);
       $this->uid = $uid;
       $this->ip = $ip;
       return;

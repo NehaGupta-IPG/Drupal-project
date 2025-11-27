@@ -84,7 +84,7 @@ class MigrateUpgradeImportBatch {
       $event_dispatcher->addListener(MigrateEvents::MAP_SAVE, [static::class, 'onMapSave']);
       $event_dispatcher->addListener(MigrateEvents::IDMAP_MESSAGE, [static::class, 'onIdMapMessage']);
 
-      static::$maxExecTime = ini_get('max_execution_time');
+      static::$maxExecTime = \ini_get('max_execution_time');
       if (static::$maxExecTime <= 0) {
         static::$maxExecTime = 60;
       }
@@ -95,7 +95,7 @@ class MigrateUpgradeImportBatch {
       static::$listenersAdded = TRUE;
     }
     if (!isset($context['sandbox']['migration_ids'])) {
-      $context['sandbox']['max'] = count($initial_ids);
+      $context['sandbox']['max'] = \count($initial_ids);
       $context['sandbox']['current'] = 1;
       // Total number processed for this migration.
       $context['sandbox']['num_processed'] = 0;
@@ -109,7 +109,7 @@ class MigrateUpgradeImportBatch {
     // Number processed in this batch.
     static::$numProcessed = 0;
 
-    $migration_id = reset($context['sandbox']['migration_ids']);
+    $migration_id = \reset($context['sandbox']['migration_ids']);
     $definition = \Drupal::service('plugin.manager.migration')->getDefinition($migration_id);
     $configuration = [];
 
@@ -124,7 +124,7 @@ class MigrateUpgradeImportBatch {
       $base_path = ($scheme === 'private' && $config['source_private_file_path'])
         ? $config['source_private_file_path']
         : $config['source_base_path'];
-      $configuration['source']['constants']['source_base_path'] = rtrim($base_path, '/');
+      $configuration['source']['constants']['source_base_path'] = \rtrim($base_path, '/');
     }
 
     /** @var \Drupal\migrate\Plugin\Migration $migration */
@@ -161,7 +161,7 @@ class MigrateUpgradeImportBatch {
           // @see onPostImport()
           if (!empty(static::$followUpMigrations)) {
             foreach (static::$followUpMigrations as $migration_id => $migration) {
-              if (!in_array($migration_id, $context['sandbox']['migration_ids'], TRUE)) {
+              if (!\in_array($migration_id, $context['sandbox']['migration_ids'], TRUE)) {
                 // Add the follow-up migration ID to the batch migration IDs for
                 // later execution.
                 $context['sandbox']['migration_ids'][] = $migration_id;
@@ -205,7 +205,7 @@ class MigrateUpgradeImportBatch {
 
       // Unless we're continuing on with this migration, take it off the list.
       if ($migration_status != MigrationInterface::RESULT_INCOMPLETE) {
-        array_shift($context['sandbox']['migration_ids']);
+        \array_shift($context['sandbox']['migration_ids']);
         $context['sandbox']['current']++;
       }
 
@@ -216,9 +216,9 @@ class MigrateUpgradeImportBatch {
       }
 
       // Only display the last MESSAGE_LENGTH messages, in reverse order.
-      $message_count = count($context['sandbox']['messages']);
+      $message_count = \count($context['sandbox']['messages']);
       $context['message'] = '';
-      for ($index = max(0, $message_count - self::MESSAGE_LENGTH); $index < $message_count; $index++) {
+      for ($index = \max(0, $message_count - self::MESSAGE_LENGTH); $index < $message_count; $index++) {
         $context['message'] = $context['sandbox']['messages'][$index] . "<br />\n" . $context['message'];
       }
       if ($message_count > self::MESSAGE_LENGTH) {
@@ -228,7 +228,7 @@ class MigrateUpgradeImportBatch {
       // At the top of the list, display the next one (which will be the one
       // that is running while this message is visible).
       if (!empty($context['sandbox']['migration_ids'])) {
-        $migration_id = reset($context['sandbox']['migration_ids']);
+        $migration_id = \reset($context['sandbox']['migration_ids']);
         $migration = \Drupal::service('plugin.manager.migration')->createInstance($migration_id);
         $migration_name = $migration->label() ?: $migration_id;
         $context['message'] = (string) new TranslatableMarkup('Currently upgrading @migration (@current of @max total tasks)', [
@@ -239,11 +239,11 @@ class MigrateUpgradeImportBatch {
       }
     }
     else {
-      array_shift($context['sandbox']['migration_ids']);
+      \array_shift($context['sandbox']['migration_ids']);
       $context['sandbox']['current']++;
     }
 
-    $context['finished'] = 1 - count($context['sandbox']['migration_ids']) / $context['sandbox']['max'];
+    $context['finished'] = 1 - \count($context['sandbox']['migration_ids']) / $context['sandbox']['max'];
   }
 
   /**
@@ -271,12 +271,12 @@ class MigrateUpgradeImportBatch {
     if ($failures > 0) {
       \Drupal::messenger()->addError(\Drupal::translation()
         ->formatPlural($failures, '1 upgrade failed', '@count upgrades failed'));
-      \Drupal::messenger()->addError(t('Upgrade process not completed'));
+      \Drupal::messenger()->addError(\t('Upgrade process not completed'));
     }
     else {
       // Everything went off without a hitch. We may not have had successes
       // but we didn't have failures so this is fine.
-      \Drupal::messenger()->addStatus(t('Congratulations, you upgraded Drupal!'));
+      \Drupal::messenger()->addStatus(\t('Congratulations, you upgraded Drupal!'));
     }
 
     if (\Drupal::moduleHandler()->moduleExists('dblog')) {
@@ -365,8 +365,8 @@ class MigrateUpgradeImportBatch {
       $type = 'error';
     }
     $migration_id = $event->getMigration()->getPluginId();
-    $source_id_string = implode(',', $event->getSourceIdValues());
-    $message = t('Migration @migration_id: Source ID @source_id: @message', [
+    $source_id_string = \implode(',', $event->getSourceIdValues());
+    $message = \t('Migration @migration_id: Source ID @source_id: @message', [
       '@migration_id' => $migration_id,
       '@source_id' => $source_id_string,
       '@message' => $event->getMessage(),

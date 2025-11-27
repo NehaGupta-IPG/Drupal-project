@@ -74,19 +74,19 @@ class FilterID extends StaticMap implements ContainerFactoryPluginInterface {
     // If the static map is bypassed on failure, the returned plugin ID will be
     // an array if $value was. Plugin IDs cannot be arrays, so flatten it before
     // passing it into the filter manager.
-    if (is_array($plugin_id)) {
-      $plugin_id = implode(':', $plugin_id);
+    if (\is_array($plugin_id)) {
+      $plugin_id = \implode(':', $plugin_id);
     }
 
     if ($this->filterManager->hasDefinition($plugin_id)) {
       return $plugin_id;
     }
     else {
-      if (in_array(static::getSourceFilterType($value), [
+      if (\in_array(static::getSourceFilterType($value), [
         FilterInterface::TYPE_TRANSFORM_REVERSIBLE,
         FilterInterface::TYPE_TRANSFORM_IRREVERSIBLE,
       ], TRUE)) {
-        $message = sprintf('Filter %s could not be mapped to an existing filter plugin; omitted since it is a transformation-only filter. Install and configure a successor after the migration.', $plugin_id);
+        $message = \sprintf('Filter %s could not be mapped to an existing filter plugin; omitted since it is a transformation-only filter. Install and configure a successor after the migration.', $plugin_id);
         $migrate_executable->saveMessage($message, MigrationInterface::MESSAGE_INFORMATIONAL);
         $this->stopPipeline();
         return NULL;
@@ -94,7 +94,7 @@ class FilterID extends StaticMap implements ContainerFactoryPluginInterface {
       $fallback = $this->filterManager->getFallbackPluginId($plugin_id);
 
       // @see \Drupal\filter\Plugin\migrate\process\FilterSettings::transform()
-      $message = sprintf('Filter %s could not be mapped to an existing filter plugin; defaulting to %s and dropping all settings. Either redo the migration with the module installed that provides an equivalent filter, or modify the text format after the migration to remove this filter if it is no longer necessary.', $plugin_id, $fallback);
+      $message = \sprintf('Filter %s could not be mapped to an existing filter plugin; defaulting to %s and dropping all settings. Either redo the migration with the module installed that provides an equivalent filter, or modify the text format after the migration to remove this filter if it is no longer necessary.', $plugin_id, $fallback);
       $migrate_executable->saveMessage($message, MigrationInterface::MESSAGE_WARNING);
 
       return $fallback;

@@ -191,12 +191,12 @@ class WorkspaceAccessTest extends KernelTestBase {
       'top1',
       'child1_1',
     ];
-    $this->assertEquals($expected, array_keys($selection_handler->getReferenceableEntities()['workspace']));
-    $this->assertEquals($expected, array_keys($selection_handler->getReferenceableEntities(NULL, 'CONTAINS', 3)['workspace']));
+    $this->assertEquals($expected, \array_keys($selection_handler->getReferenceableEntities()['workspace']));
+    $this->assertEquals($expected, \array_keys($selection_handler->getReferenceableEntities(NULL, 'CONTAINS', 3)['workspace']));
     $expected = [
       'top1',
     ];
-    $this->assertEquals($expected, array_keys($selection_handler->getReferenceableEntities('top')['workspace']));
+    $this->assertEquals($expected, \array_keys($selection_handler->getReferenceableEntities('top')['workspace']));
 
     // The $any_permission_user and $admin_permission_user should be allowed to
     // reference any workspace.
@@ -218,14 +218,14 @@ class WorkspaceAccessTest extends KernelTestBase {
       'top2',
     ];
     $this->setCurrentUser($any_permission_user);
-    $this->assertEquals($expected_all, array_keys($selection_handler->getReferenceableEntities()['workspace']));
-    $this->assertEquals($expected_3, array_keys($selection_handler->getReferenceableEntities(NULL, 'CONTAINS', 3)['workspace']));
-    $this->assertEquals($expected_top, array_keys($selection_handler->getReferenceableEntities('top')['workspace']));
+    $this->assertEquals($expected_all, \array_keys($selection_handler->getReferenceableEntities()['workspace']));
+    $this->assertEquals($expected_3, \array_keys($selection_handler->getReferenceableEntities(NULL, 'CONTAINS', 3)['workspace']));
+    $this->assertEquals($expected_top, \array_keys($selection_handler->getReferenceableEntities('top')['workspace']));
 
     $this->setCurrentUser($admin_permission_user);
-    $this->assertEquals($expected_all, array_keys($selection_handler->getReferenceableEntities()['workspace']));
-    $this->assertEquals($expected_3, array_keys($selection_handler->getReferenceableEntities(NULL, 'CONTAINS', 3)['workspace']));
-    $this->assertEquals($expected_top, array_keys($selection_handler->getReferenceableEntities('top')['workspace']));
+    $this->assertEquals($expected_all, \array_keys($selection_handler->getReferenceableEntities()['workspace']));
+    $this->assertEquals($expected_3, \array_keys($selection_handler->getReferenceableEntities(NULL, 'CONTAINS', 3)['workspace']));
+    $this->assertEquals($expected_top, \array_keys($selection_handler->getReferenceableEntities('top')['workspace']));
   }
 
   /**

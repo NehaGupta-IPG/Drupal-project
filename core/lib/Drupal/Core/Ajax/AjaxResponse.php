@@ -37,7 +37,7 @@ class AjaxResponse extends JsonResponse implements AttachmentsInterface {
    */
   public function addCommand(CommandInterface $command, $prepend = FALSE) {
     if ($prepend) {
-      array_unshift($this->commands, $command->render());
+      \array_unshift($this->commands, $command->render());
     }
     else {
       $this->commands[] = $command->render();
@@ -67,7 +67,7 @@ class AjaxResponse extends JsonResponse implements AttachmentsInterface {
    *   Returns this after merging.
    */
   public function mergeWith(AjaxResponse $other): AjaxResponse {
-    $this->commands = array_merge($this->getCommands(), $other->getCommands());
+    $this->commands = \array_merge($this->getCommands(), $other->getCommands());
     $this->attachments = BubbleableMetadata::mergeAttachments($this->getAttachments(), $other->getAttachments());
     return $this;
   }

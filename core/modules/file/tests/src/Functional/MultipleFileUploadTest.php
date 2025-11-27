@@ -47,7 +47,7 @@ class MultipleFileUploadTest extends BrowserTestBase {
     // Create few files with non-typical extensions.
     foreach (['file1.wtf', 'file2.wtf'] as $i => $file) {
       $file_path = $this->root . "/sites/default/files/simpletest/$file";
-      file_put_contents($file_path, 'File with non-default extension.', FILE_APPEND | LOCK_EX);
+      \file_put_contents($file_path, 'File with non-default extension.', FILE_APPEND | LOCK_EX);
       $edit["files[multi_file][$i]"] = $file_path;
     }
 

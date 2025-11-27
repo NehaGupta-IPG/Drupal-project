@@ -162,7 +162,7 @@ class Node extends WizardPluginBase {
       }
     }
     if (!empty($tids)) {
-      $vid = reset($form['displays']['show']['tagged_with']['#selection_settings']['target_bundles']);
+      $vid = \reset($form['displays']['show']['tagged_with']['#selection_settings']['target_bundles']);
       $filters['tid'] = [
         'id' => 'tid',
         'table' => 'taxonomy_index',
@@ -173,11 +173,11 @@ class Node extends WizardPluginBase {
       ];
       // If the user entered more than one valid term in the autocomplete
       // field, they probably intended both of them to be applied.
-      if (count($tids) > 1) {
+      if (\count($tids) > 1) {
         $filters['tid']['operator'] = 'and';
         // Sort the terms so the filter will be displayed as it normally would
         // on the edit screen.
-        sort($filters['tid']['value']);
+        \sort($filters['tid']['value']);
       }
     }
 
@@ -262,16 +262,16 @@ class Node extends WizardPluginBase {
     // entities. If a particular entity type (i.e., bundle) has been
     // selected above, then we only search for taxonomy fields associated
     // with that bundle. Otherwise, we use all bundles.
-    $bundles = array_keys($this->bundleInfoService->getBundleInfo($this->entityTypeId));
+    $bundles = \array_keys($this->bundleInfoService->getBundleInfo($this->entityTypeId));
     // Double check that this is a real bundle before using it (since above
     // we added a dummy option 'all' to the bundle list on the form).
-    if (isset($selected_bundle) && in_array($selected_bundle, $bundles)) {
+    if (isset($selected_bundle) && \in_array($selected_bundle, $bundles)) {
       $bundles = [$selected_bundle];
     }
     $tag_fields = [];
     foreach ($bundles as $bundle) {
       $display = $this->entityDisplayRepository->getFormDisplay($this->entityTypeId, $bundle);
-      $tag_fields += array_filter($this->entityFieldManager->getFieldDefinitions($this->entityTypeId, $bundle), function (FieldDefinitionInterface $field_definition) use ($display) {
+      $tag_fields += \array_filter($this->entityFieldManager->getFieldDefinitions($this->entityTypeId, $bundle), function (FieldDefinitionInterface $field_definition) use ($display) {
         if ($field_definition->getType() == 'entity_reference' && $field_definition->getSetting('target_type') == 'taxonomy_term') {
           $widget = $display->getComponent($field_definition->getName());
           return isset($widget['type']) && $widget['type'] == 'entity_reference_autocomplete_tags';
@@ -286,11 +286,11 @@ class Node extends WizardPluginBase {
       // that is created by the Standard install profile in core and also
       // commonly used by contrib modules; thus, it is most likely to be
       // associated with the "main" free-tagging vocabulary on the site.
-      if (array_key_exists('field_tags', $tag_fields)) {
+      if (\array_key_exists('field_tags', $tag_fields)) {
         $tag_field_name = 'field_tags';
       }
       else {
-        $tag_field_name = key($tag_fields);
+        $tag_field_name = \key($tag_fields);
       }
       // Add the autocomplete textfield to the wizard.
       $form['displays']['show']['tagged_with'] = [
@@ -303,7 +303,7 @@ class Node extends WizardPluginBase {
       ];
       $target_bundles = $tag_fields[$tag_field_name]->getSetting('handler_settings')['target_bundles'] ?? FALSE;
       if (!$target_bundles) {
-        $target_bundles = array_keys($this->bundleInfoService->getBundleInfo('taxonomy_term'));
+        $target_bundles = \array_keys($this->bundleInfoService->getBundleInfo('taxonomy_term'));
       }
       $form['displays']['show']['tagged_with']['#selection_settings']['target_bundles'] = $target_bundles;
     }

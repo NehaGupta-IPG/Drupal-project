@@ -139,7 +139,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       if (!$form_state->get('user_pass_reset') && ($token = $request->query->get('pass-reset-token'))) {
         $session_key = 'pass_reset_' . $account->id();
         $session_value = $request->getSession()->get($session_key);
-        $user_pass_reset = isset($session_value) && hash_equals($session_value, $token);
+        $user_pass_reset = isset($session_value) && \hash_equals($session_value, $token);
         $form_state->set('user_pass_reset', $user_pass_reset);
       }
 
@@ -206,7 +206,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
 
     $roles = Role::loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
-    $roles = array_map(fn(RoleInterface $role) => Html::escape($role->label()), $roles);
+    $roles = \array_map(fn(RoleInterface $role) => Html::escape($role->label()), $roles);
 
     $form['account']['roles'] = [
       '#type' => 'checkboxes',
@@ -367,8 +367,8 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     //   numeric keys. Allow to override this per field. As this function is
     //   called twice, we have to prevent it from getting the array keys twice.
 
-    if (is_string(key($form_state->getValue('roles')))) {
-      $form_state->setValue('roles', array_keys(array_filter($form_state->getValue('roles'))));
+    if (\is_string(\key($form_state->getValue('roles')))) {
+      $form_state->setValue('roles', \array_keys(\array_filter($form_state->getValue('roles'))));
     }
 
     /** @var \Drupal\user\UserInterface $account */
@@ -382,8 +382,8 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     }
 
     // Set existing password if set in the form state.
-    $current_pass = trim($form_state->getValue('current_pass', ''));
-    if (strlen($current_pass) > 0) {
+    $current_pass = \trim($form_state->getValue('current_pass', ''));
+    if (\strlen($current_pass) > 0) {
       $account->setExistingPassword($current_pass);
     }
 
@@ -398,7 +398,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    * {@inheritdoc}
    */
   protected function getEditedFieldNames(FormStateInterface $form_state) {
-    return array_merge([
+    return \array_merge([
       'name',
       'pass',
       'mail',
@@ -428,7 +428,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       'preferred_admin_langcode',
     ];
     foreach ($violations->getByFields($field_names) as $violation) {
-      [$field_name] = explode('.', $violation->getPropertyPath(), 2);
+      [$field_name] = \explode('.', $violation->getPropertyPath(), 2);
       $form_state->setErrorByName($field_name, $violation->getMessage());
     }
     parent::flagViolations($violations, $form, $form_state);

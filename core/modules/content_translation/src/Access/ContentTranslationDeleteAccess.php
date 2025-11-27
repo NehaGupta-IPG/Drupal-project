@@ -63,7 +63,7 @@ class ContentTranslationDeleteAccess implements AccessInterface {
    */
   public function access(RouteMatchInterface $route_match, AccountInterface $account) {
     $requirement = $route_match->getRouteObject()->getRequirement('_access_content_translation_delete');
-    $entity_type_id = current(explode('.', $requirement));
+    $entity_type_id = \current(\explode('.', $requirement));
     $entity = $route_match->getParameter($entity_type_id);
     return $this->checkAccess($entity);
   }

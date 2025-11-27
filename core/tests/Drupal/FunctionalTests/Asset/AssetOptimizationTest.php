@@ -106,7 +106,7 @@ class AssetOptimizationTest extends BrowserTestBase {
       // condition is not really possible since it relies on timing. However, by
       // changing the case of the part of the URL that is handled by Drupal
       // routing, we can force the request to be served by Drupal.
-      $this->assertAggregate(str_replace($this->fileAssetsPath, strtoupper($this->fileAssetsPath), $url), TRUE, 'text/css');
+      $this->assertAggregate(\str_replace($this->fileAssetsPath, \strtoupper($this->fileAssetsPath), $url), TRUE, 'text/css');
       $this->assertAggregate($url, FALSE, 'text/css');
       $this->assertInvalidAggregates($url);
     }
@@ -130,7 +130,7 @@ class AssetOptimizationTest extends BrowserTestBase {
    */
   protected function assertAggregate(string $url, bool $from_php = TRUE, ?string $content_type = NULL): void {
     $url = $this->getAbsoluteUrl($url);
-    if (!stripos($url, $this->fileAssetsPath) !== FALSE) {
+    if (!\stripos($url, $this->fileAssetsPath) !== FALSE) {
       return;
     }
     $session = $this->getSession();
@@ -160,7 +160,7 @@ class AssetOptimizationTest extends BrowserTestBase {
   protected function assertInvalidAggregates(string $url): void {
     $url = $this->getAbsoluteUrl($url);
     // Not every script or style on a page is aggregated.
-    if (!str_contains($url, $this->fileAssetsPath)) {
+    if (!\str_contains($url, $this->fileAssetsPath)) {
       return;
     }
     $session = $this->getSession();
@@ -219,10 +219,10 @@ class AssetOptimizationTest extends BrowserTestBase {
    *   The URL with the group hash replaced.
    */
   protected function replaceGroupHash(string $url): string {
-    $parts = explode('_', $url, 2);
-    $hash = strtok($parts[1], '.');
-    $parts[1] = str_replace($hash, 'abcdefghijklmnop', $parts[1]);
-    return $this->getAbsoluteUrl(implode('_', $parts));
+    $parts = \explode('_', $url, 2);
+    $hash = \strtok($parts[1], '.');
+    $parts[1] = \str_replace($hash, 'abcdefghijklmnop', $parts[1]);
+    return $this->getAbsoluteUrl(\implode('_', $parts));
   }
 
   /**
@@ -235,7 +235,7 @@ class AssetOptimizationTest extends BrowserTestBase {
    *   The URL with the file name prefix replaced.
    */
   protected function replaceFileNamePrefix(string $url): string {
-    return str_replace(['/css_', '/js_'], '/xyz_', $url);
+    return \str_replace(['/css_', '/js_'], '/xyz_', $url);
   }
 
   /**
@@ -251,9 +251,9 @@ class AssetOptimizationTest extends BrowserTestBase {
     // First replace the hash, so we don't get served the actual file on disk.
     $url = $this->replaceGroupHash($url);
     $parts = UrlHelper::parse($url);
-    $include = explode(',', UrlHelper::uncompressQueryParameter($parts['query']['include']));
+    $include = \explode(',', UrlHelper::uncompressQueryParameter($parts['query']['include']));
     $include[] = 'system/llama';
-    $parts['query']['include'] = UrlHelper::compressQueryParameter(implode(',', $include));
+    $parts['query']['include'] = UrlHelper::compressQueryParameter(\implode(',', $include));
 
     $query = UrlHelper::buildQuery($parts['query']);
     return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);

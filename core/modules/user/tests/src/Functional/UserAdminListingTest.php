@@ -92,7 +92,7 @@ class UserAdminListingTest extends BrowserTestBase {
       ];
     }
 
-    $this->assertEmpty(array_keys(array_diff_key($result_accounts, $accounts)), 'Ensure all accounts are listed.');
+    $this->assertEmpty(\array_keys(\array_diff_key($result_accounts, $accounts)), 'Ensure all accounts are listed.');
     foreach ($result_accounts as $name => $values) {
       $this->assertEquals($accounts[$name]->status->value, $values['status'] == 'active');
     }

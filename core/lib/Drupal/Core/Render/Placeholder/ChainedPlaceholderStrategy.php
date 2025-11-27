@@ -40,7 +40,7 @@ class ChainedPlaceholderStrategy implements PlaceholderStrategyInterface {
     }
 
     // Assert that there is at least one strategy.
-    assert(!empty($this->placeholderStrategies), 'At least one placeholder strategy must be present; by default the fallback strategy \Drupal\Core\Render\Placeholder\SingleFlushStrategy is always present.');
+    \assert(!empty($this->placeholderStrategies), 'At least one placeholder strategy must be present; by default the fallback strategy \Drupal\Core\Render\Placeholder\SingleFlushStrategy is always present.');
 
     $new_placeholders = [];
 
@@ -56,15 +56,15 @@ class ChainedPlaceholderStrategy implements PlaceholderStrategyInterface {
       }
 
       $processed_placeholders = $strategy->processPlaceholders($candidate_placeholders);
-      assert(array_intersect_key($processed_placeholders, $placeholders) === $processed_placeholders, 'Processed placeholders must be a subset of all placeholders.');
-      $placeholders = array_diff_key($placeholders, $processed_placeholders);
+      \assert(\array_intersect_key($processed_placeholders, $placeholders) === $processed_placeholders, 'Processed placeholders must be a subset of all placeholders.');
+      $placeholders = \array_diff_key($placeholders, $processed_placeholders);
       $new_placeholders += $processed_placeholders;
 
       if (empty($placeholders)) {
         break;
       }
     }
-    assert(empty($placeholders), 'It was not possible to replace all placeholders in ChainedPlaceholderStrategy::processPlaceholders()');
+    \assert(empty($placeholders), 'It was not possible to replace all placeholders in ChainedPlaceholderStrategy::processPlaceholders()');
 
     return $new_placeholders;
   }

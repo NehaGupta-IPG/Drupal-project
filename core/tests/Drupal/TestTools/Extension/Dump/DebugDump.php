@@ -44,23 +44,23 @@ final class DebugDump implements Extension {
     ParameterCollection $parameters,
   ): void {
     // Determine staging file path.
-    self::$stagingFilePath = tempnam(sys_get_temp_dir(), 'dpd');
+    self::$stagingFilePath = \tempnam(\sys_get_temp_dir(), 'dpd');
 
     // Determine color output.
     $colors = $parameters->has('colors') ? $parameters->get('colors') : FALSE;
-    self::$colors = filter_var($colors, \FILTER_VALIDATE_BOOLEAN);
+    self::$colors = \filter_var($colors, \FILTER_VALIDATE_BOOLEAN);
 
     // Print caller.
     $printCaller = $parameters->has('printCaller') ? $parameters->get('printCaller') : FALSE;
-    self::$printCaller = filter_var($printCaller, \FILTER_VALIDATE_BOOLEAN);
+    self::$printCaller = \filter_var($printCaller, \FILTER_VALIDATE_BOOLEAN);
 
     // Set the environment variable with the configuration.
-    $config = json_encode([
+    $config = \json_encode([
       'stagingFilePath' => self::$stagingFilePath,
       'colors' => self::$colors,
       'printCaller' => self::$printCaller,
     ]);
-    putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG=' . $config);
+    \putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG=' . $config);
 
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
   }
@@ -72,7 +72,7 @@ final class DebugDump implements Extension {
    *   TRUE if enabled, FALSE if disabled.
    */
   public static function isEnabled(): bool {
-    return getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG') !== FALSE;
+    return \getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG') !== FALSE;
   }
 
   /**
@@ -85,7 +85,7 @@ final class DebugDump implements Extension {
     if (!self::isEnabled()) {
       return;
     }
-    $config = (array) json_decode(getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG'));
+    $config = (array) \json_decode(\getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG'));
 
     $caller = self::getCaller();
 
@@ -99,12 +99,12 @@ final class DebugDump implements Extension {
         // A negative depth means "end of dump".
         if ($depth >= 0) {
           // Adds a two spaces indentation to the line.
-          $dump[] = str_repeat($indent_pad, $depth) . $line;
+          $dump[] = \str_repeat($indent_pad, $depth) . $line;
         }
       }
     );
 
-    file_put_contents(
+    \file_put_contents(
       $config['stagingFilePath'],
       self::encodeDump($caller['test']->id(), $caller['file'], $caller['line'], $dump) . "\n",
       FILE_APPEND,
@@ -133,8 +133,8 @@ final class DebugDump implements Extension {
       'line' => $line,
       'dump' => $dump,
     ];
-    $jsonData = json_encode($data);
-    return base64_encode($jsonData);
+    $jsonData = \json_encode($data);
+    return \base64_encode($jsonData);
   }
 
   /**
@@ -147,8 +147,8 @@ final class DebugDump implements Extension {
    *   An encoded string.
    */
   private static function decodeDump(string $encodedData): array {
-    $jsonData = base64_decode($encodedData);
-    return (array) json_decode($jsonData);
+    $jsonData = \base64_decode($encodedData);
+    return (array) \json_decode($jsonData);
   }
 
   /**
@@ -158,16 +158,16 @@ final class DebugDump implements Extension {
    *   Caller information.
    */
   private static function getCaller(): array {
-    $backtrace = debug_backtrace();
+    $backtrace = \debug_backtrace();
 
     while (!isset($backtrace[0]['function']) || $backtrace[0]['function'] !== 'dump') {
-      array_shift($backtrace);
+      \array_shift($backtrace);
     }
     $call['file'] = $backtrace[1]['file'] ?? NULL;
     $call['line'] = $backtrace[1]['line'] ?? NULL;
 
     while (!isset($backtrace[0]['object']) || !($backtrace[0]['object'] instanceof TestCase)) {
-      array_shift($backtrace);
+      \array_shift($backtrace);
     }
     $call['test'] = $backtrace[0]['object']->valueObjectForEvents();
 
@@ -184,12 +184,12 @@ final class DebugDump implements Extension {
     if (!self::isEnabled()) {
       return [];
     }
-    $config = (array) json_decode(getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG'));
-    $contents = rtrim(file_get_contents($config['stagingFilePath']));
+    $config = (array) \json_decode(\getenv('DRUPAL_PHPUNIT_DUMPER_CONFIG'));
+    $contents = \rtrim(\file_get_contents($config['stagingFilePath']));
     if (empty($contents)) {
       return [];
     }
-    $encodedDumps = explode("\n", $contents);
+    $encodedDumps = \explode("\n", $contents);
     $dumps = [];
     foreach ($encodedDumps as $encodedDump) {
       $dump = self::decodeDump($encodedDump);
@@ -207,8 +207,8 @@ final class DebugDump implements Extension {
     $dumps = self::getDumps();
 
     // Cleanup.
-    unlink(self::$stagingFilePath);
-    putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG');
+    \unlink(self::$stagingFilePath);
+    \putenv('DRUPAL_PHPUNIT_DUMPER_CONFIG');
 
     if ($dumps === []) {
       return;

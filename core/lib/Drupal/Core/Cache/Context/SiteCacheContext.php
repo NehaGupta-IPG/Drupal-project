@@ -23,7 +23,7 @@ class SiteCacheContext extends RequestStackCacheContextBase implements CacheCont
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Site');
+    return \t('Site');
   }
 
   /**

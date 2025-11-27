@@ -75,12 +75,12 @@ final class ContentExportCommand extends Command {
 
     // Confirm that all specified bundles exist.
     if ($bundles) {
-      $unknown_bundles = array_diff(
+      $unknown_bundles = \array_diff(
         $bundles,
-        array_keys($container->get(EntityTypeBundleInfoInterface::class)->getBundleInfo($entity_type_id)),
+        \array_keys($container->get(EntityTypeBundleInfoInterface::class)->getBundleInfo($entity_type_id)),
       );
       if ($unknown_bundles) {
-        $io->error("These bundles do not exist on the $entity_type_id entity type: " . implode(', ', $unknown_bundles));
+        $io->error("These bundles do not exist on the $entity_type_id entity type: " . \implode(', ', $unknown_bundles));
         return 1;
       }
     }
@@ -116,7 +116,7 @@ final class ContentExportCommand extends Command {
     if ($entity_id && $count === 0) {
       $io->error("$entity_type_id $entity_id does not exist.");
       if ($bundles) {
-        $io->caution('Maybe this entity is not one of the specified bundles: ' . implode(', ', $bundles));
+        $io->caution('Maybe this entity is not one of the specified bundles: ' . \implode(', ', $bundles));
       }
       return 1;
     }

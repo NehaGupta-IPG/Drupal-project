@@ -109,7 +109,7 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
     // picked up.
     \Drupal::service('content_translation.manager')->setEnabled('node', 'article', TRUE);
     $roles = $this->adminUser->getRoles(TRUE);
-    Role::load(reset($roles))
+    Role::load(\reset($roles))
       ->grantPermission('create content translations')
       ->grantPermission('translate any entity')
       ->save();
@@ -150,7 +150,7 @@ class TaxonomyTermViewTest extends TaxonomyTestBase {
     $tables = $query->getTables();
 
     // Ensure that the join to node_field_data is not added by default.
-    $this->assertEquals(['node_field_data', 'taxonomy_index'], array_keys($tables));
+    $this->assertEquals(['node_field_data', 'taxonomy_index'], \array_keys($tables));
     // Ensure that the filter to the language column is not there by default.
     $condition = $query->conditions();
     // We only want to check the no. of conditions in the query.

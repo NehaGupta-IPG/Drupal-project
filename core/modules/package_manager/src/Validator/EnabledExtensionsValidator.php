@@ -56,7 +56,7 @@ final class EnabledExtensionsValidator implements EventSubscriberInterface {
 
     if (!empty($removed_project_messages)) {
       $removed_packages_summary = $this->formatPlural(
-        count($removed_project_messages),
+        \count($removed_project_messages),
         'The update cannot proceed because the following enabled Drupal extension was removed during the update.',
         'The update cannot proceed because the following enabled Drupal extensions were removed during the update.'
       );

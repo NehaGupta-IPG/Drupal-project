@@ -76,12 +76,12 @@ class RearrangeFieldsTest extends UITestBase {
     $this->assertFieldOrder($view_name, $this->getViewFields($view_name));
 
     // Checks that revers the new field order is respected.
-    $reversedFields = array_reverse($this->getViewFields($view_name));
+    $reversedFields = \array_reverse($this->getViewFields($view_name));
     $fields = [];
     foreach ($reversedFields as $delta => $field) {
       $fields['fields[' . $field . '][weight]'] = $delta;
     }
-    $fields_count = count($fields);
+    $fields_count = \count($fields);
     $this->drupalGet('admin/structure/views/nojs/rearrange/' . $view_name . '/default/field');
     $this->submitForm($fields, 'Apply');
     $this->assertFieldOrder($view_name, $reversedFields);

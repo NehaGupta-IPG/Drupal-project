@@ -137,7 +137,7 @@ class MachineNameTest extends WebDriverTestBase {
     $this->assertFalse($machine_name_2_wrapper->isVisible(), 'The ID field must not be visible');
 
     // Validate if the element contains the correct value.
-    $this->assertEquals(end($test_values)['expected'], $machine_name_1_field->getValue(), 'The ID field value must be equal to the php generated machine name');
+    $this->assertEquals(\end($test_values)['expected'], $machine_name_1_field->getValue(), 'The ID field value must be equal to the php generated machine name');
 
     // Test that machine name generation still occurs after an HTML 5
     // validation failure.

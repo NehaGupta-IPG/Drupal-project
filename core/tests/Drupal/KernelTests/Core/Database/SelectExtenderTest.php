@@ -135,15 +135,15 @@ class SelectExtenderTest extends KernelTestBase {
 
     // Tests the method \Drupal\Core\Database\Query\Select::extend().
     $select = $connection->select('test')->extend($extend);
-    $this->assertEquals($expected, get_class($select));
+    $this->assertEquals($expected, \get_class($select));
 
     // Get an instance of the class \Drupal\Core\Database\Query\SelectExtender.
     $select_extender = $connection->select('test')->extend(SelectExtender::class);
-    $this->assertEquals(SelectExtender::class, get_class($select_extender));
+    $this->assertEquals(SelectExtender::class, \get_class($select_extender));
 
     // Tests the method \Drupal\Core\Database\Query\SelectExtender::extend().
     $select_extender_extended = $select_extender->extend($extend);
-    $this->assertEquals($expected, get_class($select_extender_extended));
+    $this->assertEquals($expected, \get_class($select_extender_extended));
   }
 
 }

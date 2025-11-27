@@ -81,11 +81,11 @@ class ConfigSingleExportForm extends FormBase {
         $this->definitions[$entity_type] = $definition;
       }
     }
-    $entity_types = array_map(function (EntityTypeInterface $definition) {
+    $entity_types = \array_map(function (EntityTypeInterface $definition) {
       return $definition->getLabel();
     }, $this->definitions);
     // Sort the entity types by label, then add the simple config to the top.
-    uasort($entity_types, 'strnatcasecmp');
+    \uasort($entity_types, 'strnatcasecmp');
     $config_types = [
       'system.simple' => $this->t('Simple configuration'),
     ] + $entity_types;
@@ -212,16 +212,16 @@ class ConfigSingleExportForm extends FormBase {
     // Handle simple configuration.
     else {
       // Gather the config entity prefixes.
-      $config_prefixes = array_map(function (EntityTypeInterface $definition) {
+      $config_prefixes = \array_map(function (EntityTypeInterface $definition) {
         return $definition->getConfigPrefix() . '.';
       }, $this->definitions);
 
       // Find all config, and then filter our anything matching a config prefix.
       $names += $this->configStorage->listAll();
-      $names = array_combine($names, $names);
+      $names = \array_combine($names, $names);
       foreach ($names as $config_name) {
         foreach ($config_prefixes as $config_prefix) {
-          if (str_starts_with($config_name, $config_prefix)) {
+          if (\str_starts_with($config_name, $config_prefix)) {
             unset($names[$config_name]);
           }
         }

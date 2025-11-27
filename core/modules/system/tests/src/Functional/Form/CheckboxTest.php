@@ -58,8 +58,8 @@ class CheckboxTest extends BrowserTestBase {
         elseif ($return_value === '1foobar') {
           $checked = ($default_value === '1foobar');
         }
-        $checked_in_html = str_contains($form, 'checked');
-        $message = '#default_value is ' . var_export($default_value, TRUE) . ' #return_value is ' . var_export($return_value, TRUE) . '.';
+        $checked_in_html = \str_contains($form, 'checked');
+        $message = '#default_value is ' . \var_export($default_value, TRUE) . ' #return_value is ' . \var_export($return_value, TRUE) . '.';
         $this->assertSame($checked, $checked_in_html, $message);
       }
     }
@@ -68,7 +68,7 @@ class CheckboxTest extends BrowserTestBase {
     // checkboxes group that includes a 0-indexed array of options.
     $this->drupalGet('form-test/checkboxes-zero/1');
     $this->submitForm([], 'Save');
-    $results = json_decode($this->getSession()->getPage()->getContent());
+    $results = \json_decode($this->getSession()->getPage()->getContent());
     $this->assertSame([0, 0, 0], $results->checkbox_off, 'All three in checkbox_off are zeroes: off.');
     $this->assertSame(['0', 0, 0], $results->checkbox_zero_default, 'The first choice is on in checkbox_zero_default');
     $this->assertSame(['0', 0, 0], $results->checkbox_string_zero_default, 'The first choice is on in checkbox_string_zero_default');
@@ -78,7 +78,7 @@ class CheckboxTest extends BrowserTestBase {
     $this->drupalGet('form-test/checkboxes-zero/1');
     $this->assertSession()->fieldExists('checkbox_off[0]')->check();
     $this->submitForm([], 'Save');
-    $results = json_decode($this->getSession()->getPage()->getContent());
+    $results = \json_decode($this->getSession()->getPage()->getContent());
     $this->assertSame(['0', 0, 0], $results->checkbox_off, 'The first choice is on in checkbox_off but the rest is not');
 
     // Ensure that each checkbox is rendered correctly for a checkboxes group

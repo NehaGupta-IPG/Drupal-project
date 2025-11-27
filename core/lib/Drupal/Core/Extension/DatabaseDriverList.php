@@ -83,11 +83,11 @@ class DatabaseDriverList extends ExtensionList {
     $drivers = [];
     foreach ($discoveredModules as $module) {
       $moduleDriverDirectory = $this->root . DIRECTORY_SEPARATOR . $module->getPath() . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Driver' . DIRECTORY_SEPARATOR . 'Database';
-      if (is_dir($moduleDriverDirectory)) {
+      if (\is_dir($moduleDriverDirectory)) {
         // Use directory iterator to avoid services.
         $directoryIterator = new \DirectoryIterator($moduleDriverDirectory);
         foreach ($directoryIterator as $fileInfo) {
-          if ($fileInfo->isDir() && !$fileInfo->isDot() && file_exists($moduleDriverDirectory . DIRECTORY_SEPARATOR . $fileInfo->getFilename() . DIRECTORY_SEPARATOR . 'Install' . DIRECTORY_SEPARATOR . 'Tasks.php')) {
+          if ($fileInfo->isDir() && !$fileInfo->isDot() && \file_exists($moduleDriverDirectory . DIRECTORY_SEPARATOR . $fileInfo->getFilename() . DIRECTORY_SEPARATOR . 'Install' . DIRECTORY_SEPARATOR . 'Tasks.php')) {
             $databaseDriver = new DatabaseDriver($this->root, $module, $fileInfo->getFilename(), $discoveredModules);
             $drivers[$databaseDriver->getName()] = $databaseDriver;
           }
@@ -130,7 +130,7 @@ class DatabaseDriverList extends ExtensionList {
    * {@inheritdoc}
    */
   public function get($extension_name) {
-    if (!str_contains($extension_name, "\\")) {
+    if (!\str_contains($extension_name, "\\")) {
       throw new \RuntimeException("Passing a database driver name '{$extension_name}' to " . __METHOD__ . '() is not supported. Pass a database driver namespace instead. See https://www.drupal.org/node/3258175');
     }
     return parent::get($extension_name);

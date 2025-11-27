@@ -63,8 +63,8 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
     $this->configurations = $configurations;
 
     if (!empty($configurations)) {
-      $instance_ids = array_keys($configurations);
-      $this->instanceIds = array_combine($instance_ids, $instance_ids);
+      $instance_ids = \array_keys($configurations);
+      $this->instanceIds = \array_combine($instance_ids, $instance_ids);
       // Store the original order of the instance IDs for export.
       $this->originalOrder = $this->instanceIds;
     }
@@ -87,7 +87,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
    * @return $this
    */
   public function sort() {
-    uasort($this->instanceIds, [$this, 'sortHelper']);
+    \uasort($this->instanceIds, [$this, 'sortHelper']);
     return $this;
   }
 
@@ -97,7 +97,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
   public function sortHelper($aID, $bID) {
     $a = $this->get($aID);
     $b = $this->get($bID);
-    return strnatcasecmp($a->getPluginId(), $b->getPluginId());
+    return \strnatcasecmp($a->getPluginId(), $b->getPluginId());
   }
 
   /**

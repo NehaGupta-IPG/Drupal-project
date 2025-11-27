@@ -21,7 +21,7 @@ final class Reflection {
     $parameterType = $parameter->getType();
     if ($parameterType instanceof \ReflectionNamedType && !$parameterType->isBuiltin()) {
       $name = $parameterType->getName();
-      $lc_name = strtolower($name);
+      $lc_name = \strtolower($name);
       switch ($lc_name) {
         case 'self':
           return $parameter->getDeclaringClass()->getName();

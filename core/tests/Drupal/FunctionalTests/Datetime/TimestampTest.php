@@ -117,7 +117,7 @@ class TimestampTest extends BrowserTestBase {
     $date = new DrupalDateTime($value, 'UTC');
 
     // Update the timezone to the system default.
-    $date->setTimezone(timezone_open(date_default_timezone_get()));
+    $date->setTimezone(\timezone_open(\date_default_timezone_get()));
 
     // Display creation form.
     $this->drupalGet('entity_test/add');
@@ -151,9 +151,9 @@ class TimestampTest extends BrowserTestBase {
     $this->assertSession()->fieldValueEquals('field_timestamp[0][value][time]', $date->format($time_format));
 
     // Make sure the entity was saved.
-    preg_match('|entity_test/manage/(\d+)|', $this->getSession()->getCurrentUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getSession()->getCurrentUrl(), $match);
     $id = $match[1];
-    $this->assertSession()->pageTextContains(sprintf('entity_test %s has been created.', $id));
+    $this->assertSession()->pageTextContains(\sprintf('entity_test %s has been created.', $id));
 
     // Make sure the timestamp is output properly with the default formatter.
     $medium = DateFormat::load('medium')->getPattern();
@@ -168,7 +168,7 @@ class TimestampTest extends BrowserTestBase {
     $this->field->setDefaultValue($date->getTimestamp())->save();
 
     // Update the timezone to the system default.
-    $date->setTimezone(timezone_open(date_default_timezone_get()));
+    $date->setTimezone(\timezone_open(\date_default_timezone_get()));
 
     $this->drupalGet('entity_test/add');
     $date_format = DateFormat::load('html_date')->getPattern();

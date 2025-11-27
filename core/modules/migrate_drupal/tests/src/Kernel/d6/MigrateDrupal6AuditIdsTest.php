@@ -31,7 +31,7 @@ class MigrateDrupal6AuditIdsTest extends MigrateDrupal6TestBase {
    */
   protected function setUp(): void {
     // Enable all modules.
-    self::$modules = array_keys($this->coreModuleListDataProvider());
+    self::$modules = \array_keys($this->coreModuleListDataProvider());
     parent::setUp();
 
     // Install required entity schemas.
@@ -131,7 +131,7 @@ class MigrateDrupal6AuditIdsTest extends MigrateDrupal6TestBase {
 
     // Audit the IDs of all migrations. There should be conflicts since content
     // has been created.
-    $conflicts = array_map(
+    $conflicts = \array_map(
       function (AuditResult $result) {
         return $result->passed() ? NULL : $result->getMigration()->getBaseId();
       },
@@ -151,7 +151,7 @@ class MigrateDrupal6AuditIdsTest extends MigrateDrupal6TestBase {
       'd6_user',
       'node_translation_menu_links',
     ];
-    $this->assertEmpty(array_diff(array_filter($conflicts), $expected));
+    $this->assertEmpty(\array_diff(\array_filter($conflicts), $expected));
   }
 
   /**

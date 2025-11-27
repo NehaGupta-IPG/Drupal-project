@@ -218,7 +218,7 @@ abstract class RendererTestBase extends UnitTestCase {
    */
   protected static function randomContextValue(): string {
     $tokens = ['llama', 'alpaca', 'camel', 'moose', 'elk'];
-    return $tokens[mt_rand(0, 4)];
+    return $tokens[\mt_rand(0, 4)];
   }
 
   /**
@@ -267,17 +267,17 @@ abstract class RendererTestBase extends UnitTestCase {
   protected function assertRenderCacheItem($keys, $data, $bin = 'render') {
     $cache_backend = $this->cacheFactory->get($bin);
     $cached = $cache_backend->get($keys, CacheableMetadata::createFromRenderArray($data));
-    $this->assertNotFalse($cached, sprintf('Expected cache item "%s" exists.', implode(':', $keys)));
+    $this->assertNotFalse($cached, \sprintf('Expected cache item "%s" exists.', \implode(':', $keys)));
     if ($cached !== FALSE) {
-      $this->assertEqualsCanonicalizing(array_keys($data), array_keys($cached->data), 'The cache item contains the same parent array keys.');
+      $this->assertEqualsCanonicalizing(\array_keys($data), \array_keys($cached->data), 'The cache item contains the same parent array keys.');
       foreach ($data as $key => $value) {
         // We do not want to assert on the order of cacheability information.
         // @see https://www.drupal.org/project/drupal/issues/3225328
         if ($key === '#cache') {
-          $this->assertEqualsCanonicalizing($value, $cached->data[$key], sprintf('Cache item "%s" has the expected data.', implode(':', $keys)));
+          $this->assertEqualsCanonicalizing($value, $cached->data[$key], \sprintf('Cache item "%s" has the expected data.', \implode(':', $keys)));
         }
         else {
-          $this->assertEquals($value, $cached->data[$key], sprintf('Cache item "%s" has the expected data.', implode(':', $keys)));
+          $this->assertEquals($value, $cached->data[$key], \sprintf('Cache item "%s" has the expected data.', \implode(':', $keys)));
         }
       }
       $this->assertEqualsCanonicalizing(Cache::mergeTags($data['#cache']['tags'], ['rendered']), $cached->tags, "The cache item's cache tags also has the 'rendered' cache tag.");

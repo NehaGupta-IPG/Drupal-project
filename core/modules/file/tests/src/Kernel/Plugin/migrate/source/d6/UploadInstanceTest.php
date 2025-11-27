@@ -43,19 +43,19 @@ class UploadInstanceTest extends MigrateSqlSourceTestBase {
     $tests[0]['source_data']['variable'] = [
       [
         'name' => 'upload_article',
-        'value' => serialize(TRUE),
+        'value' => \serialize(TRUE),
       ],
       [
         'name' => 'upload_company',
-        'value' => serialize(FALSE),
+        'value' => \serialize(FALSE),
       ],
       [
         'name' => 'upload_uploadsize_default',
-        'value' => serialize(16),
+        'value' => \serialize(16),
       ],
       [
         'name' => 'upload_extensions_default',
-        'value' => serialize('txt pdf'),
+        'value' => \serialize('txt pdf'),
       ],
     ];
 

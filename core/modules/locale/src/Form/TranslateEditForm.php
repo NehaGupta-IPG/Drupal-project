@@ -63,7 +63,7 @@ class TranslateEditForm extends TranslateFormBase {
         // Split source to work with plural values.
         $source_array = $source->getPlurals();
         $translation_array = $string->getPlurals();
-        if (count($source_array) == 1) {
+        if (\count($source_array) == 1) {
           // Add original string value and mark as non-plural.
           $plural = FALSE;
           $form['strings'][$string->lid]['original'] = [
@@ -109,7 +109,7 @@ class TranslateEditForm extends TranslateFormBase {
           ];
         }
         // Approximate the number of rows to use in the default textarea.
-        $rows = min(ceil(str_word_count($source_array[0]) / 12), 10);
+        $rows = \min(\ceil(\str_word_count($source_array[0]) / 12), 10);
         if (!$plural) {
           $form['strings'][$string->lid]['translations'][0] = [
             '#type' => 'textarea',
@@ -139,7 +139,7 @@ class TranslateEditForm extends TranslateFormBase {
           }
         }
       }
-      if (count(Element::children($form['strings']))) {
+      if (\count(Element::children($form['strings']))) {
         $form['actions'] = ['#type' => 'actions'];
         $form['actions']['submit'] = [
           '#type' => 'submit',
@@ -158,7 +158,7 @@ class TranslateEditForm extends TranslateFormBase {
     $langcode = $form_state->getValue('langcode');
     foreach ($form_state->getValue('strings') as $lid => $translations) {
       foreach ($translations['translations'] as $key => $value) {
-        if (!locale_string_is_safe($value)) {
+        if (!\locale_string_is_safe($value)) {
           $form_state->setErrorByName("strings][$lid][translations][$key", $this->t('The submitted string contains disallowed HTML: %string', ['%string' => $value]));
           $form_state->setErrorByName("translations][$langcode][$key", $this->t('The submitted string contains disallowed HTML: %string', ['%string' => $value]));
           $this->logger('locale')->warning('Attempted submission of a translation string with disallowed HTML: %string', ['%string' => $value]);
@@ -175,7 +175,7 @@ class TranslateEditForm extends TranslateFormBase {
     $updated = [];
 
     // Preload all translations for strings in the form.
-    $lids = array_keys($form_state->getValue('strings'));
+    $lids = \array_keys($form_state->getValue('strings'));
     $existing_translation_objects = [];
     foreach ($this->localeStorage->getTranslations(['lid' => $lids, 'language' => $langcode, 'translated' => TRUE]) as $existing_translation_object) {
       $existing_translation_objects[$existing_translation_object->lid] = $existing_translation_object;
@@ -187,11 +187,11 @@ class TranslateEditForm extends TranslateFormBase {
       // Plural translations are saved in a delimited string. To be able to
       // compare the new strings with the existing strings a string in the same
       // format is created.
-      $new_translation_string_delimited = implode(PoItem::DELIMITER, $new_translation['translations']);
+      $new_translation_string_delimited = \implode(PoItem::DELIMITER, $new_translation['translations']);
 
       // Generate an imploded string without delimiter, to be able to run
       // empty() on it.
-      $new_translation_string = implode('', $new_translation['translations']);
+      $new_translation_string = \implode('', $new_translation['translations']);
 
       $is_changed = FALSE;
 
@@ -234,8 +234,8 @@ class TranslateEditForm extends TranslateFormBase {
 
     if ($updated) {
       // Clear cache and force refresh of JavaScript translations.
-      _locale_refresh_translations([$langcode], $updated);
-      _locale_refresh_configuration([$langcode], $updated);
+      \_locale_refresh_translations([$langcode], $updated);
+      \_locale_refresh_configuration([$langcode], $updated);
     }
   }
 

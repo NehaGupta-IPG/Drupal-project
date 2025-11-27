@@ -773,13 +773,13 @@ class IconFinderTest extends UnitTestCase {
     // PHPUnit cannot expect warnings, so we have to catch them ourselves.
     // Thanks to: Drupal\Tests\Component\PhpStorage\FileStorageTest.
     $messages = [];
-    set_error_handler(function (int $errno, string $errstr) use (&$messages): void {
+    \set_error_handler(function (int $errno, string $errstr) use (&$messages): void {
       $messages[] = [$errno, $errstr];
     });
 
     $method->invoke($this->iconFinder, 'foo*bar*baz', 'foo*{icon_id}*baz');
 
-    restore_error_handler();
+    \restore_error_handler();
 
     $this->assertCount(1, $messages);
     $this->assertSame(E_WARNING, $messages[0][0]);
@@ -837,7 +837,7 @@ class IconFinderTest extends UnitTestCase {
   public function testGetFileContents(string $uri, bool $expected): void {
     if ($expected) {
       $result = $this->iconFinder->getFileContents($uri);
-      $this->assertEquals(file_get_contents($uri), $result);
+      $this->assertEquals(\file_get_contents($uri), $result);
       return;
     }
     $this->assertFalse($this->iconFinder->getFileContents($uri));

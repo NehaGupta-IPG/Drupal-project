@@ -54,7 +54,7 @@ class EntityTestFieldMethods extends EntityTestMul {
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['test_invocation_order'] = BaseFieldDefinition::create('auto_incrementing_test')
-      ->setLabel(t('Test field method invocation order.'))
+      ->setLabel(\t('Test field method invocation order.'))
       ->setTranslatable(TRUE);
 
     return $fields;

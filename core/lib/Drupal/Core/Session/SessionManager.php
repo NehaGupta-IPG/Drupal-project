@@ -163,14 +163,15 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       parent::save();
     }
 
-    $allowedKeys = array_map(
+    $allowedKeys = \array_map(
       fn (SessionBagInterface $bag) => $bag->getStorageKey(),
       $this->bags
     );
     $allowedKeys[] = $this->getMetadataBag()->getStorageKey();
-    $deprecatedKeys = array_diff(array_keys($_SESSION), $allowedKeys);
-    if (count($deprecatedKeys) > 0) {
-      @trigger_error(sprintf('Storing values directly in $_SESSION is deprecated in drupal:11.2.0 and will become unsupported in drupal:12.0.0. Use $request->getSession()->set() instead. Affected keys: %s. See https://www.drupal.org/node/3518527', implode(", ", $deprecatedKeys)), E_USER_DEPRECATED);
+    $deprecatedKeys = \array_diff(\array_keys($_SESSION), $allowedKeys);
+    if (\count($deprecatedKeys) > 0) {
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
+      @\trigger_error(\sprintf('Storing values directly in $_SESSION is deprecated in drupal:11.2.0 and will become unsupported in drupal:12.0.0. Use $request->getSession()->set() instead. Affected keys: %s. See https://www.drupal.org/node/3518527', \implode(", ", $deprecatedKeys)), E_USER_DEPRECATED);
     }
 
     $this->startedLazy = FALSE;
@@ -191,7 +192,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     $destroy = TRUE;
 
     // Cannot regenerate the session ID for non-active sessions.
-    if (\PHP_SESSION_ACTIVE !== session_status()) {
+    if (\PHP_SESSION_ACTIVE !== \session_status()) {
       // Ensure the metadata bag has been stamped. If the parent::regenerate()
       // is called prior to the session being started it will not refresh the
       // metadata as expected.
@@ -234,15 +235,15 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     // decided to only set sessions when absolutely necessary (e.g., to increase
     // anonymous user cache hit rates) and as such we cannot use the Symfony
     // convenience method here.
-    session_destroy();
+    \session_destroy();
 
     // Unset the session cookies.
     $session_name = $this->getName();
     $cookies = $this->requestStack->getCurrentRequest()->cookies;
     // setcookie() can only be called when headers are not yet sent.
-    if ($cookies->has($session_name) && !headers_sent()) {
-      $params = session_get_cookie_params();
-      setcookie($session_name, '', $this->time->getRequestTime() - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+    if ($cookies->has($session_name) && !\headers_sent()) {
+      $params = \session_get_cookie_params();
+      \setcookie($session_name, '', $this->time->getRequestTime() - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
       $cookies->remove($session_name);
     }
   }
@@ -274,7 +275,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    *   destroyed.
    */
   protected function isSessionObsolete() {
-    $used_session_keys = array_filter($this->getSessionDataMask());
+    $used_session_keys = \array_filter($this->getSessionDataMask());
     return empty($used_session_keys);
   }
 
@@ -292,7 +293,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     }
 
     // Start out with a completely filled mask.
-    $mask = array_fill_keys(array_keys($_SESSION), TRUE);
+    $mask = \array_fill_keys(\array_keys($_SESSION), TRUE);
 
     // Ignore the metadata bag, it does not contain any user data.
     $mask[$this->metadataBag->getStorageKey()] = FALSE;
@@ -303,7 +304,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       $mask[$key] = !empty($_SESSION[$key]);
     }
 
-    return array_intersect_key($mask, $_SESSION);
+    return \array_intersect_key($mask, $_SESSION);
   }
 
 }

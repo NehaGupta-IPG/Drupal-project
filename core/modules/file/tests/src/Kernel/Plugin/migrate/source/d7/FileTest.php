@@ -78,22 +78,22 @@ class FileTest extends MigrateSqlSourceTestBase {
     $tests[0]['source_data']['variable'] = [
       [
         'name' => 'file_public_path',
-        'value' => serialize('sites/default/files'),
+        'value' => \serialize('sites/default/files'),
       ],
       [
         'name' => 'file_private_path',
-        'value' => serialize('/path/to/private/files'),
+        'value' => \serialize('/path/to/private/files'),
       ],
       [
         'name' => 'file_temporary_path',
-        'value' => serialize('/tmp'),
+        'value' => \serialize('/tmp'),
       ],
     ];
 
     // The expected results will include only the first two files, since the
     // plugin will filter out files with either the null URI scheme or the
     // temporary scheme.
-    $tests[0]['expected_data'] = array_slice($tests[0]['source_data']['file_managed'], 0, 2);
+    $tests[0]['expected_data'] = \array_slice($tests[0]['source_data']['file_managed'], 0, 2);
 
     // The filepath property will vary by URI scheme.
     $tests[0]['expected_data'][0]['filepath'] = 'sites/default/files/cube.jpeg';
@@ -168,7 +168,7 @@ class FileTest extends MigrateSqlSourceTestBase {
     $tests[3]['source_data'] = $tests[0]['source_data'];
     $tests[3]['source_data']['variable'][1] = [
       'name' => 'file_private_path',
-      'value' => serialize('/home/lillian/subdomains/u2/u2-private-files'),
+      'value' => \serialize('/home/lillian/subdomains/u2/u2-private-files'),
     ];
     $tests[3]['expected_data'] = [
       [

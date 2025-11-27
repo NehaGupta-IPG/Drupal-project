@@ -149,7 +149,7 @@ class ModulesListConfirmForm extends ConfirmFormBase {
         $items[] = [
           [
             '#markup' => $this->formatPlural(
-              count($dependencies),
+              \count($dependencies),
               'You must install the following module to install @module:',
               'You must install the following modules to install @module:',
               [
@@ -183,7 +183,7 @@ class ModulesListConfirmForm extends ConfirmFormBase {
       // submit, in which case the user has bigger problems.
       try {
         // Install the given modules.
-        $this->moduleInstaller->install(array_keys($this->modules['install']));
+        $this->moduleInstaller->install(\array_keys($this->modules['install']));
       }
       catch (PreExistingConfigException $e) {
         $this->messenger()->addError($this->modulesFailToEnableMessage($this->modules, $e));

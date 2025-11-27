@@ -114,7 +114,7 @@ class TwigExtensionTest extends BrowserTestBase {
 
     $this->drupalGet('/twig-theme-test/dump');
     $dumps = $this->getSession()->getPage()->findAll('css', '.sf-dump');
-    $this->assertEquals(4, count($dumps));
+    $this->assertEquals(4, \count($dumps));
 
     // Test dumping single variable.
     $this->assertStringContainsString('💩', $dumps[0]->getText());

@@ -24,7 +24,7 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   public function __construct($jail, $username, #[\SensitiveParameter] $password, $hostname = "localhost", $port = 22) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
     $this->username = $username;
     $this->password = $password;
@@ -37,14 +37,14 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   public function connect() {
-    $this->connection = @ssh2_connect($this->hostname, $this->port);
+    $this->connection = @\ssh2_connect($this->hostname, $this->port);
     if (!$this->connection) {
       throw new FileTransferException('SSH Connection failed to @host:@port', 0, [
         '@host' => $this->hostname,
         '@port' => $this->port,
       ]);
     }
-    if (!@ssh2_auth_password($this->connection, $this->username, $this->password)) {
+    if (!@\ssh2_auth_password($this->connection, $this->username, $this->password)) {
       throw new FileTransferException('The supplied username/password combination was not accepted.');
     }
   }
@@ -64,7 +64,7 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   protected function copyFileJailed($source, $destination) {
-    if (!@ssh2_scp_send($this->connection, $source, $destination)) {
+    if (!@\ssh2_scp_send($this->connection, $source, $destination)) {
       throw new FileTransferException('Cannot copy @source_file to @destination_file.', 0, [
         '@source' => $source,
         '@destination' => $destination,
@@ -76,7 +76,7 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   protected function copyDirectoryJailed($source, $destination) {
-    if (@!ssh2_exec($this->connection, 'cp -Rp ' . escapeshellarg($source) . ' ' . escapeshellarg($destination))) {
+    if (@!\ssh2_exec($this->connection, 'cp -Rp ' . \escapeshellarg($source) . ' ' . \escapeshellarg($destination))) {
       throw new FileTransferException('Cannot copy directory @directory.', 0, ['@directory' => $source]);
     }
   }
@@ -85,7 +85,7 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   protected function createDirectoryJailed($directory) {
-    if (@!ssh2_exec($this->connection, 'mkdir ' . escapeshellarg($directory))) {
+    if (@!\ssh2_exec($this->connection, 'mkdir ' . \escapeshellarg($directory))) {
       throw new FileTransferException('Cannot create directory @directory.', 0, ['@directory' => $directory]);
     }
   }
@@ -94,7 +94,7 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   protected function removeDirectoryJailed($directory) {
-    if (@!ssh2_exec($this->connection, 'rm -Rf ' . escapeshellarg($directory))) {
+    if (@!\ssh2_exec($this->connection, 'rm -Rf ' . \escapeshellarg($directory))) {
       throw new FileTransferException('Cannot remove @directory.', 0, ['@directory' => $directory]);
     }
   }
@@ -103,7 +103,7 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   protected function removeFileJailed($destination) {
-    if (!@ssh2_exec($this->connection, 'rm ' . escapeshellarg($destination))) {
+    if (!@\ssh2_exec($this->connection, 'rm ' . \escapeshellarg($destination))) {
       throw new FileTransferException('Cannot remove @directory.', 0, ['@directory' => $destination]);
     }
   }
@@ -115,9 +115,9 @@ class SSH extends FileTransfer implements ChmodInterface {
    * trick.
    */
   public function isDirectory($path) {
-    $directory = escapeshellarg($path);
+    $directory = \escapeshellarg($path);
     $cmd = "[ -d {$directory} ] && echo 'yes'";
-    if ($output = @ssh2_exec($this->connection, $cmd)) {
+    if ($output = @\ssh2_exec($this->connection, $cmd)) {
       if ($output == 'yes') {
         return TRUE;
       }
@@ -132,9 +132,9 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   public function isFile($path) {
-    $file = escapeshellarg($path);
+    $file = \escapeshellarg($path);
     $cmd = "[ -f {$file} ] && echo 'yes'";
-    if ($output = @ssh2_exec($this->connection, $cmd)) {
+    if ($output = @\ssh2_exec($this->connection, $cmd)) {
       if ($output == 'yes') {
         return TRUE;
       }
@@ -149,8 +149,8 @@ class SSH extends FileTransfer implements ChmodInterface {
    * {@inheritdoc}
    */
   public function chmodJailed($path, $mode, $recursive) {
-    $cmd = sprintf("chmod %s%o %s", $recursive ? '-R ' : '', $mode, escapeshellarg($path));
-    if (@!ssh2_exec($this->connection, $cmd)) {
+    $cmd = \sprintf("chmod %s%o %s", $recursive ? '-R ' : '', $mode, \escapeshellarg($path));
+    if (@!\ssh2_exec($this->connection, $cmd)) {
       throw new FileTransferException('Cannot change permissions of @path.', 0, ['@path' => $path]);
     }
   }

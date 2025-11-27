@@ -40,7 +40,7 @@ class SearchNodePunctuationTest extends BrowserTestBase {
 
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
 
-    node_access_rebuild();
+    \node_access_rebuild();
     // Create a test user and log in.
     $this->testUser = $this->drupalCreateUser([
       'access content',

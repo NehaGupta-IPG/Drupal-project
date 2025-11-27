@@ -113,7 +113,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\migrate\Plugin\migrate\source\ContentEntity instead. See https://www.drupal.org/node/3498916', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\migrate\Plugin\migrate\source\ContentEntity instead. See https://www.drupal.org/node/3498916', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     if (empty($plugin_definition['entity_type'])) {
       throw new InvalidPluginDefinitionException($plugin_id, 'Missing required "entity_type" definition.');
@@ -123,15 +123,15 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityType = $this->entityTypeManager->getDefinition($plugin_definition['entity_type']);
     if (!$this->entityType instanceof ContentEntityTypeInterface) {
-      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The entity type (%s) is not supported. The "content_entity" source plugin only supports content entities.', $plugin_definition['entity_type']));
+      throw new InvalidPluginDefinitionException($plugin_id, \sprintf('The entity type (%s) is not supported. The "content_entity" source plugin only supports content entities.', $plugin_definition['entity_type']));
     }
     if (!empty($configuration['bundle'])) {
       if (!$this->entityType->hasKey('bundle')) {
-        throw new \InvalidArgumentException(sprintf('A bundle was provided but the entity type (%s) is not bundleable.', $plugin_definition['entity_type']));
+        throw new \InvalidArgumentException(\sprintf('A bundle was provided but the entity type (%s) is not bundleable.', $plugin_definition['entity_type']));
       }
-      $bundle_info = array_keys($this->entityTypeBundleInfo->getBundleInfo($this->entityType->id()));
-      if (!in_array($configuration['bundle'], $bundle_info, TRUE)) {
-        throw new \InvalidArgumentException(sprintf('The provided bundle (%s) is not valid for the (%s) entity type.', $configuration['bundle'], $plugin_definition['entity_type']));
+      $bundle_info = \array_keys($this->entityTypeBundleInfo->getBundleInfo($this->entityType->id()));
+      if (!\in_array($configuration['bundle'], $bundle_info, TRUE)) {
+        throw new \InvalidArgumentException(\sprintf('The provided bundle (%s) is not valid for the (%s) entity type.', $configuration['bundle'], $plugin_definition['entity_type']));
       }
     }
     parent::__construct($configuration + $this->defaultConfiguration, $plugin_id, $plugin_definition, $migration);
@@ -210,7 +210,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
     $return = $entity->toArray();
     // This is necessary because the IDs must be flat. They cannot be nested for
     // the ID map.
-    foreach (array_keys($this->getIds()) as $id) {
+    foreach (\array_keys($this->getIds()) as $id) {
       /** @var \Drupal\Core\TypedData\Plugin\DataType\ItemList $value */
       $value = $entity->get($id);
       // Force the IDs on top of the previous values.
@@ -273,7 +273,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
     if (!empty($this->configuration['bundle'])) {
       $field_definitions += $this->entityFieldManager->getFieldDefinitions($this->entityType->id(), $this->configuration['bundle']);
     }
-    $fields = array_map(function ($definition) {
+    $fields = \array_map(function ($definition) {
       return (string) $definition->getLabel();
     }, $field_definitions);
     return $fields;

@@ -91,7 +91,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
       '#process' => [[self::class, 'processMenuLevelParents']],
     ];
 
-    $options = range(0, $this->menuTree->maxDepth());
+    $options = \range(0, $this->menuTree->maxDepth());
     unset($options[0]);
 
     $form['menu_levels']['level'] = [
@@ -130,7 +130,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * Adjusts the #parents of menu_levels to save its children at the top level.
    */
   public static function processMenuLevelParents(&$element, FormStateInterface $form_state, &$complete_form) {
-    array_pop($element['#parents']);
+    \array_pop($element['#parents']);
     return $element;
   }
 
@@ -166,21 +166,21 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
     // Hence this is a relative depth that we must convert to an actual
     // (absolute) depth, that may never exceed the maximum depth.
     if ($depth > 0) {
-      $parameters->setMaxDepth(min($level + $depth - 1, $this->menuTree->maxDepth()));
+      $parameters->setMaxDepth(\min($level + $depth - 1, $this->menuTree->maxDepth()));
     }
 
     // For menu blocks with start level greater than 1, only show menu items
     // from the current active trail. Adjust the root according to the current
     // position in the menu in order to determine if we can show the subtree.
     if ($level > 1) {
-      if (count($parameters->activeTrail) >= $level) {
+      if (\count($parameters->activeTrail) >= $level) {
         // Active trail array is child-first. Reverse it, and pull the new menu
         // root based on the parent of the configured start level.
-        $menu_trail_ids = array_reverse(array_values($parameters->activeTrail));
+        $menu_trail_ids = \array_reverse(\array_values($parameters->activeTrail));
         $menu_root = $menu_trail_ids[$level - 1];
         $parameters->setRoot($menu_root)->setMinDepth(1);
         if ($depth > 0) {
-          $parameters->setMaxDepth(min($level - 1 + $depth - 1, $this->menuTree->maxDepth()));
+          $parameters->setMaxDepth(\min($level - 1 + $depth - 1, $this->menuTree->maxDepth()));
         }
       }
       else {

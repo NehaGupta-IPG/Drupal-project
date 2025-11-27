@@ -120,7 +120,7 @@ class ViewsConfigUpdater {
     foreach ($displays as $display_id => &$display) {
       foreach ($handler_types as $handler_type => $handler_type_lookup) {
         if (!empty($display['display_options'][$handler_type_lookup])) {
-          if (in_array($handler_type_lookup, $compound_display_handlers)) {
+          if (\in_array($handler_type_lookup, $compound_display_handlers)) {
             if ($handler_processor($display['display_options'][$handler_type_lookup], $handler_type, NULL, $display_id)) {
               $changed = TRUE;
               if ($return_on_changed) {
@@ -130,7 +130,7 @@ class ViewsConfigUpdater {
             continue;
           }
           foreach ($display['display_options'][$handler_type_lookup] as $key => &$handler) {
-            if (is_array($handler) && $handler_processor($handler, $handler_type, $key, $display_id)) {
+            if (\is_array($handler) && $handler_processor($handler, $handler_type, $key, $display_id)) {
               $changed = TRUE;
               if ($return_on_changed) {
                 return $changed;
@@ -208,7 +208,8 @@ class ViewsConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['2640994'][$view->id()];
     if ($this->areDeprecationsEnabled() && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The update to convert "numeric" arguments to "entity_target_id" for entity reference fields for view "%s" is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3441945', $view->id()), E_USER_DEPRECATED);
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
+      @\trigger_error(\sprintf('The update to convert "numeric" arguments to "entity_target_id" for entity reference fields for view "%s" is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3441945', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
@@ -282,7 +283,7 @@ class ViewsConfigUpdater {
   public function processRememberRolesUpdate(array &$handler, string $handler_type): bool {
     if ($handler_type === 'filter' && !empty($handler['expose']['remember_roles'])) {
       $needsUpdate = FALSE;
-      foreach (array_keys($handler['expose']['remember_roles'], '0', TRUE) as $role_key) {
+      foreach (\array_keys($handler['expose']['remember_roles'], '0', TRUE) as $role_key) {
         unset($handler['expose']['remember_roles'][$role_key]);
         $needsUpdate = TRUE;
       }
@@ -339,7 +340,8 @@ class ViewsConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['table_css_class'][$view->id()];
     if ($this->areDeprecationsEnabled() && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The update to add a default table CSS class for view "%s" is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3499943', $view->id()), E_USER_DEPRECATED);
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
+      @\trigger_error(\sprintf('The update to add a default table CSS class for view "%s" is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3499943', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
@@ -389,7 +391,8 @@ class ViewsConfigUpdater {
     $deprecations_triggered = &$this->triggeredDeprecations['block_content_listing_empty'][$view->id()];
     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The update to remove the block_content_listing_empty plugin from view "%s" is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3336219', $view->id()), E_USER_DEPRECATED);
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
+      @\trigger_error(\sprintf('The update to remove the block_content_listing_empty plugin from view "%s" is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Profile, module and theme provided configuration should be updated. See https://www.drupal.org/node/3336219', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
@@ -433,7 +436,7 @@ class ViewsConfigUpdater {
 
     foreach ($displays as &$display) {
       if (isset($display['display_options']['row']['options']['view_mode']) &&
-        array_key_exists($display['display_options']['row']['type'], $row_types) &&
+        \array_key_exists($display['display_options']['row']['type'], $row_types) &&
         $display['display_options']['row']['options']['view_mode'] === 'default') {
 
         // When system.rss is already removed but a view is saved, we still need
@@ -447,14 +450,14 @@ class ViewsConfigUpdater {
         // use that.
         if ($previous_view_mode === NULL) {
           $view_modes = $this->entityDisplayRepository->getViewModes($row_types[$display['display_options']['row']['type']]);
-          if (array_key_exists('default', $view_modes)) {
+          if (\array_key_exists('default', $view_modes)) {
             return FALSE;
           }
 
           // If there is no default, the most likely view mode is RSS. If that
           // is available we use that. Otherwise, fall back to the first
           // available.
-          $probable_view_mode = isset($view_modes['rss']) ? 'rss' : array_key_first($view_modes);
+          $probable_view_mode = isset($view_modes['rss']) ? 'rss' : \array_key_first($view_modes);
           $display['display_options']['row']['options']['view_mode'] = $probable_view_mode;
           $changed = TRUE;
         }

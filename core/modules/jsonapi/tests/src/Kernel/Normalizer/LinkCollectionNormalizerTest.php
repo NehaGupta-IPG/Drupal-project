@@ -91,7 +91,7 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
     // Create the SUT.
     $normalized = $this->getNormalizer()->normalize($link_collection)->getNormalization();
     $this->assertIsArray($normalized);
-    foreach (array_keys($normalized) as $key) {
+    foreach (\array_keys($normalized) as $key) {
       $this->assertStringStartsWith('related', $key);
     }
     $this->assertSame([
@@ -107,7 +107,7 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
           'title' => 'Top rated',
         ],
       ],
-    ], array_values($normalized));
+    ], \array_values($normalized));
   }
 
   /**
@@ -125,8 +125,8 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
         $edit_form_url = $user->toUrl('edit-form');
       }
     }
-    assert(isset($current_user));
-    assert(isset($edit_form_url));
+    \assert(isset($current_user));
+    \assert(isset($edit_form_url));
 
     // Create a link collection to normalize.
     $mock_resource_object = $this->createMock(ResourceObject::class);
@@ -147,15 +147,15 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
 
     // Check that the expected links are present and unexpected links are
     // absent.
-    $actual_link_keys = array_keys($actual_data);
-    sort($expected_link_keys);
-    sort($actual_link_keys);
+    $actual_link_keys = \array_keys($actual_data);
+    \sort($expected_link_keys);
+    \sort($actual_link_keys);
     $this->assertSame($expected_link_keys, $actual_link_keys);
 
     // Check that the expected cache contexts were added.
     $actual_cache_contexts = $actual_normalization->getCacheContexts();
-    sort($expected_cache_contexts);
-    sort($actual_cache_contexts);
+    \sort($expected_cache_contexts);
+    \sort($actual_cache_contexts);
     $this->assertSame($expected_cache_contexts, $actual_cache_contexts);
 
     // If the edit-form link was present, check that it has the correct href.
@@ -196,7 +196,7 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
    * Get an instance of the normalizer to test.
    */
   protected function getNormalizer(?AccountInterface $current_user = NULL) {
-    if (is_null($current_user)) {
+    if (\is_null($current_user)) {
       $current_user = $this->setUpCurrentUser();
     }
     else {

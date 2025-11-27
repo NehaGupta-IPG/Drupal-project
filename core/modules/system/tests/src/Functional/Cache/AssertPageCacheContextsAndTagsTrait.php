@@ -34,7 +34,7 @@ trait AssertPageCacheContextsAndTagsTrait {
    */
   protected function getCacheHeaderValues($header_name): array {
     $header_value = $this->getSession()->getResponseHeader($header_name);
-    return empty($header_value) ? [] : explode(' ', $header_value);
+    return empty($header_value) ? [] : \explode(' ', $header_value);
   }
 
   /**
@@ -44,7 +44,7 @@ trait AssertPageCacheContextsAndTagsTrait {
    *   The expected cache context.
    */
   protected function assertCacheContext($expected_cache_context) {
-    $cache_contexts = explode(' ', $this->getSession()->getResponseHeader('X-Drupal-Cache-Contexts'));
+    $cache_contexts = \explode(' ', $this->getSession()->getResponseHeader('X-Drupal-Cache-Contexts'));
     $this->assertContains($expected_cache_context, $cache_contexts, "'" . $expected_cache_context . "' is present in the X-Drupal-Cache-Contexts header.");
   }
 
@@ -55,7 +55,7 @@ trait AssertPageCacheContextsAndTagsTrait {
    *   The expected cache context.
    */
   protected function assertNoCacheContext($not_expected_cache_context) {
-    $cache_contexts = explode(' ', $this->getSession()->getResponseHeader('X-Drupal-Cache-Contexts'));
+    $cache_contexts = \explode(' ', $this->getSession()->getResponseHeader('X-Drupal-Cache-Contexts'));
     $this->assertNotContains($not_expected_cache_context, $cache_contexts, "'" . $not_expected_cache_context . "' is not present in the X-Drupal-Cache-Contexts header.");
   }
 
@@ -71,8 +71,8 @@ trait AssertPageCacheContextsAndTagsTrait {
    */
   protected function assertPageCacheContextsAndTags(Url $url, array $expected_contexts, array $expected_tags) {
     $absolute_url = $url->setAbsolute()->toString();
-    sort($expected_contexts);
-    sort($expected_tags);
+    \sort($expected_contexts);
+    \sort($expected_tags);
 
     // Assert cache miss + expected cache contexts + tags.
     $this->drupalGet($absolute_url);
@@ -87,9 +87,9 @@ trait AssertPageCacheContextsAndTagsTrait {
 
     // Assert page cache item + expected cache tags.
     $cid_parts = [$url->setAbsolute()->toString(), ''];
-    $cid = implode(':', $cid_parts);
+    $cid = \implode(':', $cid_parts);
     $cache_entry = \Drupal::cache('page')->get($cid);
-    sort($cache_entry->tags);
+    \sort($cache_entry->tags);
     $this->assertEquals($expected_tags, $cache_entry->tags);
   }
 
@@ -110,9 +110,9 @@ trait AssertPageCacheContextsAndTagsTrait {
       $expected_tags[] = 'http_response';
     }
     $actual_tags = $this->getCacheHeaderValues('X-Drupal-Cache-Tags');
-    $expected_tags = array_unique($expected_tags);
-    sort($expected_tags);
-    sort($actual_tags);
+    $expected_tags = \array_unique($expected_tags);
+    \sort($expected_tags);
+    \sort($actual_tags);
     $this->assertSame($expected_tags, $actual_tags);
   }
 
@@ -134,10 +134,10 @@ trait AssertPageCacheContextsAndTagsTrait {
       $default_contexts = ['languages:language_interface', 'theme'];
       // Add the user based contexts to the list of default contexts except when
       // user is already there.
-      if (!in_array('user', $expected_contexts)) {
+      if (!\in_array('user', $expected_contexts)) {
         $default_contexts[] = 'user.permissions';
 
-        if (!in_array('user.roles', $expected_contexts)) {
+        if (!\in_array('user.roles', $expected_contexts)) {
           // The system_page_attachments() hook is only called when dealing with
           // the HtmlRenderer, so check the Content-Type header.
           // @see \Drupal\Core\Render\MainContent\HtmlRenderer::invokePageAttachmentHooks()
@@ -150,8 +150,8 @@ trait AssertPageCacheContextsAndTagsTrait {
     }
 
     $actual_contexts = $this->getCacheHeaderValues('X-Drupal-Cache-Contexts');
-    sort($expected_contexts);
-    sort($actual_contexts);
+    \sort($expected_contexts);
+    \sort($actual_contexts);
     $this->assertSame($expected_contexts, $actual_contexts, $message ?? '');
     return TRUE;
   }

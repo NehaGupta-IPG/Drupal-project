@@ -73,7 +73,7 @@ class MediaCreationTest extends MediaKernelTestBase {
     ]);
     $media->save();
 
-    $this->assertNotInstanceOf(MediaInterface::class, Media::load(rand(1000, 9999)));
+    $this->assertNotInstanceOf(MediaInterface::class, Media::load(\rand(1000, 9999)));
 
     $this->assertInstanceOf(MediaInterface::class, Media::load($media->id()));
     $this->assertSame($this->testMediaType->id(), $media->bundle(), 'The media item was not created with the correct type.');

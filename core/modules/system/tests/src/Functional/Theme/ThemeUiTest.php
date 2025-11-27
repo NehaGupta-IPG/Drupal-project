@@ -93,10 +93,10 @@ class ThemeUiTest extends BrowserTestBase {
   public function testThemeInstallWithModuleDependencies($theme_name, array $first_modules, array $second_modules, array $required_by_messages, $base_theme_to_uninstall, array $base_theme_module_names): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
-    $all_dependent_modules = array_merge($first_modules, $second_modules);
+    $all_dependent_modules = \array_merge($first_modules, $second_modules);
     $this->drupalGet('admin/appearance');
     $assert_module_enabled_message = function ($enabled_modules) {
-      $count = count($enabled_modules);
+      $count = \count($enabled_modules);
       $module_enabled_text = $count === 1 ? "{$this->testModules[$enabled_modules[0]]} has been installed." : $count . " modules have been installed:";
       $this->assertSession()->pageTextContains($module_enabled_text);
     };
@@ -157,7 +157,7 @@ class ThemeUiTest extends BrowserTestBase {
     $this->drupalGet('admin/modules/uninstall');
 
     // Only attempt to uninstall modules not required by the base theme.
-    $modules_to_uninstall = array_diff($all_dependent_modules, $base_theme_module_names);
+    $modules_to_uninstall = \array_diff($all_dependent_modules, $base_theme_module_names);
     $this->uninstallModules($modules_to_uninstall);
 
     if (!empty($base_theme_to_uninstall)) {
@@ -341,7 +341,7 @@ class ThemeUiTest extends BrowserTestBase {
     $assert_session = $this->assertSession();
     $incompatible_themes_message = 'There are errors with some installed themes. Visit the status report page for more information.';
     $path = \Drupal::getContainer()->getParameter('site.path') . "/themes/changing_theme";
-    mkdir($path, 0777, TRUE);
+    \mkdir($path, 0777, TRUE);
     $file_path = "$path/changing_theme.info.yml";
     $theme_name = 'Theme that changes';
     $info = [

@@ -55,7 +55,7 @@ trait LinkInputValuesTraits {
 
     ];
     // Sort by keys, to be able to inject new test anywhere in the array.
-    ksort($test_values, SORT_NUMERIC);
+    \ksort($test_values, SORT_NUMERIC);
     return $test_values;
   }
 

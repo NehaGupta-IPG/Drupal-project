@@ -48,10 +48,10 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
     // Enable all modules and themes, so that all routes mentioned in topics
     // will be defined.
     $module_directories = $this->listDirectories('module');
-    $modules_to_install = array_keys($module_directories);
+    $modules_to_install = \array_keys($module_directories);
     \Drupal::service('module_installer')->install($modules_to_install);
     $theme_directories = $this->listDirectories('theme');
-    \Drupal::service('theme_installer')->install(array_keys($theme_directories));
+    \Drupal::service('theme_installer')->install(\array_keys($theme_directories));
 
     $directories = $module_directories + $theme_directories +
       $this->listDirectories('profile');
@@ -60,8 +60,8 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
 
     // Filter out directories outside of core. If you want to run this test
     // on a contrib/custom module, remove the next line.
-    $directories = array_filter($directories, function ($directory) {
-      return str_starts_with($directory, 'core');
+    $directories = \array_filter($directories, function ($directory) {
+      return \str_starts_with($directory, 'core');
     });
 
     // Verify that a few key modules, themes, and profiles are listed, so that
@@ -76,12 +76,12 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
     $this->assertArrayHasKey('standard', $directories, 'Standard profile is being scanned');
 
     $definitions = (new HelpTopicDiscovery($directories))->getDefinitions();
-    $this->assertGreaterThan(0, count($definitions), 'At least 1 topic was found');
+    $this->assertGreaterThan(0, \count($definitions), 'At least 1 topic was found');
 
     // Test each topic for compliance with standards, or for failing in the
     // right way.
-    foreach (array_keys($definitions) as $id) {
-      if (str_starts_with($id, 'bad_help_topics.')) {
+    foreach (\array_keys($definitions) as $id) {
+      if (\str_starts_with($id, 'bad_help_topics.')) {
         $this->verifyBadTopic($id, $definitions);
       }
       else {
@@ -133,7 +133,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
     // Test the syntax and contents of the Twig file (without the front
     // matter, which is tested in other ways above). We need to render the
     // template several times with variations, so read it in once.
-    $template = file_get_contents($definition[HelpTopicDiscovery::FILE_KEY]);
+    $template = \file_get_contents($definition[HelpTopicDiscovery::FILE_KEY]);
     $template_text = FrontMatter::create($template)->getContent();
 
     // Verify that the body is not empty and is valid HTML.
@@ -156,14 +156,14 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
       HelpTestTwigNodeVisitor::setStateValue('return_chunk', $chunk_num);
       $text = $this->renderHelpTopic($template_text, 'translated_chunk');
       $matches = [];
-      $matched = preg_match('|' . HelpTestTwigNodeVisitor::DELIMITER . '(.*)' . HelpTestTwigNodeVisitor::DELIMITER . '|', $text, $matches);
+      $matched = \preg_match('|' . HelpTestTwigNodeVisitor::DELIMITER . '(.*)' . HelpTestTwigNodeVisitor::DELIMITER . '|', $text, $matches);
       if ($matched) {
         $number_checked++;
         $text = $matches[1];
         $this->assertNotEmpty($text, 'Topic ' . $chunk_str . ' contains text');
 
         // Verify the chunk is OK.
-        $this->assertTrue(locale_string_is_safe($text), 'Topic ' . $chunk_str . ' translatable string is locale-safe');
+        $this->assertTrue(\locale_string_is_safe($text), 'Topic ' . $chunk_str . ' translatable string is locale-safe');
         $this->validateHtml($text, $chunk_str);
       }
       $chunk_num++;
@@ -178,7 +178,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
 
     // Verify that if we remove all the translated text, whitespace, and
     // HTML tags, there is nothing left (that is, all text is translated).
-    $text = preg_replace('|\s+|', '', $this->renderHelpTopic($template_text, 'remove_translated'));
+    $text = \preg_replace('|\s+|', '', $this->renderHelpTopic($template_text, 'remove_translated'));
     $this->assertEmpty($text, 'Topic ' . $id . ' Twig file has all of its text translated');
 
     // Verify that the Twig url() function was not used.
@@ -197,10 +197,10 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
     $doc = new \DOMDocument();
     $doc->strictErrorChecking = TRUE;
     $doc->validateOnParse = FALSE;
-    libxml_use_internal_errors(TRUE);
-    libxml_clear_errors();
+    \libxml_use_internal_errors(TRUE);
+    \libxml_clear_errors();
     if (!$doc->loadXML('<html><body>' . $body . '</body></html>')) {
-      foreach (libxml_get_errors() as $error) {
+      foreach (\libxml_get_errors() as $error) {
         $this->fail('Topic ' . $id . ' fails HTML validation: ' . $error->message);
       }
     }
@@ -234,7 +234,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
    *   Array of all topic definitions, keyed by ID.
    */
   protected function verifyBadTopic($id, $definitions): void {
-    $bad_topic_type = substr($id, 16);
+    $bad_topic_type = \substr($id, 16);
     // Topics should fail verifyTopic() in specific ways.
     $found_error = FALSE;
     try {
@@ -318,7 +318,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
       // You can tell test modules because they are in package 'Testing', but
       // test themes are only known by being found in test directories. So...
       // exclude things in test directories.
-      if (!str_contains($path, '/tests') && !str_contains($path, '/testing')) {
+      if (!\str_contains($path, '/tests') && !\str_contains($path, '/testing')) {
         $directories[$name] = $path . '/help_topics';
       }
     }
@@ -346,7 +346,7 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
     // the HelpTestTwigNodeVisitor class to hit it each time we render.
     $build = [
       '#type' => 'inline_template',
-      '#template' => $content . "\n{# " . rand() . " #}",
+      '#template' => $content . "\n{# " . \rand() . " #}",
     ];
     return (string) \Drupal::service('renderer')->renderInIsolation($build);
   }

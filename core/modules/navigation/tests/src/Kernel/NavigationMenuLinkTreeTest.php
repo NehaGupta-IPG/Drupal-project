@@ -93,7 +93,7 @@ class NavigationMenuLinkTreeTest extends KernelTestBase {
     $this->assertCount(1, $output);
     $output = $this->linkTree->transform($output, []);
     $this->assertCount(1, $output);
-    $item = reset($output);
+    $item = \reset($output);
     $this->assertSame('New Link Title', $item->link->getTitle());
   }
 

@@ -71,9 +71,9 @@ class SvgSpriteExtractor extends IconExtractorWithFinder {
       return [];
     }
 
-    libxml_use_internal_errors(TRUE);
+    \libxml_use_internal_errors(TRUE);
 
-    if (!$svg = simplexml_load_string((string) $content)) {
+    if (!$svg = \simplexml_load_string((string) $content)) {
       // @todo do we need to log a warning with the xml error?
       return [];
     }
@@ -97,7 +97,7 @@ class SvgSpriteExtractor extends IconExtractorWithFinder {
 
     $ids = [];
     foreach ($wrapper as $symbol) {
-      if (isset($symbol['id']) && 0 === preg_match('/[^\w-]/', (string) $symbol['id'])) {
+      if (isset($symbol['id']) && 0 === \preg_match('/[^\w-]/', (string) $symbol['id'])) {
         $ids[] = (string) $symbol['id'];
       }
     }

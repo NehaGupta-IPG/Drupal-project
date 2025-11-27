@@ -40,7 +40,7 @@ class TestController extends ControllerBase {
     }
 
     $headers = ['Content-Type' => 'text/xml; charset=utf-8'];
-    if (!is_file($file)) {
+    if (!\is_file($file)) {
       // Return an empty response.
       return new Response('', 200, $headers);
     }

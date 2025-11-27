@@ -47,7 +47,7 @@ class TempStoreDatabaseTest extends KernelTestBase {
     // Create two mock user IDs. Note that the user IDs are intentionally
     // random, which is not what we normally do in tests.
     for ($i = 0; $i <= 1; $i++) {
-      $users[$i] = mt_rand(500, 5000000);
+      $users[$i] = \mt_rand(500, 5000000);
 
       // Storing the SharedTempStore objects in a class member variable causes a
       // fatal exception, because in that situation garbage collection is not

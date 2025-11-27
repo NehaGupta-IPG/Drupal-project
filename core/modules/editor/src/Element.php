@@ -53,18 +53,18 @@ class Element implements TrustedCallbackInterface {
     if (!isset($element['format'])) {
       return $element;
     }
-    $format_ids = array_keys($element['format']['format']['#options']);
+    $format_ids = \array_keys($element['format']['format']['#options']);
 
     // Early-return if no text editor is associated with any of the text
     // formats.
     $editors = Editor::loadMultiple($format_ids);
     foreach ($editors as $key => $editor) {
       $definition = $this->pluginManager->getDefinition($editor->getEditor());
-      if (!in_array($element['#base_type'], $definition['supported_element_types'])) {
+      if (!\in_array($element['#base_type'], $definition['supported_element_types'])) {
         unset($editors[$key]);
       }
     }
-    if (count($editors) === 0) {
+    if (\count($editors) === 0) {
       return $element;
     }
 
@@ -108,7 +108,7 @@ class Element implements TrustedCallbackInterface {
       $format = FilterFormat::load($element['format']['format']['#value']);
 
       // Ensure XSS-safety for the current text format/editor.
-      $filtered = editor_filter_xss($original, $format);
+      $filtered = \editor_filter_xss($original, $format);
       if ($filtered !== FALSE) {
         $element['value']['#value'] = $filtered;
       }

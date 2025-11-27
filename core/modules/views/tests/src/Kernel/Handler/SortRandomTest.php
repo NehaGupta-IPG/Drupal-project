@@ -42,7 +42,7 @@ class SortRandomTest extends ViewsKernelTestBase {
         'name' => 'name_' . $i,
         'age' => $i,
         'job' => 'job_' . $i,
-        'created' => rand(0, time()),
+        'created' => \rand(0, \time()),
         'status' => 1,
       ];
     }

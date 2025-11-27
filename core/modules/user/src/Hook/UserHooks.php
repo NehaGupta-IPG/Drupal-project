@@ -156,7 +156,7 @@ class UserHooks {
    */
   #[Hook('user_view_alter')]
   public function userViewAlter(array &$build, UserInterface $account, EntityViewDisplayInterface $display): void {
-    if (!empty($build['user_picture']) && user_picture_enabled()) {
+    if (!empty($build['user_picture']) && \user_picture_enabled()) {
       foreach (Element::children($build['user_picture']) as $key) {
         if (!isset($build['user_picture'][$key]['#item']) || !$build['user_picture'][$key]['#item'] instanceof ImageItem) {
           // User picture field is provided by standard profile install. If the
@@ -244,13 +244,13 @@ class UserHooks {
   #[Hook('user_role_insert')]
   public function userRoleInsert(RoleInterface $role): void {
     // Ignore the authenticated and anonymous roles or the role is being synced.
-    if (in_array($role->id(), [
+    if (\in_array($role->id(), [
       RoleInterface::AUTHENTICATED_ID,
       RoleInterface::ANONYMOUS_ID,
     ]) || $role->isSyncing()) {
       return;
     }
-    assert(Inspector::assertStringable($role->label()), 'Role label is expected to be a string.');
+    \assert(Inspector::assertStringable($role->label()), 'Role label is expected to be a string.');
     $add_id = 'user_add_role_action.' . $role->id();
     if (!Action::load($add_id)) {
       $action = Action::create([
@@ -292,7 +292,7 @@ class UserHooks {
     $user_storage = \Drupal::entityTypeManager()->getStorage('user');
     $user_storage->deleteRoleReferences([$role->id()]);
     // Ignore the authenticated and anonymous roles or the role is being synced.
-    if (in_array($role->id(), [
+    if (\in_array($role->id(), [
       RoleInterface::AUTHENTICATED_ID,
       RoleInterface::ANONYMOUS_ID,
     ]) || $role->isSyncing()) {

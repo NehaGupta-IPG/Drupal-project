@@ -48,7 +48,7 @@ class ActionTest extends KernelTestBase {
     // Test that actions can be discovered.
     $definitions = $this->actionManager->getDefinitions();
     // Verify that the action definitions are found.
-    $this->assertGreaterThan(1, count($definitions));
+    $this->assertGreaterThan(1, \count($definitions));
     $this->assertNotEmpty($definitions['action_test_no_type'], 'The test action is among the definitions found.');
 
     $definition = $this->actionManager->getDefinition('action_test_no_type');
@@ -72,7 +72,7 @@ class ActionTest extends KernelTestBase {
     $action->execute($account);
     $loaded_accounts = $user_storage->loadMultiple();
     $this->assertCount(1, $loaded_accounts);
-    $account = reset($loaded_accounts);
+    $account = \reset($loaded_accounts);
     $this->assertEquals($name, $account->label());
   }
 

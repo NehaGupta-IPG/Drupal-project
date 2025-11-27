@@ -82,7 +82,7 @@ class File extends MediaSourceBase {
 
       case self::METADATA_ATTRIBUTE_LINK_TARGET:
         $url = $file->createFileUrl(TRUE);
-        assert(is_string($url));
+        \assert(\is_string($url));
         return (new GeneratedUrl())
           ->setGeneratedUrl($url)
           ->setCacheMaxAge(Cache::PERMANENT)
@@ -112,7 +112,7 @@ class File extends MediaSourceBase {
     // icon file named "pdf.png" is present, it will be used if the file
     // matches this MIME type.
     $mimetype = $file->getMimeType();
-    $mimetype = explode('/', $mimetype);
+    $mimetype = \explode('/', $mimetype);
 
     $icon_names = [
       $mimetype[0] . '--' . $mimetype[1],
@@ -121,7 +121,7 @@ class File extends MediaSourceBase {
     ];
     foreach ($icon_names as $icon_name) {
       $thumbnail = $icon_base . '/' . $icon_name . '.png';
-      if (is_file($thumbnail)) {
+      if (\is_file($thumbnail)) {
         return $thumbnail;
       }
     }

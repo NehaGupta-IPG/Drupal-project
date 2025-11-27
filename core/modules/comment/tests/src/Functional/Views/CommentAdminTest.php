@@ -59,7 +59,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
    */
   public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
-    user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
       'post comments' => TRUE,
       'skip comment approval' => FALSE,
@@ -82,7 +82,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
 
     // Post anonymous comment without contact info.
     $body = $this->getRandomGenerator()->sentences(4);
-    $subject = Unicode::truncate(trim(Html::decodeEntities(strip_tags($body))), 29, TRUE, TRUE);
+    $subject = Unicode::truncate(\trim(Html::decodeEntities(\strip_tags($body))), 29, TRUE, TRUE);
     $author_name = $this->randomMachineName();
     $this->drupalGet('comment/reply/node/' . $this->node->id() . '/comment');
     $this->submitForm([

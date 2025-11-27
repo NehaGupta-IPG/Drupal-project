@@ -74,13 +74,13 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
 
     // If the source block is assigned to a region in the source default theme,
     // then assign it to the destination default theme.
-    if (strtolower($theme) == strtolower($default_theme)) {
+    if (\strtolower($theme) == \strtolower($default_theme)) {
       return $this->themeConfig->get('default');
     }
 
     // If the source block is assigned to a region in the source admin theme,
     // then assign it to the destination admin theme.
-    if ($admin_theme && strtolower($theme) == strtolower($admin_theme)) {
+    if ($admin_theme && \strtolower($theme) == \strtolower($admin_theme)) {
       return $this->themeConfig->get('admin');
     }
 

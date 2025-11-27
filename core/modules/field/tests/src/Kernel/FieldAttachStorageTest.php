@@ -69,7 +69,7 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
     }
 
     // Confirm each revision loads the correct data.
-    foreach (array_keys($values) as $revision_id) {
+    foreach (\array_keys($values) as $revision_id) {
       $entity = $storage->loadRevision($revision_id);
       // Number of values per field loaded equals the field cardinality.
       $this->assertCount($cardinality, $entity->{$this->fieldTestData->field_name}, "Revision $revision_id: expected number of values.");
@@ -129,7 +129,7 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
         if (!$entity->hasField($field_name)) {
           continue;
         }
-        $values[$index][$field_name] = mt_rand(1, 127);
+        $values[$index][$field_name] = \mt_rand(1, 127);
         $entity->$field_name->setValue(['value' => $values[$index][$field_name]]);
       }
       $entity->enforceIsNew();
@@ -225,7 +225,7 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
     $this->assertTrue($entity->{$this->fieldTestData->field_name}->isEmpty(), 'Insert: NULL field results in no value saved');
 
     // Verify that prepopulated field values are not overwritten by defaults.
-    $value = [['value' => $default[0]['value'] - mt_rand(1, 127)]];
+    $value = [['value' => $default[0]['value'] - \mt_rand(1, 127)]];
     $entity = $this->container->get('entity_type.manager')
       ->getStorage($entity_type)
       ->create(['type' => $entity_init->bundle(), $this->fieldTestData->field_name => $value]);
@@ -351,7 +351,7 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
       'bundle' => $this->fieldTestData->field->getTargetBundle(),
       'label' => $this->randomMachineName() . '_label',
       'description' => $this->randomMachineName() . '_description',
-      'weight' => mt_rand(0, 127),
+      'weight' => \mt_rand(0, 127),
     ];
     FieldConfig::create($field)->save();
 

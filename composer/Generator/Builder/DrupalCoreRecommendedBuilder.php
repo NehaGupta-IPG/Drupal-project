@@ -52,7 +52,7 @@ class DrupalCoreRecommendedBuilder extends DrupalPackageBuilder {
     foreach ($composerLockData['packages'] as $package) {
       // If there is no 'source' record, then this is a path repository
       // or something else that we do not want to include.
-      if (isset($package['source']) && !in_array($package['name'], $remove_list)) {
+      if (isset($package['source']) && !\in_array($package['name'], $remove_list)) {
         $composer['require'][$package['name']] = '~' . $package['version'];
       }
     }

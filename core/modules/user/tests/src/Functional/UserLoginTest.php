@@ -343,9 +343,9 @@ class UserLoginTest extends BrowserTestBase {
     $edit['name'] = $user->getDisplayName();
     $this->submitForm($edit, 'Submit');
     $_emails = $this->drupalGetMails();
-    $email = end($_emails);
+    $email = \end($_emails);
     $urls = [];
-    preg_match('#.+user/reset/.+#', $email['body'], $urls);
+    \preg_match('#.+user/reset/.+#', $email['body'], $urls);
     $resetURL = $urls[0];
     $this->drupalGet($resetURL);
     $this->submitForm([], 'Log in');

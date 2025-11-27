@@ -142,7 +142,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     $this->assertSession()->fieldValueEquals('field_storage[subform][settings][target_type]', 'node');
 
     // Check that all entity types can be referenced.
-    $this->assertFieldSelectOptions('field_storage[subform][settings][target_type]', array_keys(\Drupal::entityTypeManager()->getDefinitions()));
+    $this->assertFieldSelectOptions('field_storage[subform][settings][target_type]', \array_keys(\Drupal::entityTypeManager()->getDefinitions()));
 
     // The base handler should be selected by default.
     $this->assertSession()->fieldValueEquals('settings[handler]', 'default:node');
@@ -160,7 +160,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
       $this->assertSession()->fieldExists('settings[handler_settings][target_bundles][' . $bundle_name . ']');
     }
 
-    reset($bundles);
+    \reset($bundles);
 
     // Initially, no bundles are selected so no sort options are available.
     $this->assertFieldSelectOptions('settings[handler_settings][sort][field]', ['_none']);
@@ -178,7 +178,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     $assert_session->optionNotExists('settings[handler_settings][sort][field]', 'field_text.value');
     // Test that the title option appears once, with the default label.
     $title_options = $sort_by->findAll('xpath', 'option[@value="title"]');
-    $this->assertEquals(1, count($title_options));
+    $this->assertEquals(1, \count($title_options));
     $this->assertEquals('Title', $title_options[0]->getText());
 
     // Also select the target bundle so that field_text is also available.
@@ -198,7 +198,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     $assert_session->optionExists('settings[handler_settings][sort][field]', 'field_text.value');
     // Exception: the title option has a different label.
     $title_options = $sort_by->findAll('xpath', 'option[@value="title"]');
-    $this->assertEquals(1, count($title_options));
+    $this->assertEquals(1, \count($title_options));
     $this->assertEquals($this->targetType . ' title', $title_options[0]->getText());
 
     // Test the sort settings.
@@ -213,10 +213,10 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     $this->assertSession()->fieldValueEquals('settings[handler_settings][sort][direction]', 'ASC');
 
     // Test that the sort-by options are sorted.
-    $labels = array_map(function (NodeElement $element) {
+    $labels = \array_map(function (NodeElement $element) {
       return $element->getText();
     }, $sort_by->findAll('xpath', 'option'));
-    for ($i = count($labels) - 1, $sorted = TRUE; $i > 0; --$i) {
+    for ($i = \count($labels) - 1, $sorted = TRUE; $i > 0; --$i) {
       if ($labels[$i - 1] > $labels[$i]) {
         $sorted = FALSE;
         break;
@@ -261,7 +261,7 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
     // @todo remove after https://www.drupal.org/i/3395590 has been fixed.
     $this->getSession()->resizeWindow(1200, 1500);
-    usleep(5000);
+    \usleep(5000);
 
     $page->find('css', '.ui-dialog-buttonset')->pressButton('Save');
 
@@ -372,8 +372,8 @@ class EntityReferenceAdminTest extends WebDriverTestBase {
     foreach ($optgroups as $optgroup) {
       $nested_options[] = $optgroup->findAll('xpath', 'option');
     }
-    $options = array_merge($options, ...$nested_options);
-    array_walk($options, function (NodeElement &$option) {
+    $options = \array_merge($options, ...$nested_options);
+    \array_walk($options, function (NodeElement &$option) {
       $option = $option->getAttribute('value');
     });
     $this->assertEqualsCanonicalizing($expected_options, $options);

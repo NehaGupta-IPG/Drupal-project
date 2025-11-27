@@ -51,7 +51,7 @@ class TrustedHostsTest extends BrowserTestBase {
    */
   public function testStatusPageWithConfiguration(): void {
     $settings['settings']['trusted_host_patterns'] = (object) [
-      'value' => ['^' . preg_quote(\Drupal::request()->getHost()) . '$'],
+      'value' => ['^' . \preg_quote(\Drupal::request()->getHost()) . '$'],
       'required' => TRUE,
     ];
 
@@ -74,7 +74,7 @@ class TrustedHostsTest extends BrowserTestBase {
 
     $host = $this->container->get('request_stack')->getCurrentRequest()->getHost();
     $settings['settings']['trusted_host_patterns'] = (object) [
-      'value' => ['^' . preg_quote($host) . '$'],
+      'value' => ['^' . \preg_quote($host) . '$'],
       'required' => TRUE,
     ];
 
@@ -106,7 +106,7 @@ class TrustedHostsTest extends BrowserTestBase {
     $role_storage = $entity_type_manager->getStorage('user_role');
     $roles = $this->loggedInUser->getRoles(TRUE);
     /** @var \Drupal\user\RoleInterface $role */
-    $role = $role_storage->load(reset($roles));
+    $role = $role_storage->load(\reset($roles));
     $role->grantPermission('access shortcuts')->save();
 
     $this->drupalPlaceBlock('shortcuts');
@@ -127,7 +127,7 @@ class TrustedHostsTest extends BrowserTestBase {
 
     $host = $this->container->get('request_stack')->getCurrentRequest()->getHost();
     $settings['settings']['trusted_host_patterns'] = (object) [
-      'value' => ['^' . preg_quote($host) . '$'],
+      'value' => ['^' . \preg_quote($host) . '$'],
       'required' => TRUE,
     ];
 

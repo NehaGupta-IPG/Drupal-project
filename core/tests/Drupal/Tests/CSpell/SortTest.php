@@ -22,7 +22,7 @@ class SortTest extends TestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->filePath = dirname(__DIR__, 5) . '/core/misc/cspell/dictionary.txt';
+    $this->filePath = \dirname(__DIR__, 5) . '/core/misc/cspell/dictionary.txt';
   }
 
   /**
@@ -36,12 +36,12 @@ class SortTest extends TestCase {
    * Tests that the file is properly sorted.
    */
   public function testSorted(): void {
-    $content = file_get_contents($this->filePath);
+    $content = \file_get_contents($this->filePath);
     $this->assertIsString($content);
-    $current_dictionary = explode("\n", rtrim($content));
+    $current_dictionary = \explode("\n", \rtrim($content));
     $this->assertIsArray($current_dictionary);
     $sorted_dictionary = $current_dictionary;
-    sort($current_dictionary);
+    \sort($current_dictionary);
     $this->assertSame($current_dictionary, $sorted_dictionary);
   }
 

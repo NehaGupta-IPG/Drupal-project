@@ -92,7 +92,7 @@ class HtmlTag extends RenderElementBase {
     $open_tag = '<' . $escaped_tag . $attributes;
     $close_tag = '</' . $escaped_tag . ">\n";
     // Construct a void element.
-    if (in_array($element['#tag'], self::$voidElements)) {
+    if (\in_array($element['#tag'], self::$voidElements)) {
       $open_tag .= ' />';
       $close_tag = "\n";
     }

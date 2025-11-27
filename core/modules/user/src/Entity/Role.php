@@ -127,7 +127,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
     if ($this->isAdmin()) {
       return TRUE;
     }
-    return in_array($permission, $this->permissions);
+    return \in_array($permission, $this->permissions);
   }
 
   /**
@@ -151,7 +151,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
     if ($this->isAdmin()) {
       return $this;
     }
-    $this->permissions = array_diff($this->permissions, [$permission]);
+    $this->permissions = \array_diff($this->permissions, [$permission]);
     return $this;
   }
 
@@ -177,7 +177,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
     parent::postLoad($storage, $entities);
     // Sort the queried roles by their weight.
     // See \Drupal\Core\Config\Entity\ConfigEntityBase::sort().
-    uasort($entities, [static::class, 'sort']);
+    \uasort($entities, [static::class, 'sort']);
   }
 
   /**
@@ -188,7 +188,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
 
     if (!isset($this->weight)) {
       // Set a role weight to make this new role last.
-      $this->weight = array_reduce($storage->loadMultiple(), function ($max, $role) {
+      $this->weight = \array_reduce($storage->loadMultiple(), function ($max, $role) {
         return $max > $role->weight ? $max : $role->weight + 1;
       }, 0);
     }
@@ -197,7 +197,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
       // Permissions are always ordered alphabetically to avoid conflicts in the
       // exported configuration. If the save is not trusted then the
       // configuration will be sorted by StorableConfigBase.
-      sort($this->permissions);
+      \sort($this->permissions);
     }
   }
 
@@ -208,13 +208,13 @@ class Role extends ConfigEntityBase implements RoleInterface {
     parent::calculateDependencies();
     // Load all permission definitions.
     $permission_definitions = \Drupal::service('user.permissions')->getPermissions();
-    $valid_permissions = array_intersect($this->permissions, array_keys($permission_definitions));
-    $invalid_permissions = array_diff($this->permissions, $valid_permissions);
+    $valid_permissions = \array_intersect($this->permissions, \array_keys($permission_definitions));
+    $invalid_permissions = \array_diff($this->permissions, $valid_permissions);
     if (!empty($invalid_permissions)) {
       \Drupal::logger('user')->error('Non-existent permission(s) assigned to role "@label" (@id) were removed. Invalid permission(s): @permissions.', [
         '@label' => $this->label(),
         '@id' => $this->id(),
-        '@permissions' => implode(', ', $invalid_permissions),
+        '@permissions' => \implode(', ', $invalid_permissions),
       ]);
       $this->permissions = $valid_permissions;
     }
@@ -241,7 +241,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
     // Convert config and content entity dependencies to a list of names to make
     // it easier to check.
     foreach (['content', 'config'] as $type) {
-      $dependencies[$type] = array_keys($dependencies[$type]);
+      $dependencies[$type] = \array_keys($dependencies[$type]);
     }
 
     // Remove any permissions from the role that are dependent on anything being
@@ -252,7 +252,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
         continue;
       }
 
-      if (in_array($permission_definitions[$permission]['provider'], $dependencies['module'], TRUE)) {
+      if (\in_array($permission_definitions[$permission]['provider'], $dependencies['module'], TRUE)) {
         unset($this->permissions[$key]);
         $changed = TRUE;
         // Process the next permission.
@@ -261,7 +261,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
 
       if (isset($permission_definitions[$permission]['dependencies'])) {
         foreach ($permission_definitions[$permission]['dependencies'] as $type => $list) {
-          if (array_intersect($list, $dependencies[$type])) {
+          if (\array_intersect($list, $dependencies[$type])) {
             unset($this->permissions[$key]);
             $changed = TRUE;
             // Process the next permission.
@@ -286,7 +286,7 @@ class Role extends ConfigEntityBase implements RoleInterface {
    * @todo Revisit in https://www.drupal.org/node/3446364
    */
   public static function getAllValidPermissions(): array {
-    return array_keys(\Drupal::service('user.permissions')->getPermissions());
+    return \array_keys(\Drupal::service('user.permissions')->getPermissions());
   }
 
 }

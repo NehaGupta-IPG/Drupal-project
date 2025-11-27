@@ -37,7 +37,7 @@ class FileTestHooks {
   public function fileDownload($uri): array|int|null {
     if (\Drupal::state()->get('file_test.allow_all', FALSE)) {
       $files = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $uri]);
-      $file = reset($files);
+      $file = \reset($files);
       return $file->getDownloadHeaders();
     }
     FileTestHelper::logCall('download', [$uri]);
@@ -104,7 +104,7 @@ class FileTestHooks {
       $schemes = ['public'];
       $scheme = $stream_wrapper_manager::getScheme($uri);
       // Only serve shipped files and public created files from the CDN.
-      if (!$scheme || in_array($scheme, $schemes)) {
+      if (!$scheme || \in_array($scheme, $schemes)) {
         // Shipped files.
         if (!$scheme) {
           $path = $uri;
@@ -114,11 +114,11 @@ class FileTestHooks {
           $path = $wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
         }
         // Clean up Windows paths.
-        $path = str_replace('\\', '/', $path);
+        $path = \str_replace('\\', '/', $path);
         // Serve files with one of the CDN extensions from CDN 1, all others
         // from CDN 2.
-        $pathinfo = pathinfo($path);
-        if (array_key_exists('extension', $pathinfo) && in_array($pathinfo['extension'], $cdn_extensions)) {
+        $pathinfo = \pathinfo($path);
+        if (\array_key_exists('extension', $pathinfo) && \in_array($pathinfo['extension'], $cdn_extensions)) {
           $uri = FileTestCdn::First->value . '/' . $path;
         }
         else {
@@ -140,9 +140,9 @@ class FileTestHooks {
           $path = $wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
         }
         // Clean up Windows paths.
-        $path = str_replace('\\', '/', $path);
+        $path = \str_replace('\\', '/', $path);
         // Generate a root-relative URL.
-        $uri = base_path() . '/' . $path;
+        $uri = \base_path() . '/' . $path;
       }
     }
     elseif ($alter_mode == 'protocol-relative') {
@@ -159,9 +159,9 @@ class FileTestHooks {
           $path = $wrapper->getDirectoryPath() . '/' . $stream_wrapper_manager::getTarget($uri);
         }
         // Clean up Windows paths.
-        $path = str_replace('\\', '/', $path);
+        $path = \str_replace('\\', '/', $path);
         // Generate a protocol-relative URL.
-        $uri = '/' . base_path() . '/' . $path;
+        $uri = '/' . \base_path() . '/' . $path;
       }
     }
   }

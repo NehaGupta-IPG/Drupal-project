@@ -31,7 +31,7 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
   protected function logCacheOperation(string|array $cids, float $start, float $stop, string $operation): void {
     $this->performanceDataCollector->addCacheOperation([
       'operation' => $operation,
-      'cids' => implode(', ', (array) $cids),
+      'cids' => \implode(', ', (array) $cids),
       'bin' => $this->bin,
       'start' => $start,
       'stop' => $stop,
@@ -42,9 +42,9 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    * {@inheritdoc}
    */
   public function get($cid, $allow_invalid = FALSE): object|bool {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $cache = $this->cacheBackend->get($cid, $allow_invalid);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation($cid, $start, $stop, 'get');
     return $cache;
   }
@@ -54,9 +54,9 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    */
   public function getMultiple(&$cids, $allow_invalid = FALSE): array {
     $cids_copy = $cids;
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $cache = $this->cacheBackend->getMultiple($cids, $allow_invalid);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation($cids_copy, $start, $stop, 'getMultiple');
 
     return $cache;
@@ -66,9 +66,9 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    * {@inheritdoc}
    */
   public function set($cid, $data, $expire = Cache::PERMANENT, array $tags = []) {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $this->cacheBackend->set($cid, $data, $expire, $tags);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation($cid, $start, $stop, 'set');
   }
 
@@ -76,10 +76,10 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    * {@inheritdoc}
    */
   public function setMultiple(array $items) {
-    $cids = array_keys($items);
-    $start = microtime(TRUE);
+    $cids = \array_keys($items);
+    $start = \microtime(TRUE);
     $this->cacheBackend->setMultiple($items);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation($cids, $start, $stop, 'setMultiple');
   }
 
@@ -87,9 +87,9 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    * {@inheritdoc}
    */
   public function delete($cid) {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $this->cacheBackend->delete($cid);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation($cid, $start, $stop, 'delete');
   }
 
@@ -97,9 +97,9 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    * {@inheritdoc}
    */
   public function deleteMultiple(array $cids) {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $this->cacheBackend->deleteMultiple($cids);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation($cids, $start, $stop, 'deleteMultiple');
   }
 
@@ -107,9 +107,9 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    * {@inheritdoc}
    */
   public function deleteAll() {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $this->cacheBackend->deleteAll();
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation([], $start, $stop, 'deleteAll');
   }
 
@@ -117,9 +117,9 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    * {@inheritdoc}
    */
   public function invalidate($cid) {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $this->cacheBackend->invalidate($cid);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation($cid, $start, $stop, 'invalidate');
   }
 
@@ -127,9 +127,9 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    * {@inheritdoc}
    */
   public function invalidateMultiple(array $cids) {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $this->cacheBackend->invalidateMultiple($cids);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation($cids, $start, $stop, 'invalidateMultiple');
   }
 
@@ -146,9 +146,9 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    * {@inheritdoc}
    */
   public function invalidateAll() {
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $this->cacheBackend->invalidateAll();
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheOperation([], $start, $stop, 'invalidateAll');
   }
 

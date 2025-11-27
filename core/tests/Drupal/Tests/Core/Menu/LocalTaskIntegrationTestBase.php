@@ -144,7 +144,7 @@ abstract class LocalTaskIntegrationTestBase extends UnitTestCase {
     // container.
     $tasks = [];
     foreach ($tmp_tasks as $level => $level_tasks) {
-      $tasks[$level] = array_keys($level_tasks);
+      $tasks[$level] = \array_keys($level_tasks);
     }
     $this->assertEquals($expected_tasks, $tasks);
   }

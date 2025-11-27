@@ -45,7 +45,7 @@ trait AnnotatedDiscoveryAutomatedProvidersTrait {
     if (!$parser) {
       throw new \LogicException('Parser argument must be passed for automated providers discovery.');
     }
-    if (!method_exists($this, 'getProviderFromNamespace')) {
+    if (!\method_exists($this, 'getProviderFromNamespace')) {
       throw new \LogicException('Classes using \Drupal\migrate\Plugin\Discovery\AnnotatedDiscoveryAutomatedProvidersTrait must have getProviderFromNamespace() method.');
     }
     // @see \Drupal\Component\Annotation\Plugin\Discovery\AnnotatedClassDiscovery::prepareAnnotationDefinition()
@@ -56,7 +56,7 @@ trait AnnotatedDiscoveryAutomatedProvidersTrait {
     do {
       $providers[] = $this->getProviderFromNamespace($parser->getNamespaceName());
     } while ($parser = StaticReflectionParser::getParentParser($parser, $this->finder));
-    $providers = array_diff(array_unique(array_filter($providers)), ['component']);
+    $providers = \array_diff(\array_unique(\array_filter($providers)), ['component']);
     $annotation->setProviders($providers);
   }
 

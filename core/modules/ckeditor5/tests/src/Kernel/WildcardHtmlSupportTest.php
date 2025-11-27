@@ -73,7 +73,7 @@ class WildcardHtmlSupportTest extends KernelTestBase {
       'format' => 'test_format',
       'settings' => [
         'toolbar' => [
-          'items' => array_merge(['sourceEditing'], $additional_toolbar_items),
+          'items' => \array_merge(['sourceEditing'], $additional_toolbar_items),
         ],
         'plugins' => [
           'ckeditor5_sourceEditing' => [
@@ -85,7 +85,7 @@ class WildcardHtmlSupportTest extends KernelTestBase {
         'status' => FALSE,
       ],
     ];
-    if (in_array('alignment', $additional_toolbar_items, TRUE)) {
+    if (\in_array('alignment', $additional_toolbar_items, TRUE)) {
       $editor_config['settings']['plugins']['ckeditor5_alignment'] = [
         'enabled_alignments' => ['left', 'center', 'right', 'justify'],
       ];
@@ -93,11 +93,11 @@ class WildcardHtmlSupportTest extends KernelTestBase {
 
     $editor = Editor::create($editor_config);
     $editor->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))
@@ -107,7 +107,7 @@ class WildcardHtmlSupportTest extends KernelTestBase {
     // The first two entries in the GHS configuration are from the
     // `ckeditor5_globalAttributeDir` and `ckeditor5_globalAttributeLang`
     // plugins. They are out of scope for this test, so omit them.
-    $ghs_configuration = array_slice($ghs_configuration, 2);
+    $ghs_configuration = \array_slice($ghs_configuration, 2);
     $this->assertEquals($expected_ghs_configuration, $ghs_configuration);
   }
 

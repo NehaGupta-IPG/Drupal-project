@@ -235,7 +235,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
     }
 
     // Sort by label.
-    return strcmp($a->label(), $b->label());
+    return \strcmp($a->label(), $b->label());
   }
 
   /**
@@ -353,18 +353,18 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
 
-    if (!is_int($this->weight)) {
-      @trigger_error('Saving a block with a non-integer weight is deprecated in drupal:11.1.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3462474', E_USER_DEPRECATED);
+    if (!\is_int($this->weight)) {
+      @\trigger_error('Saving a block with a non-integer weight is deprecated in drupal:11.1.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3462474', E_USER_DEPRECATED);
       $this->setWeight((int) $this->weight);
     }
 
     // Ensure the region is valid to mirror the behavior of block_rebuild().
     // This is done primarily for backwards compatibility support of
     // \Drupal\block\BlockInterface::BLOCK_REGION_NONE.
-    $regions = system_region_list($this->theme);
+    $regions = \system_region_list($this->theme);
     if (!isset($this->region, $regions[$this->region]) && $this->status()) {
       $this
-        ->setRegion(system_default_region($this->theme))
+        ->setRegion(\system_default_region($this->theme))
         ->disable();
     }
   }
@@ -379,7 +379,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
    */
   public static function validateRegion(?string $region, ExecutionContextInterface $context): void {
     if ($theme = $context->getRoot()->get('theme')->getValue()) {
-      if (!array_key_exists($region, system_region_list($theme))) {
+      if (!\array_key_exists($region, \system_region_list($theme))) {
         $context->addViolation('This is not a valid region of the %theme theme.', ['%theme' => $theme]);
       }
     }

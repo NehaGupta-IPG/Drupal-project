@@ -85,7 +85,7 @@ class TwigEnvironment extends Environment {
         $current = [
           'twig_extension_hash' => $twig_extension_hash,
           // Generate a new prefix which invalidates any existing cached files.
-          'twig_cache_prefix' => uniqid(),
+          'twig_cache_prefix' => \uniqid(),
 
         ];
         $state->set(static::CACHE_PREFIX_METADATA_KEY, $current);
@@ -125,7 +125,7 @@ class TwigEnvironment extends Environment {
     catch (FrontMatterParseException $exception) {
       // Convert parse exception into a syntax exception for Twig and append
       // the path/name of the source to help further identify where it occurred.
-      $message = sprintf($exception->getMessage() . ' in %s', $source->getPath() ?: $source->getName());
+      $message = \sprintf($exception->getMessage() . ' in %s', $source->getPath() ?: $source->getName());
       throw new SyntaxError($message, $exception->getSourceLine(), $source, $exception);
     }
 
@@ -179,7 +179,7 @@ class TwigEnvironment extends Environment {
     catch (FrontMatterParseException $exception) {
       // Convert parse exception into a syntax exception for Twig and append
       // the path/name of the source to help further identify where it occurred.
-      $message = sprintf($exception->getMessage() . ' in %s', $source->getPath() ?: $source->getName());
+      $message = \sprintf($exception->getMessage() . ' in %s', $source->getPath() ?: $source->getName());
       throw new SyntaxError($message, $exception->getSourceLine(), $source, $exception);
     }
   }

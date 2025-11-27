@@ -100,7 +100,7 @@ class DateRangeItemTest extends FieldKernelTestBase {
     // a \Drupal\datetime\DateTimeComputed object they should all have the same
     // time.
     $start_date = $entity->{$field_name}->start_date;
-    sleep(1);
+    \sleep(1);
     $end_date = $entity->{$field_name}->end_date;
     $this->assertEquals($start_date->getTimestamp(), $end_date->getTimestamp());
     $this->assertEquals('12:00:00', $start_date->format('H:i:s'));

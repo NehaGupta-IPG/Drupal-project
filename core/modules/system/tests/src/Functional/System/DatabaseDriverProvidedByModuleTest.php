@@ -38,7 +38,7 @@ class DatabaseDriverProvidedByModuleTest extends BrowserTestBase {
    */
   public function testDatabaseDriverIsProvidedByModuleButTheModuleIsNotEnabled(): void {
     $driver = Database::getConnection()->driver();
-    if (!in_array($driver, ['mysql', 'pgsql'])) {
+    if (!\in_array($driver, ['mysql', 'pgsql'])) {
       $this->markTestSkipped("This test does not support the {$driver} database driver.");
     }
 
@@ -51,9 +51,9 @@ class DatabaseDriverProvidedByModuleTest extends BrowserTestBase {
       'password' => $connection_info['default']['password'],
       'prefix' => $connection_info['default']['prefix'],
       'host' => $connection_info['default']['host'],
-      'driver' => 'DriverTest' . ucfirst($driver),
-      'namespace' => 'Drupal\\driver_test\\Driver\\Database\\DriverTest' . ucfirst($driver),
-      'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTest' . ucfirst($driver),
+      'driver' => 'DriverTest' . \ucfirst($driver),
+      'namespace' => 'Drupal\\driver_test\\Driver\\Database\\DriverTest' . \ucfirst($driver),
+      'autoload' => 'core/modules/system/tests/modules/driver_test/src/Driver/Database/DriverTest' . \ucfirst($driver),
       'dependencies' => [
         $driver => [
           'namespace' => "Drupal\\{$driver}",

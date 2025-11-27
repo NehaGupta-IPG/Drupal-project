@@ -130,12 +130,12 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
    * {@inheritdoc}
    */
   public function getOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
-    $args = func_get_args();
+    $args = \func_get_args();
     $cacheability = $args[1] ?? new CacheableMetadata();
     $operations = $this->getDefaultOperations($entity, $cacheability);
     $operations += $this->moduleHandler()->invokeAll('entity_operation', [$entity, $cacheability]);
     $this->moduleHandler->alter('entity_operation', $operations, $entity, $cacheability);
-    uasort($operations, '\Drupal\Component\Utility\SortArray::sortByWeightElement');
+    \uasort($operations, '\Drupal\Component\Utility\SortArray::sortByWeightElement');
 
     return $operations;
   }
@@ -158,7 +158,7 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
    *   self::getOperations().
    */
   protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
-    $args = func_get_args();
+    $args = \func_get_args();
     $cacheability = $args[1] ?? new CacheableMetadata();
     $operations = [];
     $variables = [

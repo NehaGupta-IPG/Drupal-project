@@ -65,7 +65,7 @@ class ContextualLinksTest extends WebDriverTestBase {
       $node->title = $this->randomMachineName();
       $node->body = [
         'value' => $this->randomMachineName(32),
-        'format' => filter_default_format(),
+        'format' => \filter_default_format(),
       ];
       $node->setNewRevision();
 

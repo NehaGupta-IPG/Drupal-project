@@ -70,7 +70,7 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
   protected function installAllModules(): void {
     // Enable all core modules.
     $all_modules = $this->container->get('extension.list.module')->getList();
-    $all_modules = array_filter($all_modules, function ($module) {
+    $all_modules = \array_filter($all_modules, function ($module) {
       // Filter contrib, hidden, experimental, already enabled modules, and
       // modules in the Testing package.
       if ($module->origin !== 'core'
@@ -83,8 +83,8 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
       }
       return TRUE;
     });
-    $this->allModules = array_keys($all_modules);
-    sort($this->allModules);
+    $this->allModules = \array_keys($all_modules);
+    \sort($this->allModules);
 
     $module_installer = $this->container->get('module_installer');
     $module_installer->install($this->allModules);
@@ -102,7 +102,7 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
     foreach ($registry_full as $info) {
       if (isset($info['template'])) {
         // Allow skipping templates.
-        if (in_array($info['template'], $this->templatesToSkip)) {
+        if (\in_array($info['template'], $this->templatesToSkip)) {
           continue;
         }
 

@@ -11,7 +11,7 @@ use WebDriver\Exception as WebDriverException;
 // cspell:ignore curle curlopt customrequest failonerror postfields
 // cspell:ignore returntransfer
 
-@trigger_error('The \Drupal\FunctionalJavascriptTests\WebDriverCurlService class is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3462152', E_USER_DEPRECATED);
+@\trigger_error('The \Drupal\FunctionalJavascriptTests\WebDriverCurlService class is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3462152', E_USER_DEPRECATED);
 
 /**
  * Provides a curl service to interact with Selenium driver.
@@ -67,16 +67,16 @@ class WebDriverCurlService extends CurlService {
           'Accept: application/json;charset=UTF-8',
         ];
 
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        $curl = \curl_init($url);
+        \curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
 
         switch ($requestMethod) {
           case 'GET':
             break;
 
           case 'POST':
-            if ($parameters && is_array($parameters)) {
-              curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($parameters));
+            if ($parameters && \is_array($parameters)) {
+              \curl_setopt($curl, CURLOPT_POSTFIELDS, \json_encode($parameters));
             }
             else {
               $customHeaders[] = 'Content-Length: 0';
@@ -92,16 +92,16 @@ class WebDriverCurlService extends CurlService {
             // support Expect.
             $customHeaders[] = 'Expect:';
 
-            curl_setopt($curl, CURLOPT_POST, TRUE);
+            \curl_setopt($curl, CURLOPT_POST, TRUE);
             break;
 
           case 'DELETE':
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+            \curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
             break;
 
           case 'PUT':
-            if ($parameters && is_array($parameters)) {
-              curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($parameters));
+            if ($parameters && \is_array($parameters)) {
+              \curl_setopt($curl, CURLOPT_POSTFIELDS, \json_encode($parameters));
             }
             else {
               $customHeaders[] = 'Content-Length: 0';
@@ -117,36 +117,36 @@ class WebDriverCurlService extends CurlService {
             // support Expect.
             $customHeaders[] = 'Expect:';
 
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
+            \curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
             break;
         }
 
         foreach ($extraOptions as $option => $value) {
-          curl_setopt($curl, $option, $value);
+          \curl_setopt($curl, $option, $value);
         }
 
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $customHeaders);
+        \curl_setopt($curl, CURLOPT_HTTPHEADER, $customHeaders);
 
-        $result = curl_exec($curl);
+        $result = \curl_exec($curl);
         $rawResult = NULL;
         if ($result !== FALSE) {
-          $rawResult = trim($result);
+          $rawResult = \trim($result);
         }
 
-        $info = curl_getinfo($curl);
+        $info = \curl_getinfo($curl);
         $info['request_method'] = $requestMethod;
 
-        if (array_key_exists(CURLOPT_FAILONERROR, $extraOptions) && $extraOptions[CURLOPT_FAILONERROR] && CURLE_GOT_NOTHING !== curl_errno($curl) && $error = curl_error($curl)) {
+        if (\array_key_exists(CURLOPT_FAILONERROR, $extraOptions) && $extraOptions[CURLOPT_FAILONERROR] && CURLE_GOT_NOTHING !== \curl_errno($curl) && $error = \curl_error($curl)) {
           $curl = NULL;
 
-          throw WebDriverException::factory(WebDriverException::CURL_EXEC, sprintf("Curl error thrown for http %s to %s%s\n\n%s", $requestMethod, $url, $parameters && is_array($parameters) ? ' with params: ' . json_encode($parameters) : '', $error));
+          throw WebDriverException::factory(WebDriverException::CURL_EXEC, \sprintf("Curl error thrown for http %s to %s%s\n\n%s", $requestMethod, $url, $parameters && \is_array($parameters) ? ' with params: ' . \json_encode($parameters) : '', $error));
         }
 
         $curl = NULL;
 
-        $result = json_decode($rawResult, TRUE);
+        $result = \json_decode($rawResult, TRUE);
         if (isset($result['status']) && $result['status'] === WebDriverException::STALE_ELEMENT_REFERENCE) {
-          usleep(100000);
+          \usleep(100000);
           $retries++;
           continue;
         }
@@ -159,7 +159,7 @@ class WebDriverCurlService extends CurlService {
     if (empty($error)) {
       $error = "Retries: $retries and last result:\n" . ($rawResult ?? '');
     }
-    throw WebDriverException::factory(WebDriverException::CURL_EXEC, sprintf("Curl error thrown for http %s to %s%s\n\n%s", $requestMethod, $url, $parameters && is_array($parameters) ? ' with params: ' . json_encode($parameters) : '', $error));
+    throw WebDriverException::factory(WebDriverException::CURL_EXEC, \sprintf("Curl error thrown for http %s to %s%s\n\n%s", $requestMethod, $url, $parameters && \is_array($parameters) ? ' with params: ' . \json_encode($parameters) : '', $error));
   }
 
 }

@@ -136,7 +136,7 @@ class SearchPageTextTest extends BrowserTestBase {
         $keys[] = 'OR';
       }
     }
-    $edit['keys'] = implode(' ', $keys);
+    $edit['keys'] = \implode(' ', $keys);
     $this->drupalGet('search/node');
     $this->submitForm($edit, 'Search');
     $this->assertSession()->statusMessageContains("Your search used too many AND/OR expressions. Only the first {$limit} terms were included in this search.", 'warning');

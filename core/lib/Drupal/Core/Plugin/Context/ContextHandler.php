@@ -18,13 +18,13 @@ class ContextHandler implements ContextHandlerInterface {
    */
   public function filterPluginDefinitionsByContexts(array $contexts, array $definitions) {
     $checked_requirements = [];
-    return array_filter($definitions, function ($plugin_definition) use ($contexts, &$checked_requirements) {
+    return \array_filter($definitions, function ($plugin_definition) use ($contexts, &$checked_requirements) {
       $context_definitions = $this->getContextDefinitions($plugin_definition);
       if ($context_definitions) {
         // Generate a unique key for the current context definitions. This will
         // allow calling checkRequirements() once for all plugins that have the
         // same context definitions.
-        $context_definitions_key = hash('sha256', serialize($context_definitions));
+        $context_definitions_key = \hash('sha256', \serialize($context_definitions));
         if (!isset($checked_requirements[$context_definitions_key])) {
           // Check the set of contexts against the requirements.
           $checked_requirements[$context_definitions_key] = $this->checkRequirements($contexts, $context_definitions);
@@ -50,7 +50,7 @@ class ContextHandler implements ContextHandlerInterface {
     if ($plugin_definition instanceof ContextAwarePluginDefinitionInterface) {
       return $plugin_definition->getContextDefinitions();
     }
-    if (is_array($plugin_definition) && isset($plugin_definition['context_definitions'])) {
+    if (\is_array($plugin_definition) && isset($plugin_definition['context_definitions'])) {
       return $plugin_definition['context_definitions'];
     }
     return NULL;
@@ -72,7 +72,7 @@ class ContextHandler implements ContextHandlerInterface {
    * {@inheritdoc}
    */
   public function getMatchingContexts(array $contexts, ContextDefinitionInterface $definition) {
-    return array_filter($contexts, function (ContextInterface $context) use ($definition) {
+    return \array_filter($contexts, function (ContextInterface $context) use ($definition) {
       return $definition->isSatisfiedBy($context);
     });
   }
@@ -142,7 +142,7 @@ class ContextHandler implements ContextHandlerInterface {
     // This is a more severe problem than missing values, so check and throw
     // this first.
     if (!empty($mappings)) {
-      throw new ContextException('Assigned contexts were not satisfied: ' . implode(',', array_keys($mappings)));
+      throw new ContextException('Assigned contexts were not satisfied: ' . \implode(',', \array_keys($mappings)));
     }
 
     // If there are any required contexts without a value, throw an exception.

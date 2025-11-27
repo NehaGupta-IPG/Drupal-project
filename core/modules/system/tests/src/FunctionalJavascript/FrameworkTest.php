@@ -42,7 +42,7 @@ class FrameworkTest extends WebDriverTestBase {
     $assert = $this->assertSession();
 
     $original_settings = $this->getDrupalSettings();
-    $original_libraries = explode(',', $original_settings['ajaxPageState']['libraries']);
+    $original_libraries = \explode(',', $original_settings['ajaxPageState']['libraries']);
 
     // Verify that the base page doesn't have the settings and files that are to
     // be lazy loaded as part of the next requests.
@@ -54,7 +54,7 @@ class FrameworkTest extends WebDriverTestBase {
     $page->pressButton('Submit');
     $assert->assertWaitOnAjaxRequest();
     $new_settings = $this->getDrupalSettings();
-    $new_libraries = explode(',', $new_settings['ajaxPageState']['libraries']);
+    $new_libraries = \explode(',', $new_settings['ajaxPageState']['libraries']);
 
     // Verify the setting was not added when not expected.
     $this->assertTrue(!isset($new_settings[$expected['setting_name']]), "Page still lacks the {$expected['setting_name']}, as expected.");
@@ -66,7 +66,7 @@ class FrameworkTest extends WebDriverTestBase {
     $page->pressButton('Submit');
     $assert->assertWaitOnAjaxRequest();
     $new_settings = $this->getDrupalSettings();
-    $new_libraries = explode(',', $new_settings['ajaxPageState']['libraries']);
+    $new_libraries = \explode(',', $new_settings['ajaxPageState']['libraries']);
 
     // Verify the expected setting was added, both to drupalSettings, and as
     // the first AJAX command.

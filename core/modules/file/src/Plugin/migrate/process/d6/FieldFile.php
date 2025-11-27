@@ -67,7 +67,7 @@ class FieldFile extends ProcessPluginBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    $options = unserialize($value['data']);
+    $options = \unserialize($value['data']);
 
     // Try to look up the ID of the migrated file. If one cannot be found, it
     // means the file referenced by the current field item did not migrate for

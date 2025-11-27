@@ -53,7 +53,7 @@ class BlockContentUuidLookup extends CacheCollector {
 
     // Only cache if there is a match, otherwise creating new entities would
     // require to invalidate the cache.
-    $id = reset($ids);
+    $id = \reset($ids);
     if ($id) {
       $this->storage[$key] = $id;
       $this->persist($key);

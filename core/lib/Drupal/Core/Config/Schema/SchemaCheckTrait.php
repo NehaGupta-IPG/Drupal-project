@@ -102,21 +102,21 @@ trait SchemaCheckTrait {
     foreach ($config_data as $key => $value) {
       $errors[] = $this->checkValue($key, $value);
     }
-    $errors = array_merge(...$errors);
+    $errors = \array_merge(...$errors);
     if ($validate_constraints) {
       // Also perform explicit validation. Note this does NOT require every node
       // in the config schema tree to have validation constraints defined.
       $violations = $this->schema->validate();
-      $filtered_violations = array_filter(
-        iterator_to_array($violations),
+      $filtered_violations = \array_filter(
+        \iterator_to_array($violations),
         fn(ConstraintViolationInterface $v) => !static::isViolationForIgnoredPropertyPath($v),
       );
-      $validation_errors = array_map(
-        fn(ConstraintViolationInterface $v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
+      $validation_errors = \array_map(
+        fn(ConstraintViolationInterface $v) => \sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
         $filtered_violations
       );
       // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.
-      $errors = array_merge($errors, $validation_errors);
+      $errors = \array_merge($errors, $validation_errors);
     }
 
     if (empty($errors)) {
@@ -141,9 +141,9 @@ trait SchemaCheckTrait {
     // `entity:comment_type` to the corresponding `comment.type.*`.
     if ($v->getRoot() instanceof ConfigEntityAdapter) {
       $config_entity = $v->getRoot()->getEntity();
-      assert($config_entity instanceof ConfigEntityInterface);
+      \assert($config_entity instanceof ConfigEntityInterface);
       $config_entity_type = $config_entity->getEntityType();
-      assert($config_entity_type instanceof ConfigEntityType);
+      \assert($config_entity_type instanceof ConfigEntityType);
       $config_prefix = $config_entity_type->getConfigPrefix();
       // Compute the data type of the config object being validated:
       // - the config entity type's config prefix
@@ -156,16 +156,16 @@ trait SchemaCheckTrait {
       // gradually discovering it is the only available alternative.
       $suffix_count = 1;
       do {
-        $config_object_data_type = $config_prefix . str_repeat('.*', $suffix_count);
+        $config_object_data_type = $config_prefix . \str_repeat('.*', $suffix_count);
         $suffix_count++;
-      } while ($suffix_count <= 3 && !array_key_exists($config_object_data_type, static::$ignoredPropertyPaths));
+      } while ($suffix_count <= 3 && !\array_key_exists($config_object_data_type, static::$ignoredPropertyPaths));
     }
     else {
       $config_object_data_type = $v->getRoot()
         ->getDataDefinition()
         ->getDataType();
     }
-    if (!array_key_exists($config_object_data_type, static::$ignoredPropertyPaths)) {
+    if (!\array_key_exists($config_object_data_type, static::$ignoredPropertyPaths)) {
       return FALSE;
     }
 
@@ -177,13 +177,13 @@ trait SchemaCheckTrait {
       // That requires first ensuring that preg_quote() does not escape it, and
       // then replacing it with an appropriate regular expression: `[^\.]+`,
       // which means: ">=1 characters that are anything except a period".
-      $ignored_property_path_regex = str_replace(' ', '[^\.]+', preg_quote(str_replace('*', ' ', $ignored_property_path_expression)));
+      $ignored_property_path_regex = \str_replace(' ', '[^\.]+', \preg_quote(\str_replace('*', ' ', $ignored_property_path_expression)));
 
       // To ignore this violation constraint, require a match on both the
       // property path and the message.
-      $property_path_match = preg_match('/^' . $ignored_property_path_regex . '$/', $v->getPropertyPath(), $matches) === 1;
+      $property_path_match = \preg_match('/^' . $ignored_property_path_regex . '$/', $v->getPropertyPath(), $matches) === 1;
       if ($property_path_match) {
-        return preg_match(sprintf("/^(%s)$/", implode('|', $ignored_validation_constraint_messages)), (string) $v->getMessage()) === 1;
+        return \preg_match(\sprintf("/^(%s)$/", \implode('|', $ignored_validation_constraint_messages)), (string) $v->getMessage()) === 1;
       }
     }
     return FALSE;
@@ -208,7 +208,7 @@ trait SchemaCheckTrait {
     // Check if this type has been deprecated.
     $data_definition = $element->getDataDefinition();
     if (!empty($data_definition['deprecated'])) {
-      @trigger_error($data_definition['deprecated'], E_USER_DEPRECATED);
+      @\trigger_error($data_definition['deprecated'], E_USER_DEPRECATED);
     }
 
     if ($element instanceof Undefined) {
@@ -220,9 +220,9 @@ trait SchemaCheckTrait {
       return [];
     }
 
-    if ($element && is_scalar($value) || $value === NULL) {
+    if ($element && \is_scalar($value) || $value === NULL) {
       $success = FALSE;
-      $type = gettype($value);
+      $type = \gettype($value);
       if ($element instanceof PrimitiveInterface) {
         $success =
           ($type == 'integer' && $element instanceof IntegerInterface) ||
@@ -237,7 +237,7 @@ trait SchemaCheckTrait {
       elseif ($element instanceof ArrayElement && $element->isNullable() && $value === NULL) {
         $success = TRUE;
       }
-      $class = get_class($element);
+      $class = \get_class($element);
       if (!$success) {
         return [$error_key => "variable type is $type but applied schema class is $class"];
       }
@@ -250,7 +250,7 @@ trait SchemaCheckTrait {
 
       // Go on processing so we can get errors on all levels. Any non-scalar
       // value must be an array so cast to an array.
-      if (!is_array($value)) {
+      if (!\is_array($value)) {
         $value = (array) $value;
       }
       $nested_errors = [];
@@ -258,7 +258,7 @@ trait SchemaCheckTrait {
       foreach ($value as $nested_value_key => $nested_value) {
         $nested_errors[] = $this->checkValue($key . '.' . $nested_value_key, $nested_value);
       }
-      return array_merge($errors, ...$nested_errors);
+      return \array_merge($errors, ...$nested_errors);
     }
     // No errors found.
     return [];

@@ -50,14 +50,14 @@ class CachePreWarmer implements CachePreWarmerInterface {
     protected array $serviceIds,
   ) {
     // Ensure the serviceId order is random to reduce chances of conflicts.
-    shuffle($this->serviceIds);
+    \shuffle($this->serviceIds);
   }
 
   /**
    * {@inheritdoc}
    */
   public function preWarmOneCache(): bool {
-    $candidate = array_pop($this->serviceIds);
+    $candidate = \array_pop($this->serviceIds);
     if ($candidate === NULL) {
       return FALSE;
     }

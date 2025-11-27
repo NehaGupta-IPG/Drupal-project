@@ -147,7 +147,7 @@ class DateTimePlus {
    *   If the timestamp is not numeric.
    */
   public static function createFromTimestamp($timestamp, $timezone = NULL, $settings = []) {
-    if (!is_numeric($timestamp)) {
+    if (!\is_numeric($timestamp)) {
       throw new \InvalidArgumentException('The timestamp must be numeric.');
     }
     $datetime = new static('', $timezone, $settings);
@@ -251,7 +251,7 @@ class DateTimePlus {
     try {
       $this->errors = [];
       if (!empty($prepared_time)) {
-        $test = date_parse($prepared_time);
+        $test = \date_parse($prepared_time);
         if (!empty($test['errors'])) {
           $this->errors = $test['errors'];
         }
@@ -306,11 +306,11 @@ class DateTimePlus {
     if (!isset($this->dateTimeObject)) {
       throw new \Exception('DateTime object not set.');
     }
-    if (!method_exists($this->dateTimeObject, $method)) {
-      throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
+    if (!\method_exists($this->dateTimeObject, $method)) {
+      throw new \BadMethodCallException(\sprintf('Call to undefined method %s::%s()', static::class, $method));
     }
 
-    $result = call_user_func_array([$this->dateTimeObject, $method], $args);
+    $result = \call_user_func_array([$this->dateTimeObject, $method], $args);
 
     return $result === $this->dateTimeObject ? $this : $result;
   }
@@ -334,7 +334,7 @@ class DateTimePlus {
       $datetime2 = $datetime2->dateTimeObject;
     }
     if (!($datetime2 instanceof \DateTime)) {
-      throw new \BadMethodCallException(sprintf('Method %s expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object', __METHOD__));
+      throw new \BadMethodCallException(\sprintf('Method %s expects parameter 1 to be a \DateTime or \Drupal\Component\Datetime\DateTimePlus object', __METHOD__));
     }
     return $this->dateTimeObject->diff($datetime2, $absolute);
   }
@@ -345,10 +345,10 @@ class DateTimePlus {
    * Passes through all unknown static calls onto the DateTime object.
    */
   public static function __callStatic($method, $args) {
-    if (!method_exists('\DateTime', $method)) {
-      throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', static::class, $method));
+    if (!\method_exists('\DateTime', $method)) {
+      throw new \BadMethodCallException(\sprintf('Call to undefined method %s::%s()', static::class, $method));
     }
-    return call_user_func_array(['\DateTime', $method], $args);
+    return \call_user_func_array(['\DateTime', $method], $args);
   }
 
   /**
@@ -397,14 +397,14 @@ class DateTimePlus {
     }
 
     // Allow string timezone input, and create a timezone from it.
-    elseif (!empty($timezone) && is_string($timezone)) {
+    elseif (!empty($timezone) && \is_string($timezone)) {
       $timezone_adjusted = new \DateTimeZone($timezone);
     }
 
     // Default to the system timezone when not explicitly provided.
     // If the system timezone is missing, use 'UTC'.
     if (empty($timezone_adjusted) || !$timezone_adjusted instanceof \DateTimezone) {
-      $system_timezone = date_default_timezone_get();
+      $system_timezone = \date_default_timezone_get();
       $timezone_name = !empty($system_timezone) ? $system_timezone : 'UTC';
       $timezone_adjusted = new \DateTimeZone($timezone_name);
     }
@@ -442,7 +442,7 @@ class DateTimePlus {
   public function checkErrors() {
     $errors = \DateTime::getLastErrors();
     if (!empty($errors['errors'])) {
-      $this->errors = array_merge($this->errors, $errors['errors']);
+      $this->errors = \array_merge($this->errors, $errors['errors']);
     }
     // Most warnings are messages that the date could not be parsed
     // which causes it to be altered. For validation purposes, a warning
@@ -452,7 +452,7 @@ class DateTimePlus {
       $this->errors[] = 'The date is invalid.';
     }
 
-    $this->errors = array_values(array_unique($this->errors));
+    $this->errors = \array_values(\array_unique($this->errors));
   }
 
   /**
@@ -463,7 +463,7 @@ class DateTimePlus {
    *   otherwise.
    */
   public function hasErrors() {
-    return (bool) count($this->errors);
+    return (bool) \count($this->errors);
   }
 
   /**
@@ -494,21 +494,21 @@ class DateTimePlus {
     $array = static::prepareArray($array, $force_valid_date);
     $input_time = '';
     if ($array['year'] !== '') {
-      $input_time = static::datePad(intval($array['year']), 4);
+      $input_time = static::datePad(\intval($array['year']), 4);
       if ($force_valid_date || $array['month'] !== '') {
-        $input_time .= '-' . static::datePad(intval($array['month']));
+        $input_time .= '-' . static::datePad(\intval($array['month']));
         if ($force_valid_date || $array['day'] !== '') {
-          $input_time .= '-' . static::datePad(intval($array['day']));
+          $input_time .= '-' . static::datePad(\intval($array['day']));
         }
       }
     }
     if ($array['hour'] !== '') {
       $input_time .= $input_time ? 'T' : '';
-      $input_time .= static::datePad(intval($array['hour']));
+      $input_time .= static::datePad(\intval($array['hour']));
       if ($force_valid_date || $array['minute'] !== '') {
-        $input_time .= ':' . static::datePad(intval($array['minute']));
+        $input_time .= ':' . static::datePad(\intval($array['minute']));
         if ($force_valid_date || $array['second'] !== '') {
-          $input_time .= ':' . static::datePad(intval($array['second']));
+          $input_time .= ':' . static::datePad(\intval($array['second']));
         }
       }
     }
@@ -574,16 +574,16 @@ class DateTimePlus {
     // meet that test are valid. An empty value, either a string or a 0, is not
     // a valid value.
     if (!empty($array['year']) && !empty($array['month']) && !empty($array['day'])) {
-      $valid_date = checkdate($array['month'], $array['day'], $array['year']);
+      $valid_date = \checkdate($array['month'], $array['day'], $array['year']);
     }
     // Testing for valid time is reversed. Missing time is OK,
     // but incorrect values are not.
     foreach (['hour', 'minute', 'second'] as $key) {
-      if (array_key_exists($key, $array)) {
+      if (\array_key_exists($key, $array)) {
         $value = $array[$key];
         switch ($key) {
           case 'hour':
-            if (!preg_match('/^([1-2][0-3]|[01]?[0-9])$/', $value)) {
+            if (!\preg_match('/^([1-2][0-3]|[01]?[0-9])$/', $value)) {
               $valid_time = FALSE;
             }
             break;
@@ -591,7 +591,7 @@ class DateTimePlus {
           case 'minute':
           case 'second':
           default:
-            if (!preg_match('/^([0-5][0-9]|[0-9])$/', $value)) {
+            if (!\preg_match('/^([0-5][0-9]|[0-9])$/', $value)) {
               $valid_time = FALSE;
             }
             break;
@@ -615,7 +615,7 @@ class DateTimePlus {
    *   The padded value.
    */
   public static function datePad($value, $size = 2) {
-    return sprintf("%0" . $size . "d", $value);
+    return \sprintf("%0" . $size . "d", $value);
   }
 
   /**

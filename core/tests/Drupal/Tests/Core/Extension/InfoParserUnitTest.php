@@ -271,8 +271,8 @@ CORE_INCOMPATIBILITY;
    */
   public static function providerCoreIncompatibility() {
     // Remove possible stability suffix to properly parse 11.0-dev.
-    $version = preg_replace('/-dev$/', '', \Drupal::VERSION);
-    [$major, $minor] = explode('.', $version, 2);
+    $version = \preg_replace('/-dev$/', '', \Drupal::VERSION);
+    [$major, $minor] = \explode('.', $version, 2);
 
     $next_minor = $minor + 1;
     $next_major = $major + 1;
@@ -365,7 +365,7 @@ INFO;
     if (!empty($lifecycle)) {
       $info .= "\nlifecycle: $lifecycle\n";
     }
-    if (in_array($lifecycle, [ExtensionLifecycle::DEPRECATED, ExtensionLifecycle::OBSOLETE], TRUE)) {
+    if (\in_array($lifecycle, [ExtensionLifecycle::DEPRECATED, ExtensionLifecycle::OBSOLETE], TRUE)) {
       $info .= "\nlifecycle_link: http://example.com\n";
     }
     vfsStream::setup('modules');
@@ -486,7 +486,7 @@ INFO;
     $path = vfsStream::url("modules/fixtures/$filename");
     if ($exception_message) {
       $this->expectException(InfoParserException::class);
-      $this->expectExceptionMessage(sprintf($exception_message, $path));
+      $this->expectExceptionMessage(\sprintf($exception_message, $path));
     }
     $info_values = $this->infoParser->parse($path);
     $this->assertSame($lifecycle, $info_values[ExtensionLifecycle::LIFECYCLE_IDENTIFIER]);

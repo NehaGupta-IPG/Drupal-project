@@ -54,8 +54,8 @@ class AccessDeniedTest extends BrowserTestBase {
     $this->adminUser->roles[] = 'administrator';
     $this->adminUser->save();
 
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access user profiles']);
-    user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access user profiles']);
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access user profiles']);
+    \user_role_grant_permissions(RoleInterface::AUTHENTICATED_ID, ['access user profiles']);
   }
 
   /**

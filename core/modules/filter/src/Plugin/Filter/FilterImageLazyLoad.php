@@ -30,7 +30,7 @@ final class FilterImageLazyLoad extends FilterBase {
     $result = new FilterProcessResult($text);
 
     // If there are no images, return early.
-    if (stripos($text, '<img ') === FALSE && stripos($text, 'data-entity-type="file"') === FALSE) {
+    if (\stripos($text, '<img ') === FALSE && \stripos($text, 'data-entity-type="file"') === FALSE) {
       return $result;
     }
 
@@ -52,7 +52,7 @@ final class FilterImageLazyLoad extends FilterBase {
     // Only set loading="lazy" if no existing loading attribute is specified and
     // dimensions are specified.
     foreach ($xpath->query('//img[not(@loading="eager") and @width and @height]') as $element) {
-      assert($element instanceof \DOMElement);
+      \assert($element instanceof \DOMElement);
       $element->setAttribute('loading', 'lazy');
     }
     return Html::serialize($dom);

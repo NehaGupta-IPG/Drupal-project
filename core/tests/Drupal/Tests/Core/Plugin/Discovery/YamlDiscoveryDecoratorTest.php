@@ -87,7 +87,7 @@ class YamlDiscoveryDecoratorTest extends UnitTestCase {
         $this->assertArrayHasKey($key, $definition);
       }
       $this->assertEquals($id, $definition['id']);
-      $this->assertEquals(array_search($id, $this->expectedKeys), $definition['provider']);
+      $this->assertEquals(\array_search($id, $this->expectedKeys), $definition['provider']);
     }
   }
 

@@ -64,7 +64,7 @@ class JoinTest extends RelationshipJoinTestBase {
     $join = $this->manager->createInstance('join_test', $configuration);
     $this->assertInstanceOf(JoinTestPlugin::class, $join);
 
-    $rand_int = rand(0, 1000);
+    $rand_int = \rand(0, 1000);
     $join->setJoinValue($rand_int);
 
     $query = Database::getConnection()->select('views_test_data');
@@ -155,7 +155,7 @@ class JoinTest extends RelationshipJoinTestBase {
     $this->assertStringContainsString("views_test_data.uid = users3.uid", $join_info['condition'], 'Make sure the join condition appears in the query.');
     $this->assertStringContainsString("users3.name = :views_join_condition_0", $join_info['condition'], 'Make sure the first extra join condition appears in the query and uses the first placeholder.');
     $this->assertStringContainsString("users3.name <> :views_join_condition_1", $join_info['condition'], 'Make sure the second extra join condition appears in the query and uses the second placeholder.');
-    $this->assertEquals([$random_name_1, $random_name_2], array_values($join_info['arguments']), 'Make sure the arguments are in the right order');
+    $this->assertEquals([$random_name_1, $random_name_2], \array_values($join_info['arguments']), 'Make sure the arguments are in the right order');
 
     // Test that 'IN' conditions are properly built.
     $random_name_1 = $this->randomMachineName();
@@ -209,7 +209,7 @@ class JoinTest extends RelationshipJoinTestBase {
     $this->assertStringContainsString("users5.langcode = :views_join_condition_4", $join_info['condition'], 'Make sure the first extra join condition appears in the query.');
     $this->assertStringContainsString("views_test_data.status = :views_join_condition_5", $join_info['condition'], 'Make sure the second extra join condition appears in the query.');
     $this->assertStringContainsString("users5.name = views_test_data.name", $join_info['condition'], 'Make sure the third extra join condition appears in the query.');
-    $this->assertEquals(['en', 0], array_values($join_info['arguments']), 'Make sure the arguments are in the right order');
+    $this->assertEquals(['en', 0], \array_values($join_info['arguments']), 'Make sure the arguments are in the right order');
 
     // Test that joins using 'left_formula' are properly built.
     $configuration['left_formula'] = 'MAX(views_test_data.uid)';
@@ -225,7 +225,7 @@ class JoinTest extends RelationshipJoinTestBase {
     $this->assertStringContainsString("users6.langcode = :views_join_condition_7", $join_info['condition'], 'Make sure the first extra join condition appears in the query.');
     $this->assertStringContainsString("views_test_data.status = :views_join_condition_8", $join_info['condition'], 'Make sure the second extra join condition appears in the query.');
     $this->assertStringContainsString("users6.name = views_test_data.name", $join_info['condition'], 'Make sure the third extra join condition appears in the query.');
-    $this->assertEquals(['en', 0], array_values($join_info['arguments']), 'Make sure the arguments are in the right order');
+    $this->assertEquals(['en', 0], \array_values($join_info['arguments']), 'Make sure the arguments are in the right order');
 
     $configuration = [
       'left_table' => 'views_test_data',

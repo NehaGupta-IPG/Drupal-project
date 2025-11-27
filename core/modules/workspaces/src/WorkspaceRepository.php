@@ -62,9 +62,9 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
       $workspaces = $this->entityTypeManager->getStorage('workspace')->loadMultiple();
 
       // First, sort everything alphabetically.
-      uasort($workspaces, function (WorkspaceInterface $a, WorkspaceInterface $b) {
-        assert(Inspector::assertStringable($a->label()) && Inspector::assertStringable($b->label()), 'Workspace labels are expected to be a string.');
-        return strnatcasecmp($a->label(), $b->label());
+      \uasort($workspaces, function (WorkspaceInterface $a, WorkspaceInterface $b) {
+        \assert(Inspector::assertStringable($a->label()) && Inspector::assertStringable($b->label()), 'Workspace labels are expected to be a string.');
+        return \strnatcasecmp($a->label(), $b->label());
       });
 
       $tree_children = [];
@@ -82,11 +82,11 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
       // Loops over the parent entities and adds its children to the tree array.
       // Uses a loop instead of a recursion, because it's more efficient.
       $tree = [];
-      while (count($process_parents)) {
-        $parent = array_pop($process_parents);
+      while (\count($process_parents)) {
+        $parent = \array_pop($process_parents);
 
         if (!empty($tree_children[$parent])) {
-          $child_id = current($tree_children[$parent]);
+          $child_id = \current($tree_children[$parent]);
           do {
             if (empty($child_id)) {
               break;
@@ -100,10 +100,10 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
               $process_parents[] = $child_id;
 
               // Move pointer so that we get the correct entity the next time.
-              next($tree_children[$parent]);
+              \next($tree_children[$parent]);
               break;
             }
-          } while ($child_id = next($tree_children[$parent]));
+          } while ($child_id = \next($tree_children[$parent]));
         }
       }
 
@@ -119,11 +119,11 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
       $graph = (new Graph($graph))->searchAndSort();
 
       $this->tree = [];
-      foreach (array_keys($tree) as $workspace_id) {
+      foreach (\array_keys($tree) as $workspace_id) {
         $this->tree[$workspace_id] = [
-          'depth' => count($graph[$workspace_id]['paths']),
-          'ancestors' => array_keys($graph[$workspace_id]['paths']),
-          'descendants' => isset($graph[$workspace_id]['reverse_paths']) ? array_keys($graph[$workspace_id]['reverse_paths']) : [],
+          'depth' => \count($graph[$workspace_id]['paths']),
+          'ancestors' => \array_keys($graph[$workspace_id]['paths']),
+          'descendants' => isset($graph[$workspace_id]['reverse_paths']) ? \array_keys($graph[$workspace_id]['reverse_paths']) : [],
         ];
       }
 
@@ -140,7 +140,7 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
    * {@inheritdoc}
    */
   public function getDescendantsAndSelf($workspace_id) {
-    return array_merge([$workspace_id], $this->loadTree()[$workspace_id]['descendants']);
+    return \array_merge([$workspace_id], $this->loadTree()[$workspace_id]['descendants']);
   }
 
   /**

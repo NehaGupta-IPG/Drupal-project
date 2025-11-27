@@ -44,7 +44,7 @@ class GdToolkitPngImageManipulationTest extends GdToolkitImageManipulationTestBa
     // $error_level is intentionally set to 0. It's required for PHP '@'
     // suppression not to trigger Drupal error handler. In that case native
     // PHP handler will be called and Drupal's will serve like a notification.
-    set_error_handler($error_handler, 0);
+    \set_error_handler($error_handler, 0);
 
     $image_factory = $this->container->get('image.factory');
     \assert($image_factory instanceof ImageFactory);
@@ -55,7 +55,7 @@ class GdToolkitPngImageManipulationTest extends GdToolkitImageManipulationTestBa
 
     self::assertFalse($warning_detected);
 
-    restore_error_handler();
+    \restore_error_handler();
   }
 
   /**

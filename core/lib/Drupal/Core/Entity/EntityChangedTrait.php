@@ -18,7 +18,7 @@ trait EntityChangedTrait {
     $changed = $this->getUntranslated()->getChangedTime();
     foreach ($this->getTranslationLanguages(FALSE) as $language) {
       $translation_changed = $this->getTranslation($language->getId())->getChangedTime();
-      $changed = max($translation_changed, $changed);
+      $changed = \max($translation_changed, $changed);
     }
     return $changed;
   }

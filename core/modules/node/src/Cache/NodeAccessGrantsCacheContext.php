@@ -28,7 +28,7 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
   ) {
     parent::__construct($user);
     if (!$entityTypeManager) {
-      @trigger_error('Calling NodeAccessGrantsCacheContext::__construct() without the $entityTypeManager argument is deprecated in drupal:11.3.0 and the $entityTypeManager argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
+      @\trigger_error('Calling NodeAccessGrantsCacheContext::__construct() without the $entityTypeManager argument is deprecated in drupal:11.3.0 and the $entityTypeManager argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
       $this->entityTypeManager = \Drupal::entityTypeManager();
     }
   }
@@ -37,7 +37,7 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t("Content access view grants");
+    return \t("Content access view grants");
   }
 
   /**
@@ -57,7 +57,7 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
       foreach (['view', 'update', 'delete'] as $op) {
         $result[] = $this->checkNodeGrants($op);
       }
-      return implode('-', $result);
+      return \implode('-', $result);
     }
     else {
       return $this->checkNodeGrants($operation);
@@ -83,12 +83,12 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
       return 'view.all';
     }
 
-    $grants = node_access_grants($operation, $this->user);
+    $grants = \node_access_grants($operation, $this->user);
     $grants_context_parts = [];
     foreach ($grants as $realm => $gids) {
-      $grants_context_parts[] = $realm . ':' . implode(',', $gids);
+      $grants_context_parts[] = $realm . ':' . \implode(',', $gids);
     }
-    return $operation . '.' . implode(';', $grants_context_parts);
+    return $operation . '.' . \implode(';', $grants_context_parts);
   }
 
   /**

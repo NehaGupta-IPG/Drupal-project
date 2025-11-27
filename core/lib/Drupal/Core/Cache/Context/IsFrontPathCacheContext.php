@@ -31,7 +31,7 @@ class IsFrontPathCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Is front page');
+    return \t('Is front page');
   }
 
   /**

@@ -114,7 +114,7 @@ class UserRoleAdminTest extends BrowserTestBase {
   public function testRoleWeightOrdering(): void {
     $this->drupalLogin($this->adminUser);
     $roles = Role::loadMultiple();
-    $weight = count($roles);
+    $weight = \count($roles);
     $new_role_weights = [];
     $saved_rids = [];
 
@@ -139,7 +139,7 @@ class UserRoleAdminTest extends BrowserTestBase {
       $rids[] = $role->id();
     }
     // The order of the roles should be reversed.
-    $this->assertSame(array_reverse($saved_rids), $rids);
+    $this->assertSame(\array_reverse($saved_rids), $rids);
   }
 
 }

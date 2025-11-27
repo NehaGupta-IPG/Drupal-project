@@ -134,11 +134,11 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     // Deprecated parameters.
     if ($container->hasParameter('session.storage.options')) {
       $session_storage_options = $container->getParameter('session.storage.options');
-      if (array_key_exists('sid_length', $session_storage_options)) {
-        @trigger_error('The "sid_length" parameter is deprecated in drupal:11.1.0 and will be removed in drupal:12.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3469305', E_USER_DEPRECATED);
+      if (\array_key_exists('sid_length', $session_storage_options)) {
+        @\trigger_error('The "sid_length" parameter is deprecated in drupal:11.1.0 and will be removed in drupal:12.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3469305', E_USER_DEPRECATED);
       }
-      if (array_key_exists('sid_bits_per_character', $session_storage_options)) {
-        @trigger_error('The "sid_bits_per_character" parameter is deprecated in drupal:11.1.0 and will be removed in drupal:12.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3469305', E_USER_DEPRECATED);
+      if (\array_key_exists('sid_bits_per_character', $session_storage_options)) {
+        @\trigger_error('The "sid_bits_per_character" parameter is deprecated in drupal:11.1.0 and will be removed in drupal:12.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3469305', E_USER_DEPRECATED);
       }
     }
   }
@@ -154,11 +154,11 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     // Debian/Ubuntu uses the (broken) OSSP extension as their UUID
     // implementation. The OSSP implementation is not compatible with the
     // PECL functions.
-    if (function_exists('uuid_create') && !function_exists('uuid_make')) {
+    if (\function_exists('uuid_create') && !\function_exists('uuid_make')) {
       $uuid_service->setClass('Drupal\Component\Uuid\Pecl');
     }
     // Try to use the COM implementation for Windows users.
-    elseif (function_exists('com_create_guid')) {
+    elseif (\function_exists('com_create_guid')) {
       $uuid_service->setClass('Drupal\Component\Uuid\Com');
     }
   }

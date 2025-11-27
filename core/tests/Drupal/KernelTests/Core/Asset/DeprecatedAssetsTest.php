@@ -37,11 +37,11 @@ class DeprecatedAssetsTest extends KernelTestBase {
 
     // DrupalCI uses a precision of 100 in certain environments which breaks
     // this test.
-    ini_set('serialize_precision', -1);
+    \ini_set('serialize_precision', -1);
 
     $this->expectDeprecation("The $extension/$name " . $deprecation_suffix);
     $library_definition = $library_discovery->getLibraryByName($extension, $name);
-    $this->assertEquals($expected_hashed_library_definition, md5(serialize($library_definition)));
+    $this->assertEquals($expected_hashed_library_definition, \md5(\serialize($library_definition)));
   }
 
   /**

@@ -151,22 +151,22 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     $command_tester->execute([]);
 
     // Tables that are schema-only should not have data exported.
-    $pattern = preg_quote("\$connection->insert('sessions')");
+    $pattern = \preg_quote("\$connection->insert('sessions')");
     $this->assertDoesNotMatchRegularExpression('/' . $pattern . '/', $command_tester->getDisplay(), 'Tables defined as schema-only do not have data exported to the script.');
 
     // Table data is exported.
-    $pattern = preg_quote("\$connection->insert('config')");
+    $pattern = \preg_quote("\$connection->insert('config')");
     $this->assertMatchesRegularExpression('/' . $pattern . '/', $command_tester->getDisplay(), 'Table data is properly exported to the script.');
 
     // The test data are in the dump (serialized).
-    $pattern = preg_quote(serialize($this->data));
+    $pattern = \preg_quote(\serialize($this->data));
     $this->assertMatchesRegularExpression('/' . $pattern . '/', $command_tester->getDisplay(), 'Generated data is found in the exported script.');
 
     // Check that the user account name and email address was properly escaped.
     // cspell:disable-next-line
-    $pattern = preg_quote('"q\'uote\$dollar@example.com"');
+    $pattern = \preg_quote('"q\'uote\$dollar@example.com"');
     $this->assertMatchesRegularExpression('/' . $pattern . '/', $command_tester->getDisplay(), 'The user account email address was properly escaped in the exported script.');
-    $pattern = preg_quote('\'$dollar\'');
+    $pattern = \preg_quote('\'$dollar\'');
     $this->assertMatchesRegularExpression('/' . $pattern . '/', $command_tester->getDisplay(), 'The user account name was properly escaped in the exported script.');
   }
 
@@ -191,8 +191,8 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     }
 
     // This will load the data.
-    $file = sys_get_temp_dir() . '/' . $this->randomMachineName();
-    file_put_contents($file, $script);
+    $file = \sys_get_temp_dir() . '/' . $this->randomMachineName();
+    \file_put_contents($file, $script);
     require_once $file;
 
     // The tables should now exist and the schemas should match the originals.
@@ -204,7 +204,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     }
 
     // Ensure the test config has been replaced.
-    $config = unserialize($connection->select('config', 'c')->fields('c', ['data'])->condition('name', 'test_config')->execute()->fetchField());
+    $config = \unserialize($connection->select('config', 'c')->fields('c', ['data'])->condition('name', 'test_config')->execute()->fetchField());
     $this->assertSame($this->data, $config, 'Script has properly restored the config table data.');
 
     // Ensure the cache data was not exported.

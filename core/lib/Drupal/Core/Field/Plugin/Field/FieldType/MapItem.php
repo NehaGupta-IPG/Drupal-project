@@ -61,12 +61,12 @@ class MapItem extends FieldItemBase {
       return;
     }
 
-    if (!is_array($values)) {
+    if (!\is_array($values)) {
       if ($values instanceof MapItem) {
         $values = $values->getValue();
       }
       else {
-        $values = unserialize($values, ['allowed_classes' => FALSE]);
+        $values = \unserialize($values, ['allowed_classes' => FALSE]);
       }
     }
 

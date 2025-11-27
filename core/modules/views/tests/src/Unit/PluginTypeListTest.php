@@ -40,7 +40,7 @@ class PluginTypeListTest extends UnitTestCase {
       'wizard',
     ];
 
-    $diff = array_diff($plugin_list, ViewExecutable::getPluginTypes());
+    $diff = \array_diff($plugin_list, ViewExecutable::getPluginTypes());
     $this->assertEmpty($diff);
   }
 

@@ -37,16 +37,16 @@ trait ConfigFormBaseTrait {
    *   not.
    */
   protected function config($name) {
-    if (method_exists($this, 'configFactory')) {
+    if (\method_exists($this, 'configFactory')) {
       $config_factory = $this->configFactory();
     }
-    elseif (property_exists($this, 'configFactory')) {
+    elseif (\property_exists($this, 'configFactory')) {
       $config_factory = $this->configFactory;
     }
     if (!isset($config_factory) || !($config_factory instanceof ConfigFactoryInterface)) {
       throw new \LogicException('No config factory available for ConfigFormBaseTrait');
     }
-    if (in_array($name, $this->getEditableConfigNames())) {
+    if (\in_array($name, $this->getEditableConfigNames())) {
       // Get a mutable object from the factory.
       $config = $config_factory->getEditable($name);
     }

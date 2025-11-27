@@ -26,7 +26,7 @@ trait ComposerInstallersTrait {
     $package_name = 'composer/installers';
     $this->assertTrue(InstalledVersions::isInstalled($package_name));
 
-    $repository = json_encode([
+    $repository = \json_encode([
       'type' => 'path',
       'url' => InstalledVersions::getInstallPath($package_name),
       'options' => [
@@ -63,7 +63,7 @@ trait ComposerInstallersTrait {
     // Respect any existing installer paths.
     $extra = $this->container->get(ComposerInspector::class)
       ->getConfig('extra', $directory . '/composer.json');
-    $existing_installer_paths = json_decode($extra, TRUE, flags: JSON_THROW_ON_ERROR)['installer-paths'] ?? [];
+    $existing_installer_paths = \json_decode($extra, TRUE, flags: JSON_THROW_ON_ERROR)['installer-paths'] ?? [];
 
     (new FixtureManipulator())
       ->addConfig([

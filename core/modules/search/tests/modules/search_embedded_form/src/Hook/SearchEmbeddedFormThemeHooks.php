@@ -26,7 +26,7 @@ class SearchEmbeddedFormThemeHooks {
   #[Hook('preprocess_search_result')]
   public function preprocessSearchResult(&$variables): void {
     $form = $this->formBuilder->getForm('Drupal\search_embedded_form\Form\SearchEmbeddedForm');
-    $variables['snippet'] = array_merge($variables['snippet'], $form);
+    $variables['snippet'] = \array_merge($variables['snippet'], $form);
   }
 
 }

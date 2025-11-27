@@ -119,7 +119,7 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
    * @see text_summary()
    */
   public static function preRenderSummary(array $element) {
-    $element['#markup'] = text_summary($element['#markup'], $element['#format'], $element['#text_summary_trim_length']);
+    $element['#markup'] = \text_summary($element['#markup'], $element['#format'], $element['#text_summary_trim_length']);
     return $element;
   }
 

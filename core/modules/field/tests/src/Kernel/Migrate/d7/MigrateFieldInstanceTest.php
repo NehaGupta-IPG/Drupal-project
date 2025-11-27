@@ -59,7 +59,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal7TestBase {
    * @internal
    */
   protected function assertEntity(string $id, string $expected_label, string $expected_field_type, bool $is_required, bool $expected_translatable): void {
-    [$expected_entity_type, $expected_bundle, $expected_name] = explode('.', $id);
+    [$expected_entity_type, $expected_bundle, $expected_name] = \explode('.', $id);
 
     /** @var \Drupal\field\FieldConfigInterface $field */
     $field = FieldConfig::load($id);
@@ -242,11 +242,11 @@ class MigrateFieldInstanceTest extends MigrateDrupal7TestBase {
     // For each text field instances that were skipped, there should be a log
     // message with the required steps to fix this.
     $migration = $this->getMigration('d7_field_instance');
-    $errors = array_map(function ($message) {
+    $errors = \array_map(function ($message) {
       return $message->message;
-    }, iterator_to_array($migration->getIdMap()->getMessages()));
+    }, \iterator_to_array($migration->getIdMap()->getMessages()));
     $this->assertCount(8, $errors);
-    sort($errors);
+    \sort($errors);
     $message = 'd7_field_instance:type: Can\'t migrate source field field_text_long_plain_filtered configured with both plain text and filtered text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text';
     $this->assertEquals($errors[0], $message);
     $this->assertEquals($errors[1], $message);

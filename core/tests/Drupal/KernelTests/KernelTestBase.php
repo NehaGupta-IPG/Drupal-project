@@ -224,7 +224,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    */
   protected function setUp(): void {
     if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
-      @trigger_error('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and will throw an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+      @\trigger_error('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and will throw an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
     }
 
     parent::setUp();
@@ -233,7 +233,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->registerComparator(new MarkupInterfaceComparator());
 
     $this->root = static::getDrupalRoot();
-    chdir($this->root);
+    \chdir($this->root);
     $this->initFileCache();
     $this->bootEnvironment();
     $this->bootKernel();
@@ -262,7 +262,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // safely executed. This primarily affects the (test) site directory
     // resolution (used by e.g. LocalStream and PhpStorage).
     $this->databasePrefix = $test_db->getDatabasePrefix();
-    drupal_valid_test_ua($this->databasePrefix);
+    \drupal_valid_test_ua($this->databasePrefix);
 
     $settings = [
       'hash_salt' => static::class,
@@ -292,8 +292,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->vfsRoot->addChild(vfsStream::newDirectory($test_site_path));
     $this->siteDirectory = vfsStream::url('root/' . $test_site_path);
 
-    mkdir($this->siteDirectory . '/files', 0775);
-    mkdir($this->siteDirectory . '/files/config/sync', 0775, TRUE);
+    \mkdir($this->siteDirectory . '/files', 0775);
+    \mkdir($this->siteDirectory . '/files/config/sync', 0775, TRUE);
 
     $settings = Settings::getInstance() ? Settings::getAll() : [];
     $settings['file_public_path'] = $this->siteDirectory . '/files';
@@ -316,15 +316,15 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->setSetting('container_yamls', []);
     // Allow for test-specific overrides.
     $settings_services_file = $this->root . '/sites/default/testing.services.yml';
-    if (file_exists($settings_services_file)) {
+    if (\file_exists($settings_services_file)) {
       // Copy the testing-specific service overrides in place.
       $testing_services_file = $this->siteDirectory . '/services.yml';
-      copy($settings_services_file, $testing_services_file);
+      \copy($settings_services_file, $testing_services_file);
       $this->setSetting('container_yamls', [$testing_services_file]);
     }
 
     // Allow for global test environment overrides.
-    if (file_exists($test_env = $this->root . '/sites/default/testing.services.yml')) {
+    if (\file_exists($test_env = $this->root . '/sites/default/testing.services.yml')) {
       $GLOBALS['conf']['container_yamls']['testing'] = $test_env;
     }
     // Add this test class as a service provider.
@@ -336,12 +336,12 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $connection_info = Database::getConnectionInfo();
     $namespace = $connection_info['default']['namespace'] ?? '';
     $autoload = $connection_info['default']['autoload'] ?? '';
-    if (str_contains($autoload, 'src/Driver/Database/')) {
-      [$first, $second] = explode('\\', $namespace, 3);
-      if ($first === 'Drupal' && strtolower($second) === $second) {
+    if (\str_contains($autoload, 'src/Driver/Database/')) {
+      [$first, $second] = \explode('\\', $namespace, 3);
+      if ($first === 'Drupal' && \strtolower($second) === $second) {
         // Add the module that provides the database driver to the list of
         // modules as the first to be enabled.
-        array_unshift($modules, $second);
+        \array_unshift($modules, $second);
       }
     }
 
@@ -368,7 +368,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $installer_class = $namespace . "\\Install\\Tasks";
     $errors = (new $installer_class())->runTasks();
     if (!empty($errors)) {
-      $this->fail('Failed to run installer database tasks: ' . implode(', ', $errors));
+      $this->fail('Failed to run installer database tasks: ' . \implode(', ', $errors));
     }
 
     // Setup the destination to the be frontpage by default.
@@ -377,7 +377,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Write the core.extension configuration.
     // Required for ConfigInstaller::installDefaultConfig() to work.
     $this->container->get('config.storage')->write('core.extension', [
-      'module' => array_fill_keys($modules, 0),
+      'module' => \array_fill_keys($modules, 0),
       'theme' => [],
     ]);
 
@@ -438,7 +438,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    */
   protected function getDatabaseConnectionInfo() {
     // If the test is run with argument dburl then use it.
-    $db_url = getenv('SIMPLETEST_DB');
+    $db_url = \getenv('SIMPLETEST_DB');
     if (empty($db_url)) {
       throw new \Exception('There is no database connection so no tests can be run. You must provide a SIMPLETEST_DB environment variable to run PHPUnit based functional tests outside of run-tests.sh. See https://www.drupal.org/node/2116263#skipped-tests for more information.');
     }
@@ -473,7 +473,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     if (!isset($configuration['default'])) {
       // @todo Use extension_loaded('apcu') for non-testbot
       //   https://www.drupal.org/node/2447753.
-      if (function_exists('apcu_fetch')) {
+      if (\function_exists('apcu_fetch')) {
         $configuration['default']['cache_backend_class'] = ApcuFileCacheBackend::class;
       }
     }
@@ -534,7 +534,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->register('lock', 'Drupal\Core\Lock\NullLockBackend');
 
     // Explicitly configure all cache bins to use the memory backend.
-    foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
+    foreach (\array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
       $definition = $container->getDefinition($id);
       $tags = $definition->getTags();
       $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
@@ -547,7 +547,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       $test_file_name = (new \ReflectionClass($this))->getFileName();
       // @todo Decide in https://www.drupal.org/project/drupal/issues/3437926
       //   how to remove this fallback behavior.
-      $this->usesSuperUserAccessPolicy = !str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
+      $this->usesSuperUserAccessPolicy = !\str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
     }
     $container->setParameter('security.enable_super_user', $this->usesSuperUserAccessPolicy);
 
@@ -566,7 +566,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Determine whether the test is a core test.
     $test_file_name = (new \ReflectionClass($this))->getFileName();
     // @todo Decide in https://www.drupal.org/project/drupal/issues/3395099 when/how to trigger deprecation errors or even failures for contrib modules.
-    $is_core_test = str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
+    $is_core_test = \str_starts_with($test_file_name, $this->root . DIRECTORY_SEPARATOR . 'core');
 
     if ($this->strictConfigSchema) {
       $container
@@ -628,13 +628,13 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $class = static::class;
     $exceptions = [];
     while ($class) {
-      if (property_exists($class, 'configSchemaCheckerExclusions')) {
-        $exceptions = array_merge($exceptions, $class::$configSchemaCheckerExclusions);
+      if (\property_exists($class, 'configSchemaCheckerExclusions')) {
+        $exceptions = \array_merge($exceptions, $class::$configSchemaCheckerExclusions);
       }
-      $class = get_parent_class($class);
+      $class = \get_parent_class($class);
     }
     // Filter out any duplicates.
-    return array_unique($exceptions);
+    return \array_unique($exceptions);
   }
 
   /**
@@ -644,8 +644,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Execute registered Drupal shutdown functions prior to tearing down.
     // @see _drupal_shutdown_function()
     $callbacks = &drupal_register_shutdown_function();
-    while ($callback = array_shift($callbacks)) {
-      call_user_func_array($callback['callback'], $callback['arguments']);
+    while ($callback = \array_shift($callbacks)) {
+      \call_user_func_array($callback['callback'], $callback['arguments']);
     }
 
     // Shut down the kernel (if bootKernel() was called).
@@ -689,11 +689,11 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     }
 
     // If the test used the regular file system, remove any files created.
-    if ($this->siteDirectory && !str_starts_with($this->siteDirectory, 'vfs://')) {
+    if ($this->siteDirectory && !\str_starts_with($this->siteDirectory, 'vfs://')) {
       // Delete test site directory.
       $callback = function (string $path) {
-        if (!is_link($path)) {
-          @chmod($path, 0700);
+        if (!\is_link($path)) {
+          @\chmod($path, 0700);
         }
       };
       \Drupal::service('file_system')->deleteRecursive($this->siteDirectory, $callback);
@@ -708,8 +708,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     FileCache::reset();
 
     // Clean up statics, container, and settings.
-    if (function_exists('drupal_static_reset')) {
-      drupal_static_reset();
+    if (\function_exists('drupal_static_reset')) {
+      \drupal_static_reset();
     }
     \Drupal::unsetContainer();
     $this->container = NULL;
@@ -748,7 +748,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
         $this->container->get('config.installer')->installDefaultConfig('module', $module);
       }
       catch (\Exception $e) {
-        throw new \Exception(sprintf('Exception when installing config for module %s, message was: %s', $module, $e->getMessage()), 0, $e);
+        throw new \Exception(\sprintf('Exception when installing config for module %s, message was: %s', $module, $e->getMessage()), 0, $e);
       }
     }
   }
@@ -782,7 +782,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $tables = (array) $tables;
     foreach ($tables as $table) {
       if ($module === 'system' && $table === 'sequences') {
-        @trigger_error('Installing the table sequences with the method KernelTestBase::installSchema() is deprecated in drupal:10.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
+        @\trigger_error('Installing the table sequences with the method KernelTestBase::installSchema() is deprecated in drupal:10.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
       }
       if (empty($specification[$table])) {
         throw new \LogicException("$module module does not define a schema for table '$table'.");
@@ -1006,20 +1006,20 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected static function getModulesToEnable($class) {
     $modules = [];
     while ($class) {
-      if (property_exists($class, 'modules')) {
+      if (\property_exists($class, 'modules')) {
         // Only add the modules, if the $modules property was not inherited.
         $rp = new \ReflectionProperty($class, 'modules');
         if ($rp->class == $class) {
           $modules[$class] = $class::$modules;
         }
       }
-      $class = get_parent_class($class);
+      $class = \get_parent_class($class);
     }
     // Modules have been collected in reverse class hierarchy order; modules
     // defined by base classes should be sorted first. Then, merge the results
     // together.
-    $modules = array_values(array_reverse($modules));
-    return call_user_func_array('array_merge_recursive', $modules);
+    $modules = \array_values(\array_reverse($modules));
+    return \call_user_func_array('array_merge_recursive', $modules);
   }
 
   /**

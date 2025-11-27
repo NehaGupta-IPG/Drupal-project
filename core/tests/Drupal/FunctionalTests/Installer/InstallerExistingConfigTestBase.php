@@ -35,7 +35,7 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
    * {@inheritdoc}
    */
   public function __construct(string $name) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use \Drupal\FunctionalTests\Installer\InstallerConfigDirectoryTestBase instead. See https://www.drupal.org/node/3460001');
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:10.4.0 and is removed from drupal:12.0.0. Use \Drupal\FunctionalTests\Installer\InstallerConfigDirectoryTestBase instead. See https://www.drupal.org/node/3460001');
     parent::__construct($name);
   }
 
@@ -67,8 +67,8 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
       // Put the sync directory inside the profile.
       $config_sync_directory = $path . '/config/sync';
 
-      mkdir($path, 0777, TRUE);
-      file_put_contents("$path/{$this->profile}.info.yml", Yaml::encode($info));
+      \mkdir($path, 0777, TRUE);
+      \file_put_contents("$path/{$this->profile}.info.yml", Yaml::encode($info));
     }
     else {
       // If we have no profile we must use an existing sync directory.
@@ -85,10 +85,10 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
     }
 
     // Create config/sync directory and extract tarball contents to it.
-    mkdir($config_sync_directory, 0777, TRUE);
+    \mkdir($config_sync_directory, 0777, TRUE);
     $files = [];
     $list = $archiver->listContent();
-    if (is_array($list)) {
+    if (\is_array($list)) {
       /** @var array $list */
       foreach ($list as $file) {
         $files[] = $file['filename'];
@@ -98,26 +98,26 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
 
     // Add the module that is providing the database driver to the list of
     // modules that can not be uninstalled in the core.extension configuration.
-    if (file_exists($config_sync_directory . '/core.extension.yml')) {
-      $core_extension = Yaml::decode(file_get_contents($config_sync_directory . '/core.extension.yml'));
+    if (\file_exists($config_sync_directory . '/core.extension.yml')) {
+      $core_extension = Yaml::decode(\file_get_contents($config_sync_directory . '/core.extension.yml'));
       // If the database module has dependencies, they are expected too.
       $database_module_extension = \Drupal::service(ModuleExtensionList::class)->get(Database::getConnection()->getProvider());
-      $database_modules = $database_module_extension->requires ? array_keys($database_module_extension->requires) : [];
+      $database_modules = $database_module_extension->requires ? \array_keys($database_module_extension->requires) : [];
       $database_modules[] = Database::getConnection()->getProvider();
       foreach ($database_modules as $module) {
         $core_extension['module'][$module] = 0;
-        $core_extension['module'] = module_config_sort($core_extension['module']);
+        $core_extension['module'] = \module_config_sort($core_extension['module']);
       }
-      if ($this->profile === FALSE && array_key_exists('profile', $core_extension)) {
+      if ($this->profile === FALSE && \array_key_exists('profile', $core_extension)) {
         // Remove the profile.
         unset($core_extension['module'][$core_extension['profile']]);
         unset($core_extension['profile']);
 
         // Set a default theme to the first theme that will be installed as this
         // can not be retrieved from the profile.
-        $this->defaultTheme = array_key_first($core_extension['theme']);
+        $this->defaultTheme = \array_key_first($core_extension['theme']);
       }
-      file_put_contents($config_sync_directory . '/core.extension.yml', Yaml::encode($core_extension));
+      \file_put_contents($config_sync_directory . '/core.extension.yml', Yaml::encode($core_extension));
     }
   }
 

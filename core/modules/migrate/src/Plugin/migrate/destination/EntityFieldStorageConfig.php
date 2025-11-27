@@ -72,12 +72,12 @@ class EntityFieldStorageConfig extends EntityConfigBase {
       $language = $destination_identifier['langcode'];
       unset($destination_identifier['langcode']);
       $destination_identifier = [
-        implode('.', $destination_identifier),
+        \implode('.', $destination_identifier),
         'langcode' => $language,
       ];
     }
     else {
-      $destination_identifier = [implode('.', $destination_identifier)];
+      $destination_identifier = [\implode('.', $destination_identifier)];
     }
     parent::rollback($destination_identifier);
   }

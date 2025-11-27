@@ -64,8 +64,8 @@ class StyleMappingTest extends StyleTestBase {
         // Split up the field-level class, the first part is the mapping name
         // and the second is the field ID.
         $field_attributes = $field->attributes();
-        $name = strtok((string) $field_attributes['class'][0], '-');
-        $field_id = strtok('-');
+        $name = \strtok((string) $field_attributes['class'][0], '-');
+        $field_id = \strtok('-');
 
         // The expected result is the mapping name and the field value,
         // separated by ':'.

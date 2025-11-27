@@ -27,12 +27,12 @@ class UniqueLabelInListConstraintValidator extends ConstraintValidator {
     }
 
     // This validation constraint supports nullable sequences.
-    if (!is_array($list)) {
+    if (!\is_array($list)) {
       return;
     }
 
-    $labels = array_column($list, $constraint->labelKey);
-    $label_frequencies = array_count_values($labels);
+    $labels = \array_column($list, $constraint->labelKey);
+    $label_frequencies = \array_count_values($labels);
 
     foreach ($label_frequencies as $label => $frequency) {
       if ($frequency > 1) {

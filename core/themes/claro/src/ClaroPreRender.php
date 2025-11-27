@@ -16,12 +16,12 @@ class ClaroPreRender implements TrustedCallbackInterface {
    * Prerender callback for managed_file.
    */
   public static function managedFile($element) {
-    if (!empty($element['remove_button']) && is_array($element['remove_button'])) {
+    if (!empty($element['remove_button']) && \is_array($element['remove_button'])) {
       $element['remove_button']['#attributes']['class'][] = 'button--extrasmall';
       $element['remove_button']['#attributes']['class'][] = 'remove-button';
     }
 
-    if (!empty($element['upload_button']) && is_array($element['upload_button'])) {
+    if (!empty($element['upload_button']) && \is_array($element['upload_button'])) {
       $element['upload_button']['#attributes']['class'][] = 'upload-button';
     }
 
@@ -47,7 +47,7 @@ class ClaroPreRender implements TrustedCallbackInterface {
         // Change widget title. This is the same title that is used by the
         // multiple file widget.
         // @see https://git.drupalcode.org/project/drupal/blob/ade7b950a1/core/modules/file/src/Plugin/Field/FieldWidget/FileWidget.php#L192
-        $element['#title'] = t('Add a new file');
+        $element['#title'] = \t('Add a new file');
       }
       else {
         // If the field has a value, the file upload title doesn't have to be
@@ -66,7 +66,7 @@ class ClaroPreRender implements TrustedCallbackInterface {
    */
   public static function verticalTabs($element) {
     $group_type_is_details = isset($element['group']['#type']) && $element['group']['#type'] === 'details';
-    $groups_are_present = isset($element['group']['#groups']) && is_array($element['group']['#groups']);
+    $groups_are_present = isset($element['group']['#groups']) && \is_array($element['group']['#groups']);
 
     // If the vertical tabs have a details group, add attributes to those
     // details elements so they are styled as accordion items and have BEM
@@ -77,10 +77,10 @@ class ClaroPreRender implements TrustedCallbackInterface {
       $last_group_with_child_key = NULL;
       $last_group_with_child_key_last_child_key = NULL;
 
-      $group_key = implode('][', $element['#parents']);
+      $group_key = \implode('][', $element['#parents']);
       // Only check siblings against groups because we are only looking for
       // group elements.
-      if (in_array($group_key, $group_keys)) {
+      if (\in_array($group_key, $group_keys)) {
         $children_keys = Element::children($element['group']['#groups'][$group_key], TRUE);
 
         foreach ($children_keys as $child_key) {

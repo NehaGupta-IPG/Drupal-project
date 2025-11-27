@@ -107,13 +107,13 @@ class ContentTranslationLinkTagTest extends BrowserTestBase {
       ->getId();
 
     /** @var \Drupal\Core\Url[] $urls */
-    $urls = array_map(
+    $urls = \array_map(
       function ($langcode) use ($url_base, $languageManager) {
         $url = clone $url_base;
         return $url
           ->setOption('language', $languageManager->getLanguage($langcode));
       },
-      array_combine($langcodes_all, $langcodes_all)
+      \array_combine($langcodes_all, $langcodes_all)
     );
 
     // Ensure link tags for all languages are found on each language variation

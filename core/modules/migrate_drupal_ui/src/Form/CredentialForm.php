@@ -92,8 +92,8 @@ class CredentialForm extends MigrateUpgradeFormBase {
     $form['#title'] = $this->t('Drupal Upgrade');
 
     $drivers = $this->getDatabaseTypes();
-    $drivers_keys = array_keys($drivers);
-    $default_driver = current($drivers_keys);
+    $drivers_keys = \array_keys($drivers);
+    $default_driver = \current($drivers_keys);
 
     $default_options = [];
 
@@ -111,18 +111,18 @@ class CredentialForm extends MigrateUpgradeFormBase {
       '#required' => TRUE,
     ];
 
-    $available_connections = array_diff(array_keys(Database::getAllConnectionInfo()), ['default']);
-    $options = array_combine($available_connections, $available_connections);
+    $available_connections = \array_diff(\array_keys(Database::getAllConnectionInfo()), ['default']);
+    $options = \array_combine($available_connections, $available_connections);
     $migrate_source_connection = Settings::get('migrate_source_connection');
     $preferred_connections = $migrate_source_connection
       ? ['migrate', $migrate_source_connection]
       : ['migrate'];
-    $default_options = array_intersect($preferred_connections, $available_connections);
+    $default_options = \array_intersect($preferred_connections, $available_connections);
     $form['source_connection'] = [
       '#type' => 'select',
       '#title' => $this->t('Source connection'),
       '#options' => $options,
-      '#default_value' => array_pop($default_options),
+      '#default_value' => \array_pop($default_options),
       '#empty_option' => $this->t('- User defined -'),
       '#description' => $this->t('Choose one of the keys from the $databases array or else select "User defined" and enter database credentials.'),
       '#access' => !empty($options),
@@ -151,7 +151,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
         ],
       ],
     ];
-    if (count($drivers) == 1) {
+    if (\count($drivers) == 1) {
       $form['database']['driver']['#disabled'] = TRUE;
     }
 
@@ -173,7 +173,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
           ':input[name=driver]' => ['value' => $key],
         ],
       ];
-      if (!str_ends_with($key, '\\sqlite')) {
+      if (!\str_ends_with($key, '\\sqlite')) {
         $form['database']['settings'][$key]['username']['#states'] = [
           'required' => [
             ':input[name=source_connection]' => ['value' => ''],
@@ -263,7 +263,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
     $source_connection = $form_state->getValue('source_connection');
     if ($source_connection) {
       $info = Database::getConnectionInfo($source_connection);
-      $database = reset($info);
+      $database = \reset($info);
     }
     else {
       // Retrieve the database driver from the form, use reflection to get the
@@ -276,7 +276,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
 
       $database = $form_state->getValue($driver);
       // Cut the trailing \Install from namespace.
-      $database['namespace'] = substr($install_namespace, 0, strrpos($install_namespace, '\\'));
+      $database['namespace'] = \substr($install_namespace, 0, \strrpos($install_namespace, '\\'));
       $database['driver'] = $driver;
 
       // Validate the driver settings and just end here if we have any issues.
@@ -301,17 +301,17 @@ class CredentialForm extends MigrateUpgradeFormBase {
 
     // Check that the source database is not the site database.
     if (!$this->errors) {
-      $options = array_flip(['database', 'host', 'port', 'prefix', 'namespace']);
-      $source = array_map('strval', array_intersect_key(
+      $options = \array_flip(['database', 'host', 'port', 'prefix', 'namespace']);
+      $source = \array_map('strval', \array_intersect_key(
         $connection->getConnectionOptions(),
         $options,
       ));
-      $destination = array_map('strval', array_intersect_key(
+      $destination = \array_map('strval', \array_intersect_key(
         Database::getConnection()->getConnectionOptions(),
         $options,
       ));
-      ksort($source);
-      ksort($destination);
+      \ksort($source);
+      \ksort($destination);
       if ($source === $destination) {
         $this->errors[$error_key] = $this->t('Enter credentials for the database of the Drupal site you want to upgrade, not the new site.');
       }
@@ -383,7 +383,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
           $this->errors[$element['#name']] = $msg;
         }
       }
-      elseif (!file_exists($source) || (!is_dir($source)) || (!is_readable($source))) {
+      elseif (!\file_exists($source) || (!\is_dir($source)) || (!\is_readable($source))) {
         $this->errors[$element['#name']] = $msg;
       }
     }

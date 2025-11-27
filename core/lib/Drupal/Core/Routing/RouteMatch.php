@@ -58,8 +58,8 @@ class RouteMatch implements RouteMatchInterface {
 
     // Pre-filter parameters.
     $route_params = $this->getParameterNames();
-    $parameters = array_intersect_key($parameters, $route_params);
-    $raw_parameters = array_intersect_key($raw_parameters, $route_params);
+    $parameters = \array_intersect_key($parameters, $route_params);
+    $raw_parameters = \array_intersect_key($raw_parameters, $route_params);
     $this->parameters = new ParameterBag($parameters);
     $this->rawParameters = new InputBag($raw_parameters);
   }
@@ -145,11 +145,11 @@ class RouteMatch implements RouteMatchInterface {
     if ($route = $this->getRouteObject()) {
       // Variables defined in path and host patterns are route parameters.
       $variables = $route->compile()->getVariables();
-      $names = array_combine($variables, $variables);
+      $names = \array_combine($variables, $variables);
       // Route defaults that do not start with a leading "_" are also
       // parameters, even if they are not included in path or host patterns.
       foreach ($route->getDefaults() as $name => $value) {
-        if (!isset($names[$name]) && !str_starts_with($name, '_')) {
+        if (!isset($names[$name]) && !\str_starts_with($name, '_')) {
           $names[$name] = $name;
         }
       }

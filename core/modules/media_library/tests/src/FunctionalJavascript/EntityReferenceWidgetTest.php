@@ -207,7 +207,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
     $this->drupalGet('node/add/basic_page');
     $this->openMediaLibraryForField('field_twin_media');
-    $link_titles = array_map(function ($link) {
+    $link_titles = \array_map(function ($link) {
       return $link->getText();
     }, $links);
     $this->assertSame(
@@ -339,7 +339,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
       }
     }
     $this->assertCount(1, $selected_checkboxes);
-    $assert_session->hiddenFieldValueEquals('media-library-modal-selection', implode(',', $selected_checkboxes));
+    $assert_session->hiddenFieldValueEquals('media-library-modal-selection', \implode(',', $selected_checkboxes));
     $this->assertSelectedMediaCount('1 of 2 items selected');
     // Add to selection from another type.
     $this->switchToMediaType('Two');
@@ -405,7 +405,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     // Assert the selection is cleared when the modal is closed.
     $this->openMediaLibraryForField('field_unlimited_media');
     $checkboxes = $this->getCheckboxes();
-    $this->assertGreaterThanOrEqual(4, count($checkboxes));
+    $this->assertGreaterThanOrEqual(4, \count($checkboxes));
     // Nothing is selected yet.
     $this->assertFalse($checkboxes[0]->isChecked());
     $this->assertFalse($checkboxes[1]->isChecked());
@@ -425,7 +425,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
     $assert_session->elementExists('css', '.ui-dialog-titlebar-close')->click();
     $this->openMediaLibraryForField('field_unlimited_media');
     $checkboxes = $this->getCheckboxes();
-    $this->assertGreaterThanOrEqual(4, count($checkboxes));
+    $this->assertGreaterThanOrEqual(4, \count($checkboxes));
     $this->assertFalse($checkboxes[0]->isChecked());
     $this->assertFalse($checkboxes[1]->isChecked());
     $this->assertFalse($checkboxes[2]->isChecked());
@@ -497,7 +497,7 @@ class EntityReferenceWidgetTest extends MediaLibraryTestBase {
 
     // Check that a clear error message is shown.
     $assert_session->pageTextNotContains('This value should not be null.');
-    $assert_session->pageTextContains(sprintf('%s field is required.', $field_config->label()));
+    $assert_session->pageTextContains(\sprintf('%s field is required.', $field_config->label()));
 
     // Open the media library, select an item and save the node.
     $this->openMediaLibraryForField('field_unlimited_media');

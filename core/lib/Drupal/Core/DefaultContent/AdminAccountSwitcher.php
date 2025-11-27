@@ -54,10 +54,10 @@ final class AdminAccountSwitcher implements AccountSwitcherInterface {
     else {
       $accounts = [];
     }
-    $account = $user_storage->load(reset($accounts) ?: 1);
-    assert($account instanceof AccountInterface);
+    $account = $user_storage->load(\reset($accounts) ?: 1);
+    \assert($account instanceof AccountInterface);
 
-    if (array_intersect($account->getRoles(), $admin_roles) || ((int) $account->id() === 1 && $this->isSuperUserAccessEnabled)) {
+    if (\array_intersect($account->getRoles(), $admin_roles) || ((int) $account->id() === 1 && $this->isSuperUserAccessEnabled)) {
       $this->switchTo($account);
       return $account;
     }

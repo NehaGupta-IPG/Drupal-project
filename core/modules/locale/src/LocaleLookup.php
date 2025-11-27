@@ -116,8 +116,8 @@ class LocaleLookup extends CacheCollector {
       $rids = '';
       if ($user) {
         $roles = $user->getRoles();
-        sort($roles);
-        $rids = implode(':', $roles);
+        \sort($roles);
+        $rids = \implode(':', $roles);
       }
       $this->cid = "locale:{$this->langcode}:{$this->context}:$rids";
 
@@ -178,10 +178,10 @@ class LocaleLookup extends CacheCollector {
       }
     }
 
-    if (is_string($value) && str_contains($value, PoItem::DELIMITER)) {
+    if (\is_string($value) && \str_contains($value, PoItem::DELIMITER)) {
       // Community translations imported from localize.drupal.org as well as
       // migrated translations may contain @count[number].
-      $value = preg_replace('!@count\[\d+\]!', '@count', $value);
+      $value = \preg_replace('!@count\[\d+\]!', '@count', $value);
     }
 
     $this->storage[$offset] = $value;

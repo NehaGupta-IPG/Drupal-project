@@ -228,7 +228,7 @@ class SortDateTest extends ViewsKernelTestBase {
         // Verify the result.
         $this->assertIdenticalResultset($view, $this->expectedResultSet($granularity, $reverse), [
           'views_test_data_name' => 'name',
-        ], sprintf('Result is returned correctly when ordering by granularity %s, %s.', $granularity, $reverse ? 'reverse' : 'forward'));
+        ], \sprintf('Result is returned correctly when ordering by granularity %s, %s.', $granularity, $reverse ? 'reverse' : 'forward'));
         $view->destroy();
         unset($view);
       }

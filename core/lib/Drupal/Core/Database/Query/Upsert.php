@@ -70,12 +70,12 @@ abstract class Upsert extends Query implements \Countable {
 
     // Confirm that the user did not try to specify an identical
     // field and default field.
-    if (array_intersect($this->insertFields, $this->defaultFields)) {
+    if (\array_intersect($this->insertFields, $this->defaultFields)) {
       throw new FieldsOverlapException('You may not specify the same field to have a value and a schema-default value.');
     }
 
     // Don't execute query without fields.
-    if (count($this->insertFields) + count($this->defaultFields) == 0) {
+    if (\count($this->insertFields) + \count($this->defaultFields) == 0) {
       throw new NoFieldsException('There are no fields available to insert with.');
     }
 

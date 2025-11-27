@@ -26,12 +26,12 @@ class PhpUnitTestDiscoveryTracer implements Tracer {
    * {@inheritdoc}
    */
   public function trace(Event $event): void {
-    if (in_array(get_class($event), [
+    if (\in_array(\get_class($event), [
       PhpunitErrorTriggered::class,
       PhpunitWarningTriggered::class,
       WarningTriggered::class,
     ])) {
-      $this->testDiscovery->addWarning(sprintf('%s: %s', get_class($event), $event->message()));
+      $this->testDiscovery->addWarning(\sprintf('%s: %s', \get_class($event), $event->message()));
     }
   }
 

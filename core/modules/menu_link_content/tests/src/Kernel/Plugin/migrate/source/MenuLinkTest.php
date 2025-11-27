@@ -294,8 +294,8 @@ class MenuLinkTest extends MigrateSqlSourceTestBase {
     // Don't expect D6 menu link to a custom menu, provided by menu module.
     unset($expected[5]);
 
-    array_walk($tests[0]['source_data']['menu_links'], function (&$row) {
-      $row['options'] = serialize($row['options']);
+    \array_walk($tests[0]['source_data']['menu_links'], function (&$row) {
+      $row['options'] = \serialize($row['options']);
     });
 
     // Adjust the order to match the order used in the query. The expected[5] is

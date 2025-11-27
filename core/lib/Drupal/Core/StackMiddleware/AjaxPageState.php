@@ -41,9 +41,9 @@ class AjaxPageState implements HttpKernelInterface {
       // If libraries are present in both the request and the query, ensure they
       // match by merging them together.
       if (!empty($request_ajax_page_state['libraries']) && !empty($query_ajax_page_state['libraries'])) {
-        $request_libraries = explode(',', $request_ajax_page_state['libraries']);
-        $query_libraries = explode(',', $query_ajax_page_state['libraries']);
-        $libraries = implode(',', array_unique(array_merge($request_libraries, $query_libraries)));
+        $request_libraries = \explode(',', $request_ajax_page_state['libraries']);
+        $query_libraries = \explode(',', $query_ajax_page_state['libraries']);
+        $libraries = \implode(',', \array_unique(\array_merge($request_libraries, $query_libraries)));
         $request_ajax_page_state['libraries'] = $libraries;
         $query_ajax_page_state['libraries'] = $libraries;
         $request->request->set('ajax_page_state', $request_ajax_page_state);

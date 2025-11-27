@@ -20,12 +20,12 @@ class FileSystem {
     $directories = [];
 
     // Has PHP been set with an upload_tmp_dir?
-    if (ini_get('upload_tmp_dir')) {
-      $directories[] = ini_get('upload_tmp_dir');
+    if (\ini_get('upload_tmp_dir')) {
+      $directories[] = \ini_get('upload_tmp_dir');
     }
 
     // Operating system specific dirs.
-    if (str_starts_with(PHP_OS, 'WIN')) {
+    if (\str_starts_with(PHP_OS, 'WIN')) {
       $directories[] = 'c:\\windows\\temp';
       $directories[] = 'c:\\winnt\\temp';
     }
@@ -33,13 +33,13 @@ class FileSystem {
       $directories[] = '/tmp';
     }
     // PHP may be able to find an alternative tmp directory.
-    $directories[] = sys_get_temp_dir();
+    $directories[] = \sys_get_temp_dir();
 
     foreach ($directories as $directory) {
-      if (is_dir($directory) && is_writable($directory)) {
+      if (\is_dir($directory) && \is_writable($directory)) {
         // Both sys_get_temp_dir() and ini_get('upload_tmp_dir') can return
         // paths with a trailing directory separator.
-        return rtrim($directory, DIRECTORY_SEPARATOR);
+        return \rtrim($directory, DIRECTORY_SEPARATOR);
       }
     }
     return FALSE;

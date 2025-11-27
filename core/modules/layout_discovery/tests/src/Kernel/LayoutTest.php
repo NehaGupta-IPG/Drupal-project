@@ -70,8 +70,8 @@ class LayoutTest extends KernelTestBase {
     $this->render($built);
 
     // Add in the wrapping form elements and prefix/suffix.
-    array_unshift($html, 'Test prefix');
-    array_unshift($html, '<form data-drupal-selector="the-form-id" action="/" method="post" id="the-form-id" accept-charset="UTF-8">');
+    \array_unshift($html, 'Test prefix');
+    \array_unshift($html, '<form data-drupal-selector="the-form-id" action="/" method="post" id="the-form-id" accept-charset="UTF-8">');
     // Retrieve the build ID from the rendered HTML since the string is random.
     $build_id_input = $this->cssSelect('input[name="form_build_id"]')[0]->asXML();
     $form_id_input = '<input data-drupal-selector="edit-the-form-id" type="hidden" name="form_id" value="the_form_id"/>';
@@ -79,7 +79,7 @@ class LayoutTest extends KernelTestBase {
     $html[] = $build_id_input . "\n" . $form_id_input . "\n" . '</form>';
 
     // Match the HTML to the full form element.
-    $this->assertSame(implode("\n", $html), $this->cssSelect('#the-form-id')[0]->asXML());
+    $this->assertSame(\implode("\n", $html), $this->cssSelect('#the-form-id')[0]->asXML());
   }
 
   /**
@@ -88,7 +88,7 @@ class LayoutTest extends KernelTestBase {
   protected function render(array &$elements) {
     $content = parent::render($elements);
     // Strip leading whitespace from every line.
-    $this->content = preg_replace('/^\s+/m', '', $content);
+    $this->content = \preg_replace('/^\s+/m', '', $content);
     return $this->content;
   }
 

@@ -118,11 +118,11 @@ class Htmx {
    */
   protected function ensureKebabCase(string $identifier): string {
     // Check for existing kebab case.
-    $kebabParts = explode('-', $identifier);
+    $kebabParts = \explode('-', $identifier);
     // If the number of lower case parts matches the number of parts, then
     // all the parts are lower case.
-    $isKebab = count($kebabParts) === count(array_filter($kebabParts, function ($part) {
-        return ctype_lower($part);
+    $isKebab = \count($kebabParts) === \count(\array_filter($kebabParts, function ($part) {
+        return \ctype_lower($part);
     }));
     if ($isKebab) {
       return $identifier;
@@ -185,7 +185,7 @@ class Htmx {
 
     // Ensure the object format HTMX shows in documentation.
     // Ensure numeric strings are encoded as numbers.
-    $json = json_encode($value, JSON_FORCE_OBJECT | JSON_NUMERIC_CHECK);
+    $json = \json_encode($value, JSON_FORCE_OBJECT | JSON_NUMERIC_CHECK);
     $this->attributes[$key] = new AttributeString($key, $json);
   }
 
@@ -205,7 +205,7 @@ class Htmx {
    *   returns self so that attribute methods may be chained.
    */
   protected function buildRequestAttribute(string $method, ?Url $url = NULL): static {
-    if (is_null($url)) {
+    if (\is_null($url)) {
       $value = '';
     }
     else {
@@ -460,8 +460,8 @@ class Htmx {
    * @see https://htmx.org/headers/hx-trigger/
    */
   public function triggerHeader(string|array $data): static {
-    if (is_array($data)) {
-      $data = json_encode($data);
+    if (\is_array($data)) {
+      $data = \json_encode($data);
     }
     $this->headers->set('HX-Trigger', $data);
     return $this;
@@ -481,8 +481,8 @@ class Htmx {
    * @see https://htmx.org/headers/hx-trigger/
    */
   public function triggerAfterSettleHeader(string|array $data): static {
-    if (is_array($data)) {
-      $data = json_encode($data);
+    if (\is_array($data)) {
+      $data = \json_encode($data);
     }
     $this->headers->set('HX-Trigger-After-Settle', $data);
     return $this;
@@ -502,8 +502,8 @@ class Htmx {
    * @see https://htmx.org/headers/hx-trigger/
    */
   public function triggerAfterSwapHeader(string|array $data): static {
-    if (is_array($data)) {
-      $data = json_encode($data);
+    if (\is_array($data)) {
+      $data = \json_encode($data);
     }
     $this->headers->set('HX-Trigger-After-Swap', $data);
     return $this;
@@ -634,7 +634,7 @@ class Htmx {
     // Special case: the `::EventName` shorthand for `htmx:EventName`.
     // Prepare a leading '-' so that our final attribute is
     // `data-hx--event-name` rather than `data-hx-event-name`.
-    $extra = str_starts_with($event, '::') ? '-' : '';
+    $extra = \str_starts_with($event, '::') ? '-' : '';
     $formattedEvent = 'hx-on-' . $extra . $this->ensureKebabCase($event);
     $this->createStringAttribute($formattedEvent, $action);
     return $this;
@@ -708,8 +708,8 @@ class Htmx {
    * @see https://htmx.org/attributes/hx-select-oob/
    */
   public function selectOob(string|array $selectors): static {
-    if (is_array($selectors)) {
-      $selectors = implode(',', $selectors);
+    if (\is_array($selectors)) {
+      $selectors = \implode(',', $selectors);
     }
     $this->createStringAttribute('hx-select-oob', $selectors);
     return $this;
@@ -810,8 +810,8 @@ class Htmx {
    * @see https://htmx.org/attributes/hx-trigger/
    */
   public function trigger(string|array $triggerDefinition): static {
-    if (is_array($triggerDefinition)) {
-      $triggerDefinition = implode(',', $triggerDefinition);
+    if (\is_array($triggerDefinition)) {
+      $triggerDefinition = \implode(',', $triggerDefinition);
     }
     $this->createStringAttribute('hx-trigger', $triggerDefinition);
     return $this;
@@ -1119,8 +1119,8 @@ class Htmx {
    * @see https://htmx.org/attributes/hx-params/
    */
   public function params(string|array $filter): static {
-    if (is_array($filter)) {
-      $filter = implode(',', $filter);
+    if (\is_array($filter)) {
+      $filter = \implode(',', $filter);
     }
     $this->createStringAttribute('hx-params', $filter);
     return $this;
@@ -1267,7 +1267,7 @@ class Htmx {
    */
   public function applyTo(array &$element, string $attributeKey = '#attributes'): void {
     // Attach HTMX and Drupal integration javascript.
-    if (!in_array('core/drupal.htmx', $element['#attached']['library'] ?? [])) {
+    if (!\in_array('core/drupal.htmx', $element['#attached']['library'] ?? [])) {
       $element['#attached']['library'][] = 'core/drupal.htmx';
     }
 
@@ -1276,7 +1276,7 @@ class Htmx {
       $element['#attached']['http_header'] = $element['#attached']['http_header'] ?? [];
       $element['#attached']['http_header'] = NestedArray::mergeDeep($element['#attached']['http_header'], $this->applyHeaders());
     }
-    if (count($this->attributes->storage()) !== 0) {
+    if (\count($this->attributes->storage()) !== 0) {
       // Consolidate attributes.
       $element[$attributeKey] = $element[$attributeKey] ?? [];
       $element[$attributeKey] = AttributeHelper::mergeCollections($element[$attributeKey], $this->attributes);
@@ -1299,16 +1299,16 @@ class Htmx {
     $incomingAttributes = $element[$attributeKey] ?? [];
     $incomingHeaders = $element['#attached']['http_header'] ?? [];
     // Filter for HTMX values.
-    $incomingAttributes = array_filter(
+    $incomingAttributes = \array_filter(
       $incomingAttributes,
       function (string $key) {
-        return str_starts_with($key, 'data-hx-');
+        return \str_starts_with($key, 'data-hx-');
       },
       ARRAY_FILTER_USE_KEY,
     );
     $preparedHeaders = [];
     foreach ($incomingHeaders as $value) {
-      if (is_array($value) && str_starts_with($value[0], 'hx-')) {
+      if (\is_array($value) && \str_starts_with($value[0], 'hx-')) {
         // Header value array may have 3 values, we want the first two.
         $preparedHeaders[$value[0]] = $value[1];
       }

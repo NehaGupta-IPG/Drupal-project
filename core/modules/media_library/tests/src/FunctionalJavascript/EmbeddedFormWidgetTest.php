@@ -116,7 +116,7 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
     $assert_session = $this->assertSession();
 
     foreach ($this->getTestFiles('image') as $image) {
-      $extension = pathinfo($image->filename, PATHINFO_EXTENSION);
+      $extension = \pathinfo($image->filename, PATHINFO_EXTENSION);
       if ($extension === 'jpg') {
         $jpg_image = $image;
         break;
@@ -140,7 +140,7 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
     });
     // Test reinserting the same selection.
     $media_items = Media::loadMultiple();
-    $added_media = array_pop($media_items);
+    $added_media = \array_pop($media_items);
     $added_media_id = $added_media->id();
     $wrapper->pressButton('Add media');
     $this->assertNotNull($assert_session->waitForText('Add or select media'));

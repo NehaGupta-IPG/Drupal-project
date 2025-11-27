@@ -115,7 +115,7 @@ class NodeRevisionsTest extends NodeTestBase {
       $node->title = $this->randomMachineName();
       $node->body = [
         'value' => $this->randomMachineName(32),
-        'format' => filter_default_format(),
+        'format' => \filter_default_format(),
       ];
       $node->untranslatable_string_field->value = $this->randomString();
       $node->setNewRevision();
@@ -215,11 +215,11 @@ class NodeRevisionsTest extends NodeTestBase {
     // Confirm user is redirected depending on the remaining revisions,
     // when a revision is deleted.
     $query = \Drupal::entityQuery('node')->allRevisions()->condition('nid', $node->id())->accessCheck(FALSE);
-    $existing_revision_ids = array_keys($query->execute());
+    $existing_revision_ids = \array_keys($query->execute());
     // Delete all revision except last 3.
-    $remaining_revision_ids = array_slice($existing_revision_ids, -3, 3);
+    $remaining_revision_ids = \array_slice($existing_revision_ids, -3, 3);
     foreach ($existing_revision_ids as $revision_id) {
-      if (!in_array($revision_id, $remaining_revision_ids)) {
+      if (!\in_array($revision_id, $remaining_revision_ids)) {
         $node_storage->deleteRevision($revision_id);
       }
     }

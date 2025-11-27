@@ -62,19 +62,19 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
     }
 
     /** @var \Drupal\Core\Menu\MenuLinkInterface $link */
-    $first_link = reset($tree)->link;
+    $first_link = \reset($tree)->link;
     // Get the menu name of the first link.
     $menu_name = $first_link->getMenuName();
     // Add a more specific theme suggestion to differentiate this rendered
     // menu from others.
     $build['#menu_name'] = $menu_name;
-    $build['#theme'] = 'navigation_menu__' . strtr($menu_name, '-', '_');
+    $build['#theme'] = 'navigation_menu__' . \strtr($menu_name, '-', '_');
 
     // Loop through menu items and add the plugin id as a class.
     foreach ($tree as $item) {
       if ($item->access->isAllowed()) {
         $plugin_id = $item->link->getPluginId();
-        $plugin_class = Html::getClass(str_replace('.', '_', $plugin_id));
+        $plugin_class = Html::getClass(\str_replace('.', '_', $plugin_id));
         $build['#items'][$plugin_id]['class'] = $plugin_class;
         $url = $build['#items'][$plugin_id]['url'];
         $icon_defaults = [

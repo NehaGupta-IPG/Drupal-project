@@ -127,7 +127,7 @@ class ColorTest extends TestCase {
       ['value' => '#ffffff', 'expected' => ['red' => 255, 'green' => 255, 'blue' => 255]],
       ['value' => '#010203', 'expected' => ['red' => 1, 'green' => 2, 'blue' => 3]],
     ];
-    return array_merge($invalid, $valid);
+    return \array_merge($invalid, $valid);
   }
 
   /**
@@ -163,11 +163,11 @@ class ColorTest extends TestCase {
     ];
     // Input using indexed RGB array (e.g.: [10, 10, 10]).
     foreach ($tests as $test) {
-      $tests[] = [array_values($test[0]), $test[1]];
+      $tests[] = [\array_values($test[0]), $test[1]];
     }
     // Input using CSS RGB string notation (e.g.: 10, 10, 10).
     foreach ($tests as $test) {
-      $tests[] = [implode(', ', $test[0]), $test[1]];
+      $tests[] = [\implode(', ', $test[0]), $test[1]];
     }
     return $tests;
   }

@@ -41,7 +41,7 @@ class BinaryData extends PrimitiveBase implements BinaryInterface {
     // If the value has been set by (absolute) stream resource URI, access the
     // resource now.
     if (!isset($this->handle) && isset($this->uri)) {
-      $this->handle = is_readable($this->uri) ? fopen($this->uri, 'rb') : FALSE;
+      $this->handle = \is_readable($this->uri) ? \fopen($this->uri, 'rb') : FALSE;
     }
     return $this->handle;
   }
@@ -56,7 +56,7 @@ class BinaryData extends PrimitiveBase implements BinaryInterface {
       $this->handle = NULL;
       $this->uri = NULL;
     }
-    elseif (is_string($value)) {
+    elseif (\is_string($value)) {
       // Note: For performance reasons we store the given URI and access the
       // resource upon request. See BinaryData::getValue()
       $this->uri = $value;
@@ -77,8 +77,8 @@ class BinaryData extends PrimitiveBase implements BinaryInterface {
   public function getString() {
     // Return the file content.
     $contents = '';
-    while (!feof($this->getValue())) {
-      $contents .= fread($this->handle, 8192);
+    while (!\feof($this->getValue())) {
+      $contents .= \fread($this->handle, 8192);
     }
     return $contents;
   }

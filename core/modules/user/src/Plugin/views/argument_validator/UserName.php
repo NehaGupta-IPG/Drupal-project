@@ -37,7 +37,7 @@ class UserName extends User {
     if ($this->multipleCapable && $this->options['multiple']) {
       // At this point only interested in individual IDs no matter what type,
       // just splitting by the allowed delimiters.
-      $names = array_filter(preg_split('/[,+ ]/', $argument));
+      $names = \array_filter(\preg_split('/[,+ ]/', $argument));
     }
     elseif ($argument) {
       $names = [$argument];
@@ -57,7 +57,7 @@ class UserName extends User {
 
     // Validate each account. If any fails break out and return false.
     foreach ($accounts as $account) {
-      if (!in_array($account->getAccountName(), $names) || !$this->validateEntity($account)) {
+      if (!\in_array($account->getAccountName(), $names) || !$this->validateEntity($account)) {
         return FALSE;
       }
     }
@@ -71,7 +71,7 @@ class UserName extends User {
   public function processSummaryArguments(&$args) {
     // If the validation says the input is a username, we should reverse the
     // argument so it works for example for generation summary URLs.
-    $uids_arg_keys = array_flip($args);
+    $uids_arg_keys = \array_flip($args);
 
     foreach ($this->userStorage->loadMultiple($args) as $uid => $account) {
       $args[$uids_arg_keys[$uid]] = $account->label();

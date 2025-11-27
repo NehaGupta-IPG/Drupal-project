@@ -37,19 +37,19 @@ trait RevisionLogEntityTrait {
     }
 
     $fields[$entity_type->getRevisionMetadataKey('revision_created')] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Revision create time'))
-      ->setDescription(t('The time that the current revision was created.'))
+      ->setLabel(\t('Revision create time'))
+      ->setDescription(\t('The time that the current revision was created.'))
       ->setRevisionable(TRUE);
 
     $fields[$entity_type->getRevisionMetadataKey('revision_user')] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Revision user'))
-      ->setDescription(t('The user ID of the author of the current revision.'))
+      ->setLabel(\t('Revision user'))
+      ->setDescription(\t('The user ID of the author of the current revision.'))
       ->setSetting('target_type', 'user')
       ->setRevisionable(TRUE);
 
     $fields[$entity_type->getRevisionMetadataKey('revision_log_message')] = BaseFieldDefinition::create('string_long')
-      ->setLabel(t('Revision log message'))
-      ->setDescription(t('Briefly describe the changes you have made.'))
+      ->setLabel(\t('Revision log message'))
+      ->setDescription(\t('Briefly describe the changes you have made.'))
       ->setRevisionable(TRUE)
       ->setDefaultValue('')
       ->setDisplayOptions('form', [

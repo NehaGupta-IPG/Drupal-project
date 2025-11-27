@@ -107,7 +107,7 @@ class LocalTaskDefault extends PluginBase implements LocalTaskInterface, Cacheab
   public function getOptions(RouteMatchInterface $route_match) {
     $options = $this->pluginDefinition['options'];
     if ($this->active) {
-      if (empty($options['attributes']['class']) || !in_array('is-active', $options['attributes']['class'])) {
+      if (empty($options['attributes']['class']) || !\in_array('is-active', $options['attributes']['class'])) {
         $options['attributes']['class'][] = 'is-active';
       }
     }

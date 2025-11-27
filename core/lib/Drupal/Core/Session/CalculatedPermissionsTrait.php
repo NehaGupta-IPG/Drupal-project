@@ -27,16 +27,16 @@ trait CalculatedPermissionsTrait {
   public function getItems(): array {
     $item_sets = [];
     foreach ($this->items as $scope_items) {
-      $item_sets[] = array_values($scope_items);
+      $item_sets[] = \array_values($scope_items);
     }
-    return array_merge(...$item_sets);
+    return \array_merge(...$item_sets);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getScopes(): array {
-    return array_keys($this->items);
+    return \array_keys($this->items);
   }
 
   /**
@@ -44,7 +44,7 @@ trait CalculatedPermissionsTrait {
    */
   public function getItemsByScope(string $scope = AccessPolicyInterface::SCOPE_DRUPAL): array {
     return isset($this->items[$scope])
-      ? array_values($this->items[$scope])
+      ? \array_values($this->items[$scope])
       : [];
   }
 

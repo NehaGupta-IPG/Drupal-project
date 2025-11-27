@@ -74,7 +74,7 @@ class FilterIdTest extends KernelTestBase {
         ->expects($this->exactly(1))
         ->method('saveMessage')
         ->with(
-          sprintf('Filter %s could not be mapped to an existing filter plugin; omitted since it is a transformation-only filter. Install and configure a successor after the migration.', $value),
+          \sprintf('Filter %s could not be mapped to an existing filter plugin; omitted since it is a transformation-only filter. Install and configure a successor after the migration.', $value),
           MigrationInterface::MESSAGE_INFORMATIONAL
         );
     }
@@ -84,7 +84,7 @@ class FilterIdTest extends KernelTestBase {
         ->expects($this->exactly(1))
         ->method('saveMessage')
         ->with(
-          sprintf('Filter %s could not be mapped to an existing filter plugin; defaulting to %s and dropping all settings. Either redo the migration with the module installed that provides an equivalent filter, or modify the text format after the migration to remove this filter if it is no longer necessary.', $invalid_id, $expected_value),
+          \sprintf('Filter %s could not be mapped to an existing filter plugin; defaulting to %s and dropping all settings. Either redo the migration with the module installed that provides an equivalent filter, or modify the text format after the migration to remove this filter if it is no longer necessary.', $invalid_id, $expected_value),
           MigrationInterface::MESSAGE_WARNING
         );
     }

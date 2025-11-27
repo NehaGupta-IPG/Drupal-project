@@ -96,7 +96,7 @@ class TwigEnvironmentTest extends KernelTestBase {
 
     $cache = $environment->getCache();
     $class = $environment->getTemplateClass($name);
-    $expected = $prefix . '_inline-template_' . substr(Crypt::hashBase64($class), 0, TwigPhpStorageCache::SUFFIX_SUBSTRING_LENGTH);
+    $expected = $prefix . '_inline-template_' . \substr(Crypt::hashBase64($class), 0, TwigPhpStorageCache::SUFFIX_SUBSTRING_LENGTH);
     $this->assertEquals($expected, $cache->generateKey($name, $class));
   }
 
@@ -159,15 +159,15 @@ class TwigEnvironmentTest extends KernelTestBase {
     // TwigPhpStorageCache::SUFFIX_SUBSTRING_LENGTH should get truncated.
     $cache = $environment->getCache();
     $long_name = 'core/modules/system/templates/block--system-messages-block.html.twig';
-    $this->assertGreaterThan(TwigPhpStorageCache::SUFFIX_SUBSTRING_LENGTH, strlen(basename($long_name)));
+    $this->assertGreaterThan(TwigPhpStorageCache::SUFFIX_SUBSTRING_LENGTH, \strlen(\basename($long_name)));
     $class = $environment->getTemplateClass($long_name);
     $key = $cache->generateKey($long_name, $class);
     $prefix = $environment->getTwigCachePrefix();
     // The key should consist of the prefix, an underscore, and two strings
     // each truncated to length TwigPhpStorageCache::SUFFIX_SUBSTRING_LENGTH
     // separated by an underscore.
-    $expected = strlen($prefix) + 2 + 2 * TwigPhpStorageCache::SUFFIX_SUBSTRING_LENGTH;
-    $this->assertEquals($expected, strlen($key));
+    $expected = \strlen($prefix) + 2 + 2 * TwigPhpStorageCache::SUFFIX_SUBSTRING_LENGTH;
+    $this->assertEquals($expected, \strlen($key));
 
     $cache = $environment->getCache();
     $class = $environment->getTemplateClass($template_path);
@@ -189,7 +189,7 @@ class TwigEnvironmentTest extends KernelTestBase {
   public function register(ContainerBuilder $container): void {
     parent::register($container);
 
-    $definition = new Definition('Twig\Loader\FilesystemLoader', [[sys_get_temp_dir()]]);
+    $definition = new Definition('Twig\Loader\FilesystemLoader', [[\sys_get_temp_dir()]]);
     $definition->setPublic(TRUE);
     $container->setDefinition('twig_loader__file_system', $definition)
       ->addTag('twig.loader');
@@ -206,17 +206,17 @@ TWIG;
 <div>Hello after</div>
 TWIG;
 
-    $template_file = tempnam(sys_get_temp_dir(), '__METHOD__') . '.html.twig';
-    file_put_contents($template_file, $template_before);
+    $template_file = \tempnam(\sys_get_temp_dir(), '__METHOD__') . '.html.twig';
+    \file_put_contents($template_file, $template_before);
 
     /** @var \Drupal\Core\Template\TwigEnvironment $environment */
     $environment = \Drupal::service('twig');
 
-    $output = $environment->load(basename($template_file))->render();
+    $output = $environment->load(\basename($template_file))->render();
     $this->assertEquals($template_before, $output);
 
-    file_put_contents($template_file, $template_after);
-    $output = $environment->load(basename($template_file))->render();
+    \file_put_contents($template_file, $template_after);
+    $output = $environment->load(\basename($template_file))->render();
     $this->assertEquals($template_before, $output);
   }
 
@@ -241,8 +241,8 @@ TWIG;
     // Assume this is the service container of webserver B.
     // Assume that the files on the webserver B have a different mtime than
     // webserver A.
-    touch('core/lib/Drupal/Core/Template/TwigExtension.php');
-    clearstatcache(TRUE, 'core/lib/Drupal/Core/Template/TwigExtension.php');
+    \touch('core/lib/Drupal/Core/Template/TwigExtension.php');
+    \clearstatcache(TRUE, 'core/lib/Drupal/Core/Template/TwigExtension.php');
     $container_b = \Drupal::service('kernel')->rebuildContainer();
 
     // Request 2 handled by webserver B.
@@ -271,11 +271,11 @@ TWIG;
 
     // The cache prefix should not have been changed, as this is stored in
     // state and thus shared between all (web)servers.
-    $this->assertEquals(count(array_unique($cache_prefixes)), 1);
+    $this->assertEquals(\count(\array_unique($cache_prefixes)), 1);
 
     // This also applies to twig's file cache resulting in an unlimited growth
     // of the cache storage directory.
-    $this->assertEquals(count(array_unique($cache_filenames)), 1);
+    $this->assertEquals(\count(\array_unique($cache_filenames)), 1);
   }
 
 }

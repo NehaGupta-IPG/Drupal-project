@@ -47,11 +47,11 @@ class EntityUpdateInitialTest extends BrowserTestBase {
       ->execute()
       ->fetchField();
 
-    $schema = unserialize($schema);
+    $schema = \unserialize($schema);
     $schema['entity_test_update']['fields']['name']['initial'] = 'test';
 
     $connection->update('key_value')
-      ->fields(['value' => serialize($schema)])
+      ->fields(['value' => \serialize($schema)])
       ->condition('collection', 'entity.storage_schema.sql')
       ->condition('name', 'entity_test_update.field_schema_data.name')
       ->execute();

@@ -88,8 +88,8 @@ class TestSiteInstallCommand extends Command {
       ->setDescription('Creates a test Drupal site')
       ->setHelp('The details to connect to the test site created will be displayed upon success. It will contain the database prefix and the user agent.')
       ->addOption('setup-file', NULL, InputOption::VALUE_OPTIONAL, 'The path to a PHP file containing a class to setup configuration used by the test, for example, core/tests/Drupal/TestSite/TestSiteMultilingualInstallTestScript.php.')
-      ->addOption('db-url', NULL, InputOption::VALUE_OPTIONAL, 'URL for database. Defaults to the environment variable SIMPLETEST_DB.', getenv('SIMPLETEST_DB'))
-      ->addOption('base-url', NULL, InputOption::VALUE_OPTIONAL, 'Base URL for site under test. Defaults to the environment variable SIMPLETEST_BASE_URL.', getenv('SIMPLETEST_BASE_URL'))
+      ->addOption('db-url', NULL, InputOption::VALUE_OPTIONAL, 'URL for database. Defaults to the environment variable SIMPLETEST_DB.', \getenv('SIMPLETEST_DB'))
+      ->addOption('base-url', NULL, InputOption::VALUE_OPTIONAL, 'Base URL for site under test. Defaults to the environment variable SIMPLETEST_BASE_URL.', \getenv('SIMPLETEST_BASE_URL'))
       ->addOption('install-profile', NULL, InputOption::VALUE_OPTIONAL, 'Install profile to install the site in. Defaults to testing.', 'testing')
       ->addOption('langcode', NULL, InputOption::VALUE_OPTIONAL, 'The language to install the site in. Defaults to en.', 'en')
       ->addOption('json', NULL, InputOption::VALUE_NONE, 'Output test site connection details in JSON.')
@@ -104,16 +104,16 @@ class TestSiteInstallCommand extends Command {
   protected function execute(InputInterface $input, OutputInterface $output): int {
     // Determines and validates the setup class prior to installing a database
     // to avoid creating unnecessary sites.
-    $root = dirname(__DIR__, 5);
-    chdir($root);
+    $root = \dirname(__DIR__, 5);
+    \chdir($root);
     $class_name = $this->getSetupClass($input->getOption('setup-file'));
     // Ensure we can install a site in the sites/simpletest directory.
     $this->ensureDirectory($root);
 
     $db_url = $input->getOption('db-url');
     $base_url = $input->getOption('base-url');
-    putenv("SIMPLETEST_DB=$db_url");
-    putenv("SIMPLETEST_BASE_URL=$base_url");
+    \putenv("SIMPLETEST_DB=$db_url");
+    \putenv("SIMPLETEST_BASE_URL=$base_url");
 
     // Manage site fixture.
     $this->setup($input->getOption('install-profile'), $class_name, $input->getOption('langcode'));
@@ -123,16 +123,16 @@ class TestSiteInstallCommand extends Command {
     if (!$fs->exists($root . '/sites/sites.php')) {
       $fs->copy($root . '/sites/example.sites.php', $root . '/sites/sites.php');
     }
-    $parsed = parse_url($base_url);
+    $parsed = \parse_url($base_url);
     $port = $parsed['port'] ?? 80;
     $host = $parsed['host'] ?? 'localhost';
     // Remove 'sites/' from the beginning of the path.
-    $site_path = substr($this->siteDirectory, 6);
+    $site_path = \substr($this->siteDirectory, 6);
     $fs->appendToFile($root . '/sites/sites.php', "\$sites['$port.$host'] = '$site_path';");
 
-    $user_agent = drupal_generate_test_ua($this->databasePrefix);
+    $user_agent = \drupal_generate_test_ua($this->databasePrefix);
     if ($input->getOption('json')) {
-      $output->writeln(json_encode([
+      $output->writeln(\json_encode([
         'db_prefix' => $this->databasePrefix,
         'user_agent' => $user_agent,
         'site_path' => $this->siteDirectory,
@@ -169,19 +169,19 @@ class TestSiteInstallCommand extends Command {
     if ($file === NULL) {
       return;
     }
-    if (!file_exists($file)) {
+    if (!\file_exists($file)) {
       throw new \InvalidArgumentException("The file $file does not exist.");
     }
 
-    $classes = get_declared_classes();
+    $classes = \get_declared_classes();
     include_once $file;
-    $new_classes = array_values(array_diff(get_declared_classes(), $classes));
+    $new_classes = \array_values(\array_diff(\get_declared_classes(), $classes));
     if (empty($new_classes)) {
       throw new \InvalidArgumentException("The file $file does not contain a class.");
     }
-    $class = array_pop($new_classes);
+    $class = \array_pop($new_classes);
 
-    if (!is_subclass_of($class, TestSetupInterface::class) && !is_subclass_of($class, TestPreinstallInterface::class)) {
+    if (!\is_subclass_of($class, TestSetupInterface::class) && !\is_subclass_of($class, TestPreinstallInterface::class)) {
       throw new \InvalidArgumentException("The class $class contained in $file needs to implement \Drupal\TestSite\TestSetupInterface or \Drupal\TestSite\TestPreinstallInterface");
     }
     return $class;
@@ -194,8 +194,8 @@ class TestSiteInstallCommand extends Command {
    *   The Drupal root.
    */
   protected function ensureDirectory($root) {
-    if (!is_writable($root . '/sites/simpletest')) {
-      if (!@mkdir($root . '/sites/simpletest')) {
+    if (!\is_writable($root . '/sites/simpletest')) {
+      if (!@\mkdir($root . '/sites/simpletest')) {
         throw new \RuntimeException($root . '/sites/simpletest must exist and be writable to install a test site');
       }
     }
@@ -245,7 +245,7 @@ class TestSiteInstallCommand extends Command {
    * @see \Drupal\TestSite\TestSetupInterface
    */
   protected function executeSetupClass($class) {
-    if (is_subclass_of($class, TestSetupInterface::class)) {
+    if (\is_subclass_of($class, TestSetupInterface::class)) {
       /** @var \Drupal\TestSite\TestSetupInterface $instance */
       $instance = new $class();
       $instance->setup();
@@ -263,7 +263,7 @@ class TestSiteInstallCommand extends Command {
    * @see \Drupal\TestSite\TestPreinstallInterface
    */
   protected function executePreinstallClass($class) {
-    if (is_subclass_of($class, TestPreinstallInterface::class)) {
+    if (\is_subclass_of($class, TestPreinstallInterface::class)) {
       /** @var \Drupal\TestSite\TestPreinstallInterface $instance */
       $instance = new $class();
       $instance->preinstall($this->databasePrefix, $this->siteDirectory);

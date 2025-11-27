@@ -95,7 +95,7 @@ class MenuTreeParameters implements \Serializable {
    * @return $this
    */
   public function setMinDepth($min_depth) {
-    $this->minDepth = max(1, $min_depth);
+    $this->minDepth = \max(1, $min_depth);
     return $this;
   }
 
@@ -124,8 +124,8 @@ class MenuTreeParameters implements \Serializable {
    * @return $this
    */
   public function addExpandedParents(array $parents) {
-    $this->expandedParents = array_merge($this->expandedParents, $parents);
-    $this->expandedParents = array_unique($this->expandedParents);
+    $this->expandedParents = \array_merge($this->expandedParents, $parents);
+    $this->expandedParents = \array_unique($this->expandedParents);
     return $this;
   }
 
@@ -212,14 +212,14 @@ class MenuTreeParameters implements \Serializable {
    * {@inheritdoc}
    */
   public function serialize() {
-    return serialize($this->__serialize());
+    return \serialize($this->__serialize());
   }
 
   /**
    * {@inheritdoc}
    */
   public function unserialize($serialized) {
-    $this->__unserialize(unserialize($serialized));
+    $this->__unserialize(\unserialize($serialized));
     return $this;
   }
 
@@ -231,11 +231,11 @@ class MenuTreeParameters implements \Serializable {
     $this->root = (string) $this->root;
     $this->minDepth = $this->minDepth !== NULL ? (int) $this->minDepth : NULL;
     $this->maxDepth = $this->maxDepth !== NULL ? (int) $this->maxDepth : NULL;
-    $this->activeTrail = array_values(array_filter($this->activeTrail));
+    $this->activeTrail = \array_values(\array_filter($this->activeTrail));
 
     // Sort 'expanded' and 'conditions' to prevent duplicate cache items.
-    sort($this->expandedParents);
-    asort($this->conditions);
+    \sort($this->expandedParents);
+    \asort($this->conditions);
 
     return [
       'root' => $this->root,

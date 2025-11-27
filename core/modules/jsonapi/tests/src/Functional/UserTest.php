@@ -177,7 +177,7 @@ class UserTest extends ResourceTestBase {
    */
   protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     $cache_contexts = parent::getExpectedCacheContexts($sparse_fieldset);
-    if ($sparse_fieldset === NULL || !empty(array_intersect(['mail', 'display_name'], $sparse_fieldset))) {
+    if ($sparse_fieldset === NULL || !empty(\array_intersect(['mail', 'display_name'], $sparse_fieldset))) {
       $cache_contexts = Cache::mergeContexts($cache_contexts, ['user']);
     }
     return $cache_contexts;
@@ -236,7 +236,7 @@ class UserTest extends ResourceTestBase {
    */
   public function testPatchDxForSecuritySensitiveBaseFields(): void {
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
-    $url = Url::fromRoute(sprintf('jsonapi.user--user.individual'), ['entity' => $this->account->uuid()]);
+    $url = Url::fromRoute(\sprintf('jsonapi.user--user.individual'), ['entity' => $this->account->uuid()]);
     /* $url = $this->account->toUrl('jsonapi'); */
 
     // Since this test must be performed by the user that is being modified,
@@ -256,7 +256,7 @@ class UserTest extends ResourceTestBase {
 
     // DX: 405 when read-only mode is enabled.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
+    $this->assertResourceErrorResponse(405, \sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
@@ -356,7 +356,7 @@ class UserTest extends ResourceTestBase {
    */
   public function testPatchSecurityOtherUser(): void {
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
-    $url = Url::fromRoute(sprintf('jsonapi.user--user.individual'), ['entity' => $this->account->uuid()]);
+    $url = Url::fromRoute(\sprintf('jsonapi.user--user.individual'), ['entity' => $this->account->uuid()]);
     /* $url = $this->account->toUrl('jsonapi'); */
 
     $original_normalization = $this->normalize($this->account, $url);
@@ -374,7 +374,7 @@ class UserTest extends ResourceTestBase {
 
     // DX: 405 when read-only mode is enabled.
     $response = $this->request('PATCH', $url, $request_options);
-    $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
+    $this->assertResourceErrorResponse(405, \sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
@@ -414,7 +414,7 @@ class UserTest extends ResourceTestBase {
 
     $collection_url = Url::fromRoute('jsonapi.user--user.collection', [], ['query' => ['sort' => 'drupal_internal__uid']]);
     // @todo Remove line below in favor of commented line in https://www.drupal.org/project/drupal/issues/2878463.
-    $user_a_url = Url::fromRoute(sprintf('jsonapi.user--user.individual'), ['entity' => $user_a->uuid()]);
+    $user_a_url = Url::fromRoute(\sprintf('jsonapi.user--user.individual'), ['entity' => $user_a->uuid()]);
     /* $user_a_url = $user_a->toUrl('jsonapi'); */
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
@@ -429,8 +429,8 @@ class UserTest extends ResourceTestBase {
     $doc = $this->getDocumentFromResponse($response);
     $this->assertSame($user_a->uuid(), $doc['data']['2']['id']);
     $this->assertArrayHasKey('mail', $doc['data'][2]['attributes'], "Own user--user resource's 'mail' field is visible.");
-    $this->assertSame($user_b->uuid(), $doc['data'][count($doc['data']) - 1]['id']);
-    $this->assertArrayNotHasKey('mail', $doc['data'][count($doc['data']) - 1]['attributes']);
+    $this->assertSame($user_b->uuid(), $doc['data'][\count($doc['data']) - 1]['id']);
+    $this->assertArrayNotHasKey('mail', $doc['data'][\count($doc['data']) - 1]['attributes']);
 
     // Now request the same URLs, but as user B (same roles/permissions).
     $this->account = $user_b;
@@ -444,8 +444,8 @@ class UserTest extends ResourceTestBase {
     $doc = $this->getDocumentFromResponse($response);
     $this->assertSame($user_a->uuid(), $doc['data']['2']['id']);
     $this->assertArrayNotHasKey('mail', $doc['data'][2]['attributes']);
-    $this->assertSame($user_b->uuid(), $doc['data'][count($doc['data']) - 1]['id']);
-    $this->assertArrayHasKey('mail', $doc['data'][count($doc['data']) - 1]['attributes']);
+    $this->assertSame($user_b->uuid(), $doc['data'][\count($doc['data']) - 1]['id']);
+    $this->assertArrayHasKey('mail', $doc['data'][\count($doc['data']) - 1]['attributes']);
 
     // Now grant permission to view user email addresses and verify.
     $this->grantPermissionsToTestedRole(['view user email addresses']);
@@ -790,7 +790,7 @@ class UserTest extends ResourceTestBase {
     $account = $this->createAnotherEntity($cancel_method);
     $node = $this->drupalCreateNode(['uid' => $account->id()]);
 
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $account->uuid()]);
+    $url = Url::fromRoute(\sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $account->uuid()]);
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
@@ -840,7 +840,7 @@ class UserTest extends ResourceTestBase {
    *   The cancel method.
    */
   private function sendDeleteRequestForUser(UserInterface $account, string $cancel_method): void {
-    $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $account->uuid()]);
+    $url = Url::fromRoute(\sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $account->uuid()]);
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());

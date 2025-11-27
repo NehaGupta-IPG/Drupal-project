@@ -151,8 +151,8 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
       //   prepended and appended.
       $pattern = '{^(?:' . $element['#pattern'] . ')$}';
 
-      if (!preg_match($pattern, $element['#value'])) {
-        $form_state->setError($element, t('%name field is not in the right format.', ['%name' => $element['#title']]));
+      if (!\preg_match($pattern, $element['#value'])) {
+        $form_state->setError($element, \t('%name field is not in the right format.', ['%name' => $element['#title']]));
       }
     }
   }

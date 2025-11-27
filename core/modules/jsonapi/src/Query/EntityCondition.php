@@ -142,9 +142,9 @@ class EntityCondition {
       [static::PATH_KEY, static::VALUE_KEY, static::OPERATOR_KEY],
     ];
 
-    $given_keys = array_keys($parameter);
-    $valid_key_set = array_reduce($valid_key_combinations, function ($valid, $set) use ($given_keys) {
-      return ($valid) ? $valid : count(array_diff($set, $given_keys)) === 0;
+    $given_keys = \array_keys($parameter);
+    $valid_key_set = \array_reduce($valid_key_combinations, function ($valid, $set) use ($given_keys) {
+      return ($valid) ? $valid : \count(\array_diff($set, $given_keys)) === 0;
     }, FALSE);
 
     $has_operator_key = isset($parameter[static::OPERATOR_KEY]);
@@ -170,12 +170,12 @@ class EntityCondition {
 
     if ($has_operator_key) {
       $operator = $parameter[static::OPERATOR_KEY];
-      if (!in_array($operator, static::$allowedOperators)) {
+      if (!\in_array($operator, static::$allowedOperators)) {
         $reason = "The '" . $operator . "' operator is not allowed in a filter parameter.";
         throw new CacheableBadRequestHttpException($cacheability, $reason);
       }
 
-      if (in_array($operator, ['IS NULL', 'IS NOT NULL']) && $has_value_key) {
+      if (\in_array($operator, ['IS NULL', 'IS NOT NULL']) && $has_value_key) {
         $reason = "Filters using the '" . $operator . "' operator should not provide a value.";
         throw new CacheableBadRequestHttpException($cacheability, $reason);
       }

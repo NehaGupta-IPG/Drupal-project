@@ -158,7 +158,7 @@ class SystemTokensHooks {
             /** @var \Drupal\Core\GeneratedUrl $result */
             $result = Url::fromRoute('<front>', [], $url_options)->toString(TRUE);
             $bubbleable_metadata->addCacheableDependency($result);
-            $replacements[$original] = preg_replace(['!^https?://!', '!/$!'], '', $result->getGeneratedUrl());
+            $replacements[$original] = \preg_replace(['!^https?://!', '!/$!'], '', $result->getGeneratedUrl());
             break;
 
           case 'login-url':

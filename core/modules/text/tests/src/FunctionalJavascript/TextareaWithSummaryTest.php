@@ -126,7 +126,7 @@ class TextareaWithSummaryTest extends WebDriverTestBase {
         [
           'value' => $this->randomMachineName(32),
           'summary' => $this->randomMachineName(32),
-          'format' => filter_default_format(),
+          'format' => \filter_default_format(),
         ],
       ],
     ]);

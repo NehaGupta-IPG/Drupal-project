@@ -203,8 +203,8 @@ class ConfigActionsTest extends KernelTestBase {
       ->sort('weight', 'ASC')
       ->execute();
     $this->assertGreaterThanOrEqual(3, $blocks);
-    $this->assertSame('first', key($blocks));
-    $this->assertSame('last', end($blocks));
+    $this->assertSame('first', \key($blocks));
+    $this->assertSame('last', \end($blocks));
   }
 
   /**

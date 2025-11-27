@@ -118,7 +118,7 @@ class SiteInformationForm extends ConfigFormBase {
       '#config_target' => new ConfigTarget(
         'system.site',
         'mail',
-        fromConfig: fn($value) => $value ?: ini_get('sendmail_from'),
+        fromConfig: fn($value) => $value ?: \ini_get('sendmail_from'),
       ),
       '#description' => $this->t("The <em>From</em> address in automated emails sent during registration and new password requests, and other notifications. (Use an address ending in your site's domain to help prevent this email being flagged as spam.)"),
       '#required' => TRUE,

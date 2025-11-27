@@ -138,7 +138,7 @@ class FieldDropbuttonTest extends ViewsKernelTestBase {
     // output being set in previous versions.
     foreach ($view->result as $index => $row) {
       $view->row_index = $index;
-      foreach (array_keys($view->field) as $field) {
+      foreach (\array_keys($view->field) as $field) {
         $output = $renderer->executeInRenderContext(new RenderContext(), function () use ($view, $row, $field) {
           return $view->field[$field]->advancedRender($row);
         });

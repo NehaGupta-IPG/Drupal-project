@@ -93,9 +93,9 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
    */
   private function checkUrl(LanguageInterface $language, $message): void {
     $options = ['language' => $language, 'script' => ''];
-    $base_path = trim(base_path(), '/');
-    $rewritten_path = trim(str_replace($base_path, '', Url::fromRoute('<front>', [], $options)->toString()), '/');
-    $segments = explode('/', $rewritten_path, 2);
+    $base_path = \trim(\base_path(), '/');
+    $rewritten_path = \trim(\str_replace($base_path, '', Url::fromRoute('<front>', [], $options)->toString()), '/');
+    $segments = \explode('/', $rewritten_path, 2);
     $prefix = $segments[0];
     $path = $segments[1] ?? $prefix;
 
@@ -117,7 +117,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
     global $base_url;
     $language_domain = 'example.fr';
     // Get the current host URI we're running on.
-    $base_url_host = parse_url($base_url, PHP_URL_HOST);
+    $base_url_host = \parse_url($base_url, PHP_URL_HOST);
     $edit = [
       'language_negotiation_url_part' => LanguageNegotiationUrl::CONFIG_DOMAIN,
       'domain[en]' => $base_url_host,
@@ -139,7 +139,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
 
     // In case index.php is part of the URLs, we need to adapt the asserted
     // URLs as well.
-    $index_php = str_contains(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), 'index.php');
+    $index_php = \str_contains(Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), 'index.php');
 
     $request = Request::createFromGlobals();
     $server = $request->server->all();
@@ -152,7 +152,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
       'language' => $language,
     ])->toString();
 
-    $expected = ($index_php ? 'http://example.fr:88/index.php' : 'http://example.fr:88') . rtrim(base_path(), '/') . '/';
+    $expected = ($index_php ? 'http://example.fr:88/index.php' : 'http://example.fr:88') . \rtrim(\base_path(), '/') . '/';
 
     $this->assertEquals($expected, $url, 'The right port is used.');
 
@@ -163,7 +163,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
       'base_url' => $request->getBaseUrl() . ':90',
     ])->toString();
 
-    $expected = $index_php ? 'http://example.fr:90/index.php' : 'http://example.fr:90' . rtrim(base_path(), '/') . '/';
+    $expected = $index_php ? 'http://example.fr:90/index.php' : 'http://example.fr:90' . \rtrim(\base_path(), '/') . '/';
 
     $this->assertEquals($expected, $url, 'A given port is not overridden.');
 

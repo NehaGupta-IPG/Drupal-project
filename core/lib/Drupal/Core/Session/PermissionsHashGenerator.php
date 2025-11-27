@@ -66,8 +66,8 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
     // permissions happened to differ.
     else {
       $permissions = $item->getPermissions();
-      sort($permissions);
-      $hash = $this->hash(serialize($permissions));
+      \sort($permissions);
+      $hash = $this->hash(\serialize($permissions));
     }
 
     $this->static->set($cid, $hash, Cache::PERMANENT, $calculated_permissions->getCacheTags());
@@ -91,7 +91,7 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
    *   The hash.
    */
   protected function hash($identifier) {
-    return hash('sha256', $this->privateKey->get() . Settings::getHashSalt() . $identifier);
+    return \hash('sha256', $this->privateKey->get() . Settings::getHashSalt() . $identifier);
   }
 
 }

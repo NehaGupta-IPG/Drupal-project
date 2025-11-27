@@ -21,9 +21,9 @@ trait AssertUtilsTrait {
    */
   protected function assertScaffoldedFile($path, $is_link, $contents_contains) {
     $this->assertFileExists($path);
-    $contents = file_get_contents($path);
-    $this->assertStringContainsString($contents_contains, basename($path) . ': ' . $contents);
-    $this->assertSame($is_link, is_link($path));
+    $contents = \file_get_contents($path);
+    $this->assertStringContainsString($contents_contains, \basename($path) . ': ' . $contents);
+    $this->assertSame($is_link, \is_link($path));
   }
 
   /**
@@ -36,11 +36,11 @@ trait AssertUtilsTrait {
    */
   protected function assertScaffoldedFileDoesNotContain($path, $contents_not_contains) {
     // If the file does not exist at all, we'll count that as a pass.
-    if (!file_exists($path)) {
+    if (!\file_exists($path)) {
       return;
     }
-    $contents = file_get_contents($path);
-    $this->assertStringNotContainsString($contents_not_contains, $contents, basename($path) . ' contains unexpected contents:');
+    $contents = \file_get_contents($path);
+    $this->assertStringNotContainsString($contents_not_contains, $contents, \basename($path) . ' contains unexpected contents:');
   }
 
 }

@@ -69,7 +69,7 @@ final class LockFileValidator implements EventSubscriberInterface {
    */
   private function getHash(string $path): string|false {
     try {
-      return @hash_file('xxh64', $path);
+      return @\hash_file('xxh64', $path);
     }
     catch (\Throwable) {
       return FALSE;
@@ -139,7 +139,7 @@ final class LockFileValidator implements EventSubscriberInterface {
     }
 
     // If we have both hashes, ensure they match.
-    if ($active_lock_file_hash && !hash_equals($active_lock_file_stored_hash, $active_lock_file_hash)) {
+    if ($active_lock_file_hash && !\hash_equals($active_lock_file_stored_hash, $active_lock_file_hash)) {
       $messages[] = $this->t('Unexpected changes were detected in the active lock file (@file), which indicates that other Composer operations were performed since this Package Manager operation started. This can put the code base into an unreliable state and therefore is not allowed.', [
         '@file' => $active_lock_file_path,
       ]);
@@ -150,7 +150,7 @@ final class LockFileValidator implements EventSubscriberInterface {
     if (empty($messages) && $event instanceof PreApplyEvent) {
       $staged_lock_file_path = $sandbox_manager->getSandboxDirectory() . DIRECTORY_SEPARATOR . 'composer.lock';
       $staged_lock_file_hash = $this->getHash($staged_lock_file_path);
-      if ($staged_lock_file_hash && hash_equals($active_lock_file_hash, $staged_lock_file_hash)) {
+      if ($staged_lock_file_hash && \hash_equals($active_lock_file_hash, $staged_lock_file_hash)) {
         $messages[] = $this->t('There appear to be no pending Composer operations because the active lock file (@active_file) and the staged lock file (@staged_file) are identical.', [
           '@active_file' => $active_lock_file_path,
           '@staged_file' => $staged_lock_file_path,
@@ -160,7 +160,7 @@ final class LockFileValidator implements EventSubscriberInterface {
 
     if (!empty($messages)) {
       $summary = $this->formatPlural(
-        count($messages),
+        \count($messages),
         'Problem detected in lock file during stage operations.',
         'Problems detected in lock file during stage operations.',
       );

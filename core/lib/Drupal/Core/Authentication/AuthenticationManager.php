@@ -179,7 +179,7 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
     $has_auth_option = isset($route) && $route->hasOption('_auth');
 
     if ($has_auth_option) {
-      return in_array($provider_id, $route->getOption('_auth'));
+      return \in_array($provider_id, $route->getOption('_auth'));
     }
     else {
       return $this->authCollector->isGlobal($provider_id);

@@ -43,7 +43,7 @@ trait PluginDependencyTrait {
         $config_dependencies = $definition->getConfigDependencies();
       }
     }
-    elseif (is_array($definition)) {
+    elseif (\is_array($definition)) {
       $provider = $definition['provider'];
 
       if (isset($definition['config_dependencies'])) {

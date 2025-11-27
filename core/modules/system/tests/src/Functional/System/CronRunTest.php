@@ -73,7 +73,7 @@ class CronRunTest extends BrowserTestBase {
 
     // Ensure cron does not run when a non-zero cron interval is specified and
     // was not passed.
-    $cron_last = time();
+    $cron_last = \time();
     $cron_safe_interval = 100;
     \Drupal::state()->set('system.cron_last', $cron_last);
     $this->config('automated_cron.settings')
@@ -83,10 +83,10 @@ class CronRunTest extends BrowserTestBase {
     $this->assertSame($cron_last, \Drupal::state()->get('system.cron_last'), 'Cron does not run when the cron interval is not passed.');
 
     // Test if cron runs when the cron interval was passed.
-    $cron_last = time() - 200;
+    $cron_last = \time() - 200;
     \Drupal::state()->set('system.cron_last', $cron_last);
     $this->drupalGet('');
-    sleep(1);
+    \sleep(1);
     // Verify that cron runs when the cron interval has passed.
     $this->assertLessThan(\Drupal::state()->get('system.cron_last'), $cron_last);
 
@@ -97,7 +97,7 @@ class CronRunTest extends BrowserTestBase {
     $this->drupalLogout();
 
     // Test if cron does not run when the cron interval is set to zero.
-    $cron_last = time() - 200;
+    $cron_last = \time() - 200;
     \Drupal::state()->set('system.cron_last', $cron_last);
     $this->drupalGet('');
     $this->assertSame($cron_last, \Drupal::state()->get('system.cron_last'), 'Cron does not run when the cron threshold is disabled.');
@@ -135,11 +135,11 @@ class CronRunTest extends BrowserTestBase {
     // Now check that it has run.
     // Sleep to allow cron time to complete since it happens during kernel
     // terminate after the page response is set.
-    sleep(3);
+    \sleep(3);
     $this->drupalGet('admin/config/system/cron');
     $this->assertSession()->pageTextNotContains('Last run: never');
 
-    $cron_last = time() - 200;
+    $cron_last = \time() - 200;
     \Drupal::state()->set('system.cron_last', $cron_last);
 
     $this->submitForm([], 'Save configuration');

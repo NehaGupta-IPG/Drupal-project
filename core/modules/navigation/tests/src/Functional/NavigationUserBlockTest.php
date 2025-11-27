@@ -84,10 +84,10 @@ class NavigationUserBlockTest extends PageCacheTagsTestBase {
 
     // We should see all three user links in the page.
     $link_labels = ['View profile', 'Edit profile', 'Log out'];
-    $block = $this->assertSession()->elementExists('css', sprintf('.toolbar-block:contains("%s")', $rendered_user_name));
+    $block = $this->assertSession()->elementExists('css', \sprintf('.toolbar-block:contains("%s")', $rendered_user_name));
     foreach ($link_labels as $link_label) {
       $links = $block->findAll('named', ['link', $link_label]);
-      $this->assertCount(1, $links, sprintf('Found %s links with label %s.', count($links), $link_label));
+      $this->assertCount(1, $links, \sprintf('Found %s links with label %s.', \count($links), $link_label));
     }
     // The Edit profile link should link to the users edit profile page.
     $links = $this->getSession()->getPage()->findAll('named', ['link', 'Edit profile']);

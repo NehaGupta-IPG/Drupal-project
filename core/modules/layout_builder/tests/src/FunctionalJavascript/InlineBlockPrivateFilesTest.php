@@ -224,7 +224,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
       'filemime' => 'text/plain',
     ]);
     $file->setPermanent();
-    file_put_contents($file->getFileUri(), $this->getFileSecret($file));
+    \file_put_contents($file->getFileUri(), $this->getFileSecret($file));
     $file->save();
     return $file;
   }

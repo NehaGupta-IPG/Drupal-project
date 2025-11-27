@@ -61,7 +61,7 @@ class BigPipeRegressionTestController implements TrustedCallbackInterface {
    */
   public function multipleReplacements() {
     $build = [];
-    foreach (range(1, self::PLACEHOLDER_COUNT) as $length) {
+    foreach (\range(1, self::PLACEHOLDER_COUNT) as $length) {
       $build[] = [
         '#lazy_builder' => [static::class . '::renderRandomSentence', [$length]],
         '#create_placeholder' => TRUE,
@@ -103,7 +103,7 @@ class BigPipeRegressionTestController implements TrustedCallbackInterface {
    */
   public static function currentTime() {
     return [
-      '#markup' => '<time datetime="' . date('Y-m-d', time()) . '"></time>',
+      '#markup' => '<time datetime="' . \date('Y-m-d', \time()) . '"></time>',
       '#cache' => ['max-age' => 0],
     ];
   }

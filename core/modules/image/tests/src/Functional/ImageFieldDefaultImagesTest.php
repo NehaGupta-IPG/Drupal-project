@@ -64,7 +64,7 @@ class ImageFieldDefaultImagesTest extends ImageFieldTestBase {
       'field_storage_private',
       'field_private',
     ] as $image_target) {
-      $file = File::create((array) array_pop($files));
+      $file = File::create((array) \array_pop($files));
       $file->save();
       $default_images[$image_target] = $file;
     }

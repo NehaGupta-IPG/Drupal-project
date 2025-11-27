@@ -116,9 +116,9 @@ class StatusMessages extends RenderElementBase {
         '#theme' => 'status_messages',
         '#message_list' => $messages,
         '#status_headings' => [
-          'status' => t('Status message'),
-          'error' => t('Error message'),
-          'warning' => t('Warning message'),
+          'status' => \t('Status message'),
+          'error' => \t('Error message'),
+          'warning' => \t('Warning message'),
         ],
       ];
     }

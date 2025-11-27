@@ -112,14 +112,14 @@ class PhpTransliterationTest extends TestCase {
     $two_byte = 'Ä Ö Ü Å Ø äöüåøhello';
     // This is a Cyrillic character that looks something like a "u". See
     // http://www.unicode.org/charts/PDF/U0400.pdf
-    $three_byte = html_entity_decode('&#x446;', ENT_NOQUOTES, 'UTF-8');
+    $three_byte = \html_entity_decode('&#x446;', ENT_NOQUOTES, 'UTF-8');
     // This is a Canadian Aboriginal character like a triangle. See
     // http://www.unicode.org/charts/PDF/U1400.pdf
-    $four_byte = html_entity_decode('&#x1411;', ENT_NOQUOTES, 'UTF-8');
+    $four_byte = \html_entity_decode('&#x1411;', ENT_NOQUOTES, 'UTF-8');
     // These are two Gothic alphabet letters. See
     // http://wikipedia.org/wiki/Gothic_alphabet
     // They are not in our tables, but should at least give us '?' (unknown).
-    $five_byte = html_entity_decode('&#x10330;&#x10338;', ENT_NOQUOTES, 'UTF-8');
+    $five_byte = \html_entity_decode('&#x10330;&#x10338;', ENT_NOQUOTES, 'UTF-8');
 
     // cSpell:disable
     return [
@@ -171,40 +171,40 @@ class PhpTransliterationTest extends TestCase {
         'de', $two_byte, 'Ae Oe Ue A O aeoe', '?', 18,
       ],
       'Illegal/unknown unicode' => [
-        'en', chr(0xF8) . chr(0x80) . chr(0x80) . chr(0x80) . chr(0x80), '?????',
+        'en', \chr(0xF8) . \chr(0x80) . \chr(0x80) . \chr(0x80) . \chr(0x80), '?????',
       ],
       'Illegal/unknown unicode with non default replacement' => [
-        'en', chr(0xF8) . chr(0x80) . chr(0x80) . chr(0x80) . chr(0x80), '-----', '-',
+        'en', \chr(0xF8) . \chr(0x80) . \chr(0x80) . \chr(0x80) . \chr(0x80), '-----', '-',
       ],
       'Contains Illegal/unknown unicode' => [
-        'en', 'Hel' . chr(0x80) . 'o World', 'Hel?o World',
+        'en', 'Hel' . \chr(0x80) . 'o World', 'Hel?o World',
       ],
       'Illegal/unknown unicode at end' => [
-        'en', 'Hell' . chr(0x80) . ' World', 'Hell? World',
+        'en', 'Hell' . \chr(0x80) . ' World', 'Hell? World',
       ],
       'Non default replacement' => [
-        'en', chr(0x80) . 'ello World', '_ello World', '_',
+        'en', \chr(0x80) . 'ello World', '_ello World', '_',
       ],
       'Keep the original question marks' => [
-        'en', chr(0xF8) . '?' . chr(0x80), '???',
+        'en', \chr(0xF8) . '?' . \chr(0x80), '???',
       ],
       'Keep the original question marks when non default replacement' => [
-        'en', chr(0x80) . 'ello ? World?', '_ello ? World?', '_',
+        'en', \chr(0x80) . 'ello ? World?', '_ello ? World?', '_',
       ],
       'Keep the original question marks in some other language' => [
-        'pl', 'aąeę' . chr(0x80) . 'oółżźz ?', 'aaee?oolzzz ?',
+        'pl', 'aąeę' . \chr(0x80) . 'oółżźz ?', 'aaee?oolzzz ?',
       ],
       'Non-US-ASCII replacement in English' => [
-        'en', chr(0x80) . 'ello World?', 'Oello World?', 'Ö',
+        'en', \chr(0x80) . 'ello World?', 'Oello World?', 'Ö',
       ],
       'Non-US-ASCII replacement in some other language' => [
-        'pl', chr(0x80) . 'óóść', 'ooosc', 'ó',
+        'pl', \chr(0x80) . 'óóść', 'ooosc', 'ó',
       ],
       'Ensure question marks are replaced when max length used' => [
-        'en', chr(0x80) . 'ello ? World?', '_ello ?', '_', 7,
+        'en', \chr(0x80) . 'ello ? World?', '_ello ?', '_', 7,
       ],
       'Empty replacement' => [
-        'en', chr(0x80) . 'ello World' . chr(0xF8), 'ello World', '',
+        'en', \chr(0x80) . 'ello World' . \chr(0xF8), 'ello World', '',
       ],
       'Not affecting spacing from the beginning and end of a string' => [
         'en', ' Hello Abventor! ', ' Hello Abventor! ',
@@ -236,7 +236,7 @@ class PhpTransliterationTest extends TestCase {
       ],
     ]);
     $transliteration = new PhpTransliteration(vfsStream::url('transliteration/dir'));
-    $transliterated = $transliteration->transliterate(chr(0xC2) . chr(0x82), '../index');
+    $transliterated = $transliteration->transliterate(\chr(0xC2) . \chr(0x82), '../index');
     $this->assertSame('safe', $transliterated);
   }
 

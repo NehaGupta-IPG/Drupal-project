@@ -52,7 +52,7 @@ class WorkflowStateTransitionOperationsAccessCheck implements AccessInterface {
    */
   public function access(RouteMatchInterface $route_match, AccountInterface $account) {
     $workflow_operation = $this->getOperation($route_match);
-    if (!preg_match('/^(?<operation>add|update|delete)-(?<type>state|transition)$/', $workflow_operation, $matches)) {
+    if (!\preg_match('/^(?<operation>add|update|delete)-(?<type>state|transition)$/', $workflow_operation, $matches)) {
       throw new \Exception("Invalid _workflow_access operation '$workflow_operation' specified for route '{$route_match->getRouteName()}'.");
     }
 
@@ -61,8 +61,8 @@ class WorkflowStateTransitionOperationsAccessCheck implements AccessInterface {
     if ($workflow && $matches['operation'] === 'add') {
       return $workflow->access($workflow_operation, $account, TRUE);
     }
-    if ($workflow && $type = $parameters->get(sprintf('workflow_%s', $matches['type']))) {
-      return $workflow->access(sprintf('%s:%s', $workflow_operation, $type), $account, TRUE);
+    if ($workflow && $type = $parameters->get(\sprintf('workflow_%s', $matches['type']))) {
+      return $workflow->access(\sprintf('%s:%s', $workflow_operation, $type), $account, TRUE);
     }
 
     return AccessResult::neutral();

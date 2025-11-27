@@ -61,13 +61,13 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
     }
     else {
       // Only arrays with numeric keys are supported.
-      if (!is_array($values)) {
+      if (!\is_array($values)) {
         throw new \InvalidArgumentException('Cannot set a list with a non-array value.');
       }
       // Assign incoming values. Keys are renumbered to ensure 0-based
       // sequential deltas. If possible, reuse existing items rather than
       // creating new ones.
-      foreach (array_values($values) as $delta => $value) {
+      foreach (\array_values($values) as $delta => $value) {
         if (!isset($this->list[$delta])) {
           $this->list[$delta] = $this->createItem($delta, $value);
         }
@@ -76,7 +76,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
         }
       }
       // Truncate extraneous pre-existing values.
-      $this->list = array_slice($this->list, 0, count($values));
+      $this->list = \array_slice($this->list, 0, \count($values));
     }
     // Notify the parent of any changes.
     if ($notify && isset($this->parent)) {
@@ -93,14 +93,14 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
       $strings[] = $item->getString();
     }
     // Remove any empty strings resulting from empty items.
-    return implode(', ', FilterArray::removeEmptyStrings($strings));
+    return \implode(', ', FilterArray::removeEmptyStrings($strings));
   }
 
   /**
    * {@inheritdoc}
    */
   public function get($index) {
-    if (!is_numeric($index)) {
+    if (!\is_numeric($index)) {
       throw new \InvalidArgumentException('Unable to get a value with a non-numeric delta in a list.');
     }
     return $this->list[$index] ?? NULL;
@@ -110,12 +110,12 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * {@inheritdoc}
    */
   public function set($index, $value) {
-    if (!is_numeric($index)) {
+    if (!\is_numeric($index)) {
       throw new \InvalidArgumentException('Unable to set a value with a non-numeric delta in a list.');
     }
     // Ensure indexes stay sequential. We allow assigning an item at an existing
     // index, or at the next index available.
-    if ($index < 0 || $index > count($this->list)) {
+    if ($index < 0 || $index > \count($this->list)) {
       throw new \InvalidArgumentException('Unable to set a value to a non-subsequent delta in a list.');
     }
     // Support setting values via typed data objects.
@@ -132,7 +132,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * {@inheritdoc}
    */
   public function removeItem($index) {
-    if (isset($this->list) && array_key_exists($index, $this->list)) {
+    if (isset($this->list) && \array_key_exists($index, $this->list)) {
       // Remove the item, and reassign deltas.
       unset($this->list[$index]);
       $this->rekey($index);
@@ -153,10 +153,10 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    */
   protected function rekey($from_index = 0) {
     // Re-key the list to maintain consecutive indexes.
-    $this->list = array_values($this->list);
+    $this->list = \array_values($this->list);
     // Each item holds its own index as a "name", it needs to be updated
     // according to the new list indexes.
-    for ($i = $from_index; $i < count($this->list); $i++) {
+    for ($i = $from_index; $i < \count($this->list); $i++) {
       $this->list[$i]->setContext($i, $this);
     }
   }
@@ -207,7 +207,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * {@inheritdoc}
    */
   public function appendItem($value = NULL) {
-    $offset = count($this->list);
+    $offset = \count($this->list);
     $item = $this->createItem($offset, $value);
     $this->list[$offset] = $item;
     return $item;
@@ -241,7 +241,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
    * {@inheritdoc}
    */
   public function count(): int {
-    return count($this->list);
+    return \count($this->list);
   }
 
   /**
@@ -269,8 +269,8 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
     if (isset($this->list)) {
       $removed = FALSE;
       // Apply the filter, detecting if some items were actually removed.
-      $this->list = array_filter($this->list, function ($item) use ($callback, &$removed) {
-        if (call_user_func($callback, $item)) {
+      $this->list = \array_filter($this->list, function ($item) use ($callback, &$removed) {
+        if (\call_user_func($callback, $item)) {
           return TRUE;
         }
         else {

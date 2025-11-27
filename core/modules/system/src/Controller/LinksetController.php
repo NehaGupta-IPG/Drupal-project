@@ -56,7 +56,7 @@ final class LinksetController extends ControllerBase {
     $tree = $this->loadMenuTree($menu);
     // Get the incoming request URI and parse it so the linkset can use a
     // relative URL for the linkset anchor.
-    ['path' => $path, 'query' => $query] = parse_url($request->getUri()) + ['query' => FALSE];
+    ['path' => $path, 'query' => $query] = \parse_url($request->getUri()) + ['query' => FALSE];
     // Construct a relative URL.
     $anchor = $path . (!empty($query) ? '?' . $query : '');
     $cacheability = CacheableMetadata::createFromObject($menu);
@@ -65,7 +65,7 @@ final class LinksetController extends ControllerBase {
     $menu_id = $menu->id();
     $links = $this->toLinkTargetObjects($tree, $cacheability);
     foreach ($links as $rel => $target_objects) {
-      $links[$rel] = array_map(function (array $target) use ($menu_id) {
+      $links[$rel] = \array_map(function (array $target) use ($menu_id) {
         // According to the Linkset specification, this member must be an array
         // since the "machine-name" target attribute is non-standard.
         // See https://tools.ietf.org/html/draft-ietf-httpapi-linkset-08#section-4.2.4.3
@@ -150,10 +150,10 @@ final class LinksetController extends ControllerBase {
     $links = [];
     // Calling array_values() discards any key names so that $index will be
     // numerical.
-    foreach (array_values($tree) as $index => $element) {
+    foreach (\array_values($tree) as $index => $element) {
       // Extract and preserve the access cacheability metadata.
       $element_access = $element->access;
-      assert($element_access instanceof AccessResultInterface);
+      \assert($element_access instanceof AccessResultInterface);
       $cacheability->addCacheableDependency($element_access);
       // If an element is not accessible, it should not be encoded. Its
       // cacheability should be preserved regardless, which is why that is done
@@ -168,7 +168,7 @@ final class LinksetController extends ControllerBase {
         // to the link element parent's hierarchy value. See this method's
         // docblock for more context on why this value is the way it is.
         $hierarchy = $hierarchy_ancestors;
-        array_push($hierarchy, strval($index));
+        \array_push($hierarchy, \strval($index));
         $link_options = $element->link->getOptions();
         $link_attributes = ($link_options['attributes'] ?? []);
         $link_rel = $link_attributes['rel'] ?? 'item';
@@ -186,7 +186,7 @@ final class LinksetController extends ControllerBase {
         // Recurse into the element's subtree.
         if (!empty($element->subtree)) {
           // Recursion!
-          $links = array_merge_recursive($links, $this->toLinkTargetObjects($element->subtree, $cacheability, $hierarchy));
+          $links = \array_merge_recursive($links, $this->toLinkTargetObjects($element->subtree, $cacheability, $hierarchy));
         }
       }
     }
@@ -228,25 +228,25 @@ final class LinksetController extends ControllerBase {
     ];
 
     foreach ($attributes as $key => $value) {
-      if (in_array($key, $attribute_keys_to_ignore, TRUE)) {
+      if (\in_array($key, $attribute_keys_to_ignore, TRUE)) {
         continue;
       }
       // Skip the attribute key if it has an asterisk (*).
-      if (str_contains($key, '*')) {
+      if (\str_contains($key, '*')) {
         continue;
       }
       // Skip the value if it is an object.
-      if (is_object($value)) {
+      if (\is_object($value)) {
         continue;
       }
       // See https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-linkset-03#section-4.2.4.3
       // Values for custom attributes must follow these rules,
       // - Values MUST be array.
       // - Each item in the array MUST be a string.
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $link[$key] = [];
         foreach ($value as $val) {
-          if (is_object($val) || is_array($val)) {
+          if (\is_object($val) || \is_array($val)) {
             continue;
           }
           $link[$key][] = (string) $val;

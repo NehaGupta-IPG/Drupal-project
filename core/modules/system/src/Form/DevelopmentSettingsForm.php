@@ -142,7 +142,7 @@ class DevelopmentSettingsForm extends FormBase {
     }
     else {
       $invalidate_container = TRUE;
-      $development_settings->deleteMultiple(array_keys($twig_development));
+      $development_settings->deleteMultiple(\array_keys($twig_development));
     }
 
     if ($invalidate_container || $disable_rendered_output_cache_bins_previous !== $disable_rendered_output_cache_bins) {

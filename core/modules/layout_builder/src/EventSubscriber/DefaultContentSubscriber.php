@@ -44,7 +44,7 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
   public function preExport(PreExportEvent $event): void {
     $event->setCallback('field_item:layout_section', function (LayoutSectionItem $item, ExportMetadata $metadata): array {
       $section = $item->get('section')->getValue();
-      assert($section instanceof Section);
+      \assert($section instanceof Section);
 
       foreach ($section->getComponents() as $component) {
         $plugin = $component->getPlugin();

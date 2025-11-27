@@ -148,7 +148,7 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
       FilterInterface::TYPE_HTML_RESTRICTOR
     );
 
-    $enabled_plugins = array_keys($this->pluginManager->getEnabledDefinitions($text_editor));
+    $enabled_plugins = \array_keys($this->pluginManager->getEnabledDefinitions($text_editor));
     $provided_elements = $this->pluginManager->getProvidedElements($enabled_plugins, $text_editor);
     $provided = new HTMLRestrictions($provided_elements);
 
@@ -159,16 +159,16 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
 
       if (!$diff_allowed->allowsNothing()) {
         $this->context->buildViolation($constraint->notSupportedElementsMessage)
-          ->setParameter('@list', implode(' ', $provided->toCKEditor5ElementsArray()))
-          ->setParameter('@diff', implode(' ', $diff_allowed->toCKEditor5ElementsArray()))
+          ->setParameter('@list', \implode(' ', $provided->toCKEditor5ElementsArray()))
+          ->setParameter('@diff', \implode(' ', $diff_allowed->toCKEditor5ElementsArray()))
           ->atPath("filters.$filter_plugin_id")
           ->addViolation();
       }
 
       if (!$diff_elements->allowsNothing()) {
         $this->context->buildViolation($constraint->missingElementsMessage)
-          ->setParameter('@list', implode(' ', $provided->toCKEditor5ElementsArray()))
-          ->setParameter('@diff', implode(' ', $diff_elements->toCKEditor5ElementsArray()))
+          ->setParameter('@list', \implode(' ', $provided->toCKEditor5ElementsArray()))
+          ->setParameter('@diff', \implode(' ', $diff_elements->toCKEditor5ElementsArray()))
           ->atPath("filters.$filter_plugin_id")
           ->addViolation();
       }
@@ -185,10 +185,10 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
    */
   private function checkAllHtmlTagsAreCreatable(EditorInterface $text_editor, FundamentalCompatibilityConstraint $constraint): void {
     $enabled_definitions = $this->pluginManager->getEnabledDefinitions($text_editor);
-    $enabled_plugins = array_keys($enabled_definitions);
+    $enabled_plugins = \array_keys($enabled_definitions);
 
     // When arbitrary HTML is supported, all tags are creatable.
-    if (in_array('ckeditor5_arbitraryHtmlSupport', $enabled_plugins, TRUE)) {
+    if (\in_array('ckeditor5_arbitraryHtmlSupport', $enabled_plugins, TRUE)) {
       return;
     }
 
@@ -201,42 +201,42 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
       foreach ($non_creatable_tags->toCKEditor5ElementsArray() as $non_creatable_tag) {
         // Find the plugin which has a non-creatable tag.
         $needle = HTMLRestrictions::fromString($non_creatable_tag);
-        $matching_plugins = array_filter($enabled_definitions, function (CKEditor5PluginDefinition $d) use ($needle, $text_editor) {
+        $matching_plugins = \array_filter($enabled_definitions, function (CKEditor5PluginDefinition $d) use ($needle, $text_editor) {
           if (!$d->hasElements()) {
             return FALSE;
           }
           $haystack = new HTMLRestrictions($this->pluginManager->getProvidedElements([$d->id()], $text_editor, FALSE, FALSE));
           return !$haystack->extractPlainTagsSubset()->intersect($needle)->allowsNothing();
         });
-        assert(count($matching_plugins) === 1);
-        $plugin_definition = reset($matching_plugins);
-        assert($plugin_definition instanceof CKEditor5PluginDefinition);
+        \assert(\count($matching_plugins) === 1);
+        $plugin_definition = \reset($matching_plugins);
+        \assert($plugin_definition instanceof CKEditor5PluginDefinition);
 
         // Compute which attributes it would be able to create on this tag.
         $provided_elements = new HTMLRestrictions($this->pluginManager->getProvidedElements([$plugin_definition->id()], $text_editor, FALSE, FALSE));
         $attributes_on_tag = $provided_elements->intersect(
-          new HTMLRestrictions(array_fill_keys(array_keys($needle->getAllowedElements()), TRUE))
+          new HTMLRestrictions(\array_fill_keys(\array_keys($needle->getAllowedElements()), TRUE))
         );
 
         $violation = $this->context->buildViolation($constraint->nonCreatableTagMessage)
           ->setParameter('@non_creatable_tag', $non_creatable_tag)
           ->setParameter('%plugin', $plugin_definition->label())
-          ->setParameter('@attributes_on_tag', implode(', ', $attributes_on_tag->toCKEditor5ElementsArray()));
+          ->setParameter('@attributes_on_tag', \implode(', ', $attributes_on_tag->toCKEditor5ElementsArray()));
 
         // If this plugin has a configurable subset, associate the violation
         // with the property path pointing to this plugin's settings form.
-        if (is_a($plugin_definition->getClass(), CKEditor5PluginElementsSubsetInterface::class, TRUE)) {
-          $violation->atPath(sprintf('settings.plugins.%s', $plugin_definition->id()));
+        if (\is_a($plugin_definition->getClass(), CKEditor5PluginElementsSubsetInterface::class, TRUE)) {
+          $violation->atPath(\sprintf('settings.plugins.%s', $plugin_definition->id()));
         }
         // If this plugin is associated with a toolbar item, associate the
         // violation with the property path pointing to the active toolbar item.
         elseif ($plugin_definition->hasToolbarItems()) {
           $toolbar_items = $plugin_definition->getToolbarItems();
-          $active_toolbar_items = array_intersect(
+          $active_toolbar_items = \array_intersect(
             $text_editor->getSettings()['toolbar']['items'],
-            array_keys($toolbar_items)
+            \array_keys($toolbar_items)
           );
-          $violation->atPath(sprintf('settings.toolbar.items.%d', array_keys($active_toolbar_items)[0]));
+          $violation->atPath(\sprintf('settings.toolbar.items.%d', \array_keys($active_toolbar_items)[0]));
         }
 
         $violation->addViolation();
@@ -260,7 +260,7 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
    *   An iterable of matched filter plugins.
    */
   private static function getFiltersInFormatOfType(FilterFormatInterface $text_format, int $filter_type, ?callable $extra_requirements = NULL): iterable {
-    assert(in_array($filter_type, [
+    \assert(\in_array($filter_type, [
       FilterInterface::TYPE_MARKUP_LANGUAGE,
       FilterInterface::TYPE_HTML_RESTRICTOR,
       FilterInterface::TYPE_TRANSFORM_REVERSIBLE,

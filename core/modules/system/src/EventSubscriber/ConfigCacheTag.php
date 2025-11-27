@@ -40,7 +40,7 @@ class ConfigCacheTag implements EventSubscriberInterface {
     }
 
     // Theme configuration and global theme settings.
-    if (in_array($config_name, ['system.theme', 'system.theme.global'], TRUE)) {
+    if (\in_array($config_name, ['system.theme', 'system.theme.global'], TRUE)) {
       $this->cacheTagsInvalidator->invalidateTags(['rendered']);
     }
 
@@ -54,7 +54,7 @@ class ConfigCacheTag implements EventSubscriberInterface {
     // Theme-specific settings, check if this matches a theme settings
     // configuration object (THEME_NAME.settings), in that case, clear the
     // rendered cache tag.
-    if (preg_match('/^([^\.]*)\.settings$/', $config_name, $matches)) {
+    if (\preg_match('/^([^\.]*)\.settings$/', $config_name, $matches)) {
       if ($this->themeHandler->themeExists($matches[1])) {
         $this->cacheTagsInvalidator->invalidateTags(['rendered']);
       }

@@ -239,7 +239,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'revision_user' => [
@@ -247,7 +247,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $author->id(),
           'target_type' => 'user',
           'target_uuid' => $author->uuid(),
-          'url' => base_path() . 'user/' . $author->id(),
+          'url' => \base_path() . 'user/' . $author->id(),
         ],
       ],
       'revision_translation_affected' => [
@@ -287,7 +287,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
    * {@inheritdoc}
    */
   protected function getNormalizedPatchEntity() {
-    return array_diff_key($this->getNormalizedPostEntity(), ['field_media_file' => TRUE]);
+    return \array_diff_key($this->getNormalizedPostEntity(), ['field_media_file' => TRUE]);
   }
 
   /**
@@ -432,7 +432,7 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
           'target_id' => (int) $owner->id(),
           'target_type' => 'user',
           'target_uuid' => $owner->uuid(),
-          'url' => base_path() . 'user/' . $owner->id(),
+          'url' => \base_path() . 'user/' . $owner->id(),
         ],
       ],
       'filename' => [
@@ -442,8 +442,8 @@ abstract class MediaResourceTestBase extends EntityResourceTestBase {
       ],
       'uri' => [
         [
-          'value' => 'public://' . date('Y-m') . '/drupal rocks 🤘.txt',
-          'url' => base_path() . $this->siteDirectory . '/files/' . date('Y-m') . '/drupal%20rocks%20%F0%9F%A4%98.txt',
+          'value' => 'public://' . \date('Y-m') . '/drupal rocks 🤘.txt',
+          'url' => \base_path() . $this->siteDirectory . '/files/' . \date('Y-m') . '/drupal%20rocks%20%F0%9F%A4%98.txt',
         ],
       ],
       'filemime' => [

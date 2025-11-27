@@ -130,7 +130,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
     $result = new FileUploadResult();
 
     $violations = $uploadedFile->validate($this->validatorFactory->createValidator());
-    if (count($violations) > 0) {
+    if (\count($violations) > 0) {
       $result->addViolations($violations);
       return $result;
     }
@@ -141,11 +141,11 @@ class FileUploadHandler implements FileUploadHandlerInterface {
     // Assert that the destination contains a valid stream.
     $destinationScheme = $this->streamWrapperManager::getScheme($destination);
     if (!$this->streamWrapperManager->isValidScheme($destinationScheme)) {
-      throw new InvalidStreamWrapperException(sprintf('The file could not be uploaded because the destination "%s" is invalid.', $destination));
+      throw new InvalidStreamWrapperException(\sprintf('The file could not be uploaded because the destination "%s" is invalid.', $destination));
     }
 
     // A file URI may already have a trailing slash or look like "public://".
-    if (!str_ends_with($destination, '/')) {
+    if (!\str_ends_with($destination, '/')) {
       $destination .= '/';
     }
 
@@ -158,7 +158,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
     $mimeType = $this->mimeTypeGuesser->guessMimeType($filename);
     $destinationFilename = $this->fileSystem->getDestinationFilename($destination . $filename, $fileExists);
     if ($destinationFilename === FALSE) {
-      throw new FileExistsException(sprintf('Destination file "%s" exists', $destinationFilename));
+      throw new FileExistsException(\sprintf('Destination file "%s" exists', $destinationFilename));
     }
 
     // Lock based on the prepared file URI.
@@ -167,7 +167,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
     try {
       if (!$this->lock->acquire($lock_id)) {
         throw new LockAcquiringException(
-          sprintf(
+          \sprintf(
             'File "%s" is already locked for writing.',
             $destinationFilename
           )
@@ -190,7 +190,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
 
       // Call the validation functions specified by this function's caller.
       $violations = $this->fileValidator->validate($file, $validators);
-      if (count($violations) > 0) {
+      if (\count($violations) > 0) {
         $result->addViolations($violations);
 
         return $result;
@@ -206,7 +206,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
 
       // Update the filename with any changes as a result of security or
       // renaming due to an existing file.
-      $file->setFilename(basename($file->getFileUri()));
+      $file->setFilename(\basename($file->getFileUri()));
 
       if ($fileExists === FileExists::Replace) {
         $existingFile = $this->fileRepository->loadByUri($file->getFileUri());
@@ -230,7 +230,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
 
       // We can now validate the file object itself before it's saved.
       $violations = $file->validate();
-      if (count($violations) > 0) {
+      if (\count($violations) > 0) {
         $result->addViolations($violations);
 
         return $result;

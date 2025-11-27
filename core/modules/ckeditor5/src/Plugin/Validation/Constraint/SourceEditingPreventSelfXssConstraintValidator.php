@@ -38,7 +38,7 @@ class SourceEditingPreventSelfXssConstraintValidator extends ConstraintValidator
     //   necessary because CKEditor5ElementConstraintValidator does not run
     //   before this, which means that this validator cannot assume it receives
     //   valid values.
-    if ($restrictions->allowsNothing() || count($restrictions->getAllowedElements()) > 1) {
+    if ($restrictions->allowsNothing() || \count($restrictions->getAllowedElements()) > 1) {
       return;
     }
 
@@ -46,10 +46,10 @@ class SourceEditingPreventSelfXssConstraintValidator extends ConstraintValidator
     // attributes are allowed (TRUE) or no attributes are allowed (FALSE),
     // return early. Only proceed when some attributes are allowed (an array).
     $allowed_elements = $restrictions->getAllowedElements(FALSE);
-    assert(count($allowed_elements) === 1);
-    $tag = array_key_first($allowed_elements);
+    \assert(\count($allowed_elements) === 1);
+    $tag = \array_key_first($allowed_elements);
     $attribute_restrictions = $allowed_elements[$tag];
-    if (!is_array($attribute_restrictions)) {
+    if (!\is_array($attribute_restrictions)) {
       return;
     }
 
@@ -63,8 +63,8 @@ class SourceEditingPreventSelfXssConstraintValidator extends ConstraintValidator
     // @see \Drupal\ckeditor5\HTMLRestrictions::validateAllowedRestrictionsPhase4()
     // @see \Drupal\filter\Plugin\Filter\FilterHtml::getHTMLRestrictions()
     $forbidden_attributes = [];
-    if (array_key_exists('*', $text_format_allowed_elements)) {
-      $forbidden_attributes = array_keys(array_filter($text_format_allowed_elements['*'], function ($attribute_value_restriction, string $attribute_name) {
+    if (\array_key_exists('*', $text_format_allowed_elements)) {
+      $forbidden_attributes = \array_keys(\array_filter($text_format_allowed_elements['*'], function ($attribute_value_restriction, string $attribute_name) {
         return $attribute_value_restriction === FALSE;
       }, ARRAY_FILTER_USE_BOTH));
     }
@@ -72,7 +72,7 @@ class SourceEditingPreventSelfXssConstraintValidator extends ConstraintValidator
     foreach ($forbidden_attributes as $forbidden_attribute_name) {
       // Forbidden attributes not containing wildcards, such as `style`.
       if (!self::isWildcardAttributeName($forbidden_attribute_name)) {
-        if (array_key_exists($forbidden_attribute_name, $attribute_restrictions)) {
+        if (\array_key_exists($forbidden_attribute_name, $attribute_restrictions)) {
           $this->context->buildViolation($constraint->message)
             ->setParameter('%dangerous_tag', $value)
             ->addViolation();
@@ -81,7 +81,7 @@ class SourceEditingPreventSelfXssConstraintValidator extends ConstraintValidator
       // Forbidden attributes containing wildcards such as `on*`.
       else {
         $regex = self::getRegExForWildCardAttributeName($forbidden_attribute_name);
-        if (!empty(preg_grep($regex, array_keys($attribute_restrictions)))) {
+        if (!empty(\preg_grep($regex, \array_keys($attribute_restrictions)))) {
           $this->context->buildViolation($constraint->message)
             ->setParameter('%dangerous_tag', $value)
             ->addViolation();
@@ -100,8 +100,8 @@ class SourceEditingPreventSelfXssConstraintValidator extends ConstraintValidator
    *   Whether the given attribute name contains a wildcard.
    */
   private static function isWildcardAttributeName(string $attribute_name): bool {
-    assert($attribute_name !== '*');
-    return str_contains($attribute_name, '*');
+    \assert($attribute_name !== '*');
+    return \str_contains($attribute_name, '*');
   }
 
   /**
@@ -114,8 +114,8 @@ class SourceEditingPreventSelfXssConstraintValidator extends ConstraintValidator
    *   The computed regular expression.
    */
   private static function getRegExForWildCardAttributeName(string $wildcard_attribute_name): string {
-    assert(self::isWildcardAttributeName($wildcard_attribute_name));
-    return '/^' . str_replace('*', '.*', $wildcard_attribute_name) . '$/';
+    \assert(self::isWildcardAttributeName($wildcard_attribute_name));
+    return '/^' . \str_replace('*', '.*', $wildcard_attribute_name) . '$/';
   }
 
 }

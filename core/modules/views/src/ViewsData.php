@@ -284,7 +284,7 @@ class ViewsData {
     }
 
     // Sorts by the 'weight' and then by 'title' element.
-    uasort($tables, function ($a, $b) {
+    \uasort($tables, function ($a, $b) {
       if ($a['weight'] != $b['weight']) {
         return $a['weight'] <=> $b['weight'];
       }

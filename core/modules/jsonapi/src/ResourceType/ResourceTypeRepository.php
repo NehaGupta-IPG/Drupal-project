@@ -127,10 +127,10 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
 
     $resource_types = [];
     foreach ($this->entityTypeManager->getDefinitions() as $entity_type) {
-      $bundles = array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()));
-      $resource_types = array_reduce($bundles, function ($resource_types, $bundle) use ($entity_type) {
+      $bundles = \array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type->id()));
+      $resource_types = \array_reduce($bundles, function ($resource_types, $bundle) use ($entity_type) {
         $resource_type = $this->createResourceType($entity_type, (string) $bundle);
-        return array_merge($resource_types, [
+        return \array_merge($resource_types, [
           $resource_type->getTypeName() => $resource_type,
         ]);
       }, $resource_types);
@@ -184,12 +184,12 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    * {@inheritdoc}
    */
   public function get($entity_type_id, $bundle) {
-    assert(is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
+    \assert(\is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
     if (empty($entity_type_id)) {
       throw new PreconditionFailedHttpException('Server error. The current route is malformed.');
     }
 
-    $map_id = sprintf('jsonapi.resource_type.%s.%s', $entity_type_id, $bundle);
+    $map_id = \sprintf('jsonapi.resource_type.%s.%s', $entity_type_id, $bundle);
     $cached = $this->cache->get($map_id);
 
     if ($cached) {
@@ -224,9 +224,9 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    *   An array of JSON:API resource type fields keyed by internal field names.
    */
   protected function getFields(array $field_names, EntityTypeInterface $entity_type, $bundle) {
-    assert(Inspector::assertAllStrings($field_names));
-    assert($entity_type instanceof ContentEntityTypeInterface || $entity_type instanceof ConfigEntityTypeInterface);
-    assert(is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
+    \assert(Inspector::assertAllStrings($field_names));
+    \assert($entity_type instanceof ContentEntityTypeInterface || $entity_type instanceof ConfigEntityTypeInterface);
+    \assert(\is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
 
     // JSON:API resource identifier objects are sufficient to identify
     // entities. By exposing all fields as attributes, we expose unwanted,
@@ -268,10 +268,10 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     // reserved by the JSON:API spec.
     // @see http://jsonapi.org/format/#document-resource-object-fields
     $reserved_field_names = ['id', 'type'];
-    foreach (array_diff($field_names, array_keys($fields)) as $field_name) {
+    foreach (\array_diff($field_names, \array_keys($fields)) as $field_name) {
       $alias = $field_name;
       // Alias the fields reserved by the JSON:API spec with `{entity_type}_`.
-      if (in_array($field_name, $reserved_field_names, TRUE)) {
+      if (\in_array($field_name, $reserved_field_names, TRUE)) {
         $alias = $entity_type->id() . '_' . $field_name;
       }
 
@@ -286,11 +286,11 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
 
     // With all fields now aliased, detect any conflicts caused by the
     // automatically generated aliases above.
-    foreach (array_intersect($reserved_field_names, array_keys($fields)) as $reserved_field_name) {
+    foreach (\array_intersect($reserved_field_names, \array_keys($fields)) as $reserved_field_name) {
       /** @var \Drupal\jsonapi\ResourceType\ResourceTypeField $aliased_reserved_field */
       $aliased_reserved_field = $fields[$reserved_field_name];
       /** @var \Drupal\jsonapi\ResourceType\ResourceTypeField $field */
-      foreach (array_diff_key($fields, array_flip([$reserved_field_name])) as $field) {
+      foreach (\array_diff_key($fields, \array_flip([$reserved_field_name])) as $field) {
         if ($aliased_reserved_field->getPublicName() === $field->getPublicName()) {
           throw new \LogicException("The generated alias '{$aliased_reserved_field->getPublicName()}' for field name '{$aliased_reserved_field->getInternalName()}' conflicts with an existing field. Report this in the JSON:API issue queue!");
         }
@@ -326,14 +326,14 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
         $entity_type->id(),
         $bundle
       );
-      return array_keys($field_definitions);
+      return \array_keys($field_definitions);
     }
     elseif ($entity_type instanceof ConfigEntityTypeInterface) {
       // @todo Uncomment the first line, remove everything else once https://www.drupal.org/project/drupal/issues/2483407 lands.
       // return array_keys($entity_type->getPropertiesToExport());
       $export_properties = $entity_type->getPropertiesToExport();
       if ($export_properties !== NULL) {
-        return array_keys($export_properties);
+        return \array_keys($export_properties);
       }
       else {
         return ['id', 'type', 'uuid', '_core'];
@@ -356,7 +356,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    *   TRUE if the entity type is mutable, FALSE otherwise.
    */
   protected static function isMutableResourceType(EntityTypeInterface $entity_type, $bundle) {
-    assert(is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
+    \assert(\is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
     return !$entity_type instanceof ConfigEntityTypeInterface;
   }
 
@@ -372,7 +372,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    *   TRUE if the entity type is locatable, FALSE otherwise.
    */
   protected static function isLocatableResourceType(EntityTypeInterface $entity_type, $bundle) {
-    assert(is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
+    \assert(\is_string($bundle) && !empty($bundle), 'A bundle ID is required. Bundleless entity types should pass the entity type ID again.');
     return $entity_type->getStorageClass() !== ContentEntityNullStorage::class;
   }
 
@@ -411,9 +411,9 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
         $resource_type->getBundle()
       );
 
-      $relatable_internal = array_map(function ($field_definition) use ($resource_types) {
+      $relatable_internal = \array_map(function ($field_definition) use ($resource_types) {
         return $this->getRelatableResourceTypesFromFieldDefinition($field_definition, $resource_types);
-      }, array_filter($field_definitions, function ($field_definition) {
+      }, \array_filter($field_definitions, function ($field_definition) {
         return $this->isReferenceFieldDefinition($field_definition);
       }));
 
@@ -511,7 +511,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   protected function getAllBundlesForEntityType($entity_type_id) {
     // Ensure all keys are strings because numeric values are allowed as bundle
     // names and "array_keys()" casts "42" to 42.
-    return array_map('strval', array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id)));
+    return \array_map('strval', \array_keys($this->entityTypeBundleInfo->getBundleInfo($entity_type_id)));
   }
 
   /**

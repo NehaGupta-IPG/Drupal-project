@@ -50,9 +50,9 @@ class UpdateController extends ControllerBase {
     $build = [
       '#theme' => 'update_report',
     ];
-    if ($available = update_get_available(TRUE)) {
+    if ($available = \update_get_available(TRUE)) {
       $this->moduleHandler()->loadInclude('update', 'compare.inc');
-      $build['#data'] = update_calculate_project_data($available);
+      $build['#data'] = \update_calculate_project_data($available);
 
       // @todo Consider using 'fetch_failures' from the 'update' collection
       // in the key_value_expire service for this?
@@ -82,8 +82,8 @@ class UpdateController extends ControllerBase {
       ->setProgressMessage($this->t('Trying to check available update data ...'))
       ->setErrorMessage($this->t('Error checking available update data.'))
       ->setFinishCallback('update_fetch_data_finished');
-    batch_set($batch_builder->toArray());
-    return batch_process('admin/reports/updates');
+    \batch_set($batch_builder->toArray());
+    return \batch_process('admin/reports/updates');
   }
 
 }

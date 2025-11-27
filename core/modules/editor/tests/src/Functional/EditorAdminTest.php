@@ -63,9 +63,9 @@ class EditorAdminTest extends BrowserTestBase {
 
     // Ensure the form field order is correct.
     $raw_content = $this->getSession()->getPage()->getContent();
-    $roles_pos = strpos($raw_content, 'Roles');
-    $editor_pos = strpos($raw_content, 'Text editor');
-    $filters_pos = strpos($raw_content, 'Enabled filters');
+    $roles_pos = \strpos($raw_content, 'Roles');
+    $editor_pos = \strpos($raw_content, 'Text editor');
+    $filters_pos = \strpos($raw_content, 'Enabled filters');
     $this->assertGreaterThan($roles_pos, $editor_pos);
     $this->assertLessThan($filters_pos, $editor_pos);
 
@@ -141,7 +141,7 @@ class EditorAdminTest extends BrowserTestBase {
     $this->drupalLogin($account);
 
     // The node edit page header.
-    $text = sprintf('<em>Edit %s</em> %s', Html::escape($node_type->label()), Html::escape($node->label()));
+    $text = \sprintf('<em>Edit %s</em> %s', Html::escape($node_type->label()), Html::escape($node->label()));
 
     // Go to node edit form.
     $this->drupalGet('node/' . $node->id() . '/edit');

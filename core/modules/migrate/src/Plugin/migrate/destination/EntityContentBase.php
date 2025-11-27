@@ -151,7 +151,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     $this->fieldTypeManager = $field_type_manager;
     $this->accountSwitcher = $account_switcher;
     if ($entity_type_bundle_info === NULL) {
-      @trigger_error('Calling ' . __NAMESPACE__ . '\EntityContentBase::__construct() without the $entity_type_bundle_info argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3476634', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __NAMESPACE__ . '\EntityContentBase::__construct() without the $entity_type_bundle_info argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3476634', E_USER_DEPRECATED);
       $entity_type_bundle_info = \Drupal::service('entity_type.bundle.info');
     }
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
@@ -168,7 +168,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       $plugin_definition,
       $migration,
       $container->get('entity_type.manager')->getStorage($entity_type),
-      array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type)),
+      \array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type)),
       $container->get('entity_field.manager'),
       $container->get('plugin.manager.field.field_type'),
       $container->get('account_switcher'),
@@ -190,7 +190,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     if (!$entity) {
       throw new MigrateException('Unable to get entity');
     }
-    assert($entity instanceof ContentEntityInterface);
+    \assert($entity instanceof ContentEntityInterface);
     if ($this->isEntityValidationRequired($entity)) {
       $this->validateEntity($entity);
     }
@@ -238,7 +238,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       }
     }
 
-    if (count($violations) > 0) {
+    if (\count($violations) > 0) {
       throw new EntityValidationException($violations);
     }
   }
@@ -279,7 +279,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     if ($this->isTranslationDestination()) {
       $langcode_key = $this->getKey('langcode');
       if (!$langcode_key) {
-        throw new MigrateException(sprintf('The "%s" entity type does not support translations.', $this->storage->getEntityTypeId()));
+        throw new MigrateException(\sprintf('The "%s" entity type does not support translations.', $this->storage->getEntityTypeId()));
       }
       $ids[$langcode_key] = $this->getDefinitionFromEntity($langcode_key);
     }
@@ -314,7 +314,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     // clone the row with an empty set of destination values, and re-add only
     // the specified properties.
     if (isset($this->configuration['overwrite_properties'])) {
-      $empty_destinations = array_intersect($empty_destinations, $this->configuration['overwrite_properties']);
+      $empty_destinations = \array_intersect($empty_destinations, $this->configuration['overwrite_properties']);
       $clone = $row->cloneWithoutDestination();
       foreach ($this->configuration['overwrite_properties'] as $property) {
         $clone->setDestinationProperty($property, $row->getDestinationProperty($property));
@@ -347,7 +347,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       if (empty($this->bundles)) {
         throw new MigrateException('Stubbing failed, no bundles available for entity type: ' . $this->storage->getEntityTypeId());
       }
-      $row->setDestinationProperty($bundle_key, reset($this->bundles));
+      $row->setDestinationProperty($bundle_key, \reset($this->bundles));
     }
 
     $bundle = $row->getDestinationProperty($bundle_key) ?? $this->storage->getEntityTypeId();
@@ -355,7 +355,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     $fields = $this->entityFieldManager
       ->getFieldDefinitions($this->storage->getEntityTypeId(), $bundle);
     foreach ($fields as $field_name => $field_definition) {
-      if ($field_definition->isRequired() && is_null($row->getDestinationProperty($field_name))) {
+      if ($field_definition->isRequired() && \is_null($row->getDestinationProperty($field_name))) {
         // Use the configured default value for this specific field, if any.
         if ($default_value = $field_definition->getDefaultValueLiteral()) {
           $values = $default_value;
@@ -365,7 +365,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
           $field_type_class = $this->fieldTypeManager
             ->getPluginClass($field_definition->getType());
           $values = $field_type_class::generateSampleValue($field_definition);
-          if (is_null($values)) {
+          if (\is_null($values)) {
             // Handle failure to generate a sample value.
             throw new MigrateException('Stubbing failed, unable to generate value for field ' . $field_name);
           }
@@ -382,7 +382,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
   public function rollback(array $destination_identifier) {
     if ($this->isTranslationDestination()) {
       // Attempt to remove the translation.
-      $entity = $this->storage->load(reset($destination_identifier));
+      $entity = $this->storage->load(\reset($destination_identifier));
       if ($entity && $entity instanceof TranslatableInterface) {
         if ($key = $this->getKey('langcode')) {
           if (isset($destination_identifier[$key])) {
@@ -414,7 +414,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       ->sort($this->getKey('id'), 'DESC')
       ->range(0, 1)
       ->execute();
-    return (int) current($values);
+    return (int) \current($values);
   }
 
   /**
@@ -437,12 +437,12 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
       $bundle = $this->configuration['default_bundle'];
 
       if (!isset($bundle_info[$bundle])) {
-        throw new MigrateException(sprintf("The default_bundle value '%s' is not a valid bundle for the destination entity type '%s'.", $bundle, $entity_type->id()));
+        throw new MigrateException(\sprintf("The default_bundle value '%s' is not a valid bundle for the destination entity type '%s'.", $bundle, $entity_type->id()));
       }
     }
-    elseif (count($bundle_info) === 1) {
+    elseif (\count($bundle_info) === 1) {
       // If the destination entity type has only one bundle, use that.
-      $bundle = array_key_first($bundle_info);
+      $bundle = \array_key_first($bundle_info);
     }
 
     if (isset($bundle)) {

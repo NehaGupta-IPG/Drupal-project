@@ -54,7 +54,7 @@ class DialogPositionTest extends WebDriverTestBase {
     // finish as no Javascript errors should have been triggered. If there were
     // javascript errors the test will fail on that.
     $session->resizeWindow(625, 625);
-    usleep(5000);
+    \usleep(5000);
   }
 
 }

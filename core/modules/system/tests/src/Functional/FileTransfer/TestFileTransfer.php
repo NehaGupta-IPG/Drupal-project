@@ -42,7 +42,7 @@ class TestFileTransfer extends FileTransfer {
    * Factory method to create a TestFileTransfer instance.
    */
   public static function factory($jail, $settings) {
-    assert(is_array($settings));
+    \assert(\is_array($settings));
     return new TestFileTransfer($jail);
   }
 
@@ -55,7 +55,7 @@ class TestFileTransfer extends FileTransfer {
     // Access the connection via the property. The property used to be set via a
     // magic method and this can cause problems if coded incorrectly.
     // @phpstan-ignore property.deprecatedClass
-    $this->connection->connectionString = 'test://' . urlencode($this->username) . ':' . urlencode($this->password) . "@$this->host:$this->port/";
+    $this->connection->connectionString = 'test://' . \urlencode($this->username) . ':' . \urlencode($this->password) . "@$this->host:$this->port/";
   }
 
   /**

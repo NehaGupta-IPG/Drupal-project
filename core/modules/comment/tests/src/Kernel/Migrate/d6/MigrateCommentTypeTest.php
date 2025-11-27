@@ -101,14 +101,14 @@ class MigrateCommentTypeTest extends MigrateDrupal6TestBase {
     foreach ($expected_messages as $type => $expected_messages_by_type) {
       $this->assertSameSize($expected_messages_by_type, $actual_messages[$type]);
       // Cast the actual messages to string.
-      $actual_messages_by_type = array_reduce($actual_messages[$type], function (array $carry, $actual_message) {
+      $actual_messages_by_type = \array_reduce($actual_messages[$type], function (array $carry, $actual_message) {
         $carry[] = (string) $actual_message;
         return $carry;
       }, []);
-      $missing_expected_messages_by_type = array_diff($expected_messages_by_type, $actual_messages_by_type);
-      $unexpected_messages_by_type = array_diff($actual_messages_by_type, $expected_messages_by_type);
-      $this->assertEmpty($unexpected_messages_by_type, sprintf('No additional messages are present with type "%s". This expectation is wrong, because there are additional messages present: "%s"', $type, implode('", "', $unexpected_messages_by_type)));
-      $this->assertEmpty($missing_expected_messages_by_type, sprintf('Every expected messages are present with type "%s". This expectation is wrong, because the following messages aren\'t present: "%s"', $type, implode('", "', $missing_expected_messages_by_type)));
+      $missing_expected_messages_by_type = \array_diff($expected_messages_by_type, $actual_messages_by_type);
+      $unexpected_messages_by_type = \array_diff($actual_messages_by_type, $expected_messages_by_type);
+      $this->assertEmpty($unexpected_messages_by_type, \sprintf('No additional messages are present with type "%s". This expectation is wrong, because there are additional messages present: "%s"', $type, \implode('", "', $unexpected_messages_by_type)));
+      $this->assertEmpty($missing_expected_messages_by_type, \sprintf('Every expected messages are present with type "%s". This expectation is wrong, because the following messages aren\'t present: "%s"', $type, \implode('", "', $missing_expected_messages_by_type)));
     }
 
     $this->assertEmpty(CommentType::loadMultiple());

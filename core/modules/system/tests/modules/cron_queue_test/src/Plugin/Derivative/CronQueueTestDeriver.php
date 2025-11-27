@@ -23,7 +23,7 @@ class CronQueueTestDeriver extends DeriverBase {
     $derivatives = [];
     foreach ($example_data as $key => $label) {
       $derivatives[$key] = [
-        'title' => strtr('Cron queue test: @label', [
+        'title' => \strtr('Cron queue test: @label', [
           '@label' => $label,
         ]),
       ] + $base_plugin_definition;

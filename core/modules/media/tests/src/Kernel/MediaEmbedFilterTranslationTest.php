@@ -82,7 +82,7 @@ class MediaEmbedFilterTranslationTest extends MediaEmbedFilterTestBase {
       // The text language (which is set to the host entity's language) must be
       // respected in selecting a translation. If that translation does not
       // exist, it falls back to the default translation of the embedded entity.
-      $match_or_fallback_langcode = in_array($text_langcode, $embedded_entity_translation_languages)
+      $match_or_fallback_langcode = \in_array($text_langcode, $embedded_entity_translation_languages)
         ? $text_langcode
         : 'en';
       yield "text_langcode=$text_langcode ⇒ $match_or_fallback_langcode" => [

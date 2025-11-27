@@ -26,7 +26,7 @@ class TestLog implements LoggerInterface {
       'severity_level' => 3,
       'channel' => 'php',
     ];
-    if (array_diff_assoc($trigger, $context) === []) {
+    if (\array_diff_assoc($trigger, $context) === []) {
       throw new \Exception('Oh, oh, frustrated monkeys!');
     }
   }

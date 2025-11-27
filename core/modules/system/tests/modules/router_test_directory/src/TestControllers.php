@@ -60,7 +60,7 @@ class TestControllers {
     try {
       $match = \Drupal::service('router.no_access_checks')->match('/user/' . $uid);
       if (isset($match['user']) && $match['user'] instanceof UserInterface) {
-        $text = sprintf('User route "%s" was matched.', $match[RouteObjectInterface::ROUTE_NAME]);
+        $text = \sprintf('User route "%s" was matched.', $match[RouteObjectInterface::ROUTE_NAME]);
       }
     }
     catch (ParamNotConvertedException) {

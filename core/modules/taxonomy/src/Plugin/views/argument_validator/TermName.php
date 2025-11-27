@@ -64,7 +64,7 @@ class TermName extends Entity {
    */
   public function validateArgument($argument) {
     if ($this->options['transform']) {
-      $argument = str_replace('-', ' ', $argument);
+      $argument = \str_replace('-', ' ', $argument);
       $this->argument->argument = $argument;
     }
     // If bundles is set then restrict the loaded terms to the given bundles.

@@ -55,7 +55,7 @@ class SearchTextProcessor implements SearchTextProcessorInterface {
    */
   public function process(string $text, ?string $langcode = NULL): array {
     $text = $this->analyze($text, $langcode);
-    return explode(' ', $text);
+    return \explode(' ', $text);
   }
 
   /**
@@ -66,7 +66,7 @@ class SearchTextProcessor implements SearchTextProcessorInterface {
     $text = Html::decodeEntities($text);
 
     // Lowercase.
-    $text = mb_strtolower($text);
+    $text = \mb_strtolower($text);
 
     // Remove diacritics.
     $text = $this->transliteration->removeDiacritics($text);
@@ -76,7 +76,7 @@ class SearchTextProcessor implements SearchTextProcessorInterface {
 
     // Simple CJK handling.
     if ($this->configFactory->get('search.settings')->get('index.overlap_cjk')) {
-      $text = preg_replace_callback('/[' . self::PREG_CLASS_CJK . ']+/u', [$this, 'expandCjk'], $text);
+      $text = \preg_replace_callback('/[' . self::PREG_CLASS_CJK . ']+/u', [$this, 'expandCjk'], $text);
     }
 
     // To improve searching for numerical data such as dates, IP addresses
@@ -85,25 +85,25 @@ class SearchTextProcessor implements SearchTextProcessorInterface {
     // This also means that searching for e.g. '20/03/1984' also returns
     // results with '20-03-1984' in them.
     // Readable regexp: ([number]+)[punctuation]+(?=[number])
-    $text = preg_replace('/([' . self::PREG_CLASS_NUMBERS . ']+)[' . self::PREG_CLASS_PUNCTUATION . ']+(?=[' . self::PREG_CLASS_NUMBERS . '])/u', '\1', $text);
+    $text = \preg_replace('/([' . self::PREG_CLASS_NUMBERS . ']+)[' . self::PREG_CLASS_PUNCTUATION . ']+(?=[' . self::PREG_CLASS_NUMBERS . '])/u', '\1', $text);
 
     // Multiple dot and dash groups are word boundaries and replaced with space.
     // No need to use the unicode modifier here because 0-127 ASCII characters
     // can't match higher UTF-8 characters as the leftmost bit of those are 1.
-    $text = preg_replace('/[.-]{2,}/', ' ', $text);
+    $text = \preg_replace('/[.-]{2,}/', ' ', $text);
 
     // The dot, underscore and dash are simply removed. This allows meaningful
     // search behavior with acronyms and URLs. See unicode note directly above.
-    $text = preg_replace('/[._-]+/', '', $text);
+    $text = \preg_replace('/[._-]+/', '', $text);
 
     // With the exception of the rules above, we consider all punctuation,
     // marks, spacers, etc, to be a word boundary.
-    $text = preg_replace('/[' . Unicode::PREG_CLASS_WORD_BOUNDARY . ']+/u', ' ', $text);
+    $text = \preg_replace('/[' . Unicode::PREG_CLASS_WORD_BOUNDARY . ']+/u', ' ', $text);
 
     // Truncate everything to 50 characters.
-    $words = explode(' ', $text);
-    array_walk($words, [$this, 'truncate']);
-    $text = implode(' ', $words);
+    $words = \explode(' ', $text);
+    \array_walk($words, [$this, 'truncate']);
+    $text = \implode(' ', $words);
 
     return $text;
   }
@@ -148,7 +148,7 @@ class SearchTextProcessor implements SearchTextProcessorInterface {
   protected function expandCjk(array $matches): string {
     $min = $this->configFactory->get('search.settings')->get('index.minimum_word_size');
     $str = $matches[0];
-    $length = mb_strlen($str);
+    $length = \mb_strlen($str);
     // If the text is shorter than the minimum word size, don't tokenize it.
     if ($length <= $min) {
       return ' ' . $str . ' ';
@@ -158,14 +158,14 @@ class SearchTextProcessor implements SearchTextProcessorInterface {
     $chars = [];
     for ($i = 0; $i < $length; $i++) {
       // Add the next character off the beginning of the string to the queue.
-      $current = mb_substr($str, 0, 1);
-      $str = substr($str, strlen($current));
+      $current = \mb_substr($str, 0, 1);
+      $str = \substr($str, \strlen($current));
       $chars[] = $current;
       if ($i >= $min - 1) {
         // Make a token of $min characters, and add it to the token string.
-        $tokens .= implode('', $chars) . ' ';
+        $tokens .= \implode('', $chars) . ' ';
         // Shift out the first character in the queue.
-        array_shift($chars);
+        \array_shift($chars);
       }
     }
     return $tokens;
@@ -178,13 +178,13 @@ class SearchTextProcessor implements SearchTextProcessorInterface {
    *   The text to be truncated.
    */
   protected function truncate(string &$text): void {
-    if (is_numeric($text)) {
-      $text = ltrim($text, '0');
+    if (\is_numeric($text)) {
+      $text = \ltrim($text, '0');
     }
-    if (mb_strlen($text) <= 50) {
+    if (\mb_strlen($text) <= 50) {
       return;
     }
-    $text = mb_substr($text, 0, 50);
+    $text = \mb_substr($text, 0, 50);
   }
 
 }

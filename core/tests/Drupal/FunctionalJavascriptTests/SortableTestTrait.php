@@ -38,9 +38,9 @@ trait SortableTestTrait {
    *   The HTML selector for the target container.
    */
   protected function sortableTo($item, $from, $to) {
-    $item = addslashes($item);
-    $from = addslashes($from);
-    $to   = addslashes($to);
+    $item = \addslashes($item);
+    $from = \addslashes($from);
+    $to   = \addslashes($to);
 
     $script = <<<JS
 (function (src, to) {
@@ -72,9 +72,9 @@ JS;
    *   The HTML selector for the element container.
    */
   protected function sortableAfter($item, $target, $from) {
-    $item   = addslashes($item);
-    $target = addslashes($target);
-    $from   = addslashes($from);
+    $item   = \addslashes($item);
+    $target = \addslashes($target);
+    $from   = \addslashes($from);
 
     $script = <<<JS
 (function (src, to) {

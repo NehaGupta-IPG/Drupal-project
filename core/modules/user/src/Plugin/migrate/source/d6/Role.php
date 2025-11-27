@@ -58,7 +58,7 @@ class Role extends DrupalSqlBase {
     foreach ($filter_roles as $format => $roles) {
       // Drupal 6 code: $roles = ','. implode(',', $roles) .',';
       // Remove the beginning and ending comma.
-      foreach (explode(',', trim($roles, ',')) as $rid) {
+      foreach (\explode(',', \trim($roles, ',')) as $rid) {
         $this->filterPermissions[$rid][] = $format;
       }
     }
@@ -79,7 +79,7 @@ class Role extends DrupalSqlBase {
     // If a role has no permissions then set to an empty array. The role will
     // be migrated and given the default D8 permissions.
     if ($permissions) {
-      $row->setSourceProperty('permissions', explode(', ', $permissions));
+      $row->setSourceProperty('permissions', \explode(', ', $permissions));
     }
     else {
       $row->setSourceProperty('permissions', []);

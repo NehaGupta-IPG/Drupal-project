@@ -922,7 +922,7 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
     MimeTypeMapInterface|ModuleHandlerInterface $map,
   ) {
     if ($map instanceof ModuleHandlerInterface) {
-      @trigger_error(
+      @\trigger_error(
         'Calling ' . __METHOD__ . '() with the $map argument as an instance of \Drupal\Core\Extension\ModuleHandlerInterface is deprecated in drupal:11.2.0 and an instance of \Drupal\Core\File\MimeType\MimeTypeMapInterface is required in drupal:12.0.0. See https://www.drupal.org/node/3494040',
         E_USER_DEPRECATED
       );
@@ -936,7 +936,7 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
    */
   public function guessMimeType($path): ?string {
     $extension = '';
-    $file_parts = explode('.', basename($path));
+    $file_parts = \explode('.', \basename($path));
 
     // Remove the first part: a full filename should not match an extension,
     // then iterate over the file parts, trying to find a match.
@@ -944,8 +944,8 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
     // 'image.jpeg', then 'jpeg'.
     // We explicitly check for NULL because that indicates that the array is
     // empty.
-    while (array_shift($file_parts) !== NULL) {
-      $extension = strtolower(implode('.', $file_parts));
+    while (\array_shift($file_parts) !== NULL) {
+      $extension = \strtolower(\implode('.', $file_parts));
       if ($mimeType = $this->map->getMimeTypeForExtension($extension)) {
         return $mimeType;
       }
@@ -966,14 +966,14 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
    * @see https://www.drupal.org/node/3494040
    */
   public function setMapping(?array $mapping = NULL): void {
-    @trigger_error(
+    @\trigger_error(
       __METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\File\MimeType\MimeTypeMapInterface::addMapping() instead or define your own MimeTypeMapInterface implementation. See https://www.drupal.org/node/3494040',
       E_USER_DEPRECATED
     );
     // Convert the mapping to be keyed by type.
     $typeMapping = [];
     foreach ($mapping['mimetypes'] as $index => $mimetype) {
-      $typeMapping[$mimetype] = array_keys($mapping['extensions'], $index);
+      $typeMapping[$mimetype] = \array_keys($mapping['extensions'], $index);
     }
 
     $this->map = new MimeTypeMap();

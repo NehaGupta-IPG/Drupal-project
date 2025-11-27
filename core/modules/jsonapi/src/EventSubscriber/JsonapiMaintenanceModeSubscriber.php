@@ -76,7 +76,7 @@ class JsonapiMaintenanceModeSubscriber implements EventSubscriberInterface {
     // Retry-After will be random within a range defined in jsonapi settings.
     // The goals are to keep it short and to reduce the thundering herd problem.
     $header_settings = $this->config->get('jsonapi.settings')->get('maintenance_header_retry_seconds');
-    $retry_after_time = rand($header_settings['min'], $header_settings['max']);
+    $retry_after_time = \rand($header_settings['min'], $header_settings['max']);
     $http_exception = new HttpException(503, $this->maintenanceMode->getSiteMaintenanceMessage());
     $document = new JsonApiDocumentTopLevel(new ErrorCollection([$http_exception]), new NullIncludedData(), new LinkCollection([]));
     $response = new ResourceResponse($document, $http_exception->getStatusCode(), [

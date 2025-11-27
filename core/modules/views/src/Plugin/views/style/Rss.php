@@ -132,7 +132,7 @@ class Rss extends StylePluginBase {
     $this->channel_elements = $this->getChannelElements();
     foreach ($this->channel_elements as $element) {
       if (isset($element['namespace'])) {
-        $this->namespaces = array_merge($this->namespaces, $element['namespace']);
+        $this->namespaces = \array_merge($this->namespaces, $element['namespace']);
       }
     }
 

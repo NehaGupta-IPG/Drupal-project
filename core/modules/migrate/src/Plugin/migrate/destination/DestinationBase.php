@@ -78,7 +78,7 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
    */
   public function checkRequirements() {
     if (empty($this->pluginDefinition['requirements_met'])) {
-      throw new RequirementsException(sprintf("Destination plugin '%s' did not meet the requirements", $this->pluginId));
+      throw new RequirementsException(\sprintf("Destination plugin '%s' did not meet the requirements", $this->pluginId));
     }
   }
 
@@ -127,11 +127,11 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
     if (!empty($this->pluginDefinition['destination_module'])) {
       return $this->pluginDefinition['destination_module'];
     }
-    if (is_string($this->migration->provider)) {
+    if (\is_string($this->migration->provider)) {
       return $this->migration->provider;
     }
     else {
-      return reset($this->migration->provider);
+      return \reset($this->migration->provider);
     }
   }
 

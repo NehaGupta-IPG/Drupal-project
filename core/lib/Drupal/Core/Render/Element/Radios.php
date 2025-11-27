@@ -58,7 +58,7 @@ class Radios extends FormElementBase {
    * Expands a radios element into individual radio elements.
    */
   public static function processRadios(&$element, FormStateInterface $form_state, &$complete_form) {
-    if (count($element['#options']) > 0) {
+    if (\count($element['#options']) > 0) {
       $weight = 0;
       foreach ($element['#options'] as $key => $choice) {
         // Maintain order of options as defined in #options, in case the element
@@ -69,7 +69,7 @@ class Radios extends FormElementBase {
         $element += [$key => []];
         // Generate the parents as the autogenerator does, so we will have a
         // unique id for each radio button.
-        $parents_for_id = array_merge($element['#parents'], [$key]);
+        $parents_for_id = \array_merge($element['#parents'], [$key]);
         $element[$key] += [
           '#type' => 'radio',
           '#title' => $choice,
@@ -81,7 +81,7 @@ class Radios extends FormElementBase {
           '#default_value' => $element['#default_value'] ?? FALSE,
           '#attributes' => $element['#attributes'],
           '#parents' => $element['#parents'],
-          '#id' => HtmlUtility::getUniqueId('edit-' . implode('-', $parents_for_id)),
+          '#id' => HtmlUtility::getUniqueId('edit-' . \implode('-', $parents_for_id)),
           '#ajax' => $element['#ajax'] ?? NULL,
           // Errors should only be shown on the parent radios element.
           '#error_no_message' => TRUE,

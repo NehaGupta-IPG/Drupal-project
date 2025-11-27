@@ -325,8 +325,8 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
     $entity->name->value = $this->randomMachineName();
     // This is equal to storing an entity to tempstore or cache and retrieving
     // it back. An example for this is node preview.
-    $entity = serialize($entity);
-    $entity = unserialize($entity);
+    $entity = \serialize($entity);
+    $entity = \unserialize($entity);
     // And then the entity.
     $entity->save();
     $term = \Drupal::service('entity.repository')->loadEntityByUuid($term->getEntityTypeId(), $term->uuid());

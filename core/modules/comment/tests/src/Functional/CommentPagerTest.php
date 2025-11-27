@@ -75,7 +75,7 @@ class CommentPagerTest extends CommentTestBase {
     $this->assertFalse($this->commentExists($comments[1]), 'Comment 2 does not appear on page 3.');
 
     // Post a reply to the oldest comment and test again.
-    $oldest_comment = reset($comments);
+    $oldest_comment = \reset($comments);
     $this->drupalGet('comment/reply/node/' . $node->id() . '/comment/' . $oldest_comment->id());
     $reply = $this->postComment(NULL, $this->randomMachineName(), $this->randomMachineName(), TRUE);
 
@@ -140,7 +140,7 @@ class CommentPagerTest extends CommentTestBase {
     // the page.
     foreach ($comments as $index => $comment) {
       $this->drupalGet($comment->toUrl());
-      $this->assertTrue($this->commentExists($comment), sprintf('Comment %d appears on page %d.', $index + 1, $index + 1));
+      $this->assertTrue($this->commentExists($comment), \sprintf('Comment %d appears on page %d.', $index + 1, $index + 1));
     }
   }
 
@@ -240,9 +240,9 @@ class CommentPagerTest extends CommentTestBase {
     $comment_anchors = $this->xpath('//article[starts-with(@id,"comment-")]');
     $result_order = [];
     foreach ($comment_anchors as $anchor) {
-      $result_order[] = substr($anchor->getAttribute('id'), 8);
+      $result_order[] = \substr($anchor->getAttribute('id'), 8);
     }
-    $this->assertEquals($expected_cids, $result_order, sprintf('Comment order: expected %s, returned %s.', implode(',', $expected_cids), implode(',', $result_order)));
+    $this->assertEquals($expected_cids, $result_order, \sprintf('Comment order: expected %s, returned %s.', \implode(',', $expected_cids), \implode(',', $result_order)));
   }
 
   /**

@@ -370,7 +370,7 @@ class LruMemoryCacheTest extends UnitTestCase {
 
     // Ensure the cache only contains the supply keys and the order is as
     // expected.
-    $this->assertSame($keys, array_keys($cache));
+    $this->assertSame($keys, \array_keys($cache));
   }
 
   /**

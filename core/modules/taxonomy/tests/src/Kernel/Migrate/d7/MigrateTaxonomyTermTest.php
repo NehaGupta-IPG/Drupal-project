@@ -100,11 +100,11 @@ class MigrateTaxonomyTermTest extends MigrateDrupal7TestBase {
     $this->assertEquals($expected_weight, $entity->getWeight());
     $this->assertEquals($expected_parents, $this->getParentIDs($id));
     $this->assertHierarchy($expected_vid, $id, $expected_parents);
-    if (!is_null($expected_field_integer_value)) {
+    if (!\is_null($expected_field_integer_value)) {
       $this->assertTrue($entity->hasField('field_integer'));
       $this->assertEquals($expected_field_integer_value, $entity->field_integer->value);
     }
-    if (!is_null($expected_term_reference_tid)) {
+    if (!\is_null($expected_term_reference_tid)) {
       $this->assertTrue($entity->hasField('field_integer'));
       $this->assertEquals($expected_term_reference_tid, $entity->field_term_reference->target_id);
     }
@@ -213,7 +213,7 @@ class MigrateTaxonomyTermTest extends MigrateDrupal7TestBase {
    *   List of parent term IDs.
    */
   protected function getParentIDs($tid): array {
-    return array_keys(\Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadParents($tid));
+    return \array_keys(\Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadParents($tid));
   }
 
   /**
@@ -237,7 +237,7 @@ class MigrateTaxonomyTermTest extends MigrateDrupal7TestBase {
 
     $this->assertArrayHasKey($tid, $this->treeData[$vid], "Term $tid exists in taxonomy tree");
     $term = $this->treeData[$vid][$tid];
-    $this->assertEquals($parent_ids, array_filter($term->parents), "Term $tid has correct parents in taxonomy tree");
+    $this->assertEquals($parent_ids, \array_filter($term->parents), "Term $tid has correct parents in taxonomy tree");
   }
 
 }

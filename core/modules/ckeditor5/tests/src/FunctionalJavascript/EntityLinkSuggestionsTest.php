@@ -158,7 +158,7 @@ class EntityLinkSuggestionsTest extends CKEditor5TestBase {
     $results[0]->click();
 
     // Make sure the link field is populated with the test entity's URL.
-    $expected_url = base_path() . 'node/1';
+    $expected_url = \base_path() . 'node/1';
     $this->assertSame($expected_url, $autocomplete_field->getValue());
     $balloon->pressButton('Insert');
     $this->assertBalloonClosed();
@@ -179,7 +179,7 @@ class EntityLinkSuggestionsTest extends CKEditor5TestBase {
     $assert_session->waitForElementVisible('css', '.ck-link-form .entity-link-suggestions-ui-autocomplete');
     $results = $page->findAll('css', '.entity-link-suggestions-result-line.ui-menu-item');
     $results[1]->click();
-    $expected_url = base_path() . 'media/1/edit';
+    $expected_url = \base_path() . 'media/1/edit';
     $this->assertSame($expected_url, $autocomplete_field->getValue());
     $balloon->pressButton('Update');
     $this->assertBalloonClosed();

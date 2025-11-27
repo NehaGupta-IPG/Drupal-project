@@ -87,12 +87,12 @@ class ImageHooks {
   public function fileDownload($uri): array|int|null {
     $path = StreamWrapperManager::getTarget($uri);
     // Private file access for image style derivatives.
-    if (str_starts_with($path, 'styles/')) {
-      $args = explode('/', $path);
+    if (\str_starts_with($path, 'styles/')) {
+      $args = \explode('/', $path);
       // Discard "styles", style name, and scheme from the path.
-      $args = array_slice($args, 3);
+      $args = \array_slice($args, 3);
       // Then the remaining parts are the path to the image.
-      $original_uri = StreamWrapperManager::getScheme($uri) . '://' . implode('/', $args);
+      $original_uri = StreamWrapperManager::getScheme($uri) . '://' . \implode('/', $args);
       // Check that the file exists and is an image.
       $image = \Drupal::service('image.factory')->get($uri);
       if ($image->isValid()) {
@@ -100,9 +100,9 @@ class ImageHooks {
         // original file, resulting in filenames like image.png.jpeg. So to find
         // the actual source image, we remove the extension and check if that
         // image exists.
-        if (!file_exists($original_uri)) {
+        if (!\file_exists($original_uri)) {
           $converted_original_uri = ImageStyleDownloadController::getUriWithoutConvertedExtension($original_uri);
-          if ($converted_original_uri !== $original_uri && file_exists($converted_original_uri)) {
+          if ($converted_original_uri !== $original_uri && \file_exists($converted_original_uri)) {
             // The converted file does exist, use it as the source.
             $original_uri = $converted_original_uri;
           }
@@ -111,7 +111,7 @@ class ImageHooks {
         $headers = \Drupal::moduleHandler()->invokeAll('file_download', [$original_uri]);
         // Confirm there's at least one module granting access and none denying
         // access.
-        if (!empty($headers) && !in_array(-1, $headers)) {
+        if (!empty($headers) && !\in_array(-1, $headers)) {
           return [
                 // Send headers describing the image's size, and MIME-type.
             'Content-Type' => $image->getMimeType(),
@@ -140,7 +140,7 @@ class ImageHooks {
   #[Hook('file_move')]
   public function fileMove(FileInterface $file, FileInterface $source): void {
     // Delete any image derivatives at the original image path.
-    image_path_flush($source->getFileUri());
+    \image_path_flush($source->getFileUri());
   }
 
   /**
@@ -149,7 +149,7 @@ class ImageHooks {
   #[Hook('file_predelete')]
   public function filePredelete(FileInterface $file): void {
     // Delete any image derivatives of this image.
-    image_path_flush($file->getFileUri());
+    \image_path_flush($file->getFileUri());
   }
 
   /**

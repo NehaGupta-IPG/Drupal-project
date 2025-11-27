@@ -58,7 +58,7 @@ class AnonymousUserResponseSubscriber implements EventSubscriberInterface {
     // be invalidated. Therefore, when varying by permissions and the current
     // user is the anonymous user, also add the cache tag for the 'anonymous'
     // role.
-    if (in_array('user.permissions', $response->getCacheableMetadata()->getCacheContexts())) {
+    if (\in_array('user.permissions', $response->getCacheableMetadata()->getCacheContexts())) {
       $per_permissions_response_for_anon = new CacheableMetadata();
       $per_permissions_response_for_anon->setCacheTags(['config:user.role.anonymous']);
       $response->addCacheableDependency($per_permissions_response_for_anon);

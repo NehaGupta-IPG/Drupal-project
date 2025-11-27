@@ -28,8 +28,8 @@ class DiffArray {
     $difference = [];
 
     foreach ($array1 as $key => $value) {
-      if (is_array($value)) {
-        if (!array_key_exists($key, $array2) || !is_array($array2[$key])) {
+      if (\is_array($value)) {
+        if (!\array_key_exists($key, $array2) || !\is_array($array2[$key])) {
           $difference[$key] = $value;
         }
         else {
@@ -39,7 +39,7 @@ class DiffArray {
           }
         }
       }
-      elseif (!array_key_exists($key, $array2) || $array2[$key] !== $value) {
+      elseif (!\array_key_exists($key, $array2) || $array2[$key] !== $value) {
         $difference[$key] = $value;
       }
     }

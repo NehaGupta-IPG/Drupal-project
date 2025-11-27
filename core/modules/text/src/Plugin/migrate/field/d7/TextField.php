@@ -32,11 +32,11 @@ class TextField extends FieldPluginBase {
 
     switch ($field_type) {
       case 'string':
-        $formatter_type = str_replace(['text_default', 'text_plain'], 'string', $formatter_type);
+        $formatter_type = \str_replace(['text_default', 'text_plain'], 'string', $formatter_type);
         break;
 
       case 'string_long':
-        $formatter_type = str_replace(['text_default', 'text_plain'], 'basic_string', $formatter_type);
+        $formatter_type = \str_replace(['text_default', 'text_plain'], 'basic_string', $formatter_type);
         break;
     }
 
@@ -52,11 +52,11 @@ class TextField extends FieldPluginBase {
 
     switch ($field_type) {
       case 'string':
-        $widget_type = str_replace('text_textfield', 'string_textfield', $widget_type);
+        $widget_type = \str_replace('text_textfield', 'string_textfield', $widget_type);
         break;
 
       case 'string_long':
-        $widget_type = str_replace('text_textarea', 'string_textarea', $widget_type);
+        $widget_type = \str_replace('text_textarea', 'string_textarea', $widget_type);
         break;
     }
 
@@ -74,7 +74,7 @@ class TextField extends FieldPluginBase {
     foreach ($row->getSourceProperty('instances') as $instance) {
       // Check if this field has plain text instances, filtered text instances,
       // or both.
-      $data = unserialize($instance['data']);
+      $data = \unserialize($instance['data']);
       switch ($data['settings']['text_processing']) {
         case '0':
           $plain_text = TRUE;
@@ -86,11 +86,11 @@ class TextField extends FieldPluginBase {
       }
     }
 
-    if (in_array($type, ['text', 'text_long'])) {
+    if (\in_array($type, ['text', 'text_long'])) {
       // If a text or text_long field has only plain text instances, migrate it
       // to a string or string_long field.
       if ($plain_text && !$filtered_text) {
-        $type = str_replace(['text', 'text_long'], ['string', 'string_long'], $type);
+        $type = \str_replace(['text', 'text_long'], ['string', 'string_long'], $type);
       }
       // If a text or text_long field has both plain text and filtered text
       // instances, skip the row.

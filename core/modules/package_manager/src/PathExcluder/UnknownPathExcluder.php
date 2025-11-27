@@ -105,10 +105,10 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
     foreach ($this->getScaffoldFiles() as $scaffold_file_path) {
       // The web root is always included in staging operations, so we don't need
       // to do anything special for scaffold files that live in it.
-      if (str_starts_with($scaffold_file_path, '[web-root]')) {
+      if (\str_starts_with($scaffold_file_path, '[web-root]')) {
         continue;
       }
-      $always_include[] = ltrim($scaffold_file_path, '/');
+      $always_include[] = \ltrim($scaffold_file_path, '/');
     }
 
     // Find any path repositories located inside the project root. These need
@@ -126,7 +126,7 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
         // Strip off everything except the top-level directory name. For
         // example, if the repository path is `custom/module/foo`, always
         // include `custom`.
-        $always_include[] = dirname($path, substr_count($path, '/') ?: 1);
+        $always_include[] = \dirname($path, \substr_count($path, '/') ?: 1);
       }
       catch (InvalidArgumentException) {
         // The repository path is not relative to the project root, so we don't
@@ -140,16 +140,16 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
     // \Drupal\Core\File\FileSystemInterface::scanDirectory(), because it
     // unconditionally ignores hidden files and directories.
     $files_in_project_root = [];
-    $handle = opendir($project_root);
+    $handle = \opendir($project_root);
     if (empty($handle)) {
       throw new \RuntimeException("Could not scan for files in the project root.");
     }
-    while ($entry = readdir($handle)) {
+    while ($entry = \readdir($handle)) {
       $files_in_project_root[] = $entry;
     }
-    closedir($handle);
+    \closedir($handle);
 
-    return array_diff($files_in_project_root, $always_include, ['.', '..']);
+    return \array_diff($files_in_project_root, $always_include, ['.', '..']);
   }
 
   /**
@@ -170,11 +170,11 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
   public function logExcludedPaths(): void {
     $excluded_paths = $this->getExcludedPaths();
     if ($excluded_paths) {
-      sort($excluded_paths);
+      \sort($excluded_paths);
 
       $message = $this->t("The following paths in @project_root aren't recognized as part of your Drupal site, so to be safe, Package Manager is excluding them from all stage operations. If these files are not needed for Composer to work properly in your site, no action is needed. Otherwise, you can disable this behavior by setting the <code>package_manager.settings:include_unknown_files_in_project_root</code> config setting to <code>TRUE</code>.\n\n@list", [
         '@project_root' => $this->pathLocator->getProjectRoot(),
-        '@list' => implode("\n", $excluded_paths),
+        '@list' => \implode("\n", $excluded_paths),
       ]);
       $this->logger?->info($message);
     }
@@ -195,7 +195,7 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
     $extra = Json::decode($this->composerInspector->getConfig('extra', $packages['drupal/core']->path . '/composer.json'));
 
     $scaffold_files = $extra['drupal-scaffold']['file-mapping'] ?? [];
-    return str_replace('[project-root]', '', array_keys($scaffold_files));
+    return \str_replace('[project-root]', '', \array_keys($scaffold_files));
   }
 
 }

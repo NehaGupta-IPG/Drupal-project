@@ -67,7 +67,7 @@ trait ComputedItemListTrait {
    * {@inheritdoc}
    */
   public function get($index) {
-    if (!is_numeric($index)) {
+    if (!\is_numeric($index)) {
       throw new \InvalidArgumentException('Unable to get a value with a non-numeric delta in a list.');
     }
 

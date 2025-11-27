@@ -124,15 +124,15 @@ class FileTestSaveUploadFromForm extends FormBase {
     // triggering a warning is unavoidable. We're interested in what happens
     // afterwards in _file_save_upload_from_form().
     if ($this->state->get('file_test.disable_error_collection')) {
-      define('SIMPLETEST_COLLECT_ERRORS', FALSE);
+      \define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     }
 
     $form['file_test_upload']['#upload_validators'] = $validators;
     $form['file_test_upload']['#upload_location'] = $destination;
 
-    $this->messenger->addStatus($this->t('Number of error messages before _file_save_upload_from_form(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
-    $file = _file_save_upload_from_form($form['file_test_upload'], $form_state, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
-    $this->messenger->addStatus($this->t('Number of error messages after _file_save_upload_from_form(): @count.', ['@count' => count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
+    $this->messenger->addStatus($this->t('Number of error messages before _file_save_upload_from_form(): @count.', ['@count' => \count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
+    $file = \_file_save_upload_from_form($form['file_test_upload'], $form_state, 0, static::fileExistsFromName($form_state->getValue('file_test_replace')));
+    $this->messenger->addStatus($this->t('Number of error messages after _file_save_upload_from_form(): @count.', ['@count' => \count($this->messenger->messagesByType(MessengerInterface::TYPE_ERROR))]));
 
     if ($file) {
       $form_state->setValue('file_test_upload', $file);

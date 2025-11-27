@@ -92,7 +92,7 @@ class Schema extends DatabaseSchema {
   protected function ensureIdentifiersLength($table_identifier_part, $column_identifier_part, $tag, $separator = '__') {
     $info = $this->getPrefixInfo($table_identifier_part);
     $table_identifier_part = $info['table'];
-    $identifierName = implode($separator, [$table_identifier_part, $column_identifier_part, $tag]);
+    $identifierName = \implode($separator, [$table_identifier_part, $column_identifier_part, $tag]);
 
     // Retrieve the max identifier length which is usually 63 characters
     // but can be altered before PostgreSQL is compiled so we need to check.
@@ -100,7 +100,7 @@ class Schema extends DatabaseSchema {
       $this->maxIdentifierLength = $this->connection->query("SHOW max_identifier_length")->fetchField();
     }
 
-    if (strlen($identifierName) > $this->maxIdentifierLength) {
+    if (\strlen($identifierName) > $this->maxIdentifierLength) {
       $saveIdentifier = '"drupal_' . $this->hashBase64($identifierName) . '_' . $tag . '"';
     }
     else {
@@ -134,7 +134,7 @@ class Schema extends DatabaseSchema {
     // Take into account that temporary tables are stored in a different schema.
     // \Drupal\Core\Database\Connection::generateTemporaryTableName() sets the
     // 'db_temporary_' prefix to all temporary tables.
-    if (str_contains($table, 'db_temporary_')) {
+    if (\str_contains($table, 'db_temporary_')) {
       $key = $quoted_key = $this->getTempNamespaceName() . '.' . $prefixed_table;
     }
     else {
@@ -187,7 +187,7 @@ EOD;
         if ($column->data_type == 'bytea') {
           $table_information->blob_fields[$column->column_name] = TRUE;
         }
-        elseif (preg_match("/nextval\('([^']+)'/", $column->column_default, $matches)) {
+        elseif (\preg_match("/nextval\('([^']+)'/", $column->column_default, $matches)) {
           // We must know of any sequences in the table structure to help us
           // return the last insert id. If there is more than 1 sequences the
           // first one (index 0 of the sequences array) will be used.
@@ -253,7 +253,7 @@ EOD;
    *   Exception thrown when the query for the table information fails.
    */
   public function queryFieldInformation($table, $field, $constraint_type = 'c') {
-    assert(in_array($constraint_type, ['c', 'f', 'p', 'u', 't', 'x']));
+    \assert(\in_array($constraint_type, ['c', 'f', 'p', 'u', 't', 'x']));
     $prefixInfo = $this->getPrefixInfo($table, TRUE);
 
     // Split the key into schema and table for querying.
@@ -292,11 +292,11 @@ EOD;
     }
 
     $sql_keys = [];
-    if (!empty($table['primary key']) && is_array($table['primary key'])) {
+    if (!empty($table['primary key']) && \is_array($table['primary key'])) {
       $this->ensureNotNullPrimaryKey($table['primary key'], $table['fields']);
       $sql_keys[] = 'CONSTRAINT ' . $this->ensureIdentifiersLength($name, '', 'pkey') . ' PRIMARY KEY (' . $this->createPrimaryKeySql($table['primary key']) . ')';
     }
-    if (isset($table['unique keys']) && is_array($table['unique keys'])) {
+    if (isset($table['unique keys']) && \is_array($table['unique keys'])) {
       foreach ($table['unique keys'] as $key_name => $key) {
         // Use the createPrimaryKeySql(), which already discards any prefix
         // lengths passed as part of the key column specifiers. (Postgres
@@ -307,15 +307,15 @@ EOD;
     }
 
     $sql = "CREATE TABLE {" . $name . "} (\n\t";
-    $sql .= implode(",\n\t", $sql_fields);
-    if (count($sql_keys) > 0) {
+    $sql .= \implode(",\n\t", $sql_fields);
+    if (\count($sql_keys) > 0) {
       $sql .= ",\n\t";
     }
-    $sql .= implode(",\n\t", $sql_keys);
+    $sql .= \implode(",\n\t", $sql_keys);
     $sql .= "\n)";
     $statements[] = $sql;
 
-    if (isset($table['indexes']) && is_array($table['indexes'])) {
+    if (isset($table['indexes']) && \is_array($table['indexes'])) {
       foreach ($table['indexes'] as $key_name => $key) {
         $statements[] = $this->_createIndexSql($name, $key_name, $key);
       }
@@ -352,7 +352,7 @@ EOD;
       unset($spec['not null']);
     }
 
-    if (in_array($spec['pgsql_type'], ['varchar', 'character']) && isset($spec['length'])) {
+    if (\in_array($spec['pgsql_type'], ['varchar', 'character']) && isset($spec['length'])) {
       $sql .= '(' . $spec['length'] . ')';
     }
     elseif (isset($spec['precision']) && isset($spec['scale'])) {
@@ -371,7 +371,7 @@ EOD;
         $sql .= ' NULL';
       }
     }
-    if (array_key_exists('default', $spec)) {
+    if (\array_key_exists('default', $spec)) {
       $default = $this->escapeDefaultValue($spec['default']);
       $sql .= " default $default";
     }
@@ -393,7 +393,7 @@ EOD;
     // Set the correct database-engine specific datatype.
     // In case one is already provided, force it to lowercase.
     if (isset($field['pgsql_type'])) {
-      $field['pgsql_type'] = mb_strtolower($field['pgsql_type']);
+      $field['pgsql_type'] = \mb_strtolower($field['pgsql_type']);
     }
     else {
       $map = $this->getFieldTypeMap();
@@ -478,14 +478,14 @@ EOD;
   protected function _createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {
-      if (is_array($field)) {
+      if (\is_array($field)) {
         $return[] = 'substr(' . $field[0] . ', 1, ' . $field[1] . ')';
       }
       else {
         $return[] = '"' . $field . '"';
       }
     }
-    return implode(', ', $return);
+    return \implode(', ', $return);
   }
 
   /**
@@ -498,14 +498,14 @@ EOD;
   protected function createPrimaryKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {
-      if (is_array($field)) {
+      if (\is_array($field)) {
         $return[] = '"' . $field[0] . '"';
       }
       else {
         $return[] = '"' . $field . '"';
       }
     }
-    return implode(', ', $return);
+    return \implode(', ', $return);
   }
 
   /**
@@ -522,21 +522,21 @@ EOD;
    */
   public function findTables($table_expression) {
     $prefix = $this->connection->getPrefix();
-    $prefix_length = strlen($prefix);
+    $prefix_length = \strlen($prefix);
     $tables = [];
 
     // Load all the tables up front in order to take into account per-table
     // prefixes. The actual matching is done at the bottom of the method.
     $results = $this->connection->query("SELECT tablename FROM pg_tables WHERE schemaname = :schema", [':schema' => $this->defaultSchema]);
     foreach ($results as $table) {
-      if ($prefix && substr($table->tablename, 0, $prefix_length) !== $prefix) {
+      if ($prefix && \substr($table->tablename, 0, $prefix_length) !== $prefix) {
         // This table name does not start the default prefix, which means that
         // it is not managed by Drupal so it should be excluded from the result.
         continue;
       }
 
       // Remove the prefix from the returned tables.
-      $unprefixed_table_name = substr($table->tablename, $prefix_length);
+      $unprefixed_table_name = \substr($table->tablename, $prefix_length);
 
       // The pattern can match a table which is the same as the prefix. That
       // will become an empty string when we remove the prefix, which will
@@ -549,8 +549,8 @@ EOD;
 
     // Convert the table expression from its SQL LIKE syntax to a regular
     // expression and escape the delimiter that will be used for matching.
-    $table_expression = str_replace(['%', '_'], ['.*?', '.'], preg_quote($table_expression, '/'));
-    $tables = preg_grep('/^' . $table_expression . '$/i', $tables);
+    $table_expression = \str_replace(['%', '_'], ['.*?', '.'], \preg_quote($table_expression, '/'));
+    $tables = \preg_grep('/^' . $table_expression . '$/i', $tables);
 
     return $tables;
   }
@@ -574,21 +574,21 @@ EOD;
 
     foreach ($indexes as $index) {
       // Get the index type by suffix, e.g. idx/key/pkey.
-      $index_type = substr($index->indexname, strrpos($index->indexname, '_') + 1);
+      $index_type = \substr($index->indexname, \strrpos($index->indexname, '_') + 1);
 
       // If the index is already rewritten by ensureIdentifiersLength() to not
       // exceed the 63 chars limit of PostgreSQL, we need to take care of that.
       // cSpell:disable-next-line
       // Example (drupal_Gk7Su_T1jcBHVuvSPeP22_I3Ni4GrVEgTYlIYnBJkro_idx).
-      if (str_starts_with($index->indexname, 'drupal_')) {
-        preg_match('/^drupal_(.*)_' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
+      if (\str_starts_with($index->indexname, 'drupal_')) {
+        \preg_match('/^drupal_(.*)_' . \preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
       else {
         // Make sure to remove the suffix from index names, because
         // $this->ensureIdentifiersLength() will add the suffix again and thus
         // would result in a wrong index name.
-        preg_match('/^' . preg_quote($table_name, NULL) . '__(.*)__' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
+        \preg_match('/^' . \preg_quote($table_name, NULL) . '__(.*)__' . \preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
       // The renaming of an index will fail when the there exists an table with
@@ -650,7 +650,7 @@ EOD;
     }
 
     // Fields that are part of a PRIMARY KEY must be added as NOT NULL.
-    $is_primary_key = isset($new_keys['primary key']) && in_array($field, $new_keys['primary key'], TRUE);
+    $is_primary_key = isset($new_keys['primary key']) && \in_array($field, $new_keys['primary key'], TRUE);
     if ($is_primary_key) {
       $this->ensureNotNullPrimaryKey($new_keys['primary key'], [$field => $spec]);
     }
@@ -730,7 +730,7 @@ EOD;
     $index_name = $this->ensureIdentifiersLength($table, $name, 'idx');
     // Remove leading and trailing quotes because the index name is in a WHERE
     // clause and not used as an identifier.
-    $index_name = str_replace('"', '', $index_name);
+    $index_name = \str_replace('"', '', $index_name);
 
     $sql_params = [
       ':schema' => $this->defaultSchema,
@@ -760,14 +760,14 @@ EOD;
       $name = '';
     }
     else {
-      $pos = strrpos($name, '__');
-      $suffix = substr($name, $pos + 2);
-      $name = substr($name, 0, $pos);
+      $pos = \strrpos($name, '__');
+      $suffix = \substr($name, $pos + 2);
+      $name = \substr($name, 0, $pos);
     }
     $constraint_name = $this->ensureIdentifiersLength($table, $name, $suffix);
     // Remove leading and trailing quotes because the index name is in a WHERE
     // clause and not used as an identifier.
-    $constraint_name = str_replace('"', '', $constraint_name);
+    $constraint_name = \str_replace('"', '', $constraint_name);
     return (bool) $this->connection->query("SELECT 1 FROM pg_constraint WHERE conname = '$constraint_name'")->fetchField();
   }
 
@@ -883,18 +883,18 @@ EOD;
     ];
 
     // Get the schema and tablename for the table without identifier quotes.
-    $full_name = str_replace('"', '', $this->connection->prefixTables('{' . $table . '}'));
+    $full_name = \str_replace('"', '', $this->connection->prefixTables('{' . $table . '}'));
     $result = $this->connection->query("SELECT i.relname AS index_name, a.attname AS column_name FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r' AND t.relname = :table_name ORDER BY index_name ASC, column_name ASC", [
       ':table_name' => $full_name,
     ])->fetchAll();
     foreach ($result as $row) {
-      if (str_ends_with($row->index_name, '_pkey')) {
+      if (\str_ends_with($row->index_name, '_pkey')) {
         $index_schema['primary key'][] = $row->column_name;
       }
-      elseif (str_ends_with($row->index_name, '_key')) {
+      elseif (\str_ends_with($row->index_name, '_key')) {
         $index_schema['unique keys'][$row->index_name][] = $row->column_name;
       }
-      elseif (str_ends_with($row->index_name, '_idx')) {
+      elseif (\str_ends_with($row->index_name, '_idx')) {
         $index_schema['indexes'][$row->index_name][] = $row->column_name;
       }
     }
@@ -912,7 +912,7 @@ EOD;
     if (($field != $field_new) && $this->fieldExists($table, $field_new)) {
       throw new SchemaObjectExistsException("Cannot rename field '$table.$field' to '$field_new': target field already exists.");
     }
-    if (isset($new_keys['primary key']) && in_array($field_new, $new_keys['primary key'], TRUE)) {
+    if (isset($new_keys['primary key']) && \in_array($field_new, $new_keys['primary key'], TRUE)) {
       $this->ensureNotNullPrimaryKey($new_keys['primary key'], [$field_new => $spec]);
     }
 
@@ -927,7 +927,7 @@ EOD;
       default => $spec['pgsql_type'],
     };
 
-    if (in_array($spec['pgsql_type'], ['varchar', 'character', 'text']) && isset($spec['length'])) {
+    if (\in_array($spec['pgsql_type'], ['varchar', 'character', 'text']) && isset($spec['length'])) {
       $field_def .= '(' . $spec['length'] . ')';
     }
     elseif (isset($spec['precision']) && isset($spec['scale'])) {
@@ -986,7 +986,7 @@ EOD;
       $this->executeDdlStatement('ALTER TABLE {' . $table . '} ALTER [' . $field . '] ' . $null_action);
     }
 
-    if (in_array($spec['pgsql_type'], ['serial', 'bigserial'])) {
+    if (\in_array($spec['pgsql_type'], ['serial', 'bigserial'])) {
       // Type "serial" is known to PostgreSQL, but *only* during table creation,
       // not when altering. Because of that, the sequence needs to be created
       // and initialized by hand.
@@ -1091,9 +1091,9 @@ EOD;
    *   padding characters removed.
    */
   protected function hashBase64($data) {
-    $hash = base64_encode(hash('sha256', $data, TRUE));
+    $hash = \base64_encode(\hash('sha256', $data, TRUE));
     // Modify the hash so it's safe to use in PostgreSQL identifiers.
-    return strtr($hash, ['+' => '_', '/' => '_', '=' => '']);
+    return \strtr($hash, ['+' => '_', '/' => '_', '=' => '']);
   }
 
   /**

@@ -42,15 +42,15 @@ class TermEntityQueryTest extends KernelTestBase {
       $terms[$term->id()] = $term;
     }
     $result = \Drupal::entityQuery('taxonomy_term')->accessCheck(FALSE)->execute();
-    sort($result);
-    $this->assertEquals(array_keys($terms), $result);
-    $tid = reset($result);
+    \sort($result);
+    $this->assertEquals(\array_keys($terms), $result);
+    $tid = \reset($result);
     $ids = (object) [
       'entity_type' => 'taxonomy_term',
       'entity_id' => $tid,
       'bundle' => $vocabulary->id(),
     ];
-    $term = _field_create_entity_from_ids($ids);
+    $term = \_field_create_entity_from_ids($ids);
     $this->assertEquals($tid, $term->id());
 
     // Create a second vocabulary and five more terms.
@@ -65,15 +65,15 @@ class TermEntityQueryTest extends KernelTestBase {
       ->accessCheck(FALSE)
       ->condition('vid', $vocabulary2->id())
       ->execute();
-    sort($result);
-    $this->assertEquals(array_keys($terms2), $result);
-    $tid = reset($result);
+    \sort($result);
+    $this->assertEquals(\array_keys($terms2), $result);
+    $tid = \reset($result);
     $ids = (object) [
       'entity_type' => 'taxonomy_term',
       'entity_id' => $tid,
       'bundle' => $vocabulary2->id(),
     ];
-    $term = _field_create_entity_from_ids($ids);
+    $term = \_field_create_entity_from_ids($ids);
     $this->assertEquals($tid, $term->id());
   }
 

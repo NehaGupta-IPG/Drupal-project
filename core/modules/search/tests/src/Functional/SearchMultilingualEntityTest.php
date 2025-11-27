@@ -88,7 +88,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     $field_storage->save();
 
     // Create a few page nodes with multilingual body values.
-    $default_format = filter_default_format();
+    $default_format = \filter_default_format();
     $nodes = [
       [
         'title' => 'First node en',
@@ -155,7 +155,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     // and searching has to happen in the same request, so running the shutdown
     // function manually is needed to finish the indexing process.
     $search_index = \Drupal::service('search.index');
-    assert($search_index instanceof SearchIndexInterface);
+    \assert($search_index instanceof SearchIndexInterface);
     $this->assertIndexCounts(6, 8, 'after updating partially');
     $this->assertDatabaseCounts(2, 0, 'after updating partially');
 
@@ -305,7 +305,7 @@ class SearchMultilingualEntityTest extends BrowserTestBase {
     // \Drupal\Core\StringTranslation\TranslationInterface::formatPlural(), so
     // it tests for fragments of text.
     $indexed = $total - $remaining;
-    $percent = ($total > 0) ? floor(100 * $indexed / $total) : 100;
+    $percent = ($total > 0) ? \floor(100 * $indexed / $total) : 100;
     $this->drupalGet('admin/config/search/pages');
     $this->assertSession()->pageTextContains($percent . '% of the site has been indexed.');
     $this->assertSession()->pageTextContains($remaining . ' item');

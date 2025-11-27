@@ -62,7 +62,7 @@ class ImageStyles extends DrupalSqlBase {
       ->execute();
 
     foreach ($results as $key => $result) {
-      $result['data'] = unserialize($result['data']);
+      $result['data'] = \unserialize($result['data']);
       $effects[$key] = $result;
     }
 

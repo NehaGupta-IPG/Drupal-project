@@ -59,14 +59,14 @@ abstract class ComposerPluginsValidatorTestBase extends PackageManagerKernelTest
    * Tests additional composer plugins can be trusted during pre-create.
    */
   protected function doTestValidationAfterTrustingDuringPreCreate(array $composer_config_to_add, array $packages_to_add, array $expected_results): void {
-    $expected_results_without_composer_plugin_violations = array_filter(
+    $expected_results_without_composer_plugin_violations = \array_filter(
       $expected_results,
-      fn (ValidationResult $v) => !$v->summary || !str_contains(strtolower($v->summary->getUntranslatedString()), 'unsupported composer plugin'),
+      fn (ValidationResult $v) => !$v->summary || !\str_contains(\strtolower($v->summary->getUntranslatedString()), 'unsupported composer plugin'),
     );
 
     // Trust all added packages.
     $this->config('package_manager.settings')
-      ->set('additional_trusted_composer_plugins', array_map(fn (array $package) => $package['name'], $packages_to_add))
+      ->set('additional_trusted_composer_plugins', \array_map(fn (array $package) => $package['name'], $packages_to_add))
       ->save();
 
     // Reuse the test logic that does not trust additional packages, but with
@@ -78,14 +78,14 @@ abstract class ComposerPluginsValidatorTestBase extends PackageManagerKernelTest
    * Tests additional composer plugins can be trusted during pre-apply.
    */
   protected function doTestValidationAfterTrustingDuringPreApply(array $composer_config_to_add, array $packages_to_add, array $expected_results): void {
-    $expected_results_without_composer_plugin_violations = array_filter(
+    $expected_results_without_composer_plugin_violations = \array_filter(
       $expected_results,
-      fn (ValidationResult $v) => !$v->summary || !str_contains(strtolower($v->summary->getUntranslatedString()), 'unsupported composer plugin'),
+      fn (ValidationResult $v) => !$v->summary || !\str_contains(\strtolower($v->summary->getUntranslatedString()), 'unsupported composer plugin'),
     );
 
     // Trust all added packages.
     $this->config('package_manager.settings')
-      ->set('additional_trusted_composer_plugins', array_map(fn (array $package) => $package['name'], $packages_to_add))
+      ->set('additional_trusted_composer_plugins', \array_map(fn (array $package) => $package['name'], $packages_to_add))
       ->save();
 
     // Reuse the test logic that does not trust additional packages, but with
@@ -284,15 +284,15 @@ abstract class ComposerPluginsValidatorTestBase extends PackageManagerKernelTest
    *   The test cases.
    */
   public static function providerComplexInvalidCases(): \Generator {
-    $valid_cases = iterator_to_array(static::providerSimpleValidCases());
-    $invalid_cases = iterator_to_array(static::providerSimpleInvalidCases());
+    $valid_cases = \iterator_to_array(static::providerSimpleValidCases());
+    $invalid_cases = \iterator_to_array(static::providerSimpleInvalidCases());
     $all_config = NestedArray::mergeDeepArray(
       // First key-value pair for each simple test case: the packages it adds.
-      array_map(fn (array $c) => $c[0], $valid_cases + $invalid_cases)
+      \array_map(fn (array $c) => $c[0], $valid_cases + $invalid_cases)
     );
     $all_packages = NestedArray::mergeDeepArray(
       // Second key-value pair for each simple test case: the packages it adds.
-      array_map(fn (array $c) => $c[1], $valid_cases + $invalid_cases)
+      \array_map(fn (array $c) => $c[1], $valid_cases + $invalid_cases)
     );
 
     yield 'complex combination' => [

@@ -121,14 +121,14 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
 
     // You can't create an exception in PHP without throwing it. Store the
     // current error_log, and disable it temporarily.
-    $this->errorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
+    $this->errorLog = \ini_set('error_log', \file_exists('/dev/null') ? '/dev/null' : 'nul');
   }
 
   /**
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    ini_set('error_log', $this->errorLog);
+    \ini_set('error_log', $this->errorLog);
   }
 
   /**

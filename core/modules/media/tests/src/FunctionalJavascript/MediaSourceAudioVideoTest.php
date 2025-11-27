@@ -49,7 +49,7 @@ class MediaSourceAudioVideoTest extends MediaSourceTestBase {
     $this->assertSame('file_audio', $formatter);
 
     // Create a media asset.
-    file_put_contents('public://file.mp3', str_repeat('t', 10));
+    \file_put_contents('public://file.mp3', \str_repeat('t', 10));
     $file = File::create([
       'uri' => 'public://file.mp3',
       'filename' => 'file.mp3',
@@ -98,7 +98,7 @@ class MediaSourceAudioVideoTest extends MediaSourceTestBase {
     $this->assertSame('file_video', $formatter);
 
     // Create a media asset.
-    file_put_contents('public://file.mp4', str_repeat('t', 10));
+    \file_put_contents('public://file.mp4', \str_repeat('t', 10));
     $file = File::create([
       'uri' => 'public://file.mp4',
       'filename' => 'file.mp4',

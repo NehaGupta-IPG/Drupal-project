@@ -253,7 +253,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     // Test sorting of dependency types.
     $method->invoke($this->entity, 'entity', 'system.action.id');
     $dependencies = $this->entity->getDependencies();
-    $this->assertEquals(['entity', 'module'], array_keys($dependencies));
+    $this->assertEquals(['entity', 'module'], \array_keys($dependencies));
   }
 
   /**
@@ -393,8 +393,8 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     // Confirm the calculated entity dependencies before removing dependencies.
     $entity = $this->getMockEntityWithPluginCollection($instance);
     $collections = $entity->getPluginCollections();
-    $collection = reset($collections);
-    $this->assertEquals(1, count($collection));
+    $collection = \reset($collections);
+    $this->assertEquals(1, \count($collection));
     $entity->calculateDependencies();
     $calculated_dependencies = $entity->getDependencies();
     $this->assertEquals($dependencies, $calculated_dependencies);
@@ -407,7 +407,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     // If the plugin has been removed from the collection, then the collection
     // should be empty. Otherwise, there should be one plugin instance in the
     // collection.
-    $this->assertEquals($on_dependency_removal_status == RemovableDependentPluginReturn::Remove ? 0 : 1, count($collection));
+    $this->assertEquals($on_dependency_removal_status == RemovableDependentPluginReturn::Remove ? 0 : 1, \count($collection));
     $this->assertEquals($dependencies_after_removal, $recalculated_dependencies);
     $this->assertEquals($expectation, $changed);
   }
@@ -712,22 +712,22 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
     // Test sorting by label.
     $list = [$entity_a, $entity_b];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
+    \usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     $this->assertSame($entity_b, $list[0]);
 
     $list = [$entity_b, $entity_a];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
+    \usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     $this->assertSame($entity_b, $list[0]);
 
     // Test sorting by weight.
     $entity_a->weight = 0;
     $entity_b->weight = 1;
     $list = [$entity_b, $entity_a];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
+    \usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     $this->assertSame($entity_a, $list[0]);
 
     $list = [$entity_a, $entity_b];
-    usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
+    \usort($list, '\Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     $this->assertSame($entity_a, $list[0]);
   }
 

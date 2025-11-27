@@ -45,7 +45,7 @@ class VersionByRel extends NegotiatorBase {
    * {@inheritdoc}
    */
   protected function getRevisionId(EntityInterface $entity, $version_argument) {
-    assert($entity instanceof RevisionableInterface);
+    \assert($entity instanceof RevisionableInterface);
     switch ($version_argument) {
       case static::WORKING_COPY:
         /** @var \Drupal\Core\Entity\RevisionableStorageInterface $entity_storage */
@@ -58,7 +58,7 @@ class VersionByRel extends NegotiatorBase {
         return $entity->getLoadedRevisionId();
 
       default:
-        $message = sprintf('The version specifier must be either `%s` or `%s`, `%s` given.', static::LATEST_VERSION, static::WORKING_COPY, $version_argument);
+        $message = \sprintf('The version specifier must be either `%s` or `%s`, `%s` given.', static::LATEST_VERSION, static::WORKING_COPY, $version_argument);
         throw new InvalidVersionIdentifierException($message);
     }
   }

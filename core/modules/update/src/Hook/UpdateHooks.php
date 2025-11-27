@@ -84,7 +84,7 @@ class UpdateHooks {
         // hook_requirements() supports render arrays therefore we need to
         // render them before using
         // \Drupal\Core\Messenger\MessengerInterface::addStatus().
-        if (isset($status[$type]['description']) && is_array($status[$type]['description'])) {
+        if (isset($status[$type]['description']) && \is_array($status[$type]['description'])) {
           $status[$type]['description'] = \Drupal::service('renderer')->renderInIsolation($status[$type]['description']);
         }
         if (!empty($verbose)) {
@@ -120,20 +120,20 @@ class UpdateHooks {
       // If the configured update interval has elapsed, we want to invalidate
       // the data for all projects, attempt to re-fetch, and trigger any
       // configured notifications about the new status.
-      update_refresh();
-      update_fetch_data();
+      \update_refresh();
+      \update_fetch_data();
     }
     else {
       // Otherwise, see if any individual projects are now stale or still
       // missing data, and if so, try to fetch the data.
-      update_get_available(TRUE);
+      \update_get_available(TRUE);
     }
     $last_email_notice = \Drupal::state()->get('update.last_email_notification', 0);
     if ($request_time - $last_email_notice > $interval) {
       // If configured time between notifications elapsed, send email about
       // updates possibly available.
       \Drupal::moduleHandler()->loadInclude('update', 'inc', 'update.fetch');
-      _update_cron_notify();
+      \_update_cron_notify();
     }
   }
 
@@ -146,7 +146,7 @@ class UpdateHooks {
   #[Hook('themes_installed')]
   public function themesInstalled($themes): void {
     // Clear all Update Status module data.
-    update_storage_clear();
+    \update_storage_clear();
   }
 
   /**
@@ -158,7 +158,7 @@ class UpdateHooks {
   #[Hook('themes_uninstalled')]
   public function themesUninstalled($themes): void {
     // Clear all Update Status module data.
-    update_storage_clear();
+    \update_storage_clear();
   }
 
   /**
@@ -170,7 +170,7 @@ class UpdateHooks {
   #[Hook('modules_installed')]
   public function modulesInstalled($modules): void {
     // Clear all Update Status module data.
-    update_storage_clear();
+    \update_storage_clear();
   }
 
   /**
@@ -182,7 +182,7 @@ class UpdateHooks {
   #[Hook('modules_uninstalled')]
   public function modulesUninstalled($modules): void {
     // Clear all Update Status module data.
-    update_storage_clear();
+    \update_storage_clear();
   }
 
   /**
@@ -201,7 +201,7 @@ class UpdateHooks {
     $language = \Drupal::languageManager()->getLanguage($langcode);
     $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')], ['langcode' => $langcode]);
     foreach ($params as $msg_type => $msg_reason) {
-      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
+      $message['body'][] = \_update_message_text($msg_type, $msg_reason, $langcode);
     }
     $message['body'][] = $this->t('See the available updates page for more information:', [], ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.status', [], ['absolute' => TRUE, 'language' => $language])->toString();
     $settings_url = Url::fromRoute('update.settings', [], ['absolute' => TRUE])->toString();
@@ -230,7 +230,7 @@ class UpdateHooks {
   public function verifyUpdateArchive($project, $archive_file, $directory): array {
     $errors = [];
     // Make sure this isn't a tarball of Drupal core.
-    if (file_exists("{$directory}/{$project}/index.php") && file_exists("{$directory}/{$project}/core/install.php") && file_exists("{$directory}/{$project}/core/includes/bootstrap.inc") && file_exists("{$directory}/{$project}/core/modules/node/node.module") && file_exists("{$directory}/{$project}/core/modules/system/system.module")) {
+    if (\file_exists("{$directory}/{$project}/index.php") && \file_exists("{$directory}/{$project}/core/install.php") && \file_exists("{$directory}/{$project}/core/includes/bootstrap.inc") && \file_exists("{$directory}/{$project}/core/modules/node/node.module") && \file_exists("{$directory}/{$project}/core/modules/system/system.module")) {
       return [
         'no-core' => $this->t('Automatic updating of Drupal core is not supported. See the <a href=":update-guide">Updating Drupal guide</a> for information on how to update Drupal core manually.', [
           ':update-guide' => 'https://www.drupal.org/docs/updating-drupal',
@@ -260,13 +260,13 @@ class UpdateHooks {
       }
     }
     if (empty($files)) {
-      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => basename($archive_file)]);
+      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => \basename($archive_file)]);
     }
     elseif (!$compatible_project) {
-      $errors[] = \Drupal::translation()->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
+      $errors[] = \Drupal::translation()->formatPlural(\count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
         '@version' => \Drupal::VERSION,
-        '%archive_file' => basename($archive_file),
-        '%names' => implode(', ', $incompatible),
+        '%archive_file' => \basename($archive_file),
+        '%names' => \implode(', ', $incompatible),
       ]);
     }
     return $errors;

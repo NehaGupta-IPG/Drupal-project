@@ -37,8 +37,8 @@ trait NodeMigrateTypeTestTrait {
       ->findTables('migrate_map_d' . $version . '_node%');
 
     foreach ($bases as $base) {
-      $base_tables = preg_grep('/^migrate_map_d' . $version . '_' . $base . '_{2}.*$/', $tables);
-      $results[$base] = count($base_tables);
+      $base_tables = \preg_grep('/^migrate_map_d' . $version . '_' . $base . '_{2}.*$/', $tables);
+      $results[$base] = \count($base_tables);
     }
     return $results;
   }
@@ -167,7 +167,7 @@ trait NodeMigrateTypeTestTrait {
       'destid3' => 'en',
       'source_row_status' => '1',
       'rollback_action' => '1',
-      'last_imported' => time(),
+      'last_imported' => \time(),
       'hash' => 'abc',
     ];
     $indexes = [
@@ -184,8 +184,8 @@ trait NodeMigrateTypeTestTrait {
       foreach ($keys as $key) {
         unset($fields[$key]);
         unset($values[$key]);
-        if (str_contains($key, 'sourceid')) {
-          $index_key = substr($key, -1) - 1;
+        if (\str_contains($key, 'sourceid')) {
+          $index_key = \substr($key, -1) - 1;
           unset($indexes['source'][$index_key]);
         }
       }
@@ -200,7 +200,7 @@ trait NodeMigrateTypeTestTrait {
       'mysql_character_set' => 'utf8mb4',
     ]);
 
-    $field_names = array_keys($fields);
+    $field_names = \array_keys($fields);
     $connection->insert($name)
       ->fields($field_names)
       ->values($values)

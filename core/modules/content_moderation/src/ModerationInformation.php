@@ -63,7 +63,7 @@ class ModerationInformation implements ModerationInformationInterface {
    */
   public function isModeratedEntityType(EntityTypeInterface $entity_type) {
     $bundles = $this->bundleInfo->getBundleInfo($entity_type->id());
-    return !empty(array_column($bundles, 'workflow'));
+    return !empty(\array_column($bundles, 'workflow'));
   }
 
   /**
@@ -97,7 +97,7 @@ class ModerationInformation implements ModerationInformationInterface {
         ->accessCheck(FALSE)
         ->execute();
       if ($result) {
-        return key($result);
+        return \key($result);
       }
     }
   }

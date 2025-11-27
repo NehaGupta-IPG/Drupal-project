@@ -21,23 +21,23 @@ class FilterFormat extends StringData implements OptionsProviderInterface {
    * {@inheritdoc}
    */
   public function getPossibleValues(?AccountInterface $account = NULL) {
-    return array_keys($this->getPossibleOptions($account));
+    return \array_keys($this->getPossibleOptions($account));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getPossibleOptions(?AccountInterface $account = NULL) {
-    return array_map(function ($format) {
+    return \array_map(function ($format) {
       return $format->label();
-    }, filter_formats());
+    }, \filter_formats());
   }
 
   /**
    * {@inheritdoc}
    */
   public function getSettableValues(?AccountInterface $account = NULL) {
-    return array_keys($this->getSettableOptions($account));
+    return \array_keys($this->getSettableOptions($account));
   }
 
   /**
@@ -45,9 +45,9 @@ class FilterFormat extends StringData implements OptionsProviderInterface {
    */
   public function getSettableOptions(?AccountInterface $account = NULL) {
     // @todo Avoid calling functions but move to injected dependencies.
-    return array_map(function ($format) {
+    return \array_map(function ($format) {
       return $format->label();
-    }, filter_formats($account));
+    }, \filter_formats($account));
   }
 
 }

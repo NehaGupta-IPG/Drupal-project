@@ -44,32 +44,32 @@ final class InstallConfigurator {
    *   The theme list service.
    */
   public function __construct(array $extensions, ModuleExtensionList $module_list, ThemeExtensionList $theme_list) {
-    assert(Inspector::assertAllStrings($extensions), 'Extension names must be strings.');
-    $extensions = array_map(fn($extension) => Dependency::createFromString($extension)->getName(), $extensions);
-    $extensions = array_combine($extensions, $extensions);
+    \assert(Inspector::assertAllStrings($extensions), 'Extension names must be strings.');
+    $extensions = \array_map(fn($extension) => Dependency::createFromString($extension)->getName(), $extensions);
+    $extensions = \array_combine($extensions, $extensions);
     $module_data = $module_list->reset()->getList();
     $theme_data = $theme_list->reset()->getList();
 
-    $modules = array_intersect_key($extensions, $module_data);
-    $themes = array_intersect_key($extensions, $theme_data);
+    $modules = \array_intersect_key($extensions, $module_data);
+    $themes = \array_intersect_key($extensions, $theme_data);
 
-    $missing_extensions = array_diff($extensions, $modules, $themes);
+    $missing_extensions = \array_diff($extensions, $modules, $themes);
 
     // Add theme module dependencies.
     foreach ($themes as $theme => $value) {
-      $modules = array_merge($modules, array_keys($theme_data[$theme]->module_dependencies));
+      $modules = \array_merge($modules, \array_keys($theme_data[$theme]->module_dependencies));
     }
 
     // Add modules that other modules depend on.
     foreach ($modules as $module) {
       if ($module_data[$module]->requires) {
-        $modules = array_merge($modules, array_keys($module_data[$module]->requires));
+        $modules = \array_merge($modules, \array_keys($module_data[$module]->requires));
       }
     }
 
     // Remove all modules that have been installed already.
-    $modules = array_diff(array_unique($modules), array_keys($module_list->getAllInstalledInfo()));
-    $modules = array_combine($modules, $modules);
+    $modules = \array_diff(\array_unique($modules), \array_keys($module_list->getAllInstalledInfo()));
+    $modules = \array_combine($modules, $modules);
 
     // Create a sortable list of modules.
     foreach ($modules as $name => $value) {
@@ -89,13 +89,13 @@ final class InstallConfigurator {
       // dependencies keyed by the module extension machine name. Therefore,
       // we can find the theme dependencies by finding array keys for
       // 'requires' that are not in $module_dependencies.
-      $theme_dependencies = array_diff_key($theme_data[$theme]->requires, $theme_data[$theme]->module_dependencies);
-      $themes = array_merge($themes, array_keys($theme_dependencies));
+      $theme_dependencies = \array_diff_key($theme_data[$theme]->requires, $theme_data[$theme]->module_dependencies);
+      $themes = \array_merge($themes, \array_keys($theme_dependencies));
     }
 
     // Remove all themes that have been installed already.
-    $themes = array_diff(array_unique($themes), array_keys($theme_list->getAllInstalledInfo()));
-    $themes = array_combine($themes, $themes);
+    $themes = \array_diff(\array_unique($themes), \array_keys($theme_list->getAllInstalledInfo()));
+    $themes = \array_combine($themes, $themes);
 
     // Create a sortable list of themes.
     foreach ($themes as $name => $value) {
@@ -108,13 +108,13 @@ final class InstallConfigurator {
     }
 
     if (!empty($missing_extensions)) {
-      throw new RecipeMissingExtensionsException(array_values($missing_extensions));
+      throw new RecipeMissingExtensionsException(\array_values($missing_extensions));
     }
 
-    arsort($modules);
-    arsort($themes);
-    $this->modules = array_keys($modules);
-    $this->themes = array_keys($themes);
+    \arsort($modules);
+    \arsort($themes);
+    $this->modules = \array_keys($modules);
+    $this->themes = \array_keys($themes);
   }
 
 }

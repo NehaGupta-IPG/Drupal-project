@@ -140,7 +140,7 @@ EOT;
     // Check to see whether there are any untracked files. We expect that
     // only the .gitignore files themselves should be untracked.
     $stdout = $this->mustExec('git status --porcelain', $sut);
-    $this->assertEquals(trim($expected), trim($stdout));
+    $this->assertEquals(\trim($expected), \trim($stdout));
   }
 
   /**
@@ -197,31 +197,31 @@ EOT;
     // Confirm that 'git' is available (n.b. if it were not, createSutWithGit()
     // would fail).
     $output = [];
-    exec('git --help', $output, $status);
+    \exec('git --help', $output, $status);
     $this->assertEquals(0, $status);
     // Modify our $PATH so that it begins with a path that contains an
     // executable script named 'git' that always exits with 127, as if git were
     // not found. Note that we run our tests using process isolation, so we do
     // not need to restore the PATH when we are done.
     $unavailableGitPath = $sut . '/bin';
-    mkdir($unavailableGitPath);
+    \mkdir($unavailableGitPath);
     $bash = <<<SH
 #!/bin/bash
 exit 127
 
 SH;
-    file_put_contents($unavailableGitPath . '/git', $bash);
-    chmod($unavailableGitPath . '/git', 0755);
-    $oldPath = getenv('PATH');
-    putenv('PATH=' . $unavailableGitPath . ':' . getenv('PATH'));
+    \file_put_contents($unavailableGitPath . '/git', $bash);
+    \chmod($unavailableGitPath . '/git', 0755);
+    $oldPath = \getenv('PATH');
+    \putenv('PATH=' . $unavailableGitPath . ':' . \getenv('PATH'));
     // Confirm that 'git' is no longer available.
     $output = [];
-    exec('git --help', $output, $status);
+    \exec('git --help', $output, $status);
     $this->assertEquals(127, $status);
     // Run the scaffold command.
     $output = $this->mustExec('composer drupal:scaffold 2>&1', NULL);
 
-    putenv('PATH=' . $oldPath . ':' . getenv('PATH'));
+    \putenv('PATH=' . $oldPath . ':' . \getenv('PATH'));
 
     $expected = <<<EOT
 Scaffolding files for fixtures/drupal-assets-fixture:

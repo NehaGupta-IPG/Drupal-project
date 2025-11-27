@@ -146,11 +146,11 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
 
     // The following check might throw PHP fatal errors and notices, so we
     // disable error assertions.
-    set_error_handler(function () {
+    \set_error_handler(function () {
       return TRUE;
     });
     $this->assertFalse($this->generator->validate($token, $value));
-    restore_error_handler();
+    \restore_error_handler();
   }
 
   /**

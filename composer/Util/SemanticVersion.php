@@ -17,7 +17,7 @@ class SemanticVersion {
    *   Constraint string for major and minor. Example: ^9.5
    */
   public static function majorMinorConstraint(string $version): string {
-    preg_match('/^(\d+)\.(\d+)\.\d+/', $version, $matches);
+    \preg_match('/^(\d+)\.(\d+)\.\d+/', $version, $matches);
     return '^' . $matches[1] . '.' . $matches[2];
   }
 

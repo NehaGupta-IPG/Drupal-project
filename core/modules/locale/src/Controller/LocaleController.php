@@ -23,13 +23,13 @@ class LocaleController extends ControllerBase {
     // Check translation status of all translatable project in all languages.
     // First we clear the cached list of projects. Although not strictly
     // necessary, this is helpful in case the project list is out of sync.
-    locale_translation_flush_projects();
-    locale_translation_check_projects();
+    \locale_translation_flush_projects();
+    \locale_translation_check_projects();
 
     // Execute a batch if required. A batch is only used when remote files
     // are checked.
-    if (batch_get()) {
-      return batch_process('admin/reports/translations');
+    if (\batch_get()) {
+      return \batch_process('admin/reports/translations');
     }
 
     return $this->redirect('locale.translate_status');

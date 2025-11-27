@@ -17,7 +17,7 @@ class TrackChangesTest extends SqlBase {
    * {@inheritdoc}
    */
   public function query() {
-    $field_names = array_keys($this->fields());
+    $field_names = \array_keys($this->fields());
     $query = $this
       ->select('track_changes_term', 't')
       ->fields('t', $field_names);

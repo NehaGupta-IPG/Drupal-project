@@ -28,8 +28,8 @@ class TestLazyPluginCollection extends LazyPluginCollection {
   public function __construct(PluginManagerInterface $manager) {
     $this->manager = $manager;
 
-    $instance_ids = array_keys($this->manager->getDefinitions());
-    $this->instanceIds = array_combine($instance_ids, $instance_ids);
+    $instance_ids = \array_keys($this->manager->getDefinitions());
+    $this->instanceIds = \array_combine($instance_ids, $instance_ids);
   }
 
   /**

@@ -29,28 +29,28 @@ class LocaleStringIsSafeTest extends KernelTestBase {
   public function testLocaleStringIsSafe(): void {
     // Check a translatable string without HTML.
     $string = 'Hello world!';
-    $result = locale_string_is_safe($string);
+    $result = \locale_string_is_safe($string);
     $this->assertTrue($result);
 
     // Check a translatable string which includes trustable HTML.
     $string = 'Hello <strong>world</strong>!';
-    $result = locale_string_is_safe($string);
+    $result = \locale_string_is_safe($string);
     $this->assertTrue($result);
 
     // Check an untranslatable string which includes unsafe HTML (according to
     // the locale_string_is_safe() function definition).
     $string = 'Hello <img src="world.png" alt="world" />!';
-    $result = locale_string_is_safe($string);
+    $result = \locale_string_is_safe($string);
     $this->assertFalse($result);
 
     // Check a translatable string which includes a token in an href attribute.
     $string = 'Hi <a href="[current-user:url]">user</a>';
-    $result = locale_string_is_safe($string);
+    $result = \locale_string_is_safe($string);
     $this->assertTrue($result);
 
     // Check a translatable string which includes a wbr tag.
     $string = 'DrupalLocaleModule<wbr>Test<wbr>Example';
-    $result = locale_string_is_safe($string);
+    $result = \locale_string_is_safe($string);
     $this->assertTrue($result);
   }
 

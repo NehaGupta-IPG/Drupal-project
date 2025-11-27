@@ -25,10 +25,10 @@ class ViewMode extends FieldInstance {
 
     $rows = [];
     foreach ($instances->getArrayCopy() as $instance) {
-      $data = unserialize($instance['data']);
-      foreach (array_keys($data['display']) as $view_mode) {
+      $data = \unserialize($instance['data']);
+      foreach (\array_keys($data['display']) as $view_mode) {
         $key = $instance['entity_type'] . '.' . $view_mode;
-        $rows[$key] = array_merge($instance, [
+        $rows[$key] = \array_merge($instance, [
           'view_mode' => $view_mode,
         ]);
       }
@@ -41,7 +41,7 @@ class ViewMode extends FieldInstance {
    * {@inheritdoc}
    */
   public function fields() {
-    return array_merge(parent::fields(), [
+    return \array_merge(parent::fields(), [
       'view_mode' => $this->t('The view mode ID.'),
     ]);
   }

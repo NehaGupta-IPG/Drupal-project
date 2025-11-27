@@ -107,7 +107,7 @@ class ModulesUninstallForm extends FormBase {
 
     // Get a list of all available modules that can be uninstalled.
     $modules = $this->moduleExtensionList->getList();
-    $uninstallable = array_filter($modules, function ($module) {
+    $uninstallable = \array_filter($modules, function ($module) {
        return empty($module->info['required']) && $module->status;
     });
 
@@ -142,13 +142,13 @@ class ModulesUninstallForm extends FormBase {
 
     // Deprecated and obsolete modules should appear at the top of the
     // uninstallation list.
-    $unstable_lifecycle = array_flip([
+    $unstable_lifecycle = \array_flip([
       ExtensionLifecycle::DEPRECATED,
       ExtensionLifecycle::OBSOLETE,
     ]);
 
     // Sort all modules by their lifecycle identifier and name.
-    uasort($uninstallable, function ($a, $b) use ($unstable_lifecycle) {
+    \uasort($uninstallable, function ($a, $b) use ($unstable_lifecycle) {
       $lifecycle_a = isset($unstable_lifecycle[$a->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER]]) ? -1 : 1;
       $lifecycle_b = isset($unstable_lifecycle[$b->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER]]) ? -1 : 1;
       if ($lifecycle_a === $lifecycle_b) {
@@ -156,7 +156,7 @@ class ModulesUninstallForm extends FormBase {
       }
       return $lifecycle_a <=> $lifecycle_b;
     });
-    $validation_reasons = $this->moduleInstaller->validateUninstall(array_keys($uninstallable));
+    $validation_reasons = $this->moduleInstaller->validateUninstall(\array_keys($uninstallable));
 
     $form['uninstall'] = ['#tree' => TRUE];
     foreach ($uninstallable as $module_key => $module) {
@@ -168,13 +168,13 @@ class ModulesUninstallForm extends FormBase {
 
       $lifecycle = $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
       if ($lifecycle !== ExtensionLifecycle::STABLE && !empty($module->info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER])) {
-        $form['modules'][$module->getName()]['name']['#markup'] .= ' ' . Link::fromTextAndUrl('(' . $this->t('@lifecycle', ['@lifecycle' => ucfirst($lifecycle)]) . ')',
+        $form['modules'][$module->getName()]['name']['#markup'] .= ' ' . Link::fromTextAndUrl('(' . $this->t('@lifecycle', ['@lifecycle' => \ucfirst($lifecycle)]) . ')',
             Url::fromUri($module->info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER], [
               'attributes' =>
                 [
                   'class' => 'module-link--non-stable',
                   'aria-label' => $this->t('View information on the @lifecycle status of the module @module', [
-                    '@lifecycle' => ucfirst($lifecycle),
+                    '@lifecycle' => \ucfirst($lifecycle),
                     '@module' => $module->info['name'],
                   ]),
                 ],
@@ -195,10 +195,10 @@ class ModulesUninstallForm extends FormBase {
       }
       // All modules which depend on this one must be uninstalled first, before
       // we can allow this module to be uninstalled.
-      foreach (array_keys($module->required_by) as $dependent) {
+      foreach (\array_keys($module->required_by) as $dependent) {
         if ($this->updateRegistry->getInstalledVersion($dependent) !== $this->updateRegistry::SCHEMA_UNINSTALLED) {
           $module_name = $modules[$dependent]->info['name'];
-          if ($dependent != strtolower(str_replace(' ', '_', $module_name))) {
+          if ($dependent != \strtolower(\str_replace(' ', '_', $module_name))) {
             $form['modules'][$module->getName()]['#required_by'][] = $module_name . " (" . $dependent . ")";
           }
           else {
@@ -224,7 +224,7 @@ class ModulesUninstallForm extends FormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     // Form submitted, but no modules selected.
-    if (!array_filter($form_state->getValue('uninstall'))) {
+    if (!\array_filter($form_state->getValue('uninstall'))) {
       $form_state->setErrorByName('', $this->t('No modules selected.'));
       $form_state->setRedirect('system.modules_uninstall');
     }
@@ -236,7 +236,7 @@ class ModulesUninstallForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Save all the values in an expirable key value store.
     $modules = $form_state->getValue('uninstall');
-    $uninstall = array_keys(array_filter($modules));
+    $uninstall = \array_keys(\array_filter($modules));
     $account = $this->currentUser()->id();
     // Store the values for 6 hours. This expiration time is also used in
     // the form cache.

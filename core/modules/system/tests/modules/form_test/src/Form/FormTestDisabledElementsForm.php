@@ -160,7 +160,7 @@ class FormTestDisabledElementsForm extends FormBase {
     // microseconds. Make sure that the expected value is correct for all
     // versions by encoding and decoding it again instead of hardcoding it.
     // See https://github.com/php/php-src/commit/fdb2709dd27c5987c2d2c8aaf0cdbebf9f17f643
-    $expected = json_decode(json_encode($date), TRUE);
+    $expected = \json_decode(\json_encode($date), TRUE);
     $form['disabled_container']['disabled_container_datetime'] = [
       '#type' => 'datetime',
       '#title' => 'datetime',

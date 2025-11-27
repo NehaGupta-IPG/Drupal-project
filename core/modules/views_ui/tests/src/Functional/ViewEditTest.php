@@ -98,7 +98,7 @@ class ViewEditTest extends UITestBase {
       ->condition('message', 'setDisplay() called with invalid display ID "@display_id".')
       ->execute()
       ->fetchField();
-    $this->assertEquals(serialize($arguments), $logged);
+    $this->assertEquals(\serialize($arguments), $logged);
 
     $edit = ['display_id' => 'test 1'];
     $this->drupalGet($machine_name_edit_url);
@@ -197,7 +197,7 @@ class ViewEditTest extends UITestBase {
           'hu',
         ];
         $elements = $this->assertSession()->selectExists('edit-rendering-language')->findAll('css', 'option');
-        $elements = array_map(function ($element) {
+        $elements = \array_map(function ($element) {
           return $element->getValue();
         }, $elements);
         $this->assertSame($expected_elements, $elements);
@@ -253,7 +253,7 @@ class ViewEditTest extends UITestBase {
         ];
         $elements = $this->xpath('//div[@id="edit-options-value"]//input');
         // Compare values inside the option elements with expected values.
-        for ($i = 0; $i < count($elements); $i++) {
+        for ($i = 0; $i < \count($elements); $i++) {
           $this->assertEquals($expected_elements[$i], $elements[$i]->getAttribute('value'));
         }
       }

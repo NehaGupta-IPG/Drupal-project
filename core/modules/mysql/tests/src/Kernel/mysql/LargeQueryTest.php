@@ -31,7 +31,7 @@ class LargeQueryTest extends DriverSpecificDatabaseTestBase {
       $this->markTestSkipped('The configured max_allowed_packet exceeds the php memory limit. Therefore the test is skipped.');
     }
 
-    $long_name = str_repeat('a', $max_allowed_packet + 1);
+    $long_name = \str_repeat('a', $max_allowed_packet + 1);
     try {
       $this->connection->query('SELECT [name] FROM {test} WHERE [name] = :name', [':name' => $long_name]);
       $this->fail("An exception should be thrown for queries larger than 'max_allowed_packet'");
@@ -45,7 +45,7 @@ class LargeQueryTest extends DriverSpecificDatabaseTestBase {
       $this->assertEquals(1153, $e->getPrevious()->errorInfo[1]);
       // 'max_allowed_packet' exception message truncated.
       // Use strlen() to count the bytes exactly, not the unicode chars.
-      $this->assertLessThanOrEqual($max_allowed_packet, strlen($e->getMessage()));
+      $this->assertLessThanOrEqual($max_allowed_packet, \strlen($e->getMessage()));
     }
   }
 

@@ -120,7 +120,7 @@ class CKEditor5PluginManagerTest extends KernelTestBase {
    *   being installed.
    */
   private function mockModuleInVfs(string $module_name, string $yaml, array $additional_files = []): ContainerInterface {
-    $site_directory = ltrim(parse_url($this->siteDirectory)['path'], '/');
+    $site_directory = \ltrim(\parse_url($this->siteDirectory)['path'], '/');
     vfsStream::create([
       'modules' => [
         $module_name => [
@@ -1088,10 +1088,10 @@ PHP,
     $text_editor->enforceIsNew(FALSE);
 
     // No exception when getting all provided elements.
-    $this->assertGreaterThan(0, count($this->manager->getProvidedElements()));
+    $this->assertGreaterThan(0, \count($this->manager->getProvidedElements()));
 
     // No exception when getting the sneaky plugin's provided elements.
-    $this->assertGreaterThan(0, count($this->manager->getProvidedElements([$sneaky_plugin_id])));
+    $this->assertGreaterThan(0, \count($this->manager->getProvidedElements([$sneaky_plugin_id])));
 
     // Exception when getting the sneaky plugin's provided elements *and* a text
     // editor config entity is passed: only then can a subset be generated based
@@ -1108,7 +1108,7 @@ PHP,
    *   Test scenarios.
    */
   public static function providerProvidedElementsInvalidElementSubset(): array {
-    $random_tag_name = strtolower(Random::machineName());
+    $random_tag_name = \strtolower(Random::machineName());
     $random_tag = "<$random_tag_name>";
     return [
       'superset: random tag not listed in the plugin definition' => [
@@ -1133,7 +1133,7 @@ PHP,
     $editor = Editor::load('basic_html');
 
     // Case 1: no extra CKEditor 5 plugins.
-    $definitions = array_keys($this->manager->getEnabledDefinitions($editor));
+    $definitions = \array_keys($this->manager->getEnabledDefinitions($editor));
     $default_plugins = [
       'ckeditor5_autoformat',
       'ckeditor5_bold',
@@ -1167,7 +1167,7 @@ PHP,
 
     // Case 2: The CKEditor 5 layercake plugin is available and library should
     // NOT be loaded if its toolbar items are not enabled.
-    $this->assertSame($default_plugins, array_keys($this->manager->getEnabledDefinitions($editor)));
+    $this->assertSame($default_plugins, \array_keys($this->manager->getEnabledDefinitions($editor)));
     $this->assertSame($default_libraries, $this->manager->getEnabledLibraries($editor));
 
     // Case 3: The CKEditor 5 layercake plugin is available and library should
@@ -1175,14 +1175,14 @@ PHP,
     $settings = $editor->getSettings();
     $settings['toolbar']['items'][] = 'simpleBox';
     $editor->setSettings($settings);
-    $plugin_ids = array_keys($this->manager->getEnabledDefinitions($editor));
-    $default_plugins_with_layercake = array_merge($default_plugins, ['ckeditor5_test_layercake']);
+    $plugin_ids = \array_keys($this->manager->getEnabledDefinitions($editor));
+    $default_plugins_with_layercake = \array_merge($default_plugins, ['ckeditor5_test_layercake']);
 
     // Sort on plugin id.
-    asort($default_plugins_with_layercake);
-    $this->assertSame(array_values($default_plugins_with_layercake), $plugin_ids);
-    $default_libraries_with_layercake = array_merge($default_libraries, ['ckeditor5_test/layercake']);
-    sort($default_libraries_with_layercake);
+    \asort($default_plugins_with_layercake);
+    $this->assertSame(\array_values($default_plugins_with_layercake), $plugin_ids);
+    $default_libraries_with_layercake = \array_merge($default_libraries, ['ckeditor5_test/layercake']);
+    \sort($default_libraries_with_layercake);
     $this->assertSame($default_libraries_with_layercake, $this->manager->getEnabledLibraries($editor));
 
     // Enable media embed filter which the CKEditor 5 media plugin requires.
@@ -1190,21 +1190,21 @@ PHP,
 
     // Case 4: The CKEditor 5 media plugin should be enabled and the library
     // should be available now that the media_embed is enabled.
-    $plugin_ids = array_keys($this->manager->getEnabledDefinitions($editor));
-    $expected_plugins = array_merge($default_plugins, [
+    $plugin_ids = \array_keys($this->manager->getEnabledDefinitions($editor));
+    $expected_plugins = \array_merge($default_plugins, [
       'ckeditor5_drupalMediaCaption',
       'ckeditor5_test_layercake',
       'media_media',
       'media_mediaAlign',
     ]);
-    sort($expected_plugins);
+    \sort($expected_plugins);
     $this->assertSame($expected_plugins, $plugin_ids);
-    $expected_libraries = array_merge($default_libraries, [
+    $expected_libraries = \array_merge($default_libraries, [
       'ckeditor5/internal.drupal.ckeditor5.media',
       'ckeditor5/internal.drupal.ckeditor5.mediaAlign',
       'ckeditor5_test/layercake',
     ]);
-    sort($expected_libraries);
+    \sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
 
     // Enable the CKEditor 5 Plugin Conditions Test module, which has the
@@ -1224,43 +1224,43 @@ PHP,
     // also implicitly enables the conditionally enabled plugin.
     $settings['toolbar']['items'][] = 'insertTable';
     $editor->setSettings($settings);
-    $plugin_ids = array_keys($this->manager->getEnabledDefinitions($editor));
-    $expected_plugins = array_merge($expected_plugins, [
+    $plugin_ids = \array_keys($this->manager->getEnabledDefinitions($editor));
+    $expected_plugins = \array_merge($expected_plugins, [
       'ckeditor5_table',
       'ckeditor5_plugin_conditions_test_plugins_condition',
     ]);
-    sort($expected_plugins);
-    $this->assertSame(array_values($expected_plugins), $plugin_ids);
-    $expected_libraries = array_merge($default_libraries, [
+    \sort($expected_plugins);
+    $this->assertSame(\array_values($expected_plugins), $plugin_ids);
+    $expected_libraries = \array_merge($default_libraries, [
       'ckeditor5/internal.drupal.ckeditor5.media',
       'ckeditor5/internal.drupal.ckeditor5.mediaAlign',
       'ckeditor5_test/layercake',
       'core/ckeditor5.table',
     ]);
-    sort($expected_libraries);
+    \sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
 
     // Case 7: GHS is enabled for other text editors if they are using a
     // CKEditor 5 plugin that uses wildcard tags.
     $settings['toolbar']['items'][] = 'alignment';
     $editor->setSettings($settings);
-    $plugin_ids = array_keys($this->manager->getEnabledDefinitions($editor));
-    $expected_plugins = array_merge($expected_plugins, [
+    $plugin_ids = \array_keys($this->manager->getEnabledDefinitions($editor));
+    $expected_plugins = \array_merge($expected_plugins, [
       'ckeditor5_alignment',
       'ckeditor5_wildcardHtmlSupport',
     ]);
-    sort($expected_plugins);
-    $this->assertSame(array_values($expected_plugins), $plugin_ids);
-    $expected_libraries = array_merge($expected_libraries, [
+    \sort($expected_plugins);
+    $this->assertSame(\array_values($expected_plugins), $plugin_ids);
+    $expected_libraries = \array_merge($expected_libraries, [
       'core/ckeditor5.alignment',
     ]);
-    sort($expected_libraries);
+    \sort($expected_libraries);
     $this->assertSame($expected_libraries, $this->manager->getEnabledLibraries($editor));
 
     // Case 8: GHS is enabled for Full HTML (or any other text format that has
     // no TYPE_HTML_RESTRICTOR filters).
     $editor = Editor::load('full_html');
-    $definitions = array_keys($this->manager->getEnabledDefinitions($editor));
+    $definitions = \array_keys($this->manager->getEnabledDefinitions($editor));
     $default_plugins = [
       'ckeditor5_arbitraryHtmlSupport',
       'ckeditor5_autoformat',
@@ -1324,9 +1324,9 @@ PHP,
       $text_editor->toArray()
     );
     // @todo Remove in https://www.drupal.org/project/drupal/issues/3361534, which moves this into ::assertConfigSchema()
-    $this->assertSame([], array_map(
-      fn ($v) => sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
-      iterator_to_array($this->typedConfig->createFromNameAndData($text_editor->getConfigDependencyName(), $text_editor->toArray())->validate())
+    $this->assertSame([], \array_map(
+      fn ($v) => \sprintf("[%s] %s", $v->getPropertyPath(), (string) $v->getMessage()),
+      \iterator_to_array($this->typedConfig->createFromNameAndData($text_editor->getConfigDependencyName(), $text_editor->toArray())->validate())
     ));
 
     $provided_elements = $this->manager->getProvidedElements($plugins, $text_editor);
@@ -1662,9 +1662,9 @@ PHP,
    */
   public static function providerTestDerivedPluginDefinitions(): \Generator {
     // Defaults inherited from CKEditor5AspectsOfCKEditor5Plugin.
-    $ckeditor5_aspects_defaults = get_class_vars(CKEditor5AspectsOfCKEditor5Plugin::class);
+    $ckeditor5_aspects_defaults = \get_class_vars(CKEditor5AspectsOfCKEditor5Plugin::class);
     // Defaults inherited from DrupalAspectsOfCKEditor5Plugin.
-    $drupal_aspects_defaults = get_class_vars(DrupalAspectsOfCKEditor5Plugin::class);
+    $drupal_aspects_defaults = \get_class_vars(DrupalAspectsOfCKEditor5Plugin::class);
 
     $simple_deriver_additional_files = [
       'src' => [

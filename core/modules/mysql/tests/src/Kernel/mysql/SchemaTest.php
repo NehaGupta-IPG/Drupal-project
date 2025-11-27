@@ -188,7 +188,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     // Count the number of columns defined in the indexes.
     $column_count = 0;
     foreach ($table_specification_with_new_index['indexes'] as $index) {
-      $column_count += count($index);
+      $column_count += \count($index);
     }
     $test_count = 0;
     foreach ($results as $result) {
@@ -244,12 +244,12 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       ],
     ];
 
-    $table_name = strtolower($this->getRandomGenerator()->name());
+    $table_name = \strtolower($this->getRandomGenerator()->name());
     $this->schema->createTable($table_name, $table_specification);
 
     unset($table_specification['fields']);
 
-    $introspect_index_schema = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
+    $introspect_index_schema = new \ReflectionMethod(\get_class($this->schema), 'introspectIndexSchema');
     $index_schema = $introspect_index_schema->invoke($this->schema, $table_name);
 
     $this->assertEquals($table_specification, $index_schema);
@@ -323,8 +323,8 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    * Tests adding a primary key when sql_generate_invisible_primary_key is on.
    */
   public function testGeneratedInvisiblePrimaryKey(): void {
-    $is_maria = method_exists($this->connection, 'isMariaDb') && $this->connection->isMariaDb();
-    if ($this->connection->databaseType() !== 'mysql' || $is_maria || version_compare($this->connection->version(), '8.0.30', '<')) {
+    $is_maria = \method_exists($this->connection, 'isMariaDb') && $this->connection->isMariaDb();
+    if ($this->connection->databaseType() !== 'mysql' || $is_maria || \version_compare($this->connection->version(), '8.0.30', '<')) {
       $this->markTestSkipped('This test only runs on MySQL 8.0.30 and above');
     }
     try {

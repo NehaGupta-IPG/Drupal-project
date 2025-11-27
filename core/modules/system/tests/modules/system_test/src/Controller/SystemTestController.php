@@ -293,7 +293,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    */
   public function authorizeInit($page_title) {
     $authorize_url = Url::fromUri('base:core/authorize.php', ['absolute' => TRUE])->toString();
-    system_authorized_init('system_test_authorize_run', __DIR__ . '/../../system_test.module', [], $page_title);
+    \system_authorized_init('system_test_authorize_run', __DIR__ . '/../../system_test.module', [], $page_title);
     return new RedirectResponse($authorize_url);
   }
 
@@ -338,13 +338,13 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    * A simple page callback which adds a register shutdown function.
    */
   public function shutdownFunctions($arg1, $arg2) {
-    drupal_register_shutdown_function('_system_test_first_shutdown_function', $arg1, $arg2);
+    \drupal_register_shutdown_function('_system_test_first_shutdown_function', $arg1, $arg2);
     // If using PHP-FPM then fastcgi_finish_request() will have been fired
     // preventing further output to the browser which means that the escaping of
     // the exception message can not be tested.
     // @see _drupal_shutdown_function()
     // @see \Drupal\system\Tests\System\ShutdownFunctionsTest
-    if (function_exists('fastcgi_finish_request') || ob_get_status()) {
+    if (\function_exists('fastcgi_finish_request') || \ob_get_status()) {
       return ['#markup' => 'The response will flush before shutdown functions are called.'];
     }
     return [];

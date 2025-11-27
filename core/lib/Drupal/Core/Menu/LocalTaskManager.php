@@ -161,7 +161,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
     parent::processDefinition($definition, $plugin_id);
     // If there is no route name, this is a broken definition.
     if (empty($definition['route_name'])) {
-      throw new PluginException(sprintf('Plugin (%s) definition must include "route_name"', $plugin_id));
+      throw new PluginException(\sprintf('Plugin (%s) definition must include "route_name"', $plugin_id));
     }
   }
 
@@ -172,7 +172,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
     $controller = [$local_task, 'getTitle'];
     $request = $this->requestStack->getCurrentRequest();
     $arguments = $this->argumentResolver->getArguments($request, $controller);
-    return call_user_func_array($controller, $arguments);
+    return \call_user_func_array($controller, $arguments);
   }
 
   /**
@@ -358,7 +358,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
         $data = [];
         $local_tasks = $this->getTasksBuild($route_name, $cacheability);
         foreach ($local_tasks as $tab_level => $items) {
-          $data[$tab_level] = empty($data[$tab_level]) ? $items : array_merge($data[$tab_level], $items);
+          $data[$tab_level] = empty($data[$tab_level]) ? $items : \array_merge($data[$tab_level], $items);
         }
         $this->taskData[$route_name]['tabs'] = $data;
         // Allow modules to alter local tasks.
@@ -407,7 +407,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
       // If we don't have _raw_variables, we assume the attributes are still the
       // original values.
       $raw_variables = $raw_variables_bag ? $raw_variables_bag->all() : $this->routeMatch->getParameters()->all();
-      $active = array_intersect_assoc($route_parameters, $raw_variables) == $route_parameters;
+      $active = \array_intersect_assoc($route_parameters, $raw_variables) == $route_parameters;
     }
     return $active;
   }

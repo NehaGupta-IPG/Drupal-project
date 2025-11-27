@@ -95,10 +95,10 @@ class EntityReferenceUuidItem extends EntityReferenceItem {
    * {@inheritdoc}
    */
   public function setValue($values, $notify = TRUE): void {
-    if (isset($values) && !is_array($values)) {
+    if (isset($values) && !\is_array($values)) {
       // If either a scalar or an object was passed as the value for the item,
       // assign it to the 'entity' or 'target_uuid' depending on values type.
-      if (is_object($values)) {
+      if (\is_object($values)) {
         $this->set('entity', $values, $notify);
       }
       else {
@@ -110,13 +110,13 @@ class EntityReferenceUuidItem extends EntityReferenceItem {
       // Support setting the field item with only one property, but make sure
       // values stay in sync if only property is passed.
       // NULL is a valid value, so we use array_key_exists().
-      if (is_array($values) && array_key_exists('target_uuid', $values) && !isset($values['entity'])) {
+      if (\is_array($values) && \array_key_exists('target_uuid', $values) && !isset($values['entity'])) {
         $this->onChange('target_uuid', FALSE);
       }
-      elseif (is_array($values) && !array_key_exists('target_uuid', $values) && isset($values['entity'])) {
+      elseif (\is_array($values) && !\array_key_exists('target_uuid', $values) && isset($values['entity'])) {
         $this->onChange('entity', FALSE);
       }
-      elseif (is_array($values) && array_key_exists('target_uuid', $values) && isset($values['entity'])) {
+      elseif (\is_array($values) && \array_key_exists('target_uuid', $values) && isset($values['entity'])) {
         // If both properties are passed, verify the passed values match. The
         // only exception we allow is when we have a new entity: in this case
         // its actual id and target_uuid will be different, due to the new
@@ -152,8 +152,8 @@ class EntityReferenceUuidItem extends EntityReferenceItem {
       $property = $this->get('entity');
       $entity_type = $property->getDataDefinition()->getConstraint('EntityType');
       $entities = \Drupal::entityTypeManager()->getStorage($entity_type)->loadByProperties(['uuid' => $this->get('target_uuid')->getValue()]);
-      if ($entity = array_shift($entities)) {
-        assert($entity instanceof EntityInterface);
+      if ($entity = \array_shift($entities)) {
+        \assert($entity instanceof EntityInterface);
         $this->writePropertyValue('target_uuid', $entity->uuid());
         $this->writePropertyValue('entity', $entity);
       }
@@ -218,8 +218,8 @@ class EntityReferenceUuidItem extends EntityReferenceItem {
     // Select a random number of references between the last 50 referenceable
     // entities created.
     if ($referenceable = $selection_handler->getReferenceableEntities(NULL, 'CONTAINS', 50)) {
-      $group = array_rand($referenceable);
-      return ['target_uuid' => array_rand($referenceable[$group])];
+      $group = \array_rand($referenceable);
+      return ['target_uuid' => \array_rand($referenceable[$group])];
     }
     return [];
   }

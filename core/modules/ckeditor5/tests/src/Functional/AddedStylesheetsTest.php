@@ -74,11 +74,11 @@ class AddedStylesheetsTest extends BrowserTestBase {
       ],
     ]);
     $this->editor->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair($this->editor, $filtered_html_format))
+      \iterator_to_array(CKEditor5::validatePair($this->editor, $filtered_html_format))
     ));
     // Create node type.
     $this->drupalCreateContentType([

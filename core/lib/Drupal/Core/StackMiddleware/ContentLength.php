@@ -45,7 +45,7 @@ class ContentLength implements HttpKernelInterface {
       return $response;
     }
 
-    $response->headers->set('Content-Length', strlen($content), TRUE);
+    $response->headers->set('Content-Length', \strlen($content), TRUE);
     return $response;
   }
 

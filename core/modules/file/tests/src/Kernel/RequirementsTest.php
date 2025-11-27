@@ -73,7 +73,7 @@ class RequirementsTest extends KernelTestBase {
   private function setServerSoftware(?string $software): void {
     $request = new Request();
     $request->setSession(new Session(new MockArraySessionStorage()));
-    if (is_string($software)) {
+    if (\is_string($software)) {
       $request->server->set('SERVER_SOFTWARE', $software);
     }
     $requestStack = new RequestStack();

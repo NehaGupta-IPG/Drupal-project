@@ -62,7 +62,7 @@ class PhpUnitTestDiscovery {
   private array $warnings = [];
 
   private function __construct() {
-    $this->reverseMap = array_flip($this->map);
+    $this->reverseMap = \array_flip($this->map);
     try {
       EventFacade::instance()->registerTracer(new PhpUnitTestDiscoveryTracer($this));
       EventFacade::instance()->seal();
@@ -117,15 +117,15 @@ class PhpUnitTestDiscovery {
       // test suite filter. For example, 'PHPUnit-Unit' to 'unit'.
       $tmp = [];
       foreach ($testSuites as $i) {
-        if (!is_string($i)) {
+        if (!\is_string($i)) {
           throw new \InvalidArgumentException("Test suite must be a string");
         }
-        if (str_contains($i, ' ')) {
+        if (\str_contains($i, ' ')) {
           throw new \InvalidArgumentException("Test suite name '{$i}' is invalid");
         }
         $tmp[] = $this->map[$i] ?? $i;
       }
-      $args[] = '--testsuite=' . implode(',', $tmp);
+      $args[] = '--testsuite=' . \implode(',', $tmp);
     }
 
     if ($directory !== NULL) {
@@ -141,16 +141,16 @@ class PhpUnitTestDiscovery {
     // warnings so that developers can tune their data provider code.
     if (\Drupal::hasContainer()) {
       $container = \Drupal::getContainer();
-      $containerObjectId = spl_object_id($container);
+      $containerObjectId = \spl_object_id($container);
     }
     $phpUnitTestSuite = (new TestSuiteBuilder())->build($phpUnitConfiguration);
-    if (isset($containerObjectId) && $containerObjectId !== spl_object_id(\Drupal::getContainer())) {
+    if (isset($containerObjectId) && $containerObjectId !== \spl_object_id(\Drupal::getContainer())) {
       $this->addWarning(
         ">>> The service container was changed during the test discovery <<<\n" .
         "Probably, a test data provider method called \\Drupal::setContainer().\n" .
         "Ensure that all the data providers restore the original container before returning data."
       );
-      assert(isset($container));
+      \assert(isset($container));
       \Drupal::setContainer($container);
     }
 
@@ -159,9 +159,9 @@ class PhpUnitTestDiscovery {
       $this->getTestListLimitedToDirectory($phpUnitTestSuite, $extension, $testSuites);
 
     // Sort the groups and tests within the groups by name.
-    uksort($list, 'strnatcasecmp');
+    \uksort($list, 'strnatcasecmp');
     foreach ($list as &$tests) {
-      uksort($tests, 'strnatcasecmp');
+      \uksort($tests, 'strnatcasecmp');
     }
 
     return $list;
@@ -232,7 +232,7 @@ class PhpUnitTestDiscovery {
           continue;
         }
 
-        if ($extension !== NULL && !str_starts_with($testClass->name(), "Drupal\\Tests\\{$extension}\\")) {
+        if ($extension !== NULL && !\str_starts_with($testClass->name(), "Drupal\\Tests\\{$extension}\\")) {
           continue;
         }
 
@@ -274,13 +274,13 @@ class PhpUnitTestDiscovery {
         return [];
       }
 
-      if ($extension !== NULL && !str_starts_with($phpUnitTestSuite->name(), "Drupal\\Tests\\{$extension}\\")) {
+      if ($extension !== NULL && !\str_starts_with($phpUnitTestSuite->name(), "Drupal\\Tests\\{$extension}\\")) {
         return [];
       }
 
       // Take the test suite name from the class namespace.
       $testSuite = 'PHPUnit-' . TestDiscovery::getPhpunitTestSuite($phpUnitTestSuite->name());
-      if (!empty($testSuites) && !in_array($testSuite, $testSuites, TRUE)) {
+      if (!empty($testSuites) && !\in_array($testSuite, $testSuites, TRUE)) {
         return [];
       }
 
@@ -299,13 +299,13 @@ class PhpUnitTestDiscovery {
         continue;
       }
 
-      if ($extension !== NULL && !str_starts_with($testClass->name(), "Drupal\\Tests\\{$extension}\\")) {
+      if ($extension !== NULL && !\str_starts_with($testClass->name(), "Drupal\\Tests\\{$extension}\\")) {
         continue;
       }
 
       // Take the test suite name from the class namespace.
       $testSuite = 'PHPUnit-' . TestDiscovery::getPhpunitTestSuite($testClass->name());
-      if (!empty($testSuites) && !in_array($testSuite, $testSuites, TRUE)) {
+      if (!empty($testSuites) && !\in_array($testSuite, $testSuites, TRUE)) {
         continue;
       }
 
@@ -340,18 +340,18 @@ class PhpUnitTestDiscovery {
     foreach ($testClass as $test) {
       if ($test instanceof DataProviderTestSuite) {
         foreach ($test as $testWithData) {
-          $tmp = array_merge($tmp, $testWithData->groups());
+          $tmp = \array_merge($tmp, $testWithData->groups());
         }
       }
       else {
-        $tmp = array_merge($tmp, $test->groups());
+        $tmp = \array_merge($tmp, $test->groups());
       }
     }
-    $groups = array_filter(array_unique($tmp), function (string $value): bool {
-      return !str_starts_with($value, '__phpunit');
+    $groups = \array_filter(\array_unique($tmp), function (string $value): bool {
+      return !\str_starts_with($value, '__phpunit');
     });
     if (empty($groups)) {
-      throw new MissingGroupException(sprintf('Missing group metadata in test class %s', $testClass->name()));
+      throw new MissingGroupException(\sprintf('Missing group metadata in test class %s', $testClass->name()));
     }
 
     // Let PHPUnit API return the class coverage information.
@@ -360,10 +360,10 @@ class PhpUnitTestDiscovery {
       $test = $test->tests()[0];
     }
     if (($metadata = $test->valueObjectForEvents()->metadata()->isCoversClass()) && $metadata->isNotEmpty()) {
-      $description = sprintf('Tests %s.', $metadata->asArray()[0]->className());
+      $description = \sprintf('Tests %s.', $metadata->asArray()[0]->className());
     }
     elseif (($metadata = $test->valueObjectForEvents()->metadata()->isCoversDefaultClass()) && $metadata->isNotEmpty()) {
-      $description = sprintf('Tests %s.', $metadata->asArray()[0]->className());
+      $description = \sprintf('Tests %s.', $metadata->asArray()[0]->className());
     }
     else {
       $description = TestDiscovery::parseTestClassSummary($reflection->getDocComment());
@@ -378,7 +378,7 @@ class PhpUnitTestDiscovery {
       }
       else {
         // It's a data provider test suite, count 1 per data set provided.
-        $count += count($testCase->tests());
+        $count += \count($testCase->tests());
       }
     }
 

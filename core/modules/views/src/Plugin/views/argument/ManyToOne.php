@@ -168,7 +168,7 @@ class ManyToOne extends ArgumentPluginBase {
       return !empty($this->definition['invalid input']) ? $this->definition['invalid input'] : $this->t('Invalid input');
     }
 
-    return implode($this->operator == 'or' ? ' + ' : ', ', $this->titleQuery());
+    return \implode($this->operator == 'or' ? ' + ' : ', ', $this->titleQuery());
   }
 
   /**

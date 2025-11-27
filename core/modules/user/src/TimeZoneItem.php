@@ -17,7 +17,7 @@ class TimeZoneItem extends StringItem {
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $timezones = User::getAllowedTimezones();
     // We need to vary the selected timezones since we're generating a sample.
-    $key = rand(0, count($timezones) - 1);
+    $key = \rand(0, \count($timezones) - 1);
     return $timezones[$key];
   }
 

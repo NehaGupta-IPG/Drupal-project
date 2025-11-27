@@ -199,7 +199,7 @@ class BaseFieldOverride extends FieldConfigBase {
     // written to config.
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $default_settings = $field_type_manager->getDefaultFieldSettings($this->getType());
-    $this->settings = array_intersect_key($this->settings, $default_settings) + $default_settings;
+    $this->settings = \array_intersect_key($this->settings, $default_settings) + $default_settings;
 
     // Call the parent's presave method to perform validate and calculate
     // dependencies.

@@ -107,9 +107,9 @@ class FormValuesTest extends WebDriverTestBase {
       // Not using File API, a potential error must trigger a PHP warning, which
       // should be logged in the error.log.
       $this->assertFileExists(DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log');
-      $this->assertStringContainsString('"The specified #ajax callback is empty or not callable."', file_get_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log'));
+      $this->assertStringContainsString('"The specified #ajax callback is empty or not callable."', \file_get_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log'));
       // Remove error.log, so we have a clean slate for the next request.
-      unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
+      \unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
     }
     // We need to reload the page to kill any unfinished AJAX calls before
     // tearDown() is called.

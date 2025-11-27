@@ -64,7 +64,7 @@ class SandboxDirectoryValidatorTest extends UnitTestCase {
    */
   public static function providerTestCheckNotInActive(): array {
     $expected_symlink_validation_error = ValidationResult::createError([
-      t('The sandbox directory is a subdirectory of the active directory.'),
+      \t('The sandbox directory is a subdirectory of the active directory.'),
     ]);
 
     return [

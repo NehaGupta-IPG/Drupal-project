@@ -62,15 +62,15 @@ class PathChangedHelper {
    */
   public function __construct(RouteMatchInterface $route_match, Request $request) {
     $bc_route_name = $route_match->getRouteName();
-    if (!str_ends_with($bc_route_name, '.bc')) {
+    if (!\str_ends_with($bc_route_name, '.bc')) {
       throw new \InvalidArgumentException(__CLASS__ . ' expects a route name that ends with ".bc".');
     }
     // Strip '.bc' from the end of the route name.
-    $route_name = substr($bc_route_name, 0, -3);
+    $route_name = \substr($bc_route_name, 0, -3);
     $args = $route_match->getRawParameters()->all();
     $options = [
       'absolute' => TRUE,
-      'query' => array_diff_key($request->query->all(), ['destination' => '']),
+      'query' => \array_diff_key($request->query->all(), ['destination' => '']),
     ];
 
     $this->newUrl = Url::fromRoute($route_name, $args, $options);

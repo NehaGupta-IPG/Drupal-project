@@ -43,7 +43,7 @@ class RegisterAccessChecksPass implements CompilerPassInterface {
 
       // Collect dynamic access checker services.
       $class = $container->getDefinition($id)->getClass();
-      if (in_array(AccessCheckInterface::class, class_implements($class), TRUE)) {
+      if (\in_array(AccessCheckInterface::class, \class_implements($class), TRUE)) {
         $dynamic_access_check_services[] = $id;
       }
 

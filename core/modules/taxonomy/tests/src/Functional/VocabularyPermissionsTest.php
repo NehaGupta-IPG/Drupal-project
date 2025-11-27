@@ -273,7 +273,7 @@ class VocabularyPermissionsTest extends TaxonomyTestBase {
     $terms = \Drupal::entityTypeManager()
       ->getStorage('taxonomy_term')
       ->loadByProperties(['name' => $edit['name[0][value]']]);
-    $term = reset($terms);
+    $term = \reset($terms);
 
     // Edit the term.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');
@@ -313,7 +313,7 @@ class VocabularyPermissionsTest extends TaxonomyTestBase {
     $terms = \Drupal::entityTypeManager()
       ->getStorage('taxonomy_term')
       ->loadByProperties(['name' => $edit['name[0][value]']]);
-    $term = reset($terms);
+    $term = \reset($terms);
 
     // Ensure that edit and delete access is denied.
     $this->drupalGet('taxonomy/term/' . $term->id() . '/edit');

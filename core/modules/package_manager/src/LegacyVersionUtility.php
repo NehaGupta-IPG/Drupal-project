@@ -26,10 +26,10 @@ final class LegacyVersionUtility {
    */
   public static function convertToSemanticVersion(string $version): string {
     if (self::isLegacyVersion($version)) {
-      $version = substr($version, 4);
-      $version_parts = explode('-', $version);
+      $version = \substr($version, 4);
+      $version_parts = \explode('-', $version);
       $version = $version_parts[0] . '.0';
-      if (count($version_parts) === 2) {
+      if (\count($version_parts) === 2) {
         $version .= '-' . $version_parts[1];
       }
     }
@@ -53,12 +53,12 @@ final class LegacyVersionUtility {
     }
     $version = ExtensionVersion::createFromVersionString($version_string);
     if ($extra = $version->getVersionExtra()) {
-      $version_string_without_extra = str_replace("-$extra", '', $version_string);
+      $version_string_without_extra = \str_replace("-$extra", '', $version_string);
     }
     else {
       $version_string_without_extra = $version_string;
     }
-    [,, $patch] = explode('.', $version_string_without_extra);
+    [,, $patch] = \explode('.', $version_string_without_extra);
     // A semantic version can only be converted to legacy if it's patch level is
     // '0'.
     if ($patch !== '0') {
@@ -77,7 +77,7 @@ final class LegacyVersionUtility {
    *   TRUE if the version is a legacy version number, otherwise FALSE.
    */
   private static function isLegacyVersion(string $version): bool {
-    return stripos($version, '8.x-') === 0;
+    return \stripos($version, '8.x-') === 0;
   }
 
 }

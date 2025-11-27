@@ -35,22 +35,22 @@ trait RoutePathGenerationTrait {
    *   corresponding values or removed if no matching parameter exists.
    */
   public function generateRoutePath(Route $route, array $parameters): string {
-    $path = ltrim($route->getPath(), '/');
+    $path = \ltrim($route->getPath(), '/');
 
     // Replace path parameters with their corresponding values from the
     // parameters array.
     foreach ($parameters as $param => $value) {
       if (NULL !== $value) {
-        $path = str_replace("{{$param}}", $value, $path);
+        $path = \str_replace("{{$param}}", $value, $path);
       }
     }
 
     // Remove placeholders that were not replaced.
-    $path = preg_replace('/\/{[^}]+}/', '', $path);
+    $path = \preg_replace('/\/{[^}]+}/', '', $path);
 
     // Remove trailing slashes (multiple slashes may result from the removal of
     // unreplaced placeholders).
-    $path = rtrim($path, '/');
+    $path = \rtrim($path, '/');
 
     return $path;
   }

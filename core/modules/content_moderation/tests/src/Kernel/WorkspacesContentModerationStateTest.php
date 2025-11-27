@@ -63,7 +63,7 @@ class WorkspacesContentModerationStateTest extends ContentModerationStateTest {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    if (in_array($this->name(), static::SKIP_METHODS, TRUE)) {
+    if (\in_array($this->name(), static::SKIP_METHODS, TRUE)) {
       $this->markTestSkipped('Irrelevant for this test');
     }
 

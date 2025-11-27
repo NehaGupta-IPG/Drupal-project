@@ -27,7 +27,7 @@ final class IconMimeTypes {
 
     // Use generic icons for each category that provides such icons.
     foreach (['audio', 'image', 'text', 'video'] as $category) {
-      if (str_starts_with($mimeType, $category)) {
+      if (\str_starts_with($mimeType, $category)) {
         return $category;
       }
     }

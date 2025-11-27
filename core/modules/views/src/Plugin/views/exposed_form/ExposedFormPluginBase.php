@@ -163,7 +163,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
           $sort->query();
         }
         elseif (!empty($sort->options['expose']['field_identifier']) && $sort->options['expose']['field_identifier'] === $sort_by) {
-          if (isset($exposed_data['sort_order']) && in_array($exposed_data['sort_order'], ['ASC', 'DESC'], TRUE)) {
+          if (isset($exposed_data['sort_order']) && \in_array($exposed_data['sort_order'], ['ASC', 'DESC'], TRUE)) {
             $sort->options['order'] = $exposed_data['sort_order'];
           }
           $sort->setRelationship();
@@ -211,7 +211,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       }
     }
 
-    if (count($exposed_sorts)) {
+    if (\count($exposed_sorts)) {
       $form['sort_by'] = [
         '#type' => 'select',
         '#options' => $exposed_sorts_options,
@@ -226,13 +226,13 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
         $default_sort_order = $this->view->sort[$exposed_sorts[$user_input['sort_by']]]->options['order'];
       }
       else {
-        $first_sort = reset($this->view->sort);
+        $first_sort = \reset($this->view->sort);
         $default_sort_order = $first_sort->options['order'];
       }
 
       if (!isset($user_input['sort_by'])) {
-        $keys = array_keys($exposed_sorts);
-        $user_input['sort_by'] = array_shift($keys);
+        $keys = \array_keys($exposed_sorts);
+        $user_input['sort_by'] = \array_shift($keys);
         $form_state->setUserInput($user_input);
       }
 
@@ -260,10 +260,10 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
           $exposed_filters[$handler->options['expose']['identifier']] = $id;
         }
       }
-      $all_exposed = array_merge($exposed_sorts, $exposed_filters);
+      $all_exposed = \array_merge($exposed_sorts, $exposed_filters);
 
       // Set the access to FALSE if there is no exposed input.
-      if (!array_intersect_key($all_exposed, $this->view->getExposedInput())) {
+      if (!\array_intersect_key($all_exposed, $this->view->getExposedInput())) {
         $form['actions']['reset']['#access'] = FALSE;
       }
     }

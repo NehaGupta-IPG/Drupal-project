@@ -103,7 +103,7 @@ class NodeAccessRebuildNodeGrantsTest extends NodeTestBase {
 
     // Test an anonymous node access rebuild from code.
     $this->drupalLogout();
-    node_access_rebuild();
+    \node_access_rebuild();
     foreach ($nodes as $node) {
       $this->assertTrue($grant_storage->access($node, 'view', $this->webUser)->isAllowed(), 'After rebuilding node access the grant storage returns allowed for the node author.');
       $this->assertFalse($grant_storage->access($node, 'view', $this->adminUser)->isForbidden(), 'After rebuilding node access the grant storage returns forbidden for the admin user.');

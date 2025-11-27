@@ -50,7 +50,7 @@ class DependencyOrderingTest extends BrowserTestBase {
       'update_test_1_update_8002',
       'update_test_1_update_8003',
     ];
-    $actual_updates = array_keys(update_resolve_dependencies($starting_updates));
+    $actual_updates = \array_keys(\update_resolve_dependencies($starting_updates));
     $this->assertEquals($expected_updates, $actual_updates, 'Updates within a single module run in the correct order.');
   }
 
@@ -62,11 +62,11 @@ class DependencyOrderingTest extends BrowserTestBase {
       'update_test_2' => 8001,
       'update_test_3' => 8001,
     ];
-    $update_order = array_keys(update_resolve_dependencies($starting_updates));
+    $update_order = \array_keys(\update_resolve_dependencies($starting_updates));
     // Make sure that each dependency is satisfied.
-    $first_dependency_satisfied = array_search('update_test_2_update_8001', $update_order) < array_search('update_test_3_update_8001', $update_order);
+    $first_dependency_satisfied = \array_search('update_test_2_update_8001', $update_order) < \array_search('update_test_3_update_8001', $update_order);
     $this->assertTrue($first_dependency_satisfied, 'The dependency of the second module on the first module is respected by the update function order.');
-    $second_dependency_satisfied = array_search('update_test_3_update_8001', $update_order) < array_search('update_test_2_update_8002', $update_order);
+    $second_dependency_satisfied = \array_search('update_test_3_update_8001', $update_order) < \array_search('update_test_2_update_8002', $update_order);
     $this->assertTrue($second_dependency_satisfied, 'The dependency of the first module on the second module is respected by the update function order.');
   }
 

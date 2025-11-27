@@ -64,7 +64,7 @@ class LanguageTestHooks {
       // LanguageInterface::TYPE_CONTENT configurable.
       $config = \Drupal::configFactory()->getEditable('language.types');
       $configurable = $config->get('configurable');
-      if (!in_array(LanguageInterface::TYPE_CONTENT, $configurable)) {
+      if (!\in_array(LanguageInterface::TYPE_CONTENT, $configurable)) {
         $configurable[] = LanguageInterface::TYPE_CONTENT;
         $config->set('configurable', $configurable)->save();
       }
@@ -107,7 +107,7 @@ class LanguageTestHooks {
    */
   #[Hook('module_preinstall')]
   public function modulePreinstall(): void {
-    \Drupal::state()->set('language_test.language_count_preinstall', count(\Drupal::languageManager()->getLanguages()));
+    \Drupal::state()->set('language_test.language_count_preinstall', \count(\Drupal::languageManager()->getLanguages()));
   }
 
   /**
@@ -116,7 +116,7 @@ class LanguageTestHooks {
   #[Hook('language_switch_links_alter')]
   public function languageSwitchLinksAlter(array &$links, $type, Url $url): void {
     // Record which languages had links passed in.
-    \Drupal::state()->set('language_test.language_switch_link_ids', array_keys($links));
+    \Drupal::state()->set('language_test.language_switch_link_ids', \array_keys($links));
   }
 
   /**

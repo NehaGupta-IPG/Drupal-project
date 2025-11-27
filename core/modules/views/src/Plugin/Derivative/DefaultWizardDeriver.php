@@ -17,7 +17,7 @@ class DefaultWizardDeriver extends DeriverBase {
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
     $views_data = Views::viewsData();
-    $base_tables = array_keys($views_data->fetchBaseTables());
+    $base_tables = \array_keys($views_data->fetchBaseTables());
     $this->derivatives = [];
     foreach ($base_tables as $table) {
       $views_info = $views_data->get($table);

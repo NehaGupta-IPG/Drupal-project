@@ -167,7 +167,7 @@ class ImageThemeHooks {
     $item = $variables['item'];
 
     // Do not output an empty 'title' attribute.
-    if (!is_null($item->title) && mb_strlen($item->title) != 0) {
+    if (!\is_null($item->title) && \mb_strlen($item->title) != 0) {
       $variables['image']['#title'] = $item->title;
     }
 
@@ -214,18 +214,18 @@ class ImageThemeHooks {
       'height' => $original_image->getHeight(),
     ];
     if ($variables['original']['width'] > $variables['original']['height']) {
-      $variables['preview']['original']['width'] = min($variables['original']['width'], $sample_width);
-      $variables['preview']['original']['height'] = round($variables['preview']['original']['width'] / $variables['original']['width'] * $variables['original']['height']);
+      $variables['preview']['original']['width'] = \min($variables['original']['width'], $sample_width);
+      $variables['preview']['original']['height'] = \round($variables['preview']['original']['width'] / $variables['original']['width'] * $variables['original']['height']);
     }
     else {
-      $variables['preview']['original']['height'] = min($variables['original']['height'], $sample_height);
-      $variables['preview']['original']['width'] = round($variables['preview']['original']['height'] / $variables['original']['height'] * $variables['original']['width']);
+      $variables['preview']['original']['height'] = \min($variables['original']['height'], $sample_height);
+      $variables['preview']['original']['width'] = \round($variables['preview']['original']['height'] / $variables['original']['height'] * $variables['original']['width']);
     }
 
     // Set up derivative file information.
     $preview_file = $style->buildUri($original_path);
     // Create derivative if necessary.
-    if (!file_exists($preview_file)) {
+    if (!\file_exists($preview_file)) {
       $style->createDerivative($original_path, $preview_file);
     }
     $preview_image = $this->imageFactory->get($preview_file);
@@ -240,12 +240,12 @@ class ImageThemeHooks {
       'height' => $preview_image->getHeight(),
     ];
     if ($variables['derivative']['width'] > $variables['derivative']['height']) {
-      $variables['preview']['derivative']['width'] = min($variables['derivative']['width'], $sample_width);
-      $variables['preview']['derivative']['height'] = round($variables['preview']['derivative']['width'] / $variables['derivative']['width'] * $variables['derivative']['height']);
+      $variables['preview']['derivative']['width'] = \min($variables['derivative']['width'], $sample_width);
+      $variables['preview']['derivative']['height'] = \round($variables['preview']['derivative']['width'] / $variables['derivative']['width'] * $variables['derivative']['height']);
     }
     else {
-      $variables['preview']['derivative']['height'] = min($variables['derivative']['height'], $sample_height);
-      $variables['preview']['derivative']['width'] = round($variables['preview']['derivative']['height'] / $variables['derivative']['height'] * $variables['derivative']['width']);
+      $variables['preview']['derivative']['height'] = \min($variables['derivative']['height'], $sample_height);
+      $variables['preview']['derivative']['width'] = \round($variables['preview']['derivative']['height'] / $variables['derivative']['height'] * $variables['derivative']['width']);
     }
 
     // Build the preview of the original image.

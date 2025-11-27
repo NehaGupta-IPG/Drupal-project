@@ -298,7 +298,7 @@ class ModerationStateFieldItemListTest extends KernelTestBase {
     $this->assertEquals($default, $this->testNode->isDefaultRevision());
     $this->assertEquals($published, $this->testNode->isPublished());
 
-    $unserialized = unserialize(serialize($this->testNode));
+    $unserialized = \unserialize(\serialize($this->testNode));
 
     $this->assertEquals($state, $unserialized->moderation_state->value);
     $this->assertEquals($default, $unserialized->isDefaultRevision());

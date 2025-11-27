@@ -72,29 +72,29 @@ class FilesystemLoader extends TwigFilesystemLoader {
   public function addPath(string $path, string $namespace = self::MAIN_NAMESPACE): void {
     // Invalidate the cache.
     $this->cache = [];
-    $this->paths[$namespace][] = rtrim($path, '/\\');
+    $this->paths[$namespace][] = \rtrim($path, '/\\');
   }
 
   /**
    * {@inheritdoc}
    */
   protected function findTemplate($name, $throw = TRUE) {
-    $extension = pathinfo($name, PATHINFO_EXTENSION);
-    if (!in_array($extension, $this->allowedFileExtensions, TRUE)) {
+    $extension = \pathinfo($name, PATHINFO_EXTENSION);
+    if (!\in_array($extension, $this->allowedFileExtensions, TRUE)) {
       if (!$throw) {
         return NULL;
       }
       // Customize the list of extensions if no file extension is allowed.
       $extensions = $this->allowedFileExtensions;
-      $no_extension = array_search('', $extensions, TRUE);
-      if (is_int($no_extension)) {
+      $no_extension = \array_search('', $extensions, TRUE);
+      if (\is_int($no_extension)) {
         unset($extensions[$no_extension]);
         $extensions[] = 'or no file extension';
       }
       if (empty($extension)) {
         $extension = 'no file extension';
       }
-      throw new LoaderError(sprintf("Template %s has an invalid file extension (%s). Only templates ending in one of %s are allowed. Set the twig.config.allowed_file_extensions container parameter to customize the allowed file extensions", $name, $extension, implode(', ', $extensions)));
+      throw new LoaderError(\sprintf("Template %s has an invalid file extension (%s). Only templates ending in one of %s are allowed. Set the twig.config.allowed_file_extensions container parameter to customize the allowed file extensions", $name, $extension, \implode(', ', $extensions)));
     }
 
     // Previously it was possible to access files in the parent directory of a
@@ -102,7 +102,7 @@ class FilesystemLoader extends TwigFilesystemLoader {
     // compatibility, we are adding path directory as a namespace, and therefore
     // we can remove the directory traversal from the name.
     // @todo deprecate this functionality for removal in Drupal 11.
-    if (preg_match('/(^\@[^\/]+\/)\.\.\/(.*)/', $name, $matches)) {
+    if (\preg_match('/(^\@[^\/]+\/)\.\.\/(.*)/', $name, $matches)) {
       $name = $matches[1] . $matches[2];
     }
 

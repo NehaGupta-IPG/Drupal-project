@@ -89,9 +89,9 @@ class Tables implements TablesInterface {
     // new table. So for the first two, the table array index will be 'tags'
     // while the third will be 'node_reference.nid.tags'.
     $index_prefix = '';
-    $specifiers = explode('.', $field);
+    $specifiers = \explode('.', $field);
     $base_table = 'base_table';
-    $count = count($specifiers) - 1;
+    $count = \count($specifiers) - 1;
     // This will contain the definitions of the last specifier seen by the
     // system.
     $propertyDefinitions = [];
@@ -143,7 +143,7 @@ class Tables implements TablesInterface {
           $next = $specifiers[$key + 1];
           // If this is a numeric specifier we're adding a condition on the
           // specific delta.
-          if (is_numeric($next)) {
+          if (\is_numeric($next)) {
             $delta = $next;
             $index_prefix .= ".$delta";
             // Do not process it again.
@@ -168,7 +168,7 @@ class Tables implements TablesInterface {
           }
           // Is this a field column?
           $columns = $field_storage->getColumns();
-          if (isset($columns[$next]) || in_array($next, $table_mapping->getReservedColumns())) {
+          if (isset($columns[$next]) || \in_array($next, $table_mapping->getReservedColumns())) {
             // Use it.
             $column = $next;
             // Do not process it again.
@@ -208,7 +208,7 @@ class Tables implements TablesInterface {
           $data_table = $entity_type->getDataTable();
           $entity_base_table = $entity_type->getBaseTable();
 
-          if ($field_storage && $field_storage->isRevisionable() && in_array($field_storage->getName(), $entity_type->getRevisionMetadataKeys())) {
+          if ($field_storage && $field_storage->isRevisionable() && \in_array($field_storage->getName(), $entity_type->getRevisionMetadataKeys())) {
             $revision_table = $entity_type->getRevisionTable();
           }
         }
@@ -240,7 +240,7 @@ class Tables implements TablesInterface {
           // If this is a numeric specifier then, add a condition on the
           // specific delta. Since this is a single value base field, the only
           // value that makes sense is 0.
-          if (is_numeric($next)) {
+          if (\is_numeric($next)) {
             if ($next > 0) {
               $this->sqlQuery->alwaysFalse();
             }
@@ -249,7 +249,7 @@ class Tables implements TablesInterface {
           }
           // Is this a field column?
           $columns = $field_storage?->getColumns() ?? [];
-          if (isset($columns[$next]) || in_array($next, $table_mapping->getReservedColumns())) {
+          if (isset($columns[$next]) || \in_array($next, $table_mapping->getReservedColumns())) {
             // Use it.
             $sql_column = $table_mapping->getFieldColumnName($field_storage, $next);
             // Do not process it again.
@@ -289,8 +289,8 @@ class Tables implements TablesInterface {
         $entity_type_id = NULL;
         // Relationship specifier can also contain the entity type ID, i.e.
         // entity:node, entity:user or entity:taxonomy.
-        if (str_contains($relationship_specifier, ':')) {
-          [$relationship_specifier, $entity_type_id] = explode(':', $relationship_specifier, 2);
+        if (\str_contains($relationship_specifier, ':')) {
+          [$relationship_specifier, $entity_type_id] = \explode(':', $relationship_specifier, 2);
         }
         // Check for a valid relationship.
         if (isset($propertyDefinitions[$relationship_specifier]) && $propertyDefinitions[$relationship_specifier] instanceof DataReferenceDefinitionInterface) {
@@ -301,7 +301,7 @@ class Tables implements TablesInterface {
             $entity_type_id = $target_definition->getEntityTypeId();
           }
           if (!$entity_type_id) {
-            throw new QueryException(sprintf("Cannot determine entity type for relationship '%s' for field '%s'", $relationship_specifier ?? '', $field));
+            throw new QueryException(\sprintf("Cannot determine entity type for relationship '%s' for field '%s'", $relationship_specifier ?? '', $field));
           }
           $entity_type = $this->entityTypeManager->getActiveDefinition($entity_type_id);
           $field_storage_definitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($entity_type_id);
@@ -477,7 +477,7 @@ class Tables implements TablesInterface {
     else {
       return FALSE;
     }
-    return array_flip($mapping);
+    return \array_flip($mapping);
   }
 
   /**

@@ -53,7 +53,7 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
   public static function nonHtmlResponseProvider() {
     return [
       'AjaxResponse, which implements AttachmentsInterface' => [AjaxResponse::class],
-      'A dummy that implements AttachmentsInterface' => [get_class((new Prophet())->prophesize(AttachmentsInterface::class)->reveal())],
+      'A dummy that implements AttachmentsInterface' => [\get_class((new Prophet())->prophesize(AttachmentsInterface::class)->reveal())],
     ];
   }
 
@@ -73,13 +73,13 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
     $html_response_attachments_processor = $this->prophesize(AttachmentsResponseProcessorInterface::class);
     $html_response_attachments_processor->processAttachments(Argument::that(function ($response) {
       return $response instanceof HtmlResponse
-        && empty(array_intersect(['big_pipe_placeholders', 'big_pipe_nojs_placeholders'], array_keys($response->getAttachments())));
+        && empty(\array_intersect(['big_pipe_placeholders', 'big_pipe_nojs_placeholders'], \array_keys($response->getAttachments())));
     }))
       ->will(function ($args) {
         /** @var \Symfony\Component\HttpFoundation\Response|\Drupal\Core\Render\AttachmentsInterface $response */
         $response = $args[0];
         // Simulate its actual behavior.
-        $attachments = array_diff_key($response->getAttachments(), ['html_response_attachment_placeholders' => TRUE]);
+        $attachments = \array_diff_key($response->getAttachments(), ['html_response_attachment_placeholders' => TRUE]);
         $response->setContent('processed');
         $response->setAttachments($attachments);
         return $response;
@@ -94,7 +94,7 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
     // the expected values.
     $this->assertSame($attachments, $big_pipe_response->getAttachments(), 'Attachments of original response object MUST NOT be changed.');
     $this->assertEquals('original', $big_pipe_response->getContent(), 'Content of original response object MUST NOT be changed.');
-    $this->assertEquals(array_diff_key($attachments, ['html_response_attachment_placeholders' => TRUE]), $processed_big_pipe_response->getAttachments(), 'Attachments of returned (processed) response object MUST be changed.');
+    $this->assertEquals(\array_diff_key($attachments, ['html_response_attachment_placeholders' => TRUE]), $processed_big_pipe_response->getAttachments(), 'Attachments of returned (processed) response object MUST be changed.');
     $this->assertEquals('processed', $processed_big_pipe_response->getContent(), 'Content of returned (processed) response object MUST be changed.');
   }
 

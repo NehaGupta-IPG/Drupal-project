@@ -28,25 +28,25 @@ trait AssetGroupSetHashTrait {
       'browsers' => NULL,
     ];
 
-    $normalized['asset_group'] = array_intersect_key($group, $group_keys);
+    $normalized['asset_group'] = \array_intersect_key($group, $group_keys);
     $normalized['asset_group']['items'] = [];
     // Remove some keys to make the hash more stable.
     $omit_keys = [
       'weight' => NULL,
     ];
     foreach ($group['items'] as $key => $asset) {
-      $normalized['asset_group']['items'][$key] = array_diff_key($asset, $group_keys, $omit_keys);
+      $normalized['asset_group']['items'][$key] = \array_diff_key($asset, $group_keys, $omit_keys);
       // If the version is set to -1, this means there is no version in the
       // library definition. To ensure unique hashes when unversioned files
       // change, replace the version with a hash of the file contents.
       if ($asset['version'] === -1) {
-        $normalized['asset_group']['items'][$key]['version'] = hash('xxh64', file_get_contents($asset['data']));
+        $normalized['asset_group']['items'][$key]['version'] = \hash('xxh64', \file_get_contents($asset['data']));
       }
     }
     // The asset array ensures that a valid hash can only be generated via the
     // same code base. Additionally use the hash salt to ensure that hashes are
     // not re-usable between different installations.
-    return Crypt::hmacBase64(serialize($normalized), Settings::getHashSalt());
+    return Crypt::hmacBase64(\serialize($normalized), Settings::getHashSalt());
   }
 
 }

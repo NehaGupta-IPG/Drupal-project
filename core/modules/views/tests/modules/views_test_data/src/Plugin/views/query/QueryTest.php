@@ -147,7 +147,7 @@ class QueryTest extends QueryPluginBase {
         // If the query explicit defines fields to use, filter all others out.
         // Filter out fields.
         if ($this->fields) {
-          $element = array_intersect_key($element, $this->fields);
+          $element = \array_intersect_key($element, $this->fields);
         }
         $result[] = new ResultRow($element);
       }
@@ -177,7 +177,7 @@ class QueryTest extends QueryPluginBase {
         return $value == $condition['value'];
 
       case 'IN':
-        return in_array($value, $condition['value']);
+        return \in_array($value, $condition['value']);
     }
     return FALSE;
   }

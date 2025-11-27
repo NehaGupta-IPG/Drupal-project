@@ -181,7 +181,7 @@ NODE;
       $message = $this->executable->getIdMap()
         ->getMessages($this->executable->sourceIdValues)
         ->fetchAllAssoc('message');
-      $actual_message = key($message);
+      $actual_message = \key($message);
       $this->assertSame($datum['expected_message'], $actual_message);
     }
   }

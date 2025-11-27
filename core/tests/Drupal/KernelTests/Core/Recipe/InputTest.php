@@ -381,7 +381,7 @@ config:
         name: \${name}
 YAML
     );
-    putenv('SITE_NAME=Input Test');
+    \putenv('SITE_NAME=Input Test');
 
     // Mock a collector that only returns the default value.
     $collector = $this->createMock(InputCollectorInterface::class);

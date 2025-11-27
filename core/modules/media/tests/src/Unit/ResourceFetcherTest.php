@@ -71,7 +71,7 @@ class ResourceFetcherTest extends UnitTestCase {
     $valid_response = new Response(200, $headers, $body);
     // Strip off the trailing '}' to produce a response that will cause a JSON
     // parse error.
-    $invalid_response = new Response(200, $headers, rtrim($body, '}'));
+    $invalid_response = new Response(200, $headers, \rtrim($body, '}'));
     // A response that is valid JSON, but does not decode to an array, should
     // produce an exception as well.
     $non_array_response = new Response(200, $headers, '"Valid JSON, but not an array..."');

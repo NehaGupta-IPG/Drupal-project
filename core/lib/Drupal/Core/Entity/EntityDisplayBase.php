@@ -267,8 +267,8 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
       }
     }
 
-    ksort($this->content);
-    ksort($this->hidden);
+    \ksort($this->content);
+    \ksort($this->hidden);
     parent::preSave($storage);
   }
 
@@ -289,7 +289,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     if (\Drupal::moduleHandler()->moduleExists('field')) {
       $components = $this->content + $this->hidden;
       $field_definitions = \Drupal::service('entity_field.manager')->getFieldDefinitions($this->targetEntityType, $this->bundle);
-      foreach (array_intersect_key($field_definitions, $components) as $field_definition) {
+      foreach (\array_intersect_key($field_definitions, $components) as $field_definition) {
         if ($field_definition instanceof ConfigEntityInterface && $field_definition->getEntityTypeId() == 'field_config') {
           $this->addDependency('config', $field_definition->getConfigDependencyName());
         }
@@ -396,7 +396,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     }
 
     // Let other modules feedback about their own additions.
-    $weights = array_merge($weights,
+    $weights = \array_merge($weights,
       \Drupal::moduleHandler()->invokeAll('field_info_max_weight', [
         $this->targetEntityType,
         $this->bundle,
@@ -404,7 +404,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
         $this->mode,
       ]));
 
-    return $weights ? max($weights) : NULL;
+    return $weights ? \max($weights) : NULL;
   }
 
   /**
@@ -424,7 +424,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
       // For "official" view modes and form modes, ignore fields whose
       // definition states they should not be displayed.
       if ($this->mode !== static::CUSTOM_MODE) {
-        $definitions = array_filter($definitions, [$this, 'fieldHasDisplayOptions']);
+        $definitions = \array_filter($definitions, [$this, 'fieldHasDisplayOptions']);
       }
       $this->fieldDefinitions = $definitions;
     }
@@ -465,7 +465,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     }
     foreach ($this->getComponents() as $name => $component) {
       if ($renderer = $this->getRenderer($name)) {
-        if (in_array($renderer->getPluginDefinition()['provider'], $dependencies['module'])) {
+        if (\in_array($renderer->getPluginDefinition()['provider'], $dependencies['module'])) {
           // Revert to the defaults if the plugin that supplies the widget or
           // formatter depends on a module that is being uninstalled.
           $this->setComponent($name);
@@ -531,11 +531,11 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
         // Config and content entities have the dependency names as keys while
         // module and theme dependencies are indexed arrays of dependency names.
         // @see \Drupal\Core\Config\ConfigManager::callOnDependencyRemoval()
-        if (in_array($type, ['config', 'content'])) {
-          $removed = array_intersect_key($removed_dependencies[$type], array_flip($dependencies));
+        if (\in_array($type, ['config', 'content'])) {
+          $removed = \array_intersect_key($removed_dependencies[$type], \array_flip($dependencies));
         }
         else {
-          $removed = array_values(array_intersect($removed_dependencies[$type], $dependencies));
+          $removed = \array_values(\array_intersect($removed_dependencies[$type], $dependencies));
         }
         if ($removed) {
           $intersect[$type] = $removed;
@@ -560,7 +560,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
    */
   public function __sleep(): array {
     // Only store the definition, not external objects or derived data.
-    $keys = array_keys($this->toArray());
+    $keys = \array_keys($this->toArray());
     // In addition, we need to keep the entity type and the "is new" status.
     $keys[] = 'entityTypeId';
     $keys[] = 'enforceIsNew';
@@ -582,7 +582,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     // __sleep().
     $keys = $this->_serializedKeys;
     unset($this->_serializedKeys);
-    $values = array_intersect_key(get_object_vars($this), array_flip($keys));
+    $values = \array_intersect_key(\get_object_vars($this), \array_flip($keys));
     // Run those values through the __construct(), as if they came from a
     // regular entity load.
     $this->__construct($values, $this->entityTypeId);
@@ -605,10 +605,10 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
     // If changing the entity ID, also update the target entity type, bundle,
     // and view mode.
     if ($this->isNew() && $property_name === $this->getEntityType()->getKey('id')) {
-      if (substr_count($value, '.') !== 2) {
+      if (\substr_count($value, '.') !== 2) {
         throw new \InvalidArgumentException("'$value' is not a valid entity display ID.");
       }
-      [$this->targetEntityType, $this->bundle, $this->mode] = explode('.', $value);
+      [$this->targetEntityType, $this->bundle, $this->mode] = \explode('.', $value);
     }
     parent::set($property_name, $value);
     return $this;

@@ -21,9 +21,9 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
    * {@inheritdoc}
    */
   public function validate(mixed $value, Constraint $constraint): void {
-    assert($constraint instanceof ValidKeysConstraint);
+    \assert($constraint instanceof ValidKeysConstraint);
 
-    if (!is_array($value)) {
+    if (!\is_array($value)) {
       // If the value is NULL, then the `NotNull` constraint validator will
       // set the appropriate validation error message.
       // @see \Drupal\Core\Validation\Plugin\Validation\Constraint\NotNullConstraintValidator
@@ -35,18 +35,18 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
 
     // Indexed arrays are invalid by definition. array_is_list() returns TRUE
     // for empty arrays, so only do this check if $value is not empty.
-    if ($value && array_is_list($value)) {
+    if ($value && \array_is_list($value)) {
       $this->context->addViolation($constraint->indexedArrayMessage);
       return;
     }
 
     $mapping = $this->context->getObject();
-    assert($mapping instanceof Mapping);
+    \assert($mapping instanceof Mapping);
     $resolved_type = $mapping->getDataDefinition()->getDataType();
 
     $valid_keys = $constraint->getAllowedKeys($this->context);
     $dynamically_valid_keys = $mapping->getDynamicallyValidKeys();
-    $all_dynamically_valid_keys = array_merge(...array_values($dynamically_valid_keys));
+    $all_dynamically_valid_keys = \array_merge(...\array_values($dynamically_valid_keys));
 
     // Statically valid: keys that are valid for all possible types matching the
     // type definition of this mapping.
@@ -54,7 +54,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
     // keys: id, label, label_display, provider, status, info, view_mode and
     // context_mapping.
     // @see \Drupal\KernelTests\Config\Schema\MappingTest::providerMappingInterpretation()
-    $invalid_keys = array_diff(array_keys($value), $valid_keys, $all_dynamically_valid_keys);
+    $invalid_keys = \array_diff(\array_keys($value), $valid_keys, $all_dynamically_valid_keys);
     foreach ($invalid_keys as $key) {
       $this->context->buildViolation($constraint->invalidKeyMessage)
         ->setParameter('@key', $key)
@@ -84,8 +84,8 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
       // To help determine which keys are dynamically invalid, gather all keys
       // except for those for the actual resolved type of this mapping.
       // @see \Drupal\Core\Config\Schema\Mapping::getPossibleTypes()
-      $other_types_valid_keys = array_diff($all_dynamically_valid_keys, $resolved_type_dynamically_valid_keys);
-      $dynamically_invalid_keys = array_intersect(array_keys($value), $other_types_valid_keys);
+      $other_types_valid_keys = \array_diff($all_dynamically_valid_keys, $resolved_type_dynamically_valid_keys);
+      $dynamically_invalid_keys = \array_intersect(\array_keys($value), $other_types_valid_keys);
       foreach ($dynamically_invalid_keys as $key) {
         $this->context->addViolation($constraint->dynamicInvalidKeyMessage, ['@key' => $key] + self::getDynamicMessageParameters($mapping));
       }
@@ -151,21 +151,21 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
       }
     }
 
-    $required_keys = array_intersect($mapping->getRequiredKeys(), $constraint->getAllowedKeys($this->context));
+    $required_keys = \array_intersect($mapping->getRequiredKeys(), $constraint->getAllowedKeys($this->context));
 
     // Statically required: same principle as for "statically valid" above, but
     // this time restricted to the subset of statically valid keys that do not
     // have `requiredKey: false`.
-    $statically_required_keys = array_diff($required_keys, $all_dynamically_valid_keys);
-    $missing_keys = array_diff($statically_required_keys, array_keys($value));
+    $statically_required_keys = \array_diff($required_keys, $all_dynamically_valid_keys);
+    $missing_keys = \array_diff($statically_required_keys, \array_keys($value));
     foreach ($missing_keys as $key) {
       $this->context->addViolation($constraint->missingRequiredKeyMessage, ['@key' => $key]);
     }
     // Dynamically required: same principle as for "dynamically valid" above,
     // but this time restricted to the subset of dynamically valid keys that do
     // not have `requiredKey: false`.
-    $dynamically_required_keys = array_intersect($required_keys, $all_dynamically_valid_keys);
-    $missing_dynamically_required_keys = array_diff($dynamically_required_keys, array_keys($value));
+    $dynamically_required_keys = \array_intersect($required_keys, $all_dynamically_valid_keys);
+    $missing_dynamically_required_keys = \array_diff($dynamically_required_keys, \array_keys($value));
     foreach ($missing_dynamically_required_keys as $key) {
       $this->context->addViolation($constraint->dynamicMissingRequiredKeyMessage, ['@key' => $key] + self::getDynamicMessageParameters($mapping));
     }
@@ -189,9 +189,9 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
    */
   protected static function getDynamicMessageParameters(Mapping $mapping): array {
     $definition = $mapping->getDataDefinition();
-    assert($definition instanceof MapDataDefinition);
+    \assert($definition instanceof MapDataDefinition);
     $definition = $definition->toArray();
-    assert(array_key_exists('mapping', $definition));
+    \assert(\array_key_exists('mapping', $definition));
 
     // The original mapping definition is used to determine the unresolved type.
     // e.g. if $unresolved_type is …
@@ -210,9 +210,9 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
     // $unresolved_type must be a dynamic type and the resolved type must be
     // different and not be dynamic.
     // @see \Drupal\Core\Config\TypedConfigManager::buildDataDefinition()
-    assert(strpos($unresolved_type, ']'));
-    assert($unresolved_type !== $resolved_type);
-    assert(!strpos($resolved_type, ']'));
+    \assert(\strpos($unresolved_type, ']'));
+    \assert($unresolved_type !== $resolved_type);
+    \assert(!\strpos($resolved_type, ']'));
 
     $message_parameters = [
       '@unresolved_dynamic_type' => $unresolved_type,
@@ -221,36 +221,36 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
 
     $config = $mapping->getRoot();
     // Every config object is a mapping.
-    assert($config instanceof Mapping);
+    \assert($config instanceof Mapping);
     // Find the relative property path where this mapping starts.
-    assert(str_starts_with($mapping->getPropertyPath(), $config->getName() . '.'));
-    $property_path_mapping = substr($mapping->getPropertyPath(), strlen($config->getName()) + 1);
+    \assert(\str_starts_with($mapping->getPropertyPath(), $config->getName() . '.'));
+    $property_path_mapping = \substr($mapping->getPropertyPath(), \strlen($config->getName()) + 1);
 
     // Extract the expressions stored in the dynamic type name.
     $matches = [];
     // @see \Drupal\Core\Config\TypedConfigManager::replaceDynamicTypeName()
-    $result = preg_match("/\[(.*)\]/U", $unresolved_type, $matches);
-    assert($result === 1);
+    $result = \preg_match("/\[(.*)\]/U", $unresolved_type, $matches);
+    \assert($result === 1);
     // @see \Drupal\Core\Config\TypedConfigManager::replaceExpression()
     $expression = $matches[1];
     // From the expression, extract the instructions for where to retrieve a
     // value.
-    $instructions = explode('.', $expression);
+    $instructions = \explode('.', $expression);
 
     // Determine the property path to the configuration key that has determined
     // this type.
     // @see \Drupal\Core\Config\TypedConfigManager::replaceExpression()
-    $property_path_parts = explode('.', $property_path_mapping);
+    $property_path_parts = \explode('.', $property_path_mapping);
     // @see \Drupal\Core\Config\Schema\Mapping::getDynamicallyValidKeys()
-    assert(!in_array('%type', $instructions, TRUE));
+    \assert(!\in_array('%type', $instructions, TRUE));
 
     // The %key instruction can only be used on its own. In this case, there is
     // no need to fetch a value, only the string that was used as the key is
     // responsible for determining the mapping type.
     if ($instructions === ['%key']) {
-      $key = array_pop($property_path_parts);
-      array_push($property_path_parts, '%key');
-      $resolved_property_path = implode('.', $property_path_parts);
+      $key = \array_pop($property_path_parts);
+      \array_push($property_path_parts, '%key');
+      $resolved_property_path = \implode('.', $property_path_parts);
       return $message_parameters + [
         '@dynamic_type_property_path' => $resolved_property_path,
         '@dynamic_type_property_value' => $key,
@@ -261,17 +261,17 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
     // resolve the property path that contains the value causing this particular
     // type to be selected.
     while ($instructions) {
-      $instruction = array_shift($instructions);
+      $instruction = \array_shift($instructions);
       // Go up one level: remove the last part of the property path.
       if ($instruction === '%parent') {
-        array_pop($property_path_parts);
+        \array_pop($property_path_parts);
       }
       // Go down one level: append the given key.
       else {
-        array_push($property_path_parts, $instruction);
+        \array_push($property_path_parts, $instruction);
       }
     }
-    $resolved_property_path = implode('.', $property_path_parts);
+    $resolved_property_path = \implode('.', $property_path_parts);
     $message_parameters += [
       '@dynamic_type_property_path' => $resolved_property_path,
     ];
@@ -279,7 +279,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
     // Determine the corresponding value for that property path.
     $val = $config->get($resolved_property_path)->getValue();
     // @see \Drupal\Core\Config\TypedConfigManager::replaceExpression()
-    $val = is_bool($val) ? (int) $val : $val;
+    $val = \is_bool($val) ? (int) $val : $val;
     return $message_parameters + [
       '@dynamic_type_property_value' => $val,
     ];

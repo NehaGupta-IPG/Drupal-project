@@ -96,9 +96,9 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
 
     $replace = [];
     $type = $definition['type'];
-    if (strpos($type, ']')) {
+    if (\strpos($type, ']')) {
       // Replace variable names in definition.
-      $replace = is_array($value) ? $value : [];
+      $replace = \is_array($value) ? $value : [];
       if (isset($parent)) {
         $replace['%parent'] = $parent;
       }
@@ -216,7 +216,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
 
       // If this mapping's type was dynamically defined, then this is the static
       // type root inside which all types are statically defined.
-      if (str_contains($original_mapping_type, ']')) {
+      if (\str_contains($original_mapping_type, ']')) {
         $static_type_root = $object;
         break;
       }
@@ -226,7 +226,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
 
     // Either the discovered static type root is not the actual root, or no
     // static type root was found and it is the root config object.
-    assert(($static_type_root !== NULL && $static_type_root !== $root) || ($static_type_root === NULL && $object->getParent() === NULL));
+    \assert(($static_type_root !== NULL && $static_type_root !== $root) || ($static_type_root === NULL && $object->getParent() === NULL));
 
     return $static_type_root ?? $root;
   }
@@ -246,7 +246,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     if (isset($definitions[$base_plugin_id])) {
       $type = $base_plugin_id;
     }
-    elseif (strpos($base_plugin_id, '.') && $name = $this->getFallbackName($base_plugin_id)) {
+    elseif (\strpos($base_plugin_id, '.') && $name = $this->getFallbackName($base_plugin_id)) {
       // Found a generic name, replacing the last element by '*'.
       $type = $name;
     }
@@ -284,7 +284,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
       $definition = NestedArray::mergeDeepArray([$merge, $definition], TRUE);
 
       // Replace dynamic portions of the definition type.
-      if (!empty($replacements) && strpos($definition['type'], ']')) {
+      if (!empty($replacements) && \strpos($definition['type'], ']')) {
         $sub_type = $this->determineType(TypeResolver::resolveDynamicTypeName($definition['type'], $replacements), $definitions);
         $sub_definition = $definitions[$sub_type];
         if (isset($definitions[$sub_type]['type'])) {
@@ -353,7 +353,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    */
   public function findFallback(string $name): ?string {
     $fallback = $this->getFallbackName($name);
-    assert($fallback === NULL || str_ends_with($fallback, '.*'));
+    \assert($fallback === NULL || \str_ends_with($fallback, '.*'));
     return $fallback;
   }
 
@@ -368,7 +368,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    */
   protected function getFallbackName($name) {
     // Check for definition of $name with filesystem marker.
-    $replaced = preg_replace('/([^\.:]+)([\.:\*]*)$/', '*\2', $name);
+    $replaced = \preg_replace('/([^\.:]+)([\.:\*]*)$/', '*\2', $name);
     if ($replaced != $name) {
       if (isset($this->definitions[$replaced])) {
         return $replaced;
@@ -377,7 +377,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
         // No definition for this level. Collapse multiple wildcards to a single
         // wildcard to see if there is a greedy match. For example,
         // "breakpoint.breakpoint.*.*" becomes "breakpoint.breakpoint.*".
-        $one_star = preg_replace('/\.([:\.\*]*)$/', '.*', $replaced);
+        $one_star = \preg_replace('/\.([:\.\*]*)$/', '.*', $replaced);
         if ($one_star != $replaced && isset($this->definitions[$one_star])) {
           return $one_star;
         }
@@ -394,19 +394,19 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   public function hasConfigSchema($name) {
     // The schema system falls back on the Undefined class for unknown types.
     $definition = $this->getDefinition($name);
-    return is_array($definition) && ($definition['class'] != Undefined::class);
+    return \is_array($definition) && ($definition['class'] != Undefined::class);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function alterDefinitions(&$definitions) {
-    $discovered_schema = array_keys($definitions);
+    $discovered_schema = \array_keys($definitions);
     parent::alterDefinitions($definitions);
-    $altered_schema = array_keys($definitions);
+    $altered_schema = \array_keys($definitions);
     if ($discovered_schema != $altered_schema) {
-      $added_keys = implode(',', array_diff($altered_schema, $discovered_schema));
-      $removed_keys = implode(',', array_diff($discovered_schema, $altered_schema));
+      $added_keys = \implode(',', \array_diff($altered_schema, $discovered_schema));
+      $removed_keys = \implode(',', \array_diff($discovered_schema, $altered_schema));
       if (!empty($added_keys) && !empty($removed_keys)) {
         $message = "Invoking hook_config_schema_info_alter() has added ($added_keys) and removed ($removed_keys) schema definitions";
       }

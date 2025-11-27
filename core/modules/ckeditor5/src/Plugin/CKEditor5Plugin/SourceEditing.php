@@ -29,7 +29,7 @@ class SourceEditing extends CKEditor5PluginDefault implements CKEditor5PluginCon
     $form['allowed_tags'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Manually editable HTML tags'),
-      '#default_value' => implode(' ', $this->configuration['allowed_tags']),
+      '#default_value' => \implode(' ', $this->configuration['allowed_tags']),
       '#description' => $this->t('A list of HTML tags that can be used while editing source. It is only necessary to add tags that are not already supported by other enabled plugins. For example, if "Bold" is enabled, it is not necessary to add the <code>&lt;strong&gt;</code> tag, but it may be necessary to add <code>&lt;dl&gt;&lt;dt&gt;&lt;dd&gt;</code> in a format that does not have a definition list plugin, but requires definition list markup.'),
     ];
 
@@ -43,7 +43,7 @@ class SourceEditing extends CKEditor5PluginDefault implements CKEditor5PluginCon
     // Match the config schema structure at
     // ckeditor5.plugin.ckeditor5_sourceEditing.
     $form_value = $form_state->getValue('allowed_tags');
-    assert(is_string($form_value));
+    \assert(\is_string($form_value));
     $config_value = HTMLRestrictions::fromString($form_value)->toCKEditor5ElementsArray();
     $form_state->setValue('allowed_tags', $config_value);
   }
@@ -73,7 +73,7 @@ class SourceEditing extends CKEditor5PluginDefault implements CKEditor5PluginCon
     // SourceEditing enables every tag a plugin lists, even if it's only there
     // to add support for an attribute. So, compute a list of only the tags.
     // F.e.: <foo attr>, <bar>, <baz bar> would result in <foo>, <bar>, <baz>.
-    $r = HTMLRestrictions::fromString(implode(' ', $this->configuration['allowed_tags']));
+    $r = HTMLRestrictions::fromString(\implode(' ', $this->configuration['allowed_tags']));
     $plain_tags = $r->extractPlainTagsSubset()->toCKEditor5ElementsArray();
 
     // Return the union of the "tags only" list and the original configuration,
@@ -81,7 +81,7 @@ class SourceEditing extends CKEditor5PluginDefault implements CKEditor5PluginCon
     // F.e.: merging the tags only list of <foo>, <bar>, <baz> with the original
     // list of <foo attr>, <bar>, <baz bar> would result in <bar> having a
     // duplicate.
-    $subset = array_unique(array_merge(
+    $subset = \array_unique(\array_merge(
       $plain_tags,
       $this->configuration['allowed_tags']
     ));
@@ -93,7 +93,7 @@ class SourceEditing extends CKEditor5PluginDefault implements CKEditor5PluginCon
    * {@inheritdoc}
    */
   public function getDynamicPluginConfig(array $static_plugin_config, EditorInterface $editor): array {
-    $restrictions = HTMLRestrictions::fromString(implode(' ', $this->configuration['allowed_tags']));
+    $restrictions = HTMLRestrictions::fromString(\implode(' ', $this->configuration['allowed_tags']));
     // Only handle concrete HTML elements to allow the Wildcard HTML support
     // plugin to handle wildcards.
     // @see \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::getCKEditor5PluginConfig()
@@ -102,7 +102,7 @@ class SourceEditing extends CKEditor5PluginDefault implements CKEditor5PluginCon
       'htmlSupport' => [
         'allow' => $concrete_restrictions->toGeneralHtmlSupportConfig(),
         // Any manually created elements are explicitly allowed to be empty.
-        'allowEmpty' => array_keys($concrete_restrictions->getAllowedElements()),
+        'allowEmpty' => \array_keys($concrete_restrictions->getAllowedElements()),
       ],
     ];
   }

@@ -112,7 +112,7 @@ class UpdateKernel extends DrupalKernel {
     /** @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver */
     $argument_resolver = $container->get('http_kernel.controller.argument_resolver');
     $arguments = $argument_resolver->getArguments($request, $db_update_controller);
-    return call_user_func_array($db_update_controller, $arguments);
+    return \call_user_func_array($db_update_controller, $arguments);
   }
 
   /**
@@ -152,7 +152,7 @@ class UpdateKernel extends DrupalKernel {
    */
   protected function setupRequestMatch(Request $request) {
     $path = $request->getPathInfo();
-    $args = explode('/', ltrim($path, '/'));
+    $args = \explode('/', \ltrim($path, '/'));
 
     $request->attributes->set(RouteObjectInterface::ROUTE_NAME, 'system.db_update');
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, $this->getContainer()->get('router.route_provider')->getRouteByName('system.db_update'));

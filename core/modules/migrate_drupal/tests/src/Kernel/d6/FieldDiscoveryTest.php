@@ -277,9 +277,9 @@ class FieldDiscoveryTest extends MigrateDrupal6TestBase {
   public function testGetAllFields(): void {
     $field_discovery_test = new FieldDiscoveryTestClass($this->fieldPluginManager, $this->migrationPluginManager, $this->logger);
     $actual_fields = $field_discovery_test->getAllFields('6');
-    $actual_node_types = array_keys($actual_fields['node']);
-    sort($actual_node_types);
-    $this->assertSame(['node'], array_keys($actual_fields));
+    $actual_node_types = \array_keys($actual_fields['node']);
+    \sort($actual_node_types);
+    $this->assertSame(['node'], \array_keys($actual_fields));
     $this->assertSame(['employee', 'page', 'story', 'test_page', 'test_planet'], $actual_node_types);
     $this->assertCount(25, $actual_fields['node']['story']);
     foreach ($actual_fields['node'] as $bundle => $fields) {

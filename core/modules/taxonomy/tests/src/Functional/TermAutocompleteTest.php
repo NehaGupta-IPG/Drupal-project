@@ -159,7 +159,7 @@ class TermAutocompleteTest extends TaxonomyTestBase {
    *   Array representing decoded JSON response.
    */
   protected function drupalGetJson($path, array $options = [], array $headers = []) {
-    $options = array_merge_recursive(['query' => ['_format' => 'json']], $options);
+    $options = \array_merge_recursive(['query' => ['_format' => 'json']], $options);
     return Json::decode($this->drupalGet($path, $options, $headers));
   }
 

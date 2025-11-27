@@ -26,9 +26,9 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
       return $this->checksumInvalidator->getCurrentChecksum($tags);
     }
 
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $return = $this->checksumInvalidator->getCurrentChecksum($tags);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheTagOperation($tags, $start, $stop, CacheTagOperation::GetCurrentChecksum);
     return $return;
   }
@@ -42,9 +42,9 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
     if (empty($tags)) {
       return $this->checksumInvalidator->isValid($checksum, $tags);
     }
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $return = $this->checksumInvalidator->isValid($checksum, $tags);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheTagOperation($tags, $start, $stop, CacheTagOperation::IsValid);
     return $return;
   }
@@ -58,9 +58,9 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
     if (empty($tags)) {
       return $this->checksumInvalidator->invalidateTags($tags);
     }
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $return = $this->checksumInvalidator->invalidateTags($tags);
-    $stop = microtime(TRUE);
+    $stop = \microtime(TRUE);
     $this->logCacheTagOperation($tags, $start, $stop, CacheTagOperation::InvalidateTags);
     return $return;
   }
@@ -94,7 +94,7 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
   protected function logCacheTagOperation(array $tags, float $start, float $stop, CacheTagOperation $operation): void {
     $this->performanceDataCollector->addCacheTagOperation([
       'operation' => $operation,
-      'tags' => implode(', ', $tags),
+      'tags' => \implode(', ', $tags),
       'start' => $start,
       'stop' => $stop,
     ]);

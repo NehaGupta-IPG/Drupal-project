@@ -89,7 +89,7 @@ class NodeTermData extends RelationshipPluginBase {
     // Transform the #type = checkboxes value to a numerically indexed array,
     // because the config schema expects a sequence, not a mapping.
     $vids = $form_state->getValue(['options', 'vids']);
-    $form_state->setValue(['options', 'vids'], array_values(array_filter($vids)));
+    $form_state->setValue(['options', 'vids'], \array_values(\array_filter($vids)));
   }
 
   /**
@@ -101,7 +101,7 @@ class NodeTermData extends RelationshipPluginBase {
     $def = $this->definition;
     $def['table'] = 'taxonomy_term_field_data';
 
-    if (!array_filter($this->options['vids'])) {
+    if (!\array_filter($this->options['vids'])) {
       $taxonomy_index = $this->query->addTable('taxonomy_index', $this->relationship);
       $def['left_table'] = $taxonomy_index;
       $def['left_field'] = 'tid';
@@ -118,7 +118,7 @@ class NodeTermData extends RelationshipPluginBase {
 
       $query = Database::getConnection()->select('taxonomy_term_field_data', 'td');
       $query->addJoin($def['type'], 'taxonomy_index', 'tn', '[tn].[tid] = [td].[tid]');
-      $query->condition('td.vid', array_filter($this->options['vids']), 'IN');
+      $query->condition('td.vid', \array_filter($this->options['vids']), 'IN');
       if (empty($this->query->options['disable_sql_rewrite'])) {
         $query->addTag('taxonomy_term_access');
       }

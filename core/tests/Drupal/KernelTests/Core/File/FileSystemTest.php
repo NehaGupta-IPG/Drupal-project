@@ -60,7 +60,7 @@ class FileSystemTest extends KernelTestBase {
   public function testDestinationDirectoryFailureOnCopy(): void {
     $this->expectException(DirectoryNotReadyException::class);
     $this->expectExceptionMessage("The specified file 'public://test.txt' could not be copied because the destination directory 'public://subdirectory' is not properly configured. This may be caused by a problem with file or directory permissions.");
-    touch('public://test.txt');
+    \touch('public://test.txt');
     // public://subdirectory has not been created, so
     // \Drupal::service('file_system')->prepareDirectory() will fail, causing
     // copy() to throw DirectoryNotReadyException.
@@ -76,7 +76,7 @@ class FileSystemTest extends KernelTestBase {
     $this->expectException(FileExistsException::class);
     $this->expectExceptionMessage("File 'public://test.txt' could not be copied because a file by that name already exists in the destination directory ('')");
     $uri = 'public://test.txt';
-    touch($uri);
+    \touch($uri);
     $this->fileSystem->copy($uri, $uri, FileExists::Error);
   }
 
@@ -89,7 +89,7 @@ class FileSystemTest extends KernelTestBase {
     $this->expectException(FileException::class);
     $this->expectExceptionMessage("'public://test.txt' could not be copied because it would overwrite itself");
     $uri = 'public://test.txt';
-    touch($uri);
+    \touch($uri);
     $this->fileSystem->copy($uri, $uri, FileExists::Replace);
   }
 
@@ -100,7 +100,7 @@ class FileSystemTest extends KernelTestBase {
    */
   public function testCopySelfRename(): void {
     $uri = 'public://test.txt';
-    touch($uri);
+    \touch($uri);
     $this->fileSystem->copy($uri, $uri);
     $this->assertFileExists('public://test_0.txt');
   }
@@ -111,7 +111,7 @@ class FileSystemTest extends KernelTestBase {
    * @legacy-covers ::copy
    */
   public function testSuccessfulCopy(): void {
-    touch('public://test.txt');
+    \touch('public://test.txt');
     $this->fileSystem->copy('public://test.txt', 'public://test-copy.txt');
     $this->assertFileExists('public://test-copy.txt');
   }

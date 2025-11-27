@@ -19,9 +19,9 @@ trait AjaxHelperTrait {
    */
   protected function isAjax() {
     $wrapper_format = $this->getRequestWrapperFormat() ?? '';
-    return str_contains($wrapper_format, 'drupal_ajax') ||
-      str_contains($wrapper_format, 'drupal_modal') ||
-      str_contains($wrapper_format, 'drupal_dialog');
+    return \str_contains($wrapper_format, 'drupal_ajax') ||
+      \str_contains($wrapper_format, 'drupal_modal') ||
+      \str_contains($wrapper_format, 'drupal_dialog');
   }
 
   /**

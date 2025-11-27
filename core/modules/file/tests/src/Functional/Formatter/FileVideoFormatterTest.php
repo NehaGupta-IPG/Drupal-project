@@ -34,7 +34,7 @@ class FileVideoFormatterTest extends FileMediaFormatterTestBase {
   public function testRender($tag_count, $formatter_settings): void {
     $field_config = $this->createMediaField('file_video', 'mp4', $formatter_settings);
 
-    file_put_contents('public://file.mp4', str_repeat('t', 10));
+    \file_put_contents('public://file.mp4', \str_repeat('t', 10));
     $file1 = File::create([
       'uri' => 'public://file.mp4',
       'filename' => 'file.mp4',
@@ -87,7 +87,7 @@ class FileVideoFormatterTest extends FileMediaFormatterTestBase {
       ]
     );
 
-    file_put_contents('public://file.mp4', str_repeat('t', 10));
+    \file_put_contents('public://file.mp4', \str_repeat('t', 10));
     $file = File::create([
       'uri' => 'public://file.mp4',
       'filename' => 'file.mp4',

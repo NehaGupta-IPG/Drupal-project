@@ -51,9 +51,9 @@ final class RecipeFileException extends \RuntimeException {
     $lines = ["Validation errors were found in $path:"];
 
     foreach ($violations as $violation) {
-      $lines[] = sprintf('- %s: %s', $violation->getPropertyPath(), $violation->getMessage());
+      $lines[] = \sprintf('- %s: %s', $violation->getPropertyPath(), $violation->getMessage());
     }
-    return new static($path, implode("\n", $lines), $violations);
+    return new static($path, \implode("\n", $lines), $violations);
   }
 
 }

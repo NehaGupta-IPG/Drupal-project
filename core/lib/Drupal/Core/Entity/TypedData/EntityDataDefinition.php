@@ -36,7 +36,7 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
       // EntityDeriver. In that case, this is a new definition and we'll just
       // create the definition from defaults by using an empty array.
       $values = \Drupal::typedDataManager()->getDefinition($data_type, FALSE);
-      $definition = new static(is_array($values) ? $values : []);
+      $definition = new static(\is_array($values) ? $values : []);
 
       // Set the EntityType constraint using the given entity type ID.
       $definition->setEntityTypeId($entity_type_id);
@@ -56,7 +56,7 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
    * {@inheritdoc}
    */
   public static function createFromDataType($data_type) {
-    $parts = explode(':', $data_type);
+    $parts = \explode(':', $data_type);
     if ($parts[0] != 'entity') {
       throw new \InvalidArgumentException('Data type must be in the form of "entity:ENTITY_TYPE:BUNDLE."');
     }
@@ -71,15 +71,15 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
       if ($entity_type_id = $this->getEntityTypeId()) {
         // Return an empty array for entities that are not content entities.
         $entity_type_class = \Drupal::entityTypeManager()->getDefinition($entity_type_id)->getClass();
-        if (!in_array('Drupal\Core\Entity\FieldableEntityInterface', class_implements($entity_type_class))) {
+        if (!\in_array('Drupal\Core\Entity\FieldableEntityInterface', \class_implements($entity_type_class))) {
           $this->propertyDefinitions = [];
         }
         else {
           // @todo Add support for handling multiple bundles.
           // See https://www.drupal.org/node/2169813.
           $bundles = $this->getBundles();
-          if (is_array($bundles) && count($bundles) == 1) {
-            $this->propertyDefinitions = \Drupal::service('entity_field.manager')->getFieldDefinitions($entity_type_id, reset($bundles));
+          if (\is_array($bundles) && \count($bundles) == 1) {
+            $this->propertyDefinitions = \Drupal::service('entity_field.manager')->getFieldDefinitions($entity_type_id, \reset($bundles));
           }
           else {
             $this->propertyDefinitions = \Drupal::service('entity_field.manager')->getBaseFieldDefinitions($entity_type_id);
@@ -103,8 +103,8 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
       $type .= ':' . $entity_type;
       // Append the bundle only if we know it for sure and it is not the default
       // bundle.
-      if (($bundles = $this->getBundles()) && count($bundles) == 1) {
-        $bundle = reset($bundles);
+      if (($bundles = $this->getBundles()) && \count($bundles) == 1) {
+        $bundle = \reset($bundles);
         if ($bundle != $entity_type) {
           $type .= ':' . $bundle;
         }
@@ -132,7 +132,7 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
    */
   public function getBundles() {
     $bundle = $this->definition['constraints']['Bundle'] ?? NULL;
-    return is_string($bundle) ? [$bundle] : $bundle;
+    return \is_string($bundle) ? [$bundle] : $bundle;
   }
 
   /**

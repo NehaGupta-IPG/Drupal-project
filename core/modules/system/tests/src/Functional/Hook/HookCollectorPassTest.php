@@ -56,7 +56,7 @@ class HookCollectorPassTest extends BrowserTestBase {
 
 \Drupal::getContainer()->getParameter('site.path');
 ";
-    $file_content = file_get_contents($config_module_file);
+    $file_content = \file_get_contents($config_module_file);
     $this->assertStringContainsString($bare_container, $file_content, 'container_initialize.module container test feature is missing.');
   }
 

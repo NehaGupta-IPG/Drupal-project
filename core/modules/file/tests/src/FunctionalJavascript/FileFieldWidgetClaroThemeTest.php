@@ -43,7 +43,7 @@ class FileFieldWidgetClaroThemeTest extends FileFieldWidgetTest {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
-    $test_file = current($this->getTestFiles('text'));
+    $test_file = \current($this->getTestFiles('text'));
     $test_file_path = \Drupal::service('file_system')->realpath($test_file->uri);
 
     // Fill out the form accordingly.

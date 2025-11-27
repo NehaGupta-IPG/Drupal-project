@@ -24,7 +24,7 @@ class CommentExtrasTest extends CommentTest {
   public function setUp(): void {
     // Don't run any test methods from CommentTest because those will get run
     // for CommentTest itself.
-    if (method_exists(parent::class, $this->name())) {
+    if (\method_exists(parent::class, $this->name())) {
       $this->markTestSkipped();
     }
     parent::setUp();
@@ -47,7 +47,7 @@ class CommentExtrasTest extends CommentTest {
     $this->setUpAuthorization('POST');
     $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
 
-    $url = Url::fromRoute(sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
+    $url = Url::fromRoute(\sprintf('jsonapi.%s.collection.post', static::$resourceTypeName));
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';
     $request_options[RequestOptions::HEADERS]['Content-Type'] = 'application/vnd.api+json';

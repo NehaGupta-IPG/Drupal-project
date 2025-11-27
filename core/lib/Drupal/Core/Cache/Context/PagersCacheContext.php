@@ -35,7 +35,7 @@ class PagersCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Pager');
+    return \t('Pager');
   }
 
   /**

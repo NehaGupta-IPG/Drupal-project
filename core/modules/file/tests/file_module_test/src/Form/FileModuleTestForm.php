@@ -51,7 +51,7 @@ class FileModuleTestForm extends FormBase {
       '#multiple' => (bool) $multiple,
     ];
     if ($default_fids) {
-      $default_fids = explode(',', $default_fids);
+      $default_fids = \explode(',', $default_fids);
       $form['nested']['file']['#default_value'] = $extended ? ['fids' => $default_fids] : $default_fids;
     }
 
@@ -88,7 +88,7 @@ class FileModuleTestForm extends FormBase {
       $fids[] = $fid;
     }
 
-    \Drupal::messenger()->addStatus($this->t('The file ids are %fids.', ['%fids' => implode(',', $fids)]));
+    \Drupal::messenger()->addStatus($this->t('The file ids are %fids.', ['%fids' => \implode(',', $fids)]));
   }
 
 }

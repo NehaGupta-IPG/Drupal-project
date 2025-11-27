@@ -30,11 +30,11 @@ class PhpPassword implements PasswordInterface {
    */
   public function hash(#[\SensitiveParameter] $password) {
     // Prevent DoS attacks by refusing to hash large passwords.
-    if (strlen($password) > static::PASSWORD_MAX_LENGTH) {
+    if (\strlen($password) > static::PASSWORD_MAX_LENGTH) {
       return FALSE;
     }
 
-    return password_hash($password, $this->algorithm, $this->options);
+    return \password_hash($password, $this->algorithm, $this->options);
   }
 
   /**
@@ -42,7 +42,7 @@ class PhpPassword implements PasswordInterface {
    */
   public function check(#[\SensitiveParameter] $password, #[\SensitiveParameter] $hash) {
     // Prevent DoS attacks by refusing to check large passwords.
-    if (strlen($password) > static::PASSWORD_MAX_LENGTH) {
+    if (\strlen($password) > static::PASSWORD_MAX_LENGTH) {
       return FALSE;
     }
     // Newly created accounts may have empty passwords.
@@ -50,14 +50,14 @@ class PhpPassword implements PasswordInterface {
       return FALSE;
     }
 
-    return password_verify($password, $hash);
+    return \password_verify($password, $hash);
   }
 
   /**
    * {@inheritdoc}
    */
   public function needsRehash(#[\SensitiveParameter] $hash) {
-    return password_needs_rehash($hash, $this->algorithm, $this->options);
+    return \password_needs_rehash($hash, $this->algorithm, $this->options);
   }
 
 }

@@ -33,7 +33,7 @@ class WorkspaceCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Workspace');
+    return \t('Workspace');
   }
 
   /**

@@ -155,7 +155,7 @@ class SystemController extends ControllerBase {
     }
 
     if ($blocks) {
-      ksort($blocks);
+      \ksort($blocks);
       $build = [
         '#theme' => 'admin_page',
         '#blocks' => $blocks,
@@ -182,7 +182,7 @@ class SystemController extends ControllerBase {
    *   A redirect response to the front page.
    */
   public function compactPage($mode) {
-    user_cookie_save(['admin_compact_mode' => ($mode == 'on')]);
+    \user_cookie_save(['admin_compact_mode' => ($mode == 'on')]);
     return $this->redirect('<front>');
   }
 
@@ -207,10 +207,10 @@ class SystemController extends ControllerBase {
     $themes = $this->themeExtensionList->reset()->getList();
 
     // Remove obsolete themes.
-    $themes = array_filter($themes, function ($theme) {
+    $themes = \array_filter($themes, function ($theme) {
       return !$theme->isObsolete();
     });
-    uasort($themes, [ThemeExtensionList::class, 'sortByName']);
+    \uasort($themes, [ThemeExtensionList::class, 'sortByName']);
 
     $theme_default = $config->get('default');
     $theme_groups = ['installed' => [], 'uninstalled' => []];
@@ -236,15 +236,15 @@ class SystemController extends ControllerBase {
       $theme->screenshot = NULL;
       // Create a list which includes the current theme and all its base themes.
       if (isset($themes[$theme->getName()]->base_themes)) {
-        $theme_keys = array_keys($themes[$theme->getName()]->base_themes);
+        $theme_keys = \array_keys($themes[$theme->getName()]->base_themes);
         $theme_keys[] = $theme->getName();
       }
       else {
         $theme_keys = [$theme->getName()];
       }
       // Look for a screenshot in the current theme or in its closest ancestor.
-      foreach (array_reverse($theme_keys) as $theme_key) {
-        if (isset($themes[$theme_key]) && file_exists($themes[$theme_key]->info['screenshot'])) {
+      foreach (\array_reverse($theme_keys) as $theme_key) {
+        if (isset($themes[$theme_key]) && \file_exists($themes[$theme_key]->info['screenshot'])) {
           $theme->screenshot = [
             'uri' => $themes[$theme_key]->info['screenshot'],
             'alt' => $this->t('Screenshot for @theme theme', ['@theme' => $theme->info['name']]),
@@ -259,9 +259,9 @@ class SystemController extends ControllerBase {
         // Require the 'content' region to make sure the main page
         // content has a common place in all themes.
         $theme->incompatible_region = !isset($theme->info['regions']['content']);
-        $theme->incompatible_php = version_compare(phpversion(), $theme->info['php']) < 0;
+        $theme->incompatible_php = \version_compare(\phpversion(), $theme->info['php']) < 0;
         // Confirm that all base themes are available.
-        $theme->incompatible_base = (isset($theme->info['base theme']) && !($theme->base_themes === array_filter($theme->base_themes)));
+        $theme->incompatible_base = (isset($theme->info['base theme']) && !($theme->base_themes === \array_filter($theme->base_themes)));
         // Confirm that the theme engine is available.
         $theme->incompatible_engine = isset($theme->info['engine']) && !isset($theme->owner);
         // Confirm that module dependencies are available.
@@ -361,13 +361,13 @@ class SystemController extends ControllerBase {
       }
       $lifecycle = $theme->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
       if (!empty($theme->info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER])) {
-        $theme->notes[] = Link::fromTextAndUrl($this->t('@lifecycle', ['@lifecycle' => ucfirst($lifecycle)]),
+        $theme->notes[] = Link::fromTextAndUrl($this->t('@lifecycle', ['@lifecycle' => \ucfirst($lifecycle)]),
           Url::fromUri($theme->info[ExtensionLifecycle::LIFECYCLE_LINK_IDENTIFIER], [
             'attributes' =>
               [
                 'class' => 'theme-link--non-stable',
                 'aria-label' => $this->t('View information on the @lifecycle status of the theme @theme', [
-                  '@lifecycle' => ucfirst($lifecycle),
+                  '@lifecycle' => \ucfirst($lifecycle),
                   '@theme' => $theme->info['name'],
                 ]),
               ],
@@ -384,13 +384,13 @@ class SystemController extends ControllerBase {
 
     // There are two possible theme groups.
     $theme_group_titles = [
-      'installed' => $this->formatPlural(count($theme_groups['installed']), 'Installed theme', 'Installed themes'),
+      'installed' => $this->formatPlural(\count($theme_groups['installed']), 'Installed theme', 'Installed themes'),
     ];
     if (!empty($theme_groups['uninstalled'])) {
-      $theme_group_titles['uninstalled'] = $this->formatPlural(count($theme_groups['uninstalled']), 'Uninstalled theme', 'Uninstalled themes');
+      $theme_group_titles['uninstalled'] = $this->formatPlural(\count($theme_groups['uninstalled']), 'Uninstalled theme', 'Uninstalled themes');
     }
 
-    uasort($theme_groups['installed'], 'system_sort_themes');
+    \uasort($theme_groups['installed'], 'system_sort_themes');
     $this->moduleHandler()->alter('system_themes_page', $theme_groups);
 
     $build = [];

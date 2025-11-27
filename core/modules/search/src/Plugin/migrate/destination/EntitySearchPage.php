@@ -67,7 +67,7 @@ class EntitySearchPage extends EntityConfigBase {
       $plugin_definition,
       $migration,
       $container->get('entity_type.manager')->getStorage($entity_type_id),
-      array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type_id)),
+      \array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type_id)),
       $container->get('language_manager'),
       $container->get('config.factory'),
       $container->get('module_handler')
@@ -83,7 +83,7 @@ class EntitySearchPage extends EntityConfigBase {
     if ($this->moduleHandler->moduleExists($row->getDestinationProperty('module'))) {
       return parent::import($row, $old_destination_id_values);
     }
-    $msg = sprintf("Search module '%s' is not enabled on this site.", $row->getDestinationProperty('module'));
+    $msg = \sprintf("Search module '%s' is not enabled on this site.", $row->getDestinationProperty('module'));
     throw new MigrateException($msg, 0, NULL, MigrationInterface::MESSAGE_INFORMATIONAL, MigrateIdMapInterface::STATUS_IGNORED);
   }
 

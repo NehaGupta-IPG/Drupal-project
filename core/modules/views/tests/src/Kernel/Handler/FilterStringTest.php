@@ -124,12 +124,12 @@ class FilterStringTest extends ViewsKernelTestBase {
     $data_set = $this->dataSet();
     // Adds a new data point in the views_test_data table.
     $query = Database::getConnection()->insert('views_test_data')
-      ->fields(array_keys($data_set[0]));
+      ->fields(\array_keys($data_set[0]));
     $query->values([
       'name' => 'Ringo%',
       'age' => 31,
       'job' => 'Drummer',
-      'created' => gmmktime(6, 30, 10, 1, 1, 2000),
+      'created' => \gmmktime(6, 30, 10, 1, 1, 2000),
       'status' => 1,
       'description' => NULL,
     ]);

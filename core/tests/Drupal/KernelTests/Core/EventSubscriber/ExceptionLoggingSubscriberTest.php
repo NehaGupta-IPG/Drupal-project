@@ -44,14 +44,14 @@ class ExceptionLoggingSubscriberTest extends KernelTestBase {
 
     // Temporarily disable error log as the ExceptionLoggingSubscriber logs 5xx
     // HTTP errors using error_log().
-    $error_log = ini_set('error_log', '/dev/null');
+    $error_log = \ini_set('error_log', '/dev/null');
     $request = Request::create('/test-http-response-exception/' . $error_code);
 
     if ($exception) {
       $this->expectException($exception);
     }
     $http_kernel->handle($request);
-    ini_set('error_log', $error_log);
+    \ini_set('error_log', $error_log);
 
     $logs = $this->container->get($this->testLogServiceName)->cleanLogs();
     $this->assertEquals($channel, $logs[0][2]['channel']);

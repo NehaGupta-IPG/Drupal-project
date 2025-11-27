@@ -142,7 +142,7 @@ class ViewAddForm extends ViewFormBase {
     $show_form['wizard_key']['#default_value'] = WizardPluginBase::getSelected($form_state, ['show', 'wizard_key'], $default_value, $show_form['wizard_key']);
     // Changing this dropdown updates the entire content of $form['displays']
     // via AJAX.
-    views_ui_add_ajax_trigger($show_form, 'wizard_key', ['displays']);
+    \views_ui_add_ajax_trigger($show_form, 'wizard_key', ['displays']);
 
     // Build the rest of the form based on the currently selected wizard plugin.
     $wizard_key = $show_form['wizard_key']['#default_value'];
@@ -182,7 +182,7 @@ class ViewAddForm extends ViewFormBase {
     if (!empty($path)) {
       // @todo https://www.drupal.org/node/2423913 Views should expect and store
       //   a leading /.
-      $path = ltrim($path, '/ ');
+      $path = \ltrim($path, '/ ');
     }
     $errors = $wizard_instance->validateView($form, $form_state);
 

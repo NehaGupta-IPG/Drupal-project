@@ -35,7 +35,7 @@ class Plugin implements AnnotationInterface {
   public function __construct($values) {
     $reflection = new \ReflectionClass($this);
     // Only keep actual default values by ignoring NULL values.
-    $defaults = array_filter($reflection->getDefaultProperties(), function ($value) {
+    $defaults = \array_filter($reflection->getDefaultProperties(), function ($value) {
       return $value !== NULL;
     });
     $parsed_values = $this->parse($values);
@@ -57,7 +57,7 @@ class Plugin implements AnnotationInterface {
       if ($value instanceof AnnotationInterface) {
         $definitions[$key] = $value->get();
       }
-      elseif (is_array($value)) {
+      elseif (\is_array($value)) {
         $definitions[$key] = $this->parse($value);
       }
       else {

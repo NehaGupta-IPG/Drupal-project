@@ -109,11 +109,11 @@ abstract class RowPluginBase extends PluginBase {
       }
 
       if (!empty($relationship_options)) {
-        $relationship_options = array_merge(['none' => $this->t('Do not use a relationship')], $relationship_options);
+        $relationship_options = \array_merge(['none' => $this->t('Do not use a relationship')], $relationship_options);
         $rel = empty($this->options['relationship']) ? 'none' : $this->options['relationship'];
         if (empty($relationship_options[$rel])) {
           // Pick the first relationship.
-          $rel = key($relationship_options);
+          $rel = \key($relationship_options);
         }
 
         $form['relationship'] = [

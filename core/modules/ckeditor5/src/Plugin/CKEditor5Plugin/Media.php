@@ -89,7 +89,7 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
     // This is a workaround until the above issue is fixed to prevent the
     // editor from crashing because the frontend expects the default view mode
     // to exist in drupalElementStyles.
-    if (!array_key_exists($default_view_mode, $allowed_view_modes)) {
+    if (!\array_key_exists($default_view_mode, $allowed_view_modes)) {
       $allowed_view_modes[$default_view_mode] = $default_view_mode;
     }
     // Return early since there is no need to configure if there
@@ -99,20 +99,20 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
     }
 
     // Configure view modes.
-    foreach (array_keys($media_bundles) as $bundle) {
+    foreach (\array_keys($media_bundles) as $bundle) {
       $allowed_view_modes_by_bundle = $this->entityDisplayRepository->getViewModeOptionsByBundle('media', $bundle);
 
-      foreach (array_keys($allowed_view_modes_by_bundle) as $view_mode) {
+      foreach (\array_keys($allowed_view_modes_by_bundle) as $view_mode) {
         // Get the bundles that have this view mode enabled.
         $bundles_per_view_mode[$view_mode][] = $bundle;
       }
     }
     // Limit to view modes allowed by filter.
-    $bundles_per_view_mode = array_intersect_key($bundles_per_view_mode, $allowed_view_modes);
+    $bundles_per_view_mode = \array_intersect_key($bundles_per_view_mode, $allowed_view_modes);
 
     // Configure view mode element styles.
-    foreach (array_keys($all_view_modes) as $view_mode) {
-      if (array_key_exists($view_mode, $bundles_per_view_mode)) {
+    foreach (\array_keys($all_view_modes) as $view_mode) {
+      if (\array_key_exists($view_mode, $bundles_per_view_mode)) {
         $specific_bundles = $bundles_per_view_mode[$view_mode];
         if ($view_mode == $default_view_mode) {
           $element_style_configuration[] = [
@@ -123,7 +123,7 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
             'attributeValue' => $view_mode,
             'modelElements' => ['drupalMedia'],
             'modelAttributes' => [
-              'drupalMediaType' => array_keys($media_bundles),
+              'drupalMediaType' => \array_keys($media_bundles),
             ],
           ];
         }
@@ -144,7 +144,7 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
 
     $items = [];
 
-    foreach (array_keys($allowed_view_modes) as $view_mode) {
+    foreach (\array_keys($allowed_view_modes) as $view_mode) {
       $items[] = "drupalElementStyle:viewMode:$view_mode";
     }
 
@@ -196,7 +196,7 @@ class Media extends CKEditor5PluginDefault implements ContainerFactoryPluginInte
     $subset = $this->getPluginDefinition()->getElements();
     $view_mode_override_enabled = $this->getConfiguration()['allow_view_mode_override'];
     if (!$view_mode_override_enabled) {
-      $subset = array_diff($subset, ['<drupal-media data-view-mode>']);
+      $subset = \array_diff($subset, ['<drupal-media data-view-mode>']);
     }
     return $subset;
   }

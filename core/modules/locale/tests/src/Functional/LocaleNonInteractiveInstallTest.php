@@ -36,7 +36,7 @@ class LocaleNonInteractiveInstallTest extends BrowserTestBase {
    */
   protected function getVersionStringToTest(): string {
     include_once $this->root . '/core/includes/install.core.inc';
-    $version = _install_get_version_info(\Drupal::VERSION);
+    $version = \_install_get_version_info(\Drupal::VERSION);
     return $version['major'] . '.0.0';
   }
 
@@ -59,7 +59,7 @@ msgstr "Geben sie das Passwort für ihren Benutzernamen ein."
 
 PO;
     $version = $this->getVersionStringToTest();
-    file_put_contents($this->publicFilesDirectory . "/translations/drupal-{$version}.de.po", $contents);
+    \file_put_contents($this->publicFilesDirectory . "/translations/drupal-{$version}.de.po", $contents);
     return $parameters;
   }
 

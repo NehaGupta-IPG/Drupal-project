@@ -108,7 +108,7 @@ class CKEditor5ImageController extends ControllerBase {
     $lock_id = $this->generateLockIdFromFileUri($file_uri);
 
     if (!$this->lock->acquire($lock_id)) {
-      throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $file_uri), NULL, ['Retry-After' => 1]);
+      throw new HttpException(503, \sprintf('File "%s" is already locked for writing.', $file_uri), NULL, ['Retry-After' => 1]);
     }
 
     try {
@@ -122,7 +122,7 @@ class CKEditor5ImageController extends ControllerBase {
       throw new HttpException(500, 'File could not be saved');
     }
     catch (LockAcquiringException) {
-      throw new HttpException(503, sprintf('File "%s" is already locked for writing.', $upload->getClientOriginalName()), NULL, ['Retry-After' => 1]);
+      throw new HttpException(503, \sprintf('File "%s" is already locked for writing.', $upload->getClientOriginalName()), NULL, ['Retry-After' => 1]);
     }
 
     $this->lock->release($lock_id);
@@ -151,12 +151,12 @@ class CKEditor5ImageController extends ControllerBase {
     $imageUploadPlugin = $this->pluginManager->getDefinition('ckeditor5_imageUpload')->toArray();
     $allowed_extensions = [];
     foreach ($imageUploadPlugin['ckeditor5']['config']['image']['upload']['types'] as $mime_type) {
-      $allowed_extensions = array_merge($allowed_extensions, $mimetypes->getExtensions('image/' . $mime_type));
+      $allowed_extensions = \array_merge($allowed_extensions, $mimetypes->getExtensions('image/' . $mime_type));
     }
 
     return [
       'FileExtension' => [
-        'extensions' => implode(' ', $allowed_extensions),
+        'extensions' => \implode(' ', $allowed_extensions),
       ],
       'FileSizeLimit' => [
         'fileLimit' => $max_filesize,

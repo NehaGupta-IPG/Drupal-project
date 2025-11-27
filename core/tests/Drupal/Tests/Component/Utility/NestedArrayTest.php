@@ -290,7 +290,7 @@ class NestedArrayTest extends TestCase {
     $data['2d-array-callable'] = [
       [[0, 1, '', TRUE], [0, 1, 2, 3]],
       function ($element) {
-        return is_array($element) || $element === 3;
+        return \is_array($element) || $element === 3;
       },
       [0 => [], 1 => [3 => 3]],
     ];

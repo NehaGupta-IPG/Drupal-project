@@ -297,7 +297,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     // moved slightly because the current block being configured will have a
     // border that was not present when the dialog was not open.
     $new_body_block_top_position = $this->getElementVerticalPosition($body_field_selector, 'top');
-    $distance_body_block_moved = abs($body_block_top_position - $new_body_block_top_position);
+    $distance_body_block_moved = \abs($body_block_top_position - $new_body_block_top_position);
     // Confirm that body moved only slightly compared to the distance the mouse
     // moved and therefore was not dragged when the mouse moved.
     $this->assertGreaterThan($distance_body_block_moved * 20, $minimum_distance_mouse_moved);
@@ -331,7 +331,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
    * @see https://www.drupal.org/node/3460567
    */
   protected function movePointerTo($selector): void {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use $this->getSession()->getDriver()->mouseOver() instead. See https://www.drupal.org/node/3460567', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use $this->getSession()->getDriver()->mouseOver() instead. See https://www.drupal.org/node/3460567', E_USER_DEPRECATED);
     $driver_session = $this->getSession()->getDriver()->getWebDriverSession();
     $element = $driver_session->element('css selector', $selector);
     $driver_session->moveto(['element' => $element->getID()]);

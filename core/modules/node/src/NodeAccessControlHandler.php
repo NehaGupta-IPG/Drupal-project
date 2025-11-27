@@ -128,7 +128,7 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $node, $operation, AccountInterface $account) {
-    assert($node instanceof NodeInterface);
+    \assert($node instanceof NodeInterface);
     $cacheability = new CacheableMetadata();
 
     /** @var \Drupal\node\NodeInterface $node */
@@ -258,13 +258,13 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
     // Only users with the administer nodes permission can edit administrative
     // fields.
     $administrative_fields = ['uid', 'created', 'promote', 'sticky'];
-    if ($operation == 'edit' && in_array($fieldName, $administrative_fields, TRUE)) {
+    if ($operation == 'edit' && \in_array($fieldName, $administrative_fields, TRUE)) {
       return AccessResult::allowedIfHasPermission($account, 'administer nodes');
     }
 
     // No user can change read only fields.
     $read_only_fields = ['revision_timestamp', 'revision_uid'];
-    if ($operation == 'edit' && in_array($fieldName, $read_only_fields, TRUE)) {
+    if ($operation == 'edit' && \in_array($fieldName, $read_only_fields, TRUE)) {
       return AccessResult::forbidden();
     }
 

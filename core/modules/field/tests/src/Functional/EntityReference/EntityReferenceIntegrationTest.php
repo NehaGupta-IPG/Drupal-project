@@ -101,7 +101,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
       // values remain the same.
       /** @var \Drupal\Core\Entity\EntityStorageInterface $storage */
       $storage = $this->container->get('entity_type.manager')->getStorage($this->entityType);
-      $entity = current($storage->loadByProperties(['name' => $entity_name]));
+      $entity = \current($storage->loadByProperties(['name' => $entity_name]));
       $this->drupalGet($this->entityType . '/manage/' . $entity->id() . '/edit');
       $this->assertSession()->fieldValueEquals($this->fieldName . '[0][target_id]', $referenced_entities[0]->label() . ' (' . $referenced_entities[0]->id() . ')');
       $this->assertSession()->fieldValueEquals($this->fieldName . '[1][target_id]', $referenced_entities[1]->label() . ' (' . $referenced_entities[1]->id() . ')');
@@ -129,7 +129,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
 
       // Try to post the form again with no modification and check if the field
       // values remain the same.
-      $entity = current($storage->loadByProperties(['name' => $entity_name]));
+      $entity = \current($storage->loadByProperties(['name' => $entity_name]));
       $this->drupalGet($this->entityType . '/manage/' . $entity->id() . '/edit');
       $this->assertSession()->fieldValueEquals($this->fieldName . '[target_id]', $target_id . ' (' . $referenced_entities[1]->id() . ')');
 
@@ -140,9 +140,9 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
       // Since we don't know the form structure for these widgets, just test
       // that editing and saving an already created entity works.
       $exclude = ['entity_reference_autocomplete', 'entity_reference_autocomplete_tags'];
-      $entity = current($storage->loadByProperties(['name' => $entity_name]));
+      $entity = \current($storage->loadByProperties(['name' => $entity_name]));
       $supported_widgets = \Drupal::service('plugin.manager.field.widget')->getOptions('entity_reference');
-      $supported_widget_types = array_diff(array_keys($supported_widgets), $exclude);
+      $supported_widget_types = \array_diff(\array_keys($supported_widgets), $exclude);
 
       foreach ($supported_widget_types as $widget_type) {
         $display_repository->getFormDisplay($this->entityType, $this->bundle)
@@ -189,7 +189,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
       $field = FieldConfig::loadByName($this->entityType, $this->bundle, $this->fieldName);
       $field->save();
       $dependencies = $field->getDependencies();
-      $this->assertFalse(isset($dependencies[$key]) && in_array($referenced_entities[0]->getConfigDependencyName(), $dependencies[$key]), $key . ' dependency ' . $referenced_entities[0]->getConfigDependencyName() . ' does not exist.');
+      $this->assertFalse(isset($dependencies[$key]) && \in_array($referenced_entities[0]->getConfigDependencyName(), $dependencies[$key]), $key . ' dependency ' . $referenced_entities[0]->getConfigDependencyName() . ' does not exist.');
     }
   }
 
@@ -207,7 +207,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
    * @internal
    */
   protected function assertFieldValues(string $entity_name, array $referenced_entities, $assert_order = TRUE): void {
-    $entity = current($this->container->get('entity_type.manager')->getStorage(
+    $entity = \current($this->container->get('entity_type.manager')->getStorage(
     $this->entityType)->loadByProperties(['name' => $entity_name]));
 
     $this->assertNotEmpty($entity, "$this->entityType: Entity found in the database.");

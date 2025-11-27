@@ -110,7 +110,7 @@ class LayoutBuilderHooks {
     // Hides the Layout Builder field. It is rendered directly in
     // \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay::buildMultiple().
     unset($form['fields'][OverridesSectionStorage::FIELD_NAME]);
-    $key = array_search(OverridesSectionStorage::FIELD_NAME, $form['#fields']);
+    $key = \array_search(OverridesSectionStorage::FIELD_NAME, $form['#fields']);
     if ($key !== FALSE) {
       unset($form['#fields'][$key]);
     }
@@ -178,7 +178,7 @@ class LayoutBuilderHooks {
     // If the entity is displayed within a Layout Builder block and the current
     // route is in the Layout Builder UI, then remove all contextual link
     // placeholders.
-    if ($route_name && $display instanceof LayoutBuilderEntityViewDisplay && str_starts_with($route_name, 'layout_builder.')) {
+    if ($route_name && $display instanceof LayoutBuilderEntityViewDisplay && \str_starts_with($route_name, 'layout_builder.')) {
       unset($build['#contextual_links']);
     }
   }
@@ -367,7 +367,7 @@ class LayoutBuilderHooks {
   public function systemBreadcrumbAlter(Breadcrumb &$breadcrumb, RouteMatchInterface $route_match, array $context): void {
     // Remove the extra 'Manage display' breadcrumb for Layout Builder defaults.
     if ($route_match->getRouteObject() && $route_match->getRouteObject()->hasOption('_layout_builder') && $route_match->getParameter('section_storage_type') === 'defaults') {
-      $links = array_filter($breadcrumb->getLinks(), function (Link $link) use ($route_match) {
+      $links = \array_filter($breadcrumb->getLinks(), function (Link $link) use ($route_match) {
           $entity_type_id = $route_match->getParameter('entity_type_id');
         if (!$link->getUrl()->isRouted()) {
                 return TRUE;
@@ -405,7 +405,7 @@ class LayoutBuilderHooks {
     // content_translation_preprocess_language_content_settings_table().
     if (!empty($theme_registry['language_content_settings_table']['preprocess functions'])) {
       $preprocess_functions =& $theme_registry['language_content_settings_table']['preprocess functions'];
-      $index = array_search('layout_builder_preprocess_language_content_settings_table', $preprocess_functions);
+      $index = \array_search('layout_builder_preprocess_language_content_settings_table', $preprocess_functions);
       if ($index !== FALSE) {
         unset($preprocess_functions[$index]);
         $preprocess_functions[] = 'layout_builder_preprocess_language_content_settings_table';

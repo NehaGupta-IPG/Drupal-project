@@ -41,7 +41,7 @@ class InputRequired extends ExposedFormPluginBase {
       '#title' => $this->t('Text on demand'),
       '#description' => $this->t('Text to display instead of results until the user selects and applies an exposed filter.'),
       '#default_value' => $this->options['text_input_required'],
-      '#format' => $this->options['text_input_required_format'] ?? filter_default_format(),
+      '#format' => $this->options['text_input_required_format'] ?? \filter_default_format(),
       '#editor' => FALSE,
     ];
   }
@@ -63,7 +63,7 @@ class InputRequired extends ExposedFormPluginBase {
     static $cache = NULL;
     if (!isset($cache)) {
       $view = $this->view;
-      if (is_array($view->filter) && count($view->filter)) {
+      if (\is_array($view->filter) && \count($view->filter)) {
         foreach ($view->filter as $filter) {
           if ($filter->isExposed()) {
             $identifier = $filter->options['expose']['identifier'];

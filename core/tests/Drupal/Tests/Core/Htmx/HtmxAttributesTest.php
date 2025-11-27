@@ -287,7 +287,7 @@ class HtmxAttributesTest extends UnitTestCase {
    */
   #[DataProvider('hxValidateDataProvider')]
   public function testHxValidate(?bool $value, string $expected): void {
-    if (is_null($value)) {
+    if (\is_null($value)) {
       $this->htmx->validate();
     }
     else {
@@ -338,7 +338,7 @@ class HtmxAttributesTest extends UnitTestCase {
    */
   #[DataProvider('hxSimpleStringAttributesDataProvider')]
   public function testHxSimpleAttributes(string $method, null|string|array $value, string $attribute, string|bool $expected): void {
-    if (is_null($value)) {
+    if (\is_null($value)) {
       $this->htmx->$method();
     }
     else {

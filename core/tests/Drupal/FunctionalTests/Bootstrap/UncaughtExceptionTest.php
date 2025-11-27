@@ -40,14 +40,14 @@ class UncaughtExceptionTest extends BrowserTestBase {
     parent::setUp();
 
     $settings_filename = $this->siteDirectory . '/settings.php';
-    chmod($settings_filename, 0777);
-    $settings_php = file_get_contents($settings_filename);
+    \chmod($settings_filename, 0777);
+    $settings_php = \file_get_contents($settings_filename);
     $settings_php .= "\ninclude_once 'core/tests/Drupal/FunctionalTests/Bootstrap/ErrorContainer.php';\n";
     $settings_php .= "\ninclude_once 'core/tests/Drupal/FunctionalTests/Bootstrap/ExceptionContainer.php';\n";
     // Ensure we can test errors rather than being caught in
     // \Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware.
     $settings_php .= "\ndefine('SIMPLETEST_COLLECT_ERRORS', FALSE);\n";
-    file_put_contents($settings_filename, $settings_php);
+    \file_put_contents($settings_filename, $settings_php);
 
     $settings = [];
     $settings['config']['system.logging']['error_level'] = (object) [
@@ -123,14 +123,14 @@ class UncaughtExceptionTest extends BrowserTestBase {
    */
   public function testUncaughtExceptionCustomExceptionHandler(): void {
     $settings_filename = $this->siteDirectory . '/settings.php';
-    chmod($settings_filename, 0777);
-    $settings_php = file_get_contents($settings_filename);
+    \chmod($settings_filename, 0777);
+    $settings_php = \file_get_contents($settings_filename);
     $settings_php .= "\n";
     $settings_php .= "set_exception_handler(function() {\n";
     $settings_php .= "  header('HTTP/1.1 418 I\'m a teapot');\n";
     $settings_php .= "  print('Oh oh, flying teapots');\n";
     $settings_php .= "});\n";
-    file_put_contents($settings_filename, $settings_php);
+    \file_put_contents($settings_filename, $settings_php);
 
     \Drupal::state()->set('error_service_test.break_bare_html_renderer', TRUE);
 
@@ -249,7 +249,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($this->expectedExceptionMessage);
 
     // Find fatal error logged to the error.log.
-    $errors = file(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
+    $errors = \file(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
     $this->assertCount(10, $errors, 'The error + the error that the logging service is broken has been written to the error log.');
     $this->assertStringContainsString('Failed to log error', $errors[0], 'The error handling logs when an error could not be logged to the logger.');
 
@@ -260,7 +260,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
 
     // The exception is expected. Do not interpret it as a test failure. Not
     // using File API; a potential error must trigger a PHP warning.
-    unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
+    \unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
   }
 
   /**
@@ -278,22 +278,22 @@ class UncaughtExceptionTest extends BrowserTestBase {
     $error_log_filename = DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log';
     $this->assertFileExists($error_log_filename);
 
-    $content = file_get_contents($error_log_filename);
-    $rows = explode(PHP_EOL, $content);
+    $content = \file_get_contents($error_log_filename);
+    $rows = \explode(PHP_EOL, $content);
 
     // We iterate over the rows in order to be able to remove the logged error
     // afterwards.
     $found = FALSE;
     foreach ($rows as $row_index => $row) {
-      if (str_contains($content, $error_message)) {
+      if (\str_contains($content, $error_message)) {
         $found = TRUE;
         unset($rows[$row_index]);
       }
     }
 
-    file_put_contents($error_log_filename, implode("\n", $rows));
+    \file_put_contents($error_log_filename, \implode("\n", $rows));
 
-    $this->assertTrue($found, sprintf('The %s error message was logged.', $error_message));
+    $this->assertTrue($found, \sprintf('The %s error message was logged.', $error_message));
   }
 
   /**

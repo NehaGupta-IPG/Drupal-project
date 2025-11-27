@@ -442,7 +442,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
     // the DDL statement should commit the transaction stack.
     $this->cleanUp();
     $transaction = $this->createRootTransaction('', FALSE);
-    $reflectionMethod = new \ReflectionMethod(get_class($this->connection->transactionManager()), 'getConnectionTransactionState');
+    $reflectionMethod = new \ReflectionMethod(\get_class($this->connection->transactionManager()), 'getConnectionTransactionState');
     $this->assertSame(1, $this->connection->transactionManager()->stackDepth());
     $this->assertEquals(ClientConnectionTransactionState::Active, $reflectionMethod->invoke($this->connection->transactionManager()));
     $this->insertRow('row');
@@ -450,7 +450,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
 
     // Try to rollback the root transaction. Since the DDL already committed
     // it, it should fail.
-    set_error_handler(static function (int $errno, string $errstr): bool {
+    \set_error_handler(static function (int $errno, string $errstr): bool {
       throw new \ErrorException($errstr);
     });
     try {
@@ -460,7 +460,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
       $this->assertSame('Transaction::rollBack() failed because of a prior execution of a DDL statement.', $e->getMessage());
     }
     finally {
-      restore_error_handler();
+      \restore_error_handler();
     }
 
     unset($transaction);
@@ -938,7 +938,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
     $this->assertRowAbsent('rtcRollback');
     $this->assertRowPresent('row');
 
-    set_error_handler(static function (int $errno, string $errstr): bool {
+    \set_error_handler(static function (int $errno, string $errstr): bool {
       throw new \ErrorException($errstr);
     });
     try {
@@ -948,7 +948,7 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
       $this->assertSame('Transaction::rollBack() failed because of a prior execution of a DDL statement.', $e->getMessage());
     }
     finally {
-      restore_error_handler();
+      \restore_error_handler();
     }
 
     unset($transaction);

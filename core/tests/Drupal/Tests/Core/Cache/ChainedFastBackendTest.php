@@ -73,7 +73,7 @@ class ChainedFastBackendTest extends UnitTestCase {
     $cid = $this->randomString();
     $item = (object) [
       'cid' => $cid,
-      'data' => serialize($this->randomObject()),
+      'data' => \serialize($this->randomObject()),
       'created' => ChainedFastBackend::LAST_WRITE_TIMESTAMP_PREFIX . 'cache_foo',
       'expire' => Cache::PERMANENT,
       'tags' => [],
@@ -145,13 +145,13 @@ class ChainedFastBackendTest extends UnitTestCase {
       'cid' => ChainedFastBackend::LAST_WRITE_TIMESTAMP_PREFIX . 'cache_foo',
       // This is set two seconds in the future so that the grace period before
       // writing through to the fast backend is observed.
-      'data' => time() + 2,
+      'data' => \time() + 2,
     ];
     $cache_item = (object) [
       'cid' => 'foo',
       'data' => 'baz',
-      'created' => time(),
-      'expire' => time() + 3600,
+      'created' => \time(),
+      'expire' => \time() + 3600,
       'tags' => ['tag'],
     ];
 
@@ -194,15 +194,15 @@ class ChainedFastBackendTest extends UnitTestCase {
     // is written back to the fast backend.
     $timestamp_item = (object) [
       'cid' => ChainedFastBackend::LAST_WRITE_TIMESTAMP_PREFIX . 'cache_foo',
-      'data' => time() - 2,
+      'data' => \time() - 2,
     ];
     $cache_item = (object) [
       'cid' => 'foo',
       'data' => 'baz',
       // The created time is set one minute in the past, e.g. before the
       // consistent timestamp.
-      'created' => time() - 60,
-      'expire' => time() + 3600,
+      'created' => \time() - 60,
+      'expire' => \time() + 3600,
       'tags' => ['tag'],
     ];
 

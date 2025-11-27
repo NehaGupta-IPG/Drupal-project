@@ -58,12 +58,12 @@ class LocaleUpdateCronTest extends LocaleUpdateBase {
     $this->submitForm([], 'Update translations');
 
     // Store translation status for comparison.
-    $initial_history = locale_translation_get_file_history();
+    $initial_history = \locale_translation_get_file_history();
 
     // Prepare for test: Simulate new translations being available.
     // Change the last updated timestamp of a translation file.
     $contrib_module_two_uri = 'public://local/contrib_module_two-8.x-2.0-beta4.de._po';
-    touch(\Drupal::service('file_system')->realpath($contrib_module_two_uri), \Drupal::time()->getRequestTime());
+    \touch(\Drupal::service('file_system')->realpath($contrib_module_two_uri), \Drupal::time()->getRequestTime());
 
     // Prepare for test: Simulate that the file has not been checked for a long
     // time. Set the last_check timestamp to zero.
@@ -121,13 +121,13 @@ class LocaleUpdateCronTest extends LocaleUpdateBase {
     $this->assertEquals(3, $queue->numberOfItems(), 'Queue holds tasks for one project.');
 
     // Ensure last checked is updated to a greater time than the initial value.
-    sleep(1);
+    \sleep(1);
     // Test: Execute cron and check if tasks are executed correctly.
     // Run cron to process the tasks in the queue.
     $this->cronRun();
 
-    drupal_static_reset('locale_translation_get_file_history');
-    $history = locale_translation_get_file_history();
+    \drupal_static_reset('locale_translation_get_file_history');
+    $history = \locale_translation_get_file_history();
     $initial = $initial_history['contrib_module_two']['de'];
     $current = $history['contrib_module_two']['de'];
     // Verify that the translation of contrib_module_one is imported and

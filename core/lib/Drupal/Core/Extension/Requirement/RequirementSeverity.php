@@ -79,11 +79,11 @@ enum RequirementSeverity: int {
    */
   public static function maxSeverityFromRequirements(array $requirements): RequirementSeverity {
     RequirementSeverity::convertLegacyIntSeveritiesToEnums($requirements, __METHOD__);
-    return array_reduce(
+    return \array_reduce(
       $requirements,
       function (RequirementSeverity $severity, $requirement) {
         $requirementSeverity = $requirement['severity'] ?? RequirementSeverity::OK;
-        return RequirementSeverity::from(max($severity->value, $requirementSeverity->value));
+        return RequirementSeverity::from(\max($severity->value, $requirementSeverity->value));
       },
       RequirementSeverity::OK
     );
@@ -110,7 +110,7 @@ enum RequirementSeverity: int {
       if (isset($requirement['severity'])) {
         $severity = $requirement['severity'];
         if (!$severity instanceof RequirementSeverity) {
-          @trigger_error("Calling {$deprecationMethod}() with an array of \$requirements with 'severity' with values not of type " . RequirementSeverity::class . " enums is deprecated in drupal:11.2.0 and is required in drupal:12.0.0. See https://www.drupal.org/node/3410939", \E_USER_DEPRECATED);
+          @\trigger_error("Calling {$deprecationMethod}() with an array of \$requirements with 'severity' with values not of type " . RequirementSeverity::class . " enums is deprecated in drupal:11.2.0 and is required in drupal:12.0.0. See https://www.drupal.org/node/3410939", \E_USER_DEPRECATED);
           $requirement['severity'] = RequirementSeverity::from($requirement['severity']);
         }
       }

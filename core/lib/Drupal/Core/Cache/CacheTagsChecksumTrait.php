@@ -91,7 +91,7 @@ trait CacheTagsChecksumTrait {
     // has been delayed due to an in-progress transaction must not be read by
     // any other request, so use a nonsensical checksum which will cause any
     // written cache items to be ignored.
-    if (!empty(array_intersect($tags, $this->delayedTags))) {
+    if (!empty(\array_intersect($tags, $this->delayedTags))) {
       return CacheTagsChecksumInterface::INVALID_CHECKSUM_WHILE_IN_TRANSACTION;
     }
 
@@ -120,7 +120,7 @@ trait CacheTagsChecksumTrait {
     // results to be computed instead. Together with the logic in
     // ::getCurrentChecksum(), it also prevents that computed data from being
     // written to the cache.
-    if (!empty(array_intersect($tags, $this->delayedTags))) {
+    if (!empty(\array_intersect($tags, $this->delayedTags))) {
       return FALSE;
     }
 
@@ -151,16 +151,16 @@ trait CacheTagsChecksumTrait {
     // preload cache tags in a separate variable.
     $tags_with_preload = $tags;
     if ($this->preloadTags) {
-      $tags_with_preload = array_unique(array_merge($tags, $this->preloadTags));
+      $tags_with_preload = \array_unique(\array_merge($tags, $this->preloadTags));
       $this->preloadTags = [];
     }
 
-    $query_tags = array_diff($tags_with_preload, array_keys($this->tagCache));
+    $query_tags = \array_diff($tags_with_preload, \array_keys($this->tagCache));
     if ($query_tags) {
       $tag_invalidations = $this->getTagInvalidationCounts($query_tags);
       $this->tagCache += $tag_invalidations;
       // Fill static cache with empty objects for tags not found in the storage.
-      $this->tagCache += array_fill_keys(array_diff($query_tags, array_keys($tag_invalidations)), 0);
+      $this->tagCache += \array_fill_keys(\array_diff($query_tags, \array_keys($tag_invalidations)), 0);
     }
 
     foreach ($tags as $tag) {
@@ -186,9 +186,9 @@ trait CacheTagsChecksumTrait {
       return;
     }
     // Don't preload delayed tags that are awaiting invalidation.
-    $preloadable_tags = array_diff($cache_tags, $this->delayedTags);
+    $preloadable_tags = \array_diff($cache_tags, $this->delayedTags);
     if ($preloadable_tags) {
-      $this->preloadTags = array_merge($this->preloadTags, $preloadable_tags);
+      $this->preloadTags = \array_merge($this->preloadTags, $preloadable_tags);
     }
   }
 

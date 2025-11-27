@@ -115,7 +115,7 @@ class ProviderRepository implements ProviderRepositoryInterface {
 
     $providers = Json::decode((string) $response->getBody());
 
-    if (!is_array($providers) || empty($providers)) {
+    if (!\is_array($providers) || empty($providers)) {
       if (isset($stored['data'])) {
         // Use the stale data to fall back gracefully, but as above, warn site
         // administrators that we used stale data.

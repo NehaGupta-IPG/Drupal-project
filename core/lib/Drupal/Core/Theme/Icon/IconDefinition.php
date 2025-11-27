@@ -55,18 +55,18 @@ class IconDefinition implements IconDefinitionInterface {
     array $data = [],
   ): self {
     $errors = [];
-    if (0 === strlen($pack_id)) {
+    if (0 === \strlen($pack_id)) {
       $errors[] = 'Empty pack_id provided!';
     }
-    if (0 === strlen($icon_id)) {
+    if (0 === \strlen($icon_id)) {
       $errors[] = 'Empty icon_id provided!';
     }
-    if (0 === strlen($template)) {
+    if (0 === \strlen($template)) {
       $errors[] = 'Empty template provided!';
     }
 
-    if (count($errors)) {
-      throw new IconDefinitionInvalidDataException(implode(' ', $errors));
+    if (\count($errors)) {
+      throw new IconDefinitionInvalidDataException(\implode(' ', $errors));
     }
 
     // Cleanup of data that do not need to be passed.
@@ -79,15 +79,15 @@ class IconDefinition implements IconDefinitionInterface {
    * {@inheritdoc}
    */
   public static function createIconId(string $pack_id, string $icon_id): string {
-    return sprintf('%s%s%s', $pack_id, self::ICON_SEPARATOR, $icon_id);
+    return \sprintf('%s%s%s', $pack_id, self::ICON_SEPARATOR, $icon_id);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function getIconDataFromId(string $icon_full_id): ?array {
-    $icon_data = explode(self::ICON_SEPARATOR, $icon_full_id, 2);
-    if (count($icon_data) < 2) {
+    $icon_data = \explode(self::ICON_SEPARATOR, $icon_full_id, 2);
+    if (\count($icon_data) < 2) {
       return NULL;
     }
 
@@ -128,7 +128,7 @@ class IconDefinition implements IconDefinitionInterface {
    * {@inheritdoc}
    */
   public function getId(): string {
-    return sprintf('%s%s%s', $this->pack_id, self::ICON_SEPARATOR, $this->icon_id);
+    return \sprintf('%s%s%s', $this->pack_id, self::ICON_SEPARATOR, $this->icon_id);
   }
 
   /**

@@ -98,7 +98,7 @@ class Tableselect extends Table {
         return $value;
       }
       else {
-        return is_array($input) ? array_combine($input, $input) : [];
+        return \is_array($input) ? \array_combine($input, $input) : [];
       }
     }
   }
@@ -171,7 +171,7 @@ class Tableselect extends Table {
             // A header can span over multiple cells and in this case the cells
             // are passed in an array. The order of this array determines the
             // order in which they are added.
-            if (is_array($element['#options'][$key][$fieldname]) && !isset($element['#options'][$key][$fieldname]['data'])) {
+            if (\is_array($element['#options'][$key][$fieldname]) && !isset($element['#options'][$key][$fieldname]['data'])) {
               foreach ($element['#options'][$key][$fieldname] as $cell) {
                 $row['data'][] = $cell;
               }
@@ -191,12 +191,12 @@ class Tableselect extends Table {
       if ($element['#js_select']) {
         // Add a "Select all" checkbox.
         $element['#attached']['library'][] = 'core/drupal.tableselect';
-        array_unshift($header, ['class' => ['select-all']]);
+        \array_unshift($header, ['class' => ['select-all']]);
       }
       else {
         // Add an empty header when radio buttons are displayed or a "Select
         // all" checkbox is not desired.
-        array_unshift($header, '');
+        \array_unshift($header, '');
       }
     }
 
@@ -222,7 +222,7 @@ class Tableselect extends Table {
    */
   public static function processTableselect(&$element, FormStateInterface $form_state, &$complete_form) {
     if ($element['#multiple']) {
-      $value = is_array($element['#value']) ? $element['#value'] : [];
+      $value = \is_array($element['#value']) ? $element['#value'] : [];
     }
     else {
       // Advanced selection behavior makes no sense for radios.
@@ -231,7 +231,7 @@ class Tableselect extends Table {
 
     $element['#tree'] = TRUE;
 
-    if (count($element['#options']) > 0) {
+    if (\count($element['#options']) > 0) {
       if (!isset($element['#default_value']) || $element['#default_value'] === 0) {
         $element['#default_value'] = [];
       }
@@ -245,7 +245,7 @@ class Tableselect extends Table {
           $disabled = !empty($element['#options'][$key]['#disabled']);
           if ($element['#multiple']) {
             $title = '';
-            if (isset($element['#options'][$key]['title']) && is_array($element['#options'][$key]['title'])) {
+            if (isset($element['#options'][$key]['title']) && \is_array($element['#options'][$key]['title'])) {
               if (!empty($element['#options'][$key]['title']['data']['#title'])) {
                 $title = new TranslatableMarkup('Update @title', [
                   '@title' => $element['#options'][$key]['title']['data']['#title'],
@@ -266,7 +266,7 @@ class Tableselect extends Table {
           else {
             // Generate the parents as the autogenerator does, so we will have a
             // unique id for each radio button.
-            $parents_for_id = array_merge($element['#parents'], [$key]);
+            $parents_for_id = \array_merge($element['#parents'], [$key]);
             $element[$key] = [
               '#type' => 'radio',
               '#title' => '',
@@ -274,7 +274,7 @@ class Tableselect extends Table {
               '#default_value' => ($element['#default_value'] == $key) ? $key : NULL,
               '#attributes' => $element['#attributes'],
               '#parents' => $element['#parents'],
-              '#id' => HtmlUtility::getUniqueId('edit-' . implode('-', $parents_for_id)),
+              '#id' => HtmlUtility::getUniqueId('edit-' . \implode('-', $parents_for_id)),
               '#disabled' => $disabled,
               '#ajax' => $element['#ajax'] ?? NULL,
             ];

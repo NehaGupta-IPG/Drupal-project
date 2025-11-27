@@ -94,16 +94,16 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     // reflection. We can determine the vendor directory based on that filename.
     $autoloader = require $this->appRoot . '/autoload.php';
     $reflector = new \ReflectionClass($autoloader);
-    $vendor_dir = dirname($reflector->getFileName(), 2);
+    $vendor_dir = \dirname($reflector->getFileName(), 2);
 
     // The file in Composer's bin dir is a *nix link, which does not work when
     // extracted from a tarball and generally not on Windows.
     $command = $vendor_dir . '/phpunit/phpunit/phpunit';
-    if (str_starts_with(PHP_OS, 'WIN')) {
+    if (\str_starts_with(PHP_OS, 'WIN')) {
       // On Windows it is necessary to run the script using the PHP executable.
       $php_executable_finder = new PhpExecutableFinder();
       $php = $php_executable_finder->find();
-      $command = $php . ' -f ' . escapeshellarg($command) . ' --';
+      $command = $php . ' -f ' . \escapeshellarg($command) . ' --';
     }
     return $command;
   }
@@ -191,10 +191,10 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     $process = new Process($command, \Drupal::root() . "/core", $process_environment_variables);
     $process->setTimeout(NULL);
     $process->run();
-    $output = explode("\n", $process->getOutput());
+    $output = \explode("\n", $process->getOutput());
     $errorOutput = $process->getErrorOutput();
     if (!empty($errorOutput)) {
-      $error = explode("\n", $process->getErrorOutput());
+      $error = \explode("\n", $process->getErrorOutput());
     }
     $status = $process->getExitCode();
   }
@@ -230,7 +230,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     $error = [];
     $this->runCommand($test_class_name, $log_junit_file_path, $status, $output, $error, $colors);
 
-    if (file_exists($log_junit_file_path)) {
+    if (\file_exists($log_junit_file_path)) {
       $results = JUnitConverter::xmlToRows($test_run->id(), $log_junit_file_path);
     }
     else {
@@ -240,10 +240,10 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     // If not passed, add full PHPUnit run output since individual test cases
     // messages may not give full clarity (deprecations, warnings, etc.).
     if ($status > TestStatus::PASS) {
-      $message = implode("\n", $output);
+      $message = \implode("\n", $output);
       if (!empty($error)) {
         $message .= "\nERROR:\n";
-        $message .= implode("\n", $error);
+        $message .= \implode("\n", $error);
       }
       $results[] = [
         'test_id' => $test_run->id(),
@@ -330,7 +330,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
 
         case 'cli_fail':
           $summaries[$result['test_class']]['#cli_fail']++;
-          $summaries[$result['test_class']]['#exit_code'] = max($summaries[$result['test_class']]['#exit_code'], $result['exit_code']);
+          $summaries[$result['test_class']]['#exit_code'] = \max($summaries[$result['test_class']]['#exit_code'], $result['exit_code']);
           break;
 
         case 'exception':

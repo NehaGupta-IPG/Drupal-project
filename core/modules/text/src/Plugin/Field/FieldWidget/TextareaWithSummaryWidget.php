@@ -103,8 +103,8 @@ class TextareaWithSummaryWidget extends TextareaWidget {
     if ($element === FALSE) {
       return FALSE;
     }
-    $property_path_array = explode('.', $violation->getPropertyPath());
-    return count($property_path_array) > 1 ? $element[$property_path_array[1]] : $element;
+    $property_path_array = \explode('.', $violation->getPropertyPath());
+    return \count($property_path_array) > 1 ? $element[$property_path_array[1]] : $element;
   }
 
 }

@@ -33,7 +33,7 @@ class FileTransferAuthorizeForm extends FormBase {
    *   The app root.
    */
   public function __construct($root) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
     $this->root = $root;
   }
@@ -74,7 +74,7 @@ class FileTransferAuthorizeForm extends FormBase {
     // Decide on a default backend.
     $authorize_filetransfer_default = $form_state->getValue(['connection_settings', 'authorize_filetransfer_default']);
     if (!$authorize_filetransfer_default) {
-      $authorize_filetransfer_default = key($available_backends);
+      $authorize_filetransfer_default = \key($available_backends);
     }
 
     $form['information']['main_header'] = [
@@ -248,7 +248,7 @@ class FileTransferAuthorizeForm extends FormBase {
     $filetransfer = FALSE;
     $info = $this->getRequest()->getSession()->get('authorize_filetransfer_info', []);
     if (!empty($info[$backend])) {
-      if (class_exists($info[$backend]['class'])) {
+      if (\class_exists($info[$backend]['class'])) {
         $filetransfer = $info[$backend]['class']::factory($this->root, $settings);
       }
     }
@@ -309,7 +309,7 @@ class FileTransferAuthorizeForm extends FormBase {
     // processing, pass in that subarray to the recursive call. Otherwise, just
     // pass on the whole $defaults array.
     foreach (Element::children($element) as $child_key) {
-      $this->setConnectionSettingsDefaults($element[$child_key], $child_key, ((isset($key, $defaults[$key]) && is_array($defaults[$key])) ? $defaults[$key] : $defaults));
+      $this->setConnectionSettingsDefaults($element[$child_key], $child_key, ((isset($key, $defaults[$key]) && \is_array($defaults[$key])) ? $defaults[$key] : $defaults));
     }
   }
 
@@ -328,7 +328,7 @@ class FileTransferAuthorizeForm extends FormBase {
     $operation = $this->getRequest()->getSession()->remove('authorize_operation');
 
     require_once $operation['file'];
-    return call_user_func_array($operation['callback'], array_merge([$filetransfer], $operation['arguments']));
+    return \call_user_func_array($operation['callback'], \array_merge([$filetransfer], $operation['arguments']));
   }
 
 }

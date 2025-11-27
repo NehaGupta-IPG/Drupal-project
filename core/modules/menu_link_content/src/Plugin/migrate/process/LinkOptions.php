@@ -34,8 +34,8 @@ class LinkOptions extends ProcessPluginBase {
     if (isset($value['query'])) {
       // If the query parameters are stored as a string (as in D6), convert it
       // into an array.
-      if (is_string($value['query'])) {
-        parse_str($value['query'], $old_query);
+      if (\is_string($value['query'])) {
+        \parse_str($value['query'], $old_query);
       }
       else {
         $old_query = $value['query'];

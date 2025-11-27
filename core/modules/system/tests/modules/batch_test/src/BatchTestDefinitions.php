@@ -77,11 +77,11 @@ class BatchTestDefinitions {
 
     $batch_builder = (new BatchBuilder())
       ->setFinishCallback([$batch_test_callbacks, 'finished3']);
-    for ($i = 1; $i <= round($total / 2); $i++) {
+    for ($i = 1; $i <= \round($total / 2); $i++) {
       $batch_builder->addOperation([$batch_test_callbacks, 'callback1'], [$i, $sleep]);
     }
     $batch_builder->addOperation([$batch_test_callbacks, 'callback2'], [1, $total / 2, $sleep]);
-    for ($i = round($total / 2) + 1; $i <= $total; $i++) {
+    for ($i = \round($total / 2) + 1; $i <= $total; $i++) {
       $batch_builder->addOperation([$batch_test_callbacks, 'callback1'], [$i, $sleep]);
     }
     $batch_builder->addOperation([$batch_test_callbacks, 'callback2'], [6, $total / 2, $sleep]);
@@ -105,11 +105,11 @@ class BatchTestDefinitions {
 
     $batch_builder = (new BatchBuilder())
       ->setFinishCallback([$batch_test_callbacks, 'finished4']);
-    for ($i = 1; $i <= round($total / 2); $i++) {
+    for ($i = 1; $i <= \round($total / 2); $i++) {
       $batch_builder->addOperation([$batch_test_callbacks, 'callback1'], [$i, $sleep]);
     }
     $batch_builder->addOperation([$batch_test_callbacks, 'nestedBatchCallback'], [[2]]);
-    for ($i = round($total / 2) + 1; $i <= $total; $i++) {
+    for ($i = \round($total / 2) + 1; $i <= $total; $i++) {
       $batch_builder->addOperation([$batch_test_callbacks, 'callback1'], [$i, $sleep]);
     }
 

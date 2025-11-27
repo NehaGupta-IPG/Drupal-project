@@ -37,7 +37,7 @@ class ModuleRouteSubscriber extends RouteSubscriberBase {
         $modules = $route->getRequirement('_module_dependencies');
 
         $explode_and = $this->explodeString($modules, '+');
-        if (count($explode_and) > 1) {
+        if (\count($explode_and) > 1) {
           foreach ($explode_and as $module) {
             // If any moduleExists() call returns FALSE, remove the route and
             // move on to the next.
@@ -73,7 +73,7 @@ class ModuleRouteSubscriber extends RouteSubscriberBase {
    *   An array of exploded (and trimmed) values.
    */
   protected function explodeString($string, $separator = ',') {
-    return array_filter(array_map('trim', explode($separator, $string)));
+    return \array_filter(\array_map('trim', \explode($separator, $string)));
   }
 
 }

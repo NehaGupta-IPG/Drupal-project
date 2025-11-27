@@ -34,30 +34,30 @@ class SearchExcerptTest extends KernelTestBase {
     $text = 'The <strong>quick</strong> <a href="#">brown</a> fox &amp; jumps <h2>over</h2> the lazy dog';
     $expected = 'The quick brown fox &amp; jumps over the lazy dog';
     $result = $this->doSearchExcerpt('nothing', $text);
-    $this->assertEquals($expected, preg_replace('| +|', ' ', $result), 'Entire string, stripped of HTML tags, is returned when keyword is not found in short string');
+    $this->assertEquals($expected, \preg_replace('| +|', ' ', $result), 'Entire string, stripped of HTML tags, is returned when keyword is not found in short string');
 
     $result = $this->doSearchExcerpt('fox', $text);
     $this->assertEquals('The quick brown <strong>fox</strong> &amp; jumps over the lazy dog', $result, 'Found keyword is highlighted');
 
     $expected = '<strong>The</strong> quick brown fox &amp; jumps over <strong>the</strong> lazy dog';
     $result = $this->doSearchExcerpt('The', $text);
-    $this->assertEquals($expected, preg_replace('| +|', ' ', $result), 'Keyword is highlighted at beginning of short string');
+    $this->assertEquals($expected, \preg_replace('| +|', ' ', $result), 'Keyword is highlighted at beginning of short string');
 
     $expected = 'The quick brown fox &amp; jumps over the lazy <strong>dog</strong>';
     $result = $this->doSearchExcerpt('dog', $text);
-    $this->assertEquals($expected, preg_replace('| +|', ' ', $result), 'Keyword is highlighted at end of short string');
+    $this->assertEquals($expected, \preg_replace('| +|', ' ', $result), 'Keyword is highlighted at end of short string');
 
-    $longtext = str_repeat(str_replace('brown', 'silver', $text) . ' ', 10) . $text . str_repeat(' ' . str_replace('brown', 'pink', $text), 10);
+    $longtext = \str_repeat(\str_replace('brown', 'silver', $text) . ' ', 10) . $text . \str_repeat(' ' . \str_replace('brown', 'pink', $text), 10);
     $result = $this->doSearchExcerpt('brown', $longtext);
     $expected = '… silver fox &amp; jumps over the lazy dog The quick <strong>brown</strong> fox &amp; jumps over the lazy dog The quick …';
     $this->assertEquals($expected, $result, 'Snippet around keyword in long text is correctly capped');
 
-    $longtext = str_repeat($text . ' ', 10);
+    $longtext = \str_repeat($text . ' ', 10);
     $result = $this->doSearchExcerpt('nothing', $longtext);
     $expected = 'The quick brown fox &amp; jumps over the lazy dog';
     $this->assertStringStartsWith($expected, $result, 'When keyword is not found in long string, return value starts as expected');
 
-    $entities = str_repeat('k&eacute;sz&iacute;t&eacute;se ', 20);
+    $entities = \str_repeat('k&eacute;sz&iacute;t&eacute;se ', 20);
     $result = $this->doSearchExcerpt('nothing', $entities);
     $this->assertStringNotContainsString('&', $result, 'Entities are not present in excerpt');
     $this->assertStringContainsString('í', $result, 'Entities are converted in excerpt');
@@ -159,20 +159,20 @@ class SearchExcerptTest extends KernelTestBase {
 
     // Test with accents and caps in a longer piece of text with the target
     // near the end.
-    $text = str_repeat($lorem2, 20) . ' ' . $lorem1;
+    $text = \str_repeat($lorem2, 20) . ' ' . $lorem1;
     // cspell:ignore Lìbêró
     $result = $this->doSearchExcerpt('Lìbêró', $text);
     $this->assertStringContainsString('<strong>libero</strong>', $result, 'Search excerpt works with caps and accents in longer text');
 
     // Test with an acronym provided by the hook, with the target text in the
     // middle of a long string.
-    $text = str_repeat($lorem2, 10) . ' DIC ' . str_repeat($lorem2, 10);
+    $text = \str_repeat($lorem2, 10) . ' DIC ' . \str_repeat($lorem2, 10);
     $result = $this->doSearchExcerpt('Dependency', $text, 'ex');
     $this->assertStringContainsString('<strong>DIC</strong>', $result, 'Search excerpt works with acronym in longer text');
 
     // Test a long string with a lot of whitespace in it.
-    $lorem3 = str_replace(' ', str_repeat(" \n", 20), $lorem2);
-    $text = str_repeat($lorem3, 20) . ' ' . $lorem1;
+    $lorem3 = \str_replace(' ', \str_repeat(" \n", 20), $lorem2);
+    $text = \str_repeat($lorem3, 20) . ' ' . $lorem1;
     $result = $this->doSearchExcerpt('Lìbêró', $text);
     $this->assertStringContainsString('<strong>libero</strong>', $result, 'Search excerpt works with caps and accents in longer text with whitespace');
   }
@@ -191,11 +191,11 @@ class SearchExcerptTest extends KernelTestBase {
    *   A string containing HTML for the excerpt.
    */
   protected function doSearchExcerpt($keys, $render_array, $langcode = NULL) {
-    $render_array = search_excerpt($keys, $render_array, $langcode);
+    $render_array = \search_excerpt($keys, $render_array, $langcode);
     $text = (string) \Drupal::service('renderer')->renderInIsolation($render_array);
     // The search_excerpt() function adds some extra spaces -- not
     // important for HTML formatting or this test. Remove these for comparison.
-    return preg_replace('| +|', ' ', $text);
+    return \preg_replace('| +|', ' ', $text);
   }
 
 }

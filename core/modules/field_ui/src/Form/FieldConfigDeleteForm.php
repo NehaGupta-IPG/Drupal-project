@@ -64,7 +64,7 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
 
     // If there is only one bundle left for this field storage, it will be
     // deleted too, notify the user about dependencies.
-    if (count($field_storage->getBundles()) <= 1) {
+    if (\count($field_storage->getBundles()) <= 1) {
       $config_names[] = $field_storage->getConfigDependencyName();
     }
     return $config_names;
@@ -91,7 +91,7 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
     }
     else {
       $target_entity_bundle_entity_type_definition = $this->entityTypeManager->getDefinition($target_entity_bundle_entity_type_id);
-      $source_label = strtolower($target_entity_bundle_entity_type_definition->getLabel());
+      $source_label = \strtolower($target_entity_bundle_entity_type_definition->getLabel());
     }
     $bundles = $this->entityTypeBundleInfo->getBundleInfo($target_entity_type_id);
     $bundle_label = $bundles[$target_bundle]['label'];
@@ -120,7 +120,7 @@ class FieldConfigDeleteForm extends EntityDeleteForm {
     // single call to field_purge_batch() will remove it from the system. Call
     // this with a low batch limit to avoid administrators having to wait for
     // cron runs when removing fields that meet this criteria.
-    field_purge_batch(10);
+    \field_purge_batch(10);
   }
 
 }

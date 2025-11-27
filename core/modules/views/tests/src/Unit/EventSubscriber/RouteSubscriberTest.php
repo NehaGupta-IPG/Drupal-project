@@ -141,7 +141,7 @@ class RouteSubscriberTest extends UnitTestCase {
       ->with('views.view_route_names', ['test_id.page_1' => 'test_route', 'test_id.page_2' => 'views.test_id.page_2']);
 
     $collection = $route_event->getRouteCollection();
-    $this->assertEquals(['test_route', 'test_route_2', 'views.test_id.page_2'], array_keys($collection->all()));
+    $this->assertEquals(['test_route', 'test_route_2', 'views.test_id.page_2'], \array_keys($collection->all()));
 
     $this->routeSubscriber->routeRebuildFinished();
   }

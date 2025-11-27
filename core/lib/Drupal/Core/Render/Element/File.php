@@ -86,7 +86,7 @@ class File extends FormElementBase {
       return NULL;
     }
     $parents = $element['#parents'];
-    $element_name = array_shift($parents);
+    $element_name = \array_shift($parents);
     $uploaded_files = \Drupal::request()->files->get('files', []);
     $uploaded_file = $uploaded_files[$element_name] ?? NULL;
     if ($uploaded_file) {

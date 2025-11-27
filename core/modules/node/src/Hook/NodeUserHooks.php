@@ -51,7 +51,7 @@ class NodeUserHooks {
         ->allRevisions()
         ->accessCheck(FALSE)
         ->condition('uid', $account->id());
-      $vids = array_keys($query->execute());
+      $vids = \array_keys($query->execute());
       $this->nodeBulkUpdate->process($vids, ['uid' => 0, 'revision_uid' => 0], NULL, TRUE, TRUE);
     }
   }

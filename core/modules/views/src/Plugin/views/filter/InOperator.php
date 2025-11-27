@@ -71,12 +71,12 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
       return $this->valueOptions;
     }
 
-    if (isset($this->definition['options callback']) && is_callable($this->definition['options callback'])) {
-      if (isset($this->definition['options arguments']) && is_array($this->definition['options arguments'])) {
-        $this->valueOptions = call_user_func_array($this->definition['options callback'], $this->definition['options arguments']);
+    if (isset($this->definition['options callback']) && \is_callable($this->definition['options callback'])) {
+      if (isset($this->definition['options arguments']) && \is_array($this->definition['options arguments'])) {
+        $this->valueOptions = \call_user_func_array($this->definition['options callback'], $this->definition['options arguments']);
       }
       else {
-        $this->valueOptions = call_user_func($this->definition['options callback']);
+        $this->valueOptions = \call_user_func($this->definition['options callback']);
       }
     }
     else {
@@ -214,7 +214,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
       if (empty($this->options['expose']['use_operator']) || empty($this->options['expose']['operator_id'])) {
         // Exposed and locked.
-        $which = in_array($this->operator, $this->operatorValues(1)) ? 'value' : 'none';
+        $which = \in_array($this->operator, $this->operatorValues(1)) ? 'value' : 'none';
       }
       else {
         $source = ':input[name="' . $this->options['expose']['operator_id'] . '"]';
@@ -233,12 +233,12 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
           $default_value = 'All';
         }
         elseif (empty($default_value)) {
-          $keys = array_keys($options);
-          $default_value = array_shift($keys);
+          $keys = \array_keys($options);
+          $default_value = \array_shift($keys);
         }
         else {
           $copy = $default_value;
-          $default_value = array_shift($copy);
+          $default_value = \array_shift($copy);
         }
       }
     }
@@ -253,7 +253,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
         '#multiple' => TRUE,
         // The value options can be a multidimensional array if the value form
         // type is a select list, so make sure that they are counted correctly.
-        '#size' => min(count($options, COUNT_RECURSIVE), 8),
+        '#size' => \min(\count($options, COUNT_RECURSIVE), 8),
       ];
       $user_input = $form_state->getUserInput();
       if ($exposed && !isset($user_input[$identifier])) {
@@ -262,7 +262,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
       }
 
       if ($which == 'all') {
-        if (!$exposed && (in_array($this->valueFormType, ['checkbox', 'checkboxes', 'radios', 'select']))) {
+        if (!$exposed && (\in_array($this->valueFormType, ['checkbox', 'checkboxes', 'radios', 'select']))) {
           $form['value']['#prefix'] = '<div id="edit-options-value-wrapper">';
           $form['value']['#suffix'] = '</div>';
         }
@@ -292,13 +292,13 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     // have to step through and handle each one individually.
     $options = [];
     foreach ($input as $id => $option) {
-      if (is_array($option)) {
+      if (\is_array($option)) {
         $options[$id] = $this->reduceValueOptions($option);
         continue;
       }
-      elseif (is_object($option) && !$option instanceof MarkupInterface) {
-        $keys = array_keys($option->option);
-        $key = array_shift($keys);
+      elseif (\is_object($option) && !$option instanceof MarkupInterface) {
+        $keys = \array_keys($option->option);
+        $key = \array_shift($keys);
         if (isset($this->options['value'][$key])) {
           $options[$id] = $option;
         }
@@ -363,13 +363,13 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
     // Some filter_in_operator usage uses optgroups forms, so flatten it.
     $flat_options = OptGroup::flattenOptions($this->valueOptions);
 
-    if (!is_array($this->value)) {
+    if (!\is_array($this->value)) {
       return;
     }
 
     $operator = $info[$this->operator]['short'];
     $values = '';
-    if (in_array($this->operator, $this->operatorValues(1))) {
+    if (\in_array($this->operator, $this->operatorValues(1))) {
       // Remove every element which is not known.
       foreach ($this->value as $value) {
         if (!isset($flat_options[$value])) {
@@ -377,17 +377,17 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
         }
       }
       // Choose different kind of output for 0, a single and multiple values.
-      if (count($this->value) == 0) {
+      if (\count($this->value) == 0) {
         $values = $this->t('Unknown');
       }
-      elseif (count($this->value) == 1) {
+      elseif (\count($this->value) == 1) {
         // If any, use the 'single' short name of the operator instead.
         if (isset($info[$this->operator]['short_single'])) {
           $operator = $info[$this->operator]['short_single'];
         }
 
         $keys = $this->value;
-        $value = array_shift($keys);
+        $value = \array_shift($keys);
         if (isset($flat_options[$value])) {
           $values = $flat_options[$value];
         }
@@ -400,7 +400,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
           if ($values !== '') {
             $values .= ', ';
           }
-          if (mb_strlen($values) > 8) {
+          if (\mb_strlen($values) > 8) {
             $values = Unicode::truncate($values, 8, FALSE, TRUE);
             break;
           }
@@ -435,7 +435,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
     // We use array_values() because the checkboxes keep keys and that can cause
     // array addition problems.
-    $this->query->addWhere($this->options['group'], "$this->tableAlias.$this->realField", array_values($this->value), $this->operator);
+    $this->query->addWhere($this->options['group'], "$this->tableAlias.$this->realField", \array_values($this->value), $this->operator);
   }
 
   /**
@@ -462,14 +462,14 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
 
     // If the operator is an operator which doesn't require a value, there is
     // no need for additional validation.
-    if (in_array($this->operator, $this->operatorValues(0))) {
+    if (\in_array($this->operator, $this->operatorValues(0))) {
       return [];
     }
 
-    if (!in_array($this->operator, $this->operatorValues(1))) {
+    if (!\in_array($this->operator, $this->operatorValues(1))) {
       $errors[] = $this->t('The operator is invalid on filter: @filter.', ['@filter' => $this->adminLabel(TRUE)]);
     }
-    if (is_array($this->value)) {
+    if (\is_array($this->value)) {
       if (!isset($this->valueOptions)) {
         // Don't validate if there are none value options provided, for example
         // for special handlers.
@@ -491,13 +491,13 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
         }
       }
       // Choose different kind of output for 0, a single and multiple values.
-      if (count($this->value) == 0) {
+      if (\count($this->value) == 0) {
         $errors[] = $this->t('No valid values found on filter: @filter.', ['@filter' => $this->adminLabel(TRUE)]);
       }
     }
     elseif (!empty($this->value) && ($this->operator == 'in' || $this->operator == 'not in')) {
       $errors[] = $this->t('The value @value is not an array for @operator on filter: @filter', [
-        '@value' => var_export($this->value, TRUE),
+        '@value' => \var_export($this->value, TRUE),
         '@operator' => $this->operator,
         '@filter' => $this->adminLabel(TRUE),
       ]);

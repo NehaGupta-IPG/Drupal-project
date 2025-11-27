@@ -43,7 +43,7 @@ class ArchiverManager extends DefaultPluginManager {
    *   The file handler.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, FileSystemInterface $file_system) {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3556927', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3556927', E_USER_DEPRECATED);
     parent::__construct('Plugin/Archiver', $namespaces, $module_handler, ArchiverInterface::class, Archiver::class, 'Drupal\Core\Archiver\Annotation\Archiver');
     $this->alterInfo('archiver_info');
     $this->setCacheBackend($cache_backend, 'archiver_info_plugins');
@@ -71,7 +71,7 @@ class ArchiverManager extends DefaultPluginManager {
         // This method isn't quite as clean but gets the job done.
         // Also note that the file may not yet exist, so we cannot rely
         // on fileinfo() or other disk-level utilities.
-        if (strrpos($filepath, '.' . $extension) === strlen($filepath) - strlen('.' . $extension)) {
+        if (\strrpos($filepath, '.' . $extension) === \strlen($filepath) - \strlen('.' . $extension)) {
           return $this->createInstance($plugin_id, $options);
         }
       }
@@ -89,14 +89,14 @@ class ArchiverManager extends DefaultPluginManager {
     $valid_extensions = [];
     foreach ($this->getDefinitions() as $archive) {
       foreach ($archive['extensions'] as $extension) {
-        foreach (explode('.', $extension) as $part) {
-          if (!in_array($part, $valid_extensions)) {
+        foreach (\explode('.', $extension) as $part) {
+          if (!\in_array($part, $valid_extensions)) {
             $valid_extensions[] = $part;
           }
         }
       }
     }
-    return implode(' ', $valid_extensions);
+    return \implode(' ', $valid_extensions);
   }
 
 }

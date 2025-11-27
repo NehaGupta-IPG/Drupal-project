@@ -31,7 +31,7 @@ class UserAccessTestHooks {
       return AccessResult::forbidden();
     }
     // Account with role sub-admin can manage users with no roles.
-    if (count($entity->getRoles()) == 1) {
+    if (\count($entity->getRoles()) == 1) {
       return AccessResult::allowedIfHasPermission($account, 'sub-admin');
     }
     return AccessResult::neutral();
@@ -57,8 +57,8 @@ class UserAccessTestHooks {
     // Account with role sub-admin can view the status, init and mail fields for
     // user with no roles.
     if ($field_definition->getTargetEntityTypeId() == 'user' && $operation === 'view'
-      && in_array($field_definition->getName(), ['status', 'init', 'mail'])) {
-      if ($items == NULL || count($items->getEntity()->getRoles()) == 1) {
+      && \in_array($field_definition->getName(), ['status', 'init', 'mail'])) {
+      if ($items == NULL || \count($items->getEntity()->getRoles()) == 1) {
         return AccessResult::allowedIfHasPermission($account, 'sub-admin');
       }
     }

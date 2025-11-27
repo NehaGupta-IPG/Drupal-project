@@ -26,7 +26,7 @@ class FilterAlign extends FilterBase {
   public function process($text, $langcode) {
     $result = new FilterProcessResult($text);
 
-    if (stristr($text, 'data-align') !== FALSE) {
+    if (\stristr($text, 'data-align') !== FALSE) {
       $dom = Html::load($text);
       $xpath = new \DOMXPath($dom);
       foreach ($xpath->query('//*[@data-align]') as $node) {
@@ -35,11 +35,11 @@ class FilterAlign extends FilterBase {
         $node->removeAttribute('data-align');
 
         // If one of the allowed alignments, add the corresponding class.
-        if (in_array($align, ['left', 'center', 'right'])) {
+        if (\in_array($align, ['left', 'center', 'right'])) {
           $classes = $node->getAttribute('class');
-          $classes = (strlen($classes) > 0) ? explode(' ', $classes) : [];
+          $classes = (\strlen($classes) > 0) ? \explode(' ', $classes) : [];
           $classes[] = 'align-' . $align;
-          $node->setAttribute('class', implode(' ', $classes));
+          $node->setAttribute('class', \implode(' ', $classes));
         }
       }
       $result->setProcessedText(Html::serialize($dom));

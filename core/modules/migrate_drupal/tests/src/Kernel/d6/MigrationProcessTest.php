@@ -21,7 +21,7 @@ class MigrationProcessTest extends MigrateDrupal6TestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    self::$modules = array_keys($this->coreModuleListDataProvider());
+    self::$modules = \array_keys($this->coreModuleListDataProvider());
     parent::setUp();
   }
 
@@ -39,7 +39,7 @@ class MigrationProcessTest extends MigrateDrupal6TestBase {
         $process = $migration->getProcess();
       }
       catch (\Exception $e) {
-        $this->fail(sprintf("Migration %s process failed with error: %s", $migration->label(), $e->getMessage()));
+        $this->fail(\sprintf("Migration %s process failed with error: %s", $migration->label(), $e->getMessage()));
       }
       $this->assertNotNull($process);
     }

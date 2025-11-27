@@ -138,7 +138,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
 
     $ordinal = $query->execute()->fetchField();
 
-    return ($divisor > 1) ? floor($ordinal / $divisor) : $ordinal;
+    return ($divisor > 1) ? \floor($ordinal / $divisor) : $ordinal;
   }
 
   /**
@@ -183,7 +183,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
         ->fetchField();
 
       // Remove the final '/'.
-      $first_thread = substr($first_thread, 0, -1);
+      $first_thread = \substr($first_thread, 0, -1);
 
       // Find the number of the first comment of the first unread thread.
       $count = $this->database->query('SELECT COUNT(*) FROM {' . $data_table . '} WHERE [entity_id] = :entity_id
@@ -210,7 +210,7 @@ class CommentStorage extends SqlContentEntityStorage implements CommentStorageIn
   public function getChildCids(array $comments) {
     return $this->database->select($this->getDataTable(), 'c')
       ->fields('c', ['cid'])
-      ->condition('pid', array_keys($comments), 'IN')
+      ->condition('pid', \array_keys($comments), 'IN')
       ->condition('default_langcode', 1)
       ->execute()
       ->fetchCol();

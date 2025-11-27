@@ -34,7 +34,7 @@ class JsonapiRequirements {
       'config_translation',
       'language',
     ];
-    $should_warn = array_reduce($potential_conflicts, function ($should_warn, $module_name) {
+    $should_warn = \array_reduce($potential_conflicts, function ($should_warn, $module_name) {
       return $should_warn ?: $this->moduleHandler->moduleExists($module_name);
     }, FALSE);
     if ($should_warn) {

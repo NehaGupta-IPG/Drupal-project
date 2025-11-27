@@ -76,7 +76,7 @@ REGEXP
   public function testExceptionForInvalidYaml(): void {
     $failure_marker = $this->container->get(FailureMarker::class);
     // Write the failure marker with invalid YAML.
-    file_put_contents($failure_marker->getPath(), 'message : something message : something1');
+    \file_put_contents($failure_marker->getPath(), 'message : something message : something1');
 
     $this->expectException(FailureMarkerExistsException::class);
     $this->expectExceptionMessage('Failure marker file exists but cannot be decoded.');

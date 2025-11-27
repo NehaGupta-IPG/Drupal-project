@@ -47,7 +47,7 @@ class TemporaryStream extends LocalStream {
    * {@inheritdoc}
    */
   public function getExternalUrl() {
-    $path = str_replace('\\', '/', $this->getTarget());
+    $path = \str_replace('\\', '/', $this->getTarget());
     return Url::fromRoute('system.temporary', [], ['absolute' => TRUE, 'query' => ['file' => $path]])->toString();
   }
 

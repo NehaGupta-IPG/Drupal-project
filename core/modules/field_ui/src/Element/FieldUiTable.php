@@ -21,7 +21,7 @@ class FieldUiTable extends Table {
     $info['#regions'] = ['' => []];
     $info['#theme'] = 'field_ui_table';
     // Prepend FieldUiTable's prerender callbacks.
-    array_unshift($info['#pre_render'], [$this, 'tablePreRender'], [$this, 'preRenderRegionRows']);
+    \array_unshift($info['#pre_render'], [$this, 'tablePreRender'], [$this, 'preRenderRegionRows']);
     return $info;
   }
 
@@ -51,11 +51,11 @@ class FieldUiTable extends Table {
     // indentation.
     $regions = $elements['#regions'];
     $tree = ['' => ['name' => '', 'children' => []]];
-    $trees = array_fill_keys(array_keys($regions), $tree);
+    $trees = \array_fill_keys(\array_keys($regions), $tree);
 
     $parents = [];
     $children = Element::children($elements);
-    $list = array_combine($children, $children);
+    $list = \array_combine($children, $children);
 
     // Iterate on rows until we can build a known tree path for all of them.
     while ($list) {
@@ -65,11 +65,11 @@ class FieldUiTable extends Table {
         // Proceed if parent is known.
         if (empty($parent) || isset($parents[$parent])) {
           // Grab parent, and remove the row from the next iteration.
-          $parents[$name] = $parent ? array_merge($parents[$parent], [$parent]) : [];
+          $parents[$name] = $parent ? \array_merge($parents[$parent], [$parent]) : [];
           unset($list[$name]);
 
           // Determine the region for the row.
-          $region_name = call_user_func_array($row['#region_callback'], [&$row]);
+          $region_name = \call_user_func_array($row['#region_callback'], [&$row]);
 
           // Add the element in the tree.
           // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
@@ -80,9 +80,9 @@ class FieldUiTable extends Table {
           $target['children'][$name] = ['name' => $name, 'weight' => $row['weight']['#value']];
 
           // Add tabledrag indentation to the first row cell.
-          if ($depth = count($parents[$name])) {
+          if ($depth = \count($parents[$name])) {
             $children = Element::children($row);
-            $cell = current($children);
+            $cell = \current($children);
             $indentation = [
               '#theme' => 'indentation',
               '#size' => $depth,
@@ -108,7 +108,7 @@ class FieldUiTable extends Table {
 
     // Determine rendering order from the tree structure.
     foreach ($regions as $region_name => $region) {
-      $elements['#regions'][$region_name]['rows_order'] = array_reduce($trees[$region_name], [static::class, 'reduceOrder']);
+      $elements['#regions'][$region_name]['rows_order'] = \array_reduce($trees[$region_name], [static::class, 'reduceOrder']);
     }
 
     $elements['#attached']['drupalSettings']['fieldUIRowsData'] = $js_settings;
@@ -119,7 +119,7 @@ class FieldUiTable extends Table {
     if (!empty($elements['#tabledrag']) && isset($elements['#attributes']['id'])) {
       foreach ($elements['#tabledrag'] as $options) {
         $options['table_id'] = $elements['#attributes']['id'];
-        drupal_attach_tabledrag($elements, $options);
+        \drupal_attach_tabledrag($elements, $options);
       }
     }
 
@@ -144,7 +144,7 @@ class FieldUiTable extends Table {
     // columns in the headers.
     $columns_count = 0;
     foreach ($elements['#header'] as $header) {
-      $columns_count += (is_array($header) && isset($header['colspan']) ? $header['colspan'] : 1);
+      $columns_count += (\is_array($header) && isset($header['colspan']) ? $header['colspan'] : 1);
     }
 
     $rows = [];
@@ -232,8 +232,8 @@ class FieldUiTable extends Table {
       $array[] = $a['name'];
     }
     if (!empty($a['children'])) {
-      uasort($a['children'], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
-      $array = array_merge($array, array_reduce($a['children'], [static::class, 'reduceOrder']));
+      \uasort($a['children'], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+      $array = \array_merge($array, \array_reduce($a['children'], [static::class, 'reduceOrder']));
     }
 
     return $array;

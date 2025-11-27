@@ -108,7 +108,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     $display_options = $display->getComponent('field_test');
     $format = $display_options['type'];
     $default_settings = \Drupal::service('plugin.manager.field.formatter')->getDefaultSettings($format);
-    $setting_name = key($default_settings);
+    $setting_name = \key($default_settings);
     $setting_value = $display_options['settings'][$setting_name];
 
     // Display the "Manage display" screen and check that the expected formatter
@@ -303,7 +303,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     $display_options = $display->getComponent('field_test');
     $widget_type = $display_options['type'];
     $default_settings = \Drupal::service('plugin.manager.field.widget')->getDefaultSettings($widget_type);
-    $setting_name = key($default_settings);
+    $setting_name = \key($default_settings);
     $setting_value = $display_options['settings'][$setting_name];
 
     // Display the "Manage form display" screen and check if the expected
@@ -335,7 +335,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     $this->drupalGet($manage_display);
     $widget_type = 'test_field_widget_multiple';
     $default_settings = \Drupal::service('plugin.manager.field.widget')->getDefaultSettings($widget_type);
-    $setting_name = key($default_settings);
+    $setting_name = \key($default_settings);
     $setting_value = $default_settings[$setting_name];
     $this->assertEquals($widget_type, $field_test_type->getValue(), 'The expected widget is selected.');
     $assert_session->responseContains("$setting_name: $setting_value");
@@ -466,7 +466,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     }
 
     // Validate the default value if passed.
-    if (!is_null($selected)) {
+    if (!\is_null($selected)) {
       $this->assertEquals($selected, $field->getValue());
     }
   }

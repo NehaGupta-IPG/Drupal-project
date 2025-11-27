@@ -35,9 +35,9 @@ class DependencySerializationTest extends UnitTestCase {
     $dependencySerialization = new DependencySerializationTestDummy($service);
     $dependencySerialization->setContainer($container);
 
-    $string = serialize($dependencySerialization);
+    $string = \serialize($dependencySerialization);
     /** @var \Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy $dependencySerialization */
-    $dependencySerialization = unserialize($string);
+    $dependencySerialization = \unserialize($string);
 
     $this->assertTrue($container->has(ReverseContainer::class));
     $this->assertSame($service, $dependencySerialization->service);

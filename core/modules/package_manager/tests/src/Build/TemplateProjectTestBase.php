@@ -71,7 +71,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
     $actual_version = (new \PDO('sqlite::memory:'))
       ->query('select sqlite_version()')
       ->fetch()[0];
-    if (version_compare($actual_version, $minimum_version, '<')) {
+    if (\version_compare($actual_version, $minimum_version, '<')) {
       $this->markTestSkipped("SQLite version $minimum_version or later is required, but $actual_version was detected.");
     }
 
@@ -124,10 +124,10 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
     // @see ::createTestProject()
     $core_dir = $this->getWorkspaceDrupalRoot() . '/core';
     Composer::setDrupalVersion($this->getWorkspaceDrupalRoot(), $version);
-    file_put_contents("$core_dir/README.txt", "Placeholder for Drupal core $version.");
+    \file_put_contents("$core_dir/README.txt", "Placeholder for Drupal core $version.");
 
     foreach (['default.settings.php', 'default.services.yml'] as $file) {
-      file_put_contents("$core_dir/assets/scaffold/files/$file", "# This is part of Drupal $version.\n", FILE_APPEND);
+      \file_put_contents("$core_dir/assets/scaffold/files/$file", "# This is part of Drupal $version.\n", FILE_APPEND);
     }
   }
 
@@ -157,7 +157,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
       '-t',
       $working_path,
     ];
-    if (file_exists($working_path . DIRECTORY_SEPARATOR . '.ht.router.php')) {
+    if (\file_exists($working_path . DIRECTORY_SEPARATOR . '.ht.router.php')) {
       $server[] = $working_path . DIRECTORY_SEPARATOR . '.ht.router.php';
     }
     $ps = new Process($server, $working_path);
@@ -171,13 +171,13 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
     // Wait until the web server has started. It is started if the port is no
     // longer available.
     for ($i = 0; $i < 50; $i++) {
-      usleep(100000);
+      \usleep(100000);
       if (!$this->checkPortIsAvailable($port)) {
         return $ps;
       }
     }
 
-    throw new \RuntimeException(sprintf("Unable to start the web server.\nCMD: %s \nCODE: %d\nSTATUS: %s\nOUTPUT:\n%s\n\nERROR OUTPUT:\n%s", $ps->getCommandLine(), $ps->getExitCode(), $ps->getStatus(), $ps->getOutput(), $ps->getErrorOutput()));
+    throw new \RuntimeException(\sprintf("Unable to start the web server.\nCMD: %s \nCODE: %d\nSTATUS: %s\nOUTPUT:\n%s\n\nERROR OUTPUT:\n%s", $ps->getCommandLine(), $ps->getExitCode(), $ps->getStatus(), $ps->getOutput(), $ps->getErrorOutput()));
   }
 
   /**
@@ -224,7 +224,7 @@ END;
   protected function addRepository(string $name, string $path, $working_directory = 'project'): void {
     $this->assertDirectoryExists($path);
 
-    $repository = json_encode([
+    $repository = \json_encode([
       'type' => 'path',
       'url' => $path,
       'options' => [
@@ -246,7 +246,7 @@ END;
     foreach ($xml_map as $metadata_file) {
       $this->assertFileIsReadable($metadata_file);
     }
-    $xml_map = var_export($xml_map, TRUE);
+    $xml_map = \var_export($xml_map, TRUE);
     $this->writeSettings("\$config['update_test.settings']['xml_map'] = $xml_map;");
   }
 
@@ -263,10 +263,10 @@ END;
 
     $workspace_dir = $this->getWorkspaceDirectory();
     $project_dir = $workspace_dir . '/project';
-    mkdir($project_dir);
+    \mkdir($project_dir);
 
-    $data = file_get_contents("$workspace_dir/composer/Template/$template/composer.json");
-    $data = json_decode($data, TRUE, flags: JSON_THROW_ON_ERROR);
+    $data = \file_get_contents("$workspace_dir/composer/Template/$template/composer.json");
+    $data = \json_decode($data, TRUE, flags: JSON_THROW_ON_ERROR);
 
     // Allow pre-release versions of dependencies.
     $data['minimum-stability'] = 'dev';
@@ -300,7 +300,7 @@ END;
     $data['scripts']['pre-install-cmd'] = $script;
     $data['scripts']['pre-update-cmd'] = $script;
 
-    file_put_contents($project_dir . '/composer.json', json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    \file_put_contents($project_dir . '/composer.json', \json_encode($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 
     // Because we set the COMPOSER_MIRROR_PATH_REPOS=1 environment variable when
     // creating the project, none of the dependencies should be symlinked.
@@ -343,11 +343,11 @@ END;
     // Ensure Package Manager logs Composer Stager's process output to a file
     // named for the current test.
     $log = $this->getDrupalRoot() . '/sites/simpletest/browser_output';
-    @mkdir($log, recursive: TRUE);
+    @\mkdir($log, recursive: TRUE);
     $this->assertDirectoryIsWritable($log);
-    $log .= '/' . str_replace('\\', '_', static::class) . '-' . $this->name();
+    $log .= '/' . \str_replace('\\', '_', static::class) . '-' . $this->name();
     if ($this->usesDataProvider()) {
-      $log .= '-' . preg_replace('/[^a-z0-9]+/i', '_', (string) $this->dataName());
+      $log .= '-' . \preg_replace('/[^a-z0-9]+/i', '_', (string) $this->dataName());
     }
     $code .= <<<END
 \$config['package_manager.settings']['log'] = '$log-package_manager.log';
@@ -379,7 +379,7 @@ END;
    *   reference.
    */
   private static function unboundCoreConstraints(array &$constraints): void {
-    $names = preg_grep('/^drupal\/core-?/', array_keys($constraints));
+    $names = \preg_grep('/^drupal\/core-?/', \array_keys($constraints));
     foreach ($names as $name) {
       $constraints[$name] = '*';
     }
@@ -415,7 +415,7 @@ END;
         $this->getWorkspaceDrupalRoot() . '/core',
         "$workspace_dir/composer/Metapackage",
         "$workspace_dir/composer/Plugin",
-        key($class_loaders),
+        \key($class_loaders),
       ])
       ->depth('< 3')
       ->files()
@@ -423,7 +423,7 @@ END;
 
     /** @var \Symfony\Component\Finder\SplFileInfo $file */
     foreach ($finder as $file) {
-      $package_info = json_decode($file->getContents(), TRUE, flags: JSON_THROW_ON_ERROR);
+      $package_info = \json_decode($file->getContents(), TRUE, flags: JSON_THROW_ON_ERROR);
       $name = $package_info['name'];
 
       $requirements = $package_info['require'] ?? [];
@@ -492,8 +492,8 @@ END;
         'extra' => $package_info['extra'] ?? [],
       ];
     }
-    $data = json_encode(['packages' => $packages], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-    file_put_contents($workspace_dir . '/vendor.json', $data);
+    $data = \json_encode(['packages' => $packages], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    \file_put_contents($workspace_dir . '/vendor.json', $data);
   }
 
   /**
@@ -517,9 +517,9 @@ END;
     $process = $this->executeCommand($command, $working_dir);
     $this->assertCommandSuccessful();
 
-    $output = trim($process->getOutput());
+    $output = \trim($process->getOutput());
     if ($json) {
-      $output = json_decode($output, TRUE, flags: JSON_THROW_ON_ERROR);
+      $output = \json_decode($output, TRUE, flags: JSON_THROW_ON_ERROR);
     }
     return $output;
   }
@@ -535,10 +535,10 @@ END;
     // configuration values that aren't accessible in the UI.
     $file = $this->getWebRoot() . '/sites/default/settings.php';
     $this->assertFileExists($file);
-    chmod(dirname($file), 0744);
-    chmod($file, 0744);
+    \chmod(\dirname($file), 0744);
+    \chmod($file, 0744);
     $this->assertFileIsWritable($file);
-    $this->assertIsInt(file_put_contents($file, $php, FILE_APPEND));
+    $this->assertIsInt(\file_put_contents($file, $php, FILE_APPEND));
   }
 
   /**
@@ -564,7 +564,7 @@ END;
     // or non-stable modules, submit it.
     $form_id = $assert_session->elementExists('css', 'input[type="hidden"][name="form_id"]')
       ->getValue();
-    if (preg_match('/^system_modules_(experimental_|non_stable_)?confirm_form$/', $form_id)) {
+    if (\preg_match('/^system_modules_(experimental_|non_stable_)?confirm_form$/', $form_id)) {
       $page->pressButton('Continue');
       $assert_session->statusCodeEquals(200);
     }
@@ -611,30 +611,30 @@ END;
       // from Package Manager operations, but it's not relevant for our purposes
       // because it's not part of the stage life cycle.
       unset($expected_events[CollectPathsToExcludeEvent::class]);
-      $expected_events = array_keys($expected_events);
+      $expected_events = \array_keys($expected_events);
     }
     $this->assertNotEmpty($expected_events);
 
     $log_file = $this->getWorkspaceDirectory() . '/project/' . EventLogSubscriber::LOG_FILE_NAME;
-    $max_wait = time() + $wait;
+    $max_wait = \time() + $wait;
     do {
       $this->assertFileIsReadable($log_file);
-      $log_data = file_get_contents($log_file);
-      $log_data = json_decode($log_data, TRUE, flags: JSON_THROW_ON_ERROR);
+      $log_data = \file_get_contents($log_file);
+      $log_data = \json_decode($log_data, TRUE, flags: JSON_THROW_ON_ERROR);
 
       // Filter out events logged by any other stage.
-      $log_data = array_filter($log_data, fn (array $event): bool => $event['stage'] === $expected_stage_class);
+      $log_data = \array_filter($log_data, fn (array $event): bool => $event['stage'] === $expected_stage_class);
 
       // If we've logged at least the expected number of events, stop waiting.
       // Break out of the loop and assert the expected events were logged.
-      if (count($log_data) >= count($expected_events)) {
+      if (\count($log_data) >= \count($expected_events)) {
         break;
       }
       // Wait a bit before checking again.
-      sleep(5);
-    } while ($max_wait > time());
+      \sleep(5);
+    } while ($max_wait > \time());
 
-    $this->assertSame($expected_events, array_column($log_data, 'event'), $message);
+    $this->assertSame($expected_events, \array_column($log_data, 'event'), $message);
   }
 
   /**
@@ -673,7 +673,7 @@ END;
 
     $assert_session->elementExists('css', 'a[href*="/admin/reports/dblog/event/"]:contains("Requested changes:")')
       ->click();
-    array_walk($expected_requested_changes, $assert_session->pageTextContains(...));
+    \array_walk($expected_requested_changes, $assert_session->pageTextContains(...));
   }
 
   /**
@@ -696,7 +696,7 @@ END;
 
     $assert_session->elementExists('css', 'a[href*="/admin/reports/dblog/event/"]:contains("Applied changes:")')
       ->click();
-    array_walk($expected_applied_changes, $assert_session->pageTextContains(...));
+    \array_walk($expected_applied_changes, $assert_session->pageTextContains(...));
   }
 
   /**
@@ -708,16 +708,16 @@ END;
    *   The query data.
    */
   protected function makePackageManagerTestApiRequest(string $url, array $query_data): void {
-    $url .= '?' . http_build_query($query_data);
+    $url .= '?' . \http_build_query($query_data);
     $this->visit($url);
     $session = $this->getMink()->getSession();
 
     // Ensure test failures provide helpful debug output when there's a fatal
     // PHP error: don't use \Behat\Mink\WebAssert::statusCodeEquals().
-    $message = sprintf(
+    $message = \sprintf(
       "Error response: %s\n\nHeaders: %s\n\nServer error log: %s",
       $session->getPage()->getContent(),
-      var_export($session->getResponseHeaders(), TRUE),
+      \var_export($session->getResponseHeaders(), TRUE),
       $this->serverErrorLog,
     );
     $this->assertSame(200, $session->getStatusCode(), $message);

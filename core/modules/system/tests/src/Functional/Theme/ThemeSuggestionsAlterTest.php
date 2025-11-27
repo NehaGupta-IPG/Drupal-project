@@ -149,7 +149,7 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
     $raw_content = $this->getSession()->getPage()->getContent();
     // Verify that a specific theme call is added to the suggestions array
     // before the suggestions alter hook.
-    $this->assertLessThan(strpos($raw_content, 'theme_test_specific_suggestions__variant__foo'), strpos($raw_content, 'theme_test_specific_suggestions__variant'));
+    $this->assertLessThan(\strpos($raw_content, 'theme_test_specific_suggestions__variant__foo'), \strpos($raw_content, 'theme_test_specific_suggestions__variant'));
   }
 
   /**
@@ -179,11 +179,11 @@ class ThemeSuggestionsAlterTest extends BrowserTestBase {
       'test_theme_theme_suggestions_alter() executed.',
       'test_theme_theme_suggestions_theme_test_suggestions_alter() executed.',
     ];
-    $content = preg_replace('/\s+/', ' ', Xss::filter($this->getSession()->getPage()->getContent(), []));
+    $content = \preg_replace('/\s+/', ' ', Xss::filter($this->getSession()->getPage()->getContent(), []));
     $order = 0;
     foreach ($expected_order as $expected_string) {
-      $this->assertGreaterThan($order, strpos($content, $expected_string));
-      $order = strpos($content, $expected_string);
+      $this->assertGreaterThan($order, \strpos($content, $expected_string));
+      $order = \strpos($content, $expected_string);
     }
   }
 

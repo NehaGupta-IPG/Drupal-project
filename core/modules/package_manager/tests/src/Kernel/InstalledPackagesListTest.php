@@ -145,9 +145,9 @@ class InstalledPackagesListTest extends PackageManagerKernelTestBase {
     ]);
     $info_file = $list['drupal/no_project_key']->path . '/no_project_key.info.yml';
     $this->assertFileIsWritable($info_file);
-    $info = Yaml::decode(file_get_contents($info_file));
+    $info = Yaml::decode(\file_get_contents($info_file));
     unset($info['project']);
-    file_put_contents($info_file, Yaml::encode($info));
+    \file_put_contents($info_file, Yaml::encode($info));
     $this->assertNull($list->getPackageByDrupalProjectName('no_project_key'));
 
     // The project name is repeated.

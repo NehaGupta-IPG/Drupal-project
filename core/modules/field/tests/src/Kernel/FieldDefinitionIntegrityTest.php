@@ -69,25 +69,25 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
     foreach ($field_type_manager->getDefinitions() as $definition) {
       // Test default field widgets.
       if (isset($definition['default_widget'])) {
-        $this->assertContains($definition['default_widget'], $available_field_widget_ids, sprintf('Field type %s uses a non-existent field widget by default: %s', $definition['id'], $definition['default_widget']));
+        $this->assertContains($definition['default_widget'], $available_field_widget_ids, \sprintf('Field type %s uses a non-existent field widget by default: %s', $definition['id'], $definition['default_widget']));
       }
 
       // Test default field formatters.
       if (isset($definition['default_formatter'])) {
-        $this->assertContains($definition['default_formatter'], $available_field_formatter_ids, sprintf('Field type %s uses a non-existent field formatter by default: %s', $definition['id'], $definition['default_formatter']));
+        $this->assertContains($definition['default_formatter'], $available_field_formatter_ids, \sprintf('Field type %s uses a non-existent field formatter by default: %s', $definition['id'], $definition['default_formatter']));
       }
     }
 
     // Test the field widget plugins.
     foreach ($field_widget_manager->getDefinitions() as $definition) {
-      $missing_field_type_ids = array_diff($definition['field_types'], $available_field_type_ids);
-      $this->assertEmpty($missing_field_type_ids, sprintf('Field widget %s integrates with non-existent field types: %s', $definition['id'], implode(', ', $missing_field_type_ids)));
+      $missing_field_type_ids = \array_diff($definition['field_types'], $available_field_type_ids);
+      $this->assertEmpty($missing_field_type_ids, \sprintf('Field widget %s integrates with non-existent field types: %s', $definition['id'], \implode(', ', $missing_field_type_ids)));
     }
 
     // Test the field formatter plugins.
     foreach ($field_formatter_manager->getDefinitions() as $definition) {
-      $missing_field_type_ids = array_diff($definition['field_types'], $available_field_type_ids);
-      $this->assertEmpty($missing_field_type_ids, sprintf('Field formatter %s integrates with non-existent field types: %s', $definition['id'], implode(', ', $missing_field_type_ids)));
+      $missing_field_type_ids = \array_diff($definition['field_types'], $available_field_type_ids);
+      $this->assertEmpty($missing_field_type_ids, \sprintf('Field formatter %s integrates with non-existent field types: %s', $definition['id'], \implode(', ', $missing_field_type_ids)));
     }
   }
 
@@ -115,7 +115,7 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
     $field_definitions = [];
 
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $content_entity_types */
-    $content_entity_types = array_filter($entity_type_manager->getDefinitions(), function (EntityTypeInterface $entity_type) {
+    $content_entity_types = \array_filter($entity_type_manager->getDefinitions(), function (EntityTypeInterface $entity_type) {
       return $entity_type instanceof ContentEntityTypeInterface;
     });
 
@@ -149,7 +149,7 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
     $display_options = $field_definition->getDisplayOptions($display_context);
     if (!empty($display_options['type'])) {
       $plugin = $plugin_manager->getDefinition($display_options['type'], FALSE);
-      $this->assertNotNull($plugin, sprintf(
+      $this->assertNotNull($plugin, \sprintf(
         'Plugin found for "%s" field %s display options of "%s" entity type.',
         $field_id,
         $display_context,
@@ -175,21 +175,21 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
    */
   protected function modulesWithSubdirectory($subdirectory): array {
     $modules = \Drupal::service('extension.list.module')->getList();
-    $modules = array_filter($modules, function (Extension $module) use ($subdirectory) {
+    $modules = \array_filter($modules, function (Extension $module) use ($subdirectory) {
       // Filter contrib, hidden, already enabled modules and modules in the
       // Testing package.
       return ($module->origin === 'core'
         && empty($module->info['hidden'])
         && $module->status == FALSE
         && $module->info['package'] !== 'Testing'
-        && is_readable($module->getPath() . DIRECTORY_SEPARATOR . $subdirectory));
+        && \is_readable($module->getPath() . DIRECTORY_SEPARATOR . $subdirectory));
     });
     // Gather the dependencies of the modules.
-    $dependencies = NestedArray::mergeDeepArray(array_map(function (Extension $module) {
-      return array_keys($module->requires);
+    $dependencies = NestedArray::mergeDeepArray(\array_map(function (Extension $module) {
+      return \array_keys($module->requires);
     }, $modules));
 
-    return array_unique(NestedArray::mergeDeep(array_keys($modules), $dependencies));
+    return \array_unique(NestedArray::mergeDeep(\array_keys($modules), $dependencies));
   }
 
 }

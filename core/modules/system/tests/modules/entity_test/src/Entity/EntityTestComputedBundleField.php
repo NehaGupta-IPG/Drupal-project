@@ -74,7 +74,7 @@ class EntityTestComputedBundleField extends EntityTest {
       'entity_test_comp_bund_fld_bund_2',
     ];
 
-    if (in_array($bundle, $computed_field_bundles, TRUE)) {
+    if (\in_array($bundle, $computed_field_bundles, TRUE)) {
       // @todo Use the proper FieldStorageDefinition class instead
       // https://www.drupal.org/node/2280639.
       $storageDefinition = FieldStorageDefinition::create('string')
@@ -83,7 +83,7 @@ class EntityTestComputedBundleField extends EntityTest {
         ->setComputed(TRUE)
         ->setClass(ComputedTestBundleFieldItemList::class);
       $fields['computed_bundle_field'] = FieldDefinition::createFromFieldStorageDefinition($storageDefinition)
-        ->setLabel(t('A computed Bundle Field Test'))
+        ->setLabel(\t('A computed Bundle Field Test'))
         ->setComputed(TRUE)
         ->setClass(ComputedTestBundleFieldItemList::class);
     }

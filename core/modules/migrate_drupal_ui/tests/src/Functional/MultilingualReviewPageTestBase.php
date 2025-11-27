@@ -66,7 +66,7 @@ abstract class MultilingualReviewPageTestBase extends MigrateUpgradeTestBase {
     // Test the upgrade paths. First remove the module from the available paths
     // list.
     $available_paths = $this->getAvailablePaths();
-    $available_paths = array_diff($available_paths, [$module_name]);
+    $available_paths = \array_diff($available_paths, [$module_name]);
     $this->assertReviewForm($available_paths);
   }
 

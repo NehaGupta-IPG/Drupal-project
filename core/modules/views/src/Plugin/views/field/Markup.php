@@ -34,7 +34,7 @@ class Markup extends FieldPluginBase {
     $this->format = $this->definition['format'];
 
     $this->additional_fields = [];
-    if (is_array($this->format)) {
+    if (\is_array($this->format)) {
       $this->additional_fields['format'] = $this->format;
     }
   }
@@ -44,15 +44,15 @@ class Markup extends FieldPluginBase {
    */
   public function render(ResultRow $values) {
     $value = $this->getValue($values);
-    if (is_array($this->format)) {
+    if (\is_array($this->format)) {
       $format = $this->getValue($values, 'format');
     }
     else {
       $format = $this->format;
     }
     if ($value) {
-      $value = str_replace('<!--break-->', '', $value);
-      return check_markup($value, $format);
+      $value = \str_replace('<!--break-->', '', $value);
+      return \check_markup($value, $format);
     }
   }
 

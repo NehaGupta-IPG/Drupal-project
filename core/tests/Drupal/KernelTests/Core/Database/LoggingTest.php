@@ -24,12 +24,12 @@ class LoggingTest extends DatabaseTestBase {
   public function testEnableLogging(): void {
     Database::startLog('testing');
 
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $this->connection->query('SELECT [name] FROM {test} WHERE [age] > :age', [':age' => 25])->fetchCol();
     $this->connection->query('SELECT [age] FROM {test} WHERE [name] = :name', [':name' => 'Ringo'])->fetchCol();
 
     // Trigger a call that does not have file in the backtrace.
-    call_user_func_array([Database::getConnection(), 'query'], ['SELECT [age] FROM {test} WHERE [name] = :name', [':name' => 'Ringo']])->fetchCol();
+    \call_user_func_array([Database::getConnection(), 'query'], ['SELECT [age] FROM {test} WHERE [name] = :name', [':name' => 'Ringo']])->fetchCol();
 
     $queries = Database::getLog('testing', 'default');
 

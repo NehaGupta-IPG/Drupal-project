@@ -91,7 +91,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
     // Check the controller defaults.
     foreach ($collection as $id => $route) {
       $this->assertEquals('Drupal\\views\\Routing\\ViewPageController::handle', $route->getDefault('_controller'));
-      $id_parts = explode('.', $id);
+      $id_parts = \explode('.', $id);
       $this->assertEquals($id_parts[1], $route->getDefault('view_id'));
       $this->assertEquals($id_parts[2], $route->getDefault('display_id'));
     }
@@ -182,7 +182,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
     $this->setRawContent($output);
     $result = $this->xpath('//div[@class=:class]/a', [':class' => 'more-link']);
     $this->assertEquals(Url::fromRoute('view.test_display_more.page_1')->toString(), $result[0]->attributes()->href, 'The right more link is shown.');
-    $this->assertEquals($expected_more_text, trim((string) $result[0][0]), 'The right link text is shown.');
+    $this->assertEquals($expected_more_text, \trim((string) $result[0][0]), 'The right link text is shown.');
 
     // Test the renderMoreLink method directly. This could be directly unit
     // tested.
@@ -191,7 +191,7 @@ class DisplayPageTest extends ViewsKernelTestBase {
     $this->setRawContent($more_link);
     $result = $this->xpath('//div[@class=:class]/a', [':class' => 'more-link']);
     $this->assertEquals(Url::fromRoute('view.test_display_more.page_1')->toString(), $result[0]->attributes()->href, 'The right more link is shown.');
-    $this->assertEquals($expected_more_text, trim((string) $result[0][0]), 'The right link text is shown.');
+    $this->assertEquals($expected_more_text, \trim((string) $result[0][0]), 'The right link text is shown.');
 
     // Test the useMoreText method directly. This could be directly unit
     // tested.

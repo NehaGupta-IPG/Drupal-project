@@ -48,7 +48,7 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
    * @internal
    */
   protected function assertEntity(string $id, string $expected_type, bool $expected_translatable, int $expected_cardinality): void {
-    [$expected_entity_type, $expected_name] = explode('.', $id);
+    [$expected_entity_type, $expected_name] = \explode('.', $id);
 
     /** @var \Drupal\field\FieldStorageConfigInterface $field */
     $field = FieldStorageConfig::load($id);
@@ -182,10 +182,10 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
     // For each text field bases that were skipped, there should be a log
     // message with the required steps to fix this.
     $migration = $this->getMigration('d7_field');
-    $errors = array_map(function ($message) {
+    $errors = \array_map(function ($message) {
       return $message->message;
-    }, iterator_to_array($migration->getIdMap()->getMessages()));
-    sort($errors);
+    }, \iterator_to_array($migration->getIdMap()->getMessages()));
+    \sort($errors);
     $this->assertCount(4, $errors);
     $this->assertEquals('d7_field:type: Can\'t migrate source field field_text_long_plain_filtered configured with both plain text and filtered text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text', $errors[0]);
     $this->assertEquals('d7_field:type: Can\'t migrate source field field_text_plain_filtered configured with both plain text and filtered text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text', $errors[1]);
@@ -207,7 +207,7 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
     // Validate that the source count and processed count match up.
     /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
     $migration = $this->getMigration('d7_field');
-    $messages = iterator_to_array($migration->getIdMap()->getMessages());
+    $messages = \iterator_to_array($migration->getIdMap()->getMessages());
     $this->assertCount(5, $messages);
     $msg = "d7_field:type:process_field: Can't migrate field 'field_event' with 'todate' settings. Enable the datetime_range module. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#datetime";
     $this->assertSame($messages[4]->message, $msg);

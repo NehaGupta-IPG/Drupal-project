@@ -54,7 +54,7 @@ final class NoOpStager implements StagerInterface {
 
     if ($changeLockFile && $lockFile->exists()) {
       $data = $lockFile->read();
-      $data['_time'] = microtime();
+      $data['_time'] = \microtime();
       $lockFile->write($data);
     }
   }

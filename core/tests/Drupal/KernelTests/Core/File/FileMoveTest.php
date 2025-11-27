@@ -40,7 +40,7 @@ class FileMoveTest extends FileTestBase {
     // Moving with rename.
     $desired_filepath = 'public://' . $this->randomMachineName();
     $this->assertFileExists($new_filepath);
-    $this->assertNotFalse(file_put_contents($desired_filepath, ' '), 'Created a file so a rename will have to happen.');
+    $this->assertNotFalse(\file_put_contents($desired_filepath, ' '), 'Created a file so a rename will have to happen.');
     $newer_filepath = $file_system->move($new_filepath, $desired_filepath, FileExists::Rename);
     $this->assertNotFalse($newer_filepath, 'Move was successful.');
     $this->assertNotEquals($desired_filepath, $newer_filepath, 'Returned expected filepath.');

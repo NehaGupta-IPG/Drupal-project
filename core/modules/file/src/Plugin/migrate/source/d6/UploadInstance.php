@@ -32,7 +32,7 @@ class UploadInstance extends DrupalSqlBase {
       ->fields('nt', ['type'])
       ->execute()
       ->fetchCol();
-    $variables = array_map(function ($type) {
+    $variables = \array_map(function ($type) {
       return 'upload_' . $type;
     }, $node_types);
 
@@ -49,7 +49,7 @@ class UploadInstance extends DrupalSqlBase {
       $name = 'upload_' . $node_type;
       // By default, file attachments in D6 are enabled unless upload_<type> is
       // false, so include types where the upload-variable is not set.
-      $enabled = !isset($values[$name]) || unserialize($values[$name]);
+      $enabled = !isset($values[$name]) || \unserialize($values[$name]);
       if ($enabled) {
         $return[$node_type]['node_type'] = $node_type;
         $return[$node_type]['max_filesize'] = $max_filesize;
@@ -86,7 +86,7 @@ class UploadInstance extends DrupalSqlBase {
    * {@inheritdoc}
    */
   protected function doCount() {
-    return count($this->initializeIterator());
+    return \count($this->initializeIterator());
   }
 
 }

@@ -68,8 +68,8 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    */
   public function getBaseId() {
     $plugin_id = $this->getPluginId();
-    if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
-      [$plugin_id] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+    if (\strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
+      [$plugin_id] = \explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
     }
     return $plugin_id;
   }
@@ -80,8 +80,8 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
   public function getDerivativeId() {
     $plugin_id = $this->getPluginId();
     $derivative_id = NULL;
-    if (strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
-      [, $derivative_id] = explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
+    if (\strpos($plugin_id, static::DERIVATIVE_SEPARATOR)) {
+      [, $derivative_id] = \explode(static::DERIVATIVE_SEPARATOR, $plugin_id, 2);
     }
     return $derivative_id;
   }
@@ -106,7 +106,7 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    * @see https://www.drupal.org/node/3198285
    */
   public function isConfigurable() {
-    @trigger_error(__CLASS__ . "::" . __FUNCTION__ . " is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use instanceof to check if the plugin implements \Drupal\Component\Plugin\ConfigurableInterface instead. See https://www.drupal.org/node/3198285", E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . "::" . __FUNCTION__ . " is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use instanceof to check if the plugin implements \Drupal\Component\Plugin\ConfigurableInterface instead. See https://www.drupal.org/node/3198285", E_USER_DEPRECATED);
     return $this instanceof ConfigurableInterface;
   }
 

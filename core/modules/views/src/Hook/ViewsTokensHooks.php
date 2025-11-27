@@ -125,7 +125,7 @@ class ViewsTokensHooks {
           case 'page-count':
             // If there are no items per page, set this to 1 for the division.
             $per_page = $view->getItemsPerPage() ?: 1;
-            $replacements[$original] = max(1, (int) ceil($view->total_rows / $per_page));
+            $replacements[$original] = \max(1, (int) \ceil($view->total_rows / $per_page));
             break;
         }
       }

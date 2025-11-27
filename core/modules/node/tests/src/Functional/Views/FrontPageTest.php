@@ -102,13 +102,13 @@ class FrontPageTest extends ViewTestBase {
         $node = $this->nodeStorage->create($values);
         $node->save();
         // Put the sticky on at the front.
-        array_unshift($expected, ['nid' => $node->id()]);
+        \array_unshift($expected, ['nid' => $node->id()]);
       }
       else {
         $values['sticky'] = FALSE;
         $node = $this->nodeStorage->create($values);
         $node->save();
-        array_push($expected, ['nid' => $node->id()]);
+        \array_push($expected, ['nid' => $node->id()]);
       }
     }
 
@@ -144,14 +144,14 @@ class FrontPageTest extends ViewTestBase {
 
     $view->setDisplay('page_1');
     $this->executeView($view);
-    $this->assertIdenticalResultset($view, array_slice($expected, 0, 10), $column_map, 'Ensure that the right nodes are displayed on the frontpage.');
+    $this->assertIdenticalResultset($view, \array_slice($expected, 0, 10), $column_map, 'Ensure that the right nodes are displayed on the frontpage.');
     $this->assertNotInResultSet($view, $not_expected_nids, 'Ensure no unexpected node is in the result.');
     $view->destroy();
 
     $view->setDisplay('page_1');
     $view->setCurrentPage(1);
     $this->executeView($view);
-    $this->assertIdenticalResultset($view, array_slice($expected, 10, 10), $column_map, 'Ensure that the right nodes are displayed on second page of the frontpage.');
+    $this->assertIdenticalResultset($view, \array_slice($expected, 10, 10), $column_map, 'Ensure that the right nodes are displayed on second page of the frontpage.');
     $this->assertNotInResultSet($view, $not_expected_nids, 'Ensure no unexpected node is in the result.');
     $view->destroy();
   }
@@ -169,8 +169,8 @@ class FrontPageTest extends ViewTestBase {
    * @internal
    */
   protected function assertNotInResultSet(ViewExecutable $view, array $not_expected_nids, string $message = ''): void {
-    $found_nids = array_filter($view->result, function ($row) use ($not_expected_nids) {
-      return in_array($row->nid, $not_expected_nids);
+    $found_nids = \array_filter($view->result, function ($row) use ($not_expected_nids) {
+      return \in_array($row->nid, $not_expected_nids);
     });
     $this->assertEmpty($found_nids, $message);
   }
@@ -273,7 +273,7 @@ class FrontPageTest extends ViewTestBase {
         'body' => [
           [
             'value' => $this->randomMachineName(32),
-            'format' => filter_default_format(),
+            'format' => \filter_default_format(),
           ],
         ],
         'type' => 'article',

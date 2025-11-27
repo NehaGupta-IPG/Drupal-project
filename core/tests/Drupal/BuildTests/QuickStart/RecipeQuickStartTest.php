@@ -58,8 +58,8 @@ class RecipeQuickStartTest extends BuildTestBase {
     parent::setUp();
     $php_executable_finder = new PhpExecutableFinder();
     $this->php = (string) $php_executable_finder->find();
-    $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
-    if (!is_writable("{$this->root}/sites/simpletest")) {
+    $this->root = \dirname(\substr(__DIR__, 0, -\strlen(__NAMESPACE__)), 2);
+    if (!\is_writable("{$this->root}/sites/simpletest")) {
       $this->markTestSkipped('This test requires a writable sites/simpletest directory');
     }
     // Get a lock and a valid site path.
@@ -72,7 +72,7 @@ class RecipeQuickStartTest extends BuildTestBase {
   protected function tearDown(): void {
     if ($this->testDb) {
       $test_site_directory = $this->root . DIRECTORY_SEPARATOR . $this->testDb->getTestSitePath();
-      if (file_exists($test_site_directory)) {
+      if (\file_exists($test_site_directory)) {
         // @todo use the tear down command from
         //   https://www.drupal.org/project/drupal/issues/2926633
         // Delete test site directory.
@@ -87,7 +87,7 @@ class RecipeQuickStartTest extends BuildTestBase {
    */
   public function testQuickStartRecipeCommand(): void {
     $sqlite = (string) (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
-    if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
+    if (\version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
     }
 
@@ -111,7 +111,7 @@ class RecipeQuickStartTest extends BuildTestBase {
     $guzzle = new Client();
     $port = FALSE;
     $process->waitUntil(function ($type, $output) use (&$port) {
-      if (preg_match('/127.0.0.1:(\d+)/', $output, $match)) {
+      if (\preg_match('/127.0.0.1:(\d+)/', $output, $match)) {
         $port = $match[1];
         return TRUE;
       }
@@ -123,14 +123,14 @@ class RecipeQuickStartTest extends BuildTestBase {
     $this->assertNotFalse($port, "Web server running on port $port");
 
     // Give the server a couple of seconds to be ready.
-    sleep(2);
+    \sleep(2);
     $this->assertStringContainsString("127.0.0.1:$port/user/reset/1/", $process->getOutput());
 
     // Generate a cookie so we can make a request against the installed site.
-    define('DRUPAL_TEST_IN_CHILD_SITE', FALSE);
-    chmod($this->root . '/' . $this->testDb->getTestSitePath(), 0755);
+    \define('DRUPAL_TEST_IN_CHILD_SITE', FALSE);
+    \chmod($this->root . '/' . $this->testDb->getTestSitePath(), 0755);
     $cookieJar = CookieJar::fromArray([
-      'SIMPLETEST_USER_AGENT' => drupal_generate_test_ua($this->testDb->getDatabasePrefix()),
+      'SIMPLETEST_USER_AGENT' => \drupal_generate_test_ua($this->testDb->getDatabasePrefix()),
     ], '127.0.0.1');
 
     $response = $guzzle->get('http://127.0.0.1:' . $port, ['cookies' => $cookieJar]);
@@ -164,11 +164,11 @@ class RecipeQuickStartTest extends BuildTestBase {
    */
   protected function fileUnmanagedDeleteRecursive($path, $callback = NULL): bool {
     if (isset($callback)) {
-      call_user_func($callback, $path);
+      \call_user_func($callback, $path);
     }
-    if (is_dir($path)) {
-      $dir = dir($path);
-      assert($dir instanceof \Directory);
+    if (\is_dir($path)) {
+      $dir = \dir($path);
+      \assert($dir instanceof \Directory);
       while (($entry = $dir->read()) !== FALSE) {
         if ($entry == '.' || $entry == '..') {
           continue;
@@ -178,9 +178,9 @@ class RecipeQuickStartTest extends BuildTestBase {
       }
       $dir->close();
 
-      return rmdir($path);
+      return \rmdir($path);
     }
-    return unlink($path);
+    return \unlink($path);
   }
 
 }

@@ -186,7 +186,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
     // Weights range from -delta to +delta, so delta should be at least half
     // of the amount of blocks present. This makes sure all blocks in the same
     // region get a unique weight.
-    $weight_delta = round(count($entities) / 2);
+    $weight_delta = \round(\count($entities) / 2);
 
     $placement = FALSE;
     if ($this->request->query->has('block-placement')) {
@@ -384,7 +384,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $blocks = $form_state->getValue('blocks');
-    $entities = $this->storage->loadMultiple(array_keys($blocks));
+    $entities = $this->storage->loadMultiple(\array_keys($blocks));
     /** @var \Drupal\block\BlockInterface[] $entities */
     foreach ($entities as $entity_id => $entity) {
       $entity_values = $form_state->getValue(['blocks', $entity_id]);
@@ -399,7 +399,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
    * Wraps system_region_list().
    */
   protected function systemRegionList($theme, $show = REGIONS_ALL) {
-    return system_region_list($theme, $show);
+    return \system_region_list($theme, $show);
   }
 
 }

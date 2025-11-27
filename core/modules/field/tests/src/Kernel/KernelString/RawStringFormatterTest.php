@@ -119,7 +119,7 @@ class RawStringFormatterTest extends KernelTestBase {
     // Verify that all HTML is escaped and newlines are retained.
     $this->renderEntityFields($entity, $this->display);
     $this->assertNoRaw($value);
-    $this->assertRaw(nl2br(Html::escape($value)));
+    $this->assertRaw(\nl2br(Html::escape($value)));
 
     // Verify the cache tags.
     $build = $entity->{$this->fieldName}->view();

@@ -61,7 +61,7 @@ class ImageEffectAddForm extends ImageEffectFormBase {
   protected function prepareImageEffect($image_effect) {
     $image_effect = $this->effectManager->createInstance($image_effect);
     // Set the initial weight so this effect comes last.
-    $image_effect->setWeight(count($this->imageStyle->getEffects()));
+    $image_effect->setWeight(\count($this->imageStyle->getEffects()));
     return $image_effect;
   }
 

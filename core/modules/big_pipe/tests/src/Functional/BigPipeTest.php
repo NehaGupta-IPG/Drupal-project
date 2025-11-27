@@ -93,7 +93,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertSessionCookieExists('1');
     $this->assertBigPipeNoJsCookieExists('0');
-    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . UrlHelper::encodePath(base_path() . 'big_pipe_test') . '" />' . "\n" . '</noscript>');
+    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . \base_path() . 'big_pipe/no-js?destination=' . UrlHelper::encodePath(\base_path() . 'big_pipe_test') . '" />' . "\n" . '</noscript>');
     $this->assertSession()->responseNotContains($no_js_to_js_markup);
     $this->assertBigPipeNoJsMetaRefreshRedirect();
     $this->assertBigPipeNoJsCookieExists('1');
@@ -109,7 +109,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertSessionCookieExists('1');
     $this->assertBigPipeNoJsCookieExists('0');
-    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . base_path() . 'big_pipe_test" />' . "\n" . '</noscript>');
+    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . \base_path() . 'big_pipe/no-js?destination=' . \base_path() . 'big_pipe_test" />' . "\n" . '</noscript>');
     $this->assertSession()->responseNotContains($no_js_to_js_markup);
     $this->assertBigPipeNoJsMetaRefreshRedirect();
     $this->assertBigPipeNoJsCookieExists('1');
@@ -190,7 +190,7 @@ class BigPipeTest extends BrowserTestBase {
 
     // Verifying BigPipe assets are present.
     $this->assertNotEmpty($this->getDrupalSettings());
-    $this->assertContains('big_pipe/big_pipe', explode(',', $this->getDrupalSettings()['ajaxPageState']['libraries']), 'BigPipe asset library is present.');
+    $this->assertContains('big_pipe/big_pipe', \explode(',', $this->getDrupalSettings()['ajaxPageState']['libraries']), 'BigPipe asset library is present.');
 
     // Verify that the two expected exceptions are logged as errors.
     $this->assertEquals($log_count + 2, (int) $connection->select('watchdog')->countQuery()->execute()->fetchField(), 'Two new watchdog entries.');
@@ -199,9 +199,9 @@ class BigPipeTest extends BrowserTestBase {
     // functionality.
     $records = $connection->select('watchdog', 'w')->fields('w')->orderBy('wid', 'DESC')->range(0, 2)->execute()->fetchAll();
     $this->assertEquals(RfcLogLevel::WARNING, $records[0]->severity);
-    $this->assertStringContainsString('Oh noes!', (string) unserialize($records[0]->variables)['@message']);
+    $this->assertStringContainsString('Oh noes!', (string) \unserialize($records[0]->variables)['@message']);
     $this->assertEquals(RfcLogLevel::WARNING, $records[1]->severity);
-    $this->assertStringContainsString('You are not allowed to say llamas are not cool!', (string) unserialize($records[1]->variables)['@message']);
+    $this->assertStringContainsString('You are not allowed to say llamas are not cool!', (string) \unserialize($records[1]->variables)['@message']);
 
     // Verify that 4xx responses work fine. (4xx responses are handled by
     // subrequests to a route pointing to a controller with the desired output.)
@@ -219,7 +219,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains(BigPipe::STOP_SIGNAL);
     $this->assertSession()->responseNotContains('</body>');
     // The exception is expected. Do not interpret it as a test failure.
-    unlink($this->root . '/' . $this->siteDirectory . '/error.log');
+    \unlink($this->root . '/' . $this->siteDirectory . '/error.log');
 
     // Tests the enforced redirect response exception handles redirecting to
     // a trusted redirect.
@@ -299,7 +299,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('You are not allowed to say llamas are not cool!');
     $this->assertSession()->responseNotContains('</body>');
     // The exception is expected. Do not interpret it as a test failure.
-    unlink($this->root . '/' . $this->siteDirectory . '/error.log');
+    \unlink($this->root . '/' . $this->siteDirectory . '/error.log');
   }
 
   /**
@@ -354,7 +354,7 @@ class BigPipeTest extends BrowserTestBase {
    * @internal
    */
   protected function assertBigPipeNoJsPlaceholders(array $expected_big_pipe_nojs_placeholders): void {
-    $this->assertSetsEqual(array_keys($expected_big_pipe_nojs_placeholders), array_map('rawurldecode', explode(' ', $this->getSession()->getResponseHeader('BigPipe-Test-No-Js-Placeholders'))));
+    $this->assertSetsEqual(\array_keys($expected_big_pipe_nojs_placeholders), \array_map('rawurldecode', \explode(' ', $this->getSession()->getResponseHeader('BigPipe-Test-No-Js-Placeholders'))));
     foreach ($expected_big_pipe_nojs_placeholders as $big_pipe_nojs_placeholder => $expected_replacement) {
       // Checking whether the replacement for the BigPipe no-JS placeholder
       // $big_pipe_nojs_placeholder is present.
@@ -377,14 +377,14 @@ class BigPipeTest extends BrowserTestBase {
    * @internal
    */
   protected function assertBigPipePlaceholders(array $expected_big_pipe_placeholders, array $expected_big_pipe_placeholder_stream_order): void {
-    $this->assertSetsEqual(array_keys($expected_big_pipe_placeholders), explode(' ', $this->getSession()->getResponseHeader('BigPipe-Test-Placeholders')));
+    $this->assertSetsEqual(\array_keys($expected_big_pipe_placeholders), \explode(' ', $this->getSession()->getResponseHeader('BigPipe-Test-Placeholders')));
     $placeholder_positions = [];
     $placeholder_replacement_positions = [];
     foreach ($expected_big_pipe_placeholders as $big_pipe_placeholder_id => $expected_ajax_response) {
       // Verify expected placeholder.
       $expected_placeholder_html = '<span data-big-pipe-placeholder-id="' . $big_pipe_placeholder_id . '">';
       $this->assertSession()->responseContains($expected_placeholder_html);
-      $pos = strpos($this->getSession()->getPage()->getContent(), $expected_placeholder_html);
+      $pos = \strpos($this->getSession()->getPage()->getContent(), $expected_placeholder_html);
       $placeholder_positions[$pos] = $big_pipe_placeholder_id;
       // Verify expected placeholder replacement.
       $expected_placeholder_replacement = '<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="' . $big_pipe_placeholder_id . '">';
@@ -396,41 +396,41 @@ class BigPipeTest extends BrowserTestBase {
       }
       $this->assertSession()->elementTextContains('xpath', $xpath, $expected_ajax_response);
       $this->assertSession()->responseContains($expected_placeholder_replacement);
-      $pos = strpos($this->getSession()->getPage()->getContent(), $expected_placeholder_replacement);
+      $pos = \strpos($this->getSession()->getPage()->getContent(), $expected_placeholder_replacement);
       $placeholder_replacement_positions[$pos] = $big_pipe_placeholder_id;
     }
-    ksort($placeholder_positions, SORT_NUMERIC);
-    $this->assertEquals(array_keys($expected_big_pipe_placeholders), array_values($placeholder_positions));
-    $placeholders = array_map(function (NodeElement $element) {
+    \ksort($placeholder_positions, SORT_NUMERIC);
+    $this->assertEquals(\array_keys($expected_big_pipe_placeholders), \array_values($placeholder_positions));
+    $placeholders = \array_map(function (NodeElement $element) {
       return $element->getAttribute('data-big-pipe-placeholder-id');
     }, $this->cssSelect('[data-big-pipe-placeholder-id]'));
-    $this->assertSameSize($expected_big_pipe_placeholders, array_unique($placeholders));
+    $this->assertSameSize($expected_big_pipe_placeholders, \array_unique($placeholders));
     $expected_big_pipe_placeholders_with_replacements = [];
     foreach ($expected_big_pipe_placeholder_stream_order as $big_pipe_placeholder_id) {
       $expected_big_pipe_placeholders_with_replacements[$big_pipe_placeholder_id] = $expected_big_pipe_placeholders[$big_pipe_placeholder_id];
     }
-    $this->assertEquals($expected_big_pipe_placeholders_with_replacements, array_filter($expected_big_pipe_placeholders));
-    $this->assertSetsEqual(array_keys($expected_big_pipe_placeholders_with_replacements), array_values($placeholder_replacement_positions));
-    $this->assertSame(count($expected_big_pipe_placeholders_with_replacements), preg_match_all('/' . preg_quote('<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="', '/') . '/', $this->getSession()->getPage()->getContent()));
+    $this->assertEquals($expected_big_pipe_placeholders_with_replacements, \array_filter($expected_big_pipe_placeholders));
+    $this->assertSetsEqual(\array_keys($expected_big_pipe_placeholders_with_replacements), \array_values($placeholder_replacement_positions));
+    $this->assertSame(\count($expected_big_pipe_placeholders_with_replacements), \preg_match_all('/' . \preg_quote('<script type="application/vnd.drupal-ajax" data-big-pipe-replacement-for-placeholder-with-id="', '/') . '/', $this->getSession()->getPage()->getContent()));
 
     // Verifying BigPipe start/stop signals.
     $this->assertSession()->responseContains(BigPipe::START_SIGNAL);
     $this->assertSession()->responseContains(BigPipe::STOP_SIGNAL);
-    $start_signal_position = strpos($this->getSession()->getPage()->getContent(), BigPipe::START_SIGNAL);
-    $stop_signal_position = strpos($this->getSession()->getPage()->getContent(), BigPipe::STOP_SIGNAL);
+    $start_signal_position = \strpos($this->getSession()->getPage()->getContent(), BigPipe::START_SIGNAL);
+    $stop_signal_position = \strpos($this->getSession()->getPage()->getContent(), BigPipe::STOP_SIGNAL);
     $this->assertTrue($start_signal_position < $stop_signal_position, 'BigPipe start signal appears before stop signal.');
 
     // Verifying BigPipe placeholder replacements and start/stop signals were
     // streamed in the correct order.
-    $expected_stream_order = array_keys($expected_big_pipe_placeholders_with_replacements);
-    array_unshift($expected_stream_order, BigPipe::START_SIGNAL);
-    array_push($expected_stream_order, BigPipe::STOP_SIGNAL);
+    $expected_stream_order = \array_keys($expected_big_pipe_placeholders_with_replacements);
+    \array_unshift($expected_stream_order, BigPipe::START_SIGNAL);
+    \array_push($expected_stream_order, BigPipe::STOP_SIGNAL);
     $actual_stream_order = $placeholder_replacement_positions + [
       $start_signal_position => BigPipe::START_SIGNAL,
       $stop_signal_position => BigPipe::STOP_SIGNAL,
     ];
-    ksort($actual_stream_order, SORT_NUMERIC);
-    $this->assertEquals($expected_stream_order, array_values($actual_stream_order));
+    \ksort($actual_stream_order, SORT_NUMERIC);
+    $this->assertEquals($expected_stream_order, \array_values($actual_stream_order));
   }
 
   /**
@@ -440,7 +440,7 @@ class BigPipeTest extends BrowserTestBase {
     // Retrieve the CSRF token from the child site from its serialized session
     // record in the database.
     $session_data = $this->container->get('session_handler.write_safe')->read($this->getSession()->getCookie($this->getSessionName()));
-    $csrf_token_seed = unserialize(explode('_sf2_meta|', $session_data)[1])['s'];
+    $csrf_token_seed = \unserialize(\explode('_sf2_meta|', $session_data)[1])['s'];
 
     // Ensure that the session is started before accessing a session bag.
     // Otherwise the value stored in the bag is lost when subsequent session
@@ -474,7 +474,7 @@ class BigPipeTest extends BrowserTestBase {
    * @internal
    */
   protected function assertSetsEqual(array $a, array $b): void {
-    count($a) == count($b) && !array_diff_assoc($a, $b);
+    \count($a) == \count($b) && !\array_diff_assoc($a, $b);
   }
 
   /**
@@ -530,10 +530,10 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertStringStartsWith('big_pipe_nojs=1', $headers[0]['Set-Cookie'][0], 'The first response sets the big_pipe_nojs cookie.');
     $this->assertEquals($original_url, $headers[0]['Location'][0], 'The first response redirected back to the original page.');
     $this->assertEmpty(
-      array_diff([
+      \array_diff([
         'cookies:big_pipe_nojs',
         'session.exists',
-      ], explode(' ', $headers[0]['X-Drupal-Cache-Contexts'][0])),
+      ], \explode(' ', $headers[0]['X-Drupal-Cache-Contexts'][0])),
       'The first response varies by the "cookies:big_pipe_nojs" and "session.exists" cache contexts.'
     );
     $this->assertFalse(isset($headers[0]['Surrogate-Control']), 'The first response has no "Surrogate-Control" header.');
@@ -541,10 +541,10 @@ class BigPipeTest extends BrowserTestBase {
     // Second response: redirect followed.
     $this->assertEquals(200, $statuses[1], 'The second response was a 200.');
     $this->assertEmpty(
-      array_diff([
+      \array_diff([
         'cookies:big_pipe_nojs',
         'session.exists',
-      ], explode(' ', $headers[0]['X-Drupal-Cache-Contexts'][0])),
+      ], \explode(' ', $headers[0]['X-Drupal-Cache-Contexts'][0])),
       'The second response varies by the "cookies:big_pipe_nojs" and "session.exists" cache contexts.'
     );
 

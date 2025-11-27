@@ -124,13 +124,13 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
     $this->assertSame($expected_access_result->isNeutral(), $actual->isNeutral());
 
     $actual_cache_contexts = $actual->getCacheContexts();
-    sort($expected_cache_contexts);
-    sort($actual_cache_contexts);
+    \sort($expected_cache_contexts);
+    \sort($actual_cache_contexts);
     $this->assertSame($expected_cache_contexts, $actual_cache_contexts);
 
     $actual_cache_tags = $actual->getCacheTags();
-    sort($expected_cache_tags);
-    sort($actual_cache_tags);
+    \sort($expected_cache_tags);
+    \sort($actual_cache_tags);
     $this->assertSame($expected_cache_tags, $actual_cache_tags);
   }
 

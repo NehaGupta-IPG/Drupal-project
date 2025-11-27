@@ -73,11 +73,11 @@ class Email extends FormElementBase {
    * already.
    */
   public static function validateEmail(&$element, FormStateInterface $form_state, &$complete_form) {
-    $value = trim($element['#value']);
+    $value = \trim($element['#value']);
     $form_state->setValueForElement($element, $value);
 
     if ($value !== '' && !\Drupal::service('email.validator')->isValid($value)) {
-      $form_state->setError($element, t('The email address %mail is not valid. Use the format user@example.com.', ['%mail' => $value]));
+      $form_state->setError($element, \t('The email address %mail is not valid. Use the format user@example.com.', ['%mail' => $value]));
     }
   }
 

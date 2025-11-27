@@ -62,14 +62,14 @@ class EditorFileReferenceFilterTest extends KernelTestBase {
       return $filter->process($input, 'und');
     };
 
-    file_put_contents('public://llama.jpg', $this->randomMachineName());
+    \file_put_contents('public://llama.jpg', $this->randomMachineName());
     $image = File::create(['uri' => 'public://llama.jpg']);
     $image->save();
     $id = $image->id();
     $uuid = $image->uuid();
     $cache_tag = ['file:' . $id];
 
-    file_put_contents('public://alpaca.jpg', $this->randomMachineName());
+    \file_put_contents('public://alpaca.jpg', $this->randomMachineName());
     $image_2 = File::create(['uri' => 'public://alpaca.jpg']);
     $image_2->save();
     $id_2 = $image_2->id();
@@ -134,9 +134,9 @@ class EditorFileReferenceFilterTest extends KernelTestBase {
     // Add a valid image for image dimension testing.
     /** @var array stdClass */
     $files = $this->getTestFiles('image');
-    $image = reset($files);
+    $image = \reset($files);
     \Drupal::service('file_system')->copy($image->uri, 'public://llama.jpg', FileExists::Replace);
-    [$width, $height] = getimagesize('public://llama.jpg');
+    [$width, $height] = \getimagesize('public://llama.jpg');
     $dimensions = 'width="' . $width . '" height="' . $height . '"';
 
     // Image dimensions are present.

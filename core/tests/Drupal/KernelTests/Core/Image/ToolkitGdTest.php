@@ -103,9 +103,9 @@ class ToolkitGdTest extends KernelTestBase {
    */
   #[DataProvider('providerSupportedImageTypes')]
   public function testGdFunctionsExist(int $type): void {
-    $extension = image_type_to_extension($type, FALSE);
-    $this->assertTrue(function_exists("imagecreatefrom$extension"), "imagecreatefrom$extension should exist.");
-    $this->assertTrue(function_exists("image$extension"), "image$extension should exist.");
+    $extension = \image_type_to_extension($type, FALSE);
+    $this->assertTrue(\function_exists("imagecreatefrom$extension"), "imagecreatefrom$extension should exist.");
+    $this->assertTrue(\function_exists("image$extension"), "image$extension should exist.");
   }
 
   /**
@@ -115,12 +115,12 @@ class ToolkitGdTest extends KernelTestBase {
   public function testCreateImageFromScratch(int $type): void {
     // Build an image from scratch.
     $image = $this->imageFactory->get();
-    $image->createNew(50, 20, image_type_to_extension($type, FALSE), '#ffff00');
-    $file = 'from_null' . image_type_to_extension($type);
+    $image->createNew(50, 20, \image_type_to_extension($type, FALSE), '#ffff00');
+    $file = 'from_null' . \image_type_to_extension($type);
     $file_path = $this->directory . '/' . $file;
     $this->assertSame(50, $image->getWidth());
     $this->assertSame(20, $image->getHeight());
-    $this->assertSame(image_type_to_mime_type($type), $image->getMimeType());
+    $this->assertSame(\image_type_to_mime_type($type), $image->getMimeType());
     $this->assertTrue($image->save($file_path), "Image '$file' should have been saved successfully, but it has not.");
 
     // Reload and check saved image.
@@ -128,7 +128,7 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertTrue($image_reloaded->isValid());
     $this->assertSame(50, $image_reloaded->getWidth());
     $this->assertSame(20, $image_reloaded->getHeight());
-    $this->assertSame(image_type_to_mime_type($type), $image_reloaded->getMimeType());
+    $this->assertSame(\image_type_to_mime_type($type), $image_reloaded->getMimeType());
     if ($image_reloaded->getToolkit()->getType() == IMAGETYPE_GIF) {
       $this->assertSame('#ffff00', $image_reloaded->getToolkit()->getTransparentColor(), "Image '$file' after reload should have color channel set to #ffff00, but it has not.");
     }
@@ -173,8 +173,8 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertEquals([
       'version' => [
         'title' => 'GD library',
-        'value' => gd_info()['GD Version'],
-        'description' => sprintf("Supported image file formats: %s.", implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP', 'AVIF'])),
+        'value' => \gd_info()['GD Version'],
+        'description' => \sprintf("Supported image file formats: %s.", \implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP', 'AVIF'])),
       ],
     ], $this->imageFactory->get()->getToolkit()->getRequirements());
   }

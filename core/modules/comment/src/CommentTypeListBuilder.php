@@ -68,7 +68,7 @@ class CommentTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    assert($entity instanceof CommentTypeInterface);
+    \assert($entity instanceof CommentTypeInterface);
     $entity_type = $this->entityTypeManager->getDefinition($entity->getTargetEntityTypeId());
     $row['type'] = $entity->label();
     $row['description']['data'] = ['#markup' => $entity->getDescription()];

@@ -30,7 +30,7 @@ class ThemeEngineExtensionList extends ExtensionList {
   protected function getInstalledExtensionNames() {
     // Theme engines do not have an 'install' state, so return names of all
     // discovered theme engines.
-    return array_keys($this->extensions);
+    return \array_keys($this->extensions);
   }
 
 }

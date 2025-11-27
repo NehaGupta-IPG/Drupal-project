@@ -18,7 +18,7 @@ class Theme extends Updater implements UpdaterInterface {
    * {@inheritdoc}
    */
   public function __construct($source, $root) {
-    @trigger_error('The ' . __NAMESPACE__ . '\Theme class is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+    @\trigger_error('The ' . __NAMESPACE__ . '\Theme class is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
     parent::__construct($source, $root);
   }
 
@@ -42,7 +42,7 @@ class Theme extends Updater implements UpdaterInterface {
       // The return value of
       // \Drupal::service('extension.list.theme')->getPath() is always relative
       // to the site, so prepend DRUPAL_ROOT.
-      return DRUPAL_ROOT . '/' . dirname($relative_path);
+      return DRUPAL_ROOT . '/' . \dirname($relative_path);
     }
     else {
       // When installing a new theme, prepend the requested root directory.

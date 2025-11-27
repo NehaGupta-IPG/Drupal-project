@@ -160,7 +160,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
    *   The value for that property, or NULL if the property does not exist.
    */
   public function get($property) {
-    if (property_exists($this, $property)) {
+    if (\property_exists($this, $property)) {
       $value = $this->{$property} ?? NULL;
     }
     else {
@@ -180,7 +180,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
    * @return $this
    */
   public function set($property, $value) {
-    if (property_exists($this, $property)) {
+    if (\property_exists($this, $property)) {
       $this->{$property} = $value;
     }
     else {
@@ -509,7 +509,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
    *   An array of machine-readable region names.
    */
   public function getRegionNames() {
-    return array_keys($this->getRegions());
+    return \array_keys($this->getRegions());
   }
 
   /**
@@ -520,7 +520,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
    */
   public function getRegionLabels() {
     $regions = $this->getRegions();
-    return array_combine(array_keys($regions), array_column($regions, 'label'));
+    return \array_combine(\array_keys($regions), \array_column($regions, 'label'));
   }
 
   /**

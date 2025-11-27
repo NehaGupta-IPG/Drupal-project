@@ -75,7 +75,7 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
     $this->userFloodControl = $user_flood_control;
     $this->userStorage = $user_storage;
     if (!$user_auth instanceof UserAuthenticationInterface) {
-      @trigger_error('The $user_auth parameter not implementing UserAuthenticationInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3411040');
+      @\trigger_error('The $user_auth parameter not implementing UserAuthenticationInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3411040');
     }
     $this->userAuth = $user_auth;
     $this->renderer = $renderer;
@@ -165,7 +165,7 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
       $this->getRequest()->query->set('destination', $this->getRequest()->request->get('destination'));
     }
 
-    user_login_finalize($account);
+    \user_login_finalize($account);
   }
 
   /**
@@ -174,10 +174,10 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
    * If successful, $form_state->get('uid') is set to the matching user ID.
    */
   public function validateAuthentication(array &$form, FormStateInterface $form_state) {
-    $password = trim($form_state->getValue('pass'));
+    $password = \trim($form_state->getValue('pass'));
     $flood_config = $this->config('user.flood');
     $account = FALSE;
-    if (!$form_state->isValueEmpty('name') && strlen($password) > 0) {
+    if (!$form_state->isValueEmpty('name') && \strlen($password) > 0) {
       // Do not allow any login from the current user's IP if the limit has been
       // reached. Default is 50 failed attempts allowed in one hour. This is
       // independent of the per-user limit to catch attempts from one IP to log
@@ -193,7 +193,7 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
       }
       else {
         $accounts = $this->userStorage->loadByProperties(['name' => $form_state->getValue('name')]);
-        $account = reset($accounts);
+        $account = \reset($accounts);
       }
       if ($account && $account->isBlocked()) {
         $form_state->setErrorByName('name', $this->t('The username %name has not been activated or is blocked.', ['%name' => $form_state->getValue('name')]));

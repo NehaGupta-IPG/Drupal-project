@@ -43,7 +43,7 @@ trait ApiRequestTrait {
     // HEAD requests do not have bodies. If one is specified, Guzzle will not
     // ignore it and the request will be treated as GET with an overridden
     // method string, and libcurl will expect to read a response body.
-    if ($method === 'HEAD' && array_key_exists('body', $request_options)) {
+    if ($method === 'HEAD' && \array_key_exists('body', $request_options)) {
       unset($request_options['body']);
     }
     $this->refreshVariables();

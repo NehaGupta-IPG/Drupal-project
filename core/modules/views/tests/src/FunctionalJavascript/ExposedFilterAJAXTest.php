@@ -55,7 +55,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
       ->save();
 
     // Import user_test_views and set it to use ajax.
-    ViewTestData::createTestViews(get_class($this), ['user_test_views']);
+    ViewTestData::createTestViews(\get_class($this), ['user_test_views']);
     \Drupal::configFactory()->getEditable('views.view.test_user_name')
       ->set('display.default.display_options.use_ajax', TRUE)
       ->save();
@@ -261,7 +261,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $name = $this->randomMachineName();
     $this->submitForm(['uid' => $name], 'Apply');
     $this->assertSession()->waitForElement('css', 'div[aria-label="Error message"]');
-    $this->assertSession()->pageTextContainsOnce(sprintf('There are no users matching "%s"', $name));
+    $this->assertSession()->pageTextContainsOnce(\sprintf('There are no users matching "%s"', $name));
 
     \Drupal::service('module_installer')->install(['inline_form_errors']);
 
@@ -270,7 +270,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $name = $this->randomMachineName();
     $this->submitForm(['uid' => $name], 'Apply');
     $this->assertSession()->waitForElement('css', 'div[aria-label="Error message"]');
-    $this->assertSession()->pageTextContainsOnce(sprintf('There are no users matching "%s"', $name));
+    $this->assertSession()->pageTextContainsOnce(\sprintf('There are no users matching "%s"', $name));
   }
 
 }

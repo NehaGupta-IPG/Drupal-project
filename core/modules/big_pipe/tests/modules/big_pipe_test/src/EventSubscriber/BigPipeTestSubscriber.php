@@ -41,7 +41,7 @@ class BigPipeTestSubscriber implements EventSubscriberInterface {
 
     $attachments = $response->getAttachments();
     if (!isset($attachments['big_pipe_placeholders']) && !isset($attachments['big_pipe_nojs_placeholders'])) {
-      if (str_contains($response->getContent(), static::CONTENT_TRIGGER_EXCEPTION)) {
+      if (\str_contains($response->getContent(), static::CONTENT_TRIGGER_EXCEPTION)) {
         throw new \Exception('Oh noes!');
       }
     }
@@ -65,11 +65,11 @@ class BigPipeTestSubscriber implements EventSubscriberInterface {
     $response->headers->set('BigPipe-Test-No-Js-Placeholders', '<none>');
 
     if (!empty($attachments['big_pipe_placeholders'])) {
-      $response->headers->set('BigPipe-Test-Placeholders', implode(' ', array_keys($attachments['big_pipe_placeholders'])));
+      $response->headers->set('BigPipe-Test-Placeholders', \implode(' ', \array_keys($attachments['big_pipe_placeholders'])));
     }
 
     if (!empty($attachments['big_pipe_nojs_placeholders'])) {
-      $response->headers->set('BigPipe-Test-No-Js-Placeholders', implode(' ', array_map('rawurlencode', array_keys($attachments['big_pipe_nojs_placeholders']))));
+      $response->headers->set('BigPipe-Test-No-Js-Placeholders', \implode(' ', \array_map('rawurlencode', \array_keys($attachments['big_pipe_nojs_placeholders']))));
     }
   }
 

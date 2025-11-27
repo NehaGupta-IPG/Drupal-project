@@ -55,11 +55,11 @@ class PluginFormFactoryTest extends UnitTestCase {
     $plugin_form = $this->prophesize(PluginFormInterface::class);
     $expected = $plugin_form->reveal();
 
-    $this->classResolver->getInstanceFromDefinition(get_class($expected))->willReturn($expected);
+    $this->classResolver->getInstanceFromDefinition(\get_class($expected))->willReturn($expected);
 
     $plugin = $this->prophesize(PluginWithFormsInterface::class);
     $plugin->hasFormClass('standard_class')->willReturn(TRUE);
-    $plugin->getFormClass('standard_class')->willReturn(get_class($expected));
+    $plugin->getFormClass('standard_class')->willReturn(\get_class($expected));
 
     $form_object = $this->manager->createInstance($plugin->reveal(), 'standard_class');
     $this->assertSame($expected, $form_object);
@@ -75,7 +75,7 @@ class PluginFormFactoryTest extends UnitTestCase {
 
     $plugin = $this->prophesize(PluginWithFormsInterface::class)->willImplement(PluginFormInterface::class);
     $plugin->hasFormClass('configure')->willReturn(TRUE);
-    $plugin->getFormClass('configure')->willReturn(get_class($plugin->reveal()));
+    $plugin->getFormClass('configure')->willReturn(\get_class($plugin->reveal()));
 
     $form_object = $this->manager->createInstance($plugin->reveal(), 'configure');
     $this->assertSame($plugin->reveal(), $form_object);
@@ -91,7 +91,7 @@ class PluginFormFactoryTest extends UnitTestCase {
 
     $plugin = $this->prophesize(PluginWithFormsInterface::class)->willImplement(PluginFormInterface::class);
     $plugin->hasFormClass('configure')->willReturn(TRUE);
-    $plugin->getFormClass('configure')->willReturn('\\' . get_class($plugin->reveal()));
+    $plugin->getFormClass('configure')->willReturn('\\' . \get_class($plugin->reveal()));
 
     $form_object = $this->manager->createInstance($plugin->reveal(), 'configure');
     $this->assertSame($plugin->reveal(), $form_object);
@@ -108,7 +108,7 @@ class PluginFormFactoryTest extends UnitTestCase {
     $plugin = $this->prophesize(PluginWithFormsInterface::class)->willImplement(PluginFormInterface::class);
     $plugin->hasFormClass('missing')->willReturn(FALSE);
     $plugin->hasFormClass('fallback')->willReturn(TRUE);
-    $plugin->getFormClass('fallback')->willReturn(get_class($plugin->reveal()));
+    $plugin->getFormClass('fallback')->willReturn(\get_class($plugin->reveal()));
 
     $form_object = $this->manager->createInstance($plugin->reveal(), 'missing', 'fallback');
     $this->assertSame($plugin->reveal(), $form_object);
@@ -124,11 +124,11 @@ class PluginFormFactoryTest extends UnitTestCase {
 
     $expected = $plugin_form->reveal();
 
-    $this->classResolver->getInstanceFromDefinition(get_class($expected))->willReturn($expected);
+    $this->classResolver->getInstanceFromDefinition(\get_class($expected))->willReturn($expected);
 
     $plugin = $this->prophesize(PluginWithFormsInterface::class);
     $plugin->hasFormClass('operation_aware')->willReturn(TRUE);
-    $plugin->getFormClass('operation_aware')->willReturn(get_class($expected));
+    $plugin->getFormClass('operation_aware')->willReturn(\get_class($expected));
 
     $plugin_form->setPlugin($plugin->reveal())->shouldBeCalled();
 
@@ -163,12 +163,12 @@ class PluginFormFactoryTest extends UnitTestCase {
     $this->expectExceptionMessage('The "the_plugin_id" plugin did not specify a valid "invalid" form class, must implement \Drupal\Core\Plugin\PluginFormInterface');
 
     $expected = new \stdClass();
-    $this->classResolver->getInstanceFromDefinition(get_class($expected))->willReturn($expected);
+    $this->classResolver->getInstanceFromDefinition(\get_class($expected))->willReturn($expected);
 
     $plugin = $this->prophesize(PluginWithFormsInterface::class);
     $plugin->getPluginId()->willReturn('the_plugin_id');
     $plugin->hasFormClass('invalid')->willReturn(TRUE);
-    $plugin->getFormClass('invalid')->willReturn(get_class($expected));
+    $plugin->getFormClass('invalid')->willReturn(\get_class($expected));
 
     $form_object = $this->manager->createInstance($plugin->reveal(), 'invalid');
     $this->assertNull($form_object);

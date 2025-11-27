@@ -79,7 +79,7 @@ class AjaxResponseSubscriber implements EventSubscriberInterface {
       // @see Drupal.ajax.prototype.beforeSend()
       $accept = $event->getRequest()->headers->get('accept', '');
 
-      if (str_contains($accept, 'text/html')) {
+      if (\str_contains($accept, 'text/html')) {
         $response->headers->set('Content-Type', 'text/html; charset=utf-8');
 
         // Browser IFRAMEs expect HTML. Browser extensions, such as

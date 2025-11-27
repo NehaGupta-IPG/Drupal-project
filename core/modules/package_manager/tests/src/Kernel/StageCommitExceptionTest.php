@@ -95,12 +95,12 @@ class StageCommitExceptionTest extends PackageManagerKernelTestBase {
     ];
     // Composer Stager's exception messages are usually translatable, so they
     // need to be wrapped by a TranslatableMessage object.
-    if (is_subclass_of($thrown_class, ExceptionInterface::class)) {
+    if (\is_subclass_of($thrown_class, ExceptionInterface::class)) {
       $throwable_arguments[0] = $this->createComposeStagerMessage($throwable_arguments[0]);
     }
     // PreconditionException requires a preconditions object.
     if ($thrown_class === PreconditionException::class) {
-      array_unshift($throwable_arguments, $this->createMock(PreconditionInterface::class));
+      \array_unshift($throwable_arguments, $this->createMock(PreconditionInterface::class));
     }
     LoggingCommitter::setException($thrown_class, ...$throwable_arguments);
 

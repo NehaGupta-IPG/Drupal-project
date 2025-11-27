@@ -36,12 +36,12 @@ class OverlapWithTopLevelDependenciesTest extends TestCase {
    */
   #[DataProvider('templateProjectPathProvider')]
   public function testOverlapWithTemplateProject($template_project_path): void {
-    $root = dirname(__DIR__, 6);
+    $root = \dirname(__DIR__, 6);
     // Read template project composer.json.
-    $top_level_composer_json = json_decode(file_get_contents("$root/$template_project_path/composer.json"), TRUE);
+    $top_level_composer_json = \json_decode(\file_get_contents("$root/$template_project_path/composer.json"), TRUE);
 
     // Read drupal/core-recommended composer.json.
-    $core_recommended_composer_json = json_decode(file_get_contents("$root/composer/Metapackage/CoreRecommended/composer.json"), TRUE);
+    $core_recommended_composer_json = \json_decode(\file_get_contents("$root/composer/Metapackage/CoreRecommended/composer.json"), TRUE);
 
     // Fail if any required project in the require section of the template
     // project also exists in core/recommended.

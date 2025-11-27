@@ -148,27 +148,27 @@ class ArgumentDateTest extends ViewsKernelTestBase {
    */
   public function testWeekHandler(): void {
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 9, 26, 2008)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 9, 26, 2008)])
       ->condition('id', 1)
       ->execute();
 
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 2, 29, 2004)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 2, 29, 2004)])
       ->condition('id', 2)
       ->execute();
 
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 1, 1, 2000)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 1, 1, 2000)])
       ->condition('id', 3)
       ->execute();
 
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 1, 10, 2000)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 1, 10, 2000)])
       ->condition('id', 4)
       ->execute();
 
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 2, 1, 2000)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 2, 1, 2000)])
       ->condition('id', 5)
       ->execute();
 
@@ -226,17 +226,17 @@ class ArgumentDateTest extends ViewsKernelTestBase {
    */
   public function testYearHandler(): void {
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 1, 1, 2001)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 1, 1, 2001)])
       ->condition('id', 3)
       ->execute();
 
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 1, 1, 2002)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 1, 1, 2002)])
       ->condition('id', 4)
       ->execute();
 
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 1, 1, 2002)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 1, 1, 2002)])
       ->condition('id', 5)
       ->execute();
 
@@ -277,17 +277,17 @@ class ArgumentDateTest extends ViewsKernelTestBase {
    */
   public function testYearMonthHandler(): void {
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 1, 1, 2001)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 1, 1, 2001)])
       ->condition('id', 3)
       ->execute();
 
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 4, 1, 2001)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 4, 1, 2001)])
       ->condition('id', 4)
       ->execute();
 
     $this->container->get('database')->update('views_test_data')
-      ->fields(['created' => gmmktime(0, 0, 0, 4, 1, 2001)])
+      ->fields(['created' => \gmmktime(0, 0, 0, 4, 1, 2001)])
       ->condition('id', 5)
       ->execute();
 

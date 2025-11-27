@@ -75,8 +75,8 @@ class HtmxLocationResponseData implements \Stringable {
       'select' => $this->select,
       'values' => $this->values,
     ];
-    $data = array_filter($data, static fn ($item) => $item !== '' && $item !== []);
-    return json_encode($data);
+    $data = \array_filter($data, static fn ($item) => $item !== '' && $item !== []);
+    return \json_encode($data);
   }
 
   /**

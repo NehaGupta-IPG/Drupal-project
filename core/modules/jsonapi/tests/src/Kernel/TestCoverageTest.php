@@ -40,7 +40,7 @@ class TestCoverageTest extends KernelTestBase {
 
     $this->installConfig('system');
     $all_modules = \Drupal::service('extension.list.module')->getList();
-    $stable_core_modules = array_filter($all_modules, function ($module) {
+    $stable_core_modules = \array_filter($all_modules, function ($module) {
       // Filter out contrib, hidden, testing, experimental, and deprecated
       // modules. We also don't need to enable modules that are already enabled.
       return $module->origin === 'core'
@@ -51,13 +51,13 @@ class TestCoverageTest extends KernelTestBase {
         && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::DEPRECATED;
     });
 
-    $this->container->get('module_installer')->install(array_keys($stable_core_modules));
+    $this->container->get('module_installer')->install(\array_keys($stable_core_modules));
 
     $this->definitions = $this->container->get('entity_type.manager')->getDefinitions();
 
     // Entity types marked as "internal" are not exposed by JSON:API and hence
     // also don't need test coverage.
-    $this->definitions = array_filter($this->definitions, function (EntityTypeInterface $entity_type) {
+    $this->definitions = \array_filter($this->definitions, function (EntityTypeInterface $entity_type) {
       return !$entity_type->isInternal();
     });
   }
@@ -69,8 +69,8 @@ class TestCoverageTest extends KernelTestBase {
     $problems = [];
     foreach ($this->definitions as $entity_type_id => $info) {
       $class_name_full = $info->getClass();
-      $parts = explode('\\', $class_name_full);
-      $class_name = end($parts);
+      $parts = \explode('\\', $class_name_full);
+      $class_name = \end($parts);
       $module_name = $parts[1];
 
       $possible_paths = [
@@ -82,19 +82,19 @@ class TestCoverageTest extends KernelTestBase {
       ];
       foreach ($possible_paths as $path) {
         $missing_tests = [];
-        $class = str_replace('CLASS', $class_name, $path);
-        if (class_exists($class)) {
+        $class = \str_replace('CLASS', $class_name, $path);
+        if (\class_exists($class)) {
           break;
         }
         $missing_tests[] = $class;
       }
       if (!empty($missing_tests)) {
-        $missing_tests_list = implode(', ', $missing_tests);
+        $missing_tests_list = \implode(', ', $missing_tests);
         $problems[] = "$entity_type_id: $class_name ($class_name_full) (expected tests: $missing_tests_list)";
       }
       else {
-        $config_entity = is_subclass_of($class_name_full, ConfigEntityInterface::class);
-        $config_test = is_subclass_of($class, ConfigEntityResourceTestBase::class);
+        $config_entity = \is_subclass_of($class_name_full, ConfigEntityInterface::class);
+        $config_test = \is_subclass_of($class, ConfigEntityResourceTestBase::class);
         if ($config_entity && !$config_test) {
           $problems[] = "$entity_type_id: $class_name is a config entity, but the test is for content entities.";
         }

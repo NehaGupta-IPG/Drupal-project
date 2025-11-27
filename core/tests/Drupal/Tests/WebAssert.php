@@ -60,20 +60,20 @@ class WebAssert extends MinkWebAssert {
       $url = $url->setAbsolute()->toString();
     }
     // Strip the base URL from the beginning for absolute URLs.
-    if ($this->baseUrl !== '' && str_starts_with($url, $this->baseUrl)) {
-      $url = substr($url, strlen($this->baseUrl));
+    if ($this->baseUrl !== '' && \str_starts_with($url, $this->baseUrl)) {
+      $url = \substr($url, \strlen($this->baseUrl));
     }
-    $parts = parse_url($url);
+    $parts = \parse_url($url);
     // Make sure there is a forward slash at the beginning of relative URLs for
     // consistency.
-    if (empty($parts['host']) && !str_starts_with($url, '/')) {
+    if (empty($parts['host']) && !\str_starts_with($url, '/')) {
       $parts['path'] = '/' . $parts['path'];
     }
     $fragment = empty($parts['fragment']) ? '' : '#' . $parts['fragment'];
     $path = empty($parts['path']) ? '/' : $parts['path'];
     $query = $include_query && !empty($parts['query']) ? '?' . $parts['query'] : '';
 
-    return preg_replace('/^\/[^\.\/]+\.php\//', '/', $path) . $query . $fragment;
+    return \preg_replace('/^\/[^\.\/]+\.php\//', '/', $path) . $query . $fragment;
   }
 
   /**
@@ -123,8 +123,8 @@ class WebAssert extends MinkWebAssert {
    *   (Optional) the failure message.
    */
   public function pageTextMatchesCount(int $count, string $regex, string $message = ''): void {
-    $actual = preg_replace('/\s+/u', ' ', $this->session->getPage()->getText());
-    $matches = preg_match_all($regex, $actual);
+    $actual = \preg_replace('/\s+/u', ' ', $this->session->getPage()->getText());
+    $matches = \preg_match_all($regex, $actual);
     if ($message === '') {
       $message = "Failed asserting that the page matches the pattern '$regex' $count time(s), $matches found.";
     }
@@ -147,7 +147,7 @@ class WebAssert extends MinkWebAssert {
    *   When the element doesn't exist.
    */
   public function buttonExists($button, ?TraversableElement $container = NULL) {
-    if (!is_string($button)) {
+    if (!\is_string($button)) {
       // @todo Trigger deprecation in
       //   https://www.drupal.org/project/drupal/issues/3421105.
       $button = (string) $button;
@@ -177,7 +177,7 @@ class WebAssert extends MinkWebAssert {
     $container = $container ?: $this->session->getPage();
     $node = $container->findButton($button);
 
-    $this->assert(NULL === $node, sprintf('A button "%s" appears on this page, but it should not.', $button));
+    $this->assert(NULL === $node, \sprintf('A button "%s" appears on this page, but it should not.', $button));
   }
 
   /**
@@ -270,7 +270,7 @@ class WebAssert extends MinkWebAssert {
 
     $option_field = $select_field->find('named_exact', ['option', $option]);
 
-    $this->assert($option_field === NULL, sprintf('An option "%s" exists in select "%s", but it should not.', $option, $select));
+    $this->assert($option_field === NULL, \sprintf('An option "%s" exists in select "%s", but it should not.', $option, $select));
   }
 
   /**
@@ -309,7 +309,7 @@ class WebAssert extends MinkWebAssert {
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkExists($label, $index = 0, $message = '') {
-    $message = ($message ?: strtr('Link with label %label not found.', ['%label' => $label]));
+    $message = ($message ?: \strtr('Link with label %label not found.', ['%label' => $label]));
     $links = $this->session->getPage()->findAll('named', ['link', $label]);
     $this->assert(!empty($links[$index]), $message);
   }
@@ -332,7 +332,7 @@ class WebAssert extends MinkWebAssert {
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkExistsExact($label, $index = 0, $message = '') {
-    $message = ($message ?: strtr('Link with label %label not found.', ['%label' => $label]));
+    $message = ($message ?: \strtr('Link with label %label not found.', ['%label' => $label]));
     $links = $this->session->getPage()->findAll('named_exact', ['link', $label]);
     $this->assert(!empty($links[$index]), $message);
   }
@@ -353,7 +353,7 @@ class WebAssert extends MinkWebAssert {
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkNotExists($label, $message = '') {
-    $message = ($message ?: strtr('Link with label %label found.', ['%label' => $label]));
+    $message = ($message ?: \strtr('Link with label %label found.', ['%label' => $label]));
     $links = $this->session->getPage()->findAll('named', ['link', $label]);
     $this->assert(empty($links), $message);
   }
@@ -374,7 +374,7 @@ class WebAssert extends MinkWebAssert {
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkNotExistsExact($label, $message = '') {
-    $message = ($message ?: strtr('Link with label %label found.', ['%label' => $label]));
+    $message = ($message ?: \strtr('Link with label %label found.', ['%label' => $label]));
     $links = $this->session->getPage()->findAll('named_exact', ['link', $label]);
     $this->assert(empty($links), $message);
   }
@@ -398,7 +398,7 @@ class WebAssert extends MinkWebAssert {
    */
   public function linkByHrefExists($href, $index = 0, $message = '') {
     $xpath = $this->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $href]);
-    $message = ($message ?: strtr('No link containing href %href found.', ['%href' => $href]));
+    $message = ($message ?: \strtr('No link containing href %href found.', ['%href' => $href]));
     $links = $this->session->getPage()->findAll('xpath', $xpath);
     $this->assert(!empty($links[$index]), $message);
   }
@@ -422,7 +422,7 @@ class WebAssert extends MinkWebAssert {
    */
   public function linkByHrefExistsExact(string $href, int $index = 0, string $message = ''): void {
     $xpath = $this->buildXPathQuery('//a[@href=:href]', [':href' => $href]);
-    $message = ($message ?: strtr('No link with href %href found.', ['%href' => $href]));
+    $message = ($message ?: \strtr('No link with href %href found.', ['%href' => $href]));
     $links = $this->session->getPage()->findAll('xpath', $xpath);
     $this->assert(!empty($links[$index]), $message);
   }
@@ -444,7 +444,7 @@ class WebAssert extends MinkWebAssert {
    */
   public function linkByHrefNotExists($href, $message = '') {
     $xpath = $this->buildXPathQuery('//a[contains(@href, :href)]', [':href' => $href]);
-    $message = ($message ?: strtr('Link containing href %href found.', ['%href' => $href]));
+    $message = ($message ?: \strtr('Link containing href %href found.', ['%href' => $href]));
     $links = $this->session->getPage()->findAll('xpath', $xpath);
     $this->assert(empty($links), $message);
   }
@@ -466,7 +466,7 @@ class WebAssert extends MinkWebAssert {
    */
   public function linkByHrefNotExistsExact(string $href, string $message = ''): void {
     $xpath = $this->buildXPathQuery('//a[@href=:href]', [':href' => $href]);
-    $message = ($message ?: strtr('Link with href %href found.', ['%href' => $href]));
+    $message = ($message ?: \strtr('Link with href %href found.', ['%href' => $href]));
     $links = $this->session->getPage()->findAll('xpath', $xpath);
     $this->assert(empty($links), $message);
   }
@@ -494,15 +494,15 @@ class WebAssert extends MinkWebAssert {
   public function buildXPathQuery($xpath, array $args = []) {
     // Replace placeholders.
     foreach ($args as $placeholder => $value) {
-      if (is_object($value)) {
+      if (\is_object($value)) {
         throw new \InvalidArgumentException('Just pass in scalar values for $args and remove all t() calls from your test.');
       }
       // XPath 1.0 doesn't support a way to escape single or double quotes in a
       // string literal. We split double quotes out of the string, and encode
       // them separately.
-      if (is_string($value)) {
+      if (\is_string($value)) {
         // Explode the text at the quote characters.
-        $parts = explode('"', $value);
+        $parts = \explode('"', $value);
 
         // Quote the parts.
         foreach ($parts as &$part) {
@@ -510,7 +510,7 @@ class WebAssert extends MinkWebAssert {
         }
 
         // Return the string.
-        $value = count($parts) > 1 ? 'concat(' . implode(', \'"\', ', $parts) . ')' : $parts[0];
+        $value = \count($parts) > 1 ? 'concat(' . \implode(', \'"\', ', $parts) . ')' : $parts[0];
       }
 
       // Use preg_replace_callback() instead of preg_replace() to prevent the
@@ -518,7 +518,7 @@ class WebAssert extends MinkWebAssert {
       $replacement = function ($matches) use ($value) {
         return $value;
       };
-      $xpath = preg_replace_callback('/' . preg_quote($placeholder, NULL) . '\b/', $replacement, $xpath);
+      $xpath = \preg_replace_callback('/' . \preg_quote($placeholder, NULL) . '\b/', $replacement, $xpath);
     }
     return $xpath;
   }
@@ -703,9 +703,9 @@ class WebAssert extends MinkWebAssert {
   public function hiddenFieldValueEquals($field, $value, ?TraversableElement $container = NULL) {
     $node = $this->hiddenFieldExists($field, $container);
     $actual = $node->getValue();
-    $regex = '/^' . preg_quote($value, '/') . '$/ui';
+    $regex = '/^' . \preg_quote($value, '/') . '$/ui';
     $message = "The hidden field '$field' value is '$actual', but '$value' expected.";
-    $this->assert((bool) preg_match($regex, $actual), $message);
+    $this->assert((bool) \preg_match($regex, $actual), $message);
   }
 
   /**
@@ -724,9 +724,9 @@ class WebAssert extends MinkWebAssert {
   public function hiddenFieldValueNotEquals($field, $value, ?TraversableElement $container = NULL) {
     $node = $this->hiddenFieldExists($field, $container);
     $actual = $node->getValue();
-    $regex = '/^' . preg_quote($value, '/') . '$/ui';
+    $regex = '/^' . \preg_quote($value, '/') . '$/ui';
     $message = "The hidden field '$field' value is '$actual', but it should not be.";
-    $this->assert(!preg_match($regex, $actual), $message);
+    $this->assert(!\preg_match($regex, $actual), $message);
   }
 
   /**
@@ -738,7 +738,7 @@ class WebAssert extends MinkWebAssert {
    * @see \Behat\Mink\WebAssert::pageTextContains()
    */
   public function pageTextContainsOnce($text) {
-    $regex = '/' . preg_quote($text, '/') . '/ui';
+    $regex = '/' . \preg_quote($text, '/') . '/ui';
     try {
       $this->pageTextMatchesCount(1, $regex);
     }
@@ -757,7 +757,7 @@ class WebAssert extends MinkWebAssert {
     foreach ($this->session->getPage()->findAll('xpath', '//*[@id]') as $element) {
       $id = $element->getAttribute('id');
       if (isset($seen_ids[$id])) {
-        throw new ExpectationException(sprintf('The page contains a duplicate HTML ID "%s".', $id), $this->session->getDriver());
+        throw new ExpectationException(\sprintf('The page contains a duplicate HTML ID "%s".', $id), $this->session->getDriver());
       }
       $seen_ids[$id] = TRUE;
     }
@@ -776,9 +776,9 @@ class WebAssert extends MinkWebAssert {
    */
   public function addressEquals(string|Url $page) {
     $expected = $this->cleanUrl($page, TRUE);
-    $actual = $this->cleanUrl($this->session->getCurrentUrl(), str_contains($expected, '?'));
+    $actual = $this->cleanUrl($this->session->getCurrentUrl(), \str_contains($expected, '?'));
 
-    $this->assert($actual === $expected, sprintf('Current page is "%s", but "%s" expected.', $actual, $expected));
+    $this->assert($actual === $expected, \sprintf('Current page is "%s", but "%s" expected.', $actual, $expected));
   }
 
   /**
@@ -791,9 +791,9 @@ class WebAssert extends MinkWebAssert {
    */
   public function addressNotEquals(string|Url $page) {
     $expected = $this->cleanUrl($page, TRUE);
-    $actual = $this->cleanUrl($this->session->getCurrentUrl(), str_contains($expected, '?'));
+    $actual = $this->cleanUrl($this->session->getCurrentUrl(), \str_contains($expected, '?'));
 
-    $this->assert($actual !== $expected, sprintf('Current page is "%s", but should not be.', $actual));
+    $this->assert($actual !== $expected, \sprintf('Current page is "%s", but should not be.', $actual));
   }
 
   /**
@@ -807,7 +807,7 @@ class WebAssert extends MinkWebAssert {
    *   Expected text.
    */
   public function elementTextEquals(string $selectorType, $selector, string $text): void {
-    $selector_string = is_array($selector) ? '[' . implode(', ', $selector) . ']' : $selector;
+    $selector_string = \is_array($selector) ? '[' . \implode(', ', $selector) . ']' : $selector;
     $message = "Failed asserting that the text of the element identified by '$selector_string' equals '$text'.";
     $constraint = new IsEqual($text);
     Assert::assertThat($this->elementExists($selectorType, $selector)->getText(), $constraint, $message);
@@ -907,8 +907,8 @@ class WebAssert extends MinkWebAssert {
       'warning',
       NULL,
     ];
-    if (!in_array($type, $allowed_types, TRUE)) {
-      throw new \InvalidArgumentException(sprintf("If a status message type is specified, the allowed values are 'status', 'error', 'warning'. The value provided was '%s'.", $type));
+    if (!\in_array($type, $allowed_types, TRUE)) {
+      throw new \InvalidArgumentException(\sprintf("If a status message type is specified, the allowed values are 'status', 'error', 'warning'. The value provided was '%s'.", $type));
     }
     $selector = '//div[@data-drupal-messages]';
     $aria_label = NULL;
@@ -952,7 +952,7 @@ class WebAssert extends MinkWebAssert {
    * {@inheritdoc}
    */
   public function responseHeaderEquals($name, $value) {
-    if (!is_string($name)) {
+    if (!\is_string($name)) {
       // @todo Trigger deprecation in
       //   https://www.drupal.org/project/drupal/issues/3421105.
       $name = (string) $name;
@@ -963,7 +963,7 @@ class WebAssert extends MinkWebAssert {
       $this->responseHeaderDoesNotExist($name);
       return;
     }
-    if (!is_string($value)) {
+    if (!\is_string($value)) {
       $value = (string) $value;
     }
     parent::responseHeaderEquals($name, $value);
@@ -973,7 +973,7 @@ class WebAssert extends MinkWebAssert {
    * {@inheritdoc}
    */
   public function pageTextContains($text) {
-    if (!is_string($text)) {
+    if (!\is_string($text)) {
       // @todo Trigger deprecation in
       //   https://www.drupal.org/project/drupal/issues/3421105.
       $text = (string) $text;
@@ -985,7 +985,7 @@ class WebAssert extends MinkWebAssert {
    * {@inheritdoc}
    */
   public function fieldValueEquals(string $field, $value, ?TraversableElement $container = NULL) {
-    if (!is_string($value)) {
+    if (!\is_string($value)) {
       // @todo Trigger deprecation in
       //   https://www.drupal.org/project/drupal/issues/3421105.
       $value = (string) $value;

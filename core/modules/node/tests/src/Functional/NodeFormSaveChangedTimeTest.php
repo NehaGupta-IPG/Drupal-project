@@ -71,7 +71,7 @@ class NodeFormSaveChangedTimeTest extends BrowserTestBase {
     $this->assertEquals($changed_timestamp, $node->getChangedTime(), "The entity's changed time wasn't updated after API save without changes.");
 
     // Ensure different save timestamps.
-    sleep(1);
+    \sleep(1);
 
     // Save the node on the regular node edit form.
     $this->drupalGet('node/1/edit');

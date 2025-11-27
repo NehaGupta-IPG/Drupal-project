@@ -81,8 +81,8 @@ trait FieldDiscoveryTestTrait {
       $field_discovery->addAllFieldProcesses($migration);
     }
     $actual_process = $migration->getProcess();
-    $actual = array_keys($actual_process);
-    $this->assertSame(sort($expected_process_keys), sort($actual));
+    $actual = \array_keys($actual_process);
+    $this->assertSame(\sort($expected_process_keys), \sort($actual));
   }
 
   /**

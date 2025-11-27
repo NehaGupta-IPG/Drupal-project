@@ -60,7 +60,7 @@ final class ExtensionLifecycle {
       self::DEPRECATED,
       self::OBSOLETE,
     ];
-    return in_array($lifecycle, $valid_values, TRUE);
+    return \in_array($lifecycle, $valid_values, TRUE);
   }
 
 }

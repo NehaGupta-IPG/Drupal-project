@@ -54,11 +54,11 @@ class WebDriverTestBaseTest extends UnitTestCase {
    *   No return value.
    */
   private function putEnv(string $variable, ?string $value): void {
-    if (is_string($value)) {
-      putenv($variable . "=" . $value);
+    if (\is_string($value)) {
+      \putenv($variable . "=" . $value);
     }
     else {
-      putenv($variable);
+      \putenv($variable);
     }
   }
 

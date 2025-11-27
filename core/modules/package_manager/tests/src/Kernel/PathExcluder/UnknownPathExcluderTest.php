@@ -50,7 +50,7 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
       // Create another directory and copy its contents from fake_site fixture.
       $fake_site_with_nested_webroot = DrupalFileSystem::getOsTemporaryDirectory() . DIRECTORY_SEPARATOR . 'fake_site_with_nested_webroot';
       $fs = new Filesystem();
-      if (is_dir($fake_site_with_nested_webroot)) {
+      if (\is_dir($fake_site_with_nested_webroot)) {
         $fs->remove($fake_site_with_nested_webroot);
       }
       $fs->mkdir($fake_site_with_nested_webroot);
@@ -60,7 +60,7 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
       // and files into it, except for ones that should always be in the
       // project root.
       $fs->mkdir($fake_site_with_nested_webroot . DIRECTORY_SEPARATOR . 'webroot');
-      $paths_in_project_root = glob("$fake_site_with_nested_webroot/*");
+      $paths_in_project_root = \glob("$fake_site_with_nested_webroot/*");
       $keep_in_project_root = [
         $fake_site_with_nested_webroot . '/vendor',
         $fake_site_with_nested_webroot . '/webroot',
@@ -69,8 +69,8 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
         $fake_site_with_nested_webroot . '/custom',
       ];
       foreach ($paths_in_project_root as $path_in_project_root) {
-        if (!in_array($path_in_project_root, $keep_in_project_root, TRUE)) {
-          $fs->rename($path_in_project_root, $fake_site_with_nested_webroot . '/webroot' . str_replace($fake_site_with_nested_webroot, '', $path_in_project_root));
+        if (!\in_array($path_in_project_root, $keep_in_project_root, TRUE)) {
+          $fs->rename($path_in_project_root, $fake_site_with_nested_webroot . '/webroot' . \str_replace($fake_site_with_nested_webroot, '', $path_in_project_root));
         }
       }
       parent::createTestProject($fake_site_with_nested_webroot);
@@ -156,10 +156,10 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
     $active_dir = $this->container->get(PathLocator::class)
       ->getProjectRoot();
     if ($unknown_dir) {
-      mkdir("$active_dir/$unknown_dir");
+      \mkdir("$active_dir/$unknown_dir");
     }
     foreach ($unknown_files as $unknown_file) {
-      file_put_contents("$active_dir/$unknown_file", "Unknown File");
+      \file_put_contents("$active_dir/$unknown_file", "Unknown File");
     }
 
     $stage = $this->createStage();
@@ -178,8 +178,8 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
         // If $unknown_file is in a subdirectory, only the subdirectory is going
         // to be logged as an excluded path. The excluder doesn't recurse into
         // subdirectories.
-        if (str_contains($unknown_file, '/')) {
-          $unknown_file = dirname($unknown_file);
+        if (\str_contains($unknown_file, '/')) {
+          $unknown_file = \dirname($unknown_file);
         }
         $this->assertTrue($logger->hasRecordThatContains($unknown_file, RfcLogLevel::INFO));
       }
@@ -218,8 +218,8 @@ class UnknownPathExcluderTest extends PackageManagerKernelTestBase {
 
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
-    mkdir($project_root . '/unknown');
-    touch($project_root . '/unknown/file.txt');
+    \mkdir($project_root . '/unknown');
+    \touch($project_root . '/unknown/file.txt');
 
     $config = $this->config('package_manager.settings');
     $config->set('include_unknown_files_in_project_root', TRUE)->save();

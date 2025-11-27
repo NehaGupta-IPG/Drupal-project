@@ -58,8 +58,8 @@ class EventSubscriber implements EventSubscriberInterface {
   public function onConfigImporterMissingContentOne(MissingContentEvent $event) {
     if ($this->state->get('config_import_test.config_import_missing_content', FALSE) && $this->state->get('config_import_test.config_import_missing_content_one', FALSE) === FALSE) {
       $missing = $event->getMissingContent();
-      $uuid = key($missing);
-      $this->state->set('config_import_test.config_import_missing_content_one', key($missing));
+      $uuid = \key($missing);
+      $this->state->set('config_import_test.config_import_missing_content_one', \key($missing));
       $event->resolveMissingContent($uuid);
       // Stopping propagation ensures that onConfigImporterMissingContentTwo
       // will be fired on the next batch step.
@@ -76,8 +76,8 @@ class EventSubscriber implements EventSubscriberInterface {
   public function onConfigImporterMissingContentTwo(MissingContentEvent $event) {
     if ($this->state->get('config_import_test.config_import_missing_content', FALSE) && $this->state->get('config_import_test.config_import_missing_content_two', FALSE) === FALSE) {
       $missing = $event->getMissingContent();
-      $uuid = key($missing);
-      $this->state->set('config_import_test.config_import_missing_content_two', key($missing));
+      $uuid = \key($missing);
+      $this->state->set('config_import_test.config_import_missing_content_two', \key($missing));
       $event->resolveMissingContent($uuid);
     }
   }
@@ -101,13 +101,13 @@ class EventSubscriber implements EventSubscriberInterface {
       $uninstalled = $this->state->get('ConfigImportUITest.core.extension.modules_uninstalled', []);
       $original = $config->getOriginal('module');
       $data = $config->get('module');
-      $install = array_diff_key($data, $original);
+      $install = \array_diff_key($data, $original);
       if (!empty($install)) {
-        $installed = array_merge($installed, $install);
+        $installed = \array_merge($installed, $install);
       }
-      $uninstall = array_diff_key($original, $data);
+      $uninstall = \array_diff_key($original, $data);
       if (!empty($uninstall)) {
-        $uninstalled[] = key($uninstall);
+        $uninstalled[] = \key($uninstall);
       }
 
       $this->state->set('ConfigImportUITest.core.extension.modules_installed', $installed);

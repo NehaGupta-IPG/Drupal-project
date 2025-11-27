@@ -31,11 +31,11 @@ class SectionData extends TypedData {
    * {@inheritdoc}
    */
   public function setValue($value, $notify = TRUE) {
-    if (is_array($value)) {
+    if (\is_array($value)) {
       $value = Section::fromArray($value);
     }
     if ($value && !$value instanceof Section) {
-      throw new \InvalidArgumentException(sprintf('Value assigned to "%s" is not a valid section', $this->getName()));
+      throw new \InvalidArgumentException(\sprintf('Value assigned to "%s" is not a valid section', $this->getName()));
     }
     parent::setValue($value, $notify);
   }

@@ -53,7 +53,7 @@ class Result extends ResultBase {
     // runtime (which would be healthy anyway).
     if ($this->mysqliConnection->info !== NULL) {
       $matches = [];
-      if (preg_match('/\s(\d+)\s/', $this->mysqliConnection->info, $matches) === 1) {
+      if (\preg_match('/\s(\d+)\s/', $this->mysqliConnection->info, $matches) === 1) {
         return (int) $matches[0];
       }
       else {
@@ -78,7 +78,7 @@ class Result extends ResultBase {
    * {@inheritdoc}
    */
   public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
-    assert($this->mysqliResult instanceof \mysqli_result);
+    \assert($this->mysqliResult instanceof \mysqli_result);
 
     $mysqli_row = $this->mysqliResult->fetch_assoc();
 
@@ -87,7 +87,7 @@ class Result extends ResultBase {
     }
 
     // Stringify all non-NULL column values.
-    $row = array_map(fn ($value) => $value === NULL ? NULL : (string) $value, $mysqli_row);
+    $row = \array_map(fn ($value) => $value === NULL ? NULL : (string) $value, $mysqli_row);
 
     return $this->assocToFetchMode($row, $mode, $fetchOptions);
   }

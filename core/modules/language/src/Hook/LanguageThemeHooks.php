@@ -72,7 +72,7 @@ class LanguageThemeHooks {
 
       foreach ($form[$type]['title'] as $id => $element) {
         // Do not take form control structures.
-        if (is_array($element) && Element::child($id)) {
+        if (\is_array($element) && Element::child($id)) {
           $table[$id]['#attributes']['class'][] = 'draggable';
           $table[$id]['#weight'] = $element['#weight'];
 

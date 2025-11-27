@@ -40,8 +40,8 @@ class ExtractTest extends MigrateProcessTestCase {
   #[DataProvider('providerTestExtractInvalid')]
   public function testExtractInvalid($value): void {
     $this->expectException(MigrateException::class);
-    $type = gettype($value);
-    $this->expectExceptionMessage(sprintf("Input should be an array, instead it was of type '%s'", $type));
+    $type = \gettype($value);
+    $this->expectExceptionMessage(\sprintf("Input should be an array, instead it was of type '%s'", $type));
     $this->plugin->transform($value, $this->migrateExecutable, $this->row, 'destination_property');
   }
 

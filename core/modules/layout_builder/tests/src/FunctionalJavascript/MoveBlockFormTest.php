@@ -171,10 +171,10 @@ class MoveBlockFormTest extends WebDriverTestBase {
     // Move the Body block to the end of the new section.
     $this->openBodyMoveForm(1, 'second', ['Body (current)']);
     $page->selectFieldOption('Region', '0:content');
-    $expected_block_table = array_fill(0, $large_block_number, 'Powered by Drupal');
+    $expected_block_table = \array_fill(0, $large_block_number, 'Powered by Drupal');
     $expected_block_table[] = 'Body (current)';
     $this->assertBlockTable($expected_block_table);
-    $expected_block_table = array_fill(0, $large_block_number - 1, 'Powered by Drupal');
+    $expected_block_table = \array_fill(0, $large_block_number - 1, 'Powered by Drupal');
     $expected_block_table[] = 'Body (current)*';
     $expected_block_table[] = 'Powered by Drupal';
     $this->moveBlockWithKeyboard('up', 'Body', $expected_block_table);
@@ -183,7 +183,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
     // Get all blocks currently in the region.
     $blocks = $page->findAll('css', $first_region_block_locator);
     // The second to last $block should be the body.
-    $this->assertTrue($blocks[count($blocks) - 2]->hasClass('block-field-blocknodebundle-with-section-fieldbody'));
+    $this->assertTrue($blocks[\count($blocks) - 2]->hasClass('block-field-blocknodebundle-with-section-fieldbody'));
   }
 
   /**
@@ -201,7 +201,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
     $this->assertSameSize($block_tds, $expected_block_labels);
     /** @var \Behat\Mink\Element\NodeElement $block_td */
     foreach ($block_tds as $block_td) {
-      $this->assertSame(array_shift($expected_block_labels), trim($block_td->getText()));
+      $this->assertSame(\array_shift($expected_block_labels), \trim($block_td->getText()));
     }
   }
 
@@ -271,7 +271,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
 
     /** @var \Behat\Mink\Element\NodeElement $block */
     foreach ($blocks as $block) {
-      $block_selector = array_shift($expected_block_selectors);
+      $block_selector = \array_shift($expected_block_selectors);
       $assert_session->elementsCount('css', "$region_selector $block_selector", 1);
       $expected_block = $page->find('css', "$region_selector $block_selector");
       $this->assertSame($expected_block->getAttribute('data-layout-block-uuid'), $block->getAttribute('data-layout-block-uuid'));

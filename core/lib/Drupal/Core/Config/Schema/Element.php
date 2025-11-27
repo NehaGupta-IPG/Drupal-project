@@ -50,7 +50,7 @@ abstract class Element extends TypedData {
    * @return $this
    */
   public function setTypedDataManager(TypedDataManagerInterface $typed_data_manager) {
-    assert($typed_data_manager instanceof TypedConfigManagerInterface, '$typed_data_manager should be an instance of \Drupal\Core\Config\TypedConfigManagerInterface.');
+    \assert($typed_data_manager instanceof TypedConfigManagerInterface, '$typed_data_manager should be an instance of \Drupal\Core\Config\TypedConfigManagerInterface.');
     $this->typedDataManager = $typed_data_manager;
     return $this;
   }

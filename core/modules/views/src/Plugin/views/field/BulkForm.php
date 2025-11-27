@@ -142,7 +142,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
 
     $entity_type = $this->getEntityType();
     // Filter the actions to only include those for this entity type.
-    $this->actions = array_filter($this->actionStorage->loadMultiple(), function ($action) use ($entity_type) {
+    $this->actions = \array_filter($this->actionStorage->loadMultiple(), function ($action) use ($entity_type) {
       return $action->getType() == $entity_type;
     });
   }
@@ -257,7 +257,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
     parent::validateOptionsForm($form, $form_state);
 
     $selected_actions = $form_state->getValue(['options', 'selected_actions']);
-    $form_state->setValue(['options', 'selected_actions'], array_values(array_filter($selected_actions)));
+    $form_state->setValue(['options', 'selected_actions'], \array_values(\array_filter($selected_actions)));
   }
 
   /**
@@ -298,7 +298,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
 
     // Add the tableselect javascript.
     $form['#attached']['library'][] = 'core/drupal.tableselect';
-    $use_revision = array_key_exists('revision', $this->view->getQuery()->getEntityTableInfo());
+    $use_revision = \array_key_exists('revision', $this->view->getQuery()->getEntityTableInfo());
 
     // Only add the bulk form options and buttons if there are results.
     if (!empty($this->view->result)) {
@@ -370,7 +370,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
     // Filter the action list.
     foreach ($this->actions as $id => $action) {
       if ($filtered) {
-        $in_selected = in_array($id, $this->options['selected_actions']);
+        $in_selected = \in_array($id, $this->options['selected_actions']);
         // If the field is configured to include only the selected actions,
         // skip actions that were not selected.
         if (($this->options['include_exclude'] == 'include') && !$in_selected) {
@@ -406,7 +406,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
       // the raw form values array, since the site data may change before the
       // bulk form is submitted, which can lead to data loss.
       $user_input = $form_state->getUserInput();
-      $selected = array_filter($user_input[$this->options['id']]);
+      $selected = \array_filter($user_input[$this->options['id']]);
       $entities = [];
       $action = $this->actions[$form_state->getValue('action')];
       $count = 0;
@@ -483,7 +483,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    */
   public function viewsFormValidate(&$form, FormStateInterface $form_state) {
     $ids = $form_state->getValue($this->options['id']);
-    if (empty($ids) || empty(array_filter($ids))) {
+    if (empty($ids) || empty(\array_filter($ids))) {
       $form_state->setErrorByName('', $this->emptySelectedMessage());
     }
 
@@ -538,8 +538,8 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
     // An entity ID could be an arbitrary string (although they are typically
     // numeric). JSON then Base64 encoding ensures the bulk_form_key is
     // safe to use in HTML, and that the key parts can be retrieved.
-    $key = json_encode($key_parts);
-    return base64_encode($key);
+    $key = \json_encode($key_parts);
+    return \base64_encode($key);
   }
 
   /**
@@ -554,18 +554,18 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    *   as part of the bulk form key.
    */
   protected function loadEntityFromBulkFormKey($bulk_form_key) {
-    $key = base64_decode($bulk_form_key);
-    $key_parts = json_decode($key);
+    $key = \base64_decode($bulk_form_key);
+    $key_parts = \json_decode($key);
     $revision_id = NULL;
 
     // If there are 3 items, vid will be last.
-    if (count($key_parts) === 3) {
-      $revision_id = array_pop($key_parts);
+    if (\count($key_parts) === 3) {
+      $revision_id = \array_pop($key_parts);
     }
 
     // The first two items will always be langcode and ID.
-    $id = array_pop($key_parts);
-    $langcode = array_pop($key_parts);
+    $id = \array_pop($key_parts);
+    $langcode = \array_pop($key_parts);
 
     // Load the entity or a specific revision depending on the given key.
     $storage = $this->entityTypeManager->getStorage($this->getEntityType());

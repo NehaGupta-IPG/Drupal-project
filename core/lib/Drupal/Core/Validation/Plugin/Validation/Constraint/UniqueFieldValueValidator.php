@@ -57,7 +57,7 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
     $id_key = $entity_type->getKey('id');
     $is_multiple = $field_storage_definitions[$field_name]->isMultiple();
     $is_new = $entity->isNew();
-    $item_values = array_column($items->getValue(), $property_name);
+    $item_values = \array_column($items->getValue(), $property_name);
 
     // Check if any item values for this field already exist in other entities.
     $query = $this->entityTypeManager
@@ -87,8 +87,8 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
       // The results array is a single-column multidimensional array. The
       // column key includes the field name but may or may not include the
       // property name. Pop the column key from the first result to be sure.
-      $column_key = key(reset($results));
-      $other_entity_values = array_column($results, $column_key);
+      $column_key = \key(\reset($results));
+      $other_entity_values = \array_column($results, $column_key);
 
       // If our entity duplicates field values in any other entity, the query
       // will return all field values that belong to those entities. Narrow
@@ -138,10 +138,10 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
    *   capitalization.
    */
   private function caseInsensitiveArrayIntersect(array $orig_values, array $comp_values): array {
-    $lowercase_comp_values = array_map('strtolower', $comp_values);
-    $intersect_map = array_map(fn (string $x) => in_array(strtolower($x), $lowercase_comp_values, TRUE) ? $x : NULL, $orig_values);
+    $lowercase_comp_values = \array_map('strtolower', $comp_values);
+    $intersect_map = \array_map(fn (string $x) => \in_array(\strtolower($x), $lowercase_comp_values, TRUE) ? $x : NULL, $orig_values);
 
-    return array_filter($intersect_map, function ($x) {
+    return \array_filter($intersect_map, function ($x) {
       return $x !== NULL;
     });
   }
@@ -156,18 +156,18 @@ class UniqueFieldValueValidator extends ConstraintValidator implements Container
    *   Item values only for deltas that duplicate an earlier delta.
    */
   private function extractDuplicates(array $item_values): array {
-    $value_frequency = array_count_values($item_values);
+    $value_frequency = \array_count_values($item_values);
 
     // Filter out item values which are not duplicates while preserving deltas.
-    $duplicate_values = array_intersect($item_values, array_keys(array_filter(
+    $duplicate_values = \array_intersect($item_values, \array_keys(\array_filter(
       $value_frequency, function ($value) {
         return $value > 1;
       })
     ));
 
     // Exclude the first delta of each duplicate value.
-    $first_deltas = array_unique($duplicate_values);
-    return array_diff_key($duplicate_values, $first_deltas);
+    $first_deltas = \array_unique($duplicate_values);
+    return \array_diff_key($duplicate_values, $first_deltas);
   }
 
 }

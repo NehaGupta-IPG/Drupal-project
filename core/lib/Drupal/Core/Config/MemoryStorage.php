@@ -56,7 +56,7 @@ class MemoryStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function readMultiple(array $names) {
-    return array_intersect_key($this->config[$this->collection], array_flip($names));
+    return \array_intersect_key($this->config[$this->collection], \array_flip($names));
   }
 
   /**
@@ -116,10 +116,10 @@ class MemoryStorage implements StorageInterface {
       // If the collection is empty no keys are set.
       return [];
     }
-    $names = array_keys($this->config[$this->collection]);
+    $names = \array_keys($this->config[$this->collection]);
     if ($prefix !== '') {
-      $names = array_filter($names, function ($name) use ($prefix) {
-        return str_starts_with($name, $prefix);
+      $names = \array_filter($names, function ($name) use ($prefix) {
+        return \str_starts_with($name, $prefix);
       });
     }
     return $names;
@@ -138,8 +138,8 @@ class MemoryStorage implements StorageInterface {
       return TRUE;
     }
     $success = FALSE;
-    foreach (array_keys($this->config[$this->collection]) as $name) {
-      if (str_starts_with($name, $prefix)) {
+    foreach (\array_keys($this->config[$this->collection]) as $name) {
+      if (\str_starts_with($name, $prefix)) {
         $success = TRUE;
         unset($this->config[$this->collection][$name]);
       }
@@ -172,7 +172,7 @@ class MemoryStorage implements StorageInterface {
         $collection_names[] = $collection_name;
       }
     }
-    sort($collection_names);
+    \sort($collection_names);
 
     return $collection_names;
   }

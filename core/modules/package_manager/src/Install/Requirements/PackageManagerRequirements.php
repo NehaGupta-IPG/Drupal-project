@@ -24,7 +24,7 @@ class PackageManagerRequirements implements InstallRequirementsInterface {
     if (Settings::get('testing_package_manager', FALSE) === FALSE) {
       $requirements['testing_package_manager'] = [
         'title' => 'Package Manager',
-        'description' => t("Package Manager is available for early testing. To install the module set the value of 'testing_package_manager' to TRUE in your settings.php file."),
+        'description' => \t("Package Manager is available for early testing. To install the module set the value of 'testing_package_manager' to TRUE in your settings.php file."),
         'severity' => RequirementSeverity::Error,
       ];
     }
@@ -40,7 +40,7 @@ class PackageManagerRequirements implements InstallRequirementsInterface {
       }
       catch (FailureMarkerExistsException $exception) {
         $requirements['package_manager_failure_marker'] = [
-          'title' => t('Failed Package Manager update detected'),
+          'title' => \t('Failed Package Manager update detected'),
           'description' => $exception->getMessage(),
           'severity' => RequirementSeverity::Error,
         ];

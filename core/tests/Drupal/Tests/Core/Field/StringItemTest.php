@@ -39,10 +39,10 @@ class StringItemTest extends UnitTestCase {
         // When the field value needs to be unique, the generated sample value
         // should match the maximum length to ensure sufficient entropy.
         if ($unique) {
-          $this->assertEquals($max_length, mb_strlen($sample_value['value']));
+          $this->assertEquals($max_length, \mb_strlen($sample_value['value']));
         }
         else {
-          $this->assertLessThanOrEqual($max_length, mb_strlen($sample_value['value']));
+          $this->assertLessThanOrEqual($max_length, \mb_strlen($sample_value['value']));
         }
       }
     }

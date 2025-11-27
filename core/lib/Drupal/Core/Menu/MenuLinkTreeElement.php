@@ -119,7 +119,7 @@ class MenuLinkTreeElement {
     $sum = function ($carry, MenuLinkTreeElement $element) {
       return $carry + $element->count();
     };
-    return 1 + array_reduce($this->subtree, $sum);
+    return 1 + \array_reduce($this->subtree, $sum);
   }
 
 }

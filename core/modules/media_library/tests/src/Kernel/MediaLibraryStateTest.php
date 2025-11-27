@@ -285,7 +285,7 @@ class MediaLibraryStateTest extends KernelTestBase {
     // Override the query parameters and verify an exception is thrown when
     // required state parameters are changed.
     $query = MediaLibraryState::create('test', ['file', 'image'], 'image', 2)->all();
-    $query = array_merge($query, $query_overrides);
+    $query = \array_merge($query, $query_overrides);
     if ($exception_expected) {
       $this->expectException(BadRequestHttpException::class);
       $this->expectExceptionMessage("Invalid media library parameters specified.");

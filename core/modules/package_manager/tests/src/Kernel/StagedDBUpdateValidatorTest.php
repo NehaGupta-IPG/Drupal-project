@@ -48,8 +48,8 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
     ];
     foreach ($extensions as $extension_path) {
       $extension_path = $active_dir . '/' . $extension_path;
-      mkdir($extension_path, 0777, TRUE);
-      $extension_name = basename($extension_path);
+      \mkdir($extension_path, 0777, TRUE);
+      $extension_name = \basename($extension_path);
 
       // Ensure each extension has a .install and a .post_update.php file with
       // an empty update function in it.
@@ -58,7 +58,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
           'install' => $extension_name . '_update_1000',
           'post_update.php' => $extension_name . '_post_update_test',
         };
-        file_put_contents("$extension_path/$extension_name.$suffix", "<?php\nfunction $function_name() {}");
+        \file_put_contents("$extension_path/$extension_name.$suffix", "<?php\nfunction $function_name() {}");
       }
     }
   }
@@ -70,7 +70,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
    *   The test cases.
    */
   public static function providerStagedDatabaseUpdate(): array {
-    $summary = t('Database updates have been detected in the following extensions.');
+    $summary = \t('Database updates have been detected in the following extensions.');
 
     return [
       'schema update in installed module' => [
@@ -78,7 +78,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
         'install',
         [
           ValidationResult::createWarning([
-            t('System'),
+            \t('System'),
           ], $summary),
         ],
       ],
@@ -87,7 +87,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
         'post_update.php',
         [
           ValidationResult::createWarning([
-            t('System'),
+            \t('System'),
           ], $summary),
         ],
       ],
@@ -96,7 +96,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
         'install',
         [
           ValidationResult::createWarning([
-            t('Stark'),
+            \t('Stark'),
           ], $summary),
         ],
       ],
@@ -105,7 +105,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
         'post_update.php',
         [
           ValidationResult::createWarning([
-            t('Stark'),
+            \t('Stark'),
           ], $summary),
         ],
       ],
@@ -148,7 +148,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
    */
   #[DataProvider('providerStagedDatabaseUpdate')]
   public function testStagedDatabaseUpdate(string $extension_dir, string $file_extension, array $expected_results): void {
-    $extension_name = basename($extension_dir);
+    $extension_name = \basename($extension_dir);
     $relative_file_path = $extension_dir . '/' . $extension_name . '.' . $file_extension;
 
     $stage = $this->createStage();
@@ -167,7 +167,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
       'install' => $extension_name . '_update_1001',
       'post_update.php' => $extension_name . '_post_update_' . $this->randomMachineName(),
     };
-    file_put_contents($staged_update_file, "function $update_function_name() {}\n", FILE_APPEND);
+    \file_put_contents($staged_update_file, "function $update_function_name() {}\n", FILE_APPEND);
     $this->assertStatusCheckResults($expected_results, $stage);
 
     // Add a bunch of functions which are named similarly to real schema update
@@ -182,12 +182,12 @@ function {$extension_name}_update__123() {}
 function ($extension_name}__post_update_test() {}
 function ($extension_name}_post_update() {}
 END;
-    file_put_contents($staged_update_file, $code);
+    \file_put_contents($staged_update_file, $code);
     $this->assertStatusCheckResults([], $stage);
 
     // If the update file is deleted from the stage, the validator should not
     // detect any database updates.
-    unlink($staged_update_file);
+    \unlink($staged_update_file);
     $this->assertStatusCheckResults([], $stage);
 
     // If the update file doesn't exist in the active directory, but does exist
@@ -195,8 +195,8 @@ END;
     // validator should detect it.
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
-    unlink($project_root . '/' . $relative_file_path);
-    file_put_contents($staged_update_file, "<?php\nfunction $update_function_name() {}");
+    \unlink($project_root . '/' . $relative_file_path);
+    \file_put_contents($staged_update_file, "<?php\nfunction $update_function_name() {}");
     $this->assertStatusCheckResults($expected_results, $stage);
   }
 

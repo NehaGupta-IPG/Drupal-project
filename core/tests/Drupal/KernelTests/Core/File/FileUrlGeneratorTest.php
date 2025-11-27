@@ -95,19 +95,19 @@ class FileUrlGeneratorTest extends FileTestBase {
     \Drupal::state()->set('file_test.hook_file_url_alter', 'root-relative');
     $filepath = 'core/assets/vendor/jquery/jquery.min.js';
     $url = $this->fileUrlGenerator->generateAbsoluteString($filepath);
-    $this->assertEquals(base_path() . '/' . $filepath, $url, 'Correctly generated a root-relative URL for a shipped file.');
+    $this->assertEquals(\base_path() . '/' . $filepath, $url, 'Correctly generated a root-relative URL for a shipped file.');
     $filepath = 'core/misc/favicon.ico';
     $url = $this->fileUrlGenerator->generateAbsoluteString($filepath);
-    $this->assertEquals(base_path() . '/' . $filepath, $url, 'Correctly generated a root-relative URL for a shipped file.');
+    $this->assertEquals(\base_path() . '/' . $filepath, $url, 'Correctly generated a root-relative URL for a shipped file.');
 
     // Test alteration of file URLs to use protocol-relative URLs.
     \Drupal::state()->set('file_test.hook_file_url_alter', 'protocol-relative');
     $filepath = 'core/assets/vendor/jquery/jquery.min.js';
     $url = $this->fileUrlGenerator->generateAbsoluteString($filepath);
-    $this->assertEquals('/' . base_path() . '/' . $filepath, $url, 'Correctly generated a protocol-relative URL for a shipped file.');
+    $this->assertEquals('/' . \base_path() . '/' . $filepath, $url, 'Correctly generated a protocol-relative URL for a shipped file.');
     $filepath = 'core/misc/favicon.ico';
     $url = $this->fileUrlGenerator->generateAbsoluteString($filepath);
-    $this->assertEquals('/' . base_path() . '/' . $filepath, $url, 'Correctly generated a protocol-relative URL for a shipped file.');
+    $this->assertEquals('/' . \base_path() . '/' . $filepath, $url, 'Correctly generated a protocol-relative URL for a shipped file.');
 
     // Test alteration of file URLs with query strings and/or fragment.
     \Drupal::state()->delete('file_test.hook_file_url_alter');
@@ -137,19 +137,19 @@ class FileUrlGeneratorTest extends FileTestBase {
     $public_directory_path = \Drupal::service('stream_wrapper_manager')
       ->getViaScheme('public')
       ->getDirectoryPath();
-    $this->assertEquals(FileTestCdn::Second->value . '/' . $public_directory_path . '/' . basename($uri), $url, 'Correctly generated a CDN URL for a created file.');
+    $this->assertEquals(FileTestCdn::Second->value . '/' . $public_directory_path . '/' . \basename($uri), $url, 'Correctly generated a CDN URL for a created file.');
 
     // Test alteration of file URLs to use root-relative URLs.
     \Drupal::state()->set('file_test.hook_file_url_alter', 'root-relative');
     $uri = $this->createUri();
     $url = $this->fileUrlGenerator->generateAbsoluteString($uri);
-    $this->assertEquals(base_path() . '/' . $public_directory_path . '/' . basename($uri), $url, 'Correctly generated a root-relative URL for a created file.');
+    $this->assertEquals(\base_path() . '/' . $public_directory_path . '/' . \basename($uri), $url, 'Correctly generated a root-relative URL for a created file.');
 
     // Test alteration of file URLs to use a protocol-relative URLs.
     \Drupal::state()->set('file_test.hook_file_url_alter', 'protocol-relative');
     $uri = $this->createUri();
     $url = $this->fileUrlGenerator->generateAbsoluteString($uri);
-    $this->assertEquals('/' . base_path() . '/' . $public_directory_path . '/' . basename($uri), $url, 'Correctly generated a protocol-relative URL for a created file.');
+    $this->assertEquals('/' . \base_path() . '/' . $public_directory_path . '/' . \basename($uri), $url, 'Correctly generated a protocol-relative URL for a created file.');
   }
 
   /**
@@ -170,7 +170,7 @@ class FileUrlGeneratorTest extends FileTestBase {
     // Shipped file.
     $filepath = 'core/assets/vendor/jquery/jquery.min.js';
     $url = $this->fileUrlGenerator->generateAbsoluteString($filepath);
-    $this->assertSame(base_path() . $filepath, $this->fileUrlGenerator->transformRelative($url));
+    $this->assertSame(\base_path() . $filepath, $this->fileUrlGenerator->transformRelative($url));
 
     // Managed file.
     $uri = $this->createUri();
@@ -178,8 +178,8 @@ class FileUrlGeneratorTest extends FileTestBase {
     $public_directory_path = \Drupal::service('stream_wrapper_manager')
       ->getViaScheme('public')
       ->getDirectoryPath();
-    $this->assertSame(base_path() . $public_directory_path . '/' . rawurlencode(
-      basename($uri)), $this->fileUrlGenerator->transformRelative($url));
+    $this->assertSame(\base_path() . $public_directory_path . '/' . \rawurlencode(
+      \basename($uri)), $this->fileUrlGenerator->transformRelative($url));
   }
 
   /**

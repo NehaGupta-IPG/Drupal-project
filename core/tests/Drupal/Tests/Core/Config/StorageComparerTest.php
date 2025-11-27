@@ -117,7 +117,7 @@ class StorageComparerTest extends UnitTestCase {
    */
   public function testCreateChangelistNoChange(): void {
     $config_data = $this->getConfigData();
-    $config_files = array_keys($config_data);
+    $config_files = \array_keys($config_data);
     $this->sourceStorage->expects($this->once())
       ->method('listAll')
       ->willReturn($config_files);
@@ -156,10 +156,10 @@ class StorageComparerTest extends UnitTestCase {
 
     $this->sourceStorage->expects($this->once())
       ->method('listAll')
-      ->willReturn(array_keys($source_data));
+      ->willReturn(\array_keys($source_data));
     $this->targetStorage->expects($this->once())
       ->method('listAll')
-      ->willReturn(array_keys($target_data));
+      ->willReturn(\array_keys($target_data));
     $this->sourceStorage->expects($this->once())
       ->method('readMultiple')
       ->willReturn($source_data);
@@ -197,10 +197,10 @@ class StorageComparerTest extends UnitTestCase {
 
     $this->sourceStorage->expects($this->once())
       ->method('listAll')
-      ->willReturn(array_keys($source_data));
+      ->willReturn(\array_keys($source_data));
     $this->targetStorage->expects($this->once())
       ->method('listAll')
-      ->willReturn(array_keys($target_data));
+      ->willReturn(\array_keys($target_data));
     $this->sourceStorage->expects($this->once())
       ->method('readMultiple')
       ->willReturn($source_data);
@@ -238,10 +238,10 @@ class StorageComparerTest extends UnitTestCase {
 
     $this->sourceStorage->expects($this->once())
       ->method('listAll')
-      ->willReturn(array_keys($source_data));
+      ->willReturn(\array_keys($source_data));
     $this->targetStorage->expects($this->once())
       ->method('listAll')
-      ->willReturn(array_keys($target_data));
+      ->willReturn(\array_keys($target_data));
     $this->sourceStorage->expects($this->once())
       ->method('readMultiple')
       ->willReturn($source_data);
@@ -280,14 +280,14 @@ class StorageComparerTest extends UnitTestCase {
 
     // Use random collections for source and target.
     $collections = $source->getAllCollectionNames();
-    $source = $source->createCollection($collections[array_rand($collections)]);
+    $source = $source->createCollection($collections[\array_rand($collections)]);
     $collections = $target->getAllCollectionNames();
-    $target = $target->createCollection($collections[array_rand($collections)]);
+    $target = $target->createCollection($collections[\array_rand($collections)]);
 
     $comparer = new StorageComparer($source, $target);
     $comparer->createChangelist();
 
-    foreach (array_merge([StorageInterface::DEFAULT_COLLECTION], $source->getAllCollectionNames(), $target->getAllCollectionNames()) as $collection) {
+    foreach (\array_merge([StorageInterface::DEFAULT_COLLECTION], $source->getAllCollectionNames(), $target->getAllCollectionNames()) as $collection) {
       $expected = [
         'create' => $source->createCollection($collection)->listAll(),
         'update' => [],
@@ -309,12 +309,12 @@ class StorageComparerTest extends UnitTestCase {
    */
   protected function generateRandomData(StorageInterface $storage, string $prefix = ''): void {
     $generator = $this->getRandomGenerator();
-    for ($i = 0; $i < rand(2, 10); $i++) {
+    for ($i = 0; $i < \rand(2, 10); $i++) {
       $storage->write($prefix . $this->randomMachineName(), (array) $generator->object());
     }
-    for ($i = 0; $i < rand(1, 5); $i++) {
+    for ($i = 0; $i < \rand(1, 5); $i++) {
       $collection = $storage->createCollection($prefix . $this->randomMachineName());
-      for ($i = 0; $i < rand(2, 10); $i++) {
+      for ($i = 0; $i < \rand(2, 10); $i++) {
         $collection->write($prefix . $this->randomMachineName(), (array) $generator->object());
       }
     }

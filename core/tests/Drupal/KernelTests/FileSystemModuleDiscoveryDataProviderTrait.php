@@ -16,14 +16,14 @@ trait FileSystemModuleDiscoveryDataProviderTrait {
    *   An array of module names to test.
    */
   public static function coreModuleListDataProvider(): array {
-    $prefix = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'modules';
-    $module_dirs = array_keys(iterator_to_array(new \FilesystemIterator($prefix)));
-    $module_names = array_map(function ($path) use ($prefix) {
-      return str_replace($prefix . DIRECTORY_SEPARATOR, '', $path);
+    $prefix = \dirname(__DIR__, 3) . DIRECTORY_SEPARATOR . 'modules';
+    $module_dirs = \array_keys(\iterator_to_array(new \FilesystemIterator($prefix)));
+    $module_names = \array_map(function ($path) use ($prefix) {
+      return \str_replace($prefix . DIRECTORY_SEPARATOR, '', $path);
     }, $module_dirs);
-    $modules_keyed = array_combine($module_names, $module_names);
+    $modules_keyed = \array_combine($module_names, $module_names);
 
-    $data = array_map(function ($module) {
+    $data = \array_map(function ($module) {
       return [$module];
     }, $modules_keyed);
 

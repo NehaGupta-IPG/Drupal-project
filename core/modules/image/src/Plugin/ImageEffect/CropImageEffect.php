@@ -22,7 +22,7 @@ class CropImageEffect extends ResizeImageEffect {
    * {@inheritdoc}
    */
   public function applyEffect(ImageInterface $image) {
-    [$x, $y] = explode('-', $this->configuration['anchor']);
+    [$x, $y] = \explode('-', $this->configuration['anchor']);
     $x = Image::getKeywordOffset($x, $image->getWidth(), (int) $this->configuration['width']);
     $y = Image::getKeywordOffset($y, $image->getHeight(), (int) $this->configuration['height']);
     if (!$image->crop($x, $y, $this->configuration['width'], $this->configuration['height'])) {

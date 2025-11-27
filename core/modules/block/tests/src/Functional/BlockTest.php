@@ -185,8 +185,8 @@ class BlockTest extends BlockTestBase {
       $this->assertSession()->elementTextEquals('xpath', $xpath, 'Place block');
 
       $link = $this->getSession()->getPage()->find('xpath', $xpath);
-      [, $query_string] = explode('?', $link->getAttribute('href'), 2);
-      parse_str($query_string, $query_parts);
+      [, $query_string] = \explode('?', $link->getAttribute('href'), 2);
+      \parse_str($query_string, $query_parts);
       $this->assertEquals($weight, $query_parts['weight'], 'Found the expected weight query string.');
 
       // Create a random title for the block.
@@ -258,7 +258,7 @@ class BlockTest extends BlockTestBase {
     $this->assertSession()->pageTextNotContains($block['settings[label]']);
     // Check for <div id="block-my-block-instance-name"> if the machine name
     // is my_block_instance_name.
-    $xpath = $this->assertSession()->buildXPathQuery('//div[@id=:id]/*', [':id' => 'block-' . str_replace('_', '-', strtolower($block['id']))]);
+    $xpath = $this->assertSession()->buildXPathQuery('//div[@id=:id]/*', [':id' => 'block-' . \str_replace('_', '-', \strtolower($block['id']))]);
     $this->assertSession()->elementNotExists('xpath', $xpath);
 
     $pages = [
@@ -269,7 +269,7 @@ class BlockTest extends BlockTestBase {
     ];
     // Test error when not including forward slash.
     $this->drupalGet('admin/structure/block/manage/' . $block['id']);
-    $this->submitForm(['visibility[request_path][pages]' => implode("\n", $pages)], 'Save block');
+    $this->submitForm(['visibility[request_path][pages]' => \implode("\n", $pages)], 'Save block');
     $this->assertSession()->pageTextContains('The path user/login requires a leading forward slash when used with the Pages setting.');
 
     // Test deleting the block from the edit form.
@@ -416,7 +416,7 @@ class BlockTest extends BlockTestBase {
 
     // Confirm that the content block was found at the proper region.
     $xpath = $this->assertSession()->buildXPathQuery($region_xpath[$region] . '//div[@id=:block-id]/*', [
-      ':block-id' => 'block-' . str_replace('_', '-', strtolower($block['id'])),
+      ':block-id' => 'block-' . \str_replace('_', '-', \strtolower($block['id'])),
     ]);
     $this->assertSession()->elementExists('xpath', $xpath);
   }
@@ -449,7 +449,7 @@ class BlockTest extends BlockTestBase {
     $this->drupalGet('<front>');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
     $cid_parts = [Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), ''];
-    $cid = implode(':', $cid_parts);
+    $cid = \implode(':', $cid_parts);
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
@@ -459,18 +459,18 @@ class BlockTest extends BlockTestBase {
       'http_response',
       'rendered',
     ];
-    sort($expected_cache_tags);
+    \sort($expected_cache_tags);
     $keys = \Drupal::service('cache_contexts_manager')
       ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
       ->getKeys();
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
-    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
+    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . \implode(':', $keys));
     $expected_cache_tags = [
       'block_view',
       'config:block.block.powered',
       'rendered',
     ];
-    sort($expected_cache_tags);
+    \sort($expected_cache_tags);
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
 
     // The "Powered by Drupal" block is modified; verify a cache miss.
@@ -492,7 +492,7 @@ class BlockTest extends BlockTestBase {
     $this->drupalGet('<front>');
     $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'HIT');
     $cid_parts = [Url::fromRoute('<front>', [], ['absolute' => TRUE])->toString(), ''];
-    $cid = implode(':', $cid_parts);
+    $cid = \implode(':', $cid_parts);
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
@@ -503,29 +503,29 @@ class BlockTest extends BlockTestBase {
       'http_response',
       'rendered',
     ];
-    sort($expected_cache_tags);
+    \sort($expected_cache_tags);
     $this->assertEquals($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
       'block_view',
       'config:block.block.powered',
       'rendered',
     ];
-    sort($expected_cache_tags);
+    \sort($expected_cache_tags);
     $keys = \Drupal::service('cache_contexts_manager')
       ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
       ->getKeys();
-    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
+    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . \implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
       'block_view',
       'config:block.block.powered_2',
       'rendered',
     ];
-    sort($expected_cache_tags);
+    \sort($expected_cache_tags);
     $keys = \Drupal::service('cache_contexts_manager')
       ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
       ->getKeys();
-    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered_2:' . implode(':', $keys));
+    $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered_2:' . \implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
 
     // Now we should have a cache hit again.

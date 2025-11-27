@@ -106,9 +106,9 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
       }
       $storage_definition = BaseFieldDefinition::create($plugin_id);
       $property_definitions = $class::propertyDefinitions($storage_definition);
-      $properties = implode(', ', array_keys($property_definitions));
+      $properties = \implode(', ', \array_keys($property_definitions));
       if (!empty($property_definitions)) {
-        $message = sprintf("%s property %s found in %s", $plugin_id, $property, $properties);
+        $message = \sprintf("%s property %s found in %s", $plugin_id, $property, $properties);
         $this->assertArrayHasKey($property, $class::propertyDefinitions($storage_definition), $message);
       }
     }
@@ -134,8 +134,8 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
     $module_list = $listing->scan('module', FALSE);
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
-    $module_list = array_filter(array_keys($module_list), function ($module) use ($module_handler, $module_list) {
-      return !$module_handler->moduleExists($module) && str_starts_with($module_list[$module]->getPath(), 'core');
+    $module_list = \array_filter(\array_keys($module_list), function ($module) use ($module_handler, $module_list) {
+      return !$module_handler->moduleExists($module) && \str_starts_with($module_list[$module]->getPath(), 'core');
     });
     $this->enableModules($module_list);
   }

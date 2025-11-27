@@ -70,7 +70,7 @@ class HelpTwigExtension extends AbstractExtension {
    * @see \Drupal\Core\Template\TwigExtension::getUrl()
    */
   public function getRouteLink(string $text, string $route, array $parameters = [], array $options = []): array {
-    assert($this->accessManager instanceof AccessManagerInterface, "The access manager hasn't been set up. Any configuration YAML file with a service directive dealing with the Twig configuration can cause this, most likely found in a recently installed or changed module.");
+    \assert($this->accessManager instanceof AccessManagerInterface, "The access manager hasn't been set up. Any configuration YAML file with a service directive dealing with the Twig configuration can cause this, most likely found in a recently installed or changed module.");
 
     $bubbles = new BubbleableMetadata();
     $bubbles->addCacheTags(['route_match']);
@@ -120,7 +120,7 @@ class HelpTwigExtension extends AbstractExtension {
    * @see \Drupal\Core\Template\TwigExtension::getUrl()
    */
   public function getTopicLink(string $topic_id): array {
-    assert($this->pluginManager instanceof HelpTopicPluginManagerInterface, "The plugin manager hasn't been set up. Any configuration YAML file with a service directive dealing with the Twig configuration can cause this, most likely found in a recently installed or changed module.");
+    \assert($this->pluginManager instanceof HelpTopicPluginManagerInterface, "The plugin manager hasn't been set up. Any configuration YAML file with a service directive dealing with the Twig configuration can cause this, most likely found in a recently installed or changed module.");
 
     $bubbles = new BubbleableMetadata();
     $bubbles->addCacheableDependency($this->pluginManager);

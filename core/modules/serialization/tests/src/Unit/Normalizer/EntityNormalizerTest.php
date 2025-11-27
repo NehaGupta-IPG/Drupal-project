@@ -221,10 +221,10 @@ class EntityNormalizerTest extends UnitTestCase {
     // Setup expectations for the serializer. This will be called for each field
     // item.
     $serializer = $this->prophesize('Symfony\Component\Serializer\Serializer');
-    $serializer->denormalize('value_1', get_class($key_1), NULL, ['target_instance' => $key_1, 'entity_type' => 'test'])
+    $serializer->denormalize('value_1', \get_class($key_1), NULL, ['target_instance' => $key_1, 'entity_type' => 'test'])
       ->willReturn(NULL)
       ->shouldBeCalled();
-    $serializer->denormalize('value_2', get_class($key_2), NULL, ['target_instance' => $key_2, 'entity_type' => 'test'])
+    $serializer->denormalize('value_2', \get_class($key_2), NULL, ['target_instance' => $key_2, 'entity_type' => 'test'])
       ->willReturn(NULL)
       ->shouldBeCalled();
 
@@ -371,10 +371,10 @@ class EntityNormalizerTest extends UnitTestCase {
     // Setup expectations for the serializer. This will be called for each field
     // item.
     $serializer = $this->prophesize('Symfony\Component\Serializer\Serializer');
-    $serializer->denormalize('value_1', get_class($key_1), NULL, ['target_instance' => $key_1, 'entity_type' => 'test'])
+    $serializer->denormalize('value_1', \get_class($key_1), NULL, ['target_instance' => $key_1, 'entity_type' => 'test'])
       ->willReturn(NULL)
       ->shouldBeCalled();
-    $serializer->denormalize('value_2', get_class($key_2), NULL, ['target_instance' => $key_2, 'entity_type' => 'test'])
+    $serializer->denormalize('value_2', \get_class($key_2), NULL, ['target_instance' => $key_2, 'entity_type' => 'test'])
       ->willReturn(NULL)
       ->shouldBeCalled();
 

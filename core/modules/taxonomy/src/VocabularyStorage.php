@@ -19,7 +19,7 @@ class VocabularyStorage extends ConfigEntityStorage implements VocabularyStorage
       ->condition('parent.target_id', 0)
       ->execute();
 
-    return array_values($tids);
+    return \array_values($tids);
   }
 
 }

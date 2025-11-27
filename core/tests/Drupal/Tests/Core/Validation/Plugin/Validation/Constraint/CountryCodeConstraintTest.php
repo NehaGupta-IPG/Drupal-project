@@ -36,7 +36,7 @@ class CountryCodeConstraintTest extends UnitTestCase {
 
     $constraint = CountryCodeConstraint::create($container, [], 'CountryCode', []);
     $this->assertInstanceOf(Choice::class, $constraint);
-    $this->assertSame(array_keys($countries), $constraint->choices);
+    $this->assertSame(\array_keys($countries), $constraint->choices);
   }
 
 }

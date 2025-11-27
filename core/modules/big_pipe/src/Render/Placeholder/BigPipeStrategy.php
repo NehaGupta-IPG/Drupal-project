@@ -184,7 +184,7 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
    *   it's a placeholder for an HTML attribute value or a subset of it).
    */
   protected static function placeholderIsAttributeSafe($placeholder) {
-    assert(is_string($placeholder));
+    \assert(\is_string($placeholder));
     return $placeholder[0] !== '<' || $placeholder !== Html::normalize($placeholder);
   }
 
@@ -297,15 +297,15 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       // making hash. Issue #3225328 removes sort from contexts and tags arrays
       // for performances reasons.
       if (isset($placeholder_render_array['#cache']['contexts'])) {
-        sort($placeholder_render_array['#cache']['contexts']);
+        \sort($placeholder_render_array['#cache']['contexts']);
       }
       if (isset($placeholder_render_array['#cache']['tags'])) {
-        sort($placeholder_render_array['#cache']['tags']);
+        \sort($placeholder_render_array['#cache']['tags']);
       }
 
       $callback = $placeholder_render_array['#lazy_builder'][0];
       $arguments = $placeholder_render_array['#lazy_builder'][1];
-      $token = Crypt::hashBase64(serialize($placeholder_render_array));
+      $token = Crypt::hashBase64(\serialize($placeholder_render_array));
       return UrlHelper::buildQuery(['callback' => $callback, 'args' => $arguments, 'token' => $token]);
     }
     // When the placeholder's render array is not using a #lazy_builder,

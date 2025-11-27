@@ -125,8 +125,8 @@ class ProjectInfo {
         // modules included with an enabled project if we happen to be checking
         // for uninstalled modules, too.
         $projects[$project_name]['includes'][$file->getName()] = $file->info['name'];
-        $projects[$project_name]['info']['_info_file_ctime'] = max($projects[$project_name]['info']['_info_file_ctime'], $file->info['_info_file_ctime']);
-        $projects[$project_name]['datestamp'] = max($projects[$project_name]['datestamp'], $file->info['datestamp']);
+        $projects[$project_name]['info']['_info_file_ctime'] = \max($projects[$project_name]['info']['_info_file_ctime'], $file->info['_info_file_ctime']);
+        $projects[$project_name]['datestamp'] = \max($projects[$project_name]['datestamp'], $file->info['datestamp']);
       }
       elseif (empty($status)) {
         // If we have a project_name that matches, but the project_display_type
@@ -153,7 +153,7 @@ class ProjectInfo {
     if (isset($file->info['project'])) {
       $project_name = $file->info['project'];
     }
-    elseif (str_starts_with($file->getPath(), 'core/modules')) {
+    elseif (\str_starts_with($file->getPath(), 'core/modules')) {
       $project_name = 'drupal';
     }
     return $project_name;
@@ -185,8 +185,8 @@ class ProjectInfo {
       'project status url',
       'version',
     ];
-    $elements = array_merge($elements, $additional_elements);
-    return array_intersect_key($info, array_combine($elements, $elements));
+    $elements = \array_merge($elements, $additional_elements);
+    return \array_intersect_key($info, \array_combine($elements, $elements));
   }
 
 }

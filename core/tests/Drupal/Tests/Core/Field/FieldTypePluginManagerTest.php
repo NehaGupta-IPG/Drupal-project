@@ -127,10 +127,10 @@ class FieldTypePluginManagerTest extends UnitTestCase {
     ]);
 
     $grouped_definitions = $this->fieldTypeManager->getGroupedDefinitions();
-    $this->assertEquals(['General', 'Number 🦥', 'Text 🐈'], array_keys($grouped_definitions));
+    $this->assertEquals(['General', 'Number 🦥', 'Text 🐈'], \array_keys($grouped_definitions));
 
     $grouped_definitions = $this->fieldTypeManager->getGroupedDefinitions(NULL, 'label', 'id');
-    $this->assertEquals(['general', 'number', 'text'], array_keys($grouped_definitions));
+    $this->assertEquals(['general', 'number', 'text'], \array_keys($grouped_definitions));
   }
 
   /**
@@ -154,22 +154,22 @@ class FieldTypePluginManagerTest extends UnitTestCase {
       ],
     ]);
 
-    $zend_assertions_default = ini_get('zend.assertions');
+    $zend_assertions_default = \ini_get('zend.assertions');
 
     // Test behavior when assertions are not enabled.
-    ini_set('zend.assertions', 0);
+    \ini_set('zend.assertions', 0);
     $grouped_definitions = $this->fieldTypeManager->getGroupedDefinitions();
-    $this->assertEquals(['General'], array_keys($grouped_definitions));
+    $this->assertEquals(['General'], \array_keys($grouped_definitions));
 
     // Test behavior when assertions are enabled.
-    ini_set('zend.assertions', 1);
+    \ini_set('zend.assertions', 1);
     $this->expectException(\AssertionError::class);
     try {
       $this->fieldTypeManager->getGroupedDefinitions();
     }
     catch (\Exception $e) {
       // Reset the original assert values.
-      ini_set('zend.assertions', $zend_assertions_default);
+      \ini_set('zend.assertions', $zend_assertions_default);
 
       throw $e;
     }

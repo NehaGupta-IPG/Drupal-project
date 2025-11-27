@@ -90,7 +90,7 @@ class LogMessageParserTest extends UnitTestCase {
         ['message' => 'closure @c', 'context' => []],
       ],
       'Non-stringable resource placeholder' => [
-        ['message' => 'resource @r', 'context' => ['@r' => fopen('php://memory', 'r+')]],
+        ['message' => 'resource @r', 'context' => ['@r' => \fopen('php://memory', 'r+')]],
         ['message' => 'resource @r', 'context' => []],
       ],
       'Non-stringable placeholder is not the first placeholder' => [

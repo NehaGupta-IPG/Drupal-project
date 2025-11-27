@@ -69,7 +69,7 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
       // to function correctly on non-registered theme hooks without triggering
       // a call to resolveCacheMiss().
       $this->storage = $this->initializeRegistry();
-      foreach (array_keys($this->storage) as $key) {
+      foreach (\array_keys($this->storage) as $key) {
         $this->persist($key);
       }
       // RegistryTest::testRaceCondition() ensures that the cache entry is
@@ -89,7 +89,7 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
     // @todo DIC this.
     $this->completeRegistry = \Drupal::service('theme.registry')->get();
 
-    return array_fill_keys(array_keys($this->completeRegistry), NULL);
+    return \array_fill_keys(\array_keys($this->completeRegistry), NULL);
   }
 
   /**
@@ -113,7 +113,7 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
     if (isset($this->storage[$key])) {
       return $this->storage[$key];
     }
-    elseif (array_key_exists($key, $this->storage)) {
+    elseif (\array_key_exists($key, $this->storage)) {
       return $this->resolveCacheMiss($key);
     }
   }
@@ -155,11 +155,11 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
       if ($cached = $this->cache->get($this->cid)) {
         // Use array merge instead of union so that filled in values in $data
         // overwrite empty values in the current cache.
-        $data = array_merge($cached->data, $data);
+        $data = \array_merge($cached->data, $data);
       }
       else {
         $registry = $this->initializeRegistry();
-        $data = array_merge($registry, $data);
+        $data = \array_merge($registry, $data);
       }
       $this->cache->set($this->cid, $data, Cache::PERMANENT, $this->tags);
       if ($lock) {

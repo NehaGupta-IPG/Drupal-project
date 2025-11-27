@@ -38,10 +38,10 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
     if ($entity instanceof FileInterface) {
       $uri = $entity->getFileUri();
       // Ensure the file has a name (`getFilename()` may return NULL).
-      $name = $entity->getFilename() ?? basename($uri);
+      $name = $entity->getFilename() ?? \basename($uri);
       $entity->setFilename($name);
 
-      if (file_exists($uri)) {
+      if (\file_exists($uri)) {
         $event->metadata->addAttachment($uri, $name);
       }
       else {

@@ -223,7 +223,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
       ]
     );
     $result = $this->configNamesMapper->getOverviewRoute();
-    $this->assertSame(serialize($expected), serialize($result));
+    $this->assertSame(\serialize($expected), \serialize($result));
   }
 
   /**
@@ -274,7 +274,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
       ]
     );
     $result = $this->configNamesMapper->getAddRoute();
-    $this->assertSame(serialize($expected), serialize($result));
+    $this->assertSame(\serialize($expected), \serialize($result));
   }
 
   /**
@@ -312,7 +312,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
       ]
     );
     $result = $this->configNamesMapper->getEditRoute();
-    $this->assertSame(serialize($expected), serialize($result));
+    $this->assertSame(\serialize($expected), \serialize($result));
   }
 
   /**
@@ -350,7 +350,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
       ]
     );
     $result = $this->configNamesMapper->getDeleteRoute();
-    $this->assertSame(serialize($expected), serialize($result));
+    $this->assertSame(\serialize($expected), \serialize($result));
   }
 
   /**
@@ -473,7 +473,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
       ],
     ];
 
-    $this->configNamesMapper->setConfigNames(array_keys($configs));
+    $this->configNamesMapper->setConfigNames(\array_keys($configs));
     $config_factory = $this->getConfigFactoryStub($configs);
     $this->configNamesMapper->setConfigFactory($config_factory);
 
@@ -493,7 +493,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
   #[DataProvider('providerTestHasSchema')]
   public function testHasSchema(array $mock_return_values, $expected): void {
     // As the configuration names are arbitrary, simply use integers.
-    $config_names = range(1, count($mock_return_values));
+    $config_names = \range(1, \count($mock_return_values));
     $this->configNamesMapper->setConfigNames($config_names);
 
     $map = [];
@@ -539,7 +539,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
   #[DataProvider('providerTestHasTranslatable')]
   public function testHasTranslatable(array $mock_return_values, $expected): void {
     // As the configuration names are arbitrary, simply use integers.
-    $config_names = range(1, count($mock_return_values));
+    $config_names = \range(1, \count($mock_return_values));
     $this->configNamesMapper->setConfigNames($config_names);
 
     $map = [];
@@ -589,7 +589,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
     $language = new Language();
 
     // As the configuration names are arbitrary, simply use integers.
-    $config_names = range(1, count($mock_return_values));
+    $config_names = \range(1, \count($mock_return_values));
     $this->configNamesMapper->setConfigNames($config_names);
 
     $map = [];

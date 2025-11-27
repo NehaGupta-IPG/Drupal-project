@@ -300,10 +300,10 @@ class BazCacheContext implements CalculatedCacheContextInterface {
    * {@inheritdoc}
    */
   public function getContext($parameter = NULL) {
-    if (!is_string($parameter) || strlen($parameter) === 0) {
+    if (!\is_string($parameter) || \strlen($parameter) === 0) {
       throw new \Exception();
     }
-    return str_rot13($parameter);
+    return \str_rot13($parameter);
   }
 
   /**

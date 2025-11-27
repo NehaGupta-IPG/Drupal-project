@@ -382,7 +382,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
     $response = $controller->suggestions($request, $editor);
     $this->assertInstanceOf(JsonResponse::class, $response);
 
-    $data = json_decode($response->getContent(), TRUE);
+    $data = \json_decode($response->getContent(), TRUE);
 
     // Perform assertions on the response data.
     $this->assertArrayHasKey('suggestions', $data);

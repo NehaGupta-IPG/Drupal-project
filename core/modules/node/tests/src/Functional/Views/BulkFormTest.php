@@ -107,7 +107,7 @@ class BulkFormTest extends NodeTestBase {
    */
   public function testBulkForm(): void {
     // Unpublish a node using the bulk form.
-    $node = reset($this->nodes);
+    $node = \reset($this->nodes);
     $this->assertTrue($node->isPublished(), 'Node is initially published');
     $this->assertTrue($node->getTranslation('en-gb')->isPublished(), 'Node translation is published');
     $this->assertTrue($node->getTranslation('it')->isPublished(), 'Node translation is published');
@@ -276,7 +276,7 @@ class BulkFormTest extends NodeTestBase {
     $node = $this->loadNode(2);
     $this->assertNull($node, '2: Node has been deleted');
     $node = $this->loadNode(3);
-    $result = count($node->getTranslationLanguages()) && $node->language()->getId() == 'it';
+    $result = \count($node->getTranslationLanguages()) && $node->language()->getId() == 'it';
     $this->assertTrue($result, '3: English translation has been deleted');
     $node = $this->loadNode(4);
     $this->assertNull($node, '4: Node has been deleted');

@@ -44,10 +44,10 @@ class MediaEmbedFilterConfigurationUiAddTest extends MediaEmbedFilterTestBase {
     if ($filter_html_image_secure_status) {
       $page->checkField('filters[filter_html_image_secure][status]');
     }
-    if ($media_embed === TRUE || is_numeric($media_embed)) {
+    if ($media_embed === TRUE || \is_numeric($media_embed)) {
       $page->checkField('filters[media_embed][status]');
       // Set a non-default weight.
-      if (is_numeric($media_embed)) {
+      if (\is_numeric($media_embed)) {
         $this->click('.tabledrag-toggle-weight');
         $page->selectFieldOption('filters[media_embed][weight]', $media_embed);
       }

@@ -80,13 +80,13 @@ trait FieldUiTestTrait {
       // field_storage.
       $prefixed_storage_edit = [];
       foreach ($storage_edit as $key => $value) {
-        if (str_starts_with($key, 'field_storage')) {
+        if (\str_starts_with($key, 'field_storage')) {
           $prefixed_storage_edit[$key] = $value;
           continue;
         }
         // If the key starts with settings, it needs to be prefixed differently.
-        if (str_starts_with($key, 'settings[')) {
-          $prefixed_storage_edit[str_replace('settings[', 'field_storage[subform][settings][', $key)] = $value;
+        if (\str_starts_with($key, 'settings[')) {
+          $prefixed_storage_edit[\str_replace('settings[', 'field_storage[subform][settings][', $key)] = $value;
           continue;
         }
         $prefixed_storage_edit['field_storage[subform][' . $key . ']'] = $value;
@@ -188,7 +188,7 @@ trait FieldUiTestTrait {
     $field_type_plugin_manager = \Drupal::service('plugin.manager.field.field_type');
     $grouped_field_types = $field_type_plugin_manager->getGroupedDefinitions($field_type_plugin_manager->getUiDefinitions());
     foreach ($grouped_field_types as $group => $field_types) {
-      if (array_key_exists($field_type, $field_types)) {
+      if (\array_key_exists($field_type, $field_types)) {
         return $group;
       }
     }
@@ -204,8 +204,8 @@ trait FieldUiTestTrait {
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   protected function assertFieldExistsOnOverview(string $label) {
-    $field_labels = array_map(
-      fn ($element): string => html_entity_decode($element->getHtml()),
+    $field_labels = \array_map(
+      fn ($element): string => \html_entity_decode($element->getHtml()),
       $this->getSession()->getPage()->findAll('css', 'table#field-overview tr td:first-child .field-label-text'),
     );
     $this->assertContains($label, $field_labels);
@@ -223,7 +223,7 @@ trait FieldUiTestTrait {
         ':label' => $label,
       ]);
     $element = $this->getSession()->getPage()->find('xpath', $xpath);
-    $this->assertSession()->assert($element === NULL, sprintf('A field "%s" appears on this page, but it should not.', $label));
+    $this->assertSession()->assert($element === NULL, \sprintf('A field "%s" appears on this page, but it should not.', $label));
   }
 
   /**
@@ -241,7 +241,7 @@ trait FieldUiTestTrait {
       ':label' => $label,
     ]);
     $element = $this->getSession()->getPage()->find('xpath', $xpath);
-    $this->assertSession()->assert($element !== NULL, sprintf('Table header not found by label: "%s".', $label));
+    $this->assertSession()->assert($element !== NULL, \sprintf('Table header not found by label: "%s".', $label));
   }
 
 }

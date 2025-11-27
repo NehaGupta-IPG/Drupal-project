@@ -164,7 +164,7 @@ class TimestampFormatter extends FormatterBase {
       '#title' => $this->t('Time units'),
       '#description' => $this->t("How many time units will be used in formatting the time difference. For example, if '1' is selected then the displayed time difference will only contain a single time unit such as '2 years' or '5 minutes' never '2 years 3 months' or '5 minutes 8 seconds'."),
       '#default_value' => $time_diff['granularity'],
-      '#options' => array_combine(range(1, 7), range(1, 7)),
+      '#options' => \array_combine(\range(1, 7), \range(1, 7)),
       '#states' => $states,
     ];
 
@@ -247,12 +247,12 @@ class TimestampFormatter extends FormatterBase {
 
       $options = ['granularity' => $time_diff['granularity']];
 
-      $timestamp = strtotime('1 year 1 month 1 week 1 day 1 hour 1 minute');
+      $timestamp = \strtotime('1 year 1 month 1 week 1 day 1 hour 1 minute');
       $interval = $this->dateFormatter->formatTimeDiffUntil($timestamp, $options);
       $display = new FormattableMarkup($time_diff['future_format'], ['@interval' => $interval]);
       $summary[] = $this->t('Future date: %display', ['%display' => $display]);
 
-      $timestamp = strtotime('-1 year -1 month -1 week -1 day -1 hour -1 minute');
+      $timestamp = \strtotime('-1 year -1 month -1 week -1 day -1 hour -1 minute');
       $interval = $this->dateFormatter->formatTimeDiffSince($timestamp, $options);
       $display = new FormattableMarkup($time_diff['past_format'], ['@interval' => $interval]);
       $summary[] = $this->t('Past date: %display', ['%display' => $display]);
@@ -344,7 +344,7 @@ class TimestampFormatter extends FormatterBase {
    *   The #states array.
    */
   protected function buildStates(array $path, array $conditions): array {
-    $path = '[' . implode('][', $path) . ']';
+    $path = '[' . \implode('][', $path) . ']';
     return [
       'visible' => [
         [

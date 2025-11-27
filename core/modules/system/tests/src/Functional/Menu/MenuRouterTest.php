@@ -119,7 +119,7 @@ class MenuRouterTest extends BrowserTestBase {
     /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
     $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
     $menu_links = $menu_link_manager->loadLinksByRoute('menu_test.menu_name_test');
-    $menu_link = reset($menu_links);
+    $menu_link = \reset($menu_links);
     $this->assertEquals('original', $menu_link->getMenuName(), 'Menu name is "original".');
 
     // Change the menu_name parameter in menu_test.module, then force a menu
@@ -128,7 +128,7 @@ class MenuRouterTest extends BrowserTestBase {
     $menu_link_manager->rebuild();
 
     $menu_links = $menu_link_manager->loadLinksByRoute('menu_test.menu_name_test');
-    $menu_link = reset($menu_links);
+    $menu_link = \reset($menu_links);
     $this->assertEquals('changed', $menu_link->getMenuName(), 'Menu name was successfully changed after rebuild.');
   }
 
@@ -141,7 +141,7 @@ class MenuRouterTest extends BrowserTestBase {
     /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
     $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
     $menu_links = $menu_link_manager->loadLinksByRoute('menu_test.custom');
-    $menu_link = reset($menu_links);
+    $menu_link = \reset($menu_links);
     $this->assertEquals('menu_test.custom', $menu_link->getPluginId(), 'Menu links added at hook_menu_links_discovered_alter() obtain the machine name from the $links key.');
     // Make sure that rebuilding the menu tree does not produce duplicates of
     // links added by hook_menu_links_discovered_alter().
@@ -156,11 +156,11 @@ class MenuRouterTest extends BrowserTestBase {
     /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager */
     $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
     $menu_links = $menu_link_manager->loadLinksByRoute('menu_test.hierarchy_parent');
-    $parent_link = reset($menu_links);
+    $parent_link = \reset($menu_links);
     $menu_links = $menu_link_manager->loadLinksByRoute('menu_test.hierarchy_parent_child');
-    $child_link = reset($menu_links);
+    $child_link = \reset($menu_links);
     $menu_links = $menu_link_manager->loadLinksByRoute('menu_test.hierarchy_parent_child2');
-    $unattached_child_link = reset($menu_links);
+    $unattached_child_link = \reset($menu_links);
     $this->assertEquals($parent_link->getPluginId(), $child_link->getParent(), 'The parent of a directly attached child is correct.');
     $this->assertEquals($child_link->getPluginId(), $unattached_child_link->getParent(), 'The parent of a non-directly attached child is correct.');
   }

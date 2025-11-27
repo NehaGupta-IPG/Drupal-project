@@ -42,7 +42,7 @@ class UriItem extends StringItem {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('uri')
-      ->setLabel(t('URI value'))
+      ->setLabel(\t('URI value'))
       ->setSetting('case_sensitive', $field_definition->getSetting('case_sensitive'))
       ->setRequired(TRUE);
 
@@ -82,17 +82,17 @@ class UriItem extends StringItem {
     $random = new Random();
 
     $max_length = $field_definition->getSetting('max_length');
-    $min_length = min(10, $max_length);
+    $min_length = \min(10, $max_length);
 
     // The random value is generated multiple times to create a slight
     // preference towards values that are closer to the minimum length of the
     // string.
-    $length = mt_rand($min_length, mt_rand($min_length, mt_rand($min_length, $max_length)));
+    $length = \mt_rand($min_length, \mt_rand($min_length, \mt_rand($min_length, $max_length)));
     $values['value'] = $random->word($length);
 
     $suffix_length = $max_length - 7;
     foreach ($values as $key => $value) {
-      $values[$key] = 'http://' . mb_substr($value, 0, $suffix_length);
+      $values[$key] = 'http://' . \mb_substr($value, 0, $suffix_length);
     }
     return $values;
   }

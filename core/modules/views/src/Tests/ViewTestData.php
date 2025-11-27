@@ -27,17 +27,17 @@ class ViewTestData {
   public static function createTestViews($class, array $modules) {
     $views = [];
     while ($class) {
-      if (property_exists($class, 'testViews')) {
-        $views = array_merge($views, $class::$testViews);
+      if (\property_exists($class, 'testViews')) {
+        $views = \array_merge($views, $class::$testViews);
       }
-      $class = get_parent_class($class);
+      $class = \get_parent_class($class);
     }
     if (!empty($views)) {
       $storage = \Drupal::entityTypeManager()->getStorage('view');
       $module_handler = \Drupal::moduleHandler();
       foreach ($modules as $module) {
         $config_dir = \Drupal::service('extension.list.module')->getPath($module) . '/test_views';
-        if (!is_dir($config_dir) || !$module_handler->moduleExists($module)) {
+        if (!\is_dir($config_dir) || !$module_handler->moduleExists($module)) {
           continue;
         }
 
@@ -45,7 +45,7 @@ class ViewTestData {
         $available_views = $file_storage->listAll('views.view.');
         foreach ($views as $id) {
           $config_name = 'views.view.' . $id;
-          if (in_array($config_name, $available_views)) {
+          if (\in_array($config_name, $available_views)) {
             $storage
               ->create($file_storage->read($config_name))
               ->save();
@@ -240,35 +240,35 @@ class ViewTestData {
         'name' => 'John',
         'age' => 25,
         'job' => 'Singer',
-        'created' => gmmktime(0, 0, 0, 1, 1, 2000),
+        'created' => \gmmktime(0, 0, 0, 1, 1, 2000),
         'status' => 1,
       ],
       [
         'name' => 'George',
         'age' => 27,
         'job' => 'Singer',
-        'created' => gmmktime(0, 0, 0, 1, 2, 2000),
+        'created' => \gmmktime(0, 0, 0, 1, 2, 2000),
         'status' => 0,
       ],
       [
         'name' => 'Ringo',
         'age' => 28,
         'job' => 'Drummer',
-        'created' => gmmktime(6, 30, 30, 1, 1, 2000),
+        'created' => \gmmktime(6, 30, 30, 1, 1, 2000),
         'status' => 1,
       ],
       [
         'name' => 'Paul',
         'age' => 26,
         'job' => 'Songwriter',
-        'created' => gmmktime(6, 0, 0, 1, 1, 2000),
+        'created' => \gmmktime(6, 0, 0, 1, 1, 2000),
         'status' => 0,
       ],
       [
         'name' => 'Meredith',
         'age' => 30,
         'job' => 'Speaker',
-        'created' => gmmktime(6, 30, 10, 1, 1, 2000),
+        'created' => \gmmktime(6, 30, 10, 1, 1, 2000),
         'status' => 1,
       ],
     ];

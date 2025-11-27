@@ -90,7 +90,7 @@ class FileItemValidationTest extends KernelTestBase {
       'sites' => [
         'default' => [
           'files' => [
-            'test.txt' => str_repeat('a', 3000),
+            'test.txt' => \str_repeat('a', 3000),
           ],
         ],
       ],

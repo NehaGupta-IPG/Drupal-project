@@ -57,7 +57,7 @@ trait RequirementsTrait {
     }
 
     if (!empty($tables_missing_primary_key)) {
-      $description[] = $this->t('For this to work correctly, all tables must have a primary key. The following table(s) do not have a primary key: @tables.', ['@tables' => implode(', ', $tables_missing_primary_key)]);
+      $description[] = $this->t('For this to work correctly, all tables must have a primary key. The following table(s) do not have a primary key: @tables.', ['@tables' => \implode(', ', $tables_missing_primary_key)]);
     }
 
     $description[] = $this->t('See the <a href=":performance_doc">setting MySQL transaction isolation level</a> page for more information.', [
@@ -68,7 +68,7 @@ trait RequirementsTrait {
       'title' => $this->t('Transaction isolation level'),
       'severity' => $severity_level,
       'value' => $isolation_level,
-      'description' => Markup::create(implode(' ', $description)),
+      'description' => Markup::create(\implode(' ', $description)),
     ];
 
     return $requirements;

@@ -73,7 +73,7 @@ abstract class Mapping extends StylePluginBase {
     $mapping = $this->defineMapping();
 
     // Restrict the list of defaults to the mapping, in case they have changed.
-    $options = array_intersect_key($this->options['mapping'], $mapping);
+    $options = \array_intersect_key($this->options['mapping'], $mapping);
 
     // Get the labels of the fields added to this display.
     $field_labels = $this->displayHandler->getFieldLabels();
@@ -113,7 +113,7 @@ abstract class Mapping extends StylePluginBase {
       if (!empty($mapping[$key]['#toggle'])) {
         $form['mapping']["toggle_$key"] = [
           '#type' => 'checkbox',
-          '#title' => $this->t('Use a custom %field_name', ['%field_name' => strtolower($mapping[$key]['#title'])]),
+          '#title' => $this->t('Use a custom %field_name', ['%field_name' => \strtolower($mapping[$key]['#title'])]),
           '#default_value' => $this->options['mapping']["toggle_$key"],
         ];
         $overrides['#states']['visible'][':input[name="style_options[mapping][' . "toggle_$key" . ']"]'] = ['checked' => TRUE];

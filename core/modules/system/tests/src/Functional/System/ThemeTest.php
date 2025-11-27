@@ -87,8 +87,8 @@ class ThemeTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(404);
 
     // Specify a filesystem path to be used for the logo.
-    $file = current($this->drupalGetTestFiles('image'));
-    $file_relative = strtr($file->uri, ['public:/' => PublicStream::basePath()]);
+    $file = \current($this->drupalGetTestFiles('image'));
+    $file_relative = \strtr($file->uri, ['public:/' => PublicStream::basePath()]);
     $default_theme_path = 'core/themes/starterkit_theme';
 
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
@@ -112,12 +112,12 @@ class ThemeTest extends BrowserTestBase {
       // Relative path to an arbitrary file.
       'core/misc/druplicon.png' => [
         'form' => 'core/misc/druplicon.png',
-        'src' => base_path() . 'core/misc/druplicon.png',
+        'src' => \base_path() . 'core/misc/druplicon.png',
       ],
       // Relative path to a file in a theme.
       $default_theme_path . '/logo.svg' => [
         'form' => $default_theme_path . '/logo.svg',
-        'src' => base_path() . $default_theme_path . '/logo.svg',
+        'src' => \base_path() . $default_theme_path . '/logo.svg',
       ],
     ];
     foreach ($supported_paths as $input => $expected) {
@@ -139,7 +139,7 @@ class ThemeTest extends BrowserTestBase {
       if (StreamWrapperManager::getScheme($input) == 'public') {
         $implicit_public_file = StreamWrapperManager::getTarget($input);
         $explicit_file = $input;
-        $local_file = strtr($input, ['public:/' => PublicStream::basePath()]);
+        $local_file = \strtr($input, ['public:/' => PublicStream::basePath()]);
       }
       // Adjust for fully qualified stream wrapper URI elsewhere.
       elseif (StreamWrapperManager::getScheme($input) !== FALSE) {
@@ -554,7 +554,7 @@ class ThemeTest extends BrowserTestBase {
       // Confirm the theme is indicated as the default theme and administration
       // theme because the admin theme is the default theme.
       $out = $this->getSession()->getPage()->getContent();
-      $this->assertTrue((bool) preg_match("/$theme_name " . preg_quote($version) . '\s{2,}\(default theme, administration theme\)/', $out));
+      $this->assertTrue((bool) \preg_match("/$theme_name " . \preg_quote($version) . '\s{2,}\(default theme, administration theme\)/', $out));
     }
   }
 

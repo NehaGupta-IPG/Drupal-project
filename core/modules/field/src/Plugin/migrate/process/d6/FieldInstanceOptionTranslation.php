@@ -26,15 +26,15 @@ class FieldInstanceOptionTranslation extends ProcessPluginBase {
     $option_key = 0;
     $translation = '';
     if (isset($global_settings['allowed_values'])) {
-      $list = explode("\n", $global_settings['allowed_values']);
-      $list = array_map('trim', $list);
+      $list = \explode("\n", $global_settings['allowed_values']);
+      $list = \array_map('trim', $list);
       $list = FilterArray::removeEmptyStrings($list);
       switch ($field_type) {
         case 'boolean':
-          $option = preg_replace('/^option_/', '', $row->getSourceProperty('property'));
+          $option = \preg_replace('/^option_/', '', $row->getSourceProperty('property'));
           for ($i = 0; $i < 2; $i++) {
             $value = $list[$i];
-            $tmp = explode("|", $value);
+            $tmp = \explode("|", $value);
             $original_option_key = $tmp[0] ?? NULL;
             $option_key = ($i === 0) ? 'off_label' : 'on_label';
             // Find property with name matching the original option.

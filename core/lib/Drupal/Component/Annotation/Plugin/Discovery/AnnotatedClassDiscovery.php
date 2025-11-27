@@ -74,8 +74,8 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
     $this->pluginDefinitionAnnotationName = $plugin_definition_annotation_name;
     $this->annotationNamespaces = $annotation_namespaces;
 
-    $file_cache_suffix = str_replace('\\', '_', $plugin_definition_annotation_name);
-    $file_cache_suffix .= ':' . Crypt::hashBase64(serialize($annotation_namespaces));
+    $file_cache_suffix = \str_replace('\\', '_', $plugin_definition_annotation_name);
+    $file_cache_suffix .= ':' . Crypt::hashBase64(\serialize($annotation_namespaces));
     $this->fileCache = FileCacheFactory::get('annotation_discovery:' . $file_cache_suffix);
   }
 
@@ -90,7 +90,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
       $this->annotationReader = new SimpleAnnotationReader();
 
       // Add the namespaces from the main plugin annotation, like @EntityType.
-      $namespace = substr($this->pluginDefinitionAnnotationName, 0, strrpos($this->pluginDefinitionAnnotationName, '\\'));
+      $namespace = \substr($this->pluginDefinitionAnnotationName, 0, \strrpos($this->pluginDefinitionAnnotationName, '\\'));
       $this->annotationReader->addNamespace($namespace);
 
       // Register additional namespaces to be scanned for annotations.
@@ -115,7 +115,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
     // Search for classes within all PSR-4 namespace locations.
     foreach ($this->getPluginNamespaces() as $namespace => $dirs) {
       foreach ($dirs as $dir) {
-        if (file_exists($dir)) {
+        if (\file_exists($dir)) {
           $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS)
           );
@@ -125,13 +125,13 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
                 if (isset($cached['id'])) {
                   // Explicitly unserialize this to create a new object
                   // instance.
-                  $definitions[$cached['id']] = unserialize($cached['content']);
+                  $definitions[$cached['id']] = \unserialize($cached['content']);
                 }
                 continue;
               }
 
               $sub_path = $iterator->getSubIterator()->getSubPath();
-              $sub_path = $sub_path ? str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
+              $sub_path = $sub_path ? \str_replace(DIRECTORY_SEPARATOR, '\\', $sub_path) . '\\' : '';
               $class = $namespace . '\\' . $sub_path . $fileinfo->getBasename('.php');
 
               // The filename is already known, so there is no need to find the
@@ -148,7 +148,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
                 $content = $annotation->get();
                 $definitions[$id] = $content;
                 // Explicitly serialize this to create a new object instance.
-                $this->fileCache->set($fileinfo->getPathName(), ['id' => $id, 'content' => serialize($content)]);
+                $this->fileCache->set($fileinfo->getPathName(), ['id' => $id, 'content' => \serialize($content)]);
               }
               else {
                 // Store a NULL object, so the file is not parsed again.

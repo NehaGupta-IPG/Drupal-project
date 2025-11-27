@@ -27,7 +27,7 @@ class BcRoute extends Route {
   public function __construct() {
     parent::__construct('');
     $this->setOption('bc_route', TRUE);
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use route aliases instead. See https://www.drupal.org/node/3317784', E_USER_DEPRECATED);
+    @\trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use route aliases instead. See https://www.drupal.org/node/3317784', E_USER_DEPRECATED);
   }
 
 }

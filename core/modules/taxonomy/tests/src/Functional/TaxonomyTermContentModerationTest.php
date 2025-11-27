@@ -109,7 +109,7 @@ class TaxonomyTermContentModerationTest extends TaxonomyTestBase {
     // Check that parents were not changed.
     $assert_session->pageTextContains($validation_message);
     $taxonomy_storage->resetCache();
-    $this->assertEquals([$parent_1->id()], array_keys($taxonomy_storage->loadParents($child->id())));
+    $this->assertEquals([$parent_1->id()], \array_keys($taxonomy_storage->loadParents($child->id())));
 
     // Add a pending revision and add a new parent.
     $this->drupalGet($child->toUrl('edit-form'));
@@ -118,7 +118,7 @@ class TaxonomyTermContentModerationTest extends TaxonomyTestBase {
     // Check that parents were not changed.
     $assert_session->pageTextContains($validation_message);
     $taxonomy_storage->resetCache();
-    $this->assertEquals([$parent_1->id()], array_keys($taxonomy_storage->loadParents($child->id())));
+    $this->assertEquals([$parent_1->id()], \array_keys($taxonomy_storage->loadParents($child->id())));
 
     // Add a pending revision and use the root term as a parent.
     $this->drupalGet($child->toUrl('edit-form'));
@@ -127,7 +127,7 @@ class TaxonomyTermContentModerationTest extends TaxonomyTestBase {
     // Check that parents were not changed.
     $assert_session->pageTextContains($validation_message);
     $taxonomy_storage->resetCache();
-    $this->assertEquals([$parent_1->id()], array_keys($taxonomy_storage->loadParents($child->id())));
+    $this->assertEquals([$parent_1->id()], \array_keys($taxonomy_storage->loadParents($child->id())));
 
     // Add a pending revision and remove the parent.
     $this->drupalGet($child->toUrl('edit-form'));
@@ -136,7 +136,7 @@ class TaxonomyTermContentModerationTest extends TaxonomyTestBase {
     // Check that parents were not changed.
     $assert_session->pageTextContains($validation_message);
     $taxonomy_storage->resetCache();
-    $this->assertEquals([$parent_1->id()], array_keys($taxonomy_storage->loadParents($child->id())));
+    $this->assertEquals([$parent_1->id()], \array_keys($taxonomy_storage->loadParents($child->id())));
 
     // Add a published revision.
     $this->drupalGet($child->toUrl('edit-form'));
@@ -149,7 +149,7 @@ class TaxonomyTermContentModerationTest extends TaxonomyTestBase {
     // Check that parents were changed.
     $assert_session->pageTextNotContains($validation_message);
     $taxonomy_storage->resetCache();
-    $this->assertNotEquals([$parent_1->id()], array_keys($taxonomy_storage->loadParents($child->id())));
+    $this->assertNotEquals([$parent_1->id()], \array_keys($taxonomy_storage->loadParents($child->id())));
 
     // Add a pending revision and change the weight.
     $this->drupalGet($child->toUrl('edit-form'));
@@ -167,7 +167,7 @@ class TaxonomyTermContentModerationTest extends TaxonomyTestBase {
     $this->submitForm($edit, 'Save');
     // Add a pending revision without any changes.
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['name' => $edit['name[0][value]']]);
-    $term = reset($terms);
+    $term = \reset($terms);
     $this->drupalGet($term->toUrl('edit-form'));
     $this->submitForm(['moderation_state[0][state]' => 'draft'], 'Save');
     $assert_session->pageTextNotContains($validation_message);

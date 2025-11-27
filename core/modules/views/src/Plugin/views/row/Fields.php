@@ -103,7 +103,7 @@ class Fields extends RowPluginBase {
    */
   public function submitOptionsForm(&$form, FormStateInterface $form_state) {
     $inline = $form_state->getValue(['row_options', 'inline']);
-    $form_state->setValue(['row_options', 'inline'], array_filter($inline));
+    $form_state->setValue(['row_options', 'inline'], \array_filter($inline));
   }
 
 }

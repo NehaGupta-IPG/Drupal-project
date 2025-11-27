@@ -104,10 +104,10 @@ class FieldBundle extends ProcessPluginBase implements ContainerFactoryPluginInt
       // Legacy generated migrations will not have the destination property
       // '_comment_type'.
       if (!$row->hasDestinationProperty('_comment_type')) {
-        $value = str_replace('comment_node_', '', $bundle);
+        $value = \str_replace('comment_node_', '', $bundle);
         $migration = 'd7_comment_type';
         $lookup_result = $this->migrateLookup->lookup($migration, [$value]);
-        $lookup_result = empty($lookup_result) ? NULL : reset($lookup_result[0]);
+        $lookup_result = empty($lookup_result) ? NULL : \reset($lookup_result[0]);
       }
     }
     return $lookup_result ?: $bundle;

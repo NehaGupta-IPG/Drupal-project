@@ -19,7 +19,7 @@ class MediaThemeSuggestionsHooks {
     $suggestions = [];
     /** @var \Drupal\media\MediaInterface $media */
     $media = $variables['elements']['#media'];
-    $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+    $sanitized_view_mode = \strtr($variables['elements']['#view_mode'], '.', '_');
 
     $suggestions[] = 'media__' . $sanitized_view_mode;
     $suggestions[] = 'media__' . $media->bundle();
@@ -45,8 +45,8 @@ class MediaThemeSuggestionsHooks {
       $provider_id = $source->getMetadata($media, 'provider_name');
       if ($provider_id) {
         $provider_id = \Drupal::transliteration()->transliterate($provider_id);
-        $provider_id = preg_replace('/[^a-z0-9_]+/', '_', mb_strtolower($provider_id));
-        $suggestions[] = end($suggestions) . "__provider_$provider_id";
+        $provider_id = \preg_replace('/[^a-z0-9_]+/', '_', \mb_strtolower($provider_id));
+        $suggestions[] = \end($suggestions) . "__provider_$provider_id";
       }
     }
 

@@ -62,7 +62,7 @@ class UniquePathAliasConstraintValidator extends ConstraintValidator implements 
     }
 
     if ($result = $query->range(0, 1)->execute()) {
-      $existing_alias_id = reset($result);
+      $existing_alias_id = \reset($result);
       $existing_alias = $storage->load($existing_alias_id);
 
       if ($existing_alias->getAlias() !== $alias) {

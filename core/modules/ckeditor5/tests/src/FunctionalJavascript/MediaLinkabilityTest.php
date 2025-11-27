@@ -53,11 +53,11 @@ class MediaLinkabilityTest extends MediaTestBase {
     }
     $editor->save();
     $filter_format->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))
@@ -163,7 +163,7 @@ class MediaLinkabilityTest extends MediaTestBase {
     $this->pressEditorButton('Source');
     $source_text_area = $assert_session->waitForElement('css', '.ck-source-editing-area textarea');
     $this->assertNotEmpty($source_text_area);
-    $new_value = str_replace('<a ', '<a class="trusted" ', $source_text_area->getValue());
+    $new_value = \str_replace('<a ', '<a class="trusted" ', $source_text_area->getValue());
     $source_text_area->setValue('<p>temp</p>');
     $source_text_area->setValue($new_value);
     $this->pressEditorButton('Source');
@@ -360,19 +360,19 @@ class MediaLinkabilityTest extends MediaTestBase {
     $preview_button = $assert_session->waitForElementVisible('css', '.ck-link-toolbar__preview');
     $this->assertNotNull($preview_button);
     $this->assertSame('Zoo Party (Content - blog)', $preview_button->getText());
-    $expected_preview_path = base_path() . ltrim($content_to_add->toUrl('canonical')->toString(), '/');
+    $expected_preview_path = \base_path() . \ltrim($content_to_add->toUrl('canonical')->toString(), '/');
     $this->assertEquals($expected_preview_path, $preview_button->getAttribute('href'));
 
     // Assert the linked media markup in the editor.
     $xpath = new \DOMXPath($this->getEditorDataAsDom());
-    $query = sprintf('//a[@href="' . base_path() . 'node/%s" and @data-entity-uuid="%s" and @data-entity-type="node" and @data-entity-metadata]/drupal-media', $content_to_add->id(), $content_to_add_uuid);
+    $query = \sprintf('//a[@href="' . \base_path() . 'node/%s" and @data-entity-uuid="%s" and @data-entity-type="node" and @data-entity-metadata]/drupal-media', $content_to_add->id(), $content_to_add_uuid);
     $this->assertCount(1, $xpath->query($query), "Search for $query");
 
     // Submit the node form.
     $this->submitForm([], 'Save');
 
     // Assert the rendered markup links to the correct place.
-    $selector = sprintf('a[href="%s"] > article', $content_to_add->toUrl('canonical')->toString());
+    $selector = \sprintf('a[href="%s"] > article', $content_to_add->toUrl('canonical')->toString());
     $link_around_media = $assert_session->elementExists('css', $selector);
     $link_around_media->click();
     $h1 = $page->find('css', 'h1');

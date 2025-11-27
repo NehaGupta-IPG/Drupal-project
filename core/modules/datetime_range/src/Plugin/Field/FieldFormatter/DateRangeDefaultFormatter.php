@@ -47,7 +47,7 @@ class DateRangeDefaultFormatter extends DateTimeDefaultFormatter {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    return array_merge(parent::settingsSummary(), $this->dateTimeRangeSettingsSummary());
+    return \array_merge(parent::settingsSummary(), $this->dateTimeRangeSettingsSummary());
   }
 
 }

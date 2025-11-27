@@ -32,7 +32,7 @@ class ContactSettingsTest extends MigrateSqlSourceTestBase {
     $tests[0]['source_data']['variable'] = [
       [
         'name' => 'site_name',
-        'value' => serialize('foo!'),
+        'value' => \serialize('foo!'),
       ],
     ];
     $tests[0]['source_data']['contact'] = [

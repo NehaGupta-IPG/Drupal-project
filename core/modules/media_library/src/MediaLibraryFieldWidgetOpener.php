@@ -129,7 +129,7 @@ class MediaLibraryFieldWidgetOpener implements MediaLibraryOpenerInterface {
     // field of the widget, and trigger the field update via the hidden submit
     // button.
     $widget_id = $parameters['field_widget_id'];
-    $ids = implode(',', $selected_ids);
+    $ids = \implode(',', $selected_ids);
     $response
       ->addCommand(new InvokeCommand("[data-media-library-widget-value=\"$widget_id\"]", 'val', [$ids]))
       ->addCommand(new InvokeCommand("[data-media-library-widget-update=\"$widget_id\"]", 'trigger', ['mousedown']));

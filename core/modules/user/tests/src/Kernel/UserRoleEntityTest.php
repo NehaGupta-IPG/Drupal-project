@@ -81,7 +81,7 @@ class UserRoleEntityTest extends KernelTestBase {
     $this->assertSame('test_role', $log_message[2]['@id']);
     $this->assertSame('does not exist, also does not exist', $log_message[2]['@permissions']);
     $permissions = $role->getPermissions();
-    $this->assertEmpty(array_intersect(['does not exist', 'also does not exist'], $permissions));
+    $this->assertEmpty(\array_intersect(['does not exist', 'also does not exist'], $permissions));
   }
 
   /**

@@ -87,10 +87,10 @@ class Fast404ExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
 
     $config = $this->configFactory->get('system.performance');
     $exclude_paths = $config->get('fast_404.exclude_paths');
-    if ($config->get('fast_404.enabled') && $exclude_paths && !preg_match($exclude_paths, $request->getPathInfo())) {
+    if ($config->get('fast_404.enabled') && $exclude_paths && !\preg_match($exclude_paths, $request->getPathInfo())) {
       $fast_paths = $config->get('fast_404.paths');
-      if ($fast_paths && preg_match($fast_paths, $request->getPathInfo())) {
-        $fast_404_html = strtr($config->get('fast_404.html'), ['@path' => Html::escape($request->getUri())]);
+      if ($fast_paths && \preg_match($fast_paths, $request->getPathInfo())) {
+        $fast_404_html = \strtr($config->get('fast_404.html'), ['@path' => Html::escape($request->getUri())]);
         $response = new HtmlResponse($fast_404_html, Response::HTTP_NOT_FOUND);
         // Some routes such as system.files conditionally throw a
         // NotFoundHttpException depending on URL parameters instead of just the

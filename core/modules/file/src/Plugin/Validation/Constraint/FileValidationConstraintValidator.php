@@ -47,7 +47,7 @@ class FileValidationConstraintValidator extends ConstraintValidator implements C
 
     // Always respect the configured maximum file size.
     $field_settings = $value->getFieldDefinition()->getSettings();
-    if (array_key_exists('max_filesize', $field_settings)) {
+    if (\array_key_exists('max_filesize', $field_settings)) {
       $validators['FileSizeLimit'] = ['fileLimit' => Bytes::toNumber($field_settings['max_filesize'])];
     }
     else {

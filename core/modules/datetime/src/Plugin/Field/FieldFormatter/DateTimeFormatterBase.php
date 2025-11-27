@@ -169,9 +169,9 @@ abstract class DateTimeFormatterBase extends FormatterBase {
       $timezone = DateTimeItemInterface::STORAGE_TIMEZONE;
     }
     else {
-      $timezone = date_default_timezone_get();
+      $timezone = \date_default_timezone_get();
     }
-    $date->setTimeZone(timezone_open($timezone));
+    $date->setTimeZone(\timezone_open($timezone));
   }
 
   /**

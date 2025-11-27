@@ -28,7 +28,7 @@ trait FileTestFormTrait {
 
     $form['file_test_replace'] = [
       '#type' => 'select',
-      '#title' => t('Replace existing image'),
+      '#title' => \t('Replace existing image'),
       '#options' => [
         FileExists::Rename->name => new TranslatableMarkup('Appends number until name is unique'),
         FileExists::Replace->name => new TranslatableMarkup('Replace the existing file'),
@@ -38,18 +38,18 @@ trait FileTestFormTrait {
     ];
     $form['file_subdir'] = [
       '#type' => 'textfield',
-      '#title' => t('Subdirectory for test file'),
+      '#title' => \t('Subdirectory for test file'),
       '#default_value' => '',
     ];
 
     $form['extensions'] = [
       '#type' => 'textfield',
-      '#title' => t('Allowed extensions.'),
+      '#title' => \t('Allowed extensions.'),
       '#default_value' => '',
     ];
 
     $form['allow_all_extensions'] = [
-      '#title' => t('Allow all extensions?'),
+      '#title' => \t('Allow all extensions?'),
       '#type' => 'radios',
       '#options' => [
         'false' => 'No',
@@ -61,13 +61,13 @@ trait FileTestFormTrait {
 
     $form['is_image_file'] = [
       '#type' => 'checkbox',
-      '#title' => t('Is this an image file?'),
+      '#title' => \t('Is this an image file?'),
       '#default_value' => TRUE,
     ];
 
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Submit'),
+      '#value' => \t('Submit'),
     ];
 
     return $form;

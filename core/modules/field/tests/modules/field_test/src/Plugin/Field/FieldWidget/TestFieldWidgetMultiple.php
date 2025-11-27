@@ -75,7 +75,7 @@ class TestFieldWidgetMultiple extends WidgetBase {
     }
     $element += [
       '#type' => 'textfield',
-      '#default_value' => implode(', ', $values),
+      '#default_value' => \implode(', ', $values),
       '#element_validate' => [[static::class, 'multipleValidate']],
     ];
     return $element;
@@ -92,7 +92,7 @@ class TestFieldWidgetMultiple extends WidgetBase {
    * Element validation helper.
    */
   public static function multipleValidate($element, FormStateInterface $form_state) {
-    $values = array_map('trim', explode(',', $element['#value']));
+    $values = \array_map('trim', \explode(',', $element['#value']));
     $items = [];
     foreach ($values as $value) {
       $items[] = ['value' => $value];

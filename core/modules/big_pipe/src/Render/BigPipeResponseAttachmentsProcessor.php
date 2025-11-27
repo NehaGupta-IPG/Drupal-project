@@ -61,7 +61,7 @@ class BigPipeResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
    * {@inheritdoc}
    */
   public function processAttachments(AttachmentsInterface $response) {
-    assert($response instanceof HtmlResponse);
+    \assert($response instanceof HtmlResponse);
 
     // First, render the actual placeholders; this will cause the BigPipe
     // placeholder strategy to generate BigPipe placeholders. We need those to
@@ -99,10 +99,10 @@ class BigPipeResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
     // Restore BigPipe placeholders.
     $attachments = $processed_html_response->getAttachments();
     $big_pipe_response = clone $processed_html_response;
-    if (count($big_pipe_placeholders)) {
+    if (\count($big_pipe_placeholders)) {
       $attachments['big_pipe_placeholders'] = $big_pipe_placeholders;
     }
-    if (count($big_pipe_nojs_placeholders)) {
+    if (\count($big_pipe_nojs_placeholders)) {
       $attachments['big_pipe_nojs_placeholders'] = $big_pipe_nojs_placeholders;
     }
     $big_pipe_response->setAttachments($attachments);

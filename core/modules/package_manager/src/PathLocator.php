@@ -30,7 +30,7 @@ class PathLocator {
    */
   public function getProjectRoot(): string {
     // Assume that the vendor directory is immediately below the project root.
-    return realpath($this->getVendorDirectory() . DIRECTORY_SEPARATOR . '..');
+    return \realpath($this->getVendorDirectory() . DIRECTORY_SEPARATOR . '..');
   }
 
   /**
@@ -47,21 +47,21 @@ class PathLocator {
 
     // If there's only one class loader, we don't need to search for the right
     // one.
-    if (count($loaders) === 1) {
-      return key($loaders);
+    if (\count($loaders) === 1) {
+      return \key($loaders);
     }
 
     // To determine which class loader is the one for Drupal's vendor directory,
     // look for the loader whose vendor path starts the same way as the path to
     // this file.
-    foreach (array_keys($loaders) as $path) {
-      if (str_starts_with(__FILE__, dirname($path))) {
+    foreach (\array_keys($loaders) as $path) {
+      if (\str_starts_with(__FILE__, \dirname($path))) {
         return $path;
       }
     }
     // If we couldn't find a match, assume that the first registered class
     // loader is the one we want.
-    return key($loaders);
+    return \key($loaders);
   }
 
   /**
@@ -73,8 +73,8 @@ class PathLocator {
    *   project root and Drupal root are the same.
    */
   public function getWebRoot(): string {
-    $web_root = str_replace(trim($this->getProjectRoot(), DIRECTORY_SEPARATOR), '', trim($this->appRoot, DIRECTORY_SEPARATOR));
-    return trim($web_root, DIRECTORY_SEPARATOR);
+    $web_root = \str_replace(\trim($this->getProjectRoot(), DIRECTORY_SEPARATOR), '', \trim($this->appRoot, DIRECTORY_SEPARATOR));
+    return \trim($web_root, DIRECTORY_SEPARATOR);
   }
 
   /**

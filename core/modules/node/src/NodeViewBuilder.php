@@ -136,9 +136,9 @@ class NodeViewBuilder extends EntityViewBuilder implements TrustedCallbackInterf
     // Always display a read more link on teasers because we have no way
     // to know when a teaser view is different than a full view.
     if ($view_mode == 'teaser') {
-      $node_title_stripped = strip_tags($entity->label());
+      $node_title_stripped = \strip_tags($entity->label());
       $links['node-readmore'] = [
-        'title' => t('Read more<span class="visually-hidden"> about @title</span>', [
+        'title' => \t('Read more<span class="visually-hidden"> about @title</span>', [
           '@title' => $node_title_stripped,
         ]),
         'url' => $entity->toUrl(),

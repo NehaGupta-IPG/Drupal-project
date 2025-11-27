@@ -59,18 +59,18 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
   protected function copyRawVariables(array $defaults) {
     /** @var \Symfony\Component\Routing\Route $route */
     $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];
-    $variables = array_flip($route->compile()->getVariables());
+    $variables = \array_flip($route->compile()->getVariables());
     // Foreach will copy the values from the array it iterates. Even if they
     // are references, use it to break them. This avoids any scenarios where raw
     // variables also get replaced with converted values.
     $raw_variables = [];
-    foreach (array_intersect_key($defaults, $variables) as $key => $value) {
+    foreach (\array_intersect_key($defaults, $variables) as $key => $value) {
       $raw_variables[$key] = $value;
     }
     // Route defaults that do not start with a leading "_" are also
     // parameters, even if they are not included in path or host patterns.
     foreach ($route->getDefaults() as $name => $value) {
-      if (!isset($raw_variables[$name]) && !str_starts_with($name, '_')) {
+      if (!isset($raw_variables[$name]) && !\str_starts_with($name, '_')) {
         $raw_variables[$name] = $value;
       }
     }

@@ -29,7 +29,7 @@ class HtmlSerializerRules extends OutputRules {
     $text = parent::escape($text, $attribute);
 
     if ($attribute) {
-      $text = strtr($text, [
+      $text = \strtr($text, [
         '<' => '&lt;',
         '>' => '&gt;',
       ]);

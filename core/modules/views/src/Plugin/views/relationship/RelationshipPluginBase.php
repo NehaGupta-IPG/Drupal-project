@@ -128,7 +128,7 @@ abstract class RelationshipPluginBase extends HandlerBase {
    */
   public function query() {
     if (!empty($this->definition['deprecated'])) {
-      @trigger_error($this->definition['deprecated'], E_USER_DEPRECATED);
+      @\trigger_error($this->definition['deprecated'], E_USER_DEPRECATED);
     }
 
     // Figure out what base table this relationship brings to the party.

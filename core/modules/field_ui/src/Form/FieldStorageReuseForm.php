@@ -122,7 +122,7 @@ class FieldStorageReuseForm extends FormBase {
       $readable_cardinality = $cardinality === -1 ? $this->t('Unlimited') : new PluralTranslatableMarkup(1, 'Single value', 'Multiple values: @cardinality', ['@cardinality' => $cardinality]);
 
       // Remove empty values.
-      $list = array_filter([...$summary, $readable_cardinality]);
+      $list = \array_filter([...$summary, $readable_cardinality]);
       $settings_summary = [
         '#theme' => 'item_list',
         '#items' => $list,
@@ -134,10 +134,10 @@ class FieldStorageReuseForm extends FormBase {
       foreach ($field_bundles as $bundle) {
         $bundle_label_arr[] = $bundles[$this->entityTypeId][$bundle]['label'];
       }
-      sort($bundle_label_arr);
+      \sort($bundle_label_arr);
 
       // Combine bundles to be a single string separated by a comma.
-      $settings_summary['#items'][] = $this->t('Used in: @list', ['@list' => implode(", ", $bundle_label_arr)]);
+      $settings_summary['#items'][] = $this->t('Used in: @list', ['@list' => \implode(", ", $bundle_label_arr)]);
       $row = [
         '#attributes' => [
           'data-field-id' => $field["field_name"],
@@ -176,7 +176,7 @@ class FieldStorageReuseForm extends FormBase {
     }
 
     // Sort rows by field name.
-    ksort($rows);
+    \ksort($rows);
     $form['add']['table'] = [
       '#type' => 'table',
       '#header' => [
@@ -215,7 +215,7 @@ class FieldStorageReuseForm extends FormBase {
       if ($field_storage instanceof FieldStorageConfigInterface
         && !$field_storage->isLocked()
         && empty($field_types[$field_type]['no_ui'])
-        && !in_array($this->bundle, $field_storage->getBundles(), TRUE)) {
+        && !\in_array($this->bundle, $field_storage->getBundles(), TRUE)) {
 
         $options[$field_name] = [
           'field_type' => $field_types[$field_type]['label'],
@@ -225,7 +225,7 @@ class FieldStorageReuseForm extends FormBase {
       }
     }
 
-    asort($options);
+    \asort($options);
 
     return $options;
   }
@@ -251,7 +251,7 @@ class FieldStorageReuseForm extends FormBase {
       ->condition('entity_type', $this->entityTypeId)
       ->condition('field_name', $field_name)
       ->execute();
-    $field = $fields ? $this->entityTypeManager->getStorage('field_config')->load(reset($fields)) : NULL;
+    $field = $fields ? $this->entityTypeManager->getStorage('field_config')->load(\reset($fields)) : NULL;
     // Have a default label in case a field storage doesn't have any fields.
     $existing_storage_label = $field ? $field->label() : $field_name;
     try {
@@ -272,7 +272,7 @@ class FieldStorageReuseForm extends FormBase {
 
       // Store new field information for any additional submit handlers.
       $form_state->set(['fields_added', '_add_existing_field'], $field_name);
-      $form_state->setRedirect("entity.field_config.{$this->entityTypeId}_field_edit_form", array_merge(FieldUI::getRouteBundleParameter($entity_type, $this->bundle), ['field_config' => "$this->entityTypeId.$this->bundle.$field_name"]));
+      $form_state->setRedirect("entity.field_config.{$this->entityTypeId}_field_edit_form", \array_merge(FieldUI::getRouteBundleParameter($entity_type, $this->bundle), ['field_config' => "$this->entityTypeId.$this->bundle.$field_name"]));
     }
     catch (\Exception $e) {
       $this->messenger()->addError($this->t('There was a problem reusing field %label: @message', [
@@ -313,8 +313,8 @@ class FieldStorageReuseForm extends FormBase {
     $bundles = $field_map[$this->entityTypeId][$field_name]['bundles'];
 
     // Sort bundles to ensure deterministic behavior.
-    sort($bundles);
-    $existing_bundle = reset($bundles);
+    \sort($bundles);
+    $existing_bundle = \reset($bundles);
 
     // Copy field configuration.
     $existing_field = $this->entityFieldManager->getFieldDefinitions($this->entityTypeId, $existing_bundle)[$field_name];

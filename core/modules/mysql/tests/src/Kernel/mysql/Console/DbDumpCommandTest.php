@@ -100,7 +100,7 @@ class DbDumpCommandTest extends DriverSpecificKernelTestBase {
     $router_row_count = (int) $this->container->get('database')->select('router')->countQuery()->execute()->fetchField();
 
     $output = $command_tester->getDisplay();
-    $this->assertSame($router_row_count, substr_count($output, "insert('router"));
+    $this->assertSame($router_row_count, \substr_count($output, "insert('router"));
     $this->assertGreaterThan(1, $router_row_count);
   }
 

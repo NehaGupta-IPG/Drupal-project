@@ -64,7 +64,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
    */
   public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager, ?ModuleExtensionList $module_extension_list = NULL) {
     if ($module_extension_list === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $module_extension_list = \Drupal::service('extension.list.module');
     }
     parent::__construct($permission_handler, $role_storage, $module_handler, $module_extension_list);
@@ -94,7 +94,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
     $config_name = $this->bundle->getConfigDependencyName();
     $config_entities = $this->configManager
       ->findConfigEntityDependencies('config', [$config_name]);
-    $config_names = array_map(
+    $config_names = \array_map(
       fn($dependent_config) => $dependent_config->getConfigDependencyName(),
       $config_entities,
     );
@@ -105,7 +105,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
     $permissions_by_provider = [];
     foreach ($permissions as $permission_name => $permission) {
       $required_configs = $permission['dependencies']['config'] ?? [];
-      if (array_intersect($required_configs, $config_names)) {
+      if (\array_intersect($required_configs, $config_names)) {
         $provider = $permission['provider'];
         $permissions_by_provider[$provider][$permission_name] = $permission;
       }
@@ -164,7 +164,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
    * @see https://www.drupal.org/node/3384745
    */
   public function access(Route $route, RouteMatchInterface $route_match, $bundle = NULL): AccessResultInterface {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use a permissions check on the route definition instead. See https://www.drupal.org/node/3384745', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use a permissions check on the route definition instead. See https://www.drupal.org/node/3384745', E_USER_DEPRECATED);
     $permission = $route->getRequirement('_permission');
     if ($permission && !$this->currentUser()->hasPermission($permission)) {
       return AccessResult::neutral()->cachePerPermissions();
@@ -175,7 +175,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
     }
     else {
       $bundle_entity_type = $route->getDefault('bundle_entity_type');
-      $bundle_name = is_string($bundle) ? $bundle : $route_match->getRawParameter($bundle_entity_type);
+      $bundle_name = \is_string($bundle) ? $bundle : $route_match->getRawParameter($bundle_entity_type);
       $this->bundle = $this->entityTypeManager
         ->getStorage($bundle_entity_type)
         ->load($bundle_name);

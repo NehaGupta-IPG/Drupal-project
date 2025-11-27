@@ -56,7 +56,7 @@ class PasswordConfirm extends FormElementBase {
       // These should be strings, but allow other scalars since they might be
       // valid input in programmatic form submissions. Any nested array values
       // are ignored.
-      if (isset($input[$allowed_key]) && is_scalar($input[$allowed_key])) {
+      if (isset($input[$allowed_key]) && \is_scalar($input[$allowed_key])) {
         $value[$allowed_key] = (string) $input[$allowed_key];
       }
     }
@@ -69,7 +69,7 @@ class PasswordConfirm extends FormElementBase {
   public static function processPasswordConfirm(&$element, FormStateInterface $form_state, &$complete_form) {
     $element['pass1'] = [
       '#type' => 'password',
-      '#title' => t('Password'),
+      '#title' => \t('Password'),
       '#value' => empty($element['#value']) ? NULL : $element['#value']['pass1'],
       '#required' => $element['#required'],
       '#attributes' => [
@@ -80,7 +80,7 @@ class PasswordConfirm extends FormElementBase {
     ];
     $element['pass2'] = [
       '#type' => 'password',
-      '#title' => t('Confirm password'),
+      '#title' => \t('Confirm password'),
       '#value' => empty($element['#value']) ? NULL : $element['#value']['pass2'],
       '#required' => $element['#required'],
       '#attributes' => [
@@ -103,15 +103,15 @@ class PasswordConfirm extends FormElementBase {
    * Validates a password_confirm element.
    */
   public static function validatePasswordConfirm(&$element, FormStateInterface $form_state, &$complete_form) {
-    $pass1 = trim($element['pass1']['#value']);
-    $pass2 = trim($element['pass2']['#value']);
-    if (strlen($pass1) > 0 || strlen($pass2) > 0) {
-      if (strcmp($pass1, $pass2)) {
-        $form_state->setError($element, t('The specified passwords do not match.'));
+    $pass1 = \trim($element['pass1']['#value']);
+    $pass2 = \trim($element['pass2']['#value']);
+    if (\strlen($pass1) > 0 || \strlen($pass2) > 0) {
+      if (\strcmp($pass1, $pass2)) {
+        $form_state->setError($element, \t('The specified passwords do not match.'));
       }
     }
     elseif ($element['#required'] && $form_state->getUserInput()) {
-      $form_state->setError($element, t('Password field is required.'));
+      $form_state->setError($element, \t('Password field is required.'));
     }
 
     // Password field must be converted from a two-element array into a single

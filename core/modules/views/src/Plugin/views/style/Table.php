@@ -126,7 +126,7 @@ class Table extends StylePluginBase implements CacheableDependencyInterface {
       $sort = $order;
       // Store the $order for later use.
       $request_sort = $query->get('sort');
-      $this->order = !empty($request_sort) ? strtolower($request_sort) : 'asc';
+      $this->order = !empty($request_sort) ? \strtolower($request_sort) : 'asc';
     }
 
     // If a sort we don't know anything about gets through, exit gracefully.

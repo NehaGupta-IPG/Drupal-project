@@ -38,7 +38,8 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
   public function __construct(array $directories, string $file_cache_key_suffix, ?FileSystemInterface $fileSystem = NULL) {
     parent::__construct($directories, $file_cache_key_suffix);
     if ($fileSystem) {
-      @trigger_error(sprintf('Passing the $fileSystem parameter to %s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. The class no longer uses the file system service. See https://www.drupal.org/node/3530869', __METHOD__), E_USER_DEPRECATED);
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
+      @\trigger_error(\sprintf('Passing the $fileSystem parameter to %s() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. The class no longer uses the file system service. See https://www.drupal.org/node/3530869', __METHOD__), E_USER_DEPRECATED);
     }
   }
 
@@ -77,12 +78,12 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
    * 2. Because the same component exists in different themes.
    */
   protected function getIdentifier($file, array $data): string {
-    $id = basename($file, '.component.yml');
-    $provider_paths = array_flip($this->directories);
+    $id = \basename($file, '.component.yml');
+    $provider_paths = \array_flip($this->directories);
     $provider = $this->findProvider($file, $provider_paths);
     // We use the provider to dedupe components because it does not make sense
     // for a single provider to fork itself.
-    return sprintf('%s:%s', $provider, $id);
+    return \sprintf('%s:%s', $provider, $id);
   }
 
   /**
@@ -101,14 +102,14 @@ class DirectoryWithMetadataDiscovery extends YamlDirectoryDiscovery {
    *   The provider
    */
   private function findProvider(string $file, array $provider_paths): string {
-    $parts = explode(DIRECTORY_SEPARATOR, $file);
-    array_pop($parts);
+    $parts = \explode(DIRECTORY_SEPARATOR, $file);
+    \array_pop($parts);
     if (empty($parts)) {
       return '';
     }
-    $provider = $provider_paths[implode(DIRECTORY_SEPARATOR, $parts)] ?? '';
+    $provider = $provider_paths[\implode(DIRECTORY_SEPARATOR, $parts)] ?? '';
     return empty($provider)
-      ? $this->findProvider(implode(DIRECTORY_SEPARATOR, $parts), $provider_paths)
+      ? $this->findProvider(\implode(DIRECTORY_SEPARATOR, $parts), $provider_paths)
       : $provider;
   }
 

@@ -26,20 +26,20 @@ class LanguageNegotiation extends ProcessPluginBase {
       'method_weights' => [],
     ];
 
-    if (!is_array($value)) {
+    if (!\is_array($value)) {
       throw new MigrateException('The input should be an array');
     }
 
     // If no weights are provided, use the keys by flipping the array.
     if (empty($value[1])) {
-      $new_value['enabled'] = array_flip(array_map([$this, 'mapNewMethods'], array_keys($value[0])));
+      $new_value['enabled'] = \array_flip(\array_map([$this, 'mapNewMethods'], \array_keys($value[0])));
       unset($new_value['method_weights']);
     }
     else {
       foreach ($value[1] as $method => $weight) {
         $new_method = $this->mapNewMethods($method);
         $new_value['method_weights'][$new_method] = $weight;
-        if (in_array($method, array_keys($value[0]))) {
+        if (\in_array($method, \array_keys($value[0]))) {
           $new_value['enabled'][$new_method] = $weight;
         }
       }

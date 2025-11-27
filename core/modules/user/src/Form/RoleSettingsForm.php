@@ -61,11 +61,11 @@ class RoleSettingsForm extends FormBase {
     $roles = $this->roleStorage->loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
     unset($roles[RoleInterface::AUTHENTICATED_ID]);
-    $roles = array_map(fn(RoleInterface $role) => $role->label(), $roles);
+    $roles = \array_map(fn(RoleInterface $role) => $role->label(), $roles);
     $admin_roles = $this->roleStorage->getQuery()
       ->condition('is_admin', TRUE)
       ->execute();
-    $default_value = reset($admin_roles);
+    $default_value = \reset($admin_roles);
     $form['admin_role']['user_admin_role'] = [
       '#type' => 'select',
       '#title' => $this->t('Administrator role'),
@@ -75,7 +75,7 @@ class RoleSettingsForm extends FormBase {
       '#description' => $this->t('This role will be automatically granted all permissions.'),
       // Don't allow to select a single admin role in case multiple roles got
       // marked as admin role already.
-      '#access' => count($admin_roles) <= 1,
+      '#access' => \count($admin_roles) <= 1,
     ];
 
     $form['actions'] = ['#type' => 'actions'];

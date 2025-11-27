@@ -162,7 +162,7 @@ class Entity extends ArgumentValidatorPluginBase {
     // Note that the bundles form option doesn't appear on the form if the
     // entity type doesn't support bundles, so the option may not be set.
     if (!empty($options['bundles'])) {
-      $options['bundles'] = array_filter($options['bundles']);
+      $options['bundles'] = \array_filter($options['bundles']);
     }
     else {
       // Set bundles back to its default empty value.
@@ -179,7 +179,7 @@ class Entity extends ArgumentValidatorPluginBase {
     if ($this->multipleCapable && $this->options['multiple'] && isset($argument)) {
       // At this point only interested in individual IDs no matter what type,
       // just splitting by the allowed delimiters.
-      $ids = array_filter(preg_split('/[,+ ]/', $argument));
+      $ids = \array_filter(\preg_split('/[,+ ]/', $argument));
     }
     elseif ($argument) {
       $ids = [$argument];
@@ -241,7 +241,7 @@ class Entity extends ArgumentValidatorPluginBase {
     if ($bundle_entity_type && $this->entityTypeManager->hasHandler($bundle_entity_type, 'storage')) {
       $bundle_entity_storage = $this->entityTypeManager->getStorage($bundle_entity_type);
 
-      foreach ($bundle_entity_storage->loadMultiple(array_keys($this->options['bundles'])) as $bundle_entity) {
+      foreach ($bundle_entity_storage->loadMultiple(\array_keys($this->options['bundles'])) as $bundle_entity) {
         $dependencies[$bundle_entity->getConfigDependencyKey()][] = $bundle_entity->getConfigDependencyName();
       }
     }

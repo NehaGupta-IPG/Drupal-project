@@ -174,7 +174,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
     // these package types that allow for the setBinaries() method, and since
     // BasePackage does not include the setBinaries() method, we have to make
     // sure we're processing a class with a setBinaries() method.
-    if (!method_exists($package, 'setBinaries')) {
+    if (!\method_exists($package, 'setBinaries')) {
       return;
     }
     $binaries = $package->getBinaries();
@@ -185,13 +185,13 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
     }
     if ($unset_these_binaries = $this->findBinOverlap($binaries, $clean_paths)) {
       $this->io->writeError(
-        sprintf('%sModifying bin config for <info>%s</info> which overlaps with cleanup directories.', str_repeat(' ', 4), $package->getName()),
+        \sprintf('%sModifying bin config for <info>%s</info> which overlaps with cleanup directories.', \str_repeat(' ', 4), $package->getName()),
         TRUE,
         IOInterface::VERBOSE
       );
       $modified_binaries = [];
       foreach ($binaries as $binary) {
-        if (!in_array($binary, $unset_these_binaries)) {
+        if (!\in_array($binary, $unset_these_binaries)) {
           $modified_binaries[] = $binary;
         }
       }
@@ -216,7 +216,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
     // "tests/src" becomes "$filesystem['tests']['src'] = TRUE".
     $filesystem = [];
     foreach ($clean_paths as $clean_path) {
-      $clean_pieces = explode("/", $clean_path);
+      $clean_pieces = \explode("/", $clean_path);
       // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
       $current = &$filesystem;
       foreach ($clean_pieces as $clean_piece) {
@@ -227,7 +227,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
     // Explore the filesystem with our bin config.
     $unset_these_binaries = [];
     foreach ($binaries as $binary) {
-      $binary_pieces = explode('/', $binary);
+      $binary_pieces = \explode('/', $binary);
       $current = &$filesystem;
       foreach ($binary_pieces as $binary_piece) {
         if (!isset($current[$binary_piece])) {
@@ -281,16 +281,16 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
     $installed_packages = [];
     foreach ($this->getInstalledPackages() as $package) {
       // Normalize package names to lower case.
-      $installed_packages[strtolower($package->getName())] = $package;
+      $installed_packages[\strtolower($package->getName())] = $package;
     }
 
     $all_cleanup_paths = $this->config->getAllCleanupPaths();
 
     // Get all the packages that we should clean up but haven't already.
-    $cleanup_paths = array_diff_key($all_cleanup_paths, $this->packagesAlreadyCleaned);
+    $cleanup_paths = \array_diff_key($all_cleanup_paths, $this->packagesAlreadyCleaned);
 
     // Get all the packages that are installed that we should clean up.
-    $packages_to_be_cleaned = array_intersect_key($cleanup_paths, $installed_packages);
+    $packages_to_be_cleaned = \array_intersect_key($cleanup_paths, $installed_packages);
 
     if (!$packages_to_be_cleaned) {
       $this->io->writeError('<info>Packages already clean.</info>');
@@ -313,15 +313,15 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    */
   public function cleanPackage(PackageInterface $package): void {
     // Normalize package names to lower case.
-    $package_name = strtolower($package->getName());
+    $package_name = \strtolower($package->getName());
     if (isset($this->packagesAlreadyCleaned[$package_name])) {
-      $this->io->writeError(sprintf('%s<info>%s</info> already cleaned.', str_repeat(' ', 4), $package_name), TRUE, IOInterface::VERY_VERBOSE);
+      $this->io->writeError(\sprintf('%s<info>%s</info> already cleaned.', \str_repeat(' ', 4), $package_name), TRUE, IOInterface::VERY_VERBOSE);
       return;
     }
 
     $paths_for_package = $this->config->getPathsForPackage($package_name);
     if ($paths_for_package) {
-      $this->io->writeError(sprintf('%sCleaning: <info>%s</info>', str_repeat(' ', 4), $package_name));
+      $this->io->writeError(\sprintf('%sCleaning: <info>%s</info>', \str_repeat(' ', 4), $package_name));
       $this->cleanPathsForPackage($package, $paths_for_package);
     }
   }
@@ -337,22 +337,22 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
   protected function cleanPathsForPackage(PackageInterface $package, $paths_for_package): void {
     // Whatever happens here, this package counts as cleaned so that we don't
     // process it more than once.
-    $package_name = strtolower($package->getName());
+    $package_name = \strtolower($package->getName());
     $this->packagesAlreadyCleaned[$package_name] = TRUE;
 
     $package_dir = $this->getInstallPathForPackage($package);
-    if (!is_dir($package_dir)) {
+    if (!\is_dir($package_dir)) {
       return;
     }
 
-    $this->io->writeError(sprintf('%sCleaning paths in <comment>%s</comment>', str_repeat(' ', 4), $package_name), TRUE, IOInterface::VERY_VERBOSE);
+    $this->io->writeError(\sprintf('%sCleaning paths in <comment>%s</comment>', \str_repeat(' ', 4), $package_name), TRUE, IOInterface::VERY_VERBOSE);
     $fs = new Filesystem();
     foreach ($paths_for_package as $cleanup_item) {
       $cleanup_path = $package_dir . '/' . $cleanup_item;
-      if (!file_exists($cleanup_path)) {
+      if (!\file_exists($cleanup_path)) {
         // If the package has changed or the --prefer-dist version does not
         // include the directory. This is not an error.
-        $this->io->writeError(sprintf("%s<comment>Path '%s' does not exist.</comment>", str_repeat(' ', 6), $cleanup_path), TRUE, IOInterface::VERY_VERBOSE);
+        $this->io->writeError(\sprintf("%s<comment>Path '%s' does not exist.</comment>", \str_repeat(' ', 6), $cleanup_path), TRUE, IOInterface::VERY_VERBOSE);
         continue;
       }
 
@@ -361,11 +361,11 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
         // has gone wrong. Therefore the message has to include the
         // package name as the first informational message might not
         // exist.
-        $this->io->writeError(sprintf("%s<error>Failure removing path '%s'</error> in package <comment>%s</comment>.", str_repeat(' ', 6), $cleanup_item, $package_name), TRUE, IOInterface::NORMAL);
+        $this->io->writeError(\sprintf("%s<error>Failure removing path '%s'</error> in package <comment>%s</comment>.", \str_repeat(' ', 6), $cleanup_item, $package_name), TRUE, IOInterface::NORMAL);
         continue;
       }
 
-      $this->io->writeError(sprintf("%sRemoving path <info>'%s'</info>", str_repeat(' ', 4), $cleanup_item), TRUE, IOInterface::VERBOSE);
+      $this->io->writeError(\sprintf("%sRemoving path <info>'%s'</info>", \str_repeat(' ', 4), $cleanup_item), TRUE, IOInterface::VERBOSE);
     }
   }
 

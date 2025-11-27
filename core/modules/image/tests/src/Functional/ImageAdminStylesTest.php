@@ -41,7 +41,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     // file directory. Copy over an image on the first run.
     if (!isset($file_path)) {
       $files = $this->drupalGetTestFiles('image');
-      $file = reset($files);
+      $file = \reset($files);
       $file_path = \Drupal::service('file_system')->copy($file->uri, 'public://');
     }
 
@@ -53,8 +53,8 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
    */
   public function getImageCount(ImageStyleInterface $style) {
     $count = 0;
-    if (is_dir('public://styles/' . $style->id())) {
-      $count = count(\Drupal::service('file_system')->scanDirectory('public://styles/' . $style->id(), '/.*/'));
+    if (\is_dir('public://styles/' . $style->id())) {
+      $count = \count(\Drupal::service('file_system')->scanDirectory('public://styles/' . $style->id(), '/.*/'));
     }
     return $count;
   }
@@ -63,7 +63,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
    * Tests creating an image style with a numeric name.
    */
   public function testNumericStyleName(): void {
-    $style_name = rand();
+    $style_name = \rand();
     $style_label = $this->randomString();
     $edit = [
       'name' => $style_name,
@@ -72,7 +72,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->drupalGet('admin/config/media/image-styles/add');
     $this->submitForm($edit, 'Create new style');
     $this->assertSession()->statusMessageContains("Style {$style_label} was created.", 'status');
-    $options = image_style_options();
+    $options = \image_style_options();
     $this->assertArrayHasKey($style_name, $options);
   }
 
@@ -174,7 +174,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     }
 
     // Assert that every effect was saved.
-    foreach (array_keys($effect_edits) as $effect_name) {
+    foreach (\array_keys($effect_edits) as $effect_name) {
       $this->assertTrue(isset($uuids[$effect_name]), "A $effect_name effect was saved with ID $uuids[$effect_name]");
     }
 
@@ -182,7 +182,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
 
     // Confirm the order of effects is maintained according to the order we
     // added the fields.
-    $effect_edits_order = array_keys($effect_edits);
+    $effect_edits_order = \array_keys($effect_edits);
     $order_correct = TRUE;
     $index = 0;
     foreach ($style->getEffects() as $effect) {
@@ -197,7 +197,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     // Change the name of the style and adjust the weights of effects.
     $style_name = $this->randomMachineName(10);
     $style_label = $this->randomMachineName();
-    $weight = count($effect_edits);
+    $weight = \count($effect_edits);
     $edit = [
       'name' => $style_name,
       'label' => $style_label,
@@ -234,7 +234,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $style = ImageStyle::load($style_name);
 
     // Confirm the new style order was saved.
-    $effect_edits_order = array_reverse($effect_edits_order);
+    $effect_edits_order = \array_reverse($effect_edits_order);
     $order_correct = TRUE;
     $index = 0;
     foreach ($style->getEffects() as $effect) {
@@ -328,7 +328,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
       ->save();
 
     // Create a new node with an image attached.
-    $test_image = current($this->drupalGetTestFiles('image'));
+    $test_image = \current($this->drupalGetTestFiles('image'));
     $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $this->randomMachineName());
     $node = Node::load($nid);
 
@@ -481,7 +481,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
       ->save();
 
     // Create a new node with an image attached.
-    $test_image = current($this->drupalGetTestFiles('image'));
+    $test_image = \current($this->drupalGetTestFiles('image'));
     $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $this->randomMachineName());
     $node = Node::load($nid);
 

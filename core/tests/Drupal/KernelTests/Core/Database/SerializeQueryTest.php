@@ -23,7 +23,7 @@ class SerializeQueryTest extends DatabaseTestBase {
     $query->condition('name', 'Ringo');
     // If this doesn't work, it will throw an exception, so no need for an
     // assertion.
-    $query = unserialize(serialize($query));
+    $query = \unserialize(\serialize($query));
     $results = $query->execute()->fetchCol();
     $this->assertEquals(28, $results[0], 'Query properly executed after unserialization.');
   }

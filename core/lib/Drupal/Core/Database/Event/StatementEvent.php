@@ -20,7 +20,7 @@ enum StatementEvent: string {
    *   An array with all statement related events.
    */
   public static function all(): array {
-    return array_map(fn(self $case) => $case->value, self::cases());
+    return \array_map(fn(self $case) => $case->value, self::cases());
   }
 
 }

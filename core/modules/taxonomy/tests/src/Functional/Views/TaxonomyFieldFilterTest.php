@@ -170,7 +170,7 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
     // page, and they are the same. So the title/body string should appear on
     // the page twice as many times as the input count.
     foreach ($counts as $langcode => $count) {
-      $this->assertEquals(2 * $count, substr_count($text, $this->termNames[$langcode]), 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);
+      $this->assertEquals(2 * $count, \substr_count($text, $this->termNames[$langcode]), 'Translation ' . $langcode . ' has count ' . $count . ' with ' . $message);
     }
   }
 
@@ -185,8 +185,8 @@ class TaxonomyFieldFilterTest extends ViewTestBase {
    */
   protected function createTermWithProperties($properties) {
     // Use the first available text format.
-    $filter_formats = filter_formats();
-    $format = array_pop($filter_formats);
+    $filter_formats = \filter_formats();
+    $format = \array_pop($filter_formats);
 
     $properties += [
       'name' => $this->randomMachineName(),

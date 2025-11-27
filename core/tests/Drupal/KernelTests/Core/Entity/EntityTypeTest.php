@@ -60,8 +60,8 @@ class EntityTypeTest extends KernelTestBase {
     $entity_type->setStringTranslation($this->container->get('string_translation'));
 
     // This should not throw an exception.
-    $tmp = serialize($entity_type);
-    $entity_type = unserialize($tmp);
+    $tmp = \serialize($entity_type);
+    $entity_type = \unserialize($tmp);
     // And this should have the correct id.
     $this->assertEquals('example_entity_type', $entity_type->id());
   }

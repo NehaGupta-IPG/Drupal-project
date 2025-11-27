@@ -138,7 +138,7 @@ class MenuUiTest extends BrowserTestBase {
 
     foreach ($this->items as $item) {
       // Menu link URIs are stored as 'internal:/node/$nid'.
-      $node = Node::load(str_replace('internal:/node/', '', $item->link->uri));
+      $node = Node::load(\str_replace('internal:/node/', '', $item->link->uri));
       $this->verifyMenuLink($item, $node);
     }
 
@@ -190,37 +190,37 @@ class MenuUiTest extends BrowserTestBase {
     // Test alphabetical order without pager.
     $menu_entities = [];
     for ($i = 1; $i < 6; $i++) {
-      $menu = strtolower($this->getRandomGenerator()->name());
+      $menu = \strtolower($this->getRandomGenerator()->name());
       $menu_entity = Menu::create(['id' => $menu, 'label' => $menu]);
       $menu_entities[] = $menu_entity;
       $menu_entity->save();
     }
-    uasort($menu_entities, [Menu::class, 'sort']);
-    $menu_entities = array_values($menu_entities);
+    \uasort($menu_entities, [Menu::class, 'sort']);
+    $menu_entities = \array_values($menu_entities);
     $this->drupalGet('/admin/structure/menu');
-    $base_path = parse_url($this->baseUrl, PHP_URL_PATH) ?? '';
+    $base_path = \parse_url($this->baseUrl, PHP_URL_PATH) ?? '';
     $first_link = $this->assertSession()->elementExists('css', 'tbody tr:nth-of-type(1) a');
     $last_link = $this->assertSession()->elementExists('css', 'tbody tr:nth-of-type(5) a');
-    $this->assertEquals($first_link->getAttribute('href'), sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menu_entities[0]->label()));
-    $this->assertEquals($last_link->getAttribute('href'), sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menu_entities[4]->label()));
+    $this->assertEquals($first_link->getAttribute('href'), \sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menu_entities[0]->label()));
+    $this->assertEquals($last_link->getAttribute('href'), \sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menu_entities[4]->label()));
 
     // Test alphabetical order with pager.
     $new_menu_entities = [];
     for ($i = 1; $i < 61; $i++) {
-      $new_menu = strtolower($this->getRandomGenerator()->name());
+      $new_menu = \strtolower($this->getRandomGenerator()->name());
       $new_menu_entity = Menu::create(['id' => $new_menu, 'label' => $new_menu]);
       $new_menu_entities[] = $new_menu_entity;
       $new_menu_entity->save();
     }
-    $menu_entities = array_merge($menu_entities, $new_menu_entities);
+    $menu_entities = \array_merge($menu_entities, $new_menu_entities);
 
     // To accommodate the current non-natural sorting of the pager, we have to
     // first non-natural sort the array of menu entities, and then do a
     // natural-sort on the ones that are on page 1.
-    sort($menu_entities);
-    $menu_entities_page_one = array_slice($menu_entities, 50, 64, TRUE);
-    uasort($menu_entities_page_one, [Menu::class, 'sort']);
-    $menu_entities_page_one = array_values($menu_entities_page_one);
+    \sort($menu_entities);
+    $menu_entities_page_one = \array_slice($menu_entities, 50, 64, TRUE);
+    \uasort($menu_entities_page_one, [Menu::class, 'sort']);
+    $menu_entities_page_one = \array_values($menu_entities_page_one);
 
     $this->drupalGet('/admin/structure/menu', [
       'query' => [
@@ -229,8 +229,8 @@ class MenuUiTest extends BrowserTestBase {
     ]);
     $first_link = $this->assertSession()->elementExists('css', 'tbody tr:nth-of-type(1) a');
     $last_link = $this->assertSession()->elementExists('css', 'tbody tr:nth-of-type(15) a');
-    $this->assertEquals($first_link->getAttribute('href'), sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menu_entities_page_one[0]->label()));
-    $this->assertEquals($last_link->getAttribute('href'), sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menu_entities_page_one[14]->label()));
+    $this->assertEquals($first_link->getAttribute('href'), \sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menu_entities_page_one[0]->label()));
+    $this->assertEquals($last_link->getAttribute('href'), \sprintf('%s/admin/structure/menu/manage/%s', $base_path, $menu_entities_page_one[14]->label()));
   }
 
   /**
@@ -294,7 +294,7 @@ class MenuUiTest extends BrowserTestBase {
 
     // Verify that using a menu_name that is too long results in a validation
     // message.
-    $this->assertSession()->pageTextContains("Menu name cannot be longer than " . MenuStorage::MAX_ID_LENGTH . " characters but is currently " . mb_strlen($menu_name) . " characters long.");
+    $this->assertSession()->pageTextContains("Menu name cannot be longer than " . MenuStorage::MAX_ID_LENGTH . " characters but is currently " . \mb_strlen($menu_name) . " characters long.");
 
     // Change the menu_name so it no longer exceeds the maximum length.
     $menu_name = $this->randomMachineName(MenuStorage::MAX_ID_LENGTH);
@@ -303,7 +303,7 @@ class MenuUiTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
 
     // Verify that no validation error is given for menu_name length.
-    $this->assertSession()->pageTextNotContains("Menu name cannot be longer than " . MenuStorage::MAX_ID_LENGTH . " characters but is currently " . mb_strlen($menu_name) . " characters long.");
+    $this->assertSession()->pageTextNotContains("Menu name cannot be longer than " . MenuStorage::MAX_ID_LENGTH . " characters but is currently " . \mb_strlen($menu_name) . " characters long.");
 
     // Verify that the confirmation message is displayed.
     $this->assertSession()->pageTextContains("Menu $label has been added.");
@@ -586,7 +586,7 @@ class MenuUiTest extends BrowserTestBase {
     // item's weight doesn't get changed because of the old hardcoded delta=50.
     $items = [];
     for ($i = -50; $i <= 51; $i++) {
-      $items[$i] = $this->addMenuLink('', '/node/' . $node1->id(), $menu_name, TRUE, strval($i));
+      $items[$i] = $this->addMenuLink('', '/node/' . $node1->id(), $menu_name, TRUE, \strval($i));
     }
     $this->assertMenuLink(['weight' => '51'], $items[51]->getPluginId());
 
@@ -800,7 +800,7 @@ class MenuUiTest extends BrowserTestBase {
 
     $menu_links = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties(['title' => $title]);
 
-    $menu_link = reset($menu_links);
+    $menu_link = \reset($menu_links);
     $this->assertInstanceOf(MenuLinkContent::class, $menu_link);
     $this->assertMenuLink(['menu_name' => $menu_name, 'children' => [], 'parent' => $parent], $menu_link->getPluginId());
 
@@ -849,11 +849,11 @@ class MenuUiTest extends BrowserTestBase {
       $this->drupalGet("admin/structure/menu/manage/tools/add");
       $this->submitForm($edit, 'Save');
       $menu_links = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties(['title' => $title]);
-      $last_link = reset($menu_links);
+      $last_link = \reset($menu_links);
       $plugin_ids[] = $last_link->getPluginId();
     }
 
-    $last_plugin_id = array_pop($plugin_ids);
+    $last_plugin_id = \array_pop($plugin_ids);
 
     // The last link cannot be a parent in the new menu link form.
     $this->drupalGet('admin/structure/menu/manage/tools/add');
@@ -867,11 +867,11 @@ class MenuUiTest extends BrowserTestBase {
 
     // The last link does not have an "Add child" operation.
     $this->drupalGet('admin/structure/menu/manage/tools');
-    $this->assertSession()->linkByHrefNotExists('parent=' . urlencode($last_plugin_id));
+    $this->assertSession()->linkByHrefNotExists('parent=' . \urlencode($last_plugin_id));
 
     // All but the last link do have an "Add child" operation.
     foreach ($plugin_ids as $plugin_id) {
-      $this->assertSession()->linkByHrefExists('parent=' . urlencode($plugin_id));
+      $this->assertSession()->linkByHrefExists('parent=' . \urlencode($plugin_id));
     }
   }
 

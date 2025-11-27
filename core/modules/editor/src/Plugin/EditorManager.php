@@ -37,7 +37,7 @@ class EditorManager extends DefaultPluginManager {
     $this->alterInfo('editor_info');
     $this->setCacheBackend($cache_backend, 'editor_plugins');
     if ($this->entityTypeManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $entityTypeManager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3447794', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $entityTypeManager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3447794', E_USER_DEPRECATED);
       $this->entityTypeManager = \Drupal::entityTypeManager();
     }
   }
@@ -70,18 +70,18 @@ class EditorManager extends DefaultPluginManager {
   public function getAttachments(array $format_ids) {
     $settings = $this->attachments['drupalSettings'] ?? [];
 
-    if (($editor_ids_to_load = array_diff($format_ids, array_keys($this->editors)))) {
+    if (($editor_ids_to_load = \array_diff($format_ids, \array_keys($this->editors)))) {
       $editors = $this->entityTypeManager->getStorage('editor')
         ->loadMultiple($editor_ids_to_load);
       // Statically cache the editors and include NULL entries for formats that
       // do not have editors.
-      $this->editors += $editors + array_fill_keys($editor_ids_to_load, NULL);
+      $this->editors += $editors + \array_fill_keys($editor_ids_to_load, NULL);
       foreach ($editors as $format_id => $editor) {
         $plugin = $this->createInstance($editor->getEditor());
         $plugin_definition = $plugin->getPluginDefinition();
 
         // Libraries.
-        $this->attachments['library'] = array_merge($this->attachments['library'], $plugin->getLibraries($editor));
+        $this->attachments['library'] = \array_merge($this->attachments['library'], $plugin->getLibraries($editor));
 
         // Format-specific JavaScript settings.
         $settings['editor']['formats'][$format_id] = [

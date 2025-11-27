@@ -83,7 +83,7 @@ class ThemeTest extends BrowserTestBase {
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('/user/login'));
     \Drupal::requestStack()->push($request);
     $this->config('system.site')->set('page.front', '/user/login')->save();
-    $suggestions = theme_get_suggestions(['user', 'login'], 'page');
+    $suggestions = \theme_get_suggestions(['user', 'login'], 'page');
     // Set it back to not annoy the batch runner.
     \Drupal::requestStack()->pop();
     $this->assertContains('page__front', $suggestions, 'Front page template was suggested.');

@@ -65,7 +65,7 @@ class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInte
 
     // Pass the names of the fields whose values can be merged.
     // @todo https://www.drupal.org/node/2456257 remove this.
-    $entity->_restSubmittedFields = array_keys($data);
+    $entity->_restSubmittedFields = \array_keys($data);
 
     return $entity;
   }

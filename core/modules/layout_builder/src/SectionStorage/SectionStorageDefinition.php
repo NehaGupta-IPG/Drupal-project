@@ -59,7 +59,7 @@ class SectionStorageDefinition extends PluginDefinition implements ContextAwareP
    *   The value for that property, or NULL if the property does not exist.
    */
   public function get($property) {
-    if (property_exists($this, $property)) {
+    if (\property_exists($this, $property)) {
       $value = $this->{$property} ?? NULL;
     }
     else {
@@ -79,7 +79,7 @@ class SectionStorageDefinition extends PluginDefinition implements ContextAwareP
    * @return $this
    */
   public function set($property, $value) {
-    if (property_exists($this, $property)) {
+    if (\property_exists($this, $property)) {
       $this->{$property} = $value;
     }
     else {

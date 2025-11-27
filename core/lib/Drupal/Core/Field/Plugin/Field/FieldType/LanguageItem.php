@@ -38,12 +38,12 @@ class LanguageItem extends FieldItemBase implements OptionsProviderInterface {
    */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(t('Language code'))
+      ->setLabel(\t('Language code'))
       ->setRequired(TRUE);
 
     $properties['language'] = DataReferenceDefinition::create('language')
-      ->setLabel(t('Language object'))
-      ->setDescription(t('The referenced language'))
+      ->setLabel(\t('Language object'))
+      ->setDescription(\t('The referenced language'))
       // The language object is retrieved via the language code.
       ->setComputed(TRUE)
       ->setReadOnly(FALSE);
@@ -71,7 +71,7 @@ class LanguageItem extends FieldItemBase implements OptionsProviderInterface {
   public function setValue($values, $notify = TRUE) {
     // Treat the values as property value of the language property, if no array
     // is given as this handles language codes and objects.
-    if (isset($values) && !is_array($values)) {
+    if (isset($values) && !\is_array($values)) {
       $this->set('language', $values, $notify);
     }
     else {
@@ -114,12 +114,12 @@ class LanguageItem extends FieldItemBase implements OptionsProviderInterface {
     // Defer to the callback in the item definition as it can be overridden.
     $constraint = $field_definition->getItemDefinition()->getConstraint('ComplexData');
     if (isset($constraint['value']['AllowedValues']['callback'])) {
-      $languages = call_user_func($constraint['value']['AllowedValues']['callback']);
+      $languages = \call_user_func($constraint['value']['AllowedValues']['callback']);
     }
     else {
-      $languages = array_keys(\Drupal::languageManager()->getLanguages(LanguageInterface::STATE_ALL));
+      $languages = \array_keys(\Drupal::languageManager()->getLanguages(LanguageInterface::STATE_ALL));
     }
-    $values['value'] = $languages[array_rand($languages)];
+    $values['value'] = $languages[\array_rand($languages)];
     return $values;
   }
 
@@ -127,7 +127,7 @@ class LanguageItem extends FieldItemBase implements OptionsProviderInterface {
    * {@inheritdoc}
    */
   public function getPossibleValues(?AccountInterface $account = NULL) {
-    return array_keys(\Drupal::languageManager()->getLanguages(LanguageInterface::STATE_ALL));
+    return \array_keys(\Drupal::languageManager()->getLanguages(LanguageInterface::STATE_ALL));
   }
 
   /**
@@ -135,7 +135,7 @@ class LanguageItem extends FieldItemBase implements OptionsProviderInterface {
    */
   public function getPossibleOptions(?AccountInterface $account = NULL) {
     $languages = \Drupal::languageManager()->getLanguages(LanguageInterface::STATE_ALL);
-    return array_map(function (LanguageInterface $language) {
+    return \array_map(function (LanguageInterface $language) {
       return $language->getName();
     }, $languages);
   }

@@ -25,7 +25,7 @@ class OmittedData extends ResourceObjectData {
    * @see \Drupal\jsonapi\JsonApiResource\Data::__construct
    */
   public function __construct(array $data) {
-    assert(Inspector::assertAllObjects($data, EntityAccessDeniedHttpException::class));
+    \assert(Inspector::assertAllObjects($data, EntityAccessDeniedHttpException::class));
     parent::__construct($data, -1);
   }
 

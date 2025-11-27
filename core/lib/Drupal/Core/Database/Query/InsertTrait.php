@@ -70,9 +70,9 @@ trait InsertTrait {
   public function fields(array $fields, array $values = []) {
     if (empty($this->insertFields)) {
       if (empty($values)) {
-        if (!is_numeric(key($fields))) {
-          $values = array_values($fields);
-          $fields = array_keys($fields);
+        if (!\is_numeric(\key($fields))) {
+          $values = \array_values($fields);
+          $fields = \array_keys($fields);
         }
       }
       $this->insertFields = $fields;
@@ -99,7 +99,7 @@ trait InsertTrait {
    *   The called object.
    */
   public function values(array $values) {
-    if (is_numeric(key($values))) {
+    if (\is_numeric(\key($values))) {
       $this->insertValues[] = $values;
     }
     elseif ($this->insertFields) {
@@ -108,7 +108,7 @@ trait InsertTrait {
         $insert_values[$key] = $values[$key];
       }
       // For consistency, the values array is always numerically indexed.
-      $this->insertValues[] = array_values($insert_values);
+      $this->insertValues[] = \array_values($insert_values);
     }
     return $this;
   }
@@ -157,21 +157,21 @@ trait InsertTrait {
 
         // Default fields aren't really placeholders, but this is the most
         // convenient way to handle them.
-        $placeholders = array_pad($placeholders, count($default_fields), 'default');
+        $placeholders = \array_pad($placeholders, \count($default_fields), 'default');
 
-        $new_placeholder = $max_placeholder + count($insert_values);
+        $new_placeholder = $max_placeholder + \count($insert_values);
         for ($i = $max_placeholder; $i < $new_placeholder; ++$i) {
           $placeholders[] = ':db_insert_placeholder_' . $i;
         }
         $max_placeholder = $new_placeholder;
-        $values[] = '(' . implode(', ', $placeholders) . ')';
+        $values[] = '(' . \implode(', ', $placeholders) . ')';
       }
     }
     else {
       // If there are no values, then this is a default-only query. We still
       // need to handle that.
-      $placeholders = array_fill(0, count($default_fields), 'default');
-      $values[] = '(' . implode(', ', $placeholders) . ')';
+      $placeholders = \array_fill(0, \count($default_fields), 'default');
+      $values[] = '(' . \implode(', ', $placeholders) . ')';
     }
 
     return $values;
@@ -181,7 +181,7 @@ trait InsertTrait {
    * {@inheritdoc}
    */
   public function count(): int {
-    return count($this->insertValues);
+    return \count($this->insertValues);
   }
 
 }

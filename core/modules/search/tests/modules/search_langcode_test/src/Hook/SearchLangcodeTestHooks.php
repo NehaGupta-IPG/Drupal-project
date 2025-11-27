@@ -30,10 +30,10 @@ class SearchLangcodeTestHooks {
       \Drupal::messenger()->addStatus('Langcode Preprocess Test: ' . $langcode);
       // Preprocessing for the excerpt test.
       if ($langcode == 'ex') {
-        $text = str_replace('finding', 'find', $text);
-        $text = str_replace('finds', 'find', $text);
-        $text = str_replace('dic', ' dependency injection container', $text);
-        $text = str_replace('hypertext markup language', 'html', $text);
+        $text = \str_replace('finding', 'find', $text);
+        $text = \str_replace('finds', 'find', $text);
+        $text = \str_replace('dic', ' dependency injection container', $text);
+        $text = \str_replace('hypertext markup language', 'html', $text);
       }
     }
     return $text;

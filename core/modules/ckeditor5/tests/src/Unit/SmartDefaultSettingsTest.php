@@ -105,7 +105,7 @@ class SmartDefaultSettingsTest extends UnitTestCase {
     $editor = $this->prophesize(EditorInterface::class);
     $this->assertSame($expected_candidates, $get_candidates->invoke($smart_default_settings, $provided, $still_needed, $disabled_plugin_definitions, $editor->reveal()));
     $select_candidate = self::getMethod(SmartDefaultSettings::class, 'selectCandidate');
-    $this->assertSame($expected_selection, $select_candidate->invoke(NULL, $expected_candidates, $still_needed, array_keys($provided->getAllowedElements())));
+    $this->assertSame($expected_selection, $select_candidate->invoke(NULL, $expected_candidates, $still_needed, \array_keys($provided->getAllowedElements())));
   }
 
   /**
@@ -123,7 +123,7 @@ class SmartDefaultSettingsTest extends UnitTestCase {
         'ckeditor5' => ['plugins' => []],
       ];
       foreach ($overrides as $path => $value) {
-        NestedArray::setValue($annotation, explode('.', $path), $value);
+        NestedArray::setValue($annotation, \explode('.', $path), $value);
       }
       $annotation_instance = new CKEditor5Plugin($annotation);
       $definition = $annotation_instance->get();

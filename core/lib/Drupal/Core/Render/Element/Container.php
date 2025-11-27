@@ -80,7 +80,7 @@ class Container extends RenderElementBase {
   public static function processContainer(&$element, FormStateInterface $form_state, &$complete_form) {
     // Generate the ID of the element if it's not explicitly given.
     if (!isset($element['#id'])) {
-      $element['#id'] = HtmlUtility::getUniqueId(implode('-', $element['#parents']) . '-wrapper');
+      $element['#id'] = HtmlUtility::getUniqueId(\implode('-', $element['#parents']) . '-wrapper');
     }
     return $element;
   }

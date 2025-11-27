@@ -93,7 +93,7 @@ class CommentStatistics implements CommentStatisticsInterface {
     $connection = $accurate ? $this->database : $this->databaseReplica;
     $stats = $connection->select('comment_entity_statistics', 'ces')
       ->fields('ces')
-      ->condition('ces.entity_id', array_keys($entities), 'IN')
+      ->condition('ces.entity_id', \array_keys($entities), 'IN')
       ->condition('ces.entity_type', $entity_type)
       ->execute();
 

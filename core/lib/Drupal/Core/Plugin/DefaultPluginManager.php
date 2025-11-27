@@ -156,7 +156,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
     $this->namespaces = $namespaces;
     $this->moduleHandler = $module_handler;
     $this->pluginInterface = $plugin_interface;
-    if (is_subclass_of($plugin_definition_attribute_name, AttributeInterface::class)) {
+    if (\is_subclass_of($plugin_definition_attribute_name, AttributeInterface::class)) {
       $this->pluginDefinitionAttributeName = $plugin_definition_attribute_name;
       $this->pluginDefinitionAnnotationName = $plugin_definition_annotation_name;
       $this->additionalAnnotationNamespaces = $additional_annotation_namespaces;
@@ -166,7 +166,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
       $this->pluginDefinitionAnnotationName = $plugin_definition_attribute_name ?? 'Drupal\Component\Annotation\Plugin';
       $this->additionalAnnotationNamespaces = $plugin_definition_annotation_name ?? [];
       if ($plugin_definition_attribute_name) {
-        @trigger_error('Not supporting attribute discovery in ' . static::class . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Provide an Attribute class and an Annotation class for BC. See https://www.drupal.org/node/3395582', E_USER_DEPRECATED);
+        @\trigger_error('Not supporting attribute discovery in ' . static::class . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Provide an Attribute class and an Annotation class for BC. See https://www.drupal.org/node/3395582', E_USER_DEPRECATED);
       }
     }
   }
@@ -190,7 +190,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *   definitions should be cleared along with other, related cache entries.
    */
   public function setCacheBackend(CacheBackendInterface $cache_backend, $cache_key, array $cache_tags = []) {
-    assert(Inspector::assertAllStrings($cache_tags), 'Cache Tags must be strings.');
+    \assert(Inspector::assertAllStrings($cache_tags), 'Cache Tags must be strings.');
     $this->cacheBackend = $cache_backend;
     $this->cacheKey = $cache_key;
     $this->cacheTags = $cache_tags;
@@ -287,17 +287,17 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    */
   public function processDefinition(&$definition, $plugin_id) {
     // Only array-based definitions can have defaults merged in.
-    if (is_array($definition) && !empty($this->defaults) && is_array($this->defaults)) {
+    if (\is_array($definition) && !empty($this->defaults) && \is_array($this->defaults)) {
       $definition = NestedArray::mergeDeep($this->defaults, $definition);
     }
 
     // Keep class definitions standard with no leading slash.
     if ($definition instanceof PluginDefinitionInterface) {
-      assert(is_string($definition->getClass()), 'Plugin definitions must have a class');
-      $definition->setClass(ltrim($definition->getClass(), '\\'));
+      \assert(\is_string($definition->getClass()), 'Plugin definitions must have a class');
+      $definition->setClass(\ltrim($definition->getClass(), '\\'));
     }
-    elseif (is_array($definition) && isset($definition['class'])) {
-      $definition['class'] = ltrim($definition['class'], '\\');
+    elseif (\is_array($definition) && isset($definition['class'])) {
+      $definition['class'] = \ltrim($definition['class'], '\\');
     }
   }
 
@@ -346,7 +346,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
     // plugin definition.
     foreach ($definitions as $plugin_id => $plugin_definition) {
       $provider = $this->extractProviderFromDefinition($plugin_definition);
-      if ($provider && !in_array($provider, ['core', 'component']) && !$this->providerExists($provider)) {
+      if ($provider && !\in_array($provider, ['core', 'component']) && !$this->providerExists($provider)) {
         unset($definitions[$plugin_id]);
       }
     }
@@ -369,7 +369,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
     }
 
     // Attempt to convert the plugin definition to an array.
-    if (is_object($plugin_definition)) {
+    if (\is_object($plugin_definition)) {
       $plugin_definition = (array) $plugin_definition;
     }
 

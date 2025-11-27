@@ -44,7 +44,7 @@ class PathAliasMenuLinkContentTest extends KernelTestBase {
 
     // Ensure that the weight of module_link_content is higher than system.
     // @see menu_link_content_install()
-    module_set_weight('menu_link_content', 1);
+    \module_set_weight('menu_link_content', 1);
   }
 
   /**

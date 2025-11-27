@@ -70,7 +70,7 @@ class MigrateSource extends Plugin implements MultipleProviderAnnotationInterfac
    */
   public function getProvider() {
     if (isset($this->definition['provider'])) {
-      return is_array($this->definition['provider']) ? reset($this->definition['provider']) : $this->definition['provider'];
+      return \is_array($this->definition['provider']) ? \reset($this->definition['provider']) : $this->definition['provider'];
     }
     return FALSE;
   }

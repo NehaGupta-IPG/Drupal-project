@@ -882,12 +882,12 @@ class MimeTypeMap implements MimeTypeMapInterface {
    * {@inheritdoc}
    */
   public function addMapping(string $mimetype, string $extension): static {
-    $mimetype = strtolower($mimetype);
-    $extension = strtolower($extension);
+    $mimetype = \strtolower($mimetype);
+    $extension = \strtolower($extension);
     $this->mapping['mimetypes'] ??= [];
-    $key = array_search($mimetype, $this->mapping['mimetypes'], TRUE);
+    $key = \array_search($mimetype, $this->mapping['mimetypes'], TRUE);
     if ($key === FALSE) {
-      $key = count($this->mapping['mimetypes']);
+      $key = \count($this->mapping['mimetypes']);
       $this->mapping['mimetypes'][] = $mimetype;
     }
     $this->mapping['extensions'][$extension] = $key;
@@ -898,7 +898,7 @@ class MimeTypeMap implements MimeTypeMapInterface {
    * {@inheritdoc}
    */
   public function removeMapping(string $mimetype, string $extension): bool {
-    $extension = strtolower($extension);
+    $extension = \strtolower($extension);
     if (isset($this->mapping['extensions'][$extension])) {
       unset($this->mapping['extensions'][$extension]);
       return TRUE;
@@ -910,8 +910,8 @@ class MimeTypeMap implements MimeTypeMapInterface {
    * {@inheritdoc}
    */
   public function removeMimeType(string $mimetype): bool {
-    $mimetype = strtolower($mimetype);
-    $key = array_search($mimetype, $this->mapping['mimetypes'], TRUE);
+    $mimetype = \strtolower($mimetype);
+    $key = \array_search($mimetype, $this->mapping['mimetypes'], TRUE);
     if ($key === FALSE) {
       return FALSE;
     }
@@ -926,8 +926,8 @@ class MimeTypeMap implements MimeTypeMapInterface {
    * {@inheritdoc}
    */
   public function listMimeTypes(): array {
-    $mimeTypes = array_values($this->mapping['mimetypes']);
-    sort($mimeTypes);
+    $mimeTypes = \array_values($this->mapping['mimetypes']);
+    \sort($mimeTypes);
 
     return $mimeTypes;
   }
@@ -936,8 +936,8 @@ class MimeTypeMap implements MimeTypeMapInterface {
    * {@inheritdoc}
    */
   public function listExtensions(): array {
-    $extensions = array_keys($this->mapping['extensions']);
-    sort($extensions);
+    $extensions = \array_keys($this->mapping['extensions']);
+    \sort($extensions);
 
     return $extensions;
   }
@@ -946,8 +946,8 @@ class MimeTypeMap implements MimeTypeMapInterface {
    * {@inheritdoc}
    */
   public function hasMimeType(string $mimetype): bool {
-    return in_array(
-      strtolower($mimetype),
+    return \in_array(
+      \strtolower($mimetype),
       $this->mapping['mimetypes'],
       TRUE
     );
@@ -957,14 +957,14 @@ class MimeTypeMap implements MimeTypeMapInterface {
    * {@inheritdoc}
    */
   public function hasExtension(string $extension): bool {
-    return isset($this->mapping['extensions'][strtolower($extension)]);
+    return isset($this->mapping['extensions'][\strtolower($extension)]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getMimeTypeForExtension($extension): ?string {
-    $extension = strtolower($extension);
+    $extension = \strtolower($extension);
     $extensions = $this->mapping['extensions'] ?? [];
 
     return isset($extensions[$extension]) ? $this->mapping['mimetypes'][$extensions[$extension]] : NULL;
@@ -974,13 +974,13 @@ class MimeTypeMap implements MimeTypeMapInterface {
    * {@inheritdoc}
    */
   public function getExtensionsForMimeType($mimetype): array {
-    $mimetype = strtolower($mimetype);
-    $key = array_search($mimetype, $this->mapping['mimetypes'], TRUE);
+    $mimetype = \strtolower($mimetype);
+    $key = \array_search($mimetype, $this->mapping['mimetypes'], TRUE);
     if ($key === FALSE) {
       return [];
     }
-    $extensions = array_keys($this->mapping['extensions'], $key, TRUE);
-    sort($extensions);
+    $extensions = \array_keys($this->mapping['extensions'], $key, TRUE);
+    \sort($extensions);
     return $extensions;
   }
 

@@ -78,7 +78,7 @@ class MigrateExecutableTest extends MigrateTestBase {
       ->createStubMigration($definition);
     $executable = new TestMigrateExecutable($migration);
     $executable->import();
-    $messages = iterator_to_array($migration->getIdMap()->getMessages());
+    $messages = \iterator_to_array($migration->getIdMap()->getMessages());
     $this->assertCount(1, $messages);
     $expected = $migration->getPluginId() . ':foo: test message';
     $this->assertEquals($expected, $messages[0]->message);

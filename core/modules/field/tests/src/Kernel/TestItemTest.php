@@ -57,7 +57,7 @@ class TestItemTest extends FieldKernelTestBase {
   public function testTestItem(): void {
     // Verify entity creation.
     $entity = EntityTest::create();
-    $value = rand(1, 10);
+    $value = \rand(1, 10);
     $entity->field_test = $value;
     $entity->name->value = $this->randomMachineName();
     $entity->save();
@@ -71,7 +71,7 @@ class TestItemTest extends FieldKernelTestBase {
     $this->assertEquals($value, $entity->{$this->fieldName}[0]->value);
 
     // Verify changing the field value.
-    $new_value = rand(1, 10);
+    $new_value = \rand(1, 10);
     $entity->field_test->value = $new_value;
     $this->assertEquals($new_value, $entity->{$this->fieldName}->value);
 

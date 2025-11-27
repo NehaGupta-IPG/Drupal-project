@@ -128,7 +128,7 @@ class FormBuilderTest extends FormTestBase {
     $form_id = $this->formBuilder->getFormId($form_arg, $form_state);
 
     $this->assertSame('test_form', $form_id);
-    $this->assertSame($form_arg, get_class($form_state->getFormObject()));
+    $this->assertSame($form_arg, \get_class($form_state->getFormObject()));
   }
 
   /**
@@ -144,7 +144,7 @@ class FormBuilderTest extends FormTestBase {
     $form_id = $this->formBuilder->getFormId($form_arg, $form_state);
 
     $this->assertSame('test_form', $form_id);
-    $this->assertSame($form_arg, get_class($form_state->getFormObject()));
+    $this->assertSame($form_arg, \get_class($form_state->getFormObject()));
   }
 
   /**
@@ -905,7 +905,7 @@ class FormBuilderTest extends FormTestBase {
     $form_token = 'the_form_token';
     $form_id = 'test_form_id';
 
-    if (is_bool($valid_token)) {
+    if (\is_bool($valid_token)) {
       $this->csrfToken->expects($this->any())
         ->method('get')
         ->willReturnArgument(0);
@@ -938,7 +938,7 @@ class FormBuilderTest extends FormTestBase {
       $this->assertEmpty($form['test']['#value']);
       $this->assertEmpty($form_state->getValue('test'));
       $this->assertEmpty($_POST);
-      $this->assertEmpty(iterator_to_array($this->request->request->getIterator()));
+      $this->assertEmpty(\iterator_to_array($this->request->request->getIterator()));
     }
     else {
       $this->assertEquals('example-value', $form['test']['#value']);
@@ -998,7 +998,7 @@ class FormBuilderTest extends FormTestBase {
     // - #method is set to 'GET' and #token is not a string. This means the GET
     //   form did not get a form token by default, and the form did not
     //   explicitly opt in.
-    if ($token === FALSE || ($method == 'get' && !is_string($token))) {
+    if ($token === FALSE || ($method == 'get' && !\is_string($token))) {
       $this->assertEquals($built_form['#cache'], ['tags' => ['CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form']]);
       $this->assertFalse(isset($built_form['form_token']));
     }

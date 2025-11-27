@@ -75,7 +75,7 @@ class DefaultViewsTest extends ViewTestBase {
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       'help' => '',
       'nodes' => ['page' => 'page'],
-      'weight' => mt_rand(0, 10),
+      'weight' => \mt_rand(0, 10),
     ]);
     $vocabulary->save();
 
@@ -150,7 +150,7 @@ class DefaultViewsTest extends ViewTestBase {
         $view->setDisplay($display_id);
 
         // Add any args if needed.
-        if (array_key_exists($name, $this->viewArgMap)) {
+        if (\array_key_exists($name, $this->viewArgMap)) {
           $view->preExecute($this->viewArgMap[$name]);
         }
 
@@ -168,8 +168,8 @@ class DefaultViewsTest extends ViewTestBase {
    * Returns a new term with random properties in vocabulary $vid.
    */
   public function createTerm($vocabulary) {
-    $filter_formats = filter_formats();
-    $format = array_pop($filter_formats);
+    $filter_formats = \filter_formats();
+    $format = \array_pop($filter_formats);
     $term = Term::create([
       'name' => $this->randomMachineName(),
       'description' => $this->randomMachineName(),
@@ -209,9 +209,9 @@ class DefaultViewsTest extends ViewTestBase {
     $view->setDisplay('page_1');
     $this->executeView($view);
     $columns = ['nid', 'created_year_month', 'num_records'];
-    $column_map = array_combine($columns, $columns);
+    $column_map = \array_combine($columns, $columns);
     // Create time of additional nodes created in the setup method.
-    $created_year_month = date('Ym', \Drupal::time()->getRequestTime() - 3600);
+    $created_year_month = \date('Ym', \Drupal::time()->getRequestTime() - 3600);
     $expected_result = [
       [
         'nid' => 1,

@@ -83,7 +83,7 @@ class PreprocessPagerTest extends UnitTestCase {
     ];
     $this->pagerPreprocess->preprocessPager($variables);
 
-    $this->assertEquals(['first', 'previous'], array_keys($variables['items']));
+    $this->assertEquals(['first', 'previous'], \array_keys($variables['items']));
   }
 
   /**
@@ -103,7 +103,7 @@ class PreprocessPagerTest extends UnitTestCase {
     ];
     $this->pagerPreprocess->preprocessPager($variables);
 
-    $this->assertEquals(['first', 'previous', 'pages'], array_keys($variables['items']));
+    $this->assertEquals(['first', 'previous', 'pages'], \array_keys($variables['items']));
     /** @var \Drupal\Core\Template\AttributeString $attribute */
     $attribute = $variables['items']['pages']['2']['attributes']->offsetGet('aria-current');
     $this->assertInstanceOf(AttributeString::class, $attribute);

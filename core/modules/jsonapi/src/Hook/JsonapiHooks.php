@@ -53,7 +53,7 @@ class JsonapiHooks {
   #[Hook('modules_installed')]
   public function modulesInstalled($modules): void {
     $potential_conflicts = ['content_translation', 'config_translation', 'language'];
-    if (!empty(array_intersect($modules, $potential_conflicts))) {
+    if (!empty(\array_intersect($modules, $potential_conflicts))) {
       \Drupal::messenger()->addWarning($this->t('Some multilingual features currently do not work well with JSON:API. See the <a href=":jsonapi-docs">JSON:API multilingual support documentation</a> for more information on the current status of multilingual support.', [':jsonapi-docs' => 'https://www.drupal.org/docs/8/modules/jsonapi/translations']));
     }
   }
@@ -79,7 +79,7 @@ class JsonapiHooks {
    */
   #[Hook('entity_create')]
   public function entityCreate(EntityInterface $entity): void {
-    if (in_array($entity->getEntityTypeId(), ['field_storage_config', 'field_config'])) {
+    if (\in_array($entity->getEntityTypeId(), ['field_storage_config', 'field_config'])) {
       // @todo Only do this when relationship fields are updated, not just any field.
       Routes::rebuild();
     }
@@ -90,7 +90,7 @@ class JsonapiHooks {
    */
   #[Hook('entity_delete')]
   public function entityDelete(EntityInterface $entity): void {
-    if (in_array($entity->getEntityTypeId(), ['field_storage_config', 'field_config'])) {
+    if (\in_array($entity->getEntityTypeId(), ['field_storage_config', 'field_config'])) {
       // @todo Only do this when relationship fields are updated, not just any field.
       Routes::rebuild();
     }

@@ -98,7 +98,7 @@ class ModulesListFormWebTest extends BrowserTestBase {
    */
   public function testModulesListFormWithInvalidInfoFile(): void {
     $path = $this->root . '/' . \Drupal::getContainer()->getParameter('site.path') . "/modules/broken";
-    mkdir($path, 0777, TRUE);
+    \mkdir($path, 0777, TRUE);
     $file_path = "$path/broken.info.yml";
 
     $yml = <<<BROKEN
@@ -106,7 +106,7 @@ name: Module with no core_version_requirement
 type: module
 BROKEN;
 
-    file_put_contents($file_path, $yml);
+    \file_put_contents($file_path, $yml);
 
     $this->drupalGet('admin/modules');
     $this->assertSession()->statusCodeEquals(200);
@@ -117,7 +117,7 @@ BROKEN;
     // Check that the module filter text box is available.
     $this->assertSession()->elementExists('xpath', '//input[@name="text"]');
 
-    unlink($file_path);
+    \unlink($file_path);
     $this->drupalGet('admin/modules');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -132,7 +132,7 @@ BROKEN;
   public function testModulesListFormWithEmptyDescriptionInfoFile(): void {
     $path = \Drupal::getContainer()
       ->getParameter('site.path') . "/modules/missing_description";
-    mkdir($path, 0777, TRUE);
+    \mkdir($path, 0777, TRUE);
     $file_path = "$path/missing_description.info.yml";
 
     $yml = <<<BROKEN
@@ -142,7 +142,7 @@ core_version_requirement: '*'
 description:
 BROKEN;
 
-    file_put_contents($file_path, $yml);
+    \file_put_contents($file_path, $yml);
 
     $this->drupalGet('admin/modules');
     $this->assertSession()->statusCodeEquals(200);
@@ -173,7 +173,7 @@ BROKEN;
   public function testInstalledIncompatibleModule(): void {
     $incompatible_modules_message = 'There are errors with some installed modules. Visit the status report page for more information.';
     $path = \Drupal::getContainer()->getParameter('site.path') . "/modules/changing_module";
-    mkdir($path, 0777, TRUE);
+    \mkdir($path, 0777, TRUE);
     $file_path = "$path/changing_module.info.yml";
     $info = [
       'name' => 'Module that changes',

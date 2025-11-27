@@ -108,7 +108,7 @@ class RssTest extends TaxonomyTestBase {
 
     // Check that the term is displayed when the RSS feed is viewed.
     $this->drupalGet('rss.xml');
-    $test_element = sprintf(
+    $test_element = \sprintf(
       '<category %s>%s</category>',
       'domain="' . $term1->toUrl('canonical', ['absolute' => TRUE])->toString() . '"',
       $term1->getName()
@@ -125,7 +125,7 @@ class RssTest extends TaxonomyTestBase {
     $assert->responseHeaderContains('Content-Type', 'application/rss+xml');
     // Ensure the RSS version is 2.0.
     $rss_array = $this->getSession()->getDriver()->find('rss');
-    $this->assertEquals('2.0', reset($rss_array)->getAttribute('version'));
+    $this->assertEquals('2.0', \reset($rss_array)->getAttribute('version'));
 
     // Check that the "Exception value" is disabled by default.
     $this->drupalGet('taxonomy/term/all/feed');

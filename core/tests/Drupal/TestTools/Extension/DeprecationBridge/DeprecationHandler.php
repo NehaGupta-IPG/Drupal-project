@@ -60,7 +60,7 @@ final class DeprecationHandler {
    *   disabled.
    */
   public static function getConfiguration(): array|FALSE {
-    $environmentVariable = getenv('SYMFONY_DEPRECATIONS_HELPER');
+    $environmentVariable = \getenv('SYMFONY_DEPRECATIONS_HELPER');
     if ($environmentVariable === 'disabled') {
       return FALSE;
     }
@@ -68,17 +68,17 @@ final class DeprecationHandler {
       // Ensure ignored deprecation patterns listed in .deprecation-ignore.txt
       // are considered in testing.
       $relativeFilePath = __DIR__ . "/../../../../../.deprecation-ignore.txt";
-      $deprecationIgnoreFilename = realpath($relativeFilePath);
+      $deprecationIgnoreFilename = \realpath($relativeFilePath);
       if (empty($deprecationIgnoreFilename)) {
-        throw new \InvalidArgumentException(sprintf('The ignoreFile "%s" does not exist.', $relativeFilePath));
+        throw new \InvalidArgumentException(\sprintf('The ignoreFile "%s" does not exist.', $relativeFilePath));
       }
       $environmentVariable = "ignoreFile=$deprecationIgnoreFilename";
     }
-    parse_str($environmentVariable, $configuration);
+    \parse_str($environmentVariable, $configuration);
 
-    $environmentVariable = getenv('PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION');
+    $environmentVariable = \getenv('PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION');
     $phpUnitDeprecationVariable = $environmentVariable !== FALSE ? $environmentVariable : TRUE;
-    $configuration['failOnPhpunitDeprecation'] = filter_var($phpUnitDeprecationVariable, \FILTER_VALIDATE_BOOLEAN);
+    $configuration['failOnPhpunitDeprecation'] = \filter_var($phpUnitDeprecationVariable, \FILTER_VALIDATE_BOOLEAN);
 
     return $configuration;
   }
@@ -106,22 +106,22 @@ final class DeprecationHandler {
 
     // Load the deprecation ignore patterns from the specified file.
     if ($ignoreFile && !self::$deprecationIgnorePatterns) {
-      if (!is_file($ignoreFile)) {
-        throw new \InvalidArgumentException(sprintf('The ignoreFile "%s" does not exist.', $ignoreFile));
+      if (!\is_file($ignoreFile)) {
+        throw new \InvalidArgumentException(\sprintf('The ignoreFile "%s" does not exist.', $ignoreFile));
       }
-      set_error_handler(static function ($t, $m) use ($ignoreFile, &$line) {
-        throw new \RuntimeException(sprintf('Invalid pattern found in "%s" on line "%d"', $ignoreFile, 1 + $line) . substr($m, 12));
+      \set_error_handler(static function ($t, $m) use ($ignoreFile, &$line) {
+        throw new \RuntimeException(\sprintf('Invalid pattern found in "%s" on line "%d"', $ignoreFile, 1 + $line) . \substr($m, 12));
       });
       try {
-        foreach (file($ignoreFile) as $line => $pattern) {
-          if ((trim($pattern)[0] ?? '#') !== '#') {
-            preg_match($pattern, '');
+        foreach (\file($ignoreFile) as $line => $pattern) {
+          if ((\trim($pattern)[0] ?? '#') !== '#') {
+            \preg_match($pattern, '');
             self::$deprecationIgnorePatterns[] = $pattern;
           }
         }
       }
       finally {
-        restore_error_handler();
+        \restore_error_handler();
       }
     }
 
@@ -187,7 +187,7 @@ final class DeprecationHandler {
     if (!self::isEnabled()) {
       return;
     }
-    if (!array_search($message, self::$collectedDeprecations, TRUE)) {
+    if (!\array_search($message, self::$collectedDeprecations, TRUE)) {
       self::$collectedDeprecations[] = $message;
     }
   }
@@ -218,9 +218,9 @@ final class DeprecationHandler {
     if (!self::$deprecationIgnorePatterns) {
       return FALSE;
     }
-    $result = @preg_filter(self::$deprecationIgnorePatterns, '$0', $deprecationMessage);
-    if (preg_last_error() !== \PREG_NO_ERROR) {
-      throw new \RuntimeException(preg_last_error_msg());
+    $result = @\preg_filter(self::$deprecationIgnorePatterns, '$0', $deprecationMessage);
+    if (\preg_last_error() !== \PREG_NO_ERROR) {
+      throw new \RuntimeException(\preg_last_error_msg());
     }
     return (bool) $result;
   }
@@ -249,7 +249,7 @@ final class DeprecationHandler {
     foreach ($testCase->valueObjectForEvents()->metadata()->isGroup() as $metadata) {
       $groups[] = $metadata->groupName();
     }
-    return in_array('legacy', $groups, TRUE);
+    return \in_array('legacy', $groups, TRUE);
   }
 
 }

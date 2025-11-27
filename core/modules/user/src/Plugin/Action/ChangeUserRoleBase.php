@@ -62,7 +62,7 @@ abstract class ChangeUserRoleBase extends ConfigurableActionBase implements Cont
     $roles = Role::loadMultiple();
     unset($roles[RoleInterface::ANONYMOUS_ID]);
     unset($roles[RoleInterface::AUTHENTICATED_ID]);
-    $roles = array_map(fn(RoleInterface $role) => $role->label(), $roles);
+    $roles = \array_map(fn(RoleInterface $role) => $role->label(), $roles);
     $form['rid'] = [
       '#type' => 'radios',
       '#title' => $this->t('Role'),

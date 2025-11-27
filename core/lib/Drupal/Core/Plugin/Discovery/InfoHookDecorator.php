@@ -57,7 +57,7 @@ class InfoHookDecorator implements DiscoveryInterface {
    * Passes through all unknown calls onto the decorated object.
    */
   public function __call($method, $args) {
-    return call_user_func_array([$this->decorated, $method], $args);
+    return \call_user_func_array([$this->decorated, $method], $args);
   }
 
 }

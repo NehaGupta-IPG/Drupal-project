@@ -112,7 +112,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
         ],
       ],
     ]);
-    _menu_ui_node_save($node, [
+    \_menu_ui_node_save($node, [
       'title' => 'bar',
       'menu_name' => 'main',
       'description' => 'view bar',

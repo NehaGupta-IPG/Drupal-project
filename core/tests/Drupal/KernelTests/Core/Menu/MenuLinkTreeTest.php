@@ -122,16 +122,16 @@ class MenuLinkTreeTest extends KernelTestBase {
       $sum = function ($carry, MenuLinkTreeElement $item) {
         return $carry + $item->count();
       };
-      return array_reduce($tree, $sum);
+      return \array_reduce($tree, $sum);
     };
 
     $this->assertEquals(8, $count($tree));
     $parameters = new MenuTreeParameters();
     $parameters->setRoot('test.example2');
     $tree = $this->linkTree->load($instance->getMenuName(), $parameters);
-    $top_link = reset($tree);
+    $top_link = \reset($tree);
     $this->assertCount(1, $top_link->subtree);
-    $child = reset($top_link->subtree);
+    $child = \reset($top_link->subtree);
     $this->assertEquals($links[3]->getPluginId(), $child->link->getPluginId());
     $height = $this->linkTree->getSubtreeHeight('test.example2');
     $this->assertEquals(3, $height);
@@ -159,8 +159,8 @@ class MenuLinkTreeTest extends KernelTestBase {
       $tree = $this->linkTree->load('mock', $parameters);
       $this->linkTree->transform($tree, $manipulators);
 
-      return array_keys(
-        array_filter($tree, function (MenuLinkTreeElement $element) {
+      return \array_keys(
+        \array_filter($tree, function (MenuLinkTreeElement $element) {
           return !$element->link instanceof InaccessibleMenuLink;
         })
       );

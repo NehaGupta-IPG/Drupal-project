@@ -122,8 +122,8 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
     // affected...
     $active_dir = $path_locator->getProjectRoot();
     $new_staging_root = $this->testProjectRoot . DIRECTORY_SEPARATOR . 'junk';
-    if (!is_dir($new_staging_root)) {
-      mkdir($new_staging_root);
+    if (!\is_dir($new_staging_root)) {
+      \mkdir($new_staging_root);
     }
     $path_locator->setPaths($active_dir, "$active_dir/vendor", '', $new_staging_root);
     $this->assertSame($stage_dir, $stage->getSandboxDirectory());
@@ -133,7 +133,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
     $another_id = $stage->create();
     $this->assertNotSame($id, $another_id);
     $stage_dir = $stage->getSandboxDirectory();
-    $this->assertStringStartsWith(realpath($new_staging_root), $stage_dir);
+    $this->assertStringStartsWith(\realpath($new_staging_root), $stage_dir);
     $this->assertStringEndsWith("/$another_id", $stage_dir);
   }
 
@@ -179,7 +179,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
         $expected_count = 2;
       }
       $this->assertCount($expected_count, $invocations);
-      $this->assertSame($expected_timeout, end($invocations[0]));
+      $this->assertSame($expected_timeout, \end($invocations[0]));
     }
   }
 
@@ -267,19 +267,19 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
       'Changes applied, with a custom exception message.' => [
         FALSE,
         TRUE,
-        t('Stage destroyed with a custom message.'),
+        \t('Stage destroyed with a custom message.'),
         'Stage destroyed with a custom message.',
       ],
       'Changes not applied and forced, with a custom exception message.' => [
         TRUE,
         FALSE,
-        t('Stage destroyed with a custom message.'),
+        \t('Stage destroyed with a custom message.'),
         'Stage destroyed with a custom message.',
       ],
       'Changes not applied and not forced, with a custom exception message.' => [
         FALSE,
         FALSE,
-        t('Stage destroyed with a custom message.'),
+        \t('Stage destroyed with a custom message.'),
         'Stage destroyed with a custom message.',
       ],
     ];
@@ -369,7 +369,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
     $exception_message = "$throwing_class is angry!";
     $throwing_class::setException(\Exception::class, $exception_message, 1024);
 
-    $expected_message = preg_quote($exception_message);
+    $expected_message = \preg_quote($exception_message);
     if ($throwing_class === LoggingCommitter::class) {
       $expected_message = "/^Staged changes failed to apply, and the site is in an indeterminate state. It is strongly recommended to restore the code and database from a backup. Caused by Exception, with this message: $expected_message\nBacktrace:\n#0 .*/";
     }
@@ -436,7 +436,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
    */
   public function testFailureCollectPathsToExclude(): void {
     $project_root = $this->container->get(PathLocator::class)->getProjectRoot();
-    unlink($project_root . '/composer.json');
+    \unlink($project_root . '/composer.json');
     $this->expectException(SandboxException::class);
     $this->expectExceptionMessage("composer.json not found.");
     $this->createStage()->create();
@@ -451,7 +451,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
     $stage->require(['drupal/random']);
     $this->expectException(SandboxException::class);
     $this->expectExceptionMessage("composer.json not found.");
-    unlink($stage->getSandboxDirectory() . '/composer.json');
+    \unlink($stage->getSandboxDirectory() . '/composer.json');
     $stage->apply();
   }
 

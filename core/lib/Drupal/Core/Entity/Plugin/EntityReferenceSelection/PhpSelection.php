@@ -33,12 +33,12 @@ class PhpSelection extends DefaultSelection {
     // the incoming $match needs to be escaped as well, making the comparison
     // possible.
     // @see \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface::getReferenceableEntities()
-    if (is_string($match)) {
-      $match = Html::escape(mb_strtolower($match));
+    if (\is_string($match)) {
+      $match = Html::escape(\mb_strtolower($match));
     }
-    elseif (is_array($match)) {
-      array_walk($match, function (&$item) {
-        $item = Html::escape(mb_strtolower($item));
+    elseif (\is_array($match)) {
+      \array_walk($match, function (&$item) {
+        $item = Html::escape(\mb_strtolower($item));
       });
     }
 
@@ -67,7 +67,7 @@ class PhpSelection extends DefaultSelection {
   public function countReferenceableEntities($match = NULL, $match_operator = 'CONTAINS') {
     $count = 0;
     foreach ($this->getReferenceableEntities($match, $match_operator) as &$items) {
-      $count += count($items);
+      $count += \count($items);
     }
 
     return $count;
@@ -88,7 +88,7 @@ class PhpSelection extends DefaultSelection {
    */
   protected function matchLabel($match, $match_operator, $label) {
     // Always use a case-insensitive value.
-    $label = mb_strtolower($label);
+    $label = \mb_strtolower($label);
 
     switch ($match_operator) {
       case '=':
@@ -110,19 +110,19 @@ class PhpSelection extends DefaultSelection {
         return $label != $match;
 
       case 'IN':
-        return array_search($label, $match) !== FALSE;
+        return \array_search($label, $match) !== FALSE;
 
       case 'NOT IN':
-        return array_search($label, $match) === FALSE;
+        return \array_search($label, $match) === FALSE;
 
       case 'STARTS_WITH':
-        return str_starts_with($label, $match);
+        return \str_starts_with($label, $match);
 
       case 'CONTAINS':
-        return str_contains($label, $match);
+        return \str_contains($label, $match);
 
       case 'ENDS_WITH':
-        return str_ends_with($label, $match);
+        return \str_ends_with($label, $match);
 
       case 'IS NOT NULL':
         return TRUE;

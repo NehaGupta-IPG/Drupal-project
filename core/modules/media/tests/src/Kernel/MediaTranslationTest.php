@@ -45,7 +45,7 @@ class MediaTranslationTest extends MediaKernelTestBase {
         'id' => $language_id,
         'label' => $this->randomString(),
       ])->save();
-      file_put_contents('public://' . $language_id . '.png', '');
+      \file_put_contents('public://' . $language_id . '.png', '');
     }
   }
 
@@ -73,8 +73,8 @@ class MediaTranslationTest extends MediaKernelTestBase {
     ]);
 
     $field_translations = [];
-    $available_langcodes = array_keys($this->container->get('language_manager')->getLanguages());
-    $media->set('langcode', reset($available_langcodes));
+    $available_langcodes = \array_keys($this->container->get('language_manager')->getLanguages());
+    $media->set('langcode', \reset($available_langcodes));
     foreach ($available_langcodes as $langcode) {
       $values = [];
       for ($i = 0; $i < $source_field_storage->getCardinality(); $i++) {

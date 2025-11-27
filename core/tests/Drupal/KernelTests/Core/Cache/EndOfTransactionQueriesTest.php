@@ -85,17 +85,17 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
     foreach (Database::getLog('testEntitySave') as $log) {
       // Exclude transaction related statements from the log.
       if (
-        str_starts_with($log['query'], 'ROLLBACK TO SAVEPOINT ') ||
-        str_starts_with($log['query'], 'RELEASE SAVEPOINT ') ||
-        str_starts_with($log['query'], 'SAVEPOINT ')
+        \str_starts_with($log['query'], 'ROLLBACK TO SAVEPOINT ') ||
+        \str_starts_with($log['query'], 'RELEASE SAVEPOINT ') ||
+        \str_starts_with($log['query'], 'SAVEPOINT ')
       ) {
         continue;
       }
       $executed_statements[] = $log['query'];
     }
-    $expected_post_transaction_statements = array_keys(array_fill(array_key_last($executed_statements) - $expected_tail_length + 1, $expected_tail_length, TRUE));
+    $expected_post_transaction_statements = \array_keys(\array_fill(\array_key_last($executed_statements) - $expected_tail_length + 1, $expected_tail_length, TRUE));
     $cachetag_statements = $this->getStatementsForTable($executed_statements, 'cachetags');
-    $tail_cachetag_statements = array_keys(array_slice($cachetag_statements, count($cachetag_statements) - $expected_tail_length, $expected_tail_length, TRUE));
+    $tail_cachetag_statements = \array_keys(\array_slice($cachetag_statements, \count($cachetag_statements) - $expected_tail_length, $expected_tail_length, TRUE));
     $this->assertSame($expected_post_transaction_statements, $tail_cachetag_statements);
 
     // Verify that a nested entity save occurred.
@@ -168,7 +168,7 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
    *   Filtered statement list.
    */
   protected function getStatementsForTable(array $statements, $table_name): array {
-    return array_filter($statements, function ($statement) use ($table_name) {
+    return \array_filter($statements, function ($statement) use ($table_name) {
       return $this->isStatementRelatedToTable($statement, $table_name);
     });
   }
@@ -189,8 +189,8 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
    */
   protected static function isStatementRelatedToTable(string $statement, string $tableName): bool {
     $realTableIdentifier = Database::getConnection()->prefixTables('{' . $tableName . '}');
-    $pattern = '/.*(INTO|FROM|UPDATE)( |\n)' . preg_quote($realTableIdentifier, '/') . '/';
-    return preg_match($pattern, $statement) === 1 ? TRUE : FALSE;
+    $pattern = '/.*(INTO|FROM|UPDATE)( |\n)' . \preg_quote($realTableIdentifier, '/') . '/';
+    return \preg_match($pattern, $statement) === 1 ? TRUE : FALSE;
   }
 
 }

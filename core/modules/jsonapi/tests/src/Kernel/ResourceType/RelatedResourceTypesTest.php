@@ -133,16 +133,16 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
     $resource_type = $this->resourceTypeRepository->getByTypeName($resource_type_name);
 
     // This extracts just the relationship fields under test.
-    $subjects = array_intersect_key(
+    $subjects = \array_intersect_key(
       $resource_type->getRelatableResourceTypes(),
-      array_flip($test_fields)
+      \array_flip($test_fields)
     );
 
     // Map the related resource type to their type name so we can just compare
     // the type names rather that the whole object.
     foreach ($test_fields as $field_name) {
       if (isset($subjects[$field_name])) {
-        $subjects[$field_name] = array_map(function ($resource_type) {
+        $subjects[$field_name] = \array_map(function ($resource_type) {
           return $resource_type->getTypeName();
         }, $subjects[$field_name]);
       }
@@ -230,7 +230,7 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
       ->condition('message', 'The "@name" at "@target_entity_type_id:@target_bundle" references the "@entity_type_id:@bundle" entity type that does not exist.')
       ->execute()
       ->fetchField();
-    $this->assertEquals(serialize($arguments), $logged);
+    $this->assertEquals(\serialize($arguments), $logged);
   }
 
 }

@@ -166,11 +166,11 @@ class HtmlTest extends TestCase {
 
     // Note, we truncate two hyphens at the end.
     // @see \Drupal\Component\Utility\Html::getId()
-    if (str_contains($source, '--')) {
-      $random_suffix = substr($id, strlen($source) + 1);
+    if (\str_contains($source, '--')) {
+      $random_suffix = \substr($id, \strlen($source) + 1);
     }
     else {
-      $random_suffix = substr($id, strlen($source) + 2);
+      $random_suffix = \substr($id, \strlen($source) + 2);
     }
     $expected = $expected . $random_suffix;
     $this->assertSame($expected, $id);
@@ -369,7 +369,7 @@ class HtmlTest extends TestCase {
     $random = new Random();
 
     // One random tag name.
-    $tag_name = strtolower($random->name(8, TRUE));
+    $tag_name = \strtolower($random->name(8, TRUE));
 
     // A site installed either in the root of a domain or a subdirectory.
     $base_paths = ['/', '/subdir/' . $random->name(8, TRUE) . '/'];

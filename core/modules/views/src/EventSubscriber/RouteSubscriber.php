@@ -96,7 +96,7 @@ class RouteSubscriber extends RouteSubscriberBase {
         [$view_id, $display_id] = $data;
         $this->viewsDisplayPairs[] = $view_id . '.' . $display_id;
       }
-      $this->viewsDisplayPairs = array_combine($this->viewsDisplayPairs, $this->viewsDisplayPairs);
+      $this->viewsDisplayPairs = \array_combine($this->viewsDisplayPairs, $this->viewsDisplayPairs);
     }
     return $this->viewsDisplayPairs;
   }
@@ -110,7 +110,7 @@ class RouteSubscriber extends RouteSubscriberBase {
   public function routes() {
     $collection = new RouteCollection();
     foreach ($this->getViewsDisplayIDsWithRoute() as $pair) {
-      [$view_id, $display_id] = explode('.', $pair);
+      [$view_id, $display_id] = \explode('.', $pair);
       $view = $this->viewStorage->load($view_id);
       // @todo This should have an executable factory injected.
       if (($view = $view->getExecutable()) && $view instanceof ViewExecutable) {
@@ -132,7 +132,7 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   protected function alterRoutes(RouteCollection $collection) {
     foreach ($this->getViewsDisplayIDsWithRoute() as $pair) {
-      [$view_id, $display_id] = explode('.', $pair);
+      [$view_id, $display_id] = \explode('.', $pair);
       $view = $this->viewStorage->load($view_id);
       // @todo This should have an executable factory injected.
       if (($view = $view->getExecutable()) && $view instanceof ViewExecutable) {

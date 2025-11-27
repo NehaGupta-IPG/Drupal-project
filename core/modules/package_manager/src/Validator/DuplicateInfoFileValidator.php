@@ -96,16 +96,16 @@ final class DuplicateInfoFileValidator implements EventSubscriberInterface {
     };
 
     // Scan all 4 extension types, explicitly ignoring tests.
-    $extension_info_files = array_merge(
-      array_keys($duplicate_aware_extension_discovery->scan('module', FALSE)),
-      array_keys($duplicate_aware_extension_discovery->scan('theme', FALSE)),
-      array_keys($duplicate_aware_extension_discovery->scan('profile', FALSE)),
-      array_keys($duplicate_aware_extension_discovery->scan('theme_engine', FALSE)),
+    $extension_info_files = \array_merge(
+      \array_keys($duplicate_aware_extension_discovery->scan('module', FALSE)),
+      \array_keys($duplicate_aware_extension_discovery->scan('theme', FALSE)),
+      \array_keys($duplicate_aware_extension_discovery->scan('profile', FALSE)),
+      \array_keys($duplicate_aware_extension_discovery->scan('theme_engine', FALSE)),
     );
 
     $info_files = [];
     foreach ($extension_info_files as $info_file) {
-      $file_name = basename($info_file);
+      $file_name = \basename($info_file);
       $info_files[$file_name] = ($info_files[$file_name] ?? 0) + 1;
     }
     return $info_files;

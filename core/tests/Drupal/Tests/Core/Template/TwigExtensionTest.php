@@ -172,13 +172,13 @@ class TwigExtensionTest extends UnitTestCase {
     $this->dateFormatter->expects($this->exactly(1))
       ->method('format')
       ->willReturnCallback(function ($timestamp) {
-        return date('Y-m-d', $timestamp);
+        return \date('Y-m-d', $timestamp);
       });
 
     $loader = new StringLoader();
     $twig = new Environment($loader);
     $twig->addExtension($this->systemUnderTest);
-    $timestamp = strtotime('1978-11-19');
+    $timestamp = \strtotime('1978-11-19');
     $result = $twig->render('{{ time|format_date("html_date") }}', ['time' => $timestamp]);
     $this->assertEquals('1978-11-19', $result);
   }

@@ -33,7 +33,7 @@ class Test extends MediaSourceBase {
       'attribute_1' => ['label' => 'Attribute 1', 'value' => 'Value 1'],
       'attribute_2' => ['label' => 'Attribute 2', 'value' => 'Value 1'],
     ]);
-    return array_map(function ($item) {
+    return \array_map(function ($item) {
       return $item['label'];
     }, $attributes);
   }
@@ -47,7 +47,7 @@ class Test extends MediaSourceBase {
       'attribute_2' => ['label' => 'Attribute 2', 'value' => 'Value 1'],
     ]);
 
-    if (in_array($attribute_name, array_keys($attributes))) {
+    if (\in_array($attribute_name, \array_keys($attributes))) {
       return $attributes[$attribute_name]['value'];
     }
 

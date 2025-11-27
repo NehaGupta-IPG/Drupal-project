@@ -162,7 +162,7 @@ class ImageItemTest extends FieldKernelTestBase {
     // Test image item properties.
     $expected = ['target_id', 'entity', 'alt', 'title', 'width', 'height'];
     $properties = $entity->getFieldDefinition('image_test')->getFieldStorageDefinition()->getPropertyDefinitions();
-    $this->assertEquals($expected, array_keys($properties));
+    $this->assertEquals($expected, \array_keys($properties));
 
   }
 
@@ -206,7 +206,7 @@ class ImageItemTest extends FieldKernelTestBase {
       ->condition('message', "Missing file with ID %id.")
       ->execute()
       ->fetchField();
-    $this->assertEquals(serialize($arguments), $logged);
+    $this->assertEquals(\serialize($arguments), $logged);
     $this->assertEmpty($entity->image_test->width);
     $this->assertEmpty($entity->image_test->height);
   }
@@ -266,7 +266,7 @@ class ImageItemTest extends FieldKernelTestBase {
 
     // Verify the file URI starts with the expected protocol and structure.
     $this->assertStringStartsWith($expected_start, $fileUri);
-    $this->assertMatchesRegularExpression('#^' . preg_quote($expected_start, '#') . '[^/]+#', $fileUri);
+    $this->assertMatchesRegularExpression('#^' . \preg_quote($expected_start, '#') . '[^/]+#', $fileUri);
   }
 
 }

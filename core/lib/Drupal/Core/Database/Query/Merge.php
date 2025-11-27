@@ -216,7 +216,7 @@ class Merge extends Query implements ConditionInterface {
    */
   public function insertFields(array $fields, array $values = []) {
     if ($values) {
-      $fields = array_combine($fields, $values);
+      $fields = \array_combine($fields, $values);
     }
     $this->insertFields = $fields;
     return $this;
@@ -269,7 +269,7 @@ class Merge extends Query implements ConditionInterface {
    */
   public function fields(array $fields, array $values = []) {
     if ($values) {
-      $fields = array_combine($fields, $values);
+      $fields = \array_combine($fields, $values);
     }
     foreach ($fields as $key => $value) {
       $this->insertFields[$key] = $value;
@@ -302,7 +302,7 @@ class Merge extends Query implements ConditionInterface {
    */
   public function keys(array $fields, array $values = []) {
     if ($values) {
-      $fields = array_combine($fields, $values);
+      $fields = \array_combine($fields, $values);
     }
     foreach ($fields as $key => $value) {
       $this->insertFields[$key] = $value;
@@ -327,7 +327,7 @@ class Merge extends Query implements ConditionInterface {
    * @see \Drupal\Core\Database\Query\Merge::keys()
    */
   public function key($field, $value = NULL) {
-    assert(is_string($field));
+    \assert(\is_string($field));
     $this->keys([$field => $value]);
     return $this;
   }
@@ -355,7 +355,7 @@ class Merge extends Query implements ConditionInterface {
    *   When there are no conditions found to merge.
    */
   public function execute() {
-    if (!count($this->condition)) {
+    if (!\count($this->condition)) {
       throw new InvalidMergeQueryException('Invalid merge query: no conditions');
     }
 

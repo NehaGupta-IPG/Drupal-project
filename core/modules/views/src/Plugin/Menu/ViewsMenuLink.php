@@ -130,7 +130,7 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function updateLink(array $new_definition_values, $persist) {
-    $overrides = array_intersect_key($new_definition_values, $this->overrideAllowed);
+    $overrides = \array_intersect_key($new_definition_values, $this->overrideAllowed);
     // Update the definition.
     $this->pluginDefinition = $overrides + $this->pluginDefinition;
     if ($persist) {

@@ -56,13 +56,13 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
    *   The test cases.
    */
   public static function providerErrorDuringPreCreate(): array {
-    $summary = t('Problems detected related to the Composer plugin <code>cweagans/composer-patches</code>.');
+    $summary = \t('Problems detected related to the Composer plugin <code>cweagans/composer-patches</code>.');
     return [
       'INVALID: exit-on-patch-failure missing' => [
         static::CONFIG_ALLOWED_PLUGIN | static::REQUIRE_PACKAGE_FROM_ROOT,
         [
           ValidationResult::createError([
-            t('The <code>composer-exit-on-patch-failure</code> key is not set to <code>true</code> in the <code>extra</code> section of <code>composer.json</code>.'),
+            \t('The <code>composer-exit-on-patch-failure</code> key is not set to <code>true</code> in the <code>extra</code> section of <code>composer.json</code>.'),
           ], $summary),
         ],
       ],
@@ -70,7 +70,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
         static::CONFIG_ALLOWED_PLUGIN | static::EXTRA_EXIT_ON_PATCH_FAILURE | static::REQUIRE_PACKAGE_INDIRECTLY,
         [
           ValidationResult::createError([
-            t('It must be a root dependency.'),
+            \t('It must be a root dependency.'),
           ], $summary),
         ],
         [
@@ -132,7 +132,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
    *   The test cases.
    */
   public static function providerErrorDuringPreApply(): array {
-    $summary = t('Problems detected related to the Composer plugin <code>cweagans/composer-patches</code>.');
+    $summary = \t('Problems detected related to the Composer plugin <code>cweagans/composer-patches</code>.');
 
     return [
       'composer-patches present in stage, but not present in active' => [
@@ -140,7 +140,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
         static::CONFIG_ALLOWED_PLUGIN | static::EXTRA_EXIT_ON_PATCH_FAILURE | static::REQUIRE_PACKAGE_FROM_ROOT,
         [
           ValidationResult::createError([
-            t('It cannot be installed by Package Manager.'),
+            \t('It cannot be installed by Package Manager.'),
           ], $summary),
         ],
         [
@@ -152,8 +152,8 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
         static::CONFIG_ALLOWED_PLUGIN | static::REQUIRE_PACKAGE_FROM_ROOT,
         [
           ValidationResult::createError([
-            t('It cannot be installed by Package Manager.'),
-            t('The <code>composer-exit-on-patch-failure</code> key is not set to <code>true</code> in the <code>extra</code> section of <code>composer.json</code>.'),
+            \t('It cannot be installed by Package Manager.'),
+            \t('The <code>composer-exit-on-patch-failure</code> key is not set to <code>true</code> in the <code>extra</code> section of <code>composer.json</code>.'),
           ], $summary),
         ],
         [
@@ -166,8 +166,8 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
         static::CONFIG_ALLOWED_PLUGIN | static::EXTRA_EXIT_ON_PATCH_FAILURE | static::REQUIRE_PACKAGE_INDIRECTLY,
         [
           ValidationResult::createError([
-            t('It cannot be installed by Package Manager.'),
-            t('It must be a root dependency.'),
+            \t('It cannot be installed by Package Manager.'),
+            \t('It must be a root dependency.'),
           ], $summary),
         ],
         [
@@ -181,7 +181,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
         static::ABSENT,
         [
           ValidationResult::createError([
-            t('It cannot be removed by Package Manager.'),
+            \t('It cannot be removed by Package Manager.'),
           ], $summary),
         ],
         [

@@ -26,7 +26,7 @@ trait SessionTestTrait {
    */
   protected function generateSessionName($data) {
     $prefix = (Request::createFromGlobals()->isSecure() ? 'SSESS' : 'SESS');
-    $this->sessionName = $prefix . substr(hash('sha256', $data), 0, 32);
+    $this->sessionName = $prefix . \substr(\hash('sha256', $data), 0, 32);
   }
 
   /**

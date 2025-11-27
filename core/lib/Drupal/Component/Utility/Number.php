@@ -31,7 +31,7 @@ class Number {
    * @see http://opensource.apple.com/source/WebCore/WebCore-1298/html/NumberInputType.cpp
    */
   public static function validStep($value, $step, $offset = 0.0) {
-    $double_value = (float) abs($value - $offset);
+    $double_value = (float) \abs($value - $offset);
 
     // The fractional part of a double has 53 bits. The greatest number that
     // could be represented with that is 2^53. If the given value is even bigger
@@ -39,18 +39,18 @@ class Number {
     // remainder. Since that remainder can't even be represented with a single
     // precision float the following computation of the remainder makes no sense
     // and we can safely ignore it instead.
-    if ($double_value / pow(2.0, 53) > $step) {
+    if ($double_value / \pow(2.0, 53) > $step) {
       return TRUE;
     }
 
     // Now compute that remainder of a division by $step.
-    $remainder = (float) abs($double_value - $step * round($double_value / $step));
+    $remainder = (float) \abs($double_value - $step * \round($double_value / $step));
 
     // $remainder is a double precision floating point number. Remainders that
     // can't be represented with single precision floats are acceptable. The
     // fractional part of a float has 24 bits. That means remainders smaller
     // than $step * 2^-24 are acceptable.
-    $computed_acceptable_error = (float) ($step / pow(2.0, 24));
+    $computed_acceptable_error = (float) ($step / \pow(2.0, 24));
 
     return $computed_acceptable_error >= $remainder || $remainder >= ($step - $computed_acceptable_error);
   }
@@ -77,10 +77,10 @@ class Number {
    * @see \Drupal\Component\Utility\Number::alphadecimalToInt
    */
   public static function intToAlphadecimal($i = 0) {
-    $num = base_convert((string) $i, 10, 36);
-    $length = strlen($num);
+    $num = \base_convert((string) $i, 10, 36);
+    $length = \strlen($num);
 
-    return chr($length + ord('0') - 1) . $num;
+    return \chr($length + \ord('0') - 1) . $num;
   }
 
   /**
@@ -102,14 +102,14 @@ class Number {
     // and the empty string, returning 0,
     // like (int) base_convert(substr($string, 1), 36, 10) always did.
     if ('' === $string || NULL === $string) {
-      @trigger_error('Passing NULL or an empty string to ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3494472', E_USER_DEPRECATED);
+      @\trigger_error('Passing NULL or an empty string to ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. See https://www.drupal.org/node/3494472', E_USER_DEPRECATED);
       return 0;
     }
-    $alpha_decimal_substring = substr($string, 1);
-    if (!ctype_alnum($alpha_decimal_substring)) {
+    $alpha_decimal_substring = \substr($string, 1);
+    if (!\ctype_alnum($alpha_decimal_substring)) {
       throw new \InvalidArgumentException("Invalid characters passed for attempted conversion: $string");
     }
-    return (int) base_convert($alpha_decimal_substring, 36, 10);
+    return (int) \base_convert($alpha_decimal_substring, 36, 10);
   }
 
 }

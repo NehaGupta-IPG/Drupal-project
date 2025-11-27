@@ -146,7 +146,7 @@ class Query extends QueryBase implements QueryInterface {
       // This improves the performance of
       // \Drupal\Core\Entity\ContentEntityStorageBase::getLatestRevisionId().
       $conditions = $this->condition->conditions();
-      if (count($conditions) === 1 && isset($conditions[0]['field']) && $conditions[0]['field'] === $id_field) {
+      if (\count($conditions) === 1 && isset($conditions[0]['field']) && $conditions[0]['field'] === $id_field) {
         $revision_subquery->condition($id_field, $conditions[0]['value'], $conditions[0]['operator']);
       }
 
@@ -154,7 +154,7 @@ class Query extends QueryBase implements QueryInterface {
       $this->sqlQuery->innerJoin($revision_subquery, 'sq_base_table', "base_table.$id_field = sq_base_table.$id_field AND base_table.$revision_field = sq_base_table.maximum_revision_id");
     }
 
-    if (is_null($this->accessCheck)) {
+    if (\is_null($this->accessCheck)) {
       throw new QueryException('Entity queries must explicitly set whether the query should be access checked or not. See Drupal\Core\Entity\Query\QueryInterface::accessCheck().');
     }
     if ($this->accessCheck) {
@@ -236,7 +236,7 @@ class Query extends QueryBase implements QueryInterface {
         // can be ordered normally, without the aggregation function.
         $this->sqlQuery->orderBy($sql_alias, $direction);
         if (!isset($this->sqlFields[$sql_alias])) {
-          $this->sqlFields[$sql_alias] = explode('.', $sql_alias);
+          $this->sqlFields[$sql_alias] = \explode('.', $sql_alias);
         }
       }
       else {
@@ -365,14 +365,14 @@ class Query extends QueryBase implements QueryInterface {
     // Quote arguments so query is able to be run.
     $quoted = [];
     foreach ($clone->sqlQuery->getArguments() as $key => $value) {
-      $quoted[$key] = is_null($value) ? 'NULL' : $this->connection->quote($value);
+      $quoted[$key] = \is_null($value) ? 'NULL' : $this->connection->quote($value);
     }
 
     // Replace table name brackets.
     $sql = $clone->connection->prefixTables((string) $clone->sqlQuery);
     $sql = $clone->connection->quoteIdentifiers($sql);
 
-    return strtr($sql, $quoted);
+    return \strtr($sql, $quoted);
   }
 
 }

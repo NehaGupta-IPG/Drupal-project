@@ -91,7 +91,7 @@ class LayoutBuilderDisableForm extends ConfirmFormBase implements WorkspaceDynam
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL) {
     if (!$section_storage instanceof DefaultsSectionStorageInterface) {
-      throw new \InvalidArgumentException(sprintf('The section storage with type "%s" and ID "%s" does not provide defaults', $section_storage->getStorageType(), $section_storage->getStorageId()));
+      throw new \InvalidArgumentException(\sprintf('The section storage with type "%s" and ID "%s" does not provide defaults', $section_storage->getStorageType(), $section_storage->getStorageId()));
     }
 
     $this->sectionStorage = $section_storage;

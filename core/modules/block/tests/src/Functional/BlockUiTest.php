@@ -369,7 +369,7 @@ class BlockUiTest extends BrowserTestBase {
   public function testRouteProtection(): void {
     // Get the first block generated in our setUp method.
     /** @var \Drupal\block\BlockInterface $block */
-    $block = reset($this->blocks);
+    $block = \reset($this->blocks);
     // Ensure that the enable and disable routes are protected.
     $this->drupalGet('admin/structure/block/manage/' . $block->id() . '/disable');
     $this->assertSession()->statusCodeEquals(403);

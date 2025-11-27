@@ -52,7 +52,7 @@ class NodeViewTest extends NodeTestBase {
     $title = '🐝';
     // To ensure that the title has multi-byte characters, we compare the byte
     // length to the character length.
-    $this->assertLessThan(strlen($title), mb_strlen($title, 'utf-8'));
+    $this->assertLessThan(\strlen($title), \mb_strlen($title, 'utf-8'));
     $node = $this->drupalCreateNode(['title' => $title]);
     $this->drupalGet($node->toUrl());
     // Verify that the passed title was returned.

@@ -94,7 +94,7 @@ class FormTest extends FieldTestBase {
       'bundle' => 'entity_test',
       'label' => $this->randomMachineName() . '_label',
       'description' => '[site:name]_description',
-      'weight' => mt_rand(0, 127),
+      'weight' => \mt_rand(0, 127),
       'settings' => [
         'test_field_setting' => $this->randomMachineName(),
       ],
@@ -141,12 +141,12 @@ class FormTest extends FieldTestBase {
     // @todo check that the correct field is flagged for error.
 
     // Create an entity.
-    $value = mt_rand(1, 127);
+    $value = \mt_rand(1, 127);
     $edit = [
       "{$field_name}[0][value]" => $value,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
     $entity = EntityTest::load($id);
@@ -160,7 +160,7 @@ class FormTest extends FieldTestBase {
     $this->assertSession()->fieldNotExists("{$field_name}[1][value]");
 
     // Update the entity.
-    $value = mt_rand(1, 127);
+    $value = \mt_rand(1, 127);
     $edit = [
       "{$field_name}[0][value]" => $value,
     ];
@@ -188,7 +188,7 @@ class FormTest extends FieldTestBase {
     $field_storage = $this->fieldStorageSingle;
     $field_name = $field_storage['field_name'];
     $this->field['field_name'] = $field_name;
-    $default = rand(1, 127);
+    $default = \rand(1, 127);
     $this->field['default_value'] = [['value' => $default]];
     FieldStorageConfig::create($field_storage)->save();
     FieldConfig::create($this->field)->save();
@@ -207,7 +207,7 @@ class FormTest extends FieldTestBase {
       "{$field_name}[0][value]" => '',
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
     $entity = EntityTest::load($id);
@@ -236,12 +236,12 @@ class FormTest extends FieldTestBase {
     $this->assertSession()->pageTextContains("{$this->field['label']} field is required.");
 
     // Create an entity.
-    $value = mt_rand(1, 127);
+    $value = \mt_rand(1, 127);
     $edit = [
       "{$field_name}[0][value]" => $value,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
     $entity = EntityTest::load($id);
@@ -304,11 +304,11 @@ class FormTest extends FieldTestBase {
     for ($delta = 0; $delta <= $delta_range; $delta++) {
       // Assign unique random values and weights.
       do {
-        $value = mt_rand(1, 127);
-      } while (in_array($value, $values));
+        $value = \mt_rand(1, 127);
+      } while (\in_array($value, $values));
       do {
-        $weight = mt_rand(-$delta_range, $delta_range);
-      } while (in_array($weight, $weights));
+        $weight = \mt_rand(-$delta_range, $delta_range);
+      } while (\in_array($weight, $weights));
       $edit["{$field_name}[$delta][value]"] = $value;
       $edit["{$field_name}[$delta][_weight]"] = $weight;
       // We'll need three slightly different formats to check the values.
@@ -324,8 +324,8 @@ class FormTest extends FieldTestBase {
       $this->assertSession()->fieldValueEquals("{$field_name}[$delta][value]", $values[$delta]);
       $this->assertSession()->fieldValueEquals("{$field_name}[$delta][_weight]", $weights[$delta]);
     }
-    ksort($pattern);
-    $pattern = implode('.*', array_values($pattern));
+    \ksort($pattern);
+    $pattern = \implode('.*', \array_values($pattern));
     // Verify that the widgets are displayed in the correct order.
     $this->assertSession()->responseMatches("|$pattern|s");
     $this->assertSession()->fieldValueEquals("{$field_name}[$delta][value]", '');
@@ -335,12 +335,12 @@ class FormTest extends FieldTestBase {
 
     // Submit the form and create the entity.
     $this->submitForm($edit, 'Save');
-    preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|entity_test/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test ' . $id . ' has been created.');
     $entity = EntityTest::load($id);
-    ksort($field_values);
-    $field_values = array_values($field_values);
+    \ksort($field_values);
+    $field_values = \array_values($field_values);
     $this->assertSame($field_values, $entity->{$field_name}->getValue(), 'Field values were saved in the correct order');
 
     // Display edit form: check that the expected number of widgets is
@@ -496,7 +496,7 @@ class FormTest extends FieldTestBase {
       "{$field_name}[0][value]" => 1,
     ];
     $this->submitForm($edit, 'Save');
-    preg_match("|$entity_type/manage/(\d+)|", $this->getUrl(), $match);
+    \preg_match("|$entity_type/manage/(\d+)|", $this->getUrl(), $match);
     $id = $match[1];
 
     // Check that the default value was saved.
@@ -553,7 +553,7 @@ class FormTest extends FieldTestBase {
     // the field that uses the hidden widget.
     $this->assertSession()->fieldNotExists("{$field_name}[0][value]");
     $this->submitForm([], 'Save');
-    preg_match('|' . $entity_type . '/manage/(\d+)|', $this->getUrl(), $match);
+    \preg_match('|' . $entity_type . '/manage/(\d+)|', $this->getUrl(), $match);
     $id = $match[1];
     $this->assertSession()->pageTextContains('entity_test_rev ' . $id . ' has been created.');
     $storage = $this->container->get('entity_type.manager')
@@ -578,7 +578,7 @@ class FormTest extends FieldTestBase {
     $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", 99);
 
     // Update the entity.
-    $value = mt_rand(1, 127);
+    $value = \mt_rand(1, 127);
     $edit = ["{$field_name}[0][value]" => $value];
     $this->submitForm($edit, 'Save');
     $this->assertSession()->pageTextContains('entity_test_rev ' . $id . ' has been updated.');

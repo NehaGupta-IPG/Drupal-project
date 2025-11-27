@@ -34,12 +34,12 @@ class HookCollectorPassTest extends KernelTestBase {
    * Test that symlinks are properly followed.
    */
   public function testSymlink(): void {
-    mkdir($this->siteDirectory);
+    \mkdir($this->siteDirectory);
 
-    foreach (scandir("core/modules/user/tests/modules/user_hooks_test") as $item) {
+    foreach (\scandir("core/modules/user/tests/modules/user_hooks_test") as $item) {
       $target = "$this->siteDirectory/$item";
-      if (!file_exists($target)) {
-        symlink(realpath("core/modules/user/tests/modules/user_hooks_test/$item"), $target);
+      if (!\file_exists($target)) {
+        \symlink(\realpath("core/modules/user/tests/modules/user_hooks_test/$item"), $target);
       }
     }
     $container = new ContainerBuilder();
@@ -124,11 +124,11 @@ class HookCollectorPassTest extends KernelTestBase {
     $module_installer = $this->container->get('module_installer');
     $this->assertTrue($module_installer->install(['hook_collector_on_behalf']));
     $this->assertTrue($module_installer->install(['hook_collector_on_behalf_procedural']));
-    drupal_flush_all_caches();
+    \drupal_flush_all_caches();
     $this->assertFalse(isset($GLOBALS['on_behalf_oop']));
     $this->assertFalse(isset($GLOBALS['on_behalf_procedural']));
     $this->assertTrue($module_installer->install(['respond_install_uninstall_hook_test']));
-    drupal_flush_all_caches();
+    \drupal_flush_all_caches();
     $this->assertTrue(isset($GLOBALS['on_behalf_oop']));
     $this->assertTrue(isset($GLOBALS['on_behalf_procedural']));
   }
@@ -147,7 +147,7 @@ class HookCollectorPassTest extends KernelTestBase {
     $this->assertFalse(isset($GLOBALS['procedural_attribute_skip_after_attribute']));
     $this->assertFalse(isset($GLOBALS['procedural_attribute_skip_find']));
     $this->assertFalse(isset($GLOBALS['skipped_procedural_oop_cache_flush']));
-    drupal_flush_all_caches();
+    \drupal_flush_all_caches();
     $this->assertFalse(isset($GLOBALS['skip_procedural_all']));
     $this->assertFalse(isset($GLOBALS['procedural_attribute_skip_has_attribute']));
     $this->assertFalse(isset($GLOBALS['procedural_attribute_skip_after_attribute']));

@@ -60,7 +60,7 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
     $connection_info = Database::getConnectionInfo();
     // Only set ignore_replica_server if there are replica servers being used,
     // which is assumed if there are more than one.
-    if (count($connection_info) > 1) {
+    if (\count($connection_info) > 1) {
       // Five minutes is long enough to allow the replica to break and resume
       // interrupted replication without causing problems on the Drupal site
       // from the old data.

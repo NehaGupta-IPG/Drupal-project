@@ -112,7 +112,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    */
   public function listTopics() {
     // Map the top level help topic plugins to a list of topic links.
-    return array_map(function (HelpTopicPluginInterface $topic) {
+    return \array_map(function (HelpTopicPluginInterface $topic) {
       return $topic->toLink();
     }, $this->getPlugins());
   }
@@ -137,13 +137,13 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
 
       // Sort the top level topics by label and, if the labels match, then by
       // plugin ID.
-      usort($this->topLevelPlugins, function (HelpTopicPluginInterface $a, HelpTopicPluginInterface $b) {
+      \usort($this->topLevelPlugins, function (HelpTopicPluginInterface $a, HelpTopicPluginInterface $b) {
         $a_label = (string) $a->getLabel();
         $b_label = (string) $b->getLabel();
         if ($a_label === $b_label) {
           return $a->getPluginId() <=> $b->getPluginId();
         }
-        return strnatcasecmp($a_label, $b_label);
+        return \strnatcasecmp($a_label, $b_label);
       });
     }
     return $this->topLevelPlugins;
@@ -154,7 +154,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    */
   public function listSearchableTopics() {
     $definitions = $this->pluginManager->getDefinitions();
-    return array_column($definitions, 'id');
+    return \array_column($definitions, 'id');
   }
 
   /**

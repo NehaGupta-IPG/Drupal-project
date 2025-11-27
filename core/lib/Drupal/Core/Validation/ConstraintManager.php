@@ -80,7 +80,7 @@ class ConstraintManager extends DefaultPluginManager {
    *   A validation constraint plugin.
    */
   public function create($name, $options) {
-    if (!is_array($options)) {
+    if (!\is_array($options)) {
       // Plugins need an array as configuration, so make sure we have one.
       // The constraint classes support passing the options as part of the
       // 'value' key also.
@@ -147,7 +147,7 @@ class ConstraintManager extends DefaultPluginManager {
    */
   public function processDefinition(&$definition, $plugin_id) {
     // Make sure 'type' is set and either an array or FALSE.
-    if ($definition['type'] !== FALSE && !is_array($definition['type'])) {
+    if ($definition['type'] !== FALSE && !\is_array($definition['type'])) {
       $definition['type'] = [$definition['type']];
     }
   }
@@ -165,7 +165,7 @@ class ConstraintManager extends DefaultPluginManager {
   public function getDefinitionsByType($type) {
     $definitions = [];
     foreach ($this->getDefinitions() as $plugin_id => $definition) {
-      if ($definition['type'] === FALSE || in_array($type, $definition['type'])) {
+      if ($definition['type'] === FALSE || \in_array($type, $definition['type'])) {
         $definitions[$plugin_id] = $definition;
       }
     }

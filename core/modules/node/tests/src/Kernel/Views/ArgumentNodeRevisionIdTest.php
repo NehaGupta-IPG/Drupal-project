@@ -39,7 +39,7 @@ class ArgumentNodeRevisionIdTest extends ViewsKernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
 
-    ViewTestData::createTestViews(get_class($this), ['node_test_views']);
+    ViewTestData::createTestViews(\get_class($this), ['node_test_views']);
   }
 
   /**

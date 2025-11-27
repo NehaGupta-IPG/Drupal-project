@@ -26,7 +26,7 @@ abstract class FileFormatterBase extends EntityReferenceFormatterBase {
     // Only check access if the current file access control handler explicitly
     // opts in by implementing FileAccessFormatterControlHandlerInterface.
     $access_handler_class = $entity->getEntityType()->getHandlerClass('access');
-    if (is_subclass_of($access_handler_class, '\Drupal\file\FileAccessFormatterControlHandlerInterface')) {
+    if (\is_subclass_of($access_handler_class, '\Drupal\file\FileAccessFormatterControlHandlerInterface')) {
       return $entity->access('view', NULL, TRUE);
     }
     else {

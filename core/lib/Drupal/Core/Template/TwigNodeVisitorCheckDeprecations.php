@@ -46,7 +46,7 @@ class TwigNodeVisitorCheckDeprecations implements NodeVisitorInterface {
     elseif ($node instanceof NameExpression) {
       // Track each usage of a variable, unless set within the template.
       $name = $node->getAttribute('name');
-      if (!in_array($name, $this->assignedNames)) {
+      if (!\in_array($name, $this->assignedNames)) {
         $this->usedNames[$name] = $name;
       }
     }

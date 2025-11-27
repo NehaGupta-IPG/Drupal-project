@@ -33,7 +33,7 @@ trait PackageManagerBypassTestTrait {
     // another to actually update the installed dependencies. If any dev
     // packages (like `drupal/core-dev`) are installed, there may also be an
     // additional call to change the dev constraints.
-    $this->assertGreaterThanOrEqual($attempted_times * 2, count($stager->getInvocationArguments()));
+    $this->assertGreaterThanOrEqual($attempted_times * 2, \count($stager->getInvocationArguments()));
 
     /** @var \Drupal\package_manager_bypass\LoggingCommitter $committer */
     $committer = $this->container->get(CommitterInterface::class);

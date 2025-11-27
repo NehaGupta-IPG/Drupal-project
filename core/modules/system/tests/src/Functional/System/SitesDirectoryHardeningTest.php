@@ -32,17 +32,17 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
     $settings_file = $this->settingsFile($site_path);
 
     // First, we check based on what the initial install has set.
-    $this->assertTrue(drupal_verify_install_file($site_path, FILE_NOT_WRITABLE, 'dir'), "Verified permissions for $site_path.");
+    $this->assertTrue(\drupal_verify_install_file($site_path, FILE_NOT_WRITABLE, 'dir'), "Verified permissions for $site_path.");
 
     // We intentionally don't check for settings.local.php as that file is
     // not created by Drupal.
-    $this->assertTrue(drupal_verify_install_file($settings_file, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE), "Verified permissions for $settings_file.");
+    $this->assertTrue(\drupal_verify_install_file($settings_file, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE), "Verified permissions for $settings_file.");
 
     $this->makeWritable($site_path);
     $this->checkSystemRequirements();
 
-    $this->assertTrue(drupal_verify_install_file($site_path, FILE_NOT_WRITABLE, 'dir'), "Verified permissions for $site_path after manual permissions change.");
-    $this->assertTrue(drupal_verify_install_file($settings_file, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE), "Verified permissions for $settings_file after manual permissions change.");
+    $this->assertTrue(\drupal_verify_install_file($site_path, FILE_NOT_WRITABLE, 'dir'), "Verified permissions for $site_path after manual permissions change.");
+    $this->assertTrue(\drupal_verify_install_file($settings_file, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE), "Verified permissions for $settings_file after manual permissions change.");
   }
 
   /**
@@ -63,7 +63,7 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
     $requirements = $this->checkSystemRequirements();
     $this->assertEquals(RequirementSeverity::Warning, $requirements['configuration_files']['severity'], 'Warning severity is properly set.');
     $this->assertEquals('Protection disabled', (string) $requirements['configuration_files']['value']);
-    $description = strip_tags((string) \Drupal::service('renderer')->renderInIsolation($requirements['configuration_files']['description']));
+    $description = \strip_tags((string) \Drupal::service('renderer')->renderInIsolation($requirements['configuration_files']['description']));
     $this->assertStringContainsString('settings.php is not protected from modifications and poses a security risk.', $description);
     $this->assertStringContainsString('services.yml is not protected from modifications and poses a security risk.', $description);
 
@@ -104,8 +104,8 @@ class SitesDirectoryHardeningTest extends BrowserTestBase {
    *   The sites directory path, such as 'sites/default'.
    */
   protected function makeWritable($site_path): void {
-    chmod($site_path, 0755);
-    chmod($this->settingsFile($site_path), 0644);
+    \chmod($site_path, 0755);
+    \chmod($this->settingsFile($site_path), 0644);
   }
 
   /**

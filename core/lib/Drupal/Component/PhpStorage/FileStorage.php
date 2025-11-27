@@ -33,7 +33,7 @@ class FileStorage implements PhpStorageInterface {
    * {@inheritdoc}
    */
   public function exists($name) {
-    return file_exists($this->getFullPath($name));
+    return \file_exists($this->getFullPath($name));
   }
 
   /**
@@ -50,9 +50,9 @@ class FileStorage implements PhpStorageInterface {
    */
   public function save($name, $code) {
     $path = $this->getFullPath($name);
-    $directory = dirname($path);
+    $directory = \dirname($path);
     $this->ensureDirectory($directory);
-    return (bool) file_put_contents($path, $code);
+    return (bool) \file_put_contents($path, $code);
   }
 
   /**
@@ -94,12 +94,12 @@ class FileStorage implements PhpStorageInterface {
    */
   protected function createDirectory($directory, $mode = 0777) {
     // If the directory exists already, there's nothing to do.
-    if (is_dir($directory)) {
+    if (\is_dir($directory)) {
       return TRUE;
     }
 
     // If the parent directory doesn't exist, try to create it.
-    $parent_exists = is_dir($parent = dirname($directory));
+    $parent_exists = \is_dir($parent = \dirname($directory));
     if (!$parent_exists) {
       $parent_exists = $this->createDirectory($parent, $mode);
     }
@@ -109,12 +109,12 @@ class FileStorage implements PhpStorageInterface {
     if ($parent_exists) {
       // We hide warnings and ignore the return because there may have been a
       // race getting here and the directory could already exist.
-      @mkdir($directory);
+      @\mkdir($directory);
       // Only try to chmod() if the subdirectory could be created.
-      if (is_dir($directory)) {
+      if (\is_dir($directory)) {
         // Avoid writing permissions if possible.
-        if (fileperms($directory) !== $mode) {
-          return chmod($directory, $mode);
+        if (\fileperms($directory) !== $mode) {
+          return \chmod($directory, $mode);
         }
         return TRUE;
       }
@@ -122,7 +122,7 @@ class FileStorage implements PhpStorageInterface {
         // The directory path is not disclosed to avoid an information
         // disclosure vulnerability. For security reasons, further details are
         // not provided in the error message.
-        trigger_error('mkdir(): Permission Denied', E_USER_WARNING);
+        \trigger_error('mkdir(): Permission Denied', E_USER_WARNING);
       }
     }
     return FALSE;
@@ -133,7 +133,7 @@ class FileStorage implements PhpStorageInterface {
    */
   public function delete($name) {
     $path = $this->getFullPath($name);
-    if (file_exists($path)) {
+    if (\file_exists($path)) {
       return $this->unlink($path);
     }
     return FALSE;
@@ -168,20 +168,20 @@ class FileStorage implements PhpStorageInterface {
    *   error.
    */
   protected function unlink($path) {
-    if (file_exists($path)) {
-      if (is_dir($path)) {
+    if (\file_exists($path)) {
+      if (\is_dir($path)) {
         // Ensure the folder is writable.
-        @chmod($path, 0777);
+        @\chmod($path, 0777);
         foreach (new \DirectoryIterator($path) as $fileinfo) {
           if (!$fileinfo->isDot()) {
             $this->unlink($fileinfo->getPathName());
           }
         }
-        return @rmdir($path);
+        return @\rmdir($path);
       }
       // Windows needs the file to be writable.
-      @chmod($path, 0700);
-      return @unlink($path);
+      @\chmod($path, 0700);
+      return @\unlink($path);
     }
     // If there's nothing to delete return TRUE anyway.
     return TRUE;
@@ -192,7 +192,7 @@ class FileStorage implements PhpStorageInterface {
    */
   public function listAll() {
     $names = [];
-    if (file_exists($this->directory)) {
+    if (\file_exists($this->directory)) {
       foreach (new \DirectoryIterator($this->directory) as $fileinfo) {
         if (!$fileinfo->isDot()) {
           $name = $fileinfo->getFilename();

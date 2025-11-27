@@ -45,15 +45,15 @@ class WorkspaceManager implements WorkspaceManagerInterface {
     protected $eventDispatcher,
   ) {
     if (!$negotiators instanceof \IteratorAggregate) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $negotiators argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3532939', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $negotiators argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3532939', E_USER_DEPRECATED);
       $this->negotiators = $this->collectedNegotiators;
     }
     if (!$entityTypeManager instanceof \Closure) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $entityTypeManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3532939', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $entityTypeManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3532939', E_USER_DEPRECATED);
       $this->eventDispatcher = new ServiceClosureArgument(new Reference('entity_type.manager'));
     }
     if (!$eventDispatcher instanceof \Closure) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $eventDispatcher argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3532939', E_USER_DEPRECATED);
+      @\trigger_error('Calling ' . __METHOD__ . '() without the $eventDispatcher argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3532939', E_USER_DEPRECATED);
       $this->eventDispatcher = new ServiceClosureArgument(new Reference('event_dispatcher'));
     }
   }
@@ -106,7 +106,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
    * {@inheritdoc}
    */
   public function setActiveWorkspace(WorkspaceInterface $workspace, /* bool $persist = TRUE */) {
-    $persist = func_num_args() < 2 || func_get_arg(1);
+    $persist = \func_num_args() < 2 || \func_get_arg(1);
 
     $this->doSwitchWorkspace($workspace);
 
@@ -215,7 +215,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
    * {@inheritdoc}
    */
   public function purgeDeletedWorkspacesBatch() {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3553582', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3553582', E_USER_DEPRECATED);
     \Drupal::service(WorkspacesHooks::class)->cron();
   }
 

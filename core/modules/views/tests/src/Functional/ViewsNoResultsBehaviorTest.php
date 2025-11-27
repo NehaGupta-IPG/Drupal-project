@@ -45,7 +45,7 @@ class ViewsNoResultsBehaviorTest extends ViewTestBase {
    */
   public function testDuplicateText(): void {
     $output = $this->drupalGet('admin/content');
-    $this->assertEquals(1, substr_count($output, 'No content available.'), 'Only one message should be present');
+    $this->assertEquals(1, \substr_count($output, 'No content available.'), 'Only one message should be present');
   }
 
 }

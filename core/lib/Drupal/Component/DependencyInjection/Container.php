@@ -127,7 +127,7 @@ class Container implements ContainerInterface, ResetInterface {
   public function get(string $id, int $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): ?object {
     if ($this->hasParameter('_deprecated_service_list')) {
       if ($deprecation = $this->getParameter('_deprecated_service_list')[$id] ?? '') {
-        @trigger_error($deprecation, E_USER_DEPRECATED);
+        @\trigger_error($deprecation, E_USER_DEPRECATED);
       }
     }
     if (isset($this->aliases[$id])) {
@@ -135,7 +135,7 @@ class Container implements ContainerInterface, ResetInterface {
     }
 
     // Re-use shared service instance if it exists.
-    if (isset($this->services[$id]) || ($invalid_behavior === ContainerInterface::NULL_ON_INVALID_REFERENCE && array_key_exists($id, $this->services))) {
+    if (isset($this->services[$id]) || ($invalid_behavior === ContainerInterface::NULL_ON_INVALID_REFERENCE && \array_key_exists($id, $this->services))) {
       return $this->services[$id];
     }
 
@@ -144,7 +144,7 @@ class Container implements ContainerInterface, ResetInterface {
     }
 
     if (isset($this->loading[$id])) {
-      throw new ServiceCircularReferenceException($id, array_keys($this->loading));
+      throw new ServiceCircularReferenceException($id, \array_keys($this->loading));
     }
 
     $definition = $this->serviceDefinitions[$id] ?? NULL;
@@ -167,7 +167,7 @@ class Container implements ContainerInterface, ResetInterface {
     // Definition is a keyed array, so [0] is only defined when it is a
     // serialized string.
     if (isset($definition[0])) {
-      $definition = unserialize($definition);
+      $definition = \unserialize($definition);
     }
 
     // Now create the service.
@@ -226,7 +226,7 @@ class Container implements ContainerInterface, ResetInterface {
    */
   protected function createService(array $definition, $id) {
     if (isset($definition['synthetic']) && $definition['synthetic'] === TRUE) {
-      throw new RuntimeException(sprintf('You have requested a synthetic service ("%s"). The service container does not know how to construct this service. The service will need to be set before it is first used.', $id));
+      throw new RuntimeException(\sprintf('You have requested a synthetic service ("%s"). The service container does not know how to construct this service. The service will need to be set before it is first used.', $id));
     }
 
     $arguments = [];
@@ -239,23 +239,23 @@ class Container implements ContainerInterface, ResetInterface {
     }
 
     if (isset($definition['file'])) {
-      $file = $this->frozen ? $definition['file'] : current($this->resolveServicesAndParameters([$definition['file']]));
+      $file = $this->frozen ? $definition['file'] : \current($this->resolveServicesAndParameters([$definition['file']]));
       require_once $file;
     }
 
     if (isset($definition['factory'])) {
       $factory = $definition['factory'];
-      if (is_array($factory)) {
+      if (\is_array($factory)) {
         $factory = $this->resolveServicesAndParameters([$factory[0], $factory[1]]);
       }
-      elseif (!is_string($factory)) {
-        throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
+      elseif (!\is_string($factory)) {
+        throw new RuntimeException(\sprintf('Cannot create service "%s" because of invalid factory', $id));
       }
 
-      $service = call_user_func_array($factory, $arguments);
+      $service = \call_user_func_array($factory, $arguments);
     }
     else {
-      $class = $this->frozen ? $definition['class'] : current($this->resolveServicesAndParameters([$definition['class']]));
+      $class = $this->frozen ? $definition['class'] : \current($this->resolveServicesAndParameters([$definition['class']]));
       $service = new $class(...$arguments);
     }
 
@@ -273,7 +273,7 @@ class Container implements ContainerInterface, ResetInterface {
             $arguments = $this->resolveServicesAndParameters($arguments);
           }
         }
-        call_user_func_array([$service, $method], $arguments);
+        \call_user_func_array([$service, $method], $arguments);
       }
     }
 
@@ -288,15 +288,15 @@ class Container implements ContainerInterface, ResetInterface {
 
     if (isset($definition['configurator'])) {
       $callable = $definition['configurator'];
-      if (is_array($callable)) {
+      if (\is_array($callable)) {
         $callable = $this->resolveServicesAndParameters($callable);
       }
 
-      if (!is_callable($callable)) {
-        throw new InvalidArgumentException(sprintf('The configurator for class "%s" is not a callable.', get_class($service)));
+      if (!\is_callable($callable)) {
+        throw new InvalidArgumentException(\sprintf('The configurator for class "%s" is not a callable.', \get_class($service)));
       }
 
-      call_user_func($callable, $service);
+      \call_user_func($callable, $service);
     }
 
     return $service;
@@ -374,7 +374,7 @@ class Container implements ContainerInterface, ResetInterface {
     // Check if this collection needs to be resolved.
     if ($arguments instanceof \stdClass) {
       if ($arguments->type !== 'collection') {
-        throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $arguments->type));
+        throw new InvalidArgumentException(\sprintf('Undefined type "%s" while resolving parameters and services.', $arguments->type));
       }
       $arguments = $arguments->value;
     }
@@ -458,7 +458,7 @@ class Container implements ContainerInterface, ResetInterface {
             foreach ($services as $key => $service) {
               yield $key => $this->resolveServicesAndParameters([$service])[0];
             }
-          }, count($services));
+          }, \count($services));
 
           continue;
         }
@@ -475,7 +475,7 @@ class Container implements ContainerInterface, ResetInterface {
         }
 
         if ($type !== NULL) {
-          throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $type));
+          throw new InvalidArgumentException(\sprintf('Undefined type "%s" while resolving parameters and services.', $type));
         }
       }
     }
@@ -497,8 +497,8 @@ class Container implements ContainerInterface, ResetInterface {
   protected function getAlternatives($search_key, array $keys) {
     $alternatives = [];
     foreach ($keys as $key) {
-      $lev = levenshtein($search_key, $key);
-      if ($lev <= strlen($search_key) / 3 || str_contains($key, $search_key)) {
+      $lev = \levenshtein($search_key, $key);
+      if ($lev <= \strlen($search_key) / 3 || \str_contains($key, $search_key)) {
         $alternatives[] = $key;
       }
     }
@@ -516,7 +516,7 @@ class Container implements ContainerInterface, ResetInterface {
    *   An array of strings with suitable alternatives.
    */
   protected function getServiceAlternatives($id) {
-    $all_service_keys = array_unique(array_merge(array_keys($this->services), array_keys($this->serviceDefinitions)));
+    $all_service_keys = \array_unique(\array_merge(\array_keys($this->services), \array_keys($this->serviceDefinitions)));
     return $this->getAlternatives($id, $all_service_keys);
   }
 
@@ -530,14 +530,14 @@ class Container implements ContainerInterface, ResetInterface {
    *   An array of strings with suitable alternatives.
    */
   protected function getParameterAlternatives($name) {
-    return $this->getAlternatives($name, array_keys($this->parameters));
+    return $this->getAlternatives($name, \array_keys($this->parameters));
   }
 
   /**
    * {@inheritdoc}
    */
   public function getServiceIds() {
-    return array_merge(['service_container'], array_keys($this->serviceDefinitions + $this->services));
+    return \array_merge(['service_container'], \array_keys($this->serviceDefinitions + $this->services));
   }
 
   /**

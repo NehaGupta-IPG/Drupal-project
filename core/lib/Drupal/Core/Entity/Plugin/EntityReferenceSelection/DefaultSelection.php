@@ -178,10 +178,10 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
       foreach ($bundles as $bundle_name => $bundle_info) {
         $bundle_options[$bundle_name] = $bundle_info['label'];
       }
-      natsort($bundle_options);
-      $selected_bundles = array_intersect_key(
+      \natsort($bundle_options);
+      $selected_bundles = \array_intersect_key(
         $bundle_options,
-        array_filter((array) $configuration['target_bundles'])
+        \array_filter((array) $configuration['target_bundles'])
       );
 
       $form['target_bundles'] = [
@@ -222,8 +222,8 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
     if ($entity_type->entityClassImplements(FieldableEntityInterface::class)) {
       $options = $entity_type->hasKey('bundle') ? $selected_bundles : $bundles;
       $fields = [];
-      foreach (array_keys($options) as $bundle) {
-        $bundle_fields = array_filter($this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle), function ($field_definition) {
+      foreach (\array_keys($options) as $bundle) {
+        $bundle_fields = \array_filter($this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle), function ($field_definition) {
           return !$field_definition->isComputed();
         });
         foreach ($bundle_fields as $field_name => $field_definition) {
@@ -232,7 +232,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
           // If there is more than one column, display them all, otherwise just
           // display the field label.
           // @todo Use property labels instead of the column name.
-          if (count($columns) > 1) {
+          if (\count($columns) > 1) {
             foreach ($columns as $column_name => $column_info) {
               $fields[$field_name . '.' . $column_name] = $this->t('@label (@column)',
                [
@@ -314,7 +314,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
         '#title' => $this->t('Store new items in'),
         '#options' => $selected_bundles,
         '#default_value' => $configuration['auto_create_bundle'],
-        '#access' => count($selected_bundles) > 1,
+        '#access' => \count($selected_bundles) > 1,
         '#states' => [
           'visible' => [
             ':input[name="settings[handler_settings][auto_create]"]' => ['checked' => TRUE],
@@ -353,7 +353,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    * Form element validation handler; Filters the #value property of an element.
    */
   public static function elementValidateFilter(&$element, FormStateInterface $form_state) {
-    $element['#value'] = array_filter($element['#value']);
+    $element['#value'] = \array_filter($element['#value']);
     $form_state->setValueForElement($element, $element['#value']);
   }
 
@@ -438,10 +438,10 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    * {@inheritdoc}
    */
   public function validateReferenceableNewEntities(array $entities) {
-    return array_filter($entities, function ($entity) {
+    return \array_filter($entities, function ($entity) {
       $target_bundles = $this->getConfiguration()['target_bundles'];
       if (isset($target_bundles)) {
-        return in_array($entity->bundle(), $target_bundles);
+        return \in_array($entity->bundle(), $target_bundles);
       }
       return TRUE;
     });
@@ -470,7 +470,7 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
 
     // If 'target_bundles' is NULL, all bundles are referenceable, no further
     // conditions are needed.
-    if (is_array($configuration['target_bundles'])) {
+    if (\is_array($configuration['target_bundles'])) {
       // If 'target_bundles' is an empty array, no bundle is referenceable,
       // force the query to never return anything and bail out early.
       if ($configuration['target_bundles'] === []) {

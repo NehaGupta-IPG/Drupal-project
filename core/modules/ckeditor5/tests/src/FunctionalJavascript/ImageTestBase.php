@@ -55,7 +55,7 @@ abstract class ImageTestBase extends CKEditor5TestBase {
    */
   protected function imageAttributes() {
     return [
-      'src' => base_path() . 'core/misc/druplicon.png',
+      'src' => \base_path() . 'core/misc/druplicon.png',
       'width' => '88',
       'height' => '100',
     ];
@@ -76,9 +76,9 @@ abstract class ImageTestBase extends CKEditor5TestBase {
       $string[] = $key . '="' . $value . '"';
     }
     if ($reverse) {
-      $string = array_reverse($string);
+      $string = \array_reverse($string);
     }
-    return implode(' ', $string);
+    return \implode(' ', $string);
   }
 
   /**

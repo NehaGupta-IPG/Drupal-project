@@ -30,7 +30,7 @@ trait ImageTestProviderTrait {
     }
 
     // Make the test content has a block image and an inline image.
-    $img_tag = preg_replace(
+    $img_tag = \preg_replace(
       '/width="\d+" height="\d+"/',
       'width="500"',
       '<img ' . $this->imageAttributesAsString() . ' />'
@@ -207,13 +207,13 @@ trait ImageTestProviderTrait {
     // should generate an appropriate `height`, matching with the aspect ratio
     // of the image.
     $expected_computed_height = $width;
-    if (!str_ends_with($width, '%')) {
+    if (!\str_ends_with($width, '%')) {
       $ratio = $width / (int) $this->imageAttributes()['width'];
-      $expected_computed_height = (string) (int) round($ratio * (int) $this->imageAttributes()['height']);
+      $expected_computed_height = (string) (int) \round($ratio * (int) $this->imageAttributes()['height']);
     }
 
     // Add image to the host body.
-    $this->host->body->value = sprintf('<img data-foo="bar" alt="drupalimage test image" width="%s" ' . $this->imageAttributesAsString() . ' />', $width);
+    $this->host->body->value = \sprintf('<img data-foo="bar" alt="drupalimage test image" width="%s" ' . $this->imageAttributesAsString() . ' />', $width);
     $this->host->save();
 
     $this->drupalGet($this->host->toUrl('edit-form'));

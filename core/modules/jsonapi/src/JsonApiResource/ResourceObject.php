@@ -89,7 +89,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    *   (optional) The resource language.
    */
   public function __construct(CacheableDependencyInterface $cacheability, ResourceType $resource_type, $id, $revision_id, array $fields, LinkCollection $links, ?LanguageInterface $language = NULL) {
-    assert(is_null($revision_id) || $resource_type->isVersionable());
+    \assert(\is_null($revision_id) || $resource_type->isVersionable());
     $this->setCacheability($cacheability);
     $this->resourceType = $resource_type;
     $this->resourceIdentifier = new ResourceIdentifier($resource_type, $id);
@@ -218,7 +218,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   public function toUrl() {
     foreach ($this->links as $key => $link) {
       if ($key === 'self') {
-        $first = reset($link);
+        $first = \reset($link);
         return $first->getUri();
       }
     }
@@ -239,7 +239,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    *   entity, the fields will be scalar values or arrays.
    */
   protected static function extractFieldsFromEntity(ResourceType $resource_type, EntityInterface $entity) {
-    assert($entity instanceof ContentEntityInterface || $entity instanceof ConfigEntityInterface);
+    \assert($entity instanceof ContentEntityInterface || $entity instanceof ConfigEntityInterface);
     return $entity instanceof ContentEntityInterface
       ? static::extractContentEntityFields($resource_type, $entity)
       : static::extractConfigEntityFields($resource_type, $entity);
@@ -264,7 +264,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
     if ($resource_type->isLocatable() && !$resource_type->isInternal()) {
       $self_url = Url::fromRoute(Routes::getRouteName($resource_type, 'individual'), ['entity' => $entity->uuid()]);
       if ($resource_type->isVersionable()) {
-        assert($entity instanceof RevisionableInterface);
+        \assert($entity instanceof RevisionableInterface);
         if (!$links->hasLinkWithKey('self')) {
           // If the resource is versionable, the `self` link should be the exact
           // link for the represented version. This helps a client track
@@ -305,8 +305,8 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
     $output = [];
     $fields = TypedDataInternalPropertiesHelper::getNonInternalProperties($entity->getTypedData());
     // Filter the array based on the field names.
-    $enabled_field_names = array_filter(
-      array_keys($fields),
+    $enabled_field_names = \array_filter(
+      \array_keys($fields),
       [$resource_type, 'isFieldEnabled']
     );
 
@@ -316,13 +316,13 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
     // @todo Eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
     $entity_type = $entity->getEntityType();
     if ($entity_type->id() == 'user' && $resource_type->isFieldEnabled('display_name')) {
-      assert($entity instanceof UserInterface);
+      \assert($entity instanceof UserInterface);
       $display_name = $resource_type->getPublicName('display_name');
       $output[$display_name] = $entity->getDisplayName();
     }
 
     // Return a sub-array of $output containing the keys in $enabled_fields.
-    $input = array_intersect_key($fields, array_flip($enabled_field_names));
+    $input = \array_intersect_key($fields, \array_flip($enabled_field_names));
     foreach ($input as $field_name => $field_value) {
       $public_field_name = $resource_type->getPublicName($field_name);
       $output[$public_field_name] = $field_value;
@@ -368,14 +368,14 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
     $enabled_public_fields = [];
     $fields = $entity->toArray();
     // Filter the array based on the field names.
-    $enabled_field_names = array_filter(array_keys($fields), function ($internal_field_name) use ($resource_type) {
+    $enabled_field_names = \array_filter(\array_keys($fields), function ($internal_field_name) use ($resource_type) {
       // Config entities have "fields" which aren't known to the resource type,
       // these fields should not be excluded because they cannot be enabled or
       // disabled.
       return !$resource_type->hasField($internal_field_name) || $resource_type->isFieldEnabled($internal_field_name);
     });
     // Return a sub-array of $output containing the keys in $enabled_fields.
-    $input = array_intersect_key($fields, array_flip($enabled_field_names));
+    $input = \array_intersect_key($fields, \array_flip($enabled_field_names));
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
     foreach ($input as $field_name => $field_value) {
       $public_field_name = $resource_type->getPublicName($field_name);

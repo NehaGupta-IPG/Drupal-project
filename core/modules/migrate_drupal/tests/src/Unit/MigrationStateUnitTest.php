@@ -50,13 +50,13 @@ class MigrationStateUnitTest extends UnitTestCase {
 
     foreach ($files as $module => $contents) {
       $path = $url . '/' . $module . '/migrations/state';
-      mkdir($path, 0755, TRUE);
-      file_put_contents($path . '/' . $module . '.migrate_drupal.yml', $contents);
+      \mkdir($path, 0755, TRUE);
+      \file_put_contents($path . '/' . $module . '.migrate_drupal.yml', $contents);
     }
     $moduleHandler->getModuleDirectories()
-      ->willReturn(array_combine(array_keys($files), array_map(function ($module) use ($url) {
+      ->willReturn(\array_combine(\array_keys($files), \array_map(function ($module) use ($url) {
         return $url . '/' . $module;
-      }, array_keys($files))));
+      }, \array_keys($files))));
     $migrationState = new MigrationState($fieldPluginManager->reveal(), $moduleHandler->reveal(), $this->createMock(MessengerInterface::class), $this->getStringTranslationStub());
 
     $all_migrations = [];

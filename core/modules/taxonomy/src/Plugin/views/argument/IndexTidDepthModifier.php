@@ -35,7 +35,7 @@ class IndexTidDepthModifier extends ArgumentPluginBase {
   public function preQuery() {
     // We don't know our argument yet, but it's based upon our position:
     $argument = $this->view->args[$this->position] ?? NULL;
-    if (!is_numeric($argument)) {
+    if (!\is_numeric($argument)) {
       return;
     }
 
@@ -48,7 +48,7 @@ class IndexTidDepthModifier extends ArgumentPluginBase {
     }
 
     // Figure out which argument preceded us.
-    $keys = array_reverse(array_keys($this->view->argument));
+    $keys = \array_reverse(\array_keys($this->view->argument));
     $skip = TRUE;
     foreach ($keys as $key) {
       if ($key == $this->options['id']) {

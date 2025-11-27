@@ -54,7 +54,7 @@ class SessionTestController extends ControllerBase {
     $session->set('test', 'test');
     $session->save();
 
-    return ['#markup' => 'session_id:' . session_id() . "\n"];
+    return ['#markup' => 'session_id:' . \session_id() . "\n"];
   }
 
   /**
@@ -65,8 +65,8 @@ class SessionTestController extends ControllerBase {
    */
   public function getIdFromCookie(Request $request): array {
     return [
-      '#markup' => 'session_id:' . $request->cookies->get(session_name()) . "\n",
-      '#cache' => ['contexts' => ['cookies:' . session_name()]],
+      '#markup' => 'session_id:' . $request->cookies->get(\session_name()) . "\n",
+      '#cache' => ['contexts' => ['cookies:' . \session_name()]],
     ];
   }
 
@@ -161,14 +161,14 @@ class SessionTestController extends ControllerBase {
   public function traceHandlerRewriteUnmodified(Request $request): Response {
     // Assert that there is an existing session with stacked handler trace data.
     $session = $request->getSession();
-    assert(
-      is_int($session->get('trace-handler')) && $session->get('trace-handler') > 0,
+    \assert(
+      \is_int($session->get('trace-handler')) && $session->get('trace-handler') > 0,
       'Existing stacked session handler trace not found'
     );
 
     // Save unmodified session data.
-    assert(
-      ini_get('session.lazy_write'),
+    \assert(
+      \ini_get('session.lazy_write'),
       'session.lazy_write must be enabled to invoke updateTimestamp()'
     );
     $session->save();
@@ -274,7 +274,7 @@ class SessionTestController extends ControllerBase {
       'primary key' => ['sid'],
     ]);
 
-    drupal_register_shutdown_function(function () {
+    \drupal_register_shutdown_function(function () {
       $schema = \Drupal::database()->schema();
       $schema->dropTable('sessions');
       $schema->renameTable('sessions_tmp', 'sessions');

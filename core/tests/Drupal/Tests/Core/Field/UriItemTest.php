@@ -33,7 +33,7 @@ class UriItemTest extends UnitTestCase {
 
     for ($i = 0; $i < 1000; $i++) {
       $sample_value = UriItem::generateSampleValue($definition->reveal());
-      $this->assertLessThanOrEqual($max_length, mb_strlen($sample_value['value']));
+      $this->assertLessThanOrEqual($max_length, \mb_strlen($sample_value['value']));
       $this->assertStringNotContainsString(' ', $sample_value['value']);
     }
   }

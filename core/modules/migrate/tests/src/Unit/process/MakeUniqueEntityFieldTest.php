@@ -83,7 +83,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
     $this->entityQueryExpects($count);
     $value = $this->randomMachineName(32);
     $actual = $plugin->transform($value, $this->migrateExecutable, $this->row, 'foo');
-    $expected = mb_substr($value, $start ?? 0, $length);
+    $expected = \mb_substr($value, $start ?? 0, $length);
     $expected .= $count ? $postfix . $count : '';
     $this->assertSame($expected, $actual);
   }

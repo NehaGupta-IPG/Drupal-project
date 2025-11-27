@@ -25,7 +25,7 @@ class Composer {
    * @see https://www.drupal.org/node/3531162
    */
   public static function preAutoloadDump(Event $event) {
-    @trigger_error('\Drupal\Core\Composer\Composer::preAutoloadDump() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Composer\Plugin\Scaffold\Plugin::preAutoloadDump() instead. See https://www.drupal.org/node/3531162', E_USER_DEPRECATED);
+    @\trigger_error('\Drupal\Core\Composer\Composer::preAutoloadDump() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\Composer\Plugin\Scaffold\Plugin::preAutoloadDump() instead. See https://www.drupal.org/node/3531162', E_USER_DEPRECATED);
     Plugin::preAutoloadDump($event);
   }
 
@@ -73,7 +73,7 @@ class Composer {
    * @internal
    */
   public static function upgradePHPUnitCheck($phpunit_version) {
-    return !(version_compare(PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, '8.4') >= 0 && version_compare($phpunit_version, '11.0') < 0);
+    return !(\version_compare(PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, '8.4') >= 0 && \version_compare($phpunit_version, '11.0') < 0);
   }
 
 }

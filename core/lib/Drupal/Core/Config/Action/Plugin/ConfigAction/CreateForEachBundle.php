@@ -84,10 +84,10 @@ final class CreateForEachBundle implements ConfigActionPluginInterface, Containe
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
-    assert(is_array($value));
+    \assert(\is_array($value));
 
     $bundle = $this->configManager->loadConfigEntityByName($configName);
-    assert(is_object($bundle));
+    \assert(\is_object($bundle));
     $value = static::replacePlaceholders($value, [
       static::BUNDLE_PLACEHOLDER => $bundle->id(),
       static::LABEL_PLACEHOLDER => $bundle->label(),
@@ -115,13 +115,13 @@ final class CreateForEachBundle implements ConfigActionPluginInterface, Containe
    *   The given $data, with the `%bundle` and `%label` placeholders replaced.
    */
   private static function replacePlaceholders(mixed $data, array $replacements): mixed {
-    assert(array_key_exists(static::BUNDLE_PLACEHOLDER, $replacements));
+    \assert(\array_key_exists(static::BUNDLE_PLACEHOLDER, $replacements));
 
-    if (is_string($data)) {
-      return str_replace(array_keys($replacements), $replacements, $data);
+    if (\is_string($data)) {
+      return \str_replace(\array_keys($replacements), $replacements, $data);
     }
 
-    if (!is_array($data)) {
+    if (!\is_array($data)) {
       return $data;
     }
 
@@ -130,8 +130,8 @@ final class CreateForEachBundle implements ConfigActionPluginInterface, Containe
 
       // Only replace the `%bundle` placeholder in array keys.
       // Non-string keys cannot contain placeholders.
-      if (is_string($old_key)) {
-        $new_key = str_replace(static::BUNDLE_PLACEHOLDER, $replacements[static::BUNDLE_PLACEHOLDER], $old_key);
+      if (\is_string($old_key)) {
+        $new_key = \str_replace(static::BUNDLE_PLACEHOLDER, $replacements[static::BUNDLE_PLACEHOLDER], $old_key);
         unset($data[$old_key]);
         $data[$new_key] = $value;
       }

@@ -52,7 +52,7 @@ class MigrateUserSettingsTest extends MigrateDrupal7TestBase {
       // Tests migration of user_register = 1.
       Database::getConnection('default', 'migrate')
         ->update('variable')
-        ->fields(['value' => serialize($map[0])])
+        ->fields(['value' => \serialize($map[0])])
         ->condition('name', 'user_register')
         ->execute();
 

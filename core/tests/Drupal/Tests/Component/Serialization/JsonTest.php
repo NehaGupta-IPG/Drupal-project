@@ -47,7 +47,7 @@ class JsonTest extends TestCase {
     // @todo Add tests for non-ASCII characters and Unicode.
     $this->string = '';
     for ($i = 1; $i < 128; $i++) {
-      $this->string .= chr($i);
+      $this->string .= \chr($i);
     }
 
     // Characters that must be escaped.
@@ -62,9 +62,9 @@ class JsonTest extends TestCase {
    */
   public function testEncodingAscii(): void {
     // Verify there aren't character encoding problems with the source string.
-    $this->assertSame(127, strlen($this->string), 'A string with the full ASCII table has the correct length.');
+    $this->assertSame(127, \strlen($this->string), 'A string with the full ASCII table has the correct length.');
     foreach ($this->htmlUnsafe as $char) {
-      $this->assertStringContainsString($char, $this->string, sprintf('A string with the full ASCII table includes %s.', $char));
+      $this->assertStringContainsString($char, $this->string, \sprintf('A string with the full ASCII table includes %s.', $char));
     }
   }
 
@@ -75,7 +75,7 @@ class JsonTest extends TestCase {
     // Verify that JSON encoding produces a string with all of the characters.
     $json = Json::encode($this->string);
     // Verify that a JSON-encoded string is larger than the source string.
-    $this->assertGreaterThan(strlen($this->string), strlen($json));
+    $this->assertGreaterThan(\strlen($this->string), \strlen($json));
   }
 
   /**
@@ -86,7 +86,7 @@ class JsonTest extends TestCase {
     // The first and last characters should be ", and no others.
     $this->assertStringStartsWith('"', $json, 'A JSON encoded string begins with ".');
     $this->assertStringEndsWith('"', $json, 'A JSON encoded string ends with ".');
-    $this->assertSame(2, substr_count($json, '"'), 'A JSON encoded string contains exactly two ".');
+    $this->assertSame(2, \substr_count($json, '"'), 'A JSON encoded string contains exactly two ".');
   }
 
   /**
@@ -108,11 +108,11 @@ class JsonTest extends TestCase {
     $source = [TRUE, FALSE, 0, 1, '0', '1', $this->string, ['key1' => $this->string, 'key2' => ['nested' => TRUE]]];
     $json = Json::encode($source);
     foreach ($this->htmlUnsafe as $char) {
-      $this->assertStringNotContainsString($char, $json, sprintf('A JSON encoded string does not contain %s.', $char));
+      $this->assertStringNotContainsString($char, $json, \sprintf('A JSON encoded string does not contain %s.', $char));
     }
     // Verify that JSON encoding escapes the HTML unsafe characters.
     foreach ($this->htmlUnsafeEscaped as $char) {
-      $this->assertStringContainsString($char, $json, sprintf('A JSON encoded string contains %s.', $char));
+      $this->assertStringContainsString($char, $json, \sprintf('A JSON encoded string contains %s.', $char));
     }
     $json_decoded = Json::decode($json);
     $this->assertNotSame($source, $json, 'An array encoded in JSON is identical to the source.');

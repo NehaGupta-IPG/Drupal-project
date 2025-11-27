@@ -38,7 +38,7 @@ class LayoutDefault extends ConfigurablePluginBase implements LayoutInterface, P
     // Ensure $build only contains defined regions and in the order defined.
     $build = [];
     foreach ($this->getPluginDefinition()->getRegionNames() as $region_name) {
-      if (array_key_exists($region_name, $regions)) {
+      if (\array_key_exists($region_name, $regions)) {
         $build[$region_name] = $regions[$region_name];
       }
     }

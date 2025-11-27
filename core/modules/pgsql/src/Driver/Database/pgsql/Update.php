@@ -51,9 +51,9 @@ class Update extends QueryUpdate {
       $placeholder = ':db_update_placeholder_' . ($max_placeholder++);
 
       if (isset($table_information->blob_fields[$field]) && $value !== NULL) {
-        $blobs[$blob_count] = fopen('php://memory', 'a');
-        fwrite($blobs[$blob_count], $value);
-        rewind($blobs[$blob_count]);
+        $blobs[$blob_count] = \fopen('php://memory', 'a');
+        \fwrite($blobs[$blob_count], $value);
+        \rewind($blobs[$blob_count]);
         $stmt->getClientStatement()->bindParam($placeholder, $blobs[$blob_count], \PDO::PARAM_LOB);
         ++$blob_count;
       }
@@ -62,7 +62,7 @@ class Update extends QueryUpdate {
       }
     }
 
-    if (count($this->condition)) {
+    if (\count($this->condition)) {
       $this->condition->compile($this->connection, $this);
 
       $arguments = $this->condition->arguments();

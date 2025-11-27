@@ -52,11 +52,11 @@ class CategoryAutocompleteTest extends UnitTestCase {
    */
   #[DataProvider('providerTestAutocompleteSuggestions')]
   public function testAutocompleteSuggestions($string, $suggestions): void {
-    $suggestions = array_map(function ($suggestion) {
+    $suggestions = \array_map(function ($suggestion) {
       return ['value' => $suggestion, 'label' => Html::escape($suggestion)];
     }, $suggestions);
     $result = $this->autocompleteController->autocomplete(new Request(['q' => $string]));
-    $this->assertSame($suggestions, json_decode($result->getContent(), TRUE));
+    $this->assertSame($suggestions, \json_decode($result->getContent(), TRUE));
   }
 
   /**

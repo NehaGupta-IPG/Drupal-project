@@ -43,7 +43,7 @@ class SelectionPluginManager extends DefaultPluginManager implements SelectionPl
     ];
 
     // A specific selection plugin ID was already specified.
-    if (str_contains($options['handler'], ':')) {
+    if (\str_contains($options['handler'], ':')) {
       $plugin_id = $options['handler'];
     }
     // Only a selection group name was specified.
@@ -63,8 +63,8 @@ class SelectionPluginManager extends DefaultPluginManager implements SelectionPl
     $selection_handler_groups = $this->getSelectionGroups($target_type);
 
     // Sort the selection plugins by weight and select the best match.
-    uasort($selection_handler_groups[$base_plugin_id], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
-    $plugin_id = array_key_last($selection_handler_groups[$base_plugin_id]);
+    \uasort($selection_handler_groups[$base_plugin_id], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    $plugin_id = \array_key_last($selection_handler_groups[$base_plugin_id]);
 
     return $plugin_id;
   }
@@ -80,7 +80,7 @@ class SelectionPluginManager extends DefaultPluginManager implements SelectionPl
     unset($definitions['broken']);
 
     foreach ($definitions as $plugin_id => $plugin) {
-      if (empty($plugin['entity_types']) || in_array($entity_type_id, $plugin['entity_types'])) {
+      if (empty($plugin['entity_types']) || \in_array($entity_type_id, $plugin['entity_types'])) {
         $plugins[$plugin['group']][$plugin_id] = $plugin;
       }
     }

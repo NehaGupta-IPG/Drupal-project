@@ -29,19 +29,19 @@ class ExistingDrupal8StyleDatabaseConnectionInSettingsPhpTest extends BrowserTes
     parent::setUp();
 
     $driver = Database::getConnection()->driver();
-    if (!in_array($driver, ['mysql', 'pgsql', 'sqlite'])) {
+    if (!\in_array($driver, ['mysql', 'pgsql', 'sqlite'])) {
       $this->markTestSkipped("This test is only relevant for database drivers that were available in Drupal prior to database drivers becoming part of modules. The {$driver} database driver is not qualifying.");
     }
 
     $filename = $this->siteDirectory . '/settings.php';
-    chmod($filename, 0777);
-    $contents = file_get_contents($filename);
+    \chmod($filename, 0777);
+    $contents = \file_get_contents($filename);
 
     $autoload = "'autoload' => 'core/modules/$driver/src/Driver/Database/$driver/',";
-    $contents = str_replace($autoload, '', $contents);
+    $contents = \str_replace($autoload, '', $contents);
     $namespace_search = "'namespace' => 'Drupal\\\\$driver\\\\Driver\\\\Database\\\\$driver',";
     $namespace_replace = "'namespace' => 'Drupal\\\\Core\\\\Database\\\\Driver\\\\$driver',";
-    $contents = str_replace($namespace_search, $namespace_replace, $contents);
+    $contents = \str_replace($namespace_search, $namespace_replace, $contents);
 
     // Add a replica connection to the database settings.
     $contents .= "\$databases['default']['replica'][] = array (\n";
@@ -55,7 +55,7 @@ class ExistingDrupal8StyleDatabaseConnectionInSettingsPhpTest extends BrowserTes
     $contents .= "  'driver' => 'mysql',\n";
     $contents .= ");\n";
 
-    file_put_contents($filename, $contents);
+    \file_put_contents($filename, $contents);
   }
 
   /**
@@ -69,7 +69,7 @@ class ExistingDrupal8StyleDatabaseConnectionInSettingsPhpTest extends BrowserTes
     // Make sure that we are have tested with the Drupal 8 style database
     // connection array.
     $filename = $this->siteDirectory . '/settings.php';
-    $contents = file_get_contents($filename);
+    $contents = \file_get_contents($filename);
     $driver = Database::getConnection()->driver();
     $this->assertStringContainsString("'namespace' => 'Drupal\\\\Core\\\\Database\\\\Driver\\\\$driver',", $contents);
     $this->assertStringContainsString("'driver' => '$driver',", $contents);

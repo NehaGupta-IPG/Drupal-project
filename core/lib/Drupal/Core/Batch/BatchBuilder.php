@@ -309,11 +309,11 @@ class BatchBuilder {
    * @return $this
    */
   public function setQueue($name, $class) {
-    if (!class_exists($class)) {
+    if (!\class_exists($class)) {
       throw new \InvalidArgumentException('Class ' . $class . ' does not exist.');
     }
 
-    if (!in_array(QueueInterface::class, class_implements($class))) {
+    if (!\in_array(QueueInterface::class, \class_implements($class))) {
       throw new \InvalidArgumentException(
         'Class ' . $class . ' does not implement \Drupal\Core\Queue\QueueInterface.'
       );

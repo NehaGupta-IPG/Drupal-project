@@ -105,7 +105,7 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
 
       // Swap out every entity which has a revision set for the current active
       // workspace.
-      foreach ($storage->loadMultipleRevisions(array_keys($tracked_entities[$entity_type_id])) as $revision) {
+      foreach ($storage->loadMultipleRevisions(\array_keys($tracked_entities[$entity_type_id])) as $revision) {
         $entities[$revision->id()] = $revision;
       }
     }
@@ -120,7 +120,7 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
     // Disallow any change to an unsupported entity when we are not in the
     // default workspace.
     if (!$this->workspaceInfo->isEntitySupported($entity)) {
-      throw new \RuntimeException(sprintf('The "%s" entity type can only be saved in the default workspace.', $entity->getEntityTypeId()));
+      throw new \RuntimeException(\sprintf('The "%s" entity type can only be saved in the default workspace.', $entity->getEntityTypeId()));
     }
 
     /** @var \Drupal\Core\Entity\ContentEntityInterface|\Drupal\Core\Entity\EntityPublishedInterface $entity */
@@ -169,7 +169,7 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
    * {@inheritdoc}
    */
   public function entityInsert(EntityInterface $entity): void {
-    assert($entity instanceof RevisionableInterface && $entity instanceof EntityPublishedInterface);
+    \assert($entity instanceof RevisionableInterface && $entity instanceof EntityPublishedInterface);
     $this->workspaceTracker->trackEntity($this->workspaceManager->getActiveWorkspace()->id(), $entity);
 
     // When a published entity is created in a workspace, it should remain
@@ -224,7 +224,7 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
     $langcode = $translation->language()->getId();
     if (!$default_revision->hasTranslation($langcode)) {
       $default_revision_translation = $default_revision->addTranslation($langcode, $translation->toArray());
-      assert($default_revision_translation instanceof EntityPublishedInterface);
+      \assert($default_revision_translation instanceof EntityPublishedInterface);
       $default_revision_translation->setUnpublished();
       $default_revision_translation->setSyncing(TRUE);
       $default_revision_translation->save();

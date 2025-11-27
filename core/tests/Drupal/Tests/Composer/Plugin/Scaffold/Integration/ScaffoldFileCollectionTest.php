@@ -43,10 +43,10 @@ class ScaffoldFileCollectionTest extends TestCase {
       ],
     ];
     $sut = new ScaffoldFileCollection($scaffold_file_fixtures, $locationReplacements);
-    $resolved_file_mappings = iterator_to_array($sut);
+    $resolved_file_mappings = \iterator_to_array($sut);
     // Confirm that the keys of the output are the same as the keys of the
     // input.
-    $this->assertEquals(array_keys($scaffold_file_fixtures), array_keys($resolved_file_mappings));
+    $this->assertEquals(\array_keys($scaffold_file_fixtures), \array_keys($resolved_file_mappings));
     // '[web-root]/robots.txt' is now a SkipOp, as it is now part of an
     // append operation.
     $this->assertEquals([
@@ -54,17 +54,17 @@ class ScaffoldFileCollectionTest extends TestCase {
       '[web-root]/.htaccess',
       '[web-root]/robots.txt',
       '[web-root]/sites/default/default.services.yml',
-    ], array_keys($resolved_file_mappings['fixtures/drupal-assets-fixture']));
+    ], \array_keys($resolved_file_mappings['fixtures/drupal-assets-fixture']));
     $this->assertInstanceOf(SkipOp::class, $resolved_file_mappings['fixtures/drupal-assets-fixture']['[web-root]/robots.txt']->op());
 
     $this->assertEquals([
       '[web-root]/sites/default/default.services.yml',
-    ], array_keys($resolved_file_mappings['fixtures/drupal-profile']));
+    ], \array_keys($resolved_file_mappings['fixtures/drupal-profile']));
 
     $this->assertEquals([
       '[web-root]/.htaccess',
       '[web-root]/robots.txt',
-    ], array_keys($resolved_file_mappings['fixtures/drupal-drupal']));
+    ], \array_keys($resolved_file_mappings['fixtures/drupal-drupal']));
 
     // Test that .htaccess is skipped.
     $this->assertInstanceOf(SkipOp::class, $resolved_file_mappings['fixtures/drupal-assets-fixture']['[web-root]/.htaccess']->op());

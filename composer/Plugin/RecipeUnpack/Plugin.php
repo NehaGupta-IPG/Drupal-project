@@ -78,7 +78,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
     // @todo https://www.drupal.org/project/drupal/issues/3523269 Use Composer
     //   API once it exists.
-    $backtrace = debug_backtrace();
+    $backtrace = \debug_backtrace();
     $composer = $event->getComposer();
     foreach ($backtrace as $trace) {
       if (isset($trace['object']) && $trace['object'] instanceof Installer) {
@@ -105,21 +105,21 @@ final class Plugin implements PluginInterface, EventSubscriberInterface, Capable
 
         foreach ($updateAllowList as $package_name) {
           $packages = $composer->getRepositoryManager()->getLocalRepository()->findPackages($package_name);
-          $package = reset($packages);
+          $package = \reset($packages);
 
           if (!$package instanceof PackageInterface) {
             if (!$isInstalling) {
               $event->getIO()->write('Recipes are not unpacked when the --no-install option is used.', verbosity: IOInterface::VERBOSE);
               return;
             }
-            $event->getIO()->error(sprintf('%s does not resolve to a package.', $package_name));
+            $event->getIO()->error(\sprintf('%s does not resolve to a package.', $package_name));
             return;
           }
 
           // Only recipes are supported.
           if ($package->getType() === self::RECIPE_PACKAGE_TYPE) {
             if ($this->manager->unpackOptions->isIgnored($package)) {
-              $event->getIO()->write(sprintf('<info>%s</info> not unpacked because it is ignored.', $package_name), verbosity: IOInterface::VERBOSE);
+              $event->getIO()->write(\sprintf('<info>%s</info> not unpacked because it is ignored.', $package_name), verbosity: IOInterface::VERBOSE);
             }
             elseif (UnpackManager::isDevRequirement($package)) {
               if (!$devRecipeWarningEmitted) {
@@ -152,7 +152,7 @@ final class Plugin implements PluginInterface, EventSubscriberInterface, Capable
       // Only recipes are supported.
       if ($package->getType() === self::RECIPE_PACKAGE_TYPE) {
         if ($this->manager->unpackOptions->isIgnored($package)) {
-          $event->getIO()->write(sprintf('<info>%s</info> not unpacked because it is ignored.', $package->getName()), verbosity: IOInterface::VERBOSE);
+          $event->getIO()->write(\sprintf('<info>%s</info> not unpacked because it is ignored.', $package->getName()), verbosity: IOInterface::VERBOSE);
         }
         elseif (UnpackManager::isDevRequirement($package)) {
           continue;

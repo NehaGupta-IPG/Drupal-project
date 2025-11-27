@@ -87,10 +87,10 @@ abstract class LocalStream implements StreamWrapperInterface {
       $uri = $this->uri;
     }
 
-    [, $target] = explode('://', $uri, 2);
+    [, $target] = \explode('://', $uri, 2);
 
     // Remove erroneous leading or trailing, forward-slashes and backslashes.
-    return trim($target, '\/');
+    return \trim($target, '\/');
   }
 
   /**
@@ -125,17 +125,17 @@ abstract class LocalStream implements StreamWrapperInterface {
     // filesystem stream wrapper URI, in which case this local stream acts like
     // a proxy. realpath() is not supported by vfsStream, because a virtual
     // file system does not have a real filepath.
-    if (str_starts_with($path, 'vfs://')) {
+    if (\str_starts_with($path, 'vfs://')) {
       return $path;
     }
 
-    $realpath = realpath($path);
+    $realpath = \realpath($path);
     if (!$realpath) {
       // This file does not yet exist.
-      $realpath = realpath(dirname($path)) . '/' . basename($path);
+      $realpath = \realpath(\dirname($path)) . '/' . \basename($path);
     }
-    $directory = realpath($this->getDirectoryPath());
-    if (!$realpath || !$directory || !str_starts_with($realpath, $directory)) {
+    $directory = \realpath($this->getDirectoryPath());
+    if (!$realpath || !$directory || !\str_starts_with($realpath, $directory)) {
       return FALSE;
     }
     return $realpath;
@@ -149,11 +149,11 @@ abstract class LocalStream implements StreamWrapperInterface {
     $path = $this->getLocalPath();
     if ($path === FALSE) {
       if ($options & STREAM_REPORT_ERRORS) {
-        trigger_error('stream_open() filename cannot be empty', E_USER_WARNING);
+        \trigger_error('stream_open() filename cannot be empty', E_USER_WARNING);
       }
       return FALSE;
     }
-    $this->handle = ($options & STREAM_REPORT_ERRORS) ? fopen($path, $mode) : @fopen($path, $mode);
+    $this->handle = ($options & STREAM_REPORT_ERRORS) ? \fopen($path, $mode) : @\fopen($path, $mode);
 
     if ((bool) $this->handle && $options & STREAM_USE_PATH) {
       $opened_path = $path;
@@ -166,8 +166,8 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function stream_lock($operation) {
-    if (in_array($operation, [LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB])) {
-      return flock($this->handle, $operation);
+    if (\in_array($operation, [LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB])) {
+      return \flock($this->handle, $operation);
     }
 
     return TRUE;
@@ -177,21 +177,21 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function stream_read($count) {
-    return fread($this->handle, $count);
+    return \fread($this->handle, $count);
   }
 
   /**
    * {@inheritdoc}
    */
   public function stream_write($data) {
-    return fwrite($this->handle, $data);
+    return \fwrite($this->handle, $data);
   }
 
   /**
    * {@inheritdoc}
    */
   public function stream_eof() {
-    return feof($this->handle);
+    return \feof($this->handle);
   }
 
   /**
@@ -200,35 +200,35 @@ abstract class LocalStream implements StreamWrapperInterface {
   public function stream_seek($offset, $whence = SEEK_SET) {
     // fseek() returns 0 on success and -1 on a failure.
     // stream_seek()   1 on success and  0 on a failure.
-    return !fseek($this->handle, $offset, $whence);
+    return !\fseek($this->handle, $offset, $whence);
   }
 
   /**
    * {@inheritdoc}
    */
   public function stream_flush() {
-    return fflush($this->handle);
+    return \fflush($this->handle);
   }
 
   /**
    * {@inheritdoc}
    */
   public function stream_tell() {
-    return ftell($this->handle);
+    return \ftell($this->handle);
   }
 
   /**
    * {@inheritdoc}
    */
   public function stream_stat() {
-    return fstat($this->handle);
+    return \fstat($this->handle);
   }
 
   /**
    * {@inheritdoc}
    */
   public function stream_close() {
-    return fclose($this->handle);
+    return \fclose($this->handle);
   }
 
   /**
@@ -247,31 +247,31 @@ abstract class LocalStream implements StreamWrapperInterface {
     switch ($option) {
       case STREAM_META_TOUCH:
         if (!empty($value)) {
-          $return = touch($target, $value[0], $value[1]);
+          $return = \touch($target, $value[0], $value[1]);
         }
         else {
-          $return = touch($target);
+          $return = \touch($target);
         }
         break;
 
       case STREAM_META_OWNER_NAME:
       case STREAM_META_OWNER:
-        $return = chown($target, $value);
+        $return = \chown($target, $value);
         break;
 
       case STREAM_META_GROUP_NAME:
       case STREAM_META_GROUP:
-        $return = chgrp($target, $value);
+        $return = \chgrp($target, $value);
         break;
 
       case STREAM_META_ACCESS:
-        $return = chmod($target, $value);
+        $return = \chmod($target, $value);
         break;
     }
     if ($return) {
       // For convenience clear the file status cache of the underlying file,
       // since metadata operations are often followed by file status checks.
-      clearstatcache(TRUE, $target);
+      \clearstatcache(TRUE, $target);
     }
     return $return;
   }
@@ -285,7 +285,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * OS-specific implementations for advanced use cases.
    */
   public function stream_set_option($option, $arg1, $arg2) {
-    trigger_error('stream_set_option() not supported for local file based stream wrappers', E_USER_WARNING);
+    \trigger_error('stream_set_option() not supported for local file based stream wrappers', E_USER_WARNING);
     return FALSE;
   }
 
@@ -293,7 +293,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function stream_truncate($new_size) {
-    return ftruncate($this->handle, $new_size);
+    return \ftruncate($this->handle, $new_size);
   }
 
   /**
@@ -308,16 +308,16 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function rename($from_uri, $to_uri) {
-    return rename($this->getLocalPath($from_uri), $this->getLocalPath($to_uri));
+    return \rename($this->getLocalPath($from_uri), $this->getLocalPath($to_uri));
   }
 
   /**
    * {@inheritdoc}
    */
   public function dirname($uri = NULL) {
-    [$scheme] = explode('://', $uri, 2);
+    [$scheme] = \explode('://', $uri, 2);
     $target = $this->getTarget($uri);
-    $dirname = dirname($target);
+    $dirname = \dirname($target);
 
     if ($dirname == '.') {
       $dirname = '';
@@ -373,11 +373,11 @@ abstract class LocalStream implements StreamWrapperInterface {
     $path = $this->getLocalPath();
     // Suppress warnings if requested or if the file or directory does not
     // exist. This is consistent with PHP's plain filesystem stream wrapper.
-    if ($flags & STREAM_URL_STAT_QUIET || !file_exists($path)) {
-      return @stat($path);
+    if ($flags & STREAM_URL_STAT_QUIET || !\file_exists($path)) {
+      return @\stat($path);
     }
     else {
-      return stat($path);
+      return \stat($path);
     }
   }
 
@@ -386,7 +386,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    */
   public function dir_opendir($uri, $options) {
     $this->uri = $uri;
-    $this->handle = opendir($this->getLocalPath());
+    $this->handle = \opendir($this->getLocalPath());
 
     return (bool) $this->handle;
   }
@@ -395,14 +395,14 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function dir_readdir() {
-    return readdir($this->handle);
+    return \readdir($this->handle);
   }
 
   /**
    * {@inheritdoc}
    */
   public function dir_rewinddir() {
-    rewinddir($this->handle);
+    \rewinddir($this->handle);
     // We do not really have a way to signal a failure as rewinddir() does not
     // have a return value and there is no way to read a directory handler
     // without advancing to the next file.
@@ -413,7 +413,7 @@ abstract class LocalStream implements StreamWrapperInterface {
    * {@inheritdoc}
    */
   public function dir_closedir() {
-    closedir($this->handle);
+    \closedir($this->handle);
     // We do not really have a way to signal a failure as closedir() does not
     // have a return value.
     return TRUE;

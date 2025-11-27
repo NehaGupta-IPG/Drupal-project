@@ -74,7 +74,7 @@ class ImageWidget extends FileWidget {
     $element['preview_image_style'] = [
       '#title' => $this->t('Preview image style'),
       '#type' => 'select',
-      '#options' => image_style_options(FALSE),
+      '#options' => \image_style_options(FALSE),
       '#empty_option' => '<' . $this->t('no preview') . '>',
       '#default_value' => $this->getSetting('preview_image_style'),
       '#description' => $this->t('The preview image will be shown while editing the content.'),
@@ -90,7 +90,7 @@ class ImageWidget extends FileWidget {
   public function settingsSummary() {
     $summary = parent::settingsSummary();
 
-    $image_styles = image_style_options(FALSE);
+    $image_styles = \image_style_options(FALSE);
     // Unset possible 'No defined styles' option.
     unset($image_styles['']);
     // Styles could be lost because of enabled/disabled modules that defines
@@ -103,7 +103,7 @@ class ImageWidget extends FileWidget {
       $preview_image_style = $this->t('No preview');
     }
 
-    array_unshift($summary, $preview_image_style);
+    \array_unshift($summary, $preview_image_style);
 
     return $summary;
   }
@@ -160,8 +160,8 @@ class ImageWidget extends FileWidget {
     // If using custom extension validation, ensure that the extensions are
     // supported by the current image toolkit. Otherwise, validate against all
     // toolkit supported extensions.
-    $extensions = !empty($extensions) ? array_intersect(explode(' ', $extensions), $supported_extensions) : $supported_extensions;
-    $element['#upload_validators']['FileExtension']['extensions'] = implode(' ', $extensions);
+    $extensions = !empty($extensions) ? \array_intersect(\explode(' ', $extensions), $supported_extensions) : $supported_extensions;
+    $element['#upload_validators']['FileExtension']['extensions'] = \implode(' ', $extensions);
 
     // Add mobile device image capture acceptance.
     $element['#accept'] = 'image/*';
@@ -202,7 +202,7 @@ class ImageWidget extends FileWidget {
 
     // Add the image preview.
     if (!empty($element['#files']) && $element['#preview_image_style']) {
-      $file = reset($element['#files']);
+      $file = \reset($element['#files']);
       $variables = [
         'style_name' => $element['#preview_image_style'],
         'uri' => $file->getFileUri(),
@@ -294,7 +294,7 @@ class ImageWidget extends FileWidget {
     // Only do validation if the function is triggered from other places than
     // the image process form.
     $triggering_element = $form_state->getTriggeringElement();
-    if (!empty($triggering_element['#submit']) && in_array([ManagedFile::class, 'submit'], $triggering_element['#submit'], TRUE)) {
+    if (!empty($triggering_element['#submit']) && \in_array([ManagedFile::class, 'submit'], $triggering_element['#submit'], TRUE)) {
       $form_state->setLimitValidationErrors([]);
     }
   }
@@ -350,7 +350,7 @@ class ImageWidget extends FileWidget {
   public function errorElement(array $element, ConstraintViolationInterface $error, array $form, FormStateInterface $form_state) {
     $element = parent::errorElement($element, $error, $form, $form_state);
 
-    $property_path_array = explode('.', $error->getPropertyPath());
+    $property_path_array = \explode('.', $error->getPropertyPath());
     return ($element === FALSE) ? FALSE : $element[$property_path_array[1]];
   }
 

@@ -51,7 +51,7 @@ abstract class SettingsTrayTestBase extends OffCanvasTestBase {
     $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', '.dialog-off-canvas-main-canvas.js-settings-tray-edit-mode'));
     // @todo https://www.drupal.org/project/drupal/issues/3317520 Work why the
     //   sleep is necessary in.
-    usleep(100000);
+    \usleep(100000);
 
     $block = $this->getSession()->getPage()->find('css', $block_selector);
     $block->mouseOver();
@@ -160,7 +160,7 @@ abstract class SettingsTrayTestBase extends OffCanvasTestBase {
   protected static function getTestThemes(): array {
     // Remove 'claro' theme. Settings Tray "Edit Mode" will not work with this
     // theme because it removes all contextual links.
-    return array_filter(parent::getTestThemes(), function ($theme) {
+    return \array_filter(parent::getTestThemes(), function ($theme) {
       return ($theme !== 'claro');
     });
   }
@@ -175,7 +175,7 @@ abstract class SettingsTrayTestBase extends OffCanvasTestBase {
    *   The CSS selector.
    */
   public function getBlockSelector(Block $block) {
-    return '#block-' . str_replace('_', '-', $block->id());
+    return '#block-' . \str_replace('_', '-', $block->id());
   }
 
   /**

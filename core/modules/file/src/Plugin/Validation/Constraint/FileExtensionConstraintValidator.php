@@ -22,7 +22,7 @@ class FileExtensionConstraintValidator extends BaseFileConstraintValidator {
     }
 
     $extensions = $constraint->extensions;
-    $regex = '/\.(' . preg_replace('/ +/', '|', preg_quote($extensions)) . ')$/i';
+    $regex = '/\.(' . \preg_replace('/ +/', '|', \preg_quote($extensions)) . ')$/i';
     // Filename may differ from the basename, for instance in case files
     // migrated from D7 file entities. Because of that new files are saved
     // temporarily with a generated file name, without the original extension,
@@ -30,7 +30,7 @@ class FileExtensionConstraintValidator extends BaseFileConstraintValidator {
     // in case of temporary files; and use the file system file name in case of
     // permanent files.
     $subject = $file->isTemporary() ? $file->getFilename() : $file->getFileUri();
-    if (!preg_match($regex, $subject)) {
+    if (!\preg_match($regex, $subject)) {
       $this->context->addViolation($constraint->message, ['%files-allowed' => $extensions]);
     }
   }

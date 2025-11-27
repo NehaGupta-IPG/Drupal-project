@@ -64,7 +64,7 @@ class DateFormatterTest extends KernelTestBase {
     /** @var \Drupal\Core\Language\LanguageManagerInterface $language_manager */
     $language_manager = $this->container->get('language_manager');
 
-    $timestamp = strtotime('2007-03-26T00:00:00+00:00');
+    $timestamp = \strtotime('2007-03-26T00:00:00+00:00');
     $this->assertSame('Sunday, 25-Mar-07 17:00:00 PDT', $formatter->format($timestamp, 'custom', 'l, d-M-y H:i:s T', 'America/Los_Angeles', 'en'), 'Test all parameters.');
     $this->assertSame('domingo, 25-Mar-07 17:00:00 PDT', $formatter->format($timestamp, 'custom', 'l, d-M-y H:i:s T', 'America/Los_Angeles', self::LANGCODE), 'Test translated format.');
     $this->assertSame('l, 25-Mar-07 17:00:00 PDT', $formatter->format($timestamp, 'custom', '\\l, d-M-y H:i:s T', 'America/Los_Angeles', self::LANGCODE), 'Test an escaped format string.');
@@ -82,7 +82,7 @@ class DateFormatterTest extends KernelTestBase {
 
     // Change the default language and timezone.
     $this->config('system.site')->set('default_langcode', static::LANGCODE)->save();
-    date_default_timezone_set('America/Los_Angeles');
+    \date_default_timezone_set('America/Los_Angeles');
 
     // Reset the language manager so new negotiations attempts will fall back on
     // on the new language.

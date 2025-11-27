@@ -130,7 +130,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
 
     $responsive_image_options = [];
     $responsive_image_styles = $this->responsiveImageStyleStorage->loadMultiple();
-    uasort($responsive_image_styles, '\Drupal\responsive_image\Entity\ResponsiveImageStyle::sort');
+    \uasort($responsive_image_styles, '\Drupal\responsive_image\Entity\ResponsiveImageStyle::sort');
     if ($responsive_image_styles && !empty($responsive_image_styles)) {
       foreach ($responsive_image_styles as $machine_name => $responsive_image_style) {
         if ($responsive_image_style->hasImageStyleMappings()) {
@@ -217,7 +217,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       '@attribute' => $image_loading['attribute'],
     ]);
 
-    return array_merge($summary, parent::settingsSummary());
+    return \array_merge($summary, parent::settingsSummary());
   }
 
   /**
@@ -259,7 +259,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
     }
 
     foreach ($files as $delta => $file) {
-      assert($file instanceof FileInterface);
+      \assert($file instanceof FileInterface);
       // Link the <picture> element to the original file.
       if (isset($link_file)) {
         $url = $file->createFileUrl();

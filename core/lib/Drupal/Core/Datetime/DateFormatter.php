@@ -106,12 +106,12 @@ class DateFormatter implements DateFormatterInterface {
    */
   public function format($timestamp, $type = 'medium', $format = '', $timezone = NULL, $langcode = NULL) {
     if (!isset($timezone)) {
-      $timezone = date_default_timezone_get();
+      $timezone = \date_default_timezone_get();
     }
     // Store DateTimeZone objects in an array rather than repeatedly
     // constructing identical objects over the life of a request.
     if (!isset($this->timezones[$timezone])) {
-      $this->timezones[$timezone] = timezone_open($timezone);
+      $this->timezones[$timezone] = \timezone_open($timezone);
     }
 
     if (empty($langcode)) {
@@ -151,9 +151,9 @@ class DateFormatter implements DateFormatterInterface {
   public function formatInterval($interval, $granularity = 2, $langcode = NULL) {
     $output = '';
     foreach ($this->units as $key => $value) {
-      $key = explode('|', $key);
+      $key = \explode('|', $key);
       if ($interval >= $value) {
-        $output .= ($output ? ' ' : '') . $this->formatPlural(floor($interval / $value), $key[0], $key[1], [], ['langcode' => $langcode]);
+        $output .= ($output ? ' ' : '') . $this->formatPlural(\floor($interval / $value), $key[0], $key[1], [], ['langcode' => $langcode]);
         $interval %= $value;
         $granularity--;
       }
@@ -175,12 +175,12 @@ class DateFormatter implements DateFormatterInterface {
    * {@inheritdoc}
    */
   public function getSampleDateFormats($langcode = NULL, $timestamp = NULL, $timezone = NULL) {
-    $timestamp = $timestamp ?: time();
+    $timestamp = $timestamp ?: \time();
     // All date format characters for the PHP date() function.
     // cspell:disable-next-line
-    $date_chars = str_split('dDjlNSwzWFmMntLoYyaABgGhHisueIOPTZcrU');
-    $date_elements = array_combine($date_chars, $date_chars);
-    return array_map(function ($character) use ($timestamp, $timezone, $langcode) {
+    $date_chars = \str_split('dDjlNSwzWFmMntLoYyaABgGhHisueIOPTZcrU');
+    $date_elements = \array_combine($date_chars, $date_chars);
+    return \array_map(function ($character) use ($timestamp, $timezone, $langcode) {
       return $this->format($timestamp, 'custom', $character, $timezone, $langcode);
     }, $date_elements);
   }
@@ -243,12 +243,12 @@ class DateFormatter implements DateFormatterInterface {
         switch ($value) {
           case 'y':
             $interval_output = $this->formatPlural($interval->y, '@count year', '@count years', [], ['langcode' => $options['langcode']]);
-            $max_age = min($max_age, 365 * 86400);
+            $max_age = \min($max_age, 365 * 86400);
             break;
 
           case 'm':
             $interval_output = $this->formatPlural($interval->m, '@count month', '@count months', [], ['langcode' => $options['langcode']]);
-            $max_age = min($max_age, 30 * 86400);
+            $max_age = \min($max_age, 30 * 86400);
             break;
 
           case 'd':
@@ -256,17 +256,17 @@ class DateFormatter implements DateFormatterInterface {
             // ourselves.
             $interval_output = '';
             $days = $interval->d;
-            $weeks = floor($days / 7);
+            $weeks = \floor($days / 7);
             if ($weeks) {
               $interval_output .= $this->formatPlural($weeks, '@count week', '@count weeks', [], ['langcode' => $options['langcode']]);
               $days -= $weeks * 7;
               $granularity--;
-              $max_age = min($max_age, 7 * 86400);
+              $max_age = \min($max_age, 7 * 86400);
             }
 
             if ((!$output || $weeks > 0) && $granularity > 0 && $days > 0) {
               $interval_output .= ($interval_output ? ' ' : '') . $this->formatPlural($days, '@count day', '@count days', [], ['langcode' => $options['langcode']]);
-              $max_age = min($max_age, 86400);
+              $max_age = \min($max_age, 86400);
             }
             else {
               // If we did not output days, set the granularity to 0 so that we
@@ -278,17 +278,17 @@ class DateFormatter implements DateFormatterInterface {
 
           case 'h':
             $interval_output = $this->formatPlural($interval->h, '@count hour', '@count hours', [], ['langcode' => $options['langcode']]);
-            $max_age = min($max_age, 3600);
+            $max_age = \min($max_age, 3600);
             break;
 
           case 'i':
             $interval_output = $this->formatPlural($interval->i, '@count minute', '@count minutes', [], ['langcode' => $options['langcode']]);
-            $max_age = min($max_age, 60);
+            $max_age = \min($max_age, 60);
             break;
 
           case 's':
             $interval_output = $this->formatPlural($interval->s, '@count second', '@count seconds', [], ['langcode' => $options['langcode']]);
-            $max_age = min($max_age, 1);
+            $max_age = \min($max_age, 1);
             break;
 
         }

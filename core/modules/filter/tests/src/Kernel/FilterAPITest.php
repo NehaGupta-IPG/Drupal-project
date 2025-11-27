@@ -65,7 +65,7 @@ class FilterAPITest extends EntityKernelTestBase {
     $text = "<p>Llamas are <not> awesome!</p>";
     $expected_filtered_text = "&lt;p&gt;Llamas are  awesome!&lt;/p&gt;";
 
-    $this->assertEquals($expected_filtered_text, check_markup($text, 'crazy'), 'Filters applied in correct order.');
+    $this->assertEquals($expected_filtered_text, \check_markup($text, 'crazy'), 'Filters applied in correct order.');
   }
 
   /**
@@ -76,15 +76,15 @@ class FilterAPITest extends EntityKernelTestBase {
     $expected_filtered_text = "Text with evil content and a URL: <a href=\"https://www.drupal.org\">https://www.drupal.org</a>!";
     $expected_filter_text_without_html_generators = "Text with evil content and a URL: https://www.drupal.org!";
 
-    $actual_filtered_text = check_markup($text, 'filtered_html', '', []);
+    $actual_filtered_text = \check_markup($text, 'filtered_html', '', []);
     $this->assertSame($expected_filtered_text, (string) $actual_filtered_text, 'Expected filter result.');
-    $actual_filtered_text_without_html_generators = check_markup($text, 'filtered_html', '', [FilterInterface::TYPE_MARKUP_LANGUAGE]);
+    $actual_filtered_text_without_html_generators = \check_markup($text, 'filtered_html', '', [FilterInterface::TYPE_MARKUP_LANGUAGE]);
     $this->assertSame($expected_filter_text_without_html_generators, (string) $actual_filtered_text_without_html_generators, 'Expected filter result when skipping FilterInterface::TYPE_MARKUP_LANGUAGE filters.');
     // Related to @see FilterSecurityTest.php/testSkipSecurityFilters(), but
     // this check focuses on the ability to filter multiple filter types at
     // once. Drupal core only ships with these two types of filters, so this is
     // the most extensive test possible.
-    $actual_filtered_text_without_html_generators = check_markup(
+    $actual_filtered_text_without_html_generators = \check_markup(
       $text,
       'filtered_html',
       '',
@@ -363,7 +363,7 @@ class FilterAPITest extends EntityKernelTestBase {
     ];
 
     $available_values = $data->getPossibleValues();
-    $this->assertEquals(array_keys($expected_available_options), $available_values);
+    $this->assertEquals(\array_keys($expected_available_options), $available_values);
     $available_options = $data->getPossibleOptions();
     $this->assertEquals($expected_available_options, $available_options);
 
@@ -433,21 +433,21 @@ class FilterAPITest extends EntityKernelTestBase {
     // Use config to directly load the configuration and check that only enabled
     // or customized plugins are saved to configuration.
     $filters = $this->config('filter.format.crazy')->get('filters');
-    $this->assertEquals(['filter_html', 'filter_html_escape'], array_keys($filters));
+    $this->assertEquals(['filter_html', 'filter_html_escape'], \array_keys($filters));
 
     // Disable a plugin to ensure that disabled plugins with custom settings are
     // stored in configuration.
     $crazy_format->setFilterConfig('filter_html_escape', ['status' => FALSE]);
     $crazy_format->save();
     $filters = $this->config('filter.format.crazy')->get('filters');
-    $this->assertEquals(['filter_html', 'filter_html_escape'], array_keys($filters));
+    $this->assertEquals(['filter_html', 'filter_html_escape'], \array_keys($filters));
 
     // Set the settings as per default to ensure that disable plugins in this
     // state are not stored in configuration.
     $crazy_format->setFilterConfig('filter_html_escape', ['weight' => -10]);
     $crazy_format->save();
     $filters = $this->config('filter.format.crazy')->get('filters');
-    $this->assertEquals(['filter_html'], array_keys($filters));
+    $this->assertEquals(['filter_html'], \array_keys($filters));
   }
 
   /**
@@ -499,7 +499,7 @@ class FilterAPITest extends EntityKernelTestBase {
     $filters = $filter_format->get('filters');
     $this->assertTrue(isset($filters['filter_test_restrict_tags_and_attributes']), 'The filter plugin filter_test_restrict_tags_and_attributes is configured by the filtered_html filter format.');
 
-    drupal_static_reset('filter_formats');
+    \drupal_static_reset('filter_formats');
     \Drupal::entityTypeManager()->getStorage('filter_format')->resetCache();
     $module_data = \Drupal::service('extension.list.module')->getList();
     $this->assertFalse(isset($module_data['filter_test']->info['required']), 'The filter_test module is required.');

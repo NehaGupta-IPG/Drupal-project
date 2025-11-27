@@ -112,7 +112,7 @@ class MigrateFileTest extends MigrateDrupal6TestBase implements MigrateDumpAlter
     Database::getConnection('default', 'migrate')
       ->insert('variable')
       ->fields(['name', 'value'])
-      ->values(['name' => 'file_directory_path', 'value' => serialize('files/test')])
+      ->values(['name' => 'file_directory_path', 'value' => \serialize('files/test')])
       ->execute();
 
     $this->executeMigration('d6_file');

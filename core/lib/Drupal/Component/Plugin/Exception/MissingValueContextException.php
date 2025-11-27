@@ -14,7 +14,7 @@ class MissingValueContextException extends ContextException {
    *   List of contexts with missing value.
    */
   public function __construct(array $contexts_without_value = []) {
-    $message = 'Required contexts without a value: ' . implode(', ', $contexts_without_value);
+    $message = 'Required contexts without a value: ' . \implode(', ', $contexts_without_value);
     parent::__construct($message);
   }
 

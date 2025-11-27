@@ -111,7 +111,7 @@ class Message {
    *   The message text.
    */
   protected function getMessageFromFile($file) {
-    return file_exists($file) ? file($file, FILE_IGNORE_NEW_LINES) : [];
+    return \file_exists($file) ? \file($file, FILE_IGNORE_NEW_LINES) : [];
   }
 
 }

@@ -26,7 +26,7 @@ abstract class FieldTestBase extends BrowserTestBase {
     $values = [];
     for ($i = 0; $i < $cardinality; $i++) {
       // field_test fields treat 0 as 'empty value'.
-      $values[$i]['value'] = mt_rand(1, 127);
+      $values[$i]['value'] = \mt_rand(1, 127);
     }
     return $values;
   }

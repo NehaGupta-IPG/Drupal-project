@@ -77,7 +77,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
    * {@inheritdoc}
    */
   public function validate(mixed $extension_name, Constraint $constraint): void {
-    assert($constraint instanceof ExtensionAvailableConstraint);
+    \assert($constraint instanceof ExtensionAvailableConstraint);
 
     // This constraint may be used to validate nullable (optional) values.
     if ($extension_name === NULL) {
@@ -87,7 +87,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
     $variables = ['@name' => $extension_name];
 
     $data = $this->context->getObject();
-    assert($data instanceof TypedDataInterface);
+    \assert($data instanceof TypedDataInterface);
     $validation_profile = $this->resolveProfile($data);
     $extension_discovery = NULL;
 
@@ -140,7 +140,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
       case 'profile':
         if (!$this->extensionExists($constraint->type, $extension_name, $extension_discovery)) {
           $message = $constraint->type . 'NotExistsMessage';
-          assert(property_exists($constraint, $message));
+          \assert(\property_exists($constraint, $message));
           $this->context->addViolation($constraint->$message, $variables);
         }
 
@@ -166,10 +166,10 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
    */
   protected function extensionExists(string $type, string $name, ?ExtensionDiscovery $discovery): bool {
     if ($discovery) {
-      return array_key_exists($name, $discovery->scan($type, static::insideTest()));
+      return \array_key_exists($name, $discovery->scan($type, static::insideTest()));
     }
     $list = $type . 'ExtensionList';
-    assert($this->$list instanceof ExtensionList);
+    \assert($this->$list instanceof ExtensionList);
     return $this->$list->exists($name);
   }
 
@@ -226,11 +226,11 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
     }
 
     // @see \Drupal\Core\CoreServiceProvider::registerTest()
-    $in_functional_test = drupal_valid_test_ua();
+    $in_functional_test = \drupal_valid_test_ua();
     // @see \Drupal\Core\DependencyInjection\DependencySerializationTrait::__wakeup()
     $in_kernel_test = isset($GLOBALS['__PHPUNIT_BOOTSTRAP']);
     // @see \Drupal\BuildTests\Framework\BuildTestBase::setUp()
-    $in_build_test = str_contains(__FILE__, DrupalFilesystem::getOsTemporaryDirectory() . '/build_workspace_');
+    $in_build_test = \str_contains(__FILE__, DrupalFilesystem::getOsTemporaryDirectory() . '/build_workspace_');
     static::$inTestEnvironment = $in_functional_test || $in_kernel_test || $in_build_test;
     return static::$inTestEnvironment;
   }

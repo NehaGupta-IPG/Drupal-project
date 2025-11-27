@@ -106,7 +106,7 @@ class FilterTest extends WebDriverTestBase {
    *   The filtered elements.
    */
   protected function filterVisibleElements($elements): array {
-    $elements = array_filter($elements, function ($element) {
+    $elements = \array_filter($elements, function ($element) {
       return $element->isVisible();
     });
     return $elements;
@@ -131,7 +131,7 @@ class FilterTest extends WebDriverTestBase {
     return $page->waitFor($timeout / 1000, function () use ($count, $page, $locator) {
       $elements = $page->findAll('css', $locator);
       $visible_elements = $this->filterVisibleElements($elements);
-      if (count($visible_elements) === $count) {
+      if (\count($visible_elements) === $count) {
         return TRUE;
       }
       return FALSE;
@@ -156,7 +156,7 @@ class FilterTest extends WebDriverTestBase {
 
       foreach ($handler_rows as $handler_row) {
         // Test that all the visible rows are of the 'content' type.
-        if (!str_contains($handler_row->getAttribute('class'), 'content')) {
+        if (!\str_contains($handler_row->getAttribute('class'), 'content')) {
           return FALSE;
         }
       }

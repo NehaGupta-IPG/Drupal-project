@@ -326,7 +326,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
 
     $domain = $this->configFactory->get('media.settings')->get('iframe_domain');
     if (!$this->iFrameUrlHelper->isSecure($domain)) {
-      array_unshift($form, [
+      \array_unshift($form, [
         '#markup' => '<p>' . $this->t('It is potentially insecure to display oEmbed content in a frame that is served from the same domain as your main Drupal site, as this may allow execution of third-party code. <a href=":url">You can specify a different domain for serving oEmbed content in the Media settings</a>.', [
           ':url' => Url::fromRoute('media.settings')->setAbsolute()->toString(),
         ]) . '</p>',
@@ -348,7 +348,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
       '#type' => 'checkboxes',
       '#title' => $this->t('Allowed providers'),
       '#default_value' => $configuration['providers'],
-      '#options' => array_combine($plugin_definition['providers'], $plugin_definition['providers']),
+      '#options' => \array_combine($plugin_definition['providers'], $plugin_definition['providers']),
       '#description' => $this->t('Optionally select the allowed oEmbed providers for this media type. If left blank, all providers will be allowed.'),
     ];
     return $form;
@@ -360,7 +360,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     $configuration = $this->getConfiguration();
-    $configuration['providers'] = array_filter(array_values($configuration['providers']));
+    $configuration['providers'] = \array_filter(\array_values($configuration['providers']));
     $this->setConfiguration($configuration);
   }
 
@@ -447,8 +447,8 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
     $remote_thumbnail_url = $remote_thumbnail_url->toString();
     $hash = Crypt::hashBase64($remote_thumbnail_url);
     $files = $this->fileSystem->scanDirectory($directory, "/^$hash\..*/");
-    if (count($files) > 0) {
-      return reset($files)->uri;
+    if (\count($files) > 0) {
+      return \reset($files)->uri;
     }
 
     // The local thumbnail doesn't exist yet, so we need to download it.
@@ -486,9 +486,9 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    */
   protected function getThumbnailFileExtensionFromUrl(string $thumbnail_url, ResponseInterface $response): ?string {
     // First, try to glean the extension from the URL path.
-    $path = parse_url($thumbnail_url, PHP_URL_PATH);
+    $path = \parse_url($thumbnail_url, PHP_URL_PATH);
     if ($path) {
-      $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+      $extension = \strtolower(\pathinfo($path, PATHINFO_EXTENSION));
       if ($extension) {
         return $extension;
       }
@@ -501,9 +501,9 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
     if (empty($content_type)) {
       return NULL;
     }
-    $extensions = MimeTypes::getDefault()->getExtensions(reset($content_type));
+    $extensions = MimeTypes::getDefault()->getExtensions(\reset($content_type));
     if ($extensions) {
-      return reset($extensions);
+      return \reset($extensions);
     }
     // If no file extension could be determined from the Content-Type header,
     // we're stumped.

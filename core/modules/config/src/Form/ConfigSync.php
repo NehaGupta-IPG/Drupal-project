@@ -114,7 +114,7 @@ class ConfigSync extends FormBase {
             }
           }
         }
-        sort($change_list);
+        \sort($change_list);
         $message = [
           [
             '#markup' => $this->t('The following items in your active configuration have changes since the last import that may be lost on the next import.'),
@@ -155,19 +155,19 @@ class ConfigSync extends FormBase {
         ];
         switch ($config_change_type) {
           case 'create':
-            $form[$collection][$config_change_type]['heading']['#value'] = $this->formatPlural(count($config_names), '@count new', '@count new');
+            $form[$collection][$config_change_type]['heading']['#value'] = $this->formatPlural(\count($config_names), '@count new', '@count new');
             break;
 
           case 'update':
-            $form[$collection][$config_change_type]['heading']['#value'] = $this->formatPlural(count($config_names), '@count changed', '@count changed');
+            $form[$collection][$config_change_type]['heading']['#value'] = $this->formatPlural(\count($config_names), '@count changed', '@count changed');
             break;
 
           case 'delete':
-            $form[$collection][$config_change_type]['heading']['#value'] = $this->formatPlural(count($config_names), '@count removed', '@count removed');
+            $form[$collection][$config_change_type]['heading']['#value'] = $this->formatPlural(\count($config_names), '@count removed', '@count removed');
             break;
 
           case 'rename':
-            $form[$collection][$config_change_type]['heading']['#value'] = $this->formatPlural(count($config_names), '@count renamed', '@count renamed');
+            $form[$collection][$config_change_type]['heading']['#value'] = $this->formatPlural(\count($config_names), '@count renamed', '@count renamed');
             break;
         }
         $form[$collection][$config_change_type]['list'] = [
@@ -197,7 +197,7 @@ class ConfigSync extends FormBase {
             'attributes' => [
               'class' => ['use-ajax'],
               'data-dialog-type' => 'modal',
-              'data-dialog-options' => json_encode([
+              'data-dialog-options' => \json_encode([
                 'width' => 700,
               ]),
             ],
@@ -238,7 +238,7 @@ class ConfigSync extends FormBase {
           $batch_builder->addOperation([ConfigImporterBatch::class, 'process'], [$config_importer, $sync_step]);
         }
 
-        batch_set($batch_builder->toArray());
+        \batch_set($batch_builder->toArray());
       }
       catch (ConfigImporterException) {
         // There are validation errors.

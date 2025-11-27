@@ -115,9 +115,9 @@ class UnmetDependenciesException extends ConfigException {
   protected static function formatConfigObjectList(array $config_objects) {
     $list = [];
     foreach ($config_objects as $config_object => $missing_dependencies) {
-      $list[] = $config_object . ' (' . implode(', ', $missing_dependencies) . ')';
+      $list[] = $config_object . ' (' . \implode(', ', $missing_dependencies) . ')';
     }
-    return implode(', ', $list);
+    return \implode(', ', $list);
   }
 
 }

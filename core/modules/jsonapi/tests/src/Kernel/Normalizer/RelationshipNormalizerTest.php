@@ -241,7 +241,7 @@ class RelationshipNormalizerTest extends JsonapiKernelTestBase {
       'related' => ['href' => Url::fromUri('base:/jsonapi/node/referencer/' . static::$referencerId . "/$field_name", ['query' => ['resourceVersion' => 'id:1']])->setAbsolute()->toString()],
     ];
     // Set up different field values.
-    $this->referencer->{$field_name} = array_map(function ($entity_property_name) {
+    $this->referencer->{$field_name} = \array_map(function ($entity_property_name) {
       $value = ['target_id' => $this->{$entity_property_name === 'image1a' ? 'image1' : $entity_property_name}->id()];
       switch ($entity_property_name) {
         case 'image1':
@@ -266,7 +266,7 @@ class RelationshipNormalizerTest extends JsonapiKernelTestBase {
     // Normalize.
     $actual = $this->normalizer->normalize($relationship, 'api_json');
     // Assert.
-    assert($actual instanceof CacheableNormalization);
+    \assert($actual instanceof CacheableNormalization);
     $this->assertEquals($expected, $actual->getNormalization());
   }
 

@@ -48,11 +48,11 @@ abstract class LockBackendAbstract implements LockBackendInterface {
       // This function should only be called by a request that failed to get a
       // lock, so we sleep first to give the parallel request a chance to finish
       // and release the lock.
-      usleep($sleep);
+      \usleep($sleep);
       // After each sleep, increase the value of $sleep until it reaches
       // 500ms, to reduce the potential for a lock stampede.
       $delay = $delay - $sleep;
-      $sleep = min(500000, $sleep + 25000, $delay);
+      $sleep = \min(500000, $sleep + 25000, $delay);
       if ($this->lockMayBeAvailable($name)) {
         // No longer need to wait.
         return FALSE;
@@ -67,7 +67,7 @@ abstract class LockBackendAbstract implements LockBackendInterface {
    */
   public function getLockId() {
     if (!isset($this->lockId)) {
-      $this->lockId = uniqid((string) mt_rand(), TRUE);
+      $this->lockId = \uniqid((string) \mt_rand(), TRUE);
     }
     return $this->lockId;
   }

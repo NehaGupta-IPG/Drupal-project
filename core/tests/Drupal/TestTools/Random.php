@@ -55,11 +55,11 @@ abstract class Random {
     // To prevent the introduction of random test failures, ensure that the
     // returned string contains a character that needs to be escaped in HTML by
     // injecting an ampersand into it.
-    $replacement_pos = intval($length / 2);
+    $replacement_pos = \intval($length / 2);
     // Remove 2 from the length to account for the ampersand and greater than
     // characters.
     $string = static::getGenerator()->string($length - 2, TRUE, [static::class, 'stringValidate']);
-    return substr_replace($string, '>&', $replacement_pos, 0);
+    return \substr_replace($string, '>&', $replacement_pos, 0);
   }
 
   /**
@@ -75,13 +75,13 @@ abstract class Random {
    */
   public static function stringValidate(string $string): bool {
     // Consecutive spaces causes issues for link validation.
-    if (preg_match('/\s{2,}/', $string)) {
+    if (\preg_match('/\s{2,}/', $string)) {
       return FALSE;
     }
 
     // Starting or ending with a space means that length might not be what is
     // expected.
-    if (preg_match('/^\s|\s$/', $string)) {
+    if (\preg_match('/^\s|\s$/', $string)) {
       return FALSE;
     }
 

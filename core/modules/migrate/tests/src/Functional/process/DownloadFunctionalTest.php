@@ -77,7 +77,7 @@ class DownloadFunctionalTest extends BrowserTestBase {
     // Check that a message with the thrown exception has been logged.
     $messages = $id_map_plugin->getMessages(['url' => $invalid_url])->fetchAll();
     $this->assertCount(1, $messages);
-    $message = reset($messages);
+    $message = \reset($messages);
 
     // Assert critical parts of the error message, but not the exact message,
     // since it depends on Guzzle's internal implementation of PSR-7.

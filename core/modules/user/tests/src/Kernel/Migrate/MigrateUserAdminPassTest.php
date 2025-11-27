@@ -37,7 +37,7 @@ class MigrateUserAdminPassTest extends MigrateTestBase {
     // Make sure the admin user and a regular user are created.
     $this->container->get('module_handler')->loadInclude('user', 'install');
     $this->installEntitySchema('user');
-    user_install();
+    \user_install();
     /** @var \Drupal\user\Entity\User $admin_account */
     $admin_account = User::load(1);
     $admin_account->setPassword('original');

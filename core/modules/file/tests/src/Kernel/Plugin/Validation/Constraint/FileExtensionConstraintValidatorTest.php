@@ -38,7 +38,7 @@ class FileExtensionConstraintValidatorTest extends FileValidatorTestBase {
     // Test for failure.
     $validators = [
       'FileExtension' => [
-        'extensions' => implode(' ', $extensions),
+        'extensions' => \implode(' ', $extensions),
       ],
     ];
     $violations = $this->validator->validate($file, $validators);

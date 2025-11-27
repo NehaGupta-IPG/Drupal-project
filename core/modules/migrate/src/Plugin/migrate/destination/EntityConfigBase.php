@@ -115,7 +115,7 @@ class EntityConfigBase extends Entity {
       $plugin_definition,
       $migration,
       $container->get('entity_type.manager')->getStorage($entity_type_id),
-      array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type_id)),
+      \array_keys($container->get('entity_type.bundle.info')->getBundleInfo($entity_type_id)),
       $container->get('language_manager'),
       $container->get('config.factory')
     );
@@ -131,9 +131,9 @@ class EntityConfigBase extends Entity {
     $this->rollbackAction = MigrateIdMapInterface::ROLLBACK_DELETE;
     $ids = $this->getIds();
     $id_key = $this->getKey('id');
-    if (count($ids) > 1) {
+    if (\count($ids) > 1) {
       // Ids is keyed by the key name so grab the keys.
-      $id_keys = array_keys($ids);
+      $id_keys = \array_keys($ids);
       if (!$row->getDestinationProperty($id_key)) {
         // Set the ID into the destination in for form "val1.val2.val3".
         $row->setDestinationProperty($id_key, $this->generateId($row, $id_keys));
@@ -144,7 +144,7 @@ class EntityConfigBase extends Entity {
     if (!$this->isTranslationDestination()) {
       $entity->save();
     }
-    if (count($ids) > 1) {
+    if (\count($ids) > 1) {
       // This can only be a config entity, content entities have their ID key
       // and that's it.
       $return = [];
@@ -220,12 +220,12 @@ class EntityConfigBase extends Entity {
         throw new \LogicException('The "translation" property is required');
       }
       $config_override = $this->languageManager->getLanguageConfigOverride($row->getDestinationProperty('langcode'), $config);
-      $config_override->set(str_replace(Row::PROPERTY_SEPARATOR, '.', $row->getDestinationProperty('property')), $row->getDestinationProperty('translation'));
+      $config_override->set(\str_replace(Row::PROPERTY_SEPARATOR, '.', $row->getDestinationProperty('property')), $row->getDestinationProperty('translation'));
       $config_override->save();
     }
     else {
       foreach ($row->getRawDestination() as $property => $value) {
-        $this->updateEntityProperty($entity, explode(Row::PROPERTY_SEPARATOR, $property), $value);
+        $this->updateEntityProperty($entity, \explode(Row::PROPERTY_SEPARATOR, $property), $value);
       }
       $this->setRollbackAction($row->getIdMap());
     }
@@ -244,9 +244,9 @@ class EntityConfigBase extends Entity {
    *   The value to update to.
    */
   protected function updateEntityProperty(EntityInterface $entity, array $parents, $value) {
-    $top_key = array_shift($parents);
+    $top_key = \array_shift($parents);
     $entity_value = $entity->get($top_key);
-    if (is_array($entity_value)) {
+    if (\is_array($entity_value)) {
       NestedArray::setValue($entity_value, $parents, $value);
     }
     else {
@@ -274,7 +274,7 @@ class EntityConfigBase extends Entity {
       }
       $id_values[] = $row->getDestinationProperty($id);
     }
-    return implode('.', $id_values);
+    return \implode('.', $id_values);
   }
 
   /**
@@ -290,7 +290,7 @@ class EntityConfigBase extends Entity {
         }
         $id_values[] = $value;
       }
-      $entity_id = implode('.', $id_values);
+      $entity_id = \implode('.', $id_values);
       $language = $destination_identifier['langcode'];
 
       $config = $this->storage->load($entity_id)->getConfigDependencyName();
@@ -299,7 +299,7 @@ class EntityConfigBase extends Entity {
       $config_override->delete();
     }
     else {
-      $destination_identifier = implode('.', $destination_identifier);
+      $destination_identifier = \implode('.', $destination_identifier);
       parent::rollback([$destination_identifier]);
     }
   }

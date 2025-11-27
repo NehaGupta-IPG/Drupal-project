@@ -123,7 +123,7 @@ abstract class DateFormatFormBase extends EntityForm {
 
     // The machine name field should already check to see if the requested
     // machine name is available.
-    $pattern = trim($form_state->getValue('date_format_pattern'));
+    $pattern = \trim($form_state->getValue('date_format_pattern'));
     foreach ($this->dateFormatStorage->loadMultiple() as $format) {
       if ($format->getPattern() == $pattern && ($format->id() == $this->entity->id())) {
         $this->messenger()->addStatus($this->t('The existing format/name combination has not been altered.'));
@@ -136,7 +136,7 @@ abstract class DateFormatFormBase extends EntityForm {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $form_state->setValue('pattern', trim($form_state->getValue('date_format_pattern')));
+    $form_state->setValue('pattern', \trim($form_state->getValue('date_format_pattern')));
     parent::submitForm($form, $form_state);
   }
 

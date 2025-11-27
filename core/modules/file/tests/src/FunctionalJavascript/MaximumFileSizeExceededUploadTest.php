@@ -81,7 +81,7 @@ class MaximumFileSizeExceededUploadTest extends WebDriverTestBase {
     // contaminated with error messages about exceeding the maximum POST size.
     // @todo Remove this when issue #2905597 is fixed.
     // @see https://www.drupal.org/node/2905597
-    $this->originalDisplayErrorsValue = ini_set('display_errors', '0');
+    $this->originalDisplayErrorsValue = \ini_set('display_errors', '0');
   }
 
   /**
@@ -91,7 +91,7 @@ class MaximumFileSizeExceededUploadTest extends WebDriverTestBase {
     // Restore the displaying of errors to the original value.
     // @todo Remove this when issue #2905597 is fixed.
     // @see https://www.drupal.org/node/2905597
-    ini_set('display_errors', $this->originalDisplayErrorsValue);
+    \ini_set('display_errors', $this->originalDisplayErrorsValue);
 
     parent::tearDown();
   }
@@ -103,12 +103,12 @@ class MaximumFileSizeExceededUploadTest extends WebDriverTestBase {
     $session = $this->getSession();
 
     // Create a test file that exceeds the maximum POST size with 1 kilobyte.
-    $post_max_size = (int) Bytes::toNumber(ini_get('post_max_size'));
+    $post_max_size = (int) Bytes::toNumber(\ini_get('post_max_size'));
     $invalid_file = 'public://exceeding_post_max_size.bin';
-    $file = fopen($invalid_file, 'wb');
-    fseek($file, $post_max_size + 1024);
-    fwrite($file, '0');
-    fclose($file);
+    $file = \fopen($invalid_file, 'wb');
+    \fseek($file, $post_max_size + 1024);
+    \fwrite($file, '0');
+    \fclose($file);
 
     // Go to the node creation form and try to upload the test file.
     $this->drupalGet('node/add/article');

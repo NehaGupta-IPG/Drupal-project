@@ -102,7 +102,7 @@ class View extends AreaPluginBase {
    */
   public function render($empty = FALSE) {
     if (!empty($this->options['view_to_insert'])) {
-      [$view_name, $display_id] = explode(':', $this->options['view_to_insert']);
+      [$view_name, $display_id] = \explode(':', $this->options['view_to_insert']);
 
       $view = $this->viewStorage->load($view_name)->getExecutable();
 
@@ -117,7 +117,7 @@ class View extends AreaPluginBase {
 
       // Check if the view is part of the parent views of this view.
       $search = "$view_name:$display_id";
-      if (in_array($search, $this->view->parent_views)) {
+      if (\in_array($search, $this->view->parent_views)) {
         \Drupal::messenger()
           ->addError($this->t("Recursion detected in view @view display @display.", [
             '@view' => $view_name,
@@ -156,7 +156,7 @@ class View extends AreaPluginBase {
   public function calculateDependencies() {
     $dependencies = parent::calculateDependencies();
 
-    [$view_id] = explode(':', $this->options['view_to_insert'], 2);
+    [$view_id] = \explode(':', $this->options['view_to_insert'], 2);
     // Don't call the current view, as it would result into an infinite
     // recursion.
     if ($view_id && $this->view->storage->id() != $view_id) {

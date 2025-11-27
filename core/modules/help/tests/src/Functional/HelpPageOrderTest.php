@@ -58,7 +58,7 @@ class HelpPageOrderTest extends BrowserTestBase {
     $this->drupalGet('admin/help');
     $page_text = $this->getTextContent();
     foreach ($this->stringOrder as $item) {
-      $new_pos = strpos($page_text, $item, $pos);
+      $new_pos = \strpos($page_text, $item, $pos);
       $this->assertGreaterThan($pos, $new_pos, "Order of $item is not correct on help page");
       $pos = $new_pos;
     }

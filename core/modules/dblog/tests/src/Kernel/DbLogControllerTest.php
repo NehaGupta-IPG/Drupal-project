@@ -72,7 +72,7 @@ class DbLogControllerTest extends KernelTestBase {
     // Check message with properly serialized data.
     $message = (object) [
       'message' => 'Sample message with placeholder: @placeholder',
-      'variables' => serialize(['@placeholder' => 'test placeholder']),
+      'variables' => \serialize(['@placeholder' => 'test placeholder']),
     ];
 
     $this->assertEquals('Sample message with placeholder: test placeholder', $dblog_controller->formatMessage($message));

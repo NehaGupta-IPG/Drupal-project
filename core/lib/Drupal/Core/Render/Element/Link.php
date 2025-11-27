@@ -73,7 +73,7 @@ class Link extends RenderElementBase {
       $element['#options'] += ['attributes' => []];
       $element_class = $element['#attributes']['class'] ?? [];
       $option_class = $element['#options']['attributes']['class'] ?? [];
-      $element['#options']['attributes']['class'] = array_merge((array) $option_class, (array) $element_class);
+      $element['#options']['attributes']['class'] = \array_merge((array) $option_class, (array) $element_class);
       $element['#options']['attributes'] += $element['#attributes'];
     }
 

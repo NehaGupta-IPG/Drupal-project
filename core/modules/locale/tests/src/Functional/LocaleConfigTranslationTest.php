@@ -165,7 +165,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
       'name' => 'image.style.medium',
     ]);
     $this->assertCount(1, $translations);
-    $translation = reset($translations);
+    $translation = \reset($translations);
     $this->assertEquals($string->source, $translation->source);
     $this->assertEmpty($translation->translation);
 
@@ -192,7 +192,7 @@ class LocaleConfigTranslationTest extends BrowserTestBase {
       'type' => 'configuration',
       'name' => 'image.style.medium',
     ]);
-    $translation = reset($translations);
+    $translation = \reset($translations);
     $this->assertCount(1, $translations, 'Got only one translation for image configuration.');
     $this->assertEquals($string->source, $translation->source);
     $this->assertEquals($image_style_label, $translation->translation);

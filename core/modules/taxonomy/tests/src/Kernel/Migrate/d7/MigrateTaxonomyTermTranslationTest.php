@@ -129,7 +129,7 @@ class MigrateTaxonomyTermTranslationTest extends MigrateDrupal7TestBase {
 
     $this->assertArrayHasKey($tid, $this->treeData[$vid], "Term $tid exists in taxonomy tree");
     $term = $this->treeData[$vid][$tid];
-    $this->assertEquals($parent_ids, array_filter($term->parents), "Term $tid has correct parents in taxonomy tree");
+    $this->assertEquals($parent_ids, \array_filter($term->parents), "Term $tid has correct parents in taxonomy tree");
   }
 
   /**

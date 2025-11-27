@@ -219,7 +219,7 @@ class LocaleConfigManager {
       if (!isset($active[$key])) {
         continue;
       }
-      if (is_array($item)) {
+      if (\is_array($item)) {
         // Only add this key if there was a translated value underneath.
         $value = $this->processTranslatableData($name, $active[$key], $item, $langcode);
         if (!empty($value)) {
@@ -227,7 +227,7 @@ class LocaleConfigManager {
         }
       }
       else {
-        if (locale_is_translatable($langcode)) {
+        if (\locale_is_translatable($langcode)) {
           $value = $this->translateString($name, $langcode, $item->getUntranslatedString(), $item->getOption('context'));
         }
         else {
@@ -297,13 +297,13 @@ class LocaleConfigManager {
    *   Array of configuration object names.
    */
   public function getComponentNames(array $components = []) {
-    $components = array_filter($components);
+    $components = \array_filter($components);
     if ($components) {
       $names = [];
       foreach ($components as $type => $list) {
         // InstallStorage::getComponentNames returns a list of folders keyed by
         // config name.
-        $names = array_merge($names, $this->defaultConfigStorage->getComponentNames($type, $list));
+        $names = \array_merge($names, $this->defaultConfigStorage->getComponentNames($type, $list));
       }
       return $names;
     }
@@ -565,7 +565,7 @@ class LocaleConfigManager {
    *   updated (saved or removed).
    */
   public function updateConfigTranslations(array $names, array $langcodes = []) {
-    $langcodes = $langcodes ?: array_keys($this->languageManager->getLanguages());
+    $langcodes = $langcodes ?: \array_keys($this->languageManager->getLanguages());
     $count = 0;
     foreach ($names as $name) {
       $translatable = $this->getTranslatableDefaultConfig($name);
@@ -603,7 +603,7 @@ class LocaleConfigManager {
             $count++;
           }
         }
-        elseif (locale_is_translatable($langcode)) {
+        elseif (\locale_is_translatable($langcode)) {
           // If the language code is the active storage language, we should
           // update. If it is English, we should only update if English is also
           // translatable.
@@ -635,7 +635,7 @@ class LocaleConfigManager {
       if (isset($translatable[$key])) {
         // If the translatable default configuration has this key, look further
         // for subkeys or ignore this element for scalar values.
-        if (is_array($value)) {
+        if (\is_array($value)) {
           $value = $this->filterOverride($value, $translatable[$key]);
           if (!empty($value)) {
             $filtered_data[$key] = $value;

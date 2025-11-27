@@ -33,7 +33,7 @@ class PhpUnitBridgeTest extends BrowserTestBase {
    */
   public function testSilencedError(): void {
     $this->expectDeprecation('This is the deprecation message for deprecation_test_function().');
-    $this->assertEquals('known_return_value', deprecation_test_function());
+    $this->assertEquals('known_return_value', \deprecation_test_function());
   }
 
   /**

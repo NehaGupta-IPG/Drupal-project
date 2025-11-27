@@ -28,13 +28,13 @@ class StackedSessionHandlerPass implements CompilerPassInterface {
       $session_handler_proxies[$id] = $container->getDefinition($id);
     }
 
-    array_multisort($priorities, SORT_ASC, $session_handler_proxies);
+    \array_multisort($priorities, SORT_ASC, $session_handler_proxies);
 
     $decorated_id = 'session_handler.storage';
     foreach ($session_handler_proxies as $id => $decorator) {
       // Prepend the inner session handler as first constructor argument.
       $arguments = $decorator->getArguments();
-      array_unshift($arguments, new Reference($decorated_id));
+      \array_unshift($arguments, new Reference($decorated_id));
       $decorator->setArguments($arguments);
 
       $decorated_id = $id;

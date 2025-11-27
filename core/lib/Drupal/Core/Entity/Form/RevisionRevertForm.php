@@ -275,7 +275,7 @@ class RevisionRevertForm extends ConfirmFormBase implements EntityFormInterface 
    * {@inheritdoc}
    */
   public function setEntity(EntityInterface $entity) {
-    assert($entity instanceof RevisionableInterface);
+    \assert($entity instanceof RevisionableInterface);
     $this->revision = $entity;
     return $this;
   }

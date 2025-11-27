@@ -58,7 +58,7 @@ class TextFieldTest extends UnitTestCase {
     $row->setSourceProperty('formatter/type', $formatter_type);
     $row->setSourceProperty('instances', [
       [
-        'data' => serialize([
+        'data' => \serialize([
           'settings' => [
             'text_processing' => '0',
           ],

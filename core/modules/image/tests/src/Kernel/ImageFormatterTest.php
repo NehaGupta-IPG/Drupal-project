@@ -123,9 +123,9 @@ class ImageFormatterTest extends FieldKernelTestBase {
 
     // We need to create an actual empty PNG, or the GD toolkit will not
     // consider the image valid.
-    $png_resource = imagecreate(300, 300);
-    imagefill($png_resource, 0, 0, imagecolorallocate($png_resource, 0, 0, 0));
-    imagepng($png_resource, $png->getFileUri());
+    $png_resource = \imagecreate(300, 300);
+    \imagefill($png_resource, 0, 0, \imagecolorallocate($png_resource, 0, 0, 0));
+    \imagepng($png_resource, $png->getFileUri());
 
     $svg = File::create([
       'uri' => 'public://test-image.svg',
@@ -133,7 +133,7 @@ class ImageFormatterTest extends FieldKernelTestBase {
     $svg->save();
     // We don't have to put any real SVG data in here, because the GD toolkit
     // won't be able to load it anyway.
-    touch($svg->getFileUri());
+    \touch($svg->getFileUri());
 
     $entity = EntityTest::create([
       'name' => $this->randomMachineName(),
@@ -212,7 +212,7 @@ class ImageFormatterTest extends FieldKernelTestBase {
    * @internal
    */
   protected function assertCacheTags(array $renderable, array $cache_tags): void {
-    $diff = array_diff($cache_tags, $renderable['#cache']['tags']);
+    $diff = \array_diff($cache_tags, $renderable['#cache']['tags']);
     $this->assertEmpty($diff);
   }
 

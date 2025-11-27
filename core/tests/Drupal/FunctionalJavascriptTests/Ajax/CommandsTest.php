@@ -157,7 +157,7 @@ JS;
   protected function assertWaitPageContains(string $text): void {
     $page = $this->getSession()->getPage();
     $page->waitFor(10, function () use ($page, $text) {
-      return stripos($page->getContent(), $text) !== FALSE;
+      return \stripos($page->getContent(), $text) !== FALSE;
     });
     $this->assertStringContainsString($text, $page->getContent());
   }

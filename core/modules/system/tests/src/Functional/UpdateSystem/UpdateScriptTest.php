@@ -264,7 +264,7 @@ class UpdateScriptTest extends BrowserTestBase {
     }
     $folder_path = \Drupal::getContainer()->getParameter('site.path') . "/{$extension_type}s/$extension_machine_names[0]";
     $file_path = "$folder_path/$extension_machine_names[0].info.yml";
-    mkdir($folder_path, 0777, TRUE);
+    \mkdir($folder_path, 0777, TRUE);
     $this->writeInfoFile($file_path, $base_info + $correct_info);
     $this->enableExtensions($extension_type, $extension_machine_names, [$extension_name]);
     $this->assertInstalledExtensionsConfig($extension_type, $extension_machine_names);
@@ -326,7 +326,7 @@ class UpdateScriptTest extends BrowserTestBase {
           'type' => 'module',
           'php' => 1000000000,
         ],
-        'The following module is installed, but it is incompatible with PHP ' . phpversion() . ":",
+        'The following module is installed, but it is incompatible with PHP ' . \phpversion() . ":",
       ],
       'theme: php requirement' => [
         [
@@ -339,7 +339,7 @@ class UpdateScriptTest extends BrowserTestBase {
           'type' => 'theme',
           'php' => 1000000000,
         ],
-        'The following theme is installed, but it is incompatible with PHP ' . phpversion() . ":",
+        'The following theme is installed, but it is incompatible with PHP ' . \phpversion() . ":",
       ],
     ];
   }
@@ -405,17 +405,17 @@ class UpdateScriptTest extends BrowserTestBase {
       // Create the requirements test message.
       if (!empty($extensions)) {
         $handbook_message = "For more information read the documentation on deprecated {$type}s.";
-        if (count($removed_list) === 1) {
+        if (\count($removed_list) === 1) {
           $test_error_texts[$type][] = "Removed core {$type} "
             . "You must add the following contributed $type and reload this page."
-            . implode($removed_list)
+            . \implode($removed_list)
             . "This $type is installed on your site but is no longer provided by Core."
             . $handbook_message;
         }
         else {
           $test_error_texts[$type][] = "Removed core {$type}s "
             . "You must add the following contributed {$type}s and reload this page."
-            . implode($removed_list)
+            . \implode($removed_list)
             . "These {$type}s are installed on your site but are no longer provided by Core."
             . $handbook_message;
         }
@@ -443,16 +443,16 @@ class UpdateScriptTest extends BrowserTestBase {
 
       // Create the requirements test message.
       if (!empty($extensions)) {
-        if (count($extensions) === 1) {
+        if (\count($extensions) === 1) {
           $test_error_texts[$type][] = "Missing or invalid {$type} "
             . "The following {$type} is marked as installed in the core.extension configuration, but it is missing:"
-            . implode($extensions)
+            . \implode($extensions)
             . $handbook_message;
         }
         else {
           $test_error_texts[$type][] = "Missing or invalid {$type}s "
             . "The following {$type}s are marked as installed in the core.extension configuration, but they are missing:"
-            . implode($extensions)
+            . \implode($extensions)
             . $handbook_message;
         }
         $test_error_urls[$type][] = $error_url;
@@ -464,8 +464,8 @@ class UpdateScriptTest extends BrowserTestBase {
       $type = $extension_info['type'];
       $folder_path = \Drupal::getContainer()->getParameter('site.path') . "/{$type}s/contrib/$machine_name";
       $file_path = "$folder_path/$machine_name.info.yml";
-      mkdir($folder_path, 0777, TRUE);
-      file_put_contents($file_path, Yaml::encode($extension_info));
+      \mkdir($folder_path, 0777, TRUE);
+      \file_put_contents($file_path, Yaml::encode($extension_info));
       $file_paths[$machine_name] = $file_path;
     }
 
@@ -481,28 +481,28 @@ class UpdateScriptTest extends BrowserTestBase {
     $this->drupalGet($this->statusReportUrl);
     $types = ['module', 'theme'];
     foreach ($types as $type) {
-      $all = array_merge($core[$type], $contrib[$type]);
+      $all = \array_merge($core[$type], $contrib[$type]);
       $this->assertUpdateWithNoErrors($test_error_texts[$type], $type, $all);
     }
 
     // Delete the info.yml(s) and confirm updates are prevented.
     foreach ($file_paths as $file_path) {
-      unlink($file_path);
+      \unlink($file_path);
     }
     $this->drupalGet($this->statusReportUrl);
     foreach ($types as $type) {
-      $all = array_merge($core[$type], $contrib[$type]);
+      $all = \array_merge($core[$type], $contrib[$type]);
       $this->assertErrorOnUpdates($test_error_texts[$type], $type, $all, $test_error_urls[$type]);
     }
 
     // Add the info.yml file(s) back and confirm we are able to go through the
     // update process uninterrupted.
     foreach ($all_extensions_info as $machine_name => $extension_info) {
-      file_put_contents($file_paths[$machine_name], Yaml::encode($extension_info));
+      \file_put_contents($file_paths[$machine_name], Yaml::encode($extension_info));
     }
     $this->drupalGet($this->statusReportUrl);
     foreach ($types as $type) {
-      $all = array_merge($core[$type], $contrib[$type]);
+      $all = \array_merge($core[$type], $contrib[$type]);
       $this->assertUpdateWithNoErrors($test_error_texts[$type], $type, $all);
     }
   }

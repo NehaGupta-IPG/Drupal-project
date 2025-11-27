@@ -90,12 +90,12 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
     }
 
     // Collect entity type and bundles.
-    $entity_type = current($entities)->getEntityTypeId();
+    $entity_type = \current($entities)->getEntityTypeId();
     $bundles = [];
     foreach ($entities as $entity) {
       $bundles[$entity->bundle()] = TRUE;
     }
-    $bundles = array_keys($bundles);
+    $bundles = \array_keys($bundles);
 
     // For each bundle, check the existence and status of:
     // - the display for the view mode,

@@ -80,15 +80,15 @@ class Routes implements ContainerInjectionInterface {
    */
   public function __construct(ResourceTypeRepositoryInterface $resource_type_repository, array $authentication_providers, $jsonapi_base_path) {
     $this->resourceTypeRepository = $resource_type_repository;
-    $this->providerIds = array_keys($authentication_providers);
-    assert(is_string($jsonapi_base_path));
-    assert(
+    $this->providerIds = \array_keys($authentication_providers);
+    \assert(\is_string($jsonapi_base_path));
+    \assert(
       $jsonapi_base_path[0] === '/',
-      sprintf('The provided base path should contain a leading slash "/". Given: "%s".', $jsonapi_base_path)
+      \sprintf('The provided base path should contain a leading slash "/". Given: "%s".', $jsonapi_base_path)
     );
-    assert(
-      !str_ends_with($jsonapi_base_path, '/'),
-      sprintf('The provided base path should not contain a trailing slash "/". Given: "%s".', $jsonapi_base_path)
+    \assert(
+      !\str_ends_with($jsonapi_base_path, '/'),
+      \sprintf('The provided base path should not contain a trailing slash "/". Given: "%s".', $jsonapi_base_path)
     );
     $this->jsonApiBasePath = $jsonapi_base_path;
   }
@@ -172,7 +172,7 @@ class Routes implements ContainerInjectionInterface {
       $collection_create_route = new Route("/{$resource_type->getPath()}");
       $collection_create_route->addDefaults([RouteObjectInterface::CONTROLLER_NAME => static::CONTROLLER_SERVICE_NAME . ':createIndividual']);
       $collection_create_route->setMethods(['POST']);
-      $create_requirement = sprintf("%s:%s", $resource_type->getEntityTypeId(), $resource_type->getBundle());
+      $create_requirement = \sprintf("%s:%s", $resource_type->getEntityTypeId(), $resource_type->getBundle());
       $collection_create_route->setRequirement('_entity_create_access', $create_requirement);
       $collection_create_route->setRequirement('_csrf_request_header_token', 'TRUE');
       $routes->add(static::getRouteName($resource_type, 'collection.post'), $collection_create_route);
@@ -215,7 +215,7 @@ class Routes implements ContainerInjectionInterface {
 
     // File upload routes are only necessary for resource types that have file
     // fields.
-    $has_file_field = array_reduce($resource_type->getRelatableResourceTypes(), function ($carry, array $target_resource_types) {
+    $has_file_field = \array_reduce($resource_type->getRelatableResourceTypes(), function ($carry, array $target_resource_types) {
       return $carry || static::hasNonInternalFileTargetResourceTypes($target_resource_types);
     }, FALSE);
     if (!$has_file_field) {
@@ -265,7 +265,7 @@ class Routes implements ContainerInjectionInterface {
    */
   public static function isJsonApiRequest(array $defaults) {
     return isset($defaults[RouteObjectInterface::CONTROLLER_NAME])
-      && str_starts_with($defaults[RouteObjectInterface::CONTROLLER_NAME], static::CONTROLLER_SERVICE_NAME);
+      && \str_starts_with($defaults[RouteObjectInterface::CONTROLLER_NAME], static::CONTROLLER_SERVICE_NAME);
   }
 
   /**
@@ -332,7 +332,7 @@ class Routes implements ContainerInjectionInterface {
         $method_specific_relationship_route->setRequirement(RelationshipRouteAccessCheck::ROUTE_REQUIREMENT_KEY, "$relationship_field_name.$field_operation");
         $method_specific_relationship_route->addDefaults([RouteObjectInterface::CONTROLLER_NAME => static::CONTROLLER_SERVICE_NAME . ":{$relationship_controller_methods[$method]}"]);
         $method_specific_relationship_route->setMethods($method);
-        $routes->add(static::getRouteName($resource_type, sprintf("%s.relationship.%s", $relationship_field_name, strtolower($method))), $method_specific_relationship_route);
+        $routes->add(static::getRouteName($resource_type, \sprintf("%s.relationship.%s", $relationship_field_name, \strtolower($method))), $method_specific_relationship_route);
       }
 
       // Only create routes for related routes that target at least one
@@ -403,7 +403,7 @@ class Routes implements ContainerInjectionInterface {
    *   The generated route name.
    */
   public static function getRouteName(ResourceType $resource_type, $route_type) {
-    return sprintf('jsonapi.%s.%s', $resource_type->getTypeName(), $route_type);
+    return \sprintf('jsonapi.%s.%s', $resource_type->getTypeName(), $route_type);
   }
 
   /**
@@ -418,7 +418,7 @@ class Routes implements ContainerInjectionInterface {
    *   The generated route name.
    */
   protected static function getFileUploadRouteName(ResourceType $resource_type, $route_type) {
-    return sprintf('jsonapi.%s.%s.%s', $resource_type->getTypeName(), 'file_upload', $route_type);
+    return \sprintf('jsonapi.%s.%s.%s', $resource_type->getTypeName(), 'file_upload', $route_type);
   }
 
   /**
@@ -432,7 +432,7 @@ class Routes implements ContainerInjectionInterface {
    *   array; FALSE otherwise.
    */
   protected static function hasNonInternalTargetResourceTypes(array $resource_types) {
-    return array_reduce($resource_types, function ($carry, ResourceType $target) {
+    return \array_reduce($resource_types, function ($carry, ResourceType $target) {
       return $carry || !$target->isInternal();
     }, FALSE);
   }
@@ -448,7 +448,7 @@ class Routes implements ContainerInjectionInterface {
    *   given array; FALSE otherwise.
    */
   protected static function hasNonInternalFileTargetResourceTypes(array $resource_types) {
-    return array_reduce($resource_types, function ($carry, ResourceType $target) {
+    return \array_reduce($resource_types, function ($carry, ResourceType $target) {
       return $carry || (!$target->isInternal() && $target->getEntityTypeId() === 'file');
     }, FALSE);
   }

@@ -73,7 +73,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
     if (!$field_state = static::getWidgetState($parents, $field_name, $form_state)) {
       $field_state = [
-        'items_count' => count($items),
+        'items_count' => \count($items),
         'array_parents' => [],
       ];
       static::setWidgetState($parents, $field_name, $form_state, $field_state);
@@ -127,7 +127,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $elements['#field_name'] = $field_name;
     $elements['#field_parents'] = $parents;
     // Enforce the structure of submitted values.
-    $elements['#parents'] = array_merge($parents, [$field_name]);
+    $elements['#parents'] = \array_merge($parents, [$field_name]);
     // Most widgets need their internal structure preserved in submitted values.
     $elements += ['#tree' => TRUE];
 
@@ -135,7 +135,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       // Aid in theming of widgets by rendering a classified container.
       '#type' => 'container',
       // Assign a different parent, to keep the main id for the widget itself.
-      '#parents' => array_merge($parents, [$field_name . '_wrapper']),
+      '#parents' => \array_merge($parents, [$field_name . '_wrapper']),
       '#attributes' => [
         'class' => [
           'field--type-' . Html::getClass($this->fieldDefinition->getType()),
@@ -191,7 +191,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
     $title = $this->fieldDefinition->getLabel();
     $description = $this->getFilteredDescription();
-    $id_prefix = implode('-', array_merge($parents, [$field_name]));
+    $id_prefix = \implode('-', \array_merge($parents, [$field_name]));
     $wrapper_id = Html::getUniqueId($id_prefix . '-add-more-wrapper');
 
     $elements = [];
@@ -240,7 +240,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
           if ($is_unlimited_not_programmed) {
             $remove_button = [
               '#delta' => $delta,
-              '#name' => str_replace('-', '_', $id_prefix) . "_{$delta}_remove_button",
+              '#name' => \str_replace('-', '_', $id_prefix) . "_{$delta}_remove_button",
               '#type' => 'submit',
               '#value' => $this->t('Remove'),
               '#validate' => [],
@@ -283,7 +283,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
         $elements['add_more'] = [
           '#type' => 'submit',
-          '#name' => strtr($id_prefix, '-', '_') . '_add_more',
+          '#name' => \strtr($id_prefix, '-', '_') . '_add_more',
           '#value' => $this->t('Add another item'),
           '#attributes' => ['class' => ['field-add-more-submit']],
           '#button_type' => 'small',
@@ -325,7 +325,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $button = $form_state->getTriggeringElement();
 
     // Go one level up in the form, to the widgets container.
-    $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $element = NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -1));
     $field_name = $element['#field_name'];
     $parents = $element['#field_parents'];
 
@@ -347,7 +347,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $button = $form_state->getTriggeringElement();
 
     // Go one level up in the form, to the widgets container.
-    $element = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $element = NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -1));
 
     // Ensure the widget allows adding additional items.
     if ($element['#cardinality'] != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
@@ -358,7 +358,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $delta = $element['#max_delta'];
     // Construct an attribute to add to div for use as selector to set the focus
     // on.
-    $button_parent = NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -1));
+    $button_parent = NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -1));
     $focus_attribute = 'data-drupal-selector="field-' . $button_parent['#field_name'] . '-more-focus-target"';
     $element[$delta]['#prefix'] = '<div class="ajax-new-content" ' . $focus_attribute . '>' . ($element[$delta]['#prefix'] ?? '');
     $element[$delta]['#suffix'] = ($element[$delta]['#suffix'] ?? '') . '</div>';
@@ -384,8 +384,8 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
   public static function deleteSubmit(&$form, FormStateInterface $form_state) {
     $button = $form_state->getTriggeringElement();
     $delta = (int) $button['#delta'];
-    $array_parents = array_slice($button['#array_parents'], 0, -4);
-    $parent_element = NestedArray::getValue($form, array_merge($array_parents, ['widget']));
+    $array_parents = \array_slice($button['#array_parents'], 0, -4);
+    $parent_element = NestedArray::getValue($form, \array_merge($array_parents, ['widget']));
     $field_name = $parent_element['#field_name'];
     $parents = $parent_element['#field_parents'];
     $field_state = static::getWidgetState($parents, $field_name, $form_state);
@@ -394,7 +394,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     if ($exists) {
       $field_values = [];
       foreach ($field_input as $key => $input) {
-        if (is_numeric($key) && $key >= $delta) {
+        if (\is_numeric($key) && $key >= $delta) {
           if ((int) $key === $delta) {
             --$key;
             continue;
@@ -424,7 +424,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       }
     }
     // Reset indices.
-    $input = array_values($input);
+    $input = \array_values($input);
 
     $user_input = $form_state->getUserInput();
     NestedArray::setValue($user_input, $parent_element['#parents'], $input);
@@ -446,7 +446,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    */
   public static function deleteAjax(array &$form, FormStateInterface $form_state) {
     $button = $form_state->getTriggeringElement();
-    return NestedArray::getValue($form, array_slice($button['#array_parents'], 0, -3));
+    return NestedArray::getValue($form, \array_slice($button['#array_parents'], 0, -3));
   }
 
   /**
@@ -488,7 +488,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     $field_name = $this->fieldDefinition->getName();
 
     // Extract the values from $form_state->getValues().
-    $path = array_merge($form['#parents'], [$field_name]);
+    $path = \array_merge($form['#parents'], [$field_name]);
     $key_exists = NULL;
     $values = NestedArray::getValue($form_state->getValues(), $path, $key_exists);
 
@@ -504,7 +504,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
           $value['_original_delta'] = $delta;
         }
 
-        usort($values, function ($a, $b) {
+        \usort($values, function ($a, $b) {
           return SortArray::sortByKeyInt($a, $b, '_weight');
         });
       }
@@ -542,10 +542,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       // already been reported for the field.
       // @todo Field validation should not be run on fields with FAPI errors to
       //   begin with. See https://www.drupal.org/node/2070429.
-      $element_path = implode('][', $element['#parents']);
+      $element_path = \implode('][', $element['#parents']);
       if ($reported_errors = $form_state->getErrors()) {
-        foreach (array_keys($reported_errors) as $error_path) {
-          if (str_starts_with($error_path, $element_path)) {
+        foreach (\array_keys($reported_errors) as $error_path) {
+          if (\str_starts_with($error_path, $element_path)) {
             return;
           }
         }
@@ -558,9 +558,9 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
         $violations_by_delta = $item_list_violations = [];
         foreach ($violations as $violation) {
           // Separate violations by delta.
-          $property_path = explode('.', $violation->getPropertyPath());
-          $delta = array_shift($property_path);
-          if (is_numeric($delta)) {
+          $property_path = \explode('.', $violation->getPropertyPath());
+          $delta = \array_shift($property_path);
+          if (\is_numeric($delta)) {
             $violations_by_delta[$delta][] = $violation;
           }
           // Violations at the ItemList level are not associated to any delta.
@@ -630,7 +630,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
     // "$form_state->get(['field_storage', '#parents', ...$parents..., '#fields', $field_name])"
     // to avoid clashes between field names and $parents parts.
     // phpcs:enable
-    return array_merge(['field_storage', '#parents'], $parents, ['#fields', $field_name]);
+    return \array_merge(['field_storage', '#parents'], $parents, ['#fields', $field_name]);
   }
 
   /**

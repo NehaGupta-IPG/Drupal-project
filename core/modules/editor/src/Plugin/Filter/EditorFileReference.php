@@ -80,7 +80,7 @@ class EditorFileReference extends FilterBase implements ContainerFactoryPluginIn
   public function process($text, $langcode) {
     $result = new FilterProcessResult($text);
 
-    if (stristr($text, 'data-entity-type="file"') !== FALSE) {
+    if (\stristr($text, 'data-entity-type="file"') !== FALSE) {
       $dom = Html::load($text);
       $xpath = new \DOMXPath($dom);
       $processed_uuids = [];

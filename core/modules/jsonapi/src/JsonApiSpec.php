@@ -89,7 +89,7 @@ class JsonApiSpec {
    * @see http://jsonapi.org/format/#document-member-names
    */
   public static function isValidMemberName($member_name) {
-    return preg_match(static::MEMBER_NAME_REGEXP, $member_name) === 1;
+    return \preg_match(static::MEMBER_NAME_REGEXP, $member_name) === 1;
   }
 
   /**
@@ -145,7 +145,7 @@ class JsonApiSpec {
    * @see http://jsonapi.org/format/#query-parameters
    */
   public static function isValidCustomQueryParameter($custom_query_parameter_name) {
-    return static::isValidMemberName($custom_query_parameter_name) && preg_match('/[^a-z]/u', $custom_query_parameter_name) === 1;
+    return static::isValidMemberName($custom_query_parameter_name) && \preg_match('/[^a-z]/u', $custom_query_parameter_name) === 1;
   }
 
 }

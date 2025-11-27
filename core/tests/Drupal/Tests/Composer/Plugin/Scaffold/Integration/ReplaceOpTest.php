@@ -36,7 +36,7 @@ class ReplaceOpTest extends TestCase {
     // Assert that the target file was created.
     $this->assertFileExists($destination->fullPath());
     // Assert the target contained the contents from the correct scaffold file.
-    $contents = trim(file_get_contents($destination->fullPath()));
+    $contents = \trim(\file_get_contents($destination->fullPath()));
     $this->assertEquals('# Test version of robots.txt from drupal/core.', $contents);
     // Confirm that expected output was written to our io fixture.
     $output = $fixtures->getOutput();
@@ -61,7 +61,7 @@ class ReplaceOpTest extends TestCase {
     // Assert that the target file was created.
     $this->assertFileExists($destination->fullPath());
     // Assert the target contained the contents from the correct scaffold file.
-    $this->assertSame('', file_get_contents($destination->fullPath()));
+    $this->assertSame('', \file_get_contents($destination->fullPath()));
     // Confirm that expected output was written to our io fixture.
     $output = $fixtures->getOutput();
     $this->assertStringContainsString('Copy [web-root]/empty_file.txt from assets/empty_file.txt', $output);

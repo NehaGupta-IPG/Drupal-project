@@ -77,7 +77,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    * {@inheritdoc}
    */
   public function processAttachments(AttachmentsInterface $response) {
-    assert($response instanceof HtmlResponse);
+    \assert($response instanceof HtmlResponse);
 
     // First, render the actual placeholders; this may cause additional
     // attachments to be added to the response, which the attachment
@@ -100,8 +100,8 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $attached = $response->getAttachments();
 
     // Send a message back if the render array has unsupported #attached types.
-    $unsupported_types = array_diff(
-      array_keys($attached),
+    $unsupported_types = \array_diff(
+      \array_keys($attached),
       [
         'html_head',
         'feed',
@@ -114,7 +114,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       ]
     );
     if (!empty($unsupported_types)) {
-      throw new \LogicException(sprintf('You are not allowed to use %s in #attached.', implode(', ', $unsupported_types)));
+      throw new \LogicException(\sprintf('You are not allowed to use %s in #attached.', \implode(', ', $unsupported_types)));
     }
 
     // If we don't have any placeholders, there is no need to proceed.
@@ -128,7 +128,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       // Turbolinks to be implemented without altering core.
       // @see https://github.com/rails/turbolinks/
       $ajax_page_state = $this->requestStack->getCurrentRequest()->get('ajax_page_state');
-      $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : []);
+      $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? \explode(',', $ajax_page_state['libraries']) : []);
       $variables = $this->processAssetLibraries($assets, $attachment_placeholders);
       // $variables now contains the markup to load the asset libraries. Update
       // $attached with the final list of libraries and JavaScript settings, so
@@ -205,12 +205,12 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    */
   public static function formatHttpHeaderAttributes(array $attributes = []) {
     foreach ($attributes as $attribute => &$data) {
-      if (is_array($data)) {
-        $data = implode(' ', $data);
+      if (\is_array($data)) {
+        $data = \implode(' ', $data);
       }
       $data = $attribute . '="' . $data . '"';
     }
-    return $attributes ? ' ' . implode('; ', $attributes) : '';
+    return $attributes ? ' ' . \implode('; ', $attributes) : '';
   }
 
   /**
@@ -279,7 +279,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   protected function processAssetLibraries(AttachedAssetsInterface $assets, array $placeholders) {
     $variables = [];
 
-    $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
+    $maintenance_mode = \defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
 
     // Print styles - if present.
     if (isset($placeholders['styles'])) {
@@ -319,7 +319,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     $content = $response->getContent();
     foreach ($placeholders as $type => $placeholder) {
       if (isset($variables[$type])) {
-        $content = str_replace($placeholder, $this->renderer->renderInIsolation($variables[$type]), $content);
+        $content = \str_replace($placeholder, $this->renderer->renderInIsolation($variables[$type]), $content);
       }
     }
     $response->setContent($content);
@@ -347,7 +347,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
 
       // Drupal treats the HTTP response status code like a header, even though
       // it really is not.
-      if (strtolower($name) === 'status') {
+      if (\strtolower($name) === 'status') {
         $response->setStatusCode($value);
       }
       else {

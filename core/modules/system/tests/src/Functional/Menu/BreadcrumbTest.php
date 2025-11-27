@@ -69,7 +69,7 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->config('system.theme')->set('admin', 'claro')->save();
 
     $this->config('system.site')->set('page.front', '/node')->save();
-    $perms = array_keys(\Drupal::service('user.permissions')->getPermissions());
+    $perms = \array_keys(\Drupal::service('user.permissions')->getPermissions());
     $this->adminUser = $this->drupalCreateUser($perms);
     $this->drupalLogin($this->adminUser);
 
@@ -152,8 +152,8 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->assertBreadcrumb("admin/structure/types/manage/$type/fields/node.$type.body", $trail);
 
     // Verify Filter text format administration breadcrumbs.
-    $filter_formats = filter_formats();
-    $format = reset($filter_formats);
+    $filter_formats = \filter_formats();
+    $format = \reset($filter_formats);
     $format_id = $format->id();
     $trail = $config + [
       'admin/config/content' => 'Content authoring',
@@ -231,7 +231,7 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->drupalGet("admin/structure/menu/manage/{$menu}/add");
     $this->submitForm($edit, 'Save');
     $menu_links = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties(['title' => 'Root']);
-    $link = reset($menu_links);
+    $link = \reset($menu_links);
 
     $edit = [
       'menu[menu_parent]' => $link->getMenuName() . ':' . $link->getPluginId(),
@@ -246,7 +246,7 @@ class BreadcrumbTest extends BrowserTestBase {
       'Breadcrumbs' => [],
     ];
     $edit = [
-      'field_tags[target_id]' => implode(',', array_keys($tags)),
+      'field_tags[target_id]' => \implode(',', \array_keys($tags)),
     ];
     $this->drupalGet('node/' . $parent->id() . '/edit');
     $this->submitForm($edit, 'Save');
@@ -257,7 +257,7 @@ class BreadcrumbTest extends BrowserTestBase {
     $parent_tid = 0;
     foreach ($tags as $name => $null) {
       $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['name' => $name]);
-      $term = reset($terms);
+      $term = \reset($terms);
       $tags[$name]['term'] = $term;
       if ($parent_tid) {
         $edit = [
@@ -283,7 +283,7 @@ class BreadcrumbTest extends BrowserTestBase {
         'title' => $edit['title[0][value]'],
         'link.uri' => 'internal:/taxonomy/term/' . $term->id(),
       ]);
-      $tags[$name]['link'] = reset($menu_links);
+      $tags[$name]['link'] = \reset($menu_links);
       $parent_menu_link_id = $tags[$name]['link']->getPluginId();
     }
 
@@ -322,7 +322,7 @@ class BreadcrumbTest extends BrowserTestBase {
     // Verify breadcrumbs on user and user/%.
     // We need to log back in and out below, and cannot simply grant the
     // 'administer users' permission, since user_page() makes your head explode.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
+    \user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [
       'access user profiles',
     ]);
 

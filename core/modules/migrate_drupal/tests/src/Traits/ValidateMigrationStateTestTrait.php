@@ -51,8 +51,8 @@ trait ValidateMigrationStateTestTrait {
     /** @var \Drupal\migrate\Plugin\Migration $migration */
     foreach ($migrations as $migration) {
       $definition = $migration->getPluginDefinition();
-      if (is_array($definition['provider'])) {
-        $provider = reset($definition['provider']);
+      if (\is_array($definition['provider'])) {
+        $provider = \reset($definition['provider']);
       }
       else {
         $provider = $definition['provider'];
@@ -62,7 +62,7 @@ trait ValidateMigrationStateTestTrait {
       $destination_module = $migration->getDestinationPlugin()
         ->getDestinationModule();
 
-      $discovered[] = implode($separator, [
+      $discovered[] = \implode($separator, [
         $provider,
         $source_module,
         $destination_module,
@@ -75,7 +75,7 @@ trait ValidateMigrationStateTestTrait {
       ->getDefinitions();
     foreach ($definitions as $key => $definition) {
       if (isset($definition['core'][$version])) {
-        $discovered[] = implode($separator, [
+        $discovered[] = \implode($separator, [
           $definition['provider'],
           $definition['source_module'],
           $definition['destination_module'],
@@ -88,7 +88,7 @@ trait ValidateMigrationStateTestTrait {
     // destination is not used yet but can be later for validating the
     // source/destination pairs with the actual source/destination pairs in the
     // migrate plugins.
-    $system_info = (new YamlDiscovery('migrate_drupal', array_map(function ($value) {
+    $system_info = (new YamlDiscovery('migrate_drupal', \array_map(function ($value) {
       return $value . '/migrations/state/';
     }, \Drupal::moduleHandler()->getModuleDirectories())))->findAll();
 
@@ -97,7 +97,7 @@ trait ValidateMigrationStateTestTrait {
       MigrationState::NOT_FINISHED => [],
     ];
     foreach ($system_info as $module => $info) {
-      foreach (array_keys($declared) as $state) {
+      foreach (\array_keys($declared) as $state) {
         if (isset($info[$state][$version])) {
           foreach ($info[$state][$version] as $source => $destination) {
             // Do not add the source module i18nstrings or i18_string. The
@@ -105,8 +105,8 @@ trait ValidateMigrationStateTestTrait {
             // can be handled in the migration.
             if (($source !== 'i18nstrings') && ($source !== 'i18n_string')) {
               foreach ((array) $destination as $dest) {
-                $key = [$module, $source, trim($dest)];
-                $declared[$state][] = implode($separator, $key);
+                $key = [$module, $source, \trim($dest)];
+                $declared[$state][] = \implode($separator, $key);
               }
             }
           }
@@ -115,30 +115,30 @@ trait ValidateMigrationStateTestTrait {
     }
 
     // Sort and make the array values unique.
-    sort($declared[MigrationState::FINISHED]);
-    sort($declared[MigrationState::NOT_FINISHED]);
-    $declared_unique[MigrationState::FINISHED] = array_unique($declared[MigrationState::FINISHED]);
-    $declared_unique[MigrationState::NOT_FINISHED] = array_unique($declared[MigrationState::NOT_FINISHED]);
-    sort($discovered);
-    $discovered_unique = array_unique($discovered);
+    \sort($declared[MigrationState::FINISHED]);
+    \sort($declared[MigrationState::NOT_FINISHED]);
+    $declared_unique[MigrationState::FINISHED] = \array_unique($declared[MigrationState::FINISHED]);
+    $declared_unique[MigrationState::NOT_FINISHED] = \array_unique($declared[MigrationState::NOT_FINISHED]);
+    \sort($discovered);
+    $discovered_unique = \array_unique($discovered);
 
     // Assert that each discovered migration has a corresponding declaration
     // in a migrate_drupal.yml.
     foreach ($discovered_unique as $datum) {
-      $data = str_getcsv($datum, escape: '');
-      $in_finished = in_array($datum, $declared_unique[MigrationState::FINISHED]);
-      $in_not_finished = in_array($datum, $declared_unique[MigrationState::NOT_FINISHED]);
+      $data = \str_getcsv($datum, escape: '');
+      $in_finished = \in_array($datum, $declared_unique[MigrationState::FINISHED]);
+      $in_not_finished = \in_array($datum, $declared_unique[MigrationState::NOT_FINISHED]);
       $found = $in_finished || $in_not_finished;
-      $this->assertTrue($found, sprintf("No migration state found for version '%s' with source_module '%s' and destination_module '%s' declared in module '%s'", $version, $data[1], $data[2], $data[0]));
+      $this->assertTrue($found, \sprintf("No migration state found for version '%s' with source_module '%s' and destination_module '%s' declared in module '%s'", $version, $data[1], $data[2], $data[0]));
     }
 
     // Remove the declared finished from the discovered, leaving just the not
     // finished, if there are any. These should have an entry in the declared
     // not finished.
-    $discovered_not_finished = array_diff($discovered_unique, $declared_unique[MigrationState::FINISHED]);
+    $discovered_not_finished = \array_diff($discovered_unique, $declared_unique[MigrationState::FINISHED]);
     foreach ($discovered_not_finished as $datum) {
-      $data = str_getcsv($datum, escape: '');
-      $this->assertContains($datum, $declared_unique[MigrationState::NOT_FINISHED], sprintf("No migration found for version '%s' with source_module '%s' and destination_module '%s' declared in module '%s'", $version, $data[1], $data[2], $data[0]));
+      $data = \str_getcsv($datum, escape: '');
+      $this->assertContains($datum, $declared_unique[MigrationState::NOT_FINISHED], \sprintf("No migration found for version '%s' with source_module '%s' and destination_module '%s' declared in module '%s'", $version, $data[1], $data[2], $data[0]));
     }
   }
 
@@ -150,7 +150,7 @@ trait ValidateMigrationStateTestTrait {
     $module_handler = $this->container->get('module_handler');
     $modules = $this->coreModuleListDataProvider();
     $modules_enabled = $module_handler->getModuleList();
-    $modules_to_enable = array_keys(array_diff_key($modules, $modules_enabled));
+    $modules_to_enable = \array_keys(\array_diff_key($modules, $modules_enabled));
     $this->enableModules($modules_to_enable);
     return $modules;
   }

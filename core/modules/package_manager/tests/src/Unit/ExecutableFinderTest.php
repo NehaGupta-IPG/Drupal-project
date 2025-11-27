@@ -44,7 +44,7 @@ class ExecutableFinderTest extends UnitTestCase {
       ],
     ]);
     $composer_bin = 'vfs://root/composer-path/bin/composer';
-    $this->assertTrue(chmod($composer_bin, 0755));
+    $this->assertTrue(\chmod($composer_bin, 0755));
 
     $decorated = $this->prophesize(ExecutableFinderInterface::class);
     $decorated->find('composer')->willReturn('the real Composer');
@@ -66,7 +66,7 @@ class ExecutableFinderTest extends UnitTestCase {
     $finder->setLogger($logger);
 
     $reflector = new \ReflectionProperty($finder, 'composerPackagePath');
-    $reflector->setValue($finder, dirname($composer_bin, 2));
+    $reflector->setValue($finder, \dirname($composer_bin, 2));
     $this->assertSame($composer_bin, $finder->find('composer'));
 
     // If the permissions change will fail, a warning should be logged.
@@ -80,7 +80,7 @@ class ExecutableFinderTest extends UnitTestCase {
 
     // If the executable disappears and Composer isn't locally installed, fall
     // back to a setting.
-    unlink($composer_bin);
+    \unlink($composer_bin);
     $reflector->setValue($finder, FALSE);
     new Settings([
       'package_manager_composer_path' => 'Composer from settings',

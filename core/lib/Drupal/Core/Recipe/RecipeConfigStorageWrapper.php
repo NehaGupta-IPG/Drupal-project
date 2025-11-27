@@ -50,15 +50,15 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
     }
 
     // When there is only one storage there is no point wrapping it.
-    if (count($storages) === 1) {
-      return reset($storages);
+    if (\count($storages) === 1) {
+      return \reset($storages);
     }
 
     // Reduce all the storages to a single RecipeConfigStorageWrapper object.
     // The storages are prioritized in the order they are added to $storages.
-    return array_reduce($storages, fn(StorageInterface $carry, StorageInterface $storage) => new static($carry, $storage), new static(
-      array_shift($storages),
-      array_shift($storages)
+    return \array_reduce($storages, fn(StorageInterface $carry, StorageInterface $storage) => new static($carry, $storage), new static(
+      \array_shift($storages),
+      \array_shift($storages)
     ));
   }
 
@@ -82,7 +82,7 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
   public function readMultiple(array $names): array {
     // If both storageA and storageB contain the same configuration, the value
     // for storageA takes precedence.
-    return array_merge($this->storageB->readMultiple($names), $this->storageA->readMultiple($names));
+    return \array_merge($this->storageB->readMultiple($names), $this->storageA->readMultiple($names));
   }
 
   /**
@@ -124,7 +124,7 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
    * {@inheritdoc}
    */
   public function listAll($prefix = ''): array {
-    return array_unique(array_merge($this->storageA->listAll($prefix), $this->storageB->listAll($prefix)));
+    return \array_unique(\array_merge($this->storageA->listAll($prefix), $this->storageB->listAll($prefix)));
   }
 
   /**
@@ -149,7 +149,7 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
    * {@inheritdoc}
    */
   public function getAllCollectionNames(): array {
-    return array_unique(array_merge($this->storageA->getAllCollectionNames(), $this->storageB->getAllCollectionNames()));
+    return \array_unique(\array_merge($this->storageA->getAllCollectionNames(), $this->storageB->getAllCollectionNames()));
   }
 
   /**

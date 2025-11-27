@@ -17,11 +17,11 @@ final class InvalidEntityException extends \RuntimeException {
     $messages = [];
 
     foreach ($violations as $violation) {
-      assert($violation instanceof ConstraintViolationInterface);
+      \assert($violation instanceof ConstraintViolationInterface);
       $messages[] = $violation->getPropertyPath() . '=' . $violation->getMessage();
     }
     // Example: "/path/to/file.yml: field_a=Violation 1., field_b=Violation 2.".
-    parent::__construct("$filePath: " . implode('||', $messages));
+    parent::__construct("$filePath: " . \implode('||', $messages));
   }
 
 }

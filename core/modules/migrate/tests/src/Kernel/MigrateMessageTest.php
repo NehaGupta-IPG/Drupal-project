@@ -97,7 +97,7 @@ class MigrateMessageTest extends KernelTestBase implements MigrateMessageInterfa
     $executable->import();
     $this->assertCount(1, $this->messages);
     $id = $this->migration->getPluginId();
-    $this->assertSame("source_message: $id:message:concat: 'a message' is not an array", reset($this->messages));
+    $this->assertSame("source_message: $id:message:concat: 'a message' is not an array", \reset($this->messages));
   }
 
   /**
@@ -142,7 +142,7 @@ class MigrateMessageTest extends KernelTestBase implements MigrateMessageInterfa
     else {
       $type = 'error';
     }
-    $source_id_string = implode(',', $event->getSourceIdValues());
+    $source_id_string = \implode(',', $event->getSourceIdValues());
     $this->display($source_id_string . ': ' . $event->getMessage(), $type);
   }
 

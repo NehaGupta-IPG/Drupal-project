@@ -77,7 +77,7 @@ class FieldReuseAccessCheck implements AccessInterface {
         if ($field_storage instanceof FieldStorageConfigInterface
           && !$field_storage->isLocked()
           && empty($field_types[$field_type]['no_ui'])
-          && !in_array($bundle, $field_storage->getBundles(), TRUE)) {
+          && !\in_array($bundle, $field_storage->getBundles(), TRUE)) {
           $permission = $route->getRequirement('_field_ui_field_reuse_access');
           $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $permission));
         }

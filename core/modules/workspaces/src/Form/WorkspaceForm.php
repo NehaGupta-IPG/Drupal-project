@@ -71,7 +71,7 @@ class WorkspaceForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   protected function getEditedFieldNames(FormStateInterface $form_state) {
-    return array_merge([
+    return \array_merge([
       'label',
       'id',
     ], parent::getEditedFieldNames($form_state));
@@ -89,7 +89,7 @@ class WorkspaceForm extends ContentEntityForm {
       'id',
     ];
     foreach ($violations->getByFields($field_names) as $violation) {
-      [$field_name] = explode('.', $violation->getPropertyPath(), 2);
+      [$field_name] = \explode('.', $violation->getPropertyPath(), 2);
       $form_state->setErrorByName($field_name, $violation->getMessage());
     }
     parent::flagViolations($violations, $form, $form_state);

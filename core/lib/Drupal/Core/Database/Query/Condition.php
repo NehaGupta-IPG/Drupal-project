@@ -93,7 +93,7 @@ class Condition implements ConditionInterface, \Countable {
    * conjunction.
    */
   public function count(): int {
-    return count($this->conditions) - 1;
+    return \count($this->conditions) - 1;
   }
 
   /**
@@ -103,13 +103,13 @@ class Condition implements ConditionInterface, \Countable {
     if (empty($operator)) {
       $operator = '=';
     }
-    if (empty($value) && is_array($value)) {
-      throw new InvalidQueryException(sprintf("Query condition '%s %s ()' cannot be empty.", $field, $operator));
+    if (empty($value) && \is_array($value)) {
+      throw new InvalidQueryException(\sprintf("Query condition '%s %s ()' cannot be empty.", $field, $operator));
     }
-    if (is_array($value) && in_array($operator, ['=', '<', '>', '<=', '>=', 'IS NULL', 'IS NOT NULL'], TRUE)) {
-      if (count($value) > 1) {
-        $value = implode(', ', $value);
-        throw new InvalidQueryException(sprintf("Query condition '%s %s %s' must have an array compatible operator.", $field, $operator, $value));
+    if (\is_array($value) && \in_array($operator, ['=', '<', '>', '<=', '>=', 'IS NULL', 'IS NOT NULL'], TRUE)) {
+      if (\count($value) > 1) {
+        $value = \implode(', ', $value);
+        throw new InvalidQueryException(\sprintf("Query condition '%s %s %s' must have an array compatible operator.", $field, $operator, $value));
       }
       else {
         throw new InvalidQueryException('Calling ' . __METHOD__ . '() without an array compatible operator is not supported. See https://www.drupal.org/node/3350985');
@@ -251,7 +251,7 @@ class Condition implements ConditionInterface, \Countable {
           // If something passed in an invalid character stop early, so we
           // don't rely on a broken SQL statement when we would just replace
           // those characters.
-          if (stripos($condition['operator'], 'UNION') !== FALSE || strpbrk($condition['operator'], '[-\'"();') !== FALSE) {
+          if (\stripos($condition['operator'], 'UNION') !== FALSE || \strpbrk($condition['operator'], '[-\'"();') !== FALSE) {
             $this->changed = TRUE;
             $this->arguments = [];
             // Provide a string which will result into an empty query result.
@@ -284,7 +284,7 @@ class Condition implements ConditionInterface, \Countable {
         if ($operator['use_value']) {
           // For simplicity, we first convert to an array, so that we can handle
           // the single and multi value cases the same.
-          if (!is_array($condition['value'])) {
+          if (!\is_array($condition['value'])) {
             if ($condition['value'] instanceof SelectInterface && ($operator['operator'] === 'IN' || $operator['operator'] === 'NOT IN')) {
               // Special case: IN is followed by a single select query instead
               // of a set of values: unset prefix and postfix to prevent double
@@ -312,16 +312,16 @@ class Condition implements ConditionInterface, \Countable {
               $arguments[$placeholder] = $value;
             }
           }
-          $value_fragment = $operator['prefix'] . implode($operator['delimiter'], $value_fragment) . $operator['postfix'];
+          $value_fragment = $operator['prefix'] . \implode($operator['delimiter'], $value_fragment) . $operator['postfix'];
         }
 
         // Concatenate the left hand part, operator and right hand part.
-        $condition_fragments[] = trim(implode(' ', [$field_fragment, $operator_fragment, $value_fragment]));
+        $condition_fragments[] = \trim(\implode(' ', [$field_fragment, $operator_fragment, $value_fragment]));
       }
 
       // Concatenate all conditions using the conjunction and brackets around
       // the individual conditions to assure the proper evaluation order.
-      $this->stringVersion = count($condition_fragments) > 1 ? '(' . implode(") $conjunction (", $condition_fragments) . ')' : implode($condition_fragments);
+      $this->stringVersion = \count($condition_fragments) > 1 ? '(' . \implode(") $conjunction (", $condition_fragments) . ')' : \implode($condition_fragments);
       $this->arguments = $arguments;
       $this->changed = FALSE;
     }
@@ -391,7 +391,7 @@ class Condition implements ConditionInterface, \Countable {
       // We need to upper case because PHP index matches are case sensitive but
       // do not need the more expensive mb_strtoupper() because SQL statements
       // are ASCII.
-      $operator = strtoupper($operator);
+      $operator = \strtoupper($operator);
       $return = static::$conditionOperatorMap[$operator] ?? [];
     }
 

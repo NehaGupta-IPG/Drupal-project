@@ -26,7 +26,7 @@ class SearchPage extends Variable {
   protected function values() {
     // Add a module key to identify the source search provider, node. This value
     // is used in the EntitySearchPage destination plugin.
-    return array_merge(['module' => 'node'], parent::values());
+    return \array_merge(['module' => 'node'], parent::values());
   }
 
   /**

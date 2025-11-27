@@ -47,7 +47,7 @@ final class ContentEntityDenormalizer extends EntityDenormalizerBase {
     // @see \Drupal\jsonapi\JsonApiResource\ResourceObject::extractContentEntityFields()
     // @todo Eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
     if ($entity_type_id === 'user') {
-      $data = array_diff_key($data, array_flip([$resource_type->getPublicName('display_name')]));
+      $data = \array_diff_key($data, \array_flip([$resource_type->getPublicName('display_name')]));
     }
 
     // Translate the public fields into the entity fields.
@@ -61,8 +61,8 @@ final class ContentEntityDenormalizer extends EntityDenormalizerBase {
         continue;
       }
 
-      if (!isset($field_map[$internal_name]) || !in_array($resource_type->getBundle(), $field_map[$internal_name]['bundles'], TRUE)) {
-        throw new UnprocessableEntityHttpException(sprintf(
+      if (!isset($field_map[$internal_name]) || !\in_array($resource_type->getBundle(), $field_map[$internal_name]['bundles'], TRUE)) {
+        throw new UnprocessableEntityHttpException(\sprintf(
           'The attribute %s does not exist on the %s resource type.',
           $internal_name,
           $resource_type->getTypeName()
@@ -72,7 +72,7 @@ final class ContentEntityDenormalizer extends EntityDenormalizerBase {
       $field_type = $field_map[$internal_name]['type'];
       $field_class = $this->pluginManager->getDefinition($field_type)['list_class'];
 
-      $field_denormalization_context = array_merge($context, [
+      $field_denormalization_context = \array_merge($context, [
         'field_type' => $field_type,
         'field_name' => $internal_name,
         'field_definition' => $this->fieldManager->getFieldDefinitions($resource_type->getEntityTypeId(), $resource_type->getBundle())[$internal_name],

@@ -37,7 +37,7 @@ class ClassResolverConstraintValidator extends ConstraintValidator implements Co
     }
     $service = $this->classResolver->getInstanceFromDefinition($constraint->classOrService);
 
-    if (!method_exists($service, $constraint->method)) {
+    if (!\method_exists($service, $constraint->method)) {
       throw new \InvalidArgumentException('The method "' . $constraint->method . '" does not exist on the service "' . $constraint->classOrService . '".');
     }
 

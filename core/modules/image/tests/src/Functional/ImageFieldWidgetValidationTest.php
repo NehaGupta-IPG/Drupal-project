@@ -54,11 +54,11 @@ class ImageFieldWidgetValidationTest extends ImageFieldTestBase {
 
     // Alt is marked as errored.
     $altElement = $this->assertSession()->elementExists('css', 'input[data-drupal-selector="edit-field-image-0-alt"]');
-    $this->assertTrue(str_contains($altElement->getAttribute('class'), 'error'));
+    $this->assertTrue(\str_contains($altElement->getAttribute('class'), 'error'));
 
     // Title is not marked as errored
     $titleElement = $this->assertSession()->elementExists('css', 'input[data-drupal-selector="edit-field-image-0-title"]');
-    $this->assertFalse(str_contains($titleElement->getAttribute('class'), 'error'));
+    $this->assertFalse(\str_contains($titleElement->getAttribute('class'), 'error'));
   }
 
 }

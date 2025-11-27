@@ -138,10 +138,10 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
       ->getMock();
 
     $delays = [2000000, 3000000];
-    $cron->expects($this->exactly(count($delays)))
+    $cron->expects($this->exactly(\count($delays)))
       ->method('usleep')
       ->with($this->callback(function (int $delay) use (&$delays): bool {
-        return array_shift($delays) === $delay;
+        return \array_shift($delays) === $delay;
       }));
 
     $queueManager->expects($this->once())
@@ -403,10 +403,10 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
       // Queue B is executed again, after queue C since its delay was longer.
       'test_data_from_queue_b',
     ];
-    $this->workerA->expects($this->exactly(count($queues)))
+    $this->workerA->expects($this->exactly(\count($queues)))
       ->method('processItem')
       ->with($this->callback(function ($queue) use (&$queues): bool {
-        return array_shift($queues) === $queue;
+        return \array_shift($queues) === $queue;
       }))
       ->willReturnOnConsecutiveCalls(
         NULL,
@@ -436,11 +436,11 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
       // have passed above, so there are just 12 seconds remaining:
       0, 12000000,
     ];
-    $cron->expects($this->exactly(count($delays) / 2))
+    $cron->expects($this->exactly(\count($delays) / 2))
       ->method('usleep')
       ->with($this->callback(function (int $delay) use (&$currentTime, &$delays): bool {
-        $currentTime += array_shift($delays);
-        return array_shift($delays) === $delay;
+        $currentTime += \array_shift($delays);
+        return \array_shift($delays) === $delay;
       }));
 
     $cron->run();

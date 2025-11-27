@@ -75,7 +75,7 @@ class Password extends FormElementBase {
     if ($input !== FALSE && $input !== NULL) {
       // This should be a string, but allow other scalars since they might be
       // valid input in programmatic form submissions.
-      return is_scalar($input) ? (string) $input : '';
+      return \is_scalar($input) ? (string) $input : '';
     }
     return NULL;
   }

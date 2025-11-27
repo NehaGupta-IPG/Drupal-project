@@ -43,7 +43,7 @@ class BaseRequirementsFulfilledValidatorTest extends PackageManagerKernelTestBas
    * {@inheritdoc}
    */
   public function validate(SandboxValidationEvent $event): void {
-    if (get_class($event) === $this->eventClass) {
+    if (\get_class($event) === $this->eventClass) {
       $event->addError([
         $this->t('This will not stand!'),
       ]);

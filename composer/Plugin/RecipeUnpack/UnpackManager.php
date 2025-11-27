@@ -40,7 +40,7 @@ final readonly class UnpackManager {
    *   The collection of recipe packages to unpack.
    */
   public function unpack(UnpackCollection $unpackCollection): void {
-    if (count($unpackCollection) === 0) {
+    if (\count($unpackCollection) === 0) {
       // Early return to avoid unnecessary work.
       return;
     }

@@ -21,7 +21,7 @@ trait ContextAwarePluginDefinitionTrait {
    * Implements \Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionInterface::hasContextDefinition().
    */
   public function hasContextDefinition($name) {
-    return array_key_exists($name, $this->contextDefinitions);
+    return \array_key_exists($name, $this->contextDefinitions);
   }
 
   /**

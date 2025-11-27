@@ -53,7 +53,7 @@ class MigrateCustomBlockContentTranslationTest extends MigrateDrupal7TestBase {
     $block = BlockContent::load(1)->getTranslation('fr');
     $this->assertSame('fr - Mildly amusing limerick of the day', $block->label());
     $this->assertGreaterThanOrEqual($block->getChangedTime(), \Drupal::time()->getRequestTime());
-    $this->assertLessThanOrEqual(time(), $block->getChangedTime());
+    $this->assertLessThanOrEqual(\time(), $block->getChangedTime());
     $this->assertSame('fr', $block->language()->getId());
     $translation = "fr - A fellow jumped off a high wall\r\nAnd had a most terrible fall\r\nHe went back to bed\r\nWith a bump on his head\r\nThat's why you don't jump off a wall";
     $this->assertSame($translation, $block->body->value);
@@ -62,7 +62,7 @@ class MigrateCustomBlockContentTranslationTest extends MigrateDrupal7TestBase {
     $block = $block->getTranslation('is');
     $this->assertSame('is - Mildly amusing limerick of the day', $block->label());
     $this->assertGreaterThanOrEqual($block->getChangedTime(), \Drupal::time()->getRequestTime());
-    $this->assertLessThanOrEqual(time(), $block->getChangedTime());
+    $this->assertLessThanOrEqual(\time(), $block->getChangedTime());
     $this->assertSame('is', $block->language()->getId());
     $text = "A fellow jumped off a high wall\r\nAnd had a most terrible fall\r\nHe went back to bed\r\nWith a bump on his head\r\nThat's why you don't jump off a wall";
     $this->assertSame($text, $block->body->value);

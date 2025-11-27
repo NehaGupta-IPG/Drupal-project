@@ -48,9 +48,9 @@ class GotoActionTest extends KernelTestBase {
     $location = $response->headers->get('Location');
 
     // Convert to relative path.
-    $base = rtrim(Url::fromRoute('<front>')->setAbsolute()->toString(), '/');
-    if (str_starts_with($location, $base)) {
-      $location = substr($location, strlen($base));
+    $base = \rtrim(Url::fromRoute('<front>')->setAbsolute()->toString(), '/');
+    if (\str_starts_with($location, $base)) {
+      $location = \substr($location, \strlen($base));
     }
 
     $this->assertSame(302, $response->getStatusCode());

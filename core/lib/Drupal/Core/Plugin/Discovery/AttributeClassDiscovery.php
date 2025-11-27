@@ -54,7 +54,7 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
         $subdir = '/' . $subdir;
       }
       $this->directorySuffix = $subdir;
-      $this->namespaceSuffix = str_replace('/', '\\', $subdir);
+      $this->namespaceSuffix = \str_replace('/', '\\', $subdir);
     }
     parent::__construct([], $pluginDefinitionAttributeName);
   }
@@ -80,10 +80,10 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
    *   The matching provider name, or NULL otherwise.
    */
   protected function getProviderFromNamespace(string $namespace): ?string {
-    preg_match('|^Drupal\\\\(?<provider>[\w]+)\\\\|', $namespace, $matches);
+    \preg_match('|^Drupal\\\\(?<provider>[\w]+)\\\\|', $namespace, $matches);
 
     if (isset($matches['provider'])) {
-      return mb_strtolower($matches['provider']);
+      return \mb_strtolower($matches['provider']);
     }
 
     return NULL;
@@ -138,8 +138,8 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
       foreach ($type_dependencies as $dependency) {
         if (($provider = $this->getProviderFromNamespace($dependency)) &&
             ($provider !== $class_provider) &&
-            !in_array($provider, ['component', 'core']) &&
-            !in_array($provider, $providers)) {
+            !\in_array($provider, ['component', 'core']) &&
+            !\in_array($provider, $providers)) {
           $providers[] = $provider;
         }
       }
@@ -162,7 +162,7 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
     }
 
     // Convert providers to two-level namespaces to check for availability.
-    $dependencies['provider'] = array_map(static fn ($provider) => "Drupal\\$provider", $dependencies['provider']);
+    $dependencies['provider'] = \array_map(static fn ($provider) => "Drupal\\$provider", $dependencies['provider']);
     return parent::hasMissingDependencies($dependencies);
   }
 

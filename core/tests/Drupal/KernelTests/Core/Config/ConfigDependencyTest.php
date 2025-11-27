@@ -349,7 +349,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
     // is called as expected and with the correct dependencies.
     $called = \Drupal::state()->get('config_test.on_dependency_removal_called', []);
     $this->assertArrayNotHasKey($entity_3->id(), $called, 'ConfigEntityInterface::onDependencyRemoval() is not called for entity 3.');
-    $this->assertSame([$entity_1->id(), $entity_4->id(), $entity_2->id(), $entity_5->id()], array_keys($called), 'The most dependent entities have ConfigEntityInterface::onDependencyRemoval() called first.');
+    $this->assertSame([$entity_1->id(), $entity_4->id(), $entity_2->id(), $entity_5->id()], \array_keys($called), 'The most dependent entities have ConfigEntityInterface::onDependencyRemoval() called first.');
     $this->assertSame(['config' => [], 'content' => [], 'module' => ['node'], 'theme' => []], $called[$entity_1->id()]);
     $this->assertSame(['config' => [$entity_1->getConfigDependencyName()], 'content' => [], 'module' => [], 'theme' => []], $called[$entity_2->id()]);
     $this->assertSame(['config' => [$entity_1->getConfigDependencyName()], 'content' => [], 'module' => ['node'], 'theme' => []], $called[$entity_4->id()]);
@@ -357,7 +357,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
 
     $this->assertEquals($entity_1->uuid(), $config_entities['delete'][1]->uuid(), 'Entity 1 will be deleted.');
     $this->assertEquals($entity_2->uuid(), $config_entities['update'][0]->uuid(), 'Entity 2 will be updated.');
-    $this->assertEquals($entity_3->uuid(), reset($config_entities['unchanged'])->uuid(), 'Entity 3 is not changed.');
+    $this->assertEquals($entity_3->uuid(), \reset($config_entities['unchanged'])->uuid(), 'Entity 3 is not changed.');
     $this->assertEquals($entity_4->uuid(), $config_entities['delete'][0]->uuid(), 'Entity 4 will be deleted.');
     $this->assertEquals($entity_5->uuid(), $config_entities['update'][1]->uuid(), 'Entity 5 is updated.');
 
@@ -471,7 +471,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
 
     $called = \Drupal::state()->get('config_test.on_dependency_removal_called', []);
     $this->assertArrayNotHasKey($entity_3->id(), $called, 'ConfigEntityInterface::onDependencyRemoval() is not called for entity 3.');
-    $this->assertSame([$entity_1->id(), $entity_4->id(), $entity_2->id()], array_keys($called), 'The most dependent entities have ConfigEntityInterface::onDependencyRemoval() called first.');
+    $this->assertSame([$entity_1->id(), $entity_4->id(), $entity_2->id()], \array_keys($called), 'The most dependent entities have ConfigEntityInterface::onDependencyRemoval() called first.');
     $this->assertSame(['config' => [], 'content' => [], 'module' => ['node'], 'theme' => []], $called[$entity_1->id()]);
     $this->assertSame(['config' => [], 'content' => [], 'module' => ['node'], 'theme' => []], $called[$entity_2->id()]);
     $this->assertSame(['config' => [], 'content' => [], 'module' => ['node'], 'theme' => []], $called[$entity_4->id()]);
@@ -523,7 +523,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
     // Do a dry run using
     // \Drupal\Core\Config\ConfigManager::getConfigEntitiesToChangeOnDependencyRemoval().
     $config_entities = $config_manager->getConfigEntitiesToChangeOnDependencyRemoval('config', [$entity1->getConfigDependencyName()]);
-    $this->assertEquals($entity2->uuid(), reset($config_entities['delete'])->uuid(), 'Entity 2 will be deleted.');
+    $this->assertEquals($entity2->uuid(), \reset($config_entities['delete'])->uuid(), 'Entity 2 will be deleted.');
     $this->assertEmpty($config_entities['update'], 'No dependent configuration entities will be updated.');
     $this->assertEmpty($config_entities['unchanged'], 'No dependent configuration entities will be unchanged.');
 
@@ -577,8 +577,8 @@ class ConfigDependencyTest extends EntityKernelTestBase {
     // \Drupal\Core\Config\ConfigManager::getConfigEntitiesToChangeOnDependencyRemoval().
     $config_entities = $config_manager->getConfigEntitiesToChangeOnDependencyRemoval('config', [$entity1->getConfigDependencyName()]);
     $this->assertEmpty($config_entities['delete'], 'No dependent configuration entities will be deleted.');
-    $this->assertEquals($entity2->uuid(), reset($config_entities['update'])->uuid(), 'Entity 2 will be updated.');
-    $this->assertEquals($entity3->uuid(), reset($config_entities['unchanged'])->uuid(), 'Entity 3 is not changed.');
+    $this->assertEquals($entity2->uuid(), \reset($config_entities['update'])->uuid(), 'Entity 2 will be updated.');
+    $this->assertEquals($entity3->uuid(), \reset($config_entities['unchanged'])->uuid(), 'Entity 3 is not changed.');
 
     // Perform the uninstall.
     $entity1->delete();

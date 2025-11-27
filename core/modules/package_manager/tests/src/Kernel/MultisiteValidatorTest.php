@@ -42,7 +42,7 @@ $sites['shop.example.com'] = 'shop';
 PHP,
         [
           ValidationResult::createError([
-            t('Drupal multisite is not supported by Package Manager.'),
+            \t('Drupal multisite is not supported by Package Manager.'),
           ]),
         ],
       ],
@@ -84,7 +84,7 @@ PHP,
   public function testMultisite(?string $sites_php, array $expected_results = []): void {
     if ($sites_php) {
       $project_root = $this->container->get(PathLocator::class)->getProjectRoot();
-      file_put_contents($project_root . '/sites/sites.php', $sites_php);
+      \file_put_contents($project_root . '/sites/sites.php', $sites_php);
     }
     $this->assertStatusCheckResults($expected_results);
     $this->assertResults($expected_results, PreCreateEvent::class);
@@ -104,7 +104,7 @@ PHP,
     $this->addEventTestListener(function () use ($sites_php): void {
       if ($sites_php) {
         $project_root = $this->container->get(PathLocator::class)->getProjectRoot();
-        file_put_contents($project_root . '/sites/sites.php', $sites_php);
+        \file_put_contents($project_root . '/sites/sites.php', $sites_php);
       }
     });
     $this->assertResults($expected_results, PreApplyEvent::class);

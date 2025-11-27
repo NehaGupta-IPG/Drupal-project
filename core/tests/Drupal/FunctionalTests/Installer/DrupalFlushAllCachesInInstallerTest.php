@@ -39,8 +39,8 @@ class DrupalFlushAllCachesInInstallerTest extends BrowserTestBase {
     ];
     // File API functions are not available yet.
     $path = $this->siteDirectory . '/profiles/cache_flush_test';
-    mkdir($path, 0777, TRUE);
-    file_put_contents("$path/cache_flush_test.info.yml", Yaml::encode($info));
+    \mkdir($path, 0777, TRUE);
+    \file_put_contents("$path/cache_flush_test.info.yml", Yaml::encode($info));
     $php_code = <<<EOF
 <?php
 function cache_flush_test_install() {
@@ -52,7 +52,7 @@ function cache_flush_test_install() {
 }
 EOF;
 
-    file_put_contents("$path/cache_flush_test.install", $php_code);
+    \file_put_contents("$path/cache_flush_test.install", $php_code);
   }
 
   /**

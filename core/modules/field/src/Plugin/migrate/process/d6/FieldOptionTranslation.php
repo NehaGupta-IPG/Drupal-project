@@ -28,8 +28,8 @@ class FieldOptionTranslation extends ProcessPluginBase {
     $allowed_values = '';
     $i = 0;
     if (isset($global_settings['allowed_values'])) {
-      $list = explode("\n", $global_settings['allowed_values']);
-      $list = array_map('trim', $list);
+      $list = \explode("\n", $global_settings['allowed_values']);
+      $list = \array_map('trim', $list);
       $list = FilterArray::removeEmptyStrings($list);
       switch ($field_type) {
         case 'list_string':
@@ -37,12 +37,12 @@ class FieldOptionTranslation extends ProcessPluginBase {
         case 'list_float':
           // Remove the prefix used in the i18n_strings table for field options
           // to get the option value.
-          $option = preg_replace('/^option_/', '', $row->getSourceProperty('property'));
+          $option = \preg_replace('/^option_/', '', $row->getSourceProperty('property'));
           $i = 0;
           foreach ($list as $allowed_value) {
             // Get the key for this allowed value which may be a key|label pair
             // or just key.
-            $value = explode("|", $allowed_value);
+            $value = \explode("|", $allowed_value);
             if (isset($value[0]) && ($value[0] == $option)) {
               $allowed_values = ['label' => $row->getSourceProperty('translation')];
               break;

@@ -26,8 +26,8 @@ class UpdateManagerTest extends UpdateTestBase {
    */
   public function testClearDiskCache(): void {
     $directories = [
-      _update_manager_cache_directory(FALSE),
-      _update_manager_extract_directory(FALSE),
+      \_update_manager_cache_directory(FALSE),
+      \_update_manager_extract_directory(FALSE),
     ];
     // Check that update directories does not exists.
     foreach ($directories as $directory) {
@@ -35,7 +35,7 @@ class UpdateManagerTest extends UpdateTestBase {
     }
 
     // Method must not fail if update directories do not exists.
-    update_clear_update_disk_cache();
+    \update_clear_update_disk_cache();
   }
 
 }

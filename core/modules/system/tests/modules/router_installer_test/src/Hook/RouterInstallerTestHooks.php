@@ -17,7 +17,7 @@ class RouterInstallerTestHooks {
    */
   #[Hook('modules_installed')]
   public function modulesInstalled($modules): void {
-    if (in_array('router_installer_test', $modules, TRUE)) {
+    if (\in_array('router_installer_test', $modules, TRUE)) {
       // Ensure a URL can be generated for routes provided by the module during
       // installation.
       \Drupal::state()->set('router_installer_test_modules_installed', Url::fromRoute('router_installer_test.1')->toString());

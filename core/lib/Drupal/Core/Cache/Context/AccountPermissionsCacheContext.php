@@ -36,7 +36,7 @@ class AccountPermissionsCacheContext extends UserCacheContextBase implements Cac
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t("Account's permissions");
+    return \t("Account's permissions");
   }
 
   /**

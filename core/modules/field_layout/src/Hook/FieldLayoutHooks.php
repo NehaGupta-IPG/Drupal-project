@@ -86,7 +86,7 @@ class FieldLayoutHooks {
    */
   #[Hook('modules_installed')]
   public function modulesInstalled($modules, bool $is_syncing): void {
-    if (!in_array('layout_builder', $modules)) {
+    if (!\in_array('layout_builder', $modules)) {
       return;
     }
     $display_changed = FALSE;

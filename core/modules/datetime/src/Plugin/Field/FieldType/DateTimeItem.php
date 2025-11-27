@@ -113,12 +113,12 @@ class DateTimeItem extends FieldItemBase implements DateTimeItemInterface {
 
     // Just pick a date in the past year. No guidance is provided by this Field
     // type.
-    $timestamp = \Drupal::time()->getRequestTime() - mt_rand(0, 86400 * 365);
+    $timestamp = \Drupal::time()->getRequestTime() - \mt_rand(0, 86400 * 365);
     if ($type == DateTimeItem::DATETIME_TYPE_DATE) {
-      $values['value'] = gmdate(static::DATE_STORAGE_FORMAT, $timestamp);
+      $values['value'] = \gmdate(static::DATE_STORAGE_FORMAT, $timestamp);
     }
     else {
-      $values['value'] = gmdate(static::DATETIME_STORAGE_FORMAT, $timestamp);
+      $values['value'] = \gmdate(static::DATETIME_STORAGE_FORMAT, $timestamp);
     }
     return $values;
   }

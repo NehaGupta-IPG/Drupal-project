@@ -416,7 +416,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
 
     // Create a list of options to check.
     // @see \Drupal\views\Plugin\views\area\DisplayLink::validate()
-    $unequal_options_text = implode(', ', array_intersect_key($options, array_flip($unequal_options)));
+    $unequal_options_text = \implode(', ', \array_intersect_key($options, \array_flip($unequal_options)));
 
     $errors = $view->validate();
     $messages = $messenger->messagesByType(MessengerInterface::TYPE_WARNING);

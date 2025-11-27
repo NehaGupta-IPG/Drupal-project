@@ -86,8 +86,8 @@ class HelpTestTwigNodeVisitor implements NodeVisitorInterface {
       // For this processing, we also want to remove all HTML tags and
       // whitespace from TextNodes.
       $text = $node->getAttribute('data');
-      $text = strip_tags($text);
-      $text = preg_replace('|\s+|', '', $text);
+      $text = \strip_tags($text);
+      $text = \preg_replace('|\s+|', '', $text);
       return new TextNode($text, 0);
     }
 
@@ -114,12 +114,12 @@ class HelpTestTwigNodeVisitor implements NodeVisitorInterface {
     // Extract the singular/body and optional plural text from the
     // TwigNodeTrans object.
     $bodies = $node->getNode('body');
-    if (!count($bodies)) {
+    if (!\count($bodies)) {
       $bodies = [$bodies];
     }
     if ($node->hasNode('plural')) {
       $plural = $node->getNode('plural');
-      if (!count($plural)) {
+      if (!\count($plural)) {
         $bodies[] = $plural;
       }
       else {
@@ -136,7 +136,7 @@ class HelpTestTwigNodeVisitor implements NodeVisitorInterface {
         $text .= $body->getAttribute('data');
       }
     }
-    return trim($text);
+    return \trim($text);
   }
 
   /**

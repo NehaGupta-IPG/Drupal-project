@@ -344,7 +344,7 @@ class WorkspaceTest extends BrowserTestBase {
 
     // Delete any of the workspace owners and visit workspaces listing.
     $this->drupalLogin($this->editor2);
-    user_cancel([], $this->editor1->id(), 'user_cancel_reassign');
+    \user_cancel([], $this->editor1->id(), 'user_cancel_reassign');
     $user = \Drupal::service('entity_type.manager')->getStorage('user')->load($this->editor1->id());
     $user->delete();
     $this->drupalGet('/admin/config/workflow/workspaces');

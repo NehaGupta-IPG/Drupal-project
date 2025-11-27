@@ -182,7 +182,7 @@ class ExecutionContext implements ExecutionContextInterface {
    * {@inheritdoc}
    */
   public function getClassName(): ?string {
-    return get_class($this->object);
+    return \get_class($this->object);
   }
 
   /**

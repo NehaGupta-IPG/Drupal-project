@@ -93,7 +93,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
 
     // Create an image.
     $files = $this->drupalGetTestFiles('image');
-    $file = reset($files);
+    $file = \reset($files);
     $original_uri = \Drupal::service('file_system')->copy($file->uri, 'public://', FileExists::Rename);
 
     // Create a style.
@@ -124,7 +124,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     $elements = $this->xpath(
       '//a[@href=:path]/img[@src=:url and @width=:width and @height=:height]',
       [
-        ':path' => base_path() . $path,
+        ':path' => \base_path() . $path,
         ':url' => $url,
         ':width' => $image->getWidth(),
         ':height' => $image->getHeight(),
@@ -140,7 +140,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
     $elements = $this->xpath(
       '//a[@href=:path]/img[@src=:url and @width=:width and @height=:height and @alt=""]',
       [
-        ':path' => base_path() . $path,
+        ':path' => \base_path() . $path,
         ':url' => $url,
         ':width' => $image->getWidth(),
         ':height' => $image->getHeight(),
@@ -171,7 +171,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
 
     // Create an image.
     $files = $this->drupalGetTestFiles('image');
-    $file = reset($files);
+    $file = \reset($files);
     $original_uri = \Drupal::service('file_system')->copy($file->uri, 'public://', FileExists::Rename);
 
     // Create a style.

@@ -128,7 +128,7 @@ class BlockContentListViewsTest extends BlockContentTestBase {
       ->get('entity_type.manager')
       ->getStorage('block_content')
       ->loadByProperties(['info' => $label]);
-    $block = reset($blocks);
+    $block = \reset($blocks);
     if (!empty($block)) {
       $this->assertSession()->linkByHrefExists('admin/content/block/' . $block->id());
       $this->clickLink('Edit');

@@ -37,9 +37,9 @@ class RoleExistsConstraintValidator extends ConstraintValidator implements Conta
    * {@inheritdoc}
    */
   public function validate($value, Constraint $constraint): void {
-    assert($constraint instanceof RoleExistsConstraint);
+    \assert($constraint instanceof RoleExistsConstraint);
 
-    if (!is_string($value)) {
+    if (!\is_string($value)) {
       throw new UnexpectedTypeException($value, 'string');
     }
 

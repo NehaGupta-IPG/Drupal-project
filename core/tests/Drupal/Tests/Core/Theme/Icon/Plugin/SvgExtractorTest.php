@@ -317,8 +317,8 @@ class SvgExtractorTest extends UnitTestCase {
 
     $this->assertNull($icon_loaded);
 
-    foreach (libxml_get_errors() as $error) {
-      $this->assertSame("Start tag expected, '<' not found", trim($error->message));
+    foreach (\libxml_get_errors() as $error) {
+      $this->assertSame("Start tag expected, '<' not found", \trim($error->message));
     }
   }
 

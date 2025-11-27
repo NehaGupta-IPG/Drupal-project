@@ -50,7 +50,7 @@ class AnnotationBridgeDecorator implements DiscoveryInterface {
       // Annotation constructors expect an array of values. If the definition is
       // not an array, it usually means it has been processed already and can be
       // ignored.
-      if (is_array($definition)) {
+      if (\is_array($definition)) {
         $definitions[$id] = (new $this->pluginDefinitionAnnotationName($definition))->get();
       }
     }
@@ -69,7 +69,7 @@ class AnnotationBridgeDecorator implements DiscoveryInterface {
    *   The method result.
    */
   public function __call($method, $args) {
-    return call_user_func_array([$this->decorated, $method], $args);
+    return \call_user_func_array([$this->decorated, $method], $args);
   }
 
 }

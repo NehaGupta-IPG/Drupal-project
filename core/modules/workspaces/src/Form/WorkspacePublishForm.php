@@ -97,7 +97,7 @@ class WorkspacePublishForm extends ConfirmFormBase implements ContainerInjection
         '#total_count' => $total_count,
       ];
       foreach ($source_rev_diff as $entity_type_id => $revision_difference) {
-        $form['description']['#items'][$entity_type_id] = $this->entityTypeManager->getDefinition($entity_type_id)->getCountLabel(count($revision_difference));
+        $form['description']['#items'][$entity_type_id] = $this->entityTypeManager->getDefinition($entity_type_id)->getCountLabel(\count($revision_difference));
       }
 
       $form['actions']['submit']['#value'] = $this->formatPlural($total_count, 'Publish @count item to @target', 'Publish @count items to @target', ['@target' => $workspace_publisher->getTargetLabel()]);

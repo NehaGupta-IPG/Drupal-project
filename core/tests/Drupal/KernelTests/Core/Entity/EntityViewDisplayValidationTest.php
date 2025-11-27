@@ -70,7 +70,7 @@ class EntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
       ->getViewDisplay('user', 'user');
     $this->assertInstanceOf(LayoutEntityDisplayInterface::class, $this->entity);
     $this->entity->enableLayoutBuilder()->save();
-    $sections = array_map(fn(Section $section) => $section->toArray(), $this->entity->getSections());
+    $sections = \array_map(fn(Section $section) => $section->toArray(), $this->entity->getSections());
     $this->assertCount(1, $sections);
     $sections[0]['layout_id'] = 'non_existent';
 

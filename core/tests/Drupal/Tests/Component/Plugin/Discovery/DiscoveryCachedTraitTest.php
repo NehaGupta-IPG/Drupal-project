@@ -51,7 +51,7 @@ class DiscoveryCachedTraitTest extends TestCase {
     // getDefinitions().
     // If there are no cached definitions, then we have to fake the side-effect
     // of getDefinitions().
-    if (count($cached_definitions) < 1) {
+    if (\count($cached_definitions) < 1) {
       $trait->expects($this->once())
         ->method('getDefinitions')
         // Use a callback method, so we can perform the side-effects.

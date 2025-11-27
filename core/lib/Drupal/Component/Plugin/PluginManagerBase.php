@@ -136,7 +136,7 @@ abstract class PluginManagerBase implements PluginManagerInterface {
    */
   public function getInstance(array $options) {
     if (!$this->mapper) {
-      throw new \BadMethodCallException(sprintf('%s does not support this method unless %s::$mapper is set.', static::class, static::class));
+      throw new \BadMethodCallException(\sprintf('%s does not support this method unless %s::$mapper is set.', static::class, static::class));
     }
     return $this->mapper->getInstance($options);
   }

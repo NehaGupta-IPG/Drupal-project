@@ -66,7 +66,7 @@ class AreaEntityUITest extends UITestBase {
     // Confirm the correct target identifiers were saved for both entities.
     $view = View::load($id);
     $header = $view->getDisplay('default')['display_options']['header'];
-    $this->assertEquals(['entity_block', 'entity_entity_test'], array_keys($header));
+    $this->assertEquals(['entity_block', 'entity_entity_test'], \array_keys($header));
 
     $this->assertEquals($block->id(), $header['entity_block']['target']);
     $this->assertEquals($entity_test->uuid(), $header['entity_entity_test']['target']);
@@ -89,7 +89,7 @@ class AreaEntityUITest extends UITestBase {
     // Confirm that the argument placeholders are saved.
     $view = View::load($id);
     $header = $view->getDisplay('default')['display_options']['header'];
-    $this->assertEquals(['entity_block', 'entity_entity_test'], array_keys($header));
+    $this->assertEquals(['entity_block', 'entity_entity_test'], \array_keys($header));
 
     $this->assertEquals('{{ raw_arguments.null }}', $header['entity_block']['target']);
     $this->assertEquals('{{ raw_arguments.null }}', $header['entity_entity_test']['target']);
@@ -112,7 +112,7 @@ class AreaEntityUITest extends UITestBase {
     // the previous form value.
     $view = View::load($id);
     $header = $view->getDisplay('default')['display_options']['header'];
-    $this->assertEquals(['entity_block', 'entity_entity_test'], array_keys($header));
+    $this->assertEquals(['entity_block', 'entity_entity_test'], \array_keys($header));
 
     $this->assertEquals($block->id(), $header['entity_block']['target']);
     $this->assertEquals($entity_test->uuid(), $header['entity_entity_test']['target']);

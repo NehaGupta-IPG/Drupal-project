@@ -249,7 +249,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
       }
     }
     if ($this->cacheCounts) {
-      $this->cacheKey = $configuration['cache_key'] ?? $plugin_id . '-' . hash('sha256', Json::encode($configuration));
+      $this->cacheKey = $configuration['cache_key'] ?? $plugin_id . '-' . \hash('sha256', Json::encode($configuration));
     }
     $this->idMap = $this->migration->getIdMap();
     $this->highWaterProperty = !empty($configuration['high_water_property']) ? $configuration['high_water_property'] : FALSE;
@@ -300,13 +300,13 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
           $this->migration,
         ]);
       // We will skip if any hook returned FALSE.
-      $skip = ($result_hook && in_array(FALSE, $result_hook)) || ($result_named_hook && in_array(FALSE, $result_named_hook));
+      $skip = ($result_hook && \in_array(FALSE, $result_hook)) || ($result_named_hook && \in_array(FALSE, $result_named_hook));
       $save_to_map = TRUE;
     }
     catch (MigrateSkipRowException $e) {
       $skip = TRUE;
       $save_to_map = $e->getSaveToMap();
-      if ($message = trim($e->getMessage())) {
+      if ($message = \trim($e->getMessage())) {
         $this->idMap->saveMessage($row->getSourceIdValues(), $message, MigrationInterface::MESSAGE_INFORMATIONAL);
       }
     }
@@ -361,7 +361,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    * preferable.
    */
   public function key(): mixed {
-    return serialize($this->currentSourceIds);
+    return \serialize($this->currentSourceIds);
   }
 
   /**
@@ -501,7 +501,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
     // requested.
     if ($this->cacheCounts && !$refresh) {
       $cache_object = $this->getCache()->get($this->cacheKey, 'cache');
-      if (is_object($cache_object)) {
+      if (\is_object($cache_object)) {
         return $cache_object->data;
       }
     }
@@ -536,7 +536,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    */
   protected function doCount() {
     $iterator = $this->getIterator();
-    return $iterator instanceof \Countable ? $iterator->count() : iterator_count($this->initializeIterator());
+    return $iterator instanceof \Countable ? $iterator->count() : \iterator_count($this->initializeIterator());
   }
 
   /**

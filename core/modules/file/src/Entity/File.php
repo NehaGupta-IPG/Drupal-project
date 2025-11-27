@@ -173,7 +173,7 @@ class File extends ContentEntityBase implements FileInterface {
   public static function preCreate(EntityStorageInterface $storage, array &$values) {
     // Automatically detect filename if not set.
     if (!isset($values['filename']) && isset($values['uri'])) {
-      $values['filename'] = basename($values['uri']);
+      $values['filename'] = \basename($values['uri']);
     }
 
     // Automatically detect filemime if not set.
@@ -190,7 +190,7 @@ class File extends ContentEntityBase implements FileInterface {
 
     // The file itself might not exist or be available right now.
     $uri = $this->getFileUri();
-    $size = @filesize($uri);
+    $size = @\filesize($uri);
 
     // Set size unless there was an error.
     if ($size !== FALSE) {
@@ -232,51 +232,51 @@ class File extends ContentEntityBase implements FileInterface {
     $fields = parent::baseFieldDefinitions($entity_type);
     $fields += static::ownerBaseFieldDefinitions($entity_type);
 
-    $fields['fid']->setLabel(t('File ID'))
-      ->setDescription(t('The file ID.'));
+    $fields['fid']->setLabel(\t('File ID'))
+      ->setDescription(\t('The file ID.'));
 
-    $fields['uuid']->setDescription(t('The file UUID.'));
+    $fields['uuid']->setDescription(\t('The file UUID.'));
 
-    $fields['langcode']->setLabel(t('Language code'))
-      ->setDescription(t('The file language code.'));
+    $fields['langcode']->setLabel(\t('Language code'))
+      ->setDescription(\t('The file language code.'));
 
     $fields['uid']
-      ->setDescription(t('The user ID of the file.'));
+      ->setDescription(\t('The user ID of the file.'));
 
     $fields['filename'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Filename'))
-      ->setDescription(t('Name of the file with no path components.'));
+      ->setLabel(\t('Filename'))
+      ->setDescription(\t('Name of the file with no path components.'));
 
     $fields['uri'] = BaseFieldDefinition::create('file_uri')
-      ->setLabel(t('URI'))
-      ->setDescription(t('The URI to access the file (either local or remote).'))
+      ->setLabel(\t('URI'))
+      ->setDescription(\t('The URI to access the file (either local or remote).'))
       ->setSetting('max_length', 255)
       ->setSetting('case_sensitive', TRUE)
       ->addConstraint('FileUriUnique');
 
     $fields['filemime'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('File MIME type'))
+      ->setLabel(\t('File MIME type'))
       ->setSetting('is_ascii', TRUE)
-      ->setDescription(t("The file's MIME type."));
+      ->setDescription(\t("The file's MIME type."));
 
     $fields['filesize'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('File size'))
-      ->setDescription(t('The size of the file in bytes.'))
+      ->setLabel(\t('File size'))
+      ->setDescription(\t('The size of the file in bytes.'))
       ->setSetting('unsigned', TRUE)
       ->setSetting('size', 'big');
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Status'))
-      ->setDescription(t('The status of the file, temporary (FALSE) and permanent (TRUE).'))
+      ->setLabel(\t('Status'))
+      ->setDescription(\t('The status of the file, temporary (FALSE) and permanent (TRUE).'))
       ->setDefaultValue(FALSE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The timestamp that the file was created.'));
+      ->setLabel(\t('Created'))
+      ->setDescription(\t('The timestamp that the file was created.'));
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The timestamp that the file was last changed.'));
+      ->setLabel(\t('Changed'))
+      ->setDescription(\t('The timestamp that the file was last changed.'));
 
     return $fields;
   }

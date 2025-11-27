@@ -129,7 +129,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    * @see https://www.drupal.org/node/3240278
    */
   protected function getFieldStorageDefinitions() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. No replacement is provided. See https://www.drupal.org/node/3240278', E_USER_DEPRECATED);
+    @\trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. No replacement is provided. See https://www.drupal.org/node/3240278', E_USER_DEPRECATED);
     if (!isset($this->fieldStorageDefinitions)) {
       $this->fieldStorageDefinitions = $this->entityFieldManager->getFieldStorageDefinitions($this->entityType->id());
     }
@@ -325,7 +325,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
     // the entity base, revision, data tables.
     $field_definitions = $this->entityFieldManager->getBaseFieldDefinitions($this->entityType->id());
 
-    $field_storage_definitions = array_map(function (FieldDefinitionInterface $definition) {
+    $field_storage_definitions = \array_map(function (FieldDefinitionInterface $definition) {
       return $definition->getFieldStorageDefinition();
     }, $field_definitions);
 
@@ -333,7 +333,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
     $table_mapping = $this->storage->getTableMapping($field_storage_definitions);
     // Fetch all fields that can appear in both the base table and the data
     // table.
-    $duplicate_fields = array_intersect_key($entity_keys, array_flip(['id', 'revision', 'bundle']));
+    $duplicate_fields = \array_intersect_key($entity_keys, \array_flip(['id', 'revision', 'bundle']));
     // Iterate over each table we have so far and collect field data for each.
     // Based on whether the field is in the field_definitions provided by the
     // entity field manager.
@@ -345,7 +345,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         // To avoid confusing duplication in the user interface, for fields
         // that are on both base and data tables, only add them on the data
         // table (same for revision vs. revision data).
-        if ($data_table && ($table === $base_table || $table === $revision_table) && in_array($field_name, $duplicate_fields)) {
+        if ($data_table && ($table === $base_table || $table === $revision_table) && \in_array($field_name, $duplicate_fields)) {
           continue;
         }
         $this->mapFieldDefinition($table, $field_name, $field_definitions[$field_name], $table_mapping, $data[$table]);
@@ -390,7 +390,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
 
     // Add the entity type key to each table generated.
     $entity_type_id = $this->entityType->id();
-    array_walk($data, function (&$table_data) use ($entity_type_id) {
+    \array_walk($data, function (&$table_data) use ($entity_type_id) {
       $table_data['table']['entity type'] = $entity_type_id;
     });
 
@@ -603,7 +603,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
 
     // Do post-processing for a few field types.
     $process_method = 'processViewsDataFor' . Container::camelize($field_type);
-    if (method_exists($this, $process_method)) {
+    if (\method_exists($this, $process_method)) {
       $this->{$process_method}($table, $field_definition, $views_field, $column_name);
     }
 

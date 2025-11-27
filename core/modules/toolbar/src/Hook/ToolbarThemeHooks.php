@@ -77,7 +77,7 @@ class ToolbarThemeHooks {
           'links' => $element[$key]['tray'],
           'attributes' => new Attribute($attributes),
         ];
-        if (array_key_exists('#heading', $element[$key]['tray'])) {
+        if (\array_key_exists('#heading', $element[$key]['tray'])) {
           $variables['trays'][$key]['label'] = $element[$key]['tray']['#heading'];
         }
       }
@@ -99,7 +99,7 @@ class ToolbarThemeHooks {
       // Add other non-tray, non-tab child elements to the remainder variable
       // for later rendering.
       foreach (Element::children($element[$key]) as $child_key) {
-        if (!in_array($child_key, ['tray', 'tab'])) {
+        if (!\in_array($child_key, ['tray', 'tab'])) {
           $variables['remainder'][$key][$child_key] = $element[$key][$child_key];
         }
       }

@@ -77,7 +77,7 @@ class VerticalTabs extends RenderElementBase {
    */
   public static function preRenderVerticalTabs($element) {
     // Do not render the vertical tabs element if it is empty.
-    $group = implode('][', $element['#parents']);
+    $group = \implode('][', $element['#parents']);
     if (!Element::getVisibleChildren($element['group']['#groups'][$group])) {
       $element['#printed'] = TRUE;
     }
@@ -113,7 +113,7 @@ class VerticalTabs extends RenderElementBase {
 
     // Add an invisible label for accessibility.
     if (!isset($element['#title'])) {
-      $element['#title'] = t('Vertical Tabs');
+      $element['#title'] = \t('Vertical Tabs');
       $element['#title_display'] = 'invisible';
     }
 
@@ -123,7 +123,7 @@ class VerticalTabs extends RenderElementBase {
     // field so that the active tab can be restored the next time the
     // form is rendered, e.g. on preview pages or when form validation
     // fails.
-    $name = implode('__', $element['#parents']);
+    $name = \implode('__', $element['#parents']);
     if ($form_state->hasValue($name . '__active_tab')) {
       $element['#default_tab'] = $form_state->getValue($name . '__active_tab');
     }

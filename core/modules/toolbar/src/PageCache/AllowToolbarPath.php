@@ -19,7 +19,7 @@ class AllowToolbarPath implements RequestPolicyInterface {
   public function check(Request $request) {
     // Note that this regular expression matches the end of pathinfo in order to
     // support multilingual sites using path prefixes.
-    if (preg_match('#/toolbar/subtrees/[^/]+(/[^/]+)?$#', $request->getPathInfo())) {
+    if (\preg_match('#/toolbar/subtrees/[^/]+(/[^/]+)?$#', $request->getPathInfo())) {
       return static::ALLOW;
     }
   }

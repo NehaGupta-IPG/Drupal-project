@@ -79,7 +79,7 @@ class FormValidator implements FormValidatorInterface {
     }
 
     foreach ($handlers as $callback) {
-      call_user_func_array($form_state->prepareCallback($callback), [&$form, &$form_state]);
+      \call_user_func_array($form_state->prepareCallback($callback), [&$form, &$form_state]);
     }
   }
 
@@ -257,10 +257,10 @@ class FormValidator implements FormValidatorInterface {
         // length if it's a string, and the item count if it's an array.
         // An unchecked checkbox has a #value of integer 0, different than
         // string '0', which could be a valid value.
-        $is_empty_multiple = is_countable($elements['#value']) && count($elements['#value']) == 0;
-        $is_empty_string = (is_string($elements['#value']) && mb_strlen(trim($elements['#value'])) == 0);
+        $is_empty_multiple = \is_countable($elements['#value']) && \count($elements['#value']) == 0;
+        $is_empty_string = (\is_string($elements['#value']) && \mb_strlen(\trim($elements['#value'])) == 0);
         $is_empty_value = ($elements['#value'] === 0);
-        $is_empty_null = is_null($elements['#value']);
+        $is_empty_null = \is_null($elements['#value']);
         if ($is_empty_multiple || $is_empty_string || $is_empty_value || $is_empty_null) {
           // Flag this element as #required_but_empty to allow #element_validate
           // handlers to set a custom required error message, but without having
@@ -279,7 +279,7 @@ class FormValidator implements FormValidatorInterface {
       elseif (isset($elements['#element_validate'])) {
         foreach ($elements['#element_validate'] as $callback) {
           $complete_form = &$form_state->getCompleteForm();
-          call_user_func_array($form_state->prepareCallback($callback), [&$elements, &$form_state, &$complete_form]);
+          \call_user_func_array($form_state->prepareCallback($callback), [&$elements, &$form_state, &$complete_form]);
         }
       }
 
@@ -330,11 +330,11 @@ class FormValidator implements FormValidatorInterface {
    */
   protected function performRequiredValidation(&$elements, FormStateInterface &$form_state) {
     // Verify that the value is not longer than #maxlength.
-    if (isset($elements['#maxlength']) && mb_strlen($elements['#value']) > $elements['#maxlength']) {
+    if (isset($elements['#maxlength']) && \mb_strlen($elements['#value']) > $elements['#maxlength']) {
       $form_state->setError($elements, $this->t('@name cannot be longer than %max characters but is currently %length characters long.', [
         '@name' => empty($elements['#title']) ? $elements['#parents'][0] : $elements['#title'],
         '%max' => $elements['#maxlength'],
-        '%length' => mb_strlen($elements['#value']),
+        '%length' => \mb_strlen($elements['#value']),
       ]));
     }
 
@@ -347,11 +347,11 @@ class FormValidator implements FormValidatorInterface {
       else {
         $options = $elements['#options'];
       }
-      if (is_array($elements['#value'])) {
-        $value = in_array($elements['#type'], ['checkboxes', 'tableselect']) ? array_keys($elements['#value']) : $elements['#value'];
+      if (\is_array($elements['#value'])) {
+        $value = \in_array($elements['#type'], ['checkboxes', 'tableselect']) ? \array_keys($elements['#value']) : $elements['#value'];
         foreach ($value as $v) {
-          if (!is_scalar($v)) {
-            $message_arguments['%type'] = gettype($v);
+          if (!\is_scalar($v)) {
+            $message_arguments['%type'] = \gettype($v);
             $form_state->setError($elements, $this->t('The submitted value type %type in the %name element is not allowed.', $message_arguments));
             $this->logger->error('The submitted value type %type in the %name element is not allowed.', $message_arguments);
             continue;

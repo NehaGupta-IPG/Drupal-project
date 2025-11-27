@@ -132,12 +132,12 @@ class AccessTest extends ViewTestBase {
     $view->execute();
     /** @var \Drupal\Core\Database\Query\Select $main_query */
     $main_query = $view->build_info['query'];
-    $tables = array_keys($main_query->getTables());
+    $tables = \array_keys($main_query->getTables());
     $this->assertNotContains('node_access', $tables);
 
     // Enable node access test module to ensure that table is present again.
     \Drupal::service('module_installer')->install(['node_access_test']);
-    node_access_rebuild();
+    \node_access_rebuild();
 
     $view = Views::getView('test_content_access_filter');
     $view->setDisplay('page_1');
@@ -145,7 +145,7 @@ class AccessTest extends ViewTestBase {
     $view->execute();
     /** @var \Drupal\Core\Database\Query\Select $main_query */
     $main_query = $view->build_info['query'];
-    $tables = array_keys($main_query->getTables());
+    $tables = \array_keys($main_query->getTables());
     $this->assertContains('node_access', $tables);
   }
 

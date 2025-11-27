@@ -328,7 +328,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    */
   public function __construct($definition) {
     // Throw an exception if the entity type ID is longer than 32 characters.
-    if (mb_strlen($definition['id']) > static::ID_MAX_LENGTH) {
+    if (\mb_strlen($definition['id']) > static::ID_MAX_LENGTH) {
       throw new EntityTypeIdLengthException('Attempt to create an entity type with an ID longer than ' . static::ID_MAX_LENGTH . " characters: {$definition['id']}.");
     }
 
@@ -372,7 +372,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    * {@inheritdoc}
    */
   public function get($property) {
-    if (property_exists($this, $property)) {
+    if (\property_exists($this, $property)) {
       $value = $this->{$property} ?? NULL;
     }
     else {
@@ -385,7 +385,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    * {@inheritdoc}
    */
   public function set($property, $value) {
-    if (property_exists($this, $property)) {
+    if (\property_exists($this, $property)) {
       $this->{$property} = $value;
     }
     else {
@@ -469,7 +469,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    * {@inheritdoc}
    */
   public function entityClassImplements($interface) {
-    return is_subclass_of($this->getClass(), $interface);
+    return \is_subclass_of($this->getClass(), $interface);
   }
 
   /**
@@ -510,7 +510,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
     if ($nested) {
       $handler = $handler[$nested];
     }
-    return class_exists($handler);
+    return \class_exists($handler);
   }
 
   /**
@@ -792,7 +792,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    */
   public function getSingularLabel() {
     if (empty($this->label_singular)) {
-      $lowercase_label = mb_strtolower($this->getLabel());
+      $lowercase_label = \mb_strtolower($this->getLabel());
       $this->label_singular = $lowercase_label;
     }
     return $this->label_singular;
@@ -921,7 +921,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
     // the bundle entity.
     if ($bundle_entity_type_id = $this->getBundleEntityType()) {
       if (!$bundle_entity = \Drupal::entityTypeManager()->getStorage($bundle_entity_type_id)->load($bundle)) {
-        throw new \LogicException(sprintf('Missing bundle entity, entity type %s, entity id %s.', $bundle_entity_type_id, $bundle));
+        throw new \LogicException(\sprintf('Missing bundle entity, entity type %s, entity id %s.', $bundle_entity_type_id, $bundle));
       }
       $config_dependency = [
         'type' => 'config',

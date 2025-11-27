@@ -147,7 +147,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface,
 
     foreach ($row->getRawDestination() as $key => $value) {
       if (isset($value) || !empty($this->configuration['store null'])) {
-        $this->config->set(str_replace(Row::PROPERTY_SEPARATOR, '.', $key), $value);
+        $this->config->set(\str_replace(Row::PROPERTY_SEPARATOR, '.', $key), $value);
       }
     }
 
@@ -190,7 +190,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface,
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    $provider = explode('.', $this->config->getName(), 2)[0];
+    $provider = \explode('.', $this->config->getName(), 2)[0];
     $this->addDependency('module', $provider);
     return $this->dependencies;
   }
@@ -235,7 +235,7 @@ class Config extends DestinationBase implements ContainerFactoryPluginInterface,
     }
     // Get the module handling this configuration object from the config_name,
     // which is of the form "<module_name>.<configuration object name>".
-    return !empty($this->configuration['config_name']) ? explode('.', $this->configuration['config_name'], 2)[0] : NULL;
+    return !empty($this->configuration['config_name']) ? \explode('.', $this->configuration['config_name'], 2)[0] : NULL;
   }
 
 }

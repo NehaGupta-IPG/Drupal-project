@@ -59,7 +59,7 @@ class SearchDateIntervalTest extends BrowserTestBase {
     // search_date_query_alter test module.
     $created_time_en = new \DateTime('February 10 2016 10PM');
     $created_time_es = new \DateTime('March 19 2016 10PM');
-    $default_format = filter_default_format();
+    $default_format = \filter_default_format();
 
     $node = $this->drupalCreateNode([
       'title' => 'Node EN',

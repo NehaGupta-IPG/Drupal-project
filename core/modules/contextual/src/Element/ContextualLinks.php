@@ -72,14 +72,14 @@ class ContextualLinks extends RenderElementBase {
       $items += $contextual_links_manager->getContextualLinksArrayByGroup($group, $args['route_parameters'], $args['metadata']);
     }
 
-    uasort($items, [SortArray::class, 'sortByWeightElement']);
+    \uasort($items, [SortArray::class, 'sortByWeightElement']);
 
     // Transform contextual links into parameters suitable for links.html.twig.
     $links = [];
     $use_ajax = FALSE;
     foreach ($items as $class => $item) {
       // Check whether any of the contextual links have the use-ajax class.
-      $use_ajax = $use_ajax || in_array('use-ajax', $item['localized_options']['class'] ?? [], TRUE);
+      $use_ajax = $use_ajax || \in_array('use-ajax', $item['localized_options']['class'] ?? [], TRUE);
       $class = Html::getClass($class);
       $links[$class] = [
         'title' => $item['title'],

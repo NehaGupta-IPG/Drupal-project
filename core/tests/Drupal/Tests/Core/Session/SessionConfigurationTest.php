@@ -207,8 +207,8 @@ class SessionConfigurationTest extends UnitTestCase {
       ['https://[::1]:8443/path/index.php', 'SSESS', '[::1]'],
     ];
 
-    return array_map(function ($record) {
-      return [$record[0], $record[1] . substr(hash('sha256', $record[2]), 0, 32)];
+    return \array_map(function ($record) {
+      return [$record[0], $record[1] . \substr(\hash('sha256', $record[2]), 0, 32)];
     }, $data);
   }
 
@@ -254,8 +254,8 @@ class SessionConfigurationTest extends UnitTestCase {
       ['https://[::1]:8443/path/index.php', 'SSESS', '.example.com'],
     ];
 
-    return array_map(function ($record) {
-      return [$record[0], $record[1] . substr(hash('sha256', $record[2]), 0, 32)];
+    return \array_map(function ($record) {
+      return [$record[0], $record[1] . \substr(\hash('sha256', $record[2]), 0, 32)];
     }, $data);
   }
 

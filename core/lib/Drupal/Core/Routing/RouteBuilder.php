@@ -143,7 +143,7 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
       if (isset($routes['route_callbacks'])) {
         foreach ($routes['route_callbacks'] as $route_callback) {
           $callback = $this->controllerResolver->getControllerFromDefinition($route_callback);
-          if ($callback_routes = call_user_func($callback)) {
+          if ($callback_routes = \call_user_func($callback)) {
             // If a RouteCollection is returned, add the whole collection.
             if ($callback_routes instanceof RouteCollection) {
               $collection->addCollection($callback_routes);

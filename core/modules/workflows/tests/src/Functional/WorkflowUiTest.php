@@ -240,11 +240,11 @@ class WorkflowUiTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('admin/config/workflow/workflows/manage/test');
 
     // Ensure that weight changes the transition ordering.
-    $this->assertEquals(['publish', 'create_new_draft'], array_keys($workflow->getTypePlugin()->getTransitions()));
+    $this->assertEquals(['publish', 'create_new_draft'], \array_keys($workflow->getTypePlugin()->getTransitions()));
     $this->drupalGet('admin/config/workflow/workflows/manage/test');
     $this->submitForm(['transitions[create_new_draft][weight]' => '-1'], 'Save');
     $workflow = $workflow_storage->loadUnchanged('test');
-    $this->assertEquals(['create_new_draft', 'publish'], array_keys($workflow->getTypePlugin()->getTransitions()));
+    $this->assertEquals(['create_new_draft', 'publish'], \array_keys($workflow->getTypePlugin()->getTransitions()));
 
     // Verify that we are still on the workflow edit page.
     $this->assertSession()->addressEquals('admin/config/workflow/workflows/manage/test');

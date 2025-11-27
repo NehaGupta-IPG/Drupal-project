@@ -89,7 +89,7 @@ final class FieldFilteredMarkup implements MarkupInterface, \Countable {
    *   A human-readable list of allowed tags for display in help texts.
    */
   public static function displayAllowedTags() {
-    return '<' . implode('> <', static::allowedTags()) . '>';
+    return '<' . \implode('> <', static::allowedTags()) . '>';
   }
 
 }

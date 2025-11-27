@@ -89,13 +89,13 @@ final class ConfigTarget {
     $this->fromConfig = $fromConfig;
     $this->toConfig = $toConfig;
 
-    if (is_string($propertyPath)) {
+    if (\is_string($propertyPath)) {
       $propertyPath = [$propertyPath];
     }
-    elseif (count($propertyPath) > 1 && (empty($fromConfig) || empty($toConfig))) {
+    elseif (\count($propertyPath) > 1 && (empty($fromConfig) || empty($toConfig))) {
       throw new \LogicException('The $fromConfig and $toConfig arguments must be passed to ' . __METHOD__ . '() if multiple property paths are targeted.');
     }
-    $this->propertyPaths = array_values($propertyPath);
+    $this->propertyPaths = \array_values($propertyPath);
   }
 
   /**
@@ -125,7 +125,7 @@ final class ConfigTarget {
    *   A ConfigTarget instance.
    */
   public static function fromString(string $target, ?string $fromConfig = NULL, ?string $toConfig = NULL): self {
-    [$configName, $propertyPath] = explode(':', $target, 2);
+    [$configName, $propertyPath] = \explode(':', $target, 2);
     return new self($configName, $propertyPath, $fromConfig, $toConfig);
   }
 
@@ -143,14 +143,14 @@ final class ConfigTarget {
   public static function fromForm(array $array_parents, array $form): self {
     $element = NestedArray::getValue($form, $array_parents);
     if (!isset($element['#config_target'])) {
-      throw new \LogicException('The form element [' . implode('][', $array_parents) . '] does not have the #config_target property set');
+      throw new \LogicException('The form element [' . \implode('][', $array_parents) . '] does not have the #config_target property set');
     }
     $target = $element['#config_target'];
-    if (is_string($target)) {
+    if (\is_string($target)) {
       $target = ConfigTarget::fromString($target);
     }
     if (!$target instanceof ConfigTarget) {
-      throw new \LogicException('The form element [' . implode('][', $array_parents) . '] #config_target property is not a string or a ConfigTarget object');
+      throw new \LogicException('The form element [' . \implode('][', $array_parents) . '] #config_target property is not a string or a ConfigTarget object');
     }
 
     // Add the element information to the config target object.
@@ -173,13 +173,13 @@ final class ConfigTarget {
    */
   public function getValue(Config $config): mixed {
     if ($config->getName() !== $this->configName) {
-      throw new \InvalidArgumentException(sprintf('Config target is associated with %s but %s given.', $this->configName, $config->getName()));
+      throw new \InvalidArgumentException(\sprintf('Config target is associated with %s but %s given.', $this->configName, $config->getName()));
     }
 
     $is_multi_target = $this->isMultiTarget();
 
     $value = $is_multi_target
-      ? array_map($config->get(...), $this->propertyPaths)
+      ? \array_map($config->get(...), $this->propertyPaths)
       : $config->get($this->propertyPaths[0]);
 
     if ($this->fromConfig) {
@@ -210,7 +210,7 @@ final class ConfigTarget {
    */
   public function setValue(Config $config, mixed $value, FormStateInterface $form_state): void {
     if ($config->getName() !== $this->configName) {
-      throw new \InvalidArgumentException(sprintf('Config target is associated with %s but %s given.', $this->configName, $config->getName()));
+      throw new \InvalidArgumentException(\sprintf('Config target is associated with %s but %s given.', $this->configName, $config->getName()));
     }
 
     $is_multi_target = $this->isMultiTarget();
@@ -219,14 +219,14 @@ final class ConfigTarget {
       if ($is_multi_target) {
         // If we're targeting multiple property paths, $value needs to be an
         // array with every targeted property path.
-        if (!is_array($value)) {
-          throw new \LogicException(sprintf('The toConfig callable returned a %s, but it must be an array with a key-value pair for each of the targeted property paths.', gettype($value)));
+        if (!\is_array($value)) {
+          throw new \LogicException(\sprintf('The toConfig callable returned a %s, but it must be an array with a key-value pair for each of the targeted property paths.', \gettype($value)));
         }
-        elseif ($missing_keys = array_diff($this->propertyPaths, array_keys($value))) {
-          throw new \LogicException(sprintf('The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: %s.', implode(', ', $missing_keys)));
+        elseif ($missing_keys = \array_diff($this->propertyPaths, \array_keys($value))) {
+          throw new \LogicException(\sprintf('The toConfig callable returned an array that is missing key-value pairs for the following targeted property paths: %s.', \implode(', ', $missing_keys)));
         }
-        elseif ($unknown_keys = array_diff(array_keys($value), $this->propertyPaths)) {
-          throw new \LogicException(sprintf('The toConfig callable returned an array that contains key-value pairs that do not match targeted property paths: %s.', implode(', ', $unknown_keys)));
+        elseif ($unknown_keys = \array_diff(\array_keys($value), $this->propertyPaths)) {
+          throw new \LogicException(\sprintf('The toConfig callable returned an array that contains key-value pairs that do not match targeted property paths: %s.', \implode(', ', $unknown_keys)));
         }
       }
     }
@@ -238,7 +238,7 @@ final class ConfigTarget {
 
     // Set the returned value, or if a special value (one of the cases in the
     // ToConfig enum): apply the appropriate action.
-    array_walk($value, fn (mixed $value, string $property) => match ($value) {
+    \array_walk($value, fn (mixed $value, string $property) => match ($value) {
       // No-op.
       ToConfig::NoOp => NULL,
       // Delete.
@@ -256,7 +256,7 @@ final class ConfigTarget {
    *   FALSE.
    */
   private function isMultiTarget(): bool {
-    return count($this->propertyPaths) > 1;
+    return \count($this->propertyPaths) > 1;
   }
 
 }

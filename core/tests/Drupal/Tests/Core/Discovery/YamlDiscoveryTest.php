@@ -36,8 +36,8 @@ class YamlDiscoveryTest extends TestCase {
     vfsStreamWrapper::setRoot($root);
     $url = vfsStream::url('modules');
 
-    mkdir($url . '/test_broken');
-    file_put_contents($url . '/test_broken/test_broken.test.yml', "broken:\n:");
+    \mkdir($url . '/test_broken');
+    \file_put_contents($url . '/test_broken/test_broken.test.yml', "broken:\n:");
 
     $this->expectException(InvalidDataTypeException::class);
     $this->expectExceptionMessage('vfs://modules/test_broken/test_broken.test.yml');

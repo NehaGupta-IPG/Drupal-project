@@ -27,7 +27,7 @@ class CalculatedPermissionsItem implements CalculatedPermissionsItemInterface {
     protected string $scope = AccessPolicyInterface::SCOPE_DRUPAL,
     protected string|int $identifier = AccessPolicyInterface::SCOPE_DRUPAL,
   ) {
-    $this->permissions = $isAdmin ? [] : array_unique($permissions);
+    $this->permissions = $isAdmin ? [] : \array_unique($permissions);
   }
 
   /**
@@ -62,7 +62,7 @@ class CalculatedPermissionsItem implements CalculatedPermissionsItemInterface {
    * {@inheritdoc}
    */
   public function hasPermission(string $permission): bool {
-    return $this->isAdmin() || in_array($permission, $this->permissions, TRUE);
+    return $this->isAdmin() || \in_array($permission, $this->permissions, TRUE);
   }
 
 }

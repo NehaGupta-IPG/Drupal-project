@@ -35,7 +35,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
    */
   protected function createMediaItems(array $media_items) {
     $created_items = [];
-    $time = time();
+    $time = \time();
     foreach ($media_items as $type => $names) {
       foreach ($names as $name) {
         /** @var \Drupal\media\MediaInterface $media */
@@ -83,9 +83,9 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
   protected function waitForNoText($text, $timeout = 10000) {
     $page = $this->getSession()->getPage();
     $result = $page->waitFor($timeout / 1000, function ($page) use ($text) {
-      $actual = preg_replace('/\s+/u', ' ', $page->getText());
-      $regex = '/' . preg_quote($text, '/') . '/ui';
-      return (bool) !preg_match($regex, $actual);
+      $actual = \preg_replace('/\s+/u', ' ', $page->getText());
+      $regex = '/' . \preg_quote($text, '/') . '/ui';
+      return (bool) !\preg_match($regex, $actual);
     });
     $this->assertNotEmpty($result, "\"$text\" was found but shouldn't be there.");
   }
@@ -108,15 +108,15 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
   protected function waitForElementsCount($selector_type, $selector, $count, $timeout = 10000) {
     $page = $this->getSession()->getPage();
 
-    $start = microtime(TRUE);
+    $start = \microtime(TRUE);
     $end = $start + ($timeout / 1000);
     do {
       $nodes = $page->findAll($selector_type, $selector);
-      if (count($nodes) === $count) {
+      if (\count($nodes) === $count) {
         return;
       }
-      usleep(100000);
-    } while (microtime(TRUE) < $end);
+      \usleep(100000);
+    } while (\microtime(TRUE) < $end);
 
     $this->assertSession()->elementsCount($selector_type, $selector, $count);
   }
@@ -400,7 +400,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
    */
   protected function selectMediaItem($index, $expected_selected_count = NULL) {
     $checkboxes = $this->getCheckboxes();
-    $this->assertGreaterThan($index, count($checkboxes));
+    $this->assertGreaterThan($index, \count($checkboxes));
     $checkboxes[$index]->check();
 
     if ($expected_selected_count) {
@@ -416,7 +416,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
    */
   protected function deselectMediaItem(int $index): void {
     $checkboxes = $this->getCheckboxes();
-    $this->assertGreaterThan($index, count($checkboxes));
+    $this->assertGreaterThan($index, \count($checkboxes));
     $checkboxes[$index]->uncheck();
   }
 

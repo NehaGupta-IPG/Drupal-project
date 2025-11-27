@@ -134,7 +134,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/translate');
     $this->submitForm($edit, 'Save translations');
     $this->assertSession()->pageTextContains('The strings have been saved.');
-    $url_bits = explode('?', $this->getUrl());
+    $url_bits = \explode('?', $this->getUrl());
     $this->assertEquals(Url::fromRoute('locale.translate_page', [], ['absolute' => TRUE])->toString(), $url_bits[0], 'Correct page redirection.');
     $search = [
       'string' => $name,
@@ -311,7 +311,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save translations');
 
     // Trigger JavaScript translation parsing and building.
-    _locale_rebuild_js($langcode);
+    \_locale_rebuild_js($langcode);
 
     $locale_javascripts = \Drupal::state()->get('locale.translation.javascript', []);
     $js_file = 'public://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
@@ -320,7 +320,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     // Test JavaScript translation rebuilding.
     \Drupal::service('file_system')->delete($js_file);
     $this->assertFileDoesNotExist($js_file);
-    _locale_rebuild_js($langcode);
+    \_locale_rebuild_js($langcode);
     $this->assertFileExists($js_file);
 
     // Test if JavaScript translation contains a custom string override.
@@ -329,10 +329,10 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $settings['locale_custom_strings_' . $langcode] = ['' => [$string_override => $string_override]];
     // Recreate the settings static.
     new Settings($settings);
-    _locale_rebuild_js($langcode);
+    \_locale_rebuild_js($langcode);
     $locale_javascripts = \Drupal::state()->get('locale.translation.javascript', []);
     $js_file = 'public://' . $config->get('javascript.directory') . '/' . $langcode . '_' . $locale_javascripts[$langcode] . '.js';
-    $content = file_get_contents($js_file);
+    $content = \file_get_contents($js_file);
     $this->assertStringContainsString('"' . $string_override . '":"' . $string_override . '"', $content);
   }
 

@@ -29,7 +29,7 @@ class ZipTest extends ArchiverTestBase {
   public function testCreateArchive(): void {
     $this->expectDeprecation('\Drupal\Core\Archiver\Zip is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3556927');
 
-    $textFile = current($this->getTestFiles('text'));
+    $textFile = \current($this->getTestFiles('text'));
     $archiveFilename = $this->fileSystem->realpath('public://' . $this->randomMachineName() . '.zip');
     $zip = new Zip($archiveFilename, [
       'flags' => \ZipArchive::CREATE,
@@ -49,7 +49,7 @@ class ZipTest extends ArchiverTestBase {
 
     // Create an archive similarly to how it's done in ::testCreateArchive.
     $files = $this->getTestFiles('text');
-    $textFile = current($files);
+    $textFile = \current($files);
     $archiveFilename = $this->fileSystem->realpath('public://' . $this->randomMachineName() . '.zip');
     $zip = new Zip($archiveFilename, [
       'flags' => \ZipArchive::CREATE,
@@ -58,7 +58,7 @@ class ZipTest extends ArchiverTestBase {
     $zip->getArchive()->close();
     $this->assertArchiveContainsFile($archiveFilename, $this->fileSystem->realPath($textFile->uri));
     // Overwrite the zip with just a new text file.
-    $secondTextFile = next($files);
+    $secondTextFile = \next($files);
     $zip = new Zip($archiveFilename, [
       'flags' => \ZipArchive::OVERWRITE,
     ]);

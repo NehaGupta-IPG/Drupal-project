@@ -24,7 +24,7 @@ class ImageUploadAccessTest extends ImageUploadTest {
   public function testCkeditor5ImageUploadRoute(): void {
     $this->createBasicFormat();
     $url = $this->getUploadUrl();
-    $test_image = file_get_contents(current($this->getTestFiles('image'))->uri);
+    $test_image = \file_get_contents(\current($this->getTestFiles('image'))->uri);
 
     // With no text editor, expect a 404.
     $response = $this->uploadRequest($url, $test_image, 'test.jpg');

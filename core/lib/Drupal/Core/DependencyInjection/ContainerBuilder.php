@@ -66,7 +66,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
    * {@inheritdoc}
    */
   public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void {
-    if (strtolower($name) !== $name) {
+    if (\strtolower($name) !== $name) {
       throw new \InvalidArgumentException("Parameter names must be lowercase: $name");
     }
     parent::setParameter($name, $value);
@@ -76,8 +76,8 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    assert(FALSE, 'The container was serialized.');
-    return array_keys(get_object_vars($this));
+    \assert(FALSE, 'The container was serialized.');
+    return \array_keys(\get_object_vars($this));
   }
 
 }

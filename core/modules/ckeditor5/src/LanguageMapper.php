@@ -49,10 +49,10 @@ class LanguageMapper {
     if (empty($langcodes)) {
       $langcodes = [];
       // Collect languages included with CKEditor 5 based on file listing.
-      $files = scandir('core/assets/vendor/ckeditor5/ckeditor5-dll/translations');
+      $files = \scandir('core/assets/vendor/ckeditor5/ckeditor5-dll/translations');
       foreach ($files as $file) {
-        if (str_ends_with($file, '.js')) {
-          $langcode = basename($file, '.js');
+        if (\str_ends_with($file, '.js')) {
+          $langcode = \basename($file, '.js');
           $langcodes[$langcode] = $langcode;
         }
       }
@@ -63,7 +63,7 @@ class LanguageMapper {
     // Get language mapping if available to map to Drupal language codes.
     // This is configurable in the user interface and not expensive to get, so
     // we don't include it in the cached language list.
-    $language_mappings = $this->moduleHandler->moduleExists('language') ? language_get_browser_drupal_langcode_mappings() : [];
+    $language_mappings = $this->moduleHandler->moduleExists('language') ? \language_get_browser_drupal_langcode_mappings() : [];
     foreach ($langcodes as $langcode) {
       // If this language code is available in a Drupal mapping, use that to
       // compute a possibility for matching from the Drupal langcode to the

@@ -200,7 +200,7 @@ class OverridesSectionStorageTest extends KernelTestBase {
       'view_mode',
     ];
     $result = $this->plugin->getContexts();
-    $this->assertEquals($expected, array_keys($result));
+    $this->assertEquals($expected, \array_keys($result));
     $this->assertSame($context, $result['entity']);
   }
 
@@ -221,7 +221,7 @@ class OverridesSectionStorageTest extends KernelTestBase {
       'layout_builder.entity',
     ];
     $result = $this->plugin->getContextsDuringPreview();
-    $this->assertEquals($expected, array_keys($result));
+    $this->assertEquals($expected, \array_keys($result));
     $this->assertSame($context, $result['layout_builder.entity']);
   }
 
@@ -275,7 +275,7 @@ class OverridesSectionStorageTest extends KernelTestBase {
     $entity = EntityTest::load($entity->id());
 
     $result = $this->plugin->deriveContextsFromRoute('entity_test.1', [], '', []);
-    $this->assertSame(['entity', 'view_mode'], array_keys($result));
+    $this->assertSame(['entity', 'view_mode'], \array_keys($result));
     $this->assertSame($entity, $result['entity']->getContextValue());
     $this->assertSame('default', $result['view_mode']->getContextValue());
   }

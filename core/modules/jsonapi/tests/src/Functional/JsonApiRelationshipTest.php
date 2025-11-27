@@ -107,7 +107,7 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
     $this->assertEquals($childUuid, $uuid);
 
     // 1. Successful PATCH to the related endpoint.
-    $url = Url::fromUri(sprintf('internal:/jsonapi/%s/%s/%s/relationships/%s', $this->entityTypeId, $this->bundle, $parentEntity->uuid(), $this->fieldName));
+    $url = Url::fromUri(\sprintf('internal:/jsonapi/%s/%s/%s/relationships/%s', $this->entityTypeId, $this->bundle, $parentEntity->uuid(), $this->fieldName));
     $request_options = [
       RequestOptions::HEADERS => [
         'Content-Type' => 'application/vnd.api+json',
@@ -117,7 +117,7 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
       RequestOptions::JSON => [
         'data' => [
           'id' => $childUuid,
-          'type' => sprintf('%s--%s', $this->entityTypeId, $this->bundle),
+          'type' => \sprintf('%s--%s', $this->entityTypeId, $this->bundle),
         ],
       ],
     ];
@@ -133,17 +133,17 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
     $this->assertTrue($parentEntity->get($this->fieldName)->isEmpty());
 
     // 2. Successful PATCH to individual endpoint.
-    $url = Url::fromUri(sprintf('internal:/jsonapi/%s/%s/%s', $this->entityTypeId, $this->bundle, $parentEntity->uuid()));
+    $url = Url::fromUri(\sprintf('internal:/jsonapi/%s/%s/%s', $this->entityTypeId, $this->bundle, $parentEntity->uuid()));
     $request_options[RequestOptions::JSON] = [
       'data' => [
         'id' => $parentEntity->uuid(),
-        'type' => sprintf('%s--%s', $this->entityTypeId, $this->bundle),
+        'type' => \sprintf('%s--%s', $this->entityTypeId, $this->bundle),
         'relationships' => [
           $this->fieldName => [
             'data' => [
               [
                 'id' => $childUuid,
-                'type' => sprintf('%s--%s', $this->entityTypeId, $this->bundle),
+                'type' => \sprintf('%s--%s', $this->entityTypeId, $this->bundle),
               ],
             ],
           ],

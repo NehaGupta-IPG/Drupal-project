@@ -46,7 +46,7 @@ class ThemeRegistryLoader extends FilesystemLoader {
    */
   protected function findTemplate(string $name, bool $throw = TRUE) {
     // Allow for loading based on the Drupal theme registry.
-    $hook = str_replace('.html.twig', '', strtr($name, '-', '_'));
+    $hook = \str_replace('.html.twig', '', \strtr($name, '-', '_'));
     $theme_registry = $this->themeRegistry->getRuntime();
 
     if ($theme_registry->has($hook)) {
@@ -57,13 +57,13 @@ class ThemeRegistryLoader extends FilesystemLoader {
       elseif (isset($info['template'])) {
         $path = $info['template'] . '.html.twig';
       }
-      if (isset($path) && is_file($path)) {
+      if (isset($path) && \is_file($path)) {
         return $this->cache[$name] = $path;
       }
     }
 
     if ($throw) {
-      throw new LoaderError(sprintf('Unable to find template "%s" in the Drupal theme registry.', $name));
+      throw new LoaderError(\sprintf('Unable to find template "%s" in the Drupal theme registry.', $name));
     }
 
     return NULL;

@@ -105,14 +105,14 @@ class CommandsTest extends KernelTestBase {
     foreach ($haystack as $command) {
       // If the command has additional settings that we're not testing for, do
       // not consider that a failure.
-      if (isset($command['settings']) && is_array($command['settings']) && isset($needle['settings']) && is_array($needle['settings'])) {
-        $command['settings'] = array_intersect_key($command['settings'], $needle['settings']);
+      if (isset($command['settings']) && \is_array($command['settings']) && isset($needle['settings']) && \is_array($needle['settings'])) {
+        $command['settings'] = \array_intersect_key($command['settings'], $needle['settings']);
       }
       // If the command has additional data that we're not testing for, do not
       // consider that a failure. Also, == instead of ===, because we don't
       // require the key/value pairs to be in any particular order
       // (http://php.net/manual/language.operators.array.php).
-      if (array_intersect_key($command, $needle) == $needle) {
+      if (\array_intersect_key($command, $needle) == $needle) {
         $found = TRUE;
         break;
       }

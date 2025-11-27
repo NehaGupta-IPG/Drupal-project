@@ -227,7 +227,7 @@ class CommentAdminOverview extends FormBase {
         'title' => $this->t('Edit'),
         'url' => $comment->toUrl('edit-form', $comment_uri_options),
       ];
-      if ($this->moduleHandler->moduleExists('content_translation') && content_translation_translate_access($comment)->isAllowed()) {
+      if ($this->moduleHandler->moduleExists('content_translation') && \content_translation_translate_access($comment)->isAllowed()) {
         $links['translate'] = [
           'title' => $this->t('Translate'),
           'url' => $comment->toUrl('drupal:content-translation-overview', $comment_uri_options),
@@ -255,9 +255,9 @@ class CommentAdminOverview extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $form_state->setValue('comments', array_diff($form_state->getValue('comments'), [0]));
+    $form_state->setValue('comments', \array_diff($form_state->getValue('comments'), [0]));
     // We can't execute any 'Update options' if no comments were selected.
-    if (count($form_state->getValue('comments')) == 0) {
+    if (\count($form_state->getValue('comments')) == 0) {
       $form_state->setErrorByName('', $this->t('Select one or more comments to perform the update on.'));
     }
   }

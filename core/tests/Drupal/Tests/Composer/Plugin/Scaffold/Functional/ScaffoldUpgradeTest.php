@@ -92,7 +92,7 @@ class ScaffoldUpgradeTest extends TestCase {
 
     // Remove a scaffold file and run the scaffold command again to prove that
     // scaffolding is still working.
-    unlink("$sut/index.php");
+    \unlink("$sut/index.php");
     $stdout = $this->mustExec("composer scaffold", $sut);
     $this->assertStringContainsString("Scaffolding files for", $stdout);
     $this->assertFileExists("$sut/index.php");
@@ -112,7 +112,7 @@ class ScaffoldUpgradeTest extends TestCase {
    *   Path to temporary git repository.
    */
   protected function createTmpRepo($source, $destParent, $version): string {
-    $target = $destParent . '/' . basename($source);
+    $target = $destParent . '/' . \basename($source);
     $filesystem = new Filesystem();
     $filesystem->copy($source, $target);
     $this->mustExec("git init", $target);

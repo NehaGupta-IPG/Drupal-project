@@ -57,13 +57,13 @@ class TaxonomyIndexTidDepth extends TaxonomyIndexTid {
    */
   public function query() {
     // If no filter values are present, then do nothing.
-    if (count($this->value) == 0) {
+    if (\count($this->value) == 0) {
       return;
     }
-    elseif (count($this->value) == 1) {
+    elseif (\count($this->value) == 1) {
       // Sometimes $this->value is an array with a single element so convert it.
-      if (is_array($this->value)) {
-        $this->value = current($this->value);
+      if (\is_array($this->value)) {
+        $this->value = \current($this->value);
       }
     }
 

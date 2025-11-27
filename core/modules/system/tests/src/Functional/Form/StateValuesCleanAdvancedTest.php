@@ -44,7 +44,7 @@ class StateValuesCleanAdvancedTest extends BrowserTestBase {
 
     // Get an image for uploading.
     $image_files = $this->drupalGetTestFiles('image');
-    $this->image = current($image_files);
+    $this->image = \current($image_files);
 
     // Check if the physical file is there.
     $this->assertFileExists($this->image->uri);

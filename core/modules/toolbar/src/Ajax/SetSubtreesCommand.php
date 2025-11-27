@@ -32,7 +32,7 @@ class SetSubtreesCommand implements CommandInterface {
   public function render() {
     return [
       'command' => 'setToolbarSubtrees',
-      'subtrees' => array_map('strval', $this->subtrees),
+      'subtrees' => \array_map('strval', $this->subtrees),
     ];
   }
 

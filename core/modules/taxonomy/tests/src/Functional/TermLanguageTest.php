@@ -78,7 +78,7 @@ class TermLanguageTest extends TaxonomyTestBase {
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
       'name' => $edit['name[0][value]'],
     ]);
-    $term = reset($terms);
+    $term = \reset($terms);
     $this->assertEquals($edit['langcode[0][value]'], $term->language()->getId(), 'The term contains the correct langcode.');
 
     // Check if on the edit page the language is correct.
@@ -157,7 +157,7 @@ class TermLanguageTest extends TaxonomyTestBase {
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
       'name' => $edit['name[0][value]'],
     ]);
-    $term = reset($terms);
+    $term = \reset($terms);
 
     // Add a translation for that term.
     $translated_title = $this->randomMachineName();

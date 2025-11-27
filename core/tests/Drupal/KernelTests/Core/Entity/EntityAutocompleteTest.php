@@ -80,7 +80,7 @@ class EntityAutocompleteTest extends EntityKernelTestBase {
       'value' => $entity_1->name->value . ' (1)',
       'label' => Html::escape($entity_1->name->value),
     ];
-    $this->assertSame($target, reset($data), 'Autocomplete returns only the expected matching entity.');
+    $this->assertSame($target, \reset($data), 'Autocomplete returns only the expected matching entity.');
 
     // Pass the first entity to the request.
     // We should get empty results.
@@ -108,7 +108,7 @@ class EntityAutocompleteTest extends EntityKernelTestBase {
       'value' => $n,
       'label' => Html::escape($entity_3->name->value),
     ];
-    $this->assertSame($target, reset($data), 'Autocomplete returns an entity label containing a comma and a slash.');
+    $this->assertSame($target, \reset($data), 'Autocomplete returns an entity label containing a comma and a slash.');
 
     // Test empty input.
     foreach (['', NULL, FALSE, 0, 0.0] as $input) {
@@ -167,7 +167,7 @@ class EntityAutocompleteTest extends EntityKernelTestBase {
     try {
       // Generate a valid hash key but store a modified settings array.
       $selection_settings = [];
-      $selection_settings_key = Crypt::hmacBase64(serialize($selection_settings) . $this->entityType . 'default', Settings::getHashSalt());
+      $selection_settings_key = Crypt::hmacBase64(\serialize($selection_settings) . $this->entityType . 'default', Settings::getHashSalt());
 
       $selection_settings[$this->randomMachineName()] = $this->randomString();
       \Drupal::keyValue('entity_autocomplete')->set($selection_settings_key, $selection_settings);
@@ -202,7 +202,7 @@ class EntityAutocompleteTest extends EntityKernelTestBase {
       $request->query->set('entity_id', $entity_id);
     }
 
-    $selection_settings_key = Crypt::hmacBase64(serialize($selection_settings) . $this->entityType . 'entity_test_all_except_host', Settings::getHashSalt());
+    $selection_settings_key = Crypt::hmacBase64(\serialize($selection_settings) . $this->entityType . 'entity_test_all_except_host', Settings::getHashSalt());
     \Drupal::keyValue('entity_autocomplete')->set($selection_settings_key, $selection_settings);
 
     $entity_reference_controller = EntityAutocompleteController::create($this->container);

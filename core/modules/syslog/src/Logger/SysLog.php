@@ -60,7 +60,7 @@ class SysLog implements LoggerInterface {
       if ($identity === NULL || $facility === NULL) {
         return;
       }
-      $this->connectionOpened = openlog($identity, LOG_NDELAY, $facility);
+      $this->connectionOpened = \openlog($identity, LOG_NDELAY, $facility);
     }
   }
 
@@ -86,9 +86,9 @@ class SysLog implements LoggerInterface {
 
     // Populate the message placeholders and then replace them in the message.
     $message_placeholders = $this->parser->parseMessagePlaceholders($message, $context);
-    $message = empty($message_placeholders) ? $message : strtr($message, $message_placeholders);
+    $message = empty($message_placeholders) ? $message : \strtr($message, $message_placeholders);
 
-    $entry = strtr($format, [
+    $entry = \strtr($format, [
       '!base_url' => $base_url,
       '!timestamp' => $context['timestamp'],
       '!type' => $context['channel'],
@@ -97,8 +97,8 @@ class SysLog implements LoggerInterface {
       '!referer' => $context['referer'],
       '!severity' => $level,
       '!uid' => $context['uid'],
-      '!link' => strip_tags($context['link']),
-      '!message' => strip_tags($message),
+      '!link' => \strip_tags($context['link']),
+      '!message' => \strip_tags($message),
     ]);
 
     $this->syslogWrapper($level, $entry);
@@ -113,7 +113,7 @@ class SysLog implements LoggerInterface {
    *   The message to send to syslog function.
    */
   protected function syslogWrapper($level, $entry) {
-    syslog($level, $entry);
+    \syslog($level, $entry);
   }
 
 }

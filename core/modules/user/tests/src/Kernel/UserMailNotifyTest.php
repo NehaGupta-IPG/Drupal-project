@@ -88,7 +88,7 @@ class UserMailNotifyTest extends EntityKernelTestBase {
     $this->installConfig('user');
     $this->config('system.site')->set('mail', 'test@example.com')->save();
     $this->config('user.settings')->set('notify.' . $op, TRUE)->save();
-    $return = _user_mail_notify($op, $this->createUser());
+    $return = \_user_mail_notify($op, $this->createUser());
     $this->assertTrue($return);
     foreach ($mail_keys as $key) {
       $filter = ['key' => $key];
@@ -107,7 +107,7 @@ class UserMailNotifyTest extends EntityKernelTestBase {
   public function testUserMailsNotSent($op): void {
     $this->installConfig('user');
     $this->config('user.settings')->set('notify.' . $op, FALSE)->save();
-    $return = _user_mail_notify($op, $this->createUser());
+    $return = \_user_mail_notify($op, $this->createUser());
     $this->assertNull($return);
     $this->assertEmpty($this->getMails());
   }
@@ -131,7 +131,7 @@ class UserMailNotifyTest extends EntityKernelTestBase {
     $logger_factory->get('user')
       ->addLogger($logger);
 
-    $return = _user_mail_notify($op, $this->createUser([], NULL, FALSE, [
+    $return = \_user_mail_notify($op, $this->createUser([], NULL, FALSE, [
       'mail' => NULL,
     ]));
 
@@ -165,8 +165,8 @@ class UserMailNotifyTest extends EntityKernelTestBase {
     // Install configs.
     $this->installConfig(['language', 'locale', 'user']);
 
-    locale_system_set_config_langcodes();
-    $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
+    \locale_system_set_config_langcodes();
+    $langcodes = \array_keys(\Drupal::languageManager()->getLanguages());
     $locale_config_manager = \Drupal::service('locale.config_manager');
     $names = $locale_config_manager->getComponentNames();
     $locale_config_manager->updateConfigTranslations($names, $langcodes);

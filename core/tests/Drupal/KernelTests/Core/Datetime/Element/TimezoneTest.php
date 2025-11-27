@@ -163,7 +163,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
     $this->installConfig(['system']);
 
     // Setup the background time zones.
-    $this->timezones['php initial'] = date_default_timezone_get();
+    $this->timezones['php initial'] = \date_default_timezone_get();
     $user = $this->createUser();
     $user->set('timezone', $this->timezones['user'])->save();
     // This also sets PHP's assumed time.
@@ -190,8 +190,8 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
     }
 
     // Validate the timezone setup.
-    $this->assertEquals($this->timezones['user'], date_default_timezone_get(), 'Subsequent tests assume specific value for date_default_timezone_get().');
-    $this->assertEquals(date_default_timezone_get(), $this->date->getTimezone()->getName(), 'Subsequent tests assume DrupalDateTime objects default to Drupal user time zone if none specified');
+    $this->assertEquals($this->timezones['user'], \date_default_timezone_get(), 'Subsequent tests assume specific value for date_default_timezone_get().');
+    $this->assertEquals(\date_default_timezone_get(), $this->date->getTimezone()->getName(), 'Subsequent tests assume DrupalDateTime objects default to Drupal user time zone if none specified');
   }
 
   /**
@@ -290,12 +290,12 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
     foreach ($form_state->getCompleteForm() as $elementName => $element) {
       if (isset($element['#type']) && $element['#type'] === $this->elementType) {
         $actualDate = $form_state->getValue($elementName);
-        $actualTimezone = array_search($actualDate->getTimezone()->getName(), $this->timezones);
+        $actualTimezone = \array_search($actualDate->getTimezone()->getName(), $this->timezones);
         $actualDateUTC = $actualDate->setTimezone($utc)->format('Y-m-d H:i:s');
 
         // Check that $this->date has not anywhere been accidentally changed
         // from its default timezone, invalidating the test logic.
-        $this->assertEquals(date_default_timezone_get(), $this->date->getTimezone()->getName(), "Test date still set to user timezone.");
+        $this->assertEquals(\date_default_timezone_get(), $this->date->getTimezone()->getName(), "Test date still set to user timezone.");
 
         // Build a list of cases where the result is not as expected.
         // Check the time has been understood correctly.
@@ -314,9 +314,9 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
       }
     }
 
-    $message = "On all elements the time should be understood correctly as $expectedDateUTC: \n" . print_r($wrongDates, TRUE);
+    $message = "On all elements the time should be understood correctly as $expectedDateUTC: \n" . \print_r($wrongDates, TRUE);
     $this->assertEquals($this->testConditions, $rightDates, $message);
-    $message = "On all elements the correct timezone should be set on the value object: (expected, actual) \n" . print_r($wrongTimezones, TRUE);
+    $message = "On all elements the correct timezone should be set on the value object: (expected, actual) \n" . \print_r($wrongTimezones, TRUE);
     $this->assertCount(0, $wrongTimezones, $message);
   }
 
@@ -342,7 +342,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
     foreach ($form_state->getCompleteForm() as $element) {
       if (isset($element['#type']) && $element['#type'] === $this->elementType) {
         // Check the correct timezone is set on the value object.
-        $actualTimezone = array_search($element['#date_timezone'], $this->timezones, TRUE);
+        $actualTimezone = \array_search($element['#date_timezone'], $this->timezones, TRUE);
         if ($element['#test_expect_timezone'] !== $actualTimezone) {
           $wrongTimezones[$element['#title']] = [
             $element['#test_expect_timezone'],
@@ -350,8 +350,8 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
           ];
         }
       }
-      $this->assertEquals($this->timezones['user'], date_default_timezone_get(), 'Subsequent tests assume specific value for date_default_timezone_get().');
-      $message = "The correct timezone should be set on the processed {$this->elementType}  elements: (expected, actual) \n" . print_r($wrongTimezones, TRUE);
+      $this->assertEquals($this->timezones['user'], \date_default_timezone_get(), 'Subsequent tests assume specific value for date_default_timezone_get().');
+      $message = "The correct timezone should be set on the processed {$this->elementType}  elements: (expected, actual) \n" . \print_r($wrongTimezones, TRUE);
       $this->assertCount(0, $wrongTimezones, $message);
     }
   }

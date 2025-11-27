@@ -35,7 +35,7 @@ class FilterNoFormatTest extends KernelTestBase {
 
     // Make sure that when this text is run through check_markup() with no text
     // format, it is filtered as though it is in the fallback format.
-    $this->assertEquals(check_markup($text), check_markup($text, filter_fallback_format()));
+    $this->assertEquals(\check_markup($text), \check_markup($text, \filter_fallback_format()));
   }
 
 }

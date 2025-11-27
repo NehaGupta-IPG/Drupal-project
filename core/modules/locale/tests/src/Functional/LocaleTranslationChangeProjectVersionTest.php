@@ -53,7 +53,7 @@ class LocaleTranslationChangeProjectVersionTest extends LocaleUpdateBase {
     // Initialize the projects status and change the project version to the old
     // version. This makes the code update the module translation to the new
     // version when the (batch) update script is triggered.
-    $status = locale_translation_get_status();
+    $status = \locale_translation_get_status();
     $status['contrib_module_one']['de']->version = '8.x-1.0';
     \Drupal::keyValue('locale.translation_status')->setMultiple($status);
   }
@@ -64,7 +64,7 @@ class LocaleTranslationChangeProjectVersionTest extends LocaleUpdateBase {
   public function testUpdateImportSourceRemote(): void {
 
     // Verify that the project status has the old version.
-    $status = locale_translation_get_status(['contrib_module_one']);
+    $status = \locale_translation_get_status(['contrib_module_one']);
     $this->assertEquals('8.x-1.0', $status['contrib_module_one']['de']->version);
 
     // Verify that the old translation file exists and the new does not exist.
@@ -73,12 +73,12 @@ class LocaleTranslationChangeProjectVersionTest extends LocaleUpdateBase {
 
     // Run batch tasks.
     $context = [];
-    locale_translation_batch_version_check('contrib_module_one', 'de', $context);
-    locale_translation_batch_status_check('contrib_module_one', 'de', [], $context);
-    locale_translation_batch_fetch_download('contrib_module_one', 'de', $context);
+    \locale_translation_batch_version_check('contrib_module_one', 'de', $context);
+    \locale_translation_batch_status_check('contrib_module_one', 'de', [], $context);
+    \locale_translation_batch_fetch_download('contrib_module_one', 'de', $context);
 
     // Verify that the project status has the new version.
-    $status = locale_translation_get_status(['contrib_module_one']);
+    $status = \locale_translation_get_status(['contrib_module_one']);
     $this->assertEquals('8.x-1.1', $status['contrib_module_one']['de']->version);
 
     // Verify that the old translation file was removed and the new was

@@ -251,7 +251,7 @@ JS;
     $current_languages = $page->findAll('css', '.ck-text-fragment-language-dropdown li .ck-button__label');
 
     // Remove "Remove language" element from current languages.
-    array_shift($current_languages);
+    \array_shift($current_languages);
 
     // Create array of full language name.
     $languages = [];
@@ -260,11 +260,11 @@ JS;
     }
 
     // Return the values from a single column.
-    $configured_languages = array_column($configured_languages, 0);
+    $configured_languages = \array_column($configured_languages, 0);
 
     // Sort on full language name.
-    asort($configured_languages);
-    $this->assertSame(array_values($configured_languages), $languages);
+    \asort($configured_languages);
+    $this->assertSame(\array_values($configured_languages), $languages);
   }
 
   /**
@@ -294,7 +294,7 @@ JS;
     // Make sure that the container selector contains exactly one Vertical Tabs
     // UI component.
     $vertical_tabs = $container->findAll('css', '.vertical-tabs');
-    if (count($vertical_tabs) != 1) {
+    if (\count($vertical_tabs) != 1) {
       throw new \LogicException('The given container should contain exactly one Vertical Tabs component.');
     }
 
@@ -510,11 +510,11 @@ JS;
     $uploaded_image = File::load(1);
     $image_url = $this->container->get('file_url_generator')->generateString($uploaded_image->getFileUri());
     $image_uuid = $uploaded_image->uuid();
-    $assert_session->elementExists('xpath', sprintf('//img[@src="%s" and @width="40" and @height="20" and @data-entity-uuid="%s" and @data-entity-type="file"]', $image_url, $image_uuid));
+    $assert_session->elementExists('xpath', \sprintf('//img[@src="%s" and @width="40" and @height="20" and @data-entity-uuid="%s" and @data-entity-type="file"]', $image_url, $image_uuid));
 
     // Ensure that width, height, and length attributes are not stored in the
     // database.
-    $this->assertEquals(sprintf('<img data-entity-uuid="%s" data-entity-type="file" src="%s" width="40" height="20" alt="There is now alt text">', $image_uuid, $image_url), Node::load(1)->get('body')->value);
+    $this->assertEquals(\sprintf('<img data-entity-uuid="%s" data-entity-type="file" src="%s" width="40" height="20" alt="There is now alt text">', $image_uuid, $image_url), Node::load(1)->get('body')->value);
 
     // Ensure that data-entity-uuid and data-entity-type attributes are upcasted
     // correctly to CKEditor model.
@@ -522,7 +522,7 @@ JS;
     $this->assertNotEmpty($assert_session->waitForElement('css', '.ck-editor'));
     $page->pressButton('Save');
 
-    $assert_session->elementExists('xpath', sprintf('//img[@src="%s" and @width="40" and @height="20" and @data-entity-uuid="%s" and @data-entity-type="file"]', $image_url, $image_uuid));
+    $assert_session->elementExists('xpath', \sprintf('//img[@src="%s" and @width="40" and @height="20" and @data-entity-uuid="%s" and @data-entity-type="file"]', $image_url, $image_uuid));
   }
 
   /**
@@ -585,11 +585,11 @@ JS;
         ],
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))
@@ -674,7 +674,7 @@ JS;
 
         // Open the list type toolbar and choose a type.
         $list_button_tip_text = $list_tag === 'ol' ? 'Numbered List' : 'Bulleted List';
-        $toolbar_selector = '[aria-label="' . str_replace(' L', ' l', $list_button_tip_text) . ' styles toolbar"]';
+        $toolbar_selector = '[aria-label="' . \str_replace(' L', ' l', $list_button_tip_text) . ' styles toolbar"]';
         $button_selector = '[data-cke-tooltip-text="' . $list_button_tip_text . '"]';
         $page->find('css', '[aria-expanded="false"]' . $button_selector)->click();
         $open_splitbutton = $assert_session->waitForElementVisible('css', '[aria-expanded="true"]' . $button_selector);
@@ -687,22 +687,22 @@ JS;
         // While this is a bit of an indirect way to find the correct button, it
         // accounts for the mixed dash characters and worked better than other
         // attempts.
-        $toolbar_button_tips = array_map(fn($item) => str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
-        $this->assertNotFalse(array_search($type, $toolbar_button_tips));
-        $toolbar_buttons[array_search($type, $toolbar_button_tips)]->click();
+        $toolbar_button_tips = \array_map(fn($item) => \str_replace('–', '-', $item->getAttribute('data-cke-tooltip-text')), $toolbar_buttons);
+        $this->assertNotFalse(\array_search($type, $toolbar_button_tips));
+        $toolbar_buttons[\array_search($type, $toolbar_button_tips)]->click();
         $widget_selector = '.ck-editor__editable_inline > ' . $list_tag . '[type="' . $type_attribute . '"]';
         $widget = $assert_session->waitForElementVisible('css', $widget_selector);
         $this->assertNotNull($widget, "The widget exists at $widget_selector");
 
         // Confirm the style applied in-editor is for the type of list chosen.
         $list_style_type = $this->getSession()->evaluateScript('window.getComputedStyle(document.querySelector(\'' . $widget_selector . '\')).listStyleType');
-        $this->assertSame(str_replace('latin', 'alpha', strtolower($type)), $list_style_type, "The $list_style_type list should have the correct style.");
+        $this->assertSame(\str_replace('latin', 'alpha', \strtolower($type)), $list_style_type, "The $list_style_type list should have the correct style.");
         $page->pressButton('Save');
 
         $fe_list_style_type = $this->getSession()->evaluateScript('window.getComputedStyle(document.querySelector(\'' . $list_tag . '[type]\')).listStyleType');
         // Confirm the style applied on the default theme is for the type of
         // list chosen.
-        $this->assertSame(str_replace('latin', 'alpha', strtolower($type)), strtolower($fe_list_style_type));
+        $this->assertSame(\str_replace('latin', 'alpha', \strtolower($type)), \strtolower($fe_list_style_type));
         $this->drupalGet($edit_url);
         $this->waitForEditor();
       }
@@ -739,11 +739,11 @@ JS;
         ],
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('ckeditor5'),
         FilterFormat::load('ckeditor5')
       ))
@@ -760,11 +760,11 @@ JS;
         'status' => FALSE,
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('ckeditor5_2'),
         FilterFormat::load('ckeditor5_2')
       ))

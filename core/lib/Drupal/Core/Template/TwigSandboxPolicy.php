@@ -56,11 +56,11 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
       'Drupal\Core\Template\Attribute',
     ]);
     // Flip the array so we can check using isset().
-    $this->allowed_classes = array_flip($allowed_classes);
+    $this->allowed_classes = \array_flip($allowed_classes);
 
     $allowed_methods = static::getMethodsAllowedOnAllObjects();
     // Flip the array so we can check using isset().
-    $this->allowed_methods = array_flip($allowed_methods);
+    $this->allowed_methods = \array_flip($allowed_methods);
 
     $this->allowed_prefixes = Settings::get('twig_sandbox_allowed_prefixes', [
       'get',
@@ -97,7 +97,7 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
     // If the method name starts with an allowed prefix, allow it. Note:
     // strpos() is between 3x and 7x faster than preg_match() in this case.
     foreach ($this->allowed_prefixes as $prefix) {
-      if (str_starts_with($method, $prefix)) {
+      if (\str_starts_with($method, $prefix)) {
         return;
       }
     }
@@ -108,7 +108,7 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
       return;
     }
 
-    throw new SecurityError(sprintf('Calling "%s" method on a "%s" object is not allowed.', $method, get_class($obj)));
+    throw new SecurityError(\sprintf('Calling "%s" method on a "%s" object is not allowed.', $method, \get_class($obj)));
   }
 
   /**

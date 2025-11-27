@@ -116,8 +116,8 @@ class ExternalNormalizersTest extends BrowserTestBase {
    */
   #[DataProvider('providerTestFormatAgnosticNormalizers')]
   public function testFormatAgnosticNormalizers($test_module, $expected_value_jsonapi_normalization, $expected_value_jsonapi_denormalization): void {
-    assert(in_array($expected_value_jsonapi_normalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
-    assert(in_array($expected_value_jsonapi_denormalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
+    \assert(\in_array($expected_value_jsonapi_normalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
+    \assert(\in_array($expected_value_jsonapi_denormalization, [static::VALUE_ORIGINAL, static::VALUE_OVERRIDDEN], TRUE));
 
     // Asserts the entity contains the value we set.
     $this->assertSame(static::VALUE_ORIGINAL, $this->entity->field_test->value);
@@ -179,7 +179,7 @@ class ExternalNormalizersTest extends BrowserTestBase {
     $entities = $entity_type_manager
       ->getStorage('entity_test')
       ->loadByProperties([$uuid_key => $document['data']['id']]);
-    $created_entity = reset($entities);
+    $created_entity = \reset($entities);
     $this->assertSame($expected_value_jsonapi_denormalization, $created_entity->field_test->value);
   }
 

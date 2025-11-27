@@ -17,7 +17,7 @@ class HighWaterTest extends SqlBase {
    * {@inheritdoc}
    */
   public function query() {
-    $field_names = array_keys($this->fields());
+    $field_names = \array_keys($this->fields());
     $query = $this
       ->select('high_water_node', 'm')
       ->fields('m', $field_names);

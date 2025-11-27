@@ -309,7 +309,7 @@ class FilterCombineTest extends ViewsKernelTestBase {
     $this->assertTrue($view->build_info['fail'], "View build has been marked as failed.");
     // Make sure this view does not pass validation with the right error.
     $errors = $view->validate();
-    $this->assertEquals('Field dummy set in Global: Combine fields filter is not set in display Default.', reset($errors['default']));
+    $this->assertEquals('Field dummy set in Global: Combine fields filter is not set in display Default.', \reset($errors['default']));
   }
 
   /**
@@ -343,7 +343,7 @@ class FilterCombineTest extends ViewsKernelTestBase {
     $this->executeView($view);
     $errors = $view->validate();
     // Check that the right error is shown.
-    $this->assertEquals('Default: Global: Combine fields filter can only be used on displays that use fields. Set the style or row format for that display to one using fields to use the combine field filter.', reset($errors['default']));
+    $this->assertEquals('Default: Global: Combine fields filter can only be used on displays that use fields. Set the style or row format for that display to one using fields to use the combine field filter.', \reset($errors['default']));
 
     // Confirm that the query with single filter does not use the "CONCAT_WS"
     // operator.
@@ -758,7 +758,7 @@ class FilterCombineTest extends ViewsKernelTestBase {
       'name' => 'Ginger',
       'age' => 25,
       'job' => NULL,
-      'created' => gmmktime(0, 0, 0, 1, 2, 2000),
+      'created' => \gmmktime(0, 0, 0, 1, 2, 2000),
       'status' => 1,
     ];
     return $data_set;

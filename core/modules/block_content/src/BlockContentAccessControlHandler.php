@@ -55,9 +55,9 @@ class BlockContentAccessControlHandler extends EntityAccessControlHandler implem
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    assert($entity instanceof BlockContentInterface);
+    \assert($entity instanceof BlockContentInterface);
     $bundle = $entity->bundle();
-    $forbidIfNotReusable = fn (): AccessResultInterface => AccessResult::forbiddenIf($entity->isReusable() === FALSE, sprintf('Block content must be reusable to use `%s` operation', $operation));
+    $forbidIfNotReusable = fn (): AccessResultInterface => AccessResult::forbiddenIf($entity->isReusable() === FALSE, \sprintf('Block content must be reusable to use `%s` operation', $operation));
     $access = AccessResult::allowedIfHasPermissions($account, ['administer block content']);
     if (!$access->isAllowed()) {
       $access = match ($operation) {

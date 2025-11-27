@@ -17,7 +17,7 @@ class CookiesCacheContext extends RequestStackCacheContextBase implements Calcul
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('HTTP cookies');
+    return \t('HTTP cookies');
   }
 
   /**
@@ -28,9 +28,9 @@ class CookiesCacheContext extends RequestStackCacheContextBase implements Calcul
       $cookies = $this->requestStack->getCurrentRequest()->cookies->all();
       // Sort the cookies by names, to always set the same context if the
       // cookies are the same but in a different order.
-      ksort($cookies);
+      \ksort($cookies);
       // Use http_build_query() to get a short string from the cookies array.
-      return http_build_query($cookies);
+      return \http_build_query($cookies);
     }
     else {
       return $this->requestStack->getCurrentRequest()->cookies->get($cookie);

@@ -74,7 +74,7 @@ final class Exporter implements LoggerAwareInterface {
     // - `created` fields aren't needed because default content should be
     //   "created" upon import.
     foreach ($field_definitions as $name => $definition) {
-      if (in_array($definition->getType(), ['changed', 'created'], TRUE)) {
+      if (\in_array($definition->getType(), ['changed', 'created'], TRUE)) {
         $event->setExportable($name, FALSE);
       }
     }
@@ -138,7 +138,7 @@ final class Exporter implements LoggerAwareInterface {
 
     $path = $destination . '/' . $entity->uuid() . '.' . Yaml::getFileExtension();
     $result = $this->export($entity);
-    file_put_contents($path, (string) $result) || throw new FileWriteException("Could not write file '$path'");
+    \file_put_contents($path, (string) $result) || throw new FileWriteException("Could not write file '$path'");
 
     foreach ($result->metadata->getAttachments() as $from => $to) {
       $this->fileSystem->copy($from, $destination . '/' . $to, FileExists::Replace);
@@ -163,7 +163,7 @@ final class Exporter implements LoggerAwareInterface {
     $done = [];
 
     while ($queue) {
-      $entity = array_shift($queue);
+      $entity = \array_shift($queue);
       $uuid = $entity->uuid();
       // Don't export the same entity twice, both for performance and to prevent
       // an infinite loop caused by circular dependencies.
@@ -180,7 +180,7 @@ final class Exporter implements LoggerAwareInterface {
       }
       $done[$uuid] = TRUE;
     }
-    return count($done);
+    return \count($done);
   }
 
   /**
@@ -224,7 +224,7 @@ final class Exporter implements LoggerAwareInterface {
       foreach ($items as $item) {
         $values = $callback($item, $metadata);
         // If the callback returns NULL, this item should not be exported.
-        if (is_array($values)) {
+        if (\is_array($values)) {
           $data[$name][] = $values;
         }
       }
@@ -257,8 +257,8 @@ final class Exporter implements LoggerAwareInterface {
     foreach ($item->getProperties() as $name => $property) {
       $value = $property instanceof PrimitiveInterface ? $property->getCastedValue() : $property->getValue();
 
-      if (is_string($value) && in_array($name, $custom_serialized, TRUE)) {
-        $value = unserialize($value);
+      if (\is_string($value) && \in_array($name, $custom_serialized, TRUE)) {
+        $value = \unserialize($value);
       }
       $values[$name] = $value;
     }
@@ -299,8 +299,8 @@ final class Exporter implements LoggerAwareInterface {
       // processing because user 0 is guaranteed to exist, and user 1 is
       // guaranteed to have existed at some point. Either way, there's no chance
       // of accidentally referencing the wrong entity on import.
-      if ($entity instanceof AccountInterface && intval($entity->id()) < 2) {
-        return array_map('intval', $values);
+      if ($entity instanceof AccountInterface && \intval($entity->id()) < 2) {
+        return \array_map('intval', $values);
       }
       // Mark the referenced entity as a dependency of the one we're exporting.
       $metadata->addDependency($entity);

@@ -96,7 +96,7 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
     $entity->save();
     $class = new TestLayoutEntityHelperTrait();
     $result = $class->getSectionStorageForEntity($entity);
-    $this->assertEquals($expected_context_keys, array_keys($result));
+    $this->assertEquals($expected_context_keys, \array_keys($result));
     if ($entity instanceof EntityViewDisplayInterface) {
       $this->assertEquals(EntityContext::fromEntity($entity), $result['display']);
     }

@@ -25,7 +25,7 @@ class EntityRevisionRouteEnhancer implements EnhancerInterface {
     // Check whether there is any entity revision parameter.
     $parameters = $route->getOption('parameters') ?: [];
     foreach ($parameters as $info) {
-      if (isset($info['type']) && str_starts_with($info['type'], 'entity_revision:')) {
+      if (isset($info['type']) && \str_starts_with($info['type'], 'entity_revision:')) {
         return TRUE;
       }
     }
@@ -45,7 +45,7 @@ class EntityRevisionRouteEnhancer implements EnhancerInterface {
     $options = $route->getOptions();
     if (isset($options['parameters'])) {
       foreach ($options['parameters'] as $name => $details) {
-        if (!empty($details['type']) && str_contains($details['type'], 'entity_revision:')) {
+        if (!empty($details['type']) && \str_contains($details['type'], 'entity_revision:')) {
           $defaults['_entity_revision'] = $defaults[$name];
           break;
         }

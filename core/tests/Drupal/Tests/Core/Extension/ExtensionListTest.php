@@ -322,12 +322,12 @@ class ExtensionListTest extends UnitTestCase {
     }
     vfsStream::create($folders);
     foreach ($extension_names as $extension_name) {
-      touch("vfs://drupal_root/example/$extension_name/$extension_name.info.yml", 123456789);
+      \touch("vfs://drupal_root/example/$extension_name/$extension_name.info.yml", 123456789);
     }
 
     [$cache, $info_parser, $module_handler, $state] = $this->getMocks();
     $info_parser->parse(Argument::any())->will(function ($args) {
-      return Yaml::decode(file_get_contents('vfs://drupal_root/' . $args[0]));
+      return Yaml::decode(\file_get_contents('vfs://drupal_root/' . $args[0]));
     });
 
     $test_extension_list = new TestExtension('vfs://drupal_root', 'test_extension', $cache->reveal(), $info_parser->reveal(), $module_handler->reveal(), $state->reveal(), 'testing');

@@ -76,10 +76,10 @@ class TranslatableMarkupTest extends UnitTestCase {
 
     // We set a custom error handler because of
     // https://github.com/sebastianbergmann/phpunit/issues/487
-    set_error_handler([$this, 'errorHandler']);
+    \set_error_handler([$this, 'errorHandler']);
     // We want this to trigger an error.
     (string) $text;
-    restore_error_handler();
+    \restore_error_handler();
 
     $this->assertEquals(E_USER_WARNING, $this->lastErrorNumber);
     $this->assertMatchesRegularExpression('/Exception thrown while calling __toString on a .*MockObject_TranslatableMarkup_.* object in .*TranslatableMarkupTest.php on line [0-9]+: Yes you may./', $this->lastErrorMessage);

@@ -192,7 +192,7 @@ class ModerationStateWidget extends OptionsSelectWidget {
    * {@inheritdoc}
    */
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
-    return is_a($field_definition->getClass(), ModerationStateFieldItemList::class, TRUE);
+    return \is_a($field_definition->getClass(), ModerationStateFieldItemList::class, TRUE);
   }
 
   /**

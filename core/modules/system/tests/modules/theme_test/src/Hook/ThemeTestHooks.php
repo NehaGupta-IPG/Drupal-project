@@ -97,7 +97,7 @@ class ThemeTestHooks {
    *   An associative array of variables.
    */
   public function preprocessThemeTestDeprecationsPreprocess(array &$variables): void {
-    $variables = array_merge($variables, \Drupal::state()->get('theme_test.theme_test_deprecations_preprocess'));
+    $variables = \array_merge($variables, \Drupal::state()->get('theme_test.theme_test_deprecations_preprocess'));
   }
 
   /**
@@ -222,7 +222,7 @@ class ThemeTestHooks {
     // $extension`, whose values is an array containing everything that should
     // be recursively merged into the given extension's library definitions.
     $info = \Drupal::state()->get('theme_test_library_info_alter' . " {$extension}");
-    if (is_array($info)) {
+    if (\is_array($info)) {
       $libraries = NestedArray::mergeDeep($libraries, $info);
     }
   }

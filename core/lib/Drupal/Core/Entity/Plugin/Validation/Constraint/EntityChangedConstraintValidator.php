@@ -24,8 +24,8 @@ class EntityChangedConstraintValidator extends ConstraintValidator {
         // saved might contain an older entity translation when different
         // translations are being concurrently edited.
         if ($saved_entity) {
-          $common_translation_languages = array_intersect_key($entity->getTranslationLanguages(), $saved_entity->getTranslationLanguages());
-          foreach (array_keys($common_translation_languages) as $langcode) {
+          $common_translation_languages = \array_intersect_key($entity->getTranslationLanguages(), $saved_entity->getTranslationLanguages());
+          foreach (\array_keys($common_translation_languages) as $langcode) {
             // Merely comparing the latest changed timestamps across all
             // translations is not sufficient since other translations may have
             // been edited and saved in the meanwhile. Therefore, compare the

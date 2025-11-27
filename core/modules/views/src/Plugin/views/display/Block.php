@@ -141,7 +141,7 @@ class Block extends DisplayPluginBase {
       ],
     ];
 
-    $block_description = strip_tags($this->getOption('block_description'));
+    $block_description = \strip_tags($this->getOption('block_description'));
     if (empty($block_description)) {
       $block_description = $this->t('None');
     }
@@ -158,7 +158,7 @@ class Block extends DisplayPluginBase {
       'value' => Unicode::truncate($block_category, 24, FALSE, TRUE),
     ];
 
-    $filtered_allow = array_filter($this->getOption('allow'));
+    $filtered_allow = \array_filter($this->getOption('allow'));
 
     $options['allow'] = [
       'category' => 'block',
@@ -227,7 +227,7 @@ class Block extends DisplayPluginBase {
           'items_per_page' => $this->t('Items per page'),
         ];
 
-        $allow = array_keys(array_filter($this->getOption('allow')));
+        $allow = \array_keys(\array_filter($this->getOption('allow')));
         $form['allow'] = [
           '#type' => 'checkboxes',
           '#default_value' => $allow,
@@ -273,7 +273,7 @@ class Block extends DisplayPluginBase {
    * @see \Drupal\views\Plugin\Block\ViewsBlock::blockForm()
    */
   public function blockForm(ViewsBlock $block, array &$form, FormStateInterface $form_state) {
-    $allow_settings = array_filter($this->getOption('allow'));
+    $allow_settings = \array_filter($this->getOption('allow'));
 
     $block_configuration = $block->getConfiguration();
 
@@ -342,7 +342,7 @@ class Block extends DisplayPluginBase {
    */
   public function blockSubmit(ViewsBlock $block, $form, FormStateInterface $form_state) {
     if ($items_per_page = $form_state->getValue(['override', 'items_per_page'])) {
-      $block->setConfigurationValue('items_per_page', $items_per_page === 'none' ? NULL : intval($items_per_page));
+      $block->setConfigurationValue('items_per_page', $items_per_page === 'none' ? NULL : \intval($items_per_page));
     }
     $form_state->unsetValue(['override', 'items_per_page']);
   }
@@ -355,9 +355,9 @@ class Block extends DisplayPluginBase {
    */
   public function preBlockBuild(ViewsBlock $block) {
     $config = $block->getConfiguration();
-    if (is_numeric($config['items_per_page']) && $config['items_per_page'] > 0) {
+    if (\is_numeric($config['items_per_page']) && $config['items_per_page'] > 0) {
       // @todo Delete the intval() in https://www.drupal.org/project/drupal/issues/3521221
-      $this->view->setItemsPerPage(intval($config['items_per_page']));
+      $this->view->setItemsPerPage(\intval($config['items_per_page']));
     }
   }
 

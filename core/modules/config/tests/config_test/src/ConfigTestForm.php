@@ -52,7 +52,7 @@ class ConfigTestForm extends EntityForm {
     ];
     if ($this->moduleHandler->moduleExists('image')) {
       $form['style']['#access'] = TRUE;
-      $form['style']['#options'] = image_style_options();
+      $form['style']['#options'] = \image_style_options();
     }
 
     // The main premise of entity forms is that we get to work with an entity

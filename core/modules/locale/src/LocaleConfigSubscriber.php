@@ -124,7 +124,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    */
   public function updateLocaleStorage(StorableConfigBase $config, $langcode, array $reference_config = []) {
     $name = $config->getName();
-    if ($this->localeConfigManager->isSupported($name) && locale_is_translatable($langcode)) {
+    if ($this->localeConfigManager->isSupported($name) && \locale_is_translatable($langcode)) {
       $translatables = $this->localeConfigManager->getTranslatableDefaultConfig($name);
       $this->processTranslatableData($name, $config->get(), $translatables, $langcode, $reference_config);
     }
@@ -155,7 +155,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
         }
         continue;
       }
-      if (is_array($item)) {
+      if (\is_array($item)) {
         $reference_config_item = $reference_config[$key] ?? [];
         $this->processTranslatableData($name, $config[$key], $item, $langcode, $reference_config_item);
       }
@@ -184,7 +184,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    *   The language code of the translation being processed.
    */
   protected function resetExistingTranslations($name, $translatable, $reference_config, $langcode) {
-    if (is_array($translatable)) {
+    if (\is_array($translatable)) {
       foreach ($translatable as $key => $item) {
         if (isset($reference_config[$key])) {
           // Process further if the key still exists in the reference active
@@ -194,7 +194,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
         }
       }
     }
-    elseif (!is_array($reference_config)) {
+    elseif (!\is_array($reference_config)) {
       $this->saveCustomizedTranslation($name, $translatable->getUntranslatedString(), $translatable->getOption('context'), $reference_config, $langcode);
     }
   }

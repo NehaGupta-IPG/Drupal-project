@@ -50,7 +50,7 @@ class HandlerArgumentUserUidTest extends KernelTestBase {
     $view = Views::getView('test_user_uid_argument');
 
     // Tests an invalid user uid.
-    $view->preview(NULL, [rand(1000, 10000)]);
+    $view->preview(NULL, [\rand(1000, 10000)]);
     $this->assertEmpty($view->getTitle());
     $view->destroy();
 

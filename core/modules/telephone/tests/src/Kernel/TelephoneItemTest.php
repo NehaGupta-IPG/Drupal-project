@@ -65,7 +65,7 @@ class TelephoneItemTest extends FieldKernelTestBase {
     $this->assertEquals($value, $entity->field_test[0]->value);
 
     // Verify changing the field value.
-    $new_value = '+41' . rand(1000000, 9999999);
+    $new_value = '+41' . \rand(1000000, 9999999);
     $entity->field_test->value = $new_value;
     $this->assertEquals($new_value, $entity->field_test->value);
 

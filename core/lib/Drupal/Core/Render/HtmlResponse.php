@@ -54,7 +54,7 @@ class HtmlResponse extends Response implements CacheableResponseInterface, Attac
   public function setContent($content): static {
     // A render array can automatically be converted to a string and set the
     // necessary metadata.
-    if (is_array($content) && (isset($content['#markup']))) {
+    if (\is_array($content) && (isset($content['#markup']))) {
       $content += [
         '#attached' => [
           'html_response_attachment_placeholders' => [],

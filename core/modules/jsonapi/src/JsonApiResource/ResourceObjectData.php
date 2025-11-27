@@ -27,7 +27,7 @@ class ResourceObjectData extends Data implements TopLevelDataInterface {
    * @see \Drupal\jsonapi\JsonApiResource\Data::__construct
    */
   public function __construct($data, $cardinality = -1) {
-    assert(Inspector::assertAllObjects($data, ResourceObject::class, EntityAccessDeniedHttpException::class));
+    \assert(Inspector::assertAllObjects($data, ResourceObject::class, EntityAccessDeniedHttpException::class));
     parent::__construct($data, $cardinality);
   }
 

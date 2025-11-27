@@ -53,9 +53,9 @@ class HtaccessTest extends KernelTestBase {
     $stream = 'public://test/stream';
 
     // Create public .htaccess file.
-    mkdir($this->public, 0777, TRUE);
+    \mkdir($this->public, 0777, TRUE);
     $this->assertTrue($this->htaccessWriter->write($this->public, FALSE));
-    $content = file_get_contents($this->public . '/.htaccess');
+    $content = \file_get_contents($this->public . '/.htaccess');
     $this->assertStringContainsString("SetHandler Drupal_Security_Do_Not_Remove_See_SA_2006_006", $content);
     $this->assertStringNotContainsString("Require all denied", $content);
     $this->assertStringNotContainsString("Deny from all", $content);
@@ -66,9 +66,9 @@ class HtaccessTest extends KernelTestBase {
     $this->assertTrue($this->htaccessWriter->write($this->public, FALSE));
 
     // Create private .htaccess file.
-    mkdir($private, 0777, TRUE);
+    \mkdir($private, 0777, TRUE);
     $this->assertTrue($this->htaccessWriter->write($private));
-    $content = file_get_contents($private . '/.htaccess');
+    $content = \file_get_contents($private . '/.htaccess');
     $this->assertStringContainsString("SetHandler Drupal_Security_Do_Not_Remove_See_SA_2006_006", $content);
     $this->assertStringContainsString("Require all denied", $content);
     $this->assertStringContainsString("Deny from all", $content);
@@ -79,9 +79,9 @@ class HtaccessTest extends KernelTestBase {
     $this->assertTrue($this->htaccessWriter->write($private));
 
     // Create an .htaccess file using a stream URI.
-    mkdir($stream, 0777, TRUE);
+    \mkdir($stream, 0777, TRUE);
     $this->assertTrue($this->htaccessWriter->write($stream));
-    $content = file_get_contents($stream . '/.htaccess');
+    $content = \file_get_contents($stream . '/.htaccess');
     $this->assertStringContainsString("SetHandler Drupal_Security_Do_Not_Remove_See_SA_2006_006", $content);
     $this->assertStringContainsString("Require all denied", $content);
     $this->assertStringContainsString("Deny from all", $content);
@@ -114,11 +114,11 @@ class HtaccessTest extends KernelTestBase {
    * @internal
    */
   protected function assertFilePermissions(string $uri, int $expected): void {
-    $actual = fileperms($uri) & 0777;
-    $this->assertSame($actual, $expected, sprintf('%s file permissions %s are identical to %s.',
+    $actual = \fileperms($uri) & 0777;
+    $this->assertSame($actual, $expected, \sprintf('%s file permissions %s are identical to %s.',
       $uri,
-      0 . decoct($actual),
-      0 . decoct($expected),
+      0 . \decoct($actual),
+      0 . \decoct($expected),
     ));
   }
 

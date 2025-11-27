@@ -64,7 +64,7 @@ class HtmlEscapedTextTest extends TestCase {
   public function testCount(): void {
     $string = 'Can I have a <em>kitten</em>';
     $escapable_string = new HtmlEscapedText($string);
-    $this->assertEquals(strlen($string), $escapable_string->count());
+    $this->assertEquals(\strlen($string), $escapable_string->count());
   }
 
 }

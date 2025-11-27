@@ -55,9 +55,9 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     $component_id = $component->getPluginId();
     $emoji = static::emojiForString($component_id);
     if ($env->isDebug()) {
-      $print_nodes[] = new PrintNode(new ConstantExpression(sprintf('<!-- %s Component start: %s -->', $emoji, $component_id), $line), $line);
+      $print_nodes[] = new PrintNode(new ConstantExpression(\sprintf('<!-- %s Component start: %s -->', $emoji, $component_id), $line), $line);
       if (!empty($component->metadata->variants)) {
-        $print_nodes[] = new PrintNode(new ConstantExpression(sprintf('<!--     with variant: "'), $line), $line);
+        $print_nodes[] = new PrintNode(new ConstantExpression(\sprintf('<!--     with variant: "'), $line), $line);
         $print_nodes[] = new PrintNode(new ContextVariable('variant', $line), $line);
         $print_nodes[] = new PrintNode(new ConstantExpression('" -->', $line), $line);
       }
@@ -95,7 +95,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
       $node->setNode(
         'display_end',
         new Nodes([
-          new PrintNode(new ConstantExpression(sprintf('<!-- %s Component end: %s -->', $emoji, $component_id), $line), $line),
+          new PrintNode(new ConstantExpression(\sprintf('<!-- %s Component end: %s -->', $emoji, $component_id), $line), $line),
           $node->getNode('display_end'),
         ])
       );
@@ -117,7 +117,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
    */
   protected function getComponent(Node $node): ?Component {
     $component_id = $node->getTemplateName();
-    if (!preg_match('/^[a-z]([a-zA-Z0-9_-]*[a-zA-Z0-9])*:[a-z]([a-zA-Z0-9_-]*[a-zA-Z0-9])*$/', $component_id)) {
+    if (!\preg_match('/^[a-z]([a-zA-Z0-9_-]*[a-zA-Z0-9])*:[a-z]([a-zA-Z0-9_-]*[a-zA-Z0-9])*$/', $component_id)) {
       return NULL;
     }
     try {
@@ -153,7 +153,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
       return;
     }
     $slot_definitions = $metadata->slots;
-    $ids_available = array_keys($slot_definitions);
+    $ids_available = \array_keys($slot_definitions);
     $undocumented_ids = [];
     try {
       $it = $node->getIterator();
@@ -164,7 +164,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     if ($it instanceof \SeekableIterator) {
       while ($it->valid()) {
         $provided_id = $it->key();
-        if (!in_array($provided_id, $ids_available, TRUE)) {
+        if (!\in_array($provided_id, $ids_available, TRUE)) {
           $undocumented_ids[] = $provided_id;
         }
         $it->next();
@@ -173,14 +173,14 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     // Now build the error message.
     $error_messages = [];
     if (!empty($undocumented_ids)) {
-      $error_messages[] = sprintf(
+      $error_messages[] = \sprintf(
         'We found an unexpected slot that is not declared: [%s]. Declare them in "%s.component.yml".',
-        implode(', ', $undocumented_ids),
+        \implode(', ', $undocumented_ids),
         $component->machineName
       );
     }
     if (!empty($error_messages)) {
-      $message = implode("\n", $error_messages);
+      $message = \implode("\n", $error_messages);
       throw new InvalidComponentException($message);
     }
   }
@@ -198,21 +198,21 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
     // Compute a cheap and reproducible float between 0 and 1 for based on the
     // component ID.
     $max_length = 40;
-    $input = strtolower($input);
-    $input = strtr($input, '-_:', '000');
-    $input = substr($input, 0, $max_length);
-    $chars = str_split($input);
-    $chars = array_pad($chars, 20, '0');
-    $sum = array_reduce($chars, static fn(int $total, string $char) => $total + ord($char), 0);
+    $input = \strtolower($input);
+    $input = \strtr($input, '-_:', '000');
+    $input = \substr($input, 0, $max_length);
+    $chars = \str_split($input);
+    $chars = \array_pad($chars, 20, '0');
+    $sum = \array_reduce($chars, static fn(int $total, string $char) => $total + \ord($char), 0);
     $num = $sum / 4880;
 
     // Compute an int between 129338 and 129431, which is the sequential emoji
     // range we are interested in. We chose this range because all integers in
     // between correspond to an emoji. These emojis depict sports, food, and
     // animals.
-    $html_entity = floor(129338 + $num * (129431 - 129338));
-    $emoji = mb_convert_encoding("&#$html_entity;", 'UTF-8', 'HTML-ENTITIES');
-    return is_string($emoji) ? $emoji : '';
+    $html_entity = \floor(129338 + $num * (129431 - 129338));
+    $emoji = \mb_convert_encoding("&#$html_entity;", 'UTF-8', 'HTML-ENTITIES');
+    return \is_string($emoji) ? $emoji : '';
   }
 
 }

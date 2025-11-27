@@ -101,7 +101,7 @@ class D6NodeDeriver extends DeriverBase implements ContainerDeriverInterface {
         // If this migration is based on the d6_node_revision migration or
         // is for translations of nodes, it should explicitly depend on the
         // corresponding d6_node variant.
-        if (in_array($base_plugin_definition['id'], ['d6_node_revision', 'd6_node_translation'])) {
+        if (\in_array($base_plugin_definition['id'], ['d6_node_revision', 'd6_node_translation'])) {
           $values['migration_dependencies']['required'][] = 'd6_node:' . $node_type;
         }
 

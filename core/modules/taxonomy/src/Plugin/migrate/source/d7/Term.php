@@ -100,8 +100,8 @@ class Term extends FieldableEntity {
     // its source language to get the field values in the right language.
     // The translations will be migrated by the d7_node_entity_translation
     // migration.
-    $translatable_vocabularies = array_keys(array_filter($this->variableGet('entity_translation_taxonomy', [])));
-    $entity_translatable = $this->isEntityTranslatable('taxonomy_term') && in_array($vocabulary, $translatable_vocabularies, TRUE);
+    $translatable_vocabularies = \array_keys(\array_filter($this->variableGet('entity_translation_taxonomy', [])));
+    $entity_translatable = $this->isEntityTranslatable('taxonomy_term') && \in_array($vocabulary, $translatable_vocabularies, TRUE);
 
     if ($entity_translatable) {
       $source_language = $this->getEntityTranslationSourceLanguage('taxonomy_term', $tid);

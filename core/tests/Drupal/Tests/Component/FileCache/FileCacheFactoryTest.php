@@ -47,7 +47,7 @@ class FileCacheFactoryTest extends TestCase {
 
     // Ensure the right backend and configuration is used.
     $filename = __DIR__ . '/Fixtures/llama-23.txt';
-    $realpath = realpath($filename);
+    $realpath = \realpath($filename);
     $cid = 'prefix:test-23:' . $realpath;
 
     $file_cache->set($filename, 23);

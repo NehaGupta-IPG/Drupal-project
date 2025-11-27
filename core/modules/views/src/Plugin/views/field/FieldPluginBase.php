@@ -207,9 +207,9 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       ];
     }
 
-    if (!empty($fields) && is_array($fields)) {
+    if (!empty($fields) && \is_array($fields)) {
       foreach ($fields as $identifier => $info) {
-        if (is_array($info)) {
+        if (\is_array($info)) {
           if (isset($info['table'])) {
             $table_alias = $this->query->ensureTable($info['table'], $this->relationship);
           }
@@ -218,7 +218,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
           }
 
           if (empty($table_alias)) {
-            trigger_error(sprintf(
+            \trigger_error(\sprintf(
               "Handler %s tried to add additional_field %s but %s could not be added!",
               $this->definition['id'],
               $identifier,
@@ -363,18 +363,18 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
    */
   public function elementClasses($row_index = NULL) {
     $classes = $this->tokenizeValue($this->options['element_class'], $row_index);
-    $classes = explode(' ', $classes);
+    $classes = \explode(' ', $classes);
     foreach ($classes as &$class) {
       $class = Html::cleanCssIdentifier($class);
     }
-    return implode(' ', $classes);
+    return \implode(' ', $classes);
   }
 
   /**
    * {@inheritdoc}
    */
   public function tokenizeValue($value, $row_index = NULL) {
-    if (str_contains($value, '{{')) {
+    if (\str_contains($value, '{{')) {
       $fake_item = [
         'alter_text' => TRUE,
         'text' => $value,
@@ -387,7 +387,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       }
       else {
         // Get tokens from the last field.
-        $last_field = end($this->view->field);
+        $last_field = \end($this->view->field);
         if (isset($last_field->last_tokens)) {
           $tokens = $last_field->last_tokens;
         }
@@ -396,9 +396,9 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
         }
       }
 
-      $value = strip_tags($this->renderAltered($fake_item, $tokens));
+      $value = \strip_tags($this->renderAltered($fake_item, $tokens));
       if (!empty($this->options['alter']['trim_whitespace'])) {
-        $value = trim($value);
+        $value = \trim($value);
       }
     }
 
@@ -410,11 +410,11 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
    */
   public function elementLabelClasses($row_index = NULL) {
     $classes = $this->tokenizeValue($this->options['element_label_class'], $row_index);
-    $classes = explode(' ', $classes);
+    $classes = \explode(' ', $classes);
     foreach ($classes as &$class) {
       $class = Html::cleanCssIdentifier($class);
     }
-    return implode(' ', $classes);
+    return \implode(' ', $classes);
   }
 
   /**
@@ -422,11 +422,11 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
    */
   public function elementWrapperClasses($row_index = NULL) {
     $classes = $this->tokenizeValue($this->options['element_wrapper_class'], $row_index);
-    $classes = explode(' ', $classes);
+    $classes = \explode(' ', $classes);
     foreach ($classes as &$class) {
       $class = Html::cleanCssIdentifier($class);
     }
-    return implode(' ', $classes);
+    return \implode(' ', $classes);
   }
 
   /**
@@ -552,7 +552,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
   public function submitOptionsForm(&$form, FormStateInterface $form_state) {
     $options = &$form_state->getValue('options');
     $types = ['element_type', 'element_label_type', 'element_wrapper_type'];
-    $classes = array_combine(['element_class', 'element_label_class', 'element_wrapper_class'], $types);
+    $classes = \array_combine(['element_class', 'element_label_class', 'element_wrapper_class'], $types);
 
     foreach ($types as $type) {
       if (!$options[$type . '_enable']) {
@@ -785,7 +785,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
         // The tag list will be escaped.
         '#description' => $this->t('The text to display for this field. You may enter data from this view as per the "Replacement patterns" below. You may include <a href="@twig_docs">Twig</a> or the following allowed HTML tags: <code>@tags</code>', [
           '@twig_docs' => 'https://twig.symfony.com/doc/' . Environment::MAJOR_VERSION . '.x',
-          '@tags' => '<' . implode('> <', Xss::getAdminTagList()) . '>',
+          '@tags' => '<' . \implode('> <', Xss::getAdminTagList()) . '>',
         ]),
         '#states' => [
           'visible' => [
@@ -934,10 +934,10 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       $optgroup_arguments = (string) $this->t('Arguments');
       $optgroup_fields = (string) $this->t('Fields');
       foreach ($previous as $id => $label) {
-        $options[$optgroup_fields]["{{ $id }}"] = substr(strrchr($label, ":"), 2);
+        $options[$optgroup_fields]["{{ $id }}"] = \substr(\strrchr($label, ":"), 2);
       }
       // Add the field to the list of options.
-      $options[$optgroup_fields]["{{ {$this->options['id']} }}"] = substr(strrchr($this->adminLabel(), ":"), 2);
+      $options[$optgroup_fields]["{{ {$this->options['id']} }}"] = \substr(\strrchr($this->adminLabel(), ":"), 2);
 
       foreach ($this->view->display_handler->getHandlers('argument') as $arg => $handler) {
         $options[$optgroup_arguments]["{{ arguments.$arg }}"] = $this->t('@argument title', ['@argument' => $handler->adminLabel()]);
@@ -957,7 +957,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
         $output[] = [
           '#markup' => '<p>' . $this->t("The following replacement tokens are available for this field. Note that due to rendering order, you cannot use fields that come after this field; if you need a field not listed here, rearrange your fields.") . '</p>',
         ];
-        foreach (array_keys($options) as $type) {
+        foreach (\array_keys($options) as $type) {
           if (!empty($options[$type])) {
             $items = [];
             foreach ($options[$type] as $key => $value) {
@@ -1160,7 +1160,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
    */
   protected function getPreviousFieldLabels() {
     $all_fields = $this->view->display_handler->getFieldLabels();
-    $field_options = array_slice($all_fields, 0, array_search($this->options['id'], array_keys($all_fields)));
+    $field_options = \array_slice($all_fields, 0, \array_search($this->options['id'], \array_keys($all_fields)));
     return $field_options;
   }
 
@@ -1211,7 +1211,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     }
     else {
       $value = $this->render($values);
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $value = $this->getRenderer()->render($value);
       }
       $this->last_render = $value;
@@ -1223,7 +1223,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
         $items = [];
         foreach ($raw_items as $count => $item) {
           $value = $this->render_item($count, $item);
-          if (is_array($value)) {
+          if (\is_array($value)) {
             $value = (string) $this->getRenderer()->render($value);
           }
           $this->last_render = $value;
@@ -1241,7 +1241,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
         $value = $this->renderText($alter);
       }
 
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $value = $this->getRenderer()->render($value);
       }
       // This happens here so that renderAsLink can get the unaltered value of
@@ -1313,7 +1313,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     }
 
     if (!empty($this->options['alter']['trim_whitespace'])) {
-      $value = trim($value);
+      $value = \trim($value);
     }
 
     // Check if there should be no further rewrite for empty values.
@@ -1336,26 +1336,26 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     }
 
     if (!empty($alter['strip_tags'])) {
-      $value = strip_tags($value, $alter['preserve_tags']);
+      $value = \strip_tags($value, $alter['preserve_tags']);
     }
 
     $more_link = '';
     if (!empty($alter['trim']) && !empty($alter['max_length'])) {
-      $length = strlen($value);
+      $length = \strlen($value);
       $value = $this->renderTrimText($alter, $value);
-      if ($this->options['alter']['more_link'] && strlen($value) < $length) {
+      if ($this->options['alter']['more_link'] && \strlen($value) < $length) {
         $tokens = $this->getRenderTokens($alter);
         $more_link_text = $this->options['alter']['more_link_text'] ?: $this->t('more');
-        $more_link_text = strtr(Xss::filterAdmin($more_link_text), $tokens);
+        $more_link_text = \strtr(Xss::filterAdmin($more_link_text), $tokens);
         $more_link_path = $this->options['alter']['more_link_path'];
-        $more_link_path = strip_tags(Html::decodeEntities($this->viewsTokenReplace($more_link_path, $tokens)));
+        $more_link_path = \strip_tags(Html::decodeEntities($this->viewsTokenReplace($more_link_path, $tokens)));
 
         // Make sure that paths which were run through URL generation work as
         // well.
         $base_path = base_path();
         // Checks whether the path starts with the base_path.
-        if (str_starts_with($more_link_path, $base_path)) {
-          $more_link_path = mb_substr($more_link_path, mb_strlen($base_path));
+        if (\str_starts_with($more_link_path, $base_path)) {
+          $more_link_path = \mb_substr($more_link_path, \mb_strlen($base_path));
         }
 
         // @todo Views should expect and store a leading /. See
@@ -1378,7 +1378,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     }
 
     if (!empty($alter['nl2br'])) {
-      $value = nl2br($value);
+      $value = \nl2br($value);
     }
 
     if ($value_is_safe) {
@@ -1467,14 +1467,14 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
 
       // Tokens might contain <front>, so check for <front> again.
       if ($path != '<front>') {
-        $path = strip_tags($path);
+        $path = \strip_tags($path);
       }
 
       // Tokens might have resolved URL's, as is the case for tokens provided by
       // Link fields, so all internal paths will be prefixed by base_path(). For
       // proper further handling reset this to internal:/.
-      if (str_starts_with($path, base_path())) {
-        $path = 'internal:/' . substr($path, strlen(base_path()));
+      if (\str_starts_with($path, base_path())) {
+        $path = 'internal:/' . \substr($path, \strlen(base_path()));
       }
 
       // If we have no $path and no $alter['url'], we have nothing to work with,
@@ -1488,17 +1488,17 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       // 'http://www.example.com'.
       // Only do this when flag for external has been set, $path doesn't contain
       // a scheme and $path doesn't have a leading /.
-      if ($alter['external'] && !parse_url($path, PHP_URL_SCHEME) && !str_starts_with($path, '/')) {
+      if ($alter['external'] && !\parse_url($path, PHP_URL_SCHEME) && !\str_starts_with($path, '/')) {
         // There is no scheme, add the default 'http://' to the $path.
         $path = "http://" . $path;
       }
     }
 
     if (empty($alter['url'])) {
-      if (!parse_url($path, PHP_URL_SCHEME)) {
+      if (!\parse_url($path, PHP_URL_SCHEME)) {
         // @todo Views should expect and store a leading /. See
         //   https://www.drupal.org/node/2423913.
-        $alter['url'] = CoreUrl::fromUserInput('/' . ltrim($path, '/'));
+        $alter['url'] = CoreUrl::fromUserInput('/' . \ltrim($path, '/'));
       }
       else {
         $alter['url'] = CoreUrl::fromUri($path);
@@ -1510,11 +1510,11 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     $path = $alter['url']->setOptions($options)->toUriString();
 
     if (!empty($alter['path_case']) && $alter['path_case'] != 'none' && !$alter['url']->isRouted()) {
-      $path = str_replace($alter['path'], $this->caseTransform($alter['path'], $this->options['alter']['path_case']), $path);
+      $path = \str_replace($alter['path'], $this->caseTransform($alter['path'], $this->options['alter']['path_case']), $path);
     }
 
     if (!empty($alter['replace_spaces'])) {
-      $path = str_replace(' ', '-', $path);
+      $path = \str_replace(' ', '-', $path);
     }
 
     // Parse the URL and move any query and fragment parameters out of the path.
@@ -1556,7 +1556,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     }
 
     if (isset($url['fragment'])) {
-      $path = strtr($path, ['#' . $url['fragment'] => '']);
+      $path = \strtr($path, ['#' . $url['fragment'] => '']);
       // If the path is empty we want to have a fragment for the current site.
       if ($path == '') {
         $options['external'] = TRUE;
@@ -1579,7 +1579,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       $options['attributes']['rel'] = $rel;
     }
 
-    $target = trim($this->viewsTokenReplace($alter['target'], $tokens));
+    $target = \trim($this->viewsTokenReplace($alter['target'], $tokens));
     if (!empty($target)) {
       $options['attributes']['target'] = $target;
     }
@@ -1587,7 +1587,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     // Allow the addition of arbitrary attributes to links. Additional
     // attributes currently can only be altered in preprocessors and not within
     // the UI.
-    if (isset($alter['link_attributes']) && is_array($alter['link_attributes'])) {
+    if (isset($alter['link_attributes']) && \is_array($alter['link_attributes'])) {
       foreach ($alter['link_attributes'] as $key => $attribute) {
         if (!isset($options['attributes'][$key])) {
           $options['attributes'][$key] = $this->viewsTokenReplace($attribute, $tokens);
@@ -1604,7 +1604,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       $options['query'] = UrlHelper::buildQuery($alter['query']);
       $options['query'] = $this->viewsTokenReplace($options['query'], $tokens);
       $query = [];
-      parse_str($options['query'], $query);
+      \parse_str($options['query'], $query);
       $options['query'] = $query;
     }
     if (isset($alter['alias'])) {
@@ -1665,7 +1665,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       // Use strip tags as there should never be HTML in the path.
       // However, we need to preserve special characters like " that
       // were removed by Html::escape().
-      $tokens["{{ raw_arguments.$arg }}"] = isset($this->view->args[$count]) ? strip_tags(Html::decodeEntities($this->view->args[$count])) : '';
+      $tokens["{{ raw_arguments.$arg }}"] = isset($this->view->args[$count]) ? \strip_tags(Html::decodeEntities($this->view->args[$count])) : '';
       $count++;
     }
 
@@ -1752,11 +1752,11 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     $tokens = [];
 
     foreach ($array as $param => $val) {
-      if (!is_numeric($param) && preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $param) === 0) {
+      if (!\is_numeric($param) && \preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $param) === 0) {
         // Skip as the parameter is not a valid Twig variable name.
         continue;
       }
-      if (is_array($val)) {
+      if (\is_array($val)) {
         // Copy parent_keys array, so we don't affect other elements of this
         // iteration.
         $child_parent_keys = $parent_keys;
@@ -1768,8 +1768,8 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
       }
       else {
         // Create a token key based on array element structure.
-        $token_string = !empty($parent_keys) ? implode('.', $parent_keys) . '.' . $param : $param;
-        $tokens['{{ arguments.' . $token_string . ' }}'] = strip_tags(Html::decodeEntities($val));
+        $token_string = !empty($parent_keys) ? \implode('.', $parent_keys) . '.' . $param : $param;
+        $tokens['{{ arguments.' . $token_string . ' }}'] = \strip_tags(Html::decodeEntities($val));
       }
     }
 
@@ -1870,23 +1870,23 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
    *   The trimmed string.
    */
   public static function trimText($alter, $value) {
-    if (mb_strlen($value) > $alter['max_length']) {
-      $value = mb_substr($value, 0, $alter['max_length']);
+    if (\mb_strlen($value) > $alter['max_length']) {
+      $value = \mb_substr($value, 0, $alter['max_length']);
       if (!empty($alter['word_boundary'])) {
         $regex = "(.*)\b.+";
-        if (function_exists('mb_ereg')) {
-          mb_regex_encoding('UTF-8');
-          $found = mb_ereg($regex, $value, $matches);
+        if (\function_exists('mb_ereg')) {
+          \mb_regex_encoding('UTF-8');
+          $found = \mb_ereg($regex, $value, $matches);
         }
         else {
-          $found = preg_match("/$regex/us", $value, $matches);
+          $found = \preg_match("/$regex/us", $value, $matches);
         }
         if ($found) {
           $value = $matches[1];
         }
       }
       // Remove scraps of HTML entities from the end of a strings.
-      $value = rtrim(preg_replace('/(?:<(?!.+>)|&(?!.+;)).*$/us', '', $value));
+      $value = \rtrim(\preg_replace('/(?:<(?!.+>)|&(?!.+;)).*$/us', '', $value));
 
       if (!empty($alter['ellipsis'])) {
         $value .= new TranslatableMarkup('…');

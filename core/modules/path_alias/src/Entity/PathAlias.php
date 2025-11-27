@@ -98,7 +98,7 @@ class PathAlias extends ContentEntityBase implements PathAliasInterface {
 
     // Trim the alias value of whitespace and slashes. Ensure to not trim the
     // slash on the left side.
-    $alias = rtrim(trim($this->getAlias()), "\\/");
+    $alias = \rtrim(\trim($this->getAlias()), "\\/");
     $this->setAlias($alias);
   }
 

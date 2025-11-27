@@ -78,7 +78,7 @@ class LinkGenerator implements LinkGeneratorInterface {
     // service from the container.
     $url->setUrlGenerator($this->urlGenerator);
 
-    if (is_array($text)) {
+    if (\is_array($text)) {
       $text = $this->renderer->render($text);
     }
 
@@ -106,7 +106,7 @@ class LinkGenerator implements LinkGeneratorInterface {
     }
 
     // Ensure that query values are strings.
-    array_walk($variables['options']['query'], function (&$value) {
+    \array_walk($variables['options']['query'], function (&$value) {
       if ($value instanceof MarkupInterface) {
         $value = (string) $value;
       }
@@ -118,7 +118,7 @@ class LinkGenerator implements LinkGeneratorInterface {
       // drupal.active-link library know the query in a standardized manner.
       if (!empty($variables['options']['query'])) {
         $query = $variables['options']['query'];
-        ksort($query);
+        \ksort($query);
         $variables['options']['attributes']['data-drupal-link-query'] = Json::encode($query);
       }
 
@@ -142,8 +142,8 @@ class LinkGenerator implements LinkGeneratorInterface {
 
     // Remove all HTML and PHP tags from a tooltip, calling expensive
     // strip_tags() only when a quick strpos() gives suspicion tags are present.
-    if (isset($variables['options']['attributes']['title']) && str_contains($variables['options']['attributes']['title'], '<')) {
-      $variables['options']['attributes']['title'] = strip_tags($variables['options']['attributes']['title']);
+    if (isset($variables['options']['attributes']['title']) && \str_contains($variables['options']['attributes']['title'], '<')) {
+      $variables['options']['attributes']['title'] = \strip_tags($variables['options']['attributes']['title']);
     }
 
     // Allow other modules to modify the structure of the link.

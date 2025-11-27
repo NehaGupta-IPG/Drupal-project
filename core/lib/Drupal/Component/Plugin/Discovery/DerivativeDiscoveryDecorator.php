@@ -133,8 +133,8 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
     // Try and split the passed plugin definition into a plugin and a
     // derivative id. We don't need to check for !== FALSE because a leading
     // colon would break the derivative system and doesn't makes sense.
-    if (strpos($plugin_id, ':')) {
-      return explode(':', $plugin_id, 2);
+    if (\strpos($plugin_id, ':')) {
+      return \explode(':', $plugin_id, 2);
     }
 
     return [$plugin_id, ''];
@@ -209,16 +209,16 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
       $class = $base_definition->getDeriver();
       $id = $base_definition->id();
     }
-    if ((is_array($base_definition) || ($base_definition = (array) $base_definition)) && (isset($base_definition['deriver']))) {
+    if ((\is_array($base_definition) || ($base_definition = (array) $base_definition)) && (isset($base_definition['deriver']))) {
       $class = $base_definition['deriver'];
       $id = $base_definition['id'];
     }
     if ($class) {
-      if (!class_exists($class)) {
-        throw new InvalidDeriverException(sprintf('Plugin (%s) deriver "%s" does not exist.', $id, $class));
+      if (!\class_exists($class)) {
+        throw new InvalidDeriverException(\sprintf('Plugin (%s) deriver "%s" does not exist.', $id, $class));
       }
-      if (!is_subclass_of($class, '\Drupal\Component\Plugin\Derivative\DeriverInterface')) {
-        throw new InvalidDeriverException(sprintf('Plugin (%s) deriver "%s" must implement \Drupal\Component\Plugin\Derivative\DeriverInterface.', $id, $class));
+      if (!\is_subclass_of($class, '\Drupal\Component\Plugin\Derivative\DeriverInterface')) {
+        throw new InvalidDeriverException(\sprintf('Plugin (%s) deriver "%s" must implement \Drupal\Component\Plugin\Derivative\DeriverInterface.', $id, $class));
       }
     }
     return $class;
@@ -238,7 +238,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
   protected function mergeDerivativeDefinition($base_plugin_definition, $derivative_definition) {
     // Use this definition as defaults if a plugin already defined itself as
     // this derivative, but filter out empty values first.
-    $filtered_base = array_filter($base_plugin_definition);
+    $filtered_base = \array_filter($base_plugin_definition);
     $derivative_definition = $filtered_base + ($derivative_definition ?: []);
     // Add back any empty keys that the derivative didn't have.
     return $derivative_definition + $base_plugin_definition;
@@ -264,7 +264,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
    * Passes through all unknown calls onto the decorated object.
    */
   public function __call($method, $args) {
-    return call_user_func_array([$this->decorated, $method], $args);
+    return \call_user_func_array([$this->decorated, $method], $args);
   }
 
 }

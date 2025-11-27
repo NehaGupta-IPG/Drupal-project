@@ -115,7 +115,7 @@ class ProcessingTest extends BrowserTestBase {
     $this->assertSession()->responseContains('Redirection successful.');
     $this->assertBatchMessages($this->_resultMessages('batch4'));
     $this->assertBatchMessages($this->_resultMessages('batch7'));
-    $expected_stack = array_merge($this->_resultStack('batch4'), $this->_resultStack('batch7'));
+    $expected_stack = \array_merge($this->_resultStack('batch4'), $this->_resultStack('batch7'));
     $this->assertEquals($expected_stack, $batch_test_helper->stack(), 'Execution order was correct.');
     $batch = \Drupal::state()->get('batch_test_nested_order_multiple_batches');
     $this->assertCount(5, $batch['sets']);
@@ -125,7 +125,7 @@ class ProcessingTest extends BrowserTestBase {
     }
     // Ensure correct order of the nested batches. We reset the indexes in
     // order to directly access the batches by their order.
-    $batch_sets = array_values($batch['sets']);
+    $batch_sets = \array_values($batch['sets']);
     $this->assertEquals('batch4', $batch_sets[0]['batch_test_id']);
     $this->assertEquals('batch2', $batch_sets[1]['batch_test_id']);
     $this->assertEquals('batch7', $batch_sets[2]['batch_test_id']);
@@ -171,7 +171,7 @@ class ProcessingTest extends BrowserTestBase {
     $batch_test_helper = new BatchTestHelper();
     // Batches 1, 2 and 3 are triggered in sequence by different submit
     // handlers. Each submit handler modify the submitted 'value'.
-    $value = rand(0, 255);
+    $value = \rand(0, 255);
     $edit = ['value' => $value];
     $this->drupalGet('batch-test/chained');
     $this->submitForm($edit, 'Submit');
@@ -192,7 +192,7 @@ class ProcessingTest extends BrowserTestBase {
     $batch_test_helper = new BatchTestHelper();
     // Batches 1, 2 and 3 are triggered in sequence by different submit
     // handlers. Each submit handler modify the submitted 'value'.
-    $value = rand(0, 255);
+    $value = \rand(0, 255);
     $this->drupalGet('batch-test/programmatic/' . $value);
     // Check that result messages are present and in the correct order.
     $this->assertBatchMessages($this->_resultMessages('chained'));
@@ -209,7 +209,7 @@ class ProcessingTest extends BrowserTestBase {
     $batch_test_helper = new BatchTestHelper();
     // Displaying the page triggers a batch that programmatically submits a
     // form.
-    $value = rand(0, 255);
+    $value = \rand(0, 255);
     $this->drupalGet('batch-test/nested-programmatic/' . $value);
     $this->assertEquals(['mock form submitted with value = ' . $value], $batch_test_helper->stack(), '\\Drupal::formBuilder()->submitForm() ran successfully within a batch operation.');
   }
@@ -237,7 +237,7 @@ class ProcessingTest extends BrowserTestBase {
    * @internal
    */
   public function assertBatchMessages(array $texts): void {
-    $pattern = '|' . implode('.*', $texts) . '|s';
+    $pattern = '|' . \implode('.*', $texts) . '|s';
     $this->assertSession()->responseMatches($pattern);
   }
 
@@ -282,7 +282,7 @@ class ProcessingTest extends BrowserTestBase {
         for ($i = 6; $i <= 10; $i++) {
           $stack[] = "op 1 id $i";
         }
-        $stack = array_merge($stack, $this->_resultStack('batch2'));
+        $stack = \array_merge($stack, $this->_resultStack('batch2'));
         break;
 
       case 'batch5':
@@ -306,22 +306,22 @@ class ProcessingTest extends BrowserTestBase {
         for ($i = 6; $i <= 10; $i++) {
           $stack[] = "op 7 id $i";
         }
-        $stack = array_merge($stack, $this->_resultStack('batch6'));
-        $stack = array_merge($stack, $this->_resultStack('batch5'));
+        $stack = \array_merge($stack, $this->_resultStack('batch6'));
+        $stack = \array_merge($stack, $this->_resultStack('batch5'));
         break;
 
       case 'chained':
         $stack[] = 'submit handler 1';
         $stack[] = 'value = ' . $value;
-        $stack = array_merge($stack, $this->_resultStack('batch1'));
+        $stack = \array_merge($stack, $this->_resultStack('batch1'));
         $stack[] = 'submit handler 2';
         $stack[] = 'value = ' . ($value + 1);
-        $stack = array_merge($stack, $this->_resultStack('batch2'));
+        $stack = \array_merge($stack, $this->_resultStack('batch2'));
         $stack[] = 'submit handler 3';
         $stack[] = 'value = ' . ($value + 2);
         $stack[] = 'submit handler 4';
         $stack[] = 'value = ' . ($value + 3);
-        $stack = array_merge($stack, $this->_resultStack('batch3'));
+        $stack = \array_merge($stack, $this->_resultStack('batch3'));
         break;
     }
     return $stack;
@@ -354,7 +354,7 @@ class ProcessingTest extends BrowserTestBase {
 
       case 'batch4':
         $messages[] = 'results for batch 4' . $pattern_elapsed . '<div class="item-list"><ul><li>op 1: processed 10 elements</li></ul></div>';
-        $messages = array_merge($messages, $this->_resultMessages('batch2'));
+        $messages = \array_merge($messages, $this->_resultMessages('batch2'));
         break;
 
       case 'batch5':
@@ -367,14 +367,14 @@ class ProcessingTest extends BrowserTestBase {
 
       case 'batch7':
         $messages[] = 'results for batch 7' . $pattern_elapsed . '<div class="item-list"><ul><li>op 7: processed 10 elements</li></ul></div>';
-        $messages = array_merge($messages, $this->_resultMessages('batch6'));
-        $messages = array_merge($messages, $this->_resultMessages('batch5'));
+        $messages = \array_merge($messages, $this->_resultMessages('batch6'));
+        $messages = \array_merge($messages, $this->_resultMessages('batch5'));
         break;
 
       case 'chained':
-        $messages = array_merge($messages, $this->_resultMessages('batch1'));
-        $messages = array_merge($messages, $this->_resultMessages('batch2'));
-        $messages = array_merge($messages, $this->_resultMessages('batch3'));
+        $messages = \array_merge($messages, $this->_resultMessages('batch1'));
+        $messages = \array_merge($messages, $this->_resultMessages('batch2'));
+        $messages = \array_merge($messages, $this->_resultMessages('batch3'));
         break;
     }
     return $messages;

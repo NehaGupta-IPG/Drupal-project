@@ -66,7 +66,7 @@ class SearchLanguageTest extends BrowserTestBase {
     $field_storage->save();
 
     // Create a few page nodes with multilingual body values.
-    $default_format = filter_default_format();
+    $default_format = \filter_default_format();
     $nodes = [
       [
         'title' => 'First node en',
@@ -134,8 +134,8 @@ class SearchLanguageTest extends BrowserTestBase {
     $this->submitForm($edit, 'edit-submit--2');
     // Get the redirected URL.
     $url = $this->getUrl();
-    $parts = parse_url($url);
-    $query_string = isset($parts['query']) ? rawurldecode($parts['query']) : '';
+    $parts = \parse_url($url);
+    $query_string = isset($parts['query']) ? \rawurldecode($parts['query']) : '';
     $this->assertStringContainsString('=language:fr', $query_string, 'Language filter language:fr add to the query string.');
 
     // Search for keyword node and language filter as Spanish.

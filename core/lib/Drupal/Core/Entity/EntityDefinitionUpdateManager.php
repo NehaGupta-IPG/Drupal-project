@@ -268,17 +268,17 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
           $original_storage_definitions = $this->entityLastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions($entity_type_id);
 
           // Detect created field storage definitions.
-          foreach (array_diff_key($storage_definitions, $original_storage_definitions) as $field_name => $storage_definition) {
+          foreach (\array_diff_key($storage_definitions, $original_storage_definitions) as $field_name => $storage_definition) {
             $field_changes[$field_name] = static::DEFINITION_CREATED;
           }
 
           // Detect deleted field storage definitions.
-          foreach (array_diff_key($original_storage_definitions, $storage_definitions) as $field_name => $original_storage_definition) {
+          foreach (\array_diff_key($original_storage_definitions, $storage_definitions) as $field_name => $original_storage_definition) {
             $field_changes[$field_name] = static::DEFINITION_DELETED;
           }
 
           // Detect updated field storage definitions.
-          foreach (array_intersect_key($storage_definitions, $original_storage_definitions) as $field_name => $storage_definition) {
+          foreach (\array_intersect_key($storage_definitions, $original_storage_definitions) as $field_name => $storage_definition) {
             // @todo Support non-storage-schema-changing definition updates too:
             //   https://www.drupal.org/node/2336895. So long as we're checking
             //   based on schema change requirements rather than definition
@@ -305,7 +305,7 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
     $this->entityTypeManager->useCaches(TRUE);
     $this->entityFieldManager->useCaches(TRUE);
 
-    return array_filter($change_list);
+    return \array_filter($change_list);
   }
 
   /**

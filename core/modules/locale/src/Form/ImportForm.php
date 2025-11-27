@@ -78,7 +78,7 @@ class ImportForm extends FormBase {
     // are to translate Drupal to English as well.
     $existing_languages = [];
     foreach ($languages as $langcode => $language) {
-      if (locale_is_translatable($langcode)) {
+      if (\locale_is_translatable($langcode)) {
         $existing_languages[$langcode] = $language->getName();
       }
     }
@@ -88,10 +88,10 @@ class ImportForm extends FormBase {
     // groups with the list of existing and then predefined languages.
     if (empty($existing_languages)) {
       $language_options = $this->languageManager->getStandardLanguageListWithoutConfigured();
-      $default = key($language_options);
+      $default = \key($language_options);
     }
     else {
-      $default = key($existing_languages);
+      $default = \key($existing_languages);
       $language_options = [
         (string) $this->t('Existing languages') => $existing_languages,
         (string) $this->t('Languages not yet added') => $this->languageManager->getStandardLanguageListWithoutConfigured(),
@@ -160,7 +160,7 @@ class ImportForm extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $this->file = _file_save_upload_from_form($form['file'], $form_state, 0);
+    $this->file = \_file_save_upload_from_form($form['file'], $form_state, 0);
 
     // Ensure we have the file uploaded.
     if (!$this->file) {
@@ -181,19 +181,19 @@ class ImportForm extends FormBase {
       // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $this->messenger()->addStatus($this->t('The language %language has been created.', ['%language' => $this->t($language->label())]));
     }
-    $options = array_merge(_locale_translation_default_update_options(), [
+    $options = \array_merge(\_locale_translation_default_update_options(), [
       'langcode' => $form_state->getValue('langcode'),
       'overwrite_options' => $form_state->getValue('overwrite_options'),
       'customized' => $form_state->getValue('customized') ? LOCALE_CUSTOMIZED : LOCALE_NOT_CUSTOMIZED,
     ]);
     $this->moduleHandler->loadInclude('locale', 'bulk.inc');
-    $file = locale_translate_file_attach_properties($this->file, $options);
-    $batch = locale_translate_batch_build([$file->uri => $file], $options);
-    batch_set($batch);
+    $file = \locale_translate_file_attach_properties($this->file, $options);
+    $batch = \locale_translate_batch_build([$file->uri => $file], $options);
+    \batch_set($batch);
 
     // Create or update all configuration translations for this language.
-    if ($batch = locale_config_batch_update_components($options, [$form_state->getValue('langcode')])) {
-      batch_set($batch);
+    if ($batch = \locale_config_batch_update_components($options, [$form_state->getValue('langcode')])) {
+      \batch_set($batch);
     }
 
     $form_state->setRedirect('locale.translate_page');

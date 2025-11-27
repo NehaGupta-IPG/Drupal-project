@@ -33,7 +33,7 @@ final class LoggingStager implements StagerInterface {
     $path = $this->configFactory->get('package_manager.settings')->get('log');
     if ($path) {
       $callback = new FileProcessOutputCallback($path, $callback);
-      $callback(OutputTypeEnum::OUT, sprintf("### Staging '%s' in %s\n", implode(' ', $composerCommand), $stagingDir->absolute()));
+      $callback(OutputTypeEnum::OUT, \sprintf("### Staging '%s' in %s\n", \implode(' ', $composerCommand), $stagingDir->absolute()));
     }
     $this->decorated->stage($composerCommand, $activeDir, $stagingDir, $callback, $timeout);
   }

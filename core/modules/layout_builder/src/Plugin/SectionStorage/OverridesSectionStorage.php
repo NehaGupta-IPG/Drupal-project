@@ -193,8 +193,8 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    * @see \Drupal\Core\ParamConverter\ParamConverterInterface::convert()
    */
   private function extractEntityFromRoute($value, array $defaults) {
-    if (str_contains($value, '.')) {
-      [$entity_type_id, $entity_id] = explode('.', $value, 2);
+    if (\str_contains($value, '.')) {
+      [$entity_type_id, $entity_id] = \explode('.', $value, 2);
     }
     elseif (isset($defaults['entity_type_id']) && !empty($defaults[$defaults['entity_type_id']])) {
       $entity_type_id = $defaults['entity_type_id'];
@@ -274,7 +274,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    *   An array of entity types.
    */
   protected function getEntityTypes() {
-    return array_filter($this->entityTypeManager->getDefinitions(), function (EntityTypeInterface $entity_type) {
+    return \array_filter($this->entityTypeManager->getDefinitions(), function (EntityTypeInterface $entity_type) {
       return $entity_type->entityClassImplements(FieldableEntityInterface::class) && $entity_type->hasHandlerClass('form', 'layout_builder') && $entity_type->hasViewBuilderClass() && $entity_type->hasLinkTemplate('canonical');
     });
   }

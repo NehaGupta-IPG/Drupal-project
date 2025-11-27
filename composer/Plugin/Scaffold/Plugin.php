@@ -177,7 +177,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     // use APCu and optimize them if they're present.
     // @see \Drupal\Core\DrupalKernel::boot()
     if ($repository->findPackage('symfony/http-foundation', $constraint)) {
-      $autoload['classmap'] = array_merge($autoload['classmap'], [
+      $autoload['classmap'] = \array_merge($autoload['classmap'], [
         $vendor_dir . '/symfony/http-foundation/Request.php',
         $vendor_dir . '/symfony/http-foundation/RequestStack.php',
         $vendor_dir . '/symfony/http-foundation/ParameterBag.php',
@@ -188,7 +188,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
       ]);
     }
     if ($repository->findPackage('symfony/http-kernel', $constraint)) {
-      $autoload['classmap'] = array_merge($autoload['classmap'], [
+      $autoload['classmap'] = \array_merge($autoload['classmap'], [
         $vendor_dir . '/symfony/http-kernel/HttpKernel.php',
         $vendor_dir . '/symfony/http-kernel/HttpKernelInterface.php',
         $vendor_dir . '/symfony/http-kernel/TerminableInterface.php',
@@ -205,10 +205,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     // Do not remove double realpath() calls.
     // Fixes failing Windows realpath() implementation.
     // See https://bugs.php.net/bug.php?id=72738
-    $vendor_path = realpath(realpath($vendor_dir));
+    $vendor_path = \realpath(\realpath($vendor_dir));
     $filesystem->ensureDirectoryExists($vendor_path . '/drupal');
     // Create the Drupal\DrupalInstalled class.
-    file_put_contents($vendor_path . '/drupal/DrupalInstalled.php', DrupalInstalledTemplate::getCode($package, $repository));
+    \file_put_contents($vendor_path . '/drupal/DrupalInstalled.php', DrupalInstalledTemplate::getCode($package, $repository));
     $autoload['classmap'][] = $vendor_dir . '/drupal/DrupalInstalled.php';
 
     $package->setAutoload($autoload);

@@ -65,7 +65,7 @@ class ThemeSettingsProvider {
       $this->memoryCache->set($cid, $themeSettings, tags: [
         'config:core.extension',
         'config:system.theme.global',
-        sprintf('config:%s.settings', $theme),
+        \sprintf('config:%s.settings', $theme),
       ]);
     }
     return $themeSettings->get($setting_name);
@@ -99,7 +99,7 @@ class ThemeSettingsProvider {
       // global setting and set the value to NULL.
       if (!empty($themeObject->info['features'])) {
         foreach (self::DEFAULT_THEME_FEATURES as $feature) {
-          if (!in_array($feature, $themeObject->info['features'])) {
+          if (!\in_array($feature, $themeObject->info['features'])) {
             $themeSettings->set('features.' . $feature, NULL);
           }
         }
@@ -118,7 +118,7 @@ class ThemeSettingsProvider {
       if ($themeSettings->get('features.favicon')) {
         $faviconPath = $themeSettings->get('favicon.path');
         if ($themeSettings->get('favicon.use_default')) {
-          if (file_exists($favicon = $themeObject->getPath() . '/favicon.ico')) {
+          if (\file_exists($favicon = $themeObject->getPath() . '/favicon.ico')) {
             $themeSettings->set('favicon.url', $this->fileUrlGenerator->generateString($favicon));
           }
           else {

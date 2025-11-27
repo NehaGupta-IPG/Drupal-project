@@ -82,8 +82,8 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
         'entity_type' => 'entity_test',
         'field_name' => 'body',
       ]);
-    ksort($body_fields);
-    $this->assertSame(['entity_test.entity_test.body', 'entity_test.one.body', 'entity_test.two.body'], array_keys($body_fields));
+    \ksort($body_fields);
+    $this->assertSame(['entity_test.entity_test.body', 'entity_test.one.body', 'entity_test.two.body'], \array_keys($body_fields));
     foreach ($body_fields as $field) {
       $this->assertSame('Body field label', $field->label());
       $this->assertSame('Set by config actions.', $field->getDescription());
@@ -160,7 +160,7 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
    *   any bundle. Defaults to FALSE.
    */
   private function applyAction(string $config_name, bool $fail_if_exists = FALSE): void {
-    $fail_if_exists = var_export($fail_if_exists, TRUE);
+    $fail_if_exists = \var_export($fail_if_exists, TRUE);
     $contents = <<<YAML
 name: Instantiate field on all bundles
 config:

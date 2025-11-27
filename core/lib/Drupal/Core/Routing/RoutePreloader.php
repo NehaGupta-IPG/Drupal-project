@@ -65,11 +65,11 @@ class RoutePreloader implements EventSubscriberInterface {
   public function onAlterRoutes(RouteBuildEvent $event) {
     $collection = $event->getRouteCollection();
     foreach ($collection->all() as $name => $route) {
-      if (!str_starts_with($route->getPath(), '/admin/') && $route->getPath() != '/admin' && static::isGetAndHtmlRoute($route)) {
+      if (!\str_starts_with($route->getPath(), '/admin/') && $route->getPath() != '/admin' && static::isGetAndHtmlRoute($route)) {
         $this->nonAdminRoutesOnRebuild[] = $name;
       }
     }
-    $this->nonAdminRoutesOnRebuild = array_unique($this->nonAdminRoutesOnRebuild);
+    $this->nonAdminRoutesOnRebuild = \array_unique($this->nonAdminRoutesOnRebuild);
   }
 
   /**
@@ -106,8 +106,8 @@ class RoutePreloader implements EventSubscriberInterface {
     $methods = $route->getMethods() ?: ['GET'];
     // If a route has no explicit format, then HTML is valid.
     // @see \Drupal\Core\Routing\RequestFormatRouteFilter::getAvailableFormats()
-    $format = $route->hasRequirement('_format') ? explode('|', $route->getRequirement('_format')) : ['html'];
-    return in_array('GET', $methods, TRUE) && in_array('html', $format, TRUE);
+    $format = $route->hasRequirement('_format') ? \explode('|', $route->getRequirement('_format')) : ['html'];
+    return \in_array('GET', $methods, TRUE) && \in_array('html', $format, TRUE);
   }
 
 }

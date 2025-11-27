@@ -33,7 +33,7 @@ trait EntityDefinitionTestTrait {
     }
 
     if ($entity_type_id) {
-      $complete_change_list = array_intersect_key($complete_change_list, [$entity_type_id => TRUE]);
+      $complete_change_list = \array_intersect_key($complete_change_list, [$entity_type_id => TRUE]);
     }
 
     foreach ($complete_change_list as $entity_type_id => $change_list) {
@@ -242,7 +242,7 @@ trait EntityDefinitionTestTrait {
       ->setTranslatable($is_translatable);
 
     if ($set_label) {
-      $definitions['new_base_field']->setLabel(t('A new base field'));
+      $definitions['new_base_field']->setLabel(\t('A new base field'));
     }
 
     $this->state->set($entity_type_id . '.additional_base_field_definitions', $definitions);
@@ -256,7 +256,7 @@ trait EntityDefinitionTestTrait {
     $definitions = $this->state->get($key, []);
     $definitions['new_long_named_entity_reference_base_field'] = BaseFieldDefinition::create('entity_reference')
       ->setName('new_long_named_entity_reference_base_field')
-      ->setLabel(t('A new long-named base field'))
+      ->setLabel(\t('A new long-named base field'))
       ->setSetting('target_type', 'user')
       ->setSetting('handler', 'default');
     $this->state->set($key, $definitions);
@@ -271,7 +271,7 @@ trait EntityDefinitionTestTrait {
   protected function addRevisionableBaseField($type = 'string'): void {
     $definitions['new_base_field'] = BaseFieldDefinition::create($type)
       ->setName('new_base_field')
-      ->setLabel(t('A new revisionable base field'))
+      ->setLabel(\t('A new revisionable base field'))
       ->setRevisionable(TRUE);
     $this->state->set('entity_test_update.additional_base_field_definitions', $definitions);
   }
@@ -331,7 +331,7 @@ trait EntityDefinitionTestTrait {
   protected function addBundleField($type = 'string', $revisionable = FALSE, $translatable = FALSE): void {
     $definitions['new_bundle_field'] = FieldStorageDefinition::create($type)
       ->setName('new_bundle_field')
-      ->setLabel(t('A new bundle field'))
+      ->setLabel(\t('A new bundle field'))
       ->setTargetEntityTypeId('entity_test_update')
       ->setRevisionable($revisionable)
       ->setTranslatable($translatable);

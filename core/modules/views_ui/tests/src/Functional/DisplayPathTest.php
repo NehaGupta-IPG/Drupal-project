@@ -68,7 +68,7 @@ class DisplayPathTest extends UITestBase {
     $random_path = $this->randomMachineName();
     // @todo Once https://www.drupal.org/node/2351379 is resolved, Views will no
     //   longer use Url::fromUri(), and this path will be able to contain ':'.
-    $random_path = str_replace(':', '', $random_path);
+    $random_path = \str_replace(':', '', $random_path);
 
     $this->drupalGet('admin/structure/views/nojs/display/test_view/page_1/path');
     $this->submitForm(['path' => $random_path], 'Apply');
@@ -184,7 +184,7 @@ class DisplayPathTest extends UITestBase {
     $this->drupalGet('admin/structure/views/nojs/display/test_page_display_menu/page_5/menu');
     $this->assertSession()->statusCodeEquals(200);
     $menu_options = $this->assertSession()->selectExists('edit-menu-parent')->findAll('css', 'option');
-    $menu_options = array_map(function ($element) {
+    $menu_options = \array_map(function ($element) {
       return $element->getText();
     }, $menu_options);
 
@@ -238,7 +238,7 @@ class DisplayPathTest extends UITestBase {
       ->sort('id', 'DESC')
       ->pager(1)
       ->execute();
-    $menu_item = end($menu_items);
+    $menu_item = \end($menu_items);
     /** @var \Drupal\menu_link_content\MenuLinkContentInterface $menu_link_content */
     $menu_link_content = MenuLinkContent::load($menu_item);
 
@@ -255,7 +255,7 @@ class DisplayPathTest extends UITestBase {
     $parameters = new MenuTreeParameters();
     $parameters->addCondition('id', $menu_link_content->getPluginId());
     $result = \Drupal::menuTree()->load('admin', $parameters);
-    $plugin_definition = end($result)->link->getPluginDefinition();
+    $plugin_definition = \end($result)->link->getPluginDefinition();
     $this->assertEquals('view.' . $view_id . '.page_1', $plugin_definition['route_name']);
 
     $this->clickLink('No menu');

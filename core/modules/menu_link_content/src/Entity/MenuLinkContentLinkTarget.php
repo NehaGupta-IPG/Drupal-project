@@ -24,7 +24,7 @@ class MenuLinkContentLinkTarget implements EntityLinkTargetInterface {
    * {@inheritdoc}
    */
   public function getLinkTarget(EntityInterface $entity): GeneratedUrl {
-    assert($entity instanceof MenuLinkContentInterface);
+    \assert($entity instanceof MenuLinkContentInterface);
     return $entity->getUrlObject()->toString(TRUE);
   }
 

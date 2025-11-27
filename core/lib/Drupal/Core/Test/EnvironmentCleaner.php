@@ -83,7 +83,7 @@ class EnvironmentCleaner implements EnvironmentCleanerInterface {
     foreach ($tables as $table) {
       // Only drop tables which begin wih 'test' followed by digits, for
       // example, {test12345678node__body}.
-      if (preg_match('/^test\d+.*/', $table, $matches)) {
+      if (\preg_match('/^test\d+.*/', $table, $matches)) {
         $schema->dropTable($matches[0]);
         $count++;
       }
@@ -113,13 +113,13 @@ class EnvironmentCleaner implements EnvironmentCleanerInterface {
   protected function doCleanTemporaryDirectories(): int {
     $count = 0;
     $simpletest_dir = $this->root . '/sites/simpletest';
-    if (is_dir($simpletest_dir)) {
-      $files = scandir($simpletest_dir);
+    if (\is_dir($simpletest_dir)) {
+      $files = \scandir($simpletest_dir);
       foreach ($files as $file) {
         if ($file[0] != '.') {
           $path = $simpletest_dir . '/' . $file;
           $this->fileSystem->deleteRecursive($path, function ($any_path) {
-            @chmod($any_path, 0700);
+            @\chmod($any_path, 0700);
           });
           $count++;
         }

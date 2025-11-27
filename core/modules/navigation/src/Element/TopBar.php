@@ -52,7 +52,7 @@ class TopBar extends RenderElementBase {
     // Group the items by region.
     foreach (TopBarRegion::cases() as $region) {
       $items = $top_bar_item_manager->getRenderedTopBarItemsByRegion($region);
-      $element = array_merge($element, [$region->value => $items]);
+      $element = \array_merge($element, [$region->value => $items]);
     }
 
     return $element;

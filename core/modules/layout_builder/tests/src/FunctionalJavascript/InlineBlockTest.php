@@ -154,7 +154,7 @@ class InlineBlockTest extends InlineBlockTestBase {
     $blocks = $this->blockStorage->loadMultiple();
     $this->assertCount(1, $blocks);
     /** @var \Drupal\Core\Entity\ContentEntityBase $block */
-    $block = array_pop($blocks);
+    $block = \array_pop($blocks);
     $revision_id = $block->getRevisionId();
 
     // Confirm the block can be edited.
@@ -175,7 +175,7 @@ class InlineBlockTest extends InlineBlockTestBase {
       $assert_session->pageTextContains('The block body');
 
       $this->assertCount(1, $blocks);
-      $block = array_pop($blocks);
+      $block = \array_pop($blocks);
       $this->assertEquals($block->getRevisionId(), $revision_id);
       $this->assertEquals('The block body', $block->get('body')->getValue()[0]['value']);
     }
@@ -287,7 +287,7 @@ class InlineBlockTest extends InlineBlockTestBase {
     $this->submitForm(['layout[enabled]' => TRUE, 'layout[allow_custom]' => TRUE], 'Save');
 
     $block_1_locator = static::INLINE_BLOCK_LOCATOR;
-    $block_2_locator = sprintf('%s + %s', static::INLINE_BLOCK_LOCATOR, static::INLINE_BLOCK_LOCATOR);
+    $block_2_locator = \sprintf('%s + %s', static::INLINE_BLOCK_LOCATOR, static::INLINE_BLOCK_LOCATOR);
 
     // Add two blocks to the page and assert the content in each.
     $this->drupalGet('node/1/layout');

@@ -60,7 +60,7 @@ class FieldAccessTest extends KernelTestBase {
     $this->installEntitySchema('user');
     // Register entity_test text field.
     $this->container->get('module_handler')->loadInclude('entity_test', 'install');
-    entity_test_install();
+    \entity_test_install();
   }
 
   /**

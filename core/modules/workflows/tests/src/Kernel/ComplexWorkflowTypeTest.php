@@ -49,8 +49,8 @@ class ComplexWorkflowTypeTest extends KernelTestBase {
     ]);
     $workflow3->save();
 
-    $this->assertEquals(['test1', 'test2'], array_keys(Workflow::loadMultipleByType('workflow_type_complex_test')));
-    $this->assertEquals(['test3'], array_keys(Workflow::loadMultipleByType('workflow_type_test')));
+    $this->assertEquals(['test1', 'test2'], \array_keys(Workflow::loadMultipleByType('workflow_type_complex_test')));
+    $this->assertEquals(['test3'], \array_keys(Workflow::loadMultipleByType('workflow_type_test')));
     $this->assertEquals([], Workflow::loadMultipleByType('a_type_that_does_not_exist'));
   }
 

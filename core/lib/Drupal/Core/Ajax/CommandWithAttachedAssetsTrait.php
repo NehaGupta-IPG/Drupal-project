@@ -29,7 +29,7 @@ trait CommandWithAttachedAssetsTrait {
    */
   protected function getRenderedContent() {
     $this->attachedAssets = new AttachedAssets();
-    if (is_array($this->content)) {
+    if (\is_array($this->content)) {
       if (!$this->content) {
         return '';
       }

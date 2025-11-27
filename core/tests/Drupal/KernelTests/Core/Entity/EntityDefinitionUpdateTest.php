@@ -107,7 +107,7 @@ class EntityDefinitionUpdateTest extends EntityKernelTestBase {
     $entity_type_definitions = $this->entityDefinitionUpdateManager->getEntityTypes();
 
     // Ensure that we have at least one entity type to check below.
-    $this->assertGreaterThanOrEqual(1, count($entity_type_definitions));
+    $this->assertGreaterThanOrEqual(1, \count($entity_type_definitions));
 
     foreach ($entity_type_definitions as $entity_type_id => $entity_type) {
       $this->assertEquals($this->entityDefinitionUpdateManager->getEntityType($entity_type_id), $entity_type);

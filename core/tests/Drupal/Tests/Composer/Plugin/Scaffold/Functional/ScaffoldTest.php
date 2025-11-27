@@ -64,7 +64,7 @@ class ScaffoldTest extends TestCase {
     // The directory used for creating composer projects to test can be
     // configured using the SCAFFOLD_FIXTURE_DIR environment variable. Otherwise
     // a directory will be created in the system's temporary directory.
-    $this->fixturesDir = getenv('SCAFFOLD_FIXTURE_DIR');
+    $this->fixturesDir = \getenv('SCAFFOLD_FIXTURE_DIR');
     if (!$this->fixturesDir) {
       $this->fixturesDir = $this->fixtures->tmpDir($this->name());
     }
@@ -261,7 +261,7 @@ class ScaffoldTest extends TestCase {
    * Provides test values for testDrupalDrupalFileWasAppended.
    */
   public static function scaffoldAppendTestValues(): array {
-    return array_merge(
+    return \array_merge(
       static::scaffoldAppendTestValuesToPermute(FALSE),
       static::scaffoldAppendTestValuesToPermute(TRUE),
       [
@@ -425,7 +425,7 @@ include __DIR__ . "/settings-custom-additions.php";',
 
     // Ensure that the autoload.php file was written.
     $this->assertFileExists($autoload_path);
-    $contents = file_get_contents($autoload_path);
+    $contents = \file_get_contents($autoload_path);
 
     $expected = "return require __DIR__ . '/vendor/autoload.php';";
     if ($relocated_docroot) {

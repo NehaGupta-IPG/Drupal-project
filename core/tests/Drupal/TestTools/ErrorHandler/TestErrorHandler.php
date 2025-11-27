@@ -60,7 +60,7 @@ final class TestErrorHandler {
     // a deprecation test, than we just collect the deprecation and return to
     // execution, since deprecations are expected.
     if ((E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) && DeprecationHandler::isDeprecationTest($this->testCase)) {
-      $prefix = (error_reporting() & $errorNumber) ? 'Unsilenced deprecation: ' : '';
+      $prefix = (\error_reporting() & $errorNumber) ? 'Unsilenced deprecation: ' : '';
       DeprecationHandler::collectActualDeprecation($prefix . $errorString);
       return TRUE;
     }
@@ -68,7 +68,7 @@ final class TestErrorHandler {
     // In all other cases (errors, warnings, deprecations in normal tests), we
     // fall back to the parent error handler, which is the one that was
     // registered in the test runner bootstrap (BootstrapErrorHandler).
-    call_user_func($this->parentHandler, $errorNumber, $errorString, $errorFile, $errorLine);
+    \call_user_func($this->parentHandler, $errorNumber, $errorString, $errorFile, $errorLine);
     return TRUE;
   }
 

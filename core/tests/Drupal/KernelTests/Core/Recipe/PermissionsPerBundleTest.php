@@ -114,7 +114,7 @@ YAML;
       'create terms in categories',
     ];
     $role = Role::load('super_editor');
-    assert($role instanceof RoleInterface);
+    \assert($role instanceof RoleInterface);
     foreach ($expected_permissions as $permission) {
       $this->assertTrue($role->hasPermission($permission));
     }

@@ -60,16 +60,16 @@ class ConfigExportUITest extends BrowserTestBase {
 
     // Test if header contains file name with hostname and timestamp.
     $request = \Drupal::request();
-    $hostname = str_replace('.', '-', $request->getHttpHost());
-    $this->assertSession()->responseHeaderMatches('content-disposition', '/attachment; filename="config-' . preg_quote($hostname) . '-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}\.tar\.gz"/');
+    $hostname = \str_replace('.', '-', $request->getHttpHost());
+    $this->assertSession()->responseHeaderMatches('content-disposition', '/attachment; filename="config-' . \preg_quote($hostname) . '-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}\.tar\.gz"/');
 
     // Extract the archive and verify it's not empty.
     $file_system = \Drupal::service('file_system');
-    assert($file_system instanceof FileSystemInterface);
+    \assert($file_system instanceof FileSystemInterface);
     $temp_directory = $file_system->getTempDirectory();
     $file_path = $temp_directory . '/config.tar.gz';
     $archiver = new ArchiveTar($file_path);
-    $archive_contents = array_map(static fn(array $item): string => $item['filename'], $archiver->listContent());
+    $archive_contents = \array_map(static fn(array $item): string => $item['filename'], $archiver->listContent());
     $this->assertNotEmpty($archive_contents, 'Downloaded archive file is not empty.');
 
     // Prepare the list of config files from active storage, see
@@ -86,7 +86,7 @@ class ConfigExportUITest extends BrowserTestBase {
     // Ensure the test configuration override is in effect but was not exported.
     $this->assertSame('Foo', \Drupal::config('system.maintenance')->get('message'));
     $archiver->extractList(['system.maintenance.yml'], $temp_directory);
-    $file_contents = file_get_contents($temp_directory . '/system.maintenance.yml');
+    $file_contents = \file_get_contents($temp_directory . '/system.maintenance.yml');
     $exported = Yaml::decode($file_contents);
     $this->assertNotSame('Foo', $exported['message']);
 

@@ -40,7 +40,7 @@ class InstalledPackageTest extends UnitTestCase {
       'version' => '1.0.0',
       'path' => __DIR__ . '/..',
     ]);
-    $this->assertSame(realpath(__DIR__ . '/..'), $package->path);
+    $this->assertSame(\realpath(__DIR__ . '/..'), $package->path);
 
     // If we provide a path that cannot be resolved to a real path, it should
     // raise an error.

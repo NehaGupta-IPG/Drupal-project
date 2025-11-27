@@ -77,7 +77,7 @@ class PagerPreprocess {
 
     // Calculate various markers within this pager piece:
     // Middle is used to "center" pages around the current page.
-    $pager_middle = ceil($quantity / 2);
+    $pager_middle = \ceil($quantity / 2);
     $current_page = $pager->getCurrentPage();
     // The current pager is the page we are currently paged to.
     $pager_current = $current_page + 1;
@@ -173,7 +173,7 @@ class PagerPreprocess {
     $variables['items'] = $items;
     $variables['heading_id'] = Html::getUniqueId('pagination-heading');
     $variables['pagination_heading_level'] = $variables['pager']['#pagination_heading_level'] ?? 'h4';
-    if (!preg_match('/^h[1-6]$/', $variables['pagination_heading_level'])) {
+    if (!\preg_match('/^h[1-6]$/', $variables['pagination_heading_level'])) {
       $variables['pagination_heading_level'] = 'h4';
     }
 

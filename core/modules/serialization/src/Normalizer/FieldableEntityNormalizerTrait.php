@@ -72,7 +72,7 @@ trait FieldableEntityNormalizerTrait {
 
     // Don't try to create an entity without an entity type id.
     if (!$entity_type_definition) {
-      throw new UnexpectedValueException(sprintf('The specified entity type "%s" does not exist. A valid entity type is required for denormalization', $entity_type_id));
+      throw new UnexpectedValueException(\sprintf('The specified entity type "%s" does not exist. A valid entity type is required for denormalization', $entity_type_id));
     }
 
     return $entity_type_definition;
@@ -111,13 +111,13 @@ trait FieldableEntityNormalizerTrait {
     $bundle_types = $bundle_type_id ? $this->getEntityTypeManager()->getStorage($bundle_type_id)->getQuery()->accessCheck(TRUE)->execute() : [];
 
     // Make sure a bundle has been provided.
-    if (!is_string($bundle_value)) {
-      throw new UnexpectedValueException(sprintf('Could not determine entity type bundle: "%s" field is missing.', $bundle_key));
+    if (!\is_string($bundle_value)) {
+      throw new UnexpectedValueException(\sprintf('Could not determine entity type bundle: "%s" field is missing.', $bundle_key));
     }
 
     // Make sure the submitted bundle is a valid bundle for the entity type.
-    if ($bundle_types && !in_array($bundle_value, $bundle_types)) {
-      throw new UnexpectedValueException(sprintf('"%s" is not a valid bundle type for denormalization.', $bundle_value));
+    if ($bundle_types && !\in_array($bundle_value, $bundle_types)) {
+      throw new UnexpectedValueException(\sprintf('"%s" is not a valid bundle type for denormalization.', $bundle_value));
     }
 
     return [$bundle_key => $bundle_value];
@@ -143,7 +143,7 @@ trait FieldableEntityNormalizerTrait {
       // uuid). If the incoming field data is set to an empty array, this will
       // also have the effect of emptying the field in REST module.
       $field_item_list->setValue([]);
-      $field_item_list_class = get_class($field_item_list);
+      $field_item_list_class = \get_class($field_item_list);
 
       if ($field_data) {
         // The field instance must be passed in the context so that the field
@@ -208,10 +208,10 @@ trait FieldableEntityNormalizerTrait {
     $field_item = $context['target_instance'];
 
     // Get the property definitions.
-    assert($field_item instanceof FieldItemInterface);
+    \assert($field_item instanceof FieldItemInterface);
     $field_definition = $field_item->getFieldDefinition();
     $item_definition = $field_definition->getItemDefinition();
-    assert($item_definition instanceof FieldItemDataDefinitionInterface);
+    \assert($item_definition instanceof FieldItemDataDefinitionInterface);
     $property_definitions = $item_definition->getPropertyDefinitions();
 
     $serialized_property_names = $this->getCustomSerializedPropertyNames($field_item);
@@ -220,14 +220,14 @@ trait FieldableEntityNormalizerTrait {
         return $this->serializer->denormalize($property_value, $property_value_class, NULL, $context);
       }
       else {
-        if (in_array($property_name, $serialized_property_names, TRUE)) {
-          $property_value = serialize($property_value);
+        if (\in_array($property_name, $serialized_property_names, TRUE)) {
+          $property_value = \serialize($property_value);
         }
         return $property_value;
       }
     };
 
-    if (!is_array($data)) {
+    if (!\is_array($data)) {
       $property_value = $data;
       $property_name = $item_definition->getMainPropertyName();
       $property_value_class = $property_definitions[$property_name]->getClass();
@@ -238,7 +238,7 @@ trait FieldableEntityNormalizerTrait {
     if (!empty($property_definitions)) {
       foreach ($property_definitions as $property_name => $property_definition) {
         // Not every property is required to be sent.
-        if (!array_key_exists($property_name, $data)) {
+        if (!\array_key_exists($property_name, $data)) {
           continue;
         }
         $property_value = $data[$property_name];

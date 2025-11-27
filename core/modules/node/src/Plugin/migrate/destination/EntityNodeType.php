@@ -37,7 +37,7 @@ class EntityNodeType extends EntityConfigBase {
   public function import(Row $row, array $old_destination_id_values = []) {
     $entity_ids = parent::import($row, $old_destination_id_values);
     if ($row->getDestinationProperty('create_body')) {
-      $node_type = $this->storage->load(reset($entity_ids));
+      $node_type = $this->storage->load(\reset($entity_ids));
       $field_storage = FieldStorageConfig::loadByName('node', 'body');
       if (!$field_storage) {
         FieldStorageConfig::create([

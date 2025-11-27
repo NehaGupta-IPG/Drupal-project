@@ -72,18 +72,18 @@ class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
       $tracked_revisions = $this->workspaceTracker->getTrackedEntities($active_workspace->id());
       if (isset($tracked_revisions['menu_link_content'])) {
         /** @var \Drupal\menu_link_content\MenuLinkContentInterface[] $workspace_revisions */
-        $workspace_revisions = $this->entityTypeManager->getStorage('menu_link_content')->loadMultipleRevisions(array_keys($tracked_revisions['menu_link_content']));
+        $workspace_revisions = $this->entityTypeManager->getStorage('menu_link_content')->loadMultipleRevisions(\array_keys($tracked_revisions['menu_link_content']));
         foreach ($workspace_revisions as $workspace_revision) {
           if (isset($links[$workspace_revision->getPluginId()])) {
             $pending_plugin_definition = $workspace_revision->getPluginDefinition();
             $links[$workspace_revision->getPluginId()] = [
-              'title' => serialize($pending_plugin_definition['title']),
-              'description' => serialize($pending_plugin_definition['description']),
+              'title' => \serialize($pending_plugin_definition['title']),
+              'description' => \serialize($pending_plugin_definition['description']),
               'enabled' => (string) $pending_plugin_definition['enabled'],
               'url' => $pending_plugin_definition['url'],
               'route_name' => $pending_plugin_definition['route_name'],
-              'route_parameters' => serialize($pending_plugin_definition['route_parameters']),
-              'options' => serialize($pending_plugin_definition['options']),
+              'route_parameters' => \serialize($pending_plugin_definition['route_parameters']),
+              'options' => \serialize($pending_plugin_definition['options']),
             ] + $links[$workspace_revision->getPluginId()];
           }
         }

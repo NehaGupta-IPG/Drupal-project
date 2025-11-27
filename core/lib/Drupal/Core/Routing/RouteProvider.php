@@ -180,12 +180,12 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     else {
       // Just trim on the right side.
       $path = $request->getPathInfo();
-      $path = $path === '/' ? $path : rtrim($request->getPathInfo(), '/');
+      $path = $path === '/' ? $path : \rtrim($request->getPathInfo(), '/');
       $path = $this->pathProcessor->processInbound($path, $request);
       $this->currentPath->setPath($path, $request);
       // Incoming path processors may also set query parameters.
       $query_parameters = $request->query->all();
-      $routes = $this->getRoutesByPath(rtrim($path, '/'));
+      $routes = $this->getRoutesByPath(\rtrim($path, '/'));
       $cache_value = [
         'path' => $path,
         'query' => $query_parameters,
@@ -211,15 +211,15 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
   public function getRouteByName($name) {
     $routes = $this->getRoutesByNames([$name]);
     if (empty($routes)) {
-      throw new RouteNotFoundException(sprintf('Route "%s" does not exist.', $name));
+      throw new RouteNotFoundException(\sprintf('Route "%s" does not exist.', $name));
     }
 
-    $result = reset($routes);
+    $result = \reset($routes);
     if ($result instanceof Alias) {
       $alias = $result->getId();
       if ($result->isDeprecated()) {
         $deprecation = $result->getDeprecation($name);
-        @trigger_error($deprecation['message'], E_USER_DEPRECATED);
+        @\trigger_error($deprecation['message'], E_USER_DEPRECATED);
       }
       return $this->getRouteByName($alias);
     }
@@ -234,10 +234,10 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       throw new \InvalidArgumentException('You must specify the route names to load');
     }
 
-    $routes_to_load = array_diff($names, array_keys($this->routes), array_keys($this->serializedRoutes));
+    $routes_to_load = \array_diff($names, \array_keys($this->routes), \array_keys($this->serializedRoutes));
     if ($routes_to_load) {
 
-      $cid = static::ROUTE_LOAD_CID_PREFIX . hash('sha512', serialize($routes_to_load));
+      $cid = static::ROUTE_LOAD_CID_PREFIX . \hash('sha512', \serialize($routes_to_load));
       if ($cache = $this->cache->get($cid)) {
         $routes = $cache->data;
       }
@@ -266,12 +266,12 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     foreach ($names as $name) {
       // The specified route name might not exist or might be serialized.
       if (!isset($this->routes[$name]) && isset($this->serializedRoutes[$name])) {
-        $this->routes[$name] = unserialize($this->serializedRoutes[$name]);
+        $this->routes[$name] = \unserialize($this->serializedRoutes[$name]);
         unset($this->serializedRoutes[$name]);
       }
     }
 
-    return array_intersect_key($this->routes, array_flip($names));
+    return \array_intersect_key($this->routes, \array_flip($names));
   }
 
   /**
@@ -284,7 +284,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    *   An array of outlines that could match the specified path parts.
    */
   protected function getCandidateOutlines(array $parts) {
-    $number_parts = count($parts);
+    $number_parts = \count($parts);
     $ancestors = [];
     $length = $number_parts - 1;
     $end = (1 << $number_parts) - 1;
@@ -298,7 +298,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       // Optimization - don't query the state system for short paths. This also
       // insulates against the state entry for masks going missing for common
       // user-facing paths since we generate all values without checking state.
-      $masks = range($end, 1);
+      $masks = \range($end, 1);
     }
     elseif ($number_parts <= 0) {
       // No path can match, short-circuit the process.
@@ -367,7 +367,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     // have a case-insensitive match from the incoming path to the lower case
     // pattern outlines from \Drupal\Core\Routing\RouteCompiler::compile().
     // @see \Drupal\Core\Routing\CompiledRoute::__construct()
-    $parts = preg_split('@/+@', mb_strtolower($path), -1, PREG_SPLIT_NO_EMPTY);
+    $parts = \preg_split('@/+@', \mb_strtolower($path), -1, PREG_SPLIT_NO_EMPTY);
 
     $collection = new RouteCollection();
 
@@ -382,7 +382,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     try {
       $routes = $this->connection->query("SELECT [name], [route], [fit] FROM {" . $this->connection->escapeTable($this->tableName) . "} WHERE [pattern_outline] IN ( :patterns[] ) AND [number_parts] >= :count_parts", [
         ':patterns[]' => $ancestors,
-        ':count_parts' => count($parts),
+        ':count_parts' => \count($parts),
       ])
         ->fetchAll(FetchAs::Associative);
     }
@@ -392,10 +392,10 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
 
     // We sort by fit and name in PHP to avoid a SQL filesort and avoid any
     // difference in the sorting behavior of SQL back-ends.
-    usort($routes, [$this, 'routeProviderRouteCompare']);
+    \usort($routes, [$this, 'routeProviderRouteCompare']);
 
     foreach ($routes as $row) {
-      $collection->add($row['name'], unserialize($row['route']));
+      $collection->add($row['name'], \unserialize($row['route']));
     }
 
     return $collection;
@@ -406,7 +406,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    */
   protected function routeProviderRouteCompare(array $a, array $b) {
     if ($a['fit'] == $b['fit']) {
-      return strcmp($a['name'], $b['name']);
+      return \strcmp($a['name'], $b['name']);
     }
     // Reverse sort from highest to lowest fit. PHP should cast to int, but
     // the explicit cast makes this sort more robust against unexpected input.
@@ -424,7 +424,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
 
     $result = [];
     foreach ($routes as $name => $route) {
-      $result[$name] = unserialize($route);
+      $result[$name] = \unserialize($route);
     }
 
     $array_object = new \ArrayObject($result);
@@ -474,13 +474,13 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
 
     // Sort the cache key parts by their provider in order to have predictable
     // cache keys.
-    ksort($this->extraCacheKeyParts);
+    \ksort($this->extraCacheKeyParts);
     $key_parts = [];
     foreach ($this->extraCacheKeyParts as $provider => $key_part) {
       $key_parts[] = '[' . $provider . ']=' . $key_part;
     }
 
-    return 'route:' . implode(':', $key_parts) . ':' . $request->getPathInfo();
+    return 'route:' . \implode(':', $key_parts) . ':' . $request->getPathInfo();
   }
 
   /**
@@ -502,11 +502,11 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     //   for recursive key ordering if support is added in the future.
     $recursive_sort = function (&$array) use (&$recursive_sort) {
       foreach ($array as &$v) {
-        if (is_array($v)) {
+        if (\is_array($v)) {
           $recursive_sort($v);
         }
       }
-      ksort($array);
+      \ksort($array);
     };
     // Recursively normalize the query parameters to ensure maximal cache hits.
     // If we did not normalize the order, functionally identical query string
@@ -518,12 +518,12 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
     $recursive_sort($sorted_original_parameters);
     // Hash this portion to help shorten the total key length.
     $resolved_hash = $sorted_resolved_parameters
-      ? sha1(http_build_query($sorted_resolved_parameters))
+      ? \sha1(\http_build_query($sorted_resolved_parameters))
       : NULL;
-    return implode(
+    return \implode(
       ',',
-      array_filter([
-        http_build_query($sorted_original_parameters),
+      \array_filter([
+        \http_build_query($sorted_original_parameters),
         $resolved_hash,
       ])
     );

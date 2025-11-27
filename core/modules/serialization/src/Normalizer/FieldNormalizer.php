@@ -34,8 +34,8 @@ class FieldNormalizer extends ListNormalizer implements DenormalizerInterface {
     $items = $context['target_instance'];
     $item_class = $items->getItemDefinition()->getClass();
 
-    if (!is_array($data)) {
-      throw new UnexpectedValueException(sprintf('Field values for "%s" must use an array structure', $items->getName()));
+    if (!\is_array($data)) {
+      throw new UnexpectedValueException(\sprintf('Field values for "%s" must use an array structure', $items->getName()));
     }
 
     foreach ($data as $item_data) {

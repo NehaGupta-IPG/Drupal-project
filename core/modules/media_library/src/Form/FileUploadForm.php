@@ -131,7 +131,7 @@ class FileUploadForm extends AddFormBase {
     // The file upload form only supports media types which use a file field as
     // a source field.
     $field_definition = $media_type->getSource()->getSourceFieldDefinition($media_type);
-    if (!is_a($field_definition->getClass(), FileFieldItemList::class, TRUE)) {
+    if (!\is_a($field_definition->getClass(), FileFieldItemList::class, TRUE)) {
       throw new \InvalidArgumentException('Can only add media types which use a file field as a source field.');
     }
     return $media_type;
@@ -163,7 +163,7 @@ class FileUploadForm extends AddFormBase {
       '#type' => 'managed_file',
       '#title' => $this->formatPlural($slots, 'Add file', 'Add files'),
       // @todo Move validation in https://www.drupal.org/node/2988215
-      '#process' => array_merge(['::validateUploadElement'], $process, ['::processUploadElement']),
+      '#process' => \array_merge(['::validateUploadElement'], $process, ['::processUploadElement']),
       '#upload_validators' => $item->getUploadValidators(),
       // Set multiple to true only if available slots is not exactly one
       // to ensure correct language (singular or plural) in UI.
@@ -209,7 +209,7 @@ class FileUploadForm extends AddFormBase {
       $element['#value'] = [];
     }
     $values = $form_state->getValue('upload', []);
-    if (count($values['fids']) > $element['#cardinality'] && $element['#cardinality'] !== FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
+    if (\count($values['fids']) > $element['#cardinality'] && $element['#cardinality'] !== FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED) {
       $form_state->setError($element, $this->t('A maximum of @count files can be uploaded.', [
         '@count' => $element['#cardinality'],
       ]));
@@ -377,7 +377,7 @@ class FileUploadForm extends AddFormBase {
     // Retrieve the delta of the media item from the parents of the remove
     // button.
     $triggering_element = $form_state->getTriggeringElement();
-    $delta = array_slice($triggering_element['#array_parents'], -2, 1)[0];
+    $delta = \array_slice($triggering_element['#array_parents'], -2, 1)[0];
 
     /** @var \Drupal\media\MediaInterface $removed_media */
     $removed_media = $form_state->get(['media', $delta]);

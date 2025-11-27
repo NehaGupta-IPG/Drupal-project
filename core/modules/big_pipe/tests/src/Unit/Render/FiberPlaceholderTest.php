@@ -104,13 +104,13 @@ class FiberPlaceholderTest extends UnitTestCase {
     $response->setContent($content);
 
     // Capture the result to avoid PHPUnit complaining.
-    ob_start();
+    \ob_start();
     $fiber = new \Fiber(function () use ($bigpipe, $response) {
       $bigpipe->sendContent($response);
     });
     $fiber->start();
     $this->assertFalse($fiber->isTerminated(), 'Placeholder fibers with long execution time supposed to return control before terminating');
-    ob_get_clean();
+    \ob_get_clean();
   }
 
 }

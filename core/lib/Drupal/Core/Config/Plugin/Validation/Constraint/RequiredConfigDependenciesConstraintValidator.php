@@ -49,7 +49,7 @@ class RequiredConfigDependenciesConstraintValidator extends ConstraintValidator 
    * {@inheritdoc}
    */
   public function validate(mixed $entity, Constraint $constraint): void {
-    assert($constraint instanceof RequiredConfigDependenciesConstraint);
+    \assert($constraint instanceof RequiredConfigDependenciesConstraint);
 
     // Only config entities can have config dependencies.
     if (!$entity instanceof ConfigEntityInterface) {
@@ -67,8 +67,8 @@ class RequiredConfigDependenciesConstraintValidator extends ConstraintValidator 
 
       // Ensure the current entity type's config prefix is found in the config
       // dependencies of the entity being validated.
-      $pattern = sprintf('/^%s\\.\\w+/', $entity_type->getConfigPrefix());
-      if (!preg_grep($pattern, $config_dependencies)) {
+      $pattern = \sprintf('/^%s\\.\\w+/', $entity_type->getConfigPrefix());
+      if (!\preg_grep($pattern, $config_dependencies)) {
         $this->context->addViolation($constraint->message, [
           '@entity_type' => $entity->getEntityType()->getSingularLabel(),
           '@dependency_type' => $entity_type->getSingularLabel(),

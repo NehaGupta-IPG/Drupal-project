@@ -24,10 +24,10 @@ trait AutowiredInstanceTrait {
    * @return static
    */
   public static function createInstanceAutowired(ContainerInterface $container, mixed ...$args): static {
-    if (method_exists(static::class, '__construct')) {
+    if (\method_exists(static::class, '__construct')) {
       $constructor = new \ReflectionMethod(static::class, '__construct');
-      foreach (array_slice($constructor->getParameters(), count($args)) as $parameter) {
-        $service = ltrim((string) $parameter->getType(), '?');
+      foreach (\array_slice($constructor->getParameters(), \count($args)) as $parameter) {
+        $service = \ltrim((string) $parameter->getType(), '?');
         foreach ($parameter->getAttributes(Autowire::class) as $attribute) {
           $service = (string) $attribute->newInstance()->value;
         }
@@ -37,7 +37,7 @@ trait AutowiredInstanceTrait {
             $args[] = NULL;
             continue;
           }
-          throw new AutowiringFailedException($service, sprintf('Cannot autowire service "%s": argument "$%s" of method "%s::_construct()", you should configure its value explicitly.', $service, $parameter->getName(), static::class));
+          throw new AutowiringFailedException($service, \sprintf('Cannot autowire service "%s": argument "$%s" of method "%s::_construct()", you should configure its value explicitly.', $service, $parameter->getName(), static::class));
         }
 
         $args[] = $container->get($service);

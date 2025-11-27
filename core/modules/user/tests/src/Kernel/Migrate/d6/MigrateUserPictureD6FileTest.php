@@ -36,18 +36,18 @@ class MigrateUserPictureD6FileTest extends MigrateDrupal6TestBase {
   public function testUserPictures(): void {
     $file_ids = [];
     foreach ($this->migration->getIdMap() as $destination_ids) {
-      $file_ids[] = reset($destination_ids);
+      $file_ids[] = \reset($destination_ids);
     }
     $files = File::loadMultiple($file_ids);
     /** @var \Drupal\file\FileInterface $file */
-    $file = array_shift($files);
+    $file = \array_shift($files);
     $this->assertSame('image-test.jpg', $file->getFilename());
     $this->assertSame('public://image-test.jpg', $file->getFileUri());
     $this->assertSame('2', $file->getOwnerId());
     $this->assertSame(1901, $file->getSize());
     $this->assertSame('image/jpeg', $file->getMimeType());
 
-    $file = array_shift($files);
+    $file = \array_shift($files);
     $this->assertSame('image-test.png', $file->getFilename());
     $this->assertSame('public://image-test.png', $file->getFileUri());
     $this->assertSame('8', $file->getOwnerId());

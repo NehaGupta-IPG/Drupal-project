@@ -18,7 +18,7 @@ trait DummyQueryTrait {
   public function query() {
     // Pass an arbitrary table name - the query should never be executed
     // anyway.
-    $query = $this->select(uniqid(), 's')
+    $query = $this->select(\uniqid(), 's')
       ->range(0, 1);
     $query->addExpression('1');
     return $query;

@@ -83,7 +83,7 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
     $storage = $this->createMock('\Drupal\Core\Config\Entity\ConfigEntityStorageInterface');
     $storage->expects($this->any())
       ->method('loadMultiple')
-      ->with(array_keys($styles))
+      ->with(\array_keys($styles))
       ->willReturn($styles);
 
     $this->entityTypeManager->expects($this->any())

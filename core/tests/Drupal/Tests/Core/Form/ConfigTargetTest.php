@@ -330,8 +330,8 @@ class ConfigTargetTest extends UnitTestCase {
       // present this to the user as two integers separated by the pipe symbol.
       fromConfig: fn (int $first, int $second): string => "$first|$second",
       toConfig: fn (string $form_value): array => [
-        'first' => intval(explode('|', $form_value)[0]),
-        'second' => intval(explode('|', $form_value)[1]),
+        'first' => \intval(\explode('|', $form_value)[0]),
+        'second' => \intval(\explode('|', $form_value)[1]),
       ],
     );
     // Assert the logic in the callables works as expected.

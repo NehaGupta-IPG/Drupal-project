@@ -106,7 +106,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
     foreach ($entity_type->getLookupKeys() as $lookup_key) {
       foreach ($this->getKeys($config, $lookup_key, 'get', $entity_type) as $key) {
         $values = $config_key_store->get($key, []);
-        if (!in_array($config->getName(), $values, TRUE)) {
+        if (!\in_array($config->getName(), $values, TRUE)) {
           $values[] = $config->getName();
           $config_key_store->set($key, $values);
         }
@@ -127,7 +127,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
     foreach ($entity_type->getLookupKeys() as $lookup_key) {
       foreach ($this->getKeys($config, $lookup_key, 'getOriginal', $entity_type) as $key) {
         $values = $config_key_store->get($key, []);
-        $pos = array_search($config->getName(), $values, TRUE);
+        $pos = \array_search($config->getName(), $values, TRUE);
         if ($pos !== FALSE) {
           unset($values[$pos]);
         }
@@ -162,16 +162,16 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
    *   you cannot do fast lookups against this.
    */
   protected function getKeys(Config $config, $key, $get_method, ConfigEntityTypeInterface $entity_type) {
-    if (str_ends_with($key, '*')) {
-      throw new InvalidLookupKeyException(strtr('%entity_type lookup key %key ends with a wildcard this can not be used as a lookup', [
+    if (\str_ends_with($key, '*')) {
+      throw new InvalidLookupKeyException(\strtr('%entity_type lookup key %key ends with a wildcard this can not be used as a lookup', [
         '%entity_type' => $entity_type->id(),
         '%key' => $key,
       ]));
     }
-    $parts = explode('.*', $key);
+    $parts = \explode('.*', $key);
     // Remove leading dots.
-    array_walk($parts, function (&$value) {
-      $value = trim($value, '.');
+    \array_walk($parts, function (&$value) {
+      $value = \trim($value, '.');
     });
 
     $values = (array) $this->getValues($config, $parts[0], $get_method, $parts);
@@ -179,8 +179,8 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
     $output = [];
     // Flatten the array to a single dimension and add the key to all the
     // values.
-    array_walk_recursive($values, function ($current) use (&$output, $key) {
-      if (is_scalar($current)) {
+    \array_walk_recursive($values, function ($current) use (&$output, $key) {
+      if (\is_scalar($current)) {
         $current = $key . ':' . $current;
       }
       $output[] = $current;
@@ -209,7 +209,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
    */
   protected function getValues(Config $config, $key, $get_method, array $parts, $start = 0) {
     $value = $config->$get_method($key);
-    if (is_array($value)) {
+    if (\is_array($value)) {
       $new_value = [];
       $start++;
       if (!isset($parts[$start])) {
@@ -217,7 +217,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
         // the key.
         return NULL;
       }
-      foreach (array_keys($value) as $key_bit) {
+      foreach (\array_keys($value) as $key_bit) {
         $new_key = $key . '.' . $key_bit;
         if (!empty($parts[$start])) {
           $new_key .= '.' . $parts[$start];

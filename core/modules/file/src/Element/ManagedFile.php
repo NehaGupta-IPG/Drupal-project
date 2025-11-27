@@ -60,7 +60,7 @@ class ManagedFile extends FormElementBase {
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     // Find the current value of this field.
-    $fids = !empty($input['fids']) ? explode(' ', $input['fids']) : [];
+    $fids = !empty($input['fids']) ? \explode(' ', $input['fids']) : [];
     foreach ($fids as $key => $fid) {
       $fids[$key] = (int) $fid;
     }
@@ -72,12 +72,12 @@ class ManagedFile extends FormElementBase {
       $return = $input;
 
       // Uploads take priority over all other values.
-      if ($files = file_managed_file_save_upload($element, $form_state)) {
+      if ($files = \file_managed_file_save_upload($element, $form_state)) {
         if ($element['#multiple']) {
-          $fids = array_merge($fids, array_keys($files));
+          $fids = \array_merge($fids, \array_keys($files));
         }
         else {
-          $fids = array_keys($files);
+          $fids = \array_keys($files);
         }
       }
       else {
@@ -114,9 +114,9 @@ class ManagedFile extends FormElementBase {
                 // submissions of the same form, so to allow that, check for the
                 // token added by $this->processManagedFile().
                 elseif (\Drupal::currentUser()->isAnonymous()) {
-                  $token = NestedArray::getValue($form_state->getUserInput(), array_merge($element['#parents'], ['file_' . $file->id(), 'fid_token']));
+                  $token = NestedArray::getValue($form_state->getUserInput(), \array_merge($element['#parents'], ['file_' . $file->id(), 'fid_token']));
                   $file_hmac = Crypt::hmacBase64('file-' . $file->id(), \Drupal::service('private_key')->get() . Settings::getHashSalt());
-                  if ($token === NULL || !hash_equals($file_hmac, $token)) {
+                  if ($token === NULL || !\hash_equals($file_hmac, $token)) {
                     $force_default = TRUE;
                     break;
                   }
@@ -180,10 +180,10 @@ class ManagedFile extends FormElementBase {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
-    $form_parents = explode('/', $request->query->get('element_parents'));
+    $form_parents = \explode('/', $request->query->get('element_parents'));
 
     // Sanitize form parents before using them.
-    $form_parents = array_filter($form_parents, [Element::class, 'child']);
+    $form_parents = \array_filter($form_parents, [Element::class, 'child']);
 
     // Retrieve the element to be rendered.
     $form = NestedArray::getValue($form, $form_parents);
@@ -213,7 +213,7 @@ class ManagedFile extends FormElementBase {
   public static function processManagedFile(&$element, FormStateInterface $form_state, &$complete_form) {
 
     // This is used sometimes so let's implode it just once.
-    $parents_prefix = implode('_', $element['#parents']);
+    $parents_prefix = \implode('_', $element['#parents']);
 
     $fids = $element['#value']['fids'] ?? [];
 
@@ -229,7 +229,7 @@ class ManagedFile extends FormElementBase {
       'callback' => [static::class, 'uploadAjaxCallback'],
       'options' => [
         'query' => [
-          'element_parents' => implode('/', $element['#array_parents']),
+          'element_parents' => \implode('/', $element['#array_parents']),
         ],
       ],
       'wrapper' => $ajax_wrapper_id,
@@ -244,7 +244,7 @@ class ManagedFile extends FormElementBase {
     $element['upload_button'] = [
       '#name' => $parents_prefix . '_upload_button',
       '#type' => 'submit',
-      '#value' => t('Upload'),
+      '#value' => \t('Upload'),
       '#attributes' => ['class' => ['js-hide']],
       '#validate' => [],
       '#submit' => [[static::class, 'submit']],
@@ -261,7 +261,7 @@ class ManagedFile extends FormElementBase {
     $element['remove_button'] = [
       '#name' => $parents_prefix . '_remove_button',
       '#type' => 'submit',
-      '#value' => $element['#multiple'] ? t('Remove selected') : t('Remove'),
+      '#value' => $element['#multiple'] ? \t('Remove selected') : \t('Remove'),
       '#validate' => [],
       '#submit' => [[static::class, 'submit']],
       '#limit_validation_errors' => [$element['#parents']],
@@ -275,8 +275,8 @@ class ManagedFile extends FormElementBase {
     ];
 
     // Add progress bar support to the upload if possible.
-    if ($element['#progress_indicator'] == 'bar' && extension_loaded('uploadprogress')) {
-      $upload_progress_key = mt_rand();
+    if ($element['#progress_indicator'] == 'bar' && \extension_loaded('uploadprogress')) {
+      $upload_progress_key = \mt_rand();
 
       $element['UPLOAD_IDENTIFIER'] = [
         '#type' => 'hidden',
@@ -299,7 +299,7 @@ class ManagedFile extends FormElementBase {
     // field label can be associated with it below. Use the same method for
     // setting the ID that the form API autogenerator does.
     // @see \Drupal\Core\Form\FormBuilder::doBuildForm()
-    $id = Html::getUniqueId('edit-' . implode('-', array_merge($element['#parents'], ['upload'])));
+    $id = Html::getUniqueId('edit-' . \implode('-', \array_merge($element['#parents'], ['upload'])));
 
     // The file upload field itself.
     $element['upload'] = [
@@ -310,7 +310,7 @@ class ManagedFile extends FormElementBase {
       // through theme('form_element'). Instead the parent element's #title is
       // used as the label (see below). That is usually a more meaningful label
       // anyway.
-      '#title' => t('Choose a file'),
+      '#title' => \t('Choose a file'),
       '#title_display' => 'invisible',
       '#id' => $id,
       '#size' => $element['#size'],
@@ -364,7 +364,7 @@ class ManagedFile extends FormElementBase {
     // Add the extension list to the page as JavaScript settings.
     if (isset($element['#upload_validators']['FileExtension']['extensions'])) {
       $allowed_extensions = $element['#upload_validators']['FileExtension']['extensions'];
-      $extension_list = implode(',', array_filter(explode(' ', $allowed_extensions)));
+      $extension_list = \implode(',', \array_filter(\explode(' ', $allowed_extensions)));
       $element['upload']['#attached']['drupalSettings']['file']['elements']['#' . $id] = $extension_list;
     }
 
@@ -415,7 +415,7 @@ class ManagedFile extends FormElementBase {
    */
   public static function validateManagedFile(&$element, FormStateInterface $form_state, &$complete_form) {
     $triggering_element = $form_state->getTriggeringElement();
-    $clicked_button = isset($triggering_element['#parents']) ? end($triggering_element['#parents']) : '';
+    $clicked_button = isset($triggering_element['#parents']) ? \end($triggering_element['#parents']) : '';
     if ($clicked_button != 'remove_button' && !empty($element['fids']['#value'])) {
       $fids = $element['fids']['#value'];
       foreach ($fids as $fid) {
@@ -436,23 +436,23 @@ class ManagedFile extends FormElementBase {
             if (empty($references)) {
               // We expect the field name placeholder value to be wrapped in t()
               // here, so it won't be escaped again as it's already marked safe.
-              $form_state->setError($element, t('The file used in the @name field may not be referenced.', ['@name' => $element['#title']]));
+              $form_state->setError($element, \t('The file used in the @name field may not be referenced.', ['@name' => $element['#title']]));
             }
           }
         }
         else {
           // We expect the field name placeholder value to be wrapped in t()
           // here, so it won't be escaped again as it's already marked safe.
-          $form_state->setError($element, t('The file referenced by the @name field does not exist.', ['@name' => $element['#title']]));
+          $form_state->setError($element, \t('The file referenced by the @name field does not exist.', ['@name' => $element['#title']]));
         }
       }
     }
 
     // Check required property based on the FID.
-    if ($element['#required'] && empty($element['fids']['#value']) && !in_array($clicked_button, ['upload_button', 'remove_button'])) {
+    if ($element['#required'] && empty($element['fids']['#value']) && !\in_array($clicked_button, ['upload_button', 'remove_button'])) {
       // We expect the field name placeholder value to be wrapped in t()
       // here, so it won't be escaped again as it's already marked safe.
-      $form_state->setError($element, t('@name field is required.', ['@name' => $element['#title']]));
+      $form_state->setError($element, \t('@name field is required.', ['@name' => $element['#title']]));
     }
 
     // Consolidate the array value of this field to array of FIDs.
@@ -485,7 +485,7 @@ class ManagedFile extends FormElementBase {
     // Determine whether it was the upload or the remove button that was clicked
     // and set $element to the managed_file element that contains that button.
     $parents = $form_state->getTriggeringElement()['#array_parents'];
-    $button_key = array_pop($parents);
+    $button_key = \array_pop($parents);
     $element = NestedArray::getValue($form, $parents);
 
     // No action is needed here for the upload button, because all file uploads
@@ -494,16 +494,16 @@ class ManagedFile extends FormElementBase {
     // button was clicked. Action is needed here for the remove button, because
     // we only remove a file in response to its remove button being clicked.
     if ($button_key == 'remove_button') {
-      $fids = array_keys($element['#files']);
+      $fids = \array_keys($element['#files']);
       // Get files that will be removed.
       if ($element['#multiple']) {
         $remove_fids = [];
         foreach (Element::children($element) as $name) {
-          if (str_starts_with($name, 'file_') && $element[$name]['selected']['#value']) {
-            $remove_fids[] = (int) substr($name, 5);
+          if (\str_starts_with($name, 'file_') && $element[$name]['selected']['#value']) {
+            $remove_fids[] = (int) \substr($name, 5);
           }
         }
-        $fids = array_diff($fids, $remove_fids);
+        $fids = \array_diff($fids, $remove_fids);
       }
       else {
         // If we deal with single upload element remove the file and set
@@ -529,8 +529,8 @@ class ManagedFile extends FormElementBase {
       // widget. FormState::$input must be updated so that
       // \Drupal\file\Element\ManagedFile::valueCallback() has correct
       // information during the rebuild.
-      $form_state->setValueForElement($element['fids'], implode(' ', $fids));
-      NestedArray::setValue($form_state->getUserInput(), $element['fids']['#parents'], implode(' ', $fids));
+      $form_state->setValueForElement($element['fids'], \implode(' ', $fids));
+      NestedArray::setValue($form_state->getUserInput(), $element['fids']['#parents'], \implode(' ', $fids));
     }
 
     // Set the form to rebuild so that $form is correctly updated in response to

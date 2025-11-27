@@ -189,7 +189,7 @@ class FieldCrudTest extends FieldKernelTestBase {
     $this->assertCount(2, $violations, 'Two violations found when using a null and outside the range value.');
 
     $this->assertEquals($field_name . '.0.value', $violations[0]->getPropertyPath());
-    $this->assertEquals(sprintf('%s does not accept the value -2.', $field_name), $violations[0]->getMessage());
+    $this->assertEquals(\sprintf('%s does not accept the value -2.', $field_name), $violations[0]->getMessage());
 
     $this->assertEquals($field_name . '.0.value', $violations[1]->getPropertyPath());
     $this->assertEquals('This value should be between 0 and 32.', $violations[1]->getMessage());
@@ -292,7 +292,7 @@ class FieldCrudTest extends FieldKernelTestBase {
     FieldConfig::create($another_field_definition)->save();
 
     // Test that the first field is not deleted, and then delete it.
-    $field = current(\Drupal::entityTypeManager()
+    $field = \current(\Drupal::entityTypeManager()
       ->getStorage('field_config')
       ->loadByProperties([
         'entity_type' => 'entity_test',

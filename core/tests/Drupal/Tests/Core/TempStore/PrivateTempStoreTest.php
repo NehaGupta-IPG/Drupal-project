@@ -106,10 +106,10 @@ class PrivateTempStoreTest extends UnitTestCase {
    */
   public function testGet(): void {
     $calls = ['1:test_2', '1:test', '1:test'];
-    $this->keyValue->expects($this->exactly(count($calls)))
+    $this->keyValue->expects($this->exactly(\count($calls)))
       ->method('get')
       ->with($this->callback(function (string $key) use (&$calls): bool {
-        return array_shift($calls) == $key;
+        return \array_shift($calls) == $key;
       }))
       ->willReturnOnConsecutiveCalls(
         FALSE,
@@ -251,10 +251,10 @@ class PrivateTempStoreTest extends UnitTestCase {
       ->willReturn(TRUE);
 
     $calls = ['1:test_1', '1:test_2', '1:test_3'];
-    $this->keyValue->expects($this->exactly(count($calls)))
+    $this->keyValue->expects($this->exactly(\count($calls)))
       ->method('get')
       ->with($this->callback(function (string $key) use (&$calls): bool {
-        return array_shift($calls) == $key;
+        return \array_shift($calls) == $key;
       }))
       ->willReturnOnConsecutiveCalls(
         FALSE,

@@ -89,7 +89,7 @@ class RequestSanitizer {
     if (!empty($sanitized_keys)) {
       $sanitized = TRUE;
       if ($log_sanitized_keys) {
-        trigger_error(sprintf($message, implode(', ', $sanitized_keys)));
+        \trigger_error(\sprintf($message, \implode(', ', $sanitized_keys)));
       }
     }
 
@@ -103,7 +103,7 @@ class RequestSanitizer {
         $bag->remove('destination');
         $sanitized = TRUE;
         if ($log_sanitized_keys) {
-          trigger_error(sprintf('Potentially unsafe destination removed from %s parameter bag because it contained the following keys: %s', $bag_name, implode(', ', $destination_dangerous_keys)));
+          \trigger_error(\sprintf('Potentially unsafe destination removed from %s parameter bag because it contained the following keys: %s', $bag_name, \implode(', ', $destination_dangerous_keys)));
         }
       }
       // Sanitize the destination parameter (which is often used for redirects)
@@ -113,7 +113,7 @@ class RequestSanitizer {
         $bag->remove('destination');
         $sanitized = TRUE;
         if ($log_sanitized_keys) {
-          trigger_error(sprintf('Potentially unsafe destination removed from %s parameter bag because it points to an external URL.', $bag_name));
+          \trigger_error(\sprintf('Potentially unsafe destination removed from %s parameter bag because it points to an external URL.', $bag_name));
         }
       }
     }
@@ -155,9 +155,9 @@ class RequestSanitizer {
    *   The sanitized input.
    */
   protected static function stripDangerousValues($input, array $safe_keys, array &$sanitized_keys) {
-    if (is_array($input)) {
+    if (\is_array($input)) {
       foreach ($input as $key => $value) {
-        if ($key !== '' && ((string) $key)[0] === '#' && !in_array($key, $safe_keys, TRUE)) {
+        if ($key !== '' && ((string) $key)[0] === '#' && !\in_array($key, $safe_keys, TRUE)) {
           unset($input[$key]);
           $sanitized_keys[] = $key;
         }

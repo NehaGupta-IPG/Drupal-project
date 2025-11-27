@@ -148,7 +148,7 @@ class Renderer implements RendererInterface {
    * {@inheritdoc}
    */
   public function renderPlain(&$elements) {
-    @trigger_error('Renderer::renderPlain() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Instead, you should use ::renderInIsolation(). See https://www.drupal.org/node/3407994', E_USER_DEPRECATED);
+    @\trigger_error('Renderer::renderPlain() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Instead, you should use ::renderInIsolation(). See https://www.drupal.org/node/3407994', E_USER_DEPRECATED);
     return $this->renderInIsolation($elements);
   }
 
@@ -188,7 +188,7 @@ class Renderer implements RendererInterface {
   protected function doReplacePlaceholder(string $placeholder, string|MarkupInterface $markup, array $elements, array $placeholder_element): array {
     // Replace the placeholder with its rendered markup, and merge its
     // bubbleable metadata with the main elements'.
-    $elements['#markup'] = Markup::create(str_replace($placeholder, $markup, $elements['#markup']));
+    $elements['#markup'] = Markup::create(\str_replace($placeholder, $markup, $elements['#markup']));
     $elements = $this->mergeBubbleableMetadata($elements, $placeholder_element);
 
     // Remove the placeholder that we've just rendered.
@@ -212,8 +212,8 @@ class Renderer implements RendererInterface {
    */
   public function render(/* array */&$elements, $is_root_call = FALSE) {
 
-    if (!is_array($elements)) {
-      trigger_error('Calling ' . __METHOD__ . ' with NULL is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Either pass an array or skip the call. See https://www.drupal.org/node/3534020.');
+    if (!\is_array($elements)) {
+      \trigger_error('Calling ' . __METHOD__ . ' with NULL is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Either pass an array or skip the call. See https://www.drupal.org/node/3534020.');
       return '';
     }
 
@@ -223,7 +223,7 @@ class Renderer implements RendererInterface {
     }
 
     if ($is_root_call) {
-      trigger_error(__METHOD__ . ' with $is_root_call is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::renderRoot() instead.  See https://www.drupal.org/node/3497318.');
+      \trigger_error(__METHOD__ . ' with $is_root_call is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::renderRoot() instead.  See https://www.drupal.org/node/3497318.');
       return $this->doRenderRoot($elements, $context);
     }
 
@@ -276,7 +276,7 @@ class Renderer implements RendererInterface {
     }
 
     if ($this->rendererConfig['debug'] === TRUE) {
-      $render_start = microtime(TRUE);
+      $render_start = \microtime(TRUE);
     }
 
     if (!isset($elements['#access']) && isset($elements['#access_callback'])) {
@@ -340,7 +340,7 @@ class Renderer implements RendererInterface {
       if ($cached_element !== FALSE) {
         $elements = $cached_element;
         // Mark the element markup as safe if is it a string.
-        if (is_string($elements['#markup'])) {
+        if (\is_string($elements['#markup'])) {
           $elements['#markup'] = Markup::create($elements['#markup']);
         }
         // Add debug output to the renderable array on cache hit.
@@ -360,7 +360,7 @@ class Renderer implements RendererInterface {
     // #create_placeholder for later comparison.
     // @see \Drupal\Core\Render\RenderCacheInterface::get()
     // @see \Drupal\Core\Render\RenderCacheInterface::set()
-    $pre_bubbling_elements = array_intersect_key($elements, [
+    $pre_bubbling_elements = \array_intersect_key($elements, [
       '#cache' => TRUE,
       '#lazy_builder' => TRUE,
       '#lazy_builder_preview' => TRUE,
@@ -373,13 +373,13 @@ class Renderer implements RendererInterface {
     // First validate the usage of #lazy_builder; both of the next if-statements
     // use it if available.
     if (isset($elements['#lazy_builder'])) {
-      assert(is_array($elements['#lazy_builder']), 'The #lazy_builder property must have an array as a value.');
-      assert(count($elements['#lazy_builder']) === 2, 'The #lazy_builder property must have an array as a value, containing two values: the callback, and the arguments for the callback.');
-      assert(is_array($elements['#lazy_builder'][1]), 'The #lazy_builder argument for callback must have an array as a value.');
-      assert(count($elements['#lazy_builder'][1]) === count(array_filter($elements['#lazy_builder'][1], function ($v) {
-        return is_null($v) || is_scalar($v);
+      \assert(\is_array($elements['#lazy_builder']), 'The #lazy_builder property must have an array as a value.');
+      \assert(\count($elements['#lazy_builder']) === 2, 'The #lazy_builder property must have an array as a value, containing two values: the callback, and the arguments for the callback.');
+      \assert(\is_array($elements['#lazy_builder'][1]), 'The #lazy_builder argument for callback must have an array as a value.');
+      \assert(\count($elements['#lazy_builder'][1]) === \count(\array_filter($elements['#lazy_builder'][1], function ($v) {
+        return \is_null($v) || \is_scalar($v);
       })), "A #lazy_builder callback's context may only contain scalar values or NULL.");
-      assert(!Element::children($elements), sprintf('When a #lazy_builder callback is specified, no children can exist; all children must be generated by the #lazy_builder callback. You specified the following children: %s.', implode(', ', Element::children($elements))));
+      \assert(!Element::children($elements), \sprintf('When a #lazy_builder callback is specified, no children can exist; all children must be generated by the #lazy_builder callback. You specified the following children: %s.', \implode(', ', Element::children($elements))));
       $supported_keys = [
         '#lazy_builder',
         '#cache',
@@ -393,7 +393,7 @@ class Renderer implements RendererInterface {
         '#weight',
         '#printed',
       ];
-      assert(empty(array_diff(array_keys($elements), $supported_keys)), sprintf('When a #lazy_builder callback is specified, no properties can exist; all properties must be generated by the #lazy_builder callback. You specified the following properties: %s.', implode(', ', array_diff(array_keys($elements), $supported_keys))));
+      \assert(empty(\array_diff(\array_keys($elements), $supported_keys)), \sprintf('When a #lazy_builder callback is specified, no properties can exist; all properties must be generated by the #lazy_builder callback. You specified the following properties: %s.', \implode(', ', \array_diff(\array_keys($elements), $supported_keys))));
     }
     // Determine whether to do auto-placeholdering.
     if ($this->placeholderGenerator->canCreatePlaceholder($elements) && $this->placeholderGenerator->shouldAutomaticallyPlaceholder($elements)) {
@@ -417,7 +417,7 @@ class Renderer implements RendererInterface {
       $new_elements = $this->doCallback('#lazy_builder', $elements['#lazy_builder'][0], $elements['#lazy_builder'][1]);
       // Throw an exception if #lazy_builder callback does not return an array;
       // provide helpful details for troubleshooting.
-      assert(is_array($new_elements), "#lazy_builder callbacks must return a valid renderable array, got " . gettype($new_elements) . " from " . Variable::callableToString($elements['#lazy_builder'][0]));
+      \assert(\is_array($new_elements), "#lazy_builder callbacks must return a valid renderable array, got " . \gettype($new_elements) . " from " . Variable::callableToString($elements['#lazy_builder'][0]));
 
       // The lazy builder could have set a #type, load its defaults.
       $this->loadElementDefaults($new_elements);
@@ -486,7 +486,7 @@ class Renderer implements RendererInterface {
         '#field_suffix',
       ];
       foreach ($markup_keys as $key) {
-        if (!empty($elements[$key]) && is_scalar($elements[$key])) {
+        if (!empty($elements[$key]) && \is_scalar($elements[$key])) {
           $elements[$key] = $this->xssFilterAdminIfUnsafe($elements[$key]);
         }
       }
@@ -543,7 +543,7 @@ class Renderer implements RendererInterface {
         // #theme hooks and #theme_wrappers hooks to share variable names
         // without conflict or ambiguity.
         $wrapper_elements = $elements;
-        if (is_string($key)) {
+        if (\is_string($key)) {
           $wrapper_hook = $key;
           foreach ($value as $attribute => $override) {
             $wrapper_elements[$attribute] = $override;
@@ -593,7 +593,7 @@ class Renderer implements RendererInterface {
       $this->renderCache->set($elements, $pre_bubbling_elements);
       // Add debug output to the renderable array on cache miss.
       if ($this->rendererConfig['debug'] === TRUE) {
-        $render_stop = microtime(TRUE);
+        $render_stop = \microtime(TRUE);
         $elements = $this->addDebugOutput($elements, FALSE, $pre_bubbling_elements, $render_stop - $render_start);
       }
       // Update the render context; the render cache implementation may update
@@ -652,11 +652,11 @@ class Renderer implements RendererInterface {
       // immediately resumed, assume that the fiber is waiting on an async
       // operation and wait a bit.
       if (!$fiber->isTerminated() && $resume_type !== FiberResumeType::Immediate) {
-        usleep(500);
+        \usleep(500);
       }
     }
     $result = $fiber->getReturn();
-    assert($context->count() <= 1, 'Bubbling failed.');
+    \assert($context->count() <= 1, 'Bubbling failed.');
 
     // Restore the original render context.
     $this->setCurrentRenderContext($previous_context);
@@ -685,7 +685,7 @@ class Renderer implements RendererInterface {
   protected function getCurrentRenderContext() {
     $request = $this->requestStack->getCurrentRequest();
 
-    if (is_null($request)) {
+    if (\is_null($request)) {
       return NULL;
     }
 
@@ -762,7 +762,7 @@ class Renderer implements RendererInterface {
       }
     }
     $iterations = 0;
-    while (count($fibers) > 0) {
+    while (\count($fibers) > 0) {
       foreach ($fibers as $placeholder => $fiber) {
         if (!$fiber->isStarted()) {
           $fiber->start();
@@ -815,7 +815,8 @@ class Renderer implements RendererInterface {
    */
   public function addCacheableDependency(array &$elements, $dependency) {
     if (!$dependency instanceof CacheableDependencyInterface) {
-      @trigger_error(sprintf("Calling %s() with an object that doesn't implement %s is deprecated in drupal:11.3.0 and will throw an error in drupal:13.0.0. See https://www.drupal.org/node/3525389", __METHOD__, CacheableDependencyInterface::class), E_USER_DEPRECATED);
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
+      @\trigger_error(\sprintf("Calling %s() with an object that doesn't implement %s is deprecated in drupal:11.3.0 and will throw an error in drupal:13.0.0. See https://www.drupal.org/node/3525389", __METHOD__, CacheableDependencyInterface::class), E_USER_DEPRECATED);
     }
     $meta_a = CacheableMetadata::createFromRenderArray($elements);
     $meta_b = CacheableMetadata::createFromObject($dependency);
@@ -901,7 +902,7 @@ class Renderer implements RendererInterface {
    */
   protected function doCallback($callback_type, $callback, array $args) {
     $callable = $this->callableResolver->getCallableFromDefinition($callback);
-    $message = sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/2966725', $callback_type, '%s');
+    $message = \sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/2966725', $callback_type, '%s');
     // Add \Drupal\Core\Render\Element\RenderCallbackInterface as an extra
     // trusted interface so that:
     // - All public methods on Render elements are considered trusted.
@@ -964,7 +965,7 @@ class Renderer implements RendererInterface {
     }
 
     if (!empty($render_time)) {
-      $prefix .= "\n<!-- RENDERING TIME: " . number_format($render_time, 9) . " -->";
+      $prefix .= "\n<!-- RENDERING TIME: " . \number_format($render_time, 9) . " -->";
     }
     $suffix = "<!-- END RENDERER -->";
 

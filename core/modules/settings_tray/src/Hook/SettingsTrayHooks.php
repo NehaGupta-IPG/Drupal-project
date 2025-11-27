@@ -81,7 +81,7 @@ class SettingsTrayHooks {
       // Ensure that contextual links vary by whether the block has config
       // overrides or not.
       // @see _contextual_links_to_id()
-      $build['#contextual_links']['block']['metadata']['has_overrides'] = _settings_tray_has_block_overrides($build['#block']) ? 1 : 0;
+      $build['#contextual_links']['block']['metadata']['has_overrides'] = \_settings_tray_has_block_overrides($build['#block']) ? 1 : 0;
     }
     // Force a new 'data-contextual-id' attribute on blocks when this module is
     // enabled so as not to reuse stale data cached client-side.
@@ -122,7 +122,7 @@ class SettingsTrayHooks {
       //   https://www.drupal.org/node/2784589.
       $edit_mode_items = ['contextual'];
       foreach ($items as $key => $item) {
-        if (!in_array($key, $edit_mode_items) && (!isset($items[$key]['#wrapper_attributes']['class']) || !in_array('hidden', $items[$key]['#wrapper_attributes']['class']))) {
+        if (!\in_array($key, $edit_mode_items) && (!isset($items[$key]['#wrapper_attributes']['class']) || !\in_array('hidden', $items[$key]['#wrapper_attributes']['class']))) {
           $items[$key]['#wrapper_attributes']['class'][] = 'edit-mode-inactive';
         }
       }

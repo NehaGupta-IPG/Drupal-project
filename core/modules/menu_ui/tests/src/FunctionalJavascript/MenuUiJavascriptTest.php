@@ -93,7 +93,7 @@ class MenuUiJavascriptTest extends WebDriverTestBase {
     $page->fillField('Menu name', $menu_id);
     $page->pressButton('Save');
     // Check that the menu was saved with the ID truncated to the max length.
-    $menu = Menu::load(substr($menu_id, 0, MenuStorage::MAX_ID_LENGTH));
+    $menu = Menu::load(\substr($menu_id, 0, MenuStorage::MAX_ID_LENGTH));
     $this->assertEquals($label, $menu->label());
 
     // Check that the menu was added.
@@ -151,7 +151,7 @@ class MenuUiJavascriptTest extends WebDriverTestBase {
 
     $storage = $this->container->get('entity_type.manager')->getStorage('menu_link_content');
     $menu_links = $storage->loadByProperties(['title' => $title]);
-    $menu_link = reset($menu_links);
+    $menu_link = \reset($menu_links);
 
     // Check that the stored menu link meeting the expectations.
     $this->assertNotNull($menu_link);

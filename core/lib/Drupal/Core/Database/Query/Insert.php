@@ -113,20 +113,20 @@ class Insert extends Query implements \Countable {
     $comments = $this->connection->makeComment($this->comments);
 
     // Default fields are always placed first for consistency.
-    $insert_fields = array_merge($this->defaultFields, $this->insertFields);
+    $insert_fields = \array_merge($this->defaultFields, $this->insertFields);
 
     if (!empty($this->fromQuery)) {
-      return $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') ' . $this->fromQuery;
+      return $comments . 'INSERT INTO {' . $this->table . '} (' . \implode(', ', $insert_fields) . ') ' . $this->fromQuery;
     }
 
     // For simplicity, we will use the $placeholders array to inject
     // default keywords even though they are not, strictly speaking,
     // placeholders for prepared statements.
     $placeholders = [];
-    $placeholders = array_pad($placeholders, count($this->defaultFields), 'default');
-    $placeholders = array_pad($placeholders, count($this->insertFields), '?');
+    $placeholders = \array_pad($placeholders, \count($this->defaultFields), 'default');
+    $placeholders = \array_pad($placeholders, \count($this->insertFields), '?');
 
-    return $comments . 'INSERT INTO {' . $this->table . '} (' . implode(', ', $insert_fields) . ') VALUES (' . implode(', ', $placeholders) . ')';
+    return $comments . 'INSERT INTO {' . $this->table . '} (' . \implode(', ', $insert_fields) . ') VALUES (' . \implode(', ', $placeholders) . ')';
   }
 
   /**
@@ -141,7 +141,7 @@ class Insert extends Query implements \Countable {
   protected function preExecute() {
     // Confirm that the user did not try to specify an identical
     // field and default field.
-    if (array_intersect($this->insertFields, $this->defaultFields)) {
+    if (\array_intersect($this->insertFields, $this->defaultFields)) {
       throw new FieldsOverlapException('You may not specify the same field to have a value and a schema-default value.');
     }
 
@@ -151,11 +151,11 @@ class Insert extends Query implements \Countable {
       // same order for the insert fields.
       // This behavior can be overridden by calling fields() manually as only
       // the first call to fields() does have an effect.
-      $this->fields(array_merge(array_keys($this->fromQuery->getFields()), array_keys($this->fromQuery->getExpressions())));
+      $this->fields(\array_merge(\array_keys($this->fromQuery->getFields()), \array_keys($this->fromQuery->getExpressions())));
     }
     else {
       // Don't execute query without fields.
-      if (count($this->insertFields) + count($this->defaultFields) == 0) {
+      if (\count($this->insertFields) + \count($this->defaultFields) == 0) {
         throw new NoFieldsException('There are no fields available to insert with.');
       }
     }
@@ -163,7 +163,7 @@ class Insert extends Query implements \Countable {
     // If no values have been added, silently ignore this query. This can happen
     // if values are added conditionally, so we don't want to throw an
     // exception.
-    if (!isset($this->insertValues[0]) && count($this->insertFields) > 0 && empty($this->fromQuery)) {
+    if (!isset($this->insertValues[0]) && \count($this->insertFields) > 0 && empty($this->fromQuery)) {
       return FALSE;
     }
     return TRUE;

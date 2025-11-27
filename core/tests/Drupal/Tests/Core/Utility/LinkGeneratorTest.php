@@ -670,7 +670,7 @@ class LinkGeneratorTest extends UnitTestCase {
       $predicates[] = "contains(.,'{$properties['content']}')";
     }
     if (!empty($predicates)) {
-      $query .= '[' . implode(' and ', $predicates) . ']';
+      $query .= '[' . \implode(' and ', $predicates) . ']';
     }
 
     // Execute the query.

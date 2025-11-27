@@ -112,7 +112,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
     $this->commentsCreated = Comment::loadMultiple();
 
     // Sort created comments in descending order.
-    ksort($this->commentsCreated, SORT_NUMERIC);
+    \ksort($this->commentsCreated, SORT_NUMERIC);
   }
 
   /**
@@ -132,7 +132,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
       'comment_field_data_created' => 'created',
     ];
     $expected_result = [];
-    foreach (array_values($this->commentsCreated) as $key => $comment) {
+    foreach (\array_values($this->commentsCreated) as $key => $comment) {
       $expected_result[$key]['subject'] = $comment->getSubject();
       $expected_result[$key]['cid'] = $comment->id();
       $expected_result[$key]['created'] = $comment->getCreatedTime();
@@ -141,7 +141,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
 
     // Check the number of results given by the display is the expected.
     $this->assertCount($this->blockDisplayResults, $view->result,
-      'There are exactly ' . count($view->result) . ' comments. Expected ' . $this->blockDisplayResults
+      'There are exactly ' . \count($view->result) . ' comments. Expected ' . $this->blockDisplayResults
     );
   }
 

@@ -92,11 +92,11 @@ class EmphasisTest extends WebDriverTestBase {
         ],
       ],
     ])->save();
-    $this->assertSame([], array_map(
+    $this->assertSame([], \array_map(
       function (ConstraintViolationInterface $v) {
         return (string) $v->getMessage();
       },
-      iterator_to_array(CKEditor5::validatePair(
+      \iterator_to_array(CKEditor5::validatePair(
         Editor::load('test_format'),
         FilterFormat::load('test_format')
       ))
@@ -157,7 +157,7 @@ class EmphasisTest extends WebDriverTestBase {
 
     // Add data-foo use to an existing em tag.
     $original_value = $this->host->body->value;
-    $this->host->body->value = str_replace('<em>', '<em data-foo="bar">', $original_value);
+    $this->host->body->value = \str_replace('<em>', '<em data-foo="bar">', $original_value);
     $this->host->save();
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();

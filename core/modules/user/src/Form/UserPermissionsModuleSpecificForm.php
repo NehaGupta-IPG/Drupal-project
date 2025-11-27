@@ -26,9 +26,9 @@ class UserPermissionsModuleSpecificForm extends UserPermissionsForm {
    * {@inheritdoc}
    */
   protected function permissionsByProvider(): array {
-    return array_intersect_key(
+    return \array_intersect_key(
       parent::permissionsByProvider(),
-      array_flip($this->moduleList)
+      \array_flip($this->moduleList)
     );
   }
 
@@ -43,7 +43,7 @@ class UserPermissionsModuleSpecificForm extends UserPermissionsForm {
    *   (optional) One or more module machine names, comma-separated.
    */
   public function buildForm(array $form, FormStateInterface $form_state, $modules = ''): array {
-    $this->moduleList = explode(',', $modules);
+    $this->moduleList = \explode(',', $modules);
     return parent::buildForm($form, $form_state);
   }
 
@@ -57,7 +57,7 @@ class UserPermissionsModuleSpecificForm extends UserPermissionsForm {
    *   The access result.
    */
   public function access($modules): AccessResultInterface {
-    foreach (explode(',', $modules) as $module) {
+    foreach (\explode(',', $modules) as $module) {
       if ($this->permissionHandler->moduleProvidesPermissions($module)) {
         return AccessResult::allowed();
       }

@@ -67,14 +67,14 @@ class Number extends FormElementBase {
     $name = empty($element['#title']) ? $element['#parents'][0] : $element['#title'];
 
     // Ensure the input is numeric.
-    if (!is_numeric($value)) {
-      $form_state->setError($element, t('%name must be a number.', ['%name' => $name]));
+    if (!\is_numeric($value)) {
+      $form_state->setError($element, \t('%name must be a number.', ['%name' => $name]));
       return;
     }
 
     // Ensure that the input is greater than the #min property, if set.
     if (isset($element['#min']) && $value < $element['#min']) {
-      $form_state->setError($element, t('%name must be higher than or equal to %min.', [
+      $form_state->setError($element, \t('%name must be higher than or equal to %min.', [
         '%name' => $name,
         '%min' => $element['#min'],
       ]));
@@ -82,19 +82,19 @@ class Number extends FormElementBase {
 
     // Ensure that the input is less than the #max property, if set.
     if (isset($element['#max']) && $value > $element['#max']) {
-      $form_state->setError($element, t('%name must be lower than or equal to %max.', [
+      $form_state->setError($element, \t('%name must be lower than or equal to %max.', [
         '%name' => $name,
         '%max' => $element['#max'],
       ]));
     }
 
-    if (isset($element['#step']) && strtolower($element['#step']) != 'any') {
+    if (isset($element['#step']) && \strtolower($element['#step']) != 'any') {
       // Check that the input is an allowed multiple of #step (offset by #min if
       // #min is set).
       $offset = $element['#min'] ?? 0.0;
 
       if (!NumberUtility::validStep($value, $element['#step'], $offset)) {
-        $form_state->setError($element, t('%name is not a valid number.', ['%name' => $name]));
+        $form_state->setError($element, \t('%name is not a valid number.', ['%name' => $name]));
       }
     }
   }

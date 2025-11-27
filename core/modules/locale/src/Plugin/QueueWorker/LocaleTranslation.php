@@ -89,8 +89,8 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
     // for the first time a default batch context is created. When called
     // iterative (usually the batch import function) the batch context is passed
     // through via the queue and is part of the $data.
-    $last = count($args) - 1;
-    if (!is_array($args[$last]) || !isset($args[$last]['finished'])) {
+    $last = \count($args) - 1;
+    if (!\is_array($args[$last]) || !isset($args[$last]['finished'])) {
       $batch_context = [
         'sandbox'  => [],
         'results'  => [],
@@ -102,10 +102,10 @@ class LocaleTranslation extends QueueWorkerBase implements ContainerFactoryPlugi
       $batch_context = $args[$last];
       unset($args[$last]);
     }
-    $args = array_merge($args, [&$batch_context]);
+    $args = \array_merge($args, [&$batch_context]);
 
     // Call the batch operation function.
-    call_user_func_array($function, $args);
+    \call_user_func_array($function, $args);
 
     // If the batch operation is not finished we create a new queue task to
     // continue the task. This is typically the translation import task.

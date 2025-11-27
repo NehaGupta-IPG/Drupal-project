@@ -33,7 +33,7 @@ class PhpArrayDumper extends OptimizedPhpArrayDumper {
     $code = [];
 
     foreach ($collection as $key => $value) {
-      if (is_array($value)) {
+      if (\is_array($value)) {
         $code[$key] = $this->dumpCollection($value);
       }
       else {

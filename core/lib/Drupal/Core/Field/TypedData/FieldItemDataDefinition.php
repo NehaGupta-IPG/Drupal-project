@@ -27,7 +27,7 @@ class FieldItemDataDefinition extends DataDefinition implements FieldItemDataDef
    */
   public static function createFromDataType($data_type) {
     // The data type of a field item is in the form of "field_item:$field_type".
-    $parts = explode(':', $data_type, 2);
+    $parts = \explode(':', $data_type, 2);
     if ($parts[0] != 'field_item') {
       throw new \InvalidArgumentException('Data type must be in the form of "field_item:FIELD_TYPE".');
     }

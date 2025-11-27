@@ -52,7 +52,7 @@ class MigrationPluginManagerTest extends UnitTestCase {
     $ordered_migrations = $this->pluginManager->buildDependencyMigration($migrations, []);
 
     // Verify results.
-    $this->assertEquals($result_ids, array_keys($ordered_migrations));
+    $this->assertEquals($result_ids, \array_keys($ordered_migrations));
     foreach ($migrations_data as $migration_id => $migration_data) {
       $migration = $migrations[$migration_id];
 
@@ -61,10 +61,10 @@ class MigrationPluginManagerTest extends UnitTestCase {
         $this->assertEquals([], $migration->set);
       }
       else {
-        $requirements = array_combine($requirements, $requirements);
+        $requirements = \array_combine($requirements, $requirements);
 
         $this->assertCount(1, $migration->set);
-        [$set_prop, $set_requirements] = reset($migration->set);
+        [$set_prop, $set_requirements] = \reset($migration->set);
         $this->assertEquals('requirements', $set_prop);
         $this->assertEquals($requirements, $set_requirements);
       }
@@ -240,7 +240,7 @@ class TestMigrationMock extends Migration {
    * {@inheritdoc}
    */
   public function set($prop, $value): void {
-    $this->set[] = func_get_args();
+    $this->set[] = \func_get_args();
   }
 
 }

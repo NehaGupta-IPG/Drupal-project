@@ -24,7 +24,7 @@ class LocaleNonInteractiveDevInstallTest extends LocaleNonInteractiveInstallTest
    */
   protected function getVersionStringToTest(): string {
     include_once $this->root . '/core/includes/install.core.inc';
-    $version = _install_get_version_info(\Drupal::VERSION);
+    $version = \_install_get_version_info(\Drupal::VERSION);
     return $version['major'] . '.' . $version['minor'] . '.x';
   }
 

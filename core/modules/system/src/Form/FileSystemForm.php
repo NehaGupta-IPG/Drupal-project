@@ -139,7 +139,7 @@ class FileSystemForm extends ConfigFormBase {
     }
 
     $intervals = [0, 21600, 43200, 86400, 604800, 2419200, 7776000];
-    $period = array_combine($intervals, array_map([$this->dateFormatter, 'formatInterval'], $intervals));
+    $period = \array_combine($intervals, \array_map([$this->dateFormatter, 'formatInterval'], $intervals));
     $period[0] = $this->t('Never');
     $form['temporary_maximum_age'] = [
       '#type' => 'select',

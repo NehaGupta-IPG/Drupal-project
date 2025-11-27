@@ -133,7 +133,7 @@ class MigrateSourceTest extends MigrateTestCase {
     $rows = [$this->row];
     if (isset($configuration['high_water_property']) && isset($high_water_value)) {
       $property = $configuration['high_water_property']['name'];
-      $rows = array_filter($rows, function (array $row) use ($property, $high_water_value) {
+      $rows = \array_filter($rows, function (array $row) use ($property, $high_water_value) {
         return $row[$property] >= $high_water_value;
       });
     }
@@ -241,7 +241,7 @@ class MigrateSourceTest extends MigrateTestCase {
 
     // $row->needsUpdate() === TRUE so we get a row.
     $source->rewind();
-    $this->assertTrue(is_a($source->current(), 'Drupal\migrate\Row'), '$row->needsUpdate() is TRUE so we got a row.');
+    $this->assertTrue(\is_a($source->current(), 'Drupal\migrate\Row'), '$row->needsUpdate() is TRUE so we got a row.');
 
     // Test that we don't get a row when the incoming row is marked as imported.
     $source = $this->getSource([], [], MigrateIdMapInterface::STATUS_IMPORTED);

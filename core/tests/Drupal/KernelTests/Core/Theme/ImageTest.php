@@ -64,13 +64,13 @@ class ImageTest extends KernelTestBase {
    */
   public function testThemeImageWithSizes(): void {
     // Test with multipliers.
-    $sizes = '(max-width: ' . rand(10, 30) . 'em) 100vw, (max-width: ' . rand(30, 50) . 'em) 50vw, 30vw';
+    $sizes = '(max-width: ' . \rand(10, 30) . 'em) 100vw, (max-width: ' . \rand(30, 50) . 'em) 50vw, 30vw';
     $image = [
       '#theme' => 'image',
       '#sizes' => $sizes,
-      '#uri' => reset($this->testImages),
-      '#width' => rand(0, 1000) . 'px',
-      '#height' => rand(0, 500) . 'px',
+      '#uri' => \reset($this->testImages),
+      '#width' => \rand(0, 1000) . 'px',
+      '#height' => \rand(0, 500) . 'px',
       '#alt' => $this->randomMachineName(),
       '#title' => $this->randomMachineName(),
     ];
@@ -87,9 +87,9 @@ class ImageTest extends KernelTestBase {
 
     $image = [
       '#theme' => 'image',
-      '#uri' => reset($this->testImages),
-      '#width' => rand(0, 1000) . 'px',
-      '#height' => rand(0, 500) . 'px',
+      '#uri' => \reset($this->testImages),
+      '#width' => \rand(0, 1000) . 'px',
+      '#height' => \rand(0, 500) . 'px',
       '#alt' => $this->randomMachineName(),
       '#title' => $this->randomMachineName(),
     ];
@@ -116,8 +116,8 @@ class ImageTest extends KernelTestBase {
           'multiplier' => '2x',
         ],
       ],
-      '#width' => rand(0, 1000) . 'px',
-      '#height' => rand(0, 500) . 'px',
+      '#width' => \rand(0, 1000) . 'px',
+      '#height' => \rand(0, 500) . 'px',
       '#alt' => $this->randomMachineName(),
       '#title' => $this->randomMachineName(),
     ];
@@ -133,8 +133,8 @@ class ImageTest extends KernelTestBase {
   public function testThemeImageWithSrcsetWidth(): void {
     // Test with multipliers.
     $widths = [
-      rand(0, 500) . 'w',
-      rand(500, 1000) . 'w',
+      \rand(0, 500) . 'w',
+      \rand(500, 1000) . 'w',
     ];
     $image = [
       '#theme' => 'image',
@@ -148,8 +148,8 @@ class ImageTest extends KernelTestBase {
           'width' => $widths[1],
         ],
       ],
-      '#width' => rand(0, 1000) . 'px',
-      '#height' => rand(0, 500) . 'px',
+      '#width' => \rand(0, 1000) . 'px',
+      '#height' => \rand(0, 500) . 'px',
       '#alt' => $this->randomMachineName(),
       '#title' => $this->randomMachineName(),
     ];

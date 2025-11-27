@@ -124,20 +124,20 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
       // Set of possible top-level domains.
       $tlds = ['com', 'net', 'gov', 'org', 'edu', 'biz', 'info'];
       // Set random length for the domain name.
-      $domain_length = mt_rand(7, 15);
+      $domain_length = \mt_rand(7, 15);
 
       $link_title_visibility = LinkTitleVisibility::tryFrom((int) $field_definition->getSetting('title'));
       $values['title'] = match ($link_title_visibility) {
         LinkTitleVisibility::Required => $random->sentences(4),
         // In case of optional title, randomize its generation.
-        LinkTitleVisibility::Optional => mt_rand(0, 1) ? $random->sentences(4) : '',
+        LinkTitleVisibility::Optional => \mt_rand(0, 1) ? $random->sentences(4) : '',
         // Disabled, or a value that does not translate to an enum case.
         default => '',
       };
-      $values['uri'] = 'https://www.' . $random->word($domain_length) . '.' . $tlds[mt_rand(0, (count($tlds) - 1))];
+      $values['uri'] = 'https://www.' . $random->word($domain_length) . '.' . $tlds[\mt_rand(0, (\count($tlds) - 1))];
     }
     else {
-      $values['uri'] = 'base:' . $random->name(mt_rand(1, 64));
+      $values['uri'] = 'base:' . $random->name(\mt_rand(1, 64));
     }
     return $values;
   }
@@ -184,7 +184,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
   public function setValue($values, $notify = TRUE) {
     // Treat the values as property value of the main property, if no array is
     // given.
-    if (isset($values) && !is_array($values)) {
+    if (isset($values) && !\is_array($values)) {
       $values = [static::mainPropertyName() => $values];
     }
     if (isset($values)) {

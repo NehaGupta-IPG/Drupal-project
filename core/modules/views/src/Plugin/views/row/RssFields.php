@@ -49,7 +49,7 @@ class RssFields extends RowPluginBase {
 
     $initial_labels = ['' => $this->t('- None -')];
     $view_fields_labels = $this->displayHandler->getFieldLabels();
-    $view_fields_labels = array_merge($initial_labels, $view_fields_labels);
+    $view_fields_labels = \array_merge($initial_labels, $view_fields_labels);
 
     $form['title_field'] = [
       '#type' => 'select',
@@ -146,12 +146,12 @@ class RssFields extends RowPluginBase {
     $item->link = $this->getAbsoluteUrl($this->getField($row_index, $this->options['link_field']));
 
     $field = $this->getField($row_index, $this->options['description_field']);
-    $item->description = is_array($field) ? $field : ['#markup' => $field];
+    $item->description = \is_array($field) ? $field : ['#markup' => $field];
 
     $item->elements = [
       // Default rendering of date fields adds a <time> tag and whitespace, we
       // want to remove these because this breaks RSS feeds.
-      ['key' => 'pubDate', 'value' => trim(strip_tags($this->getField($row_index, $this->options['date_field'])))],
+      ['key' => 'pubDate', 'value' => \trim(\strip_tags($this->getField($row_index, $this->options['date_field'])))],
       [
         'key' => 'dc:creator',
         'value' => $this->getField($row_index, $this->options['creator_field']),
@@ -174,7 +174,7 @@ class RssFields extends RowPluginBase {
 
     foreach ($item->elements as $element) {
       if (isset($element['namespace'])) {
-        $this->view->style_plugin->namespaces = array_merge($this->view->style_plugin->namespaces, $element['namespace']);
+        $this->view->style_plugin->namespaces = \array_merge($this->view->style_plugin->namespaces, $element['namespace']);
       }
     }
 
@@ -203,7 +203,7 @@ class RssFields extends RowPluginBase {
    *   a MarkupInterface object containing the rendered field value.
    */
   public function getField($index, $field_id) {
-    if (empty($this->view->style_plugin) || !is_object($this->view->style_plugin) || empty($field_id)) {
+    if (empty($this->view->style_plugin) || !\is_object($this->view->style_plugin) || empty($field_id)) {
       return '';
     }
     return $this->view->style_plugin->getField($index, $field_id);
@@ -221,7 +221,7 @@ class RssFields extends RowPluginBase {
   protected function getAbsoluteUrl($url_string) {
     // If the given URL already starts with a leading slash, it's been processed
     // and we need to simply make it an absolute path by prepending the host.
-    if (str_starts_with($url_string, '/')) {
+    if (\str_starts_with($url_string, '/')) {
       $host = \Drupal::request()->getSchemeAndHttpHost();
       // @todo Views should expect and store a leading /.
       // @see https://www.drupal.org/node/2423913

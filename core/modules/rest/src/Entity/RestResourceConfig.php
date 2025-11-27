@@ -84,7 +84,7 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
     // because : is not valid for config entities.
     if (!isset($this->plugin_id) && isset($this->id)) {
       // Generate plugin_id on first entity creation.
-      $this->plugin_id = str_replace('.', ':', $this->id);
+      $this->plugin_id = \str_replace('.', ':', $this->id);
     }
   }
 
@@ -131,8 +131,8 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
    *   A list of supported HTTP methods.
    */
   protected function getMethodsForMethodGranularity() {
-    $methods = array_keys($this->configuration);
-    return array_map([$this, 'normalizeRestMethod'], $methods);
+    $methods = \array_keys($this->configuration);
+    return \array_map([$this, 'normalizeRestMethod'], $methods);
   }
 
   /**
@@ -162,7 +162,7 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
    */
   public function getAuthenticationProvidersForMethodGranularity($method) {
     $method = $this->normalizeRestMethod($method);
-    if (in_array($method, $this->getMethods()) && isset($this->configuration[$method]['supported_auth'])) {
+    if (\in_array($method, $this->getMethods()) && isset($this->configuration[$method]['supported_auth'])) {
       return $this->configuration[$method]['supported_auth'];
     }
     return [];
@@ -195,7 +195,7 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
    */
   protected function getFormatsForMethodGranularity($method) {
     $method = $this->normalizeRestMethod($method);
-    if (in_array($method, $this->getMethods()) && isset($this->configuration[$method]['supported_formats'])) {
+    if (\in_array($method, $this->getMethods()) && isset($this->configuration[$method]['supported_formats'])) {
       return $this->configuration[$method]['supported_formats'];
     }
     return [];
@@ -257,7 +257,7 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
    *   The normalized request method.
    */
   protected function normalizeRestMethod($method) {
-    return strtoupper($method);
+    return \strtoupper($method);
   }
 
   /**

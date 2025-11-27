@@ -50,7 +50,7 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
       $all_supported_methods[] = $route->getMethods();
     }
 
-    $all_supported_methods = array_merge(...$all_supported_methods);
+    $all_supported_methods = \array_merge(...$all_supported_methods);
     $collection = $this->inner->filter($collection, $request);
 
     if (!$this->readOnlyModeIsEnabled) {
@@ -64,16 +64,16 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
       }
 
       $supported_methods = $route->getMethods();
-      assert(count($supported_methods) > 0, 'JSON:API routes always have a method specified.');
-      $is_read_only_route = empty(array_diff($supported_methods, $read_only_methods));
+      \assert(\count($supported_methods) > 0, 'JSON:API routes always have a method specified.');
+      $is_read_only_route = empty(\array_diff($supported_methods, $read_only_methods));
       if (!$is_read_only_route) {
         $collection->remove($name);
       }
     }
-    if (count($collection)) {
+    if (\count($collection)) {
       return $collection;
     }
-    throw new MethodNotAllowedHttpException(array_intersect($all_supported_methods, $read_only_methods), sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromRoute('jsonapi.settings')->setAbsolute()->toString(TRUE)->getGeneratedUrl()));
+    throw new MethodNotAllowedHttpException(\array_intersect($all_supported_methods, $read_only_methods), \sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromRoute('jsonapi.settings')->setAbsolute()->toString(TRUE)->getGeneratedUrl()));
   }
 
 }

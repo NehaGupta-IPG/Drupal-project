@@ -40,9 +40,9 @@ final class DeprecationHelper {
     // Normalize the version string when it's a dev version to the first point
     // release of that minor. E.g. "10.2.x-dev" and "10.2-dev" both translate to
     // "10.2.0".
-    $normalizedVersion = str_ends_with($currentVersion, '-dev') ? str_replace(['.x-dev', '-dev'], '.0', $currentVersion) : $currentVersion;
+    $normalizedVersion = \str_ends_with($currentVersion, '-dev') ? \str_replace(['.x-dev', '-dev'], '.0', $currentVersion) : $currentVersion;
 
-    return version_compare($normalizedVersion, $deprecatedVersion, '>=') ? $currentCallable() : $deprecatedCallable();
+    return \version_compare($normalizedVersion, $deprecatedVersion, '>=') ? $currentCallable() : $deprecatedCallable();
   }
 
 }

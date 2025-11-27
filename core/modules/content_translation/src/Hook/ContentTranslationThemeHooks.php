@@ -15,7 +15,7 @@ class ContentTranslationThemeHooks {
   #[Hook('preprocess_language_content_settings_table')]
   public function preprocessLanguageContentSettingsTable(&$variables): void {
     \Drupal::moduleHandler()->loadInclude('content_translation', 'inc', 'content_translation.admin');
-    _content_translation_preprocess_language_content_settings_table($variables);
+    \_content_translation_preprocess_language_content_settings_table($variables);
   }
 
 }

@@ -19,7 +19,7 @@ class MediaLinkTargetStandaloneWhenAvailable extends MediaLinkTarget {
    * {@inheritdoc}
    */
   public function getLinkTarget(EntityInterface $entity): GeneratedUrl {
-    assert($entity instanceof MediaInterface);
+    \assert($entity instanceof MediaInterface);
 
     // Default to the standalone URL if it is enabled.
     // @see media_entity_type_alter()

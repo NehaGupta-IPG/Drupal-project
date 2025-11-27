@@ -35,7 +35,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $driver = $this->getSession()->getDriver();
 
     foreach ($this->getTestFiles('image') as $image) {
-      $extension = pathinfo($image->filename, PATHINFO_EXTENSION);
+      $extension = \pathinfo($image->filename, PATHINFO_EXTENSION);
       if ($extension === 'png') {
         $png_image = $image;
       }
@@ -111,7 +111,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->pageTextNotContains('Additional selected media');
     // Files are temporary until the form is saved.
     $files = $file_storage->loadMultiple();
-    $file = array_pop($files);
+    $file = \array_pop($files);
     $this->assertSame('public://type-three-dir', $file_system->dirname($file->getFileUri()));
     $this->assertTrue($file->isTemporary());
     // Assert the revision_log_message field is not shown.
@@ -126,11 +126,11 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->assertJsCondition('jQuery("input[name=\'media_library_select_form[1]\']").is(":focus")');
     // The file should be permanent now.
     $files = $file_storage->loadMultiple();
-    $file = array_pop($files);
+    $file = \array_pop($files);
     $this->assertFalse($file->isTemporary());
     // Load the created media item.
     $media_items = Media::loadMultiple();
-    $added_media = array_pop($media_items);
+    $added_media = \array_pop($media_items);
     $added_media_id = $added_media->id();
     // Ensure the media item was saved to the library and automatically
     // selected. The added media items should be in the first position of the
@@ -158,7 +158,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->waitForFieldExists('Alternative text')->setValue($this->randomString());
     $this->pressSaveButton();
     $this->pressInsertSelected('Added one media item.');
-    $this->waitForText(basename($png_uri_2));
+    $this->waitForText(\basename($png_uri_2));
 
     // Also make sure that we can upload to the unlimited cardinality field.
     $this->openMediaLibraryForField('field_unlimited_media');
@@ -166,7 +166,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
 
     // Select a media item to check if the selection is persisted when adding
     // new items.
-    $existing_media_name = basename($png_uri_2);
+    $existing_media_name = \basename($png_uri_2);
     $checkbox = $page->findField("Select $existing_media_name");
     $selected_item_id = $checkbox->getAttribute('value');
     $checkbox->click();
@@ -180,7 +180,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->pressSaveButton();
     // Load the created media item.
     $media_items = Media::loadMultiple();
-    $added_media = array_pop($media_items);
+    $added_media = \array_pop($media_items);
     $added_media_name = $added_media->label();
     $added_media_id = $added_media->id();
     // Ensure the media item was saved to the library and automatically
@@ -195,7 +195,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->pageTextContains('2 items selected');
     $assert_session->checkboxChecked("Select $added_media_name");
     $assert_session->checkboxChecked("Select $existing_media_name");
-    $assert_session->hiddenFieldValueEquals('current_selection', implode(',', [$selected_item_id, $added_media_id]));
+    $assert_session->hiddenFieldValueEquals('current_selection', \implode(',', [$selected_item_id, $added_media_id]));
     $selected_checkboxes = [];
     foreach ($this->getCheckboxes() as $checkbox) {
       if ($checkbox->isChecked()) {
@@ -230,19 +230,19 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->pageTextContains('Extra Image');
     $jpg_uri_3 = $file_system->copy($jpg_image->uri, 'public://');
     $this->addMediaFileToField('Extra Image', $this->container->get('file_system')->realpath($jpg_uri_3));
-    $this->waitForText(basename($jpg_uri_3));
+    $this->waitForText(\basename($jpg_uri_3));
     // Ensure that the extra image was uploaded to the correct directory.
     $files = $file_storage->loadMultiple();
-    $file = array_pop($files);
+    $file = \array_pop($files);
     $this->assertSame('public://type-four-extra-dir', $file_system->dirname($file->getFileUri()));
     $this->pressSaveButton();
     // Ensure the media item was saved to the library and automatically
     // selected.
     $this->waitForText('Add or select media');
-    $this->waitForText(basename($jpg_uri_2));
+    $this->waitForText(\basename($jpg_uri_2));
     // Ensure the created item is added in the widget.
     $this->pressInsertSelected('Added one media item.');
-    $assert_session->pageTextContains(basename($jpg_uri_2));
+    $assert_session->pageTextContains(\basename($jpg_uri_2));
 
     // Assert we can also remove selected items from the selection area in the
     // upload form.
@@ -264,7 +264,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->waitForText('1 item selected');
     $this->waitForText("Select $existing_media_name");
     $media_items = Media::loadMultiple();
-    $added_media = array_pop($media_items);
+    $added_media = \array_pop($media_items);
     $added_media_name = $added_media->label();
     $added_media_id = $added_media->id();
     $assert_session->pageTextContains('1 item selected');
@@ -272,7 +272,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->checkboxNotChecked("Select $existing_media_name");
     $assert_session->hiddenFieldValueEquals('current_selection', $added_media_id);
     $this->pressInsertSelected('Added one media item.');
-    $this->waitForText(basename($png_uri_5));
+    $this->waitForText(\basename($png_uri_5));
 
     // Assert removing an uploaded media item before save works as expected.
     $this->openMediaLibraryForField('field_unlimited_media');
@@ -305,10 +305,10 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $remote_paths = [];
     for ($i = 1; $i < 5; $i++) {
       $path = $file_system->copy($png_image->uri, 'public://');
-      $filenames[] = basename($path);
+      $filenames[] = \basename($path);
       $remote_paths[] = $driver->uploadFileAndGetRemoteFilePath($file_system->realpath($path));
     }
-    $page->findField('Add files')->setValue(implode("\n", $remote_paths));
+    $page->findField('Add files')->setValue(\implode("\n", $remote_paths));
     // Assert the media item fields are shown and the vertical tabs are no
     // longer shown.
     $this->assertMediaAdded();
@@ -325,7 +325,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert the file is available in the file storage.
     $files = $file_storage->loadByProperties(['filename' => $filenames[1]]);
     $this->assertCount(1, $files);
-    $file_1_uri = reset($files)->getFileUri();
+    $file_1_uri = \reset($files)->getFileUri();
     // Remove the second file and assert the focus is shifted to the container
     // of the next media item and field values are still correct.
     $page->pressButton('media-1-remove-button');
@@ -339,7 +339,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // let's add a usage for $filenames[3] (now in the third position).
     $files = $file_storage->loadByProperties(['filename' => $filenames[3]]);
     $this->assertCount(1, $files);
-    $target_file = reset($files);
+    $target_file = \reset($files);
     Media::create([
       'bundle' => 'type_three',
       'name' => 'Disturbing',
@@ -381,7 +381,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $driver = $this->getSession()->getDriver();
 
     foreach ($this->getTestFiles('image') as $image) {
-      $extension = pathinfo($image->filename, PATHINFO_EXTENSION);
+      $extension = \pathinfo($image->filename, PATHINFO_EXTENSION);
       if ($extension === 'png') {
         $png_image = $image;
       }
@@ -457,7 +457,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->elementNotExists('css', 'details summary:contains(Additional selected media)');
     // Files are temporary until the form is saved.
     $files = $file_storage->loadMultiple();
-    $file = array_pop($files);
+    $file = \array_pop($files);
     $this->assertSame('public://type-three-dir', $file_system->dirname($file->getFileUri()));
     $this->assertTrue($file->isTemporary());
     // Assert the revision_log_message field is not shown.
@@ -472,11 +472,11 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->assertJsCondition('jQuery("input[name=\'media_library_select_form[1]\']").is(":focus")');
     // The file should be permanent now.
     $files = $file_storage->loadMultiple();
-    $file = array_pop($files);
+    $file = \array_pop($files);
     $this->assertFalse($file->isTemporary());
     // Load the created media item.
     $media_items = Media::loadMultiple();
-    $added_media = array_pop($media_items);
+    $added_media = \array_pop($media_items);
     $added_media_id = $added_media->id();
     // Ensure the media item was saved to the library and automatically
     // selected. The added media items should be in the first position of the
@@ -506,7 +506,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->saveAnd('insert');
     $this->waitForText('Added one media item.');
     $this->waitForNoText('Add or select media');
-    $this->waitForText(basename($png_uri_2));
+    $this->waitForText(\basename($png_uri_2));
 
     // Also make sure that we can upload to the unlimited cardinality field.
     $this->openMediaLibraryForField('field_unlimited_media');
@@ -514,7 +514,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
 
     // Select a media item to check if the selection is persisted when adding
     // new items.
-    $existing_media_name = basename($png_uri_2);
+    $existing_media_name = \basename($png_uri_2);
     $checkbox = $page->findField("Select $existing_media_name");
     $selected_item_id = $checkbox->getAttribute('value');
     $checkbox->click();
@@ -530,7 +530,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->waitForNoText('Save and select');
     // Load the created media item.
     $media_items = Media::loadMultiple();
-    $added_media = array_pop($media_items);
+    $added_media = \array_pop($media_items);
     $added_media_name = $added_media->label();
     $added_media_id = $added_media->id();
     // Ensure the media item was saved to the library and automatically
@@ -545,7 +545,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->pageTextContains('2 items selected');
     $assert_session->checkboxChecked("Select $added_media_name");
     $assert_session->checkboxChecked("Select $existing_media_name");
-    $assert_session->hiddenFieldValueEquals('current_selection', implode(',', [$selected_item_id, $added_media_id]));
+    $assert_session->hiddenFieldValueEquals('current_selection', \implode(',', [$selected_item_id, $added_media_id]));
     $selected_checkboxes = [];
     foreach ($this->getCheckboxes() as $checkbox) {
       if ($checkbox->isChecked()) {
@@ -581,19 +581,19 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->pageTextContains('Extra Image');
     $jpg_uri_3 = $file_system->copy($jpg_image->uri, 'public://');
     $this->addMediaFileToField('Extra Image', $this->container->get('file_system')->realpath($jpg_uri_3));
-    $this->waitForText(basename($jpg_uri_3));
+    $this->waitForText(\basename($jpg_uri_3));
     // Ensure that the extra image was uploaded to the correct directory.
     $files = $file_storage->loadMultiple();
-    $file = array_pop($files);
+    $file = \array_pop($files);
     $this->assertSame('public://type-four-extra-dir', $file_system->dirname($file->getFileUri()));
     $this->saveAnd('select');
     // Ensure the media item was saved to the library and automatically
     // selected.
     $this->waitForText('Add or select media');
-    $this->waitForText(basename($jpg_uri_2));
+    $this->waitForText(\basename($jpg_uri_2));
     // Ensure the created item is added in the widget.
     $this->pressInsertSelected('Added one media item.');
-    $assert_session->pageTextContains(basename($jpg_uri_2));
+    $assert_session->pageTextContains(\basename($jpg_uri_2));
 
     // Assert users can not select media items they do not have access to.
     $unpublished_media = Media::create([
@@ -646,7 +646,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $this->saveAnd('select');
     $this->waitForText("Select $existing_media_name");
     $media_items = Media::loadMultiple();
-    $added_media = array_pop($media_items);
+    $added_media = \array_pop($media_items);
     $added_media_name = $added_media->label();
     $added_media_id = $added_media->id();
     $assert_session->pageTextContains('1 item selected');
@@ -654,7 +654,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $assert_session->checkboxNotChecked("Select $existing_media_name");
     $assert_session->hiddenFieldValueEquals('current_selection', $added_media_id);
     $this->pressInsertSelected('Added one media item.');
-    $this->waitForText(basename($png_uri_5));
+    $this->waitForText(\basename($png_uri_5));
 
     // Assert removing an uploaded media item before save works as expected.
     $this->openMediaLibraryForField('field_unlimited_media');
@@ -684,10 +684,10 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     $remote_paths = [];
     for ($i = 1; $i < 5; $i++) {
       $path = $file_system->copy($png_image->uri, 'public://');
-      $filenames[] = basename($path);
+      $filenames[] = \basename($path);
       $remote_paths[] = $driver->uploadFileAndGetRemoteFilePath($file_system->realpath($path));
     }
-    $page->findField('Add files')->setValue(implode("\n", $remote_paths));
+    $page->findField('Add files')->setValue(\implode("\n", $remote_paths));
     // Assert the media item fields are shown and the vertical tabs are no
     // longer shown.
     $this->assertMediaAdded();
@@ -706,7 +706,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // Assert the file is available in the file storage.
     $files = $file_storage->loadByProperties(['filename' => $filenames[1]]);
     $this->assertCount(1, $files);
-    $file_1_uri = reset($files)->getFileUri();
+    $file_1_uri = \reset($files)->getFileUri();
     // Remove the second file and assert the focus is shifted to the container
     // of the next media item and field values are still correct.
     $page->pressButton('media-1-remove-button');
@@ -720,7 +720,7 @@ class WidgetUploadTest extends MediaLibraryTestBase {
     // let's add a usage for $filenames[3] (now in the third position).
     $files = $file_storage->loadByProperties(['filename' => $filenames[3]]);
     $this->assertCount(1, $files);
-    $target_file = reset($files);
+    $target_file = \reset($files);
     Media::create([
       'bundle' => 'type_three',
       'name' => 'Disturbing',

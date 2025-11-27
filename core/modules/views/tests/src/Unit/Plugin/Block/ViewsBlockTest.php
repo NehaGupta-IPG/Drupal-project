@@ -232,8 +232,8 @@ class ViewsBlockTest extends UnitTestCase {
     $plugin->setContext('context_name', $blockContext);
 
     // Assertions.
-    $this->assertEmpty(array_diff(Cache::mergeTags($viewCacheTags, $blockCacheTags), $plugin->getCacheTags()));
-    $this->assertEmpty(array_diff(Cache::mergeContexts($viewCacheContexts, $blockCacheContexts), $plugin->getCacheContexts()));
+    $this->assertEmpty(\array_diff(Cache::mergeTags($viewCacheTags, $blockCacheTags), $plugin->getCacheTags()));
+    $this->assertEmpty(\array_diff(Cache::mergeContexts($viewCacheContexts, $blockCacheContexts), $plugin->getCacheContexts()));
     $this->assertEquals($expectedCacheMaxAge, $plugin->getCacheMaxAge());
   }
 
@@ -277,7 +277,7 @@ class ViewsBlockTest extends UnitTestCase {
     $definition['provider'] = 'views';
     $plugin = new ViewsBlock($config, $block_id, $definition, $this->executableFactory, $this->storage, $this->account);
 
-    $this->assertEquals(array_intersect_key($build, ['#cache' => TRUE]), $plugin->build());
+    $this->assertEquals(\array_intersect_key($build, ['#cache' => TRUE]), $plugin->build());
   }
 
   /**
@@ -308,7 +308,7 @@ class ViewsBlockTest extends UnitTestCase {
 //   views_add_contextual_links().
 namespace Drupal\views\Plugin\Block;
 
-if (!function_exists('views_add_contextual_links')) {
+if (!\function_exists('views_add_contextual_links')) {
 
   /**
    * Define method views_add_contextual_links for this test.

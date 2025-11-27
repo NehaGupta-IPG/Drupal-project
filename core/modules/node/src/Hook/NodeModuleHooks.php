@@ -25,8 +25,8 @@ class NodeModuleHooks {
   public function modulesInstalled(array $modules): void {
     // Check if any of the newly enabled modules require the node_access table
     // to be rebuilt.
-    if (!node_access_needs_rebuild() && $this->moduleHandler->hasImplementations('node_grants', $modules)) {
-      node_access_needs_rebuild(TRUE);
+    if (!\node_access_needs_rebuild() && $this->moduleHandler->hasImplementations('node_grants', $modules)) {
+      \node_access_needs_rebuild(TRUE);
     }
   }
 
@@ -43,14 +43,14 @@ class NodeModuleHooks {
       // check whether a hook implementation function exists and do not invoke
       // it. Node access also needs to be rebuilt if language module is disabled
       // to remove any language-specific grants.
-      if (!node_access_needs_rebuild() && ($this->moduleHandler->hasImplementations('node_grants', $module) || $module == 'language')) {
-        node_access_needs_rebuild(TRUE);
+      if (!\node_access_needs_rebuild() && ($this->moduleHandler->hasImplementations('node_grants', $module) || $module == 'language')) {
+        \node_access_needs_rebuild(TRUE);
       }
     }
     // If there remains no more node_access module, rebuilding will be
     // straightforward, we can do it right now.
-    if (node_access_needs_rebuild() && !$this->moduleHandler->hasImplementations('node_grants')) {
-      node_access_rebuild();
+    if (\node_access_needs_rebuild() && !$this->moduleHandler->hasImplementations('node_grants')) {
+      \node_access_rebuild();
     }
   }
 

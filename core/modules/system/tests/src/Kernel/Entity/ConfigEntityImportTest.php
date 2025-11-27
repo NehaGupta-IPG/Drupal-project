@@ -141,7 +141,7 @@ class ConfigEntityImportTest extends KernelTestBase {
     $plugin_collection = $entity->getPluginCollections()['effects'];
 
     $effects = $entity->get('effects');
-    $effect_id = key($effects);
+    $effect_id = \key($effects);
     $this->assertSame(100, $effects[$effect_id]['data']['height']);
 
     $effects[$effect_id]['data']['height'] = 50;
@@ -160,7 +160,7 @@ class ConfigEntityImportTest extends KernelTestBase {
 
     // Read the existing data, and prepare an altered version in sync.
     $custom_data = $original_data = $this->container->get('config.storage')->read($name);
-    $effect_name = key($original_data['effects']);
+    $effect_name = \key($original_data['effects']);
 
     $custom_data['effects'][$effect_name]['data']['upscale'] = FALSE;
     $this->assertConfigUpdateImport($name, $original_data, $custom_data);

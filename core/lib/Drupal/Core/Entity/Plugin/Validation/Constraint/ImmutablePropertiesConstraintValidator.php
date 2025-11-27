@@ -41,7 +41,7 @@ class ImmutablePropertiesConstraintValidator extends ConstraintValidator impleme
    * {@inheritdoc}
    */
   public function validate(mixed $value, Constraint $constraint): void {
-    assert($constraint instanceof ImmutablePropertiesConstraint);
+    \assert($constraint instanceof ImmutablePropertiesConstraint);
 
     if (!$value instanceof ConfigEntityInterface) {
       throw new UnexpectedValueException($value, ConfigEntityInterface::class);
@@ -64,7 +64,7 @@ class ImmutablePropertiesConstraintValidator extends ConstraintValidator impleme
 
     foreach ($constraint->properties as $name) {
       // The property must be concretely defined in the class.
-      if (!property_exists($value, $name)) {
+      if (!\property_exists($value, $name)) {
         throw new LogicException("The entity does not have a '$name' property.");
       }
 

@@ -20,9 +20,9 @@ class BigPipeThemeHooks {
     $suggestions = [];
     $suggestion = 'big_pipe_interface_preview';
     if ($variables['callback']) {
-      $callback = preg_replace('/[^a-zA-Z0-9]/', '_', $variables['callback']);
-      if (is_array($callback)) {
-        $callback = implode('__', $callback);
+      $callback = \preg_replace('/[^a-zA-Z0-9]/', '_', $variables['callback']);
+      if (\is_array($callback)) {
+        $callback = \implode('__', $callback);
       }
       // Use simplified template suggestion, if any.
       // For example, this simplifies
@@ -34,8 +34,8 @@ class BigPipeThemeHooks {
         $callback = $common_callbacks_simplified_suggestions[$callback];
       }
       $suggestions[] = $suggestion .= '__' . $callback;
-      if (is_array($variables['arguments'])) {
-        $arguments = preg_replace('/[^a-zA-Z0-9]/', '_', $variables['arguments']);
+      if (\is_array($variables['arguments'])) {
+        $arguments = \preg_replace('/[^a-zA-Z0-9]/', '_', $variables['arguments']);
         foreach ($arguments as $argument) {
           if (empty($argument)) {
             continue;

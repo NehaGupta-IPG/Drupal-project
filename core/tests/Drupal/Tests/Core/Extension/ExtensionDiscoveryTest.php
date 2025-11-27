@@ -128,7 +128,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
     $files_by_type_and_name_expected = [];
     $content_by_file = [];
     foreach ($info_by_file as $file => $info) {
-      $name = basename($file, '.info.yml');
+      $name = \basename($file, '.info.yml');
       $info += [
         'type' => 'module',
         'name' => "Name of ($name)",
@@ -143,7 +143,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
     $content_by_file['core/themes/engines/twig/twig.engine'] = '<?php';
 
     foreach ($content_by_file as $file => $content) {
-      $pieces = explode('/', $file);
+      $pieces = \explode('/', $file);
       $this->addFileToFilesystemStructure($filesystem_structure, $pieces, $content);
     }
 
@@ -161,7 +161,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
    *   The contents of the file.
    */
   protected function addFileToFilesystemStructure(array &$filesystem_structure, array $pieces, $content): void {
-    $piece = array_shift($pieces);
+    $piece = \array_shift($pieces);
     if ($pieces !== []) {
       $filesystem_structure += [$piece => []];
       $this->addFileToFilesystemStructure($filesystem_structure[$piece], $pieces, $content);

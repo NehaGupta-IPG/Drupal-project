@@ -167,7 +167,7 @@ class FieldConfigEditForm extends EntityForm {
     $subform_state = SubformState::createForSubform($form['field_storage']['subform'], $form, $form_state, $field_storage_form);
     $form['field_storage']['subform'] = $field_storage_form->buildForm($form['field_storage']['subform'], $subform_state, $this->entity);
 
-    $form['#entity'] = _field_create_entity_from_ids($ids);
+    $form['#entity'] = \_field_create_entity_from_ids($ids);
     $items = $this->getTypedData($this->entity, $form['#entity']);
     $item = $items->first() ?: $items->appendItem();
 
@@ -199,7 +199,7 @@ class FieldConfigEditForm extends EntityForm {
     if ($element = $items->defaultValuesForm($form, $form_state)) {
       $has_required = $this->hasAnyRequired($element);
 
-      $element = array_merge($element, [
+      $element = \array_merge($element, [
         '#type' => 'details',
         '#title' => $this->t('Default value'),
         '#open' => TRUE,
@@ -209,7 +209,7 @@ class FieldConfigEditForm extends EntityForm {
       ]);
 
       if (!$has_required) {
-        $has_default_value = count($this->entity->getDefaultValue($form['#entity'])) > 0;
+        $has_default_value = \count($this->entity->getDefaultValue($form['#entity'])) > 0;
         $element['#states'] = [
           'invisible' => [
             ':input[name="set_default_value"]' => ['checked' => FALSE],
@@ -549,7 +549,7 @@ class FieldConfigEditForm extends EntityForm {
   public static function processFieldStorageSubmit(array $element, FormStateInterface $form_state, &$complete_form) {
     // Limit validation errors to the field storage form while the field storage
     // form is being edited.
-    $complete_form['#limit_validation_errors'] = [array_slice($element['#parents'], 0, -1)];
+    $complete_form['#limit_validation_errors'] = [\array_slice($element['#parents'], 0, -1)];
     return $element;
   }
 

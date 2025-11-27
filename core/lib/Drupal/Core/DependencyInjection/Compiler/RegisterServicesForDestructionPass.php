@@ -21,7 +21,7 @@ class RegisterServicesForDestructionPass implements CompilerPassInterface {
    * {@inheritdoc}
    */
   public function process(ContainerBuilder $container): void {
-    $service_ids = array_values(array_map(strval(...), $this->findAndSortTaggedServices('needs_destruction', $container)));
+    $service_ids = \array_values(\array_map(\strval(...), $this->findAndSortTaggedServices('needs_destruction', $container)));
     $container->setParameter('kernel.destructable_services', $service_ids);
   }
 

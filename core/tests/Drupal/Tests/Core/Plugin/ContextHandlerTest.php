@@ -76,7 +76,7 @@ class ContextHandlerTest extends UnitTestCase {
    */
   #[DataProvider('providerTestCheckRequirements')]
   public function testCheckRequirements($contexts, $requirements, $expected): void {
-    $contexts = array_map(function ($context) {
+    $contexts = \array_map(function ($context) {
       $mock = $this->createMock('Drupal\Core\Plugin\Context\ContextInterface');
       $mock->expects($this->atLeastOnce())
         ->method('getContextDefinition')
@@ -128,7 +128,7 @@ class ContextHandlerTest extends UnitTestCase {
    */
   #[DataProvider('providerTestGetMatchingContexts')]
   public function testGetMatchingContexts($contexts, $requirement, $expected = NULL): void {
-    $contexts = array_map(function ($context) {
+    $contexts = \array_map(function ($context) {
       $mock = $this->createMock('Drupal\Core\Plugin\Context\ContextInterface');
       $mock->expects($this->atLeastOnce())
         ->method('getContextDefinition')
@@ -136,7 +136,7 @@ class ContextHandlerTest extends UnitTestCase {
       return $mock;
     }, $contexts);
 
-    if (is_null($expected)) {
+    if (\is_null($expected)) {
       $expected = $contexts;
     }
     $this->assertSame($expected, $this->contextHandler->getMatchingContexts($contexts, $requirement));
