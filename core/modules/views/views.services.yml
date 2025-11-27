@@ -110,5 +110,8 @@ services:
     tags:
       - { name: backend_overridable }
   Drupal\views\Plugin\views\query\CastSqlInterface: '@views.cast_sql'
+  logger.channel.views:
+    parent: logger.channel_base
+    arguments: [ 'views' ]
   Drupal\views\ViewsConfigUpdater:
     autowire: true

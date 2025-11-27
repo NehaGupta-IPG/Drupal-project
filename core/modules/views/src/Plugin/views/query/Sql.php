@@ -8,6 +8,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -160,6 +161,13 @@ class Sql extends QueryPluginBase {
   protected $messenger;
 
   /**
+   * The views logger channel.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
+   */
+  protected $logger;
+
+  /**
    * The count field definition.
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
@@ -202,7 +210,8 @@ class Sql extends QueryPluginBase {
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('views.date_sql'),
-      $container->get('messenger')
+      $container->get('messenger'),
+      $container->get('logger.channel.views')
     );
   }
 
@@ -1706,7 +1715,20 @@ class Sql extends QueryPluginBase {
           $entity = $entities[$id];
         }
         else {
-          $entity = NULL;
+          // If main entity failed to load then this is either a race condition
+          // where the entity was deleted since the query was executed or the
+          // database is inconsistent. Drop that row and log an warning.
+          if ($relationship_id == 'none') {
+            $this->logger->warning('Failed to load entity @id for view @view. If this warning persists then it indicates that the database has inconsistent entity data.', [
+              '@id' => $id,
+              '@view' => $this->view->id(),
+            ]);
+            unset($results[$index]);
+            break;
+          }
+          else {
+            $entity = NULL;
+          }
         }
 
         if ($relationship_id == 'none') {
@@ -1764,7 +1786,7 @@ class Sql extends QueryPluginBase {
       }
     }
 
-    return $entities;
+    return array_filter($entities);
   }
 
   /**
