@@ -67,7 +67,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
    * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
    *   The controller resolver.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ControllerResolverInterface $controller_resolver) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ?ControllerResolverInterface $controller_resolver = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->controllerResolver = $controller_resolver;
   }
@@ -128,7 +128,7 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
           }
           return $this->valueOptions;
         }
-        catch (\InvalidArgumentException $e) {
+        catch (\InvalidArgumentException) {
           // If ControllerResolver fails, fall through to try is_callable.
         }
       }
