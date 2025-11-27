@@ -78,7 +78,7 @@ class Some extends PagerPluginBase {
    * {@inheritdoc}
    */
   public function useCountQuery() {
-    return FALSE;
+    return TRUE;
   }
 
   /**
