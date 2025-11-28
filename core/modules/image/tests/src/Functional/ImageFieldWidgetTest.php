@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\image\Functional;
 
 use Drupal\field\Entity\FieldConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the image field widget.
- *
- * @group image
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageFieldWidgetTest extends ImageFieldTestBase {
 
   /**

@@ -8,12 +8,14 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\search\Entity\SearchPage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verify the search config settings form.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchConfigSettingsFormTest extends BrowserTestBase {
 
   /**
@@ -214,7 +216,11 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
       $this->drupalGet('node');
       $this->submitForm($terms, 'Search');
       $current = $this->getURL();
-      $expected = Url::fromRoute('search.view_' . $entity->id(), [], ['query' => ['keys' => $info['keys']], 'absolute' => TRUE])->toString();
+      $expected = Url::fromRoute(
+        'search.view_' . $entity->id(),
+        [],
+        ['query' => ['keys' => $info['keys']], 'absolute' => TRUE],
+      )->toString();
       $this->assertEquals($expected, $current, 'Block redirected to right search page');
 
       // Try an invalid search path, which should 404.

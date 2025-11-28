@@ -26,12 +26,14 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Entity Field API.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityFieldTest extends EntityKernelTestBase {
 
   /**
@@ -131,6 +133,26 @@ class EntityFieldTest extends EntityKernelTestBase {
     // The updated field value should have correctly saved as 'foo'.
     $forward_revision = $storage->loadRevision($forward_revision_id);
     $this->assertEquals('foo', $forward_revision->field_test_text->value);
+
+    // Create another entity.
+    $entity = EntityTestRev::create();
+    $entity->field_test_text->value = 'foo';
+    $entity->save();
+
+    // Create a new non-default revision and set the field value to 'bar'.
+    $entity->setNewRevision(TRUE);
+    $entity->isDefaultRevision(FALSE);
+    $entity->field_test_text->value = 'bar';
+    $entity->save();
+
+    // Now save the pending revision as the default one, without creating a new
+    // revision.
+    $entity->isDefaultRevision(TRUE);
+    $entity->save();
+
+    // The updated field value should have correctly saved as 'bar'.
+    $default_revision = $storage->loadUnchanged($entity->id());
+    $this->assertEquals('bar', $default_revision->field_test_text->value);
   }
 
   /**
