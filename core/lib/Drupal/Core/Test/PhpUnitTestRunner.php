@@ -170,7 +170,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       '--log-junit',
       $log_junit_file_path,
       '--coverage-clover',
-      $process_environment_variables['_PHPUNIT_COVERAGE_PATH'] . \DIRECTORY_SEPARATOR . 'component-coverage-clover-' . $test_run->id() . '.xml',
+      $process_environment_variables['_ARTIFACTS_DIR'] . \DIRECTORY_SEPARATOR . 'clover' . \DIRECTORY_SEPARATOR . 'core-coverage-clover-' . $test_run->id() . '.xml',
     ];
     if ($colors) {
       $command[] = '--colors=always';
