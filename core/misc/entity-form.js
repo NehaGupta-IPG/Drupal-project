@@ -48,7 +48,7 @@
           const $translationContext = $(context);
           let translate;
           let $checkbox = $translationContext.find(
-            '.js-form-item-content-translation-translate input',
+            '.js-form-item-content-translation-outdated input',
           );
 
           if ($checkbox.length) {
