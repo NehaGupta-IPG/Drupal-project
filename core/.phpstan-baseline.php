@@ -14621,18 +14621,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/content_moderation/tests/src/Unit/StateTransitionValidationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$checkbox_id might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_translation/content_translation.admin.inc',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$locked_languages might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_translation/content_translation.admin.inc',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function content_translation_enable_widget\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17890,6 +17878,46 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/filter/tests/src/Kernel/EntityLinksTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Access to constant on deprecated class Drupal\\\\filter\\\\Plugin\\\\migrate\\\\process\\\\d6\\\\FilterFormatPermission\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+  replacement\\.$#',
+	'identifier' => 'classConstant.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/filter/tests/src/Kernel/Migrate/d6/FilterFormatPermissionTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method create\\(\\) of deprecated class Drupal\\\\filter\\\\Plugin\\\\migrate\\\\process\\\\d6\\\\FilterFormatPermission\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+  replacement\\.$#',
+	'identifier' => 'staticMethod.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/filter/tests/src/Kernel/Migrate/d6/FilterFormatPermissionTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Access to constant on deprecated class Drupal\\\\filter\\\\Plugin\\\\migrate\\\\process\\\\FilterID\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+   replacement\\.$#',
+	'identifier' => 'classConstant.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/filter/tests/src/Kernel/Plugin/migrate/process/FilterIdTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method create\\(\\) of deprecated class Drupal\\\\filter\\\\Plugin\\\\migrate\\\\process\\\\FilterID\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+   replacement\\.$#',
+	'identifier' => 'staticMethod.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/filter/tests/src/Kernel/Plugin/migrate/process/FilterIdTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to method transform\\(\\) of deprecated class Drupal\\\\filter\\\\Plugin\\\\migrate\\\\process\\\\FilterID\\:
+in drupal\\:11\\.3\\.0 and is removed from drupal\\:12\\.0\\.0\\. There is no
+   replacement\\.$#',
+	'identifier' => 'method.deprecatedClass',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/filter/tests/src/Kernel/Plugin/migrate/process/FilterIdTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Kernel\\\\TextFormatElementFormTest\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -18128,12 +18156,6 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/image/src/Controller/ImageStyleDownloadController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\image\\\\Entity\\\\ImageStyle\\:\\:getReplacementID\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/src/Entity/ImageStyle.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\image\\\\Entity\\\\ImageStyle\\:\\:postDelete\\(\\) has no return type specified\\.$#',
@@ -44991,12 +45013,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/src/Negotiator/QueryParameterWorkspaceNegotiator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Negotiator\\\\SessionWorkspaceNegotiator\\:\\:getActiveWorkspace\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Negotiator/SessionWorkspaceNegotiator.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\Negotiator\\\\SessionWorkspaceNegotiator\\:\\:setActiveWorkspace\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -45049,12 +45065,6 @@ $ignoreErrors[] = [
 	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/src/Plugin/Validation/Constraint/EntityWorkspaceConflictConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceTracker.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceAssociation\\:\\:deleteAssociations\\(\\) has no return type specified\\.$#',
@@ -45184,6 +45194,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspacePublisherInterface.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
+	'identifier' => 'isset.variable',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceTracker.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceViewBuilder\\:\\:buildComponents\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -45194,12 +45210,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspacesServiceProvider.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspace_update_test\\\\Negotiator\\\\TestWorkspaceNegotiator\\:\\:getActiveWorkspace\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/modules/workspace_update_test/src/Negotiator/TestWorkspaceNegotiator.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspace_update_test\\\\Negotiator\\\\TestWorkspaceNegotiator\\:\\:setActiveWorkspace\\(\\) has no return type specified\\.$#',
@@ -47652,13 +47662,6 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
 Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
-	'identifier' => 'method.deprecated',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Call to deprecated method useHtml5Parser\\(\\) of class Symfony\\\\Component\\\\BrowserKit\\\\AbstractBrowser\\:
-since Symfony 7\\.4, Symfony 8 will unconditionally use the native HTML5 parser$#',
 	'identifier' => 'method.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
