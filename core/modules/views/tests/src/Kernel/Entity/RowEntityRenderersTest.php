@@ -29,10 +29,7 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
    */
   protected static $modules = [
     'field',
-    'filter',
-    'text',
     'node',
-    'user',
     'language',
     'views_test_language',
   ];

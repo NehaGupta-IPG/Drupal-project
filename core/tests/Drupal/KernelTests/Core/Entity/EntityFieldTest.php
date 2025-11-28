@@ -42,16 +42,22 @@ class EntityFieldTest extends EntityKernelTestBase {
   protected static $modules = ['filter', 'text', 'node', 'user', 'field_test'];
 
   /**
+   * The name of the entity.
+   *
    * @var string
    */
   protected $entityName;
 
   /**
+   * The user for the entity.
+   *
    * @var \Drupal\user\Entity\User
    */
   protected $entityUser;
 
   /**
+   * Text for the field on the entity.
+   *
    * @var string
    */
   protected $entityFieldText;
@@ -133,6 +139,26 @@ class EntityFieldTest extends EntityKernelTestBase {
     // The updated field value should have correctly saved as 'foo'.
     $forward_revision = $storage->loadRevision($forward_revision_id);
     $this->assertEquals('foo', $forward_revision->field_test_text->value);
+
+    // Create another entity.
+    $entity = EntityTestRev::create();
+    $entity->field_test_text->value = 'foo';
+    $entity->save();
+
+    // Create a new non-default revision and set the field value to 'bar'.
+    $entity->setNewRevision(TRUE);
+    $entity->isDefaultRevision(FALSE);
+    $entity->field_test_text->value = 'bar';
+    $entity->save();
+
+    // Now save the pending revision as the default one, without creating a new
+    // revision.
+    $entity->isDefaultRevision(TRUE);
+    $entity->save();
+
+    // The updated field value should have correctly saved as 'bar'.
+    $default_revision = $storage->loadUnchanged($entity->id());
+    $this->assertEquals('bar', $default_revision->field_test_text->value);
   }
 
   /**
