@@ -253,7 +253,7 @@ default:
     # Execute test coverage reporting only for the primary PHP version.
     - |
       [[ $_TARGET_PHP != $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE=""
-      [[ $_TARGET_PHP == $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE="--coverage-text=$_ARTIFACTS_DIR/component-coverage-report.txt --coverage-cobertura=$_ARTIFACTS_DIR/component-coverage-cobertura.xml"
+      [[ $_TARGET_PHP == $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE="--coverage-text=$_ARTIFACTS_DIR/component-coverage-report.txt --coverage-clover=$_ARTIFACTS_DIR/component-coverage-clover.xml"
     - |
       [[ $PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION == false ]] && export _FAIL_ON_PHPUNIT_DEPRECATION=""
       [[ $PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION != false ]] && export _FAIL_ON_PHPUNIT_DEPRECATION="--fail-on-phpunit-deprecation"
@@ -268,6 +268,7 @@ default:
   after_script:
     # Process the coverage text report to produce an OpenMetrics report.
     - |
+      [[ $_TARGET_PHP == $PRIMARY_PHP ]] && vendor/bin/clover-to-cobertura < $_ARTIFACTS_DIR/component-coverage-clover.xml > $_ARTIFACTS_DIR/component-coverage-cobertura.xml
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && php .gitlab-ci/scripts/component-coverage-metrics.php $_ARTIFACTS_DIR/component-coverage-report.txt $_ARTIFACTS_DIR/component-coverage-metrics.txt
   artifacts:
     when: always
@@ -298,7 +299,8 @@ default:
     - docker-php-ext-enable pcov
     - cd core/tests/PHPStan
     - composer install
-    - vendor/bin/phpunit tests --testdox --coverage-text --colors=always --coverage-cobertura=coverage.cobertura.xml --log-junit junit.xml
+    - vendor/bin/phpunit tests --testdox --coverage-text --colors=always --coverage-clover=coverage.clover.xml --log-junit junit.xml
+    - vendor/bin/clover-to-cobertura < coverage-clover.xml > coverage-cobertura.xml
   artifacts:
     when: always
     reports:

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "855de461ff1badd0f802cb4f67378d57",
+    "content-hash": "b2efdbc0fc08ae8cbee4cc9293cf1c98",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -6348,6 +6348,47 @@
             "time": "2025-08-01T08:46:24+00:00"
         },
         {
+            "name": "ngyuki/clover-to-cobertura",
+            "version": "v0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ngyuki/clover-to-cobertura.git",
+                "reference": "620aec8da44fb5bf60c8309e8dffd763220cf3b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ngyuki/clover-to-cobertura/zipball/620aec8da44fb5bf60c8309e8dffd763220cf3b6",
+                "reference": "620aec8da44fb5bf60c8309e8dffd763220cf3b6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-simplexml": "*",
+                "php": "^7.0|^8.0"
+            },
+            "bin": [
+                "clover-to-cobertura"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Toshiyuki Goto",
+                    "email": "ngyuki.jp@gmail.com"
+                }
+            ],
+            "description": "Clover XML to Cobertura XML for Gitlab Coverage Visualization",
+            "homepage": "https://github.com/ngyuki/clover-to-cobertura",
+            "support": {
+                "issues": "https://github.com/ngyuki/clover-to-cobertura/issues",
+                "source": "https://github.com/ngyuki/clover-to-cobertura/tree/v0.0.1"
+            },
+            "time": "2020-12-18T06:12:56+00:00"
+        },
+        {
             "name": "nikic/php-parser",
             "version": "v5.6.2",
             "source": {
@@ -10329,5 +10370,5 @@
     "platform-overrides": {
         "php": "8.3.0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
