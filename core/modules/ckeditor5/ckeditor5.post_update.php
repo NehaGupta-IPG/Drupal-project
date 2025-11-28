@@ -9,7 +9,6 @@ use Drupal\Core\Config\FileStorage;
 
 // cspell:ignore multiblock
 
-
 /**
  * Implements hook_removed_post_updates().
  */
