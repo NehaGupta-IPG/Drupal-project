@@ -392,7 +392,7 @@ class ThemeManager implements ThemeManagerInterface {
     // like '#theme' => 'node__article', add it to the suggestions array before
     // invoking suggestion alter hooks.
     $derived_suggestions_excluding_base_hook = array_slice($derived_suggestions, 1);
-    if ($info_base_hook !== '') && !in_array($hook, $derived_suggestions_excluding_base_hook)) {
+    if ($info_base_hook !== '' && !in_array($hook, $derived_suggestions_excluding_base_hook)) {
       $suggestions[] = $hook;
     }
     $suggestions = array_merge($suggestions, $derived_suggestions_excluding_base_hook);
