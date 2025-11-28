@@ -101,17 +101,26 @@ final class NavigationRenderer {
       '#lazy_builder' => ['navigation.renderer:doBuildNavigation', []],
       '#lazy_builder_preview' => [
         [
+          '#attached' => [
+            'library' => [
+              'navigation/internal.navigation',
+            ],
+          ],
           '#type' => 'html_tag',
           '#tag' => 'aside',
           '#attributes' => [
             'class' => ['admin-toolbar'],
             'id' => 'admin-toolbar',
+            'data-drupal-admin-styles' => TRUE,
+            'role' =>  'presentation',
           ],
           'child' => [
-            '#type' => 'container',
+            '#type' => 'html_tag',
+            '#tag' => 'div',
             '#attributes' => [
               'class' => ['admin-toolbar__displace-placeholder'],
             ],
+            '#value' => t('loading'),
           ],
         ],
       ],
@@ -125,6 +134,7 @@ final class NavigationRenderer {
    */
   #[TrustedCallback]
   public function doBuildNavigation(): array {
+    sleep(30);
     $build = [];
     $logo_settings = $this->configFactory->get('navigation.settings');
     $logo_provider = $logo_settings->get('logo.provider');
