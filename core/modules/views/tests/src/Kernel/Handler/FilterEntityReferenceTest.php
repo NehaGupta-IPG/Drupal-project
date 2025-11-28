@@ -242,6 +242,7 @@ class FilterEntityReferenceTest extends ViewsKernelTestBase {
 
     $this->assertEquals([
       'config' => [
+        'node.type.article',
         'node.type.page',
       ],
       'content' => $content_dependencies,

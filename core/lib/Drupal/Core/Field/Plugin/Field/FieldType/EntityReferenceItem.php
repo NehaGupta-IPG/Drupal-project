@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
+use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
@@ -556,18 +557,9 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       }
     }
 
-    // Depend on target bundle configurations. Dependencies for 'target_bundles'
-    // also covers the 'auto_create_bundle' setting, if any, because its value
-    // is included in the 'target_bundles' list.
-    $handler = $field_definition->getSetting('handler_settings');
-    if (!empty($handler['target_bundles'])) {
-      if ($bundle_entity_type_id = $target_entity_type->getBundleEntityType()) {
-        if ($storage = $entity_type_manager->getStorage($bundle_entity_type_id)) {
-          foreach ($storage->loadMultiple($handler['target_bundles']) as $bundle) {
-            $dependencies[$bundle->getConfigDependencyKey()][] = $bundle->getConfigDependencyName();
-          }
-        }
-      }
+    $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getSelectionHandler($field_definition);
+    if ($handler instanceof DependentPluginInterface) {
+      $dependencies += $handler->calculateDependencies();
     }
 
     return $dependencies;
