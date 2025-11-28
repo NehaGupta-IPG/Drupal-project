@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b2efdbc0fc08ae8cbee4cc9293cf1c98",
+    "content-hash": "845783af1165eebfa3963132bd74aeb5",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -8508,6 +8508,79 @@
             "time": "2025-08-19T18:57:03+00:00"
         },
         {
+            "name": "santysisi/phpunit-merger",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/santysisi/phpunit-merger.git",
+                "reference": "8d78a359933468d1215d6ff6741730176b53bb81"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/santysisi/phpunit-merger/zipball/8d78a359933468d1215d6ff6741730176b53bb81",
+                "reference": "8d78a359933468d1215d6ff6741730176b53bb81",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-json": "*",
+                "ext-simplexml": "*",
+                "php": "^8.0",
+                "phpunit/php-code-coverage": "^9.0 || ^10.0 || ^11.0 || ^12.0",
+                "symfony/console": ">=2.7 <8.0",
+                "symfony/finder": ">=2.7 <8.0"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-parallel-lint": "^1.4",
+                "phpspec/prophecy": "^1.0",
+                "phpunit/phpunit": "^9.3 || ^10.0 || ^11.0 || ^12.0",
+                "symfony/filesystem": ">=2.7 <8.0"
+            },
+            "suggest": {
+                "friendsofphp/php-cs-fixer": "Tool to automatically fix PHP coding standards issues"
+            },
+            "default-branch": true,
+            "bin": [
+                "bin/phpunit-merger"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Nimut\\PhpunitMerger\\": "src/PhpunitMerger/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Nicole Cordes",
+                    "email": "typo3@cordes.co",
+                    "homepage": "https://www.biz-design.biz",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Helmut Hummel",
+                    "email": "info@helhum.io",
+                    "homepage": "https://helhum.io",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Merge multiple PHPUnit reports into one file",
+            "homepage": "https://github.com/Nimut/phpunit-merger",
+            "keywords": [
+                "TYPO3 CMS",
+                "coverage",
+                "phpunit",
+                "sonarqube"
+            ],
+            "support": {
+                "source": "https://github.com/santysisi/phpunit-merger/tree/main"
+            },
+            "time": "2025-10-29T22:06:53+00:00"
+        },
+        {
             "name": "sebastian/cli-parser",
             "version": "3.0.2",
             "source": {
@@ -10361,7 +10434,8 @@
         "drupal/core": 20,
         "drupal/core-project-message": 20,
         "drupal/core-recipe-unpack": 20,
-        "drupal/core-vendor-hardening": 20
+        "drupal/core-vendor-hardening": 20,
+        "santysisi/phpunit-merger": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

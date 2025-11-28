@@ -137,6 +137,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     ?array &$output = NULL,
     ?array &$error = NULL,
     bool $colors = FALSE,
+    $test_run = NULL,
   ): void {
     global $base_url;
     $process_environment_variables = [];
@@ -168,6 +169,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       '--testdox',
       '--log-junit',
       $log_junit_file_path,
+      '--coverage-clover',
+      $process_environment_variables['_PHPUNIT_COVERAGE_PATH'] . \DIRECTORY_SEPARATOR . 'component-coverage-clover-' . $test_run->id() . '.xml',
     ];
     if ($colors) {
       $command[] = '--colors=always';
@@ -228,7 +231,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     // Store output from our test run.
     $output = [];
     $error = [];
-    $this->runCommand($test_class_name, $log_junit_file_path, $status, $output, $error, $colors);
+    $this->runCommand($test_class_name, $log_junit_file_path, $status, $output, $error, $colors, $test_run);
 
     if (file_exists($log_junit_file_path)) {
       $results = JUnitConverter::xmlToRows($test_run->id(), $log_junit_file_path);

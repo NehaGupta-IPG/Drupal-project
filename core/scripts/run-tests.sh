@@ -450,6 +450,7 @@ function simpletest_script_parse_args() {
     'repeat' => 1,
     'die-on-fail' => FALSE,
     'suppress-deprecations' => FALSE,
+    'coverage-clover-path' => NULL,
     // Used internally.
     'test-id' => 0,
     'execute-test' => '',
@@ -921,6 +922,10 @@ function simpletest_script_command(TestRun $test_run, string $test_class): array
   if (!empty($args['dburl'])) {
     $command[] = '--dburl';
     $command[] = $args['dburl'];
+  }
+  if (!empty($args['coverage-clover-path'])) {
+    $command[] = '--coverage-clover-path';
+    $command[] = $args['coverage-clover-path'];
   }
   $command[] = '--php';
   $command[] = $php;
