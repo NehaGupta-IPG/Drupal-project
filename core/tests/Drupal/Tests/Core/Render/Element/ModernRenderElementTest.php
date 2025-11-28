@@ -6,14 +6,27 @@ namespace Drupal\Tests\Core\Render\Element;
 
 use Drupal\Component\Plugin\Factory\FactoryInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Render\ElementInfoManager;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Element\RenderElementBase
- * @group Render
+ * Provides test coverage for rendering elements within a rendering context.
+ *
+ * This test validates the behavior of child element management in a renderable
+ * object. It ensures that children can be added, retrieved, and removed while
+ * maintaining the correct internal structure and references.
+ *
+ * The test simulates behavior by mocking the factory responsible for element
+ * instance creation and testing the functionality of adding and managing child
+ * elements in various scenarios. This includes verifying expected keys and
+ * handling updates to the internal renderable structure.
  */
+#[Group('Render')]
+#[CoversClass(RenderElementBase::class)]
 class ModernRenderElementTest extends UnitTestCase {
 
   public function testChildren(): void {

@@ -86,6 +86,9 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
 
       public function __construct(protected DiscoveryInterface $decorated, protected array &$reverseMapping) {}
 
+      /**
+       * {@inheritdoc}
+       */
       public function getDefinitions(): array {
         $definitions = $this->decorated->getDefinitions();
         foreach ($definitions as $element_type => $definition) {
