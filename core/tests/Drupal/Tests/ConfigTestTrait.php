@@ -29,7 +29,7 @@ trait ConfigTestTrait {
    *   The config importer object.
    */
   protected function configImporter() {
-    if (!$this->configImporter) {
+    if (!isset($this->configImporter)) {
       // Set up the ConfigImporter object for testing.
       $storage_comparer = new StorageComparer(
         $this->container->get('config.storage.sync'),
