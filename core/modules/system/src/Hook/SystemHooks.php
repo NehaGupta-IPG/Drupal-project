@@ -551,12 +551,12 @@ class SystemHooks {
   /**
    * Implements hook_entity_view_mode_presave().
    *
-   * Transforms NULL description into an empty string.
+   * Transforms empty description into null.
    */
   #[Hook('entity_view_mode_presave')]
   public function systemEntityViewModePresave(EntityInterface $entity): void {
-    if ($entity->get('description') === NULL) {
-      $entity->set('description', '');
+    if ($entity->get('description') !== NULL && trim($entity->get('description')) === '') {
+      $entity->set('description', NULL);
     }
   }
 
