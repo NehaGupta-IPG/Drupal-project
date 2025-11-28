@@ -456,6 +456,22 @@ $settings['update_free_access'] = FALSE;
 # $settings['cache_ttl_4xx'] = 3600;
 
 /**
+ * Form cache on safe request methods.
+ *
+ * This settings controls whether forms should be cached during safe request
+ * methods and it is turned off by default, as it might cause different problems
+ * and the form cache persists the form state and changing state during a GET
+ * request is not allowed according to the HTTP specification. Because of this
+ * and other problems related to caching forms on GET requests the support for
+ * this has been dropped. Changing the setting to TRUE will further allow the
+ * form caching on safe request methods, but this should be done only with
+ * extreme caution.
+ *
+ * @see https://www.drupal.org/node/2502785
+ */
+# $settings['form_cache_safe_request_method'] = FALSE;
+
+/**
  * Expiration of cached forms.
  *
  * Drupal's Form API stores details of forms in a cache and these entries are
