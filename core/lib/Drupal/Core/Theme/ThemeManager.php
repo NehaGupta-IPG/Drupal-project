@@ -224,7 +224,7 @@ class ThemeManager implements ThemeManagerInterface {
       'theme_hook_original' => $original_hook,
     ];
 
-    $suggestions = array_unique($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $derived_suggestions, $variables));
+    $suggestions = array_values(array_unique($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $derived_suggestions, $variables)));
 
     // Check if each suggestion exists in the theme registry, and if so,
     // use it instead of the base hook. For example, a function may use
@@ -392,7 +392,7 @@ class ThemeManager implements ThemeManagerInterface {
     // like '#theme' => 'node__article', add it to the suggestions array before
     // invoking suggestion alter hooks.
     $derived_suggestions_excluding_base_hook = array_slice($derived_suggestions, 1);
-    if (isset($info_base_hook['base hook']) && !in_array($hook, $derived_suggestions_excluding_base_hook)) {
+    if ($info_base_hook !== '') && !in_array($hook, $derived_suggestions_excluding_base_hook)) {
       $suggestions[] = $hook;
     }
     $suggestions = array_merge($suggestions, $derived_suggestions_excluding_base_hook);
