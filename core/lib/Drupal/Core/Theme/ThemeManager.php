@@ -224,7 +224,7 @@ class ThemeManager implements ThemeManagerInterface {
       'theme_hook_original' => $original_hook,
     ];
 
-    $suggestions = array_values(array_unique($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $derived_suggestions, $variables)));
+    $suggestions = array_values(array_unique($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $derived_suggestions, $variables), SORT_REGULAR));
 
     // Check if each suggestion exists in the theme registry, and if so,
     // use it instead of the base hook. For example, a function may use
