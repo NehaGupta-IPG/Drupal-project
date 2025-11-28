@@ -23,9 +23,6 @@ core.entity_view_mode.*.*:
       type: text
       label: 'Description'
       nullable: true
-      constraints:
-        NotBlank:
-          allowNull: true
     targetEntityType:
       type: string
       label: 'Target entity type'
