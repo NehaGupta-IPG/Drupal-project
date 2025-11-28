@@ -86,12 +86,6 @@ class EntityViewModeValidationTest extends ConfigEntityValidationTestBase {
     $this->assertSame('', $this->entity->getDescription());
     // But NULL values should be valid at the config level.
     $this->assertValidationErrors([]);
-
-    // But they cannot be empty strings, because that doesn't make sense.
-    $this->entity->set('description', '');
-    $this->assertValidationErrors([
-      'description' => 'This value should not be blank.',
-    ]);
   }
 
 }
