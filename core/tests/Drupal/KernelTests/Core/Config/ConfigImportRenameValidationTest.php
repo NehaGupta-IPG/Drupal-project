@@ -6,8 +6,6 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Component\Uuid\Php;
 use Drupal\Core\Config\ConfigImporterException;
-use Drupal\Core\Config\ConfigImporterFactory;
-use Drupal\Core\Config\StorageComparer;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,13 +17,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('config')]
 #[RunTestsInSeparateProcesses]
 class ConfigImportRenameValidationTest extends KernelTestBase {
-
-  /**
-   * Config Importer object used for testing.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   */
-  protected $configImporter;
 
   /**
    * {@inheritdoc}
@@ -47,13 +38,6 @@ class ConfigImportRenameValidationTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installConfig(['system', 'field']);
-
-    // Set up the ConfigImporter object for testing.
-    $storage_comparer = new StorageComparer(
-      $this->container->get('config.storage.sync'),
-      $this->container->get('config.storage')
-    );
-    $this->configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer->createChangelist());
   }
 
   /**
@@ -85,17 +69,16 @@ class ConfigImportRenameValidationTest extends KernelTestBase {
 
     // Confirm that the staged configuration is detected as a rename since the
     // UUIDs match.
-    $this->configImporter->reset();
     $expected = [
       'node.type.' . $content_type->id() . '::config_test.dynamic.' . $test_entity_id,
     ];
-    $renames = $this->configImporter->getUnprocessedConfiguration('rename');
+    $renames = $this->configImporter()->getUnprocessedConfiguration('rename');
     $this->assertSame($expected, $renames);
 
     // Try to import the configuration. We expect an exception to be thrown
     // because the staged entity is of a different type.
     try {
-      $this->configImporter->import();
+      $this->configImporter()->import();
       $this->fail('Expected ConfigImporterException thrown when a renamed configuration entity does not match the existing entity type.');
     }
     catch (ConfigImporterException) {
@@ -127,17 +110,16 @@ class ConfigImportRenameValidationTest extends KernelTestBase {
 
     // Confirm that the staged configuration is detected as a rename since the
     // UUIDs match.
-    $this->configImporter->reset();
     $expected = [
       'config_test.old::config_test.new',
     ];
-    $renames = $this->configImporter->getUnprocessedConfiguration('rename');
+    $renames = $this->configImporter()->getUnprocessedConfiguration('rename');
     $this->assertSame($expected, $renames);
 
     // Try to import the configuration. We expect an exception to be thrown
     // because the rename is for simple configuration.
     try {
-      $this->configImporter->import();
+      $this->configImporter()->import();
       $this->fail('Expected ConfigImporterException thrown when simple configuration is renamed.');
     }
     catch (ConfigImporterException) {

@@ -8,8 +8,6 @@ use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Block\Plugin\Block\Broken;
-use Drupal\Core\Config\ConfigImporterFactory;
-use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLoggerTrait;
 use Drupal\entity_test\Entity\EntityTest;
@@ -34,13 +32,6 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
    * @var string[]
    */
   protected $logMessages = [];
-
-  /**
-   * Config Importer object used for testing.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   */
-  protected $configImporter;
 
   /**
    * {@inheritdoc}
@@ -76,13 +67,6 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
     unset($GLOBALS['hook_config_test']);
 
     $this->copyConfig($this->container->get('config.storage'), $this->container->get('config.storage.sync'));
-
-    // Set up the ConfigImporter object for testing.
-    $storage_comparer = new StorageComparer(
-      $this->container->get('config.storage.sync'),
-      $this->container->get('config.storage')
-    );
-    $this->configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer->createChangelist());
   }
 
   /**
@@ -115,7 +99,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
     $sync->write($dynamic_name, $original_dynamic_data);
 
     // Import.
-    $this->configImporter->reset()->import();
+    $this->configImporter()->import();
     $this->assertEquals([], $this->configImporter->getErrors(), 'There were no errors during the import.');
     $this->assertEquals($entity_one->uuid(), \Drupal::state()->get('config_import_test.config_import_missing_content_one'), 'The missing content event is fired during configuration import.');
     $this->assertEquals($entity_two->uuid(), \Drupal::state()->get('config_import_test.config_import_missing_content_two'), 'The missing content event is fired during configuration import.');
@@ -176,8 +160,7 @@ class ConfigImporterMissingContentTest extends KernelTestBase implements LoggerI
 
     // Import.
     $this->logMessages = [];
-    $config_importer = $this->configImporter();
-    $config_importer->import();
+    $this->configImporter()->import();
     $this->assertNotContains('The "block_content:6376f337-fcbf-4b28-b30e-ed5b6932e692" block plugin was not found', $this->logMessages);
 
     // Ensure the expected message is generated when creating an instance of the
