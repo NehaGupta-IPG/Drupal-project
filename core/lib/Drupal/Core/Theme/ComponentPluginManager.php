@@ -261,6 +261,19 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   }
 
   /**
+   * Resolve schema references recursively.
+   *
+   * @param array $schema
+   *   JSON schema.
+   *
+   * @return array
+   *   JSON schema, with references resolved.
+   */
+  public function resolveJsonSchemaReferences(array $schema): array {
+    return $this->doResolveJsonSchemaReferences('', $schema, [], 0);
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function processDefinitionCategory(&$definition): void {
@@ -278,8 +291,12 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
       try {
         $definitions[$component_id] = $this->alterDefinition($definition);
       }
-      catch (RuntimeException) {
+      catch (RuntimeException $e) {
         unset($definitions[$component_id]);
+        // Inform developers if verbose error reporting is on.
+        if (_drupal_get_error_level() === ERROR_REPORTING_DISPLAY_VERBOSE) {
+          throw $e;
+        }
       }
     }
     // Validate the definition after alterations.
@@ -376,7 +393,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
       $definition['documentation'] = file_get_contents($documentation_path);
     }
     if (isset($definition['props']['properties']) && is_array($definition['props']['properties']) && !empty($definition['props']['properties'])) {
-      $definition['props'] = $this->resolveJsonSchemaReferences('props', $definition['props'], [], 0);
+      $definition['props'] = $this->resolveJsonSchemaReferences($definition['props']);
     }
     return $definition;
   }
@@ -547,7 +564,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   }
 
   /**
-   * Resolve schema references recursively.
+   * Performs the schema references resolving.
    *
    * @param string|int $key
    *   Array key of the schema.
@@ -561,7 +578,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
    * @return array
    *   JSON schema of a component, with references resolved.
    */
-  private function resolveJsonSchemaReferences(string|int $key, array $schema, array $required, int $depth = 0): array {
+  private function doResolveJsonSchemaReferences(string|int $key, array $schema, array $required, int $depth = 0): array {
     if ($depth > self::MAXIMUM_RECURSION_LEVEL) {
       return $schema;
     }
@@ -592,7 +609,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
         if (isset($schema['type']) && $schema['type'] == 'object') {
           $required = $schema['required'] ?? [];
         }
-        $schema[$key] = $this->resolveJsonSchemaReferences($key, (array) $value, $required, $depth);
+        $schema[$key] = $this->doResolveJsonSchemaReferences($key, (array) $value, $required, $depth);
       }
     }
 
