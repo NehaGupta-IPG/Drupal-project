@@ -871,6 +871,8 @@ class ConfigImporterTest extends KernelTestBase {
     // by uninstall hooks should be TRUE.
     unset($extensions['module']['module_test']);
     $sync->write('core.extension', $extensions);
+    // Ensure the config importer is rebuilt.
+    unset($this->configImporter);
     $this->configImporter()->import();
     $this->assertTrue(\Drupal::state()->get('system_test_preuninstall_module_config_installer_syncing'), '\Drupal::isConfigSyncing() in system_test_module_preuninstall() returns TRUE');
     $this->assertTrue(\Drupal::state()->get('system_test_preuninstall_module_syncing_param'), 'system_test_module_preuninstall() $is_syncing value is TRUE');
