@@ -611,10 +611,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $route_provider_definition->setPublic(TRUE);
     $container->setDefinition($id, $route_provider_definition);
 
-    // Remove the stored configuration importer so if used again it will be
-    // built with up-to-date services.
-    $this->configImporter = NULL;
-
     // Allow kernel tests to register hooks.
     $definition = $container->register(static::class, static::class)->setSynthetic(TRUE);
     $container->set(static::class, $this);
@@ -705,7 +701,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Free up memory: Own properties.
     $this->classLoader = NULL;
     $this->vfsRoot = NULL;
-    $this->configImporter = NULL;
 
     // Clean FileCache cache.
     FileCache::reset();
