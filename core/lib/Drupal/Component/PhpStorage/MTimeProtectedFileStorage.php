@@ -60,7 +60,7 @@ class MTimeProtectedFileStorage extends MTimeProtectedFastFileStorage {
    */
   protected function checkFile($name) {
     $filename = $this->getFullPath($name, $directory, $directory_mtime);
-    return @filemtime($filename) <= $directory_mtime ? $filename : FALSE;
+    return ($mtime = @filemtime($filename)) !== FALSE && $mtime <= $directory_mtime ? $filename : FALSE;
   }
 
   /**
