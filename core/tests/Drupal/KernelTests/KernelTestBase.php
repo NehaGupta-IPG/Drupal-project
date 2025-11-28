@@ -163,15 +163,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected $vfsRoot;
 
   /**
-   * The configuration importer.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   *
-   * @todo Move into Config test base class.
-   */
-  protected $configImporter;
-
-  /**
    * The key_value service that must persist between container rebuilds.
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueMemoryFactory

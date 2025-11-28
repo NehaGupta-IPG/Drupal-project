@@ -88,14 +88,6 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected $timeLimit = 500;
 
-
-  /**
-   * The config importer that can be used in a test.
-   *
-   * @var \Drupal\Core\Config\ConfigImporter
-   */
-  protected $configImporter;
-
   /**
    * Modules to install.
    *
