@@ -461,7 +461,8 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
       if ($status) {
         $published = 0;
         foreach ($entity->getTranslationLanguages() as $langcode => $language) {
-          $published += $this->manager->getTranslationMetadata($entity->getTranslation($langcode))->isPublished();
+          $published += $this->manager->getTranslationMetadata($entity->getTranslation($langcode))
+            ->isPublished();
         }
         $enabled = $published > 1;
       }
@@ -477,7 +478,29 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         '#disabled' => !$enabled,
       ];
 
-      $translate = !$new_translation && $metadata->isOutdated();
+      $is_outdated = $metadata->isOutdated();
+
+      // If the entity type is revisionable, we should set $is_outdated based on
+      // the latest translation affected revision.
+      $entity_type = $entity->getEntityType();
+      $use_latest_revisions = $entity_type->isRevisionable() && ContentTranslationManager::isPendingRevisionSupportEnabled($entity_type->id(), $entity->bundle());
+      if ($use_latest_revisions) {
+        /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+        $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+        $latest_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $entity->language()->getId());
+        // If the latest affected revision id is already the currently
+        // loaded entity, then there is no need to do anything.
+        if ($latest_revision_id && $latest_revision_id !== $entity->getRevisionId()) {
+          /** @var \Drupal\Core\Entity\ContentEntityInterface $latest_revision */
+          $latest_revision = $storage->loadRevision($latest_revision_id);
+          $default_revision = $storage->load($entity->id());
+          if (!$latest_revision->wasDefaultRevision() || $default_revision->hasTranslation($entity->language()->getId())) {
+            $is_outdated = $this->manager->getTranslationMetadata($latest_revision->getTranslation($entity->language()->getId()))->isOutdated();
+          }
+        }
+      }
+
+      $translate = !$new_translation && $is_outdated;
       if (!$translate) {
         $form['content_translation']['retranslate'] = [
           '#type' => 'checkbox',
