@@ -89,16 +89,14 @@ class HtmlTag extends RenderElementBase {
     // An HTML tag should not contain any special characters. Escape them to
     // ensure this cannot be abused.
     $escaped_tag = HtmlUtility::escape($element['#tag']);
-    $open_tag = '<' . $escaped_tag . $attributes;
+    $open_tag = '<' . $escaped_tag . $attributes . '>';
     $close_tag = '</' . $escaped_tag . ">\n";
     // Construct a void element.
     if (in_array($element['#tag'], self::$voidElements)) {
-      $open_tag .= ' />';
       $close_tag = "\n";
     }
     // Construct all other elements.
     else {
-      $open_tag .= '>';
       if ($element['#value'] === NULL) {
         $element['#markup'] = '';
       }

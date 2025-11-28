@@ -33,7 +33,7 @@ class DefaultMobileMetaTagsTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->defaultMetaTags = [
-      'viewport' => '<meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+      'viewport' => '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
     ];
   }
 
