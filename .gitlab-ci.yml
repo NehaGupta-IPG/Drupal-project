@@ -212,7 +212,7 @@ default:
     - |
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && docker-php-ext-enable pcov
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer $_ARTIFACTS_DIR/clover
-    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
+    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/ $_ARTIFACTS_DIR
   script:
     # Execute test coverage reporting only for the primary PHP version.
     - |

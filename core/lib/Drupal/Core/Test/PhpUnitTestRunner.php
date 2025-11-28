@@ -200,7 +200,6 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     $process->setTimeout(NULL);
     $process->run();
     $output = explode("\n", $process->getOutput());
-    dump($output);
     $errorOutput = $process->getErrorOutput();
     if (!empty($errorOutput)) {
       $error = explode("\n", $process->getErrorOutput());
