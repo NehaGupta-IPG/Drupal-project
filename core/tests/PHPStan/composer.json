@@ -2,6 +2,7 @@
     "name": "drupal/phpstan-testing",
     "description": "Tests Drupal core's PHPStan rules",
     "require-dev": {
+        "ngyuki/clover-to-cobertura": "^0.0.1",
         "phpunit/phpunit": "^11",
         "phpstan/phpstan": "2.1.32"
     },

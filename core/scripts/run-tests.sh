@@ -863,7 +863,7 @@ function simpletest_script_run_phpunit(TestRun $test_run, $class) {
 
   $runner = PhpUnitTestRunner::create(\Drupal::getContainer())->setConfigurationFilePath($args['phpunit-configuration']);
   $start = microtime(TRUE);
-  $results = $runner->execute($test_run, $class, $status, $args['color']);
+  $results = $runner->execute($test_run, $class, $status, $args['color'], $args['coverage-clover-path']);
   $time = microtime(TRUE) - $start;
 
   $runner->processPhpUnitResults($test_run, $results);

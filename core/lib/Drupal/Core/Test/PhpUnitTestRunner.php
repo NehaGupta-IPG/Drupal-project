@@ -127,6 +127,10 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    *   command.
    * @param bool $colors
    *   (optional) Whether to use colors in output. Defaults to FALSE.
+   * @param \Drupal\Core\Test\TestRun|null $test_run
+   *   The test run object.
+   * @param string|null $path
+   *   The coverage path.
    *
    * @internal
    */
@@ -137,7 +141,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     ?array &$output = NULL,
     ?array &$error = NULL,
     bool $colors = FALSE,
-    $test_run = NULL,
+    ?TestRun $test_run = NULL,
+    ?string $path = NULL,
   ): void {
     global $base_url;
     $process_environment_variables = [];
@@ -170,7 +175,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       '--log-junit',
       $log_junit_file_path,
       '--coverage-clover',
-      $process_environment_variables['_ARTIFACTS_DIR'] . \DIRECTORY_SEPARATOR . 'clover' . \DIRECTORY_SEPARATOR . 'core-coverage-clover-' . $test_run->id() . '.xml',
+      $path . \DIRECTORY_SEPARATOR . 'core-coverage-clover-' . $test_run->id() . '.xml',
     ];
     if ($colors) {
       $command[] = '--colors=always';
@@ -214,6 +219,8 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    *   to this variable.
    * @param bool $colors
    *   (optional) Whether to use colors in output. Defaults to FALSE.
+   * @param string|null $path
+   *   The coverage path.
    *
    * @return array
    *   The parsed results of PHPUnit's JUnit XML output, in the format of
@@ -226,12 +233,13 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     string $test_class_name,
     ?int &$status = NULL,
     bool $colors = FALSE,
+    ?string $path = NULL,
   ): array {
     $log_junit_file_path = $this->xmlLogFilePath($test_run->id());
     // Store output from our test run.
     $output = [];
     $error = [];
-    $this->runCommand($test_class_name, $log_junit_file_path, $status, $output, $error, $colors, $test_run);
+    $this->runCommand($test_class_name, $log_junit_file_path, $status, $output, $error, $colors, $test_run, $path);
 
     if (file_exists($log_junit_file_path)) {
       $results = JUnitConverter::xmlToRows($test_run->id(), $log_junit_file_path);
