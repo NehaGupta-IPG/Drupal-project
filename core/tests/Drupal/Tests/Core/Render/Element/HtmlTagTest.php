@@ -67,7 +67,7 @@ class HtmlTagTest extends RendererTestBase {
     $element = [
       '#tag' => 'br',
     ];
-    $tags['void-element'] = [$element, "<br />\n"];
+    $tags['void-element'] = [$element, "<br>\n"];
 
     // Attributes.
     $element = [
@@ -126,7 +126,7 @@ class HtmlTagTest extends RendererTestBase {
         'y' => 10,
       ],
     ];
-    $tags['rect'] = [$element, '<rect width="25" height="25" x="5" y="10" />' . "\n"];
+    $tags['rect'] = [$element, '<rect width="25" height="25" x="5" y="10">' . "\n"];
 
     $element = [
       '#tag' => 'circle',
@@ -136,7 +136,7 @@ class HtmlTagTest extends RendererTestBase {
         'r' => 100,
       ],
     ];
-    $tags['circle'] = [$element, '<circle cx="100" cy="100" r="100" />' . "\n"];
+    $tags['circle'] = [$element, '<circle cx="100" cy="100" r="100">' . "\n"];
 
     $element = [
       '#tag' => 'polygon',
@@ -144,7 +144,7 @@ class HtmlTagTest extends RendererTestBase {
         'points' => '60,20 100,40 100,80 60,100 20,80 20,40',
       ],
     ];
-    $tags['polygon'] = [$element, '<polygon points="60,20 100,40 100,80 60,100 20,80 20,40" />' . "\n"];
+    $tags['polygon'] = [$element, '<polygon points="60,20 100,40 100,80 60,100 20,80 20,40">' . "\n"];
 
     $element = [
       '#tag' => 'ellipse',
@@ -155,7 +155,7 @@ class HtmlTagTest extends RendererTestBase {
         'ry' => 25,
       ],
     ];
-    $tags['ellipse'] = [$element, '<ellipse cx="60" cy="60" rx="50" ry="25" />' . "\n"];
+    $tags['ellipse'] = [$element, '<ellipse cx="60" cy="60" rx="50" ry="25">' . "\n"];
 
     $element = [
       '#tag' => 'use',
@@ -166,7 +166,7 @@ class HtmlTagTest extends RendererTestBase {
         'height' => 50,
       ],
     ];
-    $tags['use'] = [$element, '<use x="50" y="10" width="50" height="50" />' . "\n"];
+    $tags['use'] = [$element, '<use x="50" y="10" width="50" height="50">' . "\n"];
 
     $element = [
       '#tag' => 'path',
@@ -179,7 +179,7 @@ class HtmlTagTest extends RendererTestBase {
     ];
     $tags['path'] = [
       $element,
-      '<path d="M 100 100 L 300 100 L 200 300 z" fill="orange" stroke="black" stroke-width="3" />' . "\n",
+      '<path d="M 100 100 L 300 100 L 200 300 z" fill="orange" stroke="black" stroke-width="3">' . "\n",
     ];
 
     $element = [
@@ -189,7 +189,7 @@ class HtmlTagTest extends RendererTestBase {
         'stop-color' => '#F60',
       ],
     ];
-    $tags['stop'] = [$element, '<stop offset="5%" stop-color="#F60" />' . "\n"];
+    $tags['stop'] = [$element, '<stop offset="5%" stop-color="#F60">' . "\n"];
 
     // Nested svg elements.
     $element = [
@@ -214,14 +214,14 @@ class HtmlTagTest extends RendererTestBase {
     ];
     $tags['linearGradient'] = [
       $element,
-      '<linearGradient><stop offset="5%" stop-color="#F60" />' . "\n" . '<stop offset="95%" stop-color="#FF6" />' . "\n" . '</linearGradient>' . "\n",
+      '<linearGradient><stop offset="5%" stop-color="#F60">' . "\n" . '<stop offset="95%" stop-color="#FF6">' . "\n" . '</linearGradient>' . "\n",
     ];
 
     // Simple link.
     $element = [
       '#tag' => 'link',
     ];
-    $tags['link'] = [$element, '<link />' . "\n"];
+    $tags['link'] = [$element, '<link>' . "\n"];
 
     return $tags;
   }

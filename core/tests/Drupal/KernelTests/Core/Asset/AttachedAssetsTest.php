@@ -100,7 +100,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $rendered_css = (string) $this->renderer->renderInIsolation($css_render_array);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
     $query_string = $this->container->get('asset.query_string')->get();
-    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/bar.css') . '?' . $query_string . '" />', $rendered_css, 'Rendering an external CSS file.');
+    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/bar.css') . '?' . $query_string . '">', $rendered_css, 'Rendering an external CSS file.');
     $this->assertStringContainsString('<script src="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/foo.js') . '?' . $query_string . '"></script>', $rendered_js, 'Rendering an external JavaScript file.');
   }
 
@@ -139,7 +139,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_css = (string) $this->renderer->renderInIsolation($css_render_array);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
-    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="http://example.com/stylesheet.css" />', $rendered_css, 'Rendering an external CSS file.');
+    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="http://example.com/stylesheet.css">', $rendered_css, 'Rendering an external CSS file.');
     $this->assertStringContainsString('<script src="http://example.com/script.js"></script>', $rendered_js, 'Rendering an external JavaScript file.');
   }
 
@@ -495,7 +495,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
     $query_string = $this->container->get('asset.query_string')->get();
-    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="' . str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.css?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '" />', $rendered_css, 'CSS file with query string gets version query string correctly appended..');
+    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="' . str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.css?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '">', $rendered_css, 'CSS file with query string gets version query string correctly appended..');
     $this->assertStringContainsString('<script src="' . str_replace('&', '&amp;', $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/querystring.js?arg1=value1&arg2=value2')) . '&amp;' . $query_string . '"></script>', $rendered_js, 'JavaScript file with query string gets version query string correctly appended.');
   }
 

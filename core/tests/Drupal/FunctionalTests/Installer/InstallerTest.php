@@ -61,7 +61,7 @@ class InstallerTest extends InstallerTestBase {
     // Test that \Drupal\Core\Render\BareHtmlPageRenderer adds assets and
     // metatags as expected to the first page of the installer.
     $this->assertSession()->responseContains("css/components/button.css");
-    $this->assertSession()->responseContains('<meta charset="utf-8" />');
+    $this->assertSession()->responseContains('<meta charset="utf-8">');
 
     // Test that the default installer theme is being used.
     $this->assertSession()->responseContains("claro/css/theme/install-page.css");

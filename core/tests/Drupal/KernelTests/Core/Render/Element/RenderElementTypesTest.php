@@ -88,7 +88,7 @@ class RenderElementTypesTest extends KernelTestBase {
         'name' => 'description',
         'content' => 'Drupal test',
       ],
-    ], '<meta name="description" content="Drupal test" />' . "\n", "#type 'html_tag', void element renders properly");
+    ], '<meta name="description" content="Drupal test">' . "\n", "#type 'html_tag', void element renders properly");
 
     // Test non-void element.
     $this->assertElements([
@@ -104,7 +104,7 @@ class RenderElementTypesTest extends KernelTestBase {
     $this->assertElements([
       '#type' => 'html_tag',
       '#tag' => 'link',
-    ], "<link />\n", "#type 'html_tag' empty void element renders properly");
+    ], "<link>\n", "#type 'html_tag' empty void element renders properly");
 
     // Test empty non-void element tag.
     $this->assertElements([
