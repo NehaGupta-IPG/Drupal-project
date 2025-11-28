@@ -19,6 +19,19 @@ interface ElementInfoManagerInterface extends DiscoveryInterface {
    * For more information about custom element types see the explanation at
    * https://www.drupal.org/node/169815.
    *
+   * Some of these properties are only applicable when the element is used in
+   * a form context. Specifically, properties that involve callbacks that have
+   * a `$form_state` parameter are form-specific and do not apply when the
+   * element is used outside of a form (i.e., in a regular render array).
+   *
+   * Form-specific properties include, but are not limited to:
+   * - #process
+   * - #pre_render
+   * - #validate
+   * - #submit
+   *
+   * When the element is used outside a form, these properties have no effect.
+   *
    * @param string $type
    *   The machine name of an element type plugin.
    *
