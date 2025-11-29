@@ -409,7 +409,7 @@ class ThemeManager implements ThemeManagerInterface {
     // Add the base suggestion, should always have the lowest priority.
     $derived_base_hook = reset($derived_suggestions);
     if (!in_array($derived_base_hook, $suggestions)) {
-      array_unshift($suggestions, $derived_base_hook);
+      $suggestions[] = $derived_base_hook;
     }
 
     return $suggestions;
