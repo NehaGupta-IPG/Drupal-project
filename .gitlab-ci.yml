@@ -225,6 +225,7 @@ default:
     - exit $EXIT_CODE
   after_script:
     - vendor/bin/phpunit-merger coverage $_ARTIFACTS_DIR/clover > $_ARTIFACTS_DIR/merged-core-coverage-clover.xml || true
+    - vendor/bin/clover-to-cobertura < $_ARTIFACTS_DIR/merged-core-coverage-clover.xml > $_ARTIFACTS_DIR/core-coverage-cobertura.xml || true
     - rm -rf $_ARTIFACTS_DIR/clover
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
   artifacts:
@@ -232,6 +233,9 @@ default:
     expire_in: 6 mos
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: $_ARTIFACTS_DIR/core-coverage-cobertura.xml
     paths:
   #    - ./sites/default/files/simpletest/phpunit-*.xml
       - $_ARTIFACTS_DIR
