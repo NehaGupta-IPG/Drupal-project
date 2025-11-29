@@ -53,11 +53,11 @@ function twig_render_template($template_file, array $variables) {
     $output['debug_prefix'] .= "\n<!-- THEME HOOK: '" . Html::escape($variables['theme_hook_original']) . "' -->";
     // If there are theme suggestions, reverse the array so more specific
     // suggestions are shown first.
-    if (!empty($variables['file_name_suggestions']) && is_array($variables['file_name_suggestions'])) {
-      $variables['file_name_suggestions'] = array_reverse($variables['file_name_suggestions']);
+    if (!empty($variables['theme_hook_suggestions'])) {
+      $variables['theme_hook_suggestions'] = array_reverse($variables['theme_hook_suggestions']);
       $extension = twig_extension();
       $current_template = basename($template_file);
-      $suggestions = $variables['file_name_suggestions'];
+      $suggestions = $variables['theme_hook_suggestions'];
       $base_hook = end($suggestions) ?: $variables['theme_hook_original'];
       $invalid_suggestions = [];
       foreach ($suggestions as $key => &$suggestion) {
