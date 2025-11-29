@@ -228,9 +228,9 @@ class ThemeManager implements ThemeManagerInterface {
 
     // Removing duplicates suggestions
     $suggestions = [];
-    foreach ($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables, $derived_suggestions) as $s) {
-      if (!in_array($s, $suggestions, TRUE)) {
-        $suggestions[] = $s;
+    foreach ($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables, $derived_suggestions) as $uggestion) {
+      if (!in_array($suggestion, $suggestions, TRUE)) {
+        $suggestions[] = $suggestion;
       }
     }
 
@@ -376,7 +376,7 @@ class ThemeManager implements ThemeManagerInterface {
    * @param array $variables
    *   Theme variables that were passed along with the call.
    * @param array $derived_suggestions
-   *   Array of derived suggestions..
+   *   (optional) Array of derived suggestions..
    *
    * @return string[]
    *   Suggested theme hook names to use instead of $hook, in the order of
