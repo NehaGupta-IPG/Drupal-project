@@ -58,7 +58,7 @@ function twig_render_template($template_file, array $variables) {
       $extension = twig_extension();
       $current_template = basename($template_file);
       $suggestions = $variables['file_name_suggestions'];
-      $base_hook = array_pop($suggestions);
+      $base_hook = end($suggestions);
       $invalid_suggestions = [];
       $base_hook = $base_hook ?? $variables['theme_hook_original'];
       foreach ($suggestions as $key => &$suggestion) {
