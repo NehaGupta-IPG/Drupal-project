@@ -37,7 +37,6 @@ class DefaultsSectionStorageTest extends KernelTestBase {
     'layout_builder',
     'layout_builder_defaults_test',
     'entity_test',
-    'field',
     'user',
   ];
 
@@ -235,6 +234,22 @@ class DefaultsSectionStorageTest extends KernelTestBase {
     $section_storage_manager = $this->container->get('plugin.manager.layout_builder.section_storage');
     $section_storage = $section_storage_manager->load('defaults', $contexts);
     $this->assertInstanceOf(DefaultsSectionStorage::class, $section_storage);
+  }
+
+  /**
+   * @legacy-covers ::isSupported
+   */
+  public function testIsSupported(): void {
+    $display = LayoutBuilderEntityViewDisplay::create([
+      'targetEntityType' => 'entity_test',
+      'bundle' => 'entity_test',
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+    $display->enableLayoutBuilder()->save();
+    $this->assertTrue($this->plugin->isSupported('entity_test', 'entity_test', 'default'));
+    $display->disableLayoutBuilder()->save();
+    $this->assertFalse($this->plugin->isSupported('entity_test', 'entity_test', 'default'));
   }
 
 }
