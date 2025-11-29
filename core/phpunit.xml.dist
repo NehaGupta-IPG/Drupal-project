@@ -151,4 +151,5 @@
       <directory>../modules/*/*/tests</directory>
     </exclude>
   </source>
+  <coverage includeUncoveredFiles="false" />
 </phpunit>
