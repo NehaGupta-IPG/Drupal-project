@@ -33,12 +33,14 @@ lullabot
 mabe
 mulrev
 mulrevpub
+ngyuki
 olivero
 olivero's
 prerender
 renderable
 revlog
 revpub
+santysisi
 simpletest
 sitename
 tempstore

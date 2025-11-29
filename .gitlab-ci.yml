@@ -203,27 +203,42 @@ default:
     exit_codes: 100
   variables:
     KUBERNETES_CPU_REQUEST: "4"
+    _ARTIFACTS_DIR: "$CI_PROJECT_DIR/test-artifacts/phpunit"
     CONCURRENCY: 24
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
   before_script:
+    - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup
-    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
-    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
+    - |
+      [[ $_TARGET_PHP == $PRIMARY_PHP ]] && docker-php-ext-enable pcov
+    - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer $_ARTIFACTS_DIR/clover
+    - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/ $_ARTIFACTS_DIR
   script:
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "PHPUnit-Unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all || EXIT_CODE=$?
+    # Execute test coverage reporting only for the primary PHP version.
+    - |
+      [[ $_TARGET_PHP != $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE_PATH=""
+      [[ $_TARGET_PHP == $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE_PATH="--coverage-clover-path $_ARTIFACTS_DIR/clover"
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "PHPUnit-Unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all $_PHPUNIT_COVERAGE_PATH || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == "8.6-ubuntu" ]] && exit 100
     - exit $EXIT_CODE
   after_script:
+    - vendor/bin/phpunit-merger coverage $_ARTIFACTS_DIR/clover > $_ARTIFACTS_DIR/merged-core-coverage-clover.xml || true
+    - vendor/bin/clover-to-cobertura < $_ARTIFACTS_DIR/merged-core-coverage-clover.xml > $_ARTIFACTS_DIR/core-coverage-cobertura.xml || true
+    - rm -rf $_ARTIFACTS_DIR/clover
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
   artifacts:
     when: always
     expire_in: 6 mos
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: $_ARTIFACTS_DIR/core-coverage-cobertura.xml
     paths:
-      - ./sites/default/files/simpletest/phpunit-*.xml
+  #    - ./sites/default/files/simpletest/phpunit-*.xml
+      - $_ARTIFACTS_DIR
 
 'Unit tests Component':
   # Jobs that produce metrics must run on performance test pipelines so MRs show
@@ -253,7 +268,7 @@ default:
     # Execute test coverage reporting only for the primary PHP version.
     - |
       [[ $_TARGET_PHP != $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE=""
-      [[ $_TARGET_PHP == $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE="--coverage-text=$_ARTIFACTS_DIR/component-coverage-report.txt --coverage-cobertura=$_ARTIFACTS_DIR/component-coverage-cobertura.xml"
+      [[ $_TARGET_PHP == $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE="--coverage-text=$_ARTIFACTS_DIR/component-coverage-report.txt --coverage-clover=$_ARTIFACTS_DIR/component-coverage-clover.xml"
     - |
       [[ $PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION == false ]] && export _FAIL_ON_PHPUNIT_DEPRECATION=""
       [[ $PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION != false ]] && export _FAIL_ON_PHPUNIT_DEPRECATION="--fail-on-phpunit-deprecation"
@@ -268,6 +283,7 @@ default:
   after_script:
     # Process the coverage text report to produce an OpenMetrics report.
     - |
+      [[ $_TARGET_PHP == $PRIMARY_PHP ]] && vendor/bin/clover-to-cobertura < $_ARTIFACTS_DIR/component-coverage-clover.xml > $_ARTIFACTS_DIR/component-coverage-cobertura.xml
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && php .gitlab-ci/scripts/component-coverage-metrics.php $_ARTIFACTS_DIR/component-coverage-report.txt $_ARTIFACTS_DIR/component-coverage-metrics.txt
   artifacts:
     when: always
@@ -298,7 +314,8 @@ default:
     - docker-php-ext-enable pcov
     - cd core/tests/PHPStan
     - composer install
-    - vendor/bin/phpunit tests --testdox --coverage-text --colors=always --coverage-cobertura=coverage.cobertura.xml --log-junit junit.xml
+    - vendor/bin/phpunit tests --testdox --coverage-text --colors=always --coverage-clover=coverage.clover.xml --log-junit junit.xml
+    - vendor/bin/clover-to-cobertura < coverage.clover.xml > coverage.cobertura.xml
   artifacts:
     when: always
     reports:

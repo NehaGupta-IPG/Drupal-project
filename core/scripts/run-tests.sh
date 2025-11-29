@@ -450,6 +450,7 @@ function simpletest_script_parse_args() {
     'repeat' => 1,
     'die-on-fail' => FALSE,
     'suppress-deprecations' => FALSE,
+    'coverage-clover-path' => NULL,
     // Used internally.
     'test-id' => 0,
     'execute-test' => '',
@@ -862,7 +863,7 @@ function simpletest_script_run_phpunit(TestRun $test_run, $class) {
 
   $runner = PhpUnitTestRunner::create(\Drupal::getContainer())->setConfigurationFilePath($args['phpunit-configuration']);
   $start = microtime(TRUE);
-  $results = $runner->execute($test_run, $class, $status, $args['color']);
+  $results = $runner->execute($test_run, $class, $status, $args['color'], $args['coverage-clover-path']);
   $time = microtime(TRUE) - $start;
 
   $runner->processPhpUnitResults($test_run, $results);
@@ -921,6 +922,10 @@ function simpletest_script_command(TestRun $test_run, string $test_class): array
   if (!empty($args['dburl'])) {
     $command[] = '--dburl';
     $command[] = $args['dburl'];
+  }
+  if (!empty($args['coverage-clover-path'])) {
+    $command[] = '--coverage-clover-path';
+    $command[] = $args['coverage-clover-path'];
   }
   $command[] = '--php';
   $command[] = $php;
