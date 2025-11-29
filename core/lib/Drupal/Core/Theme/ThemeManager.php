@@ -228,7 +228,7 @@ class ThemeManager implements ThemeManagerInterface {
 
     // Removing duplicates suggestions
     $suggestions = [];
-    foreach ($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables, $derived_suggestions) as $uggestion) {
+    foreach ($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables, $derived_suggestions) as $suggestion) {
       if (!in_array($suggestion, $suggestions, TRUE)) {
         $suggestions[] = $suggestion;
       }
