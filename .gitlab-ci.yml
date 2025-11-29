@@ -224,6 +224,8 @@ default:
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == "8.6-ubuntu" ]] && exit 100
     - exit $EXIT_CODE
   after_script:
+    - vendor/bin/phpunit-merger coverage $_ARTIFACTS_DIR/clover $_ARTIFACTS_DIR/merged-core-coverage-clover.xml
+    - rm -rf $_ARTIFACTS_DIR/clover
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
   artifacts:
     when: always
