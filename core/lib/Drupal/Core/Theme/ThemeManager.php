@@ -226,7 +226,7 @@ class ThemeManager implements ThemeManagerInterface {
       'theme_hook_original' => $original_hook,
     ];
 
-    $suggestions = array_values(array_unique($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $derived_suggestions, $variables), SORT_REGULAR));
+    $suggestions = array_values(array_unique($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables, $derived_suggestions), SORT_REGULAR));
 
     // Check if each suggestion exists in the theme registry, and if so,
     // use it instead of the base hook. For example, a function may use
@@ -367,10 +367,10 @@ class ThemeManager implements ThemeManagerInterface {
    *   Theme hook that was called.
    * @param string $info_base_hook
    *   Theme registry info for $hook['base hook'] key or empty string.
-   * @param array $derived_suggestions
-   *   Array of derived suggestions..
    * @param array $variables
    *   Theme variables that were passed along with the call.
+   * @param array $derived_suggestions
+   *   Array of derived suggestions..
    *
    * @return string[]
    *   Suggested theme hook names to use instead of $hook, in the order of
@@ -381,7 +381,7 @@ class ThemeManager implements ThemeManagerInterface {
    * @internal
    *   This method may change at any time. It is not for use outside this class.
    */
-  protected function buildThemeHookSuggestions(string $hook, string $info_base_hook, array $derived_suggestions, array &$variables): array {
+  protected function buildThemeHookSuggestions(string $hook, string $info_base_hook, array &$variables, array $derived_suggestions = []): array {
     // Set base hook for later use. For example if '#theme' => 'node__article'
     // is called, we run hook_theme_suggestions_node_alter() rather than
     // hook_theme_suggestions_node__article_alter(), and also pass in the base
