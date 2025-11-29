@@ -218,7 +218,7 @@ default:
     - |
       [[ $_TARGET_PHP != $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE_PATH=""
       [[ $_TARGET_PHP == $PRIMARY_PHP ]] && export _PHPUNIT_COVERAGE_PATH="--coverage-clover-path $_ARTIFACTS_DIR/clover"
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --color --keep-results --types "PHPUnit-Unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all $_PHPUNIT_COVERAGE_PATH || EXIT_CODE=$?
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --debug-discovery --color --keep-results --types "PHPUnit-Unit" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --verbose --non-html --all $_PHPUNIT_COVERAGE_PATH || EXIT_CODE=$?
     # Allow failure for the next PHP major.
     - |
       [[ $EXIT_CODE != 0 && $_TARGET_PHP == "8.6-ubuntu" ]] && exit 100
@@ -237,7 +237,7 @@ default:
         coverage_format: cobertura
         path: $_ARTIFACTS_DIR/core-coverage-cobertura.xml
     paths:
-#      - ./sites/default/files/simpletest/phpunit-*.xml
+      - ./sites/default/files/simpletest/phpunit-*.xml
       - $_ARTIFACTS_DIR
 
 'Unit tests Component':
