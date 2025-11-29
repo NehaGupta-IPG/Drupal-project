@@ -24,7 +24,7 @@ function views_update_11201(): void {
 /**
  * Reset views module weight.
  */
-function views_update_11202() {
+function views_update_11202(): void {
   if (\Drupal::configFactory()->getEditable('core.extension')->get('module.views') == 10) {
     module_set_weight('views', 0);
   }
