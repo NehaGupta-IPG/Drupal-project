@@ -226,6 +226,16 @@ class ThemeManager implements ThemeManagerInterface {
       'theme_hook_original' => $original_hook,
     ];
 
+    // Keep $variables passed by reference for backward compatibility with
+    // existing overrides and suggestion alter hooks. Derived suggestions are
+    // passed as an optional fourth parameter.
+    // Preserve order while removing duplicates (most specific last).
+    $suggestions = [];
+    foreach ($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables, $derived_suggestions) as $s) {
+      if (!in_array($s, $suggestions, true)) {
+        $suggestions[] = $s;
+      }
+    }
     $suggestions = array_values(array_unique($this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables, $derived_suggestions), SORT_REGULAR));
 
     // Check if each suggestion exists in the theme registry, and if so,
