@@ -60,7 +60,6 @@ function twig_render_template($template_file, array $variables) {
       $suggestions = $variables['file_name_suggestions'];
       $base_hook = end($suggestions) ?: $variables['theme_hook_original'];
       $invalid_suggestions = [];
-      $base_hook = $base_hook ?? $variables['theme_hook_original'];
       foreach ($suggestions as $key => &$suggestion) {
         // Valid suggestions are $base_hook, $base_hook__*, and contain no hyphens.
         if (($suggestion !== $base_hook && !str_starts_with($suggestion, $base_hook . '__')) || str_contains($suggestion, '-')) {

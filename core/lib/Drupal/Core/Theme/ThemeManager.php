@@ -156,6 +156,7 @@ class ThemeManager implements ThemeManagerInterface {
 
     // Set derived suggestions for directly called suggestions like
     // '#theme' => 'comment__node__article'.
+    $derived_suggestions = [];
     $derived_suggestion = $original_hook;
     $derived_suggestions[] = $derived_suggestion;
     while ($pos = strrpos($derived_suggestion, '__')) {
@@ -168,8 +169,9 @@ class ThemeManager implements ThemeManagerInterface {
     // string.
     if (!$theme_registry->has($hook)) {
       $derived_suggestions_without_original_hook = array_slice($derived_suggestions, 0, count($derived_suggestions) - 1);
-      foreach ($derived_suggestions_without_original_hook as $hook) {
-        if ($theme_registry->has($hook)) {
+      foreach ($derived_suggestions_without_original_hook as $candidate_hook) {
+        if ($theme_registry->has($candidate_hook)) {
+          $hook = $candidate_hook;
           break;
         }
       }
