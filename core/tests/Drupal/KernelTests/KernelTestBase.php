@@ -106,6 +106,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use ExpectDeprecationTrait;
 
   /**
+   * The class loader.
+   *
    * @var \Composer\Autoload\Classloader
    */
   protected $classLoader;
