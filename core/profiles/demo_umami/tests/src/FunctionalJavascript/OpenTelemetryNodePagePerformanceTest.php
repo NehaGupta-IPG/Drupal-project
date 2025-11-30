@@ -249,8 +249,8 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
 
     $expected = [
-      'QueryCount' => 169,
-      'CacheGetCount' => 204,
+      'QueryCount' => 91,
+      'CacheGetCount' => 201,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 66,
@@ -263,7 +263,7 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         'default' => 3,
         'menu' => 2,
       ],
-      'CacheSetCount' => 45,
+      'CacheSetCount' => 47,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 22,
