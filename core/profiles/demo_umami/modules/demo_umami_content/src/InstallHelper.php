@@ -94,7 +94,7 @@ class InstallHelper implements ContainerInjectionInterface {
   /**
    * The module's path.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected string $module_path;
 
   /**
@@ -454,6 +454,7 @@ class InstallHelper implements ContainerInjectionInterface {
       'title' => $data['title'],
       'moderation_state' => 'published',
       'langcode' => 'en',
+      'promote' => TRUE,
     ];
     // Set article author.
     if (!empty($data['author'])) {

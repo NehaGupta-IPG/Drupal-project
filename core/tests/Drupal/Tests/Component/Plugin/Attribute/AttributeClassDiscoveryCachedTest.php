@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Plugin\Attribute;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Component\Discovery\MissingClassDetectionClassLoader;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Plugin\Discovery\AttributeClassDiscovery;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -13,11 +14,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @legacy-covers \Drupal\Component\Discovery\MissingClassDetectionClassLoader
+ * Tests Attribute Class Discovery Cached.
  */
 #[CoversClass(AttributeClassDiscovery::class)]
 #[Group('Attribute')]
 #[RunTestsInSeparateProcesses]
+#[CoversClass(MissingClassDetectionClassLoader::class)]
 class AttributeClassDiscoveryCachedTest extends TestCase {
 
   /**
@@ -67,7 +69,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
     // Gain access to the file cache.
     $ref_file_cache = new \ReflectionProperty($discovery, 'fileCache');
-    $ref_file_cache->setAccessible(TRUE);
     /** @var \Drupal\Component\FileCache\FileCacheInterface $file_cache */
     $file_cache = $ref_file_cache->getValue($discovery);
 
@@ -125,7 +126,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
     // Gain access to the file cache.
     $ref_file_cache = new \ReflectionProperty($discovery, 'fileCache');
-    $ref_file_cache->setAccessible(TRUE);
     /** @var \Drupal\Component\FileCache\FileCacheInterface $file_cache */
     $file_cache = $ref_file_cache->getValue($discovery);
 
@@ -146,6 +146,9 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
         'id' => 'discovery_test_missing_trait',
         'class' => 'com\example\PluginNamespace\AttributeDiscoveryTestMissingTrait',
         'title' => 'Discovery test plugin missing trait',
+        'dependencies' => [
+          'trait' => ['Drupal\a_module_that_does_not_exist\Plugin\CustomTrait'],
+        ],
       ],
     ], $discovery->getDefinitions());
 

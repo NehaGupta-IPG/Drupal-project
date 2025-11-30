@@ -16,17 +16,19 @@ use Drupal\Core\EventDispatcher\EventDispatcherFactoryStage;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the database events.
  *
  * We need to run these tests in isolation since they instantiate the event
  * dispatcher via the factory that uses a static to hold it.
- *
- * @coversDefaultClass \Drupal\Core\Database\Connection
- * @group Database
- * @runTestsInSeparateProcesses
  */
+#[CoversClass(Connection::class)]
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class DatabaseEventsTest extends UnitTestCase {
 
   /**
@@ -44,9 +46,11 @@ class DatabaseEventsTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::isEventEnabled
-   * @covers ::enableEvents
-   * @covers ::disableEvents
+   * Tests event enabling and disabling.
+   *
+   * @legacy-covers ::isEventEnabled
+   * @legacy-covers ::enableEvents
+   * @legacy-covers ::disableEvents
    */
   public function testEventEnablingAndDisabling(): void {
     $this->connection->enableEvents(StatementEvent::all());
@@ -66,7 +70,9 @@ class DatabaseEventsTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::enableEvents
+   * Tests enable invalid event.
+   *
+   * @legacy-covers ::enableEvents
    */
   public function testEnableInvalidEvent(): void {
     $this->expectException(\AssertionError::class);
@@ -75,7 +81,9 @@ class DatabaseEventsTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::disableEvents
+   * Tests disable invalid event.
+   *
+   * @legacy-covers ::disableEvents
    */
   public function testDisableInvalidEvent(): void {
     $this->expectException(\AssertionError::class);
@@ -84,7 +92,9 @@ class DatabaseEventsTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::dispatchEvent
+   * Tests event dispatching when no container available.
+   *
+   * @legacy-covers ::dispatchEvent
    */
   public function testEventDispatchingWhenNoContainerAvailable(): void {
     $this->connection->dispatchEvent($this->createMock(DatabaseEvent::class));

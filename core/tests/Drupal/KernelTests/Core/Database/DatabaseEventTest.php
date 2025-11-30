@@ -11,12 +11,14 @@ use Drupal\Core\Database\Event\StatementExecutionStartEvent;
 use Drupal\Core\EventDispatcher\EventDispatcherFactoryInterface;
 use Drupal\Core\EventDispatcher\EventDispatcherFactoryStage;
 use Drupal\database_test\EventSubscriber\DatabaseEventSubscriber;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the database API events.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class DatabaseEventTest extends DatabaseTestBase {
 
   /**

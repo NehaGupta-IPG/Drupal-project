@@ -12,6 +12,7 @@ use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\Core\EventDispatcher\EventDispatcherFactory;
+use Pdo\Pgsql;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 // cSpell:ignore ilike nextval
@@ -103,6 +104,9 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       $eventDispatcher = (\Drupal::hasContainer() && \Drupal::hasService(EventDispatcherInterface::class)) ? \Drupal::service(EventDispatcherInterface::class) : new EventDispatcherFactory();
     }
 
+    // @phpstan-ignore class.notFound
+    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Pgsql : TRUE);
+
     // Sanitize the schema name here, so we do not have to do it in other
     // functions.
     if (isset($connection_options['schema']) && ($connection_options['schema'] !== 'public')) {
@@ -189,7 +193,13 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     ];
 
     try {
-      $pdo = new \PDO($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      if (\PHP_VERSION_ID >= 80400) {
+        // @phpstan-ignore class.notFound
+        $pgsql = new Pgsql($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      }
+      else {
+        $pgsql = new \PDO($dsn, $connection_options['username'], $connection_options['password'], $connection_options['pdo']);
+      }
     }
     catch (\PDOException $e) {
       if (static::getSQLState($e) == static::CONNECTION_FAILURE) {
@@ -203,7 +213,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       throw $e;
     }
 
-    return $pdo;
+    return $pgsql;
   }
 
   /**
