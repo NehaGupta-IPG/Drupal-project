@@ -137,7 +137,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 41,
-      'CacheGetCount' => 105,
+      'CacheGetCount' => 102,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 20,
