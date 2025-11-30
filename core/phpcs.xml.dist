@@ -60,6 +60,7 @@
     <exclude name="Drupal.Commenting.DocComment.LongFullStop"/>
   </rule>
   <rule  ref="Drupal.Commenting.DocComment.MissingShort">
+    <include-pattern>core/*/KernelTests/*</include-pattern>
     <include-pattern>core/*/Unit/*</include-pattern>
     <include-pattern>core/*/FunctionalJavascript/*</include-pattern>
   </rule>
@@ -77,6 +78,7 @@
     <include-pattern>*/Functional/*</include-pattern>
     <include-pattern>*/Unit/*</include-pattern>
     <include-pattern>core/lib/*</include-pattern>
+    <include-pattern>core/modules/system/tests/modules/HookOrder/*</include-pattern>
   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.MissingParamType"/>
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment"/>

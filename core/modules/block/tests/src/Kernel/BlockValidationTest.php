@@ -137,7 +137,7 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
     parent::testRequiredPropertyValuesMissing([
       'region' => [
         'region' => [
-          'This is not a valid region of the <em class="placeholder">stark</em> theme.',
+          'This value should not be blank.',
           'This value should not be null.',
         ],
       ],
@@ -262,7 +262,7 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
       'settings' => [
         'id' => 'system_menu_block:account',
         'label' => 'Account Menu',
-        'label_display' => FALSE,
+        'label_display' => '0',
         'provider' => 'system',
         'level' => $level,
         'depth' => $depth,
