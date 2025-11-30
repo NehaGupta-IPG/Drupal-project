@@ -5,6 +5,7 @@ parameters:
 services:
   _defaults:
     autoconfigure: true
+    autowire: true
   plugin.manager.language_negotiation_method:
     class: Drupal\language\LanguageNegotiationMethodManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']

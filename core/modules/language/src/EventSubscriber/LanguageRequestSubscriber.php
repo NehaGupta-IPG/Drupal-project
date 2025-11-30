@@ -86,6 +86,9 @@ class LanguageRequestSubscriber implements EventSubscriberInterface {
    * Sets the language for config overrides on the language manager.
    */
   private function setLanguageOverrides() {
+    // @fixme Deprecate and drop this obsoleted method.
+    return;
+
     $this->negotiator->setCurrentUser($this->currentUser);
     if ($this->languageManager instanceof ConfigurableLanguageManagerInterface) {
       $this->languageManager->setNegotiator($this->negotiator);
