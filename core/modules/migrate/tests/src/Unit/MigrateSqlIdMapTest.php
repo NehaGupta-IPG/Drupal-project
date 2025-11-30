@@ -10,7 +10,6 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
-use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
