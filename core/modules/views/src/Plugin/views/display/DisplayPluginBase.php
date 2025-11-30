@@ -48,7 +48,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * An array of instantiated plugins used in this display.
    *
-   * @var \Drupal\views\Plugin\views\ViewsPluginInterface[]
+   * @var \Drupal\views\Plugin\views\ViewsPluginInterface[][]
    */
   protected $plugins = [];
 
@@ -111,13 +111,6 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   protected $usesAreas = TRUE;
 
   /**
-   * Static cache for unpackOptions, but not if we are in the UI.
-   *
-   * @var array
-   */
-  protected static $unpackOptions = [];
-
-  /**
    * The display information coming directly from the view entity.
    *
    * @var array
@@ -131,13 +124,13 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * Keeps track whether the display uses exposed filters.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public bool $has_exposed;
 
   /**
    * The default display.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public DisplayPluginInterface $default_display;
 
   /**
@@ -198,21 +191,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
       unset($options['defaults']);
     }
 
-    $cid = 'views:unpack_options:' . hash('sha256', serialize([$this->options, $options])) . ':' . \Drupal::languageManager()->getCurrentLanguage()->getId();
-    if (empty(static::$unpackOptions[$cid])) {
-      $cache = \Drupal::cache('data')->get($cid);
-      if (!empty($cache->data)) {
-        $this->options = $cache->data;
-      }
-      else {
-        $this->unpackOptions($this->options, $options);
-        \Drupal::cache('data')->set($cid, $this->options, Cache::PERMANENT, $this->view->storage->getCacheTags());
-      }
-      static::$unpackOptions[$cid] = $this->options;
-    }
-    else {
-      $this->options = static::$unpackOptions[$cid];
-    }
+    $this->unpackOptions($this->options, $options);
 
     // Mark the view as changed so the user has a chance to save it.
     if ($changed) {

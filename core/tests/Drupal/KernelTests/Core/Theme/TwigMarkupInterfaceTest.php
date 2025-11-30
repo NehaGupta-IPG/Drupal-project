@@ -25,13 +25,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class TwigMarkupInterfaceTest extends KernelTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  protected static $modules = [
-    'language',
-  ];
-
-  /**
  * Tests markup interface empty.
  */
   #[DataProvider('providerTestMarkupInterfaceEmpty')]
@@ -77,6 +70,8 @@ class TwigMarkupInterfaceTest extends KernelTestBase {
   }
 
   /**
+   * Renders a variable using a Twig inline template.
+   *
    * @return \Drupal\Component\Render\MarkupInterface
    *   The rendered HTML.
    */

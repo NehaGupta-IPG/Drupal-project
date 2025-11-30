@@ -141,7 +141,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 20,
-        'data' => 8,
+        'data' => 5,
         'discovery' => 37,
         'bootstrap' => 10,
         'dynamic_page_cache' => 1,
@@ -153,7 +153,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 48,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 16,
+      'CacheTagLookupQueryCount' => 15,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -166,9 +166,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
           'local_task',
           'library_info',
         ],
-        ['config:views.view.frontpage'],
         ['config:core.extension', 'views_data'],
-        ['node:1', 'node_list'],
+        ['config:views.view.frontpage', 'node:1', 'node_list'],
         ['rendered', 'user:0', 'user_view'],
         ['config:filter.format.restricted_html', 'node_view'],
         [
@@ -366,7 +365,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 11,
-        'data' => 8,
+        'data' => 5,
         'discovery' => 21,
         'bootstrap' => 8,
         'dynamic_page_cache' => 2,
@@ -605,7 +604,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 20,
+      'CacheTagLookupQueryCount' => 19,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -623,7 +622,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
   /**
    * Passes if no JavaScript is found on the page.
    *
-   * @param Drupal\Tests\PerformanceData $performance_data
+   * @param \Drupal\Tests\PerformanceData $performance_data
    *   A PerformanceData value object.
    *
    * @internal

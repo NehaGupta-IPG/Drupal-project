@@ -73,6 +73,11 @@ parameters:
   tempstore.expire: 604800
   queue.config:
     suspendMaximumWait: 30.0
+  stream_wrapper.allowed_file_extensions:
+    module:
+      - json
+    theme:
+      - json
 services:
   _defaults:
     autoconfigure: true
@@ -414,6 +419,8 @@ services:
       - { name: service_collector, tag: 'config.factory.override', call: addOverride }
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
   Drupal\Core\Config\ConfigFactoryInterface: '@config.factory'
+  Drupal\Core\Config\ConfigImporterFactory:
+    autowire: true
   config.importer_subscriber:
     class: Drupal\Core\Config\Importer\FinalMissingContentSubscriber
   config.installer:
@@ -848,6 +855,7 @@ services:
     class: Drupal\Core\Archiver\ArchiverManager
     parent: default_plugin_manager
     arguments: ['@file_system']
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3556927'
   plugin.manager.action:
     class: Drupal\Core\Action\ActionManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
@@ -1291,7 +1299,10 @@ services:
   psr_response_view_subscriber:
     class: Drupal\Core\EventSubscriber\PsrResponseSubscriber
     arguments: ['@psr7.http_foundation_factory']
-
+  # HTMX content view subscriber runs before main_content_view subscriber.
+  htmx_content_view_subscriber:
+    class: Drupal\Core\EventSubscriber\HtmxContentViewSubscriber
+    autowire: true
   # Main content view subscriber plus the renderers it uses.
   main_content_view_subscriber:
     class: Drupal\Core\EventSubscriber\MainContentViewSubscriber
@@ -1426,7 +1437,7 @@ services:
   Drupal\Core\Site\MaintenanceModeInterface: '@maintenance_mode'
   maintenance_mode_subscriber:
     class: Drupal\Core\EventSubscriber\MaintenanceModeSubscriber
-    arguments: ['@maintenance_mode', '@config.factory', '@string_translation', '@url_generator', '@current_user', '@bare_html_page_renderer', '@messenger', '@event_dispatcher']
+    autowire: true
   route_access_response_subscriber:
     class: Drupal\Core\EventSubscriber\RouteAccessResponseSubscriber
   client_error_response_subscriber:
@@ -1552,6 +1563,14 @@ services:
     class: Drupal\Core\StreamWrapper\TemporaryStream
     tags:
       - { name: stream_wrapper, scheme: temporary }
+  stream_wrapper.module:
+    class: Drupal\Core\StreamWrapper\ModuleStream
+    tags:
+      - { name: stream_wrapper, scheme: module }
+  stream_wrapper.theme:
+    class: Drupal\Core\StreamWrapper\ThemeStream
+    tags:
+      - { name: stream_wrapper, scheme: theme }
   image.toolkit.manager:
     class: Drupal\Core\ImageToolkit\ImageToolkitManager
     arguments: ['@config.factory']
@@ -1600,13 +1619,17 @@ services:
   Drupal\Core\Datetime\DateFormatterInterface: '@date.formatter'
   theme.manager:
     class: Drupal\Core\Theme\ThemeManager
-    arguments: ['%app.root%', '@theme.negotiator', '@theme.initialization', '@module_handler', '@callable_resolver', '@keyvalue', '@cache.bootstrap']
+    autowire: true
     calls:
       - [setThemeRegistry, ['@theme.registry']]
   Drupal\Core\Theme\ThemeManagerInterface: '@theme.manager'
+  Drupal\Core\Template\TwigThemeEngine:
+    autowire: true
+    tags:
+      - { name: theme_engine, engine_name: twig }
   theme.initialization:
     class: Drupal\Core\Theme\ThemeInitialization
-    arguments: ['%app.root%', '@theme_handler', '@cache.bootstrap', '@module_handler']
+    autowire: true
   Drupal\Core\Theme\ThemeInitializationInterface: '@theme.initialization'
   theme.registry:
     class: Drupal\Core\Theme\Registry
