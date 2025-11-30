@@ -19,9 +19,6 @@ default:
   title:
     -
       value: 'Layout override'
-  created:
-    -
-      value: 1733930395
   promote:
     -
       value: true
@@ -64,7 +61,7 @@ default:
             configuration:
               id: system_powered_by_block
               label: 'Powered by Drupal'
-              label_display: 0
+              label_display: '0'
               provider: system
               context_mapping: {  }
             weight: 0

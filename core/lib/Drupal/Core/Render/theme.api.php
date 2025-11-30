@@ -5,6 +5,8 @@
  * Hooks and documentation related to the theme and render system.
  */
 
+use Drupal\Core\Extension\ThemeSettingsProvider;
+
 /**
  * @defgroup themeable Theme system overview
  * @{
@@ -32,10 +34,10 @@
  * 8 themes.
  *
  * For further information on theming in Drupal 8 see
- * https://www.drupal.org/docs/8/theming
+ * https://www.drupal.org/docs/develop/theming-drupal
  *
  * For further Twig documentation see
- * https://twig.symfony.com/doc/1.x/templates.html
+ * https://twig.symfony.com/doc/3.x/templates.html
  *
  * @section sec_theme_hooks Theme Hooks
  * The theme system is invoked in \Drupal\Core\Render\Renderer::doRender() by
@@ -228,7 +230,7 @@
  * same, which gives users fewer user interface patterns to learn.
  *
  * For further information on the Theme and Render APIs, see:
- * - https://www.drupal.org/docs/8/theming
+ * - https://www.drupal.org/docs/develop/theming-drupal
  * - https://www.drupal.org/developing/api/8/render
  * - @link themeable Theme system overview @endlink.
  *
@@ -538,7 +540,7 @@ function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormSta
   $form['toggle_breadcrumb'] = [
     '#type' => 'checkbox',
     '#title' => t('Display the breadcrumb'),
-    '#default_value' => theme_get_setting('features.breadcrumb'),
+    '#default_value' => \Drupal::service(ThemeSettingsProvider::class)->getSetting('features.breadcrumb'),
     '#description'   => t('Show a trail of links from the homepage to the current page.'),
   ];
 }

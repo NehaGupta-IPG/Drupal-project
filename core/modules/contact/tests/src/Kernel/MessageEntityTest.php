@@ -22,8 +22,6 @@ class MessageEntityTest extends EntityKernelTestBase {
    */
   protected static $modules = [
     'contact',
-    'field',
-    'user',
     'contact_test',
   ];
 

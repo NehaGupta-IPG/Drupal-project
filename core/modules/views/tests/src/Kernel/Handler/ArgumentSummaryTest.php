@@ -41,8 +41,6 @@ class ArgumentSummaryTest extends ViewsKernelTestBase {
     'node',
     'taxonomy',
     'text',
-    'user',
-    'views',
   ];
 
   /**

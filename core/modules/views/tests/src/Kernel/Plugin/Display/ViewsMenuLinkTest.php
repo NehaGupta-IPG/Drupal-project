@@ -18,14 +18,6 @@ class ViewsMenuLinkTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'user',
-    'views',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
   public static $testViews = ['test_page_display_menu'];
 
   /**

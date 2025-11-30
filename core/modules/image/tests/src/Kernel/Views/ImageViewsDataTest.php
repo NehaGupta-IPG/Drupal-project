@@ -24,9 +24,7 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
   protected static $modules = [
     'image',
     'file',
-    'views',
     'entity_test',
-    'user',
     'field',
   ];
 

@@ -27,10 +27,8 @@ class FieldApiDataTest extends ViewsKernelTestBase {
    */
   protected static $modules = [
     'field',
-    'filter',
     'language',
     'node',
-    'user',
   ];
 
   /**
