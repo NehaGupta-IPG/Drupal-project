@@ -9,6 +9,7 @@ use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -20,9 +21,8 @@ class MysqlDriverTest extends DriverSpecificKernelTestBase {
 
   /**
    * Tests connection.
-   *
-   * @legacy-covers \Drupal\mysql\Driver\Database\mysql\Connection
    */
+  #[IgnoreDeprecations]
   public function testConnection(): void {
     $this->expectDeprecation("Not passing the \$eventDispatcher parameter to Drupal\\mysql\\Driver\\Database\\mysql\\Connection::__construct() is deprecated in drupal:11.2.0 and is throwing an error from drupal:12.0.0. See https://www.drupal.org/node/3494044");
     // @phpstan-ignore class.notFound
