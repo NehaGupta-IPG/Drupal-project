@@ -6,7 +6,9 @@ namespace Drupal\Tests\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DependencyInjection\Attribute\ServiceClosure;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\DependencyInjection\SerializableServiceClosure;
 use Drupal\Core\Test\TestKernel;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -38,8 +40,7 @@ class DependencySerializationTest extends UnitTestCase {
     // Set property to be different from first service.
     $service2->serviceId = 'test_service2';
     $container->set($service2->serviceId, $service2);
-    $service2Closure = DependencySerializationTestDummy::getSerializableServiceClosure($service2->serviceId, $container);
-    $this->assertSame([spl_object_id($service2Closure) => $service2->serviceId], DependencySerializationTestDummy::getServiceIdsForClosureObjects());
+    $service2Closure = SerializableServiceClosure::create($service2->serviceId, $container);
     $this->assertSame($container, $container->get('service_container'));
     $dependencySerialization = new DependencySerializationTestDummy($service, $service2Closure);
     $dependencySerialization->setContainer($container);
@@ -56,14 +57,13 @@ class DependencySerializationTest extends UnitTestCase {
     $this->assertSame($container, $dependencySerialization->container);
     $this->assertEmpty($dependencySerialization->getServiceIds());
     $this->assertEmpty($dependencySerialization->getServiceIdsForClosurePropertyNames());
-    $this->assertSame([spl_object_id($dependencySerialization->closure) => $service2->serviceId], DependencySerializationTestDummy::getServiceIdsForClosureObjects());
 
     // Test that the correct exception is thrown when trying to create a service
     // closure from an invalid service ID.
     $nonexistent_service_closure = NULL;
     $throwable = NULL;
     try {
-      $nonexistent_service_closure = DependencySerializationTestDummy::getSerializableServiceClosure('nonexistent_service_id', $container);
+      $nonexistent_service_closure = SerializableServiceClosure::create('nonexistent_service_id', $container);
     }
     catch (\Throwable $throwable) {
     }
@@ -143,13 +143,6 @@ class DependencySerializationTestDummy {
    */
   public function getServiceIdsForClosurePropertyNames(): array {
     return $this->_serviceIdsForClosurePropertyNames;
-  }
-
-  /**
-   * Gets the stored services keyed by closure object spl_object_id() value.
-   */
-  public static function getServiceIdsForClosureObjects(): array {
-    return static::$_serviceIdsForClosureObjects;
   }
 
 }

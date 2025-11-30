@@ -81,25 +81,16 @@ trait DependencySerializationTrait {
           $this->_serviceIds[$key] = $service_id;
           unset($vars[$key]);
         }
-        elseif (($value instanceof \Closure) &&
-                ($reflection_closure = new \ReflectionFunction($value)) &&
-                !empty($reflection_closure->getAttributes(ServiceClosure::class))) {
+        elseif (
+          $value instanceof \Closure
+          && SerializableServiceClosure::check($value)
+        ) {
           // If a class member is a closure that returns a service object, only
           // store its ID so it can be used to create a new closure that returns
           // the service object on unserialization.
-          $closure_spl_id = spl_object_id($value);
-          $service_closure_id = static::$_serviceIdsForClosureObjects[$closure_spl_id] ?? '';
-          if ($service_closure_id) {
-            unset(static::$_serviceIdsForClosureObjects[$closure_spl_id]);
-            $this->_serviceIdsForClosurePropertyNames[$key] = $service_closure_id;
-            unset($vars[$key]);
-          }
-          // If somehow the closure is not registered in the map, invoke it and
-          // get the service ID from the reverse container.
-          elseif ($service_closure_id = $reverse_container->getId(($value)())) {
-            $this->_serviceIdsForClosurePropertyNames[$key] = $service_closure_id;
-            unset($vars[$key]);
-          }
+          $service_closure_id = $reverse_container->getId(($value)());
+          $this->_serviceIdsForClosurePropertyNames[$key] = $service_closure_id;
+          unset($vars[$key]);
         }
       }
     }
@@ -125,7 +116,7 @@ trait DependencySerializationTrait {
     $this->_serviceIds = [];
 
     foreach ($this->_serviceIdsForClosurePropertyNames as $key => $service_closure_id) {
-      $this->$key = static::getSerializableServiceClosure($service_closure_id, $container);
+      $this->$key = SerializableServiceClosure::create($service_closure_id, $container);
     }
     $this->_serviceIdsForClosurePropertyNames = [];
 
@@ -137,35 +128,6 @@ trait DependencySerializationTrait {
       }
     }
     $this->_entityStorages = [];
-  }
-
-  /**
-   * Gets a closure that returns the service associated with ID.
-   *
-   * @param string $service_id
-   *   The service ID.
-   * @param \Drupal\Component\DependencyInjection\ContainerInterface|null $container
-   *   The container.
-   *
-   * @return \Closure
-   *   The service closure.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown if an invalid service ID is passed.
-   */
-  public static function getSerializableServiceClosure(string $service_id, ?ContainerInterface $container = NULL): \Closure {
-    $container ??= \Drupal::getContainer();
-    if (!$container->has($service_id)) {
-      throw new \InvalidArgumentException("$service_id is not a valid service ID.");
-    }
-    // Apply ServiceClosure attribute to the closure to make it identifiable as
-    // a service closure.
-    $closure = #[ServiceClosure] fn () => $container->get($service_id);
-    // Track the service ID associated with the closure, so that the closure
-    // will not need to be invoked during serialization in order to determine
-    // which service the closure returns.
-    static::$_serviceIdsForClosureObjects[spl_object_id($closure)] = $service_id;
-    return $closure;
   }
 
 }

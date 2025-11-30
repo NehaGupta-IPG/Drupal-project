@@ -6,6 +6,8 @@ namespace Drupal\Core\DependencyInjection\Attribute;
 
 /**
  * Attribute used to identify a closure as one that returns a service object.
+ *
+ * @internal
  */
 #[\Attribute(\Attribute::TARGET_FUNCTION)]
 readonly class ServiceClosure {}

@@ -2,6 +2,7 @@
 
 namespace Drupal\responsive_image;
 
+use Drupal\Core\DependencyInjection\SerializableServiceClosure;
 use Drupal\Core\Url;
 use Drupal\breakpoint\BreakpointManagerInterface;
 use Drupal\Core\Entity\EntityForm;
@@ -22,14 +23,14 @@ class ResponsiveImageStyleForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      static::getSerializableServiceClosure('breakpoint.manager', $container)
+      SerializableServiceClosure::create('breakpoint.manager', $container)
     );
   }
 
   public function __construct(protected BreakpointManagerInterface|\Closure $breakpointManagerClosure) {
     if ($this->breakpointManagerClosure instanceof BreakpointManagerInterface) {
       @trigger_error('Passing the breakpoint manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
-      $this->breakpointManagerClosure = static::getSerializableServiceClosure('breakpoint.manager');
+      $this->breakpointManagerClosure = SerializableServiceClosure::create('breakpoint.manager');
     }
   }
 

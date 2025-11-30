@@ -5,6 +5,8 @@ namespace Drupal\media;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\SerializableServiceClosure;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityForm;
@@ -33,15 +35,15 @@ class MediaTypeForm extends EntityForm {
   ) {
     if ($this->sourceManagerClosure instanceof PluginManagerInterface) {
       @trigger_error('Passing the media source plugin manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
-      $this->sourceManagerClosure = static::getSerializableServiceClosure('plugin.manager.media.source');
+      $this->sourceManagerClosure = SerializableServiceClosure::create('plugin.manager.media.source');
     }
     if ($this->entityFieldManagerClosure instanceof EntityFieldManagerInterface) {
       @trigger_error('Passing the entity field manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
-      $this->entityFieldManagerClosure = static::getSerializableServiceClosure('entity_field.manager');
+      $this->entityFieldManagerClosure = SerializableServiceClosure::create('entity_field.manager');
     }
     if ($this->entityDisplayRepositoryClosure instanceof EntityDisplayRepositoryInterface) {
       @trigger_error('Passing the entity display manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
-      $this->entityDisplayRepositoryClosure = static::getSerializableServiceClosure('entity_display.repository');
+      $this->entityDisplayRepositoryClosure = SerializableServiceClosure::create('entity_display.repository');
     }
   }
 
@@ -62,9 +64,9 @@ class MediaTypeForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      static::getSerializableServiceClosure('plugin.manager.media.source', $container),
-      static::getSerializableServiceClosure('entity_field.manager', $container),
-      static::getSerializableServiceClosure('entity_display.repository', $container),
+      SerializableServiceClosure::create('plugin.manager.media.source', $container),
+      SerializableServiceClosure::create('entity_field.manager', $container),
+      SerializableServiceClosure::create('entity_display.repository', $container),
     );
   }
 
