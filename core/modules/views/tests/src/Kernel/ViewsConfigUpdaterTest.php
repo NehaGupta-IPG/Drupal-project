@@ -41,6 +41,16 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   ];
 
   /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE): void {
+    parent::setUp();
+
+    $this->installEntitySchema('entity_test');
+    $this->installEntitySchema('file');
+  }
+
+  /**
    * Tests ViewsConfigUpdater.
    */
   public function testViewsConfigUpdater(): void {
