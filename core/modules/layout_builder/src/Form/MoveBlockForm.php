@@ -63,7 +63,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
     protected LayoutTempstoreRepositoryInterface|\Closure $layoutTempstoreClosure,
   ) {
     if ($this->layoutTempstoreClosure instanceof LayoutTempstoreRepositoryInterface) {
-      @trigger_error('Passing the media source plugin manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
+      @trigger_error('Passing the layout tempstore repository service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
       $this->layoutTempstoreClosure = static fn(): LayoutTempstoreRepositoryInterface => \Drupal::service('layout_builder.tempstore_repository');
     }
   }
