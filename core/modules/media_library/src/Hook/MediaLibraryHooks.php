@@ -263,7 +263,6 @@ class MediaLibraryHooks {
         '#access' => $url->access(NULL, TRUE),
       ];
     }
-    dump($data);
   }
 
   /**
