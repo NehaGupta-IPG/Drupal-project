@@ -20,8 +20,7 @@ class MTimeProtectedFileStorageMock extends MTimeProtectedFileStorage {
    *
    * When MTimeProtectedFileStorageBase::$simulateFilemtimeFailure is TRUE,
    * this method deletes the file before calling filemtime() to simulate
-   * the race condition where the file is deleted between file_exists()
-   * and filemtime() calls.
+   * the race condition where the file is deleted before the filemtime() call.
    */
   protected function getFilemtime(string $filename): int|false {
     if (MTimeProtectedFileStorageBase::$simulateFilemtimeFailure && file_exists($filename)) {
