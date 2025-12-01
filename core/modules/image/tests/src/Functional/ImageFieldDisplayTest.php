@@ -493,7 +493,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       ->getStorage('node');
     $field_name = strtolower($this->randomMachineName());
     $field_settings = ['alt_field_required' => 0];
-    $instance = $this->createImageField($field_name, 'article', [], $field_settings);
+    $instance = $this->createImageField($field_name, 'node', 'article', [], $field_settings);
 
     // Go to manage display page.
     $this->drupalGet('admin/structure/types/manage/article/display');
