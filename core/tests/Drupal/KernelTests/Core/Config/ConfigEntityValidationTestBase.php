@@ -17,14 +17,12 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstraint;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 // cspell:ignore kthxbai
 
 /**
  * Base class for testing validation of config entities.
- *
- * @group config
- * @group Validation
  */
 abstract class ConfigEntityValidationTestBase extends KernelTestBase {
 
@@ -151,9 +149,8 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    *   A machine name to test.
    * @param bool $is_expected_to_be_valid
    *   Whether this machine name is expected to be considered valid.
-   *
-   * @dataProvider providerInvalidMachineNameCharacters
    */
+  #[DataProvider('providerInvalidMachineNameCharacters')]
   public function testInvalidMachineNameCharacters(string $machine_name, bool $is_expected_to_be_valid): void {
     $constraints = $this->getMachineNameConstraints();
 
@@ -260,7 +257,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
         ],
         [
           'dependencies.module.0' => [
-            'This value is not valid.',
+            'This value is not a valid extension name.',
             "Module 'invalid-module-name' is not installed.",
           ],
         ],
@@ -290,7 +287,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
         ],
         [
           'dependencies.theme.0' => [
-            'This value is not valid.',
+            'This value is not a valid extension name.',
             "Theme 'invalid-theme-name' is not installed.",
           ],
         ],
@@ -315,9 +312,8 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
    *   The expected validation error messages. Keys are property paths, values
    *   are the expected messages: a string if a single message is expected, an
    *   array of strings if multiple are expected.
-   *
-   * @dataProvider providerConfigDependenciesValidation
    */
+  #[DataProvider('providerConfigDependenciesValidation')]
   public function testConfigDependenciesValidation(array $dependencies, array $expected_messages): void {
     // Add the dependencies we were given to the dependencies that may already
     // exist in the entity.

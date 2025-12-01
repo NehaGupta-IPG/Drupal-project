@@ -4,6 +4,7 @@ namespace Drupal\field_ui\Hook;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Theme\ThemePreprocess;
 use Drupal\field_ui\Plugin\Derivative\FieldUiLocalTask;
 use Drupal\Core\Entity\EntityFormModeInterface;
 use Drupal\Core\Entity\EntityViewModeInterface;
@@ -89,6 +90,7 @@ class FieldUiHooks {
           'responsive' => TRUE,
           'empty' => '',
         ],
+        'initial preprocess' => ThemePreprocess::class . ':preprocessTable',
       ],
       // Provide a dedicated template for new storage options as their styling
       // is quite different from a typical form element, so it works best to not
@@ -238,8 +240,8 @@ class FieldUiHooks {
   #[Hook('form_field_ui_field_storage_add_form_alter')]
   public function formFieldUiFieldStorageAddFormAlter(array &$form) : void {
     $optgroup = (string) $this->t('Reference');
-    // Move the "Entity reference" option to the end of the list and rename it to
-    // "Other".
+    // Move the "Entity reference" option to the end of the list and rename it
+    // to "Other".
     unset($form['add']['new_storage_type']['#options'][$optgroup]['entity_reference']);
     $form['add']['new_storage_type']['#options'][$optgroup]['entity_reference'] = $this->t('Other…');
   }
@@ -249,7 +251,7 @@ class FieldUiHooks {
    *
    * Adds a button 'Save and manage fields' to forms.
    *
-   * @see \Drupal\node\NodeTypeForm
+   * @see \Drupal\node\Form\NodeTypeForm
    * @see \Drupal\comment\CommentTypeForm
    * @see \Drupal\media\MediaTypeForm
    * @see \Drupal\block_content\BlockContentTypeForm
