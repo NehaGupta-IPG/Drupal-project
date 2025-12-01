@@ -21,14 +21,6 @@ trait DependencySerializationTrait {
   protected $_serviceIds = [];
 
   /**
-   * An array of service IDs for closures keyed by property name.
-   *
-   * @var array
-   */
-  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  protected $_serviceClosureIds = [];
-
-  /**
    * An array of entity type IDs keyed by the property name of their storages.
    *
    * @var array<string, string>
