@@ -14,6 +14,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\image\ImageDerivativeUtilities;
+use Drupal\image\ImageStyleInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
@@ -301,6 +302,28 @@ class ImageHooks {
     // Remove the default image when the instance is deleted.
     if ($uuid && ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid))) {
       \Drupal::service('file.usage')->delete($file, 'image', 'default_image', $field->uuid());
+    }
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_prepare_form() for 'image_style'.
+   *
+   * Help site builders to use modern image formats by enabling webp
+   * conversion by default.
+   *
+   * Note that hook_ENTITY_TYPE_create() is intentionally not being used to
+   * allow programmatic creation of image styles with other defaults.
+   */
+  #[Hook('image_style_prepare_form')]
+  public function imageStyleCreate(ImageStyleInterface $style, string $operation): void {
+    if ($operation === 'add' && $style->getEffects()->count() === 0) {
+      $style->addImageEffect([
+        'id' => 'image_convert',
+        'weight' => 0,
+        'data' => [
+          'extension' => 'webp',
+        ],
+      ]);
     }
   }
 
