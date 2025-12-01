@@ -6,11 +6,11 @@ use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Generates moderation-related local tasks.
@@ -41,11 +41,11 @@ class DynamicLocalTasks extends DeriverBase implements ContainerDeriverInterface
   protected $moderationInfo;
 
   /**
-   * The router.
+   * The module handler.
    *
-   * @var \Symfony\Component\Routing\RouterInterface
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $router;
+  protected $moduleHandler;
 
   /**
    * Creates a FieldUiLocalTask object.
@@ -58,15 +58,15 @@ class DynamicLocalTasks extends DeriverBase implements ContainerDeriverInterface
    *   The translation manager.
    * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
    *   The moderation information service.
-   * @param \Symfony\Component\Routing\RouterInterface $router
-   *   The router.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
    */
-  public function __construct($base_plugin_id, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation, ModerationInformationInterface $moderation_information, RouterInterface $router) {
+  public function __construct($base_plugin_id, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation, ModerationInformationInterface $moderation_information, ModuleHandlerInterface $module_handler) {
     $this->entityTypeManager = $entity_type_manager;
     $this->stringTranslation = $string_translation;
     $this->basePluginId = $base_plugin_id;
     $this->moderationInfo = $moderation_information;
-    $this->router = $router;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -78,7 +78,7 @@ class DynamicLocalTasks extends DeriverBase implements ContainerDeriverInterface
       $container->get('entity_type.manager'),
       $container->get('string_translation'),
       $container->get('content_moderation.moderation_information'),
-      $container->get('router')
+      $container->get('module_handler')
     );
   }
 
@@ -89,7 +89,7 @@ class DynamicLocalTasks extends DeriverBase implements ContainerDeriverInterface
     $this->derivatives = [];
 
     // Add the moderated content task if the route exists.
-    if ($this->router->getRouteCollection()->get('content_moderation.admin_moderated_content') !== NULL) {
+    if ($this->moduleHandler->moduleExists('node')) {
       $this->derivatives['content_moderation.moderated_content'] = [
         'route_name' => 'content_moderation.admin_moderated_content',
         'title' => $this->t('Moderated content'),
