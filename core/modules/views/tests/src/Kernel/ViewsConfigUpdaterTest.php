@@ -182,23 +182,22 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
     FieldStorageConfig::create([
       'type' => 'image',
       'entity_type' => 'entity_test',
-      'field_name' => 'bar',
+      'field_name' => 'image_test',
     ])->save();
     FieldConfig::create([
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
-      'field_name' => 'bar',
+      'field_name' => 'image_test',
     ])->save();
 
     $test_view = $this->loadTestView('views.view.test_responsive_images');
-    $needs_update = $config_updater->needsResponsiveImageLazyLoadFieldUpdate($test_view);
     $needs_update = $config_updater->needsImagePreloadFieldUpdate($test_view);
     $test_view->save();
     $this->assertTrue($needs_update);
 
     $default_display = $test_view->getDisplay('default');
-    self::assertEquals('eager', $default_display['display_options']['fields']['bar']['settings']['image_loading']['attribute']);
-    self::assertEquals(FALSE, $default_display['display_options']['fields']['bar']['settings']['image_loading']['preload']);
+    self::assertEquals('eager', $default_display['display_options']['fields']['image_test']['settings']['image_loading']['attribute']);
+    self::assertEquals(FALSE, $default_display['display_options']['fields']['image_test']['settings']['image_loading']['preload']);
   }
 
   /**
@@ -214,12 +213,12 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
     FieldStorageConfig::create([
       'type' => 'image',
       'entity_type' => 'entity_test',
-      'field_name' => 'bar',
+      'field_name' => 'image_test',
     ])->save();
     FieldConfig::create([
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
-      'field_name' => 'bar',
+      'field_name' => 'image_test',
     ])->save();
 
     $test_view = $this->loadTestView('views.view.test_images');
@@ -228,7 +227,7 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
     $this->assertTrue($needs_update);
 
     $default_display = $test_view->getDisplay('default');
-    self::assertEquals(FALSE, $default_display['display_options']['fields']['bar']['settings']['image_loading']['preload']);
+    self::assertEquals(FALSE, $default_display['display_options']['fields']['image_test']['settings']['image_loading']['preload']);
   }
 
   /**
