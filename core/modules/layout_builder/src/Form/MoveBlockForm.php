@@ -2,7 +2,9 @@
 
 namespace Drupal\layout_builder\Form;
 
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Ajax\AjaxFormHelperTrait;
+use Drupal\Core\DependencyInjection\Attribute\ServiceClosure;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceDynamicSafeFormInterface;
@@ -15,6 +17,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a form for moving a block.
+ *
+ * @property \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layoutTempstore
  *
  * @internal
  *   Form classes are internal.
@@ -56,20 +60,31 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
   protected $uuid;
 
   /**
-   * The Layout Tempstore.
-   *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
-   */
-  protected $layoutTempstore;
-
-  /**
    * Constructs a new MoveBlockForm.
    *
    * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore.
    */
-  public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {
-    $this->layoutTempstore = $layout_tempstore_repository;
+  public function __construct(
+    #[ServiceClosure('layout_builder.tempstore_repository')]
+    protected LayoutTempstoreRepositoryInterface|\Closure $layoutTempstoreClosure
+  ) {
+    if ($this->layoutTempstoreClosure instanceof PluginManagerInterface) {
+      @trigger_error('Passing the media source plugin manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
+      $this->layoutTempstoreClosure = static fn(): LayoutTempstoreRepositoryInterface => \Drupal::service('layout_builder.tempstore_repository');
+    }
+  }
+
+  /**
+   * Magic getter for properties populated by closure return values.
+   */
+  public function __get(string $name): mixed {
+    $closureName = $name . 'Closure';
+    if (property_exists($this, $closureName) && $this->$closureName instanceof \Closure) {
+      return ($this->$closureName)();
+    }
+
+    return NULL;
   }
 
   /**
@@ -77,7 +92,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('layout_builder.tempstore_repository')
+      static fn(): LayoutTempstoreRepositoryInterface => $container->get('layout_builder.tempstore_repository'),
     );
   }
 
