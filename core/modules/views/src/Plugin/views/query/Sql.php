@@ -188,6 +188,8 @@ class Sql extends QueryPluginBase {
    *   The database-specific date handler.
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   The messenger.
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   *   The logger.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, DateSqlInterface $date_sql, MessengerInterface $messenger, ?LoggerChannelInterface $logger = NULL) {
     // By default, use AND operator to connect WHERE groups.
@@ -199,9 +201,10 @@ class Sql extends QueryPluginBase {
     $this->dateSql = $date_sql;
     $this->messenger = $messenger;
     if (!$logger) {
-      @trigger_error('Calling Sql::__construct() with the $logger argument is supported in drupal:11.2.0 and will be required before drupal:12.0.0.', E_USER_DEPRECATED);
+      @trigger_error('Calling Sql::__construct() with the $logger argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/2738051', E_USER_DEPRECATED);
       $logger = \Drupal::service('logger.channel.views');
     }
+    $this->logger = $logger;
   }
 
   /**
