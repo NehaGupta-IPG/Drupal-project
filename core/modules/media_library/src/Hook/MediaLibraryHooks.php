@@ -233,19 +233,37 @@ class MediaLibraryHooks {
   }
 
   /**
-   * Implements hook_local_tasks_alter().
+   * Implements hook_menu_local_tasks_alter().
    *
    * Removes tasks for the Media library if the view display no longer exists.
    */
-  #[Hook('local_tasks_alter')]
-  public function localTasksAlter(&$local_tasks): void {
+  #[Hook('menu_local_tasks_alter')]
+  public function menuLocalTasksAlter(&$data, $route_name, $cacheability): void {
     /** @var \Symfony\Component\Routing\RouteCollection $route_collection */
     $route_collection = \Drupal::service('router')->getRouteCollection();
-    foreach (['media_library.grid', 'media_library.table'] as $key) {
-      if (isset($local_tasks[$key]) && !$route_collection->get($local_tasks[$key]['route_name'])) {
-        unset($local_tasks[$key]);
-      }
+    if ($route_collection->get('entity.media.collection')) {
+      $url = Url::fromRoute('entity.media.collection');
+      $data['tabs'][1]['media_library.grid'] = [
+        '#theme' => 'menu_local_task',
+        '#link' => [
+          'title' => $this->t('Grid'),
+          'url' => $url,
+        ],
+        '#access' => $url->access(NULL, TRUE),
+      ];
     }
+    if ($route_collection->get('view.media_library.page')) {
+      $url = Url::fromRoute('view.media_library.page');
+      $data['tabs'][1]['media_library.table'] = [
+        '#theme' => 'menu_local_task',
+        '#link' => [
+          'title' => $this->t('Table'),
+          'url' => $url,
+        ],
+        '#access' => $url->access(NULL, TRUE),
+      ];
+    }
+    dump($data);
   }
 
   /**
