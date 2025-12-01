@@ -1084,7 +1084,6 @@ services:
     tags:
       - { name: backend_overridable }
     lazy: true
-  Drupal\Core\Lock\LockBackendInterface: '@lock'
   lock.persistent:
     class: Drupal\Core\Lock\PersistentDatabaseLockBackend
     arguments: ['@database']
