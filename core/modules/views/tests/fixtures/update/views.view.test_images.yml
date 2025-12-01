@@ -143,10 +143,10 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        bar:
-          id: bar
-          table: entity_test__bar
-          field: bar
+        image_test:
+          id: image_test
+          table: entity_test__image_test
+          field: image_test
           relationship: none
           group_type: group
           admin_label: ''
