@@ -239,7 +239,7 @@ class MediaLibraryHooks {
    */
   #[Hook('menu_local_tasks_alter')]
   public function menuLocalTasksAlter(&$data, $route_name, $cacheability): void {
-    if ($route_name !== 'entity.media.collection') {
+    if ($route_name !== 'entity.media.collection' && $route_name !== 'view.media_library.page') {
       return;
     }
     /** @var \Symfony\Component\Routing\RouteCollection $route_collection */
@@ -247,20 +247,20 @@ class MediaLibraryHooks {
 
     /** @var \Symfony\Component\Routing\RouteCollection $route_collection */
     $url = Url::fromRoute('entity.media.collection');
-    $data['tabs'][1]['media_library.grid'] = [
+    $data['tabs'][1]['media_library.table'] = [
       '#theme' => 'menu_local_task',
       '#link' => [
-        'title' => $this->t('Grid'),
+        'title' => $this->t('Table'),
         'url' => $url,
       ],
       '#access' => $url->access(NULL, TRUE),
     ];
     if ($route_collection->get('view.media_library.page')) {
       $url = Url::fromRoute('view.media_library.page');
-      $data['tabs'][1]['media_library.table'] = [
+      $data['tabs'][1]['media_library.grid'] = [
         '#theme' => 'menu_local_task',
         '#link' => [
-          'title' => $this->t('Table'),
+          'title' => $this->t('Grid'),
           'url' => $url,
         ],
         '#access' => $url->access(NULL, TRUE),
