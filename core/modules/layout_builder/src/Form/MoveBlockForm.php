@@ -2,7 +2,6 @@
 
 namespace Drupal\layout_builder\Form;
 
-use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Ajax\AjaxFormHelperTrait;
 use Drupal\Core\DependencyInjection\Attribute\ServiceClosure;
 use Drupal\Core\Form\FormBase;
@@ -63,7 +62,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
     #[ServiceClosure('layout_builder.tempstore_repository')]
     protected LayoutTempstoreRepositoryInterface|\Closure $layoutTempstoreClosure,
   ) {
-    if ($this->layoutTempstoreClosure instanceof PluginManagerInterface) {
+    if ($this->layoutTempstoreClosure instanceof LayoutTempstoreRepositoryInterface) {
       @trigger_error('Passing the media source plugin manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
       $this->layoutTempstoreClosure = static fn(): LayoutTempstoreRepositoryInterface => \Drupal::service('layout_builder.tempstore_repository');
     }
