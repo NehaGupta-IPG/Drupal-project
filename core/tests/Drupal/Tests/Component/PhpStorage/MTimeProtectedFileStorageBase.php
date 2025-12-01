@@ -14,6 +14,13 @@ use Drupal\Component\Utility\Random;
 abstract class MTimeProtectedFileStorageBase extends PhpStorageTestBase {
 
   /**
+   * Whether to simulate filemtime() failure by deleting file before call.
+   *
+   * @var bool
+   */
+  public static bool $simulateFilemtimeFailure = FALSE;
+
+  /**
    * The PHP storage class to test.
    *
    * This should be overridden by extending classes.
@@ -130,6 +137,56 @@ abstract class MTimeProtectedFileStorageBase extends PhpStorageTestBase {
       $this->assertSame($this->expected[$i], $GLOBALS['hacked']);
     }
     unset($GLOBALS['hacked']);
+  }
+
+  /**
+   * Tests that checkFile handles race conditions without PHP warnings.
+   *
+   * This test simulates a race condition where a file is deleted between
+   * the file_exists() check and the filemtime() call in checkFile().
+   *
+   * The race condition is simulated by mocking filemtime() to return FALSE
+   * (simulating the file being deleted after file_exists() returned TRUE).
+   *
+   * Without the fix, this test will:
+   * - Trigger a PHP warning: "filemtime(): stat failed for ..."
+   * - Return TRUE incorrectly (due to PHP type coercion: false <= int = true)
+   *
+   * With the fix (@filemtime with !== FALSE check), this test will:
+   * - Not trigger any PHP warning
+   * - Return FALSE correctly
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3557344
+   */
+  public function testRaceConditionFilemtimeWarning(): void {
+    // Use mock class that can simulate race condition.
+    $php = new MTimeProtectedFileStorageMock($this->settings);
+    $name = 'race_condition_test.php';
+
+    // Save a test file.
+    $this->assertTrue($php->save($name, '<?php return TRUE;'));
+
+    // Verify normal operation works (without mock).
+    $this->assertTrue($php->exists($name), 'File exists before race condition');
+
+    // Enable filemtime() failure simulation.
+    // This simulates the race condition where file is deleted after
+    // file_exists() returns TRUE but before filemtime() is called.
+    self::$simulateFilemtimeFailure = TRUE;
+
+    // This should return FALSE when filemtime() fails.
+    // Without the fix: triggers warning and returns TRUE (bug).
+    // With the fix: no warning and returns FALSE (correct).
+    $result = $php->exists($name);
+
+    // Reset mock.
+    self::$simulateFilemtimeFailure = FALSE;
+
+    // The correct behavior is to return FALSE when filemtime() fails.
+    $this->assertFalse($result, 'exists() returns FALSE when filemtime() fails during race condition');
+
+    // Cleanup.
+    $php->delete($name);
   }
 
 }
