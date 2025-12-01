@@ -1524,6 +1524,7 @@ services:
   transliteration:
     class: Drupal\Core\Transliteration\PhpTransliteration
     arguments: [null, '@module_handler']
+  Drupal\Component\Transliteration\TransliterationInterface: '@transliteration'
   flood:
     class: Drupal\Core\Flood\DatabaseBackend
     arguments: ['@database', '@request_stack', '@datetime.time']
