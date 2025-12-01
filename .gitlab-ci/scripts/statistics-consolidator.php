@@ -34,6 +34,13 @@ if (!isset($args[1])) {
   exit(2);
 }
 
+// PHP major/minor version.
+$phpImage = $args[2] ?? NULL;
+if ($phpImage) {
+  preg_match('/^\d+\.\d+/', $phpImage, $matches);
+  $phpVersion = $matches[0];
+}
+
 require __DIR__ . '/../../vendor/autoload.php';
 
 $finder = new Finder();
@@ -43,7 +50,10 @@ $files = $finder->files()->in($args[1])->name('deprecation-ignore-stats.json');
 $tmp = [];
 foreach ($files as $file) {
   $contents = json_decode($file->getContents(), TRUE);
-  dump([$file->getRealPath(), $contents['metadata']]);
+  dump([$file->getRealPath(), $contents['metadata'], $contents['metadata']['php_version'] === $phpVersion ? 'MATCH' : '**MISS**']);
+  if ($contents['metadata']['php_version'] !== $phpVersion) {
+    continue;
+  }
   foreach ($contents['skips'] as $key => $count) {
     $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
   }

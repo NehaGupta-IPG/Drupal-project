@@ -824,7 +824,7 @@ default:
   stage: 🚚 Consolidate
   script:
     - find test-artifacts
-    - php .gitlab-ci/scripts/statistics-consolidator.php test-artifacts
+#    - php .gitlab-ci/scripts/statistics-consolidator.php test-artifacts
   artifacts:
     when: always
     expire_in: 6 mos
