@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\editor\Unit\EditorXssFilter;
 
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\editor\EditorXssFilter\Standard;
 use Drupal\filter\Plugin\FilterInterface;
 use Drupal\Tests\UnitTestCase;
@@ -35,7 +36,7 @@ class StandardTest extends UnitTestCase {
     parent::setUp();
 
     // Mock text format configuration entity object.
-    $this->format = $this->getMockBuilder(\Drupal\filter\Entity\FilterFormat::class)
+    $this->format = $this->getMockBuilder(FilterFormat::class)
       ->disableOriginalConstructor()
       ->getMock();
     $this->format->expects($this->any())

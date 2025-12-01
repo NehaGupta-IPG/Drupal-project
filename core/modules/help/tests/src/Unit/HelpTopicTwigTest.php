@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\help\Unit;
 
+use Drupal\Core\Template\TwigEnvironment;
 use Drupal\Core\Cache\Cache;
 use Drupal\help\HelpTopicTwig;
 use Drupal\Tests\UnitTestCase;
@@ -103,7 +104,7 @@ class HelpTopicTwigTest extends UnitTestCase {
    */
   protected function getTwigMock() {
     $twig = $this
-      ->getMockBuilder(\Drupal\Core\Template\TwigEnvironment::class)
+      ->getMockBuilder(TwigEnvironment::class)
       ->disableOriginalConstructor()
       ->getMock();
 

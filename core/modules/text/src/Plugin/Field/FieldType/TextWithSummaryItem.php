@@ -2,6 +2,7 @@
 
 namespace Drupal\text\Plugin\Field\FieldType;
 
+use Drupal\text\TextProcessed;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -50,7 +51,7 @@ class TextWithSummaryItem extends TextItemBase {
       ->setLabel(new TranslatableMarkup('Processed summary'))
       ->setDescription(new TranslatableMarkup('The summary text with the text format applied.'))
       ->setComputed(TRUE)
-      ->setClass(\Drupal\text\TextProcessed::class)
+      ->setClass(TextProcessed::class)
       ->setSetting('text source', 'summary');
 
     return $properties;

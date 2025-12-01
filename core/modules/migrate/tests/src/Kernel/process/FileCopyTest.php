@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel\process;
 
+use Drupal\Core\StreamWrapper\TemporaryStream;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\KernelTests\Core\File\FileTestBase;
 use Drupal\migrate\MigrateException;
@@ -43,7 +44,7 @@ class FileCopyTest extends FileTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->fileSystem = $this->container->get('file_system');
-    $this->container->get('stream_wrapper_manager')->registerWrapper('temporary', \Drupal\Core\StreamWrapper\TemporaryStream::class, StreamWrapperInterface::LOCAL_NORMAL);
+    $this->container->get('stream_wrapper_manager')->registerWrapper('temporary', TemporaryStream::class, StreamWrapperInterface::LOCAL_NORMAL);
   }
 
   /**

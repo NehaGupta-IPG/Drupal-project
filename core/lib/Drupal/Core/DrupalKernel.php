@@ -2,6 +2,16 @@
 
 namespace Drupal\Core;
 
+use Symfony\Component\HttpKernel\KernelInterface;
+use Drupal\Core\DependencyInjection\Container;
+use Drupal\Core\Installer\InstallerServiceProvider;
+use Drupal\Component\FileCache\ApcuFileCacheBackend;
+use Drupal\Component\DependencyInjection\PhpArrayContainer;
+use Drupal\Core\Cache\DatabaseCacheTagsChecksum;
+use Drupal\Component\Datetime\Time;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\Core\Database\Connection;
+use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Composer\Autoload\ClassLoader;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
@@ -63,7 +73,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @var string
    */
-  protected $phpArrayDumperClass = \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper::class;
+  protected $phpArrayDumperClass = OptimizedPhpArrayDumper::class;
 
   /**
    * Holds the default bootstrap container definition.
@@ -74,19 +84,19 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     'parameters' => [],
     'services' => [
       'database' => [
-        'class' => \Drupal\Core\Database\Connection::class,
+        'class' => Connection::class,
         'factory' => 'Drupal\Core\Database\Database::getConnection',
         'arguments' => ['default'],
       ],
       'request_stack' => [
-        'class' => \Symfony\Component\HttpFoundation\RequestStack::class,
+        'class' => RequestStack::class,
       ],
       'datetime.time' => [
-        'class' => \Drupal\Component\Datetime\Time::class,
+        'class' => Time::class,
         'arguments' => ['@request_stack'],
       ],
       'cache.container' => [
-        'class' => \Drupal\Core\Cache\DatabaseBackend::class,
+        'class' => DatabaseBackend::class,
         'arguments' => [
           '@database',
           '@cache_tags_provider.container',
@@ -97,7 +107,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         ],
       ],
       'cache_tags_provider.container' => [
-        'class' => \Drupal\Core\Cache\DatabaseCacheTagsChecksum::class,
+        'class' => DatabaseCacheTagsChecksum::class,
         'arguments' => ['@database'],
       ],
       'serialization.phpserialize' => [
@@ -111,7 +121,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @var string
    */
-  protected $bootstrapContainerClass = \Drupal\Component\DependencyInjection\PhpArrayContainer::class;
+  protected $bootstrapContainerClass = PhpArrayContainer::class;
 
   /**
    * Holds the bootstrap container.
@@ -512,7 +522,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // @todo Use extension_loaded('apcu') for non-testbot
       //   https://www.drupal.org/node/2447753.
       if (function_exists('apcu_fetch')) {
-        $configuration['default']['cache_backend_class'] = \Drupal\Component\FileCache\ApcuFileCacheBackend::class;
+        $configuration['default']['cache_backend_class'] = ApcuFileCacheBackend::class;
       }
     }
     FileCacheFactory::setConfiguration($configuration);
@@ -643,7 +653,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       'site' => [],
     ];
     $this->serviceYamls['app']['core'] = 'core/core.services.yml';
-    $this->serviceProviderClasses['app']['core'] = \Drupal\Core\CoreServiceProvider::class;
+    $this->serviceProviderClasses['app']['core'] = CoreServiceProvider::class;
 
     // Retrieve enabled modules and register their namespaces.
     if (!isset($this->moduleList) || !isset($this->themeList)) {
@@ -663,7 +673,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         if ($extensions === FALSE && !InstallerKernel::installationAttempted()) {
           $this->allowDumping = FALSE;
           $this->containerNeedsDumping = FALSE;
-          $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = \Drupal\Core\Installer\InstallerServiceProvider::class;
+          $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = InstallerServiceProvider::class;
         }
         $this->moduleList = $extensions['module'] ?? [];
       }
@@ -1045,7 +1055,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // are determined from the request.
       $container_definition['parameters']['app.root'] = $this->getAppRoot();
       $container_definition['parameters']['site.path'] = $this->getSitePath();
-      $class = Settings::get('container_base_class', \Drupal\Core\DependencyInjection\Container::class);
+      $class = Settings::get('container_base_class', Container::class);
       $container = new $class($container_definition);
     }
 
@@ -1472,8 +1482,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Register synthetic services.
     $container->register('class_loader')->setSynthetic(TRUE);
-    $container->register('kernel', \Symfony\Component\HttpKernel\KernelInterface::class)->setSynthetic(TRUE);
-    $container->register('service_container', \Symfony\Component\DependencyInjection\ContainerInterface::class)->setSynthetic(TRUE);
+    $container->register('kernel', KernelInterface::class)->setSynthetic(TRUE);
+    $container->register('service_container', ContainerInterface::class)->setSynthetic(TRUE);
 
     // Register aliases of synthetic services for autowiring.
     $container->setAlias(DrupalKernelInterface::class, 'kernel');

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\announcements_feed\Unit;
 
+use Psr\Log\LoggerInterface;
+use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
+use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
+use GuzzleHttp\ClientInterface;
 use Drupal\announcements_feed\AnnounceFetcher;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -27,7 +31,7 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
    */
   public function setUp():void {
     parent::setUp();
-    $httpClient = $this->createMock(\GuzzleHttp\ClientInterface::class);
+    $httpClient = $this->createMock(ClientInterface::class);
     $config = $this->getConfigFactoryStub([
       'announcements_feed.settings' => [
         'max_age' => 86400,
@@ -35,12 +39,12 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
         'limit' => 10,
       ],
     ]);
-    $tempStore = $this->createMock(\Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface::class);
+    $tempStore = $this->createMock(KeyValueExpirableFactoryInterface::class);
     $tempStore->expects($this->once())
       ->method('get')
-      ->willReturn($this->createMock(\Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface::class));
+      ->willReturn($this->createMock(KeyValueStoreExpirableInterface::class));
 
-    $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
+    $logger = $this->createMock(LoggerInterface::class);
     $this->fetcher = new AnnounceFetcher($httpClient, $config, $tempStore, $logger, 'https://www.drupal.org/announcements.json');
   }
 

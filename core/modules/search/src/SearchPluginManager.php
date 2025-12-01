@@ -2,6 +2,7 @@
 
 namespace Drupal\search;
 
+use Drupal\search\Annotation\SearchPlugin;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -25,7 +26,7 @@ class SearchPluginManager extends DefaultPluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/Search', $namespaces, $module_handler, SearchInterface::class, Search::class, \Drupal\search\Annotation\SearchPlugin::class);
+    parent::__construct('Plugin/Search', $namespaces, $module_handler, SearchInterface::class, Search::class, SearchPlugin::class);
     $this->setCacheBackend($cache_backend, 'search_plugins');
     $this->alterInfo('search_plugin');
   }

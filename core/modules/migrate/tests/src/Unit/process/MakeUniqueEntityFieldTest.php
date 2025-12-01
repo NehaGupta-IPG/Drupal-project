@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\process;
 
+use Drupal\migrate\MigrateException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Query\QueryInterface;
@@ -46,7 +47,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->entityQuery = $this->getMockBuilder(\Drupal\Core\Entity\Query\QueryInterface::class)
+    $this->entityQuery = $this->getMockBuilder(QueryInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
     $this->entityQuery->expects($this->any())
@@ -98,7 +99,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
       'start' => 'foobar',
     ];
     $plugin = new MakeUniqueEntityField($configuration, 'make_unique', [], $this->getMigration(), $this->entityTypeManager);
-    $this->expectException(\Drupal\migrate\MigrateException::class);
+    $this->expectException(MigrateException::class);
     $this->expectExceptionMessage('The start position configuration key should be an integer. Omit this key to capture from the beginning of the string.');
     $plugin->transform('test_start', $this->migrateExecutable, $this->row, 'foo');
   }
@@ -113,7 +114,7 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
       'length' => 'foobar',
     ];
     $plugin = new MakeUniqueEntityField($configuration, 'make_unique', [], $this->getMigration(), $this->entityTypeManager);
-    $this->expectException(\Drupal\migrate\MigrateException::class);
+    $this->expectException(MigrateException::class);
     $this->expectExceptionMessage('The character length configuration key should be an integer. Omit this key to capture the entire string.');
     $plugin->transform('test_length', $this->migrateExecutable, $this->row, 'foo');
   }

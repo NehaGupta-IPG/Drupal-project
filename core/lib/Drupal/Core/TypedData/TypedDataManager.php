@@ -264,7 +264,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
     $type_definition = $this->getDefinition($definition->getDataType());
     // Auto-generate a constraint for data types implementing a primitive
     // interface.
-    if (is_subclass_of($type_definition['class'], \Drupal\Core\TypedData\PrimitiveInterface::class)) {
+    if (is_subclass_of($type_definition['class'], PrimitiveInterface::class)) {
       $constraints['PrimitiveType'] = [];
     }
     // Add in constraints specified by the data type.
@@ -276,7 +276,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
       $constraints['NotNull'] = [];
     }
     // Check if the class provides allowed values.
-    if (is_subclass_of($definition->getClass(), \Drupal\Core\TypedData\OptionsProviderInterface::class)) {
+    if (is_subclass_of($definition->getClass(), OptionsProviderInterface::class)) {
       $constraints['AllowedValues'] = [];
     }
     return $constraints;

@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Drupal\big_pipe_test;
 
+use Drupal\big_pipe_test\Form\BigPipeTestForm;
 use Drupal\big_pipe\Render\BigPipeMarkup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -113,7 +114,7 @@ class BigPipePlaceholderTestCases {
 
     // 2. Real-world example of HTML attribute value placeholder: form action.
     $form_action = new BigPipePlaceholderTestCase(
-      $container ? $container->get('form_builder')->getForm(\Drupal\big_pipe_test\Form\BigPipeTestForm::class) : [],
+      $container ? $container->get('form_builder')->getForm(BigPipeTestForm::class) : [],
       'form_action_cc611e1d',
       [
         '#lazy_builder' => ['form_builder:renderPlaceholderFormAction', []],

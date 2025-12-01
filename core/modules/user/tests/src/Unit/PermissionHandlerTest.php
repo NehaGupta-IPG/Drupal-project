@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Unit;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
@@ -61,7 +63,7 @@ class PermissionHandlerTest extends UnitTestCase {
     parent::setUp();
 
     $this->stringTranslation = new TestTranslationManager();
-    $this->callableResolver = $this->createMock(\Drupal\Core\Utility\CallableResolver::class);
+    $this->callableResolver = $this->createMock(CallableResolver::class);
   }
 
   /**
@@ -94,7 +96,7 @@ class PermissionHandlerTest extends UnitTestCase {
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
 
-    $this->moduleHandler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
     $this->moduleHandler->expects($this->once())
       ->method('getModuleDirectories')
       ->willReturn([
@@ -159,7 +161,7 @@ EOF
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
 
-    $this->moduleHandler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
     $this->moduleHandler->expects($this->once())
       ->method('getModuleDirectories')
       ->willReturn([
@@ -215,7 +217,7 @@ EOF
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
 
-    $this->moduleHandler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
     $this->moduleHandler->expects($this->once())
       ->method('getModuleDirectories')
       ->willReturn([
@@ -288,7 +290,7 @@ EOF
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
 
-    $this->moduleHandler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
     $this->moduleHandler->expects($this->once())
       ->method('getModuleDirectories')
       ->willReturn([

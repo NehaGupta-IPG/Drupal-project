@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\update_test\Hook;
 
+use Drupal\update_test\TestFileTransferWithSettingsForm;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -73,7 +74,7 @@ class UpdateTestHooks {
     return [
       'system_test' => [
         'title' => 'Update Test FileTransfer',
-        'class' => \Drupal\update_test\TestFileTransferWithSettingsForm::class,
+        'class' => TestFileTransferWithSettingsForm::class,
         'weight' => -20,
       ],
     ];

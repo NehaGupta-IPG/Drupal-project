@@ -2,6 +2,9 @@
 
 namespace Drupal\migrate\Plugin\Derivative;
 
+use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
+use Drupal\migrate\Plugin\migrate\destination\EntityConfigBase;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -59,9 +62,9 @@ class MigrateEntity implements ContainerDeriverInterface {
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
     foreach ($this->entityDefinitions as $entity_type => $entity_info) {
-      $class = is_subclass_of($entity_info->getClass(), \Drupal\Core\Config\Entity\ConfigEntityInterface::class) ?
-        \Drupal\migrate\Plugin\migrate\destination\EntityConfigBase::class :
-        \Drupal\migrate\Plugin\migrate\destination\EntityContentBase::class;
+      $class = is_subclass_of($entity_info->getClass(), ConfigEntityInterface::class) ?
+        EntityConfigBase::class :
+        EntityContentBase::class;
       $this->derivatives[$entity_type] = [
         'id' => "entity:$entity_type",
         'class' => $class,

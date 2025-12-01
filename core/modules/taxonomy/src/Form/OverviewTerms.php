@@ -2,6 +2,7 @@
 
 namespace Drupal\taxonomy\Form;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityListBuilderInterface;
@@ -465,7 +466,7 @@ class OverviewTerms extends EntityForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Sort term order based on weight.
-    uasort($form_state->getValue('terms'), [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
+    uasort($form_state->getValue('terms'), [SortArray::class, 'sortByWeightElement']);
 
     $vocabulary = $form_state->get(['taxonomy', 'vocabulary']);
     $changed_terms = [];

@@ -189,7 +189,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     $definition['weight'] = $this->getWeight();
     $definition['id'] = $this->getPluginId();
     $definition['metadata'] = ['entity_id' => $this->id()];
-    $definition['form_class'] = \Drupal\menu_link_content\Form\MenuLinkContentForm::class;
+    $definition['form_class'] = MenuLinkContentForm::class;
     $definition['enabled'] = $this->isEnabled() ? 1 : 0;
     $definition['expanded'] = $this->isExpanded() ? 1 : 0;
     $definition['provider'] = 'menu_link_content';

@@ -25,7 +25,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    * @var array
    */
   protected $defaults = [
-    'class' => \Drupal\migrate\Plugin\Migration::class,
+    'class' => Migration::class,
   ];
 
   /**
@@ -33,7 +33,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    *
    * @var string
    */
-  protected $pluginInterface = \Drupal\migrate\Plugin\MigrationInterface::class;
+  protected $pluginInterface = MigrationInterface::class;
 
   /**
    * The module handler.

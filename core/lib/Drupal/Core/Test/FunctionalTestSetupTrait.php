@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Test;
 
+use Drupal\Core\Test\StackMiddleware\TestWaitTerminateMiddleware;
+use Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\Environment;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
@@ -169,11 +171,11 @@ trait FunctionalTestSetupTrait {
     }
     // Register test middleware.
     $services['services']['testing.http_client.middleware'] = [
-      'class' => \Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware::class,
+      'class' => TestHttpClientMiddleware::class,
       'tags' => [['name' => 'http_client_middleware']],
     ];
     $services['services']['testing.http_middleware.wait_terminate_middleware'] = [
-      'class' => \Drupal\Core\Test\StackMiddleware\TestWaitTerminateMiddleware::class,
+      'class' => TestWaitTerminateMiddleware::class,
       'arguments' => ['@lock', '%drupal.test_wait_terminate%'],
       'tags' => [['name' => 'http_middleware', 'priority' => -1024]],
     ];

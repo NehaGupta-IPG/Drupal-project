@@ -5,6 +5,8 @@
  * Functions for form and batch generation and processing.
  */
 
+use Drupal\Core\Queue\BatchMemory;
+use Drupal\Core\Queue\Batch;
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\Core\Form\FormPreprocess;
 use Drupal\Core\Url;
@@ -870,7 +872,7 @@ function _batch_populate_queue(&$batch, $set_id): void {
     $batch_set += [
       'queue' => [
         'name' => 'drupal_batch:' . $batch['id'] . ':' . $set_id,
-        'class' => $batch['progressive'] ? \Drupal\Core\Queue\Batch::class : \Drupal\Core\Queue\BatchMemory::class,
+        'class' => $batch['progressive'] ? Batch::class : BatchMemory::class,
       ],
     ];
 

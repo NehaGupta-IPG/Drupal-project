@@ -2,6 +2,7 @@
 
 namespace Drupal\field_ui\Element;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
@@ -232,7 +233,7 @@ class FieldUiTable extends Table {
       $array[] = $a['name'];
     }
     if (!empty($a['children'])) {
-      uasort($a['children'], [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
+      uasort($a['children'], [SortArray::class, 'sortByWeightElement']);
       $array = array_merge($array, array_reduce($a['children'], [static::class, 'reduceOrder']));
     }
 

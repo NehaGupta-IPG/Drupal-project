@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Kernel\Migrate\d7;
 
+use Drupal\Core\StreamWrapper\PrivateStream;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -49,7 +50,7 @@ class MigratePrivateFileTest extends MigrateDrupal7TestBase {
    */
   public function register(ContainerBuilder $container): void {
     parent::register($container);
-    $container->register('stream_wrapper.private', \Drupal\Core\StreamWrapper\PrivateStream::class)
+    $container->register('stream_wrapper.private', PrivateStream::class)
       ->addTag('stream_wrapper', ['scheme' => 'private']);
   }
 

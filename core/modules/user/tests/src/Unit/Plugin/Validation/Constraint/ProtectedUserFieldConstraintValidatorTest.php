@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Unit\Plugin\Validation\Constraint;
 
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\user\UserStorageInterface;
+use Drupal\user\UserInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Entity\User;
 use Drupal\user\Plugin\Validation\Constraint\ProtectedUserFieldConstraint;
@@ -24,20 +29,20 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
    */
   protected function createValidator() {
     // Setup mocks that don't need to change.
-    $unchanged_field = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $unchanged_field = $this->createMock(FieldItemListInterface::class);
     $unchanged_field->expects($this->any())
       ->method('getValue')
       ->willReturn('unchanged-value');
 
-    $unchanged_account = $this->createMock(\Drupal\user\UserInterface::class);
+    $unchanged_account = $this->createMock(UserInterface::class);
     $unchanged_account->expects($this->any())
       ->method('get')
       ->willReturn($unchanged_field);
-    $user_storage = $this->createMock(\Drupal\user\UserStorageInterface::class);
+    $user_storage = $this->createMock(UserStorageInterface::class);
     $user_storage->expects($this->any())
       ->method('loadUnchanged')
       ->willReturn($unchanged_account);
-    $current_user = $this->createMock(\Drupal\Core\Session\AccountProxyInterface::class);
+    $current_user = $this->createMock(AccountProxyInterface::class);
     $current_user->expects($this->any())
       ->method('id')
       ->willReturn('current-user');
@@ -79,8 +84,8 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $this->validate(NULL);
 
     // Case 2: Empty user should be ignored.
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);
@@ -90,10 +95,10 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $this->validate($items);
 
     // Case 3: Account flagged to skip protected user should be ignored.
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
     $account = $this->createMock(User::class);
     $account->_skipProtectedUserFieldConstraint = TRUE;
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);
@@ -103,12 +108,12 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $this->validate($items);
 
     // Case 4: New user should be ignored.
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
-    $account = $this->createMock(\Drupal\user\UserInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
+    $account = $this->createMock(UserInterface::class);
     $account->expects($this->once())
       ->method('isNew')
       ->willReturn(TRUE);
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);
@@ -118,14 +123,14 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $this->validate($items);
 
     // Case 5: Mismatching user IDs should also be ignored.
-    $account = $this->createMock(\Drupal\user\UserInterface::class);
+    $account = $this->createMock(UserInterface::class);
     $account->expects($this->once())
       ->method('isNew')
       ->willReturn(FALSE);
     $account->expects($this->once())
       ->method('id')
       ->willReturn('not-current-user');
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);
@@ -135,11 +140,11 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $this->validate($items);
 
     // Case 6: Non-password fields that have not changed should be ignored.
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
     $field_definition->expects($this->exactly(2))
       ->method('getName')
       ->willReturn('field_not_password');
-    $account = $this->createMock(\Drupal\user\UserInterface::class);
+    $account = $this->createMock(UserInterface::class);
     $account->expects($this->once())
       ->method('isNew')
       ->willReturn(FALSE);
@@ -148,7 +153,7 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
       ->willReturn('current-user');
     $account->expects($this->never())
       ->method('checkExistingPassword');
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);
@@ -161,11 +166,11 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $this->validate($items);
 
     // Case 7: Password field with no value set should be ignored.
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
     $field_definition->expects($this->once())
       ->method('getName')
       ->willReturn('pass');
-    $account = $this->createMock(\Drupal\user\UserInterface::class);
+    $account = $this->createMock(UserInterface::class);
     $account->expects($this->once())
       ->method('isNew')
       ->willReturn(FALSE);
@@ -174,7 +179,7 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
       ->willReturn('current-user');
     $account->expects($this->never())
       ->method('checkExistingPassword');
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);
@@ -185,11 +190,11 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
 
     // Case 8: Non-password field changed, but user has passed provided current
     // password.
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
     $field_definition->expects($this->exactly(2))
       ->method('getName')
       ->willReturn('field_not_password');
-    $account = $this->createMock(\Drupal\user\UserInterface::class);
+    $account = $this->createMock(UserInterface::class);
     $account->expects($this->once())
       ->method('isNew')
       ->willReturn(FALSE);
@@ -199,7 +204,7 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $account->expects($this->once())
       ->method('checkExistingPassword')
       ->willReturn(TRUE);
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);
@@ -212,11 +217,11 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $this->validate($items);
 
     // Case 9: Password field changed, current password confirmed.
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
     $field_definition->expects($this->exactly(2))
       ->method('getName')
       ->willReturn('pass');
-    $account = $this->createMock(\Drupal\user\UserInterface::class);
+    $account = $this->createMock(UserInterface::class);
     $account->expects($this->once())
       ->method('isNew')
       ->willReturn(FALSE);
@@ -226,7 +231,7 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $account->expects($this->once())
       ->method('checkExistingPassword')
       ->willReturn(TRUE);
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);
@@ -245,14 +250,14 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     // The below calls should result in a violation.
 
     // Case 10: Password field changed, current password not confirmed.
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
     $field_definition->expects($this->exactly(2))
       ->method('getName')
       ->willReturn('pass');
     $field_definition->expects($this->any())
       ->method('getLabel')
       ->willReturn('Password');
-    $account = $this->createMock(\Drupal\user\UserInterface::class);
+    $account = $this->createMock(UserInterface::class);
     $account->expects($this->once())
       ->method('isNew')
       ->willReturn(FALSE);
@@ -262,7 +267,7 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $account->expects($this->once())
       ->method('checkExistingPassword')
       ->willReturn(FALSE);
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);
@@ -279,14 +284,14 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $this->validate($items, 'Password');
 
     // Case 11: Non-password field changed, current password not confirmed.
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
     $field_definition->expects($this->exactly(2))
       ->method('getName')
       ->willReturn('field_not_password');
     $field_definition->expects($this->any())
       ->method('getLabel')
       ->willReturn('Protected field');
-    $account = $this->createMock(\Drupal\user\UserInterface::class);
+    $account = $this->createMock(UserInterface::class);
     $account->expects($this->once())
       ->method('isNew')
       ->willReturn(FALSE);
@@ -296,7 +301,7 @@ class ProtectedUserFieldConstraintValidatorTest extends UnitTestCase {
     $account->expects($this->once())
       ->method('checkExistingPassword')
       ->willReturn(FALSE);
-    $items = $this->createMock(\Drupal\Core\Field\FieldItemListInterface::class);
+    $items = $this->createMock(FieldItemListInterface::class);
     $items->expects($this->once())
       ->method('getFieldDefinition')
       ->willReturn($field_definition);

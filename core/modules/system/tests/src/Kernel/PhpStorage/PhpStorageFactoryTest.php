@@ -99,7 +99,7 @@ class PhpStorageFactoryTest extends KernelTestBase {
    */
   protected function setSettings($name = 'default', array $configuration = []): void {
     $settings['php_storage'][$name] = $configuration + [
-      'class' => \Drupal\system\PhpStorage\MockPhpStorage::class,
+      'class' => MockPhpStorage::class,
       'directory' => 'tmp://',
       'secret' => $this->randomString(),
       'bin' => 'test',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\editor_test\Hook;
 
+use Drupal\editor_test\EditorXssFilter\Insecure;
 use Drupal\file\FileInterface;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\node\NodeInterface;
@@ -71,7 +72,7 @@ class EditorTestHooks {
     }
     $filters = $format->filters()->getAll();
     if (isset($filters['filter_html']) && $filters['filter_html']->status) {
-      $editor_xss_filter_class = \Drupal\editor_test\EditorXssFilter\Insecure::class;
+      $editor_xss_filter_class = Insecure::class;
     }
   }
 

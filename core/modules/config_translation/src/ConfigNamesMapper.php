@@ -2,6 +2,9 @@
 
 namespace Drupal\config_translation;
 
+use Drupal\config_translation\Form\ConfigTranslationDeleteForm;
+use Drupal\config_translation\Form\ConfigTranslationEditForm;
+use Drupal\config_translation\Form\ConfigTranslationAddForm;
 use Drupal\config_translation\Event\ConfigMapperPopulateEvent;
 use Drupal\config_translation\Event\ConfigTranslationEvents;
 use Drupal\config_translation\Exception\ConfigMapperLanguageException;
@@ -288,7 +291,7 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
     $route = new Route(
       $this->getBaseRoute()->getPath() . '/translate/{langcode}/add',
       [
-        '_form' => \Drupal\config_translation\Form\ConfigTranslationAddForm::class,
+        '_form' => ConfigTranslationAddForm::class,
         'plugin_id' => $this->getPluginId(),
       ],
       ['_config_translation_form_access' => 'TRUE']
@@ -318,7 +321,7 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
     $route = new Route(
       $this->getBaseRoute()->getPath() . '/translate/{langcode}/edit',
       [
-        '_form' => \Drupal\config_translation\Form\ConfigTranslationEditForm::class,
+        '_form' => ConfigTranslationEditForm::class,
         'plugin_id' => $this->getPluginId(),
       ],
       ['_config_translation_form_access' => 'TRUE']
@@ -348,7 +351,7 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
     $route = new Route(
       $this->getBaseRoute()->getPath() . '/translate/{langcode}/delete',
       [
-        '_form' => \Drupal\config_translation\Form\ConfigTranslationDeleteForm::class,
+        '_form' => ConfigTranslationDeleteForm::class,
         'plugin_id' => $this->getPluginId(),
       ],
       ['_config_translation_form_access' => 'TRUE']

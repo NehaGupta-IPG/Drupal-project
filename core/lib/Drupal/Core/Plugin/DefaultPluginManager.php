@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Plugin;
 
+use Drupal\Component\Annotation\Plugin;
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
@@ -163,7 +164,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
     }
     else {
       // Backward compatibility.
-      $this->pluginDefinitionAnnotationName = $plugin_definition_attribute_name ?? \Drupal\Component\Annotation\Plugin::class;
+      $this->pluginDefinitionAnnotationName = $plugin_definition_attribute_name ?? Plugin::class;
       $this->additionalAnnotationNamespaces = $plugin_definition_annotation_name ?? [];
       if ($plugin_definition_attribute_name) {
         @trigger_error('Not supporting attribute discovery in ' . static::class . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Provide an Attribute class and an Annotation class for BC. See https://www.drupal.org/node/3395582', E_USER_DEPRECATED);

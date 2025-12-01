@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Unit;
 
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\FieldUninstallValidator;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -35,7 +36,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->fieldUninstallValidator = $this->getMockBuilder(\Drupal\field\FieldUninstallValidator::class)
+    $this->fieldUninstallValidator = $this->getMockBuilder(FieldUninstallValidator::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getFieldStoragesByModule', 'getFieldTypeLabel'])
       ->getMock();
@@ -64,7 +65,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
    * @legacy-covers ::validate
    */
   public function testValidateDeleted(): void {
-    $field_storage = $this->getMockBuilder(\Drupal\field\Entity\FieldStorageConfig::class)
+    $field_storage = $this->getMockBuilder(FieldStorageConfig::class)
       ->disableOriginalConstructor()
       ->getMock();
     $field_storage->expects($this->once())
@@ -86,7 +87,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
    * @legacy-covers ::validate
    */
   public function testValidateNoDeleted(): void {
-    $field_storage = $this->getMockBuilder(\Drupal\field\Entity\FieldStorageConfig::class)
+    $field_storage = $this->getMockBuilder(FieldStorageConfig::class)
       ->disableOriginalConstructor()
       ->getMock();
     $field_storage->expects($this->once())

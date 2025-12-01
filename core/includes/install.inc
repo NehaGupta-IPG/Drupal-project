@@ -5,6 +5,7 @@
  * API functions for installing modules and themes.
  */
 
+use Drupal\Core\Installer\NormalInstallerServiceProvider;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Database;
@@ -232,7 +233,7 @@ function drupal_install_system($install_state): void {
   // Remove the service provider of the early installer.
   unset($GLOBALS['conf']['container_service_providers']['InstallerServiceProvider']);
   // Add the normal installer service provider.
-  $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = \Drupal\Core\Installer\NormalInstallerServiceProvider::class;
+  $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = NormalInstallerServiceProvider::class;
 
   // Get the existing request.
   $request = \Drupal::request();

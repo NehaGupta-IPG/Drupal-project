@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Kernel;
 
+use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Component\Datetime\DateTimePlus;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -64,7 +65,7 @@ class EntitySerializationTest extends NormalizerTestBase {
    *
    * @var string
    */
-  protected $entityClass = \Drupal\entity_test\Entity\EntityTest::class;
+  protected $entityClass = EntityTest::class;
 
   /**
    * {@inheritdoc}

@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Field;
 
+use Drupal\Component\Utility\SortArray;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -61,7 +63,7 @@ class FormatterPluginManager extends DefaultPluginManager {
     //   Find a way to restore sanity to
     //   \Drupal\Core\Field\FormatterBase::__construct().
     // If the plugin provides a factory method, pass the container to it.
-    if (is_subclass_of($plugin_class, \Drupal\Core\Plugin\ContainerFactoryPluginInterface::class)) {
+    if (is_subclass_of($plugin_class, ContainerFactoryPluginInterface::class)) {
       return $plugin_class::create(\Drupal::getContainer(), $configuration, $plugin_id, $plugin_definition);
     }
 
@@ -172,7 +174,7 @@ class FormatterPluginManager extends DefaultPluginManager {
       $options = [];
       $field_types = $this->fieldTypeManager->getDefinitions();
       $formatter_types = $this->getDefinitions();
-      uasort($formatter_types, [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
+      uasort($formatter_types, [SortArray::class, 'sortByWeightElement']);
       foreach ($formatter_types as $name => $formatter_type) {
         foreach ($formatter_type['field_types'] as $formatter_field_type) {
           // Check that the field type exists.

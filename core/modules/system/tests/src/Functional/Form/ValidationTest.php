@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Form;
 
+use Drupal\form_test\Form\FormTestValidateRequiredForm;
 use Drupal\Core\Render\Element;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -220,7 +221,7 @@ class ValidationTest extends BrowserTestBase {
    * @see \Drupal\form_test\Form\FormTestValidateRequiredForm
    */
   public function testCustomRequiredError(): void {
-    $form = \Drupal::formBuilder()->getForm(\Drupal\form_test\Form\FormTestValidateRequiredForm::class);
+    $form = \Drupal::formBuilder()->getForm(FormTestValidateRequiredForm::class);
 
     // Verify that a custom #required error can be set.
     $edit = [];

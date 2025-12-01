@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config_translation\Unit;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\config_translation\ConfigMapperManager;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Language\Language;
@@ -42,20 +47,20 @@ class ConfigMapperManagerTest extends UnitTestCase {
     parent::setUp();
 
     $language = new Language(['id' => 'en']);
-    $language_manager = $this->createMock(\Drupal\Core\Language\LanguageManagerInterface::class);
+    $language_manager = $this->createMock(LanguageManagerInterface::class);
     $language_manager->expects($this->once())
       ->method('getCurrentLanguage')
       ->with(LanguageInterface::TYPE_INTERFACE)
       ->willReturn($language);
 
-    $this->typedConfigManager = $this->getMockBuilder(\Drupal\Core\Config\TypedConfigManagerInterface::class)
+    $this->typedConfigManager = $this->getMockBuilder(TypedConfigManagerInterface::class)
       ->getMock();
 
-    $module_handler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
-    $theme_handler = $this->createMock(\Drupal\Core\Extension\ThemeHandlerInterface::class);
+    $module_handler = $this->createMock(ModuleHandlerInterface::class);
+    $theme_handler = $this->createMock(ThemeHandlerInterface::class);
 
     $this->configMapperManager = new ConfigMapperManager(
-      $this->createMock(\Drupal\Core\Cache\CacheBackendInterface::class),
+      $this->createMock(CacheBackendInterface::class),
       $language_manager,
       $module_handler,
       $this->typedConfigManager,

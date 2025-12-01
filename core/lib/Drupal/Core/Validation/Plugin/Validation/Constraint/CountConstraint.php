@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
+use Symfony\Component\Validator\Constraints\CountValidator;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
 use Symfony\Component\Validator\Attribute\HasNamedArguments;
@@ -34,7 +35,7 @@ class CountConstraint extends Count {
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return \Symfony\Component\Validator\Constraints\CountValidator::class;
+    return CountValidator::class;
   }
 
 }

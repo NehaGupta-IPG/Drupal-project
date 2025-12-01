@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\migrate\Plugin\Migration;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
@@ -47,7 +49,7 @@ abstract class MigrateTestCase extends UnitTestCase {
    *   The mocked migration.
    */
   protected function getMigration($id_map = NULL) {
-    $this->migrationConfiguration += ['migrationClass' => \Drupal\migrate\Plugin\Migration::class];
+    $this->migrationConfiguration += ['migrationClass' => Migration::class];
     $this->idMap = $id_map;
     if (is_null($id_map)) {
       $this->idMap = $this->createMock(MigrateIdMapInterface::class);
@@ -123,7 +125,7 @@ abstract class MigrateTestCase extends UnitTestCase {
 
     // Initialize the DIC with a fake module handler for alterable queries.
     $container = new ContainerBuilder();
-    $container->set('module_handler', $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class));
+    $container->set('module_handler', $this->createMock(ModuleHandlerInterface::class));
     \Drupal::setContainer($container);
 
     // Create the tables and load them up with data, skipping empty ones.

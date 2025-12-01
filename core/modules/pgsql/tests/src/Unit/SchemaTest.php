@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\pgsql\Unit;
 
+use Drupal\Core\Database\StatementInterface;
+use Drupal\pgsql\Driver\Database\pgsql\Connection;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -34,16 +36,16 @@ class SchemaTest extends UnitTestCase {
   public function testComputedConstraintName($table_name, $name, $expected): void {
     $max_identifier_length = 63;
 
-    $connection = $this->prophesize(\Drupal\pgsql\Driver\Database\pgsql\Connection::class);
+    $connection = $this->prophesize(Connection::class);
     $connection->getConnectionOptions()->willReturn([]);
     $connection->getPrefix()->willReturn('');
 
-    $statement = $this->prophesize(\Drupal\Core\Database\StatementInterface::class);
+    $statement = $this->prophesize(StatementInterface::class);
     $statement->fetchField()->willReturn($max_identifier_length);
     $connection->query('SHOW max_identifier_length')->willReturn($statement->reveal());
 
     $connection->query(Argument::containingString($expected))
-      ->willReturn($this->prophesize(\Drupal\Core\Database\StatementInterface::class)->reveal())
+      ->willReturn($this->prophesize(StatementInterface::class)->reveal())
       ->shouldBeCalled();
 
     $schema = new Schema($connection->reveal());

@@ -36,7 +36,7 @@ abstract class FTP extends FileTransfer {
     $port = empty($settings['advanced']['port']) ? 21 : $settings['advanced']['port'];
 
     if (function_exists('ftp_connect')) {
-      $class = \Drupal\Core\FileTransfer\FTPExtension::class;
+      $class = FTPExtension::class;
     }
     else {
       throw new FileTransferException('No FTP backend available.');

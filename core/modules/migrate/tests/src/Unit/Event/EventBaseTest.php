@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\Event;
 
+use Drupal\migrate\MigrateMessageInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Event\EventBase;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -23,8 +25,8 @@ class EventBaseTest extends UnitTestCase {
    * @legacy-covers ::getMigration
    */
   public function testGetMigration(): void {
-    $migration = $this->prophesize(\Drupal\migrate\Plugin\MigrationInterface::class)->reveal();
-    $message_service = $this->prophesize(\Drupal\migrate\MigrateMessageInterface::class)->reveal();
+    $migration = $this->prophesize(MigrationInterface::class)->reveal();
+    $message_service = $this->prophesize(MigrateMessageInterface::class)->reveal();
     $event = new EventBase($migration, $message_service);
     $this->assertSame($migration, $event->getMigration());
   }
@@ -36,8 +38,8 @@ class EventBaseTest extends UnitTestCase {
    * @legacy-covers ::logMessage
    */
   public function testLogMessage(): void {
-    $migration = $this->prophesize(\Drupal\migrate\Plugin\MigrationInterface::class)->reveal();
-    $message_service = $this->prophesize(\Drupal\migrate\MigrateMessageInterface::class);
+    $migration = $this->prophesize(MigrationInterface::class)->reveal();
+    $message_service = $this->prophesize(MigrateMessageInterface::class);
     $event = new EventBase($migration, $message_service->reveal());
     // Assert that the intended calls to the services happen.
     $message_service->display('status message', 'status')->shouldBeCalledTimes(1);

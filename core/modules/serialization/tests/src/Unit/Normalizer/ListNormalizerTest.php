@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\ItemList;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
@@ -55,7 +57,7 @@ class ListNormalizerTest extends UnitTestCase {
     parent::setUp();
 
     // Mock the TypedDataManager to return a TypedDataInterface mock.
-    $this->typedData = $this->createMock(\Drupal\Core\TypedData\TypedDataInterface::class);
+    $this->typedData = $this->createMock(TypedDataInterface::class);
     $typed_data_manager = $this->createMock(TypedDataManagerInterface::class);
     $typed_data_manager->expects($this->any())
       ->method('getPropertyInstance')
@@ -63,7 +65,7 @@ class ListNormalizerTest extends UnitTestCase {
 
     // Set up a mock container as ItemList() will call for the
     // 'typed_data_manager' service.
-    $container = $this->getMockBuilder(\Symfony\Component\DependencyInjection\ContainerBuilder::class)
+    $container = $this->getMockBuilder(ContainerBuilder::class)
       ->onlyMethods(['get'])
       ->getMock();
     $container->expects($this->any())

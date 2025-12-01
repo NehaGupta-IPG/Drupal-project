@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Field;
 
+use Drupal\Component\Utility\SortArray;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -119,7 +121,7 @@ class WidgetPluginManager extends DefaultPluginManager {
     $plugin_class = DefaultFactory::getPluginClass($plugin_id, $plugin_definition);
 
     // If the plugin provides a factory method, pass the container to it.
-    if (is_subclass_of($plugin_class, \Drupal\Core\Plugin\ContainerFactoryPluginInterface::class)) {
+    if (is_subclass_of($plugin_class, ContainerFactoryPluginInterface::class)) {
       return $plugin_class::create(\Drupal::getContainer(), $configuration, $plugin_id, $plugin_definition);
     }
 
@@ -171,7 +173,7 @@ class WidgetPluginManager extends DefaultPluginManager {
       $options = [];
       $field_types = $this->fieldTypeManager->getDefinitions();
       $widget_types = $this->getDefinitions();
-      uasort($widget_types, [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
+      uasort($widget_types, [SortArray::class, 'sortByWeightElement']);
       foreach ($widget_types as $name => $widget_type) {
         foreach ($widget_type['field_types'] as $widget_field_type) {
           // Check that the field type exists.

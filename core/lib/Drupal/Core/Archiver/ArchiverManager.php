@@ -55,7 +55,7 @@ class ArchiverManager extends DefaultPluginManager {
    */
   public function createInstance($plugin_id, array $configuration = []) {
     $plugin_definition = $this->getDefinition($plugin_id);
-    $plugin_class = DefaultFactory::getPluginClass($plugin_id, $plugin_definition, \Drupal\Core\Archiver\ArchiverInterface::class);
+    $plugin_class = DefaultFactory::getPluginClass($plugin_id, $plugin_definition, ArchiverInterface::class);
     return new $plugin_class($this->fileSystem->realpath($configuration['filepath']), $configuration);
   }
 

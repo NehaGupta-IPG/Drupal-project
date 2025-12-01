@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\breakpoint\Unit;
 
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\breakpoint\Breakpoint;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
@@ -53,7 +54,7 @@ class BreakpointTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->stringTranslation = $this->createMock(\Drupal\Core\StringTranslation\TranslationInterface::class);
+    $this->stringTranslation = $this->createMock(TranslationInterface::class);
   }
 
   /**

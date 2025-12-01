@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\content_translation\Hook;
 
+use Drupal\content_translation\Form\ContentTranslationDeleteForm;
+use Drupal\content_translation\ContentTranslationMetadataWrapper;
+use Drupal\content_translation\ContentTranslationHandler;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -147,13 +150,13 @@ class ContentTranslationHooks {
     foreach ($entity_types as $entity_type) {
       if ($entity_type->isTranslatable()) {
         if (!$entity_type->hasHandlerClass('translation')) {
-          $entity_type->setHandlerClass('translation', \Drupal\content_translation\ContentTranslationHandler::class);
+          $entity_type->setHandlerClass('translation', ContentTranslationHandler::class);
         }
         if (!$entity_type->get('content_translation_metadata')) {
-          $entity_type->set('content_translation_metadata', \Drupal\content_translation\ContentTranslationMetadataWrapper::class);
+          $entity_type->set('content_translation_metadata', ContentTranslationMetadataWrapper::class);
         }
         if (!$entity_type->getFormClass('content_translation_deletion')) {
-          $entity_type->setFormClass('content_translation_deletion', \Drupal\content_translation\Form\ContentTranslationDeleteForm::class);
+          $entity_type->setFormClass('content_translation_deletion', ContentTranslationDeleteForm::class);
         }
         $translation = $entity_type->get('translation');
         if (!$translation || !isset($translation['content_translation'])) {

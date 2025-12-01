@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Unit\Plugin\DisplayVariant;
 
+use Drupal\block\BlockInterface;
+use Drupal\Core\Block\TitleBlockPluginInterface;
+use Drupal\Core\Block\MessagesBlockPluginInterface;
+use Drupal\Core\Block\MainContentBlockPluginInterface;
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Entity\EntityViewBuilderInterface;
+use Drupal\block\BlockRepositoryInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\block\Plugin\DisplayVariant\BlockPageVariant;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\Container;
@@ -54,7 +62,7 @@ class BlockPageVariantTest extends UnitTestCase {
   public function setUpDisplayVariant($configuration = [], $definition = []) {
 
     $container = new Container();
-    $cache_context_manager = $this->getMockBuilder(\Drupal\Core\Cache\Context\CacheContextsManager::class)
+    $cache_context_manager = $this->getMockBuilder(CacheContextsManager::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['assertValidTokens'])
       ->getMock();
@@ -64,8 +72,8 @@ class BlockPageVariantTest extends UnitTestCase {
       ->willReturn(TRUE);
     \Drupal::setContainer($container);
 
-    $this->blockRepository = $this->createMock(\Drupal\block\BlockRepositoryInterface::class);
-    $this->blockViewBuilder = $this->createMock(\Drupal\Core\Entity\EntityViewBuilderInterface::class);
+    $this->blockRepository = $this->createMock(BlockRepositoryInterface::class);
+    $this->blockViewBuilder = $this->createMock(EntityViewBuilderInterface::class);
 
     return new BlockPageVariant($configuration, 'test', $definition, $this->blockRepository, $this->blockViewBuilder, ['config:block_list']);
   }
@@ -212,12 +220,12 @@ class BlockPageVariantTest extends UnitTestCase {
     $display_variant->setMainContent(['#markup' => 'Hello kittens!']);
 
     $blocks = ['top' => [], 'center' => [], 'bottom' => []];
-    $block_plugin = $this->createMock(\Drupal\Core\Block\BlockPluginInterface::class);
-    $main_content_block_plugin = $this->createMock(\Drupal\Core\Block\MainContentBlockPluginInterface::class);
-    $messages_block_plugin = $this->createMock(\Drupal\Core\Block\MessagesBlockPluginInterface::class);
-    $title_block_plugin = $this->createMock(\Drupal\Core\Block\TitleBlockPluginInterface::class);
+    $block_plugin = $this->createMock(BlockPluginInterface::class);
+    $main_content_block_plugin = $this->createMock(MainContentBlockPluginInterface::class);
+    $messages_block_plugin = $this->createMock(MessagesBlockPluginInterface::class);
+    $title_block_plugin = $this->createMock(TitleBlockPluginInterface::class);
     foreach ($blocks_config as $block_id => $block_config) {
-      $block = $this->createMock(\Drupal\block\BlockInterface::class);
+      $block = $this->createMock(BlockInterface::class);
       $block->expects($this->atLeastOnce())
         ->method('getPlugin')
         ->willReturn($block_config[1] ? $main_content_block_plugin : ($block_config[2] ? $messages_block_plugin : ($block_config[3] ? $title_block_plugin : $block_plugin)));

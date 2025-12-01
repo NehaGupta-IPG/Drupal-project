@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
+use Symfony\Component\Validator\Constraints\LengthValidator;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
 use Symfony\Component\Validator\Attribute\HasNamedArguments;
@@ -36,7 +37,7 @@ class LengthConstraint extends Length {
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return \Symfony\Component\Validator\Constraints\LengthValidator::class;
+    return LengthValidator::class;
   }
 
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Drupal\migrate\MigrateMessageInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -448,9 +450,9 @@ class MigrateSourceTest extends MigrateTestCase {
    */
   protected function getMigrateExecutable($migration) {
     /** @var \Drupal\migrate\MigrateMessageInterface $message */
-    $message = $this->createMock(\Drupal\migrate\MigrateMessageInterface::class);
+    $message = $this->createMock(MigrateMessageInterface::class);
     /** @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher */
-    $event_dispatcher = $this->createMock(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class);
+    $event_dispatcher = $this->createMock(EventDispatcherInterface::class);
     return new MigrateExecutable($migration, $message, $event_dispatcher);
   }
 

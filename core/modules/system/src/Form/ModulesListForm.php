@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Form;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Access\AccessManagerInterface;
@@ -223,7 +224,7 @@ class ModulesListForm extends FormBase {
     }
 
     // Lastly, sort all packages by title.
-    uasort($form['modules'], [\Drupal\Component\Utility\SortArray::class, 'sortByTitleProperty']);
+    uasort($form['modules'], [SortArray::class, 'sortByTitleProperty']);
 
     $form['#attached']['library'][] = 'core/drupal.tableresponsive';
     $form['#attached']['library'][] = 'system/drupal.system.modules';

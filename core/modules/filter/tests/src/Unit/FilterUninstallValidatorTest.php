@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\filter\Unit;
 
+use Drupal\filter\FilterFormatInterface;
+use Drupal\filter\FilterPluginCollection;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\FilterUninstallValidator;
 use Drupal\filter\Plugin\FilterBase;
@@ -30,7 +32,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->filterUninstallValidator = $this->getMockBuilder(\Drupal\filter\FilterUninstallValidator::class)
+    $this->filterUninstallValidator = $this->getMockBuilder(FilterUninstallValidator::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getFilterDefinitionsByProvider', 'getEnabledFilterFormats'])
       ->getMock();
@@ -111,7 +113,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
 
     // The first format has 2 matching and enabled filters, but the loop breaks
     // after finding the first one.
-    $filter_plugin_collection1 = $this->getMockBuilder(\Drupal\filter\FilterPluginCollection::class)
+    $filter_plugin_collection1 = $this->getMockBuilder(FilterPluginCollection::class)
       ->disableOriginalConstructor()
       ->getMock();
     $filter_plugin_collection1->expects($this->exactly(3))
@@ -130,7 +132,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
         ['test_filter_plugin4', $filter_plugin_enabled],
       ]);
 
-    $filter_format1 = $this->createMock(\Drupal\filter\FilterFormatInterface::class);
+    $filter_format1 = $this->createMock(FilterFormatInterface::class);
     $filter_format1->expects($this->once())
       ->method('filters')
       ->willReturn($filter_plugin_collection1);
@@ -139,7 +141,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
       ->willReturn('Filter Format 1 Label');
 
     // The second filter format only has one matching and enabled filter.
-    $filter_plugin_collection2 = $this->getMockBuilder(\Drupal\filter\FilterPluginCollection::class)
+    $filter_plugin_collection2 = $this->getMockBuilder(FilterPluginCollection::class)
       ->disableOriginalConstructor()
       ->getMock();
     $filter_plugin_collection2->expects($this->exactly(4))
@@ -155,7 +157,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
       ->with('test_filter_plugin4')
       ->willReturn($filter_plugin_enabled);
 
-    $filter_format2 = $this->createMock(\Drupal\filter\FilterFormatInterface::class);
+    $filter_format2 = $this->createMock(FilterFormatInterface::class);
     $filter_format2->expects($this->once())
       ->method('filters')
       ->willReturn($filter_plugin_collection2);

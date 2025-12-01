@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Annotation;
 
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
+use Drupal\Core\Plugin\Context\ContextDefinitionInterface;
 use Drupal\Component\Annotation\Plugin;
 
 /**
@@ -112,7 +114,7 @@ class ContextDefinition extends Plugin {
         $values[$key] = NULL;
       }
     }
-    if (isset($values['class']) && !in_array(\Drupal\Core\Plugin\Context\ContextDefinitionInterface::class, class_implements($values['class']))) {
+    if (isset($values['class']) && !in_array(ContextDefinitionInterface::class, class_implements($values['class']))) {
       throw new \Exception('ContextDefinition class must implement \Drupal\Core\Plugin\Context\ContextDefinitionInterface.');
     }
 
@@ -146,7 +148,7 @@ class ContextDefinition extends Plugin {
       return $values['class'];
     }
     if (str_starts_with($values['value'], 'entity:')) {
-      return \Drupal\Core\Plugin\Context\EntityContextDefinition::class;
+      return EntityContextDefinition::class;
     }
     return \Drupal\Core\Plugin\Context\ContextDefinition::class;
   }

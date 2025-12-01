@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Unit;
 
+use Drupal\user\Entity\User;
+use Drupal\Core\Password\PasswordInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Routing\TrustedRedirectResponse;
@@ -74,7 +77,7 @@ class UserAuthTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->userStorage = $this->createMock(\Drupal\Core\Entity\EntityStorageInterface::class);
+    $this->userStorage = $this->createMock(EntityStorageInterface::class);
 
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entity_type_manager */
     $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
@@ -83,9 +86,9 @@ class UserAuthTest extends UnitTestCase {
       ->with('user')
       ->willReturn($this->userStorage);
 
-    $this->passwordService = $this->createMock(\Drupal\Core\Password\PasswordInterface::class);
+    $this->passwordService = $this->createMock(PasswordInterface::class);
 
-    $this->testUser = $this->getMockBuilder(\Drupal\user\Entity\User::class)
+    $this->testUser = $this->getMockBuilder(User::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['id', 'setPassword', 'save', 'getPassword'])
       ->getMock();

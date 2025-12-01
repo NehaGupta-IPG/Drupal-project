@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\block_test\Controller;
 
+use Drupal\block_test\Form\FavoriteAnimalTestForm;
+use Drupal\block_test\Form\TestForm;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Form\FormState;
 
@@ -15,8 +17,8 @@ class TestMultipleFormController extends ControllerBase {
   public function testMultipleForms() {
     $form_state = new FormState();
     $build = [
-      'form1' => $this->formBuilder()->buildForm(\Drupal\block_test\Form\TestForm::class, $form_state),
-      'form2' => $this->formBuilder()->buildForm(\Drupal\block_test\Form\FavoriteAnimalTestForm::class, $form_state),
+      'form1' => $this->formBuilder()->buildForm(TestForm::class, $form_state),
+      'form2' => $this->formBuilder()->buildForm(FavoriteAnimalTestForm::class, $form_state),
     ];
 
     // Output all attached placeholders trough

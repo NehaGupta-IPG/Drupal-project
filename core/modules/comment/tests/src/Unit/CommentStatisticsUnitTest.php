@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Unit;
 
+use Drupal\Core\State\StateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Query\Select;
+use Drupal\sqlite\Driver\Database\sqlite\Statement;
 use Drupal\comment\CommentStatistics;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -59,7 +64,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->statement = $this->getMockBuilder(\Drupal\sqlite\Driver\Database\sqlite\Statement::class)
+    $this->statement = $this->getMockBuilder(Statement::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -67,7 +72,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
       ->method('fetchObject')
       ->willReturnCallback([$this, 'fetchObjectCallback']);
 
-    $this->select = $this->getMockBuilder(\Drupal\Core\Database\Query\Select::class)
+    $this->select = $this->getMockBuilder(Select::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -83,7 +88,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
       ->method('execute')
       ->willReturn($this->statement);
 
-    $this->database = $this->getMockBuilder(\Drupal\Core\Database\Connection::class)
+    $this->database = $this->getMockBuilder(Connection::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -91,7 +96,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
       ->method('select')
       ->willReturn($this->select);
 
-    $this->commentStatistics = new CommentStatistics($this->database, $this->createMock(\Drupal\Core\Session\AccountInterface::class), $this->createMock(EntityTypeManagerInterface::class), $this->createMock(\Drupal\Core\State\StateInterface::class), $this->createMock(TimeInterface::class), $this->database);
+    $this->commentStatistics = new CommentStatistics($this->database, $this->createMock(AccountInterface::class), $this->createMock(EntityTypeManagerInterface::class), $this->createMock(StateInterface::class), $this->createMock(TimeInterface::class), $this->database);
   }
 
   /**

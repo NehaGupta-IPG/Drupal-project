@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Scripts;
 
+use Drupal\Core\Command\DbImportCommand;
+use Drupal\Core\Command\DbDumpCommand;
 use Drupal\Core\Command\DbToolsApplication;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -25,7 +27,7 @@ class DbToolsApplicationTest extends KernelTestBase {
   public function testDumpCommandRegistration(): void {
     $application = new DbToolsApplication();
     $command = $application->find('dump');
-    $this->assertInstanceOf(\Drupal\Core\Command\DbDumpCommand::class, $command);
+    $this->assertInstanceOf(DbDumpCommand::class, $command);
     $this->assertSame(\Drupal::VERSION, $application->getVersion());
   }
 
@@ -35,7 +37,7 @@ class DbToolsApplicationTest extends KernelTestBase {
   public function testImportCommandRegistration(): void {
     $application = new DbToolsApplication();
     $command = $application->find('import');
-    $this->assertInstanceOf(\Drupal\Core\Command\DbImportCommand::class, $command);
+    $this->assertInstanceOf(DbImportCommand::class, $command);
   }
 
 }

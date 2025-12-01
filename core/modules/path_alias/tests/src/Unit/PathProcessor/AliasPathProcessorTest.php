@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\path_alias\Unit\PathProcessor;
 
+use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\path_alias\PathProcessor\AliasPathProcessor;
@@ -41,7 +42,7 @@ class AliasPathProcessorTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->aliasManager = $this->createMock(\Drupal\path_alias\AliasManagerInterface::class);
+    $this->aliasManager = $this->createMock(AliasManagerInterface::class);
     $this->pathProcessor = new AliasPathProcessor($this->aliasManager);
   }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Unit\Menu;
 
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\Extension;
@@ -34,7 +35,7 @@ class SystemLocalTasksTest extends LocalTaskIntegrationTestBase {
       'system' => 'core/modules/system',
     ];
 
-    $this->themeHandler = $this->createMock(\Drupal\Core\Extension\ThemeHandlerInterface::class);
+    $this->themeHandler = $this->createMock(ThemeHandlerInterface::class);
 
     $theme = new Extension($this->root, 'theme', 'core/themes/olivero', 'olivero.info.yml');
     $theme->status = 1;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Unit\EventSubscriber;
 
+use JsonSchema\Validator;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
@@ -40,7 +41,7 @@ class ResourceResponseValidatorTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     // Check that the validation class is available.
-    if (!class_exists(\JsonSchema\Validator::class)) {
+    if (!class_exists(Validator::class)) {
       $this->fail('The JSON Schema validator is missing. You can install it with `composer require justinrainbow/json-schema`.');
     }
 

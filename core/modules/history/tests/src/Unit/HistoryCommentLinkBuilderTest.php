@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\history\Unit;
 
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\node\NodeInterface;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentLinkBuilder;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -82,10 +86,10 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->commentManager = $this->createMock(\Drupal\comment\CommentManagerInterface::class);
+    $this->commentManager = $this->createMock(CommentManagerInterface::class);
     $this->stringTranslation = $this->getStringTranslationStub();
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->currentUser = $this->createMock(\Drupal\Core\Session\AccountProxyInterface::class);
+    $this->currentUser = $this->createMock(AccountProxyInterface::class);
     $this->commentLinkBuilder = new CommentLinkBuilder($this->currentUser, $this->commentManager, $this->stringTranslation);
     $this->decoratedCommentLinkBuilder = new HistoryCommentLinkBuilder($this->commentLinkBuilder, $this->commentManager, $this->currentUser, $this->entityTypeManager, $this->createMock(HistoryManager::class));
     $this->commentManager->expects($this->any())
@@ -284,7 +288,7 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
    *   Mock node for testing.
    */
   protected function getMockNode($has_field, $comment_status, $form_location, $comment_count) {
-    $node = $this->createMock(\Drupal\node\NodeInterface::class);
+    $node = $this->createMock(NodeInterface::class);
     $node->expects($this->any())
       ->method('hasField')
       ->willReturn($has_field);
@@ -302,7 +306,7 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
       ->with('comment')
       ->willReturn($field_item);
 
-    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
+    $field_definition = $this->createMock(FieldDefinitionInterface::class);
     $field_definition->expects($this->any())
       ->method('getSetting')
       ->with('form_location')

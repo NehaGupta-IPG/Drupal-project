@@ -2,6 +2,9 @@
 
 namespace Drupal\menu_ui\Hook;
 
+use Drupal\menu_ui\MenuListBuilder;
+use Drupal\menu_ui\Form\MenuDeleteForm;
+use Drupal\menu_ui\MenuForm;
 use Drupal\block\BlockInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Link;
@@ -82,7 +85,7 @@ class MenuUiHooks {
   #[Hook('entity_type_build')]
   public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-    $entity_types['menu']->setFormClass('add', \Drupal\menu_ui\MenuForm::class)->setFormClass('edit', \Drupal\menu_ui\MenuForm::class)->setFormClass('delete', \Drupal\menu_ui\Form\MenuDeleteForm::class)->setListBuilderClass(\Drupal\menu_ui\MenuListBuilder::class)->setLinkTemplate('add-form', '/admin/structure/menu/add')->setLinkTemplate('delete-form', '/admin/structure/menu/manage/{menu}/delete')->setLinkTemplate('edit-form', '/admin/structure/menu/manage/{menu}')->setLinkTemplate('add-link-form', '/admin/structure/menu/manage/{menu}/add')->setLinkTemplate('collection', '/admin/structure/menu');
+    $entity_types['menu']->setFormClass('add', MenuForm::class)->setFormClass('edit', MenuForm::class)->setFormClass('delete', MenuDeleteForm::class)->setListBuilderClass(MenuListBuilder::class)->setLinkTemplate('add-form', '/admin/structure/menu/add')->setLinkTemplate('delete-form', '/admin/structure/menu/manage/{menu}/delete')->setLinkTemplate('edit-form', '/admin/structure/menu/manage/{menu}')->setLinkTemplate('add-link-form', '/admin/structure/menu/manage/{menu}/add')->setLinkTemplate('collection', '/admin/structure/menu');
     if (isset($entity_types['node'])) {
       $entity_types['node']->addConstraint('MenuSettings', []);
     }

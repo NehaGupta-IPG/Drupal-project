@@ -2,6 +2,7 @@
 
 namespace Drupal\config_translation\Plugin\Derivative;
 
+use Drupal\config_translation\Plugin\Menu\LocalTask\ConfigTranslationLocalTask;
 use Drupal\config_translation\ConfigMapperManagerInterface;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
@@ -61,7 +62,7 @@ class ConfigTranslationLocalTasks extends DeriverBase implements ContainerDerive
       if (!empty($base_route)) {
         $this->derivatives[$route_name] = $base_plugin_definition;
         $this->derivatives[$route_name]['config_translation_plugin_id'] = $plugin_id;
-        $this->derivatives[$route_name]['class'] = \Drupal\config_translation\Plugin\Menu\LocalTask\ConfigTranslationLocalTask::class;
+        $this->derivatives[$route_name]['class'] = ConfigTranslationLocalTask::class;
         $this->derivatives[$route_name]['route_name'] = $route_name;
         $this->derivatives[$route_name]['base_route'] = $base_route;
       }

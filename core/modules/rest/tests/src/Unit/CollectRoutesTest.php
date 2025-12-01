@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\rest\Unit;
 
+use Drupal\rest\Plugin\views\style\Serializer;
+use Drupal\views\Plugin\views\access\None;
+use Drupal\Core\Authentication\AuthenticationCollectorInterface;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\State\StateInterface;
+use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\views\Plugin\ViewsPluginManager;
+use Drupal\views\ViewExecutable;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\rest\Plugin\views\display\RestExport;
 use Drupal\Tests\UnitTestCase;
@@ -41,7 +49,7 @@ class CollectRoutesTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $view = new View(['id' => 'test_view'], 'view');
 
-    $view_executable = $this->getMockBuilder(\Drupal\views\ViewExecutable::class)
+    $view_executable = $this->getMockBuilder(ViewExecutable::class)
       ->onlyMethods(['initHandlers', 'getTitle'])
       ->disableOriginalConstructor()
       ->getMock();
@@ -52,33 +60,33 @@ class CollectRoutesTest extends UnitTestCase {
     $view_executable->storage = $view;
     $view_executable->argument = [];
 
-    $display_manager = $this->getMockBuilder(\Drupal\views\Plugin\ViewsPluginManager::class)
+    $display_manager = $this->getMockBuilder(ViewsPluginManager::class)
       ->disableOriginalConstructor()
       ->getMock();
     $container->set('plugin.manager.views.display', $display_manager);
 
-    $access_manager = $this->getMockBuilder(\Drupal\views\Plugin\ViewsPluginManager::class)
+    $access_manager = $this->getMockBuilder(ViewsPluginManager::class)
       ->disableOriginalConstructor()
       ->getMock();
     $container->set('plugin.manager.views.access', $access_manager);
 
-    $route_provider = $this->getMockBuilder(\Drupal\Core\Routing\RouteProviderInterface::class)
+    $route_provider = $this->getMockBuilder(RouteProviderInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
     $container->set('router.route_provider', $route_provider);
 
     $container->setParameter('authentication_providers', ['basic_auth' => 'basic_auth']);
 
-    $state = $this->createMock(\Drupal\Core\State\StateInterface::class);
+    $state = $this->createMock(StateInterface::class);
     $container->set('state', $state);
 
-    $style_manager = $this->getMockBuilder(\Drupal\views\Plugin\ViewsPluginManager::class)
+    $style_manager = $this->getMockBuilder(ViewsPluginManager::class)
       ->disableOriginalConstructor()
       ->getMock();
     $container->set('plugin.manager.views.style', $style_manager);
-    $container->set('renderer', $this->createMock(\Drupal\Core\Render\RendererInterface::class));
+    $container->set('renderer', $this->createMock(RendererInterface::class));
 
-    $authentication_collector = $this->createMock(\Drupal\Core\Authentication\AuthenticationCollectorInterface::class);
+    $authentication_collector = $this->createMock(AuthenticationCollectorInterface::class);
     $container->set('authentication_collector', $authentication_collector);
     $authentication_collector->expects($this->any())
       ->method('getSortedProviders')
@@ -104,7 +112,7 @@ class CollectRoutesTest extends UnitTestCase {
       ->method('getDefinition')
       ->willReturn(['id' => 'test', 'provider' => 'test']);
 
-    $none = $this->getMockBuilder(\Drupal\views\Plugin\views\access\None::class)
+    $none = $this->getMockBuilder(None::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -112,7 +120,7 @@ class CollectRoutesTest extends UnitTestCase {
       ->method('createInstance')
       ->willReturn($none);
 
-    $style_plugin = $this->getMockBuilder(\Drupal\rest\Plugin\views\style\Serializer::class)
+    $style_plugin = $this->getMockBuilder(Serializer::class)
       ->onlyMethods(['getFormats', 'init'])
       ->disableOriginalConstructor()
       ->getMock();

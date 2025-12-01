@@ -2,6 +2,7 @@
 
 namespace Drupal\user;
 
+use Drupal\user\Entity\Role;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
@@ -35,7 +36,7 @@ class RoleForm extends EntityForm {
       '#size' => 30,
       '#maxlength' => ConfigEntityStorage::MAX_ID_LENGTH,
       '#machine_name' => [
-        'exists' => [\Drupal\user\Entity\Role::class, 'load'],
+        'exists' => [Role::class, 'load'],
       ],
     ];
     $form['weight'] = [

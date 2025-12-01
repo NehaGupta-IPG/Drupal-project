@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\breakpoint\Kernel;
 
+use Drupal\breakpoint\Breakpoint;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -47,7 +48,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
         'provider' => 'breakpoint_theme_test',
         'id' => 'breakpoint_theme_test.mobile',
         'group' => 'breakpoint_theme_test',
-        'class' => \Drupal\breakpoint\Breakpoint::class,
+        'class' => Breakpoint::class,
       ],
       'breakpoint_theme_test.narrow' => [
         'label' => 'narrow',
@@ -59,7 +60,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
         'provider' => 'breakpoint_theme_test',
         'id' => 'breakpoint_theme_test.narrow',
         'group' => 'breakpoint_theme_test',
-        'class' => \Drupal\breakpoint\Breakpoint::class,
+        'class' => Breakpoint::class,
       ],
       'breakpoint_theme_test.wide' => [
         'label' => 'wide',
@@ -71,7 +72,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
         'provider' => 'breakpoint_theme_test',
         'id' => 'breakpoint_theme_test.wide',
         'group' => 'breakpoint_theme_test',
-        'class' => \Drupal\breakpoint\Breakpoint::class,
+        'class' => Breakpoint::class,
       ],
       'breakpoint_theme_test.tv' => [
         'label' => 'tv',
@@ -83,7 +84,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
         'provider' => 'breakpoint_theme_test',
         'id' => 'breakpoint_theme_test.tv',
         'group' => 'breakpoint_theme_test',
-        'class' => \Drupal\breakpoint\Breakpoint::class,
+        'class' => Breakpoint::class,
       ],
     ];
 
@@ -113,7 +114,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
         'provider' => 'breakpoint_theme_test',
         'id' => 'breakpoint_theme_test.group2.narrow',
         'group' => 'breakpoint_theme_test.group2',
-        'class' => \Drupal\breakpoint\Breakpoint::class,
+        'class' => Breakpoint::class,
       ],
       'breakpoint_theme_test.group2.wide' => [
         'label' => 'wide',
@@ -126,7 +127,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
         'provider' => 'breakpoint_theme_test',
         'id' => 'breakpoint_theme_test.group2.wide',
         'group' => 'breakpoint_theme_test.group2',
-        'class' => \Drupal\breakpoint\Breakpoint::class,
+        'class' => Breakpoint::class,
       ],
       'breakpoint_module_test.breakpoint_theme_test.group2.tv' => [
         'label' => 'tv',
@@ -138,7 +139,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
         'provider' => 'breakpoint_module_test',
         'id' => 'breakpoint_module_test.breakpoint_theme_test.group2.tv',
         'group' => 'breakpoint_theme_test.group2',
-        'class' => \Drupal\breakpoint\Breakpoint::class,
+        'class' => Breakpoint::class,
       ],
     ];
 
@@ -163,7 +164,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
         'provider' => 'breakpoint_module_test',
         'id' => 'breakpoint_module_test.mobile',
         'group' => 'breakpoint_module_test',
-        'class' => \Drupal\breakpoint\Breakpoint::class,
+        'class' => Breakpoint::class,
       ],
       'breakpoint_module_test.standard' => [
         'label' => 'standard',
@@ -176,7 +177,7 @@ class BreakpointDiscoveryTest extends KernelTestBase {
         'provider' => 'breakpoint_module_test',
         'id' => 'breakpoint_module_test.standard',
         'group' => 'breakpoint_module_test',
-        'class' => \Drupal\breakpoint\Breakpoint::class,
+        'class' => Breakpoint::class,
       ],
     ];
 

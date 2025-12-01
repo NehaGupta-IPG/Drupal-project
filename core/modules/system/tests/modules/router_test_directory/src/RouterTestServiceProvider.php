@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\router_test;
 
+use Drupal\router_test\Access\TestAccessCheck;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 
@@ -16,11 +17,11 @@ class RouterTestServiceProvider implements ServiceProviderInterface {
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container) {
-    $container->register('router_test.subscriber', \Drupal\router_test\RouteTestSubscriber::class)
+    $container->register('router_test.subscriber', RouteTestSubscriber::class)
       ->addTag('event_subscriber');
-    $container->register('access_check.router_test', \Drupal\router_test\Access\TestAccessCheck::class)
+    $container->register('access_check.router_test', TestAccessCheck::class)
       ->addTag('access_check', ['applies_to' => '_access_router_test']);
-    $container->register('router_test.early_exception.subscriber', \Drupal\router_test\RouterTestEarlyExceptionSubscriber::class)
+    $container->register('router_test.early_exception.subscriber', RouterTestEarlyExceptionSubscriber::class)
       ->addTag('event_subscriber');
   }
 

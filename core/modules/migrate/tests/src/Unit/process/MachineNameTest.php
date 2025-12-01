@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\process;
 
+use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\Row;
+use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\migrate\process\MachineName;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -26,13 +29,13 @@ class MachineNameTest extends MigrateProcessTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->transliteration = $this->getMockBuilder(\Drupal\Component\Transliteration\TransliterationInterface::class)
+    $this->transliteration = $this->getMockBuilder(TransliterationInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $this->row = $this->getMockBuilder(\Drupal\migrate\Row::class)
+    $this->row = $this->getMockBuilder(Row::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $this->migrateExecutable = $this->getMockBuilder(\Drupal\migrate\MigrateExecutable::class)
+    $this->migrateExecutable = $this->getMockBuilder(MigrateExecutable::class)
       ->disableOriginalConstructor()
       ->getMock();
     parent::setUp();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\system_test\Hook;
 
+use Drupal\system_test\MockFileTransfer;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -116,7 +117,7 @@ class SystemTestHooks {
     return [
       'system_test' => [
         'title' => $this->t('System Test FileTransfer'),
-        'class' => \Drupal\system_test\MockFileTransfer::class,
+        'class' => MockFileTransfer::class,
         'weight' => -10,
       ],
     ];

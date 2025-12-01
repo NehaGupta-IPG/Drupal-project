@@ -267,7 +267,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    */
   protected function getStorageSchema() {
     if (!isset($this->storageSchema)) {
-      $class = $this->entityType->getHandlerClass('storage_schema') ?: \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema::class;
+      $class = $this->entityType->getHandlerClass('storage_schema') ?: SqlContentEntityStorageSchema::class;
       $this->storageSchema = new $class($this->entityTypeManager, $this->entityType, $this, $this->database, $this->entityFieldManager);
     }
     return $this->storageSchema;

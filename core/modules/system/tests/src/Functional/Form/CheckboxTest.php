@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Form;
 
+use Drupal\form_test\Form\FormTestCheckboxTypeJugglingForm;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -38,7 +39,7 @@ class CheckboxTest extends BrowserTestBase {
       // #return_value, with the exception of integer 0, which is not supported.
       // @see \Drupal\Core\Render\Element\Checkbox::processCheckbox().
       foreach (['0', '', 1, '1', 'foobar', '1foobar'] as $return_value) {
-        $form_array = \Drupal::formBuilder()->getForm(\Drupal\form_test\Form\FormTestCheckboxTypeJugglingForm::class, $default_value, $return_value);
+        $form_array = \Drupal::formBuilder()->getForm(FormTestCheckboxTypeJugglingForm::class, $default_value, $return_value);
         $form = (string) \Drupal::service('renderer')->renderRoot($form_array);
         if ($default_value === TRUE) {
           $checked = TRUE;

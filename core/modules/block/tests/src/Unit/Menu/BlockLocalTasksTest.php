@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Unit\Menu;
 
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -46,7 +47,7 @@ class BlockLocalTasksTest extends LocalTaskIntegrationTestBase {
         'name' => 'test_c',
       ],
     ];
-    $theme_handler = $this->createMock(\Drupal\Core\Extension\ThemeHandlerInterface::class);
+    $theme_handler = $this->createMock(ThemeHandlerInterface::class);
     $theme_handler->expects($this->any())
       ->method('listInfo')
       ->willReturn($themes);

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Unit;
 
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
@@ -71,15 +75,15 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
     parent::setUp();
 
     $this->entityTypeId = $this->randomMachineName();
-    $this->entityType = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
+    $this->entityType = $this->createMock(EntityTypeInterface::class);
 
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
 
-    $this->uuid = $this->createMock(\Drupal\Component\Uuid\UuidInterface::class);
+    $this->uuid = $this->createMock(UuidInterface::class);
 
-    $this->typedConfigManager = $this->createMock(\Drupal\Core\Config\TypedConfigManagerInterface::class);
+    $this->typedConfigManager = $this->createMock(TypedConfigManagerInterface::class);
 
-    $this->configEntityStorageInterface = $this->createMock(\Drupal\Core\Entity\EntityStorageInterface::class);
+    $this->configEntityStorageInterface = $this->createMock(EntityStorageInterface::class);
 
     $container = new ContainerBuilder();
     $container->set('entity_type.manager', $this->entityTypeManager);
@@ -96,7 +100,7 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
    */
   public function testCalculateDependencies(): void {
     // Mock the interfaces necessary to create a dependency on a bundle entity.
-    $target_entity_type = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
+    $target_entity_type = $this->createMock(EntityTypeInterface::class);
     $target_entity_type->expects($this->any())
       ->method('getBundleConfigDependency')
       ->willReturn(['type' => 'config', 'name' => 'test.test_entity_type.id']);

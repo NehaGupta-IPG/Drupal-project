@@ -41,14 +41,14 @@ class StringDatabaseStorage implements StringStorageInterface {
    * {@inheritdoc}
    */
   public function getStrings(array $conditions = [], array $options = []) {
-    return $this->dbStringLoad($conditions, $options, \Drupal\locale\SourceString::class);
+    return $this->dbStringLoad($conditions, $options, SourceString::class);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getTranslations(array $conditions = [], array $options = []) {
-    return $this->dbStringLoad($conditions, ['translation' => TRUE] + $options, \Drupal\locale\TranslationString::class);
+    return $this->dbStringLoad($conditions, ['translation' => TRUE] + $options, TranslationString::class);
   }
 
   /**

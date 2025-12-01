@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Controller;
 
+use Drupal\system\Form\ThemeAdminForm;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\ExtensionLifecycle;
@@ -393,7 +394,7 @@ class SystemController extends ControllerBase {
       '#theme_groups' => $theme_groups,
       '#theme_group_titles' => $theme_group_titles,
     ];
-    $build[] = $this->formBuilder->getForm(\Drupal\system\Form\ThemeAdminForm::class, $admin_theme_options);
+    $build[] = $this->formBuilder->getForm(ThemeAdminForm::class, $admin_theme_options);
 
     return $build;
   }

@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Unit;
 
+use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\Core\Plugin\Context\ContextHandlerInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Executable\ExecutableManagerInterface;
 use Drupal\block\BlockForm;
 use Drupal\block\BlockRepository;
 use Drupal\block\Entity\Block;
@@ -96,21 +105,21 @@ class BlockFormTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->conditionManager = $this->createMock(\Drupal\Core\Executable\ExecutableManagerInterface::class);
-    $this->language = $this->createMock(\Drupal\Core\Language\LanguageManagerInterface::class);
-    $this->contextRepository = $this->createMock(\Drupal\Core\Plugin\Context\ContextRepositoryInterface::class);
+    $this->conditionManager = $this->createMock(ExecutableManagerInterface::class);
+    $this->language = $this->createMock(LanguageManagerInterface::class);
+    $this->contextRepository = $this->createMock(ContextRepositoryInterface::class);
 
-    $this->entityTypeManager = $this->createMock(\Drupal\Core\Entity\EntityTypeManagerInterface::class);
-    $this->storage = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityStorageInterface::class);
-    $this->themeHandler = $this->createMock(\Drupal\Core\Extension\ThemeHandlerInterface::class);
+    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+    $this->storage = $this->createMock(ConfigEntityStorageInterface::class);
+    $this->themeHandler = $this->createMock(ThemeHandlerInterface::class);
     $this->entityTypeManager->expects($this->any())
       ->method('getStorage')
       ->willReturn($this->storage);
 
     $this->pluginFormFactory = $this->prophesize(PluginFormFactoryInterface::class);
 
-    $this->themeManager = $this->createMock(\Drupal\Core\Theme\ThemeManagerInterface::class);
-    $this->contextHandler = $this->createMock(\Drupal\Core\Plugin\Context\ContextHandlerInterface::class);
+    $this->themeManager = $this->createMock(ThemeManagerInterface::class);
+    $this->contextHandler = $this->createMock(ContextHandlerInterface::class);
     $this->blockRepository = new BlockRepository($this->entityTypeManager, $this->themeManager, $this->contextHandler);
   }
 
@@ -153,7 +162,7 @@ class BlockFormTest extends UnitTestCase {
     $blocks['other_test_1'] = $this->getBlockMockWithMachineName('other_test');
     $blocks['other_test_2'] = $this->getBlockMockWithMachineName('other_test');
 
-    $query = $this->createMock(\Drupal\Core\Entity\Query\QueryInterface::class);
+    $query = $this->createMock(QueryInterface::class);
     $query->expects($this->exactly(5))
       ->method('condition')
       ->willReturn($query);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Kernel;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Drupal\media\OEmbed\ProviderException;
 use Drupal\media\OEmbed\ProviderRepository;
 use GuzzleHttp\Psr7\Utils;
@@ -28,10 +30,10 @@ class ProviderRepositoryTest extends MediaKernelTestBase {
    */
   #[DataProvider('providerEmptyProviderList')]
   public function testEmptyProviderList($content): void {
-    $response = $this->prophesize(\GuzzleHttp\Psr7\Response::class);
+    $response = $this->prophesize(Response::class);
     $response->getBody()->willReturn(Utils::streamFor($content));
 
-    $client = $this->createMock(\GuzzleHttp\Client::class);
+    $client = $this->createMock(Client::class);
     $client->method('request')->withAnyParameters()->willReturn($response->reveal());
     $this->container->set('http_client', $client);
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\System;
 
+use Drupal\Core\Queue\DelayableQueueInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLogLevel;
@@ -73,7 +75,7 @@ class CronQueueTest extends KernelTestBase {
 
     $this->connection = Database::getConnection();
 
-    $time = $this->prophesize(\Drupal\Component\Datetime\TimeInterface::class);
+    $time = $this->prophesize(TimeInterface::class);
     $time->getCurrentTime()->willReturn($this->currentTime);
     $time->getCurrentMicroTime()->willReturn(100.0);
     $time->getRequestTime()->willReturn($this->currentTime);
@@ -104,8 +106,8 @@ class CronQueueTest extends KernelTestBase {
     $memory = $this->container->get('queue')->get('cron_queue_test_memory_delay_exception');
 
     // Ensure that the queues are of the correct type for this test.
-    $this->assertInstanceOf(\Drupal\Core\Queue\DelayableQueueInterface::class, $database);
-    $this->assertNotInstanceOf(\Drupal\Core\Queue\DelayableQueueInterface::class, $memory);
+    $this->assertInstanceOf(DelayableQueueInterface::class, $database);
+    $this->assertNotInstanceOf(DelayableQueueInterface::class, $memory);
 
     // Get the queue worker plugin manager.
     $manager = $this->container->get('plugin.manager.queue_worker');

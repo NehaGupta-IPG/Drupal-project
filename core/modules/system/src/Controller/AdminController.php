@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Controller;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\system\ModuleAdminLinksHelper;
@@ -42,7 +43,7 @@ class AdminController extends ControllerBase {
       }
       if (!empty($admin_tasks)) {
         // Sort links by title.
-        uasort($admin_tasks, [\Drupal\Component\Utility\SortArray::class, 'sortByTitleElement']);
+        uasort($admin_tasks, [SortArray::class, 'sortByTitleElement']);
         // Move 'Configure permissions' links to the bottom of each section.
         $permission_key = "user.admin_permissions.$module";
         if (isset($admin_tasks[$permission_key])) {

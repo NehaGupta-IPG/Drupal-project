@@ -2,6 +2,7 @@
 
 namespace Drupal\breakpoint;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
@@ -62,7 +63,7 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
     // The breakpoint group.
     'group' => '',
     // Default class for breakpoint implementations.
-    'class' => \Drupal\breakpoint\Breakpoint::class,
+    'class' => Breakpoint::class,
     // The plugin id. Set by the plugin system based on the top-level YAML key.
     'id' => '',
   ];
@@ -167,7 +168,7 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
             $breakpoints[$plugin_id] = $plugin_definition;
           }
         }
-        uasort($breakpoints, [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
+        uasort($breakpoints, [SortArray::class, 'sortByWeightElement']);
         $this->cacheBackend->set($this->cacheKey . ':' . $group, $breakpoints, Cache::PERMANENT, ['breakpoints']);
         $this->breakpointsByGroup[$group] = $breakpoints;
       }

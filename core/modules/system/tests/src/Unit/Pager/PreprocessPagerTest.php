@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Unit\Pager;
 
+use Drupal\Core\Routing\UrlGenerator;
+use Drupal\Core\Pager\Pager;
+use Drupal\Core\Pager\PagerManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Pager\PagerPreprocess;
@@ -32,13 +35,13 @@ class PreprocessPagerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $pager_manager = $this->getMockBuilder(\Drupal\Core\Pager\PagerManager::class)
+    $pager_manager = $this->getMockBuilder(PagerManager::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $pager = $this->getMockBuilder(\Drupal\Core\Pager\Pager::class)
+    $pager = $this->getMockBuilder(Pager::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $url_generator = $this->getMockBuilder(\Drupal\Core\Routing\UrlGenerator::class)
+    $url_generator = $this->getMockBuilder(UrlGenerator::class)
       ->disableOriginalConstructor()
       ->getMock();
 

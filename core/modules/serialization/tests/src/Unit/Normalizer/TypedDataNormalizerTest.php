@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\serialization\Normalizer\TypedDataNormalizer;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -37,7 +38,7 @@ class TypedDataNormalizerTest extends UnitTestCase {
     parent::setUp();
 
     $this->normalizer = new TypedDataNormalizer();
-    $this->typedData = $this->createMock(\Drupal\Core\TypedData\TypedDataInterface::class);
+    $this->typedData = $this->createMock(TypedDataInterface::class);
   }
 
   /**

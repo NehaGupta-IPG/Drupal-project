@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -44,7 +45,7 @@ class ConfigEntityNormalizerTest extends UnitTestCase {
       $entity_field_manager
     );
 
-    $config_entity = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityInterface::class);
+    $config_entity = $this->createMock(ConfigEntityInterface::class);
     $config_entity->expects($this->once())
       ->method('toArray')
       ->willReturn($test_export_properties);

@@ -41,7 +41,7 @@ class ModuleTestController {
    */
   public function testClassLoading() {
     $markup = NULL;
-    if (class_exists(\Drupal\module_autoload_test\SomeClass::class)) {
+    if (class_exists(SomeClass::class)) {
       $obj = new SomeClass();
       $markup = $obj->testMethod();
     }

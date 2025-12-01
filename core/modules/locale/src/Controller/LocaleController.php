@@ -2,6 +2,8 @@
 
 namespace Drupal\locale\Controller;
 
+use Drupal\locale\Form\TranslateEditForm;
+use Drupal\locale\Form\TranslateFilterForm;
 use Drupal\Core\Controller\ControllerBase;
 
 /**
@@ -43,8 +45,8 @@ class LocaleController extends ControllerBase {
    */
   public function translatePage() {
     return [
-      'filter' => $this->formBuilder()->getForm(\Drupal\locale\Form\TranslateFilterForm::class),
-      'form' => $this->formBuilder()->getForm(\Drupal\locale\Form\TranslateEditForm::class),
+      'filter' => $this->formBuilder()->getForm(TranslateFilterForm::class),
+      'form' => $this->formBuilder()->getForm(TranslateEditForm::class),
     ];
   }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\batch_test\Controller;
 
+use Drupal\batch_test\Form\BatchTestChainedForm;
 use Drupal\batch_test\BatchInjectionCallbacks;
 use Drupal\batch_test\BatchTestCallbacks;
 use Drupal\batch_test\BatchTestDefinitions;
@@ -114,7 +115,7 @@ class BatchTestController {
     $form_state = (new FormState())->setValues([
       'value' => $value,
     ]);
-    \Drupal::formBuilder()->submitForm(\Drupal\batch_test\Form\BatchTestChainedForm::class, $form_state);
+    \Drupal::formBuilder()->submitForm(BatchTestChainedForm::class, $form_state);
     return [
       'success' => [
         '#markup' => 'Got out of a programmatic batched form.',

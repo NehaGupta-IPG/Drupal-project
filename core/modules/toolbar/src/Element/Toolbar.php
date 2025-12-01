@@ -2,6 +2,7 @@
 
 namespace Drupal\toolbar\Element;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
@@ -78,7 +79,7 @@ class Toolbar extends RenderElementBase {
     // Allow for altering of hook_toolbar().
     $module_handler->alter('toolbar', $items);
     // Sort the children.
-    uasort($items, [\Drupal\Component\Utility\SortArray::class, 'sortByWeightProperty']);
+    uasort($items, [SortArray::class, 'sortByWeightProperty']);
 
     // Merge in the original toolbar values.
     $element = array_merge($element, $items);

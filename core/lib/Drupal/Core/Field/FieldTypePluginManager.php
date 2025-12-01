@@ -99,7 +99,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
     if (!isset($definition['list_class'])) {
-      $definition['list_class'] = \Drupal\Core\Field\FieldItemList::class;
+      $definition['list_class'] = FieldItemList::class;
     }
 
     if (empty($definition['category'])) {
@@ -210,7 +210,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
 
     // Add preconfigured definitions.
     foreach ($definitions as $id => $definition) {
-      if (is_subclass_of($definition['class'], \Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface::class)) {
+      if (is_subclass_of($definition['class'], PreconfiguredFieldUiOptionsInterface::class)) {
         foreach ($this->getPreconfiguredOptions($definition['id']) as $key => $option) {
           $definitions["field_ui:$id:$key"] = array_intersect_key(
             $option,
@@ -238,7 +238,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
   public function getPreconfiguredOptions($field_type) {
     $options = [];
     $class = $this->getPluginClass($field_type);
-    if (is_subclass_of($class, \Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface::class)) {
+    if (is_subclass_of($class, PreconfiguredFieldUiOptionsInterface::class)) {
       $options = $class::getPreconfiguredOptions();
       $this->moduleHandler->alter('field_ui_preconfigured_options', $options, $field_type);
     }

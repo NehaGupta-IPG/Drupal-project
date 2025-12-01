@@ -36,7 +36,7 @@ class UniqueFieldConstraint extends SymfonyConstraint {
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return \Drupal\Core\Validation\Plugin\Validation\Constraint\UniqueFieldValueValidator::class;
+    return UniqueFieldValueValidator::class;
   }
 
 }

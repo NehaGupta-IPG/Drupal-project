@@ -50,7 +50,7 @@ class ConfigMapperManager extends DefaultPluginManager implements ConfigMapperMa
     'title' => '',
     'names' => [],
     'weight' => 20,
-    'class' => \Drupal\config_translation\ConfigNamesMapper::class,
+    'class' => ConfigNamesMapper::class,
   ];
 
   /**
@@ -71,7 +71,7 @@ class ConfigMapperManager extends DefaultPluginManager implements ConfigMapperMa
     $this->typedConfigManager = $typed_config_manager;
     $this->languageManager = $language_manager;
 
-    $this->factory = new ContainerFactory($this, \Drupal\config_translation\ConfigMapperInterface::class);
+    $this->factory = new ContainerFactory($this, ConfigMapperInterface::class);
 
     // Let others alter definitions with hook_config_translation_info_alter().
     $this->moduleHandler = $module_handler;

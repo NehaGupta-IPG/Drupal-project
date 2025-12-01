@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Component\Serialization\Json;
 use Drupal\config_test\Entity\ConfigTest;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -93,7 +94,7 @@ class ConfigEntityListTest extends BrowserTestBase {
 
     $actual_operations = $controller->getOperations($entity);
     // Sort the operations to normalize link order.
-    uasort($actual_operations, [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
+    uasort($actual_operations, [SortArray::class, 'sortByWeightElement']);
     $this->assertEquals($expected_operations, $actual_operations, 'The operations are identical.');
 
     // Test buildHeader() method.
@@ -175,7 +176,7 @@ class ConfigEntityListTest extends BrowserTestBase {
 
     $actual_operations = $controller->getOperations($entity);
     // Sort the operations to normalize link order.
-    uasort($actual_operations, [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
+    uasort($actual_operations, [SortArray::class, 'sortByWeightElement']);
     $this->assertEquals($expected_operations, $actual_operations, 'The operations are identical.');
 
     // Test getOperations when label doesn't exist.
@@ -209,7 +210,7 @@ class ConfigEntityListTest extends BrowserTestBase {
 
     $actual_operations = $controller->getOperations($entity);
     // Sort the operations to normalize link order.
-    uasort($actual_operations, [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
+    uasort($actual_operations, [SortArray::class, 'sortByWeightElement']);
     $this->assertEquals($expected_operations, $actual_operations, 'The operations are identical.');
   }
 

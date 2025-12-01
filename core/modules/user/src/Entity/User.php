@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Entity;
 
+use Drupal\user\UserNameItem;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -519,7 +520,7 @@ class User extends ContentEntityBase implements UserInterface {
         'UserName' => [],
         'UserNameUnique' => [],
       ]);
-    $fields['name']->getItemDefinition()->setClass(\Drupal\user\UserNameItem::class);
+    $fields['name']->getItemDefinition()->setClass(UserNameItem::class);
 
     $fields['pass'] = BaseFieldDefinition::create('password')
       ->setLabel(t('Password'))
