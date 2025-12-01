@@ -134,6 +134,7 @@ default:
 
 .core-spellcheck: &core-spellcheck
   - cd core
+  - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
   - yarn run spellcheck:core --no-progress --no-must-find-files --cache --cache-strategy content
 
 .yarn-install-from-cache: &yarn-install-from-cache
@@ -446,11 +447,11 @@ default:
     _TARGET_PHP: "8.4-ubuntu"
     _TARGET_DB: "pgsql-17"
 
-'PHP 8.5 PostgreSQL 17':
+'PHP 8.5 PostgreSQL 18':
   <<: [ *default-stage, *run-on-mr ]
   variables:
     _TARGET_PHP: "8.5-ubuntu"
-    _TARGET_DB: "pgsql-17"
+    _TARGET_DB: "pgsql-18"
 
 'PHP 8.3 SQLite 3.45':
   <<: [ *default-stage, *run-on-mr ]
@@ -512,8 +513,8 @@ default:
   needs: [ '[Daily] PHP 8.4 MariaDB 10.6' ]
   <<: [ *run-daily ]
 
-'[Daily] PHP 8.5 PostgreSQL 17':
-  extends: 'PHP 8.5 PostgreSQL 17'
+'[Daily] PHP 8.5 PostgreSQL 18':
+  extends: 'PHP 8.5 PostgreSQL 18'
   needs: [ '[Daily] PHP 8.5 MySQL 9.3' ]
   <<: [ *run-daily ]
 
@@ -686,6 +687,7 @@ default:
   script:
     - *download-cache
     - cd core
+    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - yarn run check:ckeditor5
     - yarn run lint:core-js-passing --cache --cache-strategy content --format gitlab
   artifacts:
@@ -716,6 +718,7 @@ default:
   script:
     - *download-cache
     - cd core
+    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - yarn run build:css --check
     - yarn run lint:css --cache --cache-location .stylelintcache --cache-strategy content --color  --custom-formatter=@gitlab-formatters/stylelint-formatter-gitlab --output-file=$CI_PROJECT_DIR/gl-codequality.json
   artifacts:

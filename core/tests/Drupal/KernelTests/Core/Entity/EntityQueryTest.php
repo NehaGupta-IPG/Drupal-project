@@ -38,7 +38,9 @@ class EntityQueryTest extends EntityKernelTestBase {
   protected static $modules = ['field_test', 'language'];
 
   /**
-   * @var array
+   * An array of entity IDs keyed by the revision or entity ID.
+   *
+   * @var array<int, string>
    */
   protected $queryResults;
 
@@ -352,7 +354,20 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->execute();
     // This matches both the original and new current revisions, multiple
     // revisions are returned for some entities.
-    $assert = [16 => '4', 17 => '5', 18 => '6', 19 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 20 => '12', 21 => '13', 22 => '14', 23 => '15'];
+    $assert = [
+      16 => '4',
+      17 => '5',
+      18 => '6',
+      19 => '7',
+      8 => '8',
+      9 => '9',
+      10 => '10',
+      11 => '11',
+      20 => '12',
+      21 => '13',
+      22 => '14',
+      23 => '15',
+    ];
     $this->assertSame($assert, $results);
     $results = $this->storage
       ->getQuery()
@@ -381,7 +396,24 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->sort('revision_id')
       ->execute();
     // Now we get everything.
-    $assert = [4 => '4', 5 => '5', 6 => '6', 7 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 12 => '12', 20 => '12', 13 => '13', 21 => '13', 14 => '14', 22 => '14', 15 => '15', 23 => '15'];
+    $assert = [
+      4 => '4',
+      5 => '5',
+      6 => '6',
+      7 => '7',
+      8 => '8',
+      9 => '9',
+      10 => '10',
+      11 => '11',
+      12 => '12',
+      20 => '12',
+      13 => '13',
+      21 => '13',
+      14 => '14',
+      22 => '14',
+      15 => '15',
+      23 => '15',
+    ];
     $this->assertSame($assert, $results);
 
     $results = $this->queryResults = $this->storage
@@ -420,7 +452,23 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->sort('id')
       ->sort('revision_id')
       ->execute();
-    $expected = [1 => '1', 2 => '2', 3 => '3', 24 => '4', 17 => '5', 18 => '6', 19 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 20 => '12', 21 => '13', 22 => '14', 23 => '15'];
+    $expected = [
+      1 => '1',
+      2 => '2',
+      3 => '3',
+      24 => '4',
+      17 => '5',
+      18 => '6',
+      19 => '7',
+      8 => '8',
+      9 => '9',
+      10 => '10',
+      11 => '11',
+      20 => '12',
+      21 => '13',
+      22 => '14',
+      23 => '15',
+    ];
     $this->assertSame($expected, $results);
   }
 
@@ -773,6 +821,8 @@ class EntityQueryTest extends EntityKernelTestBase {
   }
 
   /**
+   * Asserts the query results.
+   *
    * @internal
    */
   protected function assertResult(): void {
@@ -788,6 +838,8 @@ class EntityQueryTest extends EntityKernelTestBase {
   }
 
   /**
+   * Asserts revision query results.
+   *
    * @internal
    */
   protected function assertRevisionResult(array $keys, array $expected): void {
@@ -799,6 +851,8 @@ class EntityQueryTest extends EntityKernelTestBase {
   }
 
   /**
+   * Asserts the bundle order.
+   *
    * @internal
    */
   protected function assertBundleOrder(string $order): void {
