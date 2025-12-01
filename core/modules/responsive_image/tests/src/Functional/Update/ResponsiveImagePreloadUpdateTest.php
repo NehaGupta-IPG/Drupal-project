@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\responsive_image\Functional;
+namespace Drupal\Tests\responsive_image\Functional\Update;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
@@ -24,7 +24,7 @@ class ResponsiveImagePreloadUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
-      __DIR__ . '/../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
       __DIR__ . '/../../fixtures/update/responsive_image.php',
       __DIR__ . '/../../fixtures/update/responsive_image-loading-attribute.php',
     ];

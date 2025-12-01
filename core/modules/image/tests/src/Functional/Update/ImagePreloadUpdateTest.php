@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\image\Functional;
+namespace Drupal\Tests\image\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\image\ImageConfigUpdater;
