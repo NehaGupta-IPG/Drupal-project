@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Unit\Plugin\query;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
@@ -331,10 +332,12 @@ class SqlTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::loadEntities
-   * @covers ::assignEntitiesToResult
+   * Tests loading entities when the entity is missing.
+   *
+   * @legacy-covers ::loadEntities
+   * @legacy-covers ::assignEntitiesToResult
    */
-  public function testLoadEntitiesWithMissingEntity() {
+  public function testLoadEntitiesWithMissingEntity(): void {
     $view = $this->prophesize(ViewExecutable::class)->reveal();
     $view_entity = $this->prophesize(ViewEntityInterface::class);
     $view_entity->get('base_table')->willReturn('entity_first');
@@ -409,7 +412,7 @@ class SqlTest extends UnitTestCase {
       'id' => 1,
     ]);
     // Note: Let the same entity be returned multiple times, for example to
-    // support the translation usecase.
+    // support the translation use case.
     $result[] = new ResultRow([
       'id' => 2,
     ]);
