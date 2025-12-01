@@ -240,7 +240,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
    * @param \Drupal\Core\Entity\EntityInterface $translation
    *   The entity translation making the other translations outdated.
    */
-  protected function markRevisionTranslationsOutdated(EntityInterface $translation) {
+  protected function markRevisionTranslationsOutdated(EntityInterface $translation): void {
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($this->entityTypeId);
     $active_langcode = $translation->language()->getId();
@@ -762,7 +762,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
    *
    * Performs required tasks after the entity has been saved.
    */
-  public function entityFormPostSave($form, FormStateInterface $form_state) {
+  public function entityFormPostSave($form, FormStateInterface $form_state): void {
     // Marks revision translations as outdated if needed.
     $values = $form_state->getValue('content_translation');
     if (empty($values['retranslate'])) {
