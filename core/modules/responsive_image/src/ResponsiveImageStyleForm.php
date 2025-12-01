@@ -11,34 +11,38 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Form controller for the responsive image edit/add forms.
  *
+ * @property \Drupal\breakpoint\BreakpointManagerInterface $breakpointManager
+ *
  * @internal
  */
 class ResponsiveImageStyleForm extends EntityForm {
-
-  /**
-   * The breakpoint manager.
-   *
-   * @var \Drupal\breakpoint\BreakpointManagerInterface
-   */
-  protected $breakpointManager;
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('breakpoint.manager')
+      static::getSerializableServiceClosure('breakpoint.manager', $container)
     );
   }
 
+  public function __construct(protected BreakpointManagerInterface|\Closure $breakpointManagerClosure) {
+    if ($this->breakpointManagerClosure instanceof BreakpointManagerInterface) {
+      @trigger_error('Passing the breakpoint manager service object to ' . __METHOD__ . ' is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a service closure instead. See https://www.drupal.org/node/3547683');
+      $this->breakpointManagerClosure = static::getSerializableServiceClosure('breakpoint.manager');
+    }
+  }
+
   /**
-   * Constructs the responsive image style form.
-   *
-   * @param \Drupal\breakpoint\BreakpointManagerInterface $breakpoint_manager
-   *   The breakpoint manager.
+   * Magic getter for properties populated by closure return values.
    */
-  public function __construct(BreakpointManagerInterface $breakpoint_manager) {
-    $this->breakpointManager = $breakpoint_manager;
+  public function __get(string $name): mixed {
+    $closureName = $name . 'Closure';
+    if (property_exists($this, $closureName) && $this->$closureName instanceof \Closure) {
+      return ($this->$closureName)();
+    }
+
+    return NULL;
   }
 
   /**
