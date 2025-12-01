@@ -636,7 +636,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
    * @return array
    *   Test data.
    */
-  public function provideResponsiveImagePreload(): array {
+  public static function provideResponsiveImagePreload(): array {
     return [
       ['preload' => TRUE],
       ['preload' => FALSE],

@@ -763,7 +763,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
    * @return array
    *   Test data.
    */
-  public function provideImagePreload(): array {
+  public static function provideImagePreload(): array {
     return [
       ['preload' => TRUE],
       ['preload' => FALSE],
