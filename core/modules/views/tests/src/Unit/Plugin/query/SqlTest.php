@@ -338,11 +338,11 @@ class SqlTest extends UnitTestCase {
    * @legacy-covers ::assignEntitiesToResult
    */
   public function testLoadEntitiesWithMissingEntity(): void {
-    $view = $this->prophesize(ViewExecutable::class)->reveal();
+    $view = $this->prophesize(ViewExecutable::class);
+    $view->id()->willReturn('test');
     $view_entity = $this->prophesize(ViewEntityInterface::class);
     $view_entity->get('base_table')->willReturn('entity_first');
     $view_entity->get('base_field')->willReturn('id');
-    $view_entity->id()->willReturn('test');
     $view->storage = $view_entity->reveal();
 
     $entities = [
@@ -405,7 +405,7 @@ class SqlTest extends UnitTestCase {
     ]);
 
     $query = new Sql([], 'sql', [], $entity_type_manager->reveal(), $date_sql->reveal(), $messenger->reveal(), $logger->reveal());
-    $query->view = $view;
+    $query->view = $view->reveal();
 
     $result = [];
     $result[] = new ResultRow([
