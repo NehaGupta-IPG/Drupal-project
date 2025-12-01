@@ -198,7 +198,7 @@ abstract class BrowserTestBase extends TestCase {
   protected function initMink() {
     $driver = $this->getDefaultDriverInstance();
 
-    if ($driver instanceof BrowserKitDriver) {
+    if ($driver instanceof BrowserKitDriver && $driver->getClient() instanceof DrupalTestBrowser) {
       // Turn off curl timeout. Having a timeout is not a problem in a normal
       // test running, but it is a problem when debugging. Also, disable SSL
       // peer verification so that testing under HTTPS always works.
@@ -284,9 +284,7 @@ abstract class BrowserTestBase extends TestCase {
     }
 
     if ($this->minkDefaultDriverClass === BrowserKitDriver::class) {
-      $browser = new DrupalTestBrowser();
-      $browser->useHtml5Parser(FALSE);
-      $driver = new $this->minkDefaultDriverClass($browser);
+      $driver = new $this->minkDefaultDriverClass(new DrupalTestBrowser());
     }
     elseif (is_array($this->minkDefaultDriverArgs)) {
       // Use ReflectionClass to instantiate class with received params.
