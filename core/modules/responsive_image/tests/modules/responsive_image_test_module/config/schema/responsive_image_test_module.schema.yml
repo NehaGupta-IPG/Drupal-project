@@ -13,6 +13,9 @@ field.formatter.settings.responsive_image_test:
       type: mapping
       label: 'Image loading settings'
       mapping:
+        preload:
+          type: boolean
+          label: 'Preload'
         attribute:
           type: string
           label: 'Loading attribute'

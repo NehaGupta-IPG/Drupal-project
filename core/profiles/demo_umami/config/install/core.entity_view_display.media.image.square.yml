@@ -25,6 +25,7 @@ content:
       responsive_image_style: square
       image_link: ''
       image_loading:
+        preload: false
         attribute: lazy
     third_party_settings: {  }
     weight: 1

@@ -19,6 +19,7 @@ content:
       image_style: 'large'
       image_link: ''
       image_loading:
+        preload: false
         attribute: lazy
     third_party_settings: {  }
     weight: 1

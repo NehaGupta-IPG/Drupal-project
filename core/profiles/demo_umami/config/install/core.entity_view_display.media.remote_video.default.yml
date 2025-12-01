@@ -18,6 +18,7 @@ content:
       max_width: 0
       max_height: 0
       loading:
+        preload: false
         attribute: lazy
     third_party_settings: {  }
     weight: 0

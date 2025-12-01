@@ -33,6 +33,7 @@ content:
       image_link: content
       image_style: medium
       image_loading:
+        preload: false
         attribute: lazy
     third_party_settings: {  }
     weight: -1

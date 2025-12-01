@@ -12,6 +12,7 @@ use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Drupal\responsive_image\Plugin\Field\FieldFormatter\ResponsiveImageFormatter;
 use Drupal\responsive_image\ResponsiveImageStyleInterface;
 use Drupal\Tests\image\Functional\ImageFieldTestBase;
+use Drupal\Tests\system\Functional\Render\AssertPageHeadTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
@@ -24,6 +25,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
 
+  use AssertPageHeadTrait;
   use TestFileCreationTrait;
 
   /**
@@ -452,8 +454,10 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
 
   /**
    * Tests responsive image formatter on node display with one and two sources.
+   *
+   * @dataProvider provideResponsiveImagePreload
    */
-  public function testResponsiveImageFieldFormattersMultipleSources(): void {
+  public function testResponsiveImageFieldFormattersMultipleSources(bool $preload): void {
     // Setup known image style sizes so the test can assert on known sizes.
     $large_style = ImageStyle::load('large');
     assert($large_style instanceof ImageStyleInterface);
@@ -507,6 +511,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
         'image_link' => '',
         'responsive_image_style' => 'style_one',
         'image_loading' => [
+          'preload' => $preload,
           // Test the image loading default option can be overridden.
           'attribute' => 'eager',
         ],
@@ -526,7 +531,15 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     $image_uri = File::load($node->{$field_name}->target_id)->getFileUri();
     $medium_transform_url = $this->fileUrlGenerator->transformRelative($medium_style->buildUrl($image_uri));
     $large_transform_url = $this->fileUrlGenerator->transformRelative($large_style->buildUrl($image_uri));
-    $this->assertSession()->responseMatches('/<img loading="eager" srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" width="480" height="480" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>/');
+    $loading = $preload ? '' : 'loading="eager" ';
+    $srcset = $medium_transform_url . ' 1x, ' . $large_transform_url . ' 1.5x, ' . $large_transform_url . ' 2x';
+    $this->assertSession()->responseMatches('/<img ' . $loading . 'srcset="' . \preg_quote($srcset, '/') . '" width="220" height="220" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>/');
+    // Check preload head link tag.
+    $this->assertPageHead('link', [
+      'rel' => 'preload',
+      'as' => 'image',
+      'imagesrcset' => $srcset,
+    ], (int) $preload);
 
     $this->responsiveImgStyle
       // Test the output of an empty media query.
@@ -538,7 +551,14 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Assert the picture tag has source tags that include dimensions.
     $this->drupalGet('node/' . $nid);
-    $this->assertSession()->responseMatches('/<picture>\s+<source srcset="' . \preg_quote($large_transform_url, '/') . ' 1x" media="\(min-width: 851px\)" type="image\/avif" width="480" height="480"\/>\s+<source srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" type="image\/avif" width="220" height="220"\/>\s+<img loading="eager" width="480" height="480" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>\s+<\/picture>/');
+    $this->assertSession()->responseMatches('/<picture>\s+<source srcset="' . \preg_quote($large_transform_url, '/') . ' 1x" media="\(min-width: 851px\)" type="image\/png" width="480" height="480"\/>\s+<source srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" type="image\/png" width="220" height="220"\/>\s+<img ' . $loading . 'src="' . \preg_quote($large_transform_url, '/') . '" width="480" height="480" alt="\w+" \/>\s+<\/picture>/');
+    // Check preload head link tag.
+    $this->assertPageHead('link', [
+      'rel' => 'preload',
+      'as' => 'image',
+      'imagesrcset' => $large_transform_url . ' 1x',
+      'media' => '(min-width: 851px)',
+    ], (int) $preload);
   }
 
   /**
@@ -608,6 +628,19 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
         $this->assertSession()->responseMatches('/<a(.*?)href="' . preg_quote($node->toUrl()->toString(), '/') . '"(.*?)>\s*<picture/');
         break;
     }
+  }
+
+  /**
+   * Provide responsive image preload test cases.
+   *
+   * @return array
+   *   Test data.
+   */
+  public function provideResponsiveImagePreload(): array {
+    return [
+      ['preload' => TRUE],
+      ['preload' => FALSE],
+    ];
   }
 
 }

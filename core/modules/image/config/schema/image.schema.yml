@@ -167,6 +167,9 @@ field.formatter.settings.image:
       type: mapping
       label: 'Image loading settings'
       mapping:
+        preload:
+          type: boolean
+          label: 'Preload'
         attribute:
           type: string
           label: 'Loading attribute'

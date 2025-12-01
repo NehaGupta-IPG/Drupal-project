@@ -25,6 +25,7 @@ content:
       image_style: medium_8_7
       image_link: ''
       image_loading:
+        preload: false
         attribute: lazy
     third_party_settings: {  }
     weight: 1
