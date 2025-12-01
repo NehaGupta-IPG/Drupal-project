@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ReverseContainer;
+use Drupal\Core\DependencyInjection\Attribute\ServiceClosure;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Test\TestKernel;
 use Drupal\Tests\UnitTestCase;
@@ -28,11 +29,18 @@ class DependencySerializationTest extends UnitTestCase {
   public function testSerialization(): void {
     // Create a pseudo service and dependency injected object.
     $service = new \stdClass();
+    // Add a property to the object to differentiate it from the next service
+    // object.
+    $service->serviceId = 'test_service';
     $container = TestKernel::setContainerWithKernel();
-    $container->set('test_service', $service);
+    $container->set($service->serviceId, $service);
+    $service2 = new \stdClass();
+    // Set property to be different from first service.
+    $service2->serviceId = 'test_service2';
+    $container->set($service2->serviceId, $service2);
+    $service2Closure = static fn () => $container->get($service2->serviceId);
     $this->assertSame($container, $container->get('service_container'));
-
-    $dependencySerialization = new DependencySerializationTestDummy($service);
+    $dependencySerialization = new DependencySerializationTestDummy($service, $service2Closure);
     $dependencySerialization->setContainer($container);
 
     $string = serialize($dependencySerialization);
@@ -41,8 +49,23 @@ class DependencySerializationTest extends UnitTestCase {
 
     $this->assertTrue($container->has(ReverseContainer::class));
     $this->assertSame($service, $dependencySerialization->service);
+    $this->assertNotEquals($service2, $dependencySerialization->service);
+    $this->assertSame($service2, ($dependencySerialization->closure)());
+    $this->assertNotEquals($service, ($dependencySerialization->closure)());
     $this->assertSame($container, $dependencySerialization->container);
     $this->assertEmpty($dependencySerialization->getServiceIds());
+
+    // Test that properties that do not have the ServiceClosure attribute will
+    // throw an exception when trying to serialize.
+    $dependencySerialization->notServiceClosure = $service2Closure;
+    $t = NULL;
+    try {
+      serialize($dependencySerialization);
+    }
+    catch (\Throwable $t) {
+    }
+    $this->assertInstanceOf(\Exception::class, $t);
+    $this->assertSame("Serialization of 'Closure' is not allowed", $t->getMessage());
   }
 
 }
@@ -54,29 +77,13 @@ class DependencySerializationTestDummy {
 
   use DependencySerializationTrait;
 
-  /**
-   * A test service.
-   *
-   * @var object
-   */
-  public $service;
-
-  /**
-   * The container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  public $container;
-
-  /**
-   * Constructs a new TestClass object.
-   *
-   * @param object $service
-   *   A test service.
-   */
-  public function __construct(\stdClass $service) {
-    $this->service = $service;
-  }
+  public function __construct(
+    public \stdClass $service,
+    #[ServiceClosure('test_service2')]
+    public \Closure $closure,
+    public ?\Closure $notServiceClosure = NULL,
+    public ?ContainerInterface $container = NULL,
+  ) {}
 
   /**
    * {@inheritdoc}

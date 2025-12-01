@@ -3,6 +3,7 @@
 namespace Drupal\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ReverseContainer;
+use Drupal\Core\DependencyInjection\Attribute\ServiceClosure;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -20,9 +21,17 @@ trait DependencySerializationTrait {
   protected $_serviceIds = [];
 
   /**
-   * An array of entity type IDs keyed by the property name of their storages.
+   * An array of service IDs for closures keyed by property name.
    *
    * @var array
+   */
+  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName
+  protected $_serviceClosureIds = [];
+
+  /**
+   * An array of entity type IDs keyed by the property name of their storages.
+   *
+   * @var array<string, string>
    */
   // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $_entityStorages = [];
@@ -58,6 +67,13 @@ trait DependencySerializationTrait {
           $this->_serviceIds[$key] = $service_id;
           unset($vars[$key]);
         }
+        elseif (($value instanceof \Closure) &&
+                ($reflection_property = new \ReflectionProperty($this, $key)) &&
+                !empty($reflection_property->getAttributes(ServiceClosure::class))) {
+          // For any class property that has the ServiceClosure attribute, set
+          // it to NULL, because closures can not be serialized.
+          unset($vars[$key]);
+        }
       }
     }
     catch (ContainerNotInitializedException) {
@@ -71,8 +87,12 @@ trait DependencySerializationTrait {
    * {@inheritdoc}
    */
   public function __wakeup(): void {
-    // Avoid trying to wakeup if there's nothing to do.
-    if (empty($this->_serviceIds) && empty($this->_entityStorages)) {
+    // Avoid trying to wakeup if there's nothing to do. Use reflection to check
+    // whether there are any service closure properties using the presence of
+    // the ServiceClosure attribute.
+    $reflection_properties = (new \ReflectionClass($this))->getProperties();
+    $service_closure_properties = array_filter($reflection_properties, static fn (\ReflectionProperty $property) => !empty($property->getAttributes(ServiceClosure::class)));
+    if (empty($this->_serviceIds) && empty($service_closure_properties) && empty($this->_entityStorages)) {
       return;
     }
     $container = \Drupal::getContainer();
@@ -80,6 +100,12 @@ trait DependencySerializationTrait {
       $this->$key = $container->get($service_id);
     }
     $this->_serviceIds = [];
+
+    // Re-populate service closure properties.
+    foreach ($service_closure_properties as $property) {
+      $service_closure_id = array_first($property->getAttributes(ServiceClosure::class)[0]->getArguments());
+      $this->{$property->getName()} = static fn () => $container->get($service_closure_id);
+    }
 
     if ($this->_entityStorages) {
       /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
