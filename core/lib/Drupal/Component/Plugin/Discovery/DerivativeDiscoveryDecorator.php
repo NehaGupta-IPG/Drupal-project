@@ -11,7 +11,7 @@ use Drupal\Component\Plugin\Exception\InvalidDeriverException;
  * Provides a decorator that allows the use of plugin derivatives for normal
  * implementations DiscoveryInterface.
  */
-class DerivativeDiscoveryDecorator implements DiscoveryInterface {
+class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
 
   use DiscoveryTrait;
 
@@ -127,7 +127,7 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
    *
    * @return array
    *   An array with the base plugin id as the first index and the derivative id
-   *   as the second. If there is no derivative id it will be null.
+   *   as the second. If there is no derivative id it will be an empty string.
    */
   protected function decodePluginId($plugin_id) {
     // Try and split the passed plugin definition into a plugin and a
@@ -137,7 +137,7 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
       return explode(':', $plugin_id, 2);
     }
 
-    return [$plugin_id, NULL];
+    return [$plugin_id, ''];
   }
 
   /**
@@ -242,6 +242,22 @@ class DerivativeDiscoveryDecorator implements DiscoveryInterface {
     $derivative_definition = $filtered_base + ($derivative_definition ?: []);
     // Add back any empty keys that the derivative didn't have.
     return $derivative_definition + $base_plugin_definition;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function clearCachedDefinitions() {
+    $this->derivers = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function useCaches($use_caches = FALSE) {
+    if (!$use_caches) {
+      $this->clearCachedDefinitions();
+    }
   }
 
   /**

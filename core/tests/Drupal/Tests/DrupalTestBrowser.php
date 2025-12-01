@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests;
 
 use GuzzleHttp\Client;
@@ -92,7 +94,7 @@ class DrupalTestBrowser extends AbstractBrowser {
       if (str_starts_with($key, 'http-')) {
         $headers[substr($key, 5)] = $val;
       }
-      // CONTENT_* are not prefixed with HTTP_
+      // "CONTENT_*" are not prefixed with "HTTP_".
       elseif (isset($content_headers[$key])) {
         $headers[$key] = $val;
       }
@@ -132,12 +134,12 @@ class DrupalTestBrowser extends AbstractBrowser {
     $method = $request->getMethod();
     $uri = $request->getUri();
 
-    // Let BrowserKit handle redirects
+    // Let BrowserKit handle redirects.
     try {
       $response = $this->getClient()->request($method, $uri, $request_options);
     }
-    // Catch RequestException rather than TransferException because we want
-    // to re-throw the exception whenever the response is NULL, and
+    // Catch RequestException rather than ClientExceptionInterface because we
+    // want to re-throw the exception whenever the response is NULL, and
     // ConnectException always has a NULL response.
     catch (RequestException $e) {
       if (!$e->hasResponse()) {

@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Enhancer;
 
 use Drupal\Core\Routing\Enhancer\ParamConversionEnhancer;
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Routing\Enhancer\ParamConversionEnhancer
- * @group Enhancer
+ * Tests Drupal\Core\Routing\Enhancer\ParamConversionEnhancer.
  */
+#[CoversClass(ParamConversionEnhancer::class)]
+#[Group('Enhancer')]
 class ParamConversionEnhancerTest extends UnitTestCase {
 
   /**
@@ -36,9 +41,11 @@ class ParamConversionEnhancerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::enhance
+   * Tests enhance.
+   *
+   * @legacy-covers ::enhance
    */
-  public function testEnhance() {
+  public function testEnhance(): void {
     $route = new Route('/test/{id}/{literal}/{null}');
 
     $raw_variables = [
@@ -71,9 +78,11 @@ class ParamConversionEnhancerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::copyRawVariables
+   * Tests copy raw variables.
+   *
+   * @legacy-covers ::copyRawVariables
    */
-  public function testCopyRawVariables() {
+  public function testCopyRawVariables(): void {
     $route = new Route('/test/{id}');
     $route->setDefault('node_type', 'page');
     $defaults = [

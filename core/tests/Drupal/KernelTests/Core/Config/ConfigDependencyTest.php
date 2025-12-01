@@ -1,21 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Config;
 
+use Drupal\Core\Config\ConfigManager;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\user\Entity\Role;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for configuration dependencies.
- *
- * @coversDefaultClass \Drupal\Core\Config\ConfigManager
- *
- * @group config
  */
+#[CoversClass(ConfigManager::class)]
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigDependencyTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * The entity_test module is enabled to provide content entity types.
    *
@@ -26,7 +33,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
   /**
    * Tests that calculating dependencies for system module.
    */
-  public function testNonEntity() {
+  public function testNonEntity(): void {
     $this->installConfig(['system']);
     $config_manager = \Drupal::service('config.manager');
     $dependents = $config_manager->findConfigEntityDependencies('module', ['system']);
@@ -40,7 +47,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
   /**
    * Tests creating dependencies on configuration entities.
    */
-  public function testDependencyManagement() {
+  public function testDependencyManagement(): void {
     /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
     $config_manager = \Drupal::service('config.manager');
     $storage = $this->container->get('entity_type.manager')->getStorage('config_test');
@@ -188,7 +195,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
   /**
    * Tests ConfigManager::uninstall() and config entity dependency management.
    */
-  public function testConfigEntityUninstall() {
+  public function testConfigEntityUninstall(): void {
     /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
     $config_manager = \Drupal::service('config.manager');
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $storage */
@@ -227,7 +234,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
   /**
    * Data provider for self::testConfigEntityUninstallComplex().
    */
-  public function providerConfigEntityUninstallComplex() {
+  public static function providerConfigEntityUninstallComplex() {
     // Ensure that alphabetical order has no influence on dependency fixing and
     // removal.
     return [
@@ -245,10 +252,9 @@ class ConfigDependencyTest extends EntityKernelTestBase {
    *
    * @param array $entity_id_suffixes
    *   The suffixes to add to the 4 entities created by the test.
-   *
-   * @dataProvider providerConfigEntityUninstallComplex
    */
-  public function testConfigEntityUninstallComplex(array $entity_id_suffixes) {
+  #[DataProvider('providerConfigEntityUninstallComplex')]
+  public function testConfigEntityUninstallComplex(array $entity_id_suffixes): void {
     /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
     $config_manager = \Drupal::service('config.manager');
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $storage */
@@ -370,10 +376,12 @@ class ConfigDependencyTest extends EntityKernelTestBase {
   }
 
   /**
-   * @covers ::uninstall
-   * @covers ::getConfigEntitiesToChangeOnDependencyRemoval
+   * Tests config entity uninstall third party.
+   *
+   * @legacy-covers ::uninstall
+   * @legacy-covers ::getConfigEntitiesToChangeOnDependencyRemoval
    */
-  public function testConfigEntityUninstallThirdParty() {
+  public function testConfigEntityUninstallThirdParty(): void {
     /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
     $config_manager = \Drupal::service('config.manager');
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $storage */
@@ -488,7 +496,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
   /**
    * Tests deleting a configuration entity and dependency management.
    */
-  public function testConfigEntityDelete() {
+  public function testConfigEntityDelete(): void {
     /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
     $config_manager = \Drupal::service('config.manager');
     /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $storage */
@@ -595,7 +603,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
    *
    * @see \Drupal\Core\Config\ConfigManager::getConfigEntitiesToChangeOnDependencyRemoval()
    */
-  public function testContentEntityDelete() {
+  public function testContentEntityDelete(): void {
     $this->installEntitySchema('entity_test');
     /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
     $config_manager = \Drupal::service('config.manager');
@@ -639,6 +647,57 @@ class ConfigDependencyTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests that config dependency ordering.
+   */
+  public function testDependencyOrder(): void {
+    $storage = $this->container->get('entity_type.manager')->getStorage('config_test');
+    // Test dependencies between modules.
+    $entity1 = $storage->create(['id' => 'entity1']);
+    $entity1->save();
+    // Create additional entities to test dependencies on config entities.
+    $entity2 = $storage->create(['id' => 'entity2', 'dependencies' => ['enforced' => ['config' => [$entity1->getConfigDependencyName()]]]]);
+    $entity2->save();
+    $entity3 = $storage->create(['id' => 'entity3', 'dependencies' => ['enforced' => ['config' => [$entity1->getConfigDependencyName()]]]]);
+    $entity3->save();
+    // Include a role entity to test ordering when dependencies have multiple
+    // entity types.
+    $role = Role::create([
+      'id' => 'test_role',
+      'label' => 'Test role',
+      // This adds an implicit dependency on $entity 2, and hence also $entity1,
+      // to the role.
+      'permissions' => ["permission with {$entity2->getConfigDependencyName()} dependency"],
+    ]);
+    $role->save();
+    $entity4 = $storage->create([
+      'id' => 'entity4',
+      'dependencies' => [
+        'enforced' => [
+          'config' => [
+            // Add dependencies to $entity3 and the role so that the $entity4
+            // should be last to be processed when handling dependency removal.
+            // The role should be processed after $entity1 and $entity2, but
+            // before $entity4.
+            $entity3->getConfigDependencyName(),
+            $role->getConfigDependencyName(),
+          ],
+        ],
+      ],
+    ]);
+    $entity4->save();
+
+    // Create scenario where entity1 is deleted, but all the config_test
+    // entities depending on entity1 are fixed instead of being deleted. This
+    // means that entity2 is not deleted, so the role should not lose the
+    // permission depending on entity2.
+    \Drupal::state()->set('config_test.fix_dependencies', ['config_test.dynamic.entity1']);
+    $entity1->delete();
+    $role = Role::load('test_role');
+    $this->assertNotNull($role);
+    $this->assertTrue($role->hasPermission("permission with {$entity2->getConfigDependencyName()} dependency"));
+  }
+
+  /**
    * Gets a list of identifiers from an array of configuration entities.
    *
    * @param \Drupal\Core\Config\Entity\ConfigEntityInterface[] $dependents
@@ -647,7 +706,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
    * @return array
    *   An array with values of entity_type_id:ID
    */
-  protected function getDependentIds(array $dependents) {
+  protected function getDependentIds(array $dependents): array {
     $dependent_ids = [];
     foreach ($dependents as $dependent) {
       $dependent_ids[] = $dependent->getEntityTypeId() . ':' . $dependent->id();

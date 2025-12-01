@@ -1,14 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Unit;
 
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Tests\TestHelperPlugin;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\PluginBase
- * @group views
+ * Tests Drupal\views\Plugin\views\PluginBase.
  */
+#[CoversClass(PluginBase::class)]
+#[Group('views')]
 class PluginBaseTest extends UnitTestCase {
 
   /**
@@ -37,14 +44,14 @@ class PluginBaseTest extends UnitTestCase {
    * @param array $definition
    *   The definition array, defining default options.
    * @param array $expected
-   *   The expected array after unpacking
+   *   The expected array after unpacking.
    * @param bool $all
    *   Whether to unpack all options.
    *
-   * @dataProvider providerTestUnpackOptions
-   * @covers ::unpackOptions
+   * @legacy-covers ::unpackOptions
    */
-  public function testUnpackOptions($storage, $options, $definition, $expected, $all = FALSE) {
+  #[DataProvider('providerTestUnpackOptions')]
+  public function testUnpackOptions($storage, $options, $definition, $expected, $all = FALSE): void {
     $this->testHelperPlugin->unpackOptions($storage, $options, $definition, $all);
     $this->assertEquals($storage, $expected);
   }
@@ -57,12 +64,12 @@ class PluginBaseTest extends UnitTestCase {
    * @param array $definition
    *   The definition array, defining default options.
    * @param array $expected
-   *   The expected array after unpacking
+   *   The expected array after unpacking.
    *
-   * @dataProvider providerTestSetOptionDefault
-   * @covers ::setOptionDefaults
+   * @legacy-covers ::setOptionDefaults
    */
-  public function testSetOptionDefault($storage, $definition, $expected) {
+  #[DataProvider('providerTestSetOptionDefault')]
+  public function testSetOptionDefault($storage, $definition, $expected): void {
     $this->testHelperPlugin->testSetOptionDefaults($storage, $definition);
     $this->assertEquals($storage, $expected);
   }
@@ -71,8 +78,9 @@ class PluginBaseTest extends UnitTestCase {
    * Data provider for testUnpackOptions().
    *
    * @return array
+   *   An array of test data.
    */
-  public function providerTestUnpackOptions() {
+  public static function providerTestUnpackOptions() {
     $test_parameters = [];
     // Set a storage but no value, so the storage value should be kept.
     $test_parameters[] = [
@@ -101,7 +109,6 @@ class PluginBaseTest extends UnitTestCase {
       'expected' => [
         'key' => 'value2',
       ],
-      '',
     ];
     // Set no storage but an options value, so the options value should be kept.
     $test_parameters[] = [
@@ -220,8 +227,9 @@ class PluginBaseTest extends UnitTestCase {
    * Data provider for testSetOptionDefault().
    *
    * @return array
+   *   An array of test data.
    */
-  public function providerTestSetOptionDefault() {
+  public static function providerTestSetOptionDefault() {
     $test_parameters = [];
     // No definition should change anything on the storage.
     $test_parameters[] = [
@@ -278,16 +286,21 @@ class PluginBaseTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerTestFilterByDefinedOptions
-   * @covers ::filterByDefinedOptions
+   * Tests filter by defined options.
+   *
+   * @legacy-covers ::filterByDefinedOptions
    */
-  public function testFilterByDefinedOptions($storage, $options, $expected_storage) {
+  #[DataProvider('providerTestFilterByDefinedOptions')]
+  public function testFilterByDefinedOptions($storage, $options, $expected_storage): void {
     $this->testHelperPlugin->setDefinedOptions($options);
     $this->testHelperPlugin->filterByDefinedOptions($storage);
     $this->assertEquals($expected_storage, $storage);
   }
 
-  public function providerTestFilterByDefinedOptions() {
+  /**
+   * Provides data to testFilterByDefinedOptions().
+   */
+  public static function providerTestFilterByDefinedOptions() {
     $data = [];
 
     // A simple defined option.
@@ -303,10 +316,22 @@ class PluginBaseTest extends UnitTestCase {
     $data[] = [$values_2, $options_1, $values_1];
 
     // Nested options, all properly defined.
-    $data[] = [['sub1' => $values_2, 'sub2' => $values_2], ['sub1' => ['contains' => $options_2], 'sub2' => ['contains' => $options_2]], ['sub1' => $values_2, 'sub2' => $values_2]];
+    $data[] = [['sub1' => $values_2, 'sub2' => $values_2],
+      [
+        'sub1' => ['contains' => $options_2],
+        'sub2' => ['contains' => $options_2],
+      ],
+      ['sub1' => $values_2, 'sub2' => $values_2],
+    ];
 
     // Nested options, not all properly defined.
-    $data[] = [['sub1' => $values_2, 'sub2' => $values_2], ['sub1' => ['contains' => $options_2], 'sub2' => ['contains' => $options_1]], ['sub1' => $values_2, 'sub2' => $values_1]];
+    $data[] = [['sub1' => $values_2, 'sub2' => $values_2],
+      [
+        'sub1' => ['contains' => $options_2],
+        'sub2' => ['contains' => $options_1],
+      ],
+      ['sub1' => $values_2, 'sub2' => $values_1],
+    ];
 
     return $data;
   }

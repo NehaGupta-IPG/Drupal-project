@@ -8,35 +8,40 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ways that field entities handle their settings.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldEntitySettingsTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['entity_test', 'field'];
+  protected static $modules = ['entity_test', 'field', 'user'];
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installEntitySchema('entity_test_with_bundle');
     EntityTestBundle::create(['id' => 'test', 'label' => 'Test'])->save();
   }
 
   /**
-   * @group legacy
-   */
+ * Tests field entities carry default settings.
+ */
+  #[IgnoreDeprecations]
   public function testFieldEntitiesCarryDefaultSettings(): void {
     /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
     $field_storage = FieldStorageConfig::create([
       'type' => 'integer',
-      'entity_type' => 'entity_test',
+      'entity_type' => 'entity_test_with_bundle',
       'field_name' => 'test',
     ]);
     $field = FieldConfig::create([
@@ -95,10 +100,10 @@ class FieldEntitySettingsTest extends KernelTestBase {
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'test_reference',
       'type' => 'entity_reference',
-      'entity_type' => 'entity_test',
+      'entity_type' => 'entity_test_with_bundle',
       'cardinality' => 1,
       'settings' => [
-        'target_type' => 'entity_test',
+        'target_type' => 'entity_test_with_bundle',
       ],
     ]);
     $field_storage->save();
@@ -111,10 +116,10 @@ class FieldEntitySettingsTest extends KernelTestBase {
         'handler' => 'default',
       ],
     ]);
-    $this->assertSame('default:entity_test', $field->getSetting('handler'));
+    $this->assertSame('default:entity_test_with_bundle', $field->getSetting('handler'));
     // If the handler is changed, it should be normalized again on pre-save.
     $field->setSetting('handler', 'default')->save();
-    $this->assertSame('default:entity_test', $field->getSetting('handler'));
+    $this->assertSame('default:entity_test_with_bundle', $field->getSetting('handler'));
   }
 
 }

@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Core;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for the machine name field.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class MachineNameTest extends WebDriverTestBase {
 
   /**
@@ -44,7 +48,7 @@ class MachineNameTest extends WebDriverTestBase {
    * Makes sure that the machine name field automatically provides a valid
    * machine name and that the manual editing mode functions.
    */
-  public function testMachineName() {
+  public function testMachineName(): void {
     // Visit the machine name test page which contains two machine name fields.
     $this->drupalGet('form-test/machine-name');
 
@@ -103,11 +107,6 @@ class MachineNameTest extends WebDriverTestBase {
 
     // Assert that a machine name based on a default value is initialized.
     $this->assertJsCondition('jQuery("#edit-machine-name-3-label-machine-name-suffix .machine-name-value").html() == "yet_another_machine_name"');
-
-    // Field must be present for the rest of the test to work.
-    if (empty($machine_name_1_value)) {
-      $this->fail('Cannot finish test, missing machine name field');
-    }
 
     // Test each value for conversion to a machine name.
     foreach ($test_values as $test_info) {
@@ -199,7 +198,7 @@ class MachineNameTest extends WebDriverTestBase {
     $assert->fieldExists('Name')->setValue('test 1');
     $machine_name_value = $page->find('css', '#edit-name-machine-name-suffix .machine-name-value');
     $this->assertNotEmpty($machine_name_value, 'Machine name field must be initialized');
-    $this->assertJsCondition('jQuery("#edit-name-machine-name-suffix .machine-name-value").html() == "' . 'test_1' . '"');
+    $this->assertJsCondition('jQuery("#edit-name-machine-name-suffix .machine-name-value").html() == "test_1"');
 
     // Ensure that machine name generation still occurs after a non-HTML 5
     // validation failure.

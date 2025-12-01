@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\BasicAuthResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group rest
+ * Tests User Xml Basic Auth.
  */
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class UserXmlBasicAuthTest extends UserResourceTestBase {
 
   use BasicAuthResourceTestTrait;
@@ -37,21 +43,5 @@ class UserXmlBasicAuthTest extends UserResourceTestBase {
    * {@inheritdoc}
    */
   protected static $auth = 'basic_auth';
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatchDxForSecuritySensitiveBaseFields() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testPatchSecurityOtherUser() {
-    // Deserialization of the XML format is not supported.
-    $this->markTestSkipped();
-  }
 
 }

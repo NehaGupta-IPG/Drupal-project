@@ -8,13 +8,14 @@ use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Path\CurrentPathStack;
+use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Ajax\ScrollTopCommand;
+use Drupal\views\Ajax\SetBrowserUrl;
 use Drupal\views\Ajax\ViewAjaxResponse;
 use Drupal\views\ViewExecutableFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -28,60 +29,30 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class ViewAjaxController implements ContainerInjectionInterface {
 
   /**
-   * The entity storage for views.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * Parameters that should be filtered and ignored inside ajax requests.
    */
-  protected $storage;
+  public const FILTERED_QUERY_PARAMETERS = [
+    'view_name',
+    'view_display_id',
+    'view_args',
+    'view_path',
+    'view_dom_id',
+    'pager_element',
+    'view_base_path',
+    'ajax_page_state',
+    '_drupal_ajax',
+    FormBuilderInterface::AJAX_FORM_REQUEST,
+    MainContentViewSubscriber::WRAPPER_FORMAT,
+  ];
 
-  /**
-   * The factory to load a view executable with.
-   *
-   * @var \Drupal\views\ViewExecutableFactory
-   */
-  protected $executableFactory;
-
-  /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The current path.
-   *
-   * @var \Drupal\Core\Path\CurrentPathStack
-   */
-  protected $currentPath;
-
-  /**
-   * The redirect destination.
-   *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface
-   */
-  protected $redirectDestination;
-
-  /**
-   * Constructs a ViewAjaxController object.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage for views.
-   * @param \Drupal\views\ViewExecutableFactory $executable_factory
-   *   The factory to load a view executable with.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
-   *   The current path.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
-   *   The redirect destination.
-   */
-  public function __construct(EntityStorageInterface $storage, ViewExecutableFactory $executable_factory, RendererInterface $renderer, CurrentPathStack $current_path, RedirectDestinationInterface $redirect_destination) {
-    $this->storage = $storage;
-    $this->executableFactory = $executable_factory;
-    $this->renderer = $renderer;
-    $this->currentPath = $current_path;
-    $this->redirectDestination = $redirect_destination;
+  public function __construct(
+    protected EntityStorageInterface $storage,
+    protected ViewExecutableFactory $executableFactory,
+    protected RendererInterface $renderer,
+    protected CurrentPathStack $currentPath,
+    protected RedirectDestinationInterface $redirectDestination,
+    protected PathValidatorInterface $pathValidator,
+  ) {
   }
 
   /**
@@ -93,7 +64,8 @@ class ViewAjaxController implements ContainerInjectionInterface {
       $container->get('views.executable'),
       $container->get('renderer'),
       $container->get('path.current'),
-      $container->get('redirect.destination')
+      $container->get('redirect.destination'),
+      $container->get('path.validator')
     );
   }
 
@@ -123,6 +95,7 @@ class ViewAjaxController implements ContainerInjectionInterface {
       }, $args);
 
       $path = $request->get('view_path');
+      $target_url = $this->pathValidator->getUrlIfValid($path ?? '');
       $dom_id = $request->get('view_dom_id');
       $dom_id = isset($dom_id) ? preg_replace('/[^a-zA-Z0-9_-]+/', '-', $dom_id) : NULL;
       $pager_element = $request->get('pager_element');
@@ -131,21 +104,13 @@ class ViewAjaxController implements ContainerInjectionInterface {
       $response = new ViewAjaxResponse();
 
       // Remove all of this stuff from the query of the request so it doesn't
-      // end up in pagers and tablesort URLs.
+      // end up in pagers and tablesort URLs. Additionally we need to preserve
+      // ajax_page_state and add it back after the request has been processed so
+      // the related listener can behave correctly.
       // @todo Remove this parsing once these are removed from the request in
       //   https://www.drupal.org/node/2504709.
-      foreach ([
-        'view_name',
-        'view_display_id',
-        'view_args',
-        'view_path',
-        'view_dom_id',
-        'pager_element',
-        'view_base_path',
-        AjaxResponseSubscriber::AJAX_REQUEST_PARAMETER,
-        FormBuilderInterface::AJAX_FORM_REQUEST,
-        MainContentViewSubscriber::WRAPPER_FORMAT,
-      ] as $key) {
+      $existing_page_state = $request->get('ajax_page_state');
+      foreach (self::FILTERED_QUERY_PARAMETERS as $key) {
         $request->query->remove($key);
         $request->request->remove($key);
       }
@@ -169,7 +134,6 @@ class ViewAjaxController implements ContainerInjectionInterface {
         // Add all POST data, because AJAX is sometimes a POST and many things,
         // such as tablesorts, exposed filters and paging assume GET.
         $param_union = $request_clone->request->all() + $request_clone->query->all();
-        unset($param_union['ajax_page_state']);
         $request_clone->query->replace($param_union);
 
         // Overwrite the destination.
@@ -180,6 +144,7 @@ class ViewAjaxController implements ContainerInjectionInterface {
         $query = UrlHelper::buildQuery($used_query_parameters);
         if ($query != '') {
           $origin_destination .= '?' . $query;
+          $target_url->setOption('query', $used_query_parameters);
         }
         $this->redirectDestination->set($origin_destination);
 
@@ -191,9 +156,26 @@ class ViewAjaxController implements ContainerInjectionInterface {
         // Reuse the same DOM id so it matches that in drupalSettings.
         $view->dom_id = $dom_id;
 
+        // Populate request attributes temporarily with ajax_page_state theme
+        // and theme_token for theme negotiation.
+        $theme_keys = [
+          'theme' => TRUE,
+          'theme_token' => TRUE,
+        ];
+        if (is_array($existing_page_state) &&
+            ($temp_attributes = array_intersect_key($existing_page_state, $theme_keys))) {
+          $request->attributes->set('ajax_page_state', $temp_attributes);
+        }
         $preview = $view->preview($display_id, $args);
+        $request->attributes->remove('ajax_page_state');
+        $response->addCommand(new SetBrowserUrl($target_url->toString()));
         $response->addCommand(new ReplaceCommand(".js-view-dom-id-$dom_id", $preview));
         $response->addCommand(new PrependCommand(".js-view-dom-id-$dom_id", ['#type' => 'status_messages']));
+        $request->query->set('ajax_page_state', $existing_page_state);
+
+        if (!empty($preview['#attached'])) {
+          $response->setAttachments($preview['#attached']);
+        }
 
         return $response;
       }

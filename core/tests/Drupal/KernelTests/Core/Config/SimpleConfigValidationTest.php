@@ -1,23 +1,27 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests validation of certain elements common to all config.
- *
- * @group config
- * @group Validation
  */
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class SimpleConfigValidationTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
+  protected static $modules = ['config_test', 'system'];
 
   /**
    * {@inheritdoc}
@@ -27,6 +31,9 @@ class SimpleConfigValidationTest extends KernelTestBase {
     $this->installConfig('system');
   }
 
+  /**
+   * Tests the validation of the default configuration hash.
+   */
   public function testDefaultConfigHashValidation(): void {
     $config = $this->config('system.site');
     $this->assertFalse($config->isNew());
@@ -68,7 +75,7 @@ class SimpleConfigValidationTest extends KernelTestBase {
     $violations = $typed_config_manager->createFromNameAndData($config->getName(), $data)
       ->validate();
     $this->assertCount(1, $violations);
-    $this->assertSame('_core', $violations[0]->getPropertyPath());
+    $this->assertSame('_core.invalid_key', $violations[0]->getPropertyPath());
     $this->assertSame("'invalid_key' is not a supported key.", (string) $violations[0]->getMessage());
   }
 
@@ -78,7 +85,7 @@ class SimpleConfigValidationTest extends KernelTestBase {
    * @return array[]
    *   The test cases.
    */
-  public function providerSpecialCharacters(): array {
+  public static function providerSpecialCharacters(): array {
     $data = [];
 
     for ($code_point = 0; $code_point < 32; $code_point++) {
@@ -112,6 +119,12 @@ class SimpleConfigValidationTest extends KernelTestBase {
       '🤓',
       NULL,
     ];
+    $data['plural label'] = [
+      'config_test.with_plural_label',
+      'label',
+      "\x03",
+      NULL,
+    ];
 
     return $data;
   }
@@ -127,11 +140,11 @@ class SimpleConfigValidationTest extends KernelTestBase {
    *   A special character to embed.
    * @param string|null $expected_error_message
    *   The expected validation error message, if any.
-   *
-   * @dataProvider providerSpecialCharacters
    */
+  #[DataProvider('providerSpecialCharacters')]
   public function testSpecialCharacters(string $config_name, string $property, string $character, ?string $expected_error_message): void {
     $config = $this->config($config_name)
+      ->set('langcode', 'en')
       ->set($property, "This has a special character: $character");
 
     $violations = $this->container->get('config.typed')
@@ -147,6 +160,29 @@ class SimpleConfigValidationTest extends KernelTestBase {
       $this->assertSame($property, $violations[0]->getPropertyPath());
       $this->assertSame($expected_error_message, (string) $violations[0]->getMessage());
     }
+  }
+
+  /**
+   * Tests that plugin IDs in simple config are validated.
+   *
+   * @param string $config_name
+   *   The name of the config object to validate.
+   * @param string $property
+   *   The property path to set. This will receive the value 'non_existent' and
+   *   is expected to raise a "plugin does not exist" error.
+   */
+  #[TestWith(["system.mail", "interface.0"])]
+  #[TestWith(["system.image", "toolkit"])]
+  public function testInvalidPluginId(string $config_name, string $property): void {
+    $config = $this->config($config_name);
+
+    $violations = $this->container->get('config.typed')
+      ->createFromNameAndData($config_name, $config->set($property, 'non_existent')->get())
+      ->validate();
+
+    $this->assertCount(1, $violations);
+    $this->assertSame($property, $violations[0]->getPropertyPath());
+    $this->assertSame("The 'non_existent' plugin does not exist.", (string) $violations[0]->getMessage());
   }
 
 }

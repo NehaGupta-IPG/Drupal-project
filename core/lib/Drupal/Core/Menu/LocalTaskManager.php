@@ -112,7 +112,8 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
    *   An object to use in resolving route arguments.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request object to use for building titles and paths for plugin instances.
+   *   The request object to use for building titles and paths for plugin
+   *   instances.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The current route match.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
@@ -223,8 +224,8 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
             }
             // Tabs that link to the current route are viable parents
             // and their parent and children should be visible also.
-            // @todo - this only works for 2 levels of tabs.
-            // instead need to iterate up.
+            // @todo This only works for 2 levels of tabs instead
+            //   need to iterate up.
             $parents[$plugin_id] = TRUE;
             if (!empty($task_info['parent_id'])) {
               $parents[$task_info['parent_id']] = TRUE;

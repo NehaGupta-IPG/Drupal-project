@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Unit\Views\Argument;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -7,19 +9,22 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Plugin\views\argument\RolesRid;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\user\Plugin\views\argument\RolesRid
- * @group user
+ * Tests Drupal\user\Plugin\views\argument\RolesRid.
  */
+#[CoversClass(RolesRid::class)]
+#[Group('user')]
 class RolesRidTest extends UnitTestCase {
 
   /**
    * Tests the titleQuery method.
    *
-   * @covers ::titleQuery
+   * @legacy-covers ::titleQuery
    */
-  public function testTitleQuery() {
+  public function testTitleQuery(): void {
     $role1 = new Role([
       'id' => 'test_rid_1',
       'label' => 'test rid 1',
@@ -29,8 +34,8 @@ class RolesRidTest extends UnitTestCase {
       'label' => 'test <strong>rid 2</strong>',
     ], 'user_role');
 
-    // Creates a stub entity storage;
-    $role_storage = $this->getMockForAbstractClass('Drupal\Core\Entity\EntityStorageInterface');
+    // Creates a stub entity storage.
+    $role_storage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
     $role_storage->expects($this->any())
       ->method('loadMultiple')
       ->willReturnMap([

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Session\UserSession;
@@ -11,10 +14,11 @@ use Drupal\Core\Utility\PhpRequirements;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
 use GuzzleHttp\HandlerStack;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Base class for testing the interactive installer.
@@ -51,9 +55,9 @@ abstract class InstallerTestBase extends BrowserTestBase {
   /**
    * Additional parameters to use for installer screens.
    *
-   * @see FunctionalTestSetupTrait::installParameters()
-   *
    * @var array
+   *
+   * @see FunctionalTestSetupTrait::installParameters()
    */
   protected $parameters = [];
 
@@ -118,7 +122,8 @@ abstract class InstallerTestBase extends BrowserTestBase {
     // server information so that XDebug works.
     // @see install_begin_request()
     $request = Request::create($GLOBALS['base_url'] . '/core/install.php', 'GET', [], $_COOKIE, [], $_SERVER);
-    $this->container = new ContainerBuilder();
+    $request->setSession(new Session(new MockArraySessionStorage()));
+    \Drupal::setContainer(new ContainerBuilder());
     $request_stack = new RequestStack();
     $request_stack->push($request);
     $this->container
@@ -145,7 +150,6 @@ abstract class InstallerTestBase extends BrowserTestBase {
 
     $this->container
       ->setParameter('app.root', DRUPAL_ROOT);
-    \Drupal::setContainer($this->container);
   }
 
   /**
@@ -197,6 +201,14 @@ abstract class InstallerTestBase extends BrowserTestBase {
       $this->container->get('config.factory')
         ->getEditable('system.mail')
         ->set('interface.default', 'test_mail_collector')
+        ->set('mailer_dsn', [
+          'scheme' => 'null',
+          'host' => 'null',
+          'user' => NULL,
+          'password' => NULL,
+          'port' => NULL,
+          'options' => [],
+        ])
         ->save();
 
       $this->installDefaultThemeFromClassProperty($this->container);
@@ -258,7 +270,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
    * Override this method to test specific requirements warnings or errors
    * during the installer.
    *
-   * @see system_requirements()
+   * @see \Drupal\system\Install\SystemRequirements
    */
   protected function setUpRequirementsProblem() {
     if (version_compare(phpversion(), PhpRequirements::getMinimumSupportedPhp()) < 0) {

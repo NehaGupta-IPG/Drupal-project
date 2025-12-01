@@ -1,20 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Form;
 
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 // cspell:ignore attribute\'close
-
 /**
  * Ensures that a form's action attribute can't be exploited with XSS.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class FormActionXssTest extends KernelTestBase implements FormInterface {
 
   /**
@@ -68,7 +73,7 @@ class FormActionXssTest extends KernelTestBase implements FormInterface {
   /**
    * Tests form action attribute for XSS.
    */
-  public function testFormActionXss() {
+  public function testFormActionXss(): void {
     // Create a new request with a uri which attempts XSS.
     $request_stack = \Drupal::service('request_stack');
     /** @var \Symfony\Component\HttpFoundation\RequestStack $original_request */
@@ -77,6 +82,7 @@ class FormActionXssTest extends KernelTestBase implements FormInterface {
     $request_stack->pop();
     $request_stack->pop();
     $request = Request::create($original_request->getSchemeAndHttpHost() . '/test/"injected=\'attribute\'close="');
+    $request->setSession(new Session(new MockArraySessionStorage()));
     $request_stack->push($request);
 
     $form = \Drupal::formBuilder()->getForm($this);
