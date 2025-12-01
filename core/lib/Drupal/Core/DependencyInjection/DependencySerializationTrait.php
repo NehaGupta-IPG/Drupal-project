@@ -23,7 +23,7 @@ trait DependencySerializationTrait {
   /**
    * An array of entity type IDs keyed by the property name of their storages.
    *
-   * @var array<string, string>
+   * @var array
    */
   // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $_entityStorages = [];
