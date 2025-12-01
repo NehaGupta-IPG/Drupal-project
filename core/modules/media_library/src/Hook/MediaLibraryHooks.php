@@ -241,10 +241,9 @@ class MediaLibraryHooks {
   public function localTasksAlter(&$local_tasks): void {
     /** @var \Symfony\Component\Routing\RouteCollection $route_collection */
     $route_collection = \Drupal::service('router')->getRouteCollection();
-    foreach (['media_library.grid', 'media_library.table'] as $key) {
-      if (isset($local_tasks[$key]) && !$route_collection->get($local_tasks[$key]['route_name'])) {
-        unset($local_tasks[$key]);
-      }
+    $key = 'media_library.grid';
+    if (isset($local_tasks[$key]) && !$route_collection->get($local_tasks[$key]['route_name'])) {
+      unset($local_tasks[$key]);
     }
   }
 
