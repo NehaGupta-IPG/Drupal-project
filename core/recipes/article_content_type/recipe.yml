@@ -101,6 +101,7 @@ config:
             settings:
               image_style: wide
               image_loading:
+                preload: false
                 attribute: eager
             weight: -1
             region: content
