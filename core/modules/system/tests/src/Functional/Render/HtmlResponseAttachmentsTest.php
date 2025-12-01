@@ -136,7 +136,7 @@ class HtmlResponseAttachmentsTest extends BrowserTestBase {
    */
   protected function assertHead(): void {
     $test_meta_attributes = [
-      'test-attribute' => 'testvalue',
+      'test-attribute' => 'test_value',
     ];
     $this->assertPageHead('meta', $test_meta_attributes, 1);
   }
