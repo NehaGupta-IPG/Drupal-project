@@ -1084,6 +1084,7 @@ services:
     tags:
       - { name: backend_overridable }
     lazy: true
+  Drupal\Core\Lock\LockBackendInterface: '@lock'
   lock.persistent:
     class: Drupal\Core\Lock\PersistentDatabaseLockBackend
     arguments: ['@database']
@@ -1866,6 +1867,7 @@ services:
     tags:
       - { name: service_collector, tag: mime_type_guesser, call: addMimeTypeGuesser }
     lazy: true
+  Symfony\Component\Mime\MimeTypeGuesserInterface: '@file.mime_type.guesser'
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
     arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']
