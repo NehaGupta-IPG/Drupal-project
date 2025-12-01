@@ -230,7 +230,9 @@ class ImageFormatter extends ImageFormatterBase {
 
     $image_loading = $this->getSetting('image_loading');
     $summary[] = $this->t('Image loading: @attribute', [
-      '@attribute' => $image_loading['preload'] ? $this->t('preload') : $image_loading['attribute'],
+      '@attribute' => array_key_exists('preload', $image_loading) && $image_loading['preload']
+        ? $this->t('preload')
+        : $image_loading['attribute'],
     ]);
 
     return array_merge($summary, parent::settingsSummary());
