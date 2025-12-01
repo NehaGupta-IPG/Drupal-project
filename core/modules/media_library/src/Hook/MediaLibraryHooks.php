@@ -237,13 +237,33 @@ class MediaLibraryHooks {
    *
    * Removes tasks for the Media library if the view display no longer exists.
    */
-  #[Hook('local_menu_tasks_alter')]
+  #[Hook('menu_local_tasks_alter')]
   public function menuLocalTasksAlter(&$data, $route_name, $cacheability): void {
     /** @var \Symfony\Component\Routing\RouteCollection $route_collection */
     $route_collection = \Drupal::service('router')->getRouteCollection();
-    foreach (['media_library.grid', 'media_library.table'] as $key) {
-      // Define local tasks here...
+    if ($route_collection->get('entity.media.collection')) {
+      $url = Url::fromRoute('entity.media.collection');
+      $data['tabs'][1]['media_library.grid'] = [
+        '#theme' => 'menu_local_task',
+        '#link' => [
+          'title' => $this->t('Grid'),
+          'url' => $url,
+        ],
+        '#access' => $url->access(NULL, TRUE),
+      ];
     }
+    if ($route_collection->get('view.media_library.page')) {
+      $url = Url::fromRoute('view.media_library.page');
+      $data['tabs'][1]['media_library.table'] = [
+        '#theme' => 'menu_local_task',
+        '#link' => [
+          'title' => $this->t('Table'),
+          'url' => $url,
+        ],
+        '#access' => $url->access(NULL, TRUE),
+      ];
+    }
+    dump($data);
   }
 
   /**
