@@ -60,7 +60,7 @@ class DateTimeItem extends FieldItemBase implements DateTimeItemInterface {
       ->setLabel(new TranslatableMarkup('Computed date'))
       ->setDescription(new TranslatableMarkup('The computed DateTime object.'))
       ->setComputed(TRUE)
-      ->setClass('\Drupal\datetime\DateTimeComputed')
+      ->setClass(\Drupal\datetime\DateTimeComputed::class)
       ->setSetting('date source', 'value');
 
     return $properties;

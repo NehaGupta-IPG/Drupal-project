@@ -85,7 +85,7 @@ class EntityPermissionsRouteProvider implements EntityRouteProviderInterface, En
       $entity_type->getLinkTemplate('entity-permissions-form'),
       [
         '_title' => 'Manage permissions',
-        '_form' => 'Drupal\user\Form\EntityPermissionsForm',
+        '_form' => \Drupal\user\Form\EntityPermissionsForm::class,
         'entity_type_id' => $bundle_of_id,
         'bundle_entity_type' => $entity_type_id,
       ],

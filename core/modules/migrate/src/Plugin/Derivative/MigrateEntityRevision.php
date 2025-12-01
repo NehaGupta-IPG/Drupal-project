@@ -62,7 +62,7 @@ class MigrateEntityRevision implements ContainerDeriverInterface {
       if ($entity_info->getKey('revision')) {
         $this->derivatives[$entity_type] = [
           'id' => "entity_revision:$entity_type",
-          'class' => 'Drupal\migrate\Plugin\migrate\destination\EntityRevision',
+          'class' => \Drupal\migrate\Plugin\migrate\destination\EntityRevision::class,
           'requirements_met' => 1,
           'provider' => $entity_info->getProvider(),
         ];

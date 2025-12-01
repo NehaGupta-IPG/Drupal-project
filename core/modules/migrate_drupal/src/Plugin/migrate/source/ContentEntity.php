@@ -266,7 +266,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
   public function fields() {
     // Retrieving fields from a non-fieldable content entity will throw a
     // LogicException. Return an empty list of fields instead.
-    if (!$this->entityType->entityClassImplements('Drupal\Core\Entity\FieldableEntityInterface')) {
+    if (!$this->entityType->entityClassImplements(\Drupal\Core\Entity\FieldableEntityInterface::class)) {
       return [];
     }
     $field_definitions = $this->entityFieldManager->getBaseFieldDefinitions($this->entityType->id());

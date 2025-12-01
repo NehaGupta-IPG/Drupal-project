@@ -71,7 +71,7 @@ class EditorTestHooks {
     }
     $filters = $format->filters()->getAll();
     if (isset($filters['filter_html']) && $filters['filter_html']->status) {
-      $editor_xss_filter_class = '\Drupal\editor_test\EditorXssFilter\Insecure';
+      $editor_xss_filter_class = \Drupal\editor_test\EditorXssFilter\Insecure::class;
     }
   }
 

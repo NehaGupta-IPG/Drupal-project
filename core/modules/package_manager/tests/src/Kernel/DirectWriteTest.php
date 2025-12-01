@@ -248,8 +248,8 @@ class DirectWriteTest extends PackageManagerKernelTestBase implements EventSubsc
    * @param class-string $service_class
    *   The class name of the precondition service.
    */
-  #[TestWith(["PhpTuf\\ComposerStager\\API\\Precondition\\Service\\ActiveAndStagingDirsAreDifferentInterface"])]
-  #[TestWith(["PhpTuf\\ComposerStager\\API\\Precondition\\Service\\RsyncIsAvailableInterface"])]
+  #[TestWith([\PhpTuf\ComposerStager\API\Precondition\Service\ActiveAndStagingDirsAreDifferentInterface::class])]
+  #[TestWith([\PhpTuf\ComposerStager\API\Precondition\Service\RsyncIsAvailableInterface::class])]
   public function testPreconditionBypass(string $service_class): void {
     // Set up conditions where the active and sandbox directories are the same,
     // and the path to rsync isn't valid.

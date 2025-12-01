@@ -36,7 +36,7 @@ class LengthConstraint extends Length {
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return '\Symfony\Component\Validator\Constraints\LengthValidator';
+    return \Symfony\Component\Validator\Constraints\LengthValidator::class;
   }
 
 }

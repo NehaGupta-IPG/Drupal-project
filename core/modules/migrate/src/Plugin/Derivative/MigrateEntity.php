@@ -59,9 +59,9 @@ class MigrateEntity implements ContainerDeriverInterface {
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
     foreach ($this->entityDefinitions as $entity_type => $entity_info) {
-      $class = is_subclass_of($entity_info->getClass(), 'Drupal\Core\Config\Entity\ConfigEntityInterface') ?
-        'Drupal\migrate\Plugin\migrate\destination\EntityConfigBase' :
-        'Drupal\migrate\Plugin\migrate\destination\EntityContentBase';
+      $class = is_subclass_of($entity_info->getClass(), \Drupal\Core\Config\Entity\ConfigEntityInterface::class) ?
+        \Drupal\migrate\Plugin\migrate\destination\EntityConfigBase::class :
+        \Drupal\migrate\Plugin\migrate\destination\EntityContentBase::class;
       $this->derivatives[$entity_type] = [
         'id' => "entity:$entity_type",
         'class' => $class,

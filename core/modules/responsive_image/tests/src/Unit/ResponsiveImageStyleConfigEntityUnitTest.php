@@ -46,7 +46,7 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->entityType = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
+    $this->entityType = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
     $this->entityType->expects($this->any())
       ->method('getProvider')
       ->willReturn('responsive_image');
@@ -57,7 +57,7 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
       ->with('responsive_image_style')
       ->willReturn($this->entityType);
 
-    $this->breakpointManager = $this->createMock('\Drupal\breakpoint\BreakpointManagerInterface');
+    $this->breakpointManager = $this->createMock(\Drupal\breakpoint\BreakpointManagerInterface::class);
 
     $container = new ContainerBuilder();
     $container->set('entity_type.manager', $this->entityTypeManager);
@@ -74,13 +74,13 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
     // Set up image style loading mock.
     $styles = [];
     foreach (['fallback', 'small', 'medium', 'large'] as $style) {
-      $mock = $this->createMock('Drupal\Core\Config\Entity\ConfigEntityInterface');
+      $mock = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityInterface::class);
       $mock->expects($this->any())
         ->method('getConfigDependencyName')
         ->willReturn('image.style.' . $style);
       $styles[$style] = $mock;
     }
-    $storage = $this->createMock('\Drupal\Core\Config\Entity\ConfigEntityStorageInterface');
+    $storage = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityStorageInterface::class);
     $storage->expects($this->any())
       ->method('loadMultiple')
       ->with(array_keys($styles))
@@ -94,7 +94,7 @@ class ResponsiveImageStyleConfigEntityUnitTest extends UnitTestCase {
     $entity_type_repository = $this->createMock(EntityTypeRepositoryInterface::class);
     $entity_type_repository->expects($this->any())
       ->method('getEntityTypeFromClass')
-      ->with('Drupal\image\Entity\ImageStyle')
+      ->with(\Drupal\image\Entity\ImageStyle::class)
       ->willReturn('image_style');
 
     $entity = new ResponsiveImageStyle(['breakpoint_group' => 'test_group']);

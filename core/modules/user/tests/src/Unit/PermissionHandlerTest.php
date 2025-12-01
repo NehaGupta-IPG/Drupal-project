@@ -61,7 +61,7 @@ class PermissionHandlerTest extends UnitTestCase {
     parent::setUp();
 
     $this->stringTranslation = new TestTranslationManager();
-    $this->callableResolver = $this->createMock('Drupal\Core\Utility\CallableResolver');
+    $this->callableResolver = $this->createMock(\Drupal\Core\Utility\CallableResolver::class);
   }
 
   /**
@@ -94,7 +94,7 @@ class PermissionHandlerTest extends UnitTestCase {
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
 
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->moduleHandler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
     $this->moduleHandler->expects($this->once())
       ->method('getModuleDirectories')
       ->willReturn([
@@ -159,7 +159,7 @@ EOF
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
 
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->moduleHandler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
     $this->moduleHandler->expects($this->once())
       ->method('getModuleDirectories')
       ->willReturn([
@@ -215,7 +215,7 @@ EOF
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
 
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->moduleHandler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
     $this->moduleHandler->expects($this->once())
       ->method('getModuleDirectories')
       ->willReturn([
@@ -288,7 +288,7 @@ EOF
     $root = new vfsStreamDirectory('modules');
     vfsStreamWrapper::setRoot($root);
 
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->moduleHandler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
     $this->moduleHandler->expects($this->once())
       ->method('getModuleDirectories')
       ->willReturn([

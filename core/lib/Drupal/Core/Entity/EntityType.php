@@ -345,7 +345,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
       'revision_translation_affected' => 'revision_translation_affected',
     ];
     $this->handlers += [
-      'access' => 'Drupal\Core\Entity\EntityAccessControlHandler',
+      'access' => \Drupal\Core\Entity\EntityAccessControlHandler::class,
     ];
     if (isset($this->handlers['storage'])) {
       $this->checkStorageClass($this->handlers['storage']);

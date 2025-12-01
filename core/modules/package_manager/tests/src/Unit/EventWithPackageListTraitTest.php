@@ -34,11 +34,11 @@ class EventWithPackageListTraitTest extends UnitTestCase {
    */
   #[DataProvider('providerGetPackages')]
   public function testGetPackages(array $runtime_packages, array $dev_packages, array $expected_runtime_packages, array $expected_dev_packages): void {
-    $stage = $this->createMock('\Drupal\package_manager\SandboxManagerBase');
+    $stage = $this->createMock(\Drupal\package_manager\SandboxManagerBase::class);
 
     $events = [
-      '\Drupal\package_manager\Event\PostRequireEvent',
-      '\Drupal\package_manager\Event\PreRequireEvent',
+      \Drupal\package_manager\Event\PostRequireEvent::class,
+      \Drupal\package_manager\Event\PreRequireEvent::class,
     ];
     foreach ($events as $event) {
       /** @var \Drupal\package_manager\Event\EventWithPackageListTrait $event */

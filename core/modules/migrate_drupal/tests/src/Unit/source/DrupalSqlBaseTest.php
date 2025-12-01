@@ -80,8 +80,8 @@ class DrupalSqlBaseTest extends MigrateTestCase {
     parent::setUp();
     $this->pluginDefinition['requirements_met'] = TRUE;
     $this->pluginDefinition['source_module'] = 'module1';
-    $this->state = $this->createMock('Drupal\Core\State\StateInterface');
-    $this->entityTypeManager = $this->createMock('Drupal\Core\Entity\EntityTypeManagerInterface');
+    $this->state = $this->createMock(\Drupal\Core\State\StateInterface::class);
+    $this->entityTypeManager = $this->createMock(\Drupal\Core\Entity\EntityTypeManagerInterface::class);
   }
 
   /**

@@ -38,11 +38,11 @@ class MigrationTest extends UnitTestCase {
 
     $configuration = ['migration_dependencies' => $dependencies];
     $plugin_id = 'test_migration';
-    $migration_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigrationPluginManagerInterface');
-    $source_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigratePluginManagerInterface');
-    $process_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigratePluginManagerInterface');
-    $destination_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigrateDestinationPluginManager');
-    $id_map_plugin_manager = $this->createMock('\Drupal\migrate\Plugin\MigratePluginManagerInterface');
+    $migration_plugin_manager = $this->createMock(\Drupal\migrate\Plugin\MigrationPluginManagerInterface::class);
+    $source_plugin_manager = $this->createMock(\Drupal\migrate\Plugin\MigratePluginManagerInterface::class);
+    $process_plugin_manager = $this->createMock(\Drupal\migrate\Plugin\MigratePluginManagerInterface::class);
+    $destination_plugin_manager = $this->createMock(\Drupal\migrate\Plugin\MigrateDestinationPluginManager::class);
+    $id_map_plugin_manager = $this->createMock(\Drupal\migrate\Plugin\MigratePluginManagerInterface::class);
 
     $this->expectException(InvalidPluginDefinitionException::class);
     $this->expectExceptionMessage("Invalid migration dependencies configuration for migration test_migration");
@@ -57,11 +57,11 @@ class MigrationTest extends UnitTestCase {
   public function testRequirementsForSourcePlugin(): void {
     $migration = new TestMigration();
 
-    $source_plugin = $this->createMock('Drupal\Tests\migrate\Unit\RequirementsAwareSourceInterface');
+    $source_plugin = $this->createMock(\Drupal\Tests\migrate\Unit\RequirementsAwareSourceInterface::class);
     $source_plugin->expects($this->once())
       ->method('checkRequirements')
       ->willThrowException(new RequirementsException('Missing source requirement', ['key' => 'value']));
-    $destination_plugin = $this->createMock('Drupal\Tests\migrate\Unit\RequirementsAwareDestinationInterface');
+    $destination_plugin = $this->createMock(\Drupal\Tests\migrate\Unit\RequirementsAwareDestinationInterface::class);
 
     $migration->setSourcePlugin($source_plugin);
     $migration->setDestinationPlugin($destination_plugin);
@@ -79,8 +79,8 @@ class MigrationTest extends UnitTestCase {
   public function testRequirementsForDestinationPlugin(): void {
     $migration = new TestMigration();
 
-    $source_plugin = $this->createMock('Drupal\migrate\Plugin\MigrateSourceInterface');
-    $destination_plugin = $this->createMock('Drupal\Tests\migrate\Unit\RequirementsAwareDestinationInterface');
+    $source_plugin = $this->createMock(\Drupal\migrate\Plugin\MigrateSourceInterface::class);
+    $destination_plugin = $this->createMock(\Drupal\Tests\migrate\Unit\RequirementsAwareDestinationInterface::class);
     $destination_plugin->expects($this->once())
       ->method('checkRequirements')
       ->willThrowException(new RequirementsException('Missing destination requirement', ['key' => 'value']));
@@ -102,12 +102,12 @@ class MigrationTest extends UnitTestCase {
     $migration = new TestMigration();
 
     // Setup source and destination plugins without any requirements.
-    $source_plugin = $this->createMock('Drupal\migrate\Plugin\MigrateSourceInterface');
-    $destination_plugin = $this->createMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $source_plugin = $this->createMock(\Drupal\migrate\Plugin\MigrateSourceInterface::class);
+    $destination_plugin = $this->createMock(\Drupal\migrate\Plugin\MigrateDestinationInterface::class);
     $migration->setSourcePlugin($source_plugin);
     $migration->setDestinationPlugin($destination_plugin);
 
-    $plugin_manager = $this->createMock('Drupal\migrate\Plugin\MigrationPluginManagerInterface');
+    $plugin_manager = $this->createMock(\Drupal\migrate\Plugin\MigrationPluginManagerInterface::class);
     $migration->setMigrationPluginManager($plugin_manager);
 
     // We setup the requirements that test_a doesn't exist and test_c is not
@@ -168,7 +168,7 @@ class MigrationTest extends UnitTestCase {
     $migration = new TestMigration();
 
     // Set the plugin manager to support getMigrationDependencies().
-    $plugin_manager = $this->createMock('Drupal\migrate\Plugin\MigrationPluginManagerInterface');
+    $plugin_manager = $this->createMock(\Drupal\migrate\Plugin\MigrationPluginManagerInterface::class);
     $migration->setMigrationPluginManager($plugin_manager);
     $plugin_manager->expects($this->exactly(2))
       ->method('expandPluginIds')
@@ -431,7 +431,7 @@ class MigrationTest extends UnitTestCase {
    *   A configured MigrationPluginManager test mock.
    */
   public function getMockPluginManager() {
-    $plugin_manager = $this->createMock('Drupal\migrate\Plugin\MigrationPluginManagerInterface');
+    $plugin_manager = $this->createMock(\Drupal\migrate\Plugin\MigrationPluginManagerInterface::class);
     $plugin_manager->expects($this->exactly(2))
       ->method('expandPluginIds')
       ->willReturnArgument(0);

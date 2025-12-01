@@ -21,7 +21,7 @@ class RegexConstraint extends Regex {
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return '\Symfony\Component\Validator\Constraints\RegexValidator';
+    return \Symfony\Component\Validator\Constraints\RegexValidator::class;
   }
 
 }

@@ -113,7 +113,7 @@ class BigPipePlaceholderTestCases {
 
     // 2. Real-world example of HTML attribute value placeholder: form action.
     $form_action = new BigPipePlaceholderTestCase(
-      $container ? $container->get('form_builder')->getForm('Drupal\big_pipe_test\Form\BigPipeTestForm') : [],
+      $container ? $container->get('form_builder')->getForm(\Drupal\big_pipe_test\Form\BigPipeTestForm::class) : [],
       'form_action_cc611e1d',
       [
         '#lazy_builder' => ['form_builder:renderPlaceholderFormAction', []],

@@ -35,7 +35,7 @@ class SqlBaseTest extends UnitTestCase {
   #[DataProvider('sqlBaseTestProvider')]
   public function testMapJoinable($expected_result, $id_map_is_sql, $with_id_map, $source_options = [], $id_map_options = []): void {
     // Setup a connection object.
-    $source_connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
+    $source_connection = $this->getMockBuilder(\Drupal\Core\Database\Connection::class)
       ->disableOriginalConstructor()
       ->getMock();
     $source_connection->expects($id_map_is_sql && $with_id_map ? $this->once() : $this->never())
@@ -43,7 +43,7 @@ class SqlBaseTest extends UnitTestCase {
       ->willReturn($source_options);
 
     // Setup the ID map connection.
-    $id_map_connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
+    $id_map_connection = $this->getMockBuilder(\Drupal\Core\Database\Connection::class)
       ->disableOriginalConstructor()
       ->getMock();
     $id_map_connection->expects($id_map_is_sql && $with_id_map ? $this->once() : $this->never())
@@ -51,7 +51,7 @@ class SqlBaseTest extends UnitTestCase {
       ->willReturn($id_map_options);
 
     // Setup the Sql object.
-    $sql = $this->getMockBuilder('Drupal\migrate\Plugin\migrate\id_map\Sql')
+    $sql = $this->getMockBuilder(\Drupal\migrate\Plugin\migrate\id_map\Sql::class)
       ->disableOriginalConstructor()
       ->getMock();
     $sql->expects($id_map_is_sql && $with_id_map ? $this->once() : $this->never())

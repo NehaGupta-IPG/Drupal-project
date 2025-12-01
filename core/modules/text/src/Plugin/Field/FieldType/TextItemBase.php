@@ -86,7 +86,7 @@ abstract class TextItemBase extends FieldItemBase {
       ->setLabel(t('Processed text'))
       ->setDescription(t('The text with the text format applied.'))
       ->setComputed(TRUE)
-      ->setClass('\Drupal\text\TextProcessed')
+      ->setClass(\Drupal\text\TextProcessed::class)
       ->setSetting('text source', 'value')
       ->setInternal(FALSE);
 
@@ -116,7 +116,7 @@ abstract class TextItemBase extends FieldItemBase {
   public function onChange($property_name, $notify = TRUE) {
     // Unset processed properties that are affected by the change.
     foreach ($this->definition->getPropertyDefinitions() as $property => $definition) {
-      if ($definition->getClass() == '\Drupal\text\TextProcessed') {
+      if ($definition->getClass() == \Drupal\text\TextProcessed::class) {
         if ($property_name == 'format' || ($definition->getSetting('text source') == $property_name)) {
           $this->writePropertyValue($property, NULL);
         }

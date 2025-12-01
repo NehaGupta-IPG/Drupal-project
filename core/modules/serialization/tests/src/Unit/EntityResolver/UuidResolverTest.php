@@ -49,7 +49,7 @@ class UuidResolverTest extends UnitTestCase {
     $this->entityRepository->expects($this->never())
       ->method('loadEntityByUuid');
 
-    $normalizer = $this->createMock('Symfony\Component\Serializer\Normalizer\NormalizerInterface');
+    $normalizer = $this->createMock(\Symfony\Component\Serializer\Normalizer\NormalizerInterface::class);
     $this->assertNull($this->resolver->resolve($normalizer, [], 'test_type'));
   }
 
@@ -60,7 +60,7 @@ class UuidResolverTest extends UnitTestCase {
     $this->entityRepository->expects($this->never())
       ->method('loadEntityByUuid');
 
-    $normalizer = $this->createMock('Drupal\serialization\EntityResolver\UuidReferenceInterface');
+    $normalizer = $this->createMock(\Drupal\serialization\EntityResolver\UuidReferenceInterface::class);
     $normalizer->expects($this->once())
       ->method('getUuid')
       ->with([])
@@ -79,7 +79,7 @@ class UuidResolverTest extends UnitTestCase {
       ->with('test_type')
       ->willReturn(NULL);
 
-    $normalizer = $this->createMock('Drupal\serialization\EntityResolver\UuidReferenceInterface');
+    $normalizer = $this->createMock(\Drupal\serialization\EntityResolver\UuidReferenceInterface::class);
     $normalizer->expects($this->once())
       ->method('getUuid')
       ->with([])
@@ -94,7 +94,7 @@ class UuidResolverTest extends UnitTestCase {
   public function testResolveWithEntity(): void {
     $uuid = '392eab92-35c2-4625-872d-a9dab4da008e';
 
-    $entity = $this->createMock('Drupal\Core\Entity\EntityInterface');
+    $entity = $this->createMock(\Drupal\Core\Entity\EntityInterface::class);
     $entity->expects($this->once())
       ->method('id')
       ->willReturn(1);
@@ -104,7 +104,7 @@ class UuidResolverTest extends UnitTestCase {
       ->with('test_type', $uuid)
       ->willReturn($entity);
 
-    $normalizer = $this->createMock('Drupal\serialization\EntityResolver\UuidReferenceInterface');
+    $normalizer = $this->createMock(\Drupal\serialization\EntityResolver\UuidReferenceInterface::class);
     $normalizer->expects($this->once())
       ->method('getUuid')
       ->with([])

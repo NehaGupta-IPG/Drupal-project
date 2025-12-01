@@ -26,7 +26,7 @@ class SelectionPluginManager extends DefaultPluginManager implements SelectionPl
     $this->alterInfo('entity_reference_selection');
     $this->setCacheBackend($cache_backend, 'entity_reference_selection_plugins');
 
-    parent::__construct('Plugin/EntityReferenceSelection', $namespaces, $module_handler, SelectionInterface::class, EntityReferenceSelection::class, 'Drupal\Core\Entity\Annotation\EntityReferenceSelection');
+    parent::__construct('Plugin/EntityReferenceSelection', $namespaces, $module_handler, SelectionInterface::class, EntityReferenceSelection::class, \Drupal\Core\Entity\Annotation\EntityReferenceSelection::class);
   }
 
   /**
@@ -63,7 +63,7 @@ class SelectionPluginManager extends DefaultPluginManager implements SelectionPl
     $selection_handler_groups = $this->getSelectionGroups($target_type);
 
     // Sort the selection plugins by weight and select the best match.
-    uasort($selection_handler_groups[$base_plugin_id], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    uasort($selection_handler_groups[$base_plugin_id], [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
     $plugin_id = array_key_last($selection_handler_groups[$base_plugin_id]);
 
     return $plugin_id;

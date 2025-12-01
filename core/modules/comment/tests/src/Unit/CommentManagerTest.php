@@ -28,7 +28,7 @@ class CommentManagerTest extends UnitTestCase {
    */
   public function testGetFields(): void {
     // Set up a content entity type.
-    $entity_type = $this->createMock('Drupal\Core\Entity\ContentEntityTypeInterface');
+    $entity_type = $this->createMock(\Drupal\Core\Entity\ContentEntityTypeInterface::class);
     $entity_type->expects($this->any())
       ->method('getClass')
       ->willReturn('Node');
@@ -56,9 +56,9 @@ class CommentManagerTest extends UnitTestCase {
 
     $comment_manager = new CommentManager(
       $entity_type_manager,
-      $this->createMock('Drupal\Core\Config\ConfigFactoryInterface'),
-      $this->createMock('Drupal\Core\StringTranslation\TranslationInterface'),
-      $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface'),
+      $this->createMock(\Drupal\Core\Config\ConfigFactoryInterface::class),
+      $this->createMock(\Drupal\Core\StringTranslation\TranslationInterface::class),
+      $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class),
       $this->createMock(AccountInterface::class),
       $entity_field_manager,
       $this->prophesize(EntityDisplayRepositoryInterface::class)->reveal()

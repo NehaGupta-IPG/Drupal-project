@@ -32,7 +32,7 @@ class ClassResolver implements ClassResolverInterface {
         throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $definition));
       }
 
-      if (is_subclass_of($definition, 'Drupal\Core\DependencyInjection\ContainerInjectionInterface')) {
+      if (is_subclass_of($definition, \Drupal\Core\DependencyInjection\ContainerInjectionInterface::class)) {
         $instance = $definition::create($this->container);
       }
       else {

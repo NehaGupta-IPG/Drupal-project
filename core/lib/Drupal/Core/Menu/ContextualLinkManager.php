@@ -39,7 +39,7 @@ class ContextualLinkManager extends DefaultPluginManager implements ContextualLi
     // The weight of the link.
     'weight' => NULL,
     // Default class for contextual link implementations.
-    'class' => '\Drupal\Core\Menu\ContextualLinkDefault',
+    'class' => \Drupal\Core\Menu\ContextualLinkDefault::class,
     // The plugin id. Set by the plugin system based on the top-level YAML key.
     'id' => '',
   ];
@@ -105,7 +105,7 @@ class ContextualLinkManager extends DefaultPluginManager implements ContextualLi
    *   The request stack.
    */
   public function __construct(ControllerResolverInterface $controller_resolver, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager, AccessManagerInterface $access_manager, AccountInterface $account, RequestStack $request_stack) {
-    $this->factory = new ContainerFactory($this, '\Drupal\Core\Menu\ContextualLinkInterface');
+    $this->factory = new ContainerFactory($this, \Drupal\Core\Menu\ContextualLinkInterface::class);
     $this->controllerResolver = $controller_resolver;
     $this->accessManager = $access_manager;
     $this->account = $account;

@@ -57,7 +57,7 @@ class ConfigTranslationContextualLinks extends DeriverBase implements ContainerD
       $route_name = $mapper->getOverviewRouteName();
       $this->derivatives[$route_name] = $base_plugin_definition;
       $this->derivatives[$route_name]['config_translation_plugin_id'] = $plugin_id;
-      $this->derivatives[$route_name]['class'] = '\Drupal\config_translation\Plugin\Menu\ContextualLink\ConfigTranslationContextualLink';
+      $this->derivatives[$route_name]['class'] = \Drupal\config_translation\Plugin\Menu\ContextualLink\ConfigTranslationContextualLink::class;
       $this->derivatives[$route_name]['route_name'] = $route_name;
       $this->derivatives[$route_name]['group'] = $group_name;
     }

@@ -116,7 +116,7 @@ class SystemTestHooks {
     return [
       'system_test' => [
         'title' => $this->t('System Test FileTransfer'),
-        'class' => 'Drupal\system_test\MockFileTransfer',
+        'class' => \Drupal\system_test\MockFileTransfer::class,
         'weight' => -10,
       ],
     ];

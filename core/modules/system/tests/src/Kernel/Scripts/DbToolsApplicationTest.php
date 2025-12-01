@@ -25,7 +25,7 @@ class DbToolsApplicationTest extends KernelTestBase {
   public function testDumpCommandRegistration(): void {
     $application = new DbToolsApplication();
     $command = $application->find('dump');
-    $this->assertInstanceOf('\Drupal\Core\Command\DbDumpCommand', $command);
+    $this->assertInstanceOf(\Drupal\Core\Command\DbDumpCommand::class, $command);
     $this->assertSame(\Drupal::VERSION, $application->getVersion());
   }
 
@@ -35,7 +35,7 @@ class DbToolsApplicationTest extends KernelTestBase {
   public function testImportCommandRegistration(): void {
     $application = new DbToolsApplication();
     $command = $application->find('import');
-    $this->assertInstanceOf('\Drupal\Core\Command\DbImportCommand', $command);
+    $this->assertInstanceOf(\Drupal\Core\Command\DbImportCommand::class, $command);
   }
 
 }

@@ -173,7 +173,7 @@ class FileTestHooks {
   public function entityTypeAlter(&$entity_types) : void {
     if (\Drupal::state()->get('file_test_alternate_access_handler', FALSE)) {
       /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-      $entity_types['file']->setAccessClass('Drupal\file_test\FileTestAccessControlHandler');
+      $entity_types['file']->setAccessClass(\Drupal\file_test\FileTestAccessControlHandler::class);
     }
   }
 

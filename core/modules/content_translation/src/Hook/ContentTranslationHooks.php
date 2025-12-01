@@ -147,13 +147,13 @@ class ContentTranslationHooks {
     foreach ($entity_types as $entity_type) {
       if ($entity_type->isTranslatable()) {
         if (!$entity_type->hasHandlerClass('translation')) {
-          $entity_type->setHandlerClass('translation', 'Drupal\content_translation\ContentTranslationHandler');
+          $entity_type->setHandlerClass('translation', \Drupal\content_translation\ContentTranslationHandler::class);
         }
         if (!$entity_type->get('content_translation_metadata')) {
-          $entity_type->set('content_translation_metadata', 'Drupal\content_translation\ContentTranslationMetadataWrapper');
+          $entity_type->set('content_translation_metadata', \Drupal\content_translation\ContentTranslationMetadataWrapper::class);
         }
         if (!$entity_type->getFormClass('content_translation_deletion')) {
-          $entity_type->setFormClass('content_translation_deletion', '\Drupal\content_translation\Form\ContentTranslationDeleteForm');
+          $entity_type->setFormClass('content_translation_deletion', \Drupal\content_translation\Form\ContentTranslationDeleteForm::class);
         }
         $translation = $entity_type->get('translation');
         if (!$translation || !isset($translation['content_translation'])) {

@@ -359,15 +359,15 @@ function install_begin_request($class_loader, &$install_state): void {
   $container = new ContainerBuilder();
   $container->setParameter('language.default_values', Language::$defaultValues);
   $container
-    ->register('language.default', 'Drupal\Core\Language\LanguageDefault')
+    ->register('language.default', \Drupal\Core\Language\LanguageDefault::class)
     ->addArgument('%language.default_values%');
   $container
-    ->register('string_translation', 'Drupal\Core\StringTranslation\TranslationManager')
+    ->register('string_translation', \Drupal\Core\StringTranslation\TranslationManager::class)
     ->addArgument(new Reference('language.default'));
 
   // Register the database driver extension list provider.
   $container
-    ->register('extension.list.database_driver', 'Drupal\Core\Extension\DatabaseDriverList')
+    ->register('extension.list.database_driver', \Drupal\Core\Extension\DatabaseDriverList::class)
     ->addArgument(dirname(__DIR__, 2))
     ->addArgument('database_driver')
     ->addArgument(new NullBackend('database_driver'));
@@ -411,13 +411,13 @@ function install_begin_request($class_loader, &$install_state): void {
   // replaced with a regular one in drupal_install_system().
   if (!$install_state['base_system_verified']) {
     $environment = 'install';
-    $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\InstallerServiceProvider';
+    $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = \Drupal\Core\Installer\InstallerServiceProvider::class;
   }
   else {
     $environment = 'prod';
-    $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\NormalInstallerServiceProvider';
+    $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = \Drupal\Core\Installer\NormalInstallerServiceProvider::class;
   }
-  $GLOBALS['conf']['container_service_providers']['InstallerConfigOverride'] = 'Drupal\Core\Installer\ConfigOverride';
+  $GLOBALS['conf']['container_service_providers']['InstallerConfigOverride'] = \Drupal\Core\Installer\ConfigOverride::class;
 
   // Note, InstallerKernel::createFromRequest() is not used because Settings is
   // already initialized.
@@ -778,7 +778,7 @@ function install_tasks($install_state): array {
       // we still need to display it if settings.php is invalid in any way,
       // since the form submit handler is where settings.php is rewritten.
       'run' => $install_state['settings_verified'] ? INSTALL_TASK_SKIP : INSTALL_TASK_RUN_IF_NOT_COMPLETED,
-      'function' => 'Drupal\Core\Installer\Form\SiteSettingsForm',
+      'function' => \Drupal\Core\Installer\Form\SiteSettingsForm::class,
     ],
     'install_verify_database_ready' => [
       'run' => INSTALL_TASK_RUN_IF_NOT_COMPLETED,
@@ -805,7 +805,7 @@ function install_tasks($install_state): array {
     'install_configure_form' => [
       'display_name' => t('Configure site'),
       'type' => 'form',
-      'function' => 'Drupal\Core\Installer\Form\SiteConfigureForm',
+      'function' => \Drupal\Core\Installer\Form\SiteConfigureForm::class,
     ],
   ];
 
@@ -1243,7 +1243,7 @@ function install_select_profile(&$install_state) {
         throw new InstallerException('Missing profile parameter.');
       }
       // Otherwise, display a form to select a profile.
-      return install_get_form('Drupal\Core\Installer\Form\SelectProfileForm', $install_state);
+      return install_get_form(\Drupal\Core\Installer\Form\SelectProfileForm::class, $install_state);
     }
   }
 }
@@ -1374,7 +1374,7 @@ function install_select_language(&$install_state) {
     // translation files were found the form shows a select list of the
     // corresponding languages to choose from.
     if ($install_state['interactive']) {
-      return install_get_form('Drupal\Core\Installer\Form\SelectLanguageForm', $install_state);
+      return install_get_form(\Drupal\Core\Installer\Form\SelectLanguageForm::class, $install_state);
     }
     // If we are performing a non-interactive installation. If only one language
     // (English) is available, assume the user is correct. Otherwise throw an

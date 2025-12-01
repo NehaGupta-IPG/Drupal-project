@@ -41,8 +41,8 @@ trait MenuLinkFieldDefinitions {
     'provider' => '',
     'metadata' => [],
     // Default class for local task implementations.
-    'class' => 'Drupal\Core\Menu\MenuLinkDefault',
-    'form_class' => 'Drupal\Core\Menu\Form\MenuLinkDefaultForm',
+    'class' => \Drupal\Core\Menu\MenuLinkDefault::class,
+    'form_class' => \Drupal\Core\Menu\Form\MenuLinkDefaultForm::class,
     // The plugin ID. Set by the plugin system based on the top-level YAML key.
     'id' => '',
   ];

@@ -49,7 +49,7 @@ class MigratePrivateFileTest extends MigrateDrupal7TestBase {
    */
   public function register(ContainerBuilder $container): void {
     parent::register($container);
-    $container->register('stream_wrapper.private', 'Drupal\Core\StreamWrapper\PrivateStream')
+    $container->register('stream_wrapper.private', \Drupal\Core\StreamWrapper\PrivateStream::class)
       ->addTag('stream_wrapper', ['scheme' => 'private']);
   }
 

@@ -157,7 +157,7 @@ class ContextualUnitTest extends KernelTestBase {
       '#type' => 'contextual_links_placeholder',
       '#id' => $id,
       '#pre_render' => [
-        ['Drupal\contextual\Element\ContextualLinksPlaceholder', 'preRenderPlaceholder'],
+        [\Drupal\contextual\Element\ContextualLinksPlaceholder::class, 'preRenderPlaceholder'],
       ],
       '#defaults_loaded' => TRUE,
     ];

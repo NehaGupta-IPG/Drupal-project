@@ -48,8 +48,8 @@ class BanMiddlewareTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-    $this->banManager = $this->createMock('Drupal\ban\BanIpManagerInterface');
+    $this->kernel = $this->createMock(\Symfony\Component\HttpKernel\HttpKernelInterface::class);
+    $this->banManager = $this->createMock(\Drupal\ban\BanIpManagerInterface::class);
     $this->banMiddleware = new BanMiddleware($this->kernel, $this->banManager);
   }
 

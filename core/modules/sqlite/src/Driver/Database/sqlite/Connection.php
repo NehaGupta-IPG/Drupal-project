@@ -174,7 +174,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       $sqlite->sqliteCreateFunction('glob', [__CLASS__, 'sqlFunctionLikeBinary']);
 
       // Create a user-space case-insensitive collation with UTF-8 support.
-      $sqlite->sqliteCreateCollation('NOCASE_UTF8', ['Drupal\Component\Utility\Unicode', 'strcasecmp']);
+      $sqlite->sqliteCreateCollation('NOCASE_UTF8', [\Drupal\Component\Utility\Unicode::class, 'strcasecmp']);
     }
 
     // Set SQLite init_commands if not already defined. Enable the Write-Ahead

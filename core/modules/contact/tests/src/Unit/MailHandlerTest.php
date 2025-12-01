@@ -75,11 +75,11 @@ class MailHandlerTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->mailManager = $this->createMock('\Drupal\Core\Mail\MailManagerInterface');
-    $this->languageManager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
-    $this->logger = $this->createMock('\Psr\Log\LoggerInterface');
+    $this->mailManager = $this->createMock(\Drupal\Core\Mail\MailManagerInterface::class);
+    $this->languageManager = $this->createMock(\Drupal\Core\Language\LanguageManagerInterface::class);
+    $this->logger = $this->createMock(\Psr\Log\LoggerInterface::class);
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->userStorage = $this->createMock('\Drupal\Core\Entity\EntityStorageInterface');
+    $this->userStorage = $this->createMock(\Drupal\Core\Entity\EntityStorageInterface::class);
     $this->entityTypeManager->expects($this->any())
       ->method('getStorage')
       ->with('user')
@@ -104,7 +104,7 @@ class MailHandlerTest extends UnitTestCase {
    * @legacy-covers ::sendMailMessages
    */
   public function testInvalidRecipient(): void {
-    $message = $this->createMock('\Drupal\contact\MessageInterface');
+    $message = $this->createMock(\Drupal\contact\MessageInterface::class);
     $message->expects($this->once())
       ->method('isPersonal')
       ->willReturn(TRUE);
@@ -113,8 +113,8 @@ class MailHandlerTest extends UnitTestCase {
       ->willReturn(NULL);
     $message->expects($this->once())
       ->method('getContactForm')
-      ->willReturn($this->createMock('\Drupal\contact\ContactFormInterface'));
-    $sender = $this->createMock('\Drupal\Core\Session\AccountInterface');
+      ->willReturn($this->createMock(\Drupal\contact\ContactFormInterface::class));
+    $sender = $this->createMock(\Drupal\Core\Session\AccountInterface::class);
     $this->userStorage->expects($this->any())
       ->method('load')
       ->willReturn($sender);
@@ -271,7 +271,7 @@ class MailHandlerTest extends UnitTestCase {
    *   Mock message for testing.
    */
   protected function getAnonymousMockMessage($recipients, $auto_reply, $copy_sender = FALSE) {
-    $message = $this->createMock('\Drupal\contact\MessageInterface');
+    $message = $this->createMock(\Drupal\contact\MessageInterface::class);
     $message->expects($this->any())
       ->method('getSenderName')
       ->willReturn('Anonymous');
@@ -300,14 +300,14 @@ class MailHandlerTest extends UnitTestCase {
    *   Mock message for testing.
    */
   protected function getAuthenticatedMockMessage($copy_sender = FALSE) {
-    $message = $this->createMock('\Drupal\contact\MessageInterface');
+    $message = $this->createMock(\Drupal\contact\MessageInterface::class);
     $message->expects($this->any())
       ->method('isPersonal')
       ->willReturn(TRUE);
     $message->expects($this->once())
       ->method('copySender')
       ->willReturn($copy_sender);
-    $recipient = $this->createMock('\Drupal\user\UserInterface');
+    $recipient = $this->createMock(\Drupal\user\UserInterface::class);
     $recipient->expects($this->once())
       ->method('getEmail')
       ->willReturn('user2@drupal.org');
@@ -335,7 +335,7 @@ class MailHandlerTest extends UnitTestCase {
    *   Mock message for testing.
    */
   protected function getMockContactForm($recipients, $auto_reply) {
-    $contact_form = $this->createMock('\Drupal\contact\ContactFormInterface');
+    $contact_form = $this->createMock(\Drupal\contact\ContactFormInterface::class);
     $contact_form->expects($this->once())
       ->method('getRecipients')
       ->willReturn($recipients);

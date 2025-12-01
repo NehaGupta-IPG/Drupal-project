@@ -26,8 +26,8 @@ class AttributeDiscoveryWithAnnotationsAutomatedProviders extends AttributeDisco
   public function __construct(
     string $subdir,
     \Traversable $rootNamespaces,
-    string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
-    string $pluginDefinitionAnnotationName = 'Drupal\Component\Annotation\Plugin',
+    string $pluginDefinitionAttributeName = \Drupal\Component\Plugin\Attribute\Plugin::class,
+    string $pluginDefinitionAnnotationName = \Drupal\Component\Annotation\Plugin::class,
     array $additionalNamespaces = [],
   ) {
     parent::__construct($subdir, $rootNamespaces, $pluginDefinitionAttributeName, $pluginDefinitionAnnotationName, $additionalNamespaces);

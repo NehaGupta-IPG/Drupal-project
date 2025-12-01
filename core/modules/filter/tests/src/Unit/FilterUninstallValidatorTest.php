@@ -30,7 +30,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->filterUninstallValidator = $this->getMockBuilder('Drupal\filter\FilterUninstallValidator')
+    $this->filterUninstallValidator = $this->getMockBuilder(\Drupal\filter\FilterUninstallValidator::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getFilterDefinitionsByProvider', 'getEnabledFilterFormats'])
       ->getMock();
@@ -111,7 +111,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
 
     // The first format has 2 matching and enabled filters, but the loop breaks
     // after finding the first one.
-    $filter_plugin_collection1 = $this->getMockBuilder('Drupal\filter\FilterPluginCollection')
+    $filter_plugin_collection1 = $this->getMockBuilder(\Drupal\filter\FilterPluginCollection::class)
       ->disableOriginalConstructor()
       ->getMock();
     $filter_plugin_collection1->expects($this->exactly(3))
@@ -130,7 +130,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
         ['test_filter_plugin4', $filter_plugin_enabled],
       ]);
 
-    $filter_format1 = $this->createMock('Drupal\filter\FilterFormatInterface');
+    $filter_format1 = $this->createMock(\Drupal\filter\FilterFormatInterface::class);
     $filter_format1->expects($this->once())
       ->method('filters')
       ->willReturn($filter_plugin_collection1);
@@ -139,7 +139,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
       ->willReturn('Filter Format 1 Label');
 
     // The second filter format only has one matching and enabled filter.
-    $filter_plugin_collection2 = $this->getMockBuilder('Drupal\filter\FilterPluginCollection')
+    $filter_plugin_collection2 = $this->getMockBuilder(\Drupal\filter\FilterPluginCollection::class)
       ->disableOriginalConstructor()
       ->getMock();
     $filter_plugin_collection2->expects($this->exactly(4))
@@ -155,7 +155,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
       ->with('test_filter_plugin4')
       ->willReturn($filter_plugin_enabled);
 
-    $filter_format2 = $this->createMock('Drupal\filter\FilterFormatInterface');
+    $filter_format2 = $this->createMock(\Drupal\filter\FilterFormatInterface::class);
     $filter_format2->expects($this->once())
       ->method('filters')
       ->willReturn($filter_plugin_collection2);

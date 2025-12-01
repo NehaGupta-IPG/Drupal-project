@@ -184,8 +184,8 @@ class MigrateMessageController extends ControllerBase {
 
     // Gets each message row and the source ID(s) for that message.
     $query = $this->database->select($message_table, 'msg')
-      ->extend('\Drupal\Core\Database\Query\PagerSelectExtender')
-      ->extend('\Drupal\Core\Database\Query\TableSortExtender');
+      ->extend(\Drupal\Core\Database\Query\PagerSelectExtender::class)
+      ->extend(\Drupal\Core\Database\Query\TableSortExtender::class);
     // Not all messages have a matching row in the map table.
     $query->leftJoin($map_table, 'map', 'msg.source_ids_hash = map.source_ids_hash');
     $query->fields('msg');
@@ -216,7 +216,7 @@ class MigrateMessageController extends ControllerBase {
     }
 
     // Build the complete form.
-    $build['message_filter_form'] = $this->formBuilder->getForm('Drupal\migrate\Form\MessageForm');
+    $build['message_filter_form'] = $this->formBuilder->getForm(\Drupal\migrate\Form\MessageForm::class);
     $build['message_table'] = [
       '#type' => 'table',
       '#header' => $header,

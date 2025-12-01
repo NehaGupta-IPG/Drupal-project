@@ -108,31 +108,31 @@ class FieldUiHooks {
   #[Hook('entity_type_build')]
   public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-    $entity_types['field_config']->setFormClass('edit', 'Drupal\field_ui\Form\FieldConfigEditForm');
+    $entity_types['field_config']->setFormClass('edit', \Drupal\field_ui\Form\FieldConfigEditForm::class);
     $entity_types['field_config']->setFormClass('default', FieldConfigEditForm::class);
-    $entity_types['field_config']->setFormClass('delete', 'Drupal\field_ui\Form\FieldConfigDeleteForm');
-    $entity_types['field_config']->setListBuilderClass('Drupal\field_ui\FieldConfigListBuilder');
-    $entity_types['field_storage_config']->setFormClass('edit', 'Drupal\field_ui\Form\FieldStorageConfigEditForm');
+    $entity_types['field_config']->setFormClass('delete', \Drupal\field_ui\Form\FieldConfigDeleteForm::class);
+    $entity_types['field_config']->setListBuilderClass(\Drupal\field_ui\FieldConfigListBuilder::class);
+    $entity_types['field_storage_config']->setFormClass('edit', \Drupal\field_ui\Form\FieldStorageConfigEditForm::class);
     $entity_types['field_storage_config']->setFormClass('default', FieldStorageConfigEditForm::class);
-    $entity_types['field_storage_config']->setListBuilderClass('Drupal\field_ui\FieldStorageConfigListBuilder');
+    $entity_types['field_storage_config']->setListBuilderClass(\Drupal\field_ui\FieldStorageConfigListBuilder::class);
     $entity_types['field_storage_config']->setLinkTemplate('collection', '/admin/reports/fields');
-    $entity_types['entity_form_display']->setFormClass('edit', 'Drupal\field_ui\Form\EntityFormDisplayEditForm');
-    $entity_types['entity_view_display']->setFormClass('edit', 'Drupal\field_ui\Form\EntityViewDisplayEditForm');
+    $entity_types['entity_form_display']->setFormClass('edit', \Drupal\field_ui\Form\EntityFormDisplayEditForm::class);
+    $entity_types['entity_view_display']->setFormClass('edit', \Drupal\field_ui\Form\EntityViewDisplayEditForm::class);
     $form_mode = $entity_types['entity_form_mode'];
-    $form_mode->setListBuilderClass('Drupal\field_ui\EntityFormModeListBuilder');
-    $form_mode->setFormClass('add', 'Drupal\field_ui\Form\EntityFormModeAddForm');
-    $form_mode->setFormClass('edit', 'Drupal\field_ui\Form\EntityDisplayModeEditForm');
-    $form_mode->setFormClass('delete', 'Drupal\field_ui\Form\EntityDisplayModeDeleteForm');
+    $form_mode->setListBuilderClass(\Drupal\field_ui\EntityFormModeListBuilder::class);
+    $form_mode->setFormClass('add', \Drupal\field_ui\Form\EntityFormModeAddForm::class);
+    $form_mode->setFormClass('edit', \Drupal\field_ui\Form\EntityDisplayModeEditForm::class);
+    $form_mode->setFormClass('delete', \Drupal\field_ui\Form\EntityDisplayModeDeleteForm::class);
     $form_mode->set('admin_permission', 'administer display modes');
     $form_mode->setLinkTemplate('delete-form', '/admin/structure/display-modes/form/manage/{entity_form_mode}/delete');
     $form_mode->setLinkTemplate('edit-form', '/admin/structure/display-modes/form/manage/{entity_form_mode}');
     $form_mode->setLinkTemplate('add-form', '/admin/structure/display-modes/form/add/{entity_type_id}');
     $form_mode->setLinkTemplate('collection', '/admin/structure/display-modes/form');
     $view_mode = $entity_types['entity_view_mode'];
-    $view_mode->setListBuilderClass('Drupal\field_ui\EntityDisplayModeListBuilder');
-    $view_mode->setFormClass('add', 'Drupal\field_ui\Form\EntityDisplayModeAddForm');
-    $view_mode->setFormClass('edit', 'Drupal\field_ui\Form\EntityDisplayModeEditForm');
-    $view_mode->setFormClass('delete', 'Drupal\field_ui\Form\EntityDisplayModeDeleteForm');
+    $view_mode->setListBuilderClass(\Drupal\field_ui\EntityDisplayModeListBuilder::class);
+    $view_mode->setFormClass('add', \Drupal\field_ui\Form\EntityDisplayModeAddForm::class);
+    $view_mode->setFormClass('edit', \Drupal\field_ui\Form\EntityDisplayModeEditForm::class);
+    $view_mode->setFormClass('delete', \Drupal\field_ui\Form\EntityDisplayModeDeleteForm::class);
     $view_mode->set('admin_permission', 'administer display modes');
     $view_mode->setLinkTemplate('delete-form', '/admin/structure/display-modes/view/manage/{entity_view_mode}/delete');
     $view_mode->setLinkTemplate('edit-form', '/admin/structure/display-modes/view/manage/{entity_view_mode}');

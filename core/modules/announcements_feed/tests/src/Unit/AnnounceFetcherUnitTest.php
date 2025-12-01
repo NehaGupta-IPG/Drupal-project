@@ -27,7 +27,7 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
    */
   public function setUp():void {
     parent::setUp();
-    $httpClient = $this->createMock('GuzzleHttp\ClientInterface');
+    $httpClient = $this->createMock(\GuzzleHttp\ClientInterface::class);
     $config = $this->getConfigFactoryStub([
       'announcements_feed.settings' => [
         'max_age' => 86400,
@@ -35,12 +35,12 @@ class AnnounceFetcherUnitTest extends UnitTestCase {
         'limit' => 10,
       ],
     ]);
-    $tempStore = $this->createMock('Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface');
+    $tempStore = $this->createMock(\Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface::class);
     $tempStore->expects($this->once())
       ->method('get')
-      ->willReturn($this->createMock('Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface'));
+      ->willReturn($this->createMock(\Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface::class));
 
-    $logger = $this->createMock('Psr\Log\LoggerInterface');
+    $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
     $this->fetcher = new AnnounceFetcher($httpClient, $config, $tempStore, $logger, 'https://www.drupal.org/announcements.json');
   }
 

@@ -21,7 +21,7 @@ class TestHelpTopicDeriver implements DeriverInterface {
     $definitions[$id] = [
       'plugin_id' => $plugin_id,
       'id' => $plugin_id,
-      'class' => 'Drupal\\help_topics_test\\Plugin\\HelpTopic\\TestHelpTopicPlugin',
+      'class' => \Drupal\help_topics_test\Plugin\HelpTopic\TestHelpTopicPlugin::class,
       'label' => 'Label for ' . $id,
       'body' => 'Body for ' . $id,
       'top_level' => TRUE,

@@ -51,7 +51,7 @@ class ConstraintManager extends DefaultPluginManager {
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     $this->factory = new ConstraintFactory($this);
-    parent::__construct('Plugin/Validation/Constraint', $namespaces, $module_handler, NULL, Constraint::class, 'Drupal\Core\Validation\Annotation\Constraint');
+    parent::__construct('Plugin/Validation/Constraint', $namespaces, $module_handler, NULL, Constraint::class, \Drupal\Core\Validation\Annotation\Constraint::class);
     $this->alterInfo('validation_constraint');
     $this->setCacheBackend($cache_backend, 'validation_constraint_plugins');
   }

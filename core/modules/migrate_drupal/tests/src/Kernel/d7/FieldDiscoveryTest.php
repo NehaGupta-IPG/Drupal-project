@@ -357,7 +357,7 @@ class FieldDiscoveryTest extends MigrateDrupal7TestBase {
       'requirements_met' => TRUE,
       'id' => 'd7_field_instance',
       'source_module' => 'field',
-      'class' => 'Drupal\\field\\Plugin\\migrate\\source\\d7\\FieldInstance',
+      'class' => \Drupal\field\Plugin\migrate\source\d7\FieldInstance::class,
       'provider' => [
         0 => 'field',
         1 => 'migrate_drupal',

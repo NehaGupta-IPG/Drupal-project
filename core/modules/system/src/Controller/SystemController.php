@@ -393,7 +393,7 @@ class SystemController extends ControllerBase {
       '#theme_groups' => $theme_groups,
       '#theme_group_titles' => $theme_group_titles,
     ];
-    $build[] = $this->formBuilder->getForm('Drupal\system\Form\ThemeAdminForm', $admin_theme_options);
+    $build[] = $this->formBuilder->getForm(\Drupal\system\Form\ThemeAdminForm::class, $admin_theme_options);
 
     return $build;
   }

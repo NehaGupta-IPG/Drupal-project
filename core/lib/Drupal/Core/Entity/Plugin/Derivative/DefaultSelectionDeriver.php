@@ -65,7 +65,7 @@ class DefaultSelectionDeriver extends DeriverBase implements ContainerDeriverInt
       // of whether a limit has been passed.
       // @see \Drupal\Core\Entity\Plugin\EntityReferenceSelection\PhpSelection
       if (!$entity_type->hasKey('label')) {
-        $this->derivatives[$entity_type_id]['class'] = 'Drupal\Core\Entity\Plugin\EntityReferenceSelection\PhpSelection';
+        $this->derivatives[$entity_type_id]['class'] = \Drupal\Core\Entity\Plugin\EntityReferenceSelection\PhpSelection::class;
       }
     }
 

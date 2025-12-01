@@ -57,7 +57,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
       $module_handler,
       ImageToolkitOperationInterface::class,
       ImageToolkitOperation::class,
-      'Drupal\Core\ImageToolkit\Annotation\ImageToolkitOperation',
+      \Drupal\Core\ImageToolkit\Annotation\ImageToolkitOperation::class,
     );
 
     $this->alterInfo('image_toolkit_operation');

@@ -34,16 +34,16 @@ class SchemaTest extends UnitTestCase {
   public function testComputedConstraintName($table_name, $name, $expected): void {
     $max_identifier_length = 63;
 
-    $connection = $this->prophesize('\Drupal\pgsql\Driver\Database\pgsql\Connection');
+    $connection = $this->prophesize(\Drupal\pgsql\Driver\Database\pgsql\Connection::class);
     $connection->getConnectionOptions()->willReturn([]);
     $connection->getPrefix()->willReturn('');
 
-    $statement = $this->prophesize('\Drupal\Core\Database\StatementInterface');
+    $statement = $this->prophesize(\Drupal\Core\Database\StatementInterface::class);
     $statement->fetchField()->willReturn($max_identifier_length);
     $connection->query('SHOW max_identifier_length')->willReturn($statement->reveal());
 
     $connection->query(Argument::containingString($expected))
-      ->willReturn($this->prophesize('\Drupal\Core\Database\StatementInterface')->reveal())
+      ->willReturn($this->prophesize(\Drupal\Core\Database\StatementInterface::class)->reveal())
       ->shouldBeCalled();
 
     $schema = new Schema($connection->reveal());

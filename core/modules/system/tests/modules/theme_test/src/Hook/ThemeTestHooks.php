@@ -169,7 +169,7 @@ class ThemeTestHooks {
   #[Hook('theme_registry_alter')]
   public function themeRegistryAlter(&$registry): void {
     $registry['theme_test_preprocess_callback']['preprocess functions'][] = [
-      '\Drupal\theme_test\ThemeTestPreprocess',
+      \Drupal\theme_test\ThemeTestPreprocess::class,
       'preprocess',
     ];
   }

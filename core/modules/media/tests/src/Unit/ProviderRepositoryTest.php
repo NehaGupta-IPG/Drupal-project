@@ -75,10 +75,10 @@ class ProviderRepositoryTest extends UnitTestCase {
     $this->keyValue = $key_value_factory->get('media');
 
     $this->currentTime = time();
-    $time = $this->prophesize('\Drupal\Component\Datetime\TimeInterface');
+    $time = $this->prophesize(\Drupal\Component\Datetime\TimeInterface::class);
     $time->getCurrentTime()->willReturn($this->currentTime);
 
-    $this->logger = $this->prophesize('\Psr\Log\LoggerInterface');
+    $this->logger = $this->prophesize(\Psr\Log\LoggerInterface::class);
     $logger_factory = $this->prophesize(LoggerChannelFactoryInterface::class);
     $logger_factory->get('media')->willReturn($this->logger);
 
@@ -139,7 +139,7 @@ END;
    */
   #[DataProvider('providerInvalidResponse')]
   public function testInvalidResponse(int $expiration_offset): void {
-    $provider = $this->prophesize('\Drupal\media\OEmbed\Provider')
+    $provider = $this->prophesize(\Drupal\media\OEmbed\Provider::class)
       ->reveal();
 
     // This stored data should be returned, irrespective of whether it's fresh.
@@ -181,7 +181,7 @@ END;
    * Tests handling of exceptions when fetching the provider database.
    */
   public function testRequestException(): void {
-    $provider = $this->prophesize('\Drupal\media\OEmbed\Provider')
+    $provider = $this->prophesize(\Drupal\media\OEmbed\Provider::class)
       ->reveal();
 
     // This data is expired (stale), but it should be returned anyway.

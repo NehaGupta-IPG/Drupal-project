@@ -16,7 +16,7 @@ class NodeConfigTranslationHooks {
    */
   #[Hook('config_translation_info_alter')]
   public function configTranslationInfoAlter(&$info): void {
-    $info['node_type']['class'] = 'Drupal\node\ConfigTranslation\NodeTypeMapper';
+    $info['node_type']['class'] = \Drupal\node\ConfigTranslation\NodeTypeMapper::class;
   }
 
 }

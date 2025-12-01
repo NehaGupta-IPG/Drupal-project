@@ -26,7 +26,7 @@ class DownloadTest extends FileTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->container->get('stream_wrapper_manager')->registerWrapper('temporary', 'Drupal\Core\StreamWrapper\TemporaryStream', StreamWrapperInterface::LOCAL_NORMAL);
+    $this->container->get('stream_wrapper_manager')->registerWrapper('temporary', \Drupal\Core\StreamWrapper\TemporaryStream::class, StreamWrapperInterface::LOCAL_NORMAL);
   }
 
   /**

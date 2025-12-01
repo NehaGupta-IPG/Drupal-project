@@ -465,7 +465,7 @@ class OverviewTerms extends EntityForm {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Sort term order based on weight.
-    uasort($form_state->getValue('terms'), ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    uasort($form_state->getValue('terms'), [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
 
     $vocabulary = $form_state->get(['taxonomy', 'vocabulary']);
     $changed_terms = [];

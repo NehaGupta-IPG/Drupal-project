@@ -81,7 +81,7 @@ class NodeTypeForm extends BundleEntityFormBase {
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
       '#disabled' => $type->isLocked(),
       '#machine_name' => [
-        'exists' => ['Drupal\node\Entity\NodeType', 'load'],
+        'exists' => [\Drupal\node\Entity\NodeType::class, 'load'],
         'source' => ['name'],
       ],
       '#description' => $this->t('Unique machine-readable name: lowercase letters, numbers, and underscores only.', [

@@ -44,7 +44,7 @@ class SectionStorageManager extends DefaultPluginManager implements SupportAware
    *   The context handler.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ContextHandlerInterface $context_handler) {
-    parent::__construct('Plugin/SectionStorage', $namespaces, $module_handler, SectionStorageInterface::class, SectionStorage::class, '\Drupal\layout_builder\Annotation\SectionStorage');
+    parent::__construct('Plugin/SectionStorage', $namespaces, $module_handler, SectionStorageInterface::class, SectionStorage::class, \Drupal\layout_builder\Annotation\SectionStorage::class);
 
     $this->contextHandler = $context_handler;
 

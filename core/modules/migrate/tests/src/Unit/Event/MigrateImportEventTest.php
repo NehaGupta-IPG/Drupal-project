@@ -23,8 +23,8 @@ class MigrateImportEventTest extends UnitTestCase {
    * @legacy-covers ::getMigration
    */
   public function testGetMigration(): void {
-    $migration = $this->prophesize('\Drupal\migrate\Plugin\MigrationInterface')->reveal();
-    $message_service = $this->prophesize('\Drupal\migrate\MigrateMessageInterface')->reveal();
+    $migration = $this->prophesize(\Drupal\migrate\Plugin\MigrationInterface::class)->reveal();
+    $message_service = $this->prophesize(\Drupal\migrate\MigrateMessageInterface::class)->reveal();
     $event = new MigrateImportEvent($migration, $message_service);
     $this->assertSame($migration, $event->getMigration());
   }
@@ -36,8 +36,8 @@ class MigrateImportEventTest extends UnitTestCase {
    * @legacy-covers ::logMessage
    */
   public function testLogMessage(): void {
-    $migration = $this->prophesize('\Drupal\migrate\Plugin\MigrationInterface');
-    $message_service = $this->prophesize('\Drupal\migrate\MigrateMessageInterface');
+    $migration = $this->prophesize(\Drupal\migrate\Plugin\MigrationInterface::class);
+    $message_service = $this->prophesize(\Drupal\migrate\MigrateMessageInterface::class);
     $event = new MigrateImportEvent($migration->reveal(), $message_service->reveal());
     // Assert that the intended calls to the services happen.
     $message_service->display('status message', 'status')->shouldBeCalledTimes(1);

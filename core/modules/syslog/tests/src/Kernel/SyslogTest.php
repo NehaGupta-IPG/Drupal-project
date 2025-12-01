@@ -46,7 +46,7 @@ class SyslogTest extends KernelTestBase {
     $request->setSession(new Session(new MockArraySessionStorage()));
     \Drupal::requestStack()->push($request);
 
-    $user = $this->getMockBuilder('Drupal\Core\Session\AccountInterface')->getMock();
+    $user = $this->getMockBuilder(\Drupal\Core\Session\AccountInterface::class)->getMock();
     $user->method('id')->willReturn(42);
     $this->container->set('current_user', $user);
 

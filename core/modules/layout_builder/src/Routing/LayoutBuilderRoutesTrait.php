@@ -71,7 +71,7 @@ trait LayoutBuilderRoutesTrait {
     $collection->add("$route_name_prefix.view", $route);
 
     $discard_changes_defaults = $defaults;
-    $discard_changes_defaults['_form'] = '\Drupal\layout_builder\Form\DiscardLayoutChangesForm';
+    $discard_changes_defaults['_form'] = \Drupal\layout_builder\Form\DiscardLayoutChangesForm::class;
     $route = (new Route("$path/discard-changes"))
       ->setDefaults($discard_changes_defaults)
       ->setRequirements($requirements)
@@ -80,7 +80,7 @@ trait LayoutBuilderRoutesTrait {
 
     if (is_subclass_of($definition->getClass(), OverridesSectionStorageInterface::class)) {
       $revert_defaults = $defaults;
-      $revert_defaults['_form'] = '\Drupal\layout_builder\Form\RevertOverridesForm';
+      $revert_defaults['_form'] = \Drupal\layout_builder\Form\RevertOverridesForm::class;
       $route = (new Route("$path/revert"))
         ->setDefaults($revert_defaults)
         ->setRequirements($requirements)
@@ -89,7 +89,7 @@ trait LayoutBuilderRoutesTrait {
     }
     elseif (is_subclass_of($definition->getClass(), DefaultsSectionStorageInterface::class)) {
       $disable_defaults = $defaults;
-      $disable_defaults['_form'] = '\Drupal\layout_builder\Form\LayoutBuilderDisableForm';
+      $disable_defaults['_form'] = \Drupal\layout_builder\Form\LayoutBuilderDisableForm::class;
       $disable_options = $options;
       unset($disable_options['_admin_route'], $disable_options['_layout_builder']);
       $route = (new Route("$path/disable"))

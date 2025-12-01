@@ -76,7 +76,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
     $container->set('cache_contexts_manager', $cache_contexts_manager);
     \Drupal::setContainer($container);
 
-    $this->viewer = $this->createMock('\Drupal\user\UserInterface');
+    $this->viewer = $this->createMock(\Drupal\user\UserInterface::class);
     $this->viewer
       ->expects($this->any())
       ->method('hasPermission')
@@ -86,7 +86,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       ->method('id')
       ->willReturn(1);
 
-    $this->owner = $this->createMock('\Drupal\user\UserInterface');
+    $this->owner = $this->createMock(\Drupal\user\UserInterface::class);
     $this->owner
       ->expects($this->any())
       ->method('hasPermission')
@@ -100,13 +100,13 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       ->method('id')
       ->willReturn(2);
 
-    $this->admin = $this->createMock('\Drupal\user\UserInterface');
+    $this->admin = $this->createMock(\Drupal\user\UserInterface::class);
     $this->admin
       ->expects($this->any())
       ->method('hasPermission')
       ->willReturn(TRUE);
 
-    $this->emailViewer = $this->createMock('\Drupal\user\UserInterface');
+    $this->emailViewer = $this->createMock(\Drupal\user\UserInterface::class);
     $this->emailViewer
       ->expects($this->any())
       ->method('hasPermission')
@@ -118,13 +118,13 @@ class UserAccessControlHandlerTest extends UnitTestCase {
       ->method('id')
       ->willReturn(3);
 
-    $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
+    $entity_type = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
 
     $this->accessControlHandler = new UserAccessControlHandler($entity_type);
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
+    $module_handler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
     $this->accessControlHandler->setModuleHandler($module_handler);
 
-    $this->items = $this->getMockBuilder('Drupal\Core\Field\FieldItemList')
+    $this->items = $this->getMockBuilder(\Drupal\Core\Field\FieldItemList::class)
       ->disableOriginalConstructor()
       ->getMock();
     $this->items
@@ -139,7 +139,7 @@ class UserAccessControlHandlerTest extends UnitTestCase {
    * @internal
    */
   public function assertFieldAccess(string $field, string $viewer, string $target, bool $view, bool $edit): void {
-    $field_definition = $this->createMock('Drupal\Core\Field\FieldDefinitionInterface');
+    $field_definition = $this->createMock(\Drupal\Core\Field\FieldDefinitionInterface::class);
     $field_definition->expects($this->any())
       ->method('getName')
       ->willReturn($field);

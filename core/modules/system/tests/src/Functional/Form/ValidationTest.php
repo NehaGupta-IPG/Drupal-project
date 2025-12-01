@@ -220,7 +220,7 @@ class ValidationTest extends BrowserTestBase {
    * @see \Drupal\form_test\Form\FormTestValidateRequiredForm
    */
   public function testCustomRequiredError(): void {
-    $form = \Drupal::formBuilder()->getForm('\Drupal\form_test\Form\FormTestValidateRequiredForm');
+    $form = \Drupal::formBuilder()->getForm(\Drupal\form_test\Form\FormTestValidateRequiredForm::class);
 
     // Verify that a custom #required error can be set.
     $edit = [];

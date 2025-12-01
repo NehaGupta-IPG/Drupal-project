@@ -71,15 +71,15 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
     parent::setUp();
 
     $this->entityTypeId = $this->randomMachineName();
-    $this->entityType = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
+    $this->entityType = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
 
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
 
-    $this->uuid = $this->createMock('\Drupal\Component\Uuid\UuidInterface');
+    $this->uuid = $this->createMock(\Drupal\Component\Uuid\UuidInterface::class);
 
-    $this->typedConfigManager = $this->createMock('Drupal\Core\Config\TypedConfigManagerInterface');
+    $this->typedConfigManager = $this->createMock(\Drupal\Core\Config\TypedConfigManagerInterface::class);
 
-    $this->configEntityStorageInterface = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
+    $this->configEntityStorageInterface = $this->createMock(\Drupal\Core\Entity\EntityStorageInterface::class);
 
     $container = new ContainerBuilder();
     $container->set('entity_type.manager', $this->entityTypeManager);
@@ -96,7 +96,7 @@ class ContentLanguageSettingsUnitTest extends UnitTestCase {
    */
   public function testCalculateDependencies(): void {
     // Mock the interfaces necessary to create a dependency on a bundle entity.
-    $target_entity_type = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
+    $target_entity_type = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
     $target_entity_type->expects($this->any())
       ->method('getBundleConfigDependency')
       ->willReturn(['type' => 'config', 'name' => 'test.test_entity_type.id']);

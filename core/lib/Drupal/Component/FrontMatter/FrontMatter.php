@@ -86,7 +86,7 @@ class FrontMatter {
    *   The name of a class that implements
    *   \Drupal\Component\Serialization\SerializationInterface.
    */
-  public function __construct(string $source, string $serializer = '\Drupal\Component\Serialization\Yaml') {
+  public function __construct(string $source, string $serializer = \Drupal\Component\Serialization\Yaml::class) {
     assert(is_subclass_of($serializer, SerializationInterface::class), sprintf('The $serializer parameter must reference a class that implements %s.', SerializationInterface::class));
     $this->serializer = $serializer;
     $this->source = $source;
@@ -103,7 +103,7 @@ class FrontMatter {
    *
    * @return static
    */
-  public static function create(string $source, string $serializer = '\Drupal\Component\Serialization\Yaml') {
+  public static function create(string $source, string $serializer = \Drupal\Component\Serialization\Yaml::class) {
     return new static($source, $serializer);
   }
 

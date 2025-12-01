@@ -519,7 +519,7 @@ class User extends ContentEntityBase implements UserInterface {
         'UserName' => [],
         'UserNameUnique' => [],
       ]);
-    $fields['name']->getItemDefinition()->setClass('\Drupal\user\UserNameItem');
+    $fields['name']->getItemDefinition()->setClass(\Drupal\user\UserNameItem::class);
 
     $fields['pass'] = BaseFieldDefinition::create('password')
       ->setLabel(t('Password'))

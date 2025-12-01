@@ -47,7 +47,7 @@ class ResourceFetcherTest extends UnitTestCase {
 
     $fetcher = new ResourceFetcher(
       $client->reveal(),
-      $this->createMock('\Drupal\media\OEmbed\ProviderRepositoryInterface'),
+      $this->createMock(\Drupal\media\OEmbed\ProviderRepositoryInterface::class),
       new NullBackend('default'),
       $non_default_timeout
     );
@@ -84,7 +84,7 @@ class ResourceFetcherTest extends UnitTestCase {
     $client = new Client([
       'handler' => HandlerStack::create($mock_handler),
     ]);
-    $providers = $this->createMock('\Drupal\media\OEmbed\ProviderRepositoryInterface');
+    $providers = $this->createMock(\Drupal\media\OEmbed\ProviderRepositoryInterface::class);
 
     $fetcher = new ResourceFetcher($client, $providers, new NullBackend('default'));
     /** @var \Drupal\media\OEmbed\Resource $resource */

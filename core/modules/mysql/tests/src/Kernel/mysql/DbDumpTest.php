@@ -74,7 +74,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    */
   public function register(ContainerBuilder $container): void {
     parent::register($container);
-    $container->register('cache_factory', 'Drupal\Core\Cache\DatabaseBackendFactory')
+    $container->register('cache_factory', \Drupal\Core\Cache\DatabaseBackendFactory::class)
       ->addArgument(new Reference('database'))
       ->addArgument(new Reference('cache_tags.invalidator.checksum'))
       ->addArgument(new Reference('settings'))

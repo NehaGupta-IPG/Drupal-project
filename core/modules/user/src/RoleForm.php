@@ -35,7 +35,7 @@ class RoleForm extends EntityForm {
       '#size' => 30,
       '#maxlength' => ConfigEntityStorage::MAX_ID_LENGTH,
       '#machine_name' => [
-        'exists' => ['\Drupal\user\Entity\Role', 'load'],
+        'exists' => [\Drupal\user\Entity\Role::class, 'load'],
       ],
     ];
     $form['weight'] = [

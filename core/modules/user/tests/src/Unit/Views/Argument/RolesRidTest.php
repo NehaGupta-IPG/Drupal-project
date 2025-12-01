@@ -35,7 +35,7 @@ class RolesRidTest extends UnitTestCase {
     ], 'user_role');
 
     // Creates a stub entity storage.
-    $role_storage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
+    $role_storage = $this->createMock(\Drupal\Core\Entity\EntityStorageInterface::class);
     $role_storage->expects($this->any())
       ->method('loadMultiple')
       ->willReturnMap([
@@ -47,7 +47,7 @@ class RolesRidTest extends UnitTestCase {
         ],
       ]);
 
-    $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
+    $entity_type = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
     $entity_type->expects($this->any())
       ->method('getKey')
       ->with('label')

@@ -30,7 +30,7 @@ class PerComponentEntityFormDisplayTest extends MigrateTestCase {
     foreach ($values as $key => $value) {
       $row->setDestinationProperty($key, $value);
     }
-    $entity = $this->getMockBuilder('Drupal\Core\Entity\Entity\EntityFormDisplay')
+    $entity = $this->getMockBuilder(\Drupal\Core\Entity\Entity\EntityFormDisplay::class)
       ->disableOriginalConstructor()
       ->getMock();
     $entity->expects($this->once())

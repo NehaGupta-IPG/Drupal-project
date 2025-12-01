@@ -919,7 +919,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
   protected function buildGroupSubmit($form, FormStateInterface $form_state) {
     $groups = [];
     $group_items = $form_state->getValue(['options', 'group_info', 'group_items']);
-    uasort($group_items, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    uasort($group_items, [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
     // Filter out removed items.
 
     // Start from 1 to avoid problems with #default_value in the widget.

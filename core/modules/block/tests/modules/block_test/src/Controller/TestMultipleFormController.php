@@ -15,8 +15,8 @@ class TestMultipleFormController extends ControllerBase {
   public function testMultipleForms() {
     $form_state = new FormState();
     $build = [
-      'form1' => $this->formBuilder()->buildForm('\Drupal\block_test\Form\TestForm', $form_state),
-      'form2' => $this->formBuilder()->buildForm('\Drupal\block_test\Form\FavoriteAnimalTestForm', $form_state),
+      'form1' => $this->formBuilder()->buildForm(\Drupal\block_test\Form\TestForm::class, $form_state),
+      'form2' => $this->formBuilder()->buildForm(\Drupal\block_test\Form\FavoriteAnimalTestForm::class, $form_state),
     ];
 
     // Output all attached placeholders trough

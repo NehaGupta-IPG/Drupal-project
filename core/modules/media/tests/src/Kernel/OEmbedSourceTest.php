@@ -48,8 +48,8 @@ class OEmbedSourceTest extends MediaKernelTestBase {
     $plugin = OEmbed::create($this->container, $configuration, 'oembed', []);
 
     // Test that NULL is returned for a media item with no source value.
-    $media = $this->prophesize('\Drupal\media\MediaInterface');
-    $field_items = $this->prophesize('\Drupal\Core\Field\FieldItemListInterface');
+    $media = $this->prophesize(\Drupal\media\MediaInterface::class);
+    $field_items = $this->prophesize(\Drupal\Core\Field\FieldItemListInterface::class);
     $field_items->isEmpty()->willReturn(TRUE);
     $media->get($configuration['source_field'])->willReturn($field_items->reveal());
     $this->assertNull($plugin->getMetadata($media->reveal(), 'type'));

@@ -36,7 +36,7 @@ class ResourcePluginManager extends DefaultPluginManager {
       $module_handler,
       ResourceInterface::class,
       RestResource::class,
-      'Drupal\rest\Annotation\RestResource',
+      \Drupal\rest\Annotation\RestResource::class,
     );
 
     $this->setCacheBackend($cache_backend, 'rest_plugins');

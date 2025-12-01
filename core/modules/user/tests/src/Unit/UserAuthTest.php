@@ -74,7 +74,7 @@ class UserAuthTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->userStorage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
+    $this->userStorage = $this->createMock(\Drupal\Core\Entity\EntityStorageInterface::class);
 
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entity_type_manager */
     $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
@@ -83,9 +83,9 @@ class UserAuthTest extends UnitTestCase {
       ->with('user')
       ->willReturn($this->userStorage);
 
-    $this->passwordService = $this->createMock('Drupal\Core\Password\PasswordInterface');
+    $this->passwordService = $this->createMock(\Drupal\Core\Password\PasswordInterface::class);
 
-    $this->testUser = $this->getMockBuilder('Drupal\user\Entity\User')
+    $this->testUser = $this->getMockBuilder(\Drupal\user\Entity\User::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['id', 'setPassword', 'save', 'getPassword'])
       ->getMock();

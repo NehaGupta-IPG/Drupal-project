@@ -24,7 +24,7 @@ class ContentTranslationLocalTasksTest extends LocalTaskIntegrationTestBase {
     ];
     parent::setUp();
 
-    $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
+    $entity_type = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
     $entity_type->expects($this->any())
       ->method('getLinkTemplate')
       ->willReturnMap([
@@ -34,7 +34,7 @@ class ContentTranslationLocalTasksTest extends LocalTaskIntegrationTestBase {
           'entity.node.content_translation_overview',
         ],
       ]);
-    $content_translation_manager = $this->createMock('Drupal\content_translation\ContentTranslationManagerInterface');
+    $content_translation_manager = $this->createMock(\Drupal\content_translation\ContentTranslationManagerInterface::class);
     $content_translation_manager->expects($this->any())
       ->method('getSupportedEntityTypes')
       ->willReturn([

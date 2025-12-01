@@ -22,11 +22,11 @@ class LocaleBulkDeprecationTest extends UnitTestCase {
     parent::setUp();
 
     $container = new ContainerBuilder();
-    $container->set('locale.config_manager', $this->createMock('Drupal\locale\LocaleConfigManager'));
-    $language_manager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $container->set('locale.config_manager', $this->createMock(\Drupal\locale\LocaleConfigManager::class));
+    $language_manager = $this->createMock(\Drupal\Core\Language\LanguageManagerInterface::class);
     $language_manager->expects($this->any())
       ->method('getDefaultLanguage')
-      ->willReturn($this->createMock('Drupal\Core\Language\LanguageInterface'));
+      ->willReturn($this->createMock(\Drupal\Core\Language\LanguageInterface::class));
     $container->set('language_manager', $language_manager);
 
     \Drupal::setContainer($container);

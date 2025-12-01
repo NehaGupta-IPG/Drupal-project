@@ -28,7 +28,7 @@ class LinkAccessConstraintValidatorTest extends UnitTestCase {
   #[DataProvider('providerValidate')]
   public function testValidate(bool $mayLinkAnyPage, bool $urlAccess, bool $valid): void {
     // Mock a Url object that returns a boolean indicating user access.
-    $url = $this->getMockBuilder('Drupal\Core\Url')
+    $url = $this->getMockBuilder(\Drupal\Core\Url::class)
       ->disableOriginalConstructor()
       ->getMock();
     if ($mayLinkAnyPage) {
@@ -42,14 +42,14 @@ class LinkAccessConstraintValidatorTest extends UnitTestCase {
     }
 
     // Mock a link object that returns the URL object.
-    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link = $this->createMock(\Drupal\link\LinkItemInterface::class);
     $link->expects($this->any())
       ->method('getUrl')
       ->willReturn($url);
 
     // Mock a user object that returns a boolean indicating user access to all
     // links.
-    $user = $this->createMock('Drupal\Core\Session\AccountProxyInterface');
+    $user = $this->createMock(\Drupal\Core\Session\AccountProxyInterface::class);
     $user->expects($this->any())
       ->method('hasPermission')
       ->with($this->equalTo('link to any page'))

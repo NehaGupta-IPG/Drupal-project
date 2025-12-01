@@ -40,7 +40,7 @@ class ResourceResponseValidatorTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     // Check that the validation class is available.
-    if (!class_exists("\\JsonSchema\\Validator")) {
+    if (!class_exists(\JsonSchema\Validator::class)) {
       $this->fail('The JSON Schema validator is missing. You can install it with `composer require justinrainbow/json-schema`.');
     }
 

@@ -38,7 +38,7 @@ class CheckboxTest extends BrowserTestBase {
       // #return_value, with the exception of integer 0, which is not supported.
       // @see \Drupal\Core\Render\Element\Checkbox::processCheckbox().
       foreach (['0', '', 1, '1', 'foobar', '1foobar'] as $return_value) {
-        $form_array = \Drupal::formBuilder()->getForm('\Drupal\form_test\Form\FormTestCheckboxTypeJugglingForm', $default_value, $return_value);
+        $form_array = \Drupal::formBuilder()->getForm(\Drupal\form_test\Form\FormTestCheckboxTypeJugglingForm::class, $default_value, $return_value);
         $form = (string) \Drupal::service('renderer')->renderRoot($form_array);
         if ($default_value === TRUE) {
           $checked = TRUE;

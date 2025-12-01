@@ -24,7 +24,7 @@ class TestPluginManager extends PluginManagerBase {
     // A simple plugin: a mock user login block.
     $this->discovery->setDefinition('user_login', [
       'label' => 'User login',
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock',
+      'class' => \Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock::class,
     ]);
 
     // In addition to finding all of the plugins available for a type, a plugin

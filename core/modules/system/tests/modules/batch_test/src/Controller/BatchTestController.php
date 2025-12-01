@@ -114,7 +114,7 @@ class BatchTestController {
     $form_state = (new FormState())->setValues([
       'value' => $value,
     ]);
-    \Drupal::formBuilder()->submitForm('Drupal\batch_test\Form\BatchTestChainedForm', $form_state);
+    \Drupal::formBuilder()->submitForm(\Drupal\batch_test\Form\BatchTestChainedForm::class, $form_state);
     return [
       'success' => [
         '#markup' => 'Got out of a programmatic batched form.',

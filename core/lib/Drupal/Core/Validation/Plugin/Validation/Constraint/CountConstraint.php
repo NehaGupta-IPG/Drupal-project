@@ -34,7 +34,7 @@ class CountConstraint extends Count {
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return '\Symfony\Component\Validator\Constraints\CountValidator';
+    return \Symfony\Component\Validator\Constraints\CountValidator::class;
   }
 
 }

@@ -110,10 +110,10 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    */
   public static function getProvider() {
     return [
-      ['node', 'article', 'Drupal\node\Entity\Node'],
-      ['node', '42', 'Drupal\node\Entity\Node'],
-      ['node_type', 'node_type', 'Drupal\node\Entity\NodeType'],
-      ['menu', 'menu', 'Drupal\system\Entity\Menu'],
+      ['node', 'article', \Drupal\node\Entity\Node::class],
+      ['node', '42', \Drupal\node\Entity\Node::class],
+      ['node_type', 'node_type', \Drupal\node\Entity\NodeType::class],
+      ['menu', 'menu', \Drupal\system\Entity\Menu::class],
     ];
   }
 

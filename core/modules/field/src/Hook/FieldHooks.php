@@ -299,7 +299,7 @@ class FieldHooks {
       // Add a step to the beginning of the configuration synchronization
       // process to purge field data where the module that provides the field is
       // being uninstalled.
-      array_unshift($sync_steps, ['\Drupal\field\ConfigImporterFieldPurger', 'process']);
+      array_unshift($sync_steps, [\Drupal\field\ConfigImporterFieldPurger::class, 'process']);
     }
   }
 
@@ -358,7 +358,7 @@ class FieldHooks {
     // Act on all sub-types of the entity_reference field type.
     /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
-    $item_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
+    $item_class = \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem::class;
     $class = $field_type_manager->getPluginClass($field_storage->getType());
     if ($class !== $item_class && !is_subclass_of($class, $item_class)) {
       return;
@@ -390,7 +390,7 @@ class FieldHooks {
     // Act on all sub-types of the entity_reference field type.
     /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
-    $item_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
+    $item_class = \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem::class;
     $class = $field_type_manager->getPluginClass($field->getType());
     if ($class !== $item_class && !is_subclass_of($class, $item_class)) {
       return;
@@ -422,7 +422,7 @@ class FieldHooks {
     // Act on all sub-types of the entity_reference field type.
     /** @var \Drupal\Core\Field\FieldTypePluginManager $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
-    $item_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
+    $item_class = \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem::class;
     $class = $field_type_manager->getPluginClass($field->getType());
     if ($class !== $item_class && !is_subclass_of($class, $item_class)) {
       return;

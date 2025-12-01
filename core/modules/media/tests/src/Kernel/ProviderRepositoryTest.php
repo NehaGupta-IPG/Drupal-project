@@ -28,10 +28,10 @@ class ProviderRepositoryTest extends MediaKernelTestBase {
    */
   #[DataProvider('providerEmptyProviderList')]
   public function testEmptyProviderList($content): void {
-    $response = $this->prophesize('\GuzzleHttp\Psr7\Response');
+    $response = $this->prophesize(\GuzzleHttp\Psr7\Response::class);
     $response->getBody()->willReturn(Utils::streamFor($content));
 
-    $client = $this->createMock('\GuzzleHttp\Client');
+    $client = $this->createMock(\GuzzleHttp\Client::class);
     $client->method('request')->withAnyParameters()->willReturn($response->reveal());
     $this->container->set('http_client', $client);
 

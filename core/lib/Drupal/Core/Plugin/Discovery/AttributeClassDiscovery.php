@@ -45,7 +45,7 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
   public function __construct(
     string $subdir,
     protected \Traversable $rootNamespacesIterator,
-    string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
+    string $pluginDefinitionAttributeName = \Drupal\Component\Plugin\Attribute\Plugin::class,
   ) {
     if ($subdir) {
       // Prepend a directory separator to $subdir,

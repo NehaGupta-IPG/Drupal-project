@@ -32,8 +32,8 @@ class BlockContentDeriverTest extends KernelTestBase {
   protected $baseDefinition = [
     'id' => 'block_content',
     'provider' => 'block_content',
-    'class' => '\Drupal\block_content\Plugin\Block\BlockContentBlock',
-    'deriver' => '\Drupal\block_content\Plugin\Derivative\BlockContent',
+    'class' => \Drupal\block_content\Plugin\Block\BlockContentBlock::class,
+    'deriver' => \Drupal\block_content\Plugin\Derivative\BlockContent::class,
   ];
 
   /**

@@ -103,7 +103,7 @@ class HelpTopicTwigTest extends UnitTestCase {
    */
   protected function getTwigMock() {
     $twig = $this
-      ->getMockBuilder('Drupal\Core\Template\TwigEnvironment')
+      ->getMockBuilder(\Drupal\Core\Template\TwigEnvironment::class)
       ->disableOriginalConstructor()
       ->getMock();
 

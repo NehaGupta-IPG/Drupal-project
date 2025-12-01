@@ -18,7 +18,7 @@ class KeyvalueTestHooks {
   public function entityTypeAlter(array &$entity_types) : void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
     if (isset($entity_types['entity_test_label'])) {
-      $entity_types['entity_test_label']->setStorageClass('Drupal\Core\Entity\KeyValueStore\KeyValueContentEntityStorage');
+      $entity_types['entity_test_label']->setStorageClass(\Drupal\Core\Entity\KeyValueStore\KeyValueContentEntityStorage::class);
       $entity_keys = $entity_types['entity_test_label']->getKeys();
       $entity_types['entity_test_label']->set('entity_keys', $entity_keys + ['uuid' => 'uuid']);
       $entity_types['entity_test_label']->set('provider', 'keyvalue_test');

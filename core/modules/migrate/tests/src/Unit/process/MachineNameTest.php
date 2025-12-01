@@ -26,13 +26,13 @@ class MachineNameTest extends MigrateProcessTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    $this->transliteration = $this->getMockBuilder('Drupal\Component\Transliteration\TransliterationInterface')
+    $this->transliteration = $this->getMockBuilder(\Drupal\Component\Transliteration\TransliterationInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $this->row = $this->getMockBuilder('Drupal\migrate\Row')
+    $this->row = $this->getMockBuilder(\Drupal\migrate\Row::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $this->migrateExecutable = $this->getMockBuilder('Drupal\migrate\MigrateExecutable')
+    $this->migrateExecutable = $this->getMockBuilder(\Drupal\migrate\MigrateExecutable::class)
       ->disableOriginalConstructor()
       ->getMock();
     parent::setUp();

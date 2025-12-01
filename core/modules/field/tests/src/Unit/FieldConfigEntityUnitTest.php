@@ -77,14 +77,14 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
     parent::setUp();
 
     $this->entityTypeId = $this->randomMachineName();
-    $this->entityType = $this->createMock('\Drupal\Core\Config\Entity\ConfigEntityTypeInterface');
+    $this->entityType = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityTypeInterface::class);
 
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $this->entityFieldManager = $this->createMock(EntityFieldManagerInterface::class);
 
-    $this->uuid = $this->createMock('\Drupal\Component\Uuid\UuidInterface');
+    $this->uuid = $this->createMock(\Drupal\Component\Uuid\UuidInterface::class);
 
-    $this->fieldTypePluginManager = $this->createMock('Drupal\Core\Field\FieldTypePluginManagerInterface');
+    $this->fieldTypePluginManager = $this->createMock(\Drupal\Core\Field\FieldTypePluginManagerInterface::class);
 
     $container = new ContainerBuilder();
     $container->set('entity_field.manager', $this->entityFieldManager);
@@ -94,7 +94,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
     \Drupal::setContainer($container);
 
     // Create a mock FieldStorageConfig object.
-    $this->fieldStorage = $this->createMock('\Drupal\field\FieldStorageConfigInterface');
+    $this->fieldStorage = $this->createMock(\Drupal\field\FieldStorageConfigInterface::class);
     $this->fieldStorage->expects($this->any())
       ->method('getType')
       ->willReturn('test_field');
@@ -120,7 +120,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
    */
   public function testCalculateDependencies(): void {
     // Mock the interfaces necessary to create a dependency on a bundle entity.
-    $target_entity_type = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
+    $target_entity_type = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
     $target_entity_type->expects($this->any())
       ->method('getBundleConfigDependency')
       ->willReturn(['type' => 'config', 'name' => 'test.test_entity_type.id']);
@@ -138,7 +138,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
       ->willReturn([
         'provider' => 'test_module',
         'config_dependencies' => ['module' => ['test_module2']],
-        'class' => '\Drupal\Tests\field\Unit\DependencyFieldItem',
+        'class' => \Drupal\Tests\field\Unit\DependencyFieldItem::class,
       ]);
 
     $this->fieldStorage->expects($this->once())
@@ -161,7 +161,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
    * Tests that invalid bundles are handled.
    */
   public function testCalculateDependenciesIncorrectBundle(): void {
-    $storage = $this->createMock('\Drupal\Core\Config\Entity\ConfigEntityStorageInterface');
+    $storage = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityStorageInterface::class);
     $storage->expects($this->any())
       ->method('load')
       ->with('test_bundle_not_exists')
@@ -190,7 +190,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
       ->willReturn([
         'provider' => 'test_module',
         'config_dependencies' => ['module' => ['test_module2']],
-        'class' => '\Drupal\Tests\field\Unit\DependencyFieldItem',
+        'class' => \Drupal\Tests\field\Unit\DependencyFieldItem::class,
       ]);
 
     $field = new FieldConfig([
@@ -213,7 +213,7 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
     $this->fieldTypePluginManager->expects($this->any())
       ->method('getDefinition')
       ->with('test_field')
-      ->willReturn(['class' => '\Drupal\Tests\field\Unit\DependencyFieldItem']);
+      ->willReturn(['class' => \Drupal\Tests\field\Unit\DependencyFieldItem::class]);
 
     $field = new FieldConfig([
       'field_name' => $this->fieldStorage->getName(),

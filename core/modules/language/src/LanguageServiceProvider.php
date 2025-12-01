@@ -21,14 +21,14 @@ class LanguageServiceProvider extends ServiceProviderBase {
   public function register(ContainerBuilder $container) {
     // The following services are needed only on multilingual sites.
     if ($this->isMultilingual()) {
-      $container->register('language_request_subscriber', 'Drupal\language\EventSubscriber\LanguageRequestSubscriber')
+      $container->register('language_request_subscriber', \Drupal\language\EventSubscriber\LanguageRequestSubscriber::class)
         ->addTag('event_subscriber')
         ->addArgument(new Reference('language_manager'))
         ->addArgument(new Reference('language_negotiator'))
         ->addArgument(new Reference('string_translation'))
         ->addArgument(new Reference('current_user'));
 
-      $container->register('path_processor_language', 'Drupal\language\HttpKernel\PathProcessorLanguage')
+      $container->register('path_processor_language', \Drupal\language\HttpKernel\PathProcessorLanguage::class)
         ->addTag('path_processor_inbound', ['priority' => 300])
         ->addTag('path_processor_outbound', ['priority' => 100])
         ->addArgument(new Reference('config.factory'))
@@ -45,7 +45,7 @@ class LanguageServiceProvider extends ServiceProviderBase {
    */
   public function alter(ContainerBuilder $container) {
     $definition = $container->getDefinition('language_manager');
-    $definition->setClass('Drupal\language\ConfigurableLanguageManager')
+    $definition->setClass(\Drupal\language\ConfigurableLanguageManager::class)
       ->addArgument(new Reference('config.factory'))
       ->addArgument(new Reference('module_handler'))
       ->addArgument(new Reference('language.config_factory_override'))

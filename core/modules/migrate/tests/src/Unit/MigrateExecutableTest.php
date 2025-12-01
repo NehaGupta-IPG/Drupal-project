@@ -76,8 +76,8 @@ class MigrateExecutableTest extends MigrateTestCase {
     parent::setUp();
     static::$idMapRecords = [];
     $this->migration = $this->getMigration();
-    $this->message = $this->createMock('Drupal\migrate\MigrateMessageInterface');
-    $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
+    $this->message = $this->createMock(\Drupal\migrate\MigrateMessageInterface::class);
+    $this->eventDispatcher = $this->createMock(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class);
     $this->executable = new TestMigrateExecutable($this->migration, $this->message, $this->eventDispatcher);
     $this->executable->setStringTranslation($this->getStringTranslationStub());
   }
@@ -87,7 +87,7 @@ class MigrateExecutableTest extends MigrateTestCase {
    */
   public function testImportWithFailingRewind(): void {
     $exception_message = $this->getRandomGenerator()->string();
-    $source = $this->createMock('Drupal\migrate\Plugin\MigrateSourceInterface');
+    $source = $this->createMock(\Drupal\migrate\Plugin\MigrateSourceInterface::class);
     $source->expects($this->once())
       ->method('rewind')
       ->will($this->throwException(new \Exception($exception_message)));
@@ -121,7 +121,7 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->method('getProcessPlugins')
       ->willReturn([]);
 
-    $destination = $this->createMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination = $this->createMock(\Drupal\migrate\Plugin\MigrateDestinationInterface::class);
 
     $this->migration
       ->method('getDestinationPlugin')
@@ -142,7 +142,7 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->method('getProcessPlugins')
       ->willReturn([]);
 
-    $destination = $this->createMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination = $this->createMock(\Drupal\migrate\Plugin\MigrateDestinationInterface::class);
 
     $this->migration
       ->method('getDestinationPlugin')
@@ -166,7 +166,7 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->method('getProcessPlugins')
       ->willReturn([]);
 
-    $destination = $this->createMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination = $this->createMock(\Drupal\migrate\Plugin\MigrateDestinationInterface::class);
 
     $this->migration
       ->method('getDestinationPlugin')
@@ -189,7 +189,7 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->method('getProcessPlugins')
       ->willReturn([]);
 
-    $destination = $this->createMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination = $this->createMock(\Drupal\migrate\Plugin\MigrateDestinationInterface::class);
 
     $this->migration
       ->method('getDestinationPlugin')
@@ -207,7 +207,7 @@ class MigrateExecutableTest extends MigrateTestCase {
     $exception_message = $this->getRandomGenerator()->string();
     $source = $this->getMockSource();
 
-    $row = $this->getMockBuilder('Drupal\migrate\Row')
+    $row = $this->getMockBuilder(\Drupal\migrate\Row::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -225,7 +225,7 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->method('getProcessPlugins')
       ->willThrowException(new MigrateException($exception_message));
 
-    $destination = $this->createMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination = $this->createMock(\Drupal\migrate\Plugin\MigrateDestinationInterface::class);
     $destination->expects($this->never())
       ->method('import');
 
@@ -258,7 +258,7 @@ class MigrateExecutableTest extends MigrateTestCase {
       ->method('getProcessPlugins')
       ->willReturn([]);
 
-    $destination = $this->createMock('Drupal\migrate\Plugin\MigrateDestinationInterface');
+    $destination = $this->createMock(\Drupal\migrate\Plugin\MigrateDestinationInterface::class);
 
     $this->migration
       ->method('getDestinationPlugin')
@@ -276,7 +276,7 @@ class MigrateExecutableTest extends MigrateTestCase {
       'test1' => 'test1 destination',
     ];
     foreach ($expected as $key => $value) {
-      $plugins[$key][0] = $this->createMock('Drupal\migrate\Plugin\MigrateProcessInterface');
+      $plugins[$key][0] = $this->createMock(\Drupal\migrate\Plugin\MigrateProcessInterface::class);
       $plugins[$key][0]->expects($this->once())
         ->method('getPluginDefinition')
         ->willReturn([]);

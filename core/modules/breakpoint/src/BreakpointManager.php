@@ -62,7 +62,7 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
     // The breakpoint group.
     'group' => '',
     // Default class for breakpoint implementations.
-    'class' => 'Drupal\breakpoint\Breakpoint',
+    'class' => \Drupal\breakpoint\Breakpoint::class,
     // The plugin id. Set by the plugin system based on the top-level YAML key.
     'id' => '',
   ];
@@ -167,7 +167,7 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
             $breakpoints[$plugin_id] = $plugin_definition;
           }
         }
-        uasort($breakpoints, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+        uasort($breakpoints, [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
         $this->cacheBackend->set($this->cacheKey . ':' . $group, $breakpoints, Cache::PERMANENT, ['breakpoints']);
         $this->breakpointsByGroup[$group] = $breakpoints;
       }

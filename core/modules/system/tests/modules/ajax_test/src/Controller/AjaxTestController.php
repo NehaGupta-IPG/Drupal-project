@@ -242,7 +242,7 @@ class AjaxTestController {
     $build['dialog_wrappers'] = ['#markup' => '<div id="ajax-test-dialog-wrapper-1"></div><div id="ajax-test-dialog-wrapper-2"></div>'];
 
     // Dialog behavior applied to a button.
-    $build['form'] = \Drupal::formBuilder()->getForm('Drupal\ajax_test\Form\AjaxTestDialogForm');
+    $build['form'] = \Drupal::formBuilder()->getForm(\Drupal\ajax_test\Form\AjaxTestDialogForm::class);
 
     // Dialog behavior applied to a #type => 'link'.
     $build['link'] = [

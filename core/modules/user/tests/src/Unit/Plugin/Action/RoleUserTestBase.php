@@ -32,10 +32,10 @@ abstract class RoleUserTestBase extends UnitTestCase {
     parent::setUp();
 
     $this->account = $this
-      ->getMockBuilder('Drupal\user\Entity\User')
+      ->getMockBuilder(\Drupal\user\Entity\User::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $this->userRoleEntityType = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
+    $this->userRoleEntityType = $this->createMock(\Drupal\Core\Entity\EntityTypeInterface::class);
   }
 
 }

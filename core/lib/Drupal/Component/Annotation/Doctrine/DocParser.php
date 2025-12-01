@@ -131,7 +131,7 @@ final class DocParser
      * @var array
      */
     private static $annotationMetadata = array(
-        'Drupal\Component\Annotation\Doctrine\Annotation\Target' => array(
+        \Drupal\Component\Annotation\Doctrine\Annotation\Target::class => array(
             'is_annotation'    => true,
             'has_constructor'  => true,
             'properties'       => array(),
@@ -147,7 +147,7 @@ final class DocParser
                 )
              ),
         ),
-        'Drupal\Component\Annotation\Doctrine\Annotation\Attribute' => array(
+        \Drupal\Component\Annotation\Doctrine\Annotation\Attribute::class => array(
             'is_annotation'    => true,
             'has_constructor'  => false,
             'targets_literal'  => 'ANNOTATION_ANNOTATION',
@@ -176,7 +176,7 @@ final class DocParser
                 )
              ),
         ),
-        'Drupal\Component\Annotation\Doctrine\Annotation\Attributes' => array(
+        \Drupal\Component\Annotation\Doctrine\Annotation\Attributes::class => array(
             'is_annotation'    => true,
             'has_constructor'  => false,
             'targets_literal'  => 'ANNOTATION_CLASS',
@@ -189,12 +189,12 @@ final class DocParser
                 'value' => array(
                     'type'      =>'array',
                     'required'  =>true,
-                    'array_type'=>'Drupal\Component\Annotation\Doctrine\Annotation\Attribute',
+                    'array_type'=>\Drupal\Component\Annotation\Doctrine\Annotation\Attribute::class,
                     'value'     =>'array<Drupal\Component\Annotation\Doctrine\Annotation\Attribute>'
                 )
              ),
         ),
-        'Drupal\Component\Annotation\Doctrine\Annotation\Enum' => array(
+        \Drupal\Component\Annotation\Doctrine\Annotation\Enum::class => array(
             'is_annotation'    => true,
             'has_constructor'  => true,
             'targets_literal'  => 'ANNOTATION_PROPERTY',
@@ -463,10 +463,10 @@ final class DocParser
             self::$metadataParser->setIgnoreNotImportedAnnotations(true);
             self::$metadataParser->setIgnoredAnnotationNames($this->ignoredAnnotationNames);
             self::$metadataParser->setImports(array(
-                'enum'          => 'Drupal\Component\Annotation\Doctrine\Annotation\Enum',
-                'target'        => 'Drupal\Component\Annotation\Doctrine\Annotation\Target',
-                'attribute'     => 'Drupal\Component\Annotation\Doctrine\Annotation\Attribute',
-                'attributes'    => 'Drupal\Component\Annotation\Doctrine\Annotation\Attributes'
+                'enum'          => \Drupal\Component\Annotation\Doctrine\Annotation\Enum::class,
+                'target'        => \Drupal\Component\Annotation\Doctrine\Annotation\Target::class,
+                'attribute'     => \Drupal\Component\Annotation\Doctrine\Annotation\Attribute::class,
+                'attributes'    => \Drupal\Component\Annotation\Doctrine\Annotation\Attributes::class
             ));
         }
 

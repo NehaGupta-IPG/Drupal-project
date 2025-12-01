@@ -64,7 +64,7 @@ class EntitySerializationTest extends NormalizerTestBase {
    *
    * @var string
    */
-  protected $entityClass = 'Drupal\entity_test\Entity\EntityTest';
+  protected $entityClass = \Drupal\entity_test\Entity\EntityTest::class;
 
   /**
    * {@inheritdoc}

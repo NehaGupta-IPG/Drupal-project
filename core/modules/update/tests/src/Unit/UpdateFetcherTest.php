@@ -73,7 +73,7 @@ class UpdateFetcherTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->mockConfigFactory = $this->getConfigFactoryStub(['update.settings' => ['fetch_url' => 'http://www.example.com']]);
-    $this->mockHttpClient = $this->createMock('\GuzzleHttp\ClientInterface');
+    $this->mockHttpClient = $this->createMock(\GuzzleHttp\ClientInterface::class);
     $settings = new Settings([]);
     $this->logger = new TestLogger();
     $this->updateFetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $settings, $this->logger);

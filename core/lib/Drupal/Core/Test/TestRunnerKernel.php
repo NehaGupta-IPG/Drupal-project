@@ -88,7 +88,7 @@ class TestRunnerKernel extends DrupalKernel {
     parent::discoverServiceProviders();
     // The test runner does not require an installed Drupal site to exist.
     // Therefore, its environment is identical to that of the early installer.
-    $this->serviceProviderClasses['app']['Test'] = 'Drupal\Core\Installer\InstallerServiceProvider';
+    $this->serviceProviderClasses['app']['Test'] = \Drupal\Core\Installer\InstallerServiceProvider::class;
     return $this->serviceProviderClasses;
   }
 

@@ -24,8 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   id: 'content_moderation',
   label: new TranslatableMarkup('Content moderation'),
   forms: [
-    'configure' => '\Drupal\content_moderation\Form\ContentModerationConfigureForm',
-    'state' => '\Drupal\content_moderation\Form\ContentModerationStateForm',
+    'configure' => \Drupal\content_moderation\Form\ContentModerationConfigureForm::class,
+    'state' => \Drupal\content_moderation\Form\ContentModerationStateForm::class,
   ],
   required_states: [
     'draft',

@@ -43,8 +43,8 @@ class LocaleController extends ControllerBase {
    */
   public function translatePage() {
     return [
-      'filter' => $this->formBuilder()->getForm('Drupal\locale\Form\TranslateFilterForm'),
-      'form' => $this->formBuilder()->getForm('Drupal\locale\Form\TranslateEditForm'),
+      'filter' => $this->formBuilder()->getForm(\Drupal\locale\Form\TranslateFilterForm::class),
+      'form' => $this->formBuilder()->getForm(\Drupal\locale\Form\TranslateEditForm::class),
     ];
   }
 

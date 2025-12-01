@@ -33,8 +33,8 @@ class FieldConfigEditFormTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $entity_type_bundle_info = $this->createMock('\Drupal\Core\Entity\EntityTypeBundleInfoInterface');
-    $typed_data = $this->createMock('\Drupal\Core\TypedData\TypedDataManagerInterface');
+    $entity_type_bundle_info = $this->createMock(\Drupal\Core\Entity\EntityTypeBundleInfoInterface::class);
+    $typed_data = $this->createMock(\Drupal\Core\TypedData\TypedDataManagerInterface::class);
     $temp_store = $this->createMock(PrivateTempStore::class);
     $element_info_manager = $this->createMock(ElementInfoManagerInterface::class);
     $entity_display_repository = $this->createMock(EntityDisplayRepositoryInterface::class);
@@ -48,7 +48,7 @@ class FieldConfigEditFormTest extends UnitTestCase {
    */
   #[DataProvider('providerRequired')]
   public function testHasAnyRequired(array $element, bool $result): void {
-    $reflection = new \ReflectionClass('\Drupal\field_ui\Form\FieldConfigEditForm');
+    $reflection = new \ReflectionClass(\Drupal\field_ui\Form\FieldConfigEditForm::class);
     $method = $reflection->getMethod('hasAnyRequired');
     $this->assertEquals($result, $method->invoke($this->fieldConfigEditForm, $element));
   }

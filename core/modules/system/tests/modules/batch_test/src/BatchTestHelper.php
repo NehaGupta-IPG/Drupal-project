@@ -17,7 +17,7 @@ class BatchTestHelper {
   public function nestedDrupalFormSubmitCallback($value): void {
     $form_state = (new FormState())
       ->setValue('test_value', $value);
-    \Drupal::formBuilder()->submitForm('Drupal\batch_test\Form\BatchTestMockForm', $form_state);
+    \Drupal::formBuilder()->submitForm(\Drupal\batch_test\Form\BatchTestMockForm::class, $form_state);
   }
 
   /**

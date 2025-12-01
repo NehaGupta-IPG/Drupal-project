@@ -25,10 +25,10 @@ class ConfigTest extends UnitTestCase {
     $source = [
       'test' => 'x',
     ];
-    $migration = $this->getMockBuilder('Drupal\migrate\Plugin\Migration')
+    $migration = $this->getMockBuilder(\Drupal\migrate\Plugin\Migration::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $config = $this->getMockBuilder('Drupal\Core\Config\Config')
+    $config = $this->getMockBuilder(\Drupal\Core\Config\Config::class)
       ->disableOriginalConstructor()
       ->getMock();
     foreach ($source as $key => $val) {
@@ -42,18 +42,18 @@ class ConfigTest extends UnitTestCase {
     $config->expects($this->atLeastOnce())
       ->method('getName')
       ->willReturn('d8_config');
-    $config_factory = $this->createMock('Drupal\Core\Config\ConfigFactoryInterface');
+    $config_factory = $this->createMock(\Drupal\Core\Config\ConfigFactoryInterface::class);
     $config_factory->expects($this->once())
       ->method('getEditable')
       ->with('d8_config')
       ->willReturn($config);
-    $row = $this->getMockBuilder('Drupal\migrate\Row')
+    $row = $this->getMockBuilder(\Drupal\migrate\Row::class)
       ->disableOriginalConstructor()
       ->getMock();
     $row->expects($this->any())
       ->method('getRawDestination')
       ->willReturn($source);
-    $language_manager = $this->getMockBuilder('Drupal\language\ConfigurableLanguageManagerInterface')
+    $language_manager = $this->getMockBuilder(\Drupal\language\ConfigurableLanguageManagerInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
     $language_manager->expects($this->never())
@@ -75,7 +75,7 @@ class ConfigTest extends UnitTestCase {
     $migration = $this->getMockBuilder(MigrationInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $config = $this->getMockBuilder('Drupal\Core\Config\Config')
+    $config = $this->getMockBuilder(\Drupal\Core\Config\Config::class)
       ->disableOriginalConstructor()
       ->getMock();
     foreach ($source as $key => $val) {
@@ -89,12 +89,12 @@ class ConfigTest extends UnitTestCase {
     $config->expects($this->any())
       ->method('getName')
       ->willReturn('d8_config');
-    $config_factory = $this->createMock('Drupal\Core\Config\ConfigFactoryInterface');
+    $config_factory = $this->createMock(\Drupal\Core\Config\ConfigFactoryInterface::class);
     $config_factory->expects($this->once())
       ->method('getEditable')
       ->with('d8_config')
       ->willReturn($config);
-    $row = $this->getMockBuilder('Drupal\migrate\Row')
+    $row = $this->getMockBuilder(\Drupal\migrate\Row::class)
       ->disableOriginalConstructor()
       ->getMock();
     $row->expects($this->any())
@@ -103,7 +103,7 @@ class ConfigTest extends UnitTestCase {
     $row->expects($this->any())
       ->method('getDestinationProperty')
       ->willReturn($source['langcode']);
-    $language_manager = $this->getMockBuilder('Drupal\language\ConfigurableLanguageManagerInterface')
+    $language_manager = $this->getMockBuilder(\Drupal\language\ConfigurableLanguageManagerInterface::class)
       ->disableOriginalConstructor()
       ->getMock();
     $language_manager->expects($this->any())

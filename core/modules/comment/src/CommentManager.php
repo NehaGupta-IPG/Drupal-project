@@ -200,7 +200,7 @@ class CommentManager implements CommentManagerInterface {
     if (!$this->moduleHandler->moduleExists('history')) {
       return FALSE;
     }
-    return \Drupal::service('Drupal\history\HistoryManager')->getCountNewComments($entity, $field_name, $timestamp);
+    return \Drupal::service(\Drupal\history\HistoryManager::class)->getCountNewComments($entity, $field_name, $timestamp);
   }
 
 }

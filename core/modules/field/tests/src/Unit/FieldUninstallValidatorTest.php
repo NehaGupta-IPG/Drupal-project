@@ -35,7 +35,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->fieldUninstallValidator = $this->getMockBuilder('Drupal\field\FieldUninstallValidator')
+    $this->fieldUninstallValidator = $this->getMockBuilder(\Drupal\field\FieldUninstallValidator::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getFieldStoragesByModule', 'getFieldTypeLabel'])
       ->getMock();
@@ -64,7 +64,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
    * @legacy-covers ::validate
    */
   public function testValidateDeleted(): void {
-    $field_storage = $this->getMockBuilder('Drupal\field\Entity\FieldStorageConfig')
+    $field_storage = $this->getMockBuilder(\Drupal\field\Entity\FieldStorageConfig::class)
       ->disableOriginalConstructor()
       ->getMock();
     $field_storage->expects($this->once())
@@ -86,7 +86,7 @@ class FieldUninstallValidatorTest extends UnitTestCase {
    * @legacy-covers ::validate
    */
   public function testValidateNoDeleted(): void {
-    $field_storage = $this->getMockBuilder('Drupal\field\Entity\FieldStorageConfig')
+    $field_storage = $this->getMockBuilder(\Drupal\field\Entity\FieldStorageConfig::class)
       ->disableOriginalConstructor()
       ->getMock();
     $field_storage->expects($this->once())

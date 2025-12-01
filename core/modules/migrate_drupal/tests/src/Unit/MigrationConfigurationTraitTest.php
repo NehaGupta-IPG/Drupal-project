@@ -26,18 +26,18 @@ class MigrationConfigurationTraitTest extends UnitTestCase {
   #[DataProvider('providerTestGetLegacyDrupalVersion')]
   public function testGetLegacyDrupalVersion($expected_version_string, $schema_version, $exception, $system_table_exists): void {
     if ($schema_version) {
-      $statement = $this->createMock('\Drupal\Core\Database\StatementInterface');
+      $statement = $this->createMock(\Drupal\Core\Database\StatementInterface::class);
       $statement->expects($this->any())
         ->method('fetchField')
         ->willReturn($schema_version);
     }
 
-    $schema = $this->createMock('\Drupal\Core\Database\Schema');
+    $schema = $this->createMock(\Drupal\Core\Database\Schema::class);
     $schema->expects($this->once())
       ->method('tableExists')
       ->willReturn($system_table_exists);
 
-    $connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
+    $connection = $this->getMockBuilder(\Drupal\Core\Database\Connection::class)
       ->disableOriginalConstructor()
       ->getMock();
 

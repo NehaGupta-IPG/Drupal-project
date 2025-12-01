@@ -32,13 +32,13 @@ class PreprocessPagerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $pager_manager = $this->getMockBuilder('Drupal\Core\Pager\PagerManager')
+    $pager_manager = $this->getMockBuilder(\Drupal\Core\Pager\PagerManager::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $pager = $this->getMockBuilder('Drupal\Core\Pager\Pager')
+    $pager = $this->getMockBuilder(\Drupal\Core\Pager\Pager::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $url_generator = $this->getMockBuilder('Drupal\Core\Routing\UrlGenerator')
+    $url_generator = $this->getMockBuilder(\Drupal\Core\Routing\UrlGenerator::class)
       ->disableOriginalConstructor()
       ->getMock();
 

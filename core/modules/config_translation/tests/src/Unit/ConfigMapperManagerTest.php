@@ -42,20 +42,20 @@ class ConfigMapperManagerTest extends UnitTestCase {
     parent::setUp();
 
     $language = new Language(['id' => 'en']);
-    $language_manager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $language_manager = $this->createMock(\Drupal\Core\Language\LanguageManagerInterface::class);
     $language_manager->expects($this->once())
       ->method('getCurrentLanguage')
       ->with(LanguageInterface::TYPE_INTERFACE)
       ->willReturn($language);
 
-    $this->typedConfigManager = $this->getMockBuilder('Drupal\Core\Config\TypedConfigManagerInterface')
+    $this->typedConfigManager = $this->getMockBuilder(\Drupal\Core\Config\TypedConfigManagerInterface::class)
       ->getMock();
 
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $theme_handler = $this->createMock('Drupal\Core\Extension\ThemeHandlerInterface');
+    $module_handler = $this->createMock(\Drupal\Core\Extension\ModuleHandlerInterface::class);
+    $theme_handler = $this->createMock(\Drupal\Core\Extension\ThemeHandlerInterface::class);
 
     $this->configMapperManager = new ConfigMapperManager(
-      $this->createMock('Drupal\Core\Cache\CacheBackendInterface'),
+      $this->createMock(\Drupal\Core\Cache\CacheBackendInterface::class),
       $language_manager,
       $module_handler,
       $this->typedConfigManager,

@@ -59,7 +59,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->statement = $this->getMockBuilder('Drupal\sqlite\Driver\Database\sqlite\Statement')
+    $this->statement = $this->getMockBuilder(\Drupal\sqlite\Driver\Database\sqlite\Statement::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -67,7 +67,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
       ->method('fetchObject')
       ->willReturnCallback([$this, 'fetchObjectCallback']);
 
-    $this->select = $this->getMockBuilder('Drupal\Core\Database\Query\Select')
+    $this->select = $this->getMockBuilder(\Drupal\Core\Database\Query\Select::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -83,7 +83,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
       ->method('execute')
       ->willReturn($this->statement);
 
-    $this->database = $this->getMockBuilder('Drupal\Core\Database\Connection')
+    $this->database = $this->getMockBuilder(\Drupal\Core\Database\Connection::class)
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -91,7 +91,7 @@ class CommentStatisticsUnitTest extends UnitTestCase {
       ->method('select')
       ->willReturn($this->select);
 
-    $this->commentStatistics = new CommentStatistics($this->database, $this->createMock('Drupal\Core\Session\AccountInterface'), $this->createMock(EntityTypeManagerInterface::class), $this->createMock('Drupal\Core\State\StateInterface'), $this->createMock(TimeInterface::class), $this->database);
+    $this->commentStatistics = new CommentStatistics($this->database, $this->createMock(\Drupal\Core\Session\AccountInterface::class), $this->createMock(EntityTypeManagerInterface::class), $this->createMock(\Drupal\Core\State\StateInterface::class), $this->createMock(TimeInterface::class), $this->database);
   }
 
   /**

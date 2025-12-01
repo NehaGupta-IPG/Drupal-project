@@ -31,7 +31,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
   #[DataProvider('providerValidate')]
   #[RunInSeparateProcess]
   public function testValidate($url, $valid): void {
-    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link = $this->createMock(\Drupal\link\LinkItemInterface::class);
     $link->expects($this->any())
       ->method('getUrl')
       ->willReturn(Url::fromUri($url));
@@ -87,7 +87,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
    * @legacy-covers ::validate
    */
   public function testValidateWithMalformedUri(): void {
-    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link = $this->createMock(\Drupal\link\LinkItemInterface::class);
     $link->expects($this->any())
       ->method('getUrl')
       ->willThrowException(new \InvalidArgumentException());
@@ -109,7 +109,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
    * @legacy-covers ::validate
    */
   public function testValidateIgnoresInternalUrls(): void {
-    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link = $this->createMock(\Drupal\link\LinkItemInterface::class);
     $link->expects($this->any())
       ->method('getUrl')
       ->willReturn(Url::fromRoute('example.test'));

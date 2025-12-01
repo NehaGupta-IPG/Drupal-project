@@ -28,7 +28,7 @@ class ContentEntityType extends EntityType {
     public readonly ?TranslatableMarkup $label_collection = NULL,
     public readonly ?TranslatableMarkup $label_singular = NULL,
     public readonly ?TranslatableMarkup $label_plural = NULL,
-    public readonly string $entity_type_class = 'Drupal\Core\Entity\ContentEntityType',
+    public readonly string $entity_type_class = \Drupal\Core\Entity\ContentEntityType::class,
     public readonly string $group = 'content',
     public readonly TranslatableMarkup $group_label = new TranslatableMarkup('Content', [], ['context' => 'Entity type group']),
     public readonly bool $static_cache = TRUE,

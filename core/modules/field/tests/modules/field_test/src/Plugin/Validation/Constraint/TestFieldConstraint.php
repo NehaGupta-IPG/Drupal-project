@@ -29,7 +29,7 @@ class TestFieldConstraint extends NotEqualTo {
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return '\Symfony\Component\Validator\Constraints\NotEqualToValidator';
+    return \Symfony\Component\Validator\Constraints\NotEqualToValidator::class;
   }
 
 }

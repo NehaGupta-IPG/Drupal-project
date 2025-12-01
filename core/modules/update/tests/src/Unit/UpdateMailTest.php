@@ -67,10 +67,10 @@ class UpdateMailTest extends UnitTestCase {
     \Drupal::setContainer($this->container);
 
     // Get needed mocks.
-    $this->currentUser = $this->createMock('\Drupal\Core\Session\AccountProxy');
-    $this->languageManager = $this->createMock('Drupal\language\ConfigurableLanguageManagerInterface');
-    $this->configFactory = $this->createMock('Drupal\Core\Config\ConfigFactory');
-    $this->urlGenerator = $this->createMock('\Drupal\Core\Render\MetadataBubblingUrlGenerator');
+    $this->currentUser = $this->createMock(\Drupal\Core\Session\AccountProxy::class);
+    $this->languageManager = $this->createMock(\Drupal\language\ConfigurableLanguageManagerInterface::class);
+    $this->configFactory = $this->createMock(\Drupal\Core\Config\ConfigFactory::class);
+    $this->urlGenerator = $this->createMock(\Drupal\Core\Render\MetadataBubblingUrlGenerator::class);
   }
 
   /**
@@ -99,13 +99,13 @@ class UpdateMailTest extends UnitTestCase {
       ->willReturn($langcode);
 
     // Create three config entities.
-    $config_site_name = $this->createMock('Drupal\Core\Config\Config');
+    $config_site_name = $this->createMock(\Drupal\Core\Config\Config::class);
     $config_site_name
       ->expects($this->once())
       ->method('get')
       ->with('name')
       ->willReturn($site_name);
-    $config_notification = $this->createMock('Drupal\Core\Config\Config');
+    $config_notification = $this->createMock(\Drupal\Core\Config\Config::class);
     $config_notification
       ->expects($this->once())
       ->method('get')

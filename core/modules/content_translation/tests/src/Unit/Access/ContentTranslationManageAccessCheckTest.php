@@ -37,7 +37,7 @@ class ContentTranslationManageAccessCheckTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->cacheContextsManager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
+    $this->cacheContextsManager = $this->getMockBuilder(\Drupal\Core\Cache\Context\CacheContextsManager::class)
       ->disableOriginalConstructor()
       ->getMock();
     $this->cacheContextsManager->method('assertValidTokens')->willReturn(TRUE);
@@ -54,7 +54,7 @@ class ContentTranslationManageAccessCheckTest extends UnitTestCase {
    */
   public function testCreateAccess(): void {
     // Set the mock translation handler.
-    $translation_handler = $this->createMock('\Drupal\content_translation\ContentTranslationHandlerInterface');
+    $translation_handler = $this->createMock(\Drupal\content_translation\ContentTranslationHandlerInterface::class);
     $translation_handler->expects($this->once())
       ->method('getTranslationAccess')
       ->willReturn(AccessResult::allowed());
@@ -70,7 +70,7 @@ class ContentTranslationManageAccessCheckTest extends UnitTestCase {
     $target = 'it';
 
     // Set the mock language manager.
-    $language_manager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $language_manager = $this->createMock(\Drupal\Core\Language\LanguageManagerInterface::class);
     $language_manager->expects($this->once())
       ->method('getLanguages')
       ->willReturn([$source => [], $target => []]);
@@ -110,14 +110,14 @@ class ContentTranslationManageAccessCheckTest extends UnitTestCase {
     $route->setRequirement('_access_content_translation_manage', 'create');
 
     // Set up the route match.
-    $route_match = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
+    $route_match = $this->createMock(\Drupal\Core\Routing\RouteMatchInterface::class);
     $route_match->expects($this->once())
       ->method('getParameter')
       ->with('node')
       ->willReturn($entity);
 
     // Set the mock account.
-    $account = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $account = $this->createMock(\Drupal\Core\Session\AccountInterface::class);
 
     // The access check under test.
     $check = new ContentTranslationManageAccessCheck($entity_type_manager, $language_manager);

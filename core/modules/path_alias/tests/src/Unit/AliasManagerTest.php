@@ -76,9 +76,9 @@ class AliasManagerTest extends UnitTestCase {
     parent::setUp();
 
     $this->aliasRepository = $this->createMock(AliasRepositoryInterface::class);
-    $this->aliasPrefixList = $this->createMock('Drupal\path_alias\AliasPrefixListInterface');
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
-    $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
+    $this->aliasPrefixList = $this->createMock(\Drupal\path_alias\AliasPrefixListInterface::class);
+    $this->languageManager = $this->createMock(\Drupal\Core\Language\LanguageManagerInterface::class);
+    $this->cache = $this->createMock(\Drupal\Core\Cache\CacheBackendInterface::class);
 
     $this->aliasManager = new AliasManager($this->aliasRepository, $this->aliasPrefixList, $this->languageManager, $this->cache, new Time());
 

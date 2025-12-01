@@ -105,7 +105,7 @@ class BlockVisibilityTest extends MigrateProcessTestCase {
   public function testTransformException(): void {
     $this->moduleHandler->moduleExists('php')->willReturn(FALSE);
     $migrate_lookup = $this->prophesize(MigrateLookupInterface::class);
-    $this->row = $this->getMockBuilder('Drupal\migrate\Row')
+    $this->row = $this->getMockBuilder(\Drupal\migrate\Row::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getSourceProperty'])
       ->getMock();

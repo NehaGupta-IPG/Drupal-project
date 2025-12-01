@@ -21,7 +21,7 @@ class TestFormBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function build() {
-    return \Drupal::formBuilder()->getForm('Drupal\block_test\Form\TestForm');
+    return \Drupal::formBuilder()->getForm(\Drupal\block_test\Form\TestForm::class);
   }
 
 }

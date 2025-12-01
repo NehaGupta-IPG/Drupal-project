@@ -159,11 +159,11 @@ class LanguageHooks {
       $type['language_select']['#process'] = array_merge($type['language_select']['#process'], [
         'language_process_language_select',
             [
-              'Drupal\Core\Render\Element\Select',
+              \Drupal\Core\Render\Element\Select::class,
               'processSelect',
             ],
             [
-              'Drupal\Core\Render\Element\RenderElementBase',
+              \Drupal\Core\Render\Element\RenderElementBase::class,
               'processAjaxForm',
             ],
       ]);
@@ -282,7 +282,7 @@ class LanguageHooks {
   #[Hook('field_info_alter')]
   public function fieldInfoAlter(&$info): void {
     // Change the default behavior of language field.
-    $info['language']['class'] = '\Drupal\language\DefaultLanguageItem';
+    $info['language']['class'] = \Drupal\language\DefaultLanguageItem::class;
   }
 
   /**

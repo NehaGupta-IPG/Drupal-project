@@ -73,7 +73,7 @@ class UpdateTestHooks {
     return [
       'system_test' => [
         'title' => 'Update Test FileTransfer',
-        'class' => 'Drupal\update_test\TestFileTransferWithSettingsForm',
+        'class' => \Drupal\update_test\TestFileTransferWithSettingsForm::class,
         'weight' => -20,
       ],
     ];

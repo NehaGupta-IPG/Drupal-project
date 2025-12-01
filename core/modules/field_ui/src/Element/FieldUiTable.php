@@ -232,7 +232,7 @@ class FieldUiTable extends Table {
       $array[] = $a['name'];
     }
     if (!empty($a['children'])) {
-      uasort($a['children'], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+      uasort($a['children'], [\Drupal\Component\Utility\SortArray::class, 'sortByWeightElement']);
       $array = array_merge($array, array_reduce($a['children'], [static::class, 'reduceOrder']));
     }
 

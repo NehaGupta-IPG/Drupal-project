@@ -36,20 +36,20 @@ class CommentBulkFormTest extends UnitTestCase {
     $actions = [];
 
     for ($i = 1; $i <= 2; $i++) {
-      $action = $this->createMock('\Drupal\system\ActionConfigEntityInterface');
+      $action = $this->createMock(\Drupal\system\ActionConfigEntityInterface::class);
       $action->expects($this->any())
         ->method('getType')
         ->willReturn('comment');
       $actions[$i] = $action;
     }
 
-    $action = $this->createMock('\Drupal\system\ActionConfigEntityInterface');
+    $action = $this->createMock(\Drupal\system\ActionConfigEntityInterface::class);
     $action->expects($this->any())
       ->method('getType')
       ->willReturn('user');
     $actions[] = $action;
 
-    $entity_storage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
+    $entity_storage = $this->createMock(\Drupal\Core\Entity\EntityStorageInterface::class);
     $entity_storage->expects($this->any())
       ->method('loadMultiple')
       ->willReturn($actions);
@@ -62,13 +62,13 @@ class CommentBulkFormTest extends UnitTestCase {
 
     $entity_repository = $this->createMock(EntityRepositoryInterface::class);
 
-    $language_manager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $language_manager = $this->createMock(\Drupal\Core\Language\LanguageManagerInterface::class);
 
-    $messenger = $this->createMock('Drupal\Core\Messenger\MessengerInterface');
+    $messenger = $this->createMock(\Drupal\Core\Messenger\MessengerInterface::class);
 
     $route_match = $this->createMock(ResettableStackedRouteMatchInterface::class);
 
-    $views_data = $this->getMockBuilder('Drupal\views\ViewsData')
+    $views_data = $this->getMockBuilder(\Drupal\views\ViewsData::class)
       ->disableOriginalConstructor()
       ->getMock();
     $views_data->expects($this->any())
@@ -80,18 +80,18 @@ class CommentBulkFormTest extends UnitTestCase {
     $container->set('string_translation', $this->getStringTranslationStub());
     \Drupal::setContainer($container);
 
-    $storage = $this->createMock('Drupal\views\ViewEntityInterface');
+    $storage = $this->createMock(\Drupal\views\ViewEntityInterface::class);
     $storage->expects($this->any())
       ->method('get')
       ->with('base_table')
       ->willReturn('comment');
 
-    $executable = $this->getMockBuilder('Drupal\views\ViewExecutable')
+    $executable = $this->getMockBuilder(\Drupal\views\ViewExecutable::class)
       ->disableOriginalConstructor()
       ->getMock();
     $executable->storage = $storage;
 
-    $display = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
+    $display = $this->getMockBuilder(\Drupal\views\Plugin\views\display\DisplayPluginBase::class)
       ->disableOriginalConstructor()
       ->getMock();
 

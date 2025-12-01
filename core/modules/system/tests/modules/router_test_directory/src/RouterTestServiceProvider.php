@@ -16,11 +16,11 @@ class RouterTestServiceProvider implements ServiceProviderInterface {
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container) {
-    $container->register('router_test.subscriber', 'Drupal\router_test\RouteTestSubscriber')
+    $container->register('router_test.subscriber', \Drupal\router_test\RouteTestSubscriber::class)
       ->addTag('event_subscriber');
-    $container->register('access_check.router_test', 'Drupal\router_test\Access\TestAccessCheck')
+    $container->register('access_check.router_test', \Drupal\router_test\Access\TestAccessCheck::class)
       ->addTag('access_check', ['applies_to' => '_access_router_test']);
-    $container->register('router_test.early_exception.subscriber', 'Drupal\router_test\RouterTestEarlyExceptionSubscriber')
+    $container->register('router_test.early_exception.subscriber', \Drupal\router_test\RouterTestEarlyExceptionSubscriber::class)
       ->addTag('event_subscriber');
   }
 

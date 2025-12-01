@@ -38,7 +38,7 @@ class UserAccountFormFieldsTest extends KernelTestBase {
     $form_state = new FormState();
     $form_state->addBuildInfo('args', [&$install_state]);
     $form = $this->container->get('form_builder')
-      ->buildForm('Drupal\Core\Installer\Form\SiteConfigureForm', $form_state);
+      ->buildForm(\Drupal\Core\Installer\Form\SiteConfigureForm::class, $form_state);
 
     // Verify name and pass field order.
     $this->assertFieldOrder($form['admin_account']['account']);

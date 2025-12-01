@@ -46,7 +46,7 @@ class BlockContentLocalTasksTest extends LocalTaskIntegrationTestBase {
         'name' => 'test_c',
       ],
     ];
-    $theme_handler = $this->createMock('Drupal\Core\Extension\ThemeHandlerInterface');
+    $theme_handler = $this->createMock(\Drupal\Core\Extension\ThemeHandlerInterface::class);
     $theme_handler->expects($this->any())
       ->method('listInfo')
       ->willReturn($themes);

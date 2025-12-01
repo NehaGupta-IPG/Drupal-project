@@ -142,7 +142,7 @@ function test_theme_preprocess_theme_test_preprocess_suggestions__kitten__meerka
  * Tests that a class can be loaded within a .theme file.
  */
 function test_theme_preprocess_theme_test_theme_class(&$variables): void {
-  if (class_exists('\Drupal\test_theme\ThemeClass')) {
+  if (class_exists(\Drupal\test_theme\ThemeClass::class)) {
     $variables['message'] = 'Loading ThemeClass was successful.';
   }
   else {

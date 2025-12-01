@@ -52,7 +52,7 @@ class BlockRepositoryTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $active_theme = $this->getMockBuilder('Drupal\Core\Theme\ActiveTheme')
+    $active_theme = $this->getMockBuilder(\Drupal\Core\Theme\ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
     $this->theme = $this->randomMachineName();
@@ -67,13 +67,13 @@ class BlockRepositoryTest extends UnitTestCase {
         'bottom',
       ]);
 
-    $theme_manager = $this->createMock('Drupal\Core\Theme\ThemeManagerInterface');
+    $theme_manager = $this->createMock(\Drupal\Core\Theme\ThemeManagerInterface::class);
     $theme_manager->expects($this->atLeastOnce())
       ->method('getActiveTheme')
       ->willReturn($active_theme);
 
-    $this->contextHandler = $this->createMock('Drupal\Core\Plugin\Context\ContextHandlerInterface');
-    $this->blockStorage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
+    $this->contextHandler = $this->createMock(\Drupal\Core\Plugin\Context\ContextHandlerInterface::class);
+    $this->blockStorage = $this->createMock(\Drupal\Core\Entity\EntityStorageInterface::class);
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entity_type_manager */
     $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
     $entity_type_manager->expects($this->any())
@@ -92,7 +92,7 @@ class BlockRepositoryTest extends UnitTestCase {
   public function testGetVisibleBlocksPerRegion(array $blocks_config, array $expected_blocks): void {
     $blocks = [];
     foreach ($blocks_config as $block_id => $block_config) {
-      $block = $this->createMock('Drupal\block\BlockInterface');
+      $block = $this->createMock(\Drupal\block\BlockInterface::class);
       $block->expects($this->once())
         ->method('access')
         ->willReturn($block_config[0]);
@@ -164,7 +164,7 @@ class BlockRepositoryTest extends UnitTestCase {
    * @legacy-covers ::getVisibleBlocksPerRegion
    */
   public function testGetVisibleBlocksPerRegionWithContext(): void {
-    $block = $this->createMock('Drupal\block\BlockInterface');
+    $block = $this->createMock(\Drupal\block\BlockInterface::class);
     $block->expects($this->once())
       ->method('access')
       ->willReturn(AccessResult::allowed()->addCacheTags(['config:block.block.block_id']));

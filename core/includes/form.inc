@@ -870,7 +870,7 @@ function _batch_populate_queue(&$batch, $set_id): void {
     $batch_set += [
       'queue' => [
         'name' => 'drupal_batch:' . $batch['id'] . ':' . $set_id,
-        'class' => $batch['progressive'] ? 'Drupal\Core\Queue\Batch' : 'Drupal\Core\Queue\BatchMemory',
+        'class' => $batch['progressive'] ? \Drupal\Core\Queue\Batch::class : \Drupal\Core\Queue\BatchMemory::class,
       ],
     ];
 

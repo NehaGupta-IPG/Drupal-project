@@ -38,7 +38,7 @@ class PhpStorageFactory {
       $configuration = $overrides['default'];
     }
     // Make sure all the necessary configuration values are set.
-    $class = $configuration['class'] ?? 'Drupal\Component\PhpStorage\MTimeProtectedFileStorage';
+    $class = $configuration['class'] ?? \Drupal\Component\PhpStorage\MTimeProtectedFileStorage::class;
     if (!isset($configuration['secret'])) {
       $configuration['secret'] = Settings::getHashSalt();
     }

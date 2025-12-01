@@ -165,12 +165,12 @@ class SystemHooks {
   public function updaterInfo(): array {
     return [
       'module' => [
-        'class' => 'Drupal\Core\Updater\Module',
+        'class' => \Drupal\Core\Updater\Module::class,
         'name' => $this->t('Update modules'),
         'weight' => 0,
       ],
       'theme' => [
-        'class' => 'Drupal\Core\Updater\Theme',
+        'class' => \Drupal\Core\Updater\Theme::class,
         'name' => $this->t('Update themes'),
         'weight' => 0,
       ],
@@ -185,12 +185,12 @@ class SystemHooks {
     $backends = [];
     // This is the default, will be available on most systems.
     if (function_exists('ftp_connect')) {
-      $backends['ftp'] = ['title' => $this->t('FTP'), 'class' => 'Drupal\Core\FileTransfer\FTP', 'weight' => 0];
+      $backends['ftp'] = ['title' => $this->t('FTP'), 'class' => \Drupal\Core\FileTransfer\FTP::class, 'weight' => 0];
     }
     // SSH2 lib connection is only available if the proper PHP extension is
     // installed.
     if (function_exists('ssh2_connect')) {
-      $backends['ssh'] = ['title' => $this->t('SSH'), 'class' => 'Drupal\Core\FileTransfer\SSH', 'weight' => 20];
+      $backends['ssh'] = ['title' => $this->t('SSH'), 'class' => \Drupal\Core\FileTransfer\SSH::class, 'weight' => 20];
     }
     return $backends;
   }
@@ -365,7 +365,7 @@ class SystemHooks {
   #[Hook('entity_type_build')]
   public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-    $entity_types['date_format']->setFormClass('add', 'Drupal\system\Form\DateFormatAddForm')->setFormClass('edit', 'Drupal\system\Form\DateFormatEditForm')->setFormClass('delete', 'Drupal\system\Form\DateFormatDeleteForm')->setListBuilderClass('Drupal\system\DateFormatListBuilder')->setLinkTemplate('edit-form', '/admin/config/regional/date-time/formats/manage/{date_format}')->setLinkTemplate('delete-form', '/admin/config/regional/date-time/formats/manage/{date_format}/delete')->setLinkTemplate('collection', '/admin/config/regional/date-time/formats');
+    $entity_types['date_format']->setFormClass('add', \Drupal\system\Form\DateFormatAddForm::class)->setFormClass('edit', \Drupal\system\Form\DateFormatEditForm::class)->setFormClass('delete', \Drupal\system\Form\DateFormatDeleteForm::class)->setListBuilderClass(\Drupal\system\DateFormatListBuilder::class)->setLinkTemplate('edit-form', '/admin/config/regional/date-time/formats/manage/{date_format}')->setLinkTemplate('delete-form', '/admin/config/regional/date-time/formats/manage/{date_format}/delete')->setLinkTemplate('collection', '/admin/config/regional/date-time/formats');
   }
 
   /**

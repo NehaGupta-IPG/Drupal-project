@@ -22,9 +22,9 @@ class MigratePostRowSaveEventTest extends EventBaseTest {
    * @legacy-covers ::getDestinationIdValues
    */
   public function testGetDestinationIdValues(): void {
-    $migration = $this->prophesize('\Drupal\migrate\Plugin\MigrationInterface')->reveal();
-    $message_service = $this->prophesize('\Drupal\migrate\MigrateMessageInterface')->reveal();
-    $row = $this->prophesize('\Drupal\migrate\Row')->reveal();
+    $migration = $this->prophesize(\Drupal\migrate\Plugin\MigrationInterface::class)->reveal();
+    $message_service = $this->prophesize(\Drupal\migrate\MigrateMessageInterface::class)->reveal();
+    $row = $this->prophesize(\Drupal\migrate\Row::class)->reveal();
     $event = new MigratePostRowSaveEvent($migration, $message_service, $row, [1, 2, 3]);
     $this->assertSame([1, 2, 3], $event->getDestinationIdValues());
   }
@@ -36,9 +36,9 @@ class MigratePostRowSaveEventTest extends EventBaseTest {
    * @legacy-covers ::getRow
    */
   public function testGetRow(): void {
-    $migration = $this->prophesize('\Drupal\migrate\Plugin\MigrationInterface')->reveal();
-    $message_service = $this->prophesize('\Drupal\migrate\MigrateMessageInterface');
-    $row = $this->prophesize('\Drupal\migrate\Row')->reveal();
+    $migration = $this->prophesize(\Drupal\migrate\Plugin\MigrationInterface::class)->reveal();
+    $message_service = $this->prophesize(\Drupal\migrate\MigrateMessageInterface::class);
+    $row = $this->prophesize(\Drupal\migrate\Row::class)->reveal();
     $event = new MigratePostRowSaveEvent($migration, $message_service->reveal(), $row, [1, 2, 3]);
     $this->assertSame($row, $event->getRow());
   }
