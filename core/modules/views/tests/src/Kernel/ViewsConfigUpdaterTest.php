@@ -30,9 +30,14 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   protected static $modules = [
     'views_config_entity_test',
     'entity_test',
+    'breakpoint',
     'text',
     'field',
     'node',
+    'file',
+    'image',
+    'responsive_image',
+    'responsive_image_test_module',
   ];
 
   /**
