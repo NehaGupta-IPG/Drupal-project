@@ -111,14 +111,15 @@ class ImagePreprocess {
           'href' => $image_src,
         ];
 
-        // Each field may have different mime types for each image just like URIs.
+        // Each field may have different mime types
+        // for each image just like URIs.
         if ($mime = @mime_content_type('.' . preg_replace('/\?itok=.*$/', '', $image_src))) {
           $attributes['type'] = $mime;
         }
 
-        // Prepare a unique key to prevent the case when we have several preloaded
-        // images on the page and the IDs of the html_head attachments
-        // will conflict.
+        // Prepare a unique key to prevent the case when we have several
+        // preloaded images on the page and the IDs
+        // of the html_head attachments will conflict.
         $key = hash('xxh32', serialize($image_src));
         $html_heads[] = [
           ['#tag' => 'link', '#attributes' => $attributes],

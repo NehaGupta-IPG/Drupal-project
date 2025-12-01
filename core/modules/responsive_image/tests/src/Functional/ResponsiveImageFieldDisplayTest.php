@@ -15,6 +15,7 @@ use Drupal\Tests\image\Functional\ImageFieldTestBase;
 use Drupal\Tests\system\Functional\Render\AssertPageHeadTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -454,9 +455,8 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
 
   /**
    * Tests responsive image formatter on node display with one and two sources.
-   *
-   * @dataProvider provideResponsiveImagePreload
    */
+  #[DataProvider('provideResponsiveImagePreload')]
   public function testResponsiveImageFieldFormattersMultipleSources(bool $preload): void {
     // Setup known image style sizes so the test can assert on known sizes.
     $large_style = ImageStyle::load('large');

@@ -1,20 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\image\Functional;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use Drupal\image\ImageConfigUpdater;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests lazy-load upgrade path.
- *
- * @group image
  */
+#[CoversClass(ImageConfigUpdater::class)]
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImagePreloadUpdateTest extends UpdatePathTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
     ];
@@ -25,7 +32,7 @@ class ImagePreloadUpdateTest extends UpdatePathTestBase {
    *
    * @see image_post_update_image_loading_attribute
    */
-  public function testUpdate() {
+  public function testUpdate(): void {
     $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
     /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $view_display */
     $view_display = $storage->load('node.article.default');

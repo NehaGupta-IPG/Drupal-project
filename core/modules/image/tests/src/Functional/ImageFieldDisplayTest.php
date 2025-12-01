@@ -13,6 +13,7 @@ use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\system\Functional\Render\AssertPageHeadTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -483,10 +484,9 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
   /**
    * Tests for image preload settings.
-   *
-   * @dataProvider provideImagePreload
    */
-  public function testImageFieldPreload($preload) {
+  #[DataProvider('provideImagePreload')]
+  public function testImageFieldPreload(bool $preload): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $node_storage = $this->container->get('entity_type.manager')

@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\responsive_image\Functional;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use Drupal\responsive_image\ResponsiveImageConfigUpdater;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests preload upgrade path.
- *
- * @coversDefaultClass \Drupal\responsive_image\ResponsiveImageConfigUpdater
- *
- * @group responsive_image
- * @group legacy
  */
+#[CoversClass(ResponsiveImageConfigUpdater::class)]
+#[Group('responsive_image')]
+#[RunTestsInSeparateProcesses]
 class ResponsiveImagePreloadUpdateTest extends UpdatePathTestBase {
 
   /**

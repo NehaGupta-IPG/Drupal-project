@@ -35,7 +35,7 @@ function media_post_update_media_author_views_filter_update(): void {
 /**
  * Add the image preload setting to image field formatter instances.
  */
-function media_post_update_image_preload_setting(array &$sandbox = NULL): void {
+function media_post_update_image_preload_setting(array &$sandbox = []): void {
   $media_config_updater = \Drupal::classResolver(MediaConfigUpdater::class);
   assert($media_config_updater instanceof MediaConfigUpdater);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_view_display', function (EntityViewDisplayInterface $view_display) use ($media_config_updater): bool {

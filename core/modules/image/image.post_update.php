@@ -23,7 +23,7 @@ function image_removed_post_updates(): array {
 /**
  * Add the image preload setting to image field formatter instances.
  */
-function image_post_update_image_preload_setting(array &$sandbox = NULL): void {
+function image_post_update_image_preload_setting(array &$sandbox = []): void {
   $image_config_updater = \Drupal::classResolver(ImageConfigUpdater::class);
   assert($image_config_updater instanceof ImageConfigUpdater);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_view_display', function (EntityViewDisplayInterface $view_display) use ($image_config_updater): bool {
