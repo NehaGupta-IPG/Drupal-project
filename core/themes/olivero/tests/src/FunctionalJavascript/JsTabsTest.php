@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\js_tabs_test\FunctionalJavascript;
+namespace Drupal\Tests\olivero\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
