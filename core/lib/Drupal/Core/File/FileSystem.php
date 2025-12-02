@@ -203,8 +203,8 @@ class FileSystem implements FileSystemInterface {
       $uri = rtrim(str_replace('/', DIRECTORY_SEPARATOR, $uri), DIRECTORY_SEPARATOR);
       // Determine the components of the path.
       if (is_dir($parent = dirname($uri))) {
-        // If the parent directory exists, then the backwards recursion must end,
-        // regardless of whether the subdirectory could be created.
+        // If the parent directory exists, then the backwards recursion must
+        // end, regardless of whether the subdirectory could be created.
         if ($status = $this->mkdirCall($uri, $mode, FALSE, $context)) {
           // Only try to chmod() if the subdirectory could be created.
           $status = chmod($uri, $mode);
