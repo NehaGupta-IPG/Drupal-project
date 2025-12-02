@@ -88,7 +88,8 @@
           /height/i.test(option)
         ) {
           // Take offsets in account.
-          const newWindowHeight = windowHeight - displace.offsets.top - displace.offsets.bottom;
+          const newWindowHeight =
+            windowHeight - displace.offsets.top - displace.offsets.bottom;
 
           adjustedValue = parseInt(
             0.01 * parseInt(optionValue, 10) * newWindowHeight,
