@@ -78,11 +78,14 @@ class TwigNodeTrans extends Node {
       $compiler->raw(', ')->subcompile($plural);
     }
 
+    // Get the actual TwigExtension class that may have been overridden.
+    $extension_class = get_class(\Drupal::service('twig.extension'));
+
     // Write any tokens found as an associative array parameter, otherwise just
     // leave as an empty array.
     $compiler->raw(', [');
     foreach ($tokens as $token) {
-      $compiler->string($token->getAttribute('placeholder'))->raw(' => $this->env->getExtension(\Drupal\Core\Template\TwigExtension::class)->renderVar(')->subcompile($token)->raw('), ');
+      $compiler->string($token->getAttribute('placeholder'))->raw(' => $this->env->getExtension(\\' . $extension_class . '::class)->renderVar(')->subcompile($token)->raw('), ');
     }
     $compiler->raw(']');
 
