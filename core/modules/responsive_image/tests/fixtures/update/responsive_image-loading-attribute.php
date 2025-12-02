@@ -62,6 +62,9 @@ $article_form_display['content']['field_image']['type'] = 'responsive_image';
 $article_form_display['content']['field_image']['settings'] = [
   'responsive_image_style' => 'responsive_image_style',
   'image_link' => '',
+  'image_loading' => [
+    'attribute' => 'eager',
+  ],
 ];
 $connection->update('config')
   ->fields(['data' => serialize($article_form_display)])
