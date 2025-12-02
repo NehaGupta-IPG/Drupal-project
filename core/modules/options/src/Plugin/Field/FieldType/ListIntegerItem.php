@@ -30,6 +30,18 @@ class ListIntegerItem extends ListItemBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultStorageSettings() {
+    return [
+      'unsigned' => FALSE,
+      // Valid size property values include: 'tiny', 'small', 'medium', 'normal'
+      // and 'big'.
+      'size' => 'normal',
+    ] + parent::defaultStorageSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('integer')
       ->setLabel(new TranslatableMarkup('Integer value'))
@@ -46,6 +58,11 @@ class ListIntegerItem extends ListItemBase {
       'columns' => [
         'value' => [
           'type' => 'int',
+          // Expose the 'unsigned' setting in the field item schema.
+          'unsigned' => $field_definition->getSetting('unsigned'),
+          // Expose the 'size' setting in the field item schema. For instance,
+          // supply 'big' as a value to produce a 'bigint' type.
+          'size' => $field_definition->getSetting('size'),
         ],
       ],
       'indexes' => [
