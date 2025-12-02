@@ -55,7 +55,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
   }
 
   /**
-   * Adds a language and tests string translation by users with the appropriate permissions.
+   * Adds a language and tests string translation with proper user permissions.
    */
   public function testStringTranslation(): void {
     // User to add and remove language.
@@ -283,7 +283,6 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $this->container->get('language_manager')->reset();
 
     // Build the JavaScript translation file.
-
     // Retrieve the source string of the first string available in the
     // {locales_source} table and translate it.
     $query = Database::getConnection()->select('locales_source', 's');
@@ -381,7 +380,6 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/translate');
     $this->submitForm($search, 'Filter');
     // Find the edit path.
-
     $textarea = $this->assertSession()->elementExists('xpath', '//textarea');
     $lid = $textarea->getAttribute('name');
     foreach ($bad_translations as $translation) {
@@ -565,12 +563,12 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $context = $this->randomMachineName(16);
     $context2 = $this->randomMachineName(16);
 
-    // Register strings with contexts
-    t($str_with_context, [], [
+    // Register strings with contexts.
+    $this->t($str_with_context, [], [
       'context' => $context,
       'langcode' => $langcode,
     ])->render();
-    t($str_with_context2, [], [
+    $this->t($str_with_context2, [], [
       'context' => $context2,
       'langcode' => $langcode,
     ])->render();
@@ -595,7 +593,7 @@ class LocaleTranslationUiTest extends BrowserTestBase {
   /**
    * Tests that only changed strings are saved customized when edited.
    */
-  public function testUICustomizedStrings(): void {
+  public function testUiCustomizedStrings(): void {
     $user = $this->drupalCreateUser([
       'translate interface',
       'administer languages',
