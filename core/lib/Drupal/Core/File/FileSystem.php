@@ -187,6 +187,13 @@ class FileSystem implements FileSystemInterface {
       return $this->mkdirCall($uri, $mode, $recursive, $context);
     }
 
+    // If the directory exists already, there's nothing to do.
+    if (is_dir($uri)) {
+      return TRUE;
+    }
+
+    // Otherwise, try to create the directory and ensure to set its permissions,
+    // because mkdir() obeys the umask of the current process.
     // If recursive, create each missing component of the parent directory
     // individually and set the mode explicitly to override the umask.
     if ($recursive) {
@@ -195,47 +202,24 @@ class FileSystem implements FileSystemInterface {
       // directories.
       $uri = rtrim(str_replace('/', DIRECTORY_SEPARATOR, $uri), DIRECTORY_SEPARATOR);
       // Determine the components of the path.
-      $components = explode(DIRECTORY_SEPARATOR, $uri);
-      // If the filepath is absolute the first component will be empty as there
-      // will be nothing before the first slash.
-      if ($components[0] == '') {
-        $recursive_path = DIRECTORY_SEPARATOR;
-        // Get rid of the empty first component.
-        array_shift($components);
-      }
-      else {
-        $recursive_path = '';
-      }
-      // Don't handle the top-level directory in this loop.
-      array_pop($components);
-      // Create each component if necessary.
-      foreach ($components as $component) {
-        $recursive_path .= $component;
-
-        if (!file_exists($recursive_path)) {
-          $success = $this->mkdirCall($recursive_path, $mode, FALSE, $context);
-          // If the operation failed, check again if the directory was created
-          // by another process/server, only report a failure if not.
-          if (!$success && !file_exists($recursive_path)) {
-            return FALSE;
-          }
-          // Not necessary to use self::chmod() as there is no scheme.
-          if (!chmod($recursive_path, $mode)) {
-            return FALSE;
-          }
+      if (is_dir($parent = dirname($uri))) {
+        // If the parent directory exists, then the backwards recursion must end,
+        // regardless of whether the subdirectory could be created.
+        if ($status = $this->mkdirCall($uri, $mode, FALSE, $context)) {
+          // Only try to chmod() if the subdirectory could be created.
+          $status = chmod($uri, $mode);
         }
-
-        $recursive_path .= DIRECTORY_SEPARATOR;
+        return $status;
       }
+      // If the parent directory and the requested directory do not exist and
+      // could not be created above, walk the requested directory path back up
+      // until an existing directory is hit, and from there, recursively create
+      // the sub-directories. Only if that recursion succeeds, create the final,
+      // originally requested subdirectory.
+      return $this->mkdir($parent, $mode, TRUE) && $this->mkdirCall($uri, $mode, FALSE, $context) && chmod($uri, $mode);
     }
 
-    // Do not check if the top-level directory already exists, as this condition
-    // must cause this function to fail.
-    if (!$this->mkdirCall($uri, $mode, FALSE, $context)) {
-      return FALSE;
-    }
-    // Not necessary to use self::chmod() as there is no scheme.
-    return chmod($uri, $mode);
+    return $this->mkdirCall($uri, $mode, FALSE, $context) && chmod($uri, $mode);
   }
 
   /**
