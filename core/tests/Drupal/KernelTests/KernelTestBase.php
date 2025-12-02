@@ -114,21 +114,29 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   }
 
   /**
+   * The class loader.
+   *
    * @var \Composer\Autoload\Classloader
    */
   protected $classLoader;
 
   /**
+   * The relative path to the test site directory.
+   *
    * @var string
    */
   protected $siteDirectory;
 
   /**
+   * The test database prefix.
+   *
    * @var string
    */
   protected $databasePrefix;
 
   /**
+   * The test container.
+   *
    * @var \Drupal\Core\DependencyInjection\ContainerBuilder
    */
   protected $container;
@@ -155,6 +163,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected $vfsRoot;
 
   /**
+   * The configuration importer.
+   *
    * @var \Drupal\Core\Config\ConfigImporter
    *
    * @todo Move into Config test base class.
@@ -302,6 +312,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   }
 
   /**
+   * Gets the database prefix used for test isolation.
+   *
    * @return string
    *   The database prefix string used to isolate test database tables.
    */
@@ -692,7 +704,9 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     if ($this->siteDirectory && !str_starts_with($this->siteDirectory, 'vfs://')) {
       // Delete test site directory.
       $callback = function (string $path) {
-        @chmod($path, 0700);
+        if (!is_link($path)) {
+          @chmod($path, 0700);
+        }
       };
       \Drupal::service('file_system')->deleteRecursive($this->siteDirectory, $callback);
     }
