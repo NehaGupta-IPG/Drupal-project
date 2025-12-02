@@ -1,0 +1,5 @@
+name: JS tabs test module
+type: module
+description: Module for the JS tabs test.
+package: Testing
+version: VERSION

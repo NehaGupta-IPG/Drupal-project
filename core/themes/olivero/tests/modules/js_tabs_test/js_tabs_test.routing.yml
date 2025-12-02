@@ -1,0 +1,11 @@
+js_tabs_test:
+  path: '/js_tabs_test/{argument}'
+  requirements:
+    _access: 'TRUE'
+  defaults:
+    _controller: '\Drupal\js_tabs_test\Controller:jsTabsTest'
+    argument: foo
+    _title: Foo
+  options:
+    parameters:
+      argument: {}
