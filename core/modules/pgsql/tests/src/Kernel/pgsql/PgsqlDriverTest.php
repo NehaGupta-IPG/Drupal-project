@@ -25,6 +25,7 @@ class PgsqlDriverTest extends DriverSpecificKernelTestBase {
   #[IgnoreDeprecations]
   public function testConnection(): void {
     $this->expectDeprecation("Not passing the \$eventDispatcher parameter to Drupal\\pgsql\\Driver\\Database\\pgsql\\Connection::__construct() is deprecated in drupal:11.2.0 and is throwing an error from drupal:12.0.0. See https://www.drupal.org/node/3494044");
+    // @phpstan-ignore class.notFound
     $connection = new Connection($this->createMock(\PHP_VERSION_ID >= 80400 ? Pgsql::class : StubPDO::class), []);
     $this->assertInstanceOf(Connection::class, $connection);
   }
