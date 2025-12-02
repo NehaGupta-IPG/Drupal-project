@@ -245,12 +245,14 @@ export default class DrupalMediaEditing extends Plugin {
           'element:drupal-media',
           (evt, data) => {
             const [modelElement] = data.modelRange.getItems();
+            // If there is no modelElement, exit early.
+            if (!modelElement) {
+              return;
+            }
+
             metadataRepository
               .getMetadata(modelElement)
               .then((metadata) => {
-                if (!modelElement) {
-                  return;
-                }
                 // On upcast, get `drupalMediaIsImage` attribute value from media metadata
                 // repository.
                 this.upcastDrupalMediaIsImage(modelElement);
