@@ -162,6 +162,29 @@ class StreamWrapperTest extends FileTestBase {
   }
 
   /**
+   * Tests that directory traversal is not possible.
+   */
+  public function testDirectoryTraversal(): void {
+    $file_system = \Drupal::service('file_system');
+    assert($file_system instanceof FileSystemInterface);
+
+    $subDirName = $this->randomMachineName();
+    $file_system->mkdir('private://' . $subDirName);
+
+    $this->assertFalse($file_system->realpath('private://..'));
+    $this->assertFalse($file_system->realpath('private://../'));
+    $this->assertFalse($file_system->realpath('private://../foo'));
+    $this->assertFalse($file_system->realpath('private://\../'));
+    $this->assertFalse($file_system->realpath('private://doesnotexist/../'));
+    $this->assertNotFalse($file_system->realpath('private://' . $subDirName . '/../'));
+    $this->assertFalse($file_system->realpath('private://' . $subDirName . '/../../'));
+
+    // Don't allow null bytes.
+    $this->expectException(\ValueError::class);
+    $file_system->realpath('private://.' . urldecode('%00') . '/');
+  }
+
+  /**
    * Tests the scheme functions.
    */
   public function testGetValidStreamScheme(): void {

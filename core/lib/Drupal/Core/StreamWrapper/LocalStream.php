@@ -131,15 +131,15 @@ abstract class LocalStream implements StreamWrapperInterface {
 
     $realpath = realpath($path);
     if (!$realpath) {
-      // This file does not yet exist.
-      $realpath = realpath(dirname($path)) . '/' . basename($path);
+      if ($baseRealpath = realpath(dirname($path))) {
+        // This file does not yet exist.
+        $realpath = $baseRealpath . '/' . basename($path);
+      }
     }
     // Get the target path relative to the files repository.
     $target = DIRECTORY_SEPARATOR . $this->getTarget($uri);
     // Get the files repository directory.
-    $repository = realpath($this->getDirectoryPath());
-    // Get the target directory.
-    $target_dir = realpath(dirname($repository . $target)) . DIRECTORY_SEPARATOR;
+    $directory = realpath($this->getDirectoryPath());
     // A directory component can point outside its parent directory if the path
     // separator ('/' or '\') is followed by '..' to reference the parent
     // directory.
@@ -147,8 +147,9 @@ abstract class LocalStream implements StreamWrapperInterface {
     // Check whether the target can possibly point outside its parent.
     $traversal = preg_match($pattern, $target);
     // Check whether the target dir exists within the files repository.
-    $subdirectory = str_starts_with($target_dir, $repository . DIRECTORY_SEPARATOR);
-    if ($traversal && !$subdirectory) {
+    $subdirectory = str_starts_with($realpath, $directory . DIRECTORY_SEPARATOR);
+    $samedirectory = $realpath == $directory;
+    if (!$realpath || !$directory || ($traversal && !$subdirectory && !$samedirectory)) {
       // If the target path contains directory-traversal parts such as '/..'
       // and does not resolve to a subdirectory of the repository, then return
       // FALSE to avoid a possible exploit.
