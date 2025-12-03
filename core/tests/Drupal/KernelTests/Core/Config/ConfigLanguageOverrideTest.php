@@ -31,6 +31,11 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['config_test']);
+
+    $config = $this->config('locale.settings');
+    $config->set('translate_english', TRUE)->save();
+    // Rebuild the container.
+    $this->rebuildContainer();
   }
 
   /**
@@ -39,9 +44,7 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
   public function testConfigLanguageOverride(): void {
     // The language module implements a config factory override object that
     // overrides configuration when the Language module is enabled. This test
-    // ensures that language overrides work. Since translate_english is now
-    // FALSE, English overrides will not be loaded when English is the default
-    // language.
+    // ensures that English overrides work.
     \Drupal::languageManager()->setConfigOverrideLanguage(\Drupal::languageManager()->getLanguage('en'));
     $config = \Drupal::config('config_test.system');
 
