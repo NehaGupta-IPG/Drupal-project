@@ -4,6 +4,8 @@ namespace Drupal\views\Plugin\views\cache;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\views\Plugin\views\filter\Bundle;
+use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\views\ResultRow;
@@ -250,6 +252,15 @@ abstract class CachePluginBase extends PluginBase {
       foreach ($entity_information as $metadata) {
         $tags = Cache::mergeTags($tags, \Drupal::entityTypeManager()->getDefinition($metadata['entity_type'])->getListCacheTags());
       }
+    }
+
+    // Add bundle specific list cache tags - ENTITY_TYPE_list:BUNDLE.
+    $bundle_filters = array_filter($this->view->filter ?: [], function (FilterPluginBase $filter) {
+      return $filter instanceof Bundle;
+    });
+
+    foreach ($bundle_filters as $bundle_filter) {
+      $tags = Cache::mergeTags($tags, $bundle_filter->getCacheTags());
     }
 
     $tags = Cache::mergeTags($tags, $this->view->getQuery()->getCacheTags());
