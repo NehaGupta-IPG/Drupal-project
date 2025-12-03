@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Functional;
 
+use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -37,6 +38,10 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
    * Tests that outdated revision translations work correctly.
    */
   public function testFlagAsOutdated(): void {
+    // @todo without re-initializing storage here, the values are not correct?
+    $entity_type_manager = $this->container->get('entity_type.manager');
+    $this->storage = $entity_type_manager->getStorage($this->entityTypeId);
+
     // Create a test node.
     $values = [
       'title' => 'Test 1.1 EN',
@@ -45,6 +50,9 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $id = $this->createEntity($values, 'en');
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->storage->load($id);
+
+    /** @var \Drupal\content_translation\ContentTranslationManagerInterface $translation_manager */
+    $translation_manager = \Drupal::service(ContentTranslationManagerInterface::class);
 
     // Add a published Italian translation.
     $add_translation_url = Url::fromRoute("entity.{$this->entityTypeId}.content_translation_add",
@@ -94,6 +102,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $en_edit_url = $this->getEditUrl($entity);
     $this->drupalGet($en_edit_url);
     $this->submitForm($edit, 'Save (this translation)');
+
     // Create an Italian draft.
     $edit = [
       'title[0][value]' => 'Test 1.5 IT',
@@ -112,6 +121,10 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $this->drupalGet($fr_edit_url);
     $this->submitForm($edit, $this->t('Save (this translation)'));
 
+    // Store the latest affected revisions for Italian and French.
+    $latest_affected_revision_id_it = $this->storage->getLatestTranslationAffectedRevisionId($id, 'it');
+    $latest_affected_revision_id_fr = $this->storage->getLatestTranslationAffectedRevisionId($id, 'fr');
+
     // Create another English draft and mark the other translations as outdated.
     $edit = [
       'title[0][value]' => 'Test 1.7 EN',
@@ -120,6 +133,14 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     ];
     $this->drupalGet($en_edit_url);
     $this->submitForm($edit, $this->t('Save (this translation)'));
+
+    // Assert that the stored Italian revision is outdated.
+    $latest_affected_revision_it = $this->storage->loadRevisionUnchanged($latest_affected_revision_id_it)->getTranslation('it');
+    $this->assertTrue($translation_manager->getTranslationMetadata($latest_affected_revision_it)->isOutdated());
+
+    // Assert that the stored French revision is outdated.
+    $latest_affected_revision_fr = $this->storage->loadRevisionUnchanged($latest_affected_revision_id_fr)->getTranslation('fr');
+    $this->assertTrue($translation_manager->getTranslationMetadata($latest_affected_revision_fr)->isOutdated());
 
     // Verify that the expected translation drafts are loaded in the related
     // entity forms and that the translations are marked as needing an update.
@@ -141,6 +162,17 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $this->drupalGet($it_edit_url);
     $this->submitForm($edit, $this->t('Save (this translation)'));
 
+    // Assert the latest affected revision id for It is not the one we have
+    // stored.
+    $this->assertNotEquals($latest_affected_revision_id_it, $this->storage->getLatestTranslationAffectedRevisionId($id, 'it'));
+
+    // Update the stored latest affected revision translation.
+    $latest_affected_revision_id_it = $this->storage->getLatestTranslationAffectedRevisionId($id, 'it');
+
+    // Assert that the stored Italian revision is marked not outdated.
+    $latest_affected_revision_it = $this->storage->loadRevisionUnchanged($latest_affected_revision_id_it)->getTranslation('it');
+    $this->assertFalse($translation_manager->getTranslationMetadata($latest_affected_revision_it)->isOutdated());
+
     // Publish the French node and mark it as not outdated anymore.
     $edit = [
       'title[0][value]' => 'Test 1.9 FR',
@@ -149,6 +181,17 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     ];
     $this->drupalGet($fr_edit_url);
     $this->submitForm($edit, $this->t('Save (this translation)'));
+
+    // Assert the latest affected revision id for Fr is not the one we have
+    // stored.
+    $this->assertNotEquals($latest_affected_revision_id_fr, $this->storage->getLatestTranslationAffectedRevisionId($id, 'fr'));
+
+    // Update the stored French revision.
+    $latest_affected_revision_id_fr = $this->storage->getLatestTranslationAffectedRevisionId($id, 'fr');
+
+    // Assert that the stored French revision is marked not outdated.
+    $latest_affected_revision_fr = $this->storage->loadRevisionUnchanged($latest_affected_revision_id_fr)->getTranslation('fr');
+    $this->assertFalse($translation_manager->getTranslationMetadata($latest_affected_revision_fr)->isOutdated());
 
     // Verify that the outdated flag is no longer checked on the translations.
     $this->drupalGet($it_edit_url);
@@ -177,6 +220,10 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $this->assertSession()->pageTextContains('Test 1.8 IT');
     $this->assertSession()->pageTextContains('This translation needs to be updated');
 
+    // Assert that the stored Italian revision is marked outdated.
+    $latest_affected_revision_it = $this->storage->loadRevisionUnchanged($latest_affected_revision_id_it)->getTranslation('it');
+    $this->assertTrue($translation_manager->getTranslationMetadata($latest_affected_revision_it)->isOutdated());
+
     // Mark the Italian node as not outdated anymore.
     $edit = [
       'title[0][value]' => 'Test 1.11 IT',
@@ -184,6 +231,17 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     ];
     $this->drupalGet($it_edit_url);
     $this->submitForm($edit, $this->t('Save (this translation)'));
+
+    // Assert the Italian revision we have stored is no longer the latest
+    // affected revision.
+    $this->assertNotEquals($latest_affected_revision_id_it, $this->storage->getLatestTranslationAffectedRevisionId($id, 'it'));
+
+    // Update the stored Italian revision.
+    $latest_affected_revision_id_it = $this->storage->getLatestTranslationAffectedRevisionId($id, 'it');
+
+    // Assert that the stored Italian revision is marked up to date.
+    $latest_affected_revision_it = $this->storage->loadRevisionUnchanged($latest_affected_revision_id_it)->getTranslation('it');
+    $this->assertFalse($translation_manager->getTranslationMetadata($latest_affected_revision_it)->isOutdated());
 
     // Verify that the outdated flag is read from the last affected
     // translation revision.
@@ -198,6 +256,17 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     ];
     $this->drupalGet($fr_edit_url);
     $this->submitForm($edit, $this->t('Save (this translation)'));
+
+    // Assert that the stored French version is no longer the latest affected
+    // revision.
+    $this->assertNotEquals($latest_affected_revision_id_fr, $this->storage->getLatestTranslationAffectedRevisionId($id, 'fr'));
+
+    // Update the stored French revision.
+    $latest_affected_revision_id_fr = $this->storage->getLatestTranslationAffectedRevisionId($id, 'fr');
+
+    // Assert that the stored French revision is marked not outdated.
+    $latest_affected_revision_fr = $this->storage->loadRevisionUnchanged($latest_affected_revision_id_fr)->getTranslation('fr');
+    $this->assertFalse($translation_manager->getTranslationMetadata($latest_affected_revision_fr)->isOutdated());
 
     // Now re-verify that the outdated flags are as they should be.
     $this->drupalGet($en_edit_url);
