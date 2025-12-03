@@ -51,7 +51,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
     protected ?AuthenticationCollectorInterface $authenticationCollector = NULL,
   ) {
     // For backward compatibility, fetch from container if not provided.
-    if ($this->authenticationCollector === NULL && \Drupal::hasContainer() && \Drupal::hasService('authentication_collector')) {
+    if ($this->authenticationCollector === NULL) {
       $this->authenticationCollector = \Drupal::service('authentication_collector');
     }
 
@@ -161,20 +161,17 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
    *
    * @return string
    *   The authentication provider name if it can be determined,
-   *   'unidentified' otherwise.
+   *   'unknown' otherwise.
    */
   protected function getAuthenticationProviderName(Request $request): string {
     // Loop through all registered authentication providers to find the one
     // that applies to this request.
-    if ($this->authenticationCollector !== NULL) {
-      foreach ($this->authenticationCollector->getSortedProviders() as $provider_id => $provider) {
-        if ($provider->applies($request)) {
-          return $provider_id;
-        }
+    foreach ($this->authenticationCollector->getSortedProviders() as $provider_id => $provider) {
+      if ($provider->applies($request)) {
+        return $provider_id;
       }
     }
-
-    return 'unidentified';
+    return 'unknown';
   }
 
 }
