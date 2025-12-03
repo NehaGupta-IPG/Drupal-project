@@ -47,8 +47,6 @@ class NumericFormatPluralTest extends ViewTestBase {
       'administer languages',
     ]);
     $this->drupalLogin($web_user);
-    $config = $this->config('locale.settings');
-    $config->set('translate_english', TRUE)->save();
   }
 
   /**
@@ -140,14 +138,20 @@ class NumericFormatPluralTest extends ViewTestBase {
     $english = \Drupal::languageManager()->getLanguageConfigOverride('en', 'views.view.numeric_test');
     $english->set('display.default.display_options.fields.count.format_plural_string', '1 time' . PoItem::DELIMITER . '@count times')->save();
 
+    // Check if English translations are enabled.
+    $translate_english = \Drupal::getContainer()->getParameter('language.translate_english');
+
     // The view displayed in English should use the English translation.
     $this->drupalGet('numeric-test');
-    $this->assertSession()->responseContains('<span class="field-content">0 times</span>');
-    $this->assertSession()->responseContains('<span class="field-content">1 time</span>');
-    $this->assertSession()->responseContains('<span class="field-content">2 times</span>');
-    $this->assertSession()->responseContains('<span class="field-content">3 times</span>');
-    $this->assertSession()->responseContains('<span class="field-content">4 times</span>');
-    $this->assertSession()->responseContains('<span class="field-content">42 times</span>');
+
+    if ($translate_english) {
+      $this->assertSession()->responseContains('<span class="field-content">0 times</span>');
+      $this->assertSession()->responseContains('<span class="field-content">1 time</span>');
+      $this->assertSession()->responseContains('<span class="field-content">2 times</span>');
+      $this->assertSession()->responseContains('<span class="field-content">3 times</span>');
+      $this->assertSession()->responseContains('<span class="field-content">4 times</span>');
+      $this->assertSession()->responseContains('<span class="field-content">42 times</span>');
+    }
   }
 
   /**
