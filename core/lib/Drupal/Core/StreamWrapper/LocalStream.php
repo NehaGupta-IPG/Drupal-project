@@ -140,8 +140,6 @@ abstract class LocalStream implements StreamWrapperInterface {
     $repository = realpath($this->getDirectoryPath());
     // Get the target directory.
     $target_dir = realpath(dirname($repository . $target)) . DIRECTORY_SEPARATOR;
-    // Get the target name, without any directory components.
-    $target_name = basename($repository . $target);
     // A directory component can point outside its parent directory if the path
     // separator ('/' or '\') is followed by '..' to reference the parent
     // directory.
@@ -156,7 +154,7 @@ abstract class LocalStream implements StreamWrapperInterface {
       // FALSE to avoid a possible exploit.
       return FALSE;
     }
-    return $target_dir . $target_name;
+    return $realpath;
   }
 
   /**
