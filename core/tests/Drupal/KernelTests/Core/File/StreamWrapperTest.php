@@ -141,6 +141,27 @@ class StreamWrapperTest extends FileTestBase {
   }
 
   /**
+   * Tests some file functions on symlinks.
+   */
+  public function testSymlinks(): void {
+    $file_system = \Drupal::service('file_system');
+    assert($file_system instanceof FileSystemInterface);
+
+    $realFilename = 'temporary://' . $this->randomMachineName();
+    $symlinkName = 'private://' . $this->randomMachineName();
+    symlink($file_system->realpath($realFilename), $file_system->realpath($symlinkName));
+
+    // Try to manipulate the symlink.
+    $this->assertNotFalse(file_put_contents($symlinkName, str_repeat('d', 1000)));
+    $handle = fopen($symlinkName, 'c+');
+    $this->assertNotFalse($handle);
+
+    // Cleanup.
+    unlink($realFilename);
+    unlink($symlinkName);
+  }
+
+  /**
    * Tests the scheme functions.
    */
   public function testGetValidStreamScheme(): void {
