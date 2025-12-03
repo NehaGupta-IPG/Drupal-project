@@ -268,6 +268,37 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
   }
 
   /**
+   * Update the outdated status for the last affected revision translation.
+   *
+   * For moderated entities, the content_translation_outdated flag is
+   * determined by the latest revision where revision_translation_affected
+   * is TRUE. Therefore, to correctly keep the content_translation_outdated
+   * flag up to date, the old latest affected revision translation must be
+   * marked as up to date before the next affected revision translation is
+   * created.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity currently being edited.
+   * @param int $outdated
+   *   Whether the outdated flag has been checked or not.
+   */
+  protected function updateLastTranslationAffectedRevisionOutdatedStatus(EntityInterface $entity, int $outdated): void {
+    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+    $latest_affected_translation_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $entity->language()->getId());
+    if ($latest_affected_translation_revision_id) {
+      $latest_affected_revision = $storage->loadRevisionUnchanged($latest_affected_translation_revision_id);
+      $latest_affected_translation_revision = $latest_affected_revision->getTranslation($entity->language()->getId());
+      $translation_revision_metadata = $this->manager->getTranslationMetadata($latest_affected_translation_revision);
+      $translation_revision_metadata->setOutdated(!empty($outdated));
+      // Set syncing to true, so we don't create a new revision while
+      // updating the metadata of the old revision.
+      $latest_affected_translation_revision->setSyncing(TRUE);
+      $storage->save($latest_affected_translation_revision);
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function retranslate(EntityInterface $entity, $langcode = NULL) {
@@ -712,27 +743,8 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     $metadata->setCreatedTime(!empty($values['created']) ? strtotime($values['created']) : $this->time->getRequestTime());
     $metadata->setOutdated(!empty($values['outdated']));
 
-    // For moderated entities, the content_translation_outdated flag is
-    // determined by the latest revision where revision_translation_affected
-    // is TRUE. Therefore, to correctly keep the content_translation_outdated
-    // flag up to date, the old latest affected revision translation must be
-    // marked as up to date before the next revision is created.
-    if (!empty($values['outdated']) && ContentTranslationManager::isPendingRevisionSupportEnabled($entity_type, $entity->bundle())) {
-      /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
-      $storage = $this->entityTypeManager->getStorage($entity_type);
-      $latest_affected_translation_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $form_langcode);
-      if ($latest_affected_translation_revision_id) {
-        $latest_affected_revision = $storage->loadRevision($latest_affected_translation_revision_id);
-        $latest_affected_translation_revision = $latest_affected_revision->getTranslation($form_langcode);
-        $translation_revision_metadata = $this->manager->getTranslationMetadata($latest_affected_translation_revision);
-        if ($translation_revision_metadata->isOutdated()) {
-          $translation_revision_metadata->setOutdated(FALSE);
-          // Set syncing to true, so we don't create a new revision while
-          // updating the metadata of the old revision.
-          $latest_affected_translation_revision->setSyncing(TRUE);
-          $storage->save($latest_affected_translation_revision);
-        }
-      }
+    if (isset($values['outdated']) && ContentTranslationManager::isPendingRevisionSupportEnabled($entity_type, $entity->bundle())) {
+      $this->updateLastTranslationAffectedRevisionOutdatedStatus($entity, $values['outdated']);
     }
 
     if (!empty($values['retranslate']) && !ContentTranslationManager::isPendingRevisionSupportEnabled($entity_type, $entity->bundle())) {
