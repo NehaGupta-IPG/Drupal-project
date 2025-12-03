@@ -1741,6 +1741,7 @@ services:
   asset.css.collection_optimizer:
     class: Drupal\Core\Asset\CssCollectionOptimizerLazy
     arguments: [ '@asset.css.collection_grouper', '@asset.css.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager']
+  Drupal\Core\Asset\AssetCollectionOptimizerInterface: '@asset.css.collection_optimizer'
   asset.css.optimizer:
     class: Drupal\Core\Asset\CssOptimizer
     arguments: ['@file_url_generator']

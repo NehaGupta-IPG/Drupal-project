@@ -31,7 +31,6 @@ class ThemeInstaller implements ThemeInstallerInterface {
     protected ConfigInstallerInterface $configInstaller,
     protected ModuleHandlerInterface $moduleHandler,
     protected ConfigManagerInterface $configManager,
-    #[Autowire(service: 'asset.css.collection_optimizer')]
     protected AssetCollectionOptimizerInterface $cssCollectionOptimizer,
     protected RouteBuilderInterface $routeBuilder,
     #[Autowire(service: 'logger.channel.default')]
