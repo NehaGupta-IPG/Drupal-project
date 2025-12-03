@@ -175,7 +175,7 @@ class StreamWrapperTest extends FileTestBase {
     $this->assertFalse($file_system->realpath('private://../'));
     $this->assertFalse($file_system->realpath('private://../foo'));
     $this->assertFalse($file_system->realpath('private://\../'));
-    $this->assertFalse($file_system->realpath('private://doesnotexist/../'));
+    $this->assertFalse($file_system->realpath('private://does-not-exist/../'));
     $this->assertNotFalse($file_system->realpath('private://' . $subDirName . '/../'));
     $this->assertFalse($file_system->realpath('private://' . $subDirName . '/../../'));
 

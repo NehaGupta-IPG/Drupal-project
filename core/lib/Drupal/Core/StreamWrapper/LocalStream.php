@@ -148,8 +148,8 @@ abstract class LocalStream implements StreamWrapperInterface {
     $traversal = preg_match($pattern, $target);
     // Check whether the target dir exists within the files repository.
     $subdirectory = str_starts_with($realpath, $directory . DIRECTORY_SEPARATOR);
-    $samedirectory = $realpath == $directory;
-    if (!$realpath || !$directory || ($traversal && !$subdirectory && !$samedirectory)) {
+    $sameDirectory = $realpath == $directory;
+    if (!$realpath || !$directory || ($traversal && !$subdirectory && !$sameDirectory)) {
       // If the target path contains directory-traversal parts such as '/..'
       // and does not resolve to a subdirectory of the repository, then return
       // FALSE to avoid a possible exploit.
