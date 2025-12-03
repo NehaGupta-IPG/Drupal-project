@@ -23,7 +23,6 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
     'user',
     'language',
     'config_test',
-    'locale',
   ];
 
   /**
@@ -33,10 +32,8 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
     parent::setUp();
     $this->installConfig(['config_test']);
 
-    $config = $this->config('locale.settings');
-    $config->set('translate_english', TRUE)->save();
-    // Rebuild the container.
-    $this->container = $this->container->get('kernel')->rebuildContainer();
+    // Directly set the parameter value.
+    $this->container->setParameter('language.translate_english', TRUE);
   }
 
   /**
