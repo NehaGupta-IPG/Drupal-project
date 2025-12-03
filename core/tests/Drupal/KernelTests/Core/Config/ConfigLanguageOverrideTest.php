@@ -29,11 +29,9 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    $this->setSetting('language.translate_english', TRUE);
     parent::setUp();
     $this->installConfig(['config_test']);
-
-    // Directly set the parameter value.
-    $this->container->setParameter('language.translate_english', TRUE);
   }
 
   /**
