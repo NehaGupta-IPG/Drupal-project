@@ -361,7 +361,7 @@ class ThemeManager implements ThemeManagerInterface {
       $variables['theme_hook_suggestion'] = $theme_hook_suggestion;
     }
     // Make sure we pass the file name suggestions that were actually used.
-    $variables['file_name_suggestions'] = $suggestions;
+    $variables['file_name_suggestions'] = $suggestions ?? [];
     $output = $render_function($template_file, $variables);
     return ($output instanceof MarkupInterface) ? $output : (string) $output;
   }
@@ -399,7 +399,8 @@ class ThemeManager implements ThemeManagerInterface {
     // If the theme implementation was invoked with a direct theme suggestion
     // like '#theme' => 'node__article', add it to the suggestions array before
     // invoking suggestion alter hooks.
-    $derived_suggestions_excluding_base_hook = array_slice($derived_suggestions, 1);
+    $derived_base_hook = reset($derived_suggestions);
+    $derived_suggestions_excluding_base_hook = array_diff($derived_suggestions, [$derived_base_hook]);    
     if ($info_base_hook !== '' && !in_array($hook, $derived_suggestions_excluding_base_hook)) {
       $suggestions[] = $hook;
     }
@@ -416,7 +417,7 @@ class ThemeManager implements ThemeManagerInterface {
 
     // Add the base suggestion, should always have the lowest priority.
     $derived_base_hook = reset($derived_suggestions);
-    if (!in_array($derived_base_hook, $suggestions)) {
+    if (!empty($derived_base_hook) && !in_array($derived_base_hook, $suggestions, TRUE)) {
       $suggestions[] = $derived_base_hook;
     }
 

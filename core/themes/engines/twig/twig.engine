@@ -53,10 +53,13 @@ function twig_render_template($template_file, array $variables) {
     $output['debug_prefix'] .= "\n<!-- THEME HOOK: '" . Html::escape($variables['theme_hook_original']) . "' -->";
     // If there are theme suggestions, reverse the array so more specific
     // suggestions are shown first.
+    if (!empty($variables['theme_hook_suggestions'])) {
+      $variables['theme_hook_suggestions'] = array_reverse($variables['theme_hook_suggestions']);
+    }
+
     $request = \Drupal::request();
     $is_html_request = $request && str_starts_with((string) $request->headers->get('Accept'), 'text/html');
-
-    if ($is_html_request && !empty($variables['theme_hook_suggestions'])) {
+    if ($is_html_request) {
       $variables['theme_hook_suggestions'] = array_reverse($variables['theme_hook_suggestions']);
       $extension = twig_extension();
       $current_template = basename($template_file);
