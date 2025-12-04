@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,8 +24,16 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
     'user',
     'language',
     'config_test',
-    'locale',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container): void {
+    parent::register($container);
+    // Override the translate_english parameter to TRUE for this test.
+    $container->setParameter('language.translate_english', TRUE);
+  }
 
   /**
    * {@inheritdoc}
@@ -38,30 +47,12 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
    * Tests locale override based on language.
    */
   public function testConfigLanguageOverride(): void {
-    // Enable translation of English configuration.
-    \Drupal::configFactory()->getEditable('locale.settings')
-      ->set('translate_english', TRUE)
-      ->save();
-
-    // Rebuild the container to pick up the new setting.
-    $this->container->get('kernel')->rebuildContainer();
-    $this->container = $this->container->get('kernel')->getContainer();
-
     // The language module implements a config factory override object that
     // overrides configuration when the Language module is enabled. This test
     // ensures that English overrides work.
     \Drupal::languageManager()->setConfigOverrideLanguage(\Drupal::languageManager()->getLanguage('en'));
     $config = \Drupal::config('config_test.system');
-
-    // Check if English translations are enabled.
-    $translate_english = \Drupal::config('locale.settings')->get('translate_english');
-
-    if ($translate_english) {
-      $this->assertSame('en bar', $config->get('foo'));
-    }
-    else {
-      $this->assertSame('bar', $config->get('foo'));
-    }
+    $this->assertSame('en bar', $config->get('foo'));
 
     // Ensure that the raw data is not translated.
     $raw = $config->getRawData();
