@@ -339,23 +339,64 @@ class Random {
     $width = rand((int) $min[0], (int) $max[0]);
     $height = rand((int) $min[1], (int) $max[1]);
 
-    // Make an image split into 4 sections with random colors.
-    $im = imagecreate($width, $height);
-    for ($n = 0; $n < 4; $n++) {
+    // Depending on the extension and the toolkit, we will use a different
+    // method for generating the actual image.
+    $php_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+    $toolkit_supported_extensions = \Drupal::service('image.factory')->getSupportedExtensions();
+    // For basic extensions, use php native "image*()" functions.
+    if (in_array($extension, $php_extensions)) {
+      // Make an image split into 4 sections with random colors.
+      $im = imagecreate($width, $height);
+      for ($n = 0; $n < 4; $n++) {
+        $color = imagecolorallocate($im, rand(0, 255), rand(0, 255), rand(0, 255));
+        $x = $width / 2 * ($n % 2);
+        $y = $height / 2 * (int) ($n >= 2);
+        imagefilledrectangle($im, $x, $y, $x + $width / 2, $y + $height / 2, $color);
+      }
+
+      // Make a perfect circle in the image middle.
       $color = imagecolorallocate($im, rand(0, 255), rand(0, 255), rand(0, 255));
-      $x = $width / 2 * ($n % 2);
-      $y = $height / 2 * (int) ($n >= 2);
-      imagefilledrectangle($im, (int) $x, (int) $y, (int) ($x + $width / 2), (int) ($y + $height / 2), $color);
+
+      $smaller_dimension = min($width, $height);
+      imageellipse($im, $width / 2, $height / 2, $smaller_dimension, $smaller_dimension, $color);
+
+      $save_function = 'image' . ($extension == 'jpg' ? 'jpeg' : $extension);
+      $save_function($im, $destination);
+    }
+    elseif (in_array($extension, $toolkit_supported_extensions)) {
+      switch ($extension) {
+        case 'svg':
+        case 'svgz':
+          $svg_content = $this->generateSampleSvgContent($width, $height);
+          file_put_contents($destination, $svg_content);
+          break;
+
+        default:
+          throw new \InvalidArgumentException("Could not generate a random image for extension $extension.");
+      }
+    }
+    else {
+      throw new \InvalidArgumentException("The extension $extension is not supported by the current toolkit");
     }
 
-    // Make a perfect circle in the image middle.
-    $color = imagecolorallocate($im, rand(0, 255), rand(0, 255), rand(0, 255));
-    $smaller_dimension = min($width, $height);
-    imageellipse($im, (int) ($width / 2), (int) ($height / 2), $smaller_dimension, $smaller_dimension, $color);
-
-    $save_function = 'image' . ($extension == 'jpg' ? 'jpeg' : $extension);
-    $save_function($im, $destination);
     return $destination;
+  }
+
+  /**
+   * Generate a sample SVG content string.
+   *
+   * @param int $width
+   *   The width of the SVG image.
+   * @param int $height
+   *   The height of the SVG image.
+   *
+   * @return string
+   *   An SVG representing a rectangle with those dimensions.
+   */
+  protected function generateSampleSvgContent($width, $height) {
+    $inner_width = $width * 0.9;
+    $inner_height = $height * 0.9;
+    return "<svg height='$height' width='$width'><rect width='$inner_width' height='$inner_height' /></svg>";
   }
 
 }
