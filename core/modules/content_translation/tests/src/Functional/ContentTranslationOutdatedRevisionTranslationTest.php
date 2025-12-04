@@ -132,11 +132,11 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $this->submitForm($edit, $this->t('Save (this translation)'));
 
     // Assert that the stored Italian revision is outdated.
-    $latest_affected_revision_it = $storage->loadRevisionUnchanged($latest_affected_revision_id_it)->getTranslation('it');
+    $latest_affected_revision_it = $storage->loadRevision($latest_affected_revision_id_it)->getTranslation('it');
     $this->assertTrue($translation_manager->getTranslationMetadata($latest_affected_revision_it)->isOutdated());
 
     // Assert that the stored French revision is outdated.
-    $latest_affected_revision_fr = $storage->loadRevisionUnchanged($latest_affected_revision_id_fr)->getTranslation('fr');
+    $latest_affected_revision_fr = $storage->loadRevision($latest_affected_revision_id_fr)->getTranslation('fr');
     $this->assertTrue($translation_manager->getTranslationMetadata($latest_affected_revision_fr)->isOutdated());
 
     // Verify that the expected translation drafts are loaded in the related
@@ -167,7 +167,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $latest_affected_revision_id_it = $storage->getLatestTranslationAffectedRevisionId($id, 'it');
 
     // Assert that the stored Italian revision is marked not outdated.
-    $latest_affected_revision_it = $storage->loadRevisionUnchanged($latest_affected_revision_id_it)->getTranslation('it');
+    $latest_affected_revision_it = $storage->loadRevision($latest_affected_revision_id_it)->getTranslation('it');
     $this->assertFalse($translation_manager->getTranslationMetadata($latest_affected_revision_it)->isOutdated());
 
     // Publish the French node and mark it as not outdated anymore.
@@ -187,7 +187,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $latest_affected_revision_id_fr = $storage->getLatestTranslationAffectedRevisionId($id, 'fr');
 
     // Assert that the stored French revision is marked not outdated.
-    $latest_affected_revision_fr = $storage->loadRevisionUnchanged($latest_affected_revision_id_fr)->getTranslation('fr');
+    $latest_affected_revision_fr = $storage->loadRevision($latest_affected_revision_id_fr)->getTranslation('fr');
     $this->assertFalse($translation_manager->getTranslationMetadata($latest_affected_revision_fr)->isOutdated());
 
     // Verify that the outdated flag is no longer checked on the translations.
@@ -218,7 +218,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $this->assertSession()->pageTextContains('This translation needs to be updated');
 
     // Assert that the stored Italian revision is marked outdated.
-    $latest_affected_revision_it = $storage->loadRevisionUnchanged($latest_affected_revision_id_it)->getTranslation('it');
+    $latest_affected_revision_it = $storage->loadRevision($latest_affected_revision_id_it)->getTranslation('it');
     $this->assertTrue($translation_manager->getTranslationMetadata($latest_affected_revision_it)->isOutdated());
 
     // Mark the Italian node as not outdated anymore.
@@ -237,7 +237,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $latest_affected_revision_id_it = $storage->getLatestTranslationAffectedRevisionId($id, 'it');
 
     // Assert that the stored Italian revision is marked up to date.
-    $latest_affected_revision_it = $storage->loadRevisionUnchanged($latest_affected_revision_id_it)->getTranslation('it');
+    $latest_affected_revision_it = $storage->loadRevision($latest_affected_revision_id_it)->getTranslation('it');
     $this->assertFalse($translation_manager->getTranslationMetadata($latest_affected_revision_it)->isOutdated());
 
     // Verify that the outdated flag is read from the last affected
@@ -262,7 +262,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $latest_affected_revision_id_fr = $storage->getLatestTranslationAffectedRevisionId($id, 'fr');
 
     // Assert that the stored French revision is marked not outdated.
-    $latest_affected_revision_fr = $storage->loadRevisionUnchanged($latest_affected_revision_id_fr)->getTranslation('fr');
+    $latest_affected_revision_fr = $storage->loadRevision($latest_affected_revision_id_fr)->getTranslation('fr');
     $this->assertFalse($translation_manager->getTranslationMetadata($latest_affected_revision_fr)->isOutdated());
 
     // Now re-verify that the outdated flags are as they should be.

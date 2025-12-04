@@ -287,7 +287,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
     $latest_affected_translation_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $entity->language()->getId());
     if ($latest_affected_translation_revision_id) {
-      $latest_affected_revision = $storage->loadRevisionUnchanged($latest_affected_translation_revision_id);
+      $latest_affected_revision = $storage->loadRevision($latest_affected_translation_revision_id);
       $latest_affected_translation_revision = $latest_affected_revision->getTranslation($entity->language()->getId());
       $translation_revision_metadata = $this->manager->getTranslationMetadata($latest_affected_translation_revision);
       $translation_revision_metadata->setOutdated(!empty($outdated));
