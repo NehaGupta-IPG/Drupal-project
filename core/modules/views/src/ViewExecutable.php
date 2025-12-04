@@ -506,7 +506,7 @@ class ViewExecutable {
       $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
     }
     if ($this->cachePluginManager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $cachePluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $cachePluginManager argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
       $this->cachePluginManager = \Drupal::service('plugin.manager.views.cache');
     }
 
