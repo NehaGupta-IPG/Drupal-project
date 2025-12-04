@@ -72,8 +72,8 @@ class ConfigHandlerGroup extends ViewsFormBase {
     $item = $executable->getHandler($display_id, $type, $id);
 
     if ($item) {
-      $handler = $executable->display_handler->getHandler($type, $id);
-      if (empty($handler)) {
+      $handler = Views::handlerManager($type)->getHandler($item);
+      if ($handler === NULL) {
         $form['markup'] = ['#markup' => $this->t("Error: handler for @table > @field doesn't exist!", ['@table' => $item['table'], '@field' => $item['field']])];
       }
       else {

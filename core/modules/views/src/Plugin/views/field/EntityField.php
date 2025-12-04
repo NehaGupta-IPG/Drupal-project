@@ -725,7 +725,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
 
     // Add settings for "field API" fields.
     $item['group_column'] = $form_state->getValue(['options', 'group_column']);
-    $item['group_columns'] = array_filter($form_state->getValue(['options', 'group_columns']));
+    $item['group_columns'] = array_filter($form_state->getValue(['options', 'group_columns']) ?? []);
   }
 
   /**
