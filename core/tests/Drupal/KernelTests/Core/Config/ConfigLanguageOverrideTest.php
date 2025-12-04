@@ -45,7 +45,7 @@ class ConfigLanguageOverrideTest extends KernelTestBase {
 
     // Rebuild the container to pick up the new setting.
     $this->container->get('kernel')->rebuildContainer();
-    $this->container = $this->kernel->getContainer();
+    $this->container = $this->container->get('kernel')->getContainer();
 
     // The language module implements a config factory override object that
     // overrides configuration when the Language module is enabled. This test
