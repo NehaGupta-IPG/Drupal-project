@@ -48,7 +48,7 @@ services:
   user.auth:
     class: Drupal\user\UserAuthentication
     arguments: ['@entity_type.manager', '@password']
-  Drupal\user\UserAuthInterface: '@user.auth'
+  Drupal\user\UserAuthenticationInterface: '@user.auth'
   user.permissions:
     class: Drupal\user\PermissionHandler
     arguments: ['@module_handler', '@string_translation', '@callable_resolver', '@extension.list.module']
