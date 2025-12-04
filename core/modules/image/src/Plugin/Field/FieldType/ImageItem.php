@@ -356,6 +356,11 @@ class ImageItem extends FileItem {
     $min_resolution = empty($settings['min_resolution']) ? '100x100' : $settings['min_resolution'];
     $max_resolution = empty($settings['max_resolution']) ? '600x600' : $settings['max_resolution'];
     $extensions = array_intersect(explode(' ', $settings['file_extensions']), ['png', 'gif', 'jpg', 'jpeg']);
+
+    if (empty($extensions)) {
+      return [];
+    }
+
     $extension = array_rand(array_combine($extensions, $extensions));
 
     $min = explode('x', $min_resolution);
