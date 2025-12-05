@@ -399,7 +399,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   public function equals(FieldItemListInterface $list_to_compare) {
     $count1 = count($this);
     $count2 = count($list_to_compare);
-    if ($count1 === 0 && $count2 === 0) {
+    if ($this->isEmpty() && $list_to_compare->isEmpty()) {
       // Both are empty we can safely assume that it did not change.
       return TRUE;
     }
