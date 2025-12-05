@@ -268,7 +268,11 @@ abstract class EntityDisplayFormBase extends EntityForm {
         // spinners will be added manually by the client-side script.
         'progress' => 'none',
       ],
-      '#attributes' => ['class' => ['visually-hidden']],
+      '#attributes' => [
+        'class' => ['visually-hidden'],
+        // Ensure the button is not focusable via keyboard navigation.
+        'tabindex' => '-1',
+      ],
     ];
 
     $form['actions'] = ['#type' => 'actions'];
@@ -579,7 +583,11 @@ abstract class EntityDisplayFormBase extends EntityForm {
 
           $display_mode_label = $display_modes[$mode]['label'];
           $url = $this->getOverviewUrl($mode);
-          $this->messenger()->addStatus($this->t('The %display_mode mode now uses custom display settings. You might want to <a href=":url">configure them</a>.', ['%display_mode' => $display_mode_label, ':url' => $url->toString()]));
+          $this->messenger()
+            ->addStatus($this->t('The %display_mode mode now uses custom display settings. You might want to <a href=":url">configure them</a>.', [
+              '%display_mode' => $display_mode_label,
+              ':url' => $url->toString(),
+            ]));
         }
         $statuses[$mode] = !empty($value);
       }

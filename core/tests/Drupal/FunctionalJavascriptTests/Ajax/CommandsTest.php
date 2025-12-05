@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs tests on AJAX framework commands.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class CommandsTest extends WebDriverTestBase {
 
   /**
@@ -50,16 +52,16 @@ class CommandsTest extends WebDriverTestBase {
     // Wait for the alert to appear.
     $page->waitFor(10, function () use ($session) {
       try {
-        $session->getDriver()->getWebDriverSession()->getAlert_text();
+        $session->getDriver()->getWebDriverSession()->alert()->getText();
         return TRUE;
       }
-      catch (\Exception $e) {
+      catch (\Exception) {
         return FALSE;
       }
     });
-    $alert_text = $this->getSession()->getDriver()->getWebDriverSession()->getAlert_text();
+    $alert_text = $this->getSession()->getDriver()->getWebDriverSession()->alert()->getText();
     $this->assertEquals('Alert', $alert_text);
-    $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
+    $this->getSession()->getDriver()->getWebDriverSession()->alert()->accept();
 
     $this->drupalGet($form_path);
     $page->pressButton("AJAX 'Announce': Click to announce");
@@ -102,7 +104,7 @@ class CommandsTest extends WebDriverTestBase {
     // Tests the 'data' command.
     $page->pressButton("AJAX data command: Issue command.");
     $this->assertTrue($page->waitFor(10, function () use ($session) {
-      return 'test_value' === $session->evaluateScript('window.jQuery("#data_div").data("testkey")');
+      return 'test_value' === $session->evaluateScript('window.jQuery("#data_div").data("test_key")');
     }));
 
     // Tests the 'html' command.

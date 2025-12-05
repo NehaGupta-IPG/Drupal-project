@@ -11,17 +11,21 @@ use Drupal\Core\Update\RemovedPostUpdateNameException;
 use Drupal\Core\Update\UpdateRegistry;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests UpdateRegistry.
  *
  * Note we load code, so isolate the tests.
- *
- * @coversDefaultClass \Drupal\Core\Update\UpdateRegistry
- * @group Update
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
  */
+#[CoversClass(UpdateRegistry::class)]
+#[Group('Update')]
+#[Group('#slow')]
+#[PreserveGlobalState(FALSE)]
+#[RunTestsInSeparateProcesses]
 class UpdateRegistryTest extends UnitTestCase {
 
   /**
@@ -38,7 +42,7 @@ class UpdateRegistryTest extends UnitTestCase {
   /**
    * Sets up some extensions with some update functions.
    */
-  protected function setupBasicExtensions() {
+  protected function setupBasicExtensions(): void {
     $info_a = <<<'EOS'
 type: module
 name: Module A
@@ -60,6 +64,7 @@ EOS;
     $info_d = <<<'EOS'
 type: theme
 name: Theme D
+core_version_requirement: '*'
 EOS;
 
     $module_a = <<<'EOS'
@@ -90,7 +95,7 @@ function module_b_post_update_a() {
 /**
  * Implements hook_removed_post_updates().
  */
-function module_b_removed_post_updates() {
+function module_b_removed_post_updates(): array {
   return [
     'module_b_post_update_b' => '8.9.0',
     'module_b_post_update_c' => '8.9.0',
@@ -117,7 +122,7 @@ function module_c_post_update_b() {
 /**
  * Implements hook_removed_post_updates().
  */
-function module_c_removed_post_updates() {
+function module_c_removed_post_updates(): array {
   return [
     'module_c_post_update_b' => '8.9.0',
     'module_c_post_update_c' => '8.9.0',
@@ -144,7 +149,7 @@ function theme_d_post_update_c() {
 /**
  * Implements hook_removed_post_updates().
  */
-function theme_d_removed_post_updates() {
+function theme_d_removed_post_updates(): array {
   return [
     'theme_d_post_update_a' => '8.9.0',
   ];
@@ -181,7 +186,9 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateFunctions
+   * Tests get pending update functions no existing updates.
+   *
+   * @legacy-covers ::getPendingUpdateFunctions
    */
   public function testGetPendingUpdateFunctionsNoExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -193,7 +200,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -225,7 +232,9 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateFunctions
+   * Tests get pending update functions with loaded modules but not enabled.
+   *
+   * @legacy-covers ::getPendingUpdateFunctions
    */
   public function testGetPendingUpdateFunctionsWithLoadedModulesButNotEnabled(): void {
     $this->setupBasicExtensions();
@@ -260,7 +269,9 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateFunctions
+   * Tests get pending update functions existing updates.
+   *
+   * @legacy-covers ::getPendingUpdateFunctions
    */
   public function testGetPendingUpdateFunctionsExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -276,7 +287,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -307,7 +318,9 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateInformation
+   * Tests get pending update information.
+   *
+   * @legacy-covers ::getPendingUpdateInformation
    */
   public function testGetPendingUpdateInformation(): void {
     $this->setupBasicExtensions();
@@ -319,7 +332,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -355,7 +368,9 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateInformation
+   * Tests get pending update information with existing updates.
+   *
+   * @legacy-covers ::getPendingUpdateInformation
    */
   public function testGetPendingUpdateInformationWithExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -371,7 +386,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -405,7 +420,9 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateInformation
+   * Tests get pending update information with removed updates.
+   *
+   * @legacy-covers ::getPendingUpdateInformation
    */
   public function testGetPendingUpdateInformationWithRemovedUpdates(): void {
     $this->setupBasicExtensions();
@@ -432,7 +449,9 @@ EOS;
   }
 
   /**
-   * @covers ::getUpdateFunctions
+   * Tests get update functions.
+   *
+   * @legacy-covers ::getUpdateFunctions
    */
   public function testGetUpdateFunctions(): void {
     $this->setupBasicExtensions();
@@ -441,7 +460,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -468,7 +487,9 @@ EOS;
   }
 
   /**
-   * @covers ::registerInvokedUpdates
+   * Tests register invoked updates without existing updates.
+   *
+   * @legacy-covers ::registerInvokedUpdates
    */
   public function testRegisterInvokedUpdatesWithoutExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -484,7 +505,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -508,7 +529,9 @@ EOS;
   }
 
   /**
-   * @covers ::registerInvokedUpdates
+   * Tests register invoked updates with multiple.
+   *
+   * @legacy-covers ::registerInvokedUpdates
    */
   public function testRegisterInvokedUpdatesWithMultiple(): void {
     $this->setupBasicExtensions();
@@ -524,7 +547,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -548,7 +571,9 @@ EOS;
   }
 
   /**
-   * @covers ::registerInvokedUpdates
+   * Tests register invoked updates with existing updates.
+   *
+   * @legacy-covers ::registerInvokedUpdates
    */
   public function testRegisterInvokedUpdatesWithExistingUpdates(): void {
     $this->setupBasicExtensions();
@@ -583,7 +608,9 @@ EOS;
   }
 
   /**
-   * @covers ::filterOutInvokedUpdatesByExtension
+   * Tests filter out invoked updates by extension.
+   *
+   * @legacy-covers ::filterOutInvokedUpdatesByExtension
    */
   public function testFilterOutInvokedUpdatesByExtension(): void {
     $this->setupBasicExtensions();
@@ -599,7 +626,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);
@@ -623,7 +650,9 @@ EOS;
   }
 
   /**
-   * @covers ::getPendingUpdateFunctions
+   * Tests get pending custom update functions.
+   *
+   * @legacy-covers ::getPendingUpdateFunctions
    */
   public function testGetPendingCustomUpdateFunctions(): void {
     // Set up a simplified module structure with custom update hooks.
@@ -636,6 +665,7 @@ EOS;
     $info_d = <<<'EOS'
 type: theme
 name: Theme D
+core_version_requirement: '*'
 EOS;
 
     $module_a = <<<'EOS'
@@ -686,7 +716,7 @@ EOS;
     $theme_handler = $this->prophesize(ThemeHandlerInterface::class);
     $theme_handler->listInfo()->willReturn([
       'theme_d' => [
-        'type' => 'theme_d',
+        'type' => 'theme',
         'pathname' => 'core/themes/theme_d/theme_d.info.yml',
       ],
     ]);

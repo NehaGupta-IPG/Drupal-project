@@ -62,6 +62,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
 
   /**
    * The user authentication.
+   *
    * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
    */
   protected $userAuth;
@@ -201,7 +202,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         $authenticated = $this->userAuth->authenticateAccount($account, $credentials['pass']) ? $account->id() : FALSE;
       }
       else {
-        $authenticated = $this->userAuth->authenticateAccount($credentials['name'], $credentials['pass']);
+        $authenticated = $this->userAuth->authenticate($credentials['name'], $credentials['pass']);
       }
       if ($authenticated) {
         $this->userFloodControl->clear('user.http_login', $this->getLoginFloodIdentifier($request, $credentials['name']));
@@ -309,10 +310,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
    *
    * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There
    * is no replacement.
-   * @see https://www.drupal.org/node/3425340
+   * @see https://www.drupal.org/node/3427209
    */
   protected function userIsBlocked($name) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3425340', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3427209', E_USER_DEPRECATED);
     return user_is_blocked($name);
   }
 
@@ -373,7 +374,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   protected function getRequestFormat(Request $request) {
     $format = $request->getRequestFormat();
     if (!in_array($format, $this->serializerFormats)) {
-      throw new BadRequestHttpException("Unrecognized format: $format.");
+      throw new BadRequestHttpException("Unrecognized format.");
     }
     return $format;
   }

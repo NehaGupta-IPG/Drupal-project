@@ -8,15 +8,15 @@ use Drupal\Component\Discovery\DiscoveryException;
 use Drupal\Component\Discovery\YamlDirectoryDiscovery;
 use Drupal\Component\FileCache\FileCacheFactory;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * YamlDirectoryDiscoveryTest component unit tests.
- *
- * @coversDefaultClass \Drupal\Component\Discovery\YamlDirectoryDiscovery
- *
- * @group Discovery
  */
+#[CoversClass(YamlDirectoryDiscovery::class)]
+#[Group('Discovery')]
 class YamlDirectoryDiscoveryTest extends TestCase {
 
   /**
@@ -30,7 +30,7 @@ class YamlDirectoryDiscoveryTest extends TestCase {
   /**
    * Tests YAML directory discovery.
    *
-   * @covers ::findAll
+   * @legacy-covers ::findAll
    */
   public function testDiscovery(): void {
     vfsStream::setup('modules', NULL, [
@@ -82,7 +82,8 @@ class YamlDirectoryDiscoveryTest extends TestCase {
     $discovery = new YamlDirectoryDiscovery($directories, 'test');
     $data = $discovery->findAll();
 
-    // The file path is dependent on the operating system, so we adjust the directory separator.
+    // The file path is dependent on the operating system, so we adjust the
+    // directory separator.
     $this->assertSame(['id' => 'item1', 'name' => 'test1 item 1', YamlDirectoryDiscovery::FILE_KEY => 'vfs://modules/test_1/subdir1' . DIRECTORY_SEPARATOR . 'item_1.test.yml'], $data['test_1']['item1']);
     $this->assertSame(['id' => 'item2', 'name' => 'test1 item 2', YamlDirectoryDiscovery::FILE_KEY => 'vfs://modules/test_1/subdir2' . DIRECTORY_SEPARATOR . 'item_2.test.yml'], $data['test_1']['item2']);
     $this->assertCount(2, $data['test_1']);
@@ -101,7 +102,7 @@ class YamlDirectoryDiscoveryTest extends TestCase {
   /**
    * Tests YAML directory discovery with an alternate ID key.
    *
-   * @covers ::findAll
+   * @legacy-covers ::findAll
    */
   public function testDiscoveryAlternateId(): void {
     vfsStream::setup('modules', NULL, [
@@ -123,8 +124,8 @@ class YamlDirectoryDiscoveryTest extends TestCase {
   /**
    * Tests YAML directory discovery with a missing ID key.
    *
-   * @covers ::findAll
-   * @covers ::getIdentifier
+   * @legacy-covers ::findAll
+   * @legacy-covers ::getIdentifier
    */
   public function testDiscoveryNoIdException(): void {
     $this->expectException(DiscoveryException::class);
@@ -145,7 +146,7 @@ class YamlDirectoryDiscoveryTest extends TestCase {
   /**
    * Tests YAML directory discovery with invalid YAML.
    *
-   * @covers ::findAll
+   * @legacy-covers ::findAll
    */
   public function testDiscoveryInvalidYamlException(): void {
     $this->expectException(DiscoveryException::class);
