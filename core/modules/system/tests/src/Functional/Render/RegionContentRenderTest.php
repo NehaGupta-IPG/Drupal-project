@@ -3,12 +3,12 @@
 namespace Drupal\Tests\system\Functional\Render;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests if blocks can be rendered separately in a region template.
- *
- * @group Render
  */
+#[Group('Render')]
 class RegionContentRenderTest extends BrowserTestBase {
 
   /**
@@ -24,7 +24,7 @@ class RegionContentRenderTest extends BrowserTestBase {
   /**
    * Tests the rendering of blocks in a region template.
    */
-  public function testRegionContentRendering() {
+  public function testRegionContentRendering(): void {
     // Define test blocks.
     $test_blocks = [
       'first' => [
