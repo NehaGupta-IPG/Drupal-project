@@ -221,7 +221,8 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       $fileExtension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
 
-      $isThemeSettings = end(explode('/', $filename)) === 'theme-settings.php';
+      $filePath = explode('/', $filename);
+      $isThemeSettings = end($filePath) === 'theme-settings.php';
 
       if ($fileExtension === 'php' && !$isThemeSettings) {
         $cached = $hookFileCache->get($filename);
