@@ -246,9 +246,34 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $this->assertSession()->pageTextContains('Test 1.9 FR');
     $this->assertSession()->pageTextContains('This translation needs to be updated');
 
-    // Mark the French node as not outdated anymore.
+    // Re-save the French node, keeping it outdated. We want to test that
+    // re-saving it in the same state removes the outdated status from the
+    // old affection revision.
     $edit = [
       'title[0][value]' => 'Test 1.12 FR',
+      'content_translation[outdated]' => 1,
+    ];
+    $this->drupalGet($fr_edit_url);
+    $this->submitForm($edit, $this->t('Save (this translation)'));
+
+    // Assert that the stored French version is no longer the latest affected
+    // revision.
+    $this->assertNotEquals($latest_affected_revision_id_fr, $storage->getLatestTranslationAffectedRevisionId($id, 'fr'));
+
+    // Assert that the old stored French revision is marked not outdated.
+    $latest_affected_revision_fr = $storage->loadRevision($latest_affected_revision_id_fr)->getTranslation('fr');
+    $this->assertFalse($translation_manager->getTranslationMetadata($latest_affected_revision_fr)->isOutdated());
+
+    // Update the stored French revision.
+    $latest_affected_revision_id_fr = $storage->getLatestTranslationAffectedRevisionId($id, 'fr');
+
+    // Assert that the stored French revision is marked outdated.
+    $latest_affected_revision_fr = $storage->loadRevision($latest_affected_revision_id_fr)->getTranslation('fr');
+    $this->assertTrue($translation_manager->getTranslationMetadata($latest_affected_revision_fr)->isOutdated());
+
+    // Mark the French node as not outdated anymore.
+    $edit = [
+      'title[0][value]' => 'Test 1.13 FR',
       'content_translation[outdated]' => 0,
     ];
     $this->drupalGet($fr_edit_url);
@@ -272,7 +297,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $this->assertSession()->pageTextContains('Test 1.11 IT');
     $this->assertSession()->pageTextContains('Flag other translations as outdated');
     $this->drupalGet($fr_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.12 FR');
+    $this->assertSession()->pageTextContains('Test 1.13 FR');
     $this->assertSession()->pageTextContains('Flag other translations as outdated');
 
   }
