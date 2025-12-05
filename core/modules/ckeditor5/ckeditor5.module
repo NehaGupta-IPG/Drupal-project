@@ -201,7 +201,6 @@ function _ckeditor5_theme_css($theme = NULL): array {
     }
     if (isset($info['base theme'])) {
       $skip = FALSE;
-      
       if (isset($info['libraries-override'])) {
         foreach ($info['libraries-override'] as $library => $override) {
           if ($library === $info['base theme'] . '/ckeditor5-stylesheets' && $override == FALSE) {
@@ -209,7 +208,6 @@ function _ckeditor5_theme_css($theme = NULL): array {
           }
         }
       }
-
       if (!$skip) {
         $css = array_merge(_ckeditor5_theme_css($info['base theme']), $css);
       }
