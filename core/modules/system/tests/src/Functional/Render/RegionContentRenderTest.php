@@ -6,11 +6,13 @@ namespace Drupal\Tests\system\Functional\Render;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests if blocks can be rendered separately in a region template.
  */
 #[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class RegionContentRenderTest extends BrowserTestBase {
 
   /**
