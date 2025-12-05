@@ -1,0 +1,8 @@
+{% if content %}
+  <div id="wrapper-special">
+    {{ content.special }}
+  </div>
+  <div id="wrapper-the-rest">
+    {{ content|without('special') }}
+  </div>
+{% endif %}

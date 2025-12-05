@@ -432,7 +432,10 @@ class ThemePreprocess {
    */
   public function preprocessRegion(array &$variables): void {
     // Create the $content variable that templates expect.
-    $variables['content'] = $variables['elements']['#children'];
+    $variables['content'] = [];
+    foreach (Element::children($variables['elements']) as $key) {
+      $variables['content'][$key] = $variables['elements'][$key];
+    }
     $variables['region'] = $variables['elements']['#region'];
   }
 
