@@ -9,11 +9,13 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\VarDumper\VarDumper;
@@ -148,20 +150,20 @@ abstract class UnitTestCase extends TestCase {
    * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\StringTranslation\TranslationInterface
    *   A mock translation object.
    */
-  public function getStringTranslationStub() {
-    $translation = $this->createMock('Drupal\Core\StringTranslation\TranslationInterface');
-    $translation->expects($this->any())
+  public function getStringTranslationStub(): TranslationInterface&Stub {
+    $translation = $this->createStub(TranslationInterface::class);
+    $translation
       ->method('translate')
       ->willReturnCallback(function ($string, array $args = [], array $options = []) use ($translation) {
         // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         return new TranslatableMarkup($string, $args, $options, $translation);
       });
-    $translation->expects($this->any())
+    $translation
       ->method('translateString')
       ->willReturnCallback(function (TranslatableMarkup $wrapper) {
         return $wrapper->getUntranslatedString();
       });
-    $translation->expects($this->any())
+    $translation
       ->method('formatPlural')
       ->willReturnCallback(function ($count, $singular, $plural, array $args = [], array $options = []) use ($translation) {
         $wrapper = new PluralTranslatableMarkup($count, $singular, $plural, $args, $options, $translation);

@@ -5,16 +5,21 @@ declare(strict_types=1);
 namespace Drupal\Tests\history\Unit;
 
 use Drupal\comment\CommentLinkBuilder;
+use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
 use Drupal\history\HistoryCommentLinkBuilder;
 use Drupal\history\HistoryManager;
+use Drupal\node\NodeInterface;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * This is duplicated from CommentLinkBuilderTest with history additions.
@@ -29,10 +34,8 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
 
   /**
    * Comment manager mock.
-   *
-   * @var \Drupal\comment\CommentManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $commentManager;
+  protected CommentManagerInterface&Stub $commentManager;
 
   /**
    * String translation mock.
@@ -43,17 +46,13 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
 
   /**
    * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&Stub $entityTypeManager;
 
   /**
    * Current user proxy mock.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $currentUser;
+  protected AccountProxyInterface&Stub $currentUser;
 
   /**
    * Timestamp used in test.
@@ -82,22 +81,22 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->commentManager = $this->createMock('\Drupal\comment\CommentManagerInterface');
+    $this->commentManager = $this->createStub(CommentManagerInterface::class);
     $this->stringTranslation = $this->getStringTranslationStub();
-    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->currentUser = $this->createMock('\Drupal\Core\Session\AccountProxyInterface');
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $this->currentUser = $this->createStub(AccountProxyInterface::class);
     $this->commentLinkBuilder = new CommentLinkBuilder($this->currentUser, $this->commentManager, $this->stringTranslation);
-    $this->decoratedCommentLinkBuilder = new HistoryCommentLinkBuilder($this->commentLinkBuilder, $this->commentManager, $this->currentUser, $this->entityTypeManager, $this->createMock(HistoryManager::class));
-    $this->commentManager->expects($this->any())
+    $this->decoratedCommentLinkBuilder = new HistoryCommentLinkBuilder($this->commentLinkBuilder, $this->commentManager, $this->currentUser, $this->entityTypeManager, $this->createStub(HistoryManager::class));
+    $this->commentManager
       ->method('getFields')
       ->with('node')
       ->willReturn([
         'comment' => [],
       ]);
-    $this->commentManager->expects($this->any())
+    $this->commentManager
       ->method('forbiddenMessage')
       ->willReturn("Can't let you do that Dave.");
-    $this->stringTranslation->expects($this->any())
+    $this->stringTranslation
       ->method('formatPlural')
       ->willReturnArgument(1);
   }
@@ -126,16 +125,16 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
   #[DataProvider('getLinkCombinations')]
   public function testCommentLinkBuilder(array $node_args, $context, $has_access_comments, $history_exists, $has_post_comments, $is_anonymous, $expected): void {
     $node = $this->getMockNode(...$node_args);
-    $this->currentUser->expects($this->any())
+    $this->currentUser
       ->method('hasPermission')
       ->willReturnMap([
         ['access comments', $has_access_comments],
         ['post comments', $has_post_comments],
       ]);
-    $this->currentUser->expects($this->any())
+    $this->currentUser
       ->method('isAuthenticated')
       ->willReturn(!$is_anonymous);
-    $this->currentUser->expects($this->any())
+    $this->currentUser
       ->method('isAnonymous')
       ->willReturn($is_anonymous);
     $links = $this->decoratedCommentLinkBuilder->buildCommentedEntityLinks($node, $context);
@@ -283,9 +282,9 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
    * @return \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\MockObject
    *   Mock node for testing.
    */
-  protected function getMockNode($has_field, $comment_status, $form_location, $comment_count) {
-    $node = $this->createMock('\Drupal\node\NodeInterface');
-    $node->expects($this->any())
+  protected function getMockNode($has_field, $comment_status, $form_location, $comment_count): NodeInterface&Stub {
+    $node = $this->createStub(NodeInterface::class);
+    $node
       ->method('hasField')
       ->willReturn($has_field);
 
@@ -297,35 +296,35 @@ class HistoryCommentLinkBuilderTest extends UnitTestCase {
       'comment_count' => $comment_count,
       'last_comment_timestamp' => $this->timestamp,
     ];
-    $node->expects($this->any())
+    $node
       ->method('get')
       ->with('comment')
       ->willReturn($field_item);
 
-    $field_definition = $this->createMock('\Drupal\Core\Field\FieldDefinitionInterface');
-    $field_definition->expects($this->any())
+    $field_definition = $this->createStub(FieldDefinitionInterface::class);
+    $field_definition
       ->method('getSetting')
       ->with('form_location')
       ->willReturn($form_location);
-    $node->expects($this->any())
+    $node
       ->method('getFieldDefinition')
       ->with('comment')
       ->willReturn($field_definition);
 
-    $node->expects($this->any())
+    $node
       ->method('language')
       ->willReturn('und');
 
-    $node->expects($this->any())
+    $node
       ->method('getEntityTypeId')
       ->willReturn('node');
 
-    $node->expects($this->any())
+    $node
       ->method('id')
       ->willReturn(1);
 
     $url = Url::fromRoute('node.view');
-    $node->expects($this->any())
+    $node
       ->method('toUrl')
       ->willReturn($url);
 
