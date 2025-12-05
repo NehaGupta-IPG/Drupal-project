@@ -93,6 +93,7 @@ class TestSiteInstallCommand extends Command {
       ->addOption('install-profile', NULL, InputOption::VALUE_OPTIONAL, 'Install profile to install the site in. Defaults to testing.', 'testing')
       ->addOption('langcode', NULL, InputOption::VALUE_OPTIONAL, 'The language to install the site in. Defaults to en.', 'en')
       ->addOption('json', NULL, InputOption::VALUE_NONE, 'Output test site connection details in JSON.')
+      ->addOption('unique-apcu-namespace', NULL, InputOption::VALUE_OPTIONAL, 'Whether to use a unique APCu namespace for the test site. Useful if tests are modifying code on disk or adding modules or themes into the test site directory. Increases memory use. Defaults to false.', FALSE)
       ->addUsage('--setup-file core/tests/Drupal/TestSite/TestSiteMultilingualInstallTestScript.php --json')
       ->addUsage('--install-profile demo_umami --langcode fr')
       ->addUsage('--base-url "http://example.com" --db-url "mysql://username:password@localhost/database_name#table_prefix"');
@@ -107,6 +108,7 @@ class TestSiteInstallCommand extends Command {
     $root = dirname(__DIR__, 5);
     chdir($root);
     $class_name = $this->getSetupClass($input->getOption('setup-file'));
+    $this->apcuEnsureUniquePrefix = $input->getOption('unique-apcu-namespace');
     // Ensure we can install a site in the sites/simpletest directory.
     $this->ensureDirectory($root);
 

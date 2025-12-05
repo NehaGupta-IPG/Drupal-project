@@ -1,3 +1,5 @@
+const { testPerTheme } = require('../../globals');
+
 const mobileNavButtonSelector = 'button.mobile-nav-button';
 const headerNavSelector = '#header-nav';
 const linkSubMenuId = 'primary-menu-item-1';
@@ -49,6 +51,7 @@ module.exports = {
         setupFile:
           'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
         installProfile: 'minimal',
+        uniqueApcuNamespace: true,
       })
       .setWindowSize(1000, 800);
   },
@@ -56,145 +59,155 @@ module.exports = {
     browser.drupalUninstall();
   },
   'Verify mobile menu and submenu functionality': (browser) => {
-    browser
-      .drupalRelativeURL('/')
-      .assert.not.visible(headerNavSelector)
-      .click(mobileNavButtonSelector)
-      .waitForElementVisible(headerNavSelector)
-      // Test interactions for normal <a> menu links.
-      .assert.not.visible(`#${linkSubMenuId}`)
-      .assert.attributeEquals(
-        `[aria-controls="${linkSubMenuId}"]`,
-        'aria-expanded',
-        'false',
-      )
-      .waitForElementVisible(`[aria-controls="${linkSubMenuId}"]`)
-      .click(`[aria-controls="${linkSubMenuId}"]`)
-      .waitForElementVisible(`#${linkSubMenuId}`)
-      .assert.attributeEquals(
-        `[aria-controls="${linkSubMenuId}"]`,
-        'aria-expanded',
-        'true',
-      )
-      // Test interactions for route:<button> menu links.
-      .assert.not.visible(`#${buttonSubMenuId}`)
-      .assert.attributeEquals(
-        `[aria-controls="${buttonSubMenuId}"]`,
-        'aria-expanded',
-        'false',
-      )
-      .click(`[aria-controls="${buttonSubMenuId}"]`)
-      .assert.visible(`#${buttonSubMenuId}`)
-      .assert.attributeEquals(
-        `[aria-controls="${buttonSubMenuId}"]`,
-        'aria-expanded',
-        'true',
-      );
-  },
-  'Verify mobile menu focus trap': (browser) => {
-    browser.drupalRelativeURL('/').click(mobileNavButtonSelector);
-    focusTrapCheck(
-      browser,
-      `${headerNavSelector} *, ${mobileNavButtonSelector}`,
-      17,
-    );
-    focusTrapCheck(
-      browser,
-      `${headerNavSelector} *, ${mobileNavButtonSelector}`,
-      19,
-      true,
-    );
-  },
-  'Verify parent <button> focus on ESC in narrow navigation': (browser) => {
-    browser
-      // Verify functionality on regular link's button.
-      .drupalRelativeURL('/node')
-      .waitForElementVisible('body')
-      .click(mobileNavButtonSelector)
-      .waitForElementVisible(headerNavSelector)
-      .waitForElementVisible(`[aria-controls="${linkSubMenuId}"]`)
-      .click(`[aria-controls="${linkSubMenuId}"]`)
-      .waitForElementVisible(`#${linkSubMenuId}`)
-      .perform(function () {
-        return this.actions().sendKeys(browser.Keys.TAB);
-      })
-      .pause(50)
-      .execute(
-        // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
-        function (linkSubMenuId) {
-          return document.activeElement.matches(`#${linkSubMenuId} *`);
-        },
-        [linkSubMenuId],
-        (result) => {
-          browser.assert.ok(result.value);
-        },
-      )
-      .perform(function () {
-        return this.actions().sendKeys(browser.Keys.ESCAPE);
-      })
-      .pause(50)
-      .execute(
-        // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
-        function (linkSubMenuId) {
-          return document.activeElement.matches(
-            `[aria-controls="${linkSubMenuId}"]`,
-          );
-        },
-        [linkSubMenuId],
-        (result) => {
-          browser.assert.ok(result.value);
-        },
-      )
-      // Verify functionality on route:<button> button.
-      .click(`[aria-controls="${buttonSubMenuId}"]`)
-      .waitForElementVisible(`#${buttonSubMenuId}`)
-      .perform(function () {
-        return this.actions().sendKeys(browser.Keys.TAB);
-      })
-      .pause(50)
-      .execute(
-        // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
-        function (buttonSubMenuId) {
-          return document.activeElement.matches(`#${buttonSubMenuId} *`);
-        },
-        [buttonSubMenuId],
-        (result) => {
-          browser.assert.ok(result.value);
-        },
-      )
-      .perform(function () {
-        return this.actions().sendKeys(browser.Keys.ESCAPE);
-      })
-      .pause(50)
-      .execute(
-        // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
-        function (buttonSubMenuId) {
-          return document.activeElement.matches(
-            `[aria-controls="${buttonSubMenuId}"]`,
-          );
-        },
-        [buttonSubMenuId],
-        (result) => {
-          browser.assert.ok(result.value);
-        },
-      );
-  },
-  'Verify clicks on hashes close mobile menu': (browser) => {
-    browser
-      .drupalRelativeURL('/node')
-      .waitForElementVisible('body')
-      .click(mobileNavButtonSelector)
-      .waitForElementVisible(headerNavSelector)
-      .click('[href="#footer"]')
-      .waitForElementNotVisible(headerNavSelector);
-  },
-  'Verify mobile menu works when Big Pipe when authenticated': (browser) => {
-    browser.drupalInstallModule('big_pipe').drupalLoginAsAdmin(() => {
+    testPerTheme(browser, null, (browser, theme, title) => {
       browser
         .drupalRelativeURL('/')
         .assert.not.visible(headerNavSelector)
         .click(mobileNavButtonSelector)
-        .waitForElementVisible(headerNavSelector);
+        .waitForElementVisible(headerNavSelector)
+        // Test interactions for normal <a> menu links.
+        .assert.not.visible(`#${linkSubMenuId}`)
+        .assert.attributeEquals(
+          `[aria-controls="${linkSubMenuId}"]`,
+          'aria-expanded',
+          'false',
+        )
+        .waitForElementVisible(`[aria-controls="${linkSubMenuId}"]`)
+        .click(`[aria-controls="${linkSubMenuId}"]`)
+        .waitForElementVisible(`#${linkSubMenuId}`)
+        .assert.attributeEquals(
+          `[aria-controls="${linkSubMenuId}"]`,
+          'aria-expanded',
+          'true',
+        )
+        // Test interactions for route:<button> menu links.
+        .assert.not.visible(`#${buttonSubMenuId}`)
+        .assert.attributeEquals(
+          `[aria-controls="${buttonSubMenuId}"]`,
+          'aria-expanded',
+          'false',
+        )
+        .click(`[aria-controls="${buttonSubMenuId}"]`)
+        .assert.visible(`#${buttonSubMenuId}`)
+        .assert.attributeEquals(
+          `[aria-controls="${buttonSubMenuId}"]`,
+          'aria-expanded',
+          'true',
+        );
+    });
+  },
+  'Verify mobile menu focus trap': (browser) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
+      browser.drupalRelativeURL('/').click(mobileNavButtonSelector);
+      focusTrapCheck(
+        browser,
+        `${headerNavSelector} *, ${mobileNavButtonSelector}`,
+        17,
+      );
+      focusTrapCheck(
+        browser,
+        `${headerNavSelector} *, ${mobileNavButtonSelector}`,
+        19,
+        true,
+      );
+    });
+  },
+  'Verify parent <button> focus on ESC in narrow navigation': (browser) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
+      browser
+        // Verify functionality on regular link's button.
+        .drupalRelativeURL('/node')
+        .waitForElementVisible('body')
+        .click(mobileNavButtonSelector)
+        .waitForElementVisible(headerNavSelector)
+        .waitForElementVisible(`[aria-controls="${linkSubMenuId}"]`)
+        .click(`[aria-controls="${linkSubMenuId}"]`)
+        .waitForElementVisible(`#${linkSubMenuId}`)
+        .perform(function () {
+          return this.actions().sendKeys(browser.Keys.TAB);
+        })
+        .pause(50)
+        .execute(
+          // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
+          function (linkSubMenuId) {
+            return document.activeElement.matches(`#${linkSubMenuId} *`);
+          },
+          [linkSubMenuId],
+          (result) => {
+            browser.assert.ok(result.value);
+          },
+        )
+        .perform(function () {
+          return this.actions().sendKeys(browser.Keys.ESCAPE);
+        })
+        .pause(50)
+        .execute(
+          // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
+          function (linkSubMenuId) {
+            return document.activeElement.matches(
+              `[aria-controls="${linkSubMenuId}"]`,
+            );
+          },
+          [linkSubMenuId],
+          (result) => {
+            browser.assert.ok(result.value);
+          },
+        )
+        // Verify functionality on route:<button> button.
+        .click(`[aria-controls="${buttonSubMenuId}"]`)
+        .waitForElementVisible(`#${buttonSubMenuId}`)
+        .perform(function () {
+          return this.actions().sendKeys(browser.Keys.TAB);
+        })
+        .pause(50)
+        .execute(
+          // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
+          function (buttonSubMenuId) {
+            return document.activeElement.matches(`#${buttonSubMenuId} *`);
+          },
+          [buttonSubMenuId],
+          (result) => {
+            browser.assert.ok(result.value);
+          },
+        )
+        .perform(function () {
+          return this.actions().sendKeys(browser.Keys.ESCAPE);
+        })
+        .pause(50)
+        .execute(
+          // eslint-disable-next-line func-names, prefer-arrow-callback, no-shadow
+          function (buttonSubMenuId) {
+            return document.activeElement.matches(
+              `[aria-controls="${buttonSubMenuId}"]`,
+            );
+          },
+          [buttonSubMenuId],
+          (result) => {
+            browser.assert.ok(result.value);
+          },
+        );
+    });
+  },
+  'Verify clicks on hashes close mobile menu': (browser) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
+      browser
+        .drupalRelativeURL('/node')
+        .waitForElementVisible('body')
+        .click(mobileNavButtonSelector)
+        .waitForElementVisible(headerNavSelector)
+        .click('[href="#footer"]')
+        .waitForElementNotVisible(headerNavSelector);
+    });
+  },
+  'Verify mobile menu works when Big Pipe when authenticated': (browser) => {
+    testPerTheme(browser, null, (browser, theme, title) => {
+      browser.drupalInstallModule('big_pipe', false, () => {
+        browser
+          .drupalRelativeURL('/')
+          .assert.not.visible(headerNavSelector)
+          .click(mobileNavButtonSelector)
+          .waitForElementVisible(headerNavSelector);
+      });
     });
   },
 };

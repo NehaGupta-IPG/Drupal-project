@@ -1,3 +1,5 @@
+const { testPerTheme } = require('../../globals');
+
 const checkboxSelector = '#edit-form-checkboxes-title-attribute';
 
 const inputTypes = [
@@ -77,36 +79,41 @@ module.exports = {
       setupFile:
         'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
       installProfile: 'minimal',
+      uniqueApcuNamespace: true,
     });
   },
   after(browser) {
     browser.drupalUninstall();
   },
   'Confirm that title attribute exists if set to display': (browser) => {
-    browser
-      .setWindowSize(1400, 800)
-      .drupalRelativeURL('/form_test/form-labels')
-      .waitForElementVisible(checkboxSelector, 1000)
-      .assert.attributeEquals(
-        checkboxSelector,
-        'title',
-        'Checkboxes test (Required)',
-      );
+    testPerTheme(browser, null, (browser, theme, title) => {
+      browser
+        .setWindowSize(1400, 800)
+        .drupalRelativeURL('/form_test/form-labels')
+        .waitForElementVisible(checkboxSelector, 1000)
+        .assert.attributeEquals(
+          checkboxSelector,
+          'title',
+          'Checkboxes test (Required)',
+        );
+    });
   },
   'Check form element classes by type': (browser) => {
-    browser.drupalRelativeURL('/form_test/form-labels');
-    inputTypes.forEach((inputType) => {
-      browser.assert.hasClass(inputType.selector, [
-        'form-element',
-        `form-element--type-${inputType.type}`,
-        `form-element--api-${inputType.api}`,
-      ]);
-    });
-    booleanInputTypes.forEach((booleanInputType) => {
-      browser.assert.hasClass(booleanInputType.selector, [
-        'form-boolean',
-        `form-boolean--type-${booleanInputType.type}`,
-      ]);
+    testPerTheme(browser, null, (browser, theme, title) => {
+      browser.drupalRelativeURL('/form_test/form-labels');
+      inputTypes.forEach((inputType) => {
+        browser.assert.hasClass(inputType.selector, [
+          'form-element',
+          `form-element--type-${inputType.type}`,
+          `form-element--api-${inputType.api}`,
+        ]);
+      });
+      booleanInputTypes.forEach((booleanInputType) => {
+        browser.assert.hasClass(booleanInputType.selector, [
+          'form-boolean',
+          `form-boolean--type-${booleanInputType.type}`,
+        ]);
+      });
     });
   },
 };

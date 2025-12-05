@@ -19,7 +19,7 @@ class TestSiteClaroInstallTestScript implements TestSetupInterface {
   /**
    * {@inheritdoc}
    */
-  public function setup() {
+  public function setup(): void {
     // Install required module for the Olivero front page.
     $module_installer = \Drupal::service('module_installer');
     assert($module_installer instanceof ModuleInstallerInterface);

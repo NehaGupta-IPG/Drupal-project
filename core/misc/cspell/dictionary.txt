@@ -445,7 +445,9 @@ strikethrough
 striptags
 strs
 styleguide
+stylelint
 stylelintcache
+stylelintrc
 stylescombo
 subarrays
 subchild

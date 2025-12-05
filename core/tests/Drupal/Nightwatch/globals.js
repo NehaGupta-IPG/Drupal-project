@@ -10,6 +10,23 @@ const commandAsWebserver = (command) => {
   return command;
 };
 
+const oliveroTestThemes = {
+  olivero: 'Olivero',
+  test_custom_theme: 'Test Custom Theme',
+};
+
+const testPerTheme = (browser, user, fn) => {
+  Object.entries(oliveroTestThemes).forEach(([theme, title]) => {
+    browser.drupalEnableTheme(theme, false);
+
+    if (user) {
+      browser.drupalLogin(user);
+    }
+
+    fn.call({}, browser, theme, title);
+  });
+};
+
 module.exports = {
   afterEach: (browser, done) => {
     // Writes the console log - used by the "logAndEnd" command.
@@ -47,4 +64,5 @@ module.exports = {
     }
   },
   commandAsWebserver,
+  testPerTheme,
 };

@@ -1,0 +1,11 @@
+ignore:
+  - 'tests/**'
+  - '/src/StarterKit.php'
+  - '/olivero.post_update.php'
+  - '/README.md'
+no_edit:
+  - '/starterkit.md'
+no_rename: []
+package: null
+info:
+  version: 1.0.0
