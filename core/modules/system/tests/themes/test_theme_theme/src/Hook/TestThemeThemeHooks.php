@@ -8,6 +8,7 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\file\Entity\File;
 
 /**
  * Hook implementations for test_theme_theme.
@@ -34,7 +35,18 @@ class TestThemeThemeHooks {
         ],
       ],
     ];
-    $form['#submit'][] = 'test_theme_theme_form_system_theme_settings_submit';
+    $form['#submit'][] = [TestThemeThemeHooks::class, 'themeSettingsSubmit'];
+  }
+
+  /**
+   * Test theme form settings submission handler.
+   */
+  public function themeSettingsSubmit(&$form, FormStateInterface $form_state): void {
+    if ($file_id = $form_state->getValue(['custom_logo', '0'])) {
+      $file = File::load($file_id);
+      $file->setPermanent();
+      $file->save();
+    }
   }
 
 }
