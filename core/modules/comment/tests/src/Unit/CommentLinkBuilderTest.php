@@ -76,7 +76,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
     $this->commentManager->expects($this->any())
       ->method('forbiddenMessage')
       ->willReturn("Can't let you do that Dave.");
-    $this->stringTranslation->expects($this->any())
+    $this->stringTranslation
       ->method('formatPlural')
       ->willReturnArgument(1);
   }
