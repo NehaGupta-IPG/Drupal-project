@@ -168,7 +168,6 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
       '--testdox',
       '--log-junit',
       $log_junit_file_path,
-      '--fail-on-phpunit-notice',
     ];
     if ($colors) {
       $command[] = '--colors=always';
