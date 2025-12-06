@@ -35,6 +35,11 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
           $group_keys = $item['preprocess'] ? [$item['type'], $item['group']] : FALSE;
           break;
 
+        case 'inline-file':
+          // Do not group inline-file items.
+          $group_keys = FALSE;
+          break;
+
         case 'external':
           // Do not group external items.
           $group_keys = FALSE;

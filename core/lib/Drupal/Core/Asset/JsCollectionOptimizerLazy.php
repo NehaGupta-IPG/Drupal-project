@@ -93,6 +93,13 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
           }
           break;
 
+        case 'inline-file':
+          // We don't do any aggregation and hence also no caching for inline-file
+          // JS assets.
+          $uri = $js_group['items'][0]['data'];
+          $js_assets[$order]['data'] = $uri;
+          break;
+
         case 'external':
           // We don't do any aggregation and hence also no caching for external
           // JS assets.

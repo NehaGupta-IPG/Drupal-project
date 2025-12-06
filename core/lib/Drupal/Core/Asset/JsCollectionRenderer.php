@@ -2,9 +2,11 @@
 
 namespace Drupal\Core\Asset;
 
+use Drupal;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\File\FileUrlGeneratorInterface;
+use Drupal\Core\Render\Markup;
 
 /**
  * Renders JavaScript assets.
@@ -79,6 +81,11 @@ class JsCollectionRenderer implements AssetCollectionRendererInterface {
           if (!isset($js_asset['preprocessed'])) {
             $element['#attributes']['src'] .= $query_string_separator . ($js_asset['cache'] ? $query_string : $this->time->getRequestTime());
           }
+          break;
+
+        case 'inline-file':
+          $element['#value'] = Markup::create(file_get_contents(Drupal::root() . '/' . $js_asset['data']));
+          $element['#attributes']['type'] = 'text/javascript';
           break;
 
         case 'external':
