@@ -631,7 +631,25 @@
     if (elementSettings.dialogRenderer) {
       wrapper += `.${elementSettings.dialogRenderer}`;
     }
-    ajax.options.url += `${Drupal.ajax.WRAPPER_FORMAT}=${wrapper}`;
+
+    // Update or add the wrapper format.
+    if (ajax.options.url.indexOf(Drupal.ajax.WRAPPER_FORMAT) !== -1) {
+      // Break url string apart to update the wrapper_format.
+      let query = ajax.options.url.split('?');
+      let query_params = query[1].split('&');
+      query_params.forEach((param, index) => {
+        if (param.indexOf(Drupal.ajax.WRAPPER_FORMAT) !== -1) {
+          param =`${Drupal.ajax.WRAPPER_FORMAT}=${wrapper}`;
+        }
+        query_params[index] = param;
+      });
+      // Rebuild the url string.
+      query[1] = query_params.join('&');
+      ajax.options.url = query.join('?');
+    }
+    else {
+      ajax.options.url += `${Drupal.ajax.WRAPPER_FORMAT}=${wrapper}`;
+    }
 
     // Bind the ajaxSubmit function to the element event.
     $(ajax.element).on(elementSettings.event, function (event) {
