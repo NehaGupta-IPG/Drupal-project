@@ -7,9 +7,12 @@ use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Config\Action\ConfigActionManager;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Attribute\RemoveHook;
+use Drupal\Core\Hook\Order\Order;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\layout_builder\Hook\LayoutBuilderHooks;
 use Drupal\navigation\NavigationContentLinks;
 use Drupal\navigation\NavigationRenderer;
 use Drupal\navigation\Plugin\SectionStorage\NavigationSectionStorage;
@@ -52,13 +55,14 @@ class NavigationHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
+  #[RemoveHook('help', class: LayoutBuilderHooks::class, method: 'help')]
   public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.navigation':
         $output = '';
         $output .= '<h3>' . $this->t('About') . '</h3>';
         $output .= '<p>' . $this->t('The Navigation module provides a left-aligned, collapsible, vertical sidebar navigation.') . '</p>';
-        $output .= '<p>' . $this->t('For more information, see the <a href=":docs">online documentation for the Navigation module</a>.', [':docs' => 'https://www.drupal.org/project/navigation']) . '</p>';
+        $output .= '<p>' . $this->t('For more information, see the <a href=":docs">online documentation for the Navigation module</a>.', [':docs' => 'https://www.drupal.org/docs/develop/core-modules-and-themes/core-modules/navigation-module']) . '</p>';
         return $output;
     }
     $configuration_route = 'layout_builder.navigation.';
@@ -76,7 +80,7 @@ class NavigationHooks {
   /**
    * Implements hook_page_top().
    */
-  #[Hook('page_top')]
+  #[Hook('page_top', order: Order::Last)]
   public function pageTop(array &$page_top): void {
     if (!$this->currentUser->hasPermission('access navigation')) {
       return;
@@ -84,45 +88,6 @@ class NavigationHooks {
     $this->navigationRenderer->removeToolbar($page_top);
     $this->navigationRenderer->buildNavigation($page_top);
     $this->navigationRenderer->buildTopBar($page_top);
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme($existing, $type, $theme, $path) : array {
-    $items['top_bar'] = ['render element' => 'element'];
-    $items['top_bar_page_actions'] = ['variables' => ['page_actions' => [], 'featured_page_actions' => []]];
-    $items['top_bar_page_action'] = ['variables' => ['link' => []]];
-    $items['block__navigation'] = ['render element' => 'elements', 'base hook' => 'block'];
-    $items['navigation_menu'] = [
-      'base hook' => 'menu',
-      'variables' => [
-        'menu_name' => NULL,
-        'title' => NULL,
-        'items' => [],
-        'attributes' => [],
-      ],
-    ];
-    $items['navigation_content_top'] = [
-      'variables' => [
-        'items' => [],
-      ],
-    ];
-    $items['navigation__messages'] = [
-      'variables' => [
-        'message_list' => NULL,
-      ],
-    ];
-    $items['navigation__message'] = [
-      'variables' => [
-        'attributes' => [],
-        'url' => NULL,
-        'content' => NULL,
-        'type' => 'status',
-      ],
-    ];
-    return $items;
   }
 
   /**

@@ -6,12 +6,14 @@ namespace Drupal\Tests\standard\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Standard installation profile JavaScript expectations.
- *
- * @group standard
  */
+#[Group('standard')]
+#[RunTestsInSeparateProcesses]
 class StandardJavascriptTest extends WebDriverTestBase {
 
   /**
@@ -39,9 +41,17 @@ class StandardJavascriptTest extends WebDriverTestBase {
     $this->drupalGet('');
     $this->assertBigPipePlaceholderReplacementCount(5);
 
-    // Node page: Six placeholders:
+    // Front page with warm render caches: Zero placeholders.
+    $this->drupalGet('');
+    $this->assertBigPipePlaceholderReplacementCount(0);
+
+    // Node page: Five placeholders.
     $this->drupalGet($node->toUrl());
-    $this->assertBigPipePlaceholderReplacementCount(6);
+    $this->assertBigPipePlaceholderReplacementCount(5);
+
+    // Node page second request: One placeholder for the comment form.
+    $this->drupalGet($node->toUrl());
+    $this->assertBigPipePlaceholderReplacementCount(1);
   }
 
   /**
@@ -52,10 +62,17 @@ class StandardJavascriptTest extends WebDriverTestBase {
    */
   protected function assertBigPipePlaceholderReplacementCount($expected_count): void {
     $web_assert = $this->assertSession();
-    $web_assert->waitForElement('css', 'script[data-big-pipe-event="stop"]');
+    if ($expected_count > 0) {
+      $web_assert->waitForElement('css', 'script[data-big-pipe-event="stop"]');
+    }
     $page = $this->getSession()->getPage();
     // Settings are removed as soon as they are processed.
-    $this->assertCount(0, $this->getDrupalSettings()['bigPipePlaceholderIds']);
+    if ($expected_count === 0) {
+      $this->assertArrayNotHasKey('bigPipePlaceholderIds', $this->getDrupalSettings());
+    }
+    else {
+      $this->assertCount(0, $this->getDrupalSettings()['bigPipePlaceholderIds']);
+    }
     $this->assertCount($expected_count, $page->findAll('css', 'script[data-big-pipe-replacement-for-placeholder-with-id]'));
   }
 
