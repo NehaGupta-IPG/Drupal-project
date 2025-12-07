@@ -131,7 +131,7 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
             $comment_form_location = $field_definition->getSetting('form_location');
             if ($this->currentUser->hasPermission('post comments')) {
               $links['comment-add'] = [
-                'title' => $this->t('Add new comment<span class="visually-hidden"> about @title</span>', [
+                'title' => $this->t('Add new comment<span class="visually-hidden"> on @title</span>', [
                   '@title' => $entity_label_stripped,
                 ]),
                 'language' => $entity->language(),
@@ -167,7 +167,7 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
               // if there are existing comments that the link will skip past.
               if ($comment_form_location == CommentItemInterface::FORM_SEPARATE_PAGE || (!empty($entity->get($field_name)->comment_count) && $this->currentUser->hasPermission('access comments'))) {
                 $links['comment-add'] = [
-                  'title' => $this->t('Add new comment<span class="visually-hidden"> about @title</span>', [
+                  'title' => $this->t('Add new comment<span class="visually-hidden"> on @title</span>', [
                     '@title' => $entity_label_stripped,
                   ]),
                   'attributes' => ['title' => $this->t('Share your thoughts and opinions.')],
