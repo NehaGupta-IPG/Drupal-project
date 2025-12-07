@@ -266,7 +266,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public function hideUntranslated(): bool {
-    return $this->configuration['hide_untranslated_menu_links'];
+    return (bool) $this->configuration['hide_untranslated_menu_links'];
   }
 
 }
