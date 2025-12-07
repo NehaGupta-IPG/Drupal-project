@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Component\Utility\Html;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Create a node with dangerous tags in its title and test that they are
- * escaped.
- *
- * @group node
+ * Tests that dangerous tags in the node title are escaped.
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTitleXSSTest extends NodeTestBase {
 
   /**
@@ -20,7 +23,7 @@ class NodeTitleXSSTest extends NodeTestBase {
   /**
    * Tests XSS functionality with a node entity.
    */
-  public function testNodeTitleXSS() {
+  public function testNodeTitleXSS(): void {
     // Prepare a user to do the stuff.
     $web_user = $this->drupalCreateUser([
       'create page content',

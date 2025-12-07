@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\image\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\CookieResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @group rest
+ * Tests Image Style Xml Cookie.
  */
+#[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class ImageStyleXmlCookieTest extends ImageStyleResourceTestBase {
 
   use CookieResourceTestTrait;
@@ -32,13 +38,5 @@ class ImageStyleXmlCookieTest extends ImageStyleResourceTestBase {
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  public function testGet() {
-    // @todo Remove this method override in https://www.drupal.org/node/2905655
-    $this->markTestSkipped();
-  }
 
 }

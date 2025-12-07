@@ -3,23 +3,15 @@
 namespace Drupal\serialization\Normalizer;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
 /**
  * Base class for Normalizers.
  */
-abstract class NormalizerBase implements SerializerAwareInterface, CacheableNormalizerInterface, CacheableSupportsMethodInterface {
+abstract class NormalizerBase implements SerializerAwareInterface, CacheableNormalizerInterface {
 
   use SerializerAwareTrait;
-
-  /**
-   * The interface or class that this Normalizer supports.
-   *
-   * @var string|array
-   */
-  protected $supportedInterfaceOrClass;
 
   /**
    * List of formats which supports (de-)normalization.
@@ -31,14 +23,13 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
   /**
    * {@inheritdoc}
    */
-  public function supportsNormalization($data, string $format = NULL, array $context = []): bool {
+  public function supportsNormalization($data, ?string $format = NULL, array $context = []): bool {
     // If we aren't dealing with an object or the format is not supported return
     // now.
     if (!is_object($data) || !$this->checkFormat($format)) {
       return FALSE;
     }
-
-    $supported = (array) $this->supportedInterfaceOrClass;
+    $supported = array_keys($this->getSupportedTypes($format));
 
     return (bool) array_filter($supported, function ($name) use ($data) {
       return $data instanceof $name;
@@ -52,13 +43,13 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
    * classes do. Therefore, this method is implemented at this level to reduce
    * code duplication.
    */
-  public function supportsDenormalization($data, string $type, string $format = NULL, array $context = []): bool {
+  public function supportsDenormalization($data, string $type, ?string $format = NULL, array $context = []): bool {
     // If the format is not supported return now.
     if (!$this->checkFormat($format)) {
       return FALSE;
     }
 
-    $supported = (array) $this->supportedInterfaceOrClass;
+    $supported = array_keys($this->getSupportedTypes($format));
 
     $subclass_check = function ($name) use ($type) {
       return (class_exists($name) || interface_exists($name)) && is_subclass_of($type, $name, TRUE);
@@ -78,7 +69,9 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
    *   specified this will return TRUE.
    */
   protected function checkFormat($format = NULL) {
-    if (!isset($format) || !isset($this->format)) {
+    // The format 'json_schema' is special-cased as it requires explicit
+    // support, as opposed to a permissive default-case value normalization.
+    if (!isset($format) || (!isset($this->format) && $format !== 'json_schema')) {
       return TRUE;
     }
 
@@ -90,7 +83,7 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
    *
    * @param array $context
    *   Context options for the normalizer.
-   * @param $data
+   * @param mixed $data
    *   The data that might have cacheability information.
    */
   protected function addCacheableDependency(array $context, $data) {
@@ -102,8 +95,10 @@ abstract class NormalizerBase implements SerializerAwareInterface, CacheableNorm
   /**
    * {@inheritdoc}
    */
-  public function hasCacheableSupportsMethod(): bool {
-    return FALSE;
+  public function getSupportedTypes(?string $format): array {
+    return [
+      '*' => FALSE,
+    ];
   }
 
 }

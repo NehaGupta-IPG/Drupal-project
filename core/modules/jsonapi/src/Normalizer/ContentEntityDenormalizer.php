@@ -18,11 +18,6 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 final class ContentEntityDenormalizer extends EntityDenormalizerBase {
 
   /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = ContentEntityInterface::class;
-
-  /**
    * Prepares the input data to create the entity.
    *
    * @param array $data
@@ -50,7 +45,7 @@ final class ContentEntityDenormalizer extends EntityDenormalizerBase {
     // User resource objects contain a read-only attribute that is not a real
     // field on the user entity type.
     // @see \Drupal\jsonapi\JsonApiResource\ResourceObject::extractContentEntityFields()
-    // @todo: eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
+    // @todo Eliminate this special casing in https://www.drupal.org/project/drupal/issues/3079254.
     if ($entity_type_id === 'user') {
       $data = array_diff_key($data, array_flip([$resource_type->getPublicName('display_name')]));
     }
@@ -91,8 +86,10 @@ final class ContentEntityDenormalizer extends EntityDenormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function hasCacheableSupportsMethod(): bool {
-    return TRUE;
+  public function getSupportedTypes(?string $format): array {
+    return [
+      ContentEntityInterface::class => TRUE,
+    ];
   }
 
 }

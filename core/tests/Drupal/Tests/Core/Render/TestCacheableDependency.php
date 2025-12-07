@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Render;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -9,9 +11,20 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
  */
 class TestCacheableDependency implements CacheableDependencyInterface {
 
+  /**
+   * The cache contexts.
+   */
   protected array $contexts;
+
+  /**
+   * The cache tags.
+   */
   protected array $tags;
-  protected $maxAge;
+
+  /**
+   * The cache maximum age.
+   */
+  protected int $maxAge;
 
   public function __construct(array $contexts, array $tags, $max_age) {
     $this->contexts = $contexts;

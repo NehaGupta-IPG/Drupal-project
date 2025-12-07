@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests;
 
 use Drupal\Component\Diff\Diff;
@@ -56,7 +58,7 @@ trait AssertConfigTrait {
             $found = FALSE;
             if (!empty($skipped_config[$config_name])) {
               foreach ($skipped_config[$config_name] as $line) {
-                if (strpos($closing, $line) !== FALSE) {
+                if (str_contains($closing, $line)) {
                   $found = TRUE;
                   break;
                 }

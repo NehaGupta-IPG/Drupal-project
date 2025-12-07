@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\IntegrityConstraintViolationException;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the insert builder.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class InsertTest extends DatabaseTestBase {
 
   /**
    * Tests very basic insert functionality.
    */
-  public function testSimpleInsert() {
+  public function testSimpleInsert(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
 
     $query = $this->connection->insert('test');
@@ -24,7 +28,7 @@ class InsertTest extends DatabaseTestBase {
     ]);
 
     // Check how many records are queued for insertion.
-    $this->assertSame(1, $query->count(), 'One record is queued for insertion.');
+    $this->assertCount(1, $query, 'One record is queued for insertion.');
     $query->execute();
 
     $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
@@ -36,7 +40,7 @@ class InsertTest extends DatabaseTestBase {
   /**
    * Tests that we can insert multiple records in one query object.
    */
-  public function testMultiInsert() {
+  public function testMultiInsert(): void {
     $num_records_before = (int) $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
 
     $query = $this->connection->insert('test');
@@ -52,14 +56,14 @@ class InsertTest extends DatabaseTestBase {
     ]);
 
     // Check how many records are queued for insertion.
-    $this->assertSame(2, $query->count(), 'Two records are queued for insertion.');
+    $this->assertCount(2, $query, 'Two records are queued for insertion.');
 
     // We should be able to say "use the field order".
     // This is not the recommended mechanism for most cases, but it should work.
     $query->values(['Moe', '32']);
 
     // Check how many records are queued for insertion.
-    $this->assertSame(3, $query->count(), 'Three records are queued for insertion.');
+    $this->assertCount(3, $query, 'Three records are queued for insertion.');
     $query->execute();
 
     $num_records_after = (int) $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
@@ -75,7 +79,7 @@ class InsertTest extends DatabaseTestBase {
   /**
    * Tests that an insert object can be reused with new data after it executes.
    */
-  public function testRepeatedInsert() {
+  public function testRepeatedInsert(): void {
     $num_records_before = $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
 
     $query = $this->connection->insert('test');
@@ -85,7 +89,7 @@ class InsertTest extends DatabaseTestBase {
       'age' => '30',
     ]);
     // Check how many records are queued for insertion.
-    $this->assertSame(1, $query->count(), 'One record is queued for insertion.');
+    $this->assertCount(1, $query, 'One record is queued for insertion.');
     // This should run the insert, but leave the fields intact.
     $query->execute();
 
@@ -95,14 +99,14 @@ class InsertTest extends DatabaseTestBase {
       'name' => 'Curly',
     ]);
     // Check how many records are queued for insertion.
-    $this->assertSame(1, $query->count(), 'One record is queued for insertion.');
+    $this->assertCount(1, $query, 'One record is queued for insertion.');
     $query->execute();
 
     // We should be able to say "use the field order".
     $query->values(['Moe', '32']);
 
     // Check how many records are queued for insertion.
-    $this->assertSame(1, $query->count(), 'One record is queued for insertion.');
+    $this->assertCount(1, $query, 'One record is queued for insertion.');
     $query->execute();
 
     $num_records_after = $this->connection->query('SELECT COUNT(*) FROM {test}')->fetchField();
@@ -118,7 +122,7 @@ class InsertTest extends DatabaseTestBase {
   /**
    * Tests that we can specify fields without values and specify values later.
    */
-  public function testInsertFieldOnlyDefinition() {
+  public function testInsertFieldOnlyDefinition(): void {
     // This is useful for importers, when we want to create a query and define
     // its fields once, then loop over a multi-insert execution.
     $this->connection->insert('test')
@@ -138,7 +142,7 @@ class InsertTest extends DatabaseTestBase {
   /**
    * Tests that inserts return the proper auto-increment ID.
    */
-  public function testInsertLastInsertID() {
+  public function testInsertLastInsertID(): void {
     $id = $this->connection->insert('test')
       ->fields([
         'name' => 'Larry',
@@ -152,7 +156,7 @@ class InsertTest extends DatabaseTestBase {
   /**
    * Tests that the INSERT INTO ... SELECT (fields) ... syntax works.
    */
-  public function testInsertSelectFields() {
+  public function testInsertSelectFields(): void {
     $query = $this->connection->select('test_people', 'tp');
     // The query builder will always append expressions after fields.
     // Add the expression first to test that the insert fields are correctly
@@ -166,7 +170,7 @@ class InsertTest extends DatabaseTestBase {
     // INSERT INTO test (age, name, job)
     // SELECT tp.age AS age, tp.name AS name, tp.job AS job
     // FROM test_people tp
-    // WHERE tp.name = 'Meredith'
+    // WHERE tp.name = 'Meredith'.
     $this->connection->insert('test')
       ->from($query)
       ->execute();
@@ -178,7 +182,7 @@ class InsertTest extends DatabaseTestBase {
   /**
    * Tests that the INSERT INTO ... SELECT * ... syntax works.
    */
-  public function testInsertSelectAll() {
+  public function testInsertSelectAll(): void {
     $query = $this->connection->select('test_people', 'tp')
       ->fields('tp')
       ->condition('tp.name', 'Meredith');
@@ -187,7 +191,7 @@ class InsertTest extends DatabaseTestBase {
     // INSERT INTO test_people_copy
     // SELECT *
     // FROM test_people tp
-    // WHERE tp.name = 'Meredith'
+    // WHERE tp.name = 'Meredith'.
     $this->connection->insert('test_people_copy')
       ->from($query)
       ->execute();
@@ -199,7 +203,7 @@ class InsertTest extends DatabaseTestBase {
   /**
    * Tests that we can INSERT INTO a special named column.
    */
-  public function testSpecialColumnInsert() {
+  public function testSpecialColumnInsert(): void {
     $this->connection->insert('select')
       ->fields([
         'id' => 2,
@@ -213,7 +217,7 @@ class InsertTest extends DatabaseTestBase {
   /**
    * Tests insertion integrity violation with no default value for a column.
    */
-  public function testInsertIntegrityViolation() {
+  public function testInsertIntegrityViolation(): void {
     // Remove the default from the 'age' column, so that inserting a record
     // without its value specified will lead to integrity failure.
     $this->connection->schema()->changeField('test', 'age', 'age', [

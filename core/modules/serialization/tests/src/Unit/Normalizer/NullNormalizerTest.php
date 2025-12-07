@@ -1,15 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\serialization\Normalizer\NullNormalizer;
+use Drupal\Tests\serialization\Traits\JsonSchemaTestTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\serialization\Normalizer\NullNormalizer
- * @group serialization
+ * Tests Drupal\serialization\Normalizer\NullNormalizer.
  */
+#[CoversClass(NullNormalizer::class)]
+#[Group('serialization')]
 class NullNormalizerTest extends UnitTestCase {
+
+  use JsonSchemaTestTrait;
 
   /**
    * The NullNormalizer instance.
@@ -29,14 +38,18 @@ class NullNormalizerTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->normalizer = new NullNormalizer($this->interface);
   }
 
   /**
-   * @covers ::__construct
-   * @covers ::supportsNormalization
+   * Tests supports normalization.
+   *
+   * @legacy-covers ::__construct
+   * @legacy-covers ::supportsNormalization
    */
-  public function testSupportsNormalization() {
+  public function testSupportsNormalization(): void {
     $mock = $this->createMock('Drupal\Core\TypedData\TypedDataInterface');
     $this->assertTrue($this->normalizer->supportsNormalization($mock));
     // Also test that an object not implementing TypedDataInterface fails.
@@ -44,11 +57,22 @@ class NullNormalizerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::normalize
+   * Tests normalize.
+   *
+   * @legacy-covers ::normalize
    */
-  public function testNormalize() {
+  public function testNormalize(): void {
     $mock = $this->createMock('Drupal\Core\TypedData\TypedDataInterface');
     $this->assertNull($this->normalizer->normalize($mock));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function jsonSchemaDataProvider(): array {
+    return [
+      'null' => [TypedDataInterface::class],
+    ];
   }
 
 }

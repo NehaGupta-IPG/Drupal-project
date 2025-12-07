@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Menu;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 
@@ -16,9 +17,10 @@ trait AssertBreadcrumbTrait {
   /**
    * Assert that a given path shows certain breadcrumb links.
    *
-   * @param \Drupal\Core\Url|string $goto
+   * @param \Drupal\Core\Url|string|null $goto
    *   (optional) A path or URL to pass to
-   *   \Drupal\Tests\UiHelperTrait::drupalGet().
+   *   \Drupal\Tests\UiHelperTrait::drupalGet() otherwise a NULL value can be
+   *   passed.
    * @param array $trail
    *   An associative array whose keys are expected breadcrumb link paths and
    *   whose values are expected breadcrumb link texts (not sanitized).
@@ -29,7 +31,7 @@ trait AssertBreadcrumbTrait {
    *   (optional) An associative array whose keys are link paths and whose
    *   values are link titles (not sanitized) of an expected active trail in a
    *   menu tree output on the page.
-   * @param $last_active
+   * @param bool $last_active
    *   (optional) Whether the last link in $tree is expected to be active (TRUE)
    *   or just to be in the active trail (FALSE).
    * @param string $active_trail_class
@@ -65,14 +67,10 @@ trait AssertBreadcrumbTrait {
   protected function assertBreadcrumbParts($trail) {
     // Compare paths with actual breadcrumb.
     $parts = $this->getBreadcrumbParts();
+    $found = $parts;
     $pass = TRUE;
-    // Fail if there is no breadcrumb and we have a trail.
-    if (!empty($trail) && empty($parts)) {
-      $pass = FALSE;
-    }
-    // There may be more than one breadcrumb on the page. If $trail is empty
-    // this test would go into an infinite loop, so we need to check that too.
-    while ($trail && !empty($parts)) {
+
+    if (!empty($trail) && !empty($parts)) {
       foreach ($trail as $path => $title) {
         // If the path is empty, generate the path from the <front> route.  If
         // the path does not start with a leading slash, then run it through
@@ -91,19 +89,28 @@ trait AssertBreadcrumbTrait {
         $pass = ($pass && $part['href'] === $url && $part['text'] === Html::escape($title));
       }
     }
+    elseif (!empty($trail) && empty($parts) || empty($trail) && !empty($parts)) {
+      // Fail if there is no breadcrumb and we have a trail or breadcrumb
+      // exists but trail is empty.
+      $pass = FALSE;
+    }
+
     // No parts must be left, or an expected "Home" will always pass.
     $pass = ($pass && empty($parts));
 
-    $this->assertTrue($pass, new FormattableMarkup('Breadcrumb %parts found on @path.', [
-      '%parts' => implode(' » ', $trail),
-      '@path' => $this->getUrl(),
-    ]));
+    $this->assertTrue($pass, sprintf('Expected breadcrumb %s on %s but found %s.',
+      implode(' » ', $trail),
+      $this->getUrl(),
+      implode(' » ', array_map(function (array $item) {
+        return $item['text'];
+      }, $found)),
+    ));
   }
 
   /**
    * Returns the breadcrumb contents of the current page in the internal browser.
    */
-  protected function getBreadcrumbParts() {
+  protected function getBreadcrumbParts(): array {
     $parts = [];
     $elements = $this->xpath('//nav[@aria-labelledby="system-breadcrumb"]//ol/li/a');
     if (!empty($elements)) {

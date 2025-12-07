@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
@@ -7,8 +9,6 @@ use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests the behavior of a theme when base_theme info key is missing.
- *
- * @group Theme
  */
 abstract class StableLibraryOverrideTestBase extends KernelTestBase {
 
@@ -95,7 +95,7 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
         }
         foreach (['css', 'js'] as $asset_type) {
           foreach ($library[$asset_type] as $index => $asset) {
-            if (strpos($asset['data'], 'core/assets/vendor') !== FALSE) {
+            if (str_contains($asset['data'], 'core/assets/vendor')) {
               unset($all_libraries[$extension][$library_name][$asset_type][$index]);
               // Re-key the array of assets. This is needed because
               // libraries-override doesn't always preserve the order.

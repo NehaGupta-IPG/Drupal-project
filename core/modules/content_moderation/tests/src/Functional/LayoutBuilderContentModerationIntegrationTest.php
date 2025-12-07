@@ -1,20 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_moderation\Functional;
 
-use Drupal\block_content\Entity\BlockContentType;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Content Moderation's integration with Layout Builder.
- *
- * @group content_moderation
- * @group layout_builder
  */
+#[Group('content_moderation')]
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
 
+  use BlockContentCreationTrait;
   use ContentModerationTestTrait;
 
   /**
@@ -43,28 +48,39 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
     //   https://www.drupal.org/project/drupal/issues/2917777.
     $this->drupalPlaceBlock('local_tasks_block');
 
-    $workflow = $this->createEditorialWorkflow();
-
-    // Add a new bundle and add an editorial workflow.
+    // Add a new bundle.
     $this->createContentType(['type' => 'bundle_with_section_field']);
-    $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'bundle_with_section_field');
 
     // Add a new block content bundle to the editorial workflow.
-    BlockContentType::create([
+    $this->createBlockContentType([
       'id' => 'basic',
       'label' => 'Basic',
       'revision' => 1,
-    ])->save();
-    block_content_add_body_field('basic');
-
-    $workflow->getTypePlugin()->addEntityTypeAndBundle('block_content', 'basic');
-    $workflow->save();
+    ], TRUE);
 
     // Enable layout overrides.
     LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default')
       ->enableLayoutBuilder()
       ->setOverridable()
       ->save();
+    // Create a node before enabling the workflow on the bundle.
+    $node = $this->createNode([
+      'type' => 'bundle_with_section_field',
+      'title' => 'Pre-workflow node',
+      'body' => [
+        [
+          'value' => 'The first node body',
+        ],
+      ],
+    ]);
+    // View the node to ensure the new extra field blocks are not cached when
+    // the workflow is updated.
+    $this->drupalGet($node->toUrl());
+    // Add editorial workflow for the bundle.
+    $workflow = $this->createEditorialWorkflow();
+    $workflow->getTypePlugin()->addEntityTypeAndBundle('block_content', 'basic');
+    $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'bundle_with_section_field');
+    $workflow->save();
 
     $this->drupalLogin($this->drupalCreateUser([
       'configure any layout',
@@ -82,7 +98,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
   /**
    * Tests that Layout changes are respected by Content Moderation.
    */
-  public function testLayoutModeration() {
+  public function testLayoutModeration(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -153,9 +169,9 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
   }
 
   /**
-   * Test placing inline blocks that belong to a moderated custom block bundle.
+   * Test placing inline blocks that belong to a moderated content block bundle.
    */
-  public function testModeratedInlineBlockBundles() {
+  public function testModeratedInlineBlockBundles(): void {
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();
 
@@ -166,7 +182,7 @@ class LayoutBuilderContentModerationIntegrationTest extends BrowserTestBase {
     ]);
     $this->drupalGet("node/{$node->id()}/layout");
     $page->clickLink('Add block');
-    $this->clickLink('Create custom block');
+    $this->clickLink('Create content block');
 
     $assert_session->fieldNotExists('settings[block_form][moderation_state][0][state]');
     $this->submitForm([

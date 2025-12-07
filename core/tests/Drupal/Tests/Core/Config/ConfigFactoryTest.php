@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Config;
 
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @group Config
- * @coversDefaultClass \Drupal\Core\Config\ConfigFactory
+ * Tests Drupal\Core\Config\ConfigFactory.
  */
+#[CoversClass(ConfigFactory::class)]
+#[Group('Config')]
 class ConfigFactoryTest extends UnitTestCase {
 
   /**
@@ -52,6 +57,8 @@ class ConfigFactoryTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->storage = $this->createMock('Drupal\Core\Config\StorageInterface');
     $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
     $this->typedConfig = $this->createMock('\Drupal\Core\Config\TypedConfigManagerInterface');
@@ -65,9 +72,11 @@ class ConfigFactoryTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::rename
+   * Tests rename.
+   *
+   * @legacy-covers ::rename
    */
-  public function testRename() {
+  public function testRename(): void {
     $old = new Config($this->randomMachineName(), $this->storage, $this->eventDispatcher, $this->typedConfig);
     $new = new Config($this->randomMachineName(), $this->storage, $this->eventDispatcher, $this->typedConfig);
 

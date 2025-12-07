@@ -26,7 +26,7 @@ dependencies:
 id: editor
 label: Editor
 weight: 4
-is_admin: null
+is_admin: false
 permissions:
   - 'access administration pages'
   - 'access content overview'
@@ -47,6 +47,7 @@ permissions:
   - 'create url aliases'
   - 'delete all revisions'
   - 'delete any article content'
+  - 'delete any file'
   - 'delete any page content'
   - 'delete any recipe content'
   - 'delete article revisions'

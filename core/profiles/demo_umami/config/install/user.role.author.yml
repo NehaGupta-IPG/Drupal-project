@@ -24,7 +24,7 @@ dependencies:
 id: author
 label: Author
 weight: 3
-is_admin: null
+is_admin: false
 permissions:
   - 'access content overview'
   - 'access contextual links'
@@ -44,6 +44,7 @@ permissions:
   - 'create url aliases'
   - 'delete article revisions'
   - 'delete own article content'
+  - 'delete own files'
   - 'delete own page content'
   - 'delete own recipe content'
   - 'delete page revisions'

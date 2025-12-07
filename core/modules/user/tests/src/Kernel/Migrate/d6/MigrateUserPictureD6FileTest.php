@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel\Migrate\d6;
 
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\Tests\file\Kernel\Migrate\d6\FileMigrationTestTrait;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * User pictures migration.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateUserPictureD6FileTest extends MigrateDrupal6TestBase {
 
   use FileMigrationTestTrait;
@@ -29,7 +33,7 @@ class MigrateUserPictureD6FileTest extends MigrateDrupal6TestBase {
   /**
    * Tests the Drupal 6 user pictures to Drupal 8 migration.
    */
-  public function testUserPictures() {
+  public function testUserPictures(): void {
     $file_ids = [];
     foreach ($this->migration->getIdMap() as $destination_ids) {
       $file_ids[] = reset($destination_ids);
@@ -40,7 +44,7 @@ class MigrateUserPictureD6FileTest extends MigrateDrupal6TestBase {
     $this->assertSame('image-test.jpg', $file->getFilename());
     $this->assertSame('public://image-test.jpg', $file->getFileUri());
     $this->assertSame('2', $file->getOwnerId());
-    $this->assertSame('1901', $file->getSize());
+    $this->assertSame(1901, $file->getSize());
     $this->assertSame('image/jpeg', $file->getMimeType());
 
     $file = array_shift($files);

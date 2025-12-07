@@ -48,11 +48,6 @@ class LinkCollectionNormalizer extends NormalizerBase {
   const LINK_CONTEXT = 'jsonapi_links_object_context';
 
   /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = LinkCollection::class;
-
-  /**
    * A random string to use when hashing links.
    *
    * This string is unique per instance of a link collection, but always the
@@ -153,8 +148,10 @@ class LinkCollectionNormalizer extends NormalizerBase {
   /**
    * {@inheritdoc}
    */
-  public function hasCacheableSupportsMethod(): bool {
-    return TRUE;
+  public function getSupportedTypes(?string $format): array {
+    return [
+      LinkCollection::class => TRUE,
+    ];
   }
 
 }

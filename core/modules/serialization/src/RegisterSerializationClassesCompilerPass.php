@@ -12,12 +12,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 class RegisterSerializationClassesCompilerPass implements CompilerPassInterface {
 
   /**
-   * Adds services to the Serializer.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
-   *   The container to process.
+   * {@inheritdoc}
    */
-  public function process(ContainerBuilder $container) {
+  public function process(ContainerBuilder $container): void {
     $definition = $container->getDefinition('serializer');
 
     // Retrieve registered Normalizers and Encoders from the container.
@@ -75,7 +72,7 @@ class RegisterSerializationClassesCompilerPass implements CompilerPassInterface 
    */
   protected function sort($services) {
     krsort($services);
-    return array_merge([], ...$services);
+    return array_merge(...$services);
   }
 
 }

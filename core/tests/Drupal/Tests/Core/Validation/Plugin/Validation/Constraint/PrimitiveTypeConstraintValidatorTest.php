@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Validation\Plugin\Validation\Constraint;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\Plugin\DataType\BooleanData;
 use Drupal\Core\TypedData\Plugin\DataType\FloatData;
@@ -11,22 +14,26 @@ use Drupal\Core\TypedData\Plugin\DataType\Uri;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraint;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraintValidator;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraintValidator
- * @group validation
+ * Tests Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraintValidator.
  */
+#[CoversClass(PrimitiveTypeConstraintValidator::class)]
+#[Group('validation')]
 class PrimitiveTypeConstraintValidatorTest extends UnitTestCase {
 
   /**
-   * @covers ::validate
+   * Tests validate.
    *
-   * @dataProvider provideTestValidate
+   * @legacy-covers ::validate
    */
-  public function testValidate(PrimitiveInterface $typed_data, $value, $valid) {
+  #[DataProvider('provideTestValidate')]
+  public function testValidate(PrimitiveInterface $typed_data, string|TranslatableMarkup|int|float|array|null $value, bool $valid): void {
     $context = $this->createMock(ExecutionContextInterface::class);
     $context->expects($this->any())
       ->method('getObject')
@@ -48,7 +55,7 @@ class PrimitiveTypeConstraintValidatorTest extends UnitTestCase {
     $validate->validate($value, $constraint);
   }
 
-  public function provideTestValidate() {
+  public static function provideTestValidate(): array {
     $data = [];
     $data[] = [new BooleanData(DataDefinition::create('boolean')), NULL, TRUE];
 
@@ -64,8 +71,8 @@ class PrimitiveTypeConstraintValidatorTest extends UnitTestCase {
     // It is odd that 1 is a valid string.
     // $data[] = [$this->createMock('Drupal\Core\TypedData\Type\StringInterface'), 1, FALSE];
     $data[] = [new StringData(DataDefinition::create('string')), [], FALSE];
-    $data[] = [new Uri(DataDefinition::create('uri')), 'http://www.drupal.org', TRUE];
-    $data[] = [new Uri(DataDefinition::create('uri')), 'https://www.drupal.org', TRUE];
+    $data[] = [new Uri(DataDefinition::create('uri')), 'http://www.example.com', TRUE];
+    $data[] = [new Uri(DataDefinition::create('uri')), 'https://www.example.com', TRUE];
     $data[] = [new Uri(DataDefinition::create('uri')), 'Invalid', FALSE];
     $data[] = [new Uri(DataDefinition::create('uri')), 'entity:node/1', TRUE];
     $data[] = [new Uri(DataDefinition::create('uri')), 'base:', TRUE];
@@ -75,7 +82,7 @@ class PrimitiveTypeConstraintValidatorTest extends UnitTestCase {
     $data[] = [new Uri(DataDefinition::create('uri')), 'public://foo.png', TRUE];
     $data[] = [new Uri(DataDefinition::create('uri')), 'private://', FALSE];
     $data[] = [new Uri(DataDefinition::create('uri')), 'private://foo.png', TRUE];
-    $data[] = [new Uri(DataDefinition::create('uri')), 'drupal.org', FALSE];
+    $data[] = [new Uri(DataDefinition::create('uri')), 'example.com', FALSE];
 
     return $data;
   }

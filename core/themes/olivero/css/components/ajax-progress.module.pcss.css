@@ -54,9 +54,9 @@
   border: 1px solid var(--color--gray-70);
   border-radius: 3.5rem;
   background-color: var(--color--white);
-  box-shadow: 0 0.25rem 0.625rem rgba(34, 35, 48, 0.1); /* LTR */
+  box-shadow: 0 0.25rem 0.625rem rgb(34, 35, 48, 0.1); /* LTR */
 
-  &:before {
+  &::before {
     position: absolute;
     inset-block-start: 50%;
     inset-inline-start: 50%;
@@ -69,14 +69,14 @@
 }
 
 [dir="rtl"] .ajax-progress-fullscreen {
-  box-shadow: 0 -0.25rem 0.625rem rgba(34, 35, 48, 0.1);
+  box-shadow: 0 -0.25rem 0.625rem rgb(34, 35, 48, 0.1);
 }
 
 /**
  * Common styles for all kinds of throbbers.
  */
 .ajax-progress-throbber .throbber,
-.ajax-progress-fullscreen:before {
+.ajax-progress-fullscreen::before {
   animation: olivero-throbber 0.75s linear infinite;
   border-style: solid dotted solid solid;
   border-color: var(--color--primary-50) transparent var(--color--primary-50) var(--color--primary-50);

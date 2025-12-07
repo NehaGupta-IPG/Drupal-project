@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Unit\Entity;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests comment acquires and releases the right lock.
- *
- * @group comment
  */
+#[Group('comment')]
 class CommentLockTest extends UnitTestCase {
 
   /**
    * Tests the lock behavior.
    */
-  public function testLocks() {
+  public function testLocks(): void {
     $container = new ContainerBuilder();
     $container->set('module_handler', $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface'));
     $container->set('current_user', $this->createMock('Drupal\Core\Session\AccountInterface'));

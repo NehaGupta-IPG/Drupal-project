@@ -29,8 +29,7 @@ trait BrokenHandlerTrait {
   }
 
   /**
-   * Ensure the main table for this handler is in the query. This is used
-   * a lot.
+   * Ensures that the main table for this handler is in the query.
    *
    * @see \Drupal\views\Plugin\views\HandlerBase::ensureMyTable()
    */
@@ -59,7 +58,7 @@ trait BrokenHandlerTrait {
       }
     }
 
-    $description_bottom = $this->t('Enabling the appropriate module may solve this issue. Otherwise, check to see if there is a module update available.');
+    $description_bottom = $this->t('Installing the appropriate module may solve this issue. Otherwise, check to see if there is a module update available.');
 
     $form['description'] = [
       '#type' => 'container',
@@ -94,6 +93,7 @@ trait BrokenHandlerTrait {
    * Gets dependencies for a broken handler.
    *
    * @return array
+   *   The dependencies for the broken handler.
    *
    * @see \Drupal\views\Plugin\views\PluginBase::calculateDependencies()
    */

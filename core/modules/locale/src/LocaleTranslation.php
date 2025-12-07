@@ -20,7 +20,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class LocaleTranslation implements TranslatorInterface, DestructableInterface {
 
-  use DependencySerializationTrait;
+  use DependencySerializationTrait {
+    __sleep as traitSleep;
+  }
 
   /**
    * Storage for strings.
@@ -119,6 +121,11 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
       $this->translations[$langcode][$context] = new LocaleLookup($langcode, $context, $this->storage, $this->cache, $this->lock, $this->configFactory, $this->languageManager, $this->requestStack);
     }
     $translation = $this->translations[$langcode][$context]->get($string);
+    // If the translation is TRUE, no translation exists, but that string needs
+    // to be stored in the persistent cache for performance reasons (so for
+    // example, we don't have hundreds of queries to locale tables on each
+    // request). That cache is persisted when the request ends, and the lookup
+    // service is destroyed.
     return $translation === TRUE ? FALSE : $translation;
   }
 
@@ -154,6 +161,15 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
         }
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep(): array {
+    // ::$translations is an array of LocaleLookup objects, which have the
+    // database service injected and therefore cannot be serialized safely.
+    return array_diff($this->traitSleep(), ['translations']);
   }
 
 }

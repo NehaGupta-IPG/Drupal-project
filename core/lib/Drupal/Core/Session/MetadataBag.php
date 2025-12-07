@@ -52,7 +52,7 @@ class MetadataBag extends SymfonyMetadataBag {
   /**
    * {@inheritdoc}
    */
-  public function stampNew($lifetime = NULL) {
+  public function stampNew($lifetime = NULL): void {
     parent::stampNew($lifetime);
 
     // Set the token seed immediately to avoid a race condition between two

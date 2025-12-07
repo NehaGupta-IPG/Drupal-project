@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\entity_test;
 
 use Drupal\Core\Access\AccessResult;
@@ -55,6 +57,9 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
           return AccessResult::allowedIfHasPermission($account, 'view test entity translations');
         }
       }
+      if ($entity instanceof EntityPublishedInterface && !$entity->isPublished()) {
+        return AccessResult::neutral('Unpublished entity');
+      }
       return AccessResult::allowedIfHasPermission($account, 'view test entity');
     }
     elseif (in_array($operation, ['update', 'delete'])) {
@@ -76,12 +81,10 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
       return AccessResult::allowedIf(in_array($operation, $labels, TRUE));
     }
     elseif ($operation === 'revert') {
-      // Disallow reverting to latest.
-      return AccessResult::allowedIf(!$entity->isDefaultRevision() && !$entity->isLatestRevision() && in_array('revert', $labels, TRUE));
+      return AccessResult::allowedIf(in_array('revert', $labels, TRUE));
     }
     elseif ($operation === 'delete revision') {
-      // Disallow deleting latest and current revision.
-      return AccessResult::allowedIf(!$entity->isLatestRevision() && in_array('delete revision', $labels, TRUE));
+      return AccessResult::allowedIf(in_array('delete revision', $labels, TRUE));
     }
 
     // No opinion.
@@ -97,6 +100,16 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
       'administer entity_test_with_bundle content',
       'create ' . $entity_bundle . ' entity_test_with_bundle entities',
     ], 'OR');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function buildCreateAccessCid(array $context, ?string $entity_bundle): string {
+    $cid = parent::buildCreateAccessCid([], $entity_bundle);
+    $cid .= isset($context['context_var1']) ? ":{$context['context_var1']}" : '';
+    $cid .= isset($context['context_var2']) ? ":{$context['context_var2']}" : '';
+    return $cid;
   }
 
 }

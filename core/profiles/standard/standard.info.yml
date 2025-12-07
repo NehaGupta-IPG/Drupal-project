@@ -11,7 +11,6 @@ install:
   - config
   - comment
   - contextual
-  - contact
   - menu_link_content
   - datetime
   - block_content
@@ -33,8 +32,8 @@ install:
   - file
   - views
   - views_ui
-  - tour
   - automated_cron
+  - announcements_feed
 themes:
   - olivero
   - claro

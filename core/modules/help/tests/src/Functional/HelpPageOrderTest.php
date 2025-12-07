@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\help\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verify the order of the help page.
- *
- * @group help
  */
+#[Group('help')]
+#[RunTestsInSeparateProcesses]
 class HelpPageOrderTest extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['help', 'tour'];
+  protected static $modules = ['help', 'help_page_test'];
 
   /**
    * {@inheritdoc}
@@ -28,7 +32,7 @@ class HelpPageOrderTest extends BrowserTestBase {
    */
   protected $stringOrder = [
     'Module overviews are provided',
-    'Tours guide you',
+    'This description should appear',
   ];
 
   /**
@@ -39,10 +43,9 @@ class HelpPageOrderTest extends BrowserTestBase {
 
     // Create and log in user.
     $account = $this->drupalCreateUser([
-      'access administration pages',
+      'access help pages',
       'view the administration theme',
       'administer permissions',
-      'access tour',
     ]);
     $this->drupalLogin($account);
   }
@@ -50,7 +53,7 @@ class HelpPageOrderTest extends BrowserTestBase {
   /**
    * Tests the order of the help page.
    */
-  public function testHelp() {
+  public function testHelp(): void {
     $pos = 0;
     $this->drupalGet('admin/help');
     $page_text = $this->getTextContent();
