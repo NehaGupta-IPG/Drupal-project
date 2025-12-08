@@ -119,7 +119,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
     $this->entityTypeManager = $entity_type_manager;
     $this->csrfToken = $csrf_token;
     if (!$user_auth instanceof UserAuthenticationInterface) {
-      @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:10.3.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
+      @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
     }
     $this->userAuth = $user_auth;
     $this->serializer = $serializer;
