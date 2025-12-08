@@ -92,7 +92,7 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
       'theme' => \Drupal::service('theme.manager')->getActiveTheme()->getName(),
     ]);
     if ($system_theme_settings_url->access() && $block_theme_settings_url->access()) {
-      $form['block_branding']['use_site_logo']['#description'] = $this->t('Defined on the <a href=":appearance">Appearance Settings</a> or <a href=":theme">Theme Settings</a> page.', [
+      $form['block_branding']['use_site_logo']['#description'] = $this->t('Defined on the <a href=":appearance">Appearance settings</a> or <a href=":theme">Theme settings</a> page.', [
         ':appearance' => $system_theme_settings_url->toString(),
         ':theme' => $block_theme_settings_url->toString(),
       ]);
