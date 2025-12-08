@@ -378,8 +378,11 @@ class ThemeSettingsForm extends ConfigFormBase {
       $default_theme = $default_active_theme->getName();
       /** @var \Drupal\Core\Theme\ThemeInitialization $theme_initialization */
       $theme_initialization = \Drupal::service('theme.initialization');
-      $editing_theme = $theme_initialization->getActiveThemeByName($theme);
-      $this->themeManager->setActiveTheme($editing_theme);
+
+      // We need to account for viewing themes that are not currently active so
+      // we temporarily set the theme we are viewing as active.
+      $editing_active_theme = $theme_initialization->getActiveThemeByName($theme);
+      $this->themeManager->setActiveTheme($editing_active_theme);
 
       // Process the theme and all its base themes.
       foreach ($theme_keys as $theme) {
@@ -403,7 +406,7 @@ class ThemeSettingsForm extends ConfigFormBase {
       }
 
       // Call theme-specific settings.
-      $this->themeManager->alterForTheme($editing_theme, 'form_system_theme_settings', $form, $form_state);
+      $this->themeManager->alterForTheme($editing_active_theme, 'form_system_theme_settings', $form, $form_state);
 
       // Restore the original current theme.
       if (isset($default_theme)) {
