@@ -35,7 +35,7 @@ class TestThemeThemeHooks {
         ],
       ],
     ];
-    $form['#submit'][] = [TestThemeThemeHooks::class, 'themeSettingsSubmit'];
+    $form['#submit'][] = static::class . ':themeSettingsSubmit';
   }
 
   /**
