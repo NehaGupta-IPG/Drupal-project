@@ -19,7 +19,7 @@ return Rector\Config\RectorConfig::configure()
   ->withSkip([
     TypedPropertyFromCreateMockAssignRector::class,
     TypedPropertyFromDocblockSetUpDefinedRector::class,
-    TypedPropertyFromJMSSerializerAttributeTypeRector::class,
+#    TypedPropertyFromJMSSerializerAttributeTypeRector::class,
     TypedPropertyFromAssignsRector::class,
     TypedPropertyFromStrictConstructorRector::class,
     TypedPropertyFromStrictSetUpRector::class,
