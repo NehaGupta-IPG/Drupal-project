@@ -857,8 +857,13 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
         '#parents' => ['form_id'],
       ];
     }
-    if (!isset($form['#attributes']['data-drupal-selector'])) {
+    // Generate a unique form ID if it wasn't
+    // created by purpose before: $form['#id']
+    if (!isset($form['#id'])) {
       $form['#id'] = Html::getUniqueId($form_id);
+    }
+    
+    if (!isset($form['#attributes']['data-drupal-selector'])) {
       // Provide a selector usable by JavaScript. As the ID is unique, it's not
       // possible to rely on it in JavaScript.
       $form['#attributes']['data-drupal-selector'] = Html::getId($form_id);
