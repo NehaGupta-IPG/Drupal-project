@@ -20,7 +20,7 @@ class DeprecatedUserRoutesSubscriber implements EventSubscriberInterface {
   public function onRouteAlter(RouteBuildEvent $event): void {
     foreach (['pass', 'login', 'login_status', 'logout'] as $route_name) {
       $user_route = $event->getRouteCollection()->get("user.$route_name.http");
-      $rest_route = $event->getRouteCollection()->get("rest.$route_name.http");
+      $rest_route = $event->getRouteCollection()->get("rest.$route_name");
       if ($user_route && $rest_route) {
         $user_route->setDefault('_controller', $rest_route->getDefault('_controller'));
       }
