@@ -295,9 +295,9 @@
     /**
      * Find the wrapper of the displayed text.
      */
-
     this.$selected_div = this.$form.find(':has(>.views-selected-options)');
     this.$selected_div.hide();
+
     /**
      *
      * @type {Array}
@@ -621,11 +621,7 @@
         '.views-display-setting a',
       );
       const previewArgs = document.getElementById('preview-args');
-      if ($contextualFilters.length) {
-        $(previewArgs.parentElement).show();
-      } else {
-        $(previewArgs.parentElement).hide();
-      }
+      $(document.getElementById('preview-args').parentElement).toggle($contextualFilters.length);
 
       // Executes an initial preview.
       const $livePreview = $(
