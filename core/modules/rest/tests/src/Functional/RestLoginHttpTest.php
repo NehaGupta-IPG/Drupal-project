@@ -555,7 +555,7 @@ class RestLoginHttpTest extends BrowserTestBase {
     ];
     $logged = Database::getConnection()->select('watchdog')
       ->fields('watchdog', ['variables'])
-      ->condition('type', 'user')
+      ->condition('type', 'rest')
       ->condition('message', 'Unable to send password reset email for blocked or not yet activated user %identifier.')
       ->orderBy('wid', 'DESC')
       ->range(0, 1)
@@ -573,7 +573,7 @@ class RestLoginHttpTest extends BrowserTestBase {
 
     $logged = Database::getConnection()->select('watchdog')
       ->fields('watchdog', ['variables'])
-      ->condition('type', 'user')
+      ->condition('type', 'rest')
       ->condition('message', 'Unable to send password reset email for blocked or not yet activated user %identifier.')
       ->orderBy('wid', 'DESC')
       ->range(0, 1)
