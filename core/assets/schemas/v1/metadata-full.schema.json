@@ -18,6 +18,11 @@
       "x-translation-context": {
         "type": "string",
         "title": "Translation Context"
+      },
+      "noUi": {
+        "type": "boolean",
+        "title": "Exclude prop from UI",
+        "description": "Use this property to exclude a prop from the UI while preserving its default value."
       }
     },
     "slotDefinition": {

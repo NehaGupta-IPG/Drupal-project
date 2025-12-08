@@ -222,6 +222,46 @@ class ComponentMetadata {
   }
 
   /**
+   * Gets the schema for UI, filtering out props marked with noUi.
+   *
+   * This method returns a copy of the schema with props that have
+   * noUi: true removed. These props are hidden from UI builders like
+   * Experience Builder, Layout Builder, or UI Patterns, while their
+   * default values are still applied during rendering.
+   *
+   * @return array|null
+   *   The filtered schema for UI, or NULL if no schema exists.
+   */
+  public function getSchemaForUi(): ?array {
+    if ($this->schema === NULL) {
+      return NULL;
+    }
+
+    $schema = $this->schema;
+    $properties = $schema['properties'] ?? [];
+    $required = $schema['required'] ?? [];
+
+    // Filter out properties with noUi: true.
+    $filtered_properties = array_filter(
+      $properties,
+      fn(array $prop_schema): bool => empty($prop_schema['noUi'])
+    );
+
+    // Also filter required array to only include visible props.
+    $filtered_required = array_values(array_intersect($required, array_keys($filtered_properties)));
+
+    $schema['properties'] = $filtered_properties;
+    if (!empty($filtered_required)) {
+      $schema['required'] = $filtered_required;
+    }
+    else {
+      unset($schema['required']);
+    }
+
+    return $schema;
+  }
+
+  /**
    * Normalizes the value object.
    *
    * @return array
