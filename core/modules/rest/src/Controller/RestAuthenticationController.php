@@ -140,7 +140,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
       $container->get('router.route_provider'),
       $container->get('serializer'),
       $container->getParameter('serializer.formats'),
-      $container->get('logger.factory')->get('user')
+      $container->get('logger.factory')->get('rest')
     );
   }
 
@@ -194,7 +194,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
         $authenticated = $this->userAuth->authenticate($credentials['name'], $credentials['pass']);
       }
       if ($authenticated) {
-        $this->userFloodControl->clear('user.http_login', $this->getLoginFloodIdentifier($request, $credentials['name']));
+        $this->userFloodControl->clear('rest.http_login', $this->getLoginFloodIdentifier($request, $credentials['name']));
         $this->userLoginFinalize($account);
 
         // Send basic metadata about the logged in user.
@@ -222,7 +222,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
 
     $flood_config = $this->config('user.flood');
     if ($identifier = $this->getLoginFloodIdentifier($request, $credentials['name'])) {
-      $this->userFloodControl->register('user.http_login', $flood_config->get('user_window'), $identifier);
+      $this->userFloodControl->register('rest.http_login', $flood_config->get('user_window'), $identifier);
     }
     // Always register an IP-based failed login event.
     $this->userFloodControl->register('user.failed_login_ip', $flood_config->get('ip_window'));
@@ -368,7 +368,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
     if ($identifier = $this->getLoginFloodIdentifier($request, $username)) {
       // Don't allow login if the limit for this user has been reached.
       // Default is to allow 5 failed attempts every 6 hours.
-      if (!$this->userFloodControl->isAllowed('user.http_login', $flood_config->get('user_limit'), $flood_config->get('user_window'), $identifier)) {
+      if (!$this->userFloodControl->isAllowed('rest.http_login', $flood_config->get('user_limit'), $flood_config->get('user_window'), $identifier)) {
         if ($flood_config->get('uid_only')) {
           $error_message = sprintf('There have been more than %s failed login attempts for this account. It is temporarily blocked. Try again later or request a new password.', $flood_config->get('user_limit'));
         }
