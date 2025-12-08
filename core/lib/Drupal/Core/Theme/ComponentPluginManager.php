@@ -592,16 +592,6 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
       $schema = (array) $schema;
     }
 
-    // Recursively resolve nested objects.
-    foreach ($schema as $key => $value) {
-      if (is_object($value)) {
-        if (isset($schema['type']) && $schema['type'] == 'object') {
-          $required = $schema['required'] ?? [];
-        }
-        $schema[$key] = $this->doResolveJsonSchemaReferences($key, (array) $value, $required, $depth);
-      }
-    }
-
     // It looks heavy as a solution to convert objects to array recursively,
     // but it is exactly what BaseConstraint::arrayToObjectRecursive() is doing.
     return json_decode(json_encode($schema), TRUE);
