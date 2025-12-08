@@ -54,7 +54,14 @@ function twig_render_template($template_file, array $variables) {
     // If there are theme suggestions, reverse the array so more specific
     // suggestions are shown first.
     if (!empty($variables['file_name_suggestions'])) {
-      $variables['file_name_suggestions'] = array_reverse($variables['file_name_suggestions']);
+      // ensure that suggestions are not duplicated
+      $unique_suggestions = [];
+      foreach ($variables['file_name_suggestions'] as $s) {
+        if (!in_array($s, $unique_suggestions, TRUE)) {
+          $unique_suggestions[] = $s;
+        }
+      }
+      $variables['file_name_suggestions'] = array_reverse($unique_suggestions);
       $extension = twig_extension();
       $current_template = basename($template_file);
       $suggestions = $variables['file_name_suggestions'];
