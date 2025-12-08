@@ -169,7 +169,7 @@ JS;
    */
   protected function assertNoRealtimeValidationErrors(): void {
     $assert_session = $this->assertSession();
-    $this->assertSame('', $assert_session->elementExists('css', '[data-drupal-selector="ckeditor5-realtime-validation-messages-container"]')->getHtml());
+    $this->assertSame('', $assert_session->elementExists('css', '#ckeditor5-realtime-validation-messages-container')->getHtml());
   }
 
 }
