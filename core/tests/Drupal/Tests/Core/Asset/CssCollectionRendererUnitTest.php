@@ -8,12 +8,13 @@ use Drupal\Core\Asset\AssetQueryStringInterface;
 use Drupal\Core\Asset\CssCollectionRenderer;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the CSS asset collection renderer.
- *
- * @group Asset
  */
+#[Group('Asset')]
 class CssCollectionRendererUnitTest extends UnitTestCase {
 
   /**
@@ -39,7 +40,7 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
     $file_url_generator = $this->createMock(FileUrlGeneratorInterface::class);
     $file_url_generator->expects($this->any())
       ->method('generateString')
-      ->with($this->isType('string'))
+      ->with($this->isString())
       ->willReturnCallback(function ($uri) {
          return 'generated-relative-url:' . $uri;
       });
@@ -275,9 +276,8 @@ class CssCollectionRendererUnitTest extends UnitTestCase {
 
   /**
    * Tests CSS asset rendering.
-   *
-   * @dataProvider providerTestRender
    */
+  #[DataProvider('providerTestRender')]
   public function testRender(array $css_assets, array $render_elements): void {
     $this->assertSame($render_elements, $this->renderer->render($css_assets));
   }

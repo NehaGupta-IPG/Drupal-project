@@ -8,8 +8,8 @@
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Cache\NullBackend;
-use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\ConfigImporterException;
+use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\Importer\ConfigImporterBatch;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\StorageComparer;
@@ -389,7 +389,7 @@ function install_begin_request($class_loader, &$install_state): void {
   }
   $install_state['database_verified'] = install_verify_database_settings($site_path);
   // A valid settings.php has database settings and a hash_salt value. Other
-  // settings will be checked by system_requirements().
+  // settings will be checked by \Drupal\system\Install\SystemRequirements.
   $install_state['settings_verified'] = $install_state['config_verified'] && $install_state['database_verified'] && (bool) Settings::get('hash_salt', FALSE);
 
   if ($install_state['settings_verified']) {
@@ -1197,7 +1197,7 @@ function install_database_errors($database, $settings_file) {
 
   try {
     $driverExtension = Database::getDriverList()->get($database['namespace']);
-    // Run driver specific validation
+    // Run driver specific validation.
     $errors = $driverExtension->getInstallTasks()->validateDatabaseSettings($database);
     if (!empty($errors)) {
       // No point to try further.
@@ -1438,7 +1438,7 @@ function install_retrieve_file($uri, $destination) {
   $file_system = \Drupal::service('file_system');
   if (is_dir($file_system->realpath($destination))) {
     // Prevent URIs with triple slashes when gluing parts together.
-    $path = str_replace('///', '//', "$destination/") . $file_system->basename($parsed_url['path']);
+    $path = str_replace('///', '//', "$destination/") . basename($parsed_url['path']);
   }
   else {
     $path = $destination;
@@ -2389,19 +2389,7 @@ function install_config_import_batch() {
   // Create the storage comparer and the config importer.
   $storage_comparer = new StorageComparer($sync, \Drupal::service('config.storage'));
   $storage_comparer->createChangelist();
-  $config_importer = new ConfigImporter(
-    $storage_comparer,
-    \Drupal::service('event_dispatcher'),
-    \Drupal::service('config.manager'),
-    \Drupal::service('lock.persistent'),
-    \Drupal::service('config.typed'),
-    \Drupal::service('module_handler'),
-    \Drupal::service('module_installer'),
-    \Drupal::service('theme_handler'),
-    \Drupal::service('string_translation'),
-    \Drupal::service('extension.list.module'),
-    \Drupal::service('extension.list.theme')
-  );
+  $config_importer = \Drupal::service(ConfigImporterFactory::class)->get($storage_comparer);
 
   try {
     $sync_steps = $config_importer->initialize();
@@ -2463,19 +2451,7 @@ function install_config_revert_install_changes(): void {
   $storage_comparer = new StorageComparer(\Drupal::service('config.storage.sync'), \Drupal::service('config.storage'));
   $storage_comparer->createChangelist();
   if ($storage_comparer->hasChanges()) {
-    $config_importer = new ConfigImporter(
-      $storage_comparer,
-      \Drupal::service('event_dispatcher'),
-      \Drupal::service('config.manager'),
-      \Drupal::service('lock.persistent'),
-      \Drupal::service('config.typed'),
-      \Drupal::service('module_handler'),
-      \Drupal::service('module_installer'),
-      \Drupal::service('theme_handler'),
-      \Drupal::service('string_translation'),
-      \Drupal::service('extension.list.module'),
-      \Drupal::service('extension.list.theme')
-    );
+    $config_importer = \Drupal::service(ConfigImporterFactory::class)->get($storage_comparer);
     try {
       $config_importer->import();
     }

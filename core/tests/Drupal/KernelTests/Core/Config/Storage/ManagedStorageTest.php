@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Config\Storage;
 
-use Drupal\Core\Config\StorageManagerInterface;
 use Drupal\Core\Config\ManagedStorage;
 use Drupal\Core\Config\MemoryStorage;
+use Drupal\Core\Config\StorageManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ManagedStorage operations.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ManagedStorageTest extends ConfigStorageTestBase implements StorageManagerInterface {
 
   /**
