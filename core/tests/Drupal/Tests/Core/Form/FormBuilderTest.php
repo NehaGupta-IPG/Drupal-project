@@ -355,7 +355,7 @@ class FormBuilderTest extends FormTestBase {
   /**
    * Tests that the 'data-drupal-selector' attribute is property set.
    */
-  public function testDataDrupalSelector() {
+  public function testDataDrupalSelector(): void {
     $form_id = '\Drupal\Tests\Core\Form\TestForm';
     $object = new TestForm();
     $form = [];
