@@ -86,6 +86,36 @@ abstract class StatementBase implements \Iterator, StatementInterface {
   }
 
   /**
+   * Determines if the client-level database statement object exists.
+   *
+   * This method should normally be used only within database driver code.
+   *
+   * @return bool
+   *   TRUE if the client statement exists, FALSE otherwise.
+   */
+  public function hasClientStatement(): bool {
+    return isset($this->clientStatement);
+  }
+
+  /**
+   * Returns the client-level database statement object.
+   *
+   * This method should normally be used only within database driver code.
+   *
+   * @return object
+   *   The client-level database statement.
+   *
+   * @throws \RuntimeException
+   *   If the client-level statement is not set.
+   */
+  public function getClientStatement(): object {
+    if ($this->hasClientStatement()) {
+      return $this->clientStatement;
+    }
+    throw new \LogicException('Client statement not initialized');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getConnectionTarget(): string {
@@ -180,7 +210,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    */
   public function setFetchMode($mode, $a1 = NULL, $a2 = []) {
     if (is_int($mode)) {
-      @trigger_error("Passing the \$mode argument as an integer to setFetchMode() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+      @trigger_error("Passing the \$mode argument as an integer to setFetchMode() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
       $mode = $this->pdoToFetchAs($mode);
     }
     assert($mode instanceof FetchAs);
@@ -217,7 +247,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    */
   public function fetch($mode = NULL, $cursorOrientation = NULL, $cursorOffset = NULL) {
     if (is_int($mode)) {
-      @trigger_error("Passing the \$mode argument as an integer to fetch() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+      @trigger_error("Passing the \$mode argument as an integer to fetch() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
       $mode = $this->pdoToFetchAs($mode);
     }
     assert($mode === NULL || $mode instanceof FetchAs);
@@ -292,7 +322,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    */
   public function fetchAll($mode = NULL, $columnIndex = NULL, $constructorArguments = NULL) {
     if (is_int($mode)) {
-      @trigger_error("Passing the \$mode argument as an integer to fetchAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+      @trigger_error("Passing the \$mode argument as an integer to fetchAll() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
       $mode = $this->pdoToFetchAs($mode);
     }
 
@@ -325,7 +355,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    */
   public function fetchAllAssoc($key, $fetch = NULL) {
     if (is_int($fetch)) {
-      @trigger_error("Passing the \$fetch argument as an integer to fetchAllAssoc() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
+      @trigger_error("Passing the \$fetch argument as an integer to fetchAllAssoc() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338", E_USER_DEPRECATED);
       $fetch = $this->pdoToFetchAs($fetch);
     }
     assert($fetch === NULL || $fetch instanceof FetchAs);

@@ -12,13 +12,16 @@ use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\AssertConfigTrait;
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the installed config matches the default config.
- *
- * @group Config
- * @group #slow
  */
+#[Group('Config')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class DefaultConfigTest extends KernelTestBase {
 
   use AssertConfigTrait;
@@ -48,18 +51,16 @@ class DefaultConfigTest extends KernelTestBase {
 
   /**
    * Tests if installed config is equal to the exported config.
-   *
-   * @dataProvider moduleListDataProvider
    */
+  #[DataProvider('moduleListDataProvider')]
   public function testModuleConfig(string $module): void {
     $this->assertExtensionConfig($module, 'module');
   }
 
   /**
    * Tests if installed config is equal to the exported config.
-   *
-   * @dataProvider themeListDataProvider
    */
+  #[DataProvider('themeListDataProvider')]
   public function testThemeConfig($theme): void {
     $this->assertExtensionConfig($theme, 'theme');
   }
