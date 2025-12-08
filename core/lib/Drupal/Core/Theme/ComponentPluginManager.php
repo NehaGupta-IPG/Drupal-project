@@ -261,7 +261,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   }
 
   /**
-   * Resolve schema references recursively.
+   * Resolves schema references recursively.
    *
    * @param array $schema
    *   JSON schema.
@@ -594,10 +594,10 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
       // Merge referenced schema into the current schema.
       $schema += $refSchema;
     }
-    catch (RuntimeException) {
+    catch (RuntimeException $e) {
       // Forbid unresolved $ref when prop is required.
       if (in_array($key, $required)) {
-        throw new RuntimeException();
+        throw $e;
       }
       // Allow unresolved $ref when prop is optional.
       $schema = (array) $schema;

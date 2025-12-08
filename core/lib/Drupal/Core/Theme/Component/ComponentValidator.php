@@ -96,7 +96,7 @@ class ComponentValidator {
     $non_string_props = [];
     \array_walk($prop_names, function (string $prop) use (&$non_string_props, $schema) {
       $type = $schema['properties'][$prop]['type'] ?? NULL;
-      // Not every prop have a type. For example, if a $ref was not resolved
+      // Not every prop may have a type. For example, if a $ref was not resolved
       // successfully.
       $ref = $schema['properties'][$prop]['$ref'] ?? NULL;
       if (!$type && $ref) {
