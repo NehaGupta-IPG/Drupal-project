@@ -619,13 +619,6 @@
       ajax.options.data.dialogOptions = elementSettings.dialog;
     }
 
-    // Ensure that we have a valid URL by adding ? when no query parameter is
-    // yet available, otherwise append using &.
-    if (!ajax.options.url.includes('?')) {
-      ajax.options.url += '?';
-    } else {
-      ajax.options.url += '&';
-    }
     // If this element has a dialog type use if for the wrapper if not use 'ajax'.
     let wrapper = `drupal_${elementSettings.dialogType || 'ajax'}`;
     if (elementSettings.dialogRenderer) {
@@ -635,19 +628,25 @@
     // Update or add the wrapper format.
     if (ajax.options.url.indexOf(Drupal.ajax.WRAPPER_FORMAT) !== -1) {
       // Break url string apart to update the wrapper_format.
-      let query = ajax.options.url.split('?');
-      let query_params = query[1].split('&');
-      query_params.forEach((param, index) => {
+      const query = ajax.options.url.split('?');
+      const queryParams = query[1].split('&');
+      queryParams.forEach((param, index) => {
         if (param.indexOf(Drupal.ajax.WRAPPER_FORMAT) !== -1) {
-          param =`${Drupal.ajax.WRAPPER_FORMAT}=${wrapper}`;
+          param = `${Drupal.ajax.WRAPPER_FORMAT}=${wrapper}`;
         }
-        query_params[index] = param;
+        queryParams[index] = param;
       });
       // Rebuild the url string.
-      query[1] = query_params.join('&');
+      query[1] = queryParams.join('&');
       ajax.options.url = query.join('?');
-    }
-    else {
+    } else {
+      // Ensure that we have a valid URL by adding ? when no query parameter is
+      // yet available, otherwise append using &.
+      if (!ajax.options.url.includes('?')) {
+        ajax.options.url += '?';
+      } else {
+        ajax.options.url += '&';
+      }
       ajax.options.url += `${Drupal.ajax.WRAPPER_FORMAT}=${wrapper}`;
     }
 
