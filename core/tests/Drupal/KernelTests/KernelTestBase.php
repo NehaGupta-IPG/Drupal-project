@@ -114,21 +114,29 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   }
 
   /**
+   * The class loader.
+   *
    * @var \Composer\Autoload\Classloader
    */
   protected $classLoader;
 
   /**
+   * The relative path to the test site directory.
+   *
    * @var string
    */
   protected $siteDirectory;
 
   /**
+   * The test database prefix.
+   *
    * @var string
    */
   protected $databasePrefix;
 
   /**
+   * The test container.
+   *
    * @var \Drupal\Core\DependencyInjection\ContainerBuilder
    */
   protected $container;
@@ -155,6 +163,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected $vfsRoot;
 
   /**
+   * The configuration importer.
+   *
    * @var \Drupal\Core\Config\ConfigImporter
    *
    * @todo Move into Config test base class.
@@ -223,6 +233,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
+      @trigger_error('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and will throw an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+    }
+
     parent::setUp();
 
     // Allow tests to compare MarkupInterface objects via assertEquals().
@@ -298,6 +312,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   }
 
   /**
+   * Gets the database prefix used for test isolation.
+   *
    * @return string
    *   The database prefix string used to isolate test database tables.
    */
@@ -528,9 +544,14 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->addArgument(new Reference('request_stack'));
     $container
       ->register('lock', 'Drupal\Core\Lock\NullLockBackend');
-    $container
-      ->register('cache_factory', 'Drupal\Core\Cache\MemoryBackendFactory')
-      ->addArgument(new Reference('datetime.time'));
+
+    // Explicitly configure all cache bins to use the memory backend.
+    foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
+      $definition = $container->getDefinition($id);
+      $tags = $definition->getTags();
+      $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
+      $definition->setTags($tags);
+    }
 
     // Disable the super user access policy so that we are sure our tests check
     // for the right permissions.
@@ -602,6 +623,11 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Remove the stored configuration importer so if used again it will be
     // built with up-to-date services.
     $this->configImporter = NULL;
+
+    // Allow kernel tests to register hooks.
+    $definition = $container->register(static::class, static::class)->setSynthetic(TRUE);
+    $container->set(static::class, $this);
+    $container->addCompilerPass(new KernelTestCompilerPass($definition), priority: -100);
   }
 
   /**
@@ -678,7 +704,9 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     if ($this->siteDirectory && !str_starts_with($this->siteDirectory, 'vfs://')) {
       // Delete test site directory.
       $callback = function (string $path) {
-        @chmod($path, 0700);
+        if (!is_link($path)) {
+          @chmod($path, 0700);
+        }
       };
       \Drupal::service('file_system')->deleteRecursive($this->siteDirectory, $callback);
     }
@@ -987,7 +1015,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @return array
    *   An array of modules to install.
    */
-  private static function getModulesToEnable($class) {
+  protected static function getModulesToEnable($class) {
     $modules = [];
     while ($class) {
       if (property_exists($class, 'modules')) {

@@ -7,12 +7,15 @@ namespace Drupal\Tests\taxonomy\Functional;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\taxonomy\Entity\Vocabulary;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests page variable deprecation.
  */
 #[Group('taxonomy_term')]
-#[Group('legacy')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class TaxonomyTermPageVariableDeprecationTest extends TaxonomyTestBase {
 
   /**

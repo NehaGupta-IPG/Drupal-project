@@ -6,12 +6,15 @@ namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests page variable deprecation.
  */
 #[Group('node')]
-#[Group('legacy')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class NodePageVariableDeprecationTest extends NodeTestBase {
 
   /**

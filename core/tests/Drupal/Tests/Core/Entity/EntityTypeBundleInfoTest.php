@@ -19,6 +19,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -315,6 +316,64 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
     ];
     $bundle_info = $this->entityTypeBundleInfo->getAllBundleInfo();
     $this->assertSame($expected, $bundle_info);
+  }
+
+  /**
+   * Tests the getBundleLabels() method.
+   *
+   * @legacy-covers ::getBundleLabels
+   */
+  #[DataProvider('providerTestGetBundleLabels')]
+  public function testGetBundleLabels(string $entity_type_id, array $expected): void {
+    $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
+    $this->moduleHandler->alter('entity_bundle_info', Argument::type('array'))->willReturn(NULL);
+
+    $apple = $this->prophesize(EntityTypeInterface::class);
+    $apple->getLabel()->willReturn('Apple');
+    $apple->getBundleEntityType()->willReturn(NULL);
+
+    $banana = $this->prophesize(EntityTypeInterface::class);
+    $banana->getLabel()->willReturn('Banana');
+    $banana->getBundleEntityType()->willReturn(NULL);
+
+    $this->setUpEntityTypeDefinitions([
+      'apple' => $apple,
+      'banana' => $banana,
+    ]);
+
+    $this->assertSame($expected, $this->entityTypeBundleInfo->getBundleLabels($entity_type_id));
+  }
+
+  /**
+   * Tests calling getBundleInfo() method with a NULL.
+   *
+   * @legacy-covers ::getBundleInfo
+   */
+  #[IgnoreDeprecations]
+  public function testGetBundleInfoWithNull(): void {
+    $this->expectDeprecation('Calling Drupal\Core\Entity\EntityTypeBundleInfo::getBundleInfo() with a non-string $entity_type_id is deprecated in drupal:11.3.0 and throws an exception in drupal:12.0.0. See https://www.drupal.org/node/3557136');
+    $bundle_info = $this->entityTypeBundleInfo->getBundleInfo(NULL);
+    $this->assertSame([], $bundle_info);
+  }
+
+  /**
+   * Provides test data for testGetBundleLabels().
+   *
+   * @return array
+   *   Test data.
+   */
+  public static function providerTestGetBundleLabels(): array {
+    return [
+      [
+        'apple',
+        ['apple' => 'Apple'],
+      ],
+      [
+        'banana',
+        ['banana' => 'Banana'],
+      ],
+      ['pear', []],
+    ];
   }
 
 }
