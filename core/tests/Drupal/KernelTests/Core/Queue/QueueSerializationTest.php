@@ -12,11 +12,13 @@ use Drupal\Core\Queue\DatabaseQueue;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests serializing a form with an injected DatabaseQueue instance.
  */
 #[Group('Queue')]
+#[RunTestsInSeparateProcesses]
 class QueueSerializationTest extends KernelTestBase implements FormInterface {
 
   use DependencySerializationTrait;
@@ -27,6 +29,8 @@ class QueueSerializationTest extends KernelTestBase implements FormInterface {
   protected static $modules = ['system', 'user'];
 
   /**
+   * The queue object.
+   *
    * @var \Drupal\Core\Queue\DatabaseQueue
    */
   protected DatabaseQueue $queue;

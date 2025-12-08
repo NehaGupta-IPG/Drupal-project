@@ -15,11 +15,13 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests DatetimeElement functionality.
  */
 #[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class DatetimeElementFormTest extends KernelTestBase implements FormInterface, TrustedCallbackInterface {
 
   /**
@@ -208,12 +210,18 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
       'untrusted date' => [
         'datetimeDateCallback',
         'datetimeTimeCallbackTrusted',
-        sprintf('DateTime element #date_date_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966', Variable::callableToString([static::class, 'datetimeDateCallback'])),
+        sprintf(
+          'DateTime element #date_date_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966',
+          Variable::callableToString([static::class, 'datetimeDateCallback']),
+        ),
       ],
       'untrusted time' => [
         'datetimeDateCallbackTrusted',
         'datetimeTimeCallback',
-        sprintf('DateTime element #date_time_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966', Variable::callableToString([static::class, 'datetimeTimeCallback'])),
+        sprintf(
+          'DateTime element #date_time_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966',
+          Variable::callableToString([static::class, 'datetimeTimeCallback']),
+        ),
       ],
     ];
   }

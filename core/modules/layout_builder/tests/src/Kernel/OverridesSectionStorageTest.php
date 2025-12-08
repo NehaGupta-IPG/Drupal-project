@@ -19,12 +19,14 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage.
  */
 #[CoversClass(OverridesSectionStorage::class)]
 #[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class OverridesSectionStorageTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -310,6 +312,25 @@ class OverridesSectionStorageTest extends KernelTestBase {
     $this->assertTrue($this->plugin->isOverridden());
     $this->plugin->removeAllSections();
     $this->assertFalse($this->plugin->isOverridden());
+  }
+
+  /**
+   * @legacy-covers ::isSupported
+   */
+  public function testIsSupported(): void {
+    $display = LayoutBuilderEntityViewDisplay::create([
+      'targetEntityType' => 'entity_test',
+      'bundle' => 'entity_test',
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+    $display
+      ->enableLayoutBuilder()
+      ->setOverridable()
+      ->save();
+    $this->assertTrue($this->plugin->isSupported('entity_test', 'entity_test', 'default'));
+    $display->setOverridable(FALSE)->save();
+    $this->assertFalse($this->plugin->isSupported('entity_test', 'entity_test', 'default'));
   }
 
 }

@@ -8,11 +8,15 @@ use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\Tests\layout_builder\Kernel\LayoutBuilderCompatibilityTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that Layout Builder and Field Layout are compatible with each other.
  */
 #[Group('field_layout')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderFieldLayoutCompatibilityTest extends LayoutBuilderCompatibilityTestBase {
 
   /**

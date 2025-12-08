@@ -9,26 +9,15 @@ use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * Test that the DbImportCommand works correctly.
  */
 #[Group('console')]
+#[RunTestsInSeparateProcesses]
 class DbImportCommandTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = [
-    'config',
-    'dblog',
-    'menu_link_content',
-    'link',
-    'block_content',
-    'file',
-    'user',
-  ];
 
   /**
    * Tables that should be part of the exported script.

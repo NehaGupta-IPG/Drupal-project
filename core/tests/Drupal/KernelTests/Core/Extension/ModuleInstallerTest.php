@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
@@ -25,6 +26,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  */
 #[CoversClass(ModuleInstaller::class)]
 #[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
 
   use RfcLoggerTrait;
@@ -195,6 +197,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    * Data provider for ::testContainerRebuildRequired().
    */
   public static function containerRebuildRequiredProvider(): array {
+    // phpcs:disable Drupal.Arrays.Array.LongLineDeclaration
     return [
       [['container_rebuild_required_true'], 1],
       [['container_rebuild_required_false'], 1],
@@ -208,6 +211,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
       [['container_rebuild_required_false_2', 'container_rebuild_required_dependency_false'], 3],
       [['container_rebuild_required_false_2', 'container_rebuild_required_dependency_false', 'container_rebuild_required_true'], 3],
     ];
+    // phpcs:enable
   }
 
   /**
