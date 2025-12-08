@@ -1161,24 +1161,6 @@ class TestForm implements FormInterface {
 
 }
 
-class TestFormWithDataDrupalSelector implements FormInterface {
-
-  public function getFormId() {
-    return 'test_form_data_drupal_selector';
-  }
-
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    $form = test_form_id();
-    $form['#attributes']['data-drupal-selector'] = 'test-value123';
-    return $form;
-  }
-
-  public function validateForm(array &$form, FormStateInterface $form_state) {}
-
-  public function submitForm(array &$form, FormStateInterface $form_state) {}
-
-}
-
 /**
  * Basic test form with container injection interface implemented.
  */
