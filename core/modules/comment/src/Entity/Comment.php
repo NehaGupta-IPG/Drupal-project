@@ -362,7 +362,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
    * {@inheritdoc}
    */
   public function getCommentedEntity() {
-    return $this->get('entity_id')->entity;
+    return $this->get('entity_id')->first()?->get('entity')->getValue();
   }
 
   /**
