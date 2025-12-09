@@ -426,7 +426,7 @@ class SystemRequirements implements InstallRequirementsInterface {
     if ($phase === 'runtime' && PHP_SAPI !== 'cli') {
       $zend_assertions = ini_get('zend.assertions');
 
-      // ini_get() can return false or an empty string when the option is not set.
+      // ini_get() may return FALSE or an empty string if unset.
       if ($zend_assertions !== FALSE && $zend_assertions !== '') {
         $zend_assertions = (int) $zend_assertions;
 
