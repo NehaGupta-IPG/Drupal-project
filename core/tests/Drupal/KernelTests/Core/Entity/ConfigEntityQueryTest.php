@@ -4,17 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\config_test\Entity\ConfigQueryTest;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Config\Entity\Query\QueryFactory;
-use Drupal\config_test\Entity\ConfigQueryTest;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Config Entity Query functionality.
  *
- * @group Entity
  * @see \Drupal\Core\Config\Entity\Query
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityQueryTest extends KernelTestBase {
 
   /**
