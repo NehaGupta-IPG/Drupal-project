@@ -12,8 +12,6 @@ use Drupal\Core\Url;
  */
 abstract class MenuLinkBase extends PluginBase implements MenuLinkInterface {
 
-  use RefinableCacheableDependencyTrait;
-
   /**
    * The list of definition values where an override is allowed.
    *
