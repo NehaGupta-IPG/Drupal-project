@@ -8,7 +8,6 @@ use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\ModuleDependencyMessageTrait;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
-use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
@@ -16,7 +15,7 @@ use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Theme\ThemeAccessCheck;
 use Drupal\Core\Url;
 use Drupal\system\SystemManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Returns responses for System routes.
@@ -47,13 +46,6 @@ class SystemController extends ControllerBase {
   protected $formBuilder;
 
   /**
-   * The theme handler service.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
    * The menu link tree service.
    *
    * @var \Drupal\Core\Menu\MenuLinkTreeInterface
@@ -68,6 +60,13 @@ class SystemController extends ControllerBase {
   protected $moduleExtensionList;
 
   /**
+   * The theme extension list.
+   *
+   * @var \Drupal\Core\Extension\ThemeExtensionList
+   */
+  protected ThemeExtensionList $themeExtensionList;
+
+  /**
    * Constructs a new SystemController.
    *
    * @param \Drupal\system\SystemManager $systemManager
@@ -76,38 +75,35 @@ class SystemController extends ControllerBase {
    *   The theme access checker service.
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The form builder.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
    * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_link_tree
    *   The menu link tree service.
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
    *   The module extension list.
+   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
+   *   The theme extension list.
    */
-  public function __construct(SystemManager $systemManager, ThemeAccessCheck $theme_access, FormBuilderInterface $form_builder, ThemeHandlerInterface $theme_handler, MenuLinkTreeInterface $menu_link_tree, ModuleExtensionList $module_extension_list) {
+  public function __construct(
+    SystemManager $systemManager,
+    #[Autowire(service: 'access_check.theme')]
+    ThemeAccessCheck $theme_access,
+    FormBuilderInterface $form_builder,
+    MenuLinkTreeInterface $menu_link_tree,
+    ModuleExtensionList $module_extension_list,
+    ThemeExtensionList $theme_extension_list,
+  ) {
     $this->systemManager = $systemManager;
     $this->themeAccess = $theme_access;
     $this->formBuilder = $form_builder;
-    $this->themeHandler = $theme_handler;
     $this->menuLinkTree = $menu_link_tree;
     $this->moduleExtensionList = $module_extension_list;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('system.manager'),
-      $container->get('access_check.theme'),
-      $container->get('form_builder'),
-      $container->get('theme_handler'),
-      $container->get('menu.link_tree'),
-      $container->get('extension.list.module')
-    );
+    $this->themeExtensionList = $theme_extension_list;
   }
 
   /**
    * Provide the administration overview page.
+   *
+   * This will render child links two levels below the specified link ID,
+   * grouped by the child links one level below.
    *
    * @param string $link_id
    *   The ID of the administrative path link for which to display child links.
@@ -177,6 +173,7 @@ class SystemController extends ControllerBase {
    *   Valid values are 'on' and 'off'.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   A redirect response to the front page.
    */
   public function compactPage($mode) {
     user_cookie_save(['admin_compact_mode' => ($mode == 'on')]);
@@ -201,7 +198,7 @@ class SystemController extends ControllerBase {
   public function themesPage() {
     $config = $this->config('system.theme');
     // Get all available themes.
-    $themes = $this->themeHandler->rebuildThemeData();
+    $themes = $this->themeExtensionList->reset()->getList();
 
     // Remove obsolete themes.
     $themes = array_filter($themes, function ($theme) {
@@ -277,8 +274,6 @@ class SystemController extends ControllerBase {
             continue;
           }
 
-          // @todo Add logic for not displaying hidden modules in
-          //   https://drupal.org/node/3117829.
           $module_name = $modules[$dependency]->info['name'];
           $theme->module_dependencies_list[$dependency] = $modules[$dependency]->status ? $this->t('@module_name', ['@module_name' => $module_name]) : $this->t('@module_name (<span class="admin-disabled">disabled</span>)', ['@module_name' => $module_name]);
 
@@ -332,7 +327,7 @@ class SystemController extends ControllerBase {
               'attributes' => ['title' => $this->t('Set @theme as default theme', ['@theme' => $theme->info['name']])],
             ];
           }
-          $admin_theme_options[$theme->getName()] = $theme->info['name'] . ($theme->isExperimental() ? ' (' . t('Experimental') . ')' : '');
+          $admin_theme_options[$theme->getName()] = $theme->info['name'] . ($theme->isExperimental() ? ' (' . $this->t('Experimental') . ')' : '');
         }
         else {
           $theme->operations[] = [

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\link\Unit\Plugin\Validation\Constraint;
 
 use Drupal\Component\Utility\UrlHelper;
@@ -7,33 +9,47 @@ use Drupal\Core\Url;
 use Drupal\link\Plugin\Validation\Constraint\LinkExternalProtocolsConstraint;
 use Drupal\link\Plugin\Validation\Constraint\LinkExternalProtocolsConstraintValidator;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 /**
- * @coversDefaultClass \Drupal\link\Plugin\Validation\Constraint\LinkExternalProtocolsConstraintValidator
- * @group Link
+ * Tests Drupal\link\Plugin\Validation\Constraint\LinkExternalProtocolsConstraintValidator.
  */
+#[CoversClass(LinkExternalProtocolsConstraintValidator::class)]
+#[Group('Link')]
 class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
 
   /**
-   * @covers ::validate
-   * @dataProvider providerValidate
-   * @runInSeparateProcess
+   * Tests validate.
+   *
+   * @legacy-covers ::validate
    */
-  public function testValidate($url, $valid) {
+  #[DataProvider('providerValidate')]
+  #[RunInSeparateProcess]
+  public function testValidate($url, $valid): void {
     $link = $this->createMock('Drupal\link\LinkItemInterface');
     $link->expects($this->any())
       ->method('getUrl')
       ->willReturn(Url::fromUri($url));
     $context = $this->createMock(ExecutionContextInterface::class);
 
+    $constraintViolationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
+    $constraintViolationBuilder->method('atPath')
+      ->with('uri')
+      ->willReturn($constraintViolationBuilder);
+
     if ($valid) {
       $context->expects($this->never())
-        ->method('addViolation');
+        ->method('buildViolation');
     }
     else {
       $context->expects($this->once())
-        ->method('addViolation');
+        ->method('buildViolation')
+        ->willReturn($constraintViolationBuilder);
     }
 
     // Setup some more allowed protocols.
@@ -49,7 +65,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
   /**
    * Data provider for ::testValidate.
    */
-  public function providerValidate() {
+  public static function providerValidate() {
     $data = [];
 
     // Test allowed protocols.
@@ -65,11 +81,12 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests validate with malformed uri.
    *
    * @see \Drupal\Core\Url::fromUri
+   * @legacy-covers ::validate
    */
-  public function testValidateWithMalformedUri() {
+  public function testValidateWithMalformedUri(): void {
     $link = $this->createMock('Drupal\link\LinkItemInterface');
     $link->expects($this->any())
       ->method('getUrl')
@@ -77,7 +94,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
 
     $context = $this->createMock(ExecutionContextInterface::class);
     $context->expects($this->never())
-      ->method('addViolation');
+      ->method('buildViolation');
 
     $constraint = new LinkExternalProtocolsConstraint();
 
@@ -87,9 +104,11 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests validate ignores internal urls.
+   *
+   * @legacy-covers ::validate
    */
-  public function testValidateIgnoresInternalUrls() {
+  public function testValidateIgnoresInternalUrls(): void {
     $link = $this->createMock('Drupal\link\LinkItemInterface');
     $link->expects($this->any())
       ->method('getUrl')
@@ -97,7 +116,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
 
     $context = $this->createMock(ExecutionContextInterface::class);
     $context->expects($this->never())
-      ->method('addViolation');
+      ->method('buildViolation');
 
     $constraint = new LinkExternalProtocolsConstraint();
 

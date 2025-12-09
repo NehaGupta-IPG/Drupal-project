@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the summary style plugin.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class StyleSummaryTest extends ViewTestBase {
 
   /**
@@ -56,7 +60,7 @@ class StyleSummaryTest extends ViewTestBase {
   /**
    * Tests a summary view.
    */
-  public function testSummaryView() {
+  public function testSummaryView(): void {
     $this->drupalGet('test-summary');
 
     // Ensure styles are properly added for summary views.

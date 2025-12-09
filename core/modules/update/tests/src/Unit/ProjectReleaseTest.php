@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\update\Unit;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\update\ProjectRelease;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\update\ProjectRelease
- *
- * @group update
+ * Tests Drupal\update\ProjectRelease.
  */
+#[CoversClass(ProjectRelease::class)]
+#[Group('update')]
 class ProjectReleaseTest extends UnitTestCase {
 
   /**
@@ -20,15 +25,14 @@ class ProjectReleaseTest extends UnitTestCase {
    * @param mixed[] $expected
    *   The values expected to be returned from the object methods.
    *
-   * @covers ::createFromArray
-   * @covers ::isInsecure
-   * @covers ::isSecurityRelease
-   * @covers ::isPublished
-   * @covers ::isUnsupported
-   * @covers ::isUnsupported
-   *
-   * @dataProvider providerCreateFromArray
+   * @legacy-covers ::createFromArray
+   * @legacy-covers ::isInsecure
+   * @legacy-covers ::isSecurityRelease
+   * @legacy-covers ::isPublished
+   * @legacy-covers ::isUnsupported
+   * @legacy-covers ::isUnsupported
    */
+  #[DataProvider('providerCreateFromArray')]
   public function testCreateFromArray(array $data, array $expected = []): void {
     $data += $this->getValidData();
     $expected += $data;
@@ -61,7 +65,7 @@ class ProjectReleaseTest extends UnitTestCase {
    * @return mixed
    *   Test cases for testCreateFromArray().
    */
-  public function providerCreateFromArray(): array {
+  public static function providerCreateFromArray(): array {
     return [
       'default valid' => [
         'data' => [],
@@ -105,7 +109,7 @@ class ProjectReleaseTest extends UnitTestCase {
   /**
    * Tests that optional fields can be omitted.
    *
-   * @covers ::createFromArray
+   * @legacy-covers ::createFromArray
    */
   public function testOptionalFields(): void {
     $data = $this->getValidData();
@@ -132,10 +136,9 @@ class ProjectReleaseTest extends UnitTestCase {
    * @param string $missing_field
    *   The field to test.
    *
-   * @covers ::createFromArray
-   *
-   * @dataProvider providerCreateFromArrayMissingField
+   * @legacy-covers ::createFromArray
    */
+  #[DataProvider('providerCreateFromArrayMissingField')]
   public function testCreateFromArrayMissingField(string $missing_field): void {
     $data = $this->getValidData();
     unset($data[$missing_field]);
@@ -149,7 +152,7 @@ class ProjectReleaseTest extends UnitTestCase {
   /**
    * Data provider for testCreateFromArrayMissingField().
    */
-  public function providerCreateFromArrayMissingField(): array {
+  public static function providerCreateFromArrayMissingField(): array {
     return [
       'status' => ['status'],
       'version' => ['version'],
@@ -167,10 +170,9 @@ class ProjectReleaseTest extends UnitTestCase {
    * @param string $expected_message
    *   The expected message for the field.
    *
-   * @covers ::createFromArray
-   *
-   * @dataProvider providerCreateFromArrayInvalidField
+   * @legacy-covers ::createFromArray
    */
+  #[DataProvider('providerCreateFromArrayInvalidField')]
   public function testCreateFromArrayInvalidField(string $invalid_field, $invalid_value, string $expected_message): void {
     $data = $this->getValidData();
     // Set the field a value that is not valid for any of the fields in the
@@ -186,7 +188,7 @@ class ProjectReleaseTest extends UnitTestCase {
   /**
    * Data provider for testCreateFromArrayInvalidField().
    */
-  public function providerCreateFromArrayInvalidField(): array {
+  public static function providerCreateFromArrayInvalidField(): array {
     return [
       'status other' => [
         'invalid_field' => 'status',

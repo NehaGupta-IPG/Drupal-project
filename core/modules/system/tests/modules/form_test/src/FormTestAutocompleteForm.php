@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test;
 
 use Drupal\Core\Form\FormBase;
@@ -45,6 +47,14 @@ class FormTestAutocompleteForm extends FormBase {
         '#type' => 'textfield',
         '#title' => 'Autocomplete 3',
         '#autocomplete_route_name' => 'form_test.autocomplete_1',
+      ],
+    ];
+    $form['autocomplete_4'] = [
+      '#type' => 'textfield',
+      '#title' => 'Autocomplete 4',
+      '#autocomplete_route_name' => 'form_test.autocomplete_1',
+      '#attributes' => [
+        'data-autocomplete-first-character-denylist' => '/',
       ],
     ];
 

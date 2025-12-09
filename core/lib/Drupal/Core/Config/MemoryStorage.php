@@ -10,7 +10,7 @@ class MemoryStorage implements StorageInterface {
   /**
    * The configuration, an object shared by reference across collections.
    *
-   * @var \ArrayAccess
+   * @var \ArrayObject
    */
   protected $config;
 
@@ -31,6 +31,7 @@ class MemoryStorage implements StorageInterface {
   public function __construct($collection = StorageInterface::DEFAULT_COLLECTION) {
     $this->collection = $collection;
     $this->config = new \ArrayObject();
+    $this->config[$collection] = [];
   }
 
   /**

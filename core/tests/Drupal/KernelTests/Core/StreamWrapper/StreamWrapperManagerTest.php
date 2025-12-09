@@ -1,14 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\StreamWrapper;
 
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\StreamWrapper\StreamWrapperManager
- * @group File
+ * Tests Drupal\Core\StreamWrapper\StreamWrapperManager.
  */
+#[CoversClass(StreamWrapperManager::class)]
+#[Group('File')]
+#[RunTestsInSeparateProcesses]
 class StreamWrapperManagerTest extends KernelTestBase {
 
   /**
@@ -21,29 +29,25 @@ class StreamWrapperManagerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->streamWrapperManager = \Drupal::service('stream_wrapper_manager');
   }
 
   /**
-   * @covers ::getScheme
+   * Tests uri scheme.
    *
-   * @dataProvider providerTestUriScheme
+   * @legacy-covers ::getScheme
    */
-  public function testUriScheme($uri, $expected) {
+  #[DataProvider('providerTestUriScheme')]
+  public function testUriScheme($uri, $expected): void {
     $this->assertSame($expected, StreamWrapperManager::getScheme($uri));
   }
 
   /**
    * Data provider.
    */
-  public function providerTestUriScheme() {
+  public static function providerTestUriScheme() {
     $data = [];
     $data[] = [
       'public://filename',
