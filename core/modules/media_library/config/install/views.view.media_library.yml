@@ -472,7 +472,9 @@ display:
       contexts:
         - 'languages:language_interface'
         - url
-        - url.query_args
+        - 'url.query_args:items_per_page'
+        - 'url.query_args:offset'
+        - 'url.query_args:page'
         - 'url.query_args:sort_by'
         - user
         - user.permissions
@@ -769,7 +771,9 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
-        - url.query_args
+        - 'url.query_args:items_per_page'
+        - 'url.query_args:offset'
+        - 'url.query_args:page'
         - 'url.query_args:sort_by'
         - user
         - user.permissions
@@ -1088,7 +1092,9 @@ display:
       contexts:
         - 'languages:language_interface'
         - url
-        - url.query_args
+        - 'url.query_args:items_per_page'
+        - 'url.query_args:offset'
+        - 'url.query_args:page'
         - 'url.query_args:sort_by'
         - user.permissions
       tags: {  }
@@ -1385,7 +1391,9 @@ display:
       contexts:
         - 'languages:language_interface'
         - url
-        - url.query_args
+        - 'url.query_args:items_per_page'
+        - 'url.query_args:offset'
+        - 'url.query_args:page'
         - 'url.query_args:sort_by'
         - user.permissions
       tags: {  }

@@ -253,7 +253,9 @@ display:
       max-age: -1
       contexts:
         - 'languages:language_interface'
-        - url.query_args
+        - 'url.query_args:items_per_page'
+        - 'url.query_args:offset'
+        - 'url.query_args:page'
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
@@ -304,7 +306,9 @@ display:
       max-age: -1
       contexts:
         - 'languages:language_interface'
-        - url.query_args
+        - 'url.query_args:items_per_page'
+        - 'url.query_args:offset'
+        - 'url.query_args:page'
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
