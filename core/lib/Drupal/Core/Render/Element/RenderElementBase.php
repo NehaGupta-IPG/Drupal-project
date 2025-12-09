@@ -283,32 +283,30 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
 
     // Add a reasonable default event handler if none was specified.
     if (isset($element['#ajax']) && !isset($element['#ajax']['event'])) {
-      switch ($element['#type']) {
-        case 'submit':
-        case 'button':
-        case 'image_button':
-          // Pressing the ENTER key within a textfield triggers the click event
-          // of the form's first submit button. Triggering Ajax in this
-          // situation leads to problems, like breaking autocomplete textfields,
-          // so we bind to mousedown instead of click.
-          // @see https://www.drupal.org/node/216059
-          $element['#ajax']['event'] = 'mousedown';
-          // Retain keyboard accessibility by setting 'keypress'. This causes
-          // ajax.js to trigger 'event' when SPACE or ENTER are pressed while
-          // the button has focus.
-          $element['#ajax']['keypress'] = TRUE;
-          // Binding to mousedown rather than click means that it is possible to
-          // trigger a click by pressing the mouse, holding the mouse button
-          // down until the Ajax request is complete and the button is
-          // re-enabled, and then releasing the mouse button. Set 'prevent' so
-          // that ajax.js binds an additional handler to prevent such a click
-          // from triggering a non-Ajax form submission. This also prevents a
-          // textfield's ENTER press triggering this button's non-Ajax form
-          // submission behavior.
-          if (!isset($element['#ajax']['prevent'])) {
-            $element['#ajax']['prevent'] = 'click';
-          }
-          break;
+    switch ($element['#type']) {
+    case 'submit':
+    case 'button':
+    case 'image_button':
+      // Bind to mouseup instead of click to support WCAG 2.5.2 Pointer Cancellation.
+      // This ensures the user can start a press, move away, and release without
+      // unintentionally activating the button. Activation should only occur on
+      // intentional release.
+      // @see https://www.drupal.org/node/216059
+      $element['#ajax']['event'] = 'mouseup';
+
+      // Retain keyboard accessibility by setting 'keypress'. This causes ajax.js
+      // to trigger the mouseup event when SPACE or ENTER are pressed while the
+      // button has focus.
+      $element['#ajax']['keypress'] = TRUE;
+
+      // Prevent a native click event from triggering a non-Ajax form submission.
+      // This is necessary because binding to mouseup does not automatically
+      // suppress the browser’s default click behavior.
+      if (!isset($element['#ajax']['prevent'])) {
+        $element['#ajax']['prevent'] = 'click';
+      }
+      break;
+
 
         case 'password':
         case 'textfield':
@@ -330,7 +328,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
           break;
 
         default:
-          return $element;
+       
+          break;
+         
       }
     }
 
