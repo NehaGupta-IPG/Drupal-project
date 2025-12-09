@@ -117,6 +117,7 @@ class Table extends FormElementBase {
   public function getInfo() {
     return [
       '#header' => [],
+      '#header_multilevel' => FALSE,
       '#rows' => [],
       '#empty' => '',
       // Properties for tableselect support.

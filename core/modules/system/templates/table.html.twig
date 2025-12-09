@@ -8,10 +8,8 @@
  * - caption: A localized string for the <caption> tag.
  * - colgroups: Column groups. Each group contains the following properties:
  *   - attributes: HTML attributes to apply to the <col> tag.
- *     Note: Drupal currently supports only one table header row, see
- *     https://www.drupal.org/node/893530 and
- *     http://api.drupal.org/api/drupal/includes!theme.inc/function/theme_table/7#comment-5109.
- * - header: Table header cells. Each cell contains the following properties:
+ * - header: Table header rows. Each row contains and array of cell with the
+ *     following properties:
  *   - tag: The HTML tag name to use; either 'th' or 'td'.
  *   - attributes: HTML attributes to apply to the tag.
  *   - content: A localized string for the title of the column.
@@ -62,14 +60,26 @@
 
   {% if header %}
     <thead>
-      <tr>
-        {% for cell in header %}
-          <{{ cell.tag }}{{ cell.attributes }}>
+      {% if header_multilevel %}
+        {% for row in header %}
+          <tr>
+          {% for cell in row %}
+            <{{ cell.tag }}{{ cell.attributes }}>
             {{- cell.content -}}
-          </{{ cell.tag }}>
+            </{{ cell.tag }}>
+          {% endfor %}
+          </tr>
         {% endfor %}
-      </tr>
-    </thead>
+      {% else %}
+        <tr>
+          {% for cell in header %}
+            <{{ cell.tag }}{{ cell.attributes }}>
+              {{- cell.content -}}
+            </{{ cell.tag }}>
+          {% endfor %}
+        </tr>
+      {% endif %}
+     </thead>
   {% endif %}
 
   {% if rows %}

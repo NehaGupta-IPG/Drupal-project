@@ -455,6 +455,8 @@ function template_preprocess_image(&$variables): void {
  *       narrow viewports to save horizontal space.
  *     - Any HTML attributes, such as "colspan", to apply to the column header
  *       cell.
+ *   - header_multilevel: A boolean flag, FALSE by default. If set to TRUE, the
+ *      header key array should have one more depth level.
  *   - rows: An array of table rows. Every row is an array of cells, or an
  *     associative array with the following keys:
  *     - data: An array of cells.

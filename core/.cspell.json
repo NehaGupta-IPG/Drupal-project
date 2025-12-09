@@ -47,7 +47,10 @@
       "!!binary .*",
       "%[0-9][0-9A-F]",
       "\\Wi18n",
-      "\\x{[0-9A-F]{4,5}}"
+      "\\x{[0-9A-F]{4,5}}",
+      "bigcell",
+      "longcell",
+      "multirows"
     ],
     "dictionaries": [
       "dictionary",
