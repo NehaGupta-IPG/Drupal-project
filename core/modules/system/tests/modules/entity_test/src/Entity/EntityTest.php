@@ -62,6 +62,16 @@ use Drupal\user\UserInterface;
 class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
 
   /**
+   * A register for the onChange calls.
+   *
+   * This array contains the number of calls for a given field name, keyed by
+   * the language code.
+   *
+   * @var array
+   */
+  protected $onChangeRegister = [];
+
+  /**
    * {@inheritdoc}
    */
   public static function preCreate(EntityStorageInterface $storage, array &$values) {
@@ -181,6 +191,89 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
     // are able to set and access entity keys dynamically, update the visibility
     // of this method to public.
     return parent::getEntityKey($key);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function initializeTranslation($langcode) {
+    // Ensure that changes to the onChangeRegister property are propagated to
+    // all the translation objects.
+    $translation = parent::initializeTranslation($langcode);
+    $translation->onChangeRegister = &$this->onChangeRegister;
+    return $translation;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __clone() {
+    // Avoid deep-cloning when we are initializing a translation object, since
+    // it will represent the same entity, only with a different active language.
+    if ($this->translationInitialize) {
+      return;
+    }
+
+    // Ensure the onChangeRegister property is actually cloned by overwriting
+    // the original reference with one pointing to a copy of it.
+    $on_change_register = $this->onChangeRegister;
+    $this->onChangeRegister = &$on_change_register;
+
+    parent::__clone();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onChange($name) {
+    // @todo what about non-translatable fields? Currently we'll set/increment
+    // the default entity translation.
+    $langcode = $this->activeLangcode;
+    if (!isset($this->onChangeRegister[$langcode][$name])) {
+      $this->onChangeRegister[$langcode][$name] = 0;
+    }
+    $this->onChangeRegister[$langcode][$name]++;
+    parent::onChange($name);
+  }
+
+  /**
+   * Returns the on-change register.
+   *
+   * @param string|NULL $langcode
+   *   (optional) If set, the on-change register for the given language will be
+   *   returned, otherwise the whole on-change register will be returned.
+   *
+   * @return array
+   *   The on-change register.
+   */
+  public function getOnChangeRegister($langcode = NULL) {
+    $langcode = $langcode === $this->defaultLangcode ? LanguageInterface::LANGCODE_DEFAULT : $langcode;
+    if ($langcode) {
+      $result = isset($this->onChangeRegister[$langcode]) ? $this->onChangeRegister[$langcode] : [];
+    }
+    else {
+      $result = $this->onChangeRegister;
+    }
+    return $result;
+  }
+
+  /**
+   * Resets the on-change register.
+   *
+   * @param string|NULL $langcode
+   *   (optional) If set, the on-change register will be reset for the given
+   *   language only, otherwise the whole register will be reset.
+   */
+  public function resetOnChangeRegister($langcode = NULL) {
+    $langcode = $langcode === $this->defaultLangcode ? LanguageInterface::LANGCODE_DEFAULT : $langcode;
+    if ($langcode) {
+      if (isset($this->onChangeRegister[$langcode])) {
+        $this->onChangeRegister[$langcode] = [];
+      }
+    }
+    else {
+      $this->onChangeRegister = [];
+    }
   }
 
 }
