@@ -4,13 +4,13 @@ namespace Drupal\Core\Menu;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
-use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Url;
 
 /**
  * Defines an interface for classes providing a type of menu link.
  */
-interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspectionInterface, RefinableCacheableDependencyInterface {
+interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspectionInterface, CacheableDependencyInterface {
 
   /**
    * Returns the weight of the menu link.
