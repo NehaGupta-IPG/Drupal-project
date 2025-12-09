@@ -607,6 +607,18 @@ function _user_mail_notify($op, AccountInterface $account) {
 }
 
 /**
+ * Implements hook_element_info_alter().
+ */
+function user_element_info_alter(array &$types): void {
+  if (isset($types['password_confirm'])) {
+    $types['password_confirm']['#process'][] = 'user_form_process_password_confirm';
+  }
+  if (isset($types['password_unmask'])) {
+    $types['password_unmask']['#process'][] = 'user_form_process_password_unmask';
+  }
+}
+
+/**
  * Form element process handler for client-side password validation.
  *
  * This #process handler is automatically invoked for 'password_confirm' form
@@ -622,28 +634,74 @@ function user_form_process_password_confirm($element) {
   ];
 
   if (\Drupal::config('user.settings')->get('password_strength')) {
-    $password_settings['showStrengthIndicator'] = TRUE;
-    $password_settings += [
-      'strengthTitle' => t('Password strength:'),
-      'hasWeaknesses' => t('Recommendations to make your password stronger:'),
-      'tooShort' => t('Make it at least 12 characters'),
-      'addLowerCase' => t('Add lowercase letters'),
-      'addUpperCase' => t('Add uppercase letters'),
-      'addNumbers' => t('Add numbers'),
-      'addPunctuation' => t('Add punctuation'),
-      'sameAsUsername' => t('Make it different from your username'),
-      'weak' => t('Weak'),
-      'fair' => t('Fair'),
-      'good' => t('Good'),
-      'strong' => t('Strong'),
-      'username' => \Drupal::currentUser()->getAccountName(),
-    ];
+    $password_settings = _user_password_strength_settings($password_settings);
   }
 
   $element['#attached']['library'][] = 'user/drupal.user';
   $element['#attached']['drupalSettings']['password'] = $password_settings;
 
   return $element;
+}
+
+/**
+ * Form element process handler for client-side password validation.
+ *
+ * This #process handler is automatically invoked for 'password_unmask' form
+ * elements to add the JavaScript to display and hide the password and string
+ * translations for dynamic password validation.
+ */
+function user_form_process_password_unmask($element): array {
+  $password_settings = [
+    'confirmTitle' => '',
+    'showStrengthIndicator' => FALSE,
+  ];
+
+  if (\Drupal::config('user.settings')->get('password_strength')) {
+    $password_settings = _user_password_strength_settings($password_settings);
+  }
+
+  $element['#attached']['library'][] = 'user/drupal.user';
+  $element['#attached']['drupalSettings']['password'] = $password_settings;
+
+  return $element;
+}
+
+/**
+ * Helper to enable password strength indicator settings.
+ *
+ * @param array $password_settings
+ *   Current #attached password settings (optional).
+ *
+ * @return array
+ *   Password settings with password strength indicator enabled.
+ */
+function _user_password_strength_settings(array $password_settings = []) {
+  $password_settings['showStrengthIndicator'] = TRUE;
+  $password_settings += [
+    'strengthTitle' => t('Password strength:'),
+    'hasWeaknesses' => t('Recommendations to make your password stronger:'),
+    'tooShort' => t('Make it at least 12 characters'),
+    'addLowerCase' => t('Add lowercase letters'),
+    'addUpperCase' => t('Add uppercase letters'),
+    'addNumbers' => t('Add numbers'),
+    'addPunctuation' => t('Add punctuation'),
+    'sameAsUsername' => t('Make it different from your username'),
+    'weak' => t('Weak'),
+    'fair' => t('Fair'),
+    'good' => t('Good'),
+    'strong' => t('Strong'),
+    'username' => \Drupal::currentUser()->getAccountName(),
+  ];
+
+  return $password_settings;
+}
+
+/**
+ * Implements hook_modules_uninstalled().
+ */
+function user_modules_uninstalled($modules): void {
+  // Remove any potentially orphan module data stored for users.
+  \Drupal::service('user.data')->delete($modules);
 }
 
 /**

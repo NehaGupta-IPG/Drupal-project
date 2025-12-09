@@ -584,10 +584,7 @@ trait FunctionalTestSetupTrait {
           'account' => [
             'name' => $this->rootUser->getAccountName(),
             'mail' => $this->rootUser->getEmail(),
-            'pass' => [
-              'pass1' => $this->rootUser->pass_raw ?? $this->rootUser->passRaw,
-              'pass2' => $this->rootUser->pass_raw ?? $this->rootUser->passRaw,
-            ],
+            'pass' => $this->rootUser->pass_raw ?? $this->rootUser->passRaw,
           ],
           // \Drupal\Core\Render\Element\Checkboxes::valueCallback() requires
           // NULL instead of FALSE values for programmatic form submissions to

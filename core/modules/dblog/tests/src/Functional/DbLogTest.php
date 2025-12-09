@@ -474,8 +474,7 @@ class DbLogTest extends BrowserTestBase {
     $edit = [];
     $edit['name'] = $name;
     $edit['mail'] = $name . '@example.com';
-    $edit['pass[pass1]'] = $pass;
-    $edit['pass[pass2]'] = $pass;
+    $edit['pass'] = $pass;
     $edit['status'] = 1;
     $this->drupalGet('admin/people/create');
     $this->submitForm($edit, 'Create new account');

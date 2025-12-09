@@ -61,8 +61,7 @@ class UserLanguageCreationTest extends BrowserTestBase {
     $edit = [
       'name' => $username,
       'mail' => $this->randomMachineName(4) . '@example.com',
-      'pass[pass1]' => $username,
-      'pass[pass2]' => $username,
+      'pass' => $username,
     ];
 
     $this->drupalGet($langcode . '/admin/people/create');
@@ -102,8 +101,7 @@ class UserLanguageCreationTest extends BrowserTestBase {
     // Set passRaw so we can log in the new user.
     $user->passRaw = $this->randomMachineName(10);
     $edit = [
-      'pass[pass1]' => $user->passRaw,
-      'pass[pass2]' => $user->passRaw,
+      'pass' => $user->passRaw,
     ];
 
     $this->drupalGet($user_edit);

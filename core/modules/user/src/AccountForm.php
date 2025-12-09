@@ -127,9 +127,14 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     // assign a password during registration.
     if (!$register) {
       $form['account']['pass'] = [
-        '#type' => 'password_confirm',
+        '#type' => 'password_unmask',
         '#size' => 25,
-        '#description' => $this->t('To change the current user password, enter the new password in both fields.'),
+        '#title' => $this->t('Password'),
+        '#description' => $this->t('To change the current user password, enter the new password.'),
+        '#attributes' => [
+          'spellcheck' => 'false',
+          'data-drupal-strength-indicator' => TRUE,
+        ],
       ];
 
       // To skip the current password field, the user must have logged in via a
@@ -146,7 +151,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       // The user must enter their current password to change to a new one.
       if ($user->id() == $account->id()) {
         $form['account']['current_pass'] = [
-          '#type' => 'password',
+          '#type' => 'password_unmask',
           '#title' => $this->t('Current password'),
           '#size' => 25,
           '#access' => !$form_state->get('user_pass_reset'),
@@ -154,7 +159,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
           // Do not let web browsers remember this password, since we are
           // trying to confirm that the person submitting the form actually
           // knows the current one.
-          '#attributes' => ['autocomplete' => 'off'],
+          '#attributes' => [
+            'autocomplete' => 'off',
+            'data-drupal-strength-indicator' => FALSE,
+          ],
+
         ];
         $form_state->set('user', $account);
 
@@ -172,10 +181,14 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     }
     elseif (!$config->get('verify_mail') || $admin_create) {
       $form['account']['pass'] = [
-        '#type' => 'password_confirm',
+        '#type' => 'password_unmask',
         '#size' => 25,
-        '#description' => $this->t('Provide a password for the new account in both fields.'),
+        '#title' => $this->t('Password'),
+        '#description' => $this->t('Provide a password for the new account.'),
         '#required' => TRUE,
+        '#attributes' => [
+          'data-drupal-strength-indicator' => TRUE,
+        ],
       ];
     }
 

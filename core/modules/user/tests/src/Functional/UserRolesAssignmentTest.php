@@ -63,8 +63,7 @@ class UserRolesAssignmentTest extends BrowserTestBase {
     $edit = [
       'name' => $this->randomMachineName(),
       'mail' => $this->randomMachineName() . '@example.com',
-      'pass[pass1]' => $pass = $this->randomString(),
-      'pass[pass2]' => $pass,
+      'pass' => $this->randomString(),
       "roles[$rid]" => $rid,
     ];
     $this->drupalGet('admin/people/create');

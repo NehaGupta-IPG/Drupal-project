@@ -308,8 +308,7 @@ class ContactPersonalTest extends BrowserTestBase {
     $edit = [
       'name' => $name,
       'mail' => $this->randomMachineName() . '@example.com',
-      'pass[pass1]' => $pass = $this->randomString(),
-      'pass[pass2]' => $pass,
+      'pass' => $this->randomString(),
       'notify' => FALSE,
     ];
     if (isset($contact_value)) {

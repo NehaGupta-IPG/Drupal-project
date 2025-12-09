@@ -33,8 +33,7 @@ exports.command = function drupalCreateUser(
   }).drupalLoginAsAdmin(async () => {
     this.drupalRelativeURL('/admin/people/create')
       .setValue('input[name="name"]', name)
-      .setValue('input[name="pass[pass1]"]', password)
-      .setValue('input[name="pass[pass2]"]', password)
+      .setValue('input[name="pass"]', password)
       .perform((client, done) => {
         if (permissions.length) {
           client.click(`input[name="roles[${roleName}]`, () => {

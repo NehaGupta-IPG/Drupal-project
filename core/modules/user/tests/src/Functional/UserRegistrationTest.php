@@ -91,16 +91,8 @@ class UserRegistrationTest extends BrowserTestBase {
     $edit['name'] = $name = $this->randomMachineName();
     $edit['mail'] = $mail = $edit['name'] . '@example.com';
 
-    // Try entering a mismatching password.
-    $edit['pass[pass1]'] = '99999.0';
-    $edit['pass[pass2]'] = '99999';
-    $this->drupalGet('user/register');
-    $this->submitForm($edit, 'Create new account');
-    $this->assertSession()->pageTextContains('The specified passwords do not match.');
-
     // Enter a correct password.
-    $edit['pass[pass1]'] = $new_pass = $this->randomMachineName();
-    $edit['pass[pass2]'] = $new_pass;
+    $edit['pass'] = $this->randomMachineName();
     $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
     $this->container->get('entity_type.manager')->getStorage('user')->resetCache();
@@ -116,8 +108,7 @@ class UserRegistrationTest extends BrowserTestBase {
     $edit = [];
     $edit['name'] = $name = $this->randomMachineName();
     $edit['mail'] = $mail = $edit['name'] . '@example.com';
-    $edit['pass[pass1]'] = $pass = $this->randomMachineName();
-    $edit['pass[pass2]'] = $pass;
+    $edit['pass'] = $pass = $this->randomMachineName();
     $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
     $this->assertSession()->pageTextContains('Thank you for applying for an account. Your account is currently pending approval by the site administrator.');
@@ -228,7 +219,7 @@ class UserRegistrationTest extends BrowserTestBase {
     $edit = [];
     $edit['name'] = $this->randomMachineName();
     $edit['mail'] = $edit['name'] . '@example.com';
-    $edit['pass[pass2]'] = $edit['pass[pass1]'] = $this->randomMachineName();
+    $edit['pass'] = $this->randomMachineName();
 
     // Create one account.
     $this->drupalGet('user/register');
@@ -243,7 +234,7 @@ class UserRegistrationTest extends BrowserTestBase {
     // Create a second account.
     $edit['name'] = $this->randomMachineName();
     $edit['mail'] = $edit['name'] . '@example.com';
-    $edit['pass[pass2]'] = $edit['pass[pass1]'] = $this->randomMachineName();
+    $edit['pass'] = $this->randomMachineName();
 
     $this->drupalGet('user/register');
     $this->submitForm($edit, 'Create new account');
@@ -276,8 +267,7 @@ class UserRegistrationTest extends BrowserTestBase {
     $edit = [];
     $edit['name'] = $name = $this->randomMachineName();
     $edit['mail'] = $mail = $edit['name'] . '@example.com';
-    $edit['pass[pass1]'] = $new_pass = $this->randomMachineName();
-    $edit['pass[pass2]'] = $new_pass;
+    $edit['pass'] = $this->randomMachineName();
     $this->submitForm($edit, 'Create new account');
 
     // Check user fields.

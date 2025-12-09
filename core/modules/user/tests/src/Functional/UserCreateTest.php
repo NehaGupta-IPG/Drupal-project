@@ -102,8 +102,7 @@ class UserCreateTest extends BrowserTestBase {
       $edit = [
         'name' => $name,
         'mail' => $this->randomMachineName() . '@example.com',
-        'pass[pass1]' => $pass = $this->randomString(),
-        'pass[pass2]' => $pass,
+        'pass' => $this->randomString(),
         'notify' => $notify,
       ];
       $this->drupalGet('admin/people/create');
@@ -130,8 +129,7 @@ class UserCreateTest extends BrowserTestBase {
     $edit = [
       'name' => $name,
       'mail' => $this->randomMachineName() . '@example.com',
-      'pass[pass1]' => 0,
-      'pass[pass2]' => 0,
+      'pass' => 0,
       'notify' => FALSE,
     ];
     $this->drupalGet('admin/people/create');

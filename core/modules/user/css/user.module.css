@@ -19,3 +19,22 @@
 .password-confirm-match {
   visibility: hidden;
 }
+@media all and (min-width: 600px) {
+  .password-parent .toggle-password {
+    height: 2.5em;
+    margin: 0 0 0 10px;
+    text-decoration: underline;
+    color: #55565b;
+    border: none;
+    border-radius: 5px;
+    background-color: transparent;
+    font-size: inherit;
+    font-weight: bold;
+
+    &:hover {
+      text-decoration: none;
+      color: #0036b1;
+      background-color: #e5edff;
+    }
+  }
+}

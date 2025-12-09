@@ -191,11 +191,11 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     // Test invalidation of 'rendered' cache tag after string translation.
     $this->drupalLogout();
     $this->drupalGet('xx/user/login');
-    $this->assertSession()->pageTextContains('Password');
+    $this->assertSession()->pageTextContains('Username');
 
     $this->drupalLogin($translate_user);
     $search = [
-      'string' => 'Password',
+      'string' => 'Username',
       'langcode' => $langcode,
       'translation' => 'untranslated',
     ];

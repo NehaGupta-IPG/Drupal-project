@@ -203,8 +203,6 @@ class UserLoginTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Member for');
 
     $this->doPasswordLengthLogin($account, $current_password, $length + 1);
-    $this->assertSession()->pageTextContains('Password cannot be longer than ' . $length . ' characters but is currently ' . ($length + 1) . ' characters long.');
-    $this->assertSession()->pageTextNotContains('Member for');
   }
 
   /**
@@ -226,13 +224,17 @@ class UserLoginTest extends BrowserTestBase {
     $edit = [
       'current_pass' => $current_password,
       'mail' => $account->getEmail(),
-      'pass[pass1]' => $new_password,
-      'pass[pass2]' => $new_password,
+      'pass' => $new_password,
     ];
 
     // Change the password.
     $this->drupalGet("user/$uid/edit");
     $this->submitForm($edit, 'Save');
+    if ($length > 128) {
+      $this->assertSession()->pageTextContains('Password cannot be longer than ' . $length - 1 . ' characters but is currently ' . ($length) . ' characters long.');
+      $this->assertSession()->pageTextNotContains('Member for');
+      return $new_password;
+    }
     $this->assertSession()->pageTextContains('The changes have been saved.');
     $this->drupalLogout();
 

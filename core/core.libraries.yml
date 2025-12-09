@@ -681,6 +681,14 @@ drupal.progress:
     - core/jquery
     - core/drupalSettings
 
+drupal.password-unmask:
+  version: VERSION
+  js:
+    misc/password-unmask.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+
 drupal.textarea-resize:
   version: VERSION
   css:

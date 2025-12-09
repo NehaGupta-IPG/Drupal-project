@@ -69,9 +69,15 @@
           .parent()
           .addClass(cssClasses.passwordParent);
         const $passwordWidget = $mainInput.closest(
+          '.js-form-type-password-unmask',
+        );
+        // @todo Remove all the code related to PasswordConfirm in
+        //   https://www.drupal.org/project/drupal/issues/3419469.
+        const $passwordWidgetConfirm = $mainInput.closest(
           '.js-form-type-password-confirm',
         );
         const $confirmInput = $passwordWidget.find('input.js-password-confirm');
+
         const $passwordConfirmMessage = $(
           Drupal.theme('passwordConfirmMessage', settings.password),
         );
@@ -84,7 +90,6 @@
           .parent()
           .addClass('confirm-parent')
           .append($passwordConfirmMessage);
-
         // List of classes to be removed from the strength bar on a state
         // change.
         const passwordStrengthBarClassesToRemove = [
@@ -119,7 +124,10 @@
         const password = {};
 
         // If the password strength indicator is enabled, add its markup.
-        if (settings.password.showStrengthIndicator) {
+        if (
+          settings.password.showStrengthIndicator &&
+          value.hasAttribute('data-drupal-strength-indicator')
+        ) {
           const $passwordStrength = $(
             Drupal.theme('passwordStrength', settings.password),
           );
@@ -136,23 +144,25 @@
           password.$suggestions.hide();
           $mainInputParent.append($passwordStrength);
           $confirmInputParent.after(password.$suggestions);
+          $mainInputParent.append(password.$suggestions);
         }
 
         /**
          * Adds classes to the widget indicating if the elements are filled.
          */
         const addWidgetClasses = () => {
-          $passwordWidget
-            .addClass(
-              $mainInput[0].value
-                ? cssClasses.passwordFilled
-                : cssClasses.passwordEmpty,
-            )
-            .addClass(
+          $passwordWidget.addClass(
+            $mainInput[0].value
+              ? cssClasses.passwordFilled
+              : cssClasses.passwordEmpty,
+          );
+          if ($passwordWidgetConfirm && $confirmInput[0]) {
+            $passwordWidgetConfirm.addClass(
               $confirmInput[0].value
                 ? cssClasses.confirmFilled
                 : cssClasses.confirmEmpty,
             );
+          }
         };
 
         /**
@@ -203,37 +213,39 @@
             );
 
             // Update the suggestions for how to improve the password if needed.
-            if (
-              password.$suggestions.html() !==
-              $currentPasswordSuggestions.html()
-            ) {
-              password.$suggestions.replaceWith($currentPasswordSuggestions);
-              password.$suggestions = $currentPasswordSuggestions.toggle(
-                // Only show the description box if a weakness exists in the
-                // password.
-                result.strength !== 100,
-              );
-            }
+            if (value.hasAttribute('data-drupal-strength-indicator')) {
+              if (
+                password.$suggestions.html() !==
+                $currentPasswordSuggestions.html()
+              ) {
+                password.$suggestions.replaceWith($currentPasswordSuggestions);
+                password.$suggestions = $currentPasswordSuggestions.toggle(
+                  // Only show the description box if a weakness exists in the
+                  // password.
+                  result.strength !== 100,
+                );
+              }
+              if (passwordStrengthBarClassesToRemove) {
+                password.$strengthBar.removeClass(
+                  passwordStrengthBarClassesToRemove,
+                );
+              }
+              // Adjust the length of the strength indicator.
+              password.$strengthBar[0].style.width = `${result.strength}%`;
+              password.$strengthBar.addClass(result.indicatorClass);
 
-            if (passwordStrengthBarClassesToRemove) {
-              password.$strengthBar.removeClass(
-                passwordStrengthBarClassesToRemove,
-              );
+              // Update the strength indication text.
+              password.$strengthTextWrapper.html(result.indicatorText);
             }
-            // Adjust the length of the strength indicator.
-            password.$strengthBar[0].style.width = `${result.strength}%`;
-            password.$strengthBar.addClass(result.indicatorClass);
-
-            // Update the strength indication text.
-            password.$strengthTextWrapper.html(result.indicatorText);
           }
-
-          // Check the value in the confirm input and show results.
-          if ($confirmInput[0].value) {
-            passwordCheckMatch($confirmInput[0].value);
-            $passwordConfirmMessage[0].style.visibility = 'visible';
-          } else {
-            $passwordConfirmMessage[0].style.visibility = 'hidden';
+          if ($confirmInput[0]) {
+            // Check the value in the confirm input and show results.
+            if ($confirmInput[0].value) {
+              passwordCheckMatch($confirmInput[0].value);
+              $passwordConfirmMessage[0].style.visibility = 'visible';
+            } else {
+              $passwordConfirmMessage[0].style.visibility = 'hidden';
+            }
           }
 
           if (widgetClassesToRemove) {
@@ -247,8 +259,10 @@
         }
 
         // Monitor input events.
+        if ($confirmInput) {
+          $confirmInput.on('input', passwordCheck);
+        }
         $mainInput.on('input', passwordCheck);
-        $confirmInput.on('input', passwordCheck);
       });
     },
   };

@@ -13,6 +13,8 @@ use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests Drupal\Core\Render\Element\PasswordConfirm.
+ *
+ * @phpstan-ignore-next-line
  */
 #[CoversClass(PasswordConfirm::class)]
 #[Group('Render')]
@@ -26,13 +28,14 @@ class PasswordConfirmTest extends UnitTestCase {
   #[DataProvider('providerTestValueCallback')]
   public function testValueCallback($expected, $element, $input): void {
     $form_state = $this->prophesize(FormStateInterface::class)->reveal();
+    // @phpstan-ignore-next-line
     $this->assertSame($expected, PasswordConfirm::valueCallback($element, $input, $form_state));
   }
 
   /**
    * Data provider for testValueCallback().
    */
-  public static function providerTestValueCallback() {
+  public static function providerTestValueCallback(): array {
     $data = [];
     $data[] = [['pass1' => '', 'pass2' => ''], [], NULL];
     $data[] = [['pass1' => '', 'pass2' => ''], ['#default_value' => ['pass2' => 'value']], NULL];

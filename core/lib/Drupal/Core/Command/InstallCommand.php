@@ -191,10 +191,7 @@ class InstallCommand extends Command {
           'account' => [
             'name' => 'admin',
             'mail' => 'admin@localhost',
-            'pass' => [
-              'pass1' => $password,
-              'pass2' => $password,
-            ],
+            'pass' => $password,
           ],
           'enable_update_status_module' => TRUE,
           // \Drupal\Core\Render\Element\Checkboxes::valueCallback() requires
