@@ -111,6 +111,16 @@ class DateTimePlus {
    *   If the array date values or value combination is not correct.
    */
   public static function createFromArray(array $date_parts, $timezone = NULL, $settings = []) {
+    // Test the array values for any special characters.
+    $contains_special = FALSE;
+    $contains_special = array_find($date_parts, function (string $str) {
+      return (bool) preg_match('/[^a-zA-Z0-9]/', $str) > 0;
+    });
+
+    if ($contains_special) {
+      throw new \InvalidArgumentException('The input is invalid.');
+    }
+
     $date_parts = static::prepareArray($date_parts, TRUE);
     if (static::checkArray($date_parts)) {
       // Even with validation, we can end up with a value that the
@@ -121,7 +131,7 @@ class DateTimePlus {
       return new static($iso_date, $timezone, $settings);
     }
     else {
-      throw new \InvalidArgumentException('The array contains invalid values.');
+      throw new \InvalidArgumentException('The input contains invalid values.');
     }
   }
 
