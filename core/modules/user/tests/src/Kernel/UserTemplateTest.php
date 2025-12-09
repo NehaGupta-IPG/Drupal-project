@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Kernel;
 
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\KernelTests\KernelTestBase;
@@ -23,25 +25,19 @@ class UserTemplateTest extends KernelTestBase {
   use StringTranslationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'user_access_test'];
 
   /**
    * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $renderer;
+  protected RendererInterface $renderer;
 
   /**
    * A user for testing.
-   *
-   * @var \Drupal\user\UserInterface
    */
-  protected $user;
+  protected UserInterface $user;
 
   /**
    * {@inheritdoc}
@@ -65,7 +61,7 @@ class UserTemplateTest extends KernelTestBase {
       '#account' => $this->user,
     ];
     $this->setRawContent($this->renderer->renderRoot($build));
-    $this->assertEscaped($this->user->getDisplayName(), 'Account has permission to view user name.');
+    $this->assertEscaped($this->user->getDisplayName());
   }
 
   /**
@@ -80,7 +76,7 @@ class UserTemplateTest extends KernelTestBase {
       '#account' => $account,
     ];
     $this->setRawContent($this->renderer->renderRoot($build));
-    $this->assertEscaped($account->getDisplayName(), 'Account can view anonymous user name.');
+    $this->assertEscaped($account->getDisplayName());
   }
 
   /**
@@ -162,7 +158,7 @@ class UserTemplateTest extends KernelTestBase {
    * @return \Drupal\Component\Render\MarkupInterface
    *   The rendered user name template.
    */
-  protected function renderUserName(array $build, UserInterface $user) {
+  protected function renderUserName(array $build, UserInterface $user): MarkupInterface {
     // Do not save the user, otherwise cache tags are invalidated.
     $build['#theme'] = 'username';
     $user->setUsername($this->randomMachineName());
