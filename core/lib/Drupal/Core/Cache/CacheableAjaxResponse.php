@@ -4,7 +4,6 @@ namespace Drupal\Core\Cache;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CommandInterface;
-use Drupal\Core\Ajax\CommandWithAttachedAssetsInterface;
 
 /**
  * A AjaxResponse that contains and can expose cacheability metadata.
@@ -26,8 +25,8 @@ class CacheableAjaxResponse extends AjaxResponse implements CacheableResponseInt
   public function addCommand(CommandInterface $command, $prepend = FALSE): CacheableAjaxResponse {
     parent::addCommand($command, $prepend);
 
-    if ($command instanceof CommandWithAttachedAssetsInterface) {
-      $this->addCacheableDependency($command->getCacheableMetadata());
+    if ($command instanceof CacheableDependencyInterface) {
+      $this->addCacheableDependency($command);
     }
 
     return $this;
