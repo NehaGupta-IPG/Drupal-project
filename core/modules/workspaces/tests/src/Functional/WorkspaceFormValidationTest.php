@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\workspaces\Functional;
 
 use Drupal\Tests\BrowserTestBase;
-use Drupal\workspaces\Entity\Workspace;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Workspaces form validation.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceFormValidationTest extends BrowserTestBase {
 
   use WorkspaceTestUtilities;
@@ -40,8 +41,7 @@ class WorkspaceFormValidationTest extends BrowserTestBase {
    * Tests partial form validation through #limit_validation_errors.
    */
   public function testValidateLimitErrors(): void {
-    $stage = Workspace::load('stage');
-    $this->switchToWorkspace($stage);
+    $this->createAndActivateWorkspaceThroughUi();
 
     $edit = [
       'test' => 'test1',
