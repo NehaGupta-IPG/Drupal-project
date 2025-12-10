@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\Controller;
 
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\Renderer;
@@ -130,6 +131,12 @@ class ViewAjaxControllerTest extends UnitTestCase {
 
     $this->viewAjaxController = new ViewAjaxController($this->viewStorage, $this->executableFactory, $this->renderer, $this->currentPath, $this->redirectDestination, $this->pathValidator);
 
+    $cacheContextsManager = $this->createMock(CacheContextsManager::class);
+    $cacheContextsManager->expects($this->any())
+      ->method('assertValidTokens')
+      ->with(['languages:language_interface', 'theme'])
+      ->willReturn(TRUE);
+
     $element_info_manager = $this->createMock('\Drupal\Core\Render\ElementInfoManagerInterface');
     $element_info_manager->expects($this->any())
       ->method('getInfo')
@@ -155,6 +162,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
     $container->set('renderer', $this->renderer);
     $container->set('path.validator', $this->pathValidator);
     $container->set('unrouted_url_assembler', $unroutedUrlAssembler);
+    $container->set('cache_contexts_manager', $cacheContextsManager);
     \Drupal::setContainer($container);
     // Not initialized in Unit tests.
     $GLOBALS['base_path'] = '/';
