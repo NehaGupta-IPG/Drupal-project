@@ -3,6 +3,7 @@
 namespace Drupal\Core\Ajax;
 
 use Drupal\Core\Asset\AttachedAssets;
+use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * Trait for Ajax commands that render content and attach assets.
@@ -17,6 +18,11 @@ trait CommandWithAttachedAssetsTrait {
    * @var \Drupal\Core\Asset\AttachedAssets
    */
   protected $attachedAssets;
+
+  /**
+   * The cacheability metadata for this Ajax command.
+   */
+  protected CacheableMetadata $cacheableMetadata;
 
   /**
    * Processes the content for output.
@@ -35,6 +41,7 @@ trait CommandWithAttachedAssetsTrait {
       }
       $html = \Drupal::service('renderer')->renderRoot($this->content);
       $this->attachedAssets = AttachedAssets::createFromRenderArray($this->content);
+      $this->cacheableMetadata = CacheableMetadata::createFromRenderArray($this->content);
       return $html;
     }
     else {
@@ -50,6 +57,13 @@ trait CommandWithAttachedAssetsTrait {
    */
   public function getAttachedAssets() {
     return $this->attachedAssets;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata(): CacheableMetadata {
+    return $this->cacheableMetadata;
   }
 
 }
