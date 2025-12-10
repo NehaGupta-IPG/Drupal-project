@@ -152,6 +152,9 @@ class NodeBulkUpdate {
     if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
       $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
     }
+    else {
+      $context['finished'] = 1;
+    }
   }
 
   /**
@@ -177,7 +180,7 @@ class NodeBulkUpdate {
         '#theme' => 'item_list',
         '#items' => $results,
       ];
-      $message .= \Drupal::service('renderer')->render($item_list);
+      $message .= \Drupal::service('renderer')->renderInIsolation($item_list);
       $messenger->addStatus($message);
     }
   }
