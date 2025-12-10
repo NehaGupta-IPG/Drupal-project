@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Ajax;
 
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Ajax\AddCssCommand;
 use Drupal\Core\Ajax\AfterCommand;
 use Drupal\Core\Ajax\AlertCommand;
@@ -29,15 +30,29 @@ use Drupal\Core\Ajax\SetDialogTitleCommand;
 use Drupal\Core\Ajax\SettingsCommand;
 use Drupal\Core\Ajax\UpdateBuildIdCommand;
 use Drupal\Core\Asset\AttachedAssets;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Test coverage for various classes in the \Drupal\Core\Ajax namespace.
  */
 #[Group('Ajax')]
 class AjaxCommandsTest extends UnitTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $container = new ContainerBuilder();
+    $container->set('renderer', $this->createMock(RendererInterface::class));
+    $container->set('cache_contexts_manager', $this->createMock(CacheContextsManager::class));
+    \Drupal::setContainer($container);
+  }
 
   /**
    * @return array
@@ -350,6 +365,24 @@ class AjaxCommandsTest extends UnitTestCase {
     ];
 
     $this->assertEquals($expected, $command->render());
+  }
+
+  /**
+   * Tests insert command cacheability metadata.
+   *
+   * @legacy-covers \Drupal\Core\Ajax\InsertCommand
+   */
+  public function testInsertCommandCache(): void {
+    $command = new InsertCommand(
+      '#page-title',
+      [
+        '#attached' => [],
+        '#cache' => ['tags' => ['my_cache_tag']],
+      ]
+    );
+
+    $command->render();
+    $this->assertEquals(['my_cache_tag'], $command->getCacheTags());
   }
 
   /**
