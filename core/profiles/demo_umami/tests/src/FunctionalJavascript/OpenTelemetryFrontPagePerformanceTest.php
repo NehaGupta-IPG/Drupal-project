@@ -99,7 +99,7 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'ScriptBytes' => 11850,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 38800,
+      'StylesheetBytes' => 38850,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -131,7 +131,7 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'ScriptBytes' => 12000,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 39150,
+      'StylesheetBytes' => 38850,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

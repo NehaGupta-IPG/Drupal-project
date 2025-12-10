@@ -36,20 +36,52 @@ class QueryArgsCacheContextTest extends UnitTestCase {
   /**
    * Provides a list of query arguments and expected cache contexts.
    */
-  public static function providerTestGetContext() {
+  public static function providerTestGetContext(): array {
     return [
       [[], NULL, ''],
       [[], 'foo', ''],
       // Non-empty query arguments.
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], NULL, 'alpaca=&llama=rocks&panda=drools&z=0'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'llama', 'rocks'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'alpaca', '?valueless?'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'panda', 'drools'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'z', '0'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'chicken', ''],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        NULL,
+        'alpaca=&llama=rocks&panda=drools&z=0',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'llama',
+        'rocks',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'alpaca',
+        '?valueless?',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'panda',
+        'drools',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'z',
+        '0',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'chicken',
+        '',
+      ],
       [['llama' => ['rocks', 'kitty']], 'llama', '0=rocks&1=kitty'],
-      [['llama' => ['rocks' => 'fuzzball', 'monkey' => 'patch']], 'llama', 'rocks=fuzzball&monkey=patch'],
-      [['llama' => ['rocks' => ['nested', 'bonobo']]], 'llama', 'rocks%5B0%5D=nested&rocks%5B1%5D=bonobo'],
+      [
+        ['llama' => ['rocks' => 'fuzzball', 'monkey' => 'patch']],
+        'llama',
+        'rocks=fuzzball&monkey=patch',
+      ],
+      [
+        ['llama' => ['rocks' => ['nested', 'bonobo']]],
+        'llama',
+        'rocks%5B0%5D=nested&rocks%5B1%5D=bonobo',
+      ],
     ];
   }
 
