@@ -99,10 +99,10 @@ class ConfigTranslationController extends ControllerBase {
 
     // Handle deprecated parameters.
     if ($router !== NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $router argument is deprecated in drupal:11.1.9 and is removed from drupal:12.0.0. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $router argument is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
     }
     if ($path_processor !== NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() with the $path_processor argument is deprecated in drupal:11.1.9 and is removed from drupal:12.0.0. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $path_processor argument is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. The parameter is no longer used. See https://www.drupal.org/node/3551748', E_USER_DEPRECATED);
     }
   }
 
