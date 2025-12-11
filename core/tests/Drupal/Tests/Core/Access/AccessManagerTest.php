@@ -105,9 +105,18 @@ class AccessManagerTest extends UnitTestCase {
 
     $this->routeCollection = new RouteCollection();
     $this->routeCollection->add('test_route_1', new Route('/test-route-1', [], ['_csrf_token' => 'FALSE']));
-    $this->routeCollection->add('test_route_2', new Route('/test-route-2', [], ['_access' => 'TRUE', '_csrf_token' => 'FALSE']));
-    $this->routeCollection->add('test_route_3', new Route('/test-route-3', [], ['_access' => 'FALSE', '_csrf_token' => 'FALSE']));
-    $this->routeCollection->add('test_route_4', new Route('/test-route-4/{value}', [], ['_access' => 'TRUE', '_csrf_token' => 'FALSE']));
+    $this->routeCollection->add('test_route_2', new Route('/test-route-2', [], [
+      '_access' => 'TRUE',
+      '_csrf_token' => 'FALSE',
+    ]));
+    $this->routeCollection->add('test_route_3', new Route('/test-route-3', [], [
+      '_access' => 'FALSE',
+      '_csrf_token' => 'FALSE',
+    ]));
+    $this->routeCollection->add('test_route_4', new Route('/test-route-4/{value}', [], [
+      '_access' => 'TRUE',
+      '_csrf_token' => 'FALSE',
+    ]));
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $map = [];
@@ -417,7 +426,10 @@ class AccessManagerTest extends UnitTestCase {
    */
   public function testCheckNamedRouteWithDefaultValue(): void {
     $this->routeCollection = new RouteCollection();
-    $route = new Route('/test-route-1/{value}', ['value' => 'example'], ['_test_access' => 'TRUE', '_csrf_token' => 'FALSE']);
+    $route = new Route('/test-route-1/{value}', ['value' => 'example'], [
+      '_test_access' => 'TRUE',
+      '_csrf_token' => 'FALSE',
+    ]);
     $this->routeCollection->add('test_route_1', $route);
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
@@ -572,8 +584,14 @@ class AccessManagerTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testRequiredCsrf(): void {
-    $this->routeCollection->add('test_route_csrf_true', new Route('/test-route-5/', [], ['_access' => 'TRUE', '_csrf_token' => 'TRUE']));
-    $this->routeCollection->add('test_route_csrf_false', new Route('/test-route-6/', [], ['_access' => 'TRUE', '_csrf_token' => 'FALSE']));
+    $this->routeCollection->add('test_route_csrf_true', new Route('/test-route-5/', [], [
+      '_access' => 'TRUE',
+      '_csrf_token' => 'TRUE',
+    ]));
+    $this->routeCollection->add('test_route_csrf_false', new Route('/test-route-6/', [], [
+      '_access' => 'TRUE',
+      '_csrf_token' => 'FALSE',
+    ]));
     $this->routeCollection->add('test_route_without_csrf', new Route('/test-route-7/', [], ['_access' => 'TRUE']));
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
