@@ -218,28 +218,30 @@ class ConvertDefinitionTest extends UnitTestCase {
 
     $schemaDefinition = new Schema(
       name: 'test_foo_bar',
-      foo: new Table(
-        name: 'foo',
-        description: 'Foo table for the database unit tests.',
-        columns: [
-          new Column(
-            name: 'id',
-            type: ColumnType::Serial,
-          ),
-        ],
-        primaryKey: new PrimaryKey(['id']),
-      ),
-      bar: new Table(
-        name: 'bar',
-        description: 'Bar table for the database unit tests.',
-        columns: [
-          new Column(
-            name: 'id',
-            type: ColumnType::Serial,
-          ),
-        ],
-        primaryKey: new PrimaryKey(['id']),
-      ),
+      tables: [
+        new Table(
+          name: 'foo',
+          description: 'Foo table for the database unit tests.',
+          columns: [
+            new Column(
+              name: 'id',
+              type: ColumnType::Serial,
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+        new Table(
+          name: 'bar',
+          description: 'Bar table for the database unit tests.',
+          columns: [
+            new Column(
+              name: 'id',
+              type: ColumnType::Serial,
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+        ),
+      ],
     );
 
     $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
