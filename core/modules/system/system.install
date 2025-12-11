@@ -43,20 +43,22 @@ function system_schema(): Schema {
   // @todo Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
   return new Schema(
     name: 'system',
-    sequences: new Table(
-      name: 'sequences',
-      description: 'Stores IDs.',
-      columns: [
-        new Column(
-          name: 'value',
-          description: 'The value of the sequence.',
-          type: ColumnType::Serial,
-          unsigned: TRUE,
-          notNull: TRUE,
-        ),
-      ],
-      primaryKey: new PrimaryKey(['value']),
-    )
+    tables: [
+      new Table(
+        name: 'sequences',
+        description: 'Stores IDs.',
+        columns: [
+          new Column(
+            name: 'value',
+            description: 'The value of the sequence.',
+            type: ColumnType::Serial,
+            unsigned: TRUE,
+            notNull: TRUE,
+          ),
+        ],
+        primaryKey: new PrimaryKey(['value']),
+      ),
+    ],
   );
 }
 

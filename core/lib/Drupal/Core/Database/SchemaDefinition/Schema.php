@@ -10,26 +10,17 @@ namespace Drupal\Core\Database\SchemaDefinition;
 final class Schema implements SchemaDefinitionInterface {
 
   /**
-   * The tables in the schema.
-   *
-   * @var list<Table>
-   *   The list of tables in the schema.
-   */
-  public readonly array $tables;
-
-  /**
    * Constructor.
    *
    * @param string $name
    *   The schema name.
-   * @param Table ...$tables
-   *   A variable number of Table objects.
+   * @param list<Table> $tables
+   *   A list of Table objects.
    */
   public function __construct(
     public readonly string $name,
-    Table ...$tables,
+    public readonly array $tables,
   ) {
-    $this->tables = array_values($tables);
   }
 
   /**
