@@ -26,7 +26,7 @@ abstract class ConvertDefinition {
     $spec = [];
     foreach ($schema as $name => $table) {
       if ($table instanceof Table) {
-        $spec[$table->name] = self::tableToArray($table);
+        $spec[$table->name] = $table->toArray();
       }
       else {
         $spec[$name] = $table;

@@ -27,7 +27,7 @@ final class KeyColumn implements SchemaDefinitionInterface {
    * {@inheritdoc}
    */
   public function toArray(): array {
-    return [];
+    return $this->length !== NULL ? [[$this->name, $this->length]] : [$this->name];
   }
 
 }
