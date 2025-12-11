@@ -11,3 +11,17 @@
 function taxonomy_update_last_removed(): int {
   return 10100;
 }
+
+/**
+ * Add a created field to terms.
+ */
+function taxonomy_update_8400() {
+  $storage_definition = BaseFieldDefinition::create('created')
+    ->setLabel(t('Created'))
+    ->setDescription(t('The time that the term was created.'))
+    ->setReadOnly(TRUE)
+    ->setTranslatable(TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()
+    ->installFieldStorageDefinition('created', 'taxonomy_term', 'taxonomy', $storage_definition);
+}
