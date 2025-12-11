@@ -184,13 +184,14 @@ function hook_migrate_MIGRATION_ID_prepare_row(Row $row, MigrateSourceInterface 
 }
 
 /**
- * Allows altering the information of discovered field plugins.
+ * Allows altering the definition for discovered field plugins.
  *
  * For example, this implementation removes the support for core version
  * 6 from the 'email' plugin and adds a new 'email_d6' plugin.
  *
- * @param array $plugin_definitions
- *   The array of Migrate field definitions, keyed by plugin ID.
+ * @param array[] $plugin_definitions
+ *   An associative array of Migrate field plugin definitions, keyed by the
+ *   plugin ID.
  *
  * @see \Drupal\migrate_drupal\Annotation\MigrateField
  * @see \Drupal\migrate_drupal\Attribute\MigrateField
@@ -214,13 +215,14 @@ function hook_migrate_field_info_alter(array &$plugin_definitions) {
 }
 
 /**
- * Allows altering the information of discovered destination plugins.
+ * Allows altering the definition for discovered destination plugins.
  *
  * For example, this implementation changes the deriver of the 'entity'
  * destination plugin.
  *
  * @param array[] $plugin_definitions
- *   The array of Migrate destination plugin definitions, keyed by plugin ID.
+ *   An associative array of Migrate destination plugin definitions, keyed by
+ *   the plugin ID.
  *
  * @see \Drupal\migrate\Annotation\MigrateDestination
  * @see \Drupal\migrate\Attribute\MigrateDestination
@@ -234,13 +236,14 @@ function hook_migrate_destination_info_alter(array &$plugin_definitions) {
 }
 
 /**
- * Allows altering the information of discovered source plugins.
+ * Allows altering the definition for discovered source plugins.
  *
  * For example, this implementation changes the class of the
  * 'content_entity:node' source plugin.
  *
  * @param array[] $plugin_definitions
- *   The array of Migrate source plugin definitions, keyed by plugin ID.
+ *   An associative array of Migrate source plugin definitions, keyed by the
+ *   plugin ID.
  *
  * @see \Drupal\migrate\Annotation\MigrateSource
  * @see \Drupal\migrate\Attribute\MigrateSource
@@ -254,12 +257,13 @@ function hook_migrate_source_info_alter(array &$plugin_definitions) {
 }
 
 /**
- * Allows altering the information of discovered process plugins.
+ * Allows altering the definition for discovered process plugins.
  *
  * For example, this implementation removes the download process plugin.
  *
  * @param array[] $plugin_definitions
- *   The array of Migrate process plugin definitions, keyed by plugin ID.
+ *   An associative array of Migrate process plugin definitions, keyed by the
+ *   plugin ID.
  *
  * @see \Drupal\migrate\Annotation\MigrateProcessPlugin
  * @see \Drupal\migrate\Attribute\MigrateProcess
@@ -271,12 +275,13 @@ function hook_migrate_process_info_alter(array &$plugin_definitions) {
 }
 
 /**
- * Allows altering the information of discovered id_map plugins.
+ * Allows altering the definition for discovered ID map plugins.
  *
- * For example, this implementation adds a new id_map plugin.
+ * For example, this implementation adds a new ID map plugin.
  *
  * @param array[] $plugin_definitions
- *   The array of Migrate ID map plugin definitions, keyed by plugin ID.
+ *   An associative array of Migrate ID map plugin definitions, keyed by the
+ *   plugin ID.
  *
  * @see \Drupal\Component\Plugin\Attribute\PluginID
  *
