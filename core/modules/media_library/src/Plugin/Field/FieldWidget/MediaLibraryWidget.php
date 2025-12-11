@@ -474,10 +474,8 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
           $cardinality_message = $this->formatPlural($remaining, 'One media item remaining.', '@count media items remaining.');
         }
       }
-      else {
-        if ($cardinality > 1) {
-          $cardinality_message = $this->t('The maximum number of media items have been selected.');
-        }
+      elseif ($cardinality > 1) {
+        $cardinality_message = $this->t('The maximum number of media items have been selected.');
       }
 
       // Add a line break between the field message and the cardinality message.
