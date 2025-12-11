@@ -18,6 +18,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
@@ -102,13 +103,10 @@ class AccessManagerTest extends UnitTestCase {
     \Drupal::setContainer($this->container);
 
     $this->routeCollection = new RouteCollection();
-    $this->routeCollection->add('test_route_1', new Route('/test-route-1'));
-    $this->routeCollection->add('test_route_2', new Route('/test-route-2', [], ['_access' => 'TRUE']));
-    $this->routeCollection->add('test_route_3', new Route('/test-route-3', [], ['_access' => 'FALSE']));
-    $this->routeCollection->add('test_route_4', new Route('/test-route-4/{value}', [], ['_access' => 'TRUE']));
-    $this->routeCollection->add('test_route_5', new Route('/test-route-5/', [], ['_access' => 'TRUE', '_csrf_token' => 'TRUE']));
-    $this->routeCollection->add('test_route_6', new Route('/test-route-6/', [], ['_access' => 'TRUE', '_csrf_token' => 'FALSE']));
-    $this->routeCollection->add('test_route_7', new Route('/test-route-7/', [], ['_access' => 'TRUE']));
+    $this->routeCollection->add('test_route_1', new Route('/test-route-1', [], ['_csrf_token' => 'FALSE']));
+    $this->routeCollection->add('test_route_2', new Route('/test-route-2', [], ['_access' => 'TRUE', '_csrf_token' => 'FALSE']));
+    $this->routeCollection->add('test_route_3', new Route('/test-route-3', [], ['_access' => 'FALSE', '_csrf_token' => 'FALSE']));
+    $this->routeCollection->add('test_route_4', new Route('/test-route-4/{value}', [], ['_access' => 'TRUE', '_csrf_token' => 'FALSE']));
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $map = [];
@@ -309,6 +307,7 @@ class AccessManagerTest extends UnitTestCase {
     $requirements = [
       '_access' => $condition_one,
       '_test_access' => $condition_two,
+      '_csrf_token' => 'FALSE',
     ];
     $route = new Route($name, [], $requirements);
     $route_collection->add($name, $route);
@@ -352,7 +351,7 @@ class AccessManagerTest extends UnitTestCase {
    */
   public function testCheckNamedRouteWithUpcastedValues(): void {
     $this->routeCollection = new RouteCollection();
-    $route = new Route('/test-route-1/{value}', [], ['_test_access' => 'TRUE']);
+    $route = new Route('/test-route-1/{value}', [], ['_test_access' => 'TRUE', '_csrf_token' => 'FALSE']);
     $this->routeCollection->add('test_route_1', $route);
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
@@ -400,7 +399,7 @@ class AccessManagerTest extends UnitTestCase {
    */
   public function testCheckNamedRouteWithDefaultValue(): void {
     $this->routeCollection = new RouteCollection();
-    $route = new Route('/test-route-1/{value}', ['value' => 'example'], ['_test_access' => 'TRUE']);
+    $route = new Route('/test-route-1/{value}', ['value' => 'example'], ['_test_access' => 'TRUE', '_csrf_token' => 'FALSE']);
     $this->routeCollection->add('test_route_1', $route);
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
@@ -465,6 +464,7 @@ class AccessManagerTest extends UnitTestCase {
     // Setup a test route for each access configuration.
     $requirements = [
       '_test_incorrect_value' => 'TRUE',
+      '_csrf_token' => 'FALSE',
     ];
     $options = [
       '_access_checks' => [
@@ -547,10 +547,23 @@ class AccessManagerTest extends UnitTestCase {
 
   /**
    * Tests that routes without _csrf_token trigger a deprecation.
-   *
-   * @group legacy
    */
+  #[IgnoreDeprecations]
   public function testRequiredCsrf(): void {
+    $this->routeCollection->add('test_route_csrf_true', new Route('/test-route-5/', [], ['_access' => 'TRUE', '_csrf_token' => 'TRUE']));
+    $this->routeCollection->add('test_route_csrf_false', new Route('/test-route-6/', [], ['_access' => 'TRUE', '_csrf_token' => 'FALSE']));
+    $this->routeCollection->add('test_route_without_csrf', new Route('/test-route-7/', [], ['_access' => 'TRUE']));
+
+    $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
+    $map = [];
+    foreach ($this->routeCollection->all() as $name => $route) {
+      $map[] = [$name, $route];
+    }
+    $this->routeProvider->expects($this->any())
+      ->method('getRouteByName')
+      ->willReturnMap($map);
+    $this->accessManager = new AccessManager($this->routeProvider, $this->paramConverter, $this->argumentsResolverFactory, $this->currentUser, $this->checkProvider);
+
     $this->setupAccessChecker();
     $this->checkProvider->setChecks($this->routeCollection);
     $this->setupAccessArgumentsResolverFactory();
@@ -560,34 +573,34 @@ class AccessManagerTest extends UnitTestCase {
       ->willReturnMap([
         [
           [
-            RouteObjectInterface::ROUTE_NAME => 'test_route_5',
-            RouteObjectInterface::ROUTE_OBJECT => $this->routeCollection->get('test_route_5'),
+            RouteObjectInterface::ROUTE_NAME => 'test_route_csrf_true',
+            RouteObjectInterface::ROUTE_OBJECT => $this->routeCollection->get('test_route_csrf_true'),
           ],
           [],
         ],
         [
           [
-            RouteObjectInterface::ROUTE_NAME => 'test_route_6',
-            RouteObjectInterface::ROUTE_OBJECT => $this->routeCollection->get('test_route_6'),
+            RouteObjectInterface::ROUTE_NAME => 'test_route_csrf_false',
+            RouteObjectInterface::ROUTE_OBJECT => $this->routeCollection->get('test_route_csrf_false'),
           ],
           [],
         ],
         [
           [
-            RouteObjectInterface::ROUTE_NAME => 'test_route_7',
-            RouteObjectInterface::ROUTE_OBJECT => $this->routeCollection->get('test_route_7'),
+            RouteObjectInterface::ROUTE_NAME => 'test_route_without_csrf',
+            RouteObjectInterface::ROUTE_OBJECT => $this->routeCollection->get('test_route_without_csrf'),
           ],
           [],
         ],
       ]);
 
     // Routes that should not trigger a deprecation.
-    $this->accessManager->checkNamedRoute('test_route_5', [], $this->account);
-    $this->accessManager->checkNamedRoute('test_route_6', [], $this->account);
+    $this->accessManager->checkNamedRoute('test_route_csrf_true', [], $this->account);
+    $this->accessManager->checkNamedRoute('test_route_csrf_false', [], $this->account);
 
     // Tests that a route without _csrf_token triggers a deprecation.
-    $this->expectDeprecation('Having a non-form route without the _csrf_token requirement explicitly set to TRUE or FALSE is deprecated in drupal:11.2.0 and will trigger an exception in drupal:13.0.0. The test_route_7 route does not have this requirement. See https://www.drupal.org/project/drupal/issues/3508087');
-    $this->accessManager->checkNamedRoute('test_route_7', [], $this->account);
+    $this->expectDeprecation('Having a non-form route without the _csrf_token requirement explicitly set to TRUE or FALSE is deprecated in drupal:11.2.0 and will trigger an exception in drupal:13.0.0. The test_route_without_csrf route does not have this requirement. See https://www.drupal.org/project/drupal/issues/3508087');
+    $this->accessManager->checkNamedRoute('test_route_without_csrf', [], $this->account);
   }
 
 }
