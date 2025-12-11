@@ -6,7 +6,7 @@ namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\BrowserTestBase;
@@ -49,9 +49,8 @@ abstract class ModuleTestBase extends BrowserTestBase {
    *   The name of the module.
    */
   public function assertModuleTablesExist($module) {
-    $tables = array_keys(ConvertDefinition::schemaToArray(
-      SchemaInspector::getTablesSpecification(\Drupal::moduleHandler(), $module),
-    ));
+    $specification = SchemaInspector::getTablesSpecification(\Drupal::moduleHandler(), $module);
+    $tables = array_keys(($specification instanceof Schema) ? $specification->toArray() : $specification);
     $tables_exist = TRUE;
     $schema = Database::getConnection()->schema();
     foreach ($tables as $table) {
@@ -69,9 +68,8 @@ abstract class ModuleTestBase extends BrowserTestBase {
    *   The name of the module.
    */
   public function assertModuleTablesDoNotExist($module) {
-    $tables = array_keys(ConvertDefinition::schemaToArray(
-      SchemaInspector::getTablesSpecification(\Drupal::moduleHandler(), $module),
-    ));
+    $specification = SchemaInspector::getTablesSpecification(\Drupal::moduleHandler(), $module);
+    $tables = array_keys(($specification instanceof Schema) ? $specification->toArray() : $specification);
     $tables_exist = FALSE;
     $schema = Database::getConnection()->schema();
     foreach ($tables as $table) {

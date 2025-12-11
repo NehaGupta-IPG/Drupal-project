@@ -14,6 +14,7 @@ use Drupal\Core\Database\SchemaDefinition\KeyColumn;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Tests\UnitTestCase;
@@ -25,12 +26,13 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('Database')]
 #[CoversClass(Table::class)]
+#[CoversClass(Schema::class)]
 class ConvertDefinitionTest extends UnitTestCase {
 
   /**
    * Tests Table::toArray().
    */
-  public function testConvertDefinition(): void {
+  public function testConvertTableDefinition(): void {
     $arraySpecification = [
       'description' => 'Basic test table for the database unit tests.',
       'fields' => [
@@ -184,6 +186,60 @@ class ConvertDefinitionTest extends UnitTestCase {
           'mysql_character_set' => 'utf8mb4',
         ],
       ],
+    );
+
+    $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
+  }
+
+  /**
+   * Tests Schema::toArray().
+   */
+  public function testConvertSchemaDefinition(): void {
+    $arraySpecification = [
+      'foo' => [
+        'description' => 'Foo table for the database unit tests.',
+        'fields' => [
+          'id' => [
+            'type' => 'serial',
+          ],
+        ],
+        'primary key' => ['id'],
+      ],
+      'bar' => [
+        'description' => 'Bar table for the database unit tests.',
+        'fields' => [
+          'id' => [
+            'type' => 'serial',
+          ],
+        ],
+        'primary key' => ['id'],
+      ],
+    ];
+
+    $schemaDefinition = new Schema(
+      'test_foo_bar',
+      new Table(
+        name: 'foo',
+        description: 'Foo table for the database unit tests.',
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Serial,
+          ),
+        ],
+        primaryKey: new PrimaryKey(['id']),
+      ),
+      new Table(
+        name: 'bar',
+        description: 'Bar table for the database unit tests.',
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Serial,
+          ),
+        ],
+        primaryKey: new PrimaryKey(['id']),
+      ),
     );
 
     $this->assertEquals($arraySpecification, $schemaDefinition->toArray());

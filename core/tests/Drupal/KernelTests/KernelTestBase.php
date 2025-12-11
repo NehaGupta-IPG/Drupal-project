@@ -9,7 +9,7 @@ use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
+use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DrupalKernel;
@@ -789,9 +789,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     if (!$module_handler->moduleExists($module)) {
       throw new \LogicException("$module module is not installed.");
     }
-    $specification = ConvertDefinition::schemaToArray(
-      SchemaInspector::getTablesSpecification($module_handler, $module),
-    );
+    $specification = SchemaInspector::getTablesSpecification($module_handler, $module);
+    $specification = ($specification instanceof Schema) ? $specification->toArray() : $specification;
     /** @var \Drupal\Core\Database\Schema $schema */
     $schema = $this->container->get('database')->schema();
     $tables = (array) $tables;
