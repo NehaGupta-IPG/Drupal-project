@@ -74,12 +74,20 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $this->assertSame($expected, $result);
   }
 
-  public static function providerTestApplies() {
+  public static function providerTestApplies(): array {
     $data = [];
     $data['empty'] = [[], FALSE];
     $data['no_theme'] = [['ajax_page_state' => ['theme' => '', 'theme_token' => '']], FALSE];
     $data['valid_theme_empty_theme_token'] = [['ajax_page_state' => ['theme' => 'claro', 'theme_token' => '']], TRUE];
-    $data['valid_theme_valid_theme_token'] = [['ajax_page_state' => ['theme' => 'claro', 'theme_token' => 'valid_theme_token']], TRUE];
+    $data['valid_theme_valid_theme_token'] = [
+      [
+        'ajax_page_state' => [
+          'theme' => 'claro',
+          'theme_token' => 'valid_theme_token',
+        ],
+      ],
+      TRUE,
+    ];
     return $data;
   }
 
