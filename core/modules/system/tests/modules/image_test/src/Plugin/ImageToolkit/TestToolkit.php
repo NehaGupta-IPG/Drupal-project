@@ -57,7 +57,7 @@ class TestToolkit extends ImageToolkitBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface $operation_manager
@@ -253,7 +253,11 @@ class TestToolkit extends ImageToolkitBase {
    *   IMAGETYPE_* constant (e.g. IMAGETYPE_JPEG, IMAGETYPE_PNG, etc.).
    */
   protected static function supportedTypes() {
-    return [IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF];
+    $types = [IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF];
+    if (\Drupal::keyValue('image_test')->get('avif_enabled', FALSE)) {
+      $types[] = IMAGETYPE_AVIF;
+    }
+    return $types;
   }
 
   /**

@@ -18,16 +18,21 @@ use Drupal\Core\Layout\LayoutInterface;
 use Drupal\Core\Layout\LayoutPluginManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 
 // cspell:ignore lorem, ipsum, consectetur, adipiscing
-
 /**
- * @coversDefaultClass \Drupal\Core\Layout\LayoutPluginManager
- * @group Layout
+ * Tests Drupal\Core\Layout\LayoutPluginManager.
  */
+#[CoversClass(LayoutPluginManager::class)]
+#[Group('Layout')]
+#[IgnoreDeprecations]
 class LayoutPluginManagerTest extends UnitTestCase {
 
   /**
@@ -108,11 +113,15 @@ class LayoutPluginManagerTest extends UnitTestCase {
     $class_loader->addPsr4("Drupal\\Core\\", vfsStream::url("root/core/lib/Drupal/Core"));
     $class_loader->register(TRUE);
     $this->layoutPluginManager = new LayoutPluginManager($namespaces, $this->cacheBackend->reveal(), $this->moduleHandler->reveal(), $this->themeHandler->reveal());
+
+    $this->expectDeprecation('Using @Layout annotation for plugin with ID plugin_provided_by_annotation_layout is deprecated and is removed from drupal:13.0.0. Use a Drupal\Core\Layout\Attribute\Layout attribute instead. See https://www.drupal.org/node/3395575');
   }
 
   /**
-   * @covers ::getDefinitions
-   * @covers ::providerExists
+   * Tests get definitions.
+   *
+   * @legacy-covers ::getDefinitions
+   * @legacy-covers ::providerExists
    */
   public function testGetDefinitions(): void {
     $expected = [
@@ -128,8 +137,10 @@ class LayoutPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDefinition
-   * @covers ::processDefinition
+   * Tests get definition.
+   *
+   * @legacy-covers ::getDefinition
+   * @legacy-covers ::processDefinition
    */
   public function testGetDefinition(): void {
     $layout_definition = $this->layoutPluginManager->getDefinition('theme_a_provided_layout');
@@ -251,7 +262,9 @@ class LayoutPluginManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::processDefinition
+   * Tests process definition.
+   *
+   * @legacy-covers ::processDefinition
    */
   public function testProcessDefinition(): void {
     $this->moduleHandler->alter('layout', Argument::type('array'))->shouldNotBeCalled();
@@ -273,13 +286,16 @@ EOS;
   }
 
   /**
-   * @covers ::getThemeImplementations
+   * Tests get theme implementations.
+   *
+   * @legacy-covers ::getThemeImplementations
    */
   public function testGetThemeImplementations(): void {
     $core_path = '/core/lib/Drupal/Core';
     $expected = [
       'layout' => [
         'render element' => 'content',
+        'initial preprocess' => LayoutDiscoveryThemeHooks::class . ':preprocessLayout',
       ],
       'twocol' => [
         'render element' => 'content',
@@ -305,7 +321,9 @@ EOS;
   }
 
   /**
-   * @covers ::getCategories
+   * Tests get categories.
+   *
+   * @legacy-covers ::getCategories
    */
   public function testGetCategories(): void {
     $expected = [
@@ -317,7 +335,9 @@ EOS;
   }
 
   /**
-   * @covers ::getSortedDefinitions
+   * Tests get sorted definitions.
+   *
+   * @legacy-covers ::getSortedDefinitions
    */
   public function testGetSortedDefinitions(): void {
     // Sorted by category first, then label.
@@ -334,7 +354,9 @@ EOS;
   }
 
   /**
-   * @covers ::getGroupedDefinitions
+   * Tests get grouped definitions.
+   *
+   * @legacy-covers ::getGroupedDefinitions
    */
   public function testGetGroupedDefinitions(): void {
     $category_expected = [
@@ -358,9 +380,9 @@ EOS;
   }
 
   /**
-   * @covers ::getLayoutOptions
-   *
    * Test that modules and themes can alter the list of layouts.
+   *
+   * @legacy-covers ::getLayoutOptions
    */
   public function testGetLayoutOptions(): void {
     $this->moduleHandler->alter(
@@ -382,7 +404,7 @@ EOS;
   /**
    * Sets up the filesystem with YAML files and annotated plugins.
    */
-  protected function setUpFilesystem() {
+  protected function setUpFilesystem(): void {
     $module_a_provided_layout = <<<'EOS'
 module_a_provided_layout:
   label: 1 column layout

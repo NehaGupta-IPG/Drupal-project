@@ -9,12 +9,18 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\FileExistsException;
 use Drupal\Core\File\Exception\FileNotExistsException;
 use Drupal\Core\File\FileExists;
+use Drupal\Core\File\FileSystem;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\File\FileSystem
- * @group File
+ * Tests Drupal\Core\File\FileSystem.
  */
+#[CoversClass(FileSystem::class)]
+#[Group('File')]
+#[RunTestsInSeparateProcesses]
 class FileSystemTest extends KernelTestBase {
 
   /**
@@ -27,18 +33,15 @@ class FileSystemTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     $this->fileSystem = $this->container->get('file_system');
   }
 
   /**
-   * @covers ::copy
+   * Tests ensure file exists before copy.
+   *
+   * @legacy-covers ::copy
    */
   public function testEnsureFileExistsBeforeCopy(): void {
     // We need to compute the exception message here because it will include
@@ -50,19 +53,24 @@ class FileSystemTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::copy
+   * Tests destination directory failure on copy.
+   *
+   * @legacy-covers ::copy
    */
   public function testDestinationDirectoryFailureOnCopy(): void {
     $this->expectException(DirectoryNotReadyException::class);
     $this->expectExceptionMessage("The specified file 'public://test.txt' could not be copied because the destination directory 'public://subdirectory' is not properly configured. This may be caused by a problem with file or directory permissions.");
     touch('public://test.txt');
-    // public://subdirectory has not been created, so \Drupal::service('file_system')->prepareDirectory()
-    // will fail, causing copy() to throw DirectoryNotReadyException.
+    // public://subdirectory has not been created, so
+    // \Drupal::service('file_system')->prepareDirectory() will fail, causing
+    // copy() to throw DirectoryNotReadyException.
     $this->fileSystem->copy('public://test.txt', 'public://subdirectory/test.txt');
   }
 
   /**
-   * @covers ::copy
+   * Tests copy failure if file already exists.
+   *
+   * @legacy-covers ::copy
    */
   public function testCopyFailureIfFileAlreadyExists(): void {
     $this->expectException(FileExistsException::class);
@@ -73,7 +81,9 @@ class FileSystemTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::copy
+   * Tests copy failure if self overwrite.
+   *
+   * @legacy-covers ::copy
    */
   public function testCopyFailureIfSelfOverwrite(): void {
     $this->expectException(FileException::class);
@@ -84,7 +94,9 @@ class FileSystemTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::copy
+   * Tests copy self rename.
+   *
+   * @legacy-covers ::copy
    */
   public function testCopySelfRename(): void {
     $uri = 'public://test.txt';
@@ -94,7 +106,9 @@ class FileSystemTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::copy
+   * Tests successful copy.
+   *
+   * @legacy-covers ::copy
    */
   public function testSuccessfulCopy(): void {
     touch('public://test.txt');

@@ -9,15 +9,17 @@ use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\Tests\WaitTerminateTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore português
-
 /**
  * Tests the feed display plugin with translated content.
  *
- * @group views
  * @see \Drupal\views\Plugin\views\display\Feed
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisplayFeedTranslationTest extends ViewTestBase {
 
   use ContentTranslationTestTrait;
@@ -140,7 +142,7 @@ class DisplayFeedTranslationTest extends ViewTestBase {
    * @param \Drupal\node\Entity\Node $node
    *   The node entity that's been created.
    */
-  protected function checkFeedResults($link_style, Node $node) {
+  protected function checkFeedResults($link_style, Node $node): void {
     /** @var \Drupal\Core\Language\LanguageManagerInterface $languageManager */
     $language_manager = \Drupal::languageManager()->reset();
 
