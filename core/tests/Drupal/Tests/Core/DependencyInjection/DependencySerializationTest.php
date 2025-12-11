@@ -129,8 +129,8 @@ class DependencySerializationTestWithPropertyHooks {
    */
   // phpcs:disable
   public ?string $title {
-  get => $this->title ?? NULL;
-  set => $this->title = $value;
+    get => $this->title;
+    set => $this->title = $value;
   }
   // phpcs:enabled
 
