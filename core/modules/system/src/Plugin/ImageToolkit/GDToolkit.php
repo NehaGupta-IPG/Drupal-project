@@ -4,6 +4,7 @@ namespace Drupal\system\Plugin\ImageToolkit;
 
 use Drupal\Component\Utility\Color;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
@@ -439,9 +440,6 @@ class GDToolkit extends ImageToolkitBase {
       IMG_AVIF => 'AVIF',
     ];
     $supported_formats = array_filter($check_formats, fn($type) => imagetypes() & $type, ARRAY_FILTER_USE_KEY);
-    if (isset($supported_formats[IMG_AVIF]) && !$this->checkAvifSupport()) {
-      unset($supported_formats[IMG_AVIF]);
-    }
     $unsupported_formats = array_diff_key($check_formats, $supported_formats);
 
     $descriptions = [];
@@ -454,7 +452,7 @@ class GDToolkit extends ImageToolkitBase {
       );
     }
     if ($unsupported_formats) {
-      $requirements['version']['severity'] = REQUIREMENT_WARNING;
+      $requirements['version']['severity'] = RequirementSeverity::Warning;
       $unsupported = $this->formatPlural(
         count($unsupported_formats),
         'Unsupported image file format: %formats.',
@@ -475,7 +473,7 @@ class GDToolkit extends ImageToolkitBase {
 
     // Check for filter and rotate support.
     if (!function_exists('imagefilter') || !function_exists('imagerotate')) {
-      $requirements['version']['severity'] = REQUIREMENT_WARNING;
+      $requirements['version']['severity'] = RequirementSeverity::Warning;
       $descriptions[] = $this->t('The GD Library for PHP is enabled, but was compiled without support for functions used by the rotate and desaturate effects. It was probably compiled using the official GD libraries from the <a href="https://libgd.github.io/">gdLibrary site</a> instead of the GD library bundled with PHP. You should recompile PHP --with-gd using the bundled GD library. See <a href="https://www.php.net/manual/book.image.php">the PHP manual</a>.');
     }
 
@@ -556,7 +554,7 @@ class GDToolkit extends ImageToolkitBase {
    * @return bool
    *   TRUE if AVIF is fully supported, FALSE otherwise.
    */
-  protected function checkAvifSupport(): bool {
+  protected static function checkAvifSupport(): bool {
     static $supported = NULL;
 
     if ($supported !== NULL) {
@@ -564,7 +562,9 @@ class GDToolkit extends ImageToolkitBase {
     }
 
     $tempFile = fopen('php://memory', 'r+');
-    $supported = imageavif(imagecreatetruecolor(1, 1), $tempFile, 0, 10) && fstat($tempFile)['size'] > 0;
+    // We suppress any errors when running the imageavif command because of this
+    // upstream php bug: https://bugs.php.net/bug.php?id=81217.
+    $supported = function_exists('imageavif') && @imageavif(imagecreatetruecolor(1, 1), $tempFile, 0, 10) && fstat($tempFile)['size'] > 0;
     fclose($tempFile);
 
     return $supported;
@@ -578,13 +578,16 @@ class GDToolkit extends ImageToolkitBase {
    *   IMAGETYPE_* constant (e.g. IMAGETYPE_JPEG, IMAGETYPE_PNG, etc.).
    */
   protected static function supportedTypes() {
-    return [
+    $types = [
       IMAGETYPE_PNG,
       IMAGETYPE_JPEG,
       IMAGETYPE_GIF,
       IMAGETYPE_WEBP,
-      IMAGETYPE_AVIF,
     ];
+    if (static::checkAvifSupport()) {
+      $types[] = IMAGETYPE_AVIF;
+    }
+    return $types;
   }
 
 }

@@ -112,7 +112,9 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
 
     $reordered = [];
     foreach ($placeholder_order as $placeholder) {
-      $reordered[$placeholder] = $build['#attached']['placeholders'][$placeholder];
+      if (isset($build['#attached']['placeholders'][$placeholder])) {
+        $reordered[$placeholder] = $build['#attached']['placeholders'][$placeholder];
+      }
     }
     $build['#attached']['placeholders'] = $reordered;
 
@@ -120,7 +122,9 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
   }
 
   /**
-   * #lazy_builder callback; sets and prints a message.
+   * Render API callback: Sets and prints a message.
+   *
+   * This function is assigned as a #lazy_builder callback.
    *
    * @param string $message
    *   The message to send.

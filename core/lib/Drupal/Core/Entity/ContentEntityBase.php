@@ -516,7 +516,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   public function validate() {
     $this->validated = TRUE;
     $violations = $this->getTypedData()->validate();
-    return new EntityConstraintViolationList($this, iterator_to_array($violations));
+    return new EntityConstraintViolationList($this, $violations);
   }
 
   /**
@@ -573,6 +573,17 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   public function bundle() {
     return $this->getEntityKey('bundle');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBundleEntity(): ?EntityInterface {
+    $entityType = $this->getEntityType();
+    if (!$entityType->hasKey('bundle') || !$entityType->getBundleEntityType()) {
+      return NULL;
+    }
+    return $this->get($entityType->getKey('bundle'))->entity;
   }
 
   /**

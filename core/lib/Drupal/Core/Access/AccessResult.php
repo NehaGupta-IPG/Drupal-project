@@ -98,7 +98,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
   }
 
   /**
-   * Creates an allowed access result if the permission is present, neutral otherwise.
+   * Creates an access result if the permission is present, neutral otherwise.
    *
    * Checks the permission and adds a 'user.permissions' cache context.
    *
@@ -121,7 +121,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
   }
 
   /**
-   * Creates an allowed access result if the permissions are present, neutral otherwise.
+   * Creates an access result if the permissions are present, neutral otherwise.
    *
    * Checks the permission and adds a 'user.permissions' cache contexts.
    *
@@ -406,14 +406,17 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    * @return $this
    */
   public function inheritCacheability(AccessResultInterface $other) {
-    $this->addCacheableDependency($other);
     if ($other instanceof CacheableDependencyInterface) {
+      $this->addCacheableDependency($other);
       if ($this->getCacheMaxAge() !== 0 && $other->getCacheMaxAge() !== 0) {
         $this->setCacheMaxAge(Cache::mergeMaxAges($this->getCacheMaxAge(), $other->getCacheMaxAge()));
       }
       else {
         $this->setCacheMaxAge($other->getCacheMaxAge());
       }
+    }
+    else {
+      $this->setCacheMaxAge(0);
     }
     return $this;
   }

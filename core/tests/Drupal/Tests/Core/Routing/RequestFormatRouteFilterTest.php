@@ -9,21 +9,27 @@ use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Routing\RequestFormatRouteFilter;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @coversDefaultClass \Drupal\Core\Routing\RequestFormatRouteFilter
- * @group Routing
+ * Tests Drupal\Core\Routing\RequestFormatRouteFilter.
  */
+#[CoversClass(RequestFormatRouteFilter::class)]
+#[Group('Routing')]
 class RequestFormatRouteFilterTest extends UnitTestCase {
 
   /**
-   * @covers ::filter
-   * @dataProvider filterProvider
+   * Tests filter.
+   *
+   * @legacy-covers ::filter
    */
+  #[DataProvider('filterProvider')]
   public function testFilter(RouteCollection $collection, $request_format, array $expected_filtered_collection): void {
     $route_filter = new RequestFormatRouteFilter();
 
@@ -61,7 +67,9 @@ class RequestFormatRouteFilterTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::filter
+   * Tests no route found.
+   *
+   * @legacy-covers ::filter
    */
   public function testNoRouteFound(): void {
     $url = $this->prophesize(GeneratedUrl::class);
@@ -82,16 +90,18 @@ class RequestFormatRouteFilterTest extends UnitTestCase {
     $request->setRequestFormat('xml');
     $route_filter = new RequestFormatRouteFilter();
     $this->expectException(NotAcceptableHttpException::class);
-    $this->expectExceptionMessage('No route found for the specified format xml.');
+    $this->expectExceptionMessage('No route found for the specified format.');
     $route_filter->filter($collection, $request);
   }
 
   /**
-   * @covers ::filter
+   * Tests no route found when no request format and single route with multiple formats.
+   *
+   * @legacy-covers ::filter
    */
   public function testNoRouteFoundWhenNoRequestFormatAndSingleRouteWithMultipleFormats(): void {
     $this->expectException(NotAcceptableHttpException::class);
-    $this->expectExceptionMessage('No route found for the specified format html.');
+    $this->expectExceptionMessage('No route found for the specified format.');
 
     $url = $this->prophesize(GeneratedUrl::class);
     $url_assembler = $this->prophesize(UnroutedUrlAssemblerInterface::class);

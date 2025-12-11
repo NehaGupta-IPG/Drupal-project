@@ -82,17 +82,6 @@ class TestSiteInstallCommand extends Command {
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Remove and fix test to not rely on super user.
-   * @see https://www.drupal.org/project/drupal/issues/3437620
-   */
-  public function __construct(?string $name = NULL) {
-    parent::__construct($name);
-    $this->usesSuperUserAccessPolicy = TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
    */
   protected function configure() {
     $this->setName('install')
@@ -291,18 +280,18 @@ class TestSiteInstallCommand extends Command {
   }
 
   /**
-   * {@inheritdoc}
+   * Changes the database connection to the prefixed one.
    */
-  protected function changeDatabasePrefix() {
+  protected function changeDatabasePrefix(): void {
     // Ensure that we use the database from SIMPLETEST_DB environment variable.
     Database::removeConnection('default');
     $this->changeDatabasePrefixTrait();
   }
 
   /**
-   * {@inheritdoc}
+   * Generates a database prefix for the site installation.
    */
-  protected function prepareDatabasePrefix() {
+  protected function prepareDatabasePrefix(): void {
     // Override this method so that we can force a lock to be created.
     $test_db = new TestDatabase(NULL, TRUE);
     $this->siteDirectory = $test_db->getTestSitePath();

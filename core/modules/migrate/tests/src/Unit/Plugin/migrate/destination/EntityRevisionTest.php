@@ -10,16 +10,17 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\destination\EntityRevision;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests entity revision destination functionality.
- *
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\destination\EntityRevision
- * @group migrate
  */
+#[CoversClass(EntityRevision::class)]
+#[Group('migrate')]
 class EntityRevisionTest extends EntityTestBase {
 
   /**
@@ -110,14 +111,23 @@ class EntityRevisionTestDestination extends EntityRevision {
    */
   private $entity = NULL;
 
+  /**
+   * Sets the test entity.
+   */
   public function setEntity($entity): void {
     $this->entity = $entity;
   }
 
+  /**
+   * Gets the test entity.
+   */
   protected function getEntity(Row $row, array $old_destination_id_values) {
     return $this->entity;
   }
 
+  /**
+   * Gets the test entity ID.
+   */
   public static function getEntityTypeId($plugin_id) {
     return 'foo';
   }

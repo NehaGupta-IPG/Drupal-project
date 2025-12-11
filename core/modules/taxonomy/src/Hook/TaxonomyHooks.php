@@ -74,14 +74,6 @@ class TaxonomyHooks {
   }
 
   /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return ['taxonomy_term' => ['render element' => 'elements']];
-  }
-
-  /**
    * Implements hook_local_tasks_alter().
    *
    * @todo Evaluate removing as part of https://www.drupal.org/node/2358923.
@@ -179,5 +171,10 @@ class TaxonomyHooks {
       \Drupal::database()->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
   }
+
+  // phpcs:ignore Drupal.Commenting.InlineComment.DocBlock
+  /**
+   * @} End of "defgroup taxonomy_index".
+   */
 
 }

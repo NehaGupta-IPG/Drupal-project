@@ -86,7 +86,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
   /**
    * Tracks whether the plugin is a handler.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public bool $is_handler;
 
   /**
@@ -398,8 +398,16 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    *
    * @param array $option
    *   An array of options.
+   *
+   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   *   This method is no longer used by Drupal core. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3486781
    */
-  public function defineExtraOptions(&$option) {}
+  public function defineExtraOptions(&$option) {
+    @trigger_error('defineExtraOptions() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. This method is no longer in use and should not be called. See https://www.drupal.org/node/3486781', E_USER_DEPRECATED);
+  }
 
   /**
    * Provide a form for setting options.
@@ -562,6 +570,9 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function access(AccountInterface $account) {
     if (isset($this->definition['access callback']) && function_exists($this->definition['access callback'])) {
+      // @todo when this is removed return FALSE.
+      // See https://www.drupal.org/project/drupal/issues/3547724
+      @trigger_error('Passing the access callback using the array key is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3539918', E_USER_DEPRECATED);
       if (isset($this->definition['access arguments']) && is_array($this->definition['access arguments'])) {
         return call_user_func_array($this->definition['access callback'], [$account] + $this->definition['access arguments']);
       }
@@ -695,8 +706,8 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function getJoin() {
     // Get the join from this table that links back to the base table.
-    // Determine the primary table to seek
-    if (empty($this->query->relationships[$this->relationship])) {
+    // Determine the primary table to seek.
+    if (!isset($this->relationship) || empty($this->query->relationships[$this->relationship])) {
       $base_table = $this->view->storage->get('base_table');
     }
     else {
@@ -833,7 +844,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    * {@inheritdoc}
    */
   public static function breakString($str, $force_int = FALSE) {
-    $operator = NULL;
+    $operator = '';
     $value = [];
 
     // Determine if the string has 'or' operators (plus signs) or 'and'
@@ -870,7 +881,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function displayExposedForm($form, FormStateInterface $form_state) {
     $item = &$this->options;
-    // Flip
+    // Flip.
     $item['exposed'] = empty($item['exposed']);
 
     // If necessary, set new defaults:
@@ -950,7 +961,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
 
     $form_state->get('rerender', TRUE);
     $form_state->setRebuild();
-    // Write to cache
+    // Write to cache.
     $view->cacheSet();
   }
 

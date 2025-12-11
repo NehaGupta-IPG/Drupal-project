@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\file_test\Hook;
 
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\file\Entity\File;
 use Drupal\file_test\FileTestCdn;
 use Drupal\file_test\FileTestHelper;
-use Drupal\Core\Hook\Attribute\Hook;
 
 // cspell:ignore tarz
 // cspell:ignore garply
@@ -167,28 +167,6 @@ class FileTestHooks {
   }
 
   /**
-   * Implements hook_file_mimetype_mapping_alter().
-   */
-  #[Hook('file_mimetype_mapping_alter')]
-  public function fileMimetypeMappingAlter(&$mapping): void {
-    // Add new mappings.
-    $mapping['mimetypes']['file_test_mimetype_1'] = 'made_up/file_test_1';
-    $mapping['mimetypes']['file_test_mimetype_2'] = 'made_up/file_test_2';
-    $mapping['mimetypes']['file_test_mimetype_3'] = 'made_up/doc';
-    $mapping['mimetypes']['application-x-compress'] = 'application/x-compress';
-    $mapping['mimetypes']['application-x-tarz'] = 'application/x-tarz';
-    $mapping['mimetypes']['application-x-garply-waldo'] = 'application/x-garply-waldo';
-    $mapping['extensions']['file_test_1'] = 'file_test_mimetype_1';
-    $mapping['extensions']['file_test_2'] = 'file_test_mimetype_2';
-    $mapping['extensions']['file_test_3'] = 'file_test_mimetype_2';
-    $mapping['extensions']['z'] = 'application-x-compress';
-    $mapping['extensions']['tar.z'] = 'application-x-tarz';
-    $mapping['extensions']['garply.waldo'] = 'application-x-garply-waldo';
-    // Override existing mapping.
-    $mapping['extensions']['doc'] = 'file_test_mimetype_3';
-  }
-
-  /**
    * Implements hook_entity_type_alter().
    */
   #[Hook('entity_type_alter')]
@@ -212,7 +190,7 @@ class FileTestHooks {
    * @see Drupal\file_test\FileTestHelper::reset()
    */
   public function getReturn($op): array|int|null {
-    $return = \Drupal::state()->get('file_test.return', [$op => NULL]);
+    $return = \Drupal::keyValue('file_test')->get('return', [$op => NULL]);
     return $return[$op];
   }
 
