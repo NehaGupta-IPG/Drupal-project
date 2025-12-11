@@ -217,8 +217,8 @@ class ConvertDefinitionTest extends UnitTestCase {
     ];
 
     $schemaDefinition = new Schema(
-      'test_foo_bar',
-      new Table(
+      name: 'test_foo_bar',
+      foo: new Table(
         name: 'foo',
         description: 'Foo table for the database unit tests.',
         columns: [
@@ -229,7 +229,7 @@ class ConvertDefinitionTest extends UnitTestCase {
         ],
         primaryKey: new PrimaryKey(['id']),
       ),
-      new Table(
+      bar: new Table(
         name: 'bar',
         description: 'Bar table for the database unit tests.',
         columns: [

@@ -29,7 +29,7 @@ final class Schema implements SchemaDefinitionInterface {
     public readonly string $name,
     Table ...$tables,
   ) {
-    $this->tables = $tables;
+    $this->tables = array_values($tables);
   }
 
   /**
