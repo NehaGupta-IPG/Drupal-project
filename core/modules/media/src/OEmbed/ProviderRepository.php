@@ -5,15 +5,28 @@ namespace Drupal\media\OEmbed;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use GuzzleHttp\ClientInterface;
+use Psr\Clock\ClockInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 
 /**
  * Retrieves and caches information about oEmbed providers.
  */
 class ProviderRepository implements ProviderRepositoryInterface {
+
+  use DeprecatedServicePropertyTrait;
+
+  /**
+   * The deprecated properties.
+   *
+   * @var array<string, string>
+   */
+  protected array $deprecatedProperties = [
+    'time' => 'datetime.time',
+  ];
 
   /**
    * How long the provider data should be cached, in seconds.
@@ -37,11 +50,9 @@ class ProviderRepository implements ProviderRepositoryInterface {
   protected $providersUrl;
 
   /**
-   * The time service.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
+   * The clock.
    */
-  protected $time;
+  protected ClockInterface $clock;
 
   /**
    * The key-value store.
@@ -64,7 +75,7 @@ class ProviderRepository implements ProviderRepositoryInterface {
    *   The HTTP client.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface|\Psr\Clock\ClockInterface $clock
    *   The time service.
    * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
    *   The key-value store factory.
@@ -73,10 +84,14 @@ class ProviderRepository implements ProviderRepositoryInterface {
    * @param int $max_age
    *   (optional) How long the cache data should be kept. Defaults to a week.
    */
-  public function __construct(ClientInterface $http_client, ConfigFactoryInterface $config_factory, TimeInterface $time, KeyValueFactoryInterface $key_value_factory, LoggerChannelFactoryInterface $logger_factory, int $max_age = 604800) {
+  public function __construct(ClientInterface $http_client, ConfigFactoryInterface $config_factory, TimeInterface|ClockInterface $clock, KeyValueFactoryInterface $key_value_factory, LoggerChannelFactoryInterface $logger_factory, int $max_age = 604800) {
     $this->httpClient = $http_client;
     $this->providersUrl = $config_factory->get('media.settings')->get('oembed_providers_url');
-    $this->time = $time;
+    if (!$clock instanceof ClockInterface) {
+      @trigger_error(sprintf('Passing a $clock param not as an instance of %s to %s() is deprecated in drupal:11.2.0 and is removed in drupal:12.0.0. Use Psr\Clock\ClockInterface instead. See https://www.drupal.org/node/3513300', ClockInterface::class, __METHOD__), E_USER_DEPRECATED);
+      $clock = \Drupal::service(ClockInterface::class);
+    }
+    $this->clock = $clock;
     $this->maxAge = $max_age;
     $this->keyValue = $key_value_factory->get('media');
     $this->logger = $logger_factory->get('media');
@@ -86,7 +101,7 @@ class ProviderRepository implements ProviderRepositoryInterface {
    * {@inheritdoc}
    */
   public function getAll() {
-    $current_time = $this->time->getCurrentTime();
+    $current_time = $this->clock->now()->getTimestamp();
     $stored = $this->keyValue->get('oembed_providers');
     // If we have stored data that hasn't yet expired, return that. We need to
     // store the data in a key-value store because, if the remote provider
