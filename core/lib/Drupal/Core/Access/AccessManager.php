@@ -122,7 +122,12 @@ class AccessManager implements AccessManagerInterface {
     }
     $route = $route_match->getRouteObject();
     $checks = $route->getOption('_access_checks') ?: [];
-    if (!$route->hasDefault('_form') && !$route->hasRequirement('_csrf_token')) {
+    if (!$route->hasDefault('_form')
+      && !$route->hasDefault('_entity_form')
+      && !$route->hasDefault('_entity_list')
+      && !$route->hasDefault('_entity_view')
+      && !$route->hasRequirement('_csrf_token')
+    ) {
       @trigger_error(
         'Having a non-form route without the _csrf_token requirement explicitly set to TRUE or FALSE is deprecated in drupal:11.2.0 and will trigger an exception in drupal:13.0.0. The ' . $route_match->getRouteName() . ' route does not have this requirement. See https://www.drupal.org/project/drupal/issues/3508087',
         E_USER_DEPRECATED
