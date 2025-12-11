@@ -5,7 +5,6 @@ bypass node access:
 administer content types:
   title: 'Administer content types'
   description: 'Maintain the types of content available and the fields that are associated with those types.'
-  restrict access: true
 administer nodes:
   title: 'Administer content'
   description: 'Promote, change ownership, edit revisions, and perform other tasks across all content types.'
