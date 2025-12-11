@@ -6,6 +6,7 @@ namespace Drupal\entity_test\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -225,7 +226,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
   /**
    * {@inheritdoc}
    */
-  public function onChange($name) {
+  public function onChange($name) : void {
     // @todo what about non-translatable fields? Currently we'll set/increment
     // the default entity translation.
     $langcode = $this->activeLangcode;
@@ -239,7 +240,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
   /**
    * Returns the on-change register.
    *
-   * @param string|NULL $langcode
+   * @param string|null $langcode
    *   (optional) If set, the on-change register for the given language will be
    *   returned, otherwise the whole on-change register will be returned.
    *
@@ -249,22 +250,19 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
   public function getOnChangeRegister($langcode = NULL) {
     $langcode = $langcode === $this->defaultLangcode ? LanguageInterface::LANGCODE_DEFAULT : $langcode;
     if ($langcode) {
-      $result = isset($this->onChangeRegister[$langcode]) ? $this->onChangeRegister[$langcode] : [];
+      return $this->onChangeRegister[$langcode] ?? [];
     }
-    else {
-      $result = $this->onChangeRegister;
-    }
-    return $result;
+    return $this->onChangeRegister;
   }
 
   /**
    * Resets the on-change register.
    *
-   * @param string|NULL $langcode
+   * @param string|null $langcode
    *   (optional) If set, the on-change register will be reset for the given
    *   language only, otherwise the whole register will be reset.
    */
-  public function resetOnChangeRegister($langcode = NULL) {
+  public function resetOnChangeRegister($langcode = NULL) : void {
     $langcode = $langcode === $this->defaultLangcode ? LanguageInterface::LANGCODE_DEFAULT : $langcode;
     if ($langcode) {
       if (isset($this->onChangeRegister[$langcode])) {

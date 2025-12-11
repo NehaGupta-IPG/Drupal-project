@@ -116,8 +116,8 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
    * @param int $index
    *   Index of the item to remove.
    * @param bool $notify
-   *  (optional) Whether to notify the parent object of the change. Defaults to
-   *  TRUE.
+   *   (optional) Whether to notify the parent object of the change. Defaults to
+   *   TRUE.
    *
    * @return $this
    */

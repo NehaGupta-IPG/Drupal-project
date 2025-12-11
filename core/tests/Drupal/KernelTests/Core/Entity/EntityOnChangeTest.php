@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\entity_test\Entity\EntityTest;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
 
 /**
  * Tests the Entity Change Notification System.
- *
- * @group Entity
  */
+#[Group('entity')]
+#[RunInSeparateProcesses]
 class EntityOnChangeTest extends EntityKernelTestBase {
 
   /**
    * Tests removing an item.
    */
-  public function testRemove() {
+  public function testRemove(): void {
     // Test on-change when creating an entity with initial values.
     $entity = EntityTest::create([
       'type' => 'entity_test',
