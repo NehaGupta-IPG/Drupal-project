@@ -4,6 +4,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Utility\FiberResumeType;
 
 /**
  * A base entity storage class.
@@ -294,7 +295,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
         // of entities to load, so that another call can load everything at
         // once.
         $this->entityIdsToLoad = array_unique(array_merge($this->entityIdsToLoad, $ids));
-        $fiber->suspend();
+        $fiber->suspend(FiberResumeType::Immediate);
 
         // If all the IDs we need to return have already been loaded into the
         // static cache, ignore any additionally requested entities here since
@@ -450,7 +451,11 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
       $entity_class = $this->getEntityClass();
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       $entity = new $entity_class($record, $this->entityTypeId);
-      $entities[$entity->id()] = $entity;
+      $entity_id = $entity->id();
+      if ($entity_id === NULL) {
+        throw new EntityMalformedException('The entity does not have an ID.');
+      }
+      $entities[$entity_id] = $entity;
     }
     return $entities;
   }

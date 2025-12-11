@@ -34,7 +34,12 @@ class EntityConstraintViolationListTest extends UnitTestCase {
 
     $this->assertSame($constraint_list->filterByFields(['name']), $constraint_list);
     $this->assertCount(4, $constraint_list);
-    $this->assertEquals(array_values(iterator_to_array($constraint_list)), [$violations[2], $violations[3], $violations[4], $violations[5]]);
+    $this->assertEquals(array_values(iterator_to_array($constraint_list)), [
+      $violations[2],
+      $violations[3],
+      $violations[4],
+      $violations[5],
+    ]);
   }
 
   /**
@@ -51,7 +56,12 @@ class EntityConstraintViolationListTest extends UnitTestCase {
 
     $this->assertSame($constraint_list->filterByFields(['name']), $constraint_list);
     $this->assertCount(4, $constraint_list);
-    $this->assertEquals(array_values(iterator_to_array($constraint_list)), [$violations[2], $violations[3], $violations[4], $violations[5]]);
+    $this->assertEquals(array_values(iterator_to_array($constraint_list)), [
+      $violations[2],
+      $violations[3],
+      $violations[4],
+      $violations[5],
+    ]);
   }
 
   /**
@@ -68,7 +78,12 @@ class EntityConstraintViolationListTest extends UnitTestCase {
 
     $this->assertSame($constraint_list->filterByFieldAccess($account), $constraint_list);
     $this->assertCount(4, $constraint_list);
-    $this->assertEquals(array_values(iterator_to_array($constraint_list)), [$violations[2], $violations[3], $violations[4], $violations[5]]);
+    $this->assertEquals(array_values(iterator_to_array($constraint_list)), [
+      $violations[2],
+      $violations[3],
+      $violations[4],
+      $violations[5],
+    ]);
   }
 
   /**
@@ -85,7 +100,12 @@ class EntityConstraintViolationListTest extends UnitTestCase {
 
     $this->assertSame($constraint_list->filterByFieldAccess($account), $constraint_list);
     $this->assertCount(4, $constraint_list);
-    $this->assertEquals(array_values(iterator_to_array($constraint_list)), [$violations[2], $violations[3], $violations[4], $violations[5]]);
+    $this->assertEquals(array_values(iterator_to_array($constraint_list)), [
+      $violations[2],
+      $violations[3],
+      $violations[4],
+      $violations[5],
+    ]);
   }
 
   /**
@@ -148,7 +168,7 @@ class EntityConstraintViolationListTest extends UnitTestCase {
    * @return \Drupal\Core\Entity\EntityConstraintViolationList
    *   The entity constraint violation list.
    */
-  protected function setupConstraintListWithoutCompositeConstraint(FieldableEntityInterface $entity) {
+  protected function setupConstraintListWithoutCompositeConstraint(FieldableEntityInterface $entity): EntityConstraintViolationList {
     $violations = [];
 
     // Add two violations to two specific fields.
@@ -174,7 +194,7 @@ class EntityConstraintViolationListTest extends UnitTestCase {
    * @return \Drupal\Core\Entity\EntityConstraintViolationList
    *   The entity constraint violation list.
    */
-  protected function setupConstraintListWithCompositeConstraint(FieldableEntityInterface $entity) {
+  protected function setupConstraintListWithCompositeConstraint(FieldableEntityInterface $entity): EntityConstraintViolationList {
     $violations = [];
 
     // Add two violations to two specific fields.
