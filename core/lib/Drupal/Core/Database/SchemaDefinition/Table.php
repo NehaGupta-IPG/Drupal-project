@@ -52,4 +52,45 @@ final class Table implements SchemaDefinitionInterface {
   ) {
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function toArray(): array {
+    $spec = [];
+    if ($this->description !== NULL) {
+      $spec['description'] = $this->description;
+    }
+    if ($this->columns !== NULL) {
+      foreach ($this->columns as $column) {
+        $spec['fields'][$column->name] = $column->toArray();
+      }
+    }
+    if ($this->primaryKey !== NULL) {
+      $spec['primary key'] = $this->primaryKey->toArray();
+    }
+    if ($this->uniqueKeys !== NULL) {
+      foreach ($this->uniqueKeys as $uniqueKey) {
+        $spec['unique keys'][$uniqueKey->name] = $uniqueKey->toArray();
+      }
+    }
+    if ($this->indexes !== NULL) {
+      foreach ($this->indexes as $index) {
+        $spec['indexes'][$index->name] = $index->toArray();
+      }
+    }
+    if ($this->foreignKeys !== NULL) {
+      foreach ($this->foreignKeys as $foreignKey) {
+        $spec['foreign keys'][$foreignKey->name] = $foreignKey->toArray();
+      }
+    }
+    if ($this->dbSpecificExtra !== NULL) {
+      foreach ($this->dbSpecificExtra as $extra) {
+        foreach ($extra as $key => $value) {
+          $spec[$key] = $value;
+        }
+      }
+    }
+    return $spec;
+  }
+
 }

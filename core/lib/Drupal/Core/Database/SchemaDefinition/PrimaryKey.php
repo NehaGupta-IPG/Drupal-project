@@ -21,4 +21,11 @@ final class PrimaryKey extends KeyBase {
     parent::__construct($columns);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function toArray(): array {
+    return $this->keyColumnsToArray($this->columns);
+  }
+
 }

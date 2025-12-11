@@ -56,4 +56,17 @@ abstract class KeyBase implements SchemaDefinitionInterface {
     return $columns;
   }
 
+  protected function keyColumnsToArray(array $rawColumns): array {
+    $spec = [];
+    foreach ($rawColumns as $column) {
+      if ($column->length !== NULL) {
+        $spec[] = [$column->name, $column->length];
+      }
+      else {
+        $spec[] = $column->name;
+      }
+    }
+    return $spec;
+  }
+
 }

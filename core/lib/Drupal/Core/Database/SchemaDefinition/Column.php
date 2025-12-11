@@ -85,4 +85,52 @@ final class Column implements SchemaDefinitionInterface {
   ) {
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function toArray(): array {
+    $spec = [];
+    if ($this->type) {
+      $spec['type'] = $this->type->value;
+    }
+    if ($this->description !== NULL) {
+      $spec['description'] = $this->description;
+    }
+    if ($this->serialize !== NULL) {
+      $spec['serialize'] = $this->serialize;
+    }
+    if ($this->size) {
+      $spec['size'] = $this->size->value;
+    }
+    if ($this->notNull !== NULL) {
+      $spec['not null'] = $this->notNull;
+    }
+    if ($this->default) {
+      $spec['default'] = $this->default->value;
+    }
+    if ($this->length !== NULL) {
+      $spec['length'] = $this->length;
+    }
+    if ($this->unsigned !== NULL) {
+      $spec['unsigned'] = $this->unsigned;
+    }
+    if ($this->precision !== NULL) {
+      $spec['precision'] = $this->precision;
+    }
+    if ($this->scale !== NULL) {
+      $spec['scale'] = $this->scale;
+    }
+    if ($this->binary !== NULL) {
+      $spec['binary'] = $this->binary;
+    }
+    if ($this->dbSpecificExtra !== NULL) {
+      foreach ($this->dbSpecificExtra as $extra) {
+        foreach ($extra as $key => $value) {
+          $spec[$key] = $value;
+        }
+      }
+    }
+    return $spec;
+  }
+
 }

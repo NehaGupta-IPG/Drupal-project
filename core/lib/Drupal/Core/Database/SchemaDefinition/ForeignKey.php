@@ -44,4 +44,20 @@ final class ForeignKey extends KeyBase {
     assert(count($this->columns) === count($this->foreignColumns), "Mismatching count of columns for the {$this->name} foreign key.");
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function toArray(): array {
+    $cols = $this->keyColumnsToArray($this->columns);
+    $foreignCols = $this->keyColumnsToArray($this->foreignColumns);
+    $match = [];
+    for ($i = 0; $i < count($cols); $i++) {
+      $match[$cols[$i]] = $foreignCols[$i];
+    }
+    return [
+      'table' => $this->foreignTable,
+      'columns' => $match,
+    ];
+  }
+
 }

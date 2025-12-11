@@ -9,7 +9,6 @@ use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
-use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Table;
@@ -178,7 +177,7 @@ class BatchStorage implements BatchStorageInterface {
     try {
       $database_schema = $this->connection->schema();
       $schema_definition = $this->schemaDefinition();
-      $database_schema->createTable(static::TABLE_NAME, ConvertDefinition::tableToArray($schema_definition));
+      $database_schema->createTable(static::TABLE_NAME, $schema_definition->toArray());
     }
     // If another process has already created the batch table, attempting to
     // recreate it will throw an exception. In this case just catch the

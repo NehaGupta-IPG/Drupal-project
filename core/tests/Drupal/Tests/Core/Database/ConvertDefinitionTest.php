@@ -7,7 +7,6 @@ namespace Drupal\Tests\Core\Database;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
-use Drupal\Core\Database\SchemaDefinition\ConvertDefinition;
 use Drupal\Core\Database\SchemaDefinition\ForeignKey;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
@@ -18,16 +17,18 @@ use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests conversion of SchemaDefinition objects to legacy array-based structure.
  */
 #[Group('Database')]
+#[CoversClass(Table::class)]
 class ConvertDefinitionTest extends UnitTestCase {
 
   /**
-   * Tests ConvertDefinition::tableToArray.
+   * Tests Table::toArray().
    */
   public function testConvertDefinition(): void {
     $arraySpecification = [
@@ -185,7 +186,7 @@ class ConvertDefinitionTest extends UnitTestCase {
       ],
     );
 
-    $this->assertEquals($arraySpecification, ConvertDefinition::tableToArray($schemaDefinition));
+    $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
   }
 
 }

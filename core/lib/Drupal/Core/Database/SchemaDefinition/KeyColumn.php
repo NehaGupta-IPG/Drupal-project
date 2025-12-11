@@ -23,4 +23,11 @@ final class KeyColumn implements SchemaDefinitionInterface {
   ) {
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function toArray(): array {
+    return [];
+  }
+
 }
