@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Installer;
 
+use Composer\InstalledVersions;
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
@@ -225,6 +227,42 @@ class InstallerKernel extends DrupalKernel {
     }
 
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function discoverServiceProviders(): void {
+    parent::discoverServiceProviders();
+
+    // Read the root composer.json to see if it wants to affect the installer's
+    // behavior.
+    ['install_path' => $project_root] = InstalledVersions::getRootPackage();
+    $composer_json = Json::decode(file_get_contents($project_root . '/composer.json'));
+    $service_provider = $composer_json['extra']['drupal-installer']['service-provider'] ?? NULL;
+    if (empty($service_provider)) {
+      return;
+    }
+    // The service provider may be one of:
+    // - The name of an installed package which has an install.services.yml at
+    //   its root.
+    // - The fully qualified name of an extant PHP class.
+    // - A file path, relative to the project root.
+    if (InstalledVersions::isInstalled($service_provider)) {
+      $services_yaml = InstalledVersions::getInstallPath($service_provider) . '/install.services.yml';
+      if (file_exists($services_yaml)) {
+        $this->serviceYamls['app'][$service_provider] = $services_yaml;
+      }
+    }
+    elseif (class_exists($service_provider)) {
+      $this->serviceProviderClasses['app'][$service_provider] = $service_provider;
+    }
+    else {
+      $services_yaml = $project_root . '/' . ltrim($service_provider, '/');
+      if (file_exists($services_yaml)) {
+        $this->serviceYamls['app'][$service_provider] = $services_yaml;
+      }
+    }
   }
 
 }
