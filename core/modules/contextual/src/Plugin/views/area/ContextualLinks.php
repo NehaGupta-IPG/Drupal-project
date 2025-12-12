@@ -83,7 +83,7 @@ class ContextualLinks extends TokenizeAreaPluginBase {
    * @param mixed $value
    *   The view field result value.
    *
-   * @return MarkupInterface|null
+   * @return \Drupal\Component\Render\MarkupInterface|null
    *   The renderable views markup.
    */
   public function renderTextarea($value): ?MarkupInterface {
@@ -96,8 +96,9 @@ class ContextualLinks extends TokenizeAreaPluginBase {
   /**
    * Parses content markup to extra a tag links.
    *
-   * @param MarkupInterface $markup
+   * @param \Drupal\Component\Render\MarkupInterface $markup
    *   View area content to parse.
+   *
    * @return array
    *   Array of link data.
    */
