@@ -210,6 +210,31 @@ class StatusTest extends BrowserTestBase {
     }
   }
 
+    /**
+   * Tests that the status report warns when zend.assertions = 1.
+   *
+   * The assertion machinery incurs runtime cost when zend.assertions is 1,
+   * which should trigger a WARNING on the status report. This test is
+   * environment-dependent and will be skipped unless zend.assertions == 1.
+   */
+  public function testPhpRuntimeAssertionsStatus(): void {
+    // Ensure the environment is actually running with assertions executed.
+    $zend_assertions = ini_get('zend.assertions');
+    if ((int) $zend_assertions !== 1) {
+      $this->markTestSkipped('zend.assertions must be 1 to test the assertions status check.');
+    }
+
+    // Visit the status page and assert the requirement is present.
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // The requirement title.
+    $this->assertSession()->pageTextContains('PHP runtime assertions');
+
+    // The value should indicate that assertions are enabled.
+    $this->assertSession()->pageTextContains('Enabled (zend.assertions = 1)');
+  }
+
   /**
    * Tests that the Error counter matches the displayed number of errors.
    */
