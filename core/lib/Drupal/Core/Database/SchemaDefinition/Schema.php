@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\SchemaDefinition;
 
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
+
 /**
  * Describes a database schema as a collection of Table objects.
  */
@@ -40,6 +42,31 @@ final class Schema implements SchemaDefinitionInterface, \Iterator {
       fn(Table $table): string => $table->name,
       $this->tables,
     );
+  }
+
+  /**
+   * Gets a specific table definition.
+   *
+   * @param string $name
+   *   The name of the Table object to return.
+   *
+   * @return Table
+   *   The Table object.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   *   When the requested table is missing.
+   */
+  public function getTableDefinition(string $name): Table {
+    $ret = array_find(
+      $this->tables,
+      function (Table $table) use ($name): bool {
+        return $table->name === $name;
+      },
+    );
+    if (!$ret) {
+      throw new SchemaDefinitionException("Schema {$this->name} does not define a table named {$name}");
+    }
+    return $ret;
   }
 
   /**
