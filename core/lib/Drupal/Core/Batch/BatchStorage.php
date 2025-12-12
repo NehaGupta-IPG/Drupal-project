@@ -175,9 +175,7 @@ class BatchStorage implements BatchStorageInterface {
    */
   protected function ensureTableExists() {
     try {
-      $database_schema = $this->connection->schema();
-      $schema_definition = $this->schemaDefinition();
-      $database_schema->createTable(static::TABLE_NAME, $schema_definition->toArray());
+      $this->connection->schema()->createTableFromDefinition($this->schemaDefinition());
     }
     // If another process has already created the batch table, attempting to
     // recreate it will throw an exception. In this case just catch the
