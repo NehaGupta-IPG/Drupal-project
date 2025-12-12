@@ -112,7 +112,7 @@ class Checkboxes extends FormElementBase {
               '#title' => $checkbox_label,
               '#return_value' => $checkbox_value,
               '#default_value' => isset($value[$checkbox_value]) ? $checkbox_value : NULL,
-              '#attributes' => $element['#attributes'],
+              '#attributes' => $child_attributes,
               '#ajax' => $element['#ajax'] ?? NULL,
               // Errors should only be shown on the parent checkboxes element.
               '#error_no_message' => TRUE,
@@ -134,7 +134,7 @@ class Checkboxes extends FormElementBase {
             '#title' => $choice,
             '#return_value' => $key,
             '#default_value' => $default_value,
-            '#attributes' => $element['#attributes'],
+            '#attributes' => $child_attributes,
             '#ajax' => $element['#ajax'] ?? NULL,
             // Errors should only be shown on the parent checkboxes element.
             '#error_no_message' => TRUE,
