@@ -631,10 +631,10 @@ abstract class Schema implements PlaceholderInterface {
   /**
    * Create a new table from a table schema definition.
    *
-   * @param TableDefinition|string|int $table
+   * @param \Drupal\Core\Database\SchemaDefinition\Table|string|int $table
    *   A Schema API table definition, or the name of the table if $data is
    *   specified, or an index of an array of TableDefinition objects.
-   * @param array|TableDefinition|null $data
+   * @param array|\Drupal\Core\Database\SchemaDefinition\Table|null $data
    *   (optional) A legacy table data definition in array format, or a
    *   TableDefinition object.
    *
