@@ -1343,7 +1343,15 @@
         );
 
         // Set the innerHTML of the template to the provided HTML string.
-        template.innerHTML = htmlString;
+        // If the string includes declarative shadow DOM, use setHTMLUnsafe
+        // instead. Defaults to innerHTML because not all browsers support this
+        // method yet.
+        if (htmlString.includes('shadowrootmode') && typeof template.setHTMLUnsafe === 'function') {
+          template.setHTMLUnsafe(htmlString);
+        }
+        else {
+          template.innerHTML = htmlString;
+        }
 
         // Return the contents of the temporary template.
         return template.content.childNodes;
