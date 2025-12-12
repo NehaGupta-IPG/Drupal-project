@@ -309,7 +309,7 @@ class TableTest extends KernelTestBase {
   /**
    * Tests multi rows header table.
    */
-  public function testThemeTableHeaderMultiRows() {
+  public function testThemeTableHeaderMultiRows(): void {
     $table = [
       '#type' => 'table',
       '#header' => [
