@@ -76,6 +76,8 @@ class ContextualLinks extends FieldPluginBase {
    *
    * @todo Make this reusable (or replace with reusable method).
    * @see \Drupal\Core\Render\Element\Checkboxes::getCheckedCheckboxes
+   *
+   * @return void
    */
   public static function validateOptions(&$element, FormStateInterface $form_state, &$complete_form) {
     $value = array_filter($element['#value'], function ($value) {
