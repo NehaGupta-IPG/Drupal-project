@@ -125,7 +125,6 @@ class FilterHtmlImageSecureTest extends BrowserTestBase {
       $https_base_url . '/' . $public_files_path . '/' . $special_image => $files_path . '/' . $special_image,
       $files_path . '/example.png' => $red_x_image,
       'https://example.com/' . $druplicon => $red_x_image,
-      'https://example.com/' . $druplicon => $red_x_image,
       'javascript:druplicon.png' => $red_x_image,
       $csrf_path . '/logout' => $red_x_image,
     ];
