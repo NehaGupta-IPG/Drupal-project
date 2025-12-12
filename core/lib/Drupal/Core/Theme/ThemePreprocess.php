@@ -532,7 +532,7 @@ class ThemePreprocess {
     // Format the table columns:
     if (!empty($variables['colgroups'])) {
       foreach ($variables['colgroups'] as &$colgroup) {
-        // Check if we're dealing with a simple or complex column
+        // Check if we're dealing with a simple or complex column.
         if (isset($colgroup['data'])) {
           $cols = $colgroup['data'];
           unset($colgroup['data']);
@@ -577,146 +577,147 @@ class ThemePreprocess {
               $multi_header[] = $cell;
             }
           }
-        $ts = TableSort::getContextFromRequest($multi_header, \Drupal::request());
-      }
+          $ts = TableSort::getContextFromRequest($multi_header, \Drupal::request());
+        }
 
-      foreach ($variables['header'] as $row_key => $header_row) {
-        $header_columns_in_row = 0;
+        foreach ($variables['header'] as $row_key => $header_row) {
+          $header_columns_in_row = 0;
 
-        // Use a separate index with responsive classes as headers
-        // may be associative.
-        $responsive_index = -1;
-        foreach ($header_row as $col_key => $cell) {
-          // Increase the responsive index.
-          $responsive_index++;
+          // Use a separate index with responsive classes as headers
+          // may be associative.
+          $responsive_index = -1;
+          foreach ($header_row as $col_key => $cell) {
+            // Increase the responsive index.
+            $responsive_index++;
 
-          if (!is_array($cell)) {
-            $header_columns_in_row++;
-            $cell_content = $cell;
-            $cell_attributes = new Attribute();
-            $is_header = TRUE;
-          }
-          else {
-            if (isset($cell['colspan'])) {
-              $header_columns_in_row += $cell['colspan'];
+            if (!is_array($cell)) {
+              $header_columns_in_row++;
+              $cell_content = $cell;
+              $cell_attributes = new Attribute();
+              $is_header = TRUE;
             }
             else {
-              $header_columns_in_row++;
-            }
-            $cell_content = '';
-            if (isset($cell['data'])) {
-              $cell_content = $cell['data'];
-              unset($cell['data']);
-            }
-            // Flag the cell as a header or not and remove the flag.
-            $is_header = $cell['header'] ?? TRUE;
-            unset($cell['header']);
-
-            // Track responsive classes for each column as needed. Only the header
-            // cells for a column are marked up with the responsive classes by a
-            // module developer or themer. The responsive classes on the header cells
-            // must be transferred to the content cells.
-            if (!empty($cell['class']) && is_array($cell['class'])) {
-              if (in_array(RESPONSIVE_PRIORITY_MEDIUM, $cell['class'])) {
-                $responsive_classes[$responsive_index] = RESPONSIVE_PRIORITY_MEDIUM;
-              }
-              elseif (in_array(RESPONSIVE_PRIORITY_LOW, $cell['class'])) {
-                $responsive_classes[$responsive_index] = RESPONSIVE_PRIORITY_LOW;
-              }
-            }
-
-            TableSort::header($cell_content, $cell, $header_row, $ts);
-
-            // TableSort::header() removes the 'sort', 'initial_click_sort' and
-            // 'field' keys.
-            $cell_attributes = new Attribute($cell);
-          }
-          $variables['header'][$row_key][$col_key] = [];
-          $variables['header'][$row_key][$col_key]['tag'] = $is_header ? 'th' : 'td';
-          $variables['header'][$row_key][$col_key]['attributes'] = $cell_attributes;
-          $variables['header'][$row_key][$col_key]['content'] = $cell_content;
-        }
-        $header_columns = max($header_columns_in_row, $header_columns);
-      }
-
-      // Get single row header back to normal for BC.
-      // @todo: remove this in D9.
-      if (empty($variables['header_multilevel'])) {
-        $variables['header'] = $variables['header']['single_row'];
-      }
-      else {
-        $variables['header_multilevel'] = $variables['header'];
-      }
-    }
-    $variables['header_columns'] = $header_columns;
-
-    // Rows and footer have the same structure.
-    $sections = ['rows' , 'footer'];
-    foreach ($sections as $section) {
-      if (!empty($variables[$section])) {
-        foreach ($variables[$section] as $row_key => $row) {
-          $cells = $row;
-          $row_attributes = [];
-
-          // Check if we're dealing with a simple or complex row
-          if (isset($row['data'])) {
-            $cells = $row['data'];
-            $variables['no_striping'] = $row['no_striping'] ?? FALSE;
-
-            // Set the attributes array and exclude 'data' and 'no_striping'.
-            $row_attributes = $row;
-            unset($row_attributes['data']);
-            unset($row_attributes['no_striping']);
-          }
-
-          // Build row.
-          $variables[$section][$row_key] = [];
-          $variables[$section][$row_key]['attributes'] = new Attribute($row_attributes);
-          $variables[$section][$row_key]['cells'] = [];
-          if (!empty($cells)) {
-            // Reset the responsive index.
-            $responsive_index = -1;
-            foreach ($cells as $col_key => $cell) {
-              // Increase the responsive index.
-              $responsive_index++;
-
-              if (!is_array($cell)) {
-                $cell_content = $cell;
-                $cell_attributes = [];
-                $is_header = FALSE;
+              if (isset($cell['colspan'])) {
+                $header_columns_in_row += $cell['colspan'];
               }
               else {
-                $cell_content = '';
-                if (isset($cell['data'])) {
-                  $cell_content = $cell['data'];
-                  unset($cell['data']);
+                $header_columns_in_row++;
+              }
+              $cell_content = '';
+              if (isset($cell['data'])) {
+                $cell_content = $cell['data'];
+                unset($cell['data']);
+              }
+              // Flag the cell as a header or not and remove the flag.
+              $is_header = $cell['header'] ?? TRUE;
+              unset($cell['header']);
+
+              // Track responsive classes for each column as needed. Only the header
+              // cells for a column are marked up with the responsive classes by a
+              // module developer or themer. The responsive classes on the header cells
+              // must be transferred to the content cells.
+              if (!empty($cell['class']) && is_array($cell['class'])) {
+                if (in_array(RESPONSIVE_PRIORITY_MEDIUM, $cell['class'])) {
+                  $responsive_classes[$responsive_index] = RESPONSIVE_PRIORITY_MEDIUM;
                 }
+                elseif (in_array(RESPONSIVE_PRIORITY_LOW, $cell['class'])) {
+                  $responsive_classes[$responsive_index] = RESPONSIVE_PRIORITY_LOW;
+                }
+              }
 
-                // Flag the cell as a header or not and remove the flag.
-                $is_header = !empty($cell['header']);
-                unset($cell['header']);
+              TableSort::header($cell_content, $cell, $header_row, $ts);
 
-                $cell_attributes = $cell;
+              // TableSort::header() removes the 'sort', 'initial_click_sort' and
+              // 'field' keys.
+              $cell_attributes = new Attribute($cell);
+            }
+            $variables['header'][$row_key][$col_key] = [];
+            $variables['header'][$row_key][$col_key]['tag'] = $is_header ? 'th' : 'td';
+            $variables['header'][$row_key][$col_key]['attributes'] = $cell_attributes;
+            $variables['header'][$row_key][$col_key]['content'] = $cell_content;
+          }
+          $header_columns = max($header_columns_in_row, $header_columns);
+        }
+
+        // Get single row header back to normal for BC.
+        // @todo remove this in D9.
+        if (empty($variables['header_multilevel'])) {
+          $variables['header'] = $variables['header']['single_row'];
+        }
+        else {
+          $variables['header_multilevel'] = $variables['header'];
+        }
+      }
+      $variables['header_columns'] = $header_columns;
+
+      // Rows and footer have the same structure.
+      $sections = ['rows' , 'footer'];
+      foreach ($sections as $section) {
+        if (!empty($variables[$section])) {
+          foreach ($variables[$section] as $row_key => $row) {
+            $cells = $row;
+            $row_attributes = [];
+
+            // Check if we're dealing with a simple or complex row.
+            if (isset($row['data'])) {
+              $cells = $row['data'];
+              $variables['no_striping'] = $row['no_striping'] ?? FALSE;
+
+              // Set the attributes array and exclude 'data' and 'no_striping'.
+              $row_attributes = $row;
+              unset($row_attributes['data']);
+              unset($row_attributes['no_striping']);
+            }
+
+            // Build row.
+            $variables[$section][$row_key] = [];
+            $variables[$section][$row_key]['attributes'] = new Attribute($row_attributes);
+            $variables[$section][$row_key]['cells'] = [];
+            if (!empty($cells)) {
+              // Reset the responsive index.
+              $responsive_index = -1;
+              foreach ($cells as $col_key => $cell) {
+                // Increase the responsive index.
+                $responsive_index++;
+
+                if (!is_array($cell)) {
+                  $cell_content = $cell;
+                  $cell_attributes = [];
+                  $is_header = FALSE;
+                }
+                else {
+                  $cell_content = '';
+                  if (isset($cell['data'])) {
+                    $cell_content = $cell['data'];
+                    unset($cell['data']);
+                  }
+
+                  // Flag the cell as a header or not and remove the flag.
+                  $is_header = !empty($cell['header']);
+                  unset($cell['header']);
+
+                  $cell_attributes = $cell;
+                }
+                // Active table sort information.
+                if (isset($variables['header'][$col_key]['data']) && $variables['header'][$col_key]['data'] == $ts['name'] && !empty($variables['header'][$col_key]['field'])) {
+                  $variables[$section][$row_key]['cells'][$col_key]['active_table_sort'] = TRUE;
+                }
+                // Copy RESPONSIVE_PRIORITY_LOW/RESPONSIVE_PRIORITY_MEDIUM
+                // class from header to cell as needed.
+                if (isset($responsive_classes[$responsive_index])) {
+                  $cell_attributes['class'][] = $responsive_classes[$responsive_index];
+                }
+                $variables[$section][$row_key]['cells'][$col_key]['tag'] = $is_header ? 'th' : 'td';
+                $variables[$section][$row_key]['cells'][$col_key]['attributes'] = new Attribute($cell_attributes);
+                $variables[$section][$row_key]['cells'][$col_key]['content'] = $cell_content;
               }
-              // Active table sort information.
-              if (isset($variables['header'][$col_key]['data']) && $variables['header'][$col_key]['data'] == $ts['name'] && !empty($variables['header'][$col_key]['field'])) {
-                $variables[$section][$row_key]['cells'][$col_key]['active_table_sort'] = TRUE;
-              }
-              // Copy RESPONSIVE_PRIORITY_LOW/RESPONSIVE_PRIORITY_MEDIUM
-              // class from header to cell as needed.
-              if (isset($responsive_classes[$responsive_index])) {
-                $cell_attributes['class'][] = $responsive_classes[$responsive_index];
-              }
-              $variables[$section][$row_key]['cells'][$col_key]['tag'] = $is_header ? 'th' : 'td';
-              $variables[$section][$row_key]['cells'][$col_key]['attributes'] = new Attribute($cell_attributes);
-              $variables[$section][$row_key]['cells'][$col_key]['content'] = $cell_content;
             }
           }
         }
       }
-    }
-    if (empty($variables['no_striping'])) {
-      $variables['attributes']['data-striping'] = 1;
+      if (empty($variables['no_striping'])) {
+        $variables['attributes']['data-striping'] = 1;
+      }
     }
   }
 
