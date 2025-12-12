@@ -51,8 +51,8 @@ class ContextualLinks extends TokenizeAreaPluginBase {
       $links = $this->extractLinks($markup);
 
       // Renders a contextual links placeholder.
-      // Links must be a nested array of strings, so that _contextual_links_to_id
-      // can serialize them.
+      // Links must be a nested array of strings, so that they can be
+      // serialized by _contextual_links_to_id.
       // @see \Drupal\contextual\Element\ContextualLinks::preRenderLinks
       if (!empty($links)) {
         $contextual_links = [
@@ -79,14 +79,29 @@ class ContextualLinks extends TokenizeAreaPluginBase {
 
   /**
    * Render a text area with \Drupal\Component\Utility\Xss::filterAdmin().
+   *
+   * @param mixed $value
+   *   The view field result value.
+   *
+   * @return MarkupInterface|null
+   *   The renderable views markup.
    */
-  public function renderTextarea($value) {
+  public function renderTextarea($value): ?MarkupInterface {
     if ($value) {
       return $this->sanitizeValue($this->tokenizeValue($value), 'xss_admin');
     }
+    return NULL;
   }
 
-  protected function extractLinks(MarkupInterface $markup) {
+  /**
+   * Parses content markup to extra a tag links.
+   *
+   * @param MarkupInterface $markup
+   *   View area content to parse.
+   * @return array
+   *   Array of link data.
+   */
+  protected function extractLinks(MarkupInterface $markup): array {
     $links = [];
     $dom = new \DOMDocument();
     // cSpell:disable-next-line
