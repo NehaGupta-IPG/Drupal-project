@@ -790,7 +790,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       throw new \LogicException("$module module is not installed.");
     }
     $specification = SchemaInspector::getTablesSpecification($module_handler, $module);
-    $specification = ($specification instanceof Schema) ? $specification->toArray() : $specification;
     /** @var \Drupal\Core\Database\Schema $schema */
     $schema = $this->container->get('database')->schema();
     $tables = (array) $tables;
@@ -798,10 +797,15 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       if ($module === 'system' && $table === 'sequences') {
         @trigger_error('Installing the table sequences with the method KernelTestBase::installSchema() is deprecated in drupal:10.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
       }
-      if (empty($specification[$table])) {
-        throw new \LogicException("$module module does not define a schema for table '$table'.");
+      if ($specification instanceof Schema) {
+        $schema->createTableFromDefinition($table);
       }
-      $schema->createTable($table, $specification[$table]);
+      else {
+        if (empty($specification[$table])) {
+          throw new \LogicException("$module module does not define a schema for table '$table'.");
+        }
+        $schema->createTableFromDefinition($table, $specification[$table]);
+      }
     }
   }
 
