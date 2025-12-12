@@ -67,6 +67,25 @@ interface TermInterface extends ContentEntityInterface, EntityChangedInterface, 
   public function setName($name);
 
   /**
+   * Gets the term creation timestamp.
+   *
+   * @return int
+   *   Creation timestamp of the term.
+   */
+  public function getCreatedTime();
+
+  /**
+   * Sets the term creation timestamp.
+   *
+   * @param int $timestamp
+   *   The term creation timestamp.
+   *
+   * @return $this
+   *   The called term entity.
+   */
+  public function setCreatedTime($timestamp);
+
+  /**
    * Gets the term weight.
    *
    * @return int
