@@ -210,7 +210,7 @@ class StatusTest extends BrowserTestBase {
     }
   }
 
-    /**
+  /**
    * Tests that the status report warns when zend.assertions = 1.
    *
    * The assertion machinery incurs runtime cost when zend.assertions is 1,
