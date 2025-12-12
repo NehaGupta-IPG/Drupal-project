@@ -702,8 +702,10 @@ function drupal_check_module($module) {
     require_once $file;
   }
   // Check requirements.
-  $requirements = \Drupal::moduleHandler()->invoke($module, 'requirements', ['install']) ?? [];
-  $requirements = array_merge($requirements, install_check_class_requirements($extension));
+  $requirements = install_check_class_requirements($extension);
+  if (empty($requirements)) {
+    $requirements = \Drupal::moduleHandler()->invoke($module, 'requirements', ['install']) ?? [];
+  }
 
   if (!empty($requirements) && RequirementSeverity::maxSeverityFromRequirements($requirements) === RequirementSeverity::Error) {
     // Print any error messages.
@@ -858,7 +860,7 @@ function install_check_class_requirements(Extension $extension): array {
 
         $namespace = "Drupal\\$extension_name\\Install\\Requirements";
         $class_name = $namespace . '\\' . $fileInfo->getBasename('.php');
-        if (class_exists($class_name) && class_implements($class_name, InstallRequirementsInterface::class)) {
+        if (class_exists($class_name) && is_subclass_of($class_name, InstallRequirementsInterface::class)) {
           $requirements = $class_name::getRequirements();
         }
       }
