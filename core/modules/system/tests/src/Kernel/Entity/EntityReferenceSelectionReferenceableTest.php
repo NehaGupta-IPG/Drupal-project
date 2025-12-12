@@ -91,9 +91,8 @@ class EntityReferenceSelectionReferenceableTest extends KernelTestBase {
    *   Value for 'allow_self_reference' selection handler setting.
    * @param bool $entity_is_reference
    *   Assert whether the referencing entity is reference.
-   *
-   * @dataProvider providerAllowSelfReference
    */
+  #[DataProvider('providerAllowSelfReference')]
   public function testAllowSelfReference(bool $allow_self_reference, bool $entity_is_reference): void {
     $field_name = 'field_test';
     $this->createEntityReferenceField('entity_test', 'entity_test', $field_name, 'Test entity reference', 'entity_test');
