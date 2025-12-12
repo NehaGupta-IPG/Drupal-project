@@ -42,6 +42,13 @@ final class InstallerCustomizationTest extends BuildTestBase {
     // alterations package.
     $this->executeCommand('composer config extra.drupal-installer --json \'{"service-provider":"drupal/installer-alter"}\'');
     $this->assertCommandSuccessful();
+
+    // Visit the installer and confirm that the alter hooks are running during
+    // the early installer.
+    $this->visit();
+    $assert_session = $this->getMink()->assertSession();
+    $assert_session->pageTextContains('Choose language | Drupal');
+    $assert_session->pageTextContains('This was added by a hook in the early installer.');
   }
 
   /**
