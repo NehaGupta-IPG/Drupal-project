@@ -1346,10 +1346,12 @@
         // If the string includes declarative shadow DOM, use setHTMLUnsafe
         // instead. Defaults to innerHTML because not all browsers support this
         // method yet.
-        if (htmlString.includes('shadowrootmode') && typeof template.setHTMLUnsafe === 'function') {
+        if (
+          htmlString.includes('shadowrootmode') &&
+          typeof template.setHTMLUnsafe === 'function'
+        ) {
           template.setHTMLUnsafe(htmlString);
-        }
-        else {
+        } else {
           template.innerHTML = htmlString;
         }
 
