@@ -612,10 +612,10 @@ class ThemePreprocess {
               $is_header = $cell['header'] ?? TRUE;
               unset($cell['header']);
 
-              // Track responsive classes for each column as needed. Only the header
-              // cells for a column are marked up with the responsive classes by a
-              // module developer or themer. The responsive classes on the header cells
-              // must be transferred to the content cells.
+              // Track responsive classes for each column as needed. Only the
+              // header cells for a column are marked up with the responsive
+              // classes by a module developer or themer. The responsive classes
+              // on the header cells must be transferred to the content cells.
               if (!empty($cell['class']) && is_array($cell['class'])) {
                 if (in_array(RESPONSIVE_PRIORITY_MEDIUM, $cell['class'])) {
                   $responsive_classes[$responsive_index] = RESPONSIVE_PRIORITY_MEDIUM;
@@ -627,8 +627,8 @@ class ThemePreprocess {
 
               TableSort::header($cell_content, $cell, $header_row, $ts);
 
-              // TableSort::header() removes the 'sort', 'initial_click_sort' and
-              // 'field' keys.
+              // TableSort::header() removes the 'sort', 'initial_click_sort'
+              // and 'field' keys.
               $cell_attributes = new Attribute($cell);
             }
             $variables['header'][$row_key][$col_key] = [];
