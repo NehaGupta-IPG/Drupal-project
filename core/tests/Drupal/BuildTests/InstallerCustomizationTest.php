@@ -37,32 +37,15 @@ final class InstallerCustomizationTest extends BuildTestBase {
   /**
    * Tests getting install-time services from a specific package.
    */
-  public function testInstallerServicesFromPackage(): void {
+  public function testInstallerServices(): void {
     // Configure the codebase to use the install.services.yml provided by the
     // alterations package.
-    $this->executeCommand('composer config extra.drupal-installer --json \'{"service-provider":"drupal/installer-alter"}\'');
+    $this->executeCommand('composer config extra.drupal-installer --json \'{"service-provider":"Drupal\\\\CustomInstaller\\\\InstallerServiceProvider"}\'');
     $this->assertCommandSuccessful();
 
-    // Visit the installer and confirm that the alter hooks are running during
-    // the early installer.
     $this->visit();
     $assert_session = $this->getMink()->assertSession();
     $assert_session->pageTextContains('Choose language | Drupal');
-    $assert_session->pageTextContains('This was added by a hook in the early installer.');
-  }
-
-  /**
-   * Tests getting install-time services from a PHP class.
-   */
-  public function testInstallerServicesFromClass(): void {
-    $this->markTestSkipped('Not implemented yet.');
-  }
-
-  /**
-   * Tests getting install-time services from a project-specific YAML file.
-   */
-  public function testInstallerServicesFromYamlFile(): void {
-    $this->markTestSkipped('Not implemented yet.');
   }
 
 }

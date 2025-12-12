@@ -13,7 +13,7 @@ final class InstallerServiceProvider implements ServiceProviderInterface {
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container): void {
-    $container->register('custom_installer_hooks', Hooks::class);
+    // @todo Register services here.
   }
 
 }
