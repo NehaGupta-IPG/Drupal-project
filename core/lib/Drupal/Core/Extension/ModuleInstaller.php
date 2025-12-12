@@ -793,9 +793,9 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected function uninstallSchema(string $module): void {
     $tables = $this->invoke($module, 'schema') ?? [];
-    $tables = ($tables instanceof Schema) ? $tables->toArray() : $tables;
     $schema = $this->connection->schema();
-    foreach (array_keys($tables) as $table) {
+    $table_names = ($tables instanceof Schema) ? $tables->tableNames() : array_keys($tables);
+    foreach ($table_names as $table) {
       if ($schema->tableExists($table)) {
         $schema->dropTable($table);
       }

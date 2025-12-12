@@ -30,6 +30,19 @@ final class Schema implements SchemaDefinitionInterface, \Iterator {
   }
 
   /**
+   * Returns the names of the tables.
+   *
+   * @return list<string>
+   *   The names of the tables.
+   */
+  public function tableNames(): array {
+    return array_map(
+      fn(Table $table): string => $table->name,
+      $this->tables,
+    );
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function toArray(): array {

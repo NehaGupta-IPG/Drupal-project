@@ -244,6 +244,7 @@ class ConvertDefinitionTest extends UnitTestCase {
       ],
     );
 
+    $this->assertEquals(['foo', 'bar'], $schemaDefinition->tableNames());
     $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
   }
 
