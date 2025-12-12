@@ -48,7 +48,7 @@ function taxonomy_post_update_populate_created_value(&$sandbox = NULL) {
   foreach ($terms as $term) {
     $unchanged = $term_storage->loadUnchanged($term->id());
     $term->setSyncing(TRUE);
-    $term->created->value = $unchanged->changed->value;
+    $term->created->value = $term->get('revision_created')->value ?? $unchanged->changed->value;
     $term->save();
     $sandbox['current_tid'] = $term->id();
   }
