@@ -79,8 +79,8 @@
           }
         }
         if (
-          !$(event.target).is('.ui-widget-content')
-          || !$(event.target).dialog('option', 'drupalPersist')
+          !event.target.matches('.ui-widget-content') ||
+          !$(event.target).dialog('option', 'drupalPersist')
         ) {
           $(event.target).remove();
         }
