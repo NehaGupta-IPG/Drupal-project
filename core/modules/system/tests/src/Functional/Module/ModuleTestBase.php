@@ -6,7 +6,6 @@ namespace Drupal\Tests\system\Functional\Module;
 
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\BrowserTestBase;
