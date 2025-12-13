@@ -84,7 +84,7 @@
 
         // In case the user makes an edit and does not click on the autocomplete
         // dropdown (so selectHandler() does not run), add a listener to update
-        // the hidden form inputs. Following linkit's approach.
+        // the hidden form inputs.
         $uriInput.on('focusout', function () {
           const $context = $uriInput.closest('form, fieldset, tr');
           const $hrefInput = getAttributesInput('href', $context);

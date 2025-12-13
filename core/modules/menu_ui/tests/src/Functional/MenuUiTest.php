@@ -137,8 +137,14 @@ class MenuUiTest extends BrowserTestBase {
     $this->verifyAccess(403);
 
     foreach ($this->items as $item) {
-      // Menu link URIs are stored as 'internal:/node/$nid'.
-      $node = Node::load(str_replace('internal:/node/', '', $item->link->uri));
+      // Menu link URIs are stored as 'entity:node/$nid' when using the
+      // link_autocomplete widget (which is the default for menu_link_content).
+      $uri = $item->link->uri;
+      $this->assertStringStartsWith('entity:node/', $uri, 'Menu link URI should use entity: protocol');
+      $node_id = str_replace('entity:node/', '', $uri);
+      // Remove query string and fragment if present.
+      $node_id = strtok($node_id, '?#');
+      $node = Node::load($node_id);
       $this->verifyMenuLink($item, $node);
     }
 

@@ -162,12 +162,8 @@ class LinkAutocompleteWidget extends LinkWidget {
       $element['uri']['#default_value'] = $entity->toUrl()->setOptions($uri_options)->toString();
     }
     elseif ($default_allowed && $uri && parse_url($uri, PHP_URL_SCHEME) !== 'entity') {
-      // For non-entity URIs, use the URI as-is (parent already set this, but
-      // we want to ensure entity: URIs don't get converted to "Title (ID)"
-      // format).
-      // Only override if it's not an entity: URI to avoid breaking the parent's
-      // handling of internal: and external URLs.
-      $element['uri']['#default_value'] = $uri;
+      // For non-entity URIs, use the displayable string from the parent.
+      $element['uri']['#default_value'] = static::getUriAsDisplayableString($uri);
     }
 
     // Change the URI field to use textfield with autocomplete.
@@ -250,7 +246,7 @@ class LinkAutocompleteWidget extends LinkWidget {
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     foreach ($values as &$value) {
-      // Process the URI from user input, following linkit's approach.
+      // Process the URI from user input.
       // This handles entity resolution, external URLs, internal paths, etc.
       $value['uri'] = $this->uriFromUserInput($value['uri']);
 
