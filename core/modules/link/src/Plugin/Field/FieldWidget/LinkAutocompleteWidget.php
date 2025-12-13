@@ -175,7 +175,7 @@ class LinkAutocompleteWidget extends LinkWidget {
     if (!in_array([static::class, 'validateUriElement'], $element['uri']['#element_validate'], TRUE)) {
       $element['uri']['#element_validate'][] = [static::class, 'validateUriElement'];
     }
-    $element['uri']['#description'] = $this->t('Start typing to find content or paste a URL and click on the suggestion below.');
+    $element['uri']['#description'] = $this->t('Start typing to find content and click on the suggestion below or paste a URL.');
 
     // Get host entity information for autocomplete.
     $host_entity_type_id = '';
