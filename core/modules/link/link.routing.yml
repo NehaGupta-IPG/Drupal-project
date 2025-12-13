@@ -1,0 +1,11 @@
+link.autocomplete:
+  path: '/link/autocomplete'
+  defaults:
+    _controller: '\Drupal\link\Controller\LinkAutocompleteController::suggestions'
+  methods: [GET]
+  requirements:
+    _permission: 'access content'
+    _csrf_token: 'TRUE'
+  options:
+    no_cache: TRUE
+    _theme: ajax_base_page
