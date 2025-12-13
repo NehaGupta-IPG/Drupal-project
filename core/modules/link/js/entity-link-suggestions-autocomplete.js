@@ -4,8 +4,6 @@
  */
 
 (function ($, Drupal) {
-  'use strict';
-
   /**
    * Override jQuery UI _renderItem function to output HTML by default.
    *
@@ -29,12 +27,18 @@
     const $wrapper = $(
       '<div class="entity-link-suggestions-result-line-wrapper">',
     );
-    const label = escapeHtml && Drupal.checkPlain ? Drupal.checkPlain(item.label) : item.label;
+    const label =
+      escapeHtml && Drupal.checkPlain
+        ? Drupal.checkPlain(item.label)
+        : item.label;
     $wrapper.append(
       `<span class="entity-link-suggestions-result-line--title">${label}</span>`,
     );
     if (item.hasOwnProperty('description') && item.description) {
-      const description = escapeHtml && Drupal.checkPlain ? Drupal.checkPlain(item.description) : item.description;
+      const description =
+        escapeHtml && Drupal.checkPlain
+          ? Drupal.checkPlain(item.description)
+          : item.description;
       $wrapper.append(
         `<span class="entity-link-suggestions-result-line--description">${description}</span>`,
       );
@@ -70,7 +74,10 @@
     Object.keys(groupedItems).forEach((groupLabel) => {
       const groupItems = groupedItems[groupLabel];
       if (groupLabel.length) {
-        const label = escapeHtml && Drupal.checkPlain ? Drupal.checkPlain(groupLabel) : groupLabel;
+        const label =
+          escapeHtml && Drupal.checkPlain
+            ? Drupal.checkPlain(groupLabel)
+            : groupLabel;
         ul.append(
           `<li class="entity-link-suggestions-result-line--group ui-menu-divider">${label}</li>`,
         );
@@ -147,8 +154,7 @@
       if (cache.hasOwnProperty(term)) {
         response(cache[term]);
       } else {
-        const data = Object.assign({}, queryParams);
-        data.q = term;
+        const data = { ...queryParams, q: term };
         $.ajax(autocompleteUrl, {
           success: sourceCallbackHandler,
           data,
@@ -192,16 +198,24 @@
         '> :not(.entity-link-suggestions-result-line--group)',
       );
     instance._renderMenu = function (ul, items) {
-      Drupal.entityLinkSuggestionsRenderMenu.call(this, ul, items, renderOptions);
+      Drupal.entityLinkSuggestionsRenderMenu.call(
+        this,
+        ul,
+        items,
+        renderOptions,
+      );
     };
     instance._renderItem = function (ul, item) {
-      return Drupal.entityLinkSuggestionsRenderItem.call(this, ul, item, renderOptions);
+      return Drupal.entityLinkSuggestionsRenderItem.call(
+        this,
+        ul,
+        item,
+        renderOptions,
+      );
     };
 
-    const classes = 'entity-link-suggestions-ui-autocomplete' + (widgetClass ? ' ' + widgetClass : '');
-    $auto
-      .autocomplete('widget')
-      .addClass(classes);
+    const classes = `entity-link-suggestions-ui-autocomplete${widgetClass ? ` ${widgetClass}` : ''}`;
+    $auto.autocomplete('widget').addClass(classes);
 
     $auto.on('click', () => {
       $auto.autocomplete('search', $auto[0].value);
@@ -217,7 +231,4 @@
 
     return $auto;
   };
-
 })(jQuery, Drupal);
-
-

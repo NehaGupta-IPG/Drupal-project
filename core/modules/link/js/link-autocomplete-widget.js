@@ -4,8 +4,6 @@
  */
 
 (function ($, Drupal) {
-  'use strict';
-
   /**
    * Override jQuery UI _renderItem function to output HTML by default.
    *
@@ -80,11 +78,7 @@
    *   - queryParams: Additional query parameters to send
    */
   function initializeAutocomplete(element, settings) {
-    const {
-      autocompleteUrl,
-      selectHandler,
-      queryParams,
-    } = settings;
+    const { autocompleteUrl, selectHandler, queryParams } = settings;
     const autocomplete = {
       cache: {},
       ajax: {
@@ -120,8 +114,7 @@
       if (cache.hasOwnProperty(term)) {
         response(cache[term]);
       } else {
-        const data = Object.assign({}, queryParams);
-        data.q = term;
+        const data = { ...queryParams, q: term };
         $.ajax(autocompleteUrl, {
           success: sourceCallbackHandler,
           data,
@@ -180,11 +173,21 @@
    *   Attaches autocomplete to link field widgets.
    */
   Drupal.behaviors.linkAutocompleteWidget = {
-    attach: function (context, settings) {
-      $(once('link-autocomplete-widget', '.link-autocomplete-widget-uri', context)).each(function () {
+    attach(context, settings) {
+      $(
+        once(
+          'link-autocomplete-widget',
+          '.link-autocomplete-widget-uri',
+          context,
+        ),
+      ).each(function () {
         const $uriInput = $(this);
-        const $widget = $uriInput.closest('.link-autocomplete-widget-container');
-        const $titleInput = $widget.find('input.link-autocomplete-widget-title');
+        const $widget = $uriInput.closest(
+          '.link-autocomplete-widget-container',
+        );
+        const $titleInput = $widget.find(
+          'input.link-autocomplete-widget-title',
+        );
         const autocompleteUrl = $uriInput.data('autocomplete-url');
         const hostEntityTypeId = $uriInput.data('host-entity-type-id') || '';
         const hostEntityLangcode = $uriInput.data('host-entity-langcode') || '';
@@ -194,12 +197,12 @@
         }
 
         initializeAutocomplete($uriInput, {
-          autocompleteUrl: autocompleteUrl,
+          autocompleteUrl,
           queryParams: {
-            hostEntityTypeId: hostEntityTypeId,
-            hostEntityLangcode: hostEntityLangcode,
+            hostEntityTypeId,
+            hostEntityLangcode,
           },
-          selectHandler: function (event, ui) {
+          selectHandler(event, ui) {
             event.preventDefault();
             const item = ui.item;
 
@@ -209,34 +212,47 @@
 
             // Set the URI value (use path for display, href for storage).
             const displayValue = item.path || item.href || '';
-            $uriInput.val(displayValue);
+            $uriInput[0].value = displayValue;
 
             // Set the href value for storage.
             const hrefValue = item.href || item.path || '';
-            $widget.find('[name$="[attributes][href]"]').val(hrefValue);
+            $widget.find('[name$="[attributes][href]"]')[0].value = hrefValue;
 
             // Set entity metadata if available.
             if (item.entity_type_id && item.entity_uuid) {
-              $widget.find('[name$="[attributes][data-entity-type]"]').val(item.entity_type_id);
-              $widget.find('[name$="[attributes][data-entity-uuid]"]').val(item.entity_uuid);
-              $widget.find('[name$="[attributes][data-entity-substitution]"]').val(item.entity_type_id === 'file' ? 'file' : 'canonical');
+              $widget.find(
+                '[name$="[attributes][data-entity-type]"]',
+              )[0].value = item.entity_type_id;
+              $widget.find(
+                '[name$="[attributes][data-entity-uuid]"]',
+              )[0].value = item.entity_uuid;
+              $widget.find(
+                '[name$="[attributes][data-entity-substitution]"]',
+              )[0].value =
+                item.entity_type_id === 'file' ? 'file' : 'canonical';
             } else {
-              $widget.find('[name$="[attributes][data-entity-type]"]').val('');
-              $widget.find('[name$="[attributes][data-entity-uuid]"]').val('');
-              $widget.find('[name$="[attributes][data-entity-substitution]"]').val('');
+              $widget.find(
+                '[name$="[attributes][data-entity-type]"]',
+              )[0].value = '';
+              $widget.find(
+                '[name$="[attributes][data-entity-uuid]"]',
+              )[0].value = '';
+              $widget.find(
+                '[name$="[attributes][data-entity-substitution]"]',
+              )[0].value = '';
             }
 
             // Auto-fill title if enabled and empty.
-            const autofillEnabled = $titleInput.length && (
-              $titleInput.attr('data-autofill-enabled') === '' ||
-              $titleInput.attr('data-autofill-enabled') === 'true'
-            );
-            if (autofillEnabled && !$titleInput.val() && item.label) {
+            const autofillEnabled =
+              $titleInput.length &&
+              ($titleInput.attr('data-autofill-enabled') === '' ||
+                $titleInput.attr('data-autofill-enabled') === 'true');
+            if (autofillEnabled && !$titleInput[0].value && item.label) {
               // The item label may have been sanitized for display as HTML. We want this back in the original format so that
               // characters are not double encoded (e.g. we want "foo &amp; bar" to be "foo & bar").
               const label = document.createElement('span');
               label.innerHTML = item.label;
-              $titleInput.val(label.textContent);
+              $titleInput[0].value = label.textContent;
             }
 
             // Trigger change event.
@@ -246,6 +262,4 @@
       });
     },
   };
-
 })(jQuery, Drupal);
-
