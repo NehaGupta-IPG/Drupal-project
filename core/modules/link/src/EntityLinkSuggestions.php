@@ -114,7 +114,8 @@ class EntityLinkSuggestions {
 
     // First, check if the input matches an entity URL.
     // This handles cases where user pastes or types an exact entity URL.
-    // Note: We check the original input (not lowercased) because URLs are case-sensitive.
+    // Note: We check the original input (not lowercased) because URLs are
+    // case-sensitive.
     $matched_entity = $this->findEntityByUrl($input, array_keys($allowed_bundles), $host_entity_langcode);
     if ($matched_entity) {
       // If we found a matching entity, return it as the only suggestion.
@@ -122,7 +123,8 @@ class EntityLinkSuggestions {
       return [$this->createSuggestion($matched_entity)];
     }
 
-    // Lowercase the input for text-based searching (but not for URL matching above).
+    // Lowercase the input for text-based searching (but not for URL matching
+    // above).
     $input = mb_strtolower($input);
 
     // First, find suggestions for the host entity type if it's in the allowed

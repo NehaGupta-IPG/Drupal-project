@@ -141,7 +141,8 @@ class LinkAutocompleteWidget extends LinkWidget {
     }
 
     // Display entity URL consistently across all entity types.
-    // This prevents the "Entity title (ID)" format that getUriAsDisplayableString() would produce.
+    // This prevents the "Entity title (ID)" format that
+    // getUriAsDisplayableString() would produce.
     if ($entity instanceof FileInterface) {
       // File entities are anomalies, so we handle them differently.
       $element['uri']['#default_value'] = $this->fileUrlGenerator->generateString($entity->getFileUri());
@@ -161,8 +162,9 @@ class LinkAutocompleteWidget extends LinkWidget {
       $element['uri']['#default_value'] = $entity->toUrl()->setOptions($uri_options)->toString();
     }
     elseif ($default_allowed && $uri && parse_url($uri, PHP_URL_SCHEME) !== 'entity') {
-      // For non-entity URIs, use the URI as-is (parent already set this, but we
-      // want to ensure entity: URIs don't get converted to "Title (ID)" format).
+      // For non-entity URIs, use the URI as-is (parent already set this, but
+      // we want to ensure entity: URIs don't get converted to "Title (ID)"
+      // format).
       // Only override if it's not an entity: URI to avoid breaking the parent's
       // handling of internal: and external URLs.
       $element['uri']['#default_value'] = $uri;
@@ -254,12 +256,15 @@ class LinkAutocompleteWidget extends LinkWidget {
           // This ensures metadata survives save/load cycles.
         }
         else {
-          // Fallback: use the path/href if entity can't be loaded (e.g., entity was deleted).
-          // Preserve metadata even when entity is deleted for potential recovery.
+          // Fallback: use the path/href if entity can't be loaded (e.g., entity
+          // was deleted).
+          // Preserve metadata even when entity is deleted for potential
+          // recovery.
           $href = $value['attributes']['href'] ?? $value['uri'] ?? '';
           if ($href) {
             $value['uri'] = $this->uriFromUserInput($href);
-            // Metadata is already in $value['attributes'], will be merged below.
+            // Metadata is already in $value['attributes'], will be merged
+            // below.
           }
         }
       }
@@ -282,7 +287,8 @@ class LinkAutocompleteWidget extends LinkWidget {
         $value['uri'] = $this->uriFromUserInput($value['uri']);
 
         // If the URI resolved to an entity, set metadata.
-        // This handles cases where user manually types a path that resolves to an entity.
+        // This handles cases where user manually types a path that resolves to
+        // an entity.
         $entity = $this->getEntityFromUri($value['uri']);
         if ($entity) {
           $value['attributes']['data-entity-type'] = $entity->getEntityTypeId();
@@ -296,10 +302,12 @@ class LinkAutocompleteWidget extends LinkWidget {
       }
 
       // Merge attributes into options.
-      // This stores metadata at the top level of options: options['data-entity-type'], etc.
+      // This stores metadata at the top level of options:
+      // options['data-entity-type'], etc.
       $value += ['options' => []];
       if (!empty($value['attributes'])) {
-        // Preserve existing options structure (like 'attributes' for HTML attributes).
+        // Preserve existing options structure (like 'attributes' for HTML
+        // attributes).
         // Merge attributes into options, with attributes taking precedence.
         $value['options'] = array_merge($value['options'], $value['attributes']);
       }
