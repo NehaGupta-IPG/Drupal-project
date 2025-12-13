@@ -23,7 +23,9 @@
   Drupal.entityLinkSuggestionsRenderItem = function (ul, item, options = {}) {
     const escapeHtml = options.escapeHtml !== false;
     const $ = jQuery;
-    const $line = $('<li class="entity-link-suggestions-result-line">');
+    const $line = $(
+      '<li class="entity-link-suggestions-result-line ui-menu-item">',
+    );
     const $wrapper = $(
       '<div class="entity-link-suggestions-result-line-wrapper">',
     );
