@@ -172,6 +172,13 @@ class LinkAutocompleteWidget extends LinkWidget {
 
     // Change the URI field to use textfield with autocomplete.
     $element['uri']['#type'] = 'textfield';
+    // Preserve the parent's validation handler for manual URL entry.
+    if (!isset($element['uri']['#element_validate'])) {
+      $element['uri']['#element_validate'] = [];
+    }
+    if (!in_array([static::class, 'validateUriElement'], $element['uri']['#element_validate'], TRUE)) {
+      $element['uri']['#element_validate'][] = [static::class, 'validateUriElement'];
+    }
     $element['uri']['#description'] = $this->t('Start typing to find content or paste a URL and click on the suggestion below.');
 
     // Get host entity information for autocomplete.
@@ -243,63 +250,9 @@ class LinkAutocompleteWidget extends LinkWidget {
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     foreach ($values as &$value) {
-      // If entity metadata is present, create an entity: URI.
-      if (!empty($value['attributes']['data-entity-type']) && !empty($value['attributes']['data-entity-uuid'])) {
-        $entity_type = $value['attributes']['data-entity-type'];
-        $entity_uuid = $value['attributes']['data-entity-uuid'];
-
-        // Try to load the entity to get its ID.
-        $entity = $this->entityRepository->loadEntityByUuid($entity_type, $entity_uuid);
-        if ($entity) {
-          $value['uri'] = 'entity:' . $entity_type . '/' . $entity->id();
-          // Ensure metadata is preserved even if entity loads successfully.
-          // This ensures metadata survives save/load cycles.
-        }
-        else {
-          // Fallback: use the path/href if entity can't be loaded (e.g., entity
-          // was deleted).
-          // Preserve metadata even when entity is deleted for potential
-          // recovery.
-          $href = $value['attributes']['href'] ?? $value['uri'] ?? '';
-          if ($href) {
-            $value['uri'] = $this->uriFromUserInput($href);
-            // Metadata is already in $value['attributes'], will be merged
-            // below.
-          }
-        }
-      }
-      elseif (!empty($value['attributes']['href'])) {
-        // Use href if available (for external URLs or paths entered manually).
-        $href = $value['attributes']['href'];
-        $value['uri'] = $this->uriFromUserInput($href);
-
-        // If the URI resolved to an entity, set metadata.
-        $entity = $this->getEntityFromUri($value['uri']);
-        if ($entity) {
-          $value['attributes']['data-entity-type'] = $entity->getEntityTypeId();
-          $value['attributes']['data-entity-uuid'] = $entity->uuid();
-          $value['attributes']['data-entity-substitution'] = $entity->getEntityTypeId() === 'file' ? 'file' : 'canonical';
-        }
-      }
-      elseif (!empty($value['uri'])) {
-        // Use URI processing that resolves paths to entities via URL routing.
-        $original_uri = $value['uri'];
-        $value['uri'] = $this->uriFromUserInput($value['uri']);
-
-        // If the URI resolved to an entity, set metadata.
-        // This handles cases where user manually types a path that resolves to
-        // an entity.
-        $entity = $this->getEntityFromUri($value['uri']);
-        if ($entity) {
-          $value['attributes']['data-entity-type'] = $entity->getEntityTypeId();
-          $value['attributes']['data-entity-uuid'] = $entity->uuid();
-          $value['attributes']['data-entity-substitution'] = $entity->getEntityTypeId() === 'file' ? 'file' : 'canonical';
-          // Also set href if not already set, for consistency.
-          if (empty($value['attributes']['href'])) {
-            $value['attributes']['href'] = $original_uri;
-          }
-        }
-      }
+      // Process the URI from user input, following linkit's approach.
+      // This handles entity resolution, external URLs, internal paths, etc.
+      $value['uri'] = $this->uriFromUserInput($value['uri']);
 
       // Merge attributes into options.
       // This stores metadata at the top level of options:
