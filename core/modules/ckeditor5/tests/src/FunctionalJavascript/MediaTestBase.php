@@ -61,6 +61,7 @@ abstract class MediaTestBase extends WebDriverTestBase {
    */
   protected static $modules = [
     'ckeditor5',
+    'link',
     'media',
     'node',
     'text',

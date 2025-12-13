@@ -38,6 +38,7 @@ class EntityLinkSuggestionTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'link',
     'node',
     'ckeditor5',
     'ckeditor5_test',
