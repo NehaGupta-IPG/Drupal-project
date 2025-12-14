@@ -135,12 +135,12 @@ final class Column implements SchemaDefinitionInterface {
     }
 
     // Can only set scale of a numeric column.
-    if ($this->precision !== NULL && $this->type !== ColumnType::Numeric) {
+    if ($this->precision !== NULL && $this->type !== NULL && $this->type !== ColumnType::Numeric) {
       throw new SchemaDefinitionException("Cannot set 'precision' for {$this->type->value} column '{$this->name}'");
     }
 
     // Can only set precision of a numeric column.
-    if ($this->scale !== NULL && $this->type !== ColumnType::Numeric) {
+    if ($this->scale !== NULL && $this->type !== NULL && $this->type !== ColumnType::Numeric) {
       throw new SchemaDefinitionException("Cannot set 'scale' for {$this->type->value} column '{$this->name}'");
     }
 

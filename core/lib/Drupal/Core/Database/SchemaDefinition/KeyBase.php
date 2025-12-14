@@ -14,7 +14,7 @@ abstract class KeyBase implements SchemaDefinitionInterface {
   /**
    * The key columns.
    *
-   * @var KeyColumn[]
+   * @var list<KeyColumn>
    *   The list of KeyColumn objects.
    */
   public readonly array $columns;
@@ -46,7 +46,7 @@ abstract class KeyBase implements SchemaDefinitionInterface {
    * @param bool $limitedLengthAllowed
    *   Defines if limited length columns are allowed.
    *
-   * @return KeyColumn[]
+   * @return list<KeyColumn>
    *   The normalized list of KeyColumn objects.
    */
   protected function buildKeyColumns(array $rawColumns, bool $limitedLengthAllowed): array {

@@ -14,7 +14,7 @@ final class ForeignKey extends KeyBase {
   /**
    * The foreign key columns.
    *
-   * @var KeyColumn[]
+   * @var list<KeyColumn>
    *   The list of KeyColumn objects of the foreign table.
    */
   public readonly array $foreignColumns;
@@ -26,7 +26,7 @@ final class ForeignKey extends KeyBase {
    *   The foreign key name.
    * @param string $foreignTable
    *   The foreign (referenced) table name.
-   * @param list<KeyColumn|string}> $columns
+   * @param list<KeyColumn|string> $columns
    *   A mix of key column specifiers, being KeyColumn objects, strings naming
    *   columns, or arrays of two elements, column name and length, specifying a
    *   prefix of the named column.
@@ -63,11 +63,11 @@ final class ForeignKey extends KeyBase {
    * {@inheritdoc}
    */
   public function toArray(): array {
-    $cols = $this->keyColumnsToArray($this->columns);
-    $foreignCols = $this->keyColumnsToArray($this->foreignColumns);
     $match = [];
-    for ($i = 0; $i < count($cols); $i++) {
-      $match[$cols[$i]] = $foreignCols[$i];
+    for ($i = 0; $i < count($this->columns); $i++) {
+      $localColumnName = $this->columns[$i]->name;
+      $foreignColumnName = $this->foreignColumns[$i]->name;
+      $match[$localColumnName] = $foreignColumnName;
     }
     return [
       'table' => $this->foreignTable,

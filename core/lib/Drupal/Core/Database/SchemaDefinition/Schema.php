@@ -9,6 +9,8 @@ use Drupal\Core\Database\Exception\SchemaDefinitionException;
 
 /**
  * Describes a database schema as a collection of Table objects.
+ *
+ * @implements \Iterator<int,Table>
  */
 final class Schema implements SchemaDefinitionInterface, \Iterator {
 
