@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\SchemaDefinition;
 
+use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Exception\SchemaDefinitionException;
 
 /**
@@ -28,7 +29,20 @@ final class Schema implements SchemaDefinitionInterface, \Iterator {
     public readonly string $name,
     public readonly array $tables,
   ) {
-    $this->position = 0;
+    $this->validate();
+  }
+
+  /**
+   * Validates the properties of the value object.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   */
+  private function validate(): void {
+
+    if ($this->tables && !Inspector::assertAllObjects($this->tables, Table::class)) {
+      throw new SchemaDefinitionException("All members of the 'tables' argument of a Schema must be Table objects");
+    }
+
   }
 
   /**

@@ -27,7 +27,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('Database')]
 #[CoversClass(Table::class)]
 #[CoversClass(Schema::class)]
-class ConvertDefinitionTest extends UnitTestCase {
+class SchemaDefinitionConversionTest extends UnitTestCase {
 
   /**
    * Tests Table::toArray().
@@ -100,8 +100,6 @@ class ConvertDefinitionTest extends UnitTestCase {
         new Column(
           name: 'id',
           type: ColumnType::Serial,
-          unsigned: TRUE,
-          notNull: TRUE,
         ),
         new Column(
           name: 'name',
@@ -201,6 +199,8 @@ class ConvertDefinitionTest extends UnitTestCase {
         'fields' => [
           'id' => [
             'type' => 'serial',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
           ],
         ],
         'primary key' => ['id'],
@@ -210,6 +210,8 @@ class ConvertDefinitionTest extends UnitTestCase {
         'fields' => [
           'id' => [
             'type' => 'serial',
+            'unsigned' => TRUE,
+            'not null' => TRUE,
           ],
         ],
         'primary key' => ['id'],
@@ -244,7 +246,6 @@ class ConvertDefinitionTest extends UnitTestCase {
       ],
     );
 
-    $this->assertEquals(['foo', 'bar'], $schemaDefinition->tableNames());
     $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
   }
 

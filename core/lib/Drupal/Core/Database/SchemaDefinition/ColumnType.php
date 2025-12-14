@@ -20,6 +20,7 @@ enum ColumnType: string {
   case VarcharAscii = 'varchar_ascii';
   case Text = 'text';
 
+  // Number related types.
   case Int = 'int';
   // This is to indicate auto incrementing fields. For example, this will
   // expand to 'INT auto_increment' on MySQL.
@@ -27,6 +28,7 @@ enum ColumnType: string {
   case Float = 'float';
   case Numeric = 'numeric';
 
+  // Other types.
   case Blob = 'blob';
 
 }

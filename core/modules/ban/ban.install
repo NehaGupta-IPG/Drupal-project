@@ -28,8 +28,6 @@ function ban_schema(): Schema {
             name: 'iid',
             description: 'Primary Key: unique ID for IP addresses.',
             type: ColumnType::Serial,
-            unsigned: TRUE,
-            notNull: TRUE,
           ),
           new Column(
             name: 'ip',

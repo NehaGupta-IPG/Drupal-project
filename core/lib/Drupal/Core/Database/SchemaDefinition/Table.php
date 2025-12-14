@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\SchemaDefinition;
 
+use Drupal\Component\Assertion\Inspector;
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
+
 /**
  * Describes a database table.
  */
@@ -50,6 +53,29 @@ final class Table implements SchemaDefinitionInterface {
     public readonly ?array $foreignKeys = NULL,
     public readonly ?array $dbSpecificExtra = NULL,
   ) {
+    $this->validate();
+  }
+
+  /**
+   * Validates the properties of the value object.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   */
+  private function validate(): void {
+
+    if ($this->columns && !Inspector::assertAllObjects($this->columns, Column::class)) {
+      throw new SchemaDefinitionException("All members of the 'columns' argument of the '{$this->name}' Table must be Column objects");
+    }
+    if ($this->uniqueKeys && !Inspector::assertAllObjects($this->uniqueKeys, UniqueKey::class)) {
+      throw new SchemaDefinitionException("All members of the 'uniqueKeys' argument of the '{$this->name}' Table must be UniqueKey objects");
+    }
+    if ($this->indexes && !Inspector::assertAllObjects($this->indexes, Index::class)) {
+      throw new SchemaDefinitionException("All members of the 'indexes' argument of the '{$this->name}' Table must be Index objects");
+    }
+    if ($this->foreignKeys && !Inspector::assertAllObjects($this->foreignKeys, ForeignKey::class)) {
+      throw new SchemaDefinitionException("All members of the 'foreignKeys' argument of the '{$this->name}' Table must be ForeignKey objects");
+    }
+
   }
 
   /**

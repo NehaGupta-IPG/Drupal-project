@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\SchemaDefinition;
 
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
+
 /**
  * Describes a database table's column.
  */
@@ -83,6 +85,116 @@ final class Column implements SchemaDefinitionInterface {
     public readonly ?bool $binary = NULL,
     public readonly ?array $dbSpecificExtra = NULL,
   ) {
+    $this->validate();
+  }
+
+  /**
+   * Validates the properties of the value object.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   */
+  private function validate(): void {
+
+    // If no column type specified, a db specific one should be set.
+    if ($this->type === NULL && $this->dbSpecificExtra === NULL) {
+      throw new SchemaDefinitionException("Neither 'type' not 'dbSpecificExtra' for column '{$this->name}'");
+    }
+
+    // Cannot set notNull for serial columns.
+    if ($this->notNull !== NULL && $this->type === ColumnType::Serial) {
+      throw new SchemaDefinitionException("Cannot set 'notNull' for {$this->type->value} column '{$this->name}'");
+    }
+
+    // Can only set unsigned for some column types.
+    if ($this->unsigned !== NULL && $this->type !== NULL && !in_array($this->type, [
+      ColumnType::Int,
+      ColumnType::Float,
+      ColumnType::Numeric,
+    ], TRUE)) {
+      throw new SchemaDefinitionException("Cannot set 'unsigned' for {$this->type->value} column '{$this->name}'");
+    }
+
+    // Can only set length for some column types.
+    if ($this->length !== NULL && $this->type !== NULL && !in_array($this->type, [
+      ColumnType::Char,
+      ColumnType::Varchar,
+      ColumnType::VarcharAscii,
+      ColumnType::Text,
+    ], TRUE)) {
+      throw new SchemaDefinitionException("Cannot set 'length' for {$this->type->value} column '{$this->name}'");
+    }
+
+    // Can only set binary for some column types.
+    if ($this->binary !== NULL && $this->type !== NULL && !in_array($this->type, [
+      ColumnType::Char,
+      ColumnType::Varchar,
+      ColumnType::VarcharAscii,
+      ColumnType::Text,
+    ], TRUE)) {
+      throw new SchemaDefinitionException("Cannot set 'binary' for {$this->type->value} column '{$this->name}'");
+    }
+
+    // Can only set scale of a numeric column.
+    if ($this->precision !== NULL && $this->type !== ColumnType::Numeric) {
+      throw new SchemaDefinitionException("Cannot set 'precision' for {$this->type->value} column '{$this->name}'");
+    }
+
+    // Can only set precision of a numeric column.
+    if ($this->scale !== NULL && $this->type !== ColumnType::Numeric) {
+      throw new SchemaDefinitionException("Cannot set 'scale' for {$this->type->value} column '{$this->name}'");
+    }
+
+    // Can only set serialize on a text/blob column.
+    if ($this->serialize !== NULL && $this->type !== NULL &&  !in_array($this->type, [
+      ColumnType::Text,
+      ColumnType::Blob,
+    ], TRUE)) {
+      throw new SchemaDefinitionException("Cannot set 'serialize' for {$this->type->value} column '{$this->name}'");
+    }
+
+    // Check validity of default type.
+    if ($this->type !== NULL && $this->default !== NULL) {
+      $typeClass = get_class($this->default);
+      $allowedTypes = $this->allowedDefaultTypes();
+      if (!in_array($typeClass, $allowedTypes)) {
+        throw new SchemaDefinitionException("Cannot set a $typeClass default for column '{$this->name}'");
+      }
+    }
+
+    // Cannot set a null value if notNull is true.
+    if ($this->notNull && $this->default && get_class($this->default) === NullValue::class) {
+      throw new SchemaDefinitionException("Cannot set a null default for column '{$this->name}': notNull is true");
+    }
+
+  }
+
+  /**
+   * Returns the valid default value types for the column.
+   *
+   * @return list<class-string>
+   *   The valid value classes.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaDefinitionException
+   */
+  private function allowedDefaultTypes(): array {
+    if ($this->type === NULL) {
+      throw new SchemaDefinitionException("Cannot determine allowed default types for column '{$this->name}'");
+    }
+    return match ($this->type) {
+      ColumnType::Char, ColumnType::Varchar, ColumnType::VarcharAscii, ColumnType::Text, ColumnType::Blob => [
+        StringValue::class,
+        NullValue::class,
+      ],
+      ColumnType::Int => [
+        IntValue::class,
+        NullValue::class,
+      ],
+      ColumnType::Serial => [],
+      ColumnType::Float, ColumnType::Numeric => [
+        FloatValue::class,
+        NullValue::class,
+      ],
+    };
   }
 
   /**
@@ -92,6 +204,10 @@ final class Column implements SchemaDefinitionInterface {
     $spec = [];
     if ($this->type) {
       $spec['type'] = $this->type->value;
+      if ($this->type === ColumnType::Serial) {
+        $spec['not null'] = TRUE;
+        $spec['unsigned'] = TRUE;
+      }
     }
     if ($this->description !== NULL) {
       $spec['description'] = $this->description;

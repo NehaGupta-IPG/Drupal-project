@@ -220,8 +220,6 @@ class BatchStorage implements BatchStorageInterface {
           name: 'bid',
           description: 'Primary Key: Unique batch ID.',
           type: ColumnType::Serial,
-          unsigned: TRUE,
-          notNull: TRUE,
         ),
         new Column(
           name: 'token',

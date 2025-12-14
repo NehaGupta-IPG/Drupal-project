@@ -14,7 +14,7 @@ final class UniqueKey extends KeyBase {
    *
    * @param string $name
    *   The unique key name.
-   * @param list<KeyColumn|string|array{0:string, 1:int}> $columns
+   * @param list<KeyColumn|string> $columns
    *   A mix of key column specifiers, being KeyColumn objects, strings naming
    *   columns, or arrays of two elements, column name and length, specifying a
    *   prefix of the named column.
@@ -23,7 +23,7 @@ final class UniqueKey extends KeyBase {
     public readonly string $name,
     array $columns,
   ) {
-    parent::__construct($columns);
+    parent::__construct($columns, FALSE);
   }
 
   /**

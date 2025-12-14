@@ -23,7 +23,7 @@ final class Index extends KeyBase {
     public readonly string $name,
     array $columns,
   ) {
-    parent::__construct($columns);
+    parent::__construct($columns, TRUE);
   }
 
   /**
