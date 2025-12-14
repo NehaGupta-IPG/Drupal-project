@@ -44,7 +44,7 @@ class ManageFieldsLifecycleTest extends ManageFieldsFunctionalTestBase {
     $type = empty($type) ? $this->contentType : $type;
     $this->drupalGet('admin/structure/types/manage/' . $type . '/fields');
     // Check all table columns.
-    $table_headers = ['Label', 'Machine name', 'Field type', 'Operations'];
+    $table_headers = ['Field', 'Field type', 'Operations'];
     foreach ($table_headers as $table_header) {
       // We check that the label appear in the table headings.
       $this->assertSession()->responseContains($table_header . '</th>');

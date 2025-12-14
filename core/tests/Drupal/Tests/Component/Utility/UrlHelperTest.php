@@ -27,14 +27,38 @@ class UrlHelperTest extends TestCase {
    *   - string $expected: The expected query string.
    *   - string $message: The assertion message.
    */
-  public static function providerTestBuildQuery() {
+  public static function providerTestBuildQuery(): array {
     return [
-      [['a' => ' &#//+%20@۞'], 'a=%20%26%23//%2B%2520%40%DB%9E', 'Value was properly encoded.'],
-      [[' &#//+%20@۞' => 'a'], '%20%26%23%2F%2F%2B%2520%40%DB%9E=a', 'Key was properly encoded.'],
-      [['a' => '1', 'b' => '2', 'c' => '3'], 'a=1&b=2&c=3', 'Multiple values were properly concatenated.'],
-      [['a' => ['b' => '2', 'c' => '3'], 'd' => 'foo'], 'a%5Bb%5D=2&a%5Bc%5D=3&d=foo', 'Nested array was properly encoded.'],
-      [['foo' => NULL], '', 'Simple parameters are properly added.'],
-      [['a' => '1', 'b' => [], 'c' => []], 'a=1', 'Empty key ignored.'],
+      [
+        ['a' => ' &#//+%20@۞'],
+        'a=%20%26%23//%2B%2520%40%DB%9E',
+        'Value was properly encoded.',
+      ],
+      [
+        [' &#//+%20@۞' => 'a'],
+        '%20%26%23%2F%2F%2B%2520%40%DB%9E=a',
+        'Key was properly encoded.',
+      ],
+      [
+        ['a' => '1', 'b' => '2', 'c' => '3'],
+        'a=1&b=2&c=3',
+        'Multiple values were properly concatenated.',
+      ],
+      [
+        ['a' => ['b' => '2', 'c' => '3'], 'd' => 'foo'],
+        'a%5Bb%5D=2&a%5Bc%5D=3&d=foo',
+        'Nested array was properly encoded.',
+      ],
+      [
+        ['foo' => NULL],
+        'foo',
+        'Simple parameters are properly added.',
+      ],
+      [
+        ['a' => '1', 'b' => [], 'c' => []],
+        'a=1',
+        'Empty key ignored.',
+      ],
     ];
   }
 
@@ -293,7 +317,7 @@ class UrlHelperTest extends TestCase {
    * @return array
    *   An array of test cases with URLs and expected parsed results.
    */
-  public static function providerTestParse() {
+  public static function providerTestParse(): array {
     return [
       [
         'http://www.example.com/my/path',
@@ -424,7 +448,7 @@ class UrlHelperTest extends TestCase {
    * @return array
    *   An array of test cases with unencoded paths and expected encoded paths.
    */
-  public static function providerTestEncodePath() {
+  public static function providerTestEncodePath(): array {
     return [
       ['unencoded path with spaces', 'unencoded%20path%20with%20spaces'],
       ['slashes/should/be/preserved', 'slashes/should/be/preserved'],
@@ -453,7 +477,7 @@ class UrlHelperTest extends TestCase {
    * @return array
    *   An array of test cases with paths and their expected external status.
    */
-  public static function providerTestIsExternal() {
+  public static function providerTestIsExternal(): array {
     return [
       ['/internal/path', FALSE],
       ['https://example.com/external/path', TRUE],
@@ -518,7 +542,7 @@ class UrlHelperTest extends TestCase {
    * @return array
    *   An array of test cases with URIs, expected filtered results, and allowed protocols.
    */
-  public static function providerTestFilterBadProtocol() {
+  public static function providerTestFilterBadProtocol(): array {
     return [
       ['javascript://example.com?foo&bar', '//example.com?foo&amp;bar', ['http', 'https']],
       // Test custom protocols.
@@ -557,7 +581,7 @@ class UrlHelperTest extends TestCase {
    * @return array
    *   An array of test cases with URIs, expected stripped results, and allowed protocols.
    */
-  public static function providerTestStripDangerousProtocols() {
+  public static function providerTestStripDangerousProtocols(): array {
     return [
       ['javascript://example.com', '//example.com', ['http', 'https']],
       // Test custom protocols.
@@ -632,7 +656,7 @@ class UrlHelperTest extends TestCase {
    *
    * @see \Drupal\Tests\Component\Utility\UrlHelperTest::testExternalIsLocal()
    */
-  public static function providerTestExternalIsLocal() {
+  public static function providerTestExternalIsLocal(): array {
     return [
       // Different mixes of trailing slash.
       ['http://example.com', 'http://example.com', TRUE],
@@ -685,7 +709,7 @@ class UrlHelperTest extends TestCase {
    *
    * @see \Drupal\Tests\Component\Utility\UrlHelperTest::testExternalIsLocalInvalid()
    */
-  public static function providerTestExternalIsLocalInvalid() {
+  public static function providerTestExternalIsLocalInvalid(): array {
     return [
       ['http://example.com/foo', ''],
       ['http://example.com/foo', 'bar'],

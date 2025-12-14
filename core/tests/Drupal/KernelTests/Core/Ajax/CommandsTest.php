@@ -27,7 +27,6 @@ class CommandsTest extends KernelTestBase {
    */
   protected static $modules = [
     'system',
-    'node',
     'ajax_test',
     'ajax_forms_test',
   ];
@@ -36,7 +35,7 @@ class CommandsTest extends KernelTestBase {
    * Regression test: Settings command exists regardless of JS aggregation.
    */
   public function testAttachedSettings(): void {
-    $assert = function ($message) {
+    $assert = function ($message): void {
       $response = new AjaxResponse();
       $response->setAttachments([
         'library' => ['core/drupalSettings'],

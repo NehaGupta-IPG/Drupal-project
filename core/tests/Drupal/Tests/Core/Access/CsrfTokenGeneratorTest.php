@@ -109,7 +109,7 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
 
     $this->sessionMetadata->expects($this->once())
       ->method('setCsrfTokenSeed')
-      ->with($this->isType('string'));
+      ->with($this->isString());
 
     $this->assertIsString($this->generator->get());
   }
@@ -159,7 +159,7 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
    * @return array
    *   An array of data used by the test.
    */
-  public static function providerTestValidateParameterTypes() {
+  public static function providerTestValidateParameterTypes(): array {
     return [
       [[], ''],
       [TRUE, 'foo'],
@@ -191,7 +191,7 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
    * @return array
    *   An array of data used by the test.
    */
-  public static function providerTestInvalidParameterTypes() {
+  public static function providerTestInvalidParameterTypes(): array {
     return [
       [NULL, new \stdClass()],
       [0, []],

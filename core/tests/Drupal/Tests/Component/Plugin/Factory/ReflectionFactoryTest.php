@@ -29,7 +29,7 @@ class ReflectionFactoryTest extends TestCase {
    *   - $plugin_definition parameter to getInstanceArguments().
    *   - $configuration parameter to getInstanceArguments().
    */
-  public static function providerGetInstanceArguments() {
+  public static function providerGetInstanceArguments(): array {
     return [
       [
         ['arguments_plugin_id'],
@@ -39,7 +39,13 @@ class ReflectionFactoryTest extends TestCase {
         [],
       ],
       [
-        [[], ['arguments_many' => ['class' => 'Drupal\Tests\Component\Plugin\Factory\ArgumentsMany']], 'arguments_many', 'default_value', 'what_default'],
+        [
+          [],
+          ['arguments_many' => ['class' => 'Drupal\Tests\Component\Plugin\Factory\ArgumentsMany']],
+          'arguments_many',
+          'default_value',
+          'what_default',
+        ],
         'Drupal\Tests\Component\Plugin\Factory\ArgumentsMany',
         'arguments_many',
         ['arguments_many' => ['class' => 'Drupal\Tests\Component\Plugin\Factory\ArgumentsMany']],
