@@ -26,11 +26,4 @@ final class UniqueKey extends KeyBase {
     parent::__construct($columns, FALSE);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function toArray(): array {
-    return $this->keyColumnsToArray($this->columns);
-  }
-
 }

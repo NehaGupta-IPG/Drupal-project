@@ -75,19 +75,11 @@ abstract class KeyBase implements SchemaDefinitionInterface {
   }
 
   /**
-   * Converts an array of KeyColumn objects to legacy array.
-   *
-   * @param list<KeyColumn> $keyColumns
-   *   An array of KeyColumn objects.
-   *
-   * @return list<string|array{0:string, 1:int}>
-   *   The legacy array-based specifications.
-   *
-   * @internal
+   * {@inheritdoc}
    */
-  protected function keyColumnsToArray(array $keyColumns): array {
+  public function toArray(): array {
     $spec = [];
-    foreach ($keyColumns as $keyColumn) {
+    foreach ($this->columns as $keyColumn) {
       $spec[] = $keyColumn->toArray()[0];
     }
     return $spec;
