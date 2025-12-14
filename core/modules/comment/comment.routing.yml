@@ -44,6 +44,7 @@ entity.comment.canonical:
   requirements:
     _entity_access: 'comment.view'
     comment: \d+
+    _csrf_token: 'FALSE'
 
 entity.comment.delete_form:
   path: '/comment/{comment}/delete'
@@ -81,6 +82,7 @@ comment.reply:
     pid: ~
   requirements:
     _custom_access: '\Drupal\comment\Controller\CommentController::replyFormAccess'
+    _csrf_token: 'FALSE'
   options:
     parameters:
       entity:
@@ -92,6 +94,7 @@ comment.new_comments_node_links:
     _controller: '\Drupal\comment\Controller\CommentController::renderNewCommentsNodeLinks'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'FALSE'
   deprecated:
     package: 'drupal/core'
     version: '11.3.0'
@@ -105,6 +108,7 @@ comment.node_redirect:
     _entity_access: 'node.view'
     _module_dependencies: 'node'
     node: \d+
+    _csrf_token: 'FALSE'
 
 entity.comment_type.collection:
   path: '/admin/structure/comment'

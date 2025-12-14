@@ -4,6 +4,7 @@ help_page_test.has_help:
     _controller: '\Drupal\help_page_test\HelpPageTestController::hasHelp'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 help_page_test.no_help:
   path: '/help_page_test/no_help'
@@ -11,6 +12,7 @@ help_page_test.no_help:
     _controller: '\Drupal\help_page_test\HelpPageTestController::noHelp'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 help_page_test.test_array:
   path: '/help_page_test/test_array'
@@ -18,3 +20,4 @@ help_page_test.test_array:
     _controller: '\Drupal\help_page_test\HelpPageTestController::testArray'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

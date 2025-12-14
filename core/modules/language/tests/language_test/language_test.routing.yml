@@ -4,6 +4,7 @@ language_test.l_active_class:
     _controller: '\Drupal\language_test\Controller\LanguageTestController::typeLinkActiveClass'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 language_test.subrequest:
   path: '/language_test/subrequest'
@@ -11,6 +12,7 @@ language_test.subrequest:
     _controller: '\Drupal\language_test\Controller\LanguageTestController::testSubRequest'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 language_test.entity_using_original_language:
   path: '/admin/language_test/entity_using_original_language/{configurable_language}'
@@ -18,6 +20,7 @@ language_test.entity_using_original_language:
     _controller: '\Drupal\language_test\Controller\LanguageTestController::testEntity'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 language_test.entity_using_current_language:
   path: '/admin/language_test/entity_using_current_language/{configurable_language}'
@@ -25,6 +28,7 @@ language_test.entity_using_current_language:
     _controller: '\Drupal\language_test\Controller\LanguageTestController::testEntity'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
   options:
     parameters:
       configurable_language:

@@ -5,6 +5,7 @@ migrate.messages:
     _title: 'Migration messages'
   requirements:
     _permission: 'view migration messages'
+    _csrf_token: 'FALSE'
 
 migrate.messages.detail:
   path: '/admin/reports/migration-messages/{migration_id}'
@@ -13,3 +14,4 @@ migrate.messages.detail:
     _title_callback: '\Drupal\migrate\Controller\MigrateMessageController::title'
   requirements:
     _permission: 'view migration messages'
+    _csrf_token: 'FALSE'

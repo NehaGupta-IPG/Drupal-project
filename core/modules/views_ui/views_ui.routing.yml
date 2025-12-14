@@ -37,6 +37,7 @@ views_ui.reports_fields:
     _title: 'Used in views'
   requirements:
     _permission: 'administer views'
+    _csrf_token: 'FALSE'
 
 views_ui.reports_plugins:
   path: '/admin/reports/views-plugins'
@@ -45,6 +46,7 @@ views_ui.reports_plugins:
     _title: 'Views plugins'
   requirements:
     _permission: 'administer views'
+    _csrf_token: 'FALSE'
 
 entity.view.enable:
   path: '/admin/structure/views/view/{view}/enable'
@@ -86,6 +88,7 @@ views_ui.autocomplete:
     _controller: '\Drupal\views_ui\Controller\ViewsUIController::autocompleteTag'
   requirements:
     _permission: 'administer views'
+    _csrf_token: 'FALSE'
 
 entity.view.edit_form:
   path: '/admin/structure/views/view/{view}'
@@ -98,6 +101,7 @@ entity.view.edit_form:
     _controller: '\Drupal\views_ui\Controller\ViewsUIController::edit'
   requirements:
     _entity_access: view.update
+    _csrf_token: 'FALSE'
 
 entity.view.edit_display_form:
   path: '/admin/structure/views/view/{view}/edit/{display_id}'
@@ -111,6 +115,7 @@ entity.view.edit_display_form:
     display_id: NULL
   requirements:
     _entity_access: view.update
+    _csrf_token: 'FALSE'
 
 entity.view.preview_form:
   path: '/admin/structure/views/view/{view}/preview/{display_id}'
@@ -145,6 +150,7 @@ views_ui.form_add_handler:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'
 
 views_ui.form_edit_details:
   path: '/admin/structure/views/{js}/edit-details/{view}/{display_id}'
@@ -158,6 +164,7 @@ views_ui.form_edit_details:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'
 
 views_ui.form_reorder_displays:
   path: '/admin/structure/views/{js}/reorder-displays/{view}/{display_id}'
@@ -171,6 +178,7 @@ views_ui.form_reorder_displays:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'
 
 views_ui.form_analyze:
   path: '/admin/structure/views/{js}/analyze/{view}/{display_id}'
@@ -184,6 +192,7 @@ views_ui.form_analyze:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'
 
 views_ui.form_rearrange:
   path: '/admin/structure/views/{js}/rearrange/{view}/{display_id}/{type}'
@@ -197,6 +206,7 @@ views_ui.form_rearrange:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'
 
 views_ui.form_rearrange_filter:
   path: '/admin/structure/views/{js}/rearrange-filter/{view}/{display_id}'
@@ -210,6 +220,7 @@ views_ui.form_rearrange_filter:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'
 
 views_ui.form_display:
   path: '/admin/structure/views/{js}/display/{view}/{display_id}/{type}'
@@ -223,6 +234,7 @@ views_ui.form_display:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'
 
 views_ui.form_handler:
   path: '/admin/structure/views/{js}/handler/{view}/{display_id}/{type}/{id}'
@@ -236,6 +248,7 @@ views_ui.form_handler:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'
 
 views_ui.form_handler_extra:
   path: '/admin/structure/views/{js}/handler-extra/{view}/{display_id}/{type}/{id}'
@@ -249,6 +262,7 @@ views_ui.form_handler_extra:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'
 
 views_ui.form_handler_group:
   path: '/admin/structure/views/{js}/handler-group/{view}/{display_id}/{type}/{id}'
@@ -263,3 +277,4 @@ views_ui.form_handler_group:
   requirements:
     _entity_access: view.update
     js: 'nojs|ajax'
+    _csrf_token: 'FALSE'

@@ -5,6 +5,7 @@ help_topics_test.test_route:
     _title: 'Page for testing URLs in topics'
   requirements:
     _permission: 'access test help'
+    _csrf_token: 'FALSE'
   options:
     parameters:
       required_param:

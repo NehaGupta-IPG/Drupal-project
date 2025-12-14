@@ -4,6 +4,7 @@ media.oembed_iframe:
     _controller: '\Drupal\media\Controller\OEmbedIframeController::render'
   requirements:
     _permission: 'view media'
+    _csrf_token: 'FALSE'
 
 media.settings:
   path: '/admin/config/media/media-settings'
@@ -21,3 +22,4 @@ media.filter.preview:
   requirements:
     _entity_access: 'filter_format.use'
     _custom_access: '\Drupal\media\Controller\MediaFilterController::formatUsesMediaEmbedFilter'
+    _csrf_token: 'FALSE'

@@ -4,3 +4,4 @@ mailer_transport_factory_functional_test.transport_info:
     _controller: '\Drupal\mailer_transport_factory_functional_test\Controller\TransportInfoController::transportInfo'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

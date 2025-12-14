@@ -5,6 +5,7 @@ filter.tips_all:
     _title: 'Compose tips'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 filter.tips:
   path: '/filter/tips/{filter_format}'
@@ -13,6 +14,7 @@ filter.tips:
     _title: 'Compose tips'
   requirements:
     _entity_access: 'filter_format.use'
+    _csrf_token: 'FALSE'
 
 filter.admin_overview:
   path: '/admin/config/content/formats'

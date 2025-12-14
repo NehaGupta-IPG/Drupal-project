@@ -38,6 +38,7 @@ contact.site_page:
     contact_form: NULL
   requirements:
     _permission: 'access site-wide contact form'
+    _csrf_token: 'FALSE'
 
 entity.contact_form.canonical:
   path: '/contact/{contact_form}'
@@ -46,6 +47,7 @@ entity.contact_form.canonical:
     _controller: '\Drupal\contact\Controller\ContactController::contactSitePage'
   requirements:
     _entity_access: 'contact_form.view'
+    _csrf_token: 'FALSE'
 
 entity.user.contact_form:
   path: '/user/{user}/contact'
@@ -55,3 +57,4 @@ entity.user.contact_form:
   requirements:
     _access_contact_personal_tab: 'TRUE'
     user: \d+
+    _csrf_token: 'FALSE'

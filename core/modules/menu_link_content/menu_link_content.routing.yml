@@ -5,6 +5,7 @@ entity.menu.add_link_form:
     _title: 'Add menu link'
   requirements:
     _entity_create_access: 'menu_link_content'
+    _csrf_token: 'FALSE'
 
 entity.menu_link_content.canonical:
   path: '/admin/structure/menu/item/{menu_link_content}/edit'

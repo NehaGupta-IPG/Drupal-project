@@ -5,3 +5,4 @@ announce_feed_test.json_test:
     _controller: '\Drupal\announce_feed_test\Controller\AnnounceTestController::setFeedConfig'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

@@ -5,6 +5,7 @@ dblog.overview:
     _title: 'Recent log messages'
   requirements:
     _permission: 'access site reports'
+    _csrf_token: 'FALSE'
 
 dblog.confirm:
   path: '/admin/reports/dblog/confirm'
@@ -21,6 +22,7 @@ dblog.event:
     _title: 'Details'
   requirements:
     _permission: 'access site reports'
+    _csrf_token: 'FALSE'
 
 dblog.page_not_found:
   path: '/admin/reports/page-not-found'
@@ -30,6 +32,7 @@ dblog.page_not_found:
     type: 'page not found'
   requirements:
     _permission: 'access site reports'
+    _csrf_token: 'FALSE'
 
 dblog.access_denied:
   path: '/admin/reports/access-denied'
@@ -39,6 +42,7 @@ dblog.access_denied:
     type: 'access denied'
   requirements:
     _permission: 'access site reports'
+    _csrf_token: 'FALSE'
 
 dblog.search:
   path: '/admin/reports/search'
@@ -49,3 +53,4 @@ dblog.search:
   requirements:
     _module_dependencies: 'search'
     _permission: 'access site reports'
+    _csrf_token: 'FALSE'

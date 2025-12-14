@@ -7,6 +7,7 @@ block_content.add_form:
     _admin_route: TRUE
   requirements:
     _entity_create_access: 'block_content:{block_content_type}'
+    _csrf_token: 'FALSE'
 
 # @todo remove these aliases as well as overrides in BlockContentRouteProvider and BlockContentTypeRouteProvider when
 # https://www.drupal.org/project/drupal/issues/3506653 is done.

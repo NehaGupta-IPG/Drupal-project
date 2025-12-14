@@ -4,3 +4,4 @@ contextual.render:
     _controller: '\Drupal\contextual\ContextualController::render'
   requirements:
     _permission: 'access contextual links'
+    _csrf_token: 'FALSE'

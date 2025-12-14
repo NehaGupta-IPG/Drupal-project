@@ -53,6 +53,7 @@ image.style_private:
     required_derivative_scheme: 'private'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
   options:
     no_cache: TRUE
 

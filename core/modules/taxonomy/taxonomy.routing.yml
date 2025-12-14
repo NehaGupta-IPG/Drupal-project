@@ -5,6 +5,7 @@ entity.taxonomy_term.add_form:
     _title: 'Add term'
   requirements:
     _entity_create_access: 'taxonomy_term:{taxonomy_vocabulary}'
+    _csrf_token: 'FALSE'
 
 entity.taxonomy_term.edit_form:
   path: '/taxonomy/term/{taxonomy_term}/edit'

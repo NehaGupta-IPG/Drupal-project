@@ -13,6 +13,7 @@ config.diff:
     target_name: NULL
   requirements:
     _permission: 'synchronize configuration'
+    _csrf_token: 'FALSE'
 
 config.diff_collection:
   path: '/admin/config/development/configuration/sync/diff_collection/{collection}/{source_name}/{target_name}'
@@ -21,6 +22,7 @@ config.diff_collection:
     target_name: NULL
   requirements:
     _permission: 'synchronize configuration'
+    _csrf_token: 'FALSE'
 
 config.export_download:
   path: '/admin/config/development/configuration/full/export-download'
@@ -28,6 +30,7 @@ config.export_download:
     _controller: '\Drupal\config\Controller\ConfigController::downloadExport'
   requirements:
     _permission: 'export configuration'
+    _csrf_token: 'FALSE'
 
 config.export_full:
   path: '/admin/config/development/configuration/full/export'
@@ -36,6 +39,7 @@ config.export_full:
     _title: 'Export'
   requirements:
     _permission: 'export configuration'
+    _csrf_token: 'FALSE'
 
 config.import_full:
   path: '/admin/config/development/configuration/full/import'
@@ -44,6 +48,7 @@ config.import_full:
     _title: 'Import'
   requirements:
     _permission: 'import configuration'
+    _csrf_token: 'FALSE'
 
 config.import_single:
   path: '/admin/config/development/configuration/single/import'
@@ -52,6 +57,7 @@ config.import_single:
     _form: '\Drupal\config\Form\ConfigSingleImportForm'
   requirements:
     _permission: 'import configuration'
+    _csrf_token: 'FALSE'
 
 config.export_single:
   path: '/admin/config/development/configuration/single/export/{config_type}/{config_name}'
@@ -62,3 +68,4 @@ config.export_single:
     config_name: ''
   requirements:
     _permission: 'export configuration'
+    _csrf_token: 'FALSE'

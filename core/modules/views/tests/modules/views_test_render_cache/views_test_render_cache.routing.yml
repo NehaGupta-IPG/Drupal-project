@@ -5,3 +5,4 @@ views_test_render_cache.blocks:
     _title: 'Test!'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

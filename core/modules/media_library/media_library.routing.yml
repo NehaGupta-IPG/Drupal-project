@@ -4,6 +4,7 @@ media_library.ui:
     _controller: 'media_library.ui_builder:buildUi'
   requirements:
     _custom_access: 'media_library.ui_builder:checkAccess'
+    _csrf_token: 'FALSE'
 
 media_library.settings:
   path: '/admin/config/media/media-library'

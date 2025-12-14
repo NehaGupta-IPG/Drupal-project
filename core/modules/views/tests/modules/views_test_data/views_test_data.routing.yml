@@ -19,6 +19,7 @@ views_test_data.form_multiple:
     _controller: '\Drupal\views_test_data\Controller\ViewsTestFormMultipleController::testPage'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 views_test_data.error_form_page:
   path: '/views_test_data_error_form_page'
@@ -27,3 +28,4 @@ views_test_data.error_form_page:
     _controller: '\Drupal\views_test_data\Controller\ViewsTestDataController::errorFormPage'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

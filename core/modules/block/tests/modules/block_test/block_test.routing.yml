@@ -5,3 +5,4 @@ block_test.test_multiple_forms:
     _title: 'Multiple forms'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

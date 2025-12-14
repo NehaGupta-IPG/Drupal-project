@@ -12,6 +12,7 @@ menu_ui.parent_options_js:
     _controller: '\Drupal\menu_ui\Controller\MenuController::getParentOptions'
   requirements:
     _permission: 'administer menu'
+    _csrf_token: 'FALSE'
 
 menu_ui.link_edit:
   path: '/admin/structure/menu/link/{menu_link_plugin}/edit'

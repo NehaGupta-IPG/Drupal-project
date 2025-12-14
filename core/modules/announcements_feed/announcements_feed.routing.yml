@@ -5,3 +5,4 @@ announcements_feed.announcement:
     _title: 'Community announcements'
   requirements:
     _permission: 'access announcements'
+    _csrf_token: 'FALSE'

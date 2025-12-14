@@ -4,3 +4,4 @@ file.ajax_progress:
     _controller: '\Drupal\file\Controller\FileWidgetAjaxController::progress'
   requirements:
     _permission: 'access content'
+    _csrf_token: 'FALSE'

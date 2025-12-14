@@ -4,3 +4,4 @@ vocabulary_serialization_test:
     _controller: '\Drupal\vocabulary_serialization_test\VocabularySerializationTestController::vocabularyResponse'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

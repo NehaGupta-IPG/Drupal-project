@@ -4,3 +4,4 @@ contextual_test:
     _controller: '\Drupal\contextual_test\Controller\TestController::render'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

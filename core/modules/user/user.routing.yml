@@ -30,6 +30,7 @@ user.admin_index:
     _title: 'People'
   requirements:
     _permission: 'access administration pages'
+    _csrf_token: 'FALSE'
 
 entity.user.admin_form:
   path: '/admin/config/people/accounts'
@@ -147,6 +148,7 @@ user.pass.http:
   requirements:
     _access: 'TRUE'
     _format: 'json'
+    _csrf_token: 'FALSE'
 
 user.page:
   path: '/user'
@@ -155,6 +157,7 @@ user.page:
     _title: 'My account'
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'
 
 user.edit:
   path: '/user/edit'
@@ -163,6 +166,7 @@ user.edit:
     _title: 'Edit account'
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'
 
 user.login:
   path: '/user/login'
@@ -173,6 +177,7 @@ user.login:
     _user_is_logged_in: 'FALSE'
   options:
     _maintenance_access: TRUE
+    _csrf_token: 'FALSE'
 
 user.login.http:
   path: '/user/login'
@@ -182,6 +187,7 @@ user.login.http:
   requirements:
     _user_is_logged_in: 'FALSE'
     _format: 'json'
+    _csrf_token: 'FALSE'
 
 user.login_status.http:
   path: '/user/login_status'
@@ -191,6 +197,7 @@ user.login_status.http:
   requirements:
     _access: 'TRUE'
     _format: 'json'
+    _csrf_token: 'FALSE'
 
 user.logout.http:
   path: '/user/logout'
@@ -212,6 +219,7 @@ user.cancel_confirm:
   requirements:
     _entity_access: 'user.delete'
     user: \d+
+    _csrf_token: 'FALSE'
 
 user.reset.login:
   path: '/user/reset/{uid}/{timestamp}/{hash}/login'
@@ -220,6 +228,7 @@ user.reset.login:
     _title: 'Reset password'
   requirements:
     _user_is_logged_in: 'FALSE'
+    _csrf_token: 'FALSE'
   options:
     _maintenance_access: TRUE
     no_cache: TRUE
@@ -231,6 +240,7 @@ user.reset:
     _title: 'Reset password'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
   options:
     _maintenance_access: TRUE
     no_cache: TRUE
@@ -242,6 +252,7 @@ user.reset.form:
     _title: 'Reset password'
   requirements:
     _user_is_logged_in: 'FALSE'
+    _csrf_token: 'FALSE'
   options:
     _maintenance_access: TRUE
     no_cache: TRUE
@@ -252,3 +263,4 @@ user.well-known.change_password:
     _controller: '\Drupal\user\Controller\UserController::userEditPage'
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'

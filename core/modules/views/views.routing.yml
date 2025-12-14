@@ -4,6 +4,7 @@ views.ajax:
     _controller: '\Drupal\views\Controller\ViewAjaxController::ajaxView'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 route_callbacks:
   - 'views.route_subscriber:routes'

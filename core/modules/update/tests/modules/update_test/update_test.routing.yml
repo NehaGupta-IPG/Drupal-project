@@ -4,6 +4,7 @@ update_test.503:
     _controller: '\Drupal\update_test\Controller\UpdateTestController::updateError'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 update_test.update_test:
   path: '/update-test/{project_name}/{version}'
@@ -14,3 +15,4 @@ update_test.update_test:
     project_name: NULL
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

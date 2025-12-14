@@ -5,6 +5,7 @@ config_translation.mapper_list:
     _controller: '\Drupal\config_translation\Controller\ConfigTranslationMapperList::render'
   requirements:
     _permission: 'translate configuration'
+    _csrf_token: 'FALSE'
 
 config_translation.entity_list:
   path: '/admin/config/regional/config-translation/{mapper_id}'
@@ -12,3 +13,4 @@ config_translation.entity_list:
     _controller: '\Drupal\config_translation\Controller\ConfigTranslationListController::listing'
   requirements:
     _permission: 'translate configuration'
+    _csrf_token: 'FALSE'

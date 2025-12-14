@@ -4,6 +4,7 @@ dynamic_page_cache_test.response:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::response'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 dynamic_page_cache_test.response.admin:
   path: '/dynamic-page-cache-test/response/admin'
@@ -11,6 +12,7 @@ dynamic_page_cache_test.response.admin:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::response'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
 
@@ -20,6 +22,7 @@ dynamic_page_cache_test.cacheable_response:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::cacheableResponse'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 dynamic_page_cache_test.cacheable_response.admin:
   path: '/dynamic-page-cache-test/cacheable-response/admin'
@@ -27,6 +30,7 @@ dynamic_page_cache_test.cacheable_response.admin:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::cacheableResponse'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
 
@@ -36,6 +40,7 @@ dynamic_page_cache_test.html:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::html'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 dynamic_page_cache_test.html.admin:
   path: '/dynamic-page-cache-test/html/admin'
@@ -43,6 +48,7 @@ dynamic_page_cache_test.html.admin:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::html'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
 
@@ -52,6 +58,7 @@ dynamic_page_cache_test.html.with_cache_contexts:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::htmlWithCacheContexts'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 dynamic_page_cache_test.html.uncacheable.max_age:
   path: '/dynamic-page-cache-test/html/uncacheable/max-age'
@@ -59,6 +66,7 @@ dynamic_page_cache_test.html.uncacheable.max_age:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::htmlUncacheableMaxAge'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 dynamic_page_cache_test.html.uncacheable.contexts:
   path: '/dynamic-page-cache-test/html/uncacheable/contexts'
@@ -66,6 +74,7 @@ dynamic_page_cache_test.html.uncacheable.contexts:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::htmlUncacheableContexts'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 dynamic_page_cache_test.html.uncacheable.tags:
   path: '/dynamic-page-cache-test/html/uncacheable/tags'
@@ -73,6 +82,7 @@ dynamic_page_cache_test.html.uncacheable.tags:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::htmlUncacheableTags'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 dynamic_page_cache_test.html.uncacheable.route_access:
   path: '/dynamic-page-cache-test/html/uncacheable/route-access'
@@ -80,3 +90,4 @@ dynamic_page_cache_test.html.uncacheable.route_access:
     _controller: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::cacheableResponse'
   requirements:
     _custom_access: '\Drupal\dynamic_page_cache_test\DynamicPageCacheTestController::uncacheableAccessCheck'
+    _csrf_token: 'FALSE'

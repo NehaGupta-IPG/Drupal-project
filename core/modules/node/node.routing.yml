@@ -20,6 +20,7 @@ entity.node.preview:
     _controller: '\Drupal\node\Controller\NodePreviewController::view'
   requirements:
     _node_preview_access: '{node_preview}'
+    _csrf_token: 'FALSE'
   options:
     no_cache: TRUE
     parameters:
@@ -34,6 +35,7 @@ entity.node.version_history:
   requirements:
     _entity_access: 'node.view all revisions'
     node: \d+
+    _csrf_token: 'FALSE'
   options:
     _node_operation_route: TRUE
     parameters:
@@ -47,6 +49,7 @@ entity.node.revision:
   requirements:
     _entity_access: 'node_revision.view revision'
     node: \d+
+    _csrf_token: 'FALSE'
   options:
     parameters:
       node:

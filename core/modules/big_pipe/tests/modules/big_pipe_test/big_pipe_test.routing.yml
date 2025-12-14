@@ -5,6 +5,7 @@ big_pipe_test:
     _title: 'BigPipe test'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 no_big_pipe:
   path: '/no_big_pipe'
@@ -15,6 +16,7 @@ no_big_pipe:
     _no_big_pipe: TRUE
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 big_pipe_test_multi_occurrence:
   path: '/big_pipe_test_multi_occurrence'
@@ -23,6 +25,7 @@ big_pipe_test_multi_occurrence:
     _title: 'BigPipe test multiple occurrences of the same placeholder'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 big_pipe_test_preview:
   path: '/big_pipe_test_preview'
@@ -31,6 +34,7 @@ big_pipe_test_preview:
     _title: 'Test placeholder previews'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 big_pipe_test_trusted_redirect:
   path: '/big_pipe_test_trusted_redirect'
@@ -39,6 +43,7 @@ big_pipe_test_trusted_redirect:
     _title: 'BigPipe test trusted redirect'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 big_pipe_test_untrusted_redirect:
   path: '/big_pipe_test_untrusted_redirect'
@@ -47,3 +52,4 @@ big_pipe_test_untrusted_redirect:
     _title: 'BigPipe test untrusted redirect'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
