@@ -24,13 +24,12 @@ final class KeyColumn implements SchemaDefinitionInterface {
   }
 
   /**
-   * Returns the key column as an array item.
+   * The key column cannot be converted to an array.
    *
-   * @return array{0:string|array{0:string, 1:int}}
-   *   The key column as an array item.
+   * @throws \LogicException
    */
   public function toArray(): array {
-    return $this->length !== NULL ? [[$this->name, $this->length]] : [$this->name];
+    throw new \LogicException(__METHOD__ . ' is not implemented');
   }
 
 }

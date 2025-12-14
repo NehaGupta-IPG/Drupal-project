@@ -80,7 +80,7 @@ abstract class KeyBase implements SchemaDefinitionInterface {
   public function toArray(): array {
     $spec = [];
     foreach ($this->columns as $keyColumn) {
-      $spec[] = $keyColumn->toArray()[0];
+      $spec[] = $keyColumn->length !== NULL ? [$keyColumn->name, $keyColumn->length] : $keyColumn->name;
     }
     return $spec;
   }
