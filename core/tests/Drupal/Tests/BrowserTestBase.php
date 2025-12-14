@@ -198,7 +198,7 @@ abstract class BrowserTestBase extends TestCase {
   protected function initMink() {
     $driver = $this->getDefaultDriverInstance();
 
-    if ($driver instanceof BrowserKitDriver) {
+    if ($driver instanceof BrowserKitDriver && $driver->getClient() instanceof DrupalTestBrowser) {
       // Turn off curl timeout. Having a timeout is not a problem in a normal
       // test running, but it is a problem when debugging. Also, disable SSL
       // peer verification so that testing under HTTPS always works.
@@ -379,7 +379,7 @@ abstract class BrowserTestBase extends TestCase {
    *
    * @see \Drupal\Core\File\FileSystemInterface::deleteRecursive()
    */
-  public static function filePreDeleteCallback($path) {
+  public static function filePreDeleteCallback($path): void {
     // When the webserver runs with the same system user as phpunit, we can
     // make read-only files writable again. If not, chmod will fail while the
     // file deletion still works if file permissions have been configured
@@ -546,7 +546,7 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * Installs Drupal into the test site.
    */
-  public function installDrupal() {
+  public function installDrupal(): void {
     $this->initUserSession();
     $this->prepareSettings();
     $this->doInstall();
@@ -615,7 +615,7 @@ abstract class BrowserTestBase extends TestCase {
    *   The configuration object with original configuration data.
    */
   protected function config($name) {
-    return $this->container->get('config.factory')->getEditable($name);
+    return \Drupal::configFactory()->getEditable($name);
   }
 
   /**

@@ -25,7 +25,6 @@ class BlockConfigSchemaTest extends KernelTestBase {
   protected static $modules = [
     'block',
     'block_content',
-    'comment',
     'node',
     // \Drupal\block\Entity\Block->preSave() calls system_region_list().
     'system',
@@ -82,7 +81,7 @@ class BlockConfigSchemaTest extends KernelTestBase {
         'settings' => [
           'label' => $this->randomMachineName(),
           'provider' => 'system',
-          'label_display' => FALSE,
+          'label_display' => '0',
         ],
         'visibility' => [],
       ]);
