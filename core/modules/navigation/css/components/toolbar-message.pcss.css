@@ -29,7 +29,7 @@
 html:not([data-admin-toolbar="expanded"]) .toolbar-message__label {
   position: absolute;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip-path: inset(0);
   width: 1px;
   height: 1px;
   white-space: nowrap;

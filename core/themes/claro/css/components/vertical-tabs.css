@@ -162,7 +162,7 @@
     inset-inline: calc(var(--vertical-tabs-menu-link--active-border-size) * -1) 0;
     content: "";
     pointer-events: none;
-    background-clip: padding-box;
+    background-clip: border-box;
   }
 }
 
