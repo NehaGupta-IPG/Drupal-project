@@ -472,8 +472,12 @@
             editor.sourceElement.parentNode.querySelector(
               'label.ck-voice-label',
             ).innerText = labelText;
-            const fiedAriaLabel = editor.ui.view.editable.element.closest('.ck-content').ariaLabel;
-            editor.ui.view.editable.element.closest('.ck-content').ariaLabel = labelText + '. ' + fiedAriaLabel;
+            const fieldAriaLabel = editor.ui.view.editable.element.closest(
+              '.ck-content',
+            ).ariaLabel;
+            editor.ui.view.editable.element.closest(
+              '.ck-content',
+              ).ariaLabel = `${labelText}. ${fieldAriaLabel}`;
 
             editor.ui.focusTracker.on(
               'change:isFocused',
@@ -482,7 +486,7 @@
                 // overwrite the label to appropriate field label value.
                 editor.ui.view.editable.element.closest(
                   '.ck-content',
-                ).ariaLabel = labelText + '. ' + fiedAriaLabel;
+                ).ariaLabel = `${labelText}. ${fieldAriaLabel}`;
               },
             );
           }
