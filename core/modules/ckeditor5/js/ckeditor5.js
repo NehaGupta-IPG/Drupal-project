@@ -457,7 +457,7 @@
             offCanvasCss(element);
           }
 
-          // Update aria-label with the value from default textarea label.
+          // Prepend aria-label with the value from default textarea label.
           // @see https://www.drupal.org/project/drupal/issues/3426798
           // @todo: Update when CKEditor5 will fix issue #15208
           // @see https://github.com/ckeditor/ckeditor5/issues/15208
@@ -472,8 +472,8 @@
             editor.sourceElement.parentNode.querySelector(
               'label.ck-voice-label',
             ).innerText = labelText;
-            editor.ui.view.editable.element.closest('.ck-content').ariaLabel =
-              labelText;
+            const fiedAriaLabel = editor.ui.view.editable.element.closest('.ck-content').ariaLabel;
+            editor.ui.view.editable.element.closest('.ck-content').ariaLabel = labelText + '. ' + fiedAriaLabel;
 
             editor.ui.focusTracker.on(
               'change:isFocused',
@@ -482,7 +482,7 @@
                 // overwrite the label to appropriate field label value.
                 editor.ui.view.editable.element.closest(
                   '.ck-content',
-                ).ariaLabel = labelText;
+                ).ariaLabel = labelText + '. ' + fiedAriaLabel;
               },
             );
           }
