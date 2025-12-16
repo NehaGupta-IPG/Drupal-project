@@ -104,6 +104,7 @@ class BaseFieldOverrideLanguageOverrideTest extends KernelTestBase {
     $this->config('language.negotiation')->set('selected_langcode', 'af')->save();
     $this->languageManager->reset();
     $this->assertEquals('af', $this->languageManager->getCurrentLanguage()->getId());
+    $this->entityFieldManager->clearCachedFieldDefinitions();
     $languageConfigOverride = $this->languageManager->getLanguageConfigOverride('af', $baseFieldOverride->getConfigDependencyName());
     $languageConfigOverride->set('label', 'Overridden name in Afrikaans')->save();
     $this->assertTestFieldLabel('Overridden name in Afrikaans');
