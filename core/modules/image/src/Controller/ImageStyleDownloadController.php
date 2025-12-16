@@ -174,6 +174,15 @@ class ImageStyleDownloadController extends FileDownloadController {
       // the actual source image, we remove the extension and check if that
       // image exists.
       $converted_image_uri = static::getUriWithoutConvertedExtension($image_uri);
+      // Allow modules to alter the URI before it is returned.
+      // If the image style derivative has different scheme than original file,
+      // then it should restored in alter hook, so that derivative can be
+      // created from the source. It is not possible to change the scheme
+      // earlier, because it that case `getPathToken` will return different
+      // value from the one given in the url.
+      $derivative_scheme = $this->streamWrapperManager->getScheme($derivative_uri);
+      $context = ['scheme' => $derivative_scheme, 'path' => $target, 'image_style' => $image_style];
+      $this->moduleHandler()->alter('image_style_source', $converted_image_uri, $context);
       if ($converted_image_uri !== $image_uri &&
           $this->sourceImageExists($converted_image_uri, $token_is_valid)) {
         // The converted file does exist, use it as the source.
