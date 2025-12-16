@@ -11,11 +11,13 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests language overrides for base field overrides.
  */
 #[Group('Field')]
+#[RunTestsInSeparateProcesses]
 class BaseFieldOverrideLanguageOverrideTest extends KernelTestBase {
 
   /**

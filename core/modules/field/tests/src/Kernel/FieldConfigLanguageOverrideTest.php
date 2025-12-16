@@ -10,11 +10,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests language overrides for config fields.
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldConfigLanguageOverrideTest extends FieldKernelTestBase {
 
   /**
