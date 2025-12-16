@@ -108,12 +108,13 @@ function system_post_update_remove_rss_cdata_subscriber(): void {
  * @see \Drupal\system\EventSubscriber\UpdateEmptyAdminTheme
  */
 function system_post_update_set_theme_admin_to_null(): void {
-  $config = \Drupal::configFactory()->getEditable('system.theme')
-  if ($config->get('admin) === '') {
+  $config = \Drupal::configFactory()->getEditable('system.theme');
+  if ($config->get('admin') === '') {
     /** @var \Drupal\system\EventSubscriber\UpdateEmptyAdminTheme $updateEmptyAdminTheme */
     $updateEmptyAdminTheme = \Drupal::service(UpdateEmptyAdminTheme::class);
     $updateEmptyAdminTheme->setDeprecationsEnabled(FALSE);
     $config->save();
+  }
 }
 
 /**
