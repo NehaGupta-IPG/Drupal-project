@@ -6,17 +6,19 @@ namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\migrate\Event\MigratePreRowSaveEvent;
 use Drupal\migrate\Event\MigrateEvents;
+use Drupal\migrate\Event\MigratePreRowSaveEvent;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests the Row class.
- *
- * @group migrate
  */
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class RowTest extends KernelTestBase {
 
   /**
