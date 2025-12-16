@@ -6,7 +6,6 @@ namespace Drupal\workspaces\Routing;
 
 use Drupal\content_moderation\Entity\Routing\EntityModerationRouteProvider as ContentModerationEntityModerationRouteProvider;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Symfony\Component\Routing\Route;
 
 /**
  * Overrides the content moderation provided entity moderation provider.
@@ -16,7 +15,7 @@ final class EntityModerationRouteProvider extends ContentModerationEntityModerat
   /**
    * {@inheritdoc}
    */
-  protected function getLatestVersionRoute(EntityTypeInterface $entity_type): Route {
+  protected function getLatestVersionRoute(EntityTypeInterface $entity_type) {
     $route = parent::getLatestVersionRoute($entity_type);
     if ($route !== NULL) {
       // Non-default workspaces display the active revision on the canonical
