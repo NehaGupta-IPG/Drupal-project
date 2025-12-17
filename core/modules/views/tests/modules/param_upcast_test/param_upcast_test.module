@@ -13,7 +13,7 @@ use Drupal\views\ViewExecutable;
 /**
  * Implements hook_views_post_execute().
  */
-function param_upcast_test_views_post_execute(ViewExecutable $view) {
+function param_upcast_test_views_post_execute(ViewExecutable $view): void {
   if ($view->id() === 'param_upcast') {
     $account = \Drupal::routeMatch()->getParameter('user');
     if ($account instanceof UserInterface) {

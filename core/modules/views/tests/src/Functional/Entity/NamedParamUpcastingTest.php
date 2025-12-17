@@ -7,12 +7,14 @@ namespace Drupal\Tests\views\Functional\Entity;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests named parameters upcasting.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class NamedParamUpcastingTest extends ViewTestBase {
 
   /**
@@ -33,7 +35,7 @@ class NamedParamUpcastingTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
+  protected function setUp( $import_test_views = TRUE, $modules = ['views_test_config']): void {
     parent::setUp(FALSE);
     ViewTestData::createTestViews(get_class($this), ['param_upcast_test']);
   }
