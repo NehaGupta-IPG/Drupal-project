@@ -6,9 +6,11 @@ use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\media\Form\MediaTypeDeleteConfirmForm;
 use Drupal\media\MediaTypeAccessControlHandler;
 use Drupal\media\MediaTypeForm;
@@ -259,7 +261,7 @@ class MediaType extends ConfigEntityBundleBase implements MediaTypeInterface, En
   /**
    * {@inheritdoc}
    */
-  public function postSave(\Drupal\Core\Entity\EntityStorageInterface $storage, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
     // Ensure the source field exists for this media type.
@@ -287,7 +289,7 @@ class MediaType extends ConfigEntityBundleBase implements MediaTypeInterface, En
       if (!$storage_config) {
         // Convert definition → proper FieldStorageConfig entity.
         $definition = $source_field->getFieldStorageDefinition();
-        $storage_config = \Drupal\field\Entity\FieldStorageConfig::create([
+        $storage_config = FieldStorageConfig::create([
           'entity_type'  => 'media',
           'field_name'   => $field_name,
           'type'         => $definition->getType(),
