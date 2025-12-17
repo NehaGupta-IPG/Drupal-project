@@ -2,6 +2,7 @@ dependencies:
   module:
     - entity_test
 id: param_upcast
+label: Param upcast
 module: views
 base_table: entity_test
 base_field: id
