@@ -60,7 +60,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestCleanCssIdentifier() {
+  public static function providerTestCleanCssIdentifier(): array {
     $id1 = 'abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ-0123456789';
     $id2 = '¡¢£¤¥';
     $id3 = 'css__identifier__with__double__underscores';
@@ -131,7 +131,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestHtmlGetUniqueId() {
+  public static function providerTestHtmlGetUniqueId(): array {
     // cSpell:disable
     $id = 'abcdefghijklmnopqrstuvwxyz-0123456789';
     return [
@@ -182,7 +182,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestHtmlGetUniqueIdWithAjaxIds() {
+  public static function providerTestHtmlGetUniqueIdWithAjaxIds(): array {
     return [
       ['test-unique-id1--', 'test-unique-id1'],
       // Note, we truncate two hyphens at the end.
@@ -214,7 +214,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestHtmlGetId() {
+  public static function providerTestHtmlGetId(): array {
     // cSpell:disable
     $id = 'abcdefghijklmnopqrstuvwxyz-0123456789';
     return [
@@ -246,7 +246,7 @@ class HtmlTest extends TestCase {
    *
    * @see testDecodeEntities()
    */
-  public static function providerDecodeEntities() {
+  public static function providerDecodeEntities(): array {
     return [
       ['Drupal', 'Drupal'],
       ['<script>', '<script>'],
@@ -287,7 +287,7 @@ class HtmlTest extends TestCase {
    *
    * @see testEscape()
    */
-  public static function providerEscape() {
+  public static function providerEscape(): array {
     return [
       ['Drupal', 'Drupal'],
       ['&lt;script&gt;', '<script>'],
@@ -378,25 +378,65 @@ class HtmlTest extends TestCase {
       // The only attribute that has more than just a URL as its value, is
       // 'srcset', so special-case it.
       $data += [
-        "$tag_name, srcset, $base_path: root-relative" => ["<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, {$base_path}root-relative 300w\">root-relative test</$tag_name>", 'http://example.com', "<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, http://example.com{$base_path}root-relative 300w\">root-relative test</$tag_name>"],
-        "$tag_name, srcset, $base_path: protocol-relative" => ["<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, //example.com{$base_path}protocol-relative 300w\">protocol-relative test</$tag_name>", 'http://example.com', FALSE],
-        "$tag_name, srcset, $base_path: absolute" => ["<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, http://example.com{$base_path}absolute 300w\">absolute test</$tag_name>", 'http://example.com', FALSE],
-        "$tag_name, empty srcset" => ["<$tag_name srcset>empty test</$tag_name>", 'http://example.com', FALSE],
+        "$tag_name, srcset, $base_path: root-relative" => [
+          "<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, {$base_path}root-relative 300w\">root-relative test</$tag_name>",
+          'http://example.com',
+          "<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, http://example.com{$base_path}root-relative 300w\">root-relative test</$tag_name>",
+        ],
+        "$tag_name, srcset, $base_path: protocol-relative" => [
+          "<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, //example.com{$base_path}protocol-relative 300w\">protocol-relative test</$tag_name>",
+          'http://example.com',
+          FALSE,
+        ],
+        "$tag_name, srcset, $base_path: absolute" => [
+          "<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, http://example.com{$base_path}absolute 300w\">absolute test</$tag_name>",
+          'http://example.com',
+          FALSE,
+        ],
+        "$tag_name, empty srcset" => [
+          "<$tag_name srcset>empty test</$tag_name>",
+          'http://example.com',
+          FALSE,
+        ],
       ];
 
       foreach (['href', 'poster', 'src', 'cite', 'data', 'action', 'formaction', 'about'] as $attribute) {
         $data += [
-          "$tag_name, $attribute, $base_path: root-relative" => ["<$tag_name $attribute=\"{$base_path}root-relative\">root-relative test</$tag_name>", 'http://example.com', "<$tag_name $attribute=\"http://example.com{$base_path}root-relative\">root-relative test</$tag_name>"],
-          "$tag_name, $attribute, $base_path: protocol-relative" => ["<$tag_name $attribute=\"//example.com{$base_path}protocol-relative\">protocol-relative test</$tag_name>", 'http://example.com', FALSE],
-          "$tag_name, $attribute, $base_path: absolute" => ["<$tag_name $attribute=\"http://example.com{$base_path}absolute\">absolute test</$tag_name>", 'http://example.com', FALSE],
+          "$tag_name, $attribute, $base_path: root-relative" => [
+            "<$tag_name $attribute=\"{$base_path}root-relative\">root-relative test</$tag_name>",
+            'http://example.com',
+            "<$tag_name $attribute=\"http://example.com{$base_path}root-relative\">root-relative test</$tag_name>",
+          ],
+          "$tag_name, $attribute, $base_path: protocol-relative" => [
+            "<$tag_name $attribute=\"//example.com{$base_path}protocol-relative\">protocol-relative test</$tag_name>",
+            'http://example.com',
+            FALSE,
+          ],
+          "$tag_name, $attribute, $base_path: absolute" => [
+            "<$tag_name $attribute=\"http://example.com{$base_path}absolute\">absolute test</$tag_name>",
+            'http://example.com',
+            FALSE,
+          ],
         ];
       }
     }
 
     // Double-character carriage return should be normalized.
-    $data['line break with double special character'] = ["Test without links but with\r\nsome special characters", 'http://example.com', "Test without links but with\nsome special characters"];
-    $data['line break with single special character'] = ["Test without links but with&#13;\nsome special characters", 'http://example.com', "Test without links but with\nsome special characters"];
-    $data['carriage return within html'] = ["<a\rhref='/node'>My link</a>", 'http://example.com', '<a href="http://example.com/node">My link</a>'];
+    $data['line break with double special character'] = [
+      "Test without links but with\r\nsome special characters",
+      'http://example.com',
+      "Test without links but with\nsome special characters",
+    ];
+    $data['line break with single special character'] = [
+      "Test without links but with&#13;\nsome special characters",
+      'http://example.com',
+      "Test without links but with\nsome special characters",
+    ];
+    $data['carriage return within html'] = [
+      "<a\rhref='/node'>My link</a>",
+      'http://example.com',
+      '<a href="http://example.com/node">My link</a>',
+    ];
 
     return $data;
   }
@@ -407,7 +447,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestTransformRootRelativeUrlsToAbsoluteAssertion() {
+  public static function providerTestTransformRootRelativeUrlsToAbsoluteAssertion(): array {
     return [
       'only relative path' => ['llama'],
       'only root-relative path' => ['/llama'],
