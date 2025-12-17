@@ -141,8 +141,8 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
     // Sets the response for the current route, if cached.
     $cached = $this->cache->get(['response'], (new CacheableMetadata())->setCacheContexts($this->cacheContexts));
     if ($cached) {
+      /** @var \Symfony\Component\HttpFoundation\Response&\Drupal\Core\Cache\CacheableResponseInterface $response */
       $response = $cached->data;
-      assert($response instanceof CacheableResponseInterface);
       $response->headers->set(self::HEADER, 'HIT');
       if ($cached->expire >= 0) {
         $max_age = max($cached->expire - $request->server->get('REQUEST_TIME'), 0);
