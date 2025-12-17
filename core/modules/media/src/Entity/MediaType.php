@@ -261,7 +261,7 @@ class MediaType extends ConfigEntityBundleBase implements MediaTypeInterface, En
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage, $update = TRUE): void {
     parent::postSave($storage, $update);
 
     // Ensure the source field exists for this media type.
