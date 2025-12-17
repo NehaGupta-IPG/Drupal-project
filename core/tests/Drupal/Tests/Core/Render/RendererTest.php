@@ -988,6 +988,47 @@ class RendererTest extends RendererTestBase {
   }
 
   /**
+   * Tests render cache max age correction.
+   *
+   * @param int $max_age
+   *   The initial max age of the element.
+   * @param int $age
+   *   The age of the element to simulate.
+   * @param int|false $expected_ttl
+   *   The expected time-to-live for the simulated age.
+   *
+   * @legacy-covers \Drupal\Core\Render\RenderCache::get
+   */
+  #[DataProvider('providerTestRenderCacheMaxAgeCorrection')]
+  public function testRenderCacheMaxAgeCorrection(int $max_age, int $age, int|false $expected_ttl): void {
+    $this->setUpMemoryCache();
+
+    $element = [
+      '#cache' => [
+        'keys' => ['render_cache_test'],
+        'max-age' => $max_age,
+      ],
+      '#markup' => '',
+    ];
+    $this->renderer->renderRoot($element);
+
+    $request = $this->requestStack->getCurrentRequest();
+    $request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME'] + $age);
+
+    $cache = $this->renderCache->get($element);
+    $this->assertSame($expected_ttl, $cache !== FALSE ? $cache['#cache']['max-age'] : FALSE);
+  }
+
+  public static function providerTestRenderCacheMaxAgeCorrection(): array {
+    return [
+      [800, 0, 800],
+      [800, 500, 300],
+      [800, 800, 0],
+      [800, 801, FALSE],
+    ];
+  }
+
+  /**
    * Tests that #cache_properties are properly handled.
    *
    * @param array $expected_results
