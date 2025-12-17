@@ -8,6 +8,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests views_post_update_bulk_form_action_order().
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 #[Group('Update')]
 #[CoversFunction('views_post_update_bulk_form_action_order')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class ViewsBulkFormActionsOrderUpdateTest extends UpdatePathTestBase {
 
   /**
