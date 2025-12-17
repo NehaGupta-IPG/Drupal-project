@@ -996,11 +996,14 @@ class RendererTest extends RendererTestBase {
    *   The age of the element to simulate.
    * @param int|false $expected_ttl
    *   The expected time-to-live for the simulated age.
+   * @param bool $multiple
+   *   TRUE to test ::getMultiple(), FALSE to test ::get().
    *
    * @legacy-covers \Drupal\Core\Render\RenderCache::get
+   * @legacy-covers \Drupal\Core\Render\RenderCache::getMultiple
    */
   #[DataProvider('providerTestRenderCacheMaxAgeCorrection')]
-  public function testRenderCacheMaxAgeCorrection(int $max_age, int $age, int|false $expected_ttl): void {
+  public function testRenderCacheMaxAgeCorrection(int $max_age, int $age, int|false $expected_ttl, bool $multiple): void {
     $this->setUpMemoryCache();
 
     $element = [
@@ -1015,16 +1018,20 @@ class RendererTest extends RendererTestBase {
     $request = $this->requestStack->getCurrentRequest();
     $request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME'] + $age);
 
-    $cache = $this->renderCache->get($element);
+    $cache = $multiple ? $this->renderCache->getMultiple([$element])[0] ?? FALSE : $this->renderCache->get($element);
     $this->assertSame($expected_ttl, $cache !== FALSE ? $cache['#cache']['max-age'] : FALSE);
   }
 
   public static function providerTestRenderCacheMaxAgeCorrection(): array {
     return [
-      [800, 0, 800],
-      [800, 500, 300],
-      [800, 800, 0],
-      [800, 801, FALSE],
+      'Newly-inserted cache item, single' => [800, 0, 800, FALSE],
+      'Newly-inserted cache item, multiple' => [800, 0, 800, TRUE],
+      'Aged cache item, single' => [800, 500, 300, FALSE],
+      'Aged cache item, multiple' => [800, 500, 300, TRUE],
+      'Almost-expired cache item, single' => [800, 800, 0, FALSE],
+      'Almost-expired cache item, multiple' => [800, 800, 0, TRUE],
+      'Expired cache item, single' => [800, 801, FALSE, FALSE],
+      'Expired cache item, multiple' => [800, 801, FALSE, TRUE],
     ];
   }
 
