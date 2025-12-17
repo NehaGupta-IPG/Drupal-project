@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Session;
 
 use Drupal\Component\Datetime\Time;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
@@ -601,6 +602,13 @@ class CacheItem {
    * @var \Drupal\Core\Session\CalculatedPermissions
    */
   public $data;
+
+  /**
+   * The cache expiry.
+   *
+   * @var int
+   */
+  public $expire = Cache::PERMANENT;
 
   public function __construct($data) {
     $this->data = $data;
