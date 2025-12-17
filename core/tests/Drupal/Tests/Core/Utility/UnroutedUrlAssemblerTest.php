@@ -99,7 +99,7 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
   /**
    * Provides test data for testAssembleWithExternalUrl.
    */
-  public static function providerTestAssembleWithExternalUrl() {
+  public static function providerTestAssembleWithExternalUrl(): array {
     return [
       ['http://example.com/test', [], 'http://example.com/test'],
       ['http://example.com/test', ['fragment' => 'example'], 'http://example.com/test#example'],
@@ -108,11 +108,31 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
       ['http://example.com/test', ['https' => TRUE], 'https://example.com/test'],
       ['https://example.com/test', ['https' => FALSE], 'http://example.com/test'],
       ['https://example.com/test?foo=1#bar', [], 'https://example.com/test?foo=1#bar'],
-      'override-query' => ['https://example.com/test?foo=1#bar', ['query' => ['foo' => 2]], 'https://example.com/test?foo=2#bar'],
-      'override-query-merge' => ['https://example.com/test?foo=1#bar', ['query' => ['bar' => 2]], 'https://example.com/test?foo=1&bar=2#bar'],
-      'override-deep-query-merge' => ['https://example.com/test?foo=1#bar', ['query' => ['bar' => ['baz' => 'foo']]], 'https://example.com/test?foo=1&bar%5Bbaz%5D=foo#bar'],
-      'override-deep-query-merge-int-ket' => ['https://example.com/test?120=1', ['query' => ['bar' => ['baz' => 'foo']]], 'https://example.com/test?120=1&bar%5Bbaz%5D=foo'],
-      'override-fragment' => ['https://example.com/test?foo=1#bar', ['fragment' => 'baz'], 'https://example.com/test?foo=1#baz'],
+      'override-query' => [
+        'https://example.com/test?foo=1#bar',
+        ['query' => ['foo' => 2]],
+        'https://example.com/test?foo=2#bar',
+      ],
+      'override-query-merge' => [
+        'https://example.com/test?foo=1#bar',
+        ['query' => ['bar' => 2]],
+        'https://example.com/test?foo=1&bar=2#bar',
+      ],
+      'override-deep-query-merge' => [
+        'https://example.com/test?foo=1#bar',
+        ['query' => ['bar' => ['baz' => 'foo']]],
+        'https://example.com/test?foo=1&bar%5Bbaz%5D=foo#bar',
+      ],
+      'override-deep-query-merge-int-ket' => [
+        'https://example.com/test?120=1',
+        ['query' => ['bar' => ['baz' => 'foo']]],
+        'https://example.com/test?120=1&bar%5Bbaz%5D=foo',
+      ],
+      'override-fragment' => [
+        'https://example.com/test?foo=1#bar',
+        ['fragment' => 'baz'],
+        'https://example.com/test?foo=1#baz',
+      ],
       ['//www.drupal.org', [], '//www.drupal.org'],
     ];
   }
@@ -134,7 +154,7 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
    * @return array
    *   An array of test data for testAssembleWithLocalUri.
    */
-  public static function providerTestAssembleWithLocalUri() {
+  public static function providerTestAssembleWithLocalUri(): array {
     return [
       ['base:example', [], FALSE, '/example'],
       ['base:example', ['query' => ['foo' => 'bar']], FALSE, '/example?foo=bar'],
@@ -215,12 +235,14 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
   /**
    * Tests external URLs are only processed if necessary.
    */
+  // phpcs:disable Drupal.Arrays.Array.LongLineDeclaration
   #[TestWith(['http://example.org', 'http://example.org'])]
   #[TestWith(['http://example.org?flag', 'http://example.org?flag'])]
   #[TestWith(['http://example.org?flag=', 'http://example.org?flag='])]
   #[TestWith(['http://example.org?flag=', 'http://example.org?flag', ['query' => ['flag' => '']]])]
   #[TestWith(['http://example.org?tag=one&tag=two', 'http://example.org?tag=one&tag=two'])]
   #[TestWith(['http://example.org?tag%5B0%5D=three', 'http://example.org?tag=one&tag=two', ['query' => ['tag' => ['three']]]])]
+  // phpcs:enable
   public function testAssembleExternalUrls(string $expected, string $uri, array $options = []): void {
     $this->setupRequestStack(FALSE);
     $result = $this->unroutedUrlAssembler->assemble($uri, $options);
