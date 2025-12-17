@@ -6,6 +6,8 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional\d7;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\NoMultilingualReviewPageTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Filefield Multiupload Imagefield rulesets
 /**
@@ -14,6 +16,8 @@ use PHPUnit\Framework\Attributes\Group;
  * The test method is provided by the MigrateUpgradeTestBase class.
  */
 #[Group('migrate_drupal_ui')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
 
   /**
@@ -55,7 +59,6 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'Chaos Tools (CTools) AJAX Example',
       'Chaos tools',
       'Comment',
-      'Contact',
       'Custom content panes',
       'Custom rulesets',
       'Dashboard',
@@ -151,6 +154,7 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'Book',
       'Breakpoints',
       'Color',
+      'Contact',
       'Contact translation',
       'Entity Translation Menu',
       'Entity Translation Upgrade',

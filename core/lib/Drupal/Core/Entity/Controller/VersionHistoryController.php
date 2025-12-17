@@ -15,7 +15,6 @@ use Drupal\Core\Link;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a controller showing revision history for an entity.
@@ -59,18 +58,6 @@ class VersionHistoryController extends ControllerBase {
   ) {
     $this->entityTypeManager = $entityTypeManager;
     $this->languageManager = $languageManager;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('entity_type.manager'),
-      $container->get('language_manager'),
-      $container->get('date.formatter'),
-      $container->get('renderer'),
-    );
   }
 
   /**
@@ -162,12 +149,10 @@ class VersionHistoryController extends ControllerBase {
       ['type' => $dateFormatType, 'format' => $dateFormatFormat] = $this->getRevisionDescriptionDateFormat($revision);
       $linkText = $this->dateFormatter->format($revision->getRevisionCreationTime(), $dateFormatType, $dateFormatFormat);
 
-      // @todo Simplify this when https://www.drupal.org/node/2334319 lands.
-      $username = [
+      $context['username'] = [
         '#theme' => 'username',
         '#account' => $revision->getRevisionUser(),
       ];
-      $context['username'] = $this->renderer->render($username);
     }
     else {
       $linkText = $revision->access('view label') ? $revision->label() : $this->t('- Restricted access -');

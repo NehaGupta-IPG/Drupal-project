@@ -9,6 +9,7 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the views bulk form test.
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views\Plugin\views\field\BulkForm
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class BulkFormTest extends BrowserTestBase {
 
   use NodeCreationTrait;
