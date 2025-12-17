@@ -35,7 +35,7 @@ class DeprecatedFormElementsTest extends KernelTestBase implements FormInterface
       '#type' => 'container',
       '#deprecated' => [
         'class' => self::class,
-        'deprecation_version' => 'drupal:11.3.0',
+        'deprecation_version' => 'drupal:11.4.0',
         'removed_version' => 'drupal:12.0.0',
         'change_record' => 'https://www.drupal.org/node/3521264',
       ],
@@ -50,7 +50,7 @@ class DeprecatedFormElementsTest extends KernelTestBase implements FormInterface
       '#value' => 2,
       '#deprecated' => [
         'class' => self::class,
-        'deprecation_version' => 'drupal:11.3.0',
+        'deprecation_version' => 'drupal:11.4.0',
         'removed_version' => 'drupal:12.0.0',
         'change_record' => 'https://www.drupal.org/node/3521264',
       ],
@@ -62,7 +62,7 @@ class DeprecatedFormElementsTest extends KernelTestBase implements FormInterface
       '#default_value' => 'mandarin',
       '#deprecated' => [
         'class' => self::class,
-        'deprecation_version' => 'drupal:11.3.0',
+        'deprecation_version' => 'drupal:11.4.0',
         'removed_version' => 'drupal:12.0.0',
         'change_record' => 'https://www.drupal.org/node/3521264',
       ],
@@ -72,7 +72,7 @@ class DeprecatedFormElementsTest extends KernelTestBase implements FormInterface
       '#type' => 'container',
       '#deprecated' => [
         'class' => self::class,
-        'deprecation_version' => 'drupal:11.3.0',
+        'deprecation_version' => 'drupal:11.4.0',
         'removed_version' => 'drupal:12.0.0',
         'change_record' => 'https://www.drupal.org/node/3521264',
       ],
@@ -119,10 +119,10 @@ class DeprecatedFormElementsTest extends KernelTestBase implements FormInterface
     $form_state = new FormState();
     \Drupal::formBuilder()->submitForm($this, $form_state);
 
-    $this->expectDeprecation('The form element with key [pear_container] in class Drupal\Tests\system\Kernel\Form\DeprecatedFormElementsTest is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. For any subclass that extends the class and expects a value for this key, the element should be added into that subclass\'s buildForm(). See https://www.drupal.org/node/3521264');
-    $this->expectDeprecation('The form element with key [pear_container, pear] in class Drupal\Tests\system\Kernel\Form\DeprecatedFormElementsTest is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. For any subclass that extends the class and expects a value for this key, the element should be added into that subclass\'s buildForm(). See https://www.drupal.org/node/3521264');
-    $this->expectDeprecation('The form element with key [orange] in class Drupal\Tests\system\Kernel\Form\DeprecatedFormElementsTest is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. For any subclass that extends the class and expects a value for this key, the element should be added into that subclass\'s buildForm(). See https://www.drupal.org/node/3521264');
-    $this->expectDeprecation('The form element with key [apple_settings, apple] in class Drupal\Tests\system\Kernel\Form\DeprecatedFormElementsTest is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. For any subclass that extends the class and expects a value for this key, the element should be added into that subclass\'s buildForm(). See https://www.drupal.org/node/3521264');
+    $this->expectDeprecation('The form element with key [pear_container] in class Drupal\Tests\system\Kernel\Form\DeprecatedFormElementsTest is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. For any subclass that extends the class and expects a value for this key, the element should be added into that subclass\'s buildForm(). See https://www.drupal.org/node/3521264');
+    $this->expectDeprecation('The form element with key [pear_container, pear] in class Drupal\Tests\system\Kernel\Form\DeprecatedFormElementsTest is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. For any subclass that extends the class and expects a value for this key, the element should be added into that subclass\'s buildForm(). See https://www.drupal.org/node/3521264');
+    $this->expectDeprecation('The form element with key [orange] in class Drupal\Tests\system\Kernel\Form\DeprecatedFormElementsTest is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. For any subclass that extends the class and expects a value for this key, the element should be added into that subclass\'s buildForm(). See https://www.drupal.org/node/3521264');
+    $this->expectDeprecation('The form element with key [apple_settings, apple] in class Drupal\Tests\system\Kernel\Form\DeprecatedFormElementsTest is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. For any subclass that extends the class and expects a value for this key, the element should be added into that subclass\'s buildForm(). See https://www.drupal.org/node/3521264');
   }
 
 }
