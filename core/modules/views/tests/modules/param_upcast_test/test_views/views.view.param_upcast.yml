@@ -40,7 +40,7 @@ display:
             roles: {  }
           entity_type: entity_test
           entity_field: user_id
-          plugin_id: numeric
+          plugin_id: entity_target_id
   page_1:
     display_plugin: page
     id: page_1
