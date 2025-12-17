@@ -256,4 +256,74 @@ class MediaType extends ConfigEntityBundleBase implements MediaTypeInterface, En
     return $this->set('field_map', $map);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(\Drupal\Core\Entity\EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Ensure the source field exists for this media type.
+    $source = $this->getSource();
+    $source_field = $source->getSourceFieldDefinition($this);
+
+    if (!$source_field) {
+      // Create the field instance + definition.
+      $source_field = $source->createSourceField($this);
+      $field_name = $source_field->getName();
+
+      // Ensure the plugin configuration has the source field name.
+      $configuration = $source->getConfiguration();
+      $configuration['source_field'] = $field_name;
+      $source->setConfiguration($configuration);
+
+      // Load or create the FieldStorageConfig entity.
+      $storage_id = 'media.' . $field_name;
+
+      /** @var \Drupal\field\FieldStorageConfigInterface|null $storage_config */
+      $storage_config = \Drupal::entityTypeManager()
+        ->getStorage('field_storage_config')
+        ->load($storage_id);
+
+      if (!$storage_config) {
+        // Convert definition → proper FieldStorageConfig entity.
+        $definition = $source_field->getFieldStorageDefinition();
+        $storage_config = \Drupal\field\Entity\FieldStorageConfig::create([
+          'entity_type'  => 'media',
+          'field_name'   => $field_name,
+          'type'         => $definition->getType(),
+          'settings'     => $definition->getSettings(),
+          'cardinality'  => $definition->getCardinality(),
+          'translatable' => $definition->isTranslatable(),
+        ]);
+        $storage_config->save();
+      }
+
+      // Save the field instance.
+      $source_field->save();
+
+      // Update displays.
+      $display_repository = \Drupal::service('entity_display.repository');
+
+      // Form display.
+      if ($source_field->isDisplayConfigurable('form')) {
+        $form_display = $display_repository->getFormDisplay('media', $this->id());
+        $source->prepareFormDisplay($this, $form_display);
+        $form_display->save();
+      }
+
+      // View display.
+      if ($source_field->isDisplayConfigurable('view')) {
+        $view_display = $display_repository->getViewDisplay('media', $this->id());
+
+        // Remove auto-added components.
+        foreach (array_keys($view_display->getComponents()) as $name) {
+          $view_display->removeComponent($name);
+        }
+
+        $source->prepareViewDisplay($this, $view_display);
+        $view_display->save();
+      }
+    }
+  }
+
 }
