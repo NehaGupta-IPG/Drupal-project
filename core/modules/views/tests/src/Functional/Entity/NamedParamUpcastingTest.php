@@ -35,7 +35,7 @@ class NamedParamUpcastingTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp( $import_test_views = TRUE, $modules = ['views_test_config']): void {
+  protected function setUp($import_test_views = TRUE, $modules = ['views_test_config']): void {
     parent::setUp(FALSE);
     ViewTestData::createTestViews(get_class($this), ['param_upcast_test']);
   }
