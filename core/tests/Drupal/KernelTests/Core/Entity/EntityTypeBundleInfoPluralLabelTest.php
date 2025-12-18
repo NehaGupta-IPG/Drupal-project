@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\EntityTypeBundleInfo;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\entity_test\Entity\EntityTestBundleWithPluralLabels;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests bundle singular, plural and count labels.
- *
- * @coversDefaultClass \Drupal\Core\Entity\EntityTypeBundleInfo
- * @group Entity
  */
+#[Group('Entity')]
+#[CoversClass(EntityTypeBundleInfo::class)]
+#[RunTestsInSeparateProcesses]
 class EntityTypeBundleInfoPluralLabelTest extends KernelTestBase {
 
   /**
@@ -26,24 +31,18 @@ class EntityTypeBundleInfoPluralLabelTest extends KernelTestBase {
 
   /**
    * The entity type bundle info service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
-  protected $bundleInfo;
+  protected EntityTypeBundleInfoInterface $bundleInfo;
 
   /**
    * The tested entity type ID.
-   *
-   * @var string
    */
-  protected $entityTypeId;
+  protected string $entityTypeId;
 
   /**
    * The tested bundle.
-   *
-   * @var string
    */
-  protected $bundle;
+  protected string $bundle;
 
   /**
    * {@inheritdoc}
@@ -55,8 +54,6 @@ class EntityTypeBundleInfoPluralLabelTest extends KernelTestBase {
 
   /**
    * Tests singular, plural and count labels for bundles as config entities.
-   *
-   * @covers ::getAllBundleInfo
    */
   public function testLabelsForBundlesAsConfigEntities(): void {
     // Test bundles stored in config entities.
@@ -131,8 +128,6 @@ class EntityTypeBundleInfoPluralLabelTest extends KernelTestBase {
 
   /**
    * Tests singular, plural and count labels for bundles defined in code.
-   *
-   * @covers ::getAllBundleInfo
    */
   public function testLabelsForBundlesWithoutConfigEntities(): void {
     // Test entities with bundles not stored in config entities.
@@ -164,8 +159,6 @@ class EntityTypeBundleInfoPluralLabelTest extends KernelTestBase {
 
   /**
    * Test passing a wrong entity type to ::getBundleCountLabel().
-   *
-   * @covers ::getBundleCountLabel
    */
   public function testGetBundleCountLabelWithWrongEntityType(): void {
     $this->expectExceptionObject(new \InvalidArgumentException("The 'nonexistent_entity_type' doesn't exist."));
@@ -174,8 +167,6 @@ class EntityTypeBundleInfoPluralLabelTest extends KernelTestBase {
 
   /**
    * Test passing a wrong bundle type to ::getBundleCountLabel().
-   *
-   * @covers ::getBundleCountLabel
    */
   public function testGetBundleCountLabelWithWrongBundle(): void {
     $this->expectExceptionObject(new \InvalidArgumentException("The 'entity_test' entity type bundle 'nonexistent_bundle' doesn't exist."));
@@ -184,8 +175,6 @@ class EntityTypeBundleInfoPluralLabelTest extends KernelTestBase {
 
   /**
    * Test passing a wrong bundle count label variant to ::getBundleCountLabel().
-   *
-   * @covers ::getBundleCountLabel
    */
   public function testGetBundleCountLabelWithWrongVariant(): void {
     EntityTestBundleWithPluralLabels::create([

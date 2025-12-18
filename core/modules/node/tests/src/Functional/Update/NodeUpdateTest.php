@@ -8,6 +8,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node module updates.
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 #[Group('node')]
 #[IgnoreDeprecations]
 #[CoversFunction('node_post_update_plural_variants')]
+#[RunTestsInSeparateProcesses]
 class NodeUpdateTest extends UpdatePathTestBase {
 
   /**
