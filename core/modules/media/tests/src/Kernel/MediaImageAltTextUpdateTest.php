@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Kernel;
 
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\media\Entity\Media;
 use PHPUnit\Framework\Attributes\Group;
@@ -14,14 +16,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('media')]
 #[RunTestsInSeparateProcesses]
-class MediaImageAltTextUpdateTest extends MediaKernelTestBase
-{
+class MediaImageAltTextUpdateTest extends MediaKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void
-  {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create a media type using the image source.
@@ -31,7 +31,7 @@ class MediaImageAltTextUpdateTest extends MediaKernelTestBase
     ]);
 
     // Create field storage for metadata copy.
-    $storage = \Drupal\field\Entity\FieldStorageConfig::create([
+    $storage = FieldStorageConfig::create([
       'field_name'    => 'field_media_image_alt_copy',
       'entity_type'   => 'media',
       'type'          => 'string',
@@ -40,7 +40,7 @@ class MediaImageAltTextUpdateTest extends MediaKernelTestBase
     $storage->save();
 
     // Create field instance on the bundle.
-    $field = \Drupal\field\Entity\FieldConfig::create([
+    $field = FieldConfig::create([
       'field_name'  => 'field_media_image_alt_copy',
       'entity_type' => 'media',
       'bundle'      => $media_type->id(),
@@ -58,8 +58,7 @@ class MediaImageAltTextUpdateTest extends MediaKernelTestBase
   /**
    * Creates a valid test image file.
    */
-  protected function createTestImageFile(string $name = 'test.jpg'): File
-  {
+  protected function createTestImageFile(string $name = 'test.jpg'): File {
     $uri = "public://$name";
     file_put_contents($uri, file_get_contents('data://text/plain;base64,iVBORw0KGgo='));
 
@@ -74,8 +73,7 @@ class MediaImageAltTextUpdateTest extends MediaKernelTestBase
   /**
    * The metadata should update when only the ALT changes.
    */
-  public function testAltChangeUpdatesMetadata(): void
-  {
+  public function testAltChangeUpdatesMetadata(): void {
     $file = $this->createTestImageFile();
 
     $media = Media::create([
@@ -112,8 +110,7 @@ class MediaImageAltTextUpdateTest extends MediaKernelTestBase
   /**
    * Unrelated changes must NOT update mapped metadata.
    */
-  public function testNoMetadataUpdateOnUnrelatedChange(): void
-  {
+  public function testNoMetadataUpdateOnUnrelatedChange(): void {
     $file = $this->createTestImageFile('test2.jpg');
 
     $media = Media::create([
@@ -145,4 +142,5 @@ class MediaImageAltTextUpdateTest extends MediaKernelTestBase
       'No metadata update occurred for unrelated change.'
     );
   }
+
 }
