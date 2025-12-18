@@ -124,7 +124,7 @@ claro.drupal.dialog:
 claro.tabledrag:
   version: VERSION
   js:
-    js/tabledrag.js: {}
+    js/tabledrag.js: { weight: -1 }
 
 drupal.node.preview:
   version: VERSION
@@ -137,6 +137,7 @@ drupal.tablesort:
   css:
     component:
       css/classy/components/tablesort.css: {}
+      css/components/tablesort.css: {}
       css/components/tablesort-indicator.css: {}
 
 media-form:

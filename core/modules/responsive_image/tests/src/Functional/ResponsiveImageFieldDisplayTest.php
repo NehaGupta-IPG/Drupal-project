@@ -15,11 +15,13 @@ use Drupal\Tests\image\Functional\ImageFieldTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests responsive image display formatter.
  */
 #[Group('responsive_image')]
+#[RunTestsInSeparateProcesses]
 class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
 
   use TestFileCreationTrait;
@@ -414,6 +416,38 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     $node = $node_storage->load($nid);
     $image_uri = File::load($node->{$field_name}->target_id)->getFileUri();
     $this->assertSession()->responseMatches('/srcset="' . preg_quote($this->fileUrlGenerator->transformRelative($thumbnail_style->buildUrl($image_uri)), '/') . ' 1x".+?media="\(min-width: 0px\)"/');
+  }
+
+  /**
+   * Tests formatter passes down any attributes in the render array.
+   */
+  public function testResponsiveImageFieldFormatterAttributesInRenderArray(): void {
+    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    $renderer = $this->container->get('renderer');
+    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
+    $field_name = $this->randomMachineName();
+    $this->createImageField($field_name, 'node', 'article', ['uri_scheme' => 'public']);
+
+    // Create a new node with an image attached.
+    $test_image = current($this->getTestFiles('image'));
+    $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $this->randomMachineName());
+    $node_storage->resetCache([$nid]);
+    $node = $node_storage->load($nid);
+
+    $image = [
+      '#theme' => 'responsive_image_formatter',
+      '#item' => $node->{$field_name}[0],
+      '#responsive_image_style_id' => 'style_one',
+      '#attributes' => [
+        'alt' => 'test alt',
+        'data-test1' => 'test1',
+        'data-test2' => 'test2',
+      ],
+    ];
+    $html_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
+    $this->assertStringContainsString('alt="test alt"', $html_output);
+    $this->assertStringContainsString('data-test1="test1"', $html_output);
+    $this->assertStringContainsString('data-test2="test2"', $html_output);
   }
 
   /**

@@ -12,6 +12,7 @@ use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityDefinitionUpdateManager functionality.
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(EntityDefinitionUpdateManager::class)]
 #[Group('Entity')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
@@ -221,7 +223,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
   /**
    * Test cases for ::testBaseFieldDeleteWithExistingData.
    */
-  public static function baseFieldDeleteWithExistingDataTestCases() {
+  public static function baseFieldDeleteWithExistingDataTestCases(): array {
     return [
       'Non-revisionable, non-translatable entity type' => [
         'entity_test_update',
@@ -340,7 +342,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
   /**
    * Test cases for ::testInitialValueFromField.
    */
-  public static function initialValueFromFieldTestCases() {
+  public static function initialValueFromFieldTestCases(): array {
     return [
       'literal value' => [
         'test initial value',

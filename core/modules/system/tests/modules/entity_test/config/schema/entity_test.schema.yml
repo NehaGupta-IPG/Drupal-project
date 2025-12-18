@@ -38,6 +38,17 @@ entity_test.entity_test_mul_bundle.*:
   type: entity_test.entity_test_bundle.*
   label: 'Entity test mul bundle'
 
+entity_test.entity_test_no_id_bundle.*:
+  type: config_entity
+  label: 'Entity test no ID bundle'
+  mapping:
+    label:
+      type: label
+      label: 'Label'
+    id:
+      type: string
+      label: 'Machine-readable name'
+
 entity_test.entity_test_bundle_plural_labels.*:
   type: bundle_entity_with_plural_labels
   mapping:

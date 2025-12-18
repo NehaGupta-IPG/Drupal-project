@@ -19,11 +19,13 @@ use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests deriving metadata of entity and field data types.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityTypedDataDefinitionTest extends KernelTestBase {
 
   /**
@@ -174,7 +176,7 @@ class EntityTypedDataDefinitionTest extends KernelTestBase {
   /**
    * Provides test cases for testEntityDefinitionIsInternal.
    */
-  public static function entityDefinitionIsInternalProvider() {
+  public static function entityDefinitionIsInternalProvider(): array {
     return [
       'internal' => [TRUE, TRUE],
       'external' => [FALSE, FALSE],
