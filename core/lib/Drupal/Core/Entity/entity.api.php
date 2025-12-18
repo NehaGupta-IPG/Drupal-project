@@ -893,13 +893,13 @@ function hook_entity_view_mode_info_alter(&$view_modes) {
  *     the following variants, depending on the use-case:
  *     - On a regular page: @code 1 article\x03@count articles @endcode.
  *     - On a search results page: @code 1 article was found\x03@count articles
- *       were found @encode. Note that we cannot build this version by deriving
+ *       were found @endcode. Note that we cannot build this version by deriving
  *       the first one because of the was/were forms.
  *     - On a different page: @code <span>1</span>
  *       article\x03<span>@count</span> articles @endcode.
  *     - On other pages the count might be displayed in a different @code <div>
- *       @encode or even in a different theme hook, so it needs a variant
- *       without the count part: @code Article\x03Articles @encode.
+ *       @endcode or even in a different theme hook, so it needs a variant
+ *       without the count part: @code Article\x03Articles @endcode.
  *     A meaningful key may be added to each variant in order to allow a more
  *     developer friendly identification. If the key is missed, the array index
  *     value should be used to identify which count plural variant to be used.
