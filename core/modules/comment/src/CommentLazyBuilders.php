@@ -2,6 +2,8 @@
 
 namespace Drupal\comment;
 
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -113,7 +115,13 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
       'pid' => NULL,
     ];
     $comment = $this->entityTypeManager->getStorage('comment')->create($values);
-    return $comment->access('create', $this->currentUser) ? $this->entityFormBuilder->getForm($comment) : [];
+
+    /** @var \Drupal\Core\Access\AccessResultInterface $access */
+    $access = $comment->access('create', $this->currentUser, TRUE);
+    $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($comment, $comment_type_id) : [];
+    CacheableMetadata::createFromObject($access)->applyTo($form);
+
+    return $form;
   }
 
   /**
