@@ -14,6 +14,7 @@ use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -27,6 +28,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  * @see \Drupal\rest\Plugin\views\row\DataFieldRow
  */
 #[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class StyleSerializerEntityTest extends ViewTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -54,7 +56,14 @@ class StyleSerializerEntityTest extends ViewTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_serializer_display_field', 'test_serializer_display_entity', 'test_serializer_display_entity_translated', 'test_serializer_node_display_field', 'test_serializer_node_exposed_filter', 'test_serializer_shared_path'];
+  public static $testViews = [
+    'test_serializer_display_field',
+    'test_serializer_display_entity',
+    'test_serializer_display_entity_translated',
+    'test_serializer_node_display_field',
+    'test_serializer_node_exposed_filter',
+    'test_serializer_shared_path',
+  ];
 
   /**
    * A user with permissions to look at test entity and configure views.
@@ -431,7 +440,10 @@ class StyleSerializerEntityTest extends ViewTestBase {
       'created' => 'created',
     ];
 
-    $edit = ['row_options[field_options][name][alias]' => $alias_map['name'], 'row_options[field_options][nothing][alias]' => $alias_map['nothing']];
+    $edit = [
+      'row_options[field_options][name][alias]' => $alias_map['name'],
+      'row_options[field_options][nothing][alias]' => $alias_map['nothing'],
+    ];
     $this->drupalGet($row_options);
     $this->submitForm($edit, 'Apply');
     $this->assertSession()->pageTextContains('The machine-readable name must contain only letters, numbers, dashes and underscores.');
@@ -439,7 +451,10 @@ class StyleSerializerEntityTest extends ViewTestBase {
     // Change the map alias value to a valid one.
     $alias_map['nothing'] = $this->randomMachineName();
 
-    $edit = ['row_options[field_options][name][alias]' => $alias_map['name'], 'row_options[field_options][nothing][alias]' => $alias_map['nothing']];
+    $edit = [
+      'row_options[field_options][name][alias]' => $alias_map['name'],
+      'row_options[field_options][nothing][alias]' => $alias_map['nothing'],
+    ];
     $this->drupalGet($row_options);
     $this->submitForm($edit, 'Apply');
 

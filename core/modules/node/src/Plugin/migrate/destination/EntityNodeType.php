@@ -33,12 +33,28 @@ class EntityNodeType extends EntityConfigBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3533565
    */
   public function import(Row $row, array $old_destination_id_values = []) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533565', E_USER_DEPRECATED);
     $entity_ids = parent::import($row, $old_destination_id_values);
     if ($row->getDestinationProperty('create_body')) {
       $node_type = $this->storage->load(reset($entity_ids));
       $field_storage = FieldStorageConfig::loadByName('node', 'body');
+      if (!$field_storage) {
+        FieldStorageConfig::create([
+          'field_name' => 'body',
+          'type' => 'text_with_summary',
+          'entity_type' => 'node',
+          'cardinality' => 1,
+          'persist_with_no_fields' => FALSE,
+        ])->save();
+        $field_storage = FieldStorageConfig::loadByName('node', 'body');
+      }
       $field = FieldConfig::loadByName('node', $node_type->id(), 'body');
 
       if (!$field) {

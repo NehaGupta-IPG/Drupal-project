@@ -13,12 +13,14 @@ use Drupal\node\Entity\NodeType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityDeriver functionality.
  */
 #[CoversClass(EntityDeriver::class)]
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityDeriverTest extends KernelTestBase {
 
   /**
@@ -32,8 +34,6 @@ class EntityDeriverTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
-    'field',
     'user',
     'node',
     'comment',
@@ -72,7 +72,7 @@ class EntityDeriverTest extends KernelTestBase {
   /**
    * Provides test data for ::testDerivatives().
    */
-  public static function derivativesProvider() {
+  public static function derivativesProvider(): array {
     return [
       'un-bundleable entity type with no bundle type' => ['entity:user', FALSE],
       'un-bundleable entity type with bundle type' => ['entity:user:user', TRUE],

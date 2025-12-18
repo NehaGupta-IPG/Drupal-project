@@ -237,7 +237,7 @@ class TokenTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->any())
       ->method('alter')
-      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata): void {
         $replacements['[node:title]'] = 'hello world';
         $bubbleable_metadata->addCacheContexts(['custom_context']);
         $bubbleable_metadata->addCacheTags(['node:1']);
@@ -295,7 +295,7 @@ class TokenTest extends UnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
-  public static function providerTestReplaceEscaping() {
+  public static function providerTestReplaceEscaping(): array {
     $data = [];
 
     // No tokens. The first argument to Token::replace() should not be escaped.
@@ -303,7 +303,11 @@ class TokenTest extends UnitTestCase {
     $data['html-in-string'] = ['<h1>Giraffe</h1>', [], '<h1>Giraffe</h1>'];
     $data['html-in-string-quote'] = ['<h1>Giraffe"</h1>', [], '<h1>Giraffe"</h1>'];
 
-    $data['simple-placeholder-with-plain-text'] = ['<h1>[token:meh]</h1>', ['[token:meh]' => 'Giraffe"'], '<h1>' . Html::escape('Giraffe"') . '</h1>'];
+    $data['simple-placeholder-with-plain-text'] = [
+      '<h1>[token:meh]</h1>',
+      ['[token:meh]' => 'Giraffe"'],
+      '<h1>' . Html::escape('Giraffe"') . '</h1>',
+    ];
 
     $data['simple-placeholder-with-safe-html'] = [
       '<h1>[token:meh]</h1>',
