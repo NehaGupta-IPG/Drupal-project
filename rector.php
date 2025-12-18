@@ -16,14 +16,18 @@ return Rector\Config\RectorConfig::configure()
   ->withPaths([
     __DIR__ . '/core/tests',
   ])
-  ->withPreparedSets(typeDeclarations: true)
   ->withSkip([
+    '*/*ixture*/*',
+    '*/Annotation/Doctrine/*',
+  ])
+  ->withPreparedSets(typeDeclarations: true)
+/*  ->withSkip([
     TypedPropertyFromCreateMockAssignRector::class,
     TypedPropertyFromDocblockSetUpDefinedRector::class,
     TypedPropertyFromAssignsRector::class,
     TypedPropertyFromStrictConstructorRector::class,
     TypedPropertyFromStrictSetUpRector::class,
-  ])
+  ])*/
   ->withImportNames(
     importDocBlockNames: false,
     importShortClasses: false,
