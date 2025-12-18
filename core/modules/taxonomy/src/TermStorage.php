@@ -257,7 +257,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
           $has_children = FALSE;
           $child = current($this->treeChildren[$vid][$parent]);
           do {
-            if (empty($child)) {
+            if (empty($child) || ($child == $parent)) {
               break;
             }
             $term = $load_entities ? $term_entities[$child] : $this->treeTerms[$vid][$child];
