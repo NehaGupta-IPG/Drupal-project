@@ -8,12 +8,14 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\comment\Traits\CommentCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test comment creation access control.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentCreationAccessTest extends KernelTestBase {
 
   use CommentCreationTrait;
@@ -50,9 +52,6 @@ class CommentCreationAccessTest extends KernelTestBase {
 
   /**
    * Tests that context is passed to the comment creation access control.
-   *
-   * @covers \Drupal\comment\Entity\Comment::access
-   * @covers \Drupal\comment\CommentFieldItemList::access
    */
   public function testContextForCommentCreationAccessCheck(): void {
     $state = $this->container->get('state');
