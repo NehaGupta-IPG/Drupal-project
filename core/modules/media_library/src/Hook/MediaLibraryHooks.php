@@ -287,7 +287,7 @@ class MediaLibraryHooks {
         // bypass that in order to work around the data-drupal-selector bug.
         // This is okay so long as we assume that this form only ever occurs
         // once on a page.
-        // @todo: Remove once https://www.drupal.org/node/2897377 is fixed.
+        // @todo Remove once https://www.drupal.org/node/2897377 is fixed.
         $form['#id'] = Html::getId($form_state->getBuildInfo()['form_id']);
 
       }
