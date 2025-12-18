@@ -701,6 +701,7 @@
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
+      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
     }
   });
 
@@ -711,6 +712,7 @@
         .toggleClass('form-readonly', e.value)
         .find('input, textarea')
         .prop('readonly', e.value);
+      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
     }
   });
 
@@ -732,6 +734,7 @@
           .closest('.js-form-item, .js-form-wrapper')
           .find('label.js-form-required')
           .removeClass('js-form-required form-required');
+        $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
       }
     }
   });
@@ -746,6 +749,7 @@
         $element = $(e.target);
       }
       $element.toggle(e.value);
+      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
     }
   });
 
@@ -756,6 +760,7 @@
         .find('input')
         .prop('checked', e.value)
         .trigger('change');
+      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
     }
   });
 
@@ -764,6 +769,7 @@
       if (e.target.hasAttribute('open') === e.value) {
         $(e.target).find('> summary').trigger('click');
       }
+      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
     }
   });
 })(jQuery, Drupal);
