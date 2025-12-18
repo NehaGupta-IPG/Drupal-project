@@ -103,7 +103,7 @@
           text: button.innerHTML || button.getAttribute('value'),
           class: button.getAttribute('class'),
           'data-once': button.dataset.once,
-          disabled: button.getAttribute('disabled'),
+          disabled: button.disabled,
           click(e) {
             if (button.tagName === 'A') {
               button.click();

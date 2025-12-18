@@ -701,9 +701,12 @@
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
-      const dialog = document.querySelector('.ui-dialog-content');
-      if (dialog) {
-        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+      // Only trigger dialog button updates if the target is a submit button
+      if (e.target.matches('input[type="submit"], button[type="submit"]')) {
+        const dialog = document.querySelector('.ui-dialog-content');
+        if (dialog) {
+          dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+        }
       }
     }
   });
@@ -715,10 +718,6 @@
         .toggleClass('form-readonly', e.value)
         .find('input, textarea')
         .prop('readonly', e.value);
-      const dialog = document.querySelector('.ui-dialog-content');
-      if (dialog) {
-        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
-      }
     }
   });
 
@@ -740,10 +739,6 @@
           .closest('.js-form-item, .js-form-wrapper')
           .find('label.js-form-required')
           .removeClass('js-form-required form-required');
-        const dialog = document.querySelector('.ui-dialog-content');
-        if (dialog) {
-          dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
-        }
       }
     }
   });
@@ -758,9 +753,12 @@
         $element = $(e.target);
       }
       $element.toggle(e.value);
-      const dialog = document.querySelector('.ui-dialog-content');
-      if (dialog) {
-        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+      // Only trigger dialog button updates if the target is a submit button
+      if (e.target.matches('input[type="submit"], button[type="submit"]')) {
+        const dialog = document.querySelector('.ui-dialog-content');
+        if (dialog) {
+          dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+        }
       }
     }
   });
@@ -772,10 +770,6 @@
         .find('input')
         .prop('checked', e.value)
         .trigger('change');
-      const dialog = document.querySelector('.ui-dialog-content');
-      if (dialog) {
-        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
-      }
     }
   });
 
@@ -783,10 +777,6 @@
     if (e.trigger) {
       if (e.target.hasAttribute('open') === e.value) {
         $(e.target).find('> summary').trigger('click');
-      }
-      const dialog = document.querySelector('.ui-dialog-content');
-      if (dialog) {
-        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
       }
     }
   });
