@@ -1,21 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\Plugin\Attribute;
 
 use Drupal\Component\Plugin\Attribute\Plugin;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \Drupal\Component\Annotation\Plugin
- * @group Attribute
+ * Tests Drupal\Component\Plugin\Attribute\Plugin.
  */
+#[CoversClass(Plugin::class)]
+#[Group('Attribute')]
 class PluginTest extends TestCase {
 
   /**
-   * @covers ::__construct
-   * @covers ::get
+   * @legacy-covers ::__construct
+   * @legacy-covers ::get
    */
-  public function testGet() {
+  public function testGet(): void {
     $plugin = new PluginStub(id: 'example', deriver: 'test');
     $plugin->setClass('foo');
     $this->assertEquals([
@@ -26,28 +31,28 @@ class PluginTest extends TestCase {
   }
 
   /**
-   * @covers ::setProvider
-   * @covers ::getProvider
+   * @legacy-covers ::setProvider
+   * @legacy-covers ::getProvider
    */
-  public function testSetProvider() {
+  public function testSetProvider(): void {
     $plugin = new Plugin(id: 'example');
     $plugin->setProvider('example');
     $this->assertEquals('example', $plugin->getProvider());
   }
 
   /**
-   * @covers ::getId
+   * @legacy-covers ::getId
    */
-  public function testGetId() {
+  public function testGetId(): void {
     $plugin = new Plugin(id: 'example');
     $this->assertEquals('example', $plugin->getId());
   }
 
   /**
-   * @covers ::setClass
-   * @covers ::getClass
+   * @legacy-covers ::setClass
+   * @legacy-covers ::getClass
    */
-  public function testSetClass() {
+  public function testSetClass(): void {
     $plugin = new Plugin(id: 'test');
     $plugin->setClass('example');
     $this->assertEquals('example', $plugin->getClass());

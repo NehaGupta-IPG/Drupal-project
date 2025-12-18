@@ -5,20 +5,21 @@ declare(strict_types = 1);
 namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\Config\Schema\Mapping;
-use Symfony\Component\Validator\Constraint;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Validation\Attribute\Constraint;
+use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Checks that all the keys of a mapping are valid and required keys present.
- *
- * @Constraint(
- *   id = "ValidKeys",
- *   label = @Translation("Valid mapping keys", context = "Validation"),
- *   type = { "mapping" },
- * )
  */
-class ValidKeysConstraint extends Constraint {
+#[Constraint(
+  id: 'ValidKeys',
+  label: new TranslatableMarkup('Valid mapping keys', [], ['context' => 'Validation']),
+  type: ['mapping']
+)]
+class ValidKeysConstraint extends SymfonyConstraint {
 
   /**
    * The error message if a key is invalid.
@@ -33,6 +34,20 @@ class ValidKeysConstraint extends Constraint {
    * @var string
    */
   public string $dynamicInvalidKeyMessage = "'@key' is an unknown key because @dynamic_type_property_path is @dynamic_type_property_value (see config schema type @resolved_dynamic_type).";
+
+  /**
+   * The error message if a key is missing.
+   *
+   * @var string
+   */
+  public string $missingRequiredKeyMessage = "'@key' is a required key.";
+
+  /**
+   * The error message if a dynamically required key is missing.
+   *
+   * @var string
+   */
+  public string $dynamicMissingRequiredKeyMessage = "'@key' is a required key because @dynamic_type_property_path is @dynamic_type_property_value (see config schema type @resolved_dynamic_type).";
 
   /**
    * The error message if the array being validated is a list.
@@ -51,14 +66,14 @@ class ValidKeysConstraint extends Constraint {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOption() {
+  public function getDefaultOption(): ?string {
     return 'allowedKeys';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getRequiredOptions() {
+  public function getRequiredOptions(): array {
     return ['allowedKeys'];
   }
 

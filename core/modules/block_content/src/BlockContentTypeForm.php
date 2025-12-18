@@ -3,6 +3,7 @@
 namespace Drupal\block_content;
 
 use Drupal\Core\Entity\BundleEntityFormBase;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\Entity\ContentLanguageSettings;
@@ -94,6 +95,17 @@ class BlockContentTypeForm extends BundleEntityFormBase {
   /**
    * {@inheritdoc}
    */
+  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
+    // An empty description violates config schema.
+    if (trim($form_state->getValue('description', '')) === '') {
+      $form_state->unsetValue('description');
+    }
+    parent::copyFormValuesToEntity($entity, $form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $block_type = $this->entity;
     $status = $block_type->save();
@@ -105,7 +117,6 @@ class BlockContentTypeForm extends BundleEntityFormBase {
       $logger->notice('Block type %label has been updated.', ['%label' => $block_type->label(), 'link' => $edit_link]);
     }
     else {
-      block_content_add_body_field($block_type->id());
       $this->messenger()->addStatus($this->t('Block type %label has been added.', ['%label' => $block_type->label()]));
       $logger->notice('Block type %label has been added.', ['%label' => $block_type->label(), 'link' => $edit_link]);
     }

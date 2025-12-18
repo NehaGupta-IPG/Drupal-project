@@ -1,24 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Unit\Upload;
 
 use Drupal\file\Upload\ContentDispositionFilenameParser;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Tests the ContentDispositionFilenameParser class.
- *
- * @group file
- * @coversDefaultClass \Drupal\file\Upload\ContentDispositionFilenameParser
  */
+#[CoversClass(ContentDispositionFilenameParser::class)]
+#[Group('file')]
 class ContentDispositionFilenameParserTest extends UnitTestCase {
 
   /**
    * Tests the parseFilename() method.
    *
-   * @covers ::parseFilename
+   * @legacy-covers ::parseFilename
    */
   public function testParseFilenameSuccess(): void {
     $request = $this->createRequest('filename="test.txt"');
@@ -27,9 +31,11 @@ class ContentDispositionFilenameParserTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::parseFilename
-   * @dataProvider invalidHeaderProvider
+   * Tests parse filename invalid.
+   *
+   * @legacy-covers ::parseFilename
    */
+  #[DataProvider('invalidHeaderProvider')]
   public function testParseFilenameInvalid(string | bool $contentDisposition): void {
     $this->expectException(BadRequestHttpException::class);
     $this->expectExceptionMessage('No filename found in "Content-Disposition" header. A file name in the format "filename=FILENAME" must be provided.');
@@ -38,7 +44,9 @@ class ContentDispositionFilenameParserTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::parseFilename
+   * Tests parse filename missing.
+   *
+   * @legacy-covers ::parseFilename
    */
   public function testParseFilenameMissing(): void {
     $this->expectException(BadRequestHttpException::class);
@@ -48,19 +56,21 @@ class ContentDispositionFilenameParserTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::parseFilename
+   * Tests parse filename extended.
+   *
+   * @legacy-covers ::parseFilename
    */
   public function testParseFilenameExtended(): void {
     $this->expectException(BadRequestHttpException::class);
     $this->expectExceptionMessage('The extended "filename*" format is currently not supported in the "Content-Disposition" header.');
     $request = $this->createRequest('filename*="UTF-8 \' \' example.txt"');
-    $filename = ContentDispositionFilenameParser::parseFilename($request);
+    ContentDispositionFilenameParser::parseFilename($request);
   }
 
   /**
    * A data provider for invalid headers.
    */
-  public function invalidHeaderProvider(): array {
+  public static function invalidHeaderProvider(): array {
     return [
       'multiple' => ['file; filename=""'],
       'empty' => ['filename=""'],

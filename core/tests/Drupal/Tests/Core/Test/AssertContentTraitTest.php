@@ -1,22 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Test;
 
 use Drupal\KernelTests\AssertContentTrait;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\KernelTests\AssertContentTrait
- * @group Test
+ * Tests Drupal\KernelTests\AssertContentTrait.
  */
+#[CoversClass(AssertContentTrait::class)]
+#[Group('Test')]
 class AssertContentTraitTest extends UnitTestCase {
 
   use AssertContentTrait;
 
   /**
-   * @covers ::getTextContent
+   * Tests get text content.
+   *
+   * @legacy-covers ::getTextContent
    */
-  public function testGetTextContent() {
+  public function testGetTextContent(): void {
 
     $raw_content = <<<EOT
 

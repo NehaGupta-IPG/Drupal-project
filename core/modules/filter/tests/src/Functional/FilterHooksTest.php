@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\filter\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests hooks for text formats insert/update/disable.
- *
- * @group filter
  */
+#[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterHooksTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['node', 'filter_test'];
 
@@ -30,7 +32,7 @@ class FilterHooksTest extends BrowserTestBase {
    * Tests that hooks run correctly on creating, editing, and deleting a text
    * format.
    */
-  public function testFilterHooks() {
+  public function testFilterHooks(): void {
     // Create content type, with underscores.
     $type_name = 'test_' . $this->randomMachineName();
     $type = $this->drupalCreateContentType(['name' => $type_name, 'type' => $type_name]);

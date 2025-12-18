@@ -8,18 +8,18 @@ use Drupal\field\FieldConfigInterface;
 use Drupal\media\Entity\Media;
 use Drupal\media\Entity\MediaType;
 use Drupal\media\MediaSourceInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that media UI works correctly.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaUiJavascriptTest extends MediaJavascriptTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -50,7 +50,7 @@ class MediaUiJavascriptTest extends MediaJavascriptTestBase {
   /**
    * Tests a media type administration.
    */
-  public function testMediaTypes() {
+  public function testMediaTypes(): void {
     $session = $this->getSession();
     $page = $session->getPage();
     $assert_session = $this->assertSession();

@@ -45,14 +45,18 @@ class ContactController extends ControllerBase {
    *   Exception is thrown when user tries to access non existing default
    *   contact form.
    */
-  public function contactSitePage(ContactFormInterface $contact_form = NULL) {
+  public function contactSitePage(?ContactFormInterface $contact_form = NULL) {
     $config = $this->config('contact.settings');
 
     // Use the default form if no form has been passed.
     if (empty($contact_form)) {
-      $contact_form = $this->entityTypeManager()
-        ->getStorage('contact_form')
-        ->load($config->get('default_form'));
+      $default_form = $config->get('default_form');
+      // Load the default form, if configured.
+      if (!is_null($default_form)) {
+        $contact_form = $this->entityTypeManager()
+          ->getStorage('contact_form')
+          ->load($default_form);
+      }
       // If there are no forms, do not display the form.
       if (empty($contact_form)) {
         if ($this->currentUser()->hasPermission('administer contact forms')) {
@@ -77,6 +81,12 @@ class ContactController extends ControllerBase {
     $form['#title'] = $contact_form->label();
     $form['#cache']['contexts'][] = 'user.permissions';
     $this->renderer->addCacheableDependency($form, $config);
+
+    // The form might not have the correct cacheability metadata, so make it
+    // uncacheable by default.
+    // @todo Remove this in https://www.drupal.org/node/3395506.
+    $form['#cache']['max-age'] = 0;
+
     return $form;
   }
 
