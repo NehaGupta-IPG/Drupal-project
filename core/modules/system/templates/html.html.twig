@@ -28,10 +28,11 @@
 <!DOCTYPE html>
 <html{{ html_attributes }}>
   <head>
-    <head-placeholder token="{{ placeholder_token }}">
-    <title>{{ head_title|safe_join(' | ') }}</title>
+    <meta charset="utf-8">
     <css-placeholder token="{{ placeholder_token }}">
     <js-placeholder token="{{ placeholder_token }}">
+    <title>{{ head_title|safe_join(' | ') }}</title>
+    <head-placeholder token="{{ placeholder_token }}">
   </head>
   <body{{ attributes }}>
     {#
