@@ -701,7 +701,10 @@
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
-      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
+      const dialog = document.querySelector('.ui-dialog-content');
+      if (dialog) {
+        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+      }
     }
   });
 
@@ -712,7 +715,10 @@
         .toggleClass('form-readonly', e.value)
         .find('input, textarea')
         .prop('readonly', e.value);
-      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
+      const dialog = document.querySelector('.ui-dialog-content');
+      if (dialog) {
+        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+      }
     }
   });
 
@@ -734,7 +740,10 @@
           .closest('.js-form-item, .js-form-wrapper')
           .find('label.js-form-required')
           .removeClass('js-form-required form-required');
-        $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
+        const dialog = document.querySelector('.ui-dialog-content');
+        if (dialog) {
+          dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+        }
       }
     }
   });
@@ -749,7 +758,10 @@
         $element = $(e.target);
       }
       $element.toggle(e.value);
-      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
+      const dialog = document.querySelector('.ui-dialog-content');
+      if (dialog) {
+        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+      }
     }
   });
 
@@ -760,7 +772,10 @@
         .find('input')
         .prop('checked', e.value)
         .trigger('change');
-      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
+      const dialog = document.querySelector('.ui-dialog-content');
+      if (dialog) {
+        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+      }
     }
   });
 
@@ -769,7 +784,10 @@
       if (e.target.hasAttribute('open') === e.value) {
         $(e.target).find('> summary').trigger('click');
       }
-      $document.find('.ui-dialog-content').trigger('dialogButtonsChange');
+      const dialog = document.querySelector('.ui-dialog-content');
+      if (dialog) {
+        dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
+      }
     }
   });
 })(jQuery, Drupal);
