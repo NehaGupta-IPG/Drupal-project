@@ -6,11 +6,14 @@ namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\VocabularyInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensure that the term overview page filtering works properly.
  */
 #[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TaxonomyTermFilterTest extends TaxonomyTestBase {
 
   /**
