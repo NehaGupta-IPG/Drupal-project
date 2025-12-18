@@ -76,6 +76,21 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
     // Add the bare minimum of attachments from the system module and the
     // current maintenance theme.
     $this->systemPageAttachments($html['page']);
+
+    // Add the charset meta attribute to the installer page. This is done
+    // outside ::systemPageAttachments() because it is added in html.html.twig.
+    $html['page']['#attached']['html_head'][] = [
+      [
+        '#tag' => 'meta',
+        '#attributes' => [
+          'charset' => 'utf-8',
+        ],
+        // Security: This always has to be output first.
+        '#weight' => -1000,
+      ],
+      'system_meta_content_type',
+    ];
+
     $this->renderer->renderRoot($html);
 
     $response = new HtmlResponse();
