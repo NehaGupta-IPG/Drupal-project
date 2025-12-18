@@ -7,12 +7,14 @@ namespace Drupal\Tests\system\Functional\Update;
 use Drupal\Core\Database\Database;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests update of schema for timestamp fields to bigint.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class Y2038SchemaUpdateTest extends UpdatePathTestBase {
 
   use UpdatePathTestTrait;
