@@ -148,6 +148,15 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
         'id' => 'id',
         'uuid' => 'uuid',
       ]);
+    $this->entityType
+      ->method('getKey')
+      ->willReturnMap([
+        ['default_langcode', 'default_langcode'],
+        ['id', 'id'],
+        ['langcode', 'langcode'],
+        ['revision', 'revision_id'],
+        ['uuid', 'uuid'],
+      ]);
 
     $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
     $this->entityTypeManager->expects($this->any())
@@ -241,10 +250,6 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       ->method('hasKey')
       ->with('revision')
       ->willReturnOnConsecutiveCalls(FALSE, TRUE, TRUE, TRUE);
-    $this->entityType->expects($this->exactly(2))
-      ->method('getKey')
-      ->with('revision')
-      ->willReturn('revision_id');
 
     $field_item_list = $this->getMockBuilder('\Drupal\Core\Field\FieldItemList')
       ->disableOriginalConstructor()
@@ -487,7 +492,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
     $storage = $this->createMock('\Drupal\Core\Entity\EntityStorageInterface');
     $storage->expects($this->any())
       ->method('save')
-      ->willReturnCallback(function (ContentEntityInterface $entity) use ($storage) {
+      ->willReturnCallback(function (ContentEntityInterface $entity) use ($storage): void {
         $entity->preSave($storage);
       });
 
@@ -559,7 +564,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    *   - Language code for $activeLanguage.
    *   - Fields array for $fields.
    */
-  public static function providerGet() {
+  public static function providerGet(): array {
     return [
       // Populated fields array.
       ['result', 'field_name', 'langcode', ['field_name' => ['langcode' => 'result']]],
@@ -623,7 +628,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    *     Drupal\Core\Field\FieldDefinitionInterface object will be mocked for
    *     each name.
    */
-  public static function providerGetFields() {
+  public static function providerGetFields(): array {
     return [
       [[], FALSE, FALSE, []],
       [['field' => 'field', 'field2' => 'field2'], TRUE, FALSE, ['field', 'field2']],

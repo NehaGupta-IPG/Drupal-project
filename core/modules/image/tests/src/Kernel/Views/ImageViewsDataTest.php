@@ -9,11 +9,13 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests image views data.
  */
 #[Group('image')]
+#[RunTestsInSeparateProcesses]
 class ImageViewsDataTest extends ViewsKernelTestBase {
 
   /**
@@ -22,9 +24,7 @@ class ImageViewsDataTest extends ViewsKernelTestBase {
   protected static $modules = [
     'image',
     'file',
-    'views',
     'entity_test',
-    'user',
     'field',
   ];
 

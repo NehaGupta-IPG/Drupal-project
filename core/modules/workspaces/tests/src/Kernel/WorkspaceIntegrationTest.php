@@ -22,11 +22,13 @@ use Drupal\workspaces\WorkspacePublishException;
 use PHPUnit\Framework\Attributes\DataProvider;
 // cspell:ignore differring
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests a complete publishing scenario across different workspaces.
  */
 #[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceIntegrationTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -71,7 +73,6 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     'views',
     'language',
     'content_translation',
-    'path_alias',
     'form_test',
   ];
 
@@ -859,7 +860,7 @@ class WorkspaceIntegrationTest extends KernelTestBase {
 
     // Check that the 'stage' workspace was not persisted by the workspace
     // manager.
-    $this->assertFalse($this->workspaceManager->getActiveWorkspace());
+    $this->assertNull($this->workspaceManager->getActiveWorkspace());
   }
 
   /**
@@ -1184,6 +1185,24 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     // Check that there are no more revisions to push after publishing.
     $this->workspaces['stage']->publish();
     $this->assertEmpty($workspace_publisher->getDifferringRevisionIdsOnTarget());
+  }
+
+  /**
+   * Tests that cron runs outside of workspace context.
+   */
+  public function testCronRunsOutsideWorkspace(): void {
+    $this->initializeWorkspacesModule();
+    \Drupal::service('module_installer')->install(['workspaces_test']);
+
+    // Switch to a workspace.
+    $this->switchToWorkspace('stage');
+
+    // Run cron while in the 'stage' workspace.
+    \Drupal::service('cron')->run();
+
+    // Check that cron ran without an active workspace.
+    $recorded_workspace_id = \Drupal::keyValue('ws_test')->get('cron_active_workspace');
+    $this->assertFalse($recorded_workspace_id, 'Cron should run without an active workspace.');
   }
 
 }
