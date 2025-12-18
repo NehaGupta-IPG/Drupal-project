@@ -259,7 +259,8 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     // If this form was already submitted once, it's probably hit a validation
     // error. Ensure the form is rebuilt in the same order as the user
     // submitted.
-    // The method ->getUserInput() gives problems when using the filter, so we use ->getValues() instead.
+    // The method ->getUserInput() gives problems when using the filter, so we
+    // use ->getValues() instead.
     $user_input = $form_state->getValues();
     $triggering_element = $form_state->getTriggeringElement() ? $form_state->getTriggeringElement()['#array_parents'] : NULL;
     $filter = !empty($triggering_element) && in_array('filter', $triggering_element);
@@ -605,7 +606,8 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
-    // Rebuild form if filter is submitted and discard a possible page query parameter.
+    // Rebuild form if filter is submitted and discard a possible page query
+    // parameter.
     if ('filter-submit' === $form_state->getTriggeringElement()['#id']) {
       $this->getRequest()->query->remove('page');
       return $form_state->setRebuild(TRUE);
@@ -733,7 +735,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
   }
 
   /**
-   * Filters a taxonomy term tree and returns the terms that contain the search string.
+   * Filters taxonomy terms, returning only those matching a search string.
    *
    * @param array $tree
    *   The taxonomy term tree to search in.
