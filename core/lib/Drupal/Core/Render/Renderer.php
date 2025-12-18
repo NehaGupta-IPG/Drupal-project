@@ -887,10 +887,10 @@ class Renderer implements RendererInterface {
     $callable = $this->callableResolver->getCallableFromDefinition($callback);
     // This message is formatted in two stages:
     // - Here we inject the callback type and intentionally keep a literal "%s"
-    //  placeholder for the callback description.
+    //   placeholder for the callback description.
     // - The callback description is substituted later by
-    //  \Drupal\Core\Utility\CallableResolver::doTrustedCallback()
-    //  via sprintf().
+    //   \Drupal\Core\Utility\CallableResolver::doTrustedCallback()
+    //   via sprintf().
     $message = sprintf('Render %s callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/2966725', $callback_type, '%s');
     // Add \Drupal\Core\Render\Element\RenderCallbackInterface as an extra
     // trusted interface so that:
