@@ -10,11 +10,14 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\Tests\views\Traits\ViewsLoggerTestTrait;
 use Drupal\views\Plugin\views\field\EntityOperations;
 use Drupal\views\ResultRow;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\views\Plugin\views\field\EntityOperations
- * @group Views
+ * Tests Drupal\views\Plugin\views\field\EntityOperations.
  */
+#[CoversClass(EntityOperations::class)]
+#[Group('Views')]
 class EntityOperationsUnitTest extends UnitTestCase {
 
   use ViewsLoggerTestTrait;
@@ -50,7 +53,7 @@ class EntityOperationsUnitTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    *
-   * @covers ::__construct
+   * @legacy-covers ::__construct
    */
   protected function setUp(): void {
     parent::setUp();
@@ -77,20 +80,24 @@ class EntityOperationsUnitTest extends UnitTestCase {
       ->getMock();
     $display = $this->getMockBuilder('\Drupal\views\Plugin\views\display\DisplayPluginBase')
       ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
+      ->getMock();
     $view->display_handler = $display;
     $this->plugin->init($view, $display);
   }
 
   /**
-   * @covers ::usesGroupBy
+   * Tests uses group by.
+   *
+   * @legacy-covers ::usesGroupBy
    */
   public function testUsesGroupBy(): void {
     $this->assertFalse($this->plugin->usesGroupBy());
   }
 
   /**
-   * @covers ::defineOptions
+   * Tests define options.
+   *
+   * @legacy-covers ::defineOptions
    */
   public function testDefineOptions(): void {
     $options = $this->plugin->defineOptions();
@@ -99,7 +106,9 @@ class EntityOperationsUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::render
+   * Tests render with destination.
+   *
+   * @legacy-covers ::render
    */
   public function testRenderWithDestination(): void {
     $entity_type_id = $this->randomMachineName();
@@ -134,6 +143,14 @@ class EntityOperationsUnitTest extends UnitTestCase {
     $expected_build = [
       '#type' => 'operations',
       '#links' => $operations,
+      '#attached' => [
+        'library' => ['core/drupal.dialog.ajax'],
+      ],
+      '#cache' => [
+        'contexts' => [],
+        'tags' => [],
+        'max-age' => -1,
+      ],
     ];
     $expected_build['#links']['foo']['query'] = ['destination' => 'foobar'];
     $build = $this->plugin->render($result);
@@ -141,7 +158,9 @@ class EntityOperationsUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::render
+   * Tests render without destination.
+   *
+   * @legacy-covers ::render
    */
   public function testRenderWithoutDestination(): void {
     $entity_type_id = $this->randomMachineName();
@@ -176,13 +195,23 @@ class EntityOperationsUnitTest extends UnitTestCase {
     $expected_build = [
       '#type' => 'operations',
       '#links' => $operations,
+      '#attached' => [
+        'library' => ['core/drupal.dialog.ajax'],
+      ],
+      '#cache' => [
+        'contexts' => [],
+        'tags' => [],
+        'max-age' => -1,
+      ],
     ];
     $build = $this->plugin->render($result);
     $this->assertSame($expected_build, $build);
   }
 
   /**
-   * @covers ::render
+   * Tests render without entity.
+   *
+   * @legacy-covers ::render
    */
   public function testRenderWithoutEntity(): void {
     $this->setUpMockLoggerWithMissingEntity();

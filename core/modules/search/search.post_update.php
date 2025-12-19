@@ -11,7 +11,7 @@ use Drupal\block\BlockInterface;
 /**
  * Implements hook_removed_post_updates().
  */
-function search_removed_post_updates() {
+function search_removed_post_updates(): array {
   return [
     'search_post_update_block_page' => '9.0.0',
     'search_post_update_reindex_after_diacritics_rule_change' => '10.0.0',
@@ -21,7 +21,7 @@ function search_removed_post_updates() {
 /**
  * Updates Search Blocks' without an explicit `page_id` from '' to NULL.
  */
-function search_post_update_block_with_empty_page_id(&$sandbox = []) {
+function search_post_update_block_with_empty_page_id(&$sandbox = []): void {
   $config_entity_updater = \Drupal::classResolver(ConfigEntityUpdater::class);
   $config_entity_updater->update($sandbox, 'block', function (BlockInterface $block): bool {
     // Only update blocks using the search block plugin.
