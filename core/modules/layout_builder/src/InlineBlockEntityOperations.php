@@ -144,7 +144,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The parent entity.
    */
-  public function handleInsert(EntityInterface $entity) {
+  public function handleInsert(EntityInterface $entity): void {
     if (!$this->isLayoutCompatibleEntity($entity)) {
       return;
     }
@@ -256,7 +256,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
     $post_save_configuration = $plugin->getConfiguration();
     if ($entity->id() !== NULL && ($duplicate_blocks || (empty($pre_save_configuration['block_revision_id']) && !empty($post_save_configuration['block_revision_id'])))) {
       $id = $this->getPluginBlockId($plugin);
-      if (!$id){
+      if (!$id) {
         // The standard getPluginBlockId() didn't return an id, let's use
         // reflection to get it off of the $plugin.
         // We have to use reflection for this as it's a protected method.

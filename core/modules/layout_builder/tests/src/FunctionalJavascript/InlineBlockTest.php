@@ -619,7 +619,7 @@ class InlineBlockTest extends InlineBlockTestBase {
   /**
    * Tests that Inline Blocks are added to duplicated entities.
    */
-  public function testDuplicateEntityInlineBlockUsage() {
+  public function testDuplicateEntityInlineBlockUsage(): void {
     /** @var \Drupal\Core\Cron $cron */
     $cron = \Drupal::service('cron');
     /** @var \Drupal\layout_builder\InlineBlockUsageInterface $usage */
@@ -639,16 +639,14 @@ class InlineBlockTest extends InlineBlockTestBase {
     $page = $this->getSession()->getPage();
 
     // Enable layout builder.
-    $this->drupalPostForm(
-      static::FIELD_UI_PREFIX . '/display/default',
-      ['layout[enabled]' => TRUE],
-      'Save'
-    );
+    $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
+    $this->submitForm(['layout[enabled]' => TRUE], 'Save');
     $this->clickLink('Manage layout');
     $assert_session->addressEquals(static::FIELD_UI_PREFIX . '/display/default/layout');
 
     // Enable overrides.
-    $this->drupalPostForm(static::FIELD_UI_PREFIX . '/display/default', ['layout[allow_custom]' => TRUE], 'Save');
+    $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default');
+    $this->submitForm(['layout[allow_custom]' => TRUE], 'Save');
     $this->drupalGet('node/1/layout');
 
     // Add a basic block with the body field set.
@@ -679,7 +677,7 @@ class InlineBlockTest extends InlineBlockTestBase {
 
     // Confirm cloned inline block has the right layout entity.
     $this->assertNotEmpty($cloned_usage->layout_entity_id);
-    $this->assertEqual($new_id, $cloned_usage->layout_entity_id);
+    $this->assertEquals($new_id, $cloned_usage->layout_entity_id);
     $this->assertNotEmpty($cloned_usage->layout_entity_type);
 
     $assert_session->pageTextContains('New Block title');
