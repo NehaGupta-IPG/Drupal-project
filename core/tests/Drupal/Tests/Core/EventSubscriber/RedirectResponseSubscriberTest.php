@@ -68,10 +68,30 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
       ->expects($this->any())
       ->method('assemble')
       ->willReturnMap([
-        ['base:test', ['query' => [], 'fragment' => '', 'absolute' => TRUE], FALSE, 'http://example.com/drupal/test'],
-        ['base:example.com', ['query' => [], 'fragment' => '', 'absolute' => TRUE], FALSE, 'http://example.com/drupal/example.com'],
-        ['base:example:com', ['query' => [], 'fragment' => '', 'absolute' => TRUE], FALSE, 'http://example.com/drupal/example:com'],
-        ['base:javascript:alert(0)', ['query' => [], 'fragment' => '', 'absolute' => TRUE], FALSE, 'http://example.com/drupal/javascript:alert(0)'],
+        [
+          'base:test',
+          ['query' => [], 'fragment' => '', 'absolute' => TRUE],
+          FALSE,
+          'http://example.com/drupal/test',
+        ],
+        [
+          'base:example.com',
+          ['query' => [], 'fragment' => '', 'absolute' => TRUE],
+          FALSE,
+          'http://example.com/drupal/example.com',
+        ],
+        [
+          'base:example:com',
+          ['query' => [], 'fragment' => '', 'absolute' => TRUE],
+          FALSE,
+          'http://example.com/drupal/example:com',
+        ],
+        [
+          'base:javascript:alert(0)',
+          ['query' => [], 'fragment' => '', 'absolute' => TRUE],
+          FALSE,
+          'http://example.com/drupal/javascript:alert(0)',
+        ],
       ]);
 
     $container = new Container();
@@ -115,7 +135,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\Core\EventSubscriber\RedirectResponseSubscriberTest::testDestinationRedirect()
    */
-  public static function providerTestDestinationRedirect() {
+  public static function providerTestDestinationRedirect(): array {
     return [
       [new Request(), FALSE],
       [new Request(['destination' => 'test']), 'http://example.com/drupal/test'],
@@ -168,14 +188,32 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
   /**
    * Data provider for testDestinationRedirectToExternalUrl().
    */
-  public static function providerTestDestinationRedirectToExternalUrl() {
+  public static function providerTestDestinationRedirectToExternalUrl(): array {
     return [
-      'absolute external url' => [new Request(['destination' => 'http://example.com']), 'http://example.com'],
-      'absolute external url with folder' => [new Request(['destination' => 'http://example.com/foobar']), 'http://example.com/foobar'],
-      'absolute external url with folder2' => [new Request(['destination' => 'http://example.ca/drupal']), 'http://example.ca/drupal'],
-      'path without drupal base path' => [new Request(['destination' => '/test']), 'http://example.com/test'],
-      'path with URL' => [new Request(['destination' => '/example.com']), 'http://example.com/example.com'],
-      'path with URL and two slashes' => [new Request(['destination' => '//example.com']), 'http://example.com//example.com'],
+      'absolute external url' => [
+        new Request(['destination' => 'http://example.com']),
+        'http://example.com',
+      ],
+      'absolute external url with folder' => [
+        new Request(['destination' => 'http://example.com/foobar']),
+        'http://example.com/foobar',
+      ],
+      'absolute external url with folder2' => [
+        new Request(['destination' => 'http://example.ca/drupal']),
+        'http://example.ca/drupal',
+      ],
+      'path without drupal base path' => [
+        new Request(['destination' => '/test']),
+        'http://example.com/test',
+      ],
+      'path with URL' => [
+        new Request(['destination' => '/example.com']),
+        'http://example.com/example.com',
+      ],
+      'path with URL and two slashes' => [
+        new Request(['destination' => '//example.com']),
+        'http://example.com//example.com',
+      ],
     ];
   }
 
