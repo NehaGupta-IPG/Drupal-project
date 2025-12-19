@@ -957,6 +957,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $this->doDeleteRevisionFieldItems($revision);
       $this->resetRevisionCache([$revision_id]);
       $this->invokeHook('revision_delete', $revision);
+      Cache::invalidateTags($revision->getCacheTagsToInvalidate());
     }
   }
 
