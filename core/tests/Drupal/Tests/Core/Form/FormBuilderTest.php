@@ -19,6 +19,9 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,9 +30,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\FormBuilder
- * @group Form
+ * Tests Drupal\Core\Form\FormBuilder.
  */
+#[CoversClass(FormBuilder::class)]
+#[Group('Form')]
 class FormBuilderTest extends FormTestBase {
 
   /**
@@ -91,7 +95,7 @@ class FormBuilderTest extends FormTestBase {
   /**
    * Tests the getFormId() method with a string based form ID.
    *
-   * @covers ::getFormId
+   * @legacy-covers ::getFormId
    */
   public function testGetFormIdWithString(): void {
     $form_arg = 'foo';
@@ -102,7 +106,9 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
-   * @covers ::getFormId
+   * Tests get form id with non form class.
+   *
+   * @legacy-covers ::getFormId
    */
   public function testGetFormIdWithNonFormClass(): void {
     $form_arg = \stdClass::class;
@@ -181,9 +187,8 @@ class FormBuilderTest extends FormTestBase {
 
   /**
    * Tests the handling of FormStateInterface::$response.
-   *
-   * @dataProvider formStateResponseProvider
    */
+  #[DataProvider('formStateResponseProvider')]
   public function testHandleFormStateResponse($class, $form_state_key): void {
     $form_id = 'test_form_id';
     $expected_form = self::buildTestFormStructure();
@@ -195,9 +200,12 @@ class FormBuilderTest extends FormTestBase {
     $form_arg = $this->getMockForm($form_id, $expected_form);
     $form_arg->expects($this->any())
       ->method('submitForm')
-      ->willReturnCallback(function ($form, FormStateInterface $form_state) use ($response, $form_state_key) {
+      ->willReturnCallback(function ($form, FormStateInterface $form_state) use ($response, $form_state_key): void {
         $form_state->setFormState([$form_state_key => $response]);
       });
+
+    $this->callableResolver->method('getCallableFromDefinition')
+      ->willReturn([$form_arg, 'submitForm']);
 
     $form_state = new FormState();
     try {
@@ -215,7 +223,7 @@ class FormBuilderTest extends FormTestBase {
   /**
    * Provides test data for testHandleFormStateResponse().
    */
-  public static function formStateResponseProvider() {
+  public static function formStateResponseProvider(): array {
     return [
       ['Symfony\Component\HttpFoundation\Response', 'response'],
       ['Symfony\Component\HttpFoundation\RedirectResponse', 'redirect'],
@@ -242,11 +250,14 @@ class FormBuilderTest extends FormTestBase {
     $form_arg = $this->getMockForm($form_id, $expected_form);
     $form_arg->expects($this->any())
       ->method('submitForm')
-      ->willReturnCallback(function ($form, FormStateInterface $form_state) use ($response, $redirect) {
+      ->willReturnCallback(function ($form, FormStateInterface $form_state) use ($response, $redirect): void {
         // Set both the response and the redirect.
         $form_state->setResponse($response);
         $form_state->set('redirect', $redirect);
       });
+
+    $this->callableResolver->method('getCallableFromDefinition')
+      ->willReturn([$form_arg, 'submitForm']);
 
     $form_state = new FormState();
     try {
@@ -349,10 +360,9 @@ class FormBuilderTest extends FormTestBase {
    * @param string $input_value
    *   The corresponding submitted input value.
    *
-   * @covers ::buildForm
-   *
-   * @dataProvider providerTestBuildFormWithTriggeringElement
+   * @legacy-covers ::buildForm
    */
+  #[DataProvider('providerTestBuildFormWithTriggeringElement')]
   public function testBuildFormWithTriggeringElement($element_value, $input_value): void {
     $form_id = 'test_form_id';
     $expected_form = self::buildTestFormStructure();
@@ -375,7 +385,7 @@ class FormBuilderTest extends FormTestBase {
   /**
    * Data provider for ::testBuildFormWithTriggeringElement().
    */
-  public static function providerTestBuildFormWithTriggeringElement() {
+  public static function providerTestBuildFormWithTriggeringElement(): array {
     $plain_text = 'Other submit value';
     $markup = 'Other submit <input> value';
     return [
@@ -575,12 +585,15 @@ class FormBuilderTest extends FormTestBase {
     $expected_form = self::buildTestFormStructure();
     $expected_form['#build_id'] = $form_build_id;
     $form_arg = $this->getMockForm($form_id, $expected_form);
-    $form_arg->expects($this->once())
+    $form_arg->expects($this->exactly(2))
       ->method('submitForm')
-      ->willReturnCallback(function (array &$form, FormStateInterface $form_state) {
+      ->willReturnCallback(function (array &$form, FormStateInterface $form_state): void {
         // Mimic EntityForm by cleaning the $form_state upon submit.
         $form_state->cleanValues();
       });
+
+    $this->callableResolver->method('getCallableFromDefinition')
+      ->willReturn([$form_arg, 'submitForm']);
 
     $this->formCache->expects($this->once())
       ->method('deleteCache')
@@ -611,7 +624,9 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
-   * @covers ::buildForm
+   * Tests exceeded file size.
+   *
+   * @legacy-covers ::buildForm
    */
   public function testExceededFileSize(): void {
     $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
@@ -619,7 +634,19 @@ class FormBuilderTest extends FormTestBase {
     $request_stack = new RequestStack();
     $request_stack->push($request);
     $this->formBuilder = $this->getMockBuilder('\Drupal\Core\Form\FormBuilder')
-      ->setConstructorArgs([$this->formValidator, $this->formSubmitter, $this->formCache, $this->moduleHandler, $this->eventDispatcher, $request_stack, $this->classResolver, $this->elementInfo, $this->themeManager, $this->csrfToken])
+      ->setConstructorArgs([
+        $this->formValidator,
+        $this->formSubmitter,
+        $this->formCache,
+        $this->moduleHandler,
+        $this->eventDispatcher,
+        $request_stack,
+        $this->classResolver,
+        $this->elementInfo,
+        $this->themeManager,
+        $this->csrfToken,
+        $this->callableResolver,
+      ])
       ->onlyMethods(['getFileUploadMaxSize'])
       ->getMock();
     $this->formBuilder->expects($this->once())
@@ -634,7 +661,9 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
-   * @covers ::buildForm
+   * Tests post ajax request.
+   *
+   * @legacy-covers ::buildForm
    */
   public function testPostAjaxRequest(): void {
     $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE], ['form_id' => 'different_form_id']);
@@ -658,7 +687,9 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
-   * @covers ::buildForm
+   * Tests get ajax request.
+   *
+   * @legacy-covers ::buildForm
    */
   public function testGetAjaxRequest(): void {
     $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
@@ -683,10 +714,11 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
-   * @covers ::buildForm
+   * Tests child access inheritance.
    *
-   * @dataProvider providerTestChildAccessInheritance
+   * @legacy-covers ::buildForm
    */
+  #[DataProvider('providerTestChildAccessInheritance')]
   public function testChildAccessInheritance($element, $access_checks): void {
     $form_arg = new TestFormWithPredefinedForm();
     $form_arg->setForm($element);
@@ -718,7 +750,7 @@ class FormBuilderTest extends FormTestBase {
    *   An array of test cases, each containing a form element structure and
    *   its expected access results.
    */
-  public static function providerTestChildAccessInheritance() {
+  public static function providerTestChildAccessInheritance(): array {
     $data = [];
 
     $element = [
@@ -848,17 +880,18 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
-   * @covers ::valueCallableIsSafe
+   * Tests value callable is safe.
    *
-   * @dataProvider providerTestValueCallableIsSafe
+   * @legacy-covers ::valueCallableIsSafe
    */
+  #[DataProvider('providerTestValueCallableIsSafe')]
   public function testValueCallableIsSafe($callback, $expected): void {
     $method = new \ReflectionMethod(FormBuilder::class, 'valueCallableIsSafe');
     $is_safe = $method->invoke($this->formBuilder, $callback);
     $this->assertSame($expected, $is_safe);
   }
 
-  public static function providerTestValueCallableIsSafe() {
+  public static function providerTestValueCallableIsSafe(): array {
     $data = [];
     $data['string_no_slash'] = [
       'Drupal\Core\Render\Element\Token::valueCallback',
@@ -877,17 +910,18 @@ class FormBuilderTest extends FormTestBase {
       TRUE,
     ];
     $data['closure'] = [
-      function () {},
+      function (): void {},
       FALSE,
     ];
     return $data;
   }
 
   /**
-   * @covers ::doBuildForm
+   * Tests invalid token.
    *
-   * @dataProvider providerTestInvalidToken
+   * @legacy-covers ::doBuildForm
    */
+  #[DataProvider('providerTestInvalidToken')]
   public function testInvalidToken($expected, $valid_token, $user_is_authenticated): void {
     $form_token = 'the_form_token';
     $form_id = 'test_form_id';
@@ -935,7 +969,7 @@ class FormBuilderTest extends FormTestBase {
     }
   }
 
-  public static function providerTestInvalidToken() {
+  public static function providerTestInvalidToken(): array {
     $data = [];
     $data['authenticated_invalid'] = [TRUE, FALSE, TRUE];
     $data['authenticated_valid'] = [FALSE, TRUE, TRUE];
@@ -945,10 +979,11 @@ class FormBuilderTest extends FormTestBase {
   }
 
   /**
-   * @covers ::prepareForm
+   * Tests form token cacheability.
    *
-   * @dataProvider providerTestFormTokenCacheability
+   * @legacy-covers ::prepareForm
    */
+  #[DataProvider('providerTestFormTokenCacheability')]
   public function testFormTokenCacheability($token, $is_authenticated, $method, $opted_in_for_cache): void {
     $user = $this->prophesize(AccountProxyInterface::class);
     $user->isAuthenticated()
@@ -1027,7 +1062,7 @@ class FormBuilderTest extends FormTestBase {
    *   An array of test cases, each containing a form token, the authentication,
    *   request method, and expected cacheability outcome.
    */
-  public static function providerTestFormTokenCacheability() {
+  public static function providerTestFormTokenCacheability(): array {
     return [
       'token:none,authenticated:true' => [NULL, TRUE, 'post', FALSE],
       'token:none,authenticated:true,opted_in_for_cache' => [NULL, TRUE, 'post', TRUE],
@@ -1097,11 +1132,11 @@ class FormBuilderTest extends FormTestBase {
  */
 class TestForm implements FormInterface {
 
-  public function getFormId() {
+  public function getFormId(): string {
     return 'test_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     return FormBuilderTest::buildTestFormStructure();
   }
 
@@ -1116,7 +1151,7 @@ class TestForm implements FormInterface {
  */
 class TestFormInjected extends TestForm implements ContainerInjectionInterface {
 
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static();
   }
 
@@ -1130,13 +1165,13 @@ class TestFormWithPredefinedForm extends TestForm {
   /**
    * @var array
    */
-  protected $form;
+  protected array $form;
 
-  public function setForm($form): void {
+  public function setForm(array $form): void {
     $this->form = $form;
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state): array {
     return $this->form;
   }
 

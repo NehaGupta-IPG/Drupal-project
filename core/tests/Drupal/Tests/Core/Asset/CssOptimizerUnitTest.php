@@ -7,12 +7,13 @@ namespace Drupal\Tests\Core\Asset;
 use Drupal\Core\Asset\CssOptimizer;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the CSS asset optimizer.
- *
- * @group Asset
  */
+#[Group('Asset')]
 class CssOptimizerUnitTest extends UnitTestCase {
 
   /**
@@ -37,7 +38,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
     $this->fileUrlGenerator = $this->createMock(FileUrlGeneratorInterface::class);
     $this->fileUrlGenerator->expects($this->any())
       ->method('generateString')
-      ->with($this->isType('string'))
+      ->with($this->isString())
       ->willReturnCallback(function ($uri) {
         return 'generated-relative-url:' . $uri;
       });
@@ -47,7 +48,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
   /**
    * Provides data for the CSS asset optimizing test.
    */
-  public static function providerTestOptimize() {
+  public static function providerTestOptimize(): array {
     $path = 'core/tests/Drupal/Tests/Core/Asset/css_test_files/';
     $absolute_path = dirname(__FILE__) . '/css_test_files/';
     return [
@@ -236,9 +237,8 @@ class CssOptimizerUnitTest extends UnitTestCase {
 
   /**
    * Tests optimizing a CSS asset group containing 'type' => 'file'.
-   *
-   * @dataProvider providerTestOptimize
    */
+  #[DataProvider('providerTestOptimize')]
   public function testOptimize($css_asset, $expected): void {
     global $base_path;
     $original_base_path = $base_path;

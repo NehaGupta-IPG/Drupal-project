@@ -7,6 +7,7 @@ namespace Drupal\Tests\media_library\FunctionalJavascript;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that uploads in the 'media_library_widget' works as expected.
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('media_library')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class WidgetOverflowTest extends MediaLibraryTestBase {
 
   use TestFileCreationTrait;
@@ -74,7 +76,7 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
       $this->assertNotEmpty($path);
       $this->assertFileExists($path);
 
-      $filenames[] = $file_system->basename($path);
+      $filenames[] = basename($path);
       $remote_paths[] = $this->getSession()
         ->getDriver()
         ->uploadFileAndGetRemoteFilePath($path);

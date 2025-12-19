@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\ParamConverter;
 
-use Drupal\Tests\BrowserTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore deutscher titel
-
 /**
  * Tests upcasting of URL arguments to entities.
- *
- * @group ParamConverter
  */
+#[Group('ParamConverter')]
+#[RunTestsInSeparateProcesses]
 class UpcastingTest extends BrowserTestBase {
 
   /**
