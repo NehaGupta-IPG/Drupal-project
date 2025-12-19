@@ -10,17 +10,22 @@ use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\TypedData\TypedData as TypedDataBase;
 use Drupal\Core\TypedData\TypedDataManager;
+use Drupal\Core\TypedData\Validation\RecursiveContextualValidator;
 use Drupal\Core\TypedData\Validation\RecursiveValidator;
 use Drupal\Core\Validation\ConstraintManager;
 use Drupal\Core\Validation\ExecutionContextFactory;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\TypedData\Validation\RecursiveContextualValidator
- * @group TypedData
+ * Tests Drupal\Core\TypedData\Validation\RecursiveContextualValidator.
  */
+#[CoversClass(RecursiveContextualValidator::class)]
+#[Group('TypedData')]
 class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
@@ -92,7 +97,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   /**
    * Ensures that passing an explicit group is not supported.
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
   public function testValidateWithGroups(): void {
     $this->expectException(\LogicException::class);
@@ -102,7 +107,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   /**
    * Ensures that passing a non typed data value is not supported.
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
   public function testValidateWithoutTypedData(): void {
     $this->expectException(\InvalidArgumentException::class);
@@ -110,7 +115,9 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests basic validate without constraints.
+   *
+   * @legacy-covers ::validate
    */
   public function testBasicValidateWithoutConstraints(): void {
     $typed_data = $this->typedDataManager->create(DataDefinition::create('string'));
@@ -119,13 +126,15 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests basic validate with constraint.
+   *
+   * @legacy-covers ::validate
    */
   public function testBasicValidateWithConstraint(): void {
     $typed_data = $this->typedDataManager->create(
       DataDefinition::create('string')
         ->addConstraint('Callback', [
-          'callback' => function ($value, ExecutionContextInterface $context) {
+          'callback' => function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('test violation: ' . $value);
           },
         ])
@@ -139,11 +148,13 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests basic validate with multiple constraints.
+   *
+   * @legacy-covers ::validate
    */
   public function testBasicValidateWithMultipleConstraints(): void {
     $options = [
-      'callback' => function ($value, ExecutionContextInterface $context) {
+      'callback' => function ($value, ExecutionContextInterface $context): void {
         $context->addViolation('test violation');
       },
     ];
@@ -157,7 +168,9 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validate
+   * Tests properties validate with multiple levels.
+   *
+   * @legacy-covers ::validate
    */
   public function testPropertiesValidateWithMultipleLevels(): void {
 
@@ -190,9 +203,10 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
    *   The name to use for the object.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface|\PHPUnit\Framework\MockObject\MockObject
+   *   The typed data object.
    */
   protected function setupTypedData(array $tree, $name = '') {
-    $callback = function ($value, ExecutionContextInterface $context) {
+    $callback = function ($value, ExecutionContextInterface $context): void {
       $context->addViolation('violation: ' . (is_array($value) ? count($value) : $value));
     };
 
@@ -225,7 +239,9 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validateProperty
+   * Tests validate property with custom group.
+   *
+   * @legacy-covers ::validateProperty
    */
   public function testValidatePropertyWithCustomGroup(): void {
     $tree = [
@@ -240,10 +256,11 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validateProperty
+   * Tests validate property with invalid objects.
    *
-   * @dataProvider providerTestValidatePropertyWithInvalidObjects
+   * @legacy-covers ::validateProperty
    */
+  #[DataProvider('providerTestValidatePropertyWithInvalidObjects')]
   public function testValidatePropertyWithInvalidObjects($object): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->recursiveValidator->validateProperty($object, 'key1', NULL);
@@ -261,7 +278,9 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validateProperty
+   * Tests validate property.
+   *
+   * @legacy-covers ::validateProperty
    */
   public function testValidateProperty(): void {
     $typed_data = $this->buildExampleTypedDataWithProperties();
@@ -279,17 +298,20 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validatePropertyValue
+   * Tests validate property value with invalid objects.
    *
-   * @dataProvider providerTestValidatePropertyWithInvalidObjects
+   * @legacy-covers ::validatePropertyValue
    */
+  #[DataProvider('providerTestValidatePropertyWithInvalidObjects')]
   public function testValidatePropertyValueWithInvalidObjects($object): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->recursiveValidator->validatePropertyValue($object, 'key1', [], NULL);
   }
 
   /**
-   * @covers ::validatePropertyValue
+   * Tests validate property value.
+   *
+   * @legacy-covers ::validatePropertyValue
    */
   public function testValidatePropertyValue(): void {
     $typed_data = $this->buildExampleTypedDataWithProperties(['subkey1' => 'subvalue11', 'subkey2' => 'subvalue22']);
@@ -310,6 +332,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
    * Builds some example type data object.
    *
    * @return \Drupal\Core\TypedData\TypedDataInterface|\PHPUnit\Framework\MockObject\MockObject
+   *   A typed data object with nested properties for testing purposes.
    */
   protected function buildExampleTypedDataWithProperties($subkey_value = NULL) {
     $subkey_value = $subkey_value ?: ['subkey1' => 'subvalue1', 'subkey2' => 'subvalue2'];

@@ -16,7 +16,7 @@ class NodeDisplayConfigurableTestHooks {
    * Implements hook_entity_base_field_info_alter().
    */
   #[Hook('entity_base_field_info_alter')]
-  public function entityBaseFieldInfoAlter(&$base_field_definitions, EntityTypeInterface $entity_type) {
+  public function entityBaseFieldInfoAlter(&$base_field_definitions, EntityTypeInterface $entity_type): void {
     if ($entity_type->id() == 'node') {
       foreach (['created', 'uid', 'title'] as $field) {
         /** @var \Drupal\Core\Field\BaseFieldDefinition[] $base_field_definitions */
@@ -29,7 +29,7 @@ class NodeDisplayConfigurableTestHooks {
    * Implements hook_entity_type_build().
    */
   #[Hook('entity_type_build')]
-  public function entityTypeBuild(array &$entity_types) {
+  public function entityTypeBuild(array &$entity_types): void {
     // Allow skipping of extra preprocessing for configurable display.
     $entity_types['node']->set('enable_base_field_custom_preprocess_skipping', TRUE);
     $entity_types['node']->set('enable_page_title_template', TRUE);

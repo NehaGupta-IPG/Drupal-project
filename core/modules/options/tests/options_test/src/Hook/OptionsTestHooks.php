@@ -18,7 +18,7 @@ class OptionsTestHooks {
   #[Hook('form_entity_test_entity_test_form_alter')]
   public function formEntityTestEntityTestFormAlter(&$form, FormStateInterface $form_state, $form_id) : void {
     if (\Drupal::state()->get('options_test.form_alter_enable', FALSE)) {
-      $form['card_1']['widget']['#required_error'] = t('This is custom message for required field.');
+      $form['card_1']['widget']['#required_error'] = 'This is custom message for required field.';
     }
   }
 
@@ -26,7 +26,7 @@ class OptionsTestHooks {
    * Implements hook_options_list_alter().
    */
   #[Hook('options_list_alter')]
-  public function optionsListAlter(array &$options, array $context) {
+  public function optionsListAlter(array &$options, array $context): void {
     if ($context['fieldDefinition']->getName() === 'card_4' && $context['widget']->getPluginId() === 'options_select') {
       // Rename _none option.
       $options['_none'] = '- Select something -';

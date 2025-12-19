@@ -15,7 +15,7 @@ class JsTestingLogTestHooks {
    * Implements hook_page_attachments().
    */
   #[Hook('page_attachments')]
-  public function pageAttachments(array &$attachments) {
+  public function pageAttachments(array &$attachments): void {
     // Unconditionally attach an asset to the page.
     $attachments['#attached']['library'][] = 'js_testing_log_test/deprecation_log';
   }
@@ -24,7 +24,7 @@ class JsTestingLogTestHooks {
    * Implements hook_js_settings_alter().
    */
   #[Hook('js_settings_alter')]
-  public function jsSettingsAlter(&$settings) {
+  public function jsSettingsAlter(&$settings): void {
     $settings['suppressDeprecationErrors'] = FALSE;
   }
 

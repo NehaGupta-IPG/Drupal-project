@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Functional;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 
@@ -74,7 +75,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    * @see \Drupal\update_test\Controller\UpdateTestController::updateTest()
    */
   protected function refreshUpdateStatus($xml_map, $url = 'update-test') {
-    // Tell the Update Manager module to fetch from the URL provided by
+    // Tell the Update Status module to fetch from the URL provided by
     // update_test module.
     $this->config('update.settings')->set('fetch.url', Url::fromUri('base:' . $url, ['absolute' => TRUE])->toString())->save();
     // Save the map for UpdateTestController::updateTest() to use.
@@ -294,7 +295,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    * @return \Behat\Mink\Element\NodeElement
    *   The update element.
    */
-  protected function findUpdateElementByLabel($label, int $index = 0) {
+  protected function findUpdateElementByLabel($label, int $index = 0): NodeElement {
     $update_elements = $this->getSession()->getPage()
       ->findAll('css', $this->updateTableLocator . " .project-update__version:contains(\"$label\")");
     $this->assertGreaterThanOrEqual($index, count($update_elements));
