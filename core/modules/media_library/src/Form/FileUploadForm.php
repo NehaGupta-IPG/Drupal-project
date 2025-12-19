@@ -166,7 +166,10 @@ class FileUploadForm extends AddFormBase {
       $max = $field_definition->getSetting('max_resolution');
       $min = $field_definition->getSetting('min_resolution');
       if ($max || $min) {
-        $validators['file_validate_image_resolution'] = [$max, $min];
+        $validators['FileImageDimensions'] = [
+          'maxDimensions' => $max,
+          'minDimensions' => $min,
+        ];
       }
     }
 
@@ -275,9 +278,7 @@ class FileUploadForm extends AddFormBase {
     $element = parent::buildEntityFormElement($media, $form, $form_state, $delta);
     $source_field = $this->getSourceFieldName($media->bundle->entity);
     if (isset($element['fields'][$source_field])) {
-      $element['fields'][$source_field]['widget'][0]['#process'][] = [
-        static::class, 'hideExtraSourceFieldComponents',
-      ];
+      $element['fields'][$source_field]['widget'][0]['#process'][] = [static::class, 'hideExtraSourceFieldComponents'];
     }
     return $element;
   }
