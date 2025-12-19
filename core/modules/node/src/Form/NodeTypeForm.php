@@ -179,7 +179,7 @@ class NodeTypeForm extends BundleEntityFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Create page display'),
       '#default_value' => $full_display === NULL || $full_display->hasPageDisplay() || $full_display->isNew(),
-      '#description' => $this->t('Uncheck this to prevent the content-type from having a full page display.'),
+      '#description' => $this->t('Enable this to give each content item its own page and URL.'),
     ];
     $form['display']['display_submitted'] = [
       '#type' => 'checkbox',
