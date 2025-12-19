@@ -196,7 +196,7 @@ class LayoutBuilderHooks {
   }
 
   /**
-   * Immplements hook_entity_insert().
+   * Implements hook_entity_insert().
    */
   #[Hook('entity_insert')]
   public function entityInsert(EntityInterface $entity): void {
