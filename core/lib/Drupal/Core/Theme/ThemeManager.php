@@ -354,7 +354,7 @@ class ThemeManager implements ThemeManagerInterface {
     if (isset($theme_hook_suggestion)) {
       $variables['theme_hook_suggestion'] = $theme_hook_suggestion;
     }
-        $output = $render_function($template_file, $variables);
+    $output = $render_function($template_file, $variables);
     return ($output instanceof MarkupInterface) ? $output : (string) $output;
   }
 
