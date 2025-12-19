@@ -1,50 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Functional;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\node\NodeInterface;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
+use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Create a node with revisions and test cache invalidation during CRUD
- * operations.
- *
- * @group node
+ * Create a node with revisions and test cache invalidation during CRUD operations.
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeRevisionsCacheTest extends PageCacheTagsTestBase {
 
   use StringTranslationTrait;
 
   /**
    * The user that with administration access on revisions.
-   *
-   * @var \Drupal\user\UserInterface
    */
-  protected $webUser;
+  protected UserInterface $webUser;
 
   /**
    * The initial node.
-   *
-   * @var \Drupal\node\NodeInterface
    */
-  protected $node;
+  protected NodeInterface $node;
 
   /**
    * The node revision.
-   *
-   * @var \Drupal\node\NodeInterface
    */
-  protected $revision;
+  protected NodeInterface $revision;
 
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['node', 'datetime'];
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected static $modules = ['node', 'datetime'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
     parent::setUp();
 
     $this->drupalCreateContentType([
@@ -74,15 +78,16 @@ class NodeRevisionsCacheTest extends PageCacheTagsTestBase {
   /**
    * Checks cache invalidation on revision delete.
    */
-  public function testCacheInvalidationOnRevisionDelete() {
+  public function testCacheInvalidationOnRevisionDelete(): void {
     // Visit the page twice to verify that we have cached the page.
     $this->verifyPageCache($this->node->toUrl(), 'MISS');
     $this->verifyPageCache($this->node->toUrl(), 'HIT');
 
     // Delete one of the nodes revisions.
     $this->drupalLogin($this->webUser);
-    $this->drupalPostForm("node/" . $this->node->id() . "/revisions/" . $this->node->getRevisionId() . "/delete", [], t('Delete'));
-    $this->assertRaw($this->t('Revision from %revision-date of @type %title has been deleted.', [
+    $this->drupalGet("node/" . $this->node->id() . "/revisions/" . $this->node->getRevisionId() . "/delete");
+    $this->submitForm([], $this->t('Delete'));
+    $this->assertSession()->responseContains($this->t('Revision from %revision-date of @type %title has been deleted.', [
       '@type' => 'Basic page',
       '%title' => $this->node->label(),
       '%revision-date' => $this->container->get('date.formatter')->format($this->node->getRevisionCreationTime()),
