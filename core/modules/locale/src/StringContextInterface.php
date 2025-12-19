@@ -15,4 +15,12 @@ interface StringContextInterface {
    */
   public function getContexts(): array;
 
+  /**
+   * Loads list of all available string locations.
+   *
+   * @return array
+   *   Array of location strings in "type: name" format.
+   */
+  public function getDistinctLocations(): array;
+
 }

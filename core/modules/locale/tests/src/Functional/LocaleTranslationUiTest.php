@@ -588,6 +588,51 @@ class LocaleTranslationUiTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($str_with_context);
     $this->assertSession()->pageTextNotContains($str_with_context2);
 
+    // Test the location search filter.
+    // Find an existing string with a location in the database.
+    $connection = Database::getConnection();
+    $query = $connection->select('locales_source', 's');
+    $query->addJoin('INNER', 'locales_location', 'l', '[s].[lid] = [l].[sid]');
+    $result = $query->fields('s', ['source', 'lid'])
+      ->fields('l', ['type', 'name'])
+      ->range(0, 1)
+      ->execute()
+      ->fetchAssoc();
+
+    // Ensure we have a string with location data to test.
+    $this->assertNotEmpty($result, 'Found a string with location data for testing.');
+
+    $location_string = $result['source'];
+    $location_filter = $result['type'] . ': ' . $result['name'];
+
+    // Search for the string with its location filter.
+    $search = [
+      'string' => $location_string,
+      'langcode' => $langcode,
+      'translation' => 'all',
+      'context' => '',
+      'location' => $location_filter,
+    ];
+    $this->drupalGet('admin/config/regional/translate');
+    $this->submitForm($search, 'Filter');
+    $this->assertSession()->pageTextContains($location_string);
+
+    // Find a different location to use for negative test.
+    $query2 = $connection->select('locales_location', 'l');
+    $different_location = $query2->fields('l', ['type', 'name'])
+      ->condition('sid', $result['lid'], '!=')
+      ->range(0, 1)
+      ->execute()
+      ->fetchAssoc();
+
+    if ($different_location) {
+      // Search for the string with a different location - should not appear.
+      $search['location'] = $different_location['type'] . ': ' . $different_location['name'];
+      $this->drupalGet('admin/config/regional/translate');
+      $this->submitForm($search, 'Filter');
+      $this->assertSession()->pageTextContains('No strings available.');
+    }
+
   }
 
   /**

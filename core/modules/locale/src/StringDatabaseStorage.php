@@ -125,6 +125,21 @@ class StringDatabaseStorage implements StringStorageInterface, StringContextInte
   /**
    * {@inheritdoc}
    */
+  public function getDistinctLocations(): array {
+    $query = $this->connection->select('locales_location', 'l');
+    $query->addExpression("CONCAT(l.type, ': ', l.name)", 'location');
+    $query->distinct();
+    $query->orderBy('location');
+    $results = $query->execute()->fetchCol();
+
+    // Return as associative array with location as both key and value, or empty
+    // array.
+    return $results ? array_combine($results, $results) : [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save($string) {
     if ($string->isNew()) {
       $result = $this->dbStringInsert($string);
@@ -447,6 +462,20 @@ class StringDatabaseStorage implements StringStorageInterface, StringContextInte
       $query->condition($context_filter);
       $context_filter->condition($this->dbFieldTable('context') . '.context', $this->connection->escapeLike($options['filters']['context']), 'LIKE');
       unset($options['filters']['context']);
+    }
+
+    // Add location filter.
+    if (isset($options['filters']['location'])) {
+      $location = $options['filters']['location'];
+      // Parse "type: name" format.
+      if (str_contains($location, ': ')) {
+        [$type, $name] = explode(': ', $location, 2);
+        $location_subquery = $this->connection->select('locales_location', 'll')->fields('ll', ['sid']);
+        $location_subquery->condition('ll.type', $type);
+        $location_subquery->condition('ll.name', $name);
+        $query->condition('s.lid', $location_subquery, 'IN');
+      }
+      unset($options['filters']['location']);
     }
 
     // Process other options, string filter, query limit, etc.
