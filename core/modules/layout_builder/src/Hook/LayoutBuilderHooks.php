@@ -196,6 +196,18 @@ class LayoutBuilderHooks {
   }
 
   /**
+   * Immplements hook_entity_insert().
+   */
+  #[Hook('entity_insert')]
+  public function entityInsert(EntityInterface $entity): void {
+    if (\Drupal::moduleHandler()->moduleExists('block_content')) {
+      /** @var \Drupal\layout_builder\InlineBlockEntityOperations $entity_operations */
+      $entity_operations = \Drupal::classResolver(InlineBlockEntityOperations::class);
+      $entity_operations->handleInsert($entity);
+    }
+  }
+
+  /**
    * Implements hook_entity_presave().
    */
   #[Hook('entity_presave')]

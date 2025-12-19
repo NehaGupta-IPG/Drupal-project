@@ -617,6 +617,90 @@ class InlineBlockTest extends InlineBlockTestBase {
   }
 
   /**
+   * Tests that Inline Blocks are added to duplicated entities.
+   */
+  public function testDuplicateEntityInlineBlockUsage() {
+    /** @var \Drupal\Core\Cron $cron */
+    $cron = \Drupal::service('cron');
+    /** @var \Drupal\layout_builder\InlineBlockUsageInterface $usage */
+    $usage = \Drupal::service('inline_block.usage');
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer content types',
+      'access contextual links',
+      'configure any layout',
+      'administer node display',
+      'administer node fields',
+      'administer nodes',
+      'bypass node access',
+      'create and edit custom blocks',
+    ]));
+
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+
+    // Enable layout builder.
+    $this->drupalPostForm(
+      static::FIELD_UI_PREFIX . '/display/default',
+      ['layout[enabled]' => TRUE],
+      'Save'
+    );
+    $this->clickLink('Manage layout');
+    $assert_session->addressEquals(static::FIELD_UI_PREFIX . '/display/default/layout');
+
+    // Enable overrides.
+    $this->drupalPostForm(static::FIELD_UI_PREFIX . '/display/default', ['layout[allow_custom]' => TRUE], 'Save');
+    $this->drupalGet('node/1/layout');
+
+    // Add a basic block with the body field set.
+    $this->drupalGet('node/1/layout');
+    $this->addInlineBlockToLayout('New Block title', 'New block body');
+    $this->assertSaveLayout();
+    $node_1_block_id = $this->getLatestBlockEntityId();
+    $this->drupalGet('node/1');
+    $assert_session->pageTextContains('New Block title');
+    $assert_session->pageTextContains('New block body');
+
+    /** @var \Drupal\node\NodeStorageInterface $node_storage */
+    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
+
+    /** @var \Drupal\node\NodeInterface $node_1 */
+    $node_1 = $node_storage->load(1);
+
+    // Clone node 1.
+    $cloned = $node_1->createDuplicate();
+    $cloned->save();
+
+    // Confirm inline blocks exist on clone.
+    $new_id = $cloned->id();
+    $this->drupalGet('node/' . $new_id);
+    $cloned_block_id = $this->getLatestBlockEntityId();
+    $cloned_usage = $usage->getUsage($cloned_block_id);
+    $this->assertNotEmpty($cloned_usage);
+
+    // Confirm cloned inline block has the right layout entity.
+    $this->assertNotEmpty($cloned_usage->layout_entity_id);
+    $this->assertEqual($new_id, $cloned_usage->layout_entity_id);
+    $this->assertNotEmpty($cloned_usage->layout_entity_type);
+
+    $assert_session->pageTextContains('New Block title');
+    $assert_session->pageTextContains('New block body');
+
+    // Delete the original.
+    $this->assertNotEmpty($usage->getUsage($node_1_block_id));
+    $this->drupalGet('node/1');
+    $this->drupalGet('node/1/delete');
+    $page->pressButton('Delete');
+    $this->drupalGet('node/1');
+    $this->assertNull($node_storage->loadUnchanged(1));
+    $cron->run();
+
+    // Ensure entity block was kept for clone.
+    $this->assertNull($this->blockStorage->load($node_1_block_id));
+    $this->assertFalse($usage->getUsage($node_1_block_id));
+    $this->assertCount(1, $this->blockStorage->loadMultiple());
+  }
+
+  /**
    * Test editing inline blocks when the parent has been reverted.
    */
   public function testInlineBlockParentRevert(): void {

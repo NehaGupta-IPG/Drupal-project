@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\SynchronizableInterface;
+use Drupal\layout_builder\Plugin\Block\InlineBlock;
 use Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -138,6 +139,29 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
   }
 
   /**
+   * Handles parent entity insert.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The parent entity.
+   */
+  public function handleInsert(EntityInterface $entity) {
+    if (!$this->isLayoutCompatibleEntity($entity)) {
+      return;
+    }
+
+    // If the parent entity is created with already-associated blocks (e.g. a
+    // clone or duplicate of the existing entity), those blocks must be added
+    // after the entity is saved.
+    if ($sections = $this->getEntitySections($entity)) {
+      foreach ($this->getInlineBlockComponents($sections) as $component) {
+        $plugin = $component->getPlugin();
+        $block_id = $this->getPluginBlockId($plugin);
+        $this->usage->addUsage($block_id, $entity);
+      }
+    }
+  }
+
+  /**
    * Handles saving a parent entity.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -150,7 +174,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
       return;
     }
 
-    $duplicate_blocks = FALSE;
+    $duplicate_blocks = $entity->isNew();
     if ($sections = $this->getEntitySections($entity)) {
       if ($this->originalEntityUsesDefaultStorage($entity)) {
         // This is a new override from a default and the blocks need to be
@@ -230,10 +254,38 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
     $pre_save_configuration = $plugin->getConfiguration();
     $plugin->saveBlockContent($new_revision, $duplicate_blocks);
     $post_save_configuration = $plugin->getConfiguration();
-    if ($duplicate_blocks || (empty($pre_save_configuration['block_revision_id']) && !empty($post_save_configuration['block_revision_id']))) {
-      $this->usage->addUsage($post_save_configuration['block_id'], $entity);
+    if ($entity->id() !== NULL && ($duplicate_blocks || (empty($pre_save_configuration['block_revision_id']) && !empty($post_save_configuration['block_revision_id'])))) {
+      $id = $this->getPluginBlockId($plugin);
+      if (!$id){
+        // The standard getPluginBlockId() didn't return an id, let's use
+        // reflection to get it off of the $plugin.
+        // We have to use reflection for this as it's a protected method.
+        $reflectionMethod = new \ReflectionMethod($plugin, 'getEntity');
+        $reflectionMethod->setAccessible(TRUE);
+        $new_entity = $reflectionMethod->invoke($plugin);
+        $id = $new_entity->id();
+      }
+      $this->usage->addUsage($id, $entity);
     }
     $component->setConfiguration($post_save_configuration);
+  }
+
+  /**
+   * Gets a block ID for an inline block plugin.
+   *
+   * @param \Drupal\layout_builder\Plugin\Block\InlineBlock $block_plugin
+   *   The inline block plugin.
+   *
+   * @return int
+   *   The block content ID or null none available.
+   */
+  protected function getPluginBlockId(InlineBlock $block_plugin) {
+    $configuration = $block_plugin->getConfiguration();
+    if (!empty($configuration['block_revision_id'])) {
+      $revision_ids = $this->getBlockIdsForRevisionIds([$configuration['block_revision_id']]);
+      return array_pop($revision_ids);
+    }
+    return NULL;
   }
 
 }
