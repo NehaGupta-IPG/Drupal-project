@@ -108,6 +108,7 @@ class ShortcutTest extends ResourceTestBase {
           'link' => [
             'uri' => 'internal:/user/logout',
             'title' => NULL,
+            'target_uuid' => NULL,
             'options' => [],
           ],
           'langcode' => 'en',
