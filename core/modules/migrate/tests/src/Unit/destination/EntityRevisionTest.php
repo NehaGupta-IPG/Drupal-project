@@ -160,6 +160,19 @@ class EntityRevisionTest extends UnitTestCase {
   }
 
   /**
+   * Tests that new revisions are flagged to be written as new.
+   *
+   * @legacy-covers ::getEntity
+   */
+  public function testGetEntityBadRow(): void {
+    $destination = $this->getEntityRevisionDestination([]);
+
+    $row = new Row(['nid' => 1]);
+    $row->setDestinationProperty('nid', null);
+    $this->assertFalse($destination->getEntity($row, []));
+  }
+
+  /**
    * Tests entity load failure.
    *
    * @legacy-covers ::getEntity
