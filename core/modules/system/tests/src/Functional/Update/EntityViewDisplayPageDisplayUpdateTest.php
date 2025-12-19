@@ -6,14 +6,16 @@ namespace Drupal\Tests\system\Functional\Update;
 
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path to set the page display flag on entity view displays.
  *
- * @group Update
- *
  * @see system_post_update_set_entity_view_display_page_display()
  */
+#[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class EntityViewDisplayPageDisplayUpdateTest extends UpdatePathTestBase {
 
   /**
