@@ -10,12 +10,14 @@ use Drupal\Tests\Core\Cache\CacheCollectorHelper;
 use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Tests DatabaseBackend cache tag implementation.
  */
 #[Group('Cache')]
+#[RunTestsInSeparateProcesses]
 class CacheCollectorTest extends KernelTestBase {
 
   /**
@@ -52,7 +54,7 @@ class CacheCollectorTest extends KernelTestBase {
   /**
    * Data provider for ::testCacheCollector().
    */
-  public static function providerTestInvalidCharacters() {
+  public static function providerTestInvalidCharacters(): array {
     return [
       // Nothing special.
       ['foo', 'bar', 'baz'],
