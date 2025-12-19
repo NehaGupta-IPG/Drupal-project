@@ -63,7 +63,7 @@ class NodeViewController extends EntityViewController {
    * {@inheritdoc}
    */
   public function view(EntityInterface $node, $view_mode = 'full', $langcode = NULL) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.1.0 and will be removed in drupal:12.0.0. Use \Drupal\Core\Entity\Controller\EntityViewController::view instead. See https://www.drupal.org/node/3484790', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. Use \Drupal\Core\Entity\Controller\EntityViewController::view instead. See https://www.drupal.org/node/3484790', E_USER_DEPRECATED);
     return parent::view($node, $view_mode);
   }
 
