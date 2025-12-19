@@ -354,9 +354,7 @@ class ThemeManager implements ThemeManagerInterface {
     if (isset($theme_hook_suggestion)) {
       $variables['theme_hook_suggestion'] = $theme_hook_suggestion;
     }
-    // Make sure we pass the file name suggestions that were actually used.
-    $variables['file_name_suggestions'] = $suggestions;
-    $output = $render_function($template_file, $variables);
+        $output = $render_function($template_file, $variables);
     return ($output instanceof MarkupInterface) ? $output : (string) $output;
   }
 
