@@ -208,31 +208,19 @@ class StatusTest extends BrowserTestBase {
         $this->assertFalse($elements[0]->find('xpath', '../../summary')->hasClass('system-status-report__status-icon--warning'));
       }
     }
-  }
 
-  /**
-   * Tests that the status report warns when zend.assertions = 1.
-   *
-   * The assertion machinery incurs runtime cost when zend.assertions is 1,
-   * which should trigger a WARNING on the status report. This test is
-   * environment-dependent and will be skipped unless zend.assertions == 1.
-   */
-  public function testPhpRuntimeAssertionsStatus(): void {
-    // Ensure the environment is actually running with assertions executed.
+    // Confirm PHP runtime assertion warnings are only shown when enabled.
     $zend_assertions = ini_get('zend.assertions');
-    if ((int) $zend_assertions !== 1) {
-      $this->markTestSkipped('zend.assertions must be 1 to test the assertions status check.');
+
+    // ini_get() may return FALSE or '' when unset.
+    if ((int) $zend_assertions === 1) {
+      $this->assertSession()->pageTextContains('PHP runtime assertions');
+      $this->assertSession()->pageTextContains('Enabled (zend.assertions = 1)');
+    }
+    else {
+      $this->assertSession()->pageTextNotContains('PHP runtime assertions');
     }
 
-    // Visit the status page and assert the requirement is present.
-    $this->drupalGet('admin/reports/status');
-    $this->assertSession()->statusCodeEquals(200);
-
-    // The requirement title.
-    $this->assertSession()->pageTextContains('PHP runtime assertions');
-
-    // The value should indicate that assertions are enabled.
-    $this->assertSession()->pageTextContains('Enabled (zend.assertions = 1)');
   }
 
   /**
