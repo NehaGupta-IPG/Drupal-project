@@ -2,32 +2,31 @@
 
 namespace Drupal\link;
 
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\TypedData\TypedData;
 
 /**
  * A computed property for a link field's target entity UUID (if any).
  */
-class LinkTargetEntityUuid extends TypedData {
+class LinkTargetEntityUuid extends TypedData implements CacheableDependencyInterface {
 
   /**
    * Computed value: the target entity, if any.
-   *
-   * @var \Drupal\Core\Entity\EntityInterface|false
    */
-  protected $value = NULL;
+  protected ?EntityInterface $value = NULL;
 
   /**
    * Whether the property's value has already been computed or not.
-   *
-   * @var bool
    */
-  protected $valueComputed = FALSE;
+  protected bool $valueComputed = FALSE;
 
   /**
    * Ensures that values are only computed once.
    */
-  protected function ensureComputedValue() {
+  protected function ensureComputedValue(): void {
     if ($this->valueComputed === FALSE) {
       $this->computeValue();
       $this->valueComputed = TRUE;
@@ -47,7 +46,7 @@ class LinkTargetEntityUuid extends TypedData {
   /**
    * {@inheritdoc}
    */
-  protected function computeValue() {
+  protected function computeValue(): void {
     /** @var \Drupal\link\LinkItemInterface $link_item */
     $link_item = $this->getParent();
 
@@ -69,7 +68,7 @@ class LinkTargetEntityUuid extends TypedData {
    * @return bool
    *   True if the link is for an entity.
    */
-  protected static function uriUsesEntityScheme(LinkItemInterface $link_item) {
+  protected static function uriUsesEntityScheme(LinkItemInterface $link_item): bool {
     $uri = parse_url($link_item->uri, PHP_URL_SCHEME);
     return isset($uri['scheme']) && $uri['scheme'] === 'entity';
   }
@@ -83,12 +82,12 @@ class LinkTargetEntityUuid extends TypedData {
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The linked entity if any or NULL.
    */
-  protected function getTargetEntity(LinkItemInterface $link_item) {
-    $entity_parts = $this->getEntityPathParts($link_item->uri);
+  protected function getTargetEntity(LinkItemInterface $link_item): ?EntityInterface {
+    $entity_parts = self::getEntityPathParts($link_item->uri);
     if (count($entity_parts) < 2) {
       return NULL;
     }
-    list($target_entity_type_id, $target_entity_id) = $entity_parts;
+    [$target_entity_type_id, $target_entity_id] = $entity_parts;
     if ($this->getEntityTypeManager()->hasDefinition($target_entity_type_id)) {
       return $this->getEntityTypeManager()->getStorage($target_entity_type_id)->load($target_entity_id);
     }
@@ -104,7 +103,7 @@ class LinkTargetEntityUuid extends TypedData {
    * @return array
    *   First item is entity type. The second item is entity ID.
    */
-  protected static function getEntityPathParts($uri) {
+  protected static function getEntityPathParts(string $uri): array {
     $path = parse_url($uri, PHP_URL_PATH);
     // If $uri is an external path we should return an empty array.
     if ($path === NULL) {
@@ -114,9 +113,12 @@ class LinkTargetEntityUuid extends TypedData {
   }
 
   /**
-   * {@inheritdoc}
+   * Retrieves the cache tags associated with the current value.
+   *
+   * @return array
+   *   An array of cache tags. Returns an empty array if the value is FALSE.
    */
-  public function getCacheTags() {
+  public function getCacheTags(): array {
     $this->ensureComputedValue();
     return $this->value === FALSE ? [] : $this->value->getCacheTags();
   }
@@ -124,7 +126,7 @@ class LinkTargetEntityUuid extends TypedData {
   /**
    * {@inheritdoc}
    */
-  public function getCacheContexts() {
+  public function getCacheContexts(): array {
     $this->ensureComputedValue();
     return $this->value === FALSE ? [] : $this->value->getCacheContexts();
   }
@@ -143,8 +145,8 @@ class LinkTargetEntityUuid extends TypedData {
    * @return \Drupal\Core\Entity\EntityTypeManagerInterface
    *   Entity type manager.
    */
-  protected function getEntityTypeManager() {
-    return \Drupal::service('entity_type.manager');
+  protected function getEntityTypeManager(): EntityTypeManagerInterface {
+    return \Drupal::service(EntityTypeManagerInterface::class);
   }
 
 }
