@@ -34,40 +34,6 @@ function layout_builder_removed_post_updates(): array {
 }
 
 /**
- * Update timestamp formatter settings for Layout Builder fields.
- */
-function layout_builder_post_update_timestamp_formatter(?array &$sandbox = NULL): void {
-  /** @var \Drupal\Core\Field\FormatterPluginManager $field_formatter_manager */
-  $field_formatter_manager = \Drupal::service('plugin.manager.field.formatter');
-
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'entity_view_display', function (EntityViewDisplayInterface $entity_view_display) use ($field_formatter_manager): bool {
-    $update = FALSE;
-    if ($entity_view_display instanceof LayoutEntityDisplayInterface && $entity_view_display->isLayoutBuilderEnabled()) {
-      foreach ($entity_view_display->getSections() as $section) {
-        foreach ($section->getComponents() as $component) {
-          if (str_starts_with($component->getPluginId(), 'field_block:')) {
-            $configuration = $component->get('configuration');
-            $formatter =& $configuration['formatter'];
-            if ($formatter && isset($formatter['type'])) {
-              $plugin_definition = $field_formatter_manager->getDefinition($formatter['type'], FALSE);
-              // Check also potential plugins extending TimestampFormatter.
-              if ($plugin_definition && is_a($plugin_definition['class'], TimestampFormatter::class, TRUE)) {
-                if (!isset($formatter['settings']['tooltip']) || !isset($formatter['settings']['time_diff'])) {
-                  $update = TRUE;
-                  // No need to check the rest of components.
-                  break 2;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    return $update;
-  });
-}
-
-/**
  * Clear caches due to new routes and UI elements.
  */
 function layout_builder_post_update_section_move_form() {
