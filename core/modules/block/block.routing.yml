@@ -6,9 +6,9 @@ block.admin_demo:
   requirements:
     _access_theme: 'TRUE'
     _permission: 'administer blocks'
+    _csrf_token: 'FALSE'
   options:
     _admin_route: FALSE
-    _csrf_token: 'FALSE'
 
 entity.block.delete_form:
   path: '/admin/structure/block/manage/{block}/delete'
