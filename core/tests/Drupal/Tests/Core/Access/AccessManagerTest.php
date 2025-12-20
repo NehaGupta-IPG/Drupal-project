@@ -585,14 +585,12 @@ class AccessManagerTest extends UnitTestCase {
   #[IgnoreDeprecations]
   public function testRequiredCsrf(): void {
     $this->routeCollection->add('test_route_csrf_true', new Route('/test-route-5/', [], [
-      '_access' => 'TRUE',
       '_csrf_token' => 'TRUE',
     ]));
     $this->routeCollection->add('test_route_csrf_false', new Route('/test-route-6/', [], [
-      '_access' => 'TRUE',
       '_csrf_token' => 'FALSE',
     ]));
-    $this->routeCollection->add('test_route_without_csrf', new Route('/test-route-7/', [], ['_access' => 'TRUE']));
+    $this->routeCollection->add('test_route_without_csrf', new Route('/test-route-7/', [], []));
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $map = [];
