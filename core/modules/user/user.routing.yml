@@ -176,7 +176,6 @@ user.login:
     _user_is_logged_in: 'FALSE'
   options:
     _maintenance_access: TRUE
-    _csrf_token: 'FALSE'
 
 user.login.http:
   path: '/user/login'
@@ -186,7 +185,6 @@ user.login.http:
   requirements:
     _user_is_logged_in: 'FALSE'
     _format: 'json'
-    _csrf_token: 'FALSE'
 
 user.login_status.http:
   path: '/user/login_status'
@@ -226,7 +224,6 @@ user.reset.login:
     _title: 'Reset password'
   requirements:
     _user_is_logged_in: 'FALSE'
-    _csrf_token: 'FALSE'
   options:
     _maintenance_access: TRUE
     no_cache: TRUE
@@ -249,7 +246,6 @@ user.reset.form:
     _title: 'Reset password'
   requirements:
     _user_is_logged_in: 'FALSE'
-    _csrf_token: 'FALSE'
   options:
     _maintenance_access: TRUE
     no_cache: TRUE
