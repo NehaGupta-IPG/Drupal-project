@@ -6,7 +6,6 @@ default_format_test.machine:
   requirements:
     _access: 'TRUE'
     _format: 'json'
-    _csrf_token: 'FALSE'
 
 default_format_test.human:
   path: '/default_format_test/human'
@@ -16,7 +15,6 @@ default_format_test.human:
   requirements:
     _access: 'TRUE'
     _format: 'html'
-    _csrf_token: 'FALSE'
 
 # Route definition identical to default_format_test.machine, only different name.
 # @see \Drupal\FunctionalTests\Routing\DefaultFormatTest::testMultiple
@@ -28,4 +26,3 @@ default_format_test.machine.alias:
   requirements:
     _access: 'TRUE'
     _format: 'json'
-    _csrf_token: 'FALSE'

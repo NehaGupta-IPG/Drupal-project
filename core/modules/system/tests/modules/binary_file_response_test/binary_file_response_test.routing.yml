@@ -5,4 +5,3 @@ binary_file_response_test.download:
     _title: 'Redirect'
   requirements:
     _access:  'TRUE'
-    _csrf_token: 'FALSE'

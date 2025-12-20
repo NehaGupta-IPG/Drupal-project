@@ -4,4 +4,3 @@ deprecated_twig_template:
     _controller: '\Drupal\deprecated_twig_template\Controller\DeprecatedTwigTemplateController::deprecatedTwigTemplate'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

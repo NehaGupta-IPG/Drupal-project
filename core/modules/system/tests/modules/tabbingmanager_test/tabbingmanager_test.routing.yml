@@ -5,4 +5,3 @@ tabbingmanager_test_page:
     _title: 'Tabbing Manager testing'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

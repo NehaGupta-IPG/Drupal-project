@@ -5,7 +5,6 @@ common_test.l_active_class:
     _controller: '\Drupal\common_test\Controller\CommonTestController::typeLinkActiveClass'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 common_test.destination:
   path: '/common-test/destination'
@@ -13,7 +12,6 @@ common_test.destination:
     _controller: '\Drupal\common_test\Controller\CommonTestController::destination'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 common_test.js_and_css_querystring:
   path: '/common-test/query-string'
@@ -22,7 +20,6 @@ common_test.js_and_css_querystring:
     _controller: '\Drupal\common_test\Controller\CommonTestController::jsAndCssQuerystring'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 common_test.page_attachments:
   path: '/common/attachments-test'
@@ -31,4 +28,3 @@ common_test.page_attachments:
     _controller: '\Drupal\common_test\Controller\CommonTestController::attachments'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

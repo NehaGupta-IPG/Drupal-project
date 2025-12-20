@@ -5,7 +5,6 @@ position_test_page:
     _title: 'position testing'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 position_test_ported_jqueryui:
   path: '/position-shim-test-ported-from-jqueryui'
@@ -14,4 +13,3 @@ position_test_ported_jqueryui:
     _title: 'ported position testing'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

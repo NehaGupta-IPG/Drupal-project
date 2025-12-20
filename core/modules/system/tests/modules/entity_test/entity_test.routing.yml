@@ -31,7 +31,6 @@ entity.entity_test.collection_referencing_entities:
     _title: 'List entity_test entities referencing the given entity'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 entity.entity_test.collection_labels_alphabetically:
   path: '/entity_test/list_labels_alphabetically/{entity_type_id}'
@@ -40,7 +39,6 @@ entity.entity_test.collection_labels_alphabetically:
     _title: 'List labels of entities of the given entity type alphabetically'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 entity.entity_test.collection_empty:
   path: '/entity_test/list_empty/{entity_type_id}'
@@ -49,7 +47,6 @@ entity.entity_test.collection_empty:
     _title: 'Empty list of entities of the given entity type, empty because no entities match the query'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 entity.entity_test.collection:
   path: '/entity_test/list'
@@ -70,7 +67,6 @@ entity.entity_test_mulrev.revision:
         type: entity_revision:entity_test_mulrev
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 entity.block.test_operation:
   path: '/admin/structure/block/manage/{block}/test_operation'

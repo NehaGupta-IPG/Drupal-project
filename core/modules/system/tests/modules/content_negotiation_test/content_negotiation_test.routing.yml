@@ -5,14 +5,12 @@ content_negotiation.test:
     _controller: '\Drupal\content_negotiation_test\Controller\TestController::simple'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 content_negotiation.html:
   path: content_negotiation/html
   defaults:
     _controller: '\Drupal\content_negotiation_test\Controller\TestController::html'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 content_negotiation.simple_content_negotiation:
   path: content_negotiation/html
   defaults:
@@ -20,18 +18,15 @@ content_negotiation.simple_content_negotiation:
   requirements:
     _access: 'TRUE'
     _format: 'json|xml'
-    _csrf_token: 'FALSE'
 content_negotiation.variable_with_period:
   path: content_negotiation/plugin/{plugin_id}
   defaults:
     _controller: '\Drupal\content_negotiation_test\Controller\TestController::variable'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 content_negotiation.full_content_negotiation:
   path: content_negotiation/negotiate
   defaults:
     _controller: '\Drupal\content_negotiation_test\Controller\TestController::format'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

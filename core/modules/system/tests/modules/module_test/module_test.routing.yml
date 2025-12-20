@@ -5,7 +5,6 @@ module_test.dynamic_invoke:
     _controller: '\Drupal\module_test\Controller\ModuleTestController::hookDynamicLoadingInvoke'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 module_test.dynamic_invoke_all:
   path: '/module-test/hook-dynamic-loading-invoke-all'
@@ -14,7 +13,6 @@ module_test.dynamic_invoke_all:
     _controller: '\Drupal\module_test\Controller\ModuleTestController::hookDynamicLoadingInvokeAll'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 module_test.class_loading:
   path: '/module-test/class-loading'
@@ -23,4 +21,3 @@ module_test.class_loading:
     _controller: '\Drupal\module_test\Controller\ModuleTestController::testClassLoading'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

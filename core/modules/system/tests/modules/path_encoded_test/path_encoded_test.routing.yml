@@ -5,7 +5,6 @@ path_encoded_test.colon:
     _controller: '\Drupal\path_encoded_test\Controller\PathEncodedTestController::simple'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 path_encoded_test.at_sign:
   path: '/blog/@Dries'
@@ -14,7 +13,6 @@ path_encoded_test.at_sign:
     _controller: '\Drupal\path_encoded_test\Controller\PathEncodedTestController::simple'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 path_encoded_test.parentheses:
   path: '/cat(box)'
@@ -23,4 +21,3 @@ path_encoded_test.parentheses:
     _controller: '\Drupal\path_encoded_test\Controller\PathEncodedTestController::simple'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

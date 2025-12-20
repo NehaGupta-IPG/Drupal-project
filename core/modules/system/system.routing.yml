@@ -5,7 +5,6 @@ system.401:
     _title: 'Unauthorized'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 system.403:
   path: '/system/403'
@@ -14,7 +13,6 @@ system.403:
     _title: 'Access denied'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 system.404:
   path: '/system/404'
@@ -23,7 +21,6 @@ system.404:
     _title: 'Page not found'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 system.4xx:
   path: '/system/4xx'
@@ -32,7 +29,6 @@ system.4xx:
     _title: 'Client error'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 system.admin:
   path: '/admin'
@@ -355,7 +351,6 @@ system.files:
   requirements:
     _access: 'TRUE'
     scheme: '^(?!(module|theme)).*'
-    _csrf_token: 'FALSE'
 
 system.private_file_download:
   path: '/system/files/{filepath}'
@@ -366,7 +361,6 @@ system.private_file_download:
     # http://symfony.com/doc/current/cookbook/routing/slash_in_parameter.html
     filepath: .+
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 system.temporary:
   path: '/system/temporary'
@@ -375,7 +369,6 @@ system.temporary:
     scheme: temporary
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 system.themes_page:
   path: '/admin/appearance'
@@ -479,7 +472,6 @@ system.timezone:
     abbreviation: '0|([A-Z]{3,5})'
     offset: '\-?\d+'
     is_daylight_saving_time: '\-1|0|1'
-    _csrf_token: 'FALSE'
 
 system.admin_config:
   path: '/admin/config'
@@ -499,7 +491,6 @@ system.batch_page.html:
   requirements:
     _access: 'TRUE'
     _format: 'html'
-    _csrf_token: 'FALSE'
   options:
     _admin_route: TRUE
 
@@ -541,7 +532,6 @@ system.entity_autocomplete:
     _controller: '\Drupal\system\Controller\EntityAutocompleteController::handleAutocomplete'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 system.csrftoken:
   path: '/session/token'
@@ -549,7 +539,6 @@ system.csrftoken:
     _controller: '\Drupal\system\Controller\CsrfTokenController::csrfToken'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 system.linkset_settings:
   path: '/admin/config/services/linkset'

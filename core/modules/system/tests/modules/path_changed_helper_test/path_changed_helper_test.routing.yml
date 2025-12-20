@@ -4,11 +4,9 @@ path.changed:
     _controller: '\Drupal\path_changed_helper_test\Controller\TestController::test'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 path.changed.bc:
   path: '/old/path/{block_type}'
   defaults:
     _controller: '\Drupal\path_changed_helper_test\Controller\TestController::test'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

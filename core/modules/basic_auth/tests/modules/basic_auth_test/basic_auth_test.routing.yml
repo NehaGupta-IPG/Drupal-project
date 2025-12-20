@@ -15,4 +15,3 @@ basic_auth_test.state.read:
     _controller: '\Drupal\basic_auth_test\BasicAuthTestController::readState'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

@@ -4,4 +4,3 @@ deprecation_test.route:
     _controller: \Drupal\deprecation_test\DeprecatedController::deprecatedMethod
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

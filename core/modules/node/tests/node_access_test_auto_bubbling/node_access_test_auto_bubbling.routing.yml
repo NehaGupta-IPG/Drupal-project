@@ -4,7 +4,6 @@ node_access_test_auto_bubbling:
     _controller: '\Drupal\node_access_test_auto_bubbling\Controller\NodeAccessTestAutoBubblingController::latest'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 node_access_test_auto_bubbling.node_access:
   path: '/node_access_test_auto_bubbling_node_access/{node}'
   defaults:

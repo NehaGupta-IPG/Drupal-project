@@ -24,7 +24,6 @@ batch_test.nested_programmatic:
     value: '1'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 batch_test.no_form:
   path: '/batch-test/no-form'
@@ -33,7 +32,6 @@ batch_test.no_form:
     _title: 'Simple page'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 batch_test.finish_redirect:
   path: '/batch-test/finish-redirect'
@@ -42,7 +40,6 @@ batch_test.finish_redirect:
     _title: 'Simple page with finish redirect call'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 batch_test.test_form:
   path: '/batch-test'
@@ -76,7 +73,6 @@ batch_test.programmatic:
     value: '1'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 batch_test.test_theme:
   path: '/admin/batch-test/test-theme'
@@ -84,7 +80,6 @@ batch_test.test_theme:
     _controller: '\Drupal\batch_test\Controller\BatchTestController::testThemeBatch'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 batch_test.test_title:
   path: '/batch-test/test-title'
@@ -92,4 +87,3 @@ batch_test.test_title:
     _controller: '\Drupal\batch_test\Controller\BatchTestController::testTitleBatch'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

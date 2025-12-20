@@ -7,7 +7,6 @@ session_test.get:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 session_test.get_from_session_object:
   path: '/session-test/get-from-session-object'
   defaults:
@@ -17,7 +16,6 @@ session_test.get_from_session_object:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 session_test.id:
   path: '/session-test/id'
   defaults:
@@ -27,7 +25,6 @@ session_test.id:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.id_from_cookie:
   path: '/session-test/id-from-cookie'
@@ -36,7 +33,6 @@ session_test.id_from_cookie:
     _controller: '\Drupal\session_test\Controller\SessionTestController::getIdFromCookie'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.set:
   path: '/session-test/set/{test_value}'
@@ -49,7 +45,6 @@ session_test.set:
       test_value: '\s+'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.no_set:
   path: '/session-test/no-set/{test_value}'
@@ -62,7 +57,6 @@ session_test.no_set:
       test_value: '\s+'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.set_message:
   path: '/session-test/set-message'
@@ -71,7 +65,6 @@ session_test.set_message:
     _controller: '\Drupal\session_test\Controller\SessionTestController::setMessage'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.set_message_but_do_not_save:
   path: '/session-test/set-message-but-do-not-save'
@@ -80,7 +73,6 @@ session_test.set_message_but_do_not_save:
     _controller: '\Drupal\session_test\Controller\SessionTestController::setMessageButDoNotSave'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.is_logged_in:
   path: '/session-test/is-logged-in'
@@ -106,7 +98,6 @@ session_test.trace_handler:
     _controller: '\Drupal\session_test\Controller\SessionTestController::traceHandler'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.trace_handler_rewrite_unmodified:
   path: '/session-test/trace-handler-rewrite-unmodified'
@@ -115,7 +106,6 @@ session_test.trace_handler_rewrite_unmodified:
     _controller: '\Drupal\session_test\Controller\SessionTestController::traceHandlerRewriteUnmodified'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.get_session_basic_auth:
   path: '/session-test/get-session'
@@ -138,7 +128,6 @@ session_test.get_session_no_auth:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.set_session:
   path: '/session-test/set-session/{test_value}'
@@ -163,7 +152,6 @@ session_test.set_bag_flag:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.clear_bag_flag:
   path: '/session-test/clear-bag-flag'
@@ -174,7 +162,6 @@ session_test.clear_bag_flag:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.has_bag_flag:
   path: '/session-test/has-bag-flag'
@@ -185,7 +172,6 @@ session_test.has_bag_flag:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.trigger_write_exception:
   path: '/session-test/trigger-write-exception'
@@ -196,7 +182,6 @@ session_test.trigger_write_exception:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.legacy_get:
   path: '/session-test/legacy-get'
@@ -207,7 +192,6 @@ session_test.legacy_get:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 session_test.legacy_set:
   path: '/session-test/legacy-set/{test_value}'
@@ -220,4 +204,3 @@ session_test.legacy_set:
       test_value: '\s+'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

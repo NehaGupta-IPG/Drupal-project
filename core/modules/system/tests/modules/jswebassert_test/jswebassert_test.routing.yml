@@ -5,7 +5,6 @@ jswebassert_test.jswebassert_test_form:
     _title: 'JsWebAssertForm'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 jswebassert_test.jswebassert_test_page:
   path: '/jswebassert_test_page'
@@ -14,4 +13,3 @@ jswebassert_test.jswebassert_test_page:
     _title: 'JsWebAssertPage'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

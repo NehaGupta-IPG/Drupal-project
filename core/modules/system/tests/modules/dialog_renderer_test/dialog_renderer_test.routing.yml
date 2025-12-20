@@ -5,7 +5,6 @@ dialog_renderer_test.links:
     _title: 'Links'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 dialog_renderer_test.modal_content:
   path: '/dialog_renderer-content'
@@ -14,7 +13,6 @@ dialog_renderer_test.modal_content:
     _title: 'Thing 1'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 dialog_renderer_test.modal_content_link:
   path: '/dialog_renderer-content-link'
@@ -23,7 +21,6 @@ dialog_renderer_test.modal_content_link:
     _title: 'Thing 2'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 dialog_renderer_test.modal_content_input:
   path: '/dialog_renderer-content-input'
@@ -32,7 +29,6 @@ dialog_renderer_test.modal_content_input:
     _title: 'Thing 3'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 dialog_renderer_test.collapsed_opener:
   path: '/dialog_renderer-collapsed-opener'
@@ -41,7 +37,6 @@ dialog_renderer_test.collapsed_opener:
     _title: 'Collapsed Openers'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 dialog_renderer_test.modal_form:
   path: '/dialog_renderer-form'

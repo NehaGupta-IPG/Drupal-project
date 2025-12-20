@@ -5,7 +5,6 @@ off_canvas_test.links:
     _title: 'Links'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 off_canvas_test.thing1:
   path: '/off-canvas-thing1'
@@ -14,7 +13,6 @@ off_canvas_test.thing1:
     _title: 'Thing 1'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 off_canvas_test.thing2:
   path: '/off-canvas-thing2'
@@ -22,7 +20,6 @@ off_canvas_test.thing2:
     _controller: '\Drupal\off_canvas_test\Controller\TestController::thing2'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 off_canvas_test.dialog_links:
   path: '/off-canvas-dialog-links'
@@ -30,4 +27,3 @@ off_canvas_test.dialog_links:
     _controller: '\Drupal\off_canvas_test\Controller\TestController::otherDialogLinks'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

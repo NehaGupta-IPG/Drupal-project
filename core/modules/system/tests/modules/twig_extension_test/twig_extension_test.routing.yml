@@ -4,11 +4,9 @@ twig_extension_test.filter:
     _controller: '\Drupal\twig_extension_test\TwigExtensionTestController::testFilterRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 twig_extension_test.function:
   path: '/twig-extension-test/function'
   defaults:
     _controller: '\Drupal\twig_extension_test\TwigExtensionTestController::testFunctionRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

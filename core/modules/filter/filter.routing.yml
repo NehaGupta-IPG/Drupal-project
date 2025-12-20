@@ -5,7 +5,6 @@ filter.tips_all:
     _title: 'Compose tips'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 filter.tips:
   path: '/filter/tips/{filter_format}'

@@ -7,4 +7,3 @@ big_pipe.nojs:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

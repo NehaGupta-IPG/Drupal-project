@@ -4,11 +4,9 @@ csrf_race_test.csrftoken:
     _controller: '\Drupal\csrf_race_test\Controller\TestController::getCsrfToken'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 csrf_race_test.test:
   path: '/csrf_race/test'
   defaults:
     _controller: '\Drupal\csrf_race_test\Controller\TestController::testMethod'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'

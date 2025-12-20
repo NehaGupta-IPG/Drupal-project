@@ -4,7 +4,6 @@ twig_theme_test.php_variables:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::phpVariablesRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test.trans:
   path: '/twig-theme-test/trans'
@@ -12,7 +11,6 @@ twig_theme_test.trans:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::transBlockRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test.placeholder_outside_trans:
   path: '/twig-theme-test/placeholder_outside_trans'
@@ -20,7 +18,6 @@ twig_theme_test.placeholder_outside_trans:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::placeholderOutsideTransRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test_url_generator:
   path: '/twig-theme-test/url-generator'
@@ -28,7 +25,6 @@ twig_theme_test_url_generator:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::urlGeneratorRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test_link_generator:
   path: '/twig-theme-test/link-generator'
@@ -36,7 +32,6 @@ twig_theme_test_link_generator:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::linkGeneratorRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test_url_to_string:
   path: '/twig-theme-test/url-to-string'
@@ -44,7 +39,6 @@ twig_theme_test_url_to_string:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::urlToStringRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test_file_url:
   path: '/twig-theme-test/file-url'
@@ -52,7 +46,6 @@ twig_theme_test_file_url:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::fileUrlRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test_attach_library:
   path: '/twig-theme-test/attach-library'
@@ -60,7 +53,6 @@ twig_theme_test_attach_library:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::attachLibraryRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test_registry_loader:
   path: '/twig-theme-test/registry-loader'
@@ -70,7 +62,6 @@ twig_theme_test_registry_loader:
     no_cache: TRUE
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test_renderable:
   path: '/twig-theme-test/renderable'
@@ -78,7 +69,6 @@ twig_theme_test_renderable:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::renderable'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test_embed_tag:
   path: '/twig-theme-test/embed-tag'
@@ -86,7 +76,6 @@ twig_theme_test_embed_tag:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::embedTagRender'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
 
 twig_theme_test_dump:
   path: '/twig-theme-test/dump'
@@ -94,4 +83,3 @@ twig_theme_test_dump:
     _controller: '\Drupal\twig_theme_test\TwigThemeTestController::dump'
   requirements:
     _access: 'TRUE'
-    _csrf_token: 'FALSE'
