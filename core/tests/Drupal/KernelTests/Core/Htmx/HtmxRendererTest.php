@@ -12,6 +12,7 @@ use Drupal\Tests\block\Traits\BlockCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -20,6 +21,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 #[CoversClass(HtmxRenderer::class)]
 #[Group('Htmx')]
+#[RunTestsInSeparateProcesses]
 class HtmxRendererTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -77,6 +79,24 @@ class HtmxRendererTest extends KernelTestBase {
       ],
     ];
     $url = Url::fromRoute('test_htmx.attachments.replace', [], $options);
+    $this->assertHtmxResponseContent($url);
+  }
+
+  /**
+   * Test triggering the renderer with the _htmx_route option.
+   */
+  public function testHtmxRouteOption(): void {
+    $url = Url::fromRoute('test_htmx.attachments.route_option');
+    $this->assertHtmxResponseContent($url);
+  }
+
+  /**
+   * Verify expected response from HtmxRenderer.
+   *
+   * @param \Drupal\Core\Url $url
+   *   The url to use for the request.
+   */
+  protected function assertHtmxResponseContent(Url $url): void {
     $request = Request::create($url->toString());
     $response = $this->httpKernel->handle($request);
     $this->assertEquals(200, $response->getStatusCode());

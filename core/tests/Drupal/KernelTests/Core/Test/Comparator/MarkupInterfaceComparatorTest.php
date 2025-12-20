@@ -11,6 +11,7 @@ use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory;
 
@@ -23,14 +24,19 @@ use SebastianBergmann\Comparator\Factory;
 #[CoversClass(MarkupInterfaceComparator::class)]
 #[Group('Test')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class MarkupInterfaceComparatorTest extends KernelTestBase {
 
   /**
+   * The markup comparator.
+   *
    * @var \Drupal\TestTools\Comparator\MarkupInterfaceComparator
    */
   protected $comparator;
 
   /**
+   * The comparator factory.
+   *
    * @var \SebastianBergmann\Comparator\Factory
    */
   protected $factory;
@@ -57,7 +63,7 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
    *     comparison should match, FALSE if error, or a class name of an object
    *     thrown.
    */
-  public static function dataSetProvider() {
+  public static function dataSetProvider(): array {
     return [
       'FormattableMarkup vs FormattableMarkup, equal' => [
         new FormattableMarkup('GoldFinger', []),

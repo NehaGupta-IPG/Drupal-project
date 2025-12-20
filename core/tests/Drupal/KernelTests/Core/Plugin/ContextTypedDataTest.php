@@ -13,12 +13,14 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that contexts work properly with the typed data manager.
  */
 #[CoversClass(Context::class)]
 #[Group('Context')]
+#[RunTestsInSeparateProcesses]
 class ContextTypedDataTest extends KernelTestBase {
 
   /**
@@ -67,7 +69,7 @@ class ContextTypedDataTest extends KernelTestBase {
   /**
    * Data provider for testHasContextValue.
    */
-  public static function providerHasContextValue() {
+  public static function providerHasContextValue(): array {
     return [
       [TRUE, FALSE],
       [TRUE, 0],

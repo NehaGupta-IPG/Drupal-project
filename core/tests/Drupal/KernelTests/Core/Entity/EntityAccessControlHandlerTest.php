@@ -20,12 +20,14 @@ use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity access control handler.
  */
 #[CoversClass(EntityAccessControlHandler::class)]
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
 
   /**
@@ -347,7 +349,7 @@ class EntityAccessControlHandlerTest extends EntityLanguageTestBase {
   /**
    * Provides entity data for testing access.
    */
-  public static function providerTestFieldAccess() {
+  public static function providerTestFieldAccess(): array {
     return [
       'serial ID entity' => [
         EntityTest::class,
