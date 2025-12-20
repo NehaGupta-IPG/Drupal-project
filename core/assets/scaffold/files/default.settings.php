@@ -484,6 +484,19 @@ $settings['update_free_access'] = FALSE;
 # $settings['file_chmod_file'] = 0664;
 
 /**
+ * Optimized assets base URL:
+ *
+ * An alternative base URL to be used for serving optimized assets. This must
+ * include any leading directory path.
+ *
+ * A different value from the domain used by Drupal to be used for accessing
+ * assets. This can be used for a simple CDN integration, or to improve
+ * security in conjunction with a Content Security Policy. Do not include a
+ * trailing slash.
+ */
+# $settings['file_asset_base_url'] = 'http://downloads.example.com/assets';
+
+/**
  * Optimized assets path:
  *
  * A local file system path where optimized assets will be stored. This directory
@@ -520,10 +533,10 @@ $settings['update_free_access'] = FALSE;
  * Public schemes are URI schemes that allow download access to all users for
  * all files within that scheme.
  *
- * The "public" scheme is always public, and the "private" scheme is always
- * private, but other schemes, such as "https", "s3", "example", or others,
- * can be either public or private depending on the site. By default, they're
- * private, and access to individual files is controlled via
+ * The "public" scheme and "assets" scheme are always public, and the "private"
+ * scheme is always private, but other schemes, such as "https", "s3",
+ * "example", or others, can be either public or private depending on the site.
+ * By default, they'reprivate, and access to individual files is controlled via
  * hook_file_download().
  *
  * Typically, if a scheme should be public, a module makes it public by
