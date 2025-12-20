@@ -5,3 +5,4 @@ js_once_test:
     _title: 'OnceTest'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

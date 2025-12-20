@@ -5,6 +5,7 @@ ajax_forms_test.get_form:
     _form: '\Drupal\ajax_forms_test\Form\AjaxFormsTestSimpleForm'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_forms_test.commands_form:
   path: '/ajax_forms_test_ajax_commands_form'
@@ -13,6 +14,7 @@ ajax_forms_test.commands_form:
     _form: '\Drupal\ajax_forms_test\Form\AjaxFormsTestCommandsForm'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_forms_test.validation_test:
   path: '/ajax_validation_test'
@@ -21,6 +23,7 @@ ajax_forms_test.validation_test:
     _form: '\Drupal\ajax_forms_test\Form\AjaxFormsTestValidationForm'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_forms_test.lazy_load_form:
   path: '/ajax_forms_test_lazy_load_form'
@@ -29,6 +32,7 @@ ajax_forms_test.lazy_load_form:
     _form: '\Drupal\ajax_forms_test\Form\AjaxFormsTestLazyLoadForm'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_forms_test.image_button_form:
   path: '/ajax_forms_image_button_form'
@@ -37,6 +41,7 @@ ajax_forms_test.image_button_form:
     _form: '\Drupal\ajax_forms_test\Form\AjaxFormsTestImageButtonForm'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_forms_test.ajax_element_form:
   path: '/ajax_forms_test_ajax_element_form'
@@ -45,6 +50,7 @@ ajax_forms_test.ajax_element_form:
     _form: '\Drupal\ajax_forms_test\Form\AjaxFormsTestAjaxElementsForm'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_forms_test.dialog_form_link:
   path: '/ajax_forms_test_dialog_form_link'
@@ -53,3 +59,4 @@ ajax_forms_test.dialog_form_link:
     _controller: '\Drupal\ajax_forms_test\Controller\DialogFormLink::makeDialogFormLink'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

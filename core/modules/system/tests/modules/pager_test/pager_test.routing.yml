@@ -5,6 +5,7 @@ pager_test.multiple_pagers:
     _controller: '\Drupal\pager_test\Controller\PagerTestController::multiplePagers'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 pager_test.query_parameters:
   path: '/pager-test/query-parameters'
@@ -13,6 +14,7 @@ pager_test.query_parameters:
     _controller: '\Drupal\pager_test\Controller\PagerTestController::queryParameters'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 pager_test.modal_pager:
   path: '/pager-test/modal-pager'
@@ -21,3 +23,4 @@ pager_test.modal_pager:
     _controller: '\Drupal\pager_test\Controller\TestModalController::modal'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

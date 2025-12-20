@@ -5,6 +5,7 @@ ajax_test.dialog_contents:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::dialogContents'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.ajax_render_types:
   path: '/ajax-test/dialog-contents-types/{type}'
@@ -13,6 +14,7 @@ ajax_test.ajax_render_types:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::renderTypes'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.dialog_form:
   path: '/ajax-test/dialog-form'
@@ -28,6 +30,7 @@ ajax_test.dialog:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::dialog'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.insert_links_block_wrapper:
   path: '/ajax-test/insert-block-wrapper'
@@ -35,6 +38,7 @@ ajax_test.insert_links_block_wrapper:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::insertLinksBlockWrapper'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.insert_links_inline_wrapper:
   path: '/ajax-test/insert-inline-wrapper'
@@ -42,6 +46,7 @@ ajax_test.insert_links_inline_wrapper:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::insertLinksInlineWrapper'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.insert_links_table_wrapper:
   path: '/ajax-test/insert-table-wrapper'
@@ -49,6 +54,7 @@ ajax_test.insert_links_table_wrapper:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::insertLinksTableWrapper'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.dialog_close:
   path: '/ajax-test/dialog-close'
@@ -56,6 +62,7 @@ ajax_test.dialog_close:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::dialogClose'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.render:
   path: '/ajax-test/render'
@@ -63,6 +70,7 @@ ajax_test.render:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::render'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.admin.theme:
   path: '/admin/ajax-test/theme'
@@ -70,6 +78,7 @@ ajax_test.admin.theme:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::theme'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.order:
   path: '/ajax-test/order'
@@ -77,6 +86,7 @@ ajax_test.order:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::order'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.render_error:
   path: '/ajax-test/render-error'
@@ -84,6 +94,7 @@ ajax_test.render_error:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::renderError'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.message_form:
   path: '/ajax-test/message'
@@ -115,6 +126,7 @@ ajax_test.global_events:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::globalEvents'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.global_events_clear_log:
   path: '/ajax-test/global-events/clear-log'
@@ -122,6 +134,7 @@ ajax_test.global_events_clear_log:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::globalEventsClearLog'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.exception_link:
   path: '/ajax-test/exception-link'
@@ -129,6 +142,7 @@ ajax_test.exception_link:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::exceptionLink'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.throw_exception:
   path: '/ajax-test/throw-exception'
@@ -136,6 +150,7 @@ ajax_test.throw_exception:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::throwException'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.http_methods:
   path: '/ajax-test/http-methods'
@@ -143,6 +158,7 @@ ajax_test.http_methods:
     _controller: Drupal\ajax_test\Controller\AjaxTestController::httpMethods
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
   options:
     no_cache: TRUE
 
@@ -152,6 +168,7 @@ ajax_test.http_methods.dialog:
     _controller: Drupal\ajax_test\Controller\AjaxTestController::httpMethodsDialog
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.link_page.dialog:
   path: '/ajax-test/link-page-dialog'
@@ -160,6 +177,7 @@ ajax_test.link_page.dialog:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::linkPageDialog'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 ajax_test.link_page.dialog_contents:
   path: '/ajax-test/link-page-dialog-contents'
@@ -168,3 +186,4 @@ ajax_test.link_page.dialog_contents:
     _controller: '\Drupal\ajax_test\Controller\AjaxTestController::httpMethodsDialog'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

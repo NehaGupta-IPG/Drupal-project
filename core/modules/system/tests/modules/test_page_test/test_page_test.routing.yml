@@ -5,6 +5,7 @@ test_page_test.test_page:
     _controller: '\Drupal\test_page_test\Controller\TestPageTestController::testPage'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.render_title:
   path: '/test-render-title'
@@ -12,6 +13,7 @@ test_page_test.render_title:
     _controller: '\Drupal\test_page_test\Controller\Test::renderTitle'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.static_title:
   path: '/test-page-static-title'
@@ -20,6 +22,7 @@ test_page_test.static_title:
     _title: 'Static title'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.cached_controller:
   path: '/test-page-cached-controller'
@@ -27,6 +30,7 @@ test_page_test.cached_controller:
     _controller: '\Drupal\test_page_test\Controller\Test::controllerWithCache'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.dynamic_title:
   path: '/test-page-dynamic-title'
@@ -35,6 +39,7 @@ test_page_test.dynamic_title:
     _title_callback: '\Drupal\test_page_test\Controller\Test::dynamicTitle'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.http_response_exception:
   path: '/test-http-response-exception/{code}'
@@ -43,6 +48,7 @@ test_page_test.http_response_exception:
     code: 200
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.error:
   path: '/test-error'
@@ -51,6 +57,7 @@ test_page_test.error:
     code: 200
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.field_xpath:
   path: '/test-field-xpath'
@@ -67,6 +74,7 @@ test_page_test.escaped_characters:
     code: 200
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.escaped_script:
   path: '/test-escaped-script'
@@ -75,6 +83,7 @@ test_page_test.escaped_script:
     code: 200
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.unescaped_script:
   path: '/test-unescaped-script'
@@ -83,6 +92,7 @@ test_page_test.unescaped_script:
     code: 200
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.meta_refresh:
   path: '/test-meta-refresh'
@@ -91,6 +101,7 @@ test_page_test.meta_refresh:
     _controller: '\Drupal\test_page_test\Controller\Test::metaRefresh'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.deprecations:
   path: '/test-deprecations'
@@ -99,6 +110,7 @@ test_page_test.deprecations:
     _controller: '\Drupal\test_page_test\Controller\Test::deprecations'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 test_page_test.test_page_var_dump:
   path: '/test-page-var-dump'
@@ -107,3 +119,4 @@ test_page_test.test_page_var_dump:
     _controller: '\Drupal\test_page_test\Controller\TestPageTestController::testPageVarDump'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

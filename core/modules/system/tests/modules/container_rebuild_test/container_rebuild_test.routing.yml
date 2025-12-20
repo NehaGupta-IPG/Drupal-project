@@ -4,6 +4,7 @@ container_rebuild_test.module_path:
     _controller: '\Drupal\container_rebuild_test\TestController::showModuleInfo'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 
 container_rebuild_test.container_reset:
@@ -12,3 +13,4 @@ container_rebuild_test.container_reset:
     _controller: '\Drupal\container_rebuild_test\TestController::containerReset'
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'

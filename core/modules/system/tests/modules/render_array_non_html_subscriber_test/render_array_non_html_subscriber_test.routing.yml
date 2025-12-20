@@ -4,6 +4,7 @@ render_array_non_html_subscriber_test.raw_string:
     _controller: '\Drupal\render_array_non_html_subscriber_test\RenderArrayNonHtmlSubscriberTestController::rawString'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 render_array_non_html_subscriber_test.render_array:
   path: '/render_array_non_html_subscriber_test/render_array'
@@ -11,3 +12,4 @@ render_array_non_html_subscriber_test.render_array:
     _controller: '\Drupal\render_array_non_html_subscriber_test\RenderArrayNonHtmlSubscriberTestController::renderArray'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

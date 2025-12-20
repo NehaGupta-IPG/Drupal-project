@@ -5,3 +5,4 @@ js_deprecation_test.deprecation:
     _title: 'JsDeprecationTest'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

@@ -5,3 +5,4 @@ jqueryui_library_asset_test_page:
     _title: 'Test jQuery UI asset loading order'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

@@ -4,3 +4,4 @@ http_kernel_test.empty:
     _controller: '\Drupal\http_kernel_test\Controller\TestController::get'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

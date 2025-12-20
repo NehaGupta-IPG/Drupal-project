@@ -5,6 +5,7 @@ js_message_test.links:
     _title: 'JsMessageLinks'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 js_message_test.links_with_system_messages:
   path: '/js_message_test_link_with_system_messages'
@@ -13,3 +14,4 @@ js_message_test.links_with_system_messages:
     _title: 'JsMessageLinks'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

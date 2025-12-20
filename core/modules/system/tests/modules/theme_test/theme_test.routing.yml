@@ -4,6 +4,7 @@ theme_test.template_test:
     _controller: '\Drupal\theme_test\ThemeTestController::testTemplate'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 theme_test.inline_template_test:
   path: '/theme-test/inline-template-test'
@@ -11,6 +12,7 @@ theme_test.inline_template_test:
     _controller: '\Drupal\theme_test\ThemeTestController::testInlineTemplate'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 theme_test.suggestion:
   path: '/theme-test/suggestion'
@@ -21,6 +23,7 @@ theme_test.suggestion:
     _title: 'Suggestion'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 theme_test.priority:
   path: '/theme-test/priority'
@@ -31,6 +34,7 @@ theme_test.priority:
     _title: 'Suggestion'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 theme_test.request_listener:
   path: '/theme-test/request-listener'
@@ -38,6 +42,7 @@ theme_test.request_listener:
     _controller: '\Drupal\theme_test\ThemeTestController::testRequestListener'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 suggestion_alter:
   path: '/theme-test/suggestion-alter'
@@ -45,6 +50,7 @@ suggestion_alter:
     _controller: '\Drupal\theme_test\ThemeTestController::suggestionAlter'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 theme_test.general_suggestion_alter:
   path: '/theme-test/general-suggestion-alter'
@@ -52,6 +58,7 @@ theme_test.general_suggestion_alter:
     _controller: '\Drupal\theme_test\ThemeTestController::generalSuggestionAlter'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 suggestion_provided:
   path: '/theme-test/suggestion-provided'
@@ -59,6 +66,7 @@ suggestion_provided:
     _controller: '\Drupal\theme_test\ThemeTestController::suggestionProvided'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 specific_suggestion_alter:
   path: '/theme-test/specific-suggestion-alter'
@@ -66,6 +74,7 @@ specific_suggestion_alter:
     _controller: '\Drupal\theme_test\ThemeTestController::specificSuggestionAlter'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 theme_test.non_html:
   path: '/theme-test/non-html'
@@ -73,6 +82,7 @@ theme_test.non_html:
     _controller: '\Drupal\theme_test\ThemeTestController::nonHtml'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 theme_test.preprocess_suggestions:
   path: '/theme-test/preprocess-suggestions'
@@ -80,6 +90,7 @@ theme_test.preprocess_suggestions:
     _controller: '\Drupal\theme_test\ThemeTestController::preprocessSuggestions'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 theme_test.preprocess_callback:
   path: '/theme-test/preprocess-callback'
@@ -87,6 +98,7 @@ theme_test.preprocess_callback:
     _controller: '\Drupal\theme_test\ThemeTestController::preprocessCallback'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 theme_test.test_theme_class:
   path: '/theme-test/test-theme-class'
@@ -94,3 +106,4 @@ theme_test.test_theme_class:
     _controller: '\Drupal\theme_test\ThemeTestController::testThemeClass'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

@@ -4,3 +4,4 @@ update_script_test.database_updates_menu_item:
     _controller: '\Drupal\update_script_test\Controller\UpdateScriptTestController::databaseUpdatesMenuItem'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

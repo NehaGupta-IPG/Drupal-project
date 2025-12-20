@@ -5,3 +5,4 @@ destructable:
     _title: 'Calls destructable service'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

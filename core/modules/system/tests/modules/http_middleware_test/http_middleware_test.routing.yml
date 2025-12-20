@@ -5,3 +5,4 @@ http_middleware_test.test_response:
     _controller: '\Drupal\http_middleware_test\Controller\TestResponseController::testResponse'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'

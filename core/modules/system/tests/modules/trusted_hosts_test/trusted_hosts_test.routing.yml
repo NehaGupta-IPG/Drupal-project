@@ -4,6 +4,7 @@ trusted_hosts_test.fake_request:
     _controller: '\Drupal\trusted_hosts_test\Controller\TrustedHostsTestController::fakeRequestHost'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
 
 trusted_hosts_test.bag_type:
   path: '/trusted-hosts-test/bag-type/{bag}'
@@ -11,3 +12,4 @@ trusted_hosts_test.bag_type:
     _controller: '\Drupal\trusted_hosts_test\Controller\TrustedHostsTestController::bagType'
   requirements:
     _access: 'TRUE'
+    _csrf_token: 'FALSE'
