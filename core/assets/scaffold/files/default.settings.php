@@ -536,8 +536,8 @@ $settings['update_free_access'] = FALSE;
  * The "public" scheme and "assets" scheme are always public, and the "private"
  * scheme is always private, but other schemes, such as "https", "s3",
  * "example", or others, can be either public or private depending on the site.
- * By default, they'reprivate, and access to individual files is controlled via
- * hook_file_download().
+ * By default, they're private, and access to individual files is controlled
+ * via hook_file_download().
  *
  * Typically, if a scheme should be public, a module makes it public by
  * implementing hook_file_download(), and granting access to all users for all
