@@ -12,19 +12,20 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Field\Entity\BaseFieldOverride.
  */
 #[CoversClass(BaseFieldOverride::class)]
 #[Group('Field')]
+#[RunTestsInSeparateProcesses]
 class BaseFieldOverrideTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'user',
     'entity_test',
   ];
@@ -57,7 +58,7 @@ class BaseFieldOverrideTest extends KernelTestBase {
   /**
    * Test cases for ::testGetClass.
    */
-  public static function getClassTestCases() {
+  public static function getClassTestCases(): array {
     return [
       'String (default class)' => [
         'string',
@@ -127,7 +128,7 @@ class BaseFieldOverrideTest extends KernelTestBase {
    * @return int
    *   A primitive default value.
    */
-  public static function defaultValueCallbackPrimitive() {
+  public static function defaultValueCallbackPrimitive(): int {
     return 99;
   }
 

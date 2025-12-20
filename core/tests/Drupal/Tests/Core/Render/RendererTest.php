@@ -319,7 +319,11 @@ class RendererTest extends RendererTestBase {
           return '<a' . (string) $attributes . '>' . $vars['#title'] . '</a>';
         });
     };
-    $data[] = [$build, '<div class="baz"><a href="https://www.drupal.org" id="foo">bar</a></div>' . "\n", $setup_code_type_link];
+    $data[] = [
+      $build,
+      '<div class="baz"><a href="https://www.drupal.org" id="foo">bar</a></div>' . "\n",
+      $setup_code_type_link,
+    ];
 
     // Tests that #theme_wrappers can disambiguate element attributes when the
     // "base" attribute is not set for #theme.
@@ -722,7 +726,7 @@ class RendererTest extends RendererTestBase {
    * @return array
    *   An array of render arrays.
    */
-  public static function providerRenderTwice() {
+  public static function providerRenderTwice(): array {
     return [
       [
         [
@@ -777,7 +781,7 @@ class RendererTest extends RendererTestBase {
    * @return array
    *   A list of boolean values and AccessResult objects.
    */
-  public static function providerAccessValues() {
+  public static function providerAccessValues(): array {
     return [
       [FALSE],
       [TRUE],
@@ -857,7 +861,7 @@ class RendererTest extends RendererTestBase {
    * @return array
    *   An array of access conditions and expected cache metadata.
    */
-  public static function providerRenderCache() {
+  public static function providerRenderCache(): array {
     return [
       'full access' => [
         NULL,
@@ -967,7 +971,7 @@ class RendererTest extends RendererTestBase {
     }
   }
 
-  public static function providerTestRenderCacheMaxAge() {
+  public static function providerTestRenderCacheMaxAge(): array {
     return [
       [0, FALSE, NULL],
       [60, TRUE, (int) $_SERVER['REQUEST_TIME'] + 60],
@@ -1036,7 +1040,7 @@ class RendererTest extends RendererTestBase {
    *   An array of associative arrays of expected results keyed by property
    *   name.
    */
-  public static function providerTestRenderCacheProperties() {
+  public static function providerTestRenderCacheProperties(): array {
     return [
       [[]],
       [['child1' => 0, 'child2' => 0, '#custom_property' => 0, '#custom_property_array' => 0]],
@@ -1062,7 +1066,7 @@ class RendererTest extends RendererTestBase {
     $this->assertEquals($build, $expected);
   }
 
-  public static function providerTestAddCacheableDependency() {
+  public static function providerTestAddCacheableDependency(): array {
     return [
       // Empty render array, typical default cacheability.
       [
@@ -1137,7 +1141,7 @@ class RendererTest extends RendererTestBase {
     $this->assertFalse($this->renderer->hasRenderContext());
 
     // Tests in a render context.
-    $this->renderer->executeInRenderContext(new RenderContext(), function () {
+    $this->renderer->executeInRenderContext(new RenderContext(), function (): void {
       $this->assertTrue($this->renderer->hasRenderContext());
     });
 
@@ -1217,11 +1221,11 @@ class RendererTest extends RendererTestBase {
  */
 class TestAccessClass implements TrustedCallbackInterface {
 
-  public static function accessTrue() {
+  public static function accessTrue(): bool {
     return TRUE;
   }
 
-  public static function accessFalse() {
+  public static function accessFalse(): bool {
     return FALSE;
   }
 
@@ -1236,7 +1240,7 @@ class TestAccessClass implements TrustedCallbackInterface {
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['accessTrue', 'accessFalse', 'accessResultAllowed', 'accessResultForbidden'];
   }
 
@@ -1263,7 +1267,7 @@ class TestCallables implements TrustedCallbackInterface {
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['preRenderPrinted', 'lazyBuilder'];
   }
 

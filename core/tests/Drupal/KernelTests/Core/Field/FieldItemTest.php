@@ -10,14 +10,18 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test field item methods.
  */
 #[Group('Field')]
+#[RunTestsInSeparateProcesses]
 class FieldItemTest extends EntityKernelTestBase {
 
   /**
+   * The field name.
+   *
    * @var string
    */
   protected $fieldName;

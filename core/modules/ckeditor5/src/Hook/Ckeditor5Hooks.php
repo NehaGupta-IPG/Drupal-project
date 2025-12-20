@@ -2,6 +2,8 @@
 
 namespace Drupal\ckeditor5\Hook;
 
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\ckeditor5\LanguageMapper;
 use Drupal\Core\Hook\Order\OrderAfter;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Asset\AttachedAssetsInterface;
@@ -21,6 +23,12 @@ use Drupal\editor\EditorInterface;
 class Ckeditor5Hooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    protected LanguageMapper $languageMapper,
+  ) {
+
+  }
 
   /**
    * Implements hook_help().
@@ -106,14 +114,11 @@ class Ckeditor5Hooks {
    *
    * This module's implementation of form_filter_format_form_alter() must
    * happen after the editor module's implementation, as that implementation
-   * adds the active editor to $form_state. It must also happen after the media
-   * module's implementation so media_filter_format_edit_form_validate can be
-   * removed from the validation chain, as that validator is not needed with
-   * CKEditor 5 and will trigger a false error.
+   * adds the active editor to $form_state.
    */
   #[Hook('form_filter_format_form_alter',
     order: new OrderAfter(
-      modules: ['editor', 'media'],
+      modules: ['editor'],
     )
   )]
   public function formFilterFormatFormAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
@@ -137,15 +142,6 @@ class Ckeditor5Hooks {
           by the CKEditor 5 configuration. Manually removing tags would break
           enabled functionality, and any manually added tags would be removed by
           CKEditor 5 on render.');
-        // The media_filter_format_edit_form_validate validator is not needed
-        // with CKEditor 5 as it exists to enforce the inclusion of specific
-        // allowed tags that are added automatically by CKEditor 5. The
-        // validator is removed so it does not conflict with the automatic
-        // addition of those allowed tags.
-        $key = array_search('media_filter_format_edit_form_validate', $form['#validate']);
-        if ($key !== FALSE) {
-          unset($form['#validate'][$key]);
-        }
       }
     }
     // Override the AJAX callbacks for changing editors, so multiple areas of
@@ -246,7 +242,7 @@ class Ckeditor5Hooks {
       return;
     }
     // All possibles CKEditor 5 languages that can be used by Drupal.
-    $ckeditor_langcodes = array_values(_ckeditor5_get_langcode_mapping());
+    $ckeditor_langcodes = array_values($this->languageMapper->getMappings());
     if ($extension === 'core') {
       // Generate libraries for each of the CKEditor 5 translation files so that
       // the correct translation file can be attached depending on the current
@@ -309,7 +305,11 @@ class Ckeditor5Hooks {
             $langcode = basename($file, '.js');
             // Only add languages that Drupal can understands.
             if (in_array($langcode, $ckeditor_langcodes)) {
-              $library['js']["{$dirname}/translations/{$langcode}.js"] = ['ckeditor5_langcode' => $langcode, 'minified' => TRUE, 'preprocess' => TRUE];
+              $library['js']["{$dirname}/translations/{$langcode}.js"] = [
+                'ckeditor5_langcode' => $langcode,
+                'minified' => TRUE,
+                'preprocess' => TRUE,
+              ];
             }
           }
         }
@@ -341,7 +341,7 @@ class Ckeditor5Hooks {
       if (!\Drupal::moduleHandler()->moduleExists('locale')) {
         return;
       }
-      $ckeditor5_language = _ckeditor5_get_langcode_mapping($language->getId());
+      $ckeditor5_language = $this->languageMapper->getMapping($language->getId());
       // Remove all CKEditor 5 translations files that are not in the current
       // language.
       foreach ($javascript as $index => &$item) {
@@ -380,6 +380,35 @@ class Ckeditor5Hooks {
   }
 
   /**
+   * Implements hook_field_widget_single_element_form_alter().
+   */
+  #[Hook('field_widget_single_element_form_alter')]
+  public function fieldWidgetSingleElementFormAlter(&$element, FormStateInterface $form_state, $context): void {
+    // Add an attribute so that CKEditor 5 plugins can vary their behavior based
+    // on host entity type, host entity bundle and host entity language.
+    if (!empty($element['#type']) && $element['#type'] == 'text_format') {
+      $items = $context['items'];
+      assert($items instanceof FieldItemListInterface);
+      $host_entity = $items->getEntity();
+      $element['#attributes']['data-ckeditor5-host-entity-type'] = $host_entity->getEntityTypeId();
+      $element['#attributes']['data-ckeditor5-host-entity-bundle'] = $host_entity->bundle();
+      $element['#attributes']['data-ckeditor5-host-entity-langcode'] = $host_entity->language()->getId();
+    }
+  }
+
+  /**
+   * Implements hook_entity_bundle_info_alter().
+   */
+  #[Hook('entity_bundle_info_alter')]
+  public function entityBundleInfoAlter(array &$bundles): void {
+    if (isset($bundles['node'])) {
+      foreach ($bundles['node'] as $key => $bundle) {
+        $bundles['node'][$key]['ckeditor5_link_suggestions'] = TRUE;
+      }
+    }
+  }
+
+  /**
    * Implements hook_ENTITY_TYPE_presave() for editor entities.
    */
   #[Hook('editor_presave')]
@@ -410,9 +439,11 @@ class Ckeditor5Hooks {
           ->diff($ul_type)
           ->toCKEditor5ElementsArray();
       }
+      elseif (array_key_exists('ckeditor5_list', $settings['plugins']) && !array_key_exists('styles', $settings['plugins']['ckeditor5_list']['properties'])) {
+        $settings['plugins']['ckeditor5_list']['properties']['styles'] = FALSE;
+      }
 
       $editor->setSettings($settings);
-
     }
   }
 
