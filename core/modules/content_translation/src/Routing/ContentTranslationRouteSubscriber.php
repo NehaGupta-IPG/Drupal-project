@@ -55,6 +55,7 @@ class ContentTranslationRouteSubscriber extends RouteSubscriberBase {
           [
             '_entity_access' => $entity_type_id . '.view',
             '_access_content_translation_overview' => $entity_type_id,
+            '_csrf_token' => 'FALSE',
           ],
           [
             'parameters' => [
@@ -84,6 +85,7 @@ class ContentTranslationRouteSubscriber extends RouteSubscriberBase {
           [
             '_entity_access' => $entity_type_id . '.view',
             '_access_content_translation_manage' => 'create',
+            '_csrf_token' => 'FALSE',
           ],
           [
             'parameters' => [

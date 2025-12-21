@@ -81,6 +81,7 @@ class SearchPageRoutes implements ContainerInjectionInterface {
         [
           '_entity_access' => 'entity.view',
           '_permission' => 'search content',
+          '_csrf_token' => 'FALSE',
         ],
         [
           'parameters' => [
@@ -101,6 +102,7 @@ class SearchPageRoutes implements ContainerInjectionInterface {
         [
           '_entity_access' => 'entity.view',
           '_permission' => 'search content',
+          '_csrf_token' => 'FALSE',
         ],
         [
           'parameters' => [
