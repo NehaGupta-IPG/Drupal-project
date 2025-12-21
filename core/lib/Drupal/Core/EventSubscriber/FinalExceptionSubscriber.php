@@ -114,11 +114,6 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
           $backtrace_exception = $backtrace_exception->getPrevious();
         }
         $backtrace = $backtrace_exception->getTrace();
-        // First trace is the error itself, already contained in the message.
-        // While the second trace is the error source and also contained in the
-        // message, the message doesn't contain argument values, so we output it
-        // once more in the backtrace.
-        array_shift($backtrace);
 
         // Generate a backtrace containing only scalar argument values.
         $error['@backtrace'] = Error::formatBacktrace($backtrace);
