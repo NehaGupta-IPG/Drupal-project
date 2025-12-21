@@ -94,6 +94,7 @@ class RevisionHtmlRouteProvider implements EntityRouteProviderInterface {
         '_title_callback' => EntityRevisionViewController::class . '::title',
       ])
       ->setRequirement('_entity_access', $revisionParameterName . '.view revision')
+      ->setRequirement('_csrf_token', 'FALSE')
       ->setOption('parameters', [
         $entityTypeId => [
           'type' => 'entity:' . $entityTypeId,
