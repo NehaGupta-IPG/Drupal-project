@@ -220,6 +220,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
       ],
       [
         '_config_translation_overview_access' => 'TRUE',
+        '_csrf_token' => 'FALSE',
       ]
     );
     $result = $this->configNamesMapper->getOverviewRoute();
