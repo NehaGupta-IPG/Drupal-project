@@ -513,6 +513,7 @@ system.db_update:
     op: 'info'
   requirements:
     _access_system_update: 'TRUE'
+    _csrf_token: 'FALSE'
   options:
     default_url_options:
       path_processing: FALSE
