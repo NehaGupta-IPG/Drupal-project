@@ -117,6 +117,7 @@ class ContentTranslationRouteSubscriber extends RouteSubscriberBase {
           ],
           [
             '_access_content_translation_manage' => 'update',
+            '_csrf_token' => 'FALSE',
           ],
           [
             'parameters' => [
