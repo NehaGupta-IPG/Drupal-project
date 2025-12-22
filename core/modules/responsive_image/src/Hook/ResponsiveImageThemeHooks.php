@@ -203,12 +203,6 @@ class ResponsiveImageThemeHooks {
         $variables['img_element']['#title'] = $variables['attributes']['title'];
         unset($variables['attributes']['title']);
       }
-      if (isset($variables['img_element']['#width'])) {
-        $variables['attributes']['width'] = $variables['img_element']['#width'];
-      }
-      if (isset($variables['img_element']['#height'])) {
-        $variables['attributes']['height'] = $variables['img_element']['#height'];
-      }
       $variables['img_element']['#attributes'] = $variables['attributes'];
     }
   }
