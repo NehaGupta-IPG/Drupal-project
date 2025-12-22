@@ -189,7 +189,7 @@ class ThemeManager implements ThemeManagerInterface {
     // Set derived suggestions for directly called suggestions like
     // '#theme' => 'comment__node__article'.
     $derived_suggestions = [];
-    
+
     if (!empty($info['base hook']) && str_contains($original_hook, '__')) {
       $derived_suggestion = $original_hook;
       $derived_suggestions[] = $derived_suggestion;
