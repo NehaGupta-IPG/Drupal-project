@@ -168,10 +168,11 @@ class ThemeManager implements ThemeManagerInterface {
     // If there's still no implementation, log an error and return an empty
     // string.
     if (!$theme_registry->has($hook)) {
-      $derived_suggestions_without_original_hook = array_slice($derived_suggestions, 0, count($derived_suggestions) - 1);
-      foreach ($derived_suggestions_without_original_hook as $candidate_hook) {
-        if ($theme_registry->has($candidate_hook)) {
-          $hook = $candidate_hook;
+      // Iteratively strip everything after the last '__' delimiter, until an
+      // implementation is found.
+      while ($pos = strrpos($hook, '__')) {
+        $hook = substr($hook, 0, $pos);
+        if ($theme_registry->has($hook)) {
           break;
         }
       }
