@@ -43,8 +43,8 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
     switch ($operation) {
       case 'view label':
         // User labels (usernames) are now protected by the 'view usernames'
-        // permission. Both 'access user profiles' and 'view usernames' are required
-        // to view other users' labels.
+        // permission. Both 'access user profiles' and 'view usernames'
+        // are required to view other users' labels.
         $access_result = AccessResult::allowedIfHasPermission($account, 'access user profiles')
           ->andIf(AccessResult::allowedIfHasPermission($account, 'view usernames'));
         return $access_result;
