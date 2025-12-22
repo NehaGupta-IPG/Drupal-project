@@ -9,6 +9,7 @@ services:
     parent: default_plugin_manager
     arguments:
       $entityTypeManager: '@entity_type.manager'
+      $attachmentsCache: '@variation_cache.editor_attachments'
   element.editor:
     class: Drupal\editor\Element
     arguments: ['@plugin.manager.editor']
@@ -16,3 +17,7 @@ services:
   editor.config_translation_mapper_subscriber:
     class: Drupal\editor\EventSubscriber\EditorConfigTranslationSubscriber
     arguments: ['@config.factory']
+  variation_cache.editor_attachments:
+    class: Drupal\Core\Cache\VariationCacheInterface
+    factory: ['@variation_cache_factory', 'get']
+    arguments: [editor_attachments]

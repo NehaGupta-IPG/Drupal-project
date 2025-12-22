@@ -2,6 +2,8 @@
 
 namespace Drupal\editor\Plugin;
 
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\VariationCacheInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -32,13 +34,17 @@ class EditorManager extends DefaultPluginManager {
    */
   protected array $editors = [];
 
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected ?EntityTypeManagerInterface $entityTypeManager = NULL) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected ?EntityTypeManagerInterface $entityTypeManager = NULL, protected ?VariationCacheInterface $attachmentsCache = NULL) {
     parent::__construct('Plugin/Editor', $namespaces, $module_handler, EditorPluginInterface::class, Editor::class, 'Drupal\editor\Annotation\Editor');
     $this->alterInfo('editor_info');
     $this->setCacheBackend($cache_backend, 'editor_plugins');
     if ($this->entityTypeManager === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $entityTypeManager argument is deprecated in drupal:11.2.0 and will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3447794', E_USER_DEPRECATED);
       $this->entityTypeManager = \Drupal::entityTypeManager();
+    }
+    if ($this->attachmentsCache === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $attachmentsCache argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See ...', E_USER_DEPRECATED);
+      $this->attachmentsCache = \Drupal::service('variation_cache.editor_attachments');
     }
   }
 
@@ -77,20 +83,35 @@ class EditorManager extends DefaultPluginManager {
       // do not have editors.
       $this->editors += $editors + array_fill_keys($editor_ids_to_load, NULL);
       foreach ($editors as $format_id => $editor) {
-        $plugin = $this->createInstance($editor->getEditor());
-        $plugin_definition = $plugin->getPluginDefinition();
-
-        // Libraries.
-        $this->attachments['library'] = array_merge($this->attachments['library'], $plugin->getLibraries($editor));
+        $initialCacheability = new CacheableMetadata();
+        $result = $this->attachmentsCache->get([$format_id], $initialCacheability);
+        if ($result) {
+          $format_settings = $result->data['format_settings'] ?? [];
+          $format_libraries = $result->data['format_libraries'] ?? [];
+        }
+        else {
+          $plugin = $this->createInstance($editor->getEditor());
+          $plugin_definition = $plugin->getPluginDefinition();
+          $format_settings = [
+            'format' => $format_id,
+            'editor' => $editor->getEditor(),
+            'editorSettings' => $plugin->getJSSettings($editor),
+            'editorSupportsContentFiltering' => $plugin_definition['supports_content_filtering'],
+            'isXssSafe' => $plugin_definition['is_xss_safe'],
+          ];
+          $format_libraries = $plugin->getLibraries($editor);
+          $cacheability = CacheableMetadata::createFromObject($editor);
+          $this->attachmentsCache->set([$format_id], [
+            'format_settings' => $format_settings,
+            'format_libraries' => $format_libraries,
+          ], $cacheability, $initialCacheability);
+        }
 
         // Format-specific JavaScript settings.
-        $settings['editor']['formats'][$format_id] = [
-          'format' => $format_id,
-          'editor' => $editor->getEditor(),
-          'editorSettings' => $plugin->getJSSettings($editor),
-          'editorSupportsContentFiltering' => $plugin_definition['supports_content_filtering'],
-          'isXssSafe' => $plugin_definition['is_xss_safe'],
-        ];
+        $settings['editor']['formats'][$format_id] = $format_settings;
+
+        // Libraries.
+        $this->attachments['library'] = array_merge($this->attachments['library'], $format_libraries);
       }
     }
 
