@@ -9,9 +9,9 @@ use Drupal\node\Entity\Node;
 
 /**
  * Runs tests on Revisions UI using Stark.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class RevisionsTabsUiTest extends WebDriverTestBase {
 
   /**
