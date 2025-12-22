@@ -121,7 +121,8 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
         }
         // Allow view access to anyone with permission to view usernames.
         if ($operation == 'view' || $operation == 'view label') {
-          return AccessResult::allowedIfHasPermission($account, 'view usernames')->cachePerPermissions();
+          return AccessResult::allowedIfHasPermission($account, 'view usernames')
+            ->orIf(AccessResult::allowedIf($is_own_account))->cachePerUser();
         }
         // Allow edit access for the own user name if the permission is
         // satisfied.
