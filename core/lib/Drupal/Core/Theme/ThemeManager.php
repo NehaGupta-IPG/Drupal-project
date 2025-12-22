@@ -186,6 +186,19 @@ class ThemeManager implements ThemeManagerInterface {
       @trigger_error($info['deprecated'], E_USER_DEPRECATED);
     }
 
+    // Set derived suggestions for directly called suggestions like
+    // '#theme' => 'comment__node__article'.
+    $derived_suggestions = [];
+
+    if (!empty($info['base hook']) && str_contains($original_hook, '__')) {
+      $derived_suggestion = $original_hook;
+      $derived_suggestions[] = $derived_suggestion;
+      while ($pos = strrpos($derived_suggestion, '__')) {
+        $derived_suggestion = substr($derived_suggestion, 0, $pos);
+        array_unshift($derived_suggestions, $derived_suggestion);
+      }
+    }
+
     // If a renderable array is passed as $variables, then set $variables to
     // the arguments expected by the theme function.
     if (isset($variables['#theme']) || isset($variables['#theme_wrappers'])) {
@@ -217,7 +230,7 @@ class ThemeManager implements ThemeManagerInterface {
       'theme_hook_original' => $original_hook,
     ];
 
-    $suggestions = $this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables);
+    $suggestions = $this->buildThemeHookSuggestions($hook, $info['base hook'] ?? '', $variables, $derived_suggestions);
 
     // Check if each suggestion exists in the theme registry, and if so,
     // use it instead of the base hook. For example, a function may use
@@ -358,6 +371,8 @@ class ThemeManager implements ThemeManagerInterface {
    *   Theme registry info for $hook['base hook'] key or empty string.
    * @param array $variables
    *   Theme variables that were passed along with the call.
+   * @param array $derived_suggestions
+   *   (optional) Array of derived suggestions..
    *
    * @return string[]
    *   Suggested theme hook names to use instead of $hook, in the order of
@@ -368,7 +383,7 @@ class ThemeManager implements ThemeManagerInterface {
    * @internal
    *   This method may change at any time. It is not for use outside this class.
    */
-  protected function buildThemeHookSuggestions(string $hook, string $info_base_hook, array &$variables): array {
+  protected function buildThemeHookSuggestions(string $hook, string $info_base_hook, array &$variables, array $derived_suggestions = []): array {
     // Set base hook for later use. For example if '#theme' => 'node__article'
     // is called, we run hook_theme_suggestions_node_alter() rather than
     // hook_theme_suggestions_node__article_alter(), and also pass in the base
@@ -380,9 +395,11 @@ class ThemeManager implements ThemeManagerInterface {
     // If the theme implementation was invoked with a direct theme suggestion
     // like '#theme' => 'node__article', add it to the suggestions array before
     // invoking suggestion alter hooks.
-    if ($info_base_hook) {
+    $derived_suggestions_excluding_base_hook = array_slice($derived_suggestions, 1);
+    if ($info_base_hook !== '' && !in_array($hook, $derived_suggestions_excluding_base_hook)) {
       $suggestions[] = $hook;
     }
+    $suggestions = array_merge($suggestions, $derived_suggestions_excluding_base_hook);
 
     // Invoke hook_theme_suggestions_alter() and
     // hook_theme_suggestions_HOOK_alter().
@@ -393,7 +410,20 @@ class ThemeManager implements ThemeManagerInterface {
     $this->moduleHandler->alter($hooks, $suggestions, $variables, $base_theme_hook);
     $this->alter($hooks, $suggestions, $variables, $base_theme_hook);
 
-    return $suggestions;
+    // Add the base suggestion, should always have the lowest priority.
+    $derived_base_hook = reset($derived_suggestions);
+    if (!empty($derived_base_hook) && !in_array($derived_base_hook, $suggestions, TRUE)) {
+      array_unshift($suggestions, $derived_base_hook);
+    }
+
+    // Removing duplicates suggestions
+    $unique_suggestions = [];
+    foreach ($suggestions as $suggestion) {
+      if (!in_array($suggestion, $unique_suggestions, TRUE)) {
+        $unique_suggestions[] = $suggestion;
+      }
+    }
+    return $unique_suggestions;
   }
 
   /**

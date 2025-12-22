@@ -79,6 +79,7 @@ function twig_render_template($template_file, array $variables) {
       if (!str_contains($variables['theme_hook_original'], '__')) {
         $suggestions[] = $variables['theme_hook_original'];
       }
+      $suggestions = array_values(array_unique($suggestions));
       $invalid_suggestions = [];
       $base_hook = $base_hook ?? $variables['theme_hook_original'];
       foreach ($suggestions as $key => &$suggestion) {
