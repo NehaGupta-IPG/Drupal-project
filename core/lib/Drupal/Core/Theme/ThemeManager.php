@@ -154,16 +154,6 @@ class ThemeManager implements ThemeManagerInterface {
     // preprocess callbacks.
     $original_hook = $hook;
 
-    // Set derived suggestions for directly called suggestions like
-    // '#theme' => 'comment__node__article'.
-    $derived_suggestions = [];
-    $derived_suggestion = $original_hook;
-    $derived_suggestions[] = $derived_suggestion;
-    while ($pos = strrpos($derived_suggestion, '__')) {
-      $derived_suggestion = substr($derived_suggestion, 0, $pos);
-      array_unshift($derived_suggestions, $derived_suggestion);
-    }
-
     // If there's no implementation, check for more generic fallbacks.
     // If there's still no implementation, log an error and return an empty
     // string.
@@ -194,6 +184,19 @@ class ThemeManager implements ThemeManagerInterface {
     $info = $theme_registry->get($hook);
     if (isset($info['deprecated'])) {
       @trigger_error($info['deprecated'], E_USER_DEPRECATED);
+    }
+
+    // Set derived suggestions for directly called suggestions like
+    // '#theme' => 'comment__node__article'.
+    $derived_suggestions = [];
+    
+    if (!empty($info['base hook']) && str_contains($original_hook, '__')) {
+      $derived_suggestion = $original_hook;
+      $derived_suggestions[] = $derived_suggestion;
+      while ($pos = strrpos($derived_suggestion, '__')) {
+        $derived_suggestion = substr($derived_suggestion, 0, $pos);
+        array_unshift($derived_suggestions, $derived_suggestion);
+      }
     }
 
     // If a renderable array is passed as $variables, then set $variables to
