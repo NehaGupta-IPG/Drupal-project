@@ -8,12 +8,11 @@
  * See COPYRIGHT.txt and LICENSE.txt files in the "core" directory.
  */
 
-use Drupal\Core\Runtime\DrupalRuntime;
 use Drupal\Core\Update\UpdateKernel;
 
-// @todo Replace once https://github.com/symfony/symfony/issues/60249 is fixed.
-$_ENV['APP_RUNTIME'] ??= $_SERVER['APP_RUNTIME'] ?? DrupalRuntime::class;
-require_once 'autoload_runtime.php';
+// This includes the autoloader and that loads bootstrap.inc which is needed
+// to detect test runs.
+$runner = require_once 'autoload_runtime.php';
 
 // Disable garbage collection during test runs. Under certain circumstances the
 // update path will create so many objects that garbage collection causes
@@ -23,6 +22,4 @@ if (drupal_valid_test_ua()) {
   gc_disable();
 }
 
-return static function () {
-  return new UpdateKernel('prod', require 'autoload.php', FALSE);
-};
+$runner(new UpdateKernel('prod', require 'autoload.php', FALSE));

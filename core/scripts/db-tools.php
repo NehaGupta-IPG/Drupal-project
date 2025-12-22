@@ -8,7 +8,6 @@
 
 use Drupal\Core\Command\DbToolsApplication;
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\Runtime\DrupalRuntime;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -16,18 +15,12 @@ if (PHP_SAPI !== 'cli') {
   return;
 }
 
-// @todo Replace once https://github.com/symfony/symfony/issues/60249 is fixed.
-$_ENV['APP_RUNTIME'] ??= $_SERVER['APP_RUNTIME'] ?? DrupalRuntime::class;
-require_once __DIR__ . '/../../autoload_runtime.php';
+// Bootstrap.
+// @todo Move from front-controller into runtime on request.
+$autoloader = require __DIR__ . '/../../autoload.php';
+$request = Request::createFromGlobals();
+Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $autoloader);
+DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
 
-return static function () {
-  // Bootstrap.
-  // @todo Move from front-controller into runtime on request.
-  $autoloader = require __DIR__ . '/../../autoload.php';
-  $request = Request::createFromGlobals();
-  Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $autoloader);
-  DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
-
-  // Run the database dump command.
-  return new DbToolsApplication();
-};
+$runner = require_once __DIR__ . '/../../autoload_runtime.php';
+$runner(new DbToolsApplication());
