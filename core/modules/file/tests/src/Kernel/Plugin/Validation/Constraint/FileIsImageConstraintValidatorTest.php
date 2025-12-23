@@ -6,14 +6,18 @@ namespace Drupal\Tests\file\Kernel\Plugin\Validation\Constraint;
 
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
+use Drupal\file\Plugin\Validation\Constraint\FileIsImageConstraintValidator;
 use Drupal\Tests\file\Kernel\Validation\FileValidatorTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the FileIsImageConstraintValidator.
- *
- * @group file
- * @coversDefaultClass \Drupal\file\Plugin\Validation\Constraint\FileIsImageConstraintValidator
  */
+#[CoversClass(FileIsImageConstraintValidator::class)]
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileIsImageConstraintValidatorTest extends FileValidatorTestBase {
 
   /**
@@ -48,7 +52,7 @@ class FileIsImageConstraintValidatorTest extends FileValidatorTestBase {
   /**
    * This ensures a specific file is actually an image.
    *
-   * @covers ::validate
+   * @legacy-covers ::validate
    */
   public function testFileIsImage(): void {
     $this->assertFileExists($this->image->getFileUri());

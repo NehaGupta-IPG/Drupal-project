@@ -18,6 +18,7 @@ use Drupal\Core\Layout\LayoutInterface;
 use Drupal\Core\Layout\LayoutPluginManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -285,6 +286,50 @@ EOS;
   }
 
   /**
+   * Tests ::processDefinition() with a layout that doesn't have a label.
+   *
+   * @legacy-covers ::processDefinition
+   */
+  public function testProcessDefinitionWithMissingLayoutLabel(): void {
+    $this->expectDeprecation('A layout plugin not having a label is deprecated in drupal:11.4.0 and having a label will be enforced in drupal:12.0.0. See https://www.drupal.org/node/3464076');
+    $module_a_label_less_layout = <<<'EOS'
+module_a_label_less_layout:
+  description: A layout that doesn't have a label.
+EOS;
+    vfsStream::create([
+      'modules' => [
+        'module_a' => [
+          'module_a.layouts.yml' => $module_a_label_less_layout,
+        ],
+      ],
+    ]);
+    $this->layoutPluginManager->getDefinitions();
+  }
+
+  /**
+   * Tests ::processDefinition() with a layout that doesn't have a category.
+   *
+   * @legacy-covers ::processDefinition
+   */
+  public function testProcessDefinitionWithMissingLayoutCategory(): void {
+    $module_a_category_less_layout = <<<'EOS'
+module_a_category_less_layout:
+  label: Category-less Layout
+  description: A layout that doesn't have a category.
+EOS;
+    $file_name = 'module_a.layouts.yml';
+    vfsStream::create([
+      'modules' => [
+        'module_a' => [
+          $file_name => $module_a_category_less_layout,
+        ],
+      ],
+    ]);
+    $definitions = $this->layoutPluginManager->getDefinitions();
+    $this->assertEquals($file_name, $definitions['module_a_category_less_layout']->getCategory());
+  }
+
+  /**
    * Tests get theme implementations.
    *
    * @legacy-covers ::getThemeImplementations
@@ -294,6 +339,7 @@ EOS;
     $expected = [
       'layout' => [
         'render element' => 'content',
+        'initial preprocess' => LayoutDiscoveryThemeHooks::class . ':preprocessLayout',
       ],
       'twocol' => [
         'render element' => 'content',
@@ -539,6 +585,7 @@ class LayoutDeriver extends DeriverBase {
       $this->derivatives['invalid_provider'] = new LayoutDefinition([
         'id' => 'invalid_provider',
         'provider' => 'invalid_provider',
+        'label' => 'invalid_provider',
       ]);
       $this->derivatives['invalid_provider']->setClass(LayoutInterface::class);
     }

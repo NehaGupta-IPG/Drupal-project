@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Functional\Theme;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Twig\Error\SyntaxError;
 
 // cspell:ignore contaynz errrf herro kontex muun playsholdr starrrrr starzzzz
@@ -15,6 +16,7 @@ use Twig\Error\SyntaxError;
  * Tests Twig "trans" tags.
  */
 #[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class TwigTransTest extends BrowserTestBase {
 
   /**
@@ -72,8 +74,8 @@ class TwigTransTest extends BrowserTestBase {
     $this->installLanguages();
 
     // Assign Lolspeak (xx) to be the default language.
-    $this->config('system.site')->set('default_langcode', 'xx')->save();
     $this->rebuildContainer();
+    $this->config('system.site')->set('default_langcode', 'xx')->save();
 
     // Check that lolspeak is the default language for the site.
     $this->assertEquals('xx', \Drupal::languageManager()->getDefaultLanguage()->getId(), 'Lolspeak is the default language');

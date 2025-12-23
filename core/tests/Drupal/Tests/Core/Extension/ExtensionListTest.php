@@ -249,9 +249,9 @@ class ExtensionListTest extends UnitTestCase {
   }
 
   /**
-   * DataProvider for testCheckIncompatibility().
+   * Data provider for testCheckIncompatibility().
    */
-  public static function providerCheckIncompatibility() {
+  public static function providerCheckIncompatibility(): array {
     return [
       'core_incompatible true' => [
         [
@@ -309,7 +309,7 @@ class ExtensionListTest extends UnitTestCase {
    * @return \Drupal\Tests\Core\Extension\TestExtension
    *   The test extension list.
    */
-  protected function setupTestExtensionList(array $extension_names = ['test_name'], array $additional_info_values = []) {
+  protected function setupTestExtensionList(array $extension_names = ['test_name'], array $additional_info_values = []): TestExtension {
     vfsStream::setup('drupal_root');
 
     $folders = ['example' => []];

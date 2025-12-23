@@ -18,11 +18,13 @@ use Drupal\Tests\language\Traits\LanguageTestTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Node Translation UI.
  */
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTranslationUITest extends ContentTranslationUITestBase {
 
   use LanguageTestTrait;
@@ -151,7 +153,16 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
    * {@inheritdoc}
    */
   protected function getAdministratorPermissions(): array {
-    return array_merge(parent::getAdministratorPermissions(), ['access administration pages', 'administer content types', 'administer node fields', 'access content overview', 'bypass node access', 'administer languages', 'administer themes', 'view the administration theme']);
+    return array_merge(parent::getAdministratorPermissions(), [
+      'access administration pages',
+      'administer content types',
+      'administer node fields',
+      'access content overview',
+      'bypass node access',
+      'administer languages',
+      'administer themes',
+      'view the administration theme',
+    ]);
   }
 
   /**

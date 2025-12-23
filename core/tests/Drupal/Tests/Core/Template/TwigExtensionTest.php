@@ -120,7 +120,7 @@ class TwigExtensionTest extends UnitTestCase {
    *   An array of test data each containing of a twig template string and
    *   a boolean expecting whether the path will be safe.
    */
-  public static function providerTestEscaping() {
+  public static function providerTestEscaping(): array {
     return [
       ['{{ path("foo") }}', FALSE],
       ['{{ path("foo", {}) }}', FALSE],
@@ -235,10 +235,12 @@ class TwigExtensionTest extends UnitTestCase {
       'optimizations' => 0,
     ]);
 
-    // By default, TwigExtension will attempt to cast objects to strings.
-    // Ensure objects that implement MarkupInterface are unchanged.
-    $safe_string = $this->createMock('\Drupal\Component\Render\MarkupInterface');
-    $this->assertSame($safe_string, $this->systemUnderTest->escapeFilter($twig, $safe_string, 'html', 'UTF-8', TRUE));
+    // TwigExtension should return objects that implement MarkupInterface cast
+    // to a string, but without any sanitization.
+    $html = '<div>Some text</div>';
+    $markup_object = Markup::create($html);
+
+    $this->assertSame($html, $this->systemUnderTest->escapeFilter($twig, $markup_object, 'html', 'UTF-8', TRUE));
 
     // Ensure objects that do not implement MarkupInterface are escaped.
     $string_object = new TwigExtensionTestString("<script>alert('here');</script>");
@@ -256,7 +258,9 @@ class TwigExtensionTest extends UnitTestCase {
       ->with(['#markup' => '<strong>will be rendered</strong>', '#printed' => FALSE])
       ->willReturn('<strong>will be rendered</strong>');
 
-    $twig_environment = $this->prophesize(TwigEnvironment::class)->reveal();
+    $twig_environment = $this->prophesize(TwigEnvironment::class);
+    $twig_environment->getCharset()->willReturn('UTF-8');
+    $twig_environment = $twig_environment->reveal();
 
     // Simulate t().
     $markup = $this->prophesize(TranslatableMarkup::class);
@@ -385,7 +389,7 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * Data provider for ::testRenderVarEarlyReturn().
    */
-  public static function providerTestRenderVarEarlyReturn() {
+  public static function providerTestRenderVarEarlyReturn(): array {
     return [
       'null' => ['', NULL],
       'empty array' => ['', []],
