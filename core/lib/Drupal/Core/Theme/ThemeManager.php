@@ -416,14 +416,7 @@ class ThemeManager implements ThemeManagerInterface {
       array_unshift($suggestions, $derived_base_hook);
     }
 
-    // Removing duplicates suggestions
-    $unique_suggestions = [];
-    foreach ($suggestions as $suggestion) {
-      if (!in_array($suggestion, $unique_suggestions, TRUE)) {
-        $unique_suggestions[] = $suggestion;
-      }
-    }
-    return $unique_suggestions;
+    return array_values(array_unique($suggestions));;
   }
 
   /**
