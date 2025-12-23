@@ -416,7 +416,7 @@ class ThemeManager implements ThemeManagerInterface {
       array_unshift($suggestions, $derived_base_hook);
     }
 
-    return array_values(array_unique($suggestions));;
+    return array_values(array_unique($suggestions));
   }
 
   /**
