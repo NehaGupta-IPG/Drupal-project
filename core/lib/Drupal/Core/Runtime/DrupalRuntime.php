@@ -18,9 +18,11 @@ class DrupalRuntime extends SymfonyRuntime {
    * In addition to the options managed by GenericRuntime, SymfonyRuntime
    * accepts dotenv related options and Drupal at this time does not support
    * dotenv so the role of this class is to bypass that constructor.
+   *
+   * {@inheritdoc}
    */
-  public function __construct() {
-    GenericRuntime::__construct();
+  public function __construct(array $options) {
+    GenericRuntime::__construct($options);
   }
 
 }

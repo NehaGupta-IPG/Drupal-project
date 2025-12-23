@@ -18,6 +18,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 $autoloader = require_once __DIR__ . '/../../../../../../autoload.php';
 
+if (!drupal_valid_test_ua()) {
+  exit;
+}
+
 $kernel = new DrupalKernel('prod', $autoloader);
 
 $request = Request::createFromGlobals();
