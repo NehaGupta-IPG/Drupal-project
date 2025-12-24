@@ -168,7 +168,7 @@ class EntityRevisionTest extends UnitTestCase {
     $destination = $this->getEntityRevisionDestination([]);
 
     $row = new Row(['nid' => 1]);
-    $row->setDestinationProperty('nid', null);
+    $row->setDestinationProperty('nid', NULL);
     $this->assertFalse($destination->getEntity($row, []));
   }
 
