@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
-use Behat\Mink\Element\NodeElement;
-use Drupal\block_content\Entity\BlockContentType;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
@@ -224,8 +222,6 @@ abstract class InlineBlockTestBase extends WebDriverTestBase {
       'label' => $label,
       'revision' => 1,
     ], TRUE);
-    $bundle->save();
-    block_content_add_body_field($bundle->id());
   }
 
   /**
