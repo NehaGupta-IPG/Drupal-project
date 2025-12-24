@@ -10,5 +10,5 @@
 
 use Drupal\Core\DrupalKernel;
 
-$runner = require_once 'autoload_runtime.php';
-$runner(new DrupalKernel('prod', require 'autoload.php'));
+$glue = require_once 'autoload_runtime.php';
+$glue(new DrupalKernel($glue->appContext, $glue->autoloader));

@@ -20,7 +20,7 @@ if (PHP_SAPI !== 'cli') {
 putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
 require_once __DIR__ . '/../tests/bootstrap.php';
 
-$runner = require_once __DIR__ . '/../../autoload_runtime.php';
+$glue = require_once __DIR__ . '/../../autoload_runtime.php';
 // The application version is 0.1.0 to indicate that it is for internal use
 // only and not currently API.
-$runner(new TestSiteApplication('test-site', '0.1.0'));
+$glue(new TestSiteApplication('test-site', '0.1.0'));

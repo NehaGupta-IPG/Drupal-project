@@ -16,11 +16,10 @@ if (PHP_SAPI !== 'cli') {
 }
 
 // Bootstrap.
-// @todo Move from front-controller into runtime on request.
-$autoloader = require __DIR__ . '/../../autoload.php';
+// @todo Move from front-controller into AppContext on request.
+$glue = require_once __DIR__ . '/../../autoload_runtime.php';
 $request = Request::createFromGlobals();
-Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $autoloader);
-DrupalKernel::createFromRequest($request, $autoloader, 'prod')->boot();
+Settings::initialize(dirname(__DIR__, 2), DrupalKernel::findSitePath($request), $glue->autoloader);
+DrupalKernel::createFromRequest($request, $glue->autoloader, $glue->appContext)->boot();
 
-$runner = require_once __DIR__ . '/../../autoload_runtime.php';
-$runner(new DbToolsApplication());
+$glue(new DbToolsApplication());

@@ -12,7 +12,7 @@ use Drupal\Core\Update\UpdateKernel;
 
 // This includes the autoloader and that loads bootstrap.inc which is needed
 // to detect test runs.
-$runner = require_once 'autoload_runtime.php';
+$glue = require_once 'autoload_runtime.php';
 
 // Disable garbage collection during test runs. Under certain circumstances the
 // update path will create so many objects that garbage collection causes
@@ -22,4 +22,4 @@ if (drupal_valid_test_ua()) {
   gc_disable();
 }
 
-$runner(new UpdateKernel('prod', require 'autoload.php', FALSE));
+$glue(new UpdateKernel($glue->appContext, $glue->autoloader, FALSE));
