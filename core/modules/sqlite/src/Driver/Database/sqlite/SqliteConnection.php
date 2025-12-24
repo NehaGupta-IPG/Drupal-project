@@ -33,10 +33,10 @@ class SqliteConnection extends Sqlite {
 
   public function __construct(
     string $dsn,
-    ?string $username = null,
+    ?string $username = NULL,
     #[\SensitiveParameter]
-    ?string $password = null,
-    ?array $options = null,
+    ?string $password = NULL,
+    ?array $options = NULL,
   ) {
     parent::__construct($dsn, $username, $password, $options);
   }

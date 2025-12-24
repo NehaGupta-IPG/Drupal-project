@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\TestSite\Commands;
 
-use Drupal\Core\Database\ConnectionParametersBase;
+use Drupal\Core\Database\ConnectionParameters;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Tests\BrowserTestBase;
@@ -85,7 +85,7 @@ class TestSiteTearDownCommand extends Command {
   protected function tearDown(TestDatabase $test_database, $db_url): void {
     // Connect to the test database.
     $root = dirname(__DIR__, 5);
-    $database = ConnectionParametersBase::createFromUrl($db_url)->toArray();
+    $database = ConnectionParameters::createFromUrl($db_url)->toArray();
     $database['prefix'] = $test_database->getDatabasePrefix();
     Database::addConnectionInfo(__CLASS__, 'default', $database);
 

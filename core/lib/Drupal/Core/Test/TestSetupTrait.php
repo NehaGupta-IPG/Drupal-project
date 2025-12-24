@@ -3,7 +3,7 @@
 namespace Drupal\Core\Test;
 
 use Drupal\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Database\ConnectionParametersBase;
+use Drupal\Core\Database\ConnectionParameters;
 use Drupal\Core\Database\Database;
 
 /**
@@ -158,7 +158,7 @@ trait TestSetupTrait {
       // Ensure no existing database gets in the way. If a default database
       // exists already it must be removed.
       Database::removeConnection('default');
-      $database = ConnectionParametersBase::createFromUrl($db_url, TRUE);
+      $database = ConnectionParameters::createFromUrl($db_url, TRUE);
       Database::addConnectionInfo('default', 'default', $database);
     }
 
@@ -174,7 +174,7 @@ trait TestSetupTrait {
         // Replace the full table prefix definition to ensure that no table
         // prefixes of the test runner leak into the test.
         $options['prefix'] .= $this->databasePrefix;
-        $connection_info[$target] = ConnectionParametersBase::createFromOptionsArray($options);
+        $connection_info[$target] = ConnectionParameters::createFromOptionsArray($options);
       }
       Database::removeConnection('default');
       Database::addConnectionInfo('default', 'default', $connection_info['default']);

@@ -199,13 +199,13 @@ abstract class Database {
    *   A validated connection info array.
    *
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
-   *   ConnectionParametersBase::createFromArrayOptions() instead.
+   *   ConnectionParameters::createFromArrayOptions() instead.
    *
    * @see https://www.drupal.org/node/7654123
    */
   final public static function parseConnectionInfo(array $info, ?ClassLoader $class_loader = NULL, ?string $app_root = NULL): ConnectionParametersInterface {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersBase::createFromArrayOptions() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    return ConnectionParametersBase::createFromOptionsArray($info, $class_loader, $app_root);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParameters::createFromArrayOptions() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    return ConnectionParameters::createFromOptionsArray($info, $class_loader, $app_root);
   }
 
   /**
@@ -239,7 +239,7 @@ abstract class Database {
     if (!empty(self::$databaseInfo[$key][$target])) {
       return;
     }
-    self::$databaseInfo[$key][$target] = is_array($info) ? ConnectionParametersBase::createFromOptionsArray($info, $class_loader, $app_root) : $info;
+    self::$databaseInfo[$key][$target] = is_array($info) ? ConnectionParameters::createFromOptionsArray($info, $class_loader, $app_root) : $info;
   }
 
   /**
@@ -455,12 +455,12 @@ abstract class Database {
    *   Exception thrown when a module provided database driver does not exist.
    *
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use
-   *   ConnectionParametersBase::createFromUrl() instead.
+   *   ConnectionParameters::createFromUrl() instead.
    *
    * @see https://www.drupal.org/node/7654123
    */
   public static function convertDbUrlToConnectionInfo(string $url, $root = NULL, ?bool $include_test_drivers = NULL): ConnectionParametersInterface {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParametersBase::createFromUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use ConnectionParameters::createFromUrl() instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     if ($root !== NULL) {
       if (is_bool($root)) {
         $include_test_drivers = $root;
@@ -469,7 +469,7 @@ abstract class Database {
         @trigger_error("Passing a string \$root value to " . __METHOD__ . "() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287", E_USER_DEPRECATED);
       }
     }
-    return ConnectionParametersBase::createFromUrl($url, $include_test_drivers);
+    return ConnectionParameters::createFromUrl($url, $include_test_drivers);
   }
 
   /**
