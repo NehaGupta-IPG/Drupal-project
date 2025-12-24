@@ -23,8 +23,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * where either the class itself or the methods have a #[Hook] attribute.
  * These classes are automatically registered as autowired services.
  *
- * Finally, a .theme_hook_data container parameter is added. This
- * contains a mapping from [hook,class,method] to the theme name.
+ * Finally, a temporary .theme_hook_data container parameter is added. This
+ * contains:
+ *  - theme_hook_list a mapping from theme to [hook,class,method].
+ *  - theme_preprocess_for_suggestions preprocess hooks with double underscores.
+ *
+ * The parameter theme_hook_data is processed in HookCollectorKeyValueWritePass
+ * and removed automatically.
  *
  * @internal
  */
@@ -216,7 +221,9 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       $fileExtension = $fileinfo->getExtension();
       $filename = $fileinfo->getPathname();
 
-      if ($fileExtension === 'php') {
+      $isThemeSettings = str_ends_with($filename, 'theme-settings.php');
+
+      if ($fileExtension === 'php' && !$isThemeSettings) {
         $cached = $hookFileCache->get($filename);
         if ($cached) {
           $class = $cached['class'];
@@ -345,6 +352,9 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
       }
       // glob() doesn't support streams but scandir() does.
       return !in_array($fileInfo->getFilename(), ['tests', 'js', 'css', 'templates']) && !array_filter(scandir($key), static fn($filename) => str_ends_with($filename, '.info.yml'));
+    }
+    if ($fileInfo->getFilename() === 'theme-settings.php') {
+      return TRUE;
     }
     return in_array($extension, ['inc', 'theme']);
   }

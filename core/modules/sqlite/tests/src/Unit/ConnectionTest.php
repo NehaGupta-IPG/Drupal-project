@@ -6,9 +6,9 @@ namespace Drupal\Tests\sqlite\Unit;
 
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
+use Drupal\sqlite\Driver\Database\sqlite\SqliteConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
-use Pdo\Sqlite;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -35,7 +35,7 @@ class ConnectionTest extends UnitTestCase {
   public function testCreateConnectionOptionsFromUrl(string $url, string $expected): void {
     $sqlite_connection = new Connection(
       // @phpstan-ignore class.notFound
-      $this->createMock(\PHP_VERSION_ID >= 80400 ? Sqlite::class : StubPDO::class),
+      $this->createMock(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
       new ConnectionParameters('sqlite', __NAMESPACE__, __DIR__, ':memory:')
     );
     $database = $sqlite_connection->createConnectionOptionsFromUrl($url, NULL);
@@ -68,7 +68,7 @@ class ConnectionTest extends UnitTestCase {
     $root = dirname(__DIR__, 8);
     $sqlite_connection = new Connection(
       // @phpstan-ignore class.notFound
-      $this->createMock(\PHP_VERSION_ID >= 80400 ? Sqlite::class : StubPDO::class),
+      $this->createMock(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
       new ConnectionParameters('sqlite', __NAMESPACE__, __DIR__, ':memory:'),
     );
     $database = $sqlite_connection->createConnectionOptionsFromUrl('sqlite://localhost/tmp/test', $root);

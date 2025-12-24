@@ -30,7 +30,7 @@ class EntityTypeTest extends UnitTestCase {
    * @return \Drupal\Core\Entity\EntityTypeInterface
    *   The EntityType object.
    */
-  protected function setUpEntityType($definition) {
+  protected function setUpEntityType($definition): EntityType {
     $definition += [
       'id' => 'example_entity_type',
     ];
@@ -99,7 +99,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * Provides test data for testGet.
    */
-  public static function providerTestGet() {
+  public static function providerTestGet(): array {
     return [
       [[], 'provider', NULL],
       [['provider' => ''], 'provider', ''],
@@ -113,7 +113,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * Provides test data for testSet.
    */
-  public static function providerTestSet() {
+  public static function providerTestSet(): array {
     return [
       ['provider', NULL],
       ['provider', ''],
@@ -127,7 +127,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * Provides test data.
    */
-  public static function providerTestGetKeys() {
+  public static function providerTestGetKeys(): array {
     return [
       [[], ['revision' => '', 'bundle' => '', 'langcode' => '']],
       [['id' => 'id'], ['id' => 'id', 'revision' => '', 'bundle' => '', 'langcode' => '']],
@@ -305,6 +305,65 @@ class EntityTypeTest extends UnitTestCase {
   }
 
   /**
+   * Tests get decorated classes through setClass.
+   *
+   * @legacy-covers ::setClass
+   * @legacy-covers ::getDecoratedClasses
+   */
+  public function testGetDecoratedClassesSetClass(): void {
+    $class_1 = $this->randomMachineName();
+    $entity_type = $this->setUpEntityType(['class' => $class_1]);
+    // No override: decoratedClasses is empty.
+    $expected = [];
+    $this->assertEquals($expected, $entity_type->getDecoratedClasses());
+
+    $class_2 = $this->randomMachineName();
+    $entity_type->setClass($class_2);
+    $expected = [
+      $class_1,
+    ];
+    $this->assertEquals($expected, $entity_type->getDecoratedClasses());
+
+    $class_3 = $this->randomMachineName();
+    $entity_type->setClass($class_3);
+    $expected = [
+      $class_1,
+      $class_2,
+    ];
+    $this->assertEquals($expected, $entity_type->getDecoratedClasses());
+  }
+
+  /**
+   * Tests get decorated classes through set.
+   *
+   * @legacy-covers ::set
+   * @legacy-covers ::setClass
+   * @legacy-covers ::getDecoratedClasses
+   */
+  public function testGetDecoratedClassesSet(): void {
+    $class_1 = $this->randomMachineName();
+    $entity_type = $this->setUpEntityType(['class' => $class_1]);
+    // No override: decoratedClasses is empty.
+    $expected = [];
+    $this->assertEquals($expected, $entity_type->getDecoratedClasses());
+
+    $class_2 = $this->randomMachineName();
+    $entity_type->set('class', $class_2);
+    $expected = [
+      $class_1,
+    ];
+    $this->assertEquals($expected, $entity_type->getDecoratedClasses());
+
+    $class_3 = $this->randomMachineName();
+    $entity_type->set('class', $class_3);
+    $expected = [
+      $class_1,
+      $class_2,
+    ];
+    $this->assertEquals($expected, $entity_type->getDecoratedClasses());
+  }
+
+  /**
    * Tests id.
    *
    * @legacy-covers ::id
@@ -415,7 +474,12 @@ class EntityTypeTest extends UnitTestCase {
    * @legacy-covers ::getCountLabel
    */
   public function testGetCountLabel(): void {
-    $entity_type = $this->setUpEntityType(['label_count' => ['singular' => 'one entity test', 'plural' => '@count entity test']]);
+    $entity_type = $this->setUpEntityType([
+      'label_count' => [
+        'singular' => 'one entity test',
+        'plural' => '@count entity test',
+      ],
+    ]);
     $entity_type->setStringTranslation($this->getStringTranslationStub());
     $this->assertEquals('one entity test', $entity_type->getCountLabel(1));
     $this->assertEquals('2 entity test', $entity_type->getCountLabel(2));
@@ -423,7 +487,13 @@ class EntityTypeTest extends UnitTestCase {
     $this->assertArrayNotHasKey('context', $entity_type->getCountLabel(1)->getOptions());
 
     // Test a custom context.
-    $entity_type = $this->setUpEntityType(['label_count' => ['singular' => 'one entity test', 'plural' => '@count entity test', 'context' => 'custom context']]);
+    $entity_type = $this->setUpEntityType([
+      'label_count' => [
+        'singular' => 'one entity test',
+        'plural' => '@count entity test',
+        'context' => 'custom context',
+      ],
+    ]);
     $entity_type->setStringTranslation($this->getStringTranslationStub());
     $this->assertSame('custom context', $entity_type->getCountLabel(1)->getOption('context'));
   }
@@ -457,7 +527,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetBundleLabel().
    */
-  public static function providerTestGetBundleLabel() {
+  public static function providerTestGetBundleLabel(): array {
     return [
       [['label' => 'Entity Label Foo'], 'Entity Label Foo bundle'],
       [['bundle_label' => 'Bundle Label Bar'], 'Bundle Label Bar'],

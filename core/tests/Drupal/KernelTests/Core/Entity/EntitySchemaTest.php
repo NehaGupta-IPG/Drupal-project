@@ -109,7 +109,12 @@ class EntitySchemaTest extends EntityKernelTestBase {
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_base_field']);
     \Drupal::service('field_storage_definition.listener')->onFieldStorageDefinitionCreate($storage_definitions['custom_bundle_field']);
     $schema_handler = $this->database->schema();
-    $tables = ['entity_test_update', 'entity_test_update_revision', 'entity_test_update_data', 'entity_test_update_revision_data'];
+    $tables = [
+      'entity_test_update',
+      'entity_test_update_revision',
+      'entity_test_update_data',
+      'entity_test_update_revision_data',
+    ];
     $dedicated_tables = ['entity_test_update__custom_bundle_field', 'entity_test_update_revision__custom_bundle_field'];
 
     // Initially only the base table and the dedicated field data table should
@@ -272,7 +277,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
    * @return array
    *   An array of test cases consisting of an entity type ID and a field name.
    */
-  public static function providerTestPrimaryKeyUpdate() {
+  public static function providerTestPrimaryKeyUpdate(): array {
     // Build up test cases for all possible entity type configurations.
     // For each entity type we test reinstalling each field that is part of
     // any table's primary key.
