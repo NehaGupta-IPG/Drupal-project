@@ -11,6 +11,9 @@ use Drupal\Core\Database\ConnectionParametersBase;
  */
 class ConnectionParameters extends ConnectionParametersBase {
 
+  public readonly array $init_commands;
+  public readonly array $pdo;
+
   public function __construct(array $options) {
     parent::__construct(
       $options['driver'],
@@ -24,7 +27,25 @@ class ConnectionParameters extends ConnectionParametersBase {
       $options['host'] ?? NULL,
       $options['port'] ?? NULL,
       $options['dependencies'] ?? NULL,
+      array_diff_key($options, array_flip([
+        'driver',
+        'namespace',
+        'autoload',
+        'database',
+        'prefix',
+        'module',
+        'username',
+        'password',
+        'host',
+        'port',
+        'dependencies',
+        'init_commands',
+        'pdo',
+        'optionsBackfill',
+      ])),
     );
+    $this->init_commands = $options['init_commands'] ?? [];
+    $this->pdo = $options['pdo'] ?? [];
   }
 
   /**

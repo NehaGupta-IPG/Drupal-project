@@ -116,11 +116,6 @@ abstract class ConnectionParameters {
 
     return new class ($options) extends ConnectionParametersBase {
 
-      /**
-       * Backfill connection options.
-       */
-      private array $optionsBackfill;
-
       public function __construct(array $options) {
         parent::__construct(
           $options['driver'],

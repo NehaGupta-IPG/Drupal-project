@@ -25,6 +25,10 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     #[\SensitiveParameter]
     public readonly ?int $port = NULL,
     public readonly ?array $dependencies = NULL,
+    // Backfill connection options. This is meant for BC to ensure options
+    // unexpected by the driver can still be handled.
+    // @todo remove in drupal:43.0.0.
+    protected array $optionsBackfill = [],
   ) {
   }
 
@@ -53,7 +57,9 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * {@inheritdoc}
    */
   public function toArray(): array {
-    return get_object_vars($this);
+    $tmp = array_merge($this->optionsBackfill, get_object_vars($this));
+    unset($tmp['optionsBackfill']);
+    return $tmp;
   }
 
   /**
