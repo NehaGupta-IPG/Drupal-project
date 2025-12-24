@@ -31,8 +31,14 @@ use Pdo\Sqlite;
  */
 class SqliteConnection extends Sqlite {
 
-  public function __construct(string $dsn) {
-    parent::_construct($dsn);
+  public function __construct(
+    string $dsn,
+    ?string $username = null,
+    #[\SensitiveParameter]
+    ?string $password = null,
+    ?array $options = null,
+  ) {
+    parent::__construct($dsn, $username, $password, $options);
   }
 
   /**
