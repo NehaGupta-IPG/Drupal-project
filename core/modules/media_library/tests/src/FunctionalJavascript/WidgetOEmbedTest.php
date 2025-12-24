@@ -7,14 +7,15 @@ namespace Drupal\Tests\media_library\FunctionalJavascript;
 use Drupal\media\Entity\Media;
 use Drupal\media_test_oembed\Controller\ResourceController;
 use Drupal\Tests\media\Traits\OEmbedTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Drupalin Hustlin Schipulcon
-
 /**
  * Tests that oEmbed media can be added in the Media library's widget.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class WidgetOEmbedTest extends MediaLibraryTestBase {
 
   use OEmbedTestTrait;
