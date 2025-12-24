@@ -111,7 +111,7 @@ abstract class ConnectionParameters {
 
     if (class_exists($class)) {
       $options = $class::processOptionsArray($options);
-      return new $class(...$options);
+      return new $class($options);
     }
 
     return new class ($options) extends ConnectionParametersBase {

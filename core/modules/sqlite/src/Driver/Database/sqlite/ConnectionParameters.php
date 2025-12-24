@@ -11,22 +11,20 @@ use Drupal\Core\Database\ConnectionParametersBase;
  */
 class ConnectionParameters extends ConnectionParametersBase {
 
-  public function __construct(
-    string $driver,
-    string $namespace,
-    string $autoload,
-    string $database,
-    string $prefix = '',
-    ?string $module = NULL,
-    ?string $username = NULL,
-    ?string $password = NULL,
-    ?string $host = NULL,
-    ?int $port = NULL,
-    ?array $dependencies = NULL,
-    public readonly array $init_commands = [],
-    public readonly array $pdo = [],
-  ) {
-    parent::__construct($driver, $namespace, $autoload, $database, $prefix, $module, $username, $password, $host, $port, $dependencies);
+  public function __construct(array $options) {
+    parent::__construct(
+      $options['driver'],
+      $options['namespace'],
+      $options['autoload'],
+      $options['database'],
+      $options['prefix'] ?? '',
+      $options['module'] ?? NULL,
+      $options['username'] ?? NULL,
+      $options['password'] ?? NULL,
+      $options['host'] ?? NULL,
+      $options['port'] ?? NULL,
+      $options['dependencies'] ?? NULL,
+    );
   }
 
   /**
