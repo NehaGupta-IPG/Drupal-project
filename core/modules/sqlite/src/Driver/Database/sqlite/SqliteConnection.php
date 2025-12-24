@@ -31,6 +31,10 @@ use Pdo\Sqlite;
  */
 class SqliteConnection extends Sqlite {
 
+  public function __construct(string $dsn) {
+    parent::_construct($dsn);
+  }
+
   /**
    * {@inheritdoc}
    */

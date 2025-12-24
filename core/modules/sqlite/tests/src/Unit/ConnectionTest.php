@@ -34,7 +34,6 @@ class ConnectionTest extends UnitTestCase {
   #[DataProvider('providerCreateConnectionOptionsFromUrl')]
   public function testCreateConnectionOptionsFromUrl(string $url, string $expected): void {
     $sqlite_connection = new Connection(
-      // @phpstan-ignore class.notFound
       $this->createMock(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
       new ConnectionParameters('sqlite', __NAMESPACE__, __DIR__, ':memory:')
     );
@@ -67,7 +66,6 @@ class ConnectionTest extends UnitTestCase {
     $this->expectDeprecation('Passing the $root value to Drupal\sqlite\Driver\Database\sqlite\Connection::createConnectionOptionsFromUrl() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287');
     $root = dirname(__DIR__, 8);
     $sqlite_connection = new Connection(
-      // @phpstan-ignore class.notFound
       $this->createMock(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
       new ConnectionParameters('sqlite', __NAMESPACE__, __DIR__, ':memory:'),
     );
