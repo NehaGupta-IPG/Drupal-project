@@ -114,12 +114,12 @@ abstract class MigrateTestCase extends UnitTestCase {
    */
   protected function getDatabase(array $database_contents, $connection_options = []) {
     if (extension_loaded('pdo_sqlite')) {
-      $connection_parameters = new ConnectionParameters(
-        $connection_options['driver'] ?? 'sqlite',
-        $connection_options['namespace'] ?? '',
-        $connection_options['autoload'] ?? '',
-        ':memory:',
-      );
+      $connection_parameters = new ConnectionParameters([
+        'driver' => $connection_options['driver'] ?? 'sqlite',
+        'namespace' => $connection_options['namespace'] ?? '',
+        'autoload' => $connection_options['autoload'] ?? '',
+        'database' => ':memory:',
+      ]);
       $pdo = Connection::open($connection_parameters);
       $connection = new Connection($pdo, $connection_parameters);
     }

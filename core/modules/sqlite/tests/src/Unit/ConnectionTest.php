@@ -78,12 +78,32 @@ class ConnectionTest extends UnitTestCase {
         'namespace' => __NAMESPACE__,
         'autoload' => __DIR__,
         'database' => ':memory:',
-        'foo' => 'bar',
       ]),
     );
     $database = $sqlite_connection->createConnectionOptionsFromUrl('sqlite://localhost/tmp/test', $root);
     $this->assertEquals('sqlite', $database['driver']);
     $this->assertEquals('tmp/test', $database['database']);
+  }
+
+  /**
+   * Confirms legacy array access to the ConnectionParameters.
+   */
+  public function testConnectionParametersArrayAccess(): void {
+    $sqlite_connection = new Connection(
+      $this->createStub(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
+      new ConnectionParameters([
+        'driver' => 'sqlite',
+        'namespace' => __NAMESPACE__,
+        'autoload' => __DIR__,
+        'database' => ':memory:',
+        'foo' => 'bar',
+      ]),
+    );
+    $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()->driver);
+    $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()->database);
+    $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()['driver']);
+    $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()['database']);
+    $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
   }
 
 }

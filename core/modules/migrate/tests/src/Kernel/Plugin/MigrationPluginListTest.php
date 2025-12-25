@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel\Plugin;
 
-use Drupal\Core\Database\ConnectionParameters;
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\Database;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\migrate\Exception\RequirementsException;
@@ -143,7 +143,7 @@ class MigrationPluginListTest extends KernelTestBase {
       $options = $value->toArray();
       // Tests use 7 character prefixes at most so this can't cause collisions.
       $options['prefix'] = $value->prefix . '0';
-      $connection_info[$target] = ConnectionParameters::createFromOptionsArray($options);
+      $connection_info[$target] = ConnectionParametersFactory::createFromOptionsArray($options);
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
 

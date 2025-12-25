@@ -11,7 +11,20 @@ use Drupal\Core\Database\ConnectionParametersBase;
  */
 class ConnectionParameters extends ConnectionParametersBase {
 
+  /**
+   * A list of commands to be executed upon connection established.
+   *
+   * @var list<string>
+   *
+   * @phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
+   */
   public readonly array $init_commands;
+
+  /**
+   * An array of PDO specific options for the connection.
+   *
+   * @var array<int|string, mixed>
+   */
   public readonly array $pdo;
 
   public function __construct(array $options) {

@@ -1013,7 +1013,13 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * Tests the getQualifiedMapTable method with a prefixed database.
    */
   public function testGetQualifiedMapTablePrefix(): void {
-    $connection_parameters = new ConnectionParameters('sqlite', __NAMESPACE__, __DIR__, ':memory:', 'prefix');
+    $connection_parameters = new ConnectionParameters([
+      'driver' => 'sqlite',
+      'namespace' => __NAMESPACE__,
+      'autoload' => __DIR__,
+      'database' => ':memory:',
+      'prefix' => 'prefix',
+    ]);
     $pdo = Connection::open($connection_parameters);
     $this->database = new Connection($pdo, $connection_parameters);
     $qualified_map_table = $this->getIdMap()->getQualifiedMapTableName();

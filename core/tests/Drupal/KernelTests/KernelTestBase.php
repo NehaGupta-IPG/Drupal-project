@@ -8,7 +8,7 @@ use Drupal\Component\FileCache\ApcuFileCacheBackend;
 use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
-use Drupal\Core\Database\ConnectionParameters;
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
@@ -459,7 +459,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       Database::addConnectionInfo(
         'default',
         'default',
-        ConnectionParameters::createFromUrl($db_url, TRUE),
+        ConnectionParametersFactory::createFromUrl($db_url, TRUE),
       );
     }
 
@@ -472,7 +472,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
         // Replace the full table prefix definition to ensure that no table
         // prefixes of the test runner leak into the test.
         $options['prefix'] = $this->databasePrefix ?? '';
-        $connection_info[$target] = ConnectionParameters::createFromOptionsArray($options);
+        $connection_info[$target] = ConnectionParametersFactory::createFromOptionsArray($options);
       }
     }
     return $connection_info;

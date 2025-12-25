@@ -109,28 +109,42 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function offsetExists(mixed $offset): bool {
-    return property_exists($this, $offset);
+    if (property_exists($this, $offset)) {
+      return TRUE;
+    }
+    return array_key_exists($offset, $this->optionsBackfill);
   }
 
   /**
    * This is for BC support only.
    */
   public function offsetGet(mixed $offset): mixed {
-    return $this->{$offset};
+    if (property_exists($this, $offset)) {
+      return $this->{$offset};
+    }
+    return $this->optionsBackfill[$offset];
   }
 
   /**
    * This is for BC support only.
    */
   public function offsetSet(mixed $offset, mixed $value): void {
-    $this->{$offset} = $value;
+    if (property_exists($this, $offset)) {
+      $this->{$offset} = $value;
+      return;
+    }
+    $this->optionsBackfill[$offset] = $value;
   }
 
   /**
    * This is for BC support only.
    */
   public function offsetUnset(mixed $offset): void {
-    $this->{$offset} = NULL;
+    if (property_exists($this, $offset)) {
+      $this->{$offset} = NULL;
+      return;
+    }
+    unset($this->optionsBackfill[$offset]);
   }
 
 }

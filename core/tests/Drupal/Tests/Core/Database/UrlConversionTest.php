@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Database;
 
-use Drupal\Core\Database\ConnectionParameters;
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
@@ -46,7 +46,7 @@ class UrlConversionTest extends UnitTestCase {
    */
   #[DataProvider('providerConvertDbUrlToConnectionInfo')]
   public function testConnectionParametersCreateFromUrl($url, $database_array, $include_test_drivers): void {
-    $result = ConnectionParameters::createFromUrl($url, $include_test_drivers);
+    $result = ConnectionParametersFactory::createFromUrl($url, $include_test_drivers);
     $this->assertInstanceOf(ConnectionParametersInterface::class, $result);
     $this->assertEquals($database_array, array_intersect_key($result->toArray(), $database_array));
   }
@@ -291,13 +291,13 @@ class UrlConversionTest extends UnitTestCase {
   }
 
   /**
-   * Tests ConnectionParameters::createFromUrl() exception.
+   * Tests ConnectionParametersFactory::createFromUrl() exception.
    */
   #[DataProvider('providerInvalidArgumentsUrlConversion')]
   public function testGetInvalidArgumentExceptionInUrlConversion($url, $expected_exception_message): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage($expected_exception_message);
-    ConnectionParameters::createFromUrl($url);
+    ConnectionParametersFactory::createFromUrl($url);
   }
 
   /**
@@ -320,7 +320,7 @@ class UrlConversionTest extends UnitTestCase {
    */
   public function testNoModuleSpecifiedDefaultsToDriverName(): void {
     $url = 'dummydb://test_user:test_pass@test_host/test_database';
-    $connection_info = ConnectionParameters::createFromUrl($url, TRUE);
+    $connection_info = ConnectionParametersFactory::createFromUrl($url, TRUE);
     $expected = [
       'driver' => 'dummydb',
       'username' => 'test_user',
@@ -355,7 +355,7 @@ class UrlConversionTest extends UnitTestCase {
   }
 
   /**
-   * Tests ConnectionParameters::asUrl() to get connection info as a URL.
+   * Tests ConnectionParametersFactory::asUrl() to get connection info as a URL.
    */
   #[PreserveGlobalState(FALSE)]
   #[RunInSeparateProcess]
@@ -547,7 +547,7 @@ class UrlConversionTest extends UnitTestCase {
     $url = 'foo_bar_mysql://test_user:test_pass@test_host:3306/test_database?module=foo_bar';
     $this->expectException(UnknownExtensionException::class);
     $this->expectExceptionMessage("The database_driver Drupal\\foo_bar\\Driver\\Database\\foo_bar_mysql does not exist.");
-    ConnectionParameters::createFromUrl($url, TRUE);
+    ConnectionParametersFactory::createFromUrl($url, TRUE);
   }
 
   /**
@@ -557,7 +557,7 @@ class UrlConversionTest extends UnitTestCase {
     $url = 'driver_test_mysql://test_user:test_pass@test_host:3306/test_database?module=driver_test';
     $this->expectException(UnknownExtensionException::class);
     $this->expectExceptionMessage("The database_driver Drupal\\driver_test\\Driver\\Database\\driver_test_mysql does not exist.");
-    ConnectionParameters::createFromUrl($url, TRUE);
+    ConnectionParametersFactory::createFromUrl($url, TRUE);
   }
 
   /**

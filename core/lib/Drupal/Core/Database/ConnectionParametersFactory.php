@@ -7,11 +7,11 @@ namespace Drupal\Core\Database;
 use Composer\Autoload\ClassLoader;
 
 /**
- * Base class for connection parameters objects.
+ * The factory for database connection parameters.
  *
  * @final
  */
-abstract class ConnectionParameters {
+abstract class ConnectionParametersFactory {
 
   /**
    * Converts a connection options array to a ConnectionParameters object.
@@ -141,38 +141,10 @@ abstract class ConnectionParameters {
       }
 
       /**
-       * {@inheritdoc}
-       */
-      public function toArray(): array {
-        return $this->optionsBackfill;
-      }
-
-      /**
-       * This is for BC support only.
-       */
-      public function offsetExists(mixed $offset): bool {
-        return array_key_exists($offset, $this->optionsBackfill);
-      }
-
-      /**
        * This is for BC support only.
        */
       public function &offsetGet(mixed $offset): mixed {
         return $this->optionsBackfill[$offset];
-      }
-
-      /**
-       * This is for BC support only.
-       */
-      public function offsetSet(mixed $offset, mixed $value): void {
-        $this->optionsBackfill[$offset] = $value;
-      }
-
-      /**
-       * This is for BC support only.
-       */
-      public function offsetUnset(mixed $offset): void {
-        unset($this->optionsBackfill[$offset]);
       }
 
     };
