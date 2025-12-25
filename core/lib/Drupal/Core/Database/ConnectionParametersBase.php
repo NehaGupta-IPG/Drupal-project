@@ -28,6 +28,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * {@inheritdoc}
    */
   public function getConnectionClass(): string {
+    // @phpstan-ignore property.notFound
     return $this->namespace . '\\Connection';
   }
 
@@ -62,18 +63,22 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
 
     $host = empty($this->host) ? 'localhost' : $this->host;
 
+    // @phpstan-ignore property.notFound
     $url = $this->driver . '://' . $user . $host;
 
     if (isset($this->port)) {
       $url .= ':' . $this->port;
     }
 
+    // @phpstan-ignore property.notFound
     $url .= '/' . $this->database;
 
     // Add the module.
+    // @phpstan-ignore property.notFound
     $module = $this->module ?? explode('\\', $this->namespace)[1];
     $url .= '?module=' . $module;
 
+    // @phpstan-ignore property.notFound
     if ($this->prefix !== '') {
       $url .= '#' . $this->prefix;
     }
@@ -87,7 +92,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   public function __get(string $name): mixed {
     if (array_key_exists($name, $this->optionsBackfill)) {
       return $this->optionsBackfill[$name];
-    };
+    }
     throw new \RuntimeException("There is no '{$name}' property or backfilled property in " . get_class($this));
   }
 

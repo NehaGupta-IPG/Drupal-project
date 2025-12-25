@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
-use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -1013,10 +1013,8 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * Tests the getQualifiedMapTable method with a prefixed database.
    */
   public function testGetQualifiedMapTablePrefix(): void {
-    $connection_parameters = new ConnectionParameters([
+    $connection_parameters = ConnectionParametersFactory::createFromOptionsArray([
       'driver' => 'sqlite',
-      'namespace' => __NAMESPACE__,
-      'autoload' => __DIR__,
       'database' => ':memory:',
       'prefix' => 'prefix',
     ]);

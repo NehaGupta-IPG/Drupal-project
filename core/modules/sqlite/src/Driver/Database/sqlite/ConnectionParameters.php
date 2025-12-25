@@ -11,19 +11,6 @@ use Drupal\Core\Database\ConnectionParametersBase;
  */
 class ConnectionParameters extends ConnectionParametersBase {
 
-  /**
-   * A list of commands to be executed upon connection established.
-   *
-   * @var list<string>
-   */
-  // @phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-
-  /**
-   * An array of PDO specific options for the connection.
-   *
-   * @var array<int|string, mixed>
-   */
-
   public function __construct(
     public readonly string $driver,
     public readonly string $namespace,
@@ -85,7 +72,7 @@ class ConnectionParameters extends ConnectionParametersBase {
       'init_commands',
       'pdo',
     ]));
-    foreach(array_keys($optionsBackfill) as $key) {
+    foreach (array_keys($optionsBackfill) as $key) {
       unset($options[$key]);
     }
     $options['optionsBackfill'] = $optionsBackfill;
