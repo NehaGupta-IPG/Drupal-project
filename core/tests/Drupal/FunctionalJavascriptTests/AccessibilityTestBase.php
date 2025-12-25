@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Base class for running accessibility tests.
  */
-#[Group('Testing')]
+#[Group('accessibility')]
 #[RunTestsInSeparateProcesses]
 class AccessibilityTestBase extends WebDriverTestBase {
 

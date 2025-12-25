@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests AxeCoreTestTrait.
  */
 #[CoversClass(AxeCoreTestTrait::class)]
-#[Group('Testing')]
+#[Group('Test')]
 #[RunTestsInSeparateProcesses]
 class AxeCoreTestTraitTest extends WebDriverTestBase {
 
