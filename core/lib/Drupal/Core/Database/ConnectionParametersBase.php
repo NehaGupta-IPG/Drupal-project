@@ -97,6 +97,13 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   }
 
   /**
+   * Check if an optionsBackfill element exists as a property value.
+   */
+  public function __isset(string $name): bool {
+    return array_key_exists($name, $this->optionsBackfill);
+  }
+
+  /**
    * Prevents the connection parameters from being serialized.
    *
    * @throws \LogicException
