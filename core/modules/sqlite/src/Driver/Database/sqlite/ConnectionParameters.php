@@ -15,9 +15,8 @@ class ConnectionParameters extends ConnectionParametersBase {
    * A list of commands to be executed upon connection established.
    *
    * @var list<string>
-   *
-   * @phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
    */
+  // @phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public readonly array $init_commands;
 
   /**
