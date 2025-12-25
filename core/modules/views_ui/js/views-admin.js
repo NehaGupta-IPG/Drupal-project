@@ -621,7 +621,9 @@
         '.views-display-setting a',
       );
       const previewArgs = document.getElementById('preview-args');
-      $(document.getElementById('preview-args').parentElement).toggle($contextualFilters.length);
+      $(document.getElementById('preview-args').parentElement).toggle(
+        $contextualFilters.length,
+      );
 
       // Executes an initial preview.
       const $livePreview = $(
