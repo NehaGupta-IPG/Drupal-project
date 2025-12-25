@@ -124,7 +124,7 @@ variables:
 ################
 
 '🖱️️️ PHPUnit Functional Javascript':
-  <<: [ *with-composer-and-yarn, *run-tests, *default-job-settings ]
+  <<: [ *yarn-install-from-cache, *run-tests, *default-job-settings ]
   parallel: 3
   variables:
     TESTSUITE: PHPUnit-FunctionalJavascript
