@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\sqlite\Unit;
 
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
-use Drupal\sqlite\Driver\Database\sqlite\ConnectionParameters;
 use Drupal\sqlite\Driver\Database\sqlite\SqliteConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
@@ -35,10 +35,8 @@ class ConnectionTest extends UnitTestCase {
   public function testCreateConnectionOptionsFromUrl(string $url, string $expected): void {
     $sqlite_connection = new Connection(
       $this->createStub(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
-      new ConnectionParameters([
+      ConnectionParametersFactory::createFromOptionsArray([
         'driver' => 'sqlite',
-        'namespace' => __NAMESPACE__,
-        'autoload' => __DIR__,
         'database' => ':memory:',
         'foo' => 'bar',
       ]),
@@ -73,10 +71,8 @@ class ConnectionTest extends UnitTestCase {
     $root = dirname(__DIR__, 8);
     $sqlite_connection = new Connection(
       $this->createStub(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
-      new ConnectionParameters([
+      ConnectionParametersFactory::createFromOptionsArray([
         'driver' => 'sqlite',
-        'namespace' => __NAMESPACE__,
-        'autoload' => __DIR__,
         'database' => ':memory:',
       ]),
     );
@@ -91,10 +87,8 @@ class ConnectionTest extends UnitTestCase {
   public function testConnectionParametersArrayAccess(): void {
     $sqlite_connection = new Connection(
       $this->createStub(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
-      new ConnectionParameters([
+      ConnectionParametersFactory::createFromOptionsArray([
         'driver' => 'sqlite',
-        'namespace' => __NAMESPACE__,
-        'autoload' => __DIR__,
         'database' => ':memory:',
         'foo' => 'bar',
       ]),
@@ -103,7 +97,10 @@ class ConnectionTest extends UnitTestCase {
     $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()->database);
     $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()['driver']);
     $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()['database']);
+
     $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
+    $sqlite_connection->getConnectionOptions()['foo'] = 'qux';
+    $this->assertEquals('qux', $sqlite_connection->getConnectionOptions()['foo']);
   }
 
 }

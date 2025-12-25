@@ -107,30 +107,32 @@ abstract class ConnectionParametersFactory {
       }
     }
 
+    // Return the driver's ConnectionParameters object if the driver supports
+    // it, otherwise a closure wrapper.
+    // @todo in drupal:43.0.0 remove the wrapper.
     $class = $options['namespace'] . '\\ConnectionParameters';
-
     if (class_exists($class)) {
       $options = $class::processOptionsArray($options);
-      return new $class($options);
+      return new $class(...$options);
     }
-
     return new class ($options) extends ConnectionParametersBase {
 
-      public function __construct(array $options) {
-        parent::__construct(
-          $options['driver'],
-          $options['namespace'],
-          $options['autoload'],
-          $options['database'],
-          $options['prefix'] ?? '',
-          $options['module'] ?? NULL,
-          $options['username'] ?? NULL,
-          $options['password'] ?? NULL,
-          $options['host'] ?? NULL,
-          $options['port'] ?? NULL,
-          $options['dependencies'] ?? NULL,
-        );
-        $this->optionsBackfill = array_merge($options, get_object_vars($this));
+      public function __construct(
+        // Backfill connection options. This is meant for BC to ensure options
+        // unexpected by the driver can still be handled.
+        // @todo remove in drupal:43.0.0.
+        array $optionsBackfill = [],
+      ) {
+        $optionsBackfill = array_merge([
+          'prefix' => '',
+          'module' => NULL,
+          'username' => NULL,
+          'password' => NULL,
+          'host' => NULL,
+          'port' => NULL,
+          'dependencies' => NULL,
+        ], $optionsBackfill);
+        parent::__construct($optionsBackfill);
       }
 
       /**

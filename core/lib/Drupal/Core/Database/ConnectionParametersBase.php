@@ -10,21 +10,6 @@ namespace Drupal\Core\Database;
 abstract class ConnectionParametersBase implements ConnectionParametersInterface, \ArrayAccess {
 
   public function __construct(
-    public readonly string $driver,
-    public readonly string $namespace,
-    public readonly string $autoload,
-    public readonly string $database,
-    public readonly string $prefix = '',
-    public readonly ?string $module = NULL,
-    #[\SensitiveParameter]
-    public readonly ?string $username = NULL,
-    #[\SensitiveParameter]
-    public readonly ?string $password = NULL,
-    #[\SensitiveParameter]
-    public readonly ?string $host = NULL,
-    #[\SensitiveParameter]
-    public readonly ?int $port = NULL,
-    public readonly ?array $dependencies = NULL,
     // Backfill connection options. This is meant for BC to ensure options
     // unexpected by the driver can still be handled.
     // @todo remove in drupal:43.0.0.
@@ -57,9 +42,9 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * {@inheritdoc}
    */
   public function toArray(): array {
-    $tmp = array_merge($this->optionsBackfill, get_object_vars($this));
+    $tmp = get_object_vars($this);
     unset($tmp['optionsBackfill']);
-    return $tmp;
+    return array_merge($this->optionsBackfill, $tmp);
   }
 
   /**
@@ -94,6 +79,16 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
     }
 
     return $url;
+  }
+
+  /**
+   * Gets an optionsBackfill element as a property value.
+   */
+  public function __get(string $name): mixed {
+    if (array_key_exists($name, $this->optionsBackfill)) {
+      return $this->optionsBackfill[$name];
+    };
+    throw new \RuntimeException("There is no '{$name}' property or backfilled property in " . get_class($this));
   }
 
   /**

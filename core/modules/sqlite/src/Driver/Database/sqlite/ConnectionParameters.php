@@ -17,47 +17,37 @@ class ConnectionParameters extends ConnectionParametersBase {
    * @var list<string>
    */
   // @phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public readonly array $init_commands;
 
   /**
    * An array of PDO specific options for the connection.
    *
    * @var array<int|string, mixed>
    */
-  public readonly array $pdo;
 
-  public function __construct(array $options) {
-    parent::__construct(
-      $options['driver'],
-      $options['namespace'],
-      $options['autoload'],
-      $options['database'],
-      $options['prefix'] ?? '',
-      $options['module'] ?? NULL,
-      $options['username'] ?? NULL,
-      $options['password'] ?? NULL,
-      $options['host'] ?? NULL,
-      $options['port'] ?? NULL,
-      $options['dependencies'] ?? NULL,
-      array_diff_key($options, array_flip([
-        'driver',
-        'namespace',
-        'autoload',
-        'database',
-        'prefix',
-        'module',
-        'username',
-        'password',
-        'host',
-        'port',
-        'dependencies',
-        'init_commands',
-        'pdo',
-        'optionsBackfill',
-      ])),
-    );
-    $this->init_commands = $options['init_commands'] ?? [];
-    $this->pdo = $options['pdo'] ?? [];
+  public function __construct(
+    public readonly string $driver,
+    public readonly string $namespace,
+    public readonly string $autoload,
+    public readonly string $database,
+    public readonly string $prefix = '',
+    public readonly ?string $module = NULL,
+    #[\SensitiveParameter]
+    public readonly ?string $username = NULL,
+    #[\SensitiveParameter]
+    public readonly ?string $password = NULL,
+    #[\SensitiveParameter]
+    public readonly ?string $host = NULL,
+    #[\SensitiveParameter]
+    public readonly ?int $port = NULL,
+    public readonly ?array $dependencies = NULL,
+    public readonly array $init_commands = [],
+    public readonly array $pdo = [],
+    // Backfill connection options. This is meant for BC to ensure options
+    // unexpected by the driver can still be handled.
+    // @todo remove in drupal:43.0.0.
+    array $optionsBackfill = [],
+  ) {
+    parent::__construct($optionsBackfill);
   }
 
   /**
@@ -79,6 +69,26 @@ class ConnectionParameters extends ConnectionParametersBase {
     $options['init_commands'] += [
       'wal' => "PRAGMA journal_mode=WAL",
     ];
+
+    $optionsBackfill = array_diff_key($options, array_flip([
+      'driver',
+      'namespace',
+      'autoload',
+      'database',
+      'prefix',
+      'module',
+      'username',
+      'password',
+      'host',
+      'port',
+      'dependencies',
+      'init_commands',
+      'pdo',
+    ]));
+    foreach(array_keys($optionsBackfill) as $key) {
+      unset($options[$key]);
+    }
+    $options['optionsBackfill'] = $optionsBackfill;
 
     return $options;
   }
