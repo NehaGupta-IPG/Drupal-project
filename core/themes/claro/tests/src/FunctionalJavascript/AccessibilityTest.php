@@ -6,12 +6,14 @@ namespace Drupal\Tests\claro\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\AccessibilityTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Run a basic axe-core test on some pages.
  */
 #[Group('claro')]
 #[Group('accessibility')]
+#[RunTestsInSeparateProcesses]
 class AccessibilityTest extends AccessibilityTestBase {
 
   /**

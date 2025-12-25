@@ -6,12 +6,14 @@ namespace Drupal\Tests\navigation\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\AccessibilityTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs accessibility tests for the navigation module.
  */
 #[Group('navigation')]
 #[Group('accessibility')]
+#[RunTestsInSeparateProcesses]
 class AccessibilityTest extends AccessibilityTestBase {
 
   /**

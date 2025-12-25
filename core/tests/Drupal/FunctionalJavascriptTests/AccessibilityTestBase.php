@@ -6,10 +6,14 @@ namespace Drupal\FunctionalJavascriptTests;
 
 use Drupal\Tests\AxeCoreTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Base class for running accessibility tests.
  */
+#[Group('Testing')]
+#[RunTestsInSeparateProcesses]
 class AccessibilityTestBase extends WebDriverTestBase {
 
   use AxeCoreTestTrait;
