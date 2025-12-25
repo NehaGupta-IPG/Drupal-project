@@ -50,6 +50,22 @@ default:
     - pipeline: $PARENT_PIPELINE_ID
       job: '🧹 PHP Coding standards (PHPCS)'
 
+.yarn-install-from-cache: &yarn-install-from-cache
+  before_script:
+    - cd core
+    - corepack enable
+    - yarn install
+    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
+    - cd ..
+  cache:
+    key:
+      files:
+        - ./core/package.json
+        - ./core/yarn.lock
+    paths:
+      - ./core/.yarn/cache
+    policy: pull
+
 variables:
   FF_NETWORK_PER_BUILD: 1
   FF_USE_FASTZIP: 1
@@ -116,22 +132,6 @@ variables:
         sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --color --keep-results --concurrency "$CONCURRENCY" --repeat "$REPEAT_COUNT" --sqlite ":memory:" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
       fi
 
-.yarn-install-from-cache: &yarn-install-from-cache
-  before_script:
-    - cd core
-    - corepack enable
-    - yarn install
-    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
-    - cd ..
-  cache:
-    key:
-      files:
-        - ./core/package.json
-        - ./core/yarn.lock
-    paths:
-      - ./core/.yarn/cache
-    policy: pull
-
 ################
 # Jobs
 #
@@ -143,7 +143,7 @@ variables:
 ################
 
 '🖱️️️ PHPUnit Functional Javascript':
-  <<: [ *yarn-install-from-cache, *run-tests, *default-job-settings ]
+  <<: [ *with-composer, *yarn-install-from-cache, *run-tests, *default-job-settings ]
   parallel: 3
   variables:
     TESTSUITE: PHPUnit-FunctionalJavascript
@@ -168,7 +168,7 @@ variables:
     - <<: *with-database
 
 '🌐️️ PHPUnit Functional':
-  <<: [ *with-composer,  *yarn-install-from-cache, *run-tests, *default-job-settings ]
+  <<: [ *with-composer, *run-tests, *default-job-settings ]
   parallel: 8
   variables:
     TESTSUITE: PHPUnit-Functional
@@ -188,12 +188,10 @@ variables:
     - <<: *with-database
 
 '🦉️️️ Nightwatch':
-  <<: [ *with-composer, *default-job-settings ]
+  <<: [ *with-composer, *yarn-install-from-cache, *default-job-settings ]
   retry: 1
   variables:
     KUBERNETES_CPU_REQUEST: "16"
-    YARN_ENABLE_GLOBAL_CACHE: false
-    YARN_ENABLE_MIRROR: false
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
