@@ -363,7 +363,9 @@ abstract class Database {
 
     $connection_parameters = self::$databaseInfo[$key][$target];
     $driver_class = $connection_parameters->getConnectionClass();
-    $client_connection = $driver_class::open($connection_parameters);
+    $client_connection = $driver_class::open(
+      property_exists($connection_parameters, 'driver') ? $connection_parameters : $connection_parameters->toArray(),
+    );
     $new_connection = new $driver_class(
       $client_connection,
       property_exists($connection_parameters, 'driver') ? $connection_parameters : $connection_parameters->toArray(),
