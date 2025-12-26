@@ -12,6 +12,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 
+// cspell:ignore djarin grogu kuiil
+
 /**
  * Tests MySQL database connections.
  */
@@ -160,6 +162,7 @@ class ConnectionTest extends UnitTestCase {
     $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['driver']);
     $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['database']);
     $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['foo']);
+    $this->assertEquals(['djarin', 'grogu', 'also' => 'kuiil'], $mysql_connection->getConnectionOptions()['din']);
     $this->assertEquals(['djarin', 'grogu', 'also' => 'kuiil'], $mysql_connection->getConnectionOptions()->din);
     $this->assertEquals([\PDO::ATTR_EMULATE_PREPARES => TRUE], $mysql_connection->getConnectionOptions()['pdo']);
     $this->assertEquals([\PDO::ATTR_EMULATE_PREPARES => TRUE], $mysql_connection->getConnectionOptions()->pdo);
