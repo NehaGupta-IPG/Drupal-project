@@ -18,9 +18,7 @@ use Drupal\Tests\BrowserTestBase;
 class EntityRevisionsTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'language'];
 
@@ -70,7 +68,7 @@ class EntityRevisionsTest extends BrowserTestBase {
    * @param string $entity_type
    *   The entity type to run the tests with.
    */
-  protected function runRevisionsTests($entity_type) {
+  protected function runRevisionsTests($entity_type): void {
     // Create a translatable test field.
     $field_storage = FieldStorageConfig::create([
       'entity_type' => $entity_type,

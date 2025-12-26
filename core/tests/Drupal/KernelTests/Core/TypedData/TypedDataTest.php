@@ -39,9 +39,7 @@ class TypedDataTest extends KernelTestBase {
   protected $typedDataManager;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'field', 'file', 'user'];
 
@@ -457,7 +455,7 @@ class TypedDataTest extends KernelTestBase {
       $typed_data->setValue('string');
       $this->fail('No exception has been thrown when setting an invalid value.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
   }
@@ -575,7 +573,7 @@ class TypedDataTest extends KernelTestBase {
       $typed_data->get('invalid');
       $this->fail('No exception has been thrown when getting an invalid value.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
 
@@ -584,7 +582,7 @@ class TypedDataTest extends KernelTestBase {
       $typed_data->setValue('invalid');
       $this->fail('No exception has been thrown when setting an invalid value.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
 

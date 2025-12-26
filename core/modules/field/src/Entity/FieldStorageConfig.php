@@ -307,7 +307,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\Entity::preSave().
+   * Overrides \Drupal\Core\Entity\EntityBase::preSave().
    *
    * @throws \Drupal\Core\Field\FieldException
    *   If the field definition is invalid.
@@ -688,7 +688,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
       try {
         $items = $entity->get($this->getName());
       }
-      catch (\InvalidArgumentException $e) {
+      catch (\InvalidArgumentException) {
         // When a field doesn't exist, create a new field item list using a
         // temporary base field definition. This step is necessary since there
         // may not be a field configuration for the storage when creating a new

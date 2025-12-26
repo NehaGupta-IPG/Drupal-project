@@ -9,6 +9,8 @@ use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 
+// cspell:ignore basefield
+
 /**
  * Tests Field SQL Storage .
  *
@@ -20,9 +22,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 class FieldSqlStorageTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'field_test', 'text', 'entity_test'];
 
@@ -374,7 +374,7 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
       $field_storage->save();
       $this->fail('Update succeeded.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
 

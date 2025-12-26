@@ -19,16 +19,13 @@ use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
  * Tests the Field UI "Manage display" and "Manage form display" screens.
  *
  * @group field_ui
- * @group #slow
  */
 class ManageDisplayTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'node',
@@ -401,7 +398,7 @@ class ManageDisplayTest extends BrowserTestBase {
    * @return array
    *   An array of option values as strings.
    */
-  protected function getAllOptionsList(NodeElement $element) {
+  protected function getAllOptionsList(NodeElement $element): array {
     $options = [];
     // Add all options items.
     foreach ($element->option as $option) {

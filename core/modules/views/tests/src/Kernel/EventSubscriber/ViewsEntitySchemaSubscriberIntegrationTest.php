@@ -329,7 +329,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
     // base <-> base + revision
     // base <-> base + translation + revision
 
-    // base <-> base + translation
+    // Base <-> base + translation
     $this->updateEntityTypeToTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
@@ -346,7 +346,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->resetEntityType();
 
-    // base + translation <-> base + translation + revision
+    // Base + translation <-> base + translation + revision
     $this->updateEntityTypeToTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
@@ -370,7 +370,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->resetEntityType();
 
-    // base + revision <-> base + translation + revision
+    // Base + revision <-> base + translation + revision
     $this->updateEntityTypeToRevisionable();
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
@@ -394,7 +394,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->resetEntityType();
 
-    // base <-> base + revision
+    // Base <-> base + revision
     $this->updateEntityTypeToRevisionable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
 
@@ -411,7 +411,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
 
     $this->resetEntityType();
 
-    // base <-> base + translation + revision
+    // Base <-> base + translation + revision
     $this->updateEntityTypeToRevisionable(TRUE);
     $this->updateEntityTypeToTranslatable(TRUE);
     [$view, $display] = $this->getUpdatedViewAndDisplay();
@@ -440,7 +440,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
    * Tests some possible entity table updates for a revision view.
    */
   public function testVariousTableUpdatesForRevisionView(): void {
-    // base + revision <-> base + translation + revision
+    // Base + revision <-> base + translation + revision
     $this->updateEntityTypeToRevisionable(TRUE);
 
     [$view, $display] = $this->getUpdatedViewAndDisplay(TRUE);
@@ -538,7 +538,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
    * @return array
    *   An array with the view as first item, and the display as second.
    */
-  protected function getUpdatedViewAndDisplay($revision = FALSE) {
+  protected function getUpdatedViewAndDisplay($revision = FALSE): array {
     $entity_storage = $this->entityTypeManager->getStorage('view');
     /** @var \Drupal\views\Entity\View $view */
     $view = $entity_storage->load($revision ? 'test_view_entity_test_revision' : 'test_view_entity_test');

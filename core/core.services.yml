@@ -642,9 +642,7 @@ services:
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler']
   module_handler:
     class: Drupal\Core\Extension\ModuleHandler
-    arguments: ['%app.root%', '%container.modules%', '@cache.bootstrap']
-    tags:
-      - { name: needs_destruction }
+    arguments: ['%app.root%', '%container.modules%', '@event_dispatcher', '%hook_implementations_map%']
   Drupal\Core\Extension\ModuleHandlerInterface: '@module_handler'
   module_installer:
     class: Drupal\Core\Extension\ModuleInstaller
@@ -1680,14 +1678,15 @@ services:
     class: Drupal\Core\Asset\AssetDumper
     arguments: ['@file_system']
   library.discovery:
-    class: Drupal\Core\Asset\LibraryDiscovery
-    arguments: ['@library.discovery.collector']
-  Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
-  library.discovery.collector:
     class: Drupal\Core\Asset\LibraryDiscoveryCollector
     arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager']
     tags:
       - { name: needs_destruction }
+  Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
+  library.discovery.collector:
+    arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager']
+    class: Drupal\Core\Asset\LibraryDiscoveryCollector
+    deprecated: The "%service_id%" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use LibraryDiscovery instead. See https://www.drupal.org/node/3462970
   library.discovery.parser:
     class: Drupal\Core\Asset\LibraryDiscoveryParser
     arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc']
@@ -1702,7 +1701,7 @@ services:
   Drupal\Core\Asset\LibraryDependencyResolverInterface: '@library.dependency_resolver'
   asset.resolver:
     class: Drupal\Core\Asset\AssetResolver
-    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.data']
+    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.data', '@theme_handler']
   Drupal\Core\Asset\AssetResolverInterface: '@asset.resolver'
   info_parser:
     class: Drupal\Core\Extension\InfoParser
@@ -1829,6 +1828,8 @@ services:
   response_filter.active_link:
     class: Drupal\Core\EventSubscriber\ActiveLinkResponseFilter
     arguments: ['@current_user', '@path.current', '@path.matcher', '@language_manager']
+  response_filter.rss.cdata:
+    class: Drupal\Core\EventSubscriber\RssResponseCdata
   response_filter.rss.relative_url:
     class: Drupal\Core\EventSubscriber\RssResponseRelativeUrlFilter
   messenger:

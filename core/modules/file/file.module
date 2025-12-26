@@ -239,7 +239,7 @@ function file_cron() {
  */
 function _file_save_upload_from_form(array $element, FormStateInterface $form_state, $delta = NULL, FileExists|int $fileExists = FileExists::Rename) {
   if (!$fileExists instanceof FileExists) {
-    // @phpstan-ignore-next-line
+    // @phpstan-ignore staticMethod.deprecated
     $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
   }
   // Get all errors set before calling this method. This will also clear them
@@ -333,7 +333,7 @@ function _file_save_upload_from_form(array $element, FormStateInterface $form_st
  */
 function file_save_upload($form_field_name, $validators = [], $destination = FALSE, $delta = NULL, FileExists|int $fileExists = FileExists::Rename) {
   if (!$fileExists instanceof FileExists) {
-    // @phpstan-ignore-next-line
+    // @phpstan-ignore staticMethod.deprecated
     $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
   }
   static $upload_cache;
@@ -409,24 +409,24 @@ function file_save_upload($form_field_name, $validators = [], $destination = FAL
       }
       $files[$i] = $file;
     }
-    catch (FileExistsException $e) {
+    catch (FileExistsException) {
       \Drupal::messenger()->addError(t('Destination file "%file" exists', ['%file' => $destination . $uploaded_file->getFilename()]));
       $files[$i] = FALSE;
     }
-    catch (InvalidStreamWrapperException $e) {
+    catch (InvalidStreamWrapperException) {
       \Drupal::messenger()->addError(t('The file could not be uploaded because the destination "%destination" is invalid.', ['%destination' => $destination]));
       $files[$i] = FALSE;
     }
-    catch (FileWriteException $e) {
+    catch (FileWriteException) {
       \Drupal::messenger()->addError(t('File upload error. Could not move uploaded file.'));
       \Drupal::logger('file')->notice('Upload error. Could not move uploaded file %file to destination %destination.', ['%file' => $uploaded_file->getClientOriginalName(), '%destination' => $destination . '/' . $uploaded_file->getClientOriginalName()]);
       $files[$i] = FALSE;
     }
-    catch (FileException $e) {
+    catch (FileException) {
       \Drupal::messenger()->addError(t('The file %filename could not be uploaded because the name is invalid.', ['%filename' => $uploaded_file->getClientOriginalName()]));
       $files[$i] = FALSE;
     }
-    catch (LockAcquiringException $e) {
+    catch (LockAcquiringException) {
       \Drupal::messenger()->addError(t('File already locked for writing.'));
       $files[$i] = FALSE;
     }
@@ -471,6 +471,10 @@ function file_tokens($type, $tokens, array $data, array $options, BubbleableMeta
         // Basic keys and values.
         case 'fid':
           $replacements[$original] = $file->id();
+          break;
+
+        case 'uuid':
+          $replacements[$original] = $file->uuid();
           break;
 
         // Essential file data
@@ -551,6 +555,10 @@ function file_token_info() {
   $file['fid'] = [
     'name' => t("File ID"),
     'description' => t("The unique ID of the uploaded file."),
+  ];
+  $file['uuid'] = [
+    'name' => t('UUID'),
+    'description' => t('The UUID of the uploaded file.'),
   ];
   $file['name'] = [
     'name' => t("File name"),

@@ -17,9 +17,7 @@ use Drupal\KernelTests\KernelTestBase;
 abstract class FieldKernelTestBase extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'user',
@@ -40,9 +38,9 @@ abstract class FieldKernelTestBase extends KernelTestBase {
    * - $this->fieldTestData->field[suffix]
    * - $this->fieldTestData->field_definition[suffix]
    *
-   * @see \Drupal\field\Tests\FieldUnitTestBase::createFieldWithStorage()
-   *
    * @var \ArrayObject
+   *
+   * @see \Drupal\field\Tests\FieldUnitTestBase::createFieldWithStorage()
    */
   protected $fieldTestData;
 
@@ -141,7 +139,7 @@ abstract class FieldKernelTestBase extends KernelTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The entity, freshly reloaded from storage.
    */
-  protected function entitySaveReload(EntityInterface $entity) {
+  protected function entitySaveReload(EntityInterface $entity): EntityInterface {
     $entity->save();
     $controller = $this->container->get('entity_type.manager')->getStorage($entity->getEntityTypeId());
     $controller->resetCache();

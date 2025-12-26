@@ -57,8 +57,7 @@ class TestDiscovery {
    *   The app root.
    * @param $class_loader
    *   The class loader. Normally Composer's ClassLoader, as included by the
-   *   front controller, but may also be decorated; e.g.,
-   *   \Symfony\Component\ClassLoader\ApcClassLoader.
+   *   front controller, but may also be decorated.
    */
   public function __construct($root, $class_loader) {
     $this->root = $root;
@@ -104,6 +103,15 @@ class TestDiscovery {
 
       // Add PHPUnit test namespaces.
       $this->testNamespaces["Drupal\\Tests\\$name\\"][] = "$base_path/tests/src";
+    }
+
+    // Expose tests provided by core recipes.
+    $base_path = $this->root . '/core/recipes';
+    if (@opendir($base_path)) {
+      while (($recipe = readdir()) !== FALSE) {
+        $this->testNamespaces["Drupal\\FunctionalTests\\Recipe\\Core\\$recipe\\"][] = "$base_path/$recipe/tests/src/Functional";
+      }
+      closedir();
     }
 
     foreach ($this->testNamespaces as $prefix => $paths) {

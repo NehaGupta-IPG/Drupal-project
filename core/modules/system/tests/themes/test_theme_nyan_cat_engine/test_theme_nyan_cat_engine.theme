@@ -5,6 +5,10 @@
  * Test theme.
  */
 
+declare(strict_types=1);
+
+// cspell:ignore nyan
+
 /**
  * Implements hook_preprocess_theme_test_template_test().
  */

@@ -78,6 +78,13 @@ class DrupalDialogEvent extends Event {
 
     function openDialog(settings) {
       settings = $.extend({}, drupalSettings.dialog, options, settings);
+      if (settings.dialogClass) {
+        Drupal.deprecationError({
+          message:
+            'dialogClass is deprecated in drupal:10.4.x and will be removed from drupal:12.0.0.',
+        });
+      }
+
       // Trigger a global event to allow scripts to bind events to the dialog.
       const event = new DrupalDialogEvent('beforecreate', dialog, settings);
       domElement.dispatchEvent(event);
@@ -85,13 +92,13 @@ class DrupalDialogEvent extends Event {
       dialog.open = true;
 
       // Locks the body scroll only when it opens in modal.
-      if (settings.modal) {
+      if (event.settings.modal) {
         // Locks the body when the dialog opens.
         bodyScrollLock.lock(domElement);
       }
 
       domElement.dispatchEvent(
-        new DrupalDialogEvent('aftercreate', dialog, settings),
+        new DrupalDialogEvent('aftercreate', dialog, event.settings),
       );
     }
 

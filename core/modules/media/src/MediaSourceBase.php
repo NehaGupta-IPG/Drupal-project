@@ -60,7 +60,7 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -357,7 +357,7 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
    * {@inheritdoc}
    */
   public function prepareFormDisplay(MediaTypeInterface $type, EntityFormDisplayInterface $display) {
-    // Make sure the source field is placed just after the "name" basefield.
+    // Make sure the source field is placed just after the "name" base field.
     $name_component = $display->getComponent('name');
     $source_field_weight = ($name_component && isset($name_component['weight'])) ? $name_component['weight'] + 5 : -50;
     $display->setComponent($this->getSourceFieldDefinition($type)->getName(), [

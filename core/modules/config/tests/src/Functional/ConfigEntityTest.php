@@ -26,9 +26,7 @@ class ConfigEntityTest extends BrowserTestBase {
   const MAX_ID_LENGTH = ConfigEntityStorage::MAX_ID_LENGTH;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test'];
 
@@ -179,7 +177,7 @@ class ConfigEntityTest extends BrowserTestBase {
         '@max' => static::MAX_ID_LENGTH,
       ]));
     }
-    catch (ConfigEntityIdLengthException $e) {
+    catch (ConfigEntityIdLengthException) {
       // Expected exception; just continue testing.
     }
 
@@ -193,7 +191,7 @@ class ConfigEntityTest extends BrowserTestBase {
       $same_id->save();
       $this->fail('Not possible to overwrite an entity.');
     }
-    catch (EntityStorageException $e) {
+    catch (EntityStorageException) {
       // Expected exception; just continue testing.
     }
 

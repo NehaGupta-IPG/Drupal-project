@@ -140,7 +140,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   }
 
   /**
-   * Overrides Entity::isNew().
+   * Overrides EntityBase::isNew().
    *
    * EntityInterface::enforceIsNew() is only supported for newly created
    * configuration entities but has no effect after saving, since each
@@ -160,6 +160,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set a value'), pluralize: 'setMultiple')]
   public function set($property_name, $value) {
     if ($this instanceof EntityWithPluginCollectionInterface && !$this->isSyncing()) {
       $plugin_collections = $this->getPluginCollections();
@@ -177,6 +178,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Enable'), pluralize: FALSE)]
   public function enable() {
     return $this->setStatus(TRUE);
   }
@@ -184,6 +186,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Disable'), pluralize: FALSE)]
   public function disable() {
     return $this->setStatus(FALSE);
   }
@@ -191,6 +194,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set status'), pluralize: FALSE)]
   public function setStatus($status) {
     $this->status = (bool) $status;
     return $this;
@@ -375,7 +379,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   public function calculateDependencies() {
     // All dependencies should be recalculated on every save apart from enforced
     // dependencies. This ensures stale dependencies are never saved.
-    $this->dependencies = array_intersect_key($this->dependencies, ['enforced' => '']);
+    $this->dependencies = array_intersect_key($this->dependencies ?? [], ['enforced' => '']);
     if ($this instanceof EntityWithPluginCollectionInterface) {
       // Configuration entities need to depend on the providers of any plugins
       // that they store the configuration for.

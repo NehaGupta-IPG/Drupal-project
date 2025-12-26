@@ -21,9 +21,7 @@ use Drupal\KernelTests\KernelTestBase;
 class DatetimeElementFormTest extends KernelTestBase implements FormInterface, TrustedCallbackInterface {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['datetime', 'system'];
 
@@ -44,7 +42,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function datetimeDateCallbackTrusted(array &$element, FormStateInterface $form_state, ?DrupalDateTime $date = NULL) {
+  public function datetimeDateCallbackTrusted(array &$element, FormStateInterface $form_state, ?DrupalDateTime $date = NULL): void {
     $element['datetimeDateCallbackExecuted'] = [
       '#value' => TRUE,
     ];
@@ -54,7 +52,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public static function datetimeDateCallback(array &$element, FormStateInterface $form_state, ?DrupalDateTime $date = NULL) {
+  public static function datetimeDateCallback(array &$element, FormStateInterface $form_state, ?DrupalDateTime $date = NULL): void {
     $element['datetimeDateCallbackExecuted'] = [
       '#value' => TRUE,
     ];
@@ -64,7 +62,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function datetimeTimeCallbackTrusted(array &$element, FormStateInterface $form_state, ?DrupalDateTime $date = NULL) {
+  public function datetimeTimeCallbackTrusted(array &$element, FormStateInterface $form_state, ?DrupalDateTime $date = NULL): void {
     $element['timeCallbackExecuted'] = [
       '#value' => TRUE,
     ];
@@ -74,7 +72,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public static function datetimeTimeCallback(array &$element, FormStateInterface $form_state, ?DrupalDateTime $date = NULL) {
+  public static function datetimeTimeCallback(array &$element, FormStateInterface $form_state, ?DrupalDateTime $date = NULL): void {
     $element['timeCallbackExecuted'] = [
       '#value' => TRUE,
     ];

@@ -10,13 +10,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
 
-// cspell:ignore tuvan
+// cspell:ignore testcontent tuvan
 
 /**
  * Translate settings and entities to various languages.
  *
  * @group config_translation
- * @group #slow
  */
 class ConfigTranslationUiModulesTest extends ConfigTranslationUiTestBase {
 

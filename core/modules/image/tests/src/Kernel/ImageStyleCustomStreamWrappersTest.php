@@ -22,9 +22,7 @@ use Drupal\KernelTests\KernelTestBase;
 class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'image'];
 
@@ -59,7 +57,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     foreach ($this->providerTestCustomStreamWrappers() as $stream_wrapper) {
       $scheme = $stream_wrapper[0];

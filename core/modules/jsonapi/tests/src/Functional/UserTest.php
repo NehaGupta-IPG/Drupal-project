@@ -19,7 +19,6 @@ use GuzzleHttp\RequestOptions;
  * JSON:API integration test for the "User" content entity type.
  *
  * @group jsonapi
- * @group #slow
  */
 class UserTest extends ResourceTestBase {
 
@@ -82,7 +81,7 @@ class UserTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     // @todo Remove this in
     $this->grantPermissionsToTestedRole(['access content']);
 
@@ -128,16 +127,16 @@ class UserTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public function testDeleteIndividual(): void {
+  protected function doTestDeleteIndividual(): void {
     $this->config('user.settings')->set('cancel_method', 'user_cancel_delete')->save(TRUE);
 
-    parent::testDeleteIndividual();
+    parent::doTestDeleteIndividual();
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function getExpectedDocument() {
+  protected function getExpectedDocument(): array {
     $self_url = Url::fromUri('base:/jsonapi/user/user/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
     return [
       'jsonapi' => [
@@ -184,12 +183,27 @@ class UserTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPostDocument() {
+  protected function getPostDocument(): array {
     return [
       'data' => [
         'type' => 'user--user',
         'attributes' => [
           'name' => 'Drama llama',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getPatchDocument() {
+    return [
+      'data' => [
+        'id' => $this->entity->uuid(),
+        'type' => 'user--user',
+        'attributes' => [
+          'name' => 'Drama llama 2',
         ],
       ],
     ];
@@ -458,7 +472,7 @@ class UserTest extends ResourceTestBase {
     $this->grantPermissionsToTestedRole(['administer users']);
 
     $response = $this->request('GET', $collection_url, $request_options);
-    $expected_cache_contexts = ['url.path', 'url.query_args:filter', 'url.site'];
+    $expected_cache_contexts = ['url.path', 'url.query_args', 'url.site'];
     $this->assertResourceErrorResponse(400, "Filtering on config entities is not supported by Drupal's entity API. You tried to filter on a Role config entity.", $collection_url, $response, FALSE, ['4xx-response', 'http_response'], $expected_cache_contexts, FALSE, 'MISS');
   }
 
@@ -812,7 +826,7 @@ class UserTest extends ResourceTestBase {
    * @param string $cancel_method
    *   The cancel method.
    */
-  private function sendDeleteRequestForUser(UserInterface $account, string $cancel_method) {
+  private function sendDeleteRequestForUser(UserInterface $account, string $cancel_method): void {
     $url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $account->uuid()]);
     $request_options = [];
     $request_options[RequestOptions::HEADERS]['Accept'] = 'application/vnd.api+json';

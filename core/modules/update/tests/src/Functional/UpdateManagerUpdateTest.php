@@ -15,9 +15,7 @@ class UpdateManagerUpdateTest extends UpdateTestBase {
   use UpdateTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'aaa_update_test',
@@ -308,7 +306,7 @@ class UpdateManagerUpdateTest extends UpdateTestBase {
    *   Array of expected header texts, keyed by CSS selectors relative to the
    *   thead tr (for example, "th:nth-of-type(3)").
    */
-  private function checkTableHeaders($table_locator, array $expected_headers) {
+  private function checkTableHeaders($table_locator, array $expected_headers): void {
     $assert_session = $this->assertSession();
     $assert_session->elementExists('css', $table_locator);
     foreach ($expected_headers as $locator => $header) {

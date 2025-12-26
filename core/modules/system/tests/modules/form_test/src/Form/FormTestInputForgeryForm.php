@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -59,7 +61,7 @@ class FormTestInputForgeryForm extends FormBase implements TrustedCallbackInterf
    * @see \Drupal\Tests\system\Functional\Form\FormTest::testInputForgery()
    */
   public static function postRender($rendered_form) {
-    return str_replace('value="two"', 'value="FORGERY"', $rendered_form);
+    return str_replace('value="two"', 'value="FORGERY"', (string) $rendered_form);
   }
 
   /**

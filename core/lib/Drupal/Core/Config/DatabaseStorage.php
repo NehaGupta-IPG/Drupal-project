@@ -105,6 +105,10 @@ class DatabaseStorage implements StorageInterface {
    * {@inheritdoc}
    */
   public function readMultiple(array $names) {
+    if (empty($names)) {
+      return [];
+    }
+
     $list = [];
     try {
       $list = $this->connection->query('SELECT [name], [data] FROM {' . $this->connection->escapeTable($this->table) . '} WHERE [collection] = :collection AND [name] IN ( :names[] )', [':collection' => $this->collection, ':names[]' => $names], $this->options)->fetchAllKeyed();
@@ -173,10 +177,10 @@ class DatabaseStorage implements StorageInterface {
     // If another process has already created the config table, attempting to
     // recreate it will throw an exception. In this case just catch the
     // exception and do nothing.
-    catch (DatabaseException $e) {
+    catch (DatabaseException) {
       return TRUE;
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return FALSE;
     }
     return TRUE;

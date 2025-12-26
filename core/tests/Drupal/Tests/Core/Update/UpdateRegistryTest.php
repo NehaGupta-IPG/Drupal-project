@@ -19,6 +19,7 @@ use org\bovigo\vfs\vfsStream;
  *
  * @coversDefaultClass \Drupal\Core\Update\UpdateRegistry
  * @group Update
+ * @group #slow
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
@@ -38,7 +39,7 @@ class UpdateRegistryTest extends UnitTestCase {
   /**
    * Sets up some extensions with some update functions.
    */
-  protected function setupBasicExtensions() {
+  protected function setupBasicExtensions(): void {
     $info_a = <<<'EOS'
 type: module
 name: Module A

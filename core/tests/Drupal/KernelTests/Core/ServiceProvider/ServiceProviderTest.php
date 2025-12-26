@@ -18,16 +18,14 @@ use Drupal\Core\Cache\CacheFactory;
 class ServiceProviderTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['file', 'service_provider_test', 'system'];
 
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     // Undo cache_factory override done in parent because it can hide caching
     // issues in container build time.

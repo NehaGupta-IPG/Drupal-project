@@ -26,9 +26,7 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
   use StubTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['migrate', 'user', 'language', 'entity_test'];
 
@@ -92,7 +90,7 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
    * @param array $configuration
    *   The plugin configuration.
    */
-  protected function createDestination(array $configuration) {
+  protected function createDestination(array $configuration): void {
     $this->destination = new EntityContentBase(
       $configuration,
       'fake_plugin_id',

@@ -19,9 +19,7 @@ use Drupal\views\Entity\View;
 class BlockXssTest extends BrowserTestBase {
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'block_content', 'menu_ui', 'views'];
 
@@ -103,7 +101,7 @@ class BlockXssTest extends BrowserTestBase {
   /**
    * Tests XSS coming from View block labels.
    */
-  protected function doViewTest() {
+  protected function doViewTest(): void {
     // Create a View without a custom label for its block Display. The
     // admin_label of the block then becomes just the View's label.
     $view = View::create([
@@ -153,7 +151,7 @@ class BlockXssTest extends BrowserTestBase {
   /**
    * Tests XSS coming from Menu block labels.
    */
-  protected function doMenuTest() {
+  protected function doMenuTest(): void {
     Menu::create([
       'id' => $this->randomMachineName(),
       'label' => '<script>alert("menu");</script>',
@@ -169,7 +167,7 @@ class BlockXssTest extends BrowserTestBase {
   /**
    * Tests XSS coming from Block Content block info.
    */
-  protected function doBlockContentTest() {
+  protected function doBlockContentTest(): void {
     BlockContentType::create([
       'id' => 'basic',
       'label' => 'basic',

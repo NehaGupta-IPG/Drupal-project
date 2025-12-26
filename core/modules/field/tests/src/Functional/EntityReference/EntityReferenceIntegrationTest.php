@@ -42,9 +42,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
   protected $fieldName;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['config_test', 'entity_test', 'field_ui'];
 
@@ -222,7 +220,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
    * @return array
    *   An array of entity objects.
    */
-  protected function getTestEntities() {
+  protected function getTestEntities(): array {
     $storage = \Drupal::entityTypeManager()->getStorage('config_test');
     $config_entity_1 = $storage->create(['id' => $this->randomMachineName(), 'label' => $this->randomMachineName()]);
     $config_entity_1->save();

@@ -13,11 +13,13 @@ use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\PlaceholderGeneratorInterface;
 use Drupal\Core\Render\RenderCacheInterface;
 use Drupal\Core\Render\Renderer;
+use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -69,6 +71,8 @@ class FiberPlaceholderTest extends UnitTestCase {
       $this->createMock(EventDispatcherInterface::class),
       $this->prophesize(ConfigFactoryInterface::class)->reveal(),
       $this->prophesize(MessengerInterface::class)->reveal(),
+      $this->prophesize(RequestContext::class)->reveal(),
+      $this->prophesize(LoggerInterface::class)->reveal(),
     );
     $response = new BigPipeResponse(new HtmlResponse());
 
@@ -78,6 +82,7 @@ class FiberPlaceholderTest extends UnitTestCase {
         'ajaxPageState' => [],
       ],
       'big_pipe_placeholders' => [
+        // cspell:disable-next-line
         'callback=%5CDrupal%5CTests%5Cbig_pipe%5CUnit%5CRender%5CTurtleLazyBuilder%3A%3Aturtle&amp;&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU' => [
           '#lazy_builder' => [
             '\Drupal\Tests\big_pipe\Unit\Render\TurtleLazyBuilder::turtle',
@@ -89,6 +94,7 @@ class FiberPlaceholderTest extends UnitTestCase {
     $response->setAttachments($attachments);
 
     // Construct minimal HTML response.
+    // cspell:disable-next-line
     $content = '<html><body><span data-big-pipe-placeholder-id="callback=%5CDrupal%5CTests%5Cbig_pipe%5CUnit%5CRender%5CTurtleLazyBuilder%3A%3Aturtle&amp;&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU"></body></html>';
     $response->setContent($content);
 

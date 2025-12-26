@@ -24,9 +24,7 @@ class RowRenderCacheTest extends ViewsKernelTestBase {
   use UserCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['user', 'node'];
 
@@ -61,7 +59,7 @@ class RowRenderCacheTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpFixtures() {
+  protected function setUpFixtures(): void {
     parent::setUpFixtures();
 
     $this->installEntitySchema('user');
@@ -145,7 +143,7 @@ class RowRenderCacheTest extends ViewsKernelTestBase {
    * @param bool $check_cache
    *   (optional) Whether explicitly test render cache entries.
    */
-  protected function doTestRenderedOutput(AccountInterface $account, $check_cache = FALSE) {
+  protected function doTestRenderedOutput(AccountInterface $account, $check_cache = FALSE): void {
     $this->setCurrentUser($account);
     $view = Views::getView('test_row_render_cache');
     $view->setDisplay();

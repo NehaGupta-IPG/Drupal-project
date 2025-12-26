@@ -156,6 +156,14 @@ class WorkspaceAssociationTest extends KernelTestBase {
     $expected_initial_revisions['dev'] = [8];
 
     $this->assertWorkspaceAssociations('node', $expected_latest_revisions, $expected_all_revisions, $expected_initial_revisions);
+
+    // Publish 'stage' and check the workspace associations.
+    /** @var \Drupal\workspaces\WorkspacePublisherInterface $workspace_publisher */
+    $workspace_publisher = \Drupal::service('workspaces.operation_factory')->getPublisher($this->workspaces['stage']);
+    $workspace_publisher->publish();
+
+    $expected_revisions['stage'] = $expected_revisions['dev'] = [];
+    $this->assertWorkspaceAssociations('node', $expected_revisions, $expected_revisions, $expected_revisions);
   }
 
   /**
@@ -171,7 +179,7 @@ class WorkspaceAssociationTest extends KernelTestBase {
    *   An array of expected values for the initial revisions, i.e. for the
    *   entities that were created in the specified workspace.
    */
-  protected function assertWorkspaceAssociations($entity_type_id, array $expected_latest_revisions, array $expected_all_revisions, array $expected_initial_revisions) {
+  protected function assertWorkspaceAssociations($entity_type_id, array $expected_latest_revisions, array $expected_all_revisions, array $expected_initial_revisions): void {
     $workspace_association = \Drupal::service('workspaces.association');
     foreach ($expected_latest_revisions as $workspace_id => $expected_tracked_revision_ids) {
       $tracked_entities = $workspace_association->getTrackedEntities($workspace_id, $entity_type_id);

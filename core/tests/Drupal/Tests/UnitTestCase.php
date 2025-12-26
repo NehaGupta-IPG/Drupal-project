@@ -19,7 +19,11 @@ use Symfony\Component\VarDumper\VarDumper;
 /**
  * Provides a base class and helpers for Drupal unit tests.
  *
- * Using Symfony's dump() function() in Unit tests will produce output on the
+ * Module tests extending BrowserTestBase must exist in the
+ * Drupal\Tests\your_module\Functional namespace and live in the
+ * modules/your_module/tests/src/Functional directory.
+ *
+ * Using Symfony's dump() function in Unit tests will produce output on the
  * command line.
  *
  * @ingroup testing

@@ -24,6 +24,7 @@ use Drupal\user\Entity\User;
  * Tests the entity content source plugin.
  *
  * @group migrate_drupal
+ * @group #slow
  */
 class ContentEntityTest extends KernelTestBase {
 
@@ -459,7 +460,7 @@ class ContentEntityTest extends KernelTestBase {
    * @return array
    *   The definition.
    */
-  protected function migrationDefinition($plugin_id, array $configuration = []) {
+  protected function migrationDefinition($plugin_id, array $configuration = []): array {
     return [
       'source' => [
         'plugin' => $plugin_id,

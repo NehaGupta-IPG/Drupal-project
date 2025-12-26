@@ -34,9 +34,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
   ];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['language', 'content_translation', 'taxonomy'];
 
@@ -58,7 +56,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setupBundle() {
+  protected function setupBundle(): void {
     parent::setupBundle();
 
     // Create a vocabulary.
@@ -75,7 +73,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getTranslatorPermissions() {
+  protected function getTranslatorPermissions(): array {
     return array_merge(parent::getTranslatorPermissions(), ['administer taxonomy']);
   }
 
@@ -166,7 +164,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doTestTranslationEdit() {
+  protected function doTestTranslationEdit(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
     $storage->resetCache([$this->entityId]);
@@ -187,7 +185,7 @@ class TermTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doTestPublishedStatus() {
+  protected function doTestPublishedStatus(): void {
     $storage = $this->container->get('entity_type.manager')
       ->getStorage($this->entityTypeId);
     $storage->resetCache([$this->entityId]);

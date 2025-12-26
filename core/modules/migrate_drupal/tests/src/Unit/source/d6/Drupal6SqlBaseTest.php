@@ -17,6 +17,8 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
 
   /**
    * Define bare minimum migration configuration.
+   *
+   * @var string[]
    */
   protected $migrationConfiguration = [
     'id' => 'Drupal6SqlBase',
@@ -29,6 +31,8 @@ class Drupal6SqlBaseTest extends MigrateTestCase {
 
   /**
    * Minimum database contents needed to test Drupal6SqlBase.
+   *
+   * @var string[]
    */
   protected $databaseContents = [
     'system' => [
@@ -176,7 +180,7 @@ class TestDrupal6SqlBase extends DrupalSqlBase {
    *
    * @see \Drupal\Tests\migrate\Unit\MigrateSqlTestCase
    */
-  public function setDatabase(Connection $database) {
+  public function setDatabase(Connection $database): void {
     $this->database = $database;
   }
 
@@ -188,7 +192,7 @@ class TestDrupal6SqlBase extends DrupalSqlBase {
    *
    * @see \Drupal\Tests\migrate\Unit\MigrateSqlTestCase
    */
-  public function setModuleHandler(ModuleHandlerInterface $module_handler) {
+  public function setModuleHandler(ModuleHandlerInterface $module_handler): void {
     $this->moduleHandler = $module_handler;
   }
 

@@ -21,7 +21,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  * Tests the serializer style plugin.
  *
  * @group rest
- * @group #slow
  * @see \Drupal\rest\Plugin\views\display\RestExport
  * @see \Drupal\rest\Plugin\views\style\Serializer
  * @see \Drupal\rest\Plugin\views\row\DataEntityRow
@@ -32,9 +31,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * Modules to install.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'views_ui',
@@ -60,6 +57,10 @@ class StyleSerializerEntityTest extends ViewTestBase {
 
   /**
    * A user with administrative privileges to look at test entity and configure views.
+   *
+   * @var \Drupal\user\Entity\User|false
+   *
+   * @see \Drupal\Tests\user\Traits\UserCreationTrait::createUser
    */
   protected $adminUser;
 
@@ -206,7 +207,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
    * @param string $format
    *   The new request format.
    */
-  protected function addRequestWithFormat($format) {
+  protected function addRequestWithFormat($format): void {
     $request = \Drupal::request();
     $request = clone $request;
     $request->setRequestFormat($format);
@@ -338,7 +339,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $this->submitForm([], 'Save');
 
     // Should return a 406. Emulates a sample Firefox header.
-    $this->drupalGet('test/serialize/field', [], ['Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8']);
+    $this->drupalGet('test/serialize/field', [], ['Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8']);
     $this->assertSession()->responseHeaderEquals('content-type', 'text/html; charset=UTF-8');
     $this->assertSession()->statusCodeEquals(406);
 

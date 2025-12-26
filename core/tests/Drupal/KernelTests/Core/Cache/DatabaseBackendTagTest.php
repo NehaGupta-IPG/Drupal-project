@@ -18,16 +18,14 @@ use Symfony\Component\DependencyInjection\Reference;
 class DatabaseBackendTagTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     // Change container to database cache backends.
     $container

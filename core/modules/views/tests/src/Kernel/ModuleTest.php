@@ -28,9 +28,7 @@ class ModuleTest extends ViewsKernelTestBase {
   public static $testViews = ['test_view_status', 'test_view', 'test_argument'];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['field', 'user', 'block'];
 
@@ -324,7 +322,7 @@ class ModuleTest extends ViewsKernelTestBase {
    * @return array
    *   A formatted options array that matches the expected output.
    */
-  protected function formatViewOptions(array $views = []) {
+  protected function formatViewOptions(array $views = []): array {
     $expected_options = [];
     foreach ($views as $view) {
       foreach ($view->get('display') as $display) {

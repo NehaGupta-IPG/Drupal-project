@@ -86,7 +86,7 @@ function template_preprocess_views_view(&$variables) {
  *     - element_default_classes: If the default classes are to be added.
  *     - separator: A string to be placed between inline fields to keep them
  *       visually distinct.
- *    - row: An array containing information about the current row.
+ *   - row: An array containing information about the current row.
  */
 function template_preprocess_views_view_fields(&$variables) {
   $view = $variables['view'];
@@ -98,7 +98,7 @@ function template_preprocess_views_view_fields(&$variables) {
   /** @var \Drupal\views\ResultRow $row */
   $row = $variables['row'];
   foreach ($view->field as $id => $field) {
-    // render this even if set to exclude so it can be used elsewhere.
+    // Render this even if set to exclude so it can be used elsewhere.
     $field_output = $view->style_plugin->getField($row->index, $id);
     $empty = $field->isValueEmpty($field_output, $field->options['empty_zero']);
     if (empty($field->options['exclude']) && (!$empty || (empty($field->options['hide_empty']) && empty($variables['options']['hide_empty'])))) {
@@ -303,7 +303,7 @@ function template_preprocess_views_view_summary(&$variables) {
 
         $url->setRouteParameters($parameters);
       }
-      catch (Exception $e) {
+      catch (Exception) {
         // If the given route doesn't exist, default to <front>
         $url = Url::fromRoute('<front>');
       }
@@ -389,7 +389,7 @@ function template_preprocess_views_view_summary_unformatted(&$variables) {
 
         $url->setRouteParameters($parameters);
       }
-      catch (Exception $e) {
+      catch (Exception) {
         // If the given route doesn't exist, default to <front>
         $url = Url::fromRoute('<front>');
       }
@@ -519,7 +519,7 @@ function template_preprocess_views_view_table(&$variables) {
       }
       // aria-sort is a WAI-ARIA property that indicates if items in a table
       // or grid are sorted in ascending or descending order. See
-      // http://www.w3.org/TR/wai-aria/states_and_properties#aria-sort
+      // https://www.w3.org/TR/wai-aria/states_and_properties#aria-sort
       if ($active == $field) {
         $variables['header'][$field]['attributes']['aria-sort'] = ($order == 'asc') ? 'ascending' : 'descending';
       }

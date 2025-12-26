@@ -20,9 +20,7 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
   }
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
@@ -74,7 +72,7 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
     $assertions = ini_set('zend.assertions', 0);
 
     $data = [
-      'permissionless + unlocked' => [
+      'no permission + unlocked' => [
         [],
         'unlocked',
         AccessResult::allowed(),
@@ -83,7 +81,7 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
         AccessResult::neutral()->addCacheContexts(['user.permissions'])->setReason("The 'administer menu' permission is required.")->addCacheTags(['config:system.menu.llama']),
         AccessResult::neutral()->addCacheContexts(['user.permissions'])->setReason("The 'administer menu' permission is required."),
       ],
-      'permissionless + locked' => [
+      'no permission + locked' => [
         [],
         'locked',
         AccessResult::allowed(),

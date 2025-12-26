@@ -5,6 +5,10 @@
  * Post update functions for test module.
  */
 
+declare(strict_types=1);
+
+// cspell:ignore postupdate
+
 /**
  * First update.
  */

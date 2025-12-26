@@ -7,11 +7,12 @@ namespace Drupal\Tests\layout_builder\Functional;
 use Drupal\node\Entity\Node;
 use Drupal\views\Entity\View;
 
+// cspell:ignore blocktest
+
 /**
  * Tests the Layout Builder UI with blocks.
  *
  * @group layout_builder
- * @group #slow
  */
 class LayoutBuilderBlocksTest extends LayoutBuilderTestBase {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\entity_test\Entity;
 
 use Drupal\Core\Entity\ContentEntityBase;
@@ -60,6 +62,7 @@ class EntityTestWithBundle extends ContentEntityBase {
       ->setDescription(t('The name of the test entity.'))
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 32)
+      ->setDisplayConfigurable('view', TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'string',

@@ -3,6 +3,7 @@
 namespace Drupal\image\Entity;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -12,6 +13,7 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Routing\RequestHelper;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\image\ImageEffectPluginCollection;
 use Drupal\image\ImageEffectInterface;
@@ -236,7 +238,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
         $request = \Drupal::request();
         $clean_urls = RequestHelper::isCleanUrl($request);
       }
-      catch (ServiceNotFoundException $e) {
+      catch (ServiceNotFoundException) {
       }
     }
 
@@ -274,7 +276,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
         try {
           $file_system->delete($derivative_uri);
         }
-        catch (FileException $e) {
+        catch (FileException) {
           // Ignore failed deletes.
         }
       }
@@ -287,7 +289,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
           try {
             $file_system->deleteRecursive($directory);
           }
-          catch (FileException $e) {
+          catch (FileException) {
             // Ignore failed deletes.
           }
         }
@@ -417,6 +419,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Add an image effect'))]
   public function addImageEffect(array $configuration) {
     $configuration['uuid'] = $this->uuidGenerator()->generate();
     $this->getEffects()->addInstanceId($configuration['uuid'], $configuration);

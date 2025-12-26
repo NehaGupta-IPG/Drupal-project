@@ -17,7 +17,7 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 class ConfigDependencyTest extends EntityKernelTestBase {
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * The entity_test module is enabled to provide content entity types.
    *
@@ -649,7 +649,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
    * @return array
    *   An array with values of entity_type_id:ID
    */
-  protected function getDependentIds(array $dependents) {
+  protected function getDependentIds(array $dependents): array {
     $dependent_ids = [];
     foreach ($dependents as $dependent) {
       $dependent_ids[] = $dependent->getEntityTypeId() . ':' . $dependent->id();

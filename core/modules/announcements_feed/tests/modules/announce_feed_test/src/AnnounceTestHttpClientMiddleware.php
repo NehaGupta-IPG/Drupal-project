@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\announce_feed_test;
 
 use Drupal\Core\Cache\Cache;
@@ -20,7 +22,7 @@ class AnnounceTestHttpClientMiddleware {
     return function ($handler) {
       return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
         $test_end_point = \Drupal::state()->get('announce_test_endpoint');
-        if ($test_end_point && str_contains($request->getUri(), '://www.drupal.org/announcements.json')) {
+        if ($test_end_point && str_contains((string) $request->getUri(), '://www.drupal.org/announcements.json')) {
           // Only override $uri if it matches the advisories JSON feed to avoid
           // changing any other uses of the 'http_client' service during tests with
           // this module installed.

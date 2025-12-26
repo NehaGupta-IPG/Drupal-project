@@ -31,7 +31,6 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\node\NodeInterface;
 use Drupal\node\NodeTypeInterface;
-use Drupal\user\UserInterface;
 use Drupal\node\Form\NodePreviewForm;
 
 /**
@@ -476,8 +475,16 @@ function node_theme_suggestions_node(array $variables) {
  */
 function template_preprocess_node(&$variables) {
   $variables['view_mode'] = $variables['elements']['#view_mode'];
-  // Provide a distinct $teaser boolean.
+
+  // The teaser variable is deprecated.
+  $variables['deprecations']['teaser'] = "'teaser' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3458185";
   $variables['teaser'] = $variables['view_mode'] == 'teaser';
+
+  // The 'metadata' variable was originally added to support RDF, which has now
+  // been moved to contrib. It was needed because it is not possible to
+  // extend the markup of the 'submitted' variable generically.
+  $variables['deprecations']['metadata'] = "'metadata' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3458638";
+
   $variables['node'] = $variables['elements']['#node'];
   /** @var \Drupal\node\NodeInterface $node */
   $node = $variables['node'];
@@ -603,33 +610,6 @@ function node_ranking() {
     ];
   }
   return $ranking;
-}
-
-/**
- * Implements hook_user_cancel().
- */
-function node_user_cancel($edit, UserInterface $account, $method) {
-  switch ($method) {
-    case 'user_cancel_block_unpublish':
-      // Unpublish nodes (current revisions).
-      $nids = \Drupal::entityQuery('node')
-        ->accessCheck(FALSE)
-        ->condition('uid', $account->id())
-        ->execute();
-      \Drupal::moduleHandler()->loadInclude('node', 'inc', 'node.admin');
-      node_mass_update($nids, ['status' => 0], NULL, TRUE);
-      break;
-
-    case 'user_cancel_reassign':
-      // Anonymize all of the nodes for this old account.
-      \Drupal::moduleHandler()->loadInclude('node', 'inc', 'node.admin');
-      $vids = \Drupal::entityTypeManager()->getStorage('node')->userRevisionIds($account);
-      node_mass_update($vids, [
-        'uid' => 0,
-        'revision_uid' => 0,
-      ], NULL, TRUE, TRUE);
-      break;
-  }
 }
 
 /**

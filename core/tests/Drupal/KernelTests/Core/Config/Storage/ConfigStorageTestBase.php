@@ -44,6 +44,9 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
     // Checking whether readMultiple() works with empty storage.
     $this->assertEmpty($this->storage->readMultiple([$name]));
 
+    // readMultiple() accepts an empty array.
+    $this->assertSame([], $this->storage->readMultiple([]), 'Empty query should return empty array');
+
     // Reading a non-existing name returns FALSE.
     $data = $this->storage->read($name);
     $this->assertFalse($data);
@@ -143,7 +146,7 @@ abstract class ConfigStorageTestBase extends KernelTestBase {
       $this->invalidStorage->delete($name);
       $this->fail('Exception not thrown upon deleting from a non-existing storage bin.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // An exception occurred as expected; just continue.
     }
 

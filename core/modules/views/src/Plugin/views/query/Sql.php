@@ -33,11 +33,15 @@ class Sql extends QueryPluginBase {
 
   /**
    * A list of tables in the order they should be added, keyed by alias.
+   *
+   * @var array
    */
   protected $tableQueue = [];
 
   /**
    * Holds an array of tables and counts added so that we can create aliases.
+   *
+   * @var array
    */
   public $tables = [];
 
@@ -46,6 +50,8 @@ class Sql extends QueryPluginBase {
    *
    * These are aliases of the primary table that represent different ways to
    * join the same table in.
+   *
+   * @var array
    */
   public $relationships = [];
 
@@ -54,6 +60,8 @@ class Sql extends QueryPluginBase {
    *
    * Each section is in itself an array of pieces and a flag as to whether or
    * not it should be AND or OR.
+   *
+   * @var array
    */
 
   public $where = [];
@@ -62,22 +70,30 @@ class Sql extends QueryPluginBase {
    *
    * Each section is in itself an array of pieces and a flag as to whether or
    * not it should be AND or OR.
+   *
+   * @var array
    */
   public $having = [];
 
   /**
    * A simple array of order by clauses.
+   *
+   * @var array
    */
   public $orderby = [];
 
   /**
    * A simple array of group by clauses.
+   *
+   * @var array
    */
   public $groupby = [];
 
 
   /**
    * An array of fields.
+   *
+   * @var array
    */
   public $fields = [];
 
@@ -95,16 +111,22 @@ class Sql extends QueryPluginBase {
 
   /**
    * Should this query be optimized for counts, for example no sorts.
+   *
+   * @var bool|null
    */
   protected $getCountOptimized = NULL;
 
   /**
    * An array mapping table aliases and field names to field aliases.
+   *
+   * @var array
    */
   protected $fieldAliases = [];
 
   /**
    * Query tags which will be passed over to the dbtng query object.
+   *
+   * @var array
    */
   public $tags = [];
 
@@ -148,7 +170,7 @@ class Sql extends QueryPluginBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -198,7 +220,7 @@ class Sql extends QueryPluginBase {
       'base' => $base_table,
     ];
 
-    // init the table queue with our primary table.
+    // Initialize the table queue with our primary table.
     $this->tableQueue[$base_table] = [
       'alias' => $base_table,
       'table' => $base_table,
@@ -206,7 +228,7 @@ class Sql extends QueryPluginBase {
       'join' => NULL,
     ];
 
-    // init the tables with our primary table
+    // Init the tables with our primary table
     $this->tables[$base_table][$base_table] = [
       'count' => 1,
       'alias' => $base_table,
@@ -557,7 +579,7 @@ class Sql extends QueryPluginBase {
       if (!isset($alias)) {
         $alias = '';
         if ($relationship != $this->view->storage->get('base_table')) {
-          // double underscore will help prevent accidental name
+          // Double underscore will help prevent accidental name
           // space collisions.
           $alias = $relationship . '__';
         }
@@ -596,7 +618,7 @@ class Sql extends QueryPluginBase {
    *   cannot be ensured.
    */
   public function ensureTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL) {
-    // ensure a relationship
+    // Ensure a relationship
     if (empty($relationship)) {
       $relationship = $this->view->storage->get('base_table');
     }
@@ -646,7 +668,7 @@ class Sql extends QueryPluginBase {
       // example, a view that filters on 3 taxonomy terms using AND
       // needs to join taxonomy_term_data 3 times with the same join.
 
-      // scan through the table queue to see if a matching join and
+      // Scan through the table queue to see if a matching join and
       // relationship exists.  If so, use it instead of this join.
 
       // @todo Scanning through $this->tableQueue results in an
@@ -1402,7 +1424,7 @@ class Sql extends QueryPluginBase {
     }
 
     if (!$this->getCountOptimized) {
-      // we only add the orderby if we're not counting.
+      // We only add the orderby if we're not counting.
       if ($this->orderby) {
         foreach ($this->orderby as $order) {
           if ($order['field'] == 'rand_') {

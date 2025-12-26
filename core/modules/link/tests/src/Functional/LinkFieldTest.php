@@ -21,15 +21,14 @@ use Drupal\Tests\Traits\Core\PathAliasTestTrait;
  * Tests link field widgets and formatters.
  *
  * @group link
+ * @group #slow
  */
 class LinkFieldTest extends BrowserTestBase {
 
   use PathAliasTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'entity_test',
@@ -87,7 +86,7 @@ class LinkFieldTest extends BrowserTestBase {
   /**
    * Tests link field URL validation.
    */
-  protected function doTestURLValidation() {
+  protected function doTestURLValidation(): void {
     $field_name = $this->randomMachineName();
     // Create a field with settings to validate.
     $this->fieldStorage = FieldStorageConfig::create([
@@ -274,7 +273,7 @@ class LinkFieldTest extends BrowserTestBase {
   /**
    * Tests the link title settings of a link field.
    */
-  protected function doTestLinkTitle() {
+  protected function doTestLinkTitle(): void {
     $field_name = $this->randomMachineName();
     // Create a field with settings to validate.
     $this->fieldStorage = FieldStorageConfig::create([
@@ -399,7 +398,7 @@ class LinkFieldTest extends BrowserTestBase {
   /**
    * Tests the default 'link' formatter.
    */
-  protected function doTestLinkFormatter() {
+  protected function doTestLinkFormatter(): void {
     $field_name = $this->randomMachineName();
     // Create a field with settings to validate.
     $this->fieldStorage = FieldStorageConfig::create([
@@ -735,7 +734,7 @@ class LinkFieldTest extends BrowserTestBase {
    * This test is mostly the same as testLinkFormatter(), but they cannot be
    * merged, since they involve different configuration and output.
    */
-  protected function doTestLinkSeparateFormatter() {
+  protected function doTestLinkSeparateFormatter(): void {
     $field_name = $this->randomMachineName();
     // Create a field with settings to validate.
     $this->fieldStorage = FieldStorageConfig::create([
@@ -862,7 +861,7 @@ class LinkFieldTest extends BrowserTestBase {
    * a link and also which LinkItemInterface::LINK_* is (EXTERNAL, GENERIC,
    * INTERNAL).
    */
-  protected function doTestLinkTypeOnLinkWidget() {
+  protected function doTestLinkTypeOnLinkWidget(): void {
 
     $link_type = LinkItemInterface::LINK_EXTERNAL;
     $field_name = $this->randomMachineName();
@@ -900,7 +899,7 @@ class LinkFieldTest extends BrowserTestBase {
   /**
    * Tests editing a link to a non-node entity.
    */
-  protected function doTestEditNonNodeEntityLink() {
+  protected function doTestEditNonNodeEntityLink(): void {
 
     $entity_type_manager = \Drupal::entityTypeManager();
     $entity_test_storage = $entity_type_manager->getStorage('entity_test');
@@ -1056,7 +1055,7 @@ class LinkFieldTest extends BrowserTestBase {
    * @return string
    *   The rendered HTML output.
    */
-  protected function renderTestEntity($id, $view_mode = 'full', $reset = TRUE) {
+  protected function renderTestEntity($id, $view_mode = 'full', $reset = TRUE): string {
     if ($reset) {
       $this->container->get('entity_type.manager')->getStorage('entity_test')->resetCache([$id]);
     }

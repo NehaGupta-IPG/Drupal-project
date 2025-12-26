@@ -40,9 +40,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   use CommentTestTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -53,8 +51,6 @@ class EntityCrudHookTest extends EntityKernelTestBase {
     'node',
     'comment',
   ];
-
-  protected $ids = [];
 
   /**
    * {@inheritdoc}
@@ -559,7 +555,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       EntityTest::create(['name' => 'fail_insert'])->save();
       $this->fail('Expected exception has not been thrown.');
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       // Expected exception; just continue testing.
     }
 

@@ -226,12 +226,19 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
     $this->assertEquals('value', $backend->get('TEST8')->data);
     $this->assertFalse($backend->get('test8'));
 
+    // Test a cid with and without a trailing space is treated as two different
+    // IDs.
+    $cid_nospace = 'trailing-space-test';
+    $backend->set($cid_nospace, $cid_nospace);
+    $this->assertSame($cid_nospace, $backend->get($cid_nospace)->data);
+    $this->assertFalse($backend->get($cid_nospace . ' '));
+
     // Calling ::set() with invalid cache tags. This should fail an assertion.
     try {
       $backend->set('assertion_test', 'value', Cache::PERMANENT, ['node' => [3, 5, 7]]);
       $this->fail('::set() was called with invalid cache tags, but runtime assertion did not fail.');
     }
-    catch (\AssertionError $e) {
+    catch (\AssertionError) {
       // Do nothing; continue testing in extending classes.
     }
   }
@@ -435,7 +442,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
       $backend->setMultiple($items);
       $this->fail('::setMultiple() was called with invalid cache tags, but runtime assertion did not fail.');
     }
-    catch (\AssertionError $e) {
+    catch (\AssertionError) {
       // Do nothing; continue testing in extending classes.
     }
   }

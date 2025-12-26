@@ -3,6 +3,7 @@
 namespace Drupal\filter\Entity;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
+
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
@@ -30,7 +31,8 @@ use Drupal\user\Entity\Role;
  *     "form" = {
  *       "add" = "Drupal\filter\FilterFormatAddForm",
  *       "edit" = "Drupal\filter\FilterFormatEditForm",
- *       "disable" = "Drupal\filter\Form\FilterDisableForm"
+ *       "disable" = "Drupal\filter\Form\FilterDisableForm",
+ *       "enable" = "Drupal\filter\Form\FilterEnableForm",
  *     },
  *     "list_builder" = "Drupal\filter\FilterFormatListBuilder",
  *     "access" = "Drupal\filter\FilterFormatAccessControlHandler",
@@ -45,7 +47,8 @@ use Drupal\user\Entity\Role;
  *   },
  *   links = {
  *     "edit-form" = "/admin/config/content/formats/manage/{filter_format}",
- *     "disable" = "/admin/config/content/formats/manage/{filter_format}/disable"
+ *     "disable" = "/admin/config/content/formats/manage/{filter_format}/disable",
+ *     "enable" = "/admin/config/content/formats/manage/{filter_format}/enable",
  *   },
  *   config_export = {
  *     "name",
@@ -61,9 +64,9 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
   /**
    * Unique machine name of the format.
    *
-   * @todo Rename to $id.
-   *
    * @var string
+   *
+   * @todo Rename to $id.
    */
   protected $format;
 
@@ -74,9 +77,9 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
    * label but different filter configuration would impose a security risk.
    * Therefore, each text format label must be unique.
    *
-   * @todo Rename to $label.
-   *
    * @var string
+   *
+   * @todo Rename to $label.
    */
   protected $name;
 

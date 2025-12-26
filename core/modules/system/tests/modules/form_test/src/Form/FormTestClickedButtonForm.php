@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\Form;
 
 use Drupal\Core\Form\FormBase;
@@ -43,7 +45,10 @@ class FormTestClickedButtonForm extends FormBase {
     foreach ($args as $arg) {
       $name = 'button' . ++$i;
       // 's', 'b', or 'i' in the argument define the button type wanted.
-      if (str_contains($arg, 's')) {
+      if (!is_string($arg)) {
+        $type = NULL;
+      }
+      elseif (str_contains($arg, 's')) {
         $type = 'submit';
       }
       elseif (str_contains($arg, 'b')) {

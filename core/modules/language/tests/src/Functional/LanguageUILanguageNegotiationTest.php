@@ -62,7 +62,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
   protected $adminUser;
 
   /**
-   * Modules to enable.
+   * Modules to install.
    *
    * We marginally use interface translation functionality here, so need to use
    * the locale module instead of language only, but the 90% of the test is
@@ -414,7 +414,7 @@ class LanguageUILanguageNegotiationTest extends BrowserTestBase {
     }
   }
 
-  protected function doRunTest($test) {
+  protected function doRunTest($test): void {
     $test += ['path_options' => []];
     if (!empty($test['language_negotiation'])) {
       $method_weights = array_flip($test['language_negotiation']);

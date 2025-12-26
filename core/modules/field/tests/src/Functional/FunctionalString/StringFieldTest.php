@@ -18,9 +18,7 @@ use Drupal\Tests\BrowserTestBase;
 class StringFieldTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'file'];
 
@@ -63,7 +61,7 @@ class StringFieldTest extends BrowserTestBase {
   /**
    * Helper function for testTextfieldWidgets().
    */
-  public function _testTextfieldWidgets($field_type, $widget_type) {
+  public function _testTextfieldWidgets($field_type, $widget_type): void {
     // Create a field.
     $field_name = $this->randomMachineName();
     $field_storage = FieldStorageConfig::create([

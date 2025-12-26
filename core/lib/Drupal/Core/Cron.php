@@ -104,6 +104,9 @@ class Cron implements CronInterface {
       // Release cron lock.
       $this->lock->release('cron');
 
+      // Add watchdog message.
+      $this->logger->info('Cron run completed.');
+
       // Return TRUE so other functions can check if it did run successfully
       $return = TRUE;
     }
@@ -121,7 +124,6 @@ class Cron implements CronInterface {
     // Record cron time.
     $request_time = $this->time->getRequestTime();
     $this->state->set('system.cron_last', $request_time);
-    $this->logger->info('Cron run completed.');
   }
 
   /**
@@ -164,7 +166,7 @@ class Cron implements CronInterface {
       // Each queue will be processed immediately when it is reached for the
       // first time, as zero > currentTime will never be true.
       if ($process_from > $this->time->getCurrentMicroTime()) {
-        $this->usleep(round($process_from - $this->time->getCurrentMicroTime(), 3) * 1000000);
+        $this->usleep((int) round($process_from - $this->time->getCurrentMicroTime(), 3) * 1000000);
       }
 
       try {

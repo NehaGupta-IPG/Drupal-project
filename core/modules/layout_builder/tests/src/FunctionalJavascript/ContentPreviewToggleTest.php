@@ -9,6 +9,8 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
 
+// cspell:ignore blocknodebundle testbody
+
 /**
  * Tests toggling of content preview.
  *

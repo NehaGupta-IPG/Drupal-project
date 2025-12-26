@@ -6,6 +6,7 @@ namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermInterface;
@@ -15,7 +16,6 @@ use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
  * Tests load, save and delete for taxonomy terms.
  *
  * @group taxonomy
- * @group #slow
  */
 class TermTest extends TaxonomyTestBase {
 
@@ -36,11 +36,9 @@ class TermTest extends TaxonomyTestBase {
   protected $field;
 
   /**
-   * Modules to enable.
-   *
-   * @var string[]
+   * {@inheritdoc}
    */
-  protected static $modules = ['block'];
+  protected static $modules = ['block', 'taxonomy_test'];
 
   /**
    * {@inheritdoc}
@@ -87,15 +85,6 @@ class TermTest extends TaxonomyTestBase {
         'type' => 'entity_reference_label',
       ])
       ->save();
-  }
-
-  /**
-   * The "parent" field must restrict references to the same vocabulary.
-   */
-  public function testParentHandlerSettings(): void {
-    $vocabulary_fields = \Drupal::service('entity_field.manager')->getFieldDefinitions('taxonomy_term', $this->vocabulary->id());
-    $parent_target_bundles = $vocabulary_fields['parent']->getSetting('handler_settings')['target_bundles'];
-    $this->assertSame([$this->vocabulary->id() => $this->vocabulary->id()], $parent_target_bundles);
   }
 
   /**
@@ -581,6 +570,43 @@ class TermTest extends TaxonomyTestBase {
   }
 
   /**
+   * Tests destination after saving terms.
+   */
+  public function testRedirects(): void {
+    // Save a new term.
+    $addUrl = Url::fromRoute('entity.taxonomy_term.add_form', ['taxonomy_vocabulary' => $this->vocabulary->id()]);
+    $this->drupalGet($addUrl);
+    $this->submitForm([
+      'name[0][value]' => $this->randomMachineName(),
+    ], 'Save');
+
+    // Adding a term reloads the form.
+    $this->assertSession()->addressEquals($addUrl->toString());
+    $this->assertSession()->pageTextContains('Created new term');
+
+    // Update a term.
+    $term = Term::create(['vid' => $this->vocabulary->id(), 'name' => $this->randomMachineName()]);
+    $term->save();
+    $this->drupalGet($term->toUrl('edit-form'));
+    $this->submitForm(edit: [], submit: 'Save');
+
+    // Updating a term sends user to view the term.
+    $this->assertSession()->addressEquals($term->toUrl()->setAbsolute());
+    $this->assertSession()->pageTextContains('Updated term');
+
+    // Unless the term is not accessible to the user.
+    // Label triggers forbidden in taxonomy_test_entity_access().
+    $term = Term::create(['vid' => $this->vocabulary->id(), 'name' => 'Inaccessible view']);
+    $term->save();
+    $this->drupalGet($term->toUrl('edit-form'));
+    $this->submitForm(edit: [], submit: 'Save');
+
+    // In which case, the edit form is reloaded.
+    $this->assertSession()->addressEquals($term->toUrl('edit-form')->setAbsolute());
+    $this->assertSession()->pageTextContains('Updated term');
+  }
+
+  /**
    * Reloads a term by name.
    *
    * @param string $name
@@ -605,7 +631,7 @@ class TermTest extends TaxonomyTestBase {
    * @return array
    *   A sorted array of tids and 0 if the root is a parent.
    */
-  private function getParentTids($term) {
+  private function getParentTids($term): array {
     $parent_tids = [];
     foreach ($term->get('parent') as $item) {
       $parent_tids[] = (int) $item->target_id;

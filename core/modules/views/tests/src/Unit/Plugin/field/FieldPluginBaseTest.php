@@ -169,7 +169,7 @@ class FieldPluginBaseTest extends UnitTestCase {
   /**
    * Sets up the unrouted URL assembler and the link generator.
    */
-  protected function setUpUrlIntegrationServices() {
+  protected function setUpUrlIntegrationServices(): void {
     $this->pathProcessor = $this->createMock('Drupal\Core\PathProcessor\OutboundPathProcessorInterface');
     $this->unroutedUrlAssembler = new UnroutedUrlAssembler($this->requestStack, $this->pathProcessor);
 
@@ -197,7 +197,7 @@ class FieldPluginBaseTest extends UnitTestCase {
   /**
    * Sets up a display with empty arguments and fields.
    */
-  protected function setupDisplayWithEmptyArgumentsAndFields() {
+  protected function setupDisplayWithEmptyArgumentsAndFields(): void {
     $this->display->expects($this->any())
       ->method('getHandlers')
       ->willReturnMap([
@@ -367,7 +367,7 @@ class FieldPluginBaseTest extends UnitTestCase {
     // entity_type flag.
     $entity_type_id = 'node';
     $data[] = ['test-path', ['entity_type' => $entity_type_id], '<a href="/test-path">value</a>'];
-    // prefix
+    // Prefix
     $data[] = ['test-path', ['prefix' => 'test_prefix'], 'test_prefix<a href="/test-path">value</a>'];
     // suffix.
     $data[] = ['test-path', ['suffix' => 'test_suffix'], '<a href="/test-path">value</a>test_suffix'];
@@ -858,7 +858,7 @@ class FieldPluginBaseTest extends UnitTestCase {
 
 class FieldPluginBaseTestField extends FieldPluginBase {
 
-  public function setLinkGenerator(LinkGeneratorInterface $link_generator) {
+  public function setLinkGenerator(LinkGeneratorInterface $link_generator): void {
     $this->linkGenerator = $link_generator;
   }
 

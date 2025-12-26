@@ -103,9 +103,9 @@ class FormState implements FormStateInterface {
    *
    * This property is uncacheable.
    *
-   * @see self::setRebuild()
-   *
    * @var bool
+   *
+   * @see self::setRebuild()
    */
   protected $rebuild = FALSE;
 
@@ -118,9 +118,9 @@ class FormState implements FormStateInterface {
    *
    * This property is uncacheable.
    *
-   * @see self::setInvalidToken()
-   *
    * @var bool
+   *
+   * @see self::setInvalidToken()
    */
   protected $invalidToken = FALSE;
 
@@ -149,11 +149,11 @@ class FormState implements FormStateInterface {
   /**
    * Used to redirect the form on submission.
    *
-   * @see self::getRedirect()
-   *
    * This property is uncacheable.
    *
    * @var \Drupal\Core\Url|\Symfony\Component\HttpFoundation\RedirectResponse|null
+   *
+   * @see self::getRedirect()
    */
   protected $redirect;
 
@@ -662,7 +662,7 @@ class FormState implements FormStateInterface {
    * @return bool
    *
    * @see \Symfony\Component\HttpFoundation\Request::isMethodSafe()
-   * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
+   * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
    */
   protected function isRequestMethodSafe() {
     return in_array($this->requestMethod, ['GET', 'HEAD']);
@@ -1271,7 +1271,7 @@ class FormState implements FormStateInterface {
       // @code
       //   array('foo', 'bar', 'baz')
       // @endcode
-      // then the corresponding self::getValues() part will look like this:
+      // Then the corresponding self::getValues() part will look like this:
       // @code
       // array(
       //   'foo' => array(

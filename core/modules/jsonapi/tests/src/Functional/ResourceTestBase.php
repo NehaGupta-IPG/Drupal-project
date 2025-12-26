@@ -229,21 +229,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     $this->config('system.logging')->set('error_level', ERROR_REPORTING_HIDE)->save();
 
-    // Ensure the anonymous user role has no permissions at all.
-    $user_role = Role::load(RoleInterface::ANONYMOUS_ID);
-    foreach ($user_role->getPermissions() as $permission) {
-      $user_role->revokePermission($permission);
-    }
-    $user_role->save();
-    assert([] === $user_role->getPermissions(), 'The anonymous user role has no permissions at all.');
-
-    // Ensure the authenticated user role has no permissions at all.
-    $user_role = Role::load(RoleInterface::AUTHENTICATED_ID);
-    foreach ($user_role->getPermissions() as $permission) {
-      $user_role->revokePermission($permission);
-    }
-    $user_role->save();
-    assert([] === $user_role->getPermissions(), 'The authenticated user role has no permissions at all.');
+    $this->revokePermissions();
 
     // Create an account, which tests will use. Also ensure the @current_user
     // service this account, to ensure certain access check logic in tests works
@@ -274,7 +260,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function setUpFields(EntityInterface $entity, UserInterface $account) {
+  protected function setUpFields(EntityInterface $entity, UserInterface $account): EntityInterface {
     if (!$entity instanceof FieldableEntityInterface) {
       return $entity;
     }
@@ -338,12 +324,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
     \Drupal::service('router.builder')->rebuildIfNeeded();
 
+    return $this->resaveEntity($entity, $account);
+  }
+
+  protected function resaveEntity(EntityInterface $entity, AccountInterface $account): EntityInterface {
     // Reload entity so that it has the new field.
     $reloaded_entity = $this->entityLoadUnchanged($entity->id());
     // Some entity types are not stored, hence they cannot be reloaded.
     if ($reloaded_entity !== NULL) {
       $entity = $reloaded_entity;
-
       // Set a default value on the fields.
       $entity->set('field_rest_test', ['value' => 'All the faith he had had had had no effect on the outcome of his life.']);
       $entity->set('field_jsonapi_test_entity_ref', ['user' => $account->id()]);
@@ -495,7 +484,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected function getExpectedUnauthorizedAccessCacheability() {
     return (new CacheableMetadata())
       ->setCacheTags(['4xx-response', 'http_response'])
-      ->setCacheContexts(['url.site', 'user.permissions'])
+      ->setCacheContexts(['url.query_args', 'url.site', 'user.permissions'])
       ->addCacheContexts($this->entity->getEntityType()->isRevisionable()
         ? ['url.query_args:resourceVersion']
         : []
@@ -546,8 +535,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     $cache_contexts = [
       // Cache contexts for JSON:API URL query parameters.
-      'url.query_args:fields',
-      'url.query_args:include',
+      'url.query_args',
       // Drupal defaults.
       'url.site',
       'user.permissions',
@@ -608,11 +596,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $cacheability->addCacheTags($entity_type->getListCacheTags());
     $cache_contexts = [
       // Cache contexts for JSON:API URL query parameters.
-      'url.query_args:fields',
-      'url.query_args:filter',
-      'url.query_args:include',
-      'url.query_args:page',
-      'url.query_args:sort',
+      'url.query_args',
       // Drupal defaults.
       'url.site',
     ];
@@ -765,17 +749,16 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertTrue($response->hasHeader('X-Drupal-Cache'));
       $this->assertSame($expected_page_cache_header_value, $response->getHeader('X-Drupal-Cache')[0]);
     }
-    else {
-      $this->assertFalse($response->hasHeader('X-Drupal-Cache'));
+    elseif ($response->hasHeader('X-Drupal-Cache')) {
+      $this->assertMatchesRegularExpression('#^UNCACHEABLE \((no cacheability|(request|response) policy)\)$#', $response->getHeader('X-Drupal-Cache')[0]);
     }
-
     // Expected Dynamic Page Cache header value: X-Drupal-Dynamic-Cache header.
     if ($expected_dynamic_page_cache_header_value !== FALSE) {
       $this->assertTrue($response->hasHeader('X-Drupal-Dynamic-Cache'));
       $this->assertSame($expected_dynamic_page_cache_header_value, $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
-    else {
-      $this->assertFalse($response->hasHeader('X-Drupal-Dynamic-Cache'));
+    elseif ($response->hasHeader('X-Drupal-Dynamic-Cache')) {
+      $this->assertMatchesRegularExpression('#^UNCACHEABLE \(((no|poor) cacheability|(request|response) policy)\)$#', $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
   }
 
@@ -951,8 +934,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $reason = $this->getExpectedUnauthorizedAccessMessage('GET');
       $message = trim("The current user is not allowed to GET the selected resource. $reason");
       // MISS or UNCACHEABLE depends on data. It must not be HIT.
-      $dynamic_cache_header_value = !empty(array_intersect(['user', 'session'], $expected_403_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
-      $this->assertResourceErrorResponse(403, $message, $url, $response, '/data', $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), FALSE, $dynamic_cache_header_value);
+      $dynamic_cache_header_value = !empty(array_intersect(['user', 'session'], $expected_403_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+      $this->assertResourceErrorResponse(403, $message, $url, $response, '/data', $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache_header_value);
       $this->assertArrayNotHasKey('Link', $response->getHeaders());
     }
     else {
@@ -961,8 +944,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_document['data']['attributes'] = array_intersect_key($expected_document['data']['attributes'], [$label_field_name => TRUE]);
       unset($expected_document['data']['relationships']);
       // MISS or UNCACHEABLE depends on data. It must not be HIT.
-      $dynamic_cache_label_only = !empty(array_intersect(['user', 'session'], $this->getExpectedCacheContexts([$label_field_name]))) ? 'UNCACHEABLE' : 'MISS';
-      $this->assertResourceResponse(200, $expected_document, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts([$label_field_name]), FALSE, $dynamic_cache_label_only);
+      $dynamic_cache_label_only = !empty(array_intersect(['user', 'session'], $this->getExpectedCacheContexts([$label_field_name]))) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+      $this->assertResourceResponse(200, $expected_document, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts([$label_field_name]), 'UNCACHEABLE (request policy)', $dynamic_cache_label_only);
     }
 
     $this->setUpAuthorization('GET');
@@ -988,20 +971,20 @@ abstract class ResourceTestBase extends BrowserTestBase {
         ],
       ],
     ];
-    $this->assertResourceResponse(400, $expected_document, $response, ['4xx-response', 'http_response'], ['url.query_args', 'url.site'], FALSE, 'MISS');
+    $this->assertResourceResponse(400, $expected_document, $response, ['4xx-response', 'http_response'], ['url.query_args', 'url.site'], 'UNCACHEABLE (request policy)', 'MISS');
 
     // 200 for well-formed HEAD request.
     $response = $this->request('HEAD', $url, $request_options);
     // MISS or UNCACHEABLE depends on data. It must not be HIT.
-    $dynamic_cache = !empty(array_intersect(['user', 'session'], $this->getExpectedCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
-    $this->assertResourceResponse(200, NULL, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), FALSE, $dynamic_cache);
+    $dynamic_cache = !empty(array_intersect(['user', 'session'], $this->getExpectedCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+    $this->assertResourceResponse(200, NULL, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache);
     $head_headers = $response->getHeaders();
 
     // 200 for well-formed GET request. Page Cache hit because of HEAD request.
     // Same for Dynamic Page Cache hit.
     $response = $this->request('GET', $url, $request_options);
 
-    $this->assertResourceResponse(200, $this->getExpectedDocument(), $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), FALSE, $dynamic_cache === 'MISS' ? 'HIT' : 'UNCACHEABLE');
+    $this->assertResourceResponse(200, $this->getExpectedDocument(), $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache === 'MISS' ? 'HIT' : 'UNCACHEABLE (poor cacheability)');
     // Assert that Dynamic Page Cache did not store a ResourceResponse object,
     // which needs serialization after every cache hit. Instead, it should
     // contain a flattened response. Otherwise performance suffers.
@@ -1028,7 +1011,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $this->assertInstanceOf(CacheableResponseInterface::class, $cached_response);
       }
     }
-    $this->assertSame($dynamic_cache !== 'UNCACHEABLE' || isset($dynamic_cache_label_only) && $dynamic_cache_label_only !== 'UNCACHEABLE', $found_cached_200_response);
+    $this->assertSame($dynamic_cache !== 'UNCACHEABLE (poor cacheability)' || isset($dynamic_cache_label_only) && $dynamic_cache_label_only !== 'UNCACHEABLE (poor cacheability)', $found_cached_200_response);
     $this->assertTrue($other_cached_responses_are_4xx);
 
     // Not only assert the normalization, also assert deserialization of the
@@ -1077,12 +1060,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $message_url = clone $url;
     $path = str_replace($random_uuid, '{entity}', $message_url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString());
     $message = 'The "entity" parameter was not converted for the path "' . $path . '" (route name: "jsonapi.' . static::$resourceTypeName . '.individual")';
-    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.site'], FALSE, 'UNCACHEABLE');
+    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.query_args', 'url.site'], 'UNCACHEABLE (request policy)', 'UNCACHEABLE (poor cacheability)');
 
     // DX: when Accept request header is missing, still 404, same response.
     unset($request_options[RequestOptions::HEADERS]['Accept']);
     $response = $this->request('GET', $url, $request_options);
-    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.site'], FALSE, 'UNCACHEABLE');
+    $this->assertResourceErrorResponse(404, $message, $url, $response, FALSE, ['4xx-response', 'http_response'], ['url.query_args', 'url.site'], 'UNCACHEABLE (request policy)', 'UNCACHEABLE (poor cacheability)');
   }
 
   /**
@@ -1103,8 +1086,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $expected_cacheability = $expected_response->getCacheableMetadata();
     $response = $this->request('HEAD', $collection_url, $request_options);
     // MISS or UNCACHEABLE depends on the collection data. It must not be HIT.
-    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
-    $this->assertResourceResponse(200, NULL, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+    $this->assertResourceResponse(200, NULL, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache);
 
     // Different databases have different sort orders, so a sort is required so
     // test expectations do not need to vary per database.
@@ -1117,10 +1100,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $expected_response = $this->getExpectedCollectionResponse($entity_collection, $collection_url->toString(), $request_options);
     $expected_cacheability = $expected_response->getCacheableMetadata();
     // MISS or UNCACHEABLE depends on the collection data. It must not be HIT.
-    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
+    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
     $expected_document = $expected_response->getResponseData();
     $response = $this->request('GET', $collection_url, $request_options);
-    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache);
 
     $this->setUpAuthorization('GET');
 
@@ -1128,9 +1111,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $expected_response = $this->getExpectedCollectionResponse($entity_collection, $collection_url->toString(), $request_options);
     $expected_cacheability = $expected_response->getCacheableMetadata();
     // MISS or UNCACHEABLE depends on the collection data. It must not be HIT.
-    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
+    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
     $response = $this->request('HEAD', $collection_url, $request_options);
-    $this->assertResourceResponse(200, NULL, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+    $this->assertResourceResponse(200, NULL, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache);
 
     // 200 for well-formed GET request.
     $expected_response = $this->getExpectedCollectionResponse($entity_collection, $collection_url->toString(), $request_options);
@@ -1138,8 +1121,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $expected_document = $expected_response->getResponseData();
     $response = $this->request('GET', $collection_url, $request_options);
     // Dynamic Page Cache HIT unless the HEAD request was UNCACHEABLE.
-    $dynamic_cache = $dynamic_cache === 'UNCACHEABLE' ? 'UNCACHEABLE' : 'HIT';
-    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+    $dynamic_cache = $dynamic_cache === 'UNCACHEABLE (poor cacheability)' ? 'UNCACHEABLE (poor cacheability)' : 'HIT';
+    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache);
 
     if ($this->entity instanceof FieldableEntityInterface) {
       // 403 for filtering on an unauthorized field on the base resource type.
@@ -1157,19 +1140,18 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_error_message = "The current user is not authorized to filter by the `field_jsonapi_test_entity_ref` field, given in the path `field_jsonapi_test_entity_ref`. The 'field_jsonapi_test_entity_ref view access' permission is required.";
       $expected_cache_tags = ['4xx-response', 'http_response'];
       $expected_cache_contexts = [
-        'url.query_args:filter',
-        'url.query_args:sort',
+        'url.query_args',
         'url.site',
         'user.permissions',
       ];
-      $this->assertResourceErrorResponse(403, $expected_error_message, $unauthorized_filter_url, $response, FALSE, $expected_cache_tags, $expected_cache_contexts, FALSE, 'MISS');
+      $this->assertResourceErrorResponse(403, $expected_error_message, $unauthorized_filter_url, $response, FALSE, $expected_cache_tags, $expected_cache_contexts, 'UNCACHEABLE (request policy)', 'MISS');
 
       $this->grantPermissionsToTestedRole(['field_jsonapi_test_entity_ref view access']);
 
       // 403 for filtering on an unauthorized field on a related resource type.
       $response = $this->request('GET', $unauthorized_filter_url, $request_options);
       $expected_error_message = "The current user is not authorized to filter by the `status` field, given in the path `field_jsonapi_test_entity_ref.entity:user.status`.";
-      $this->assertResourceErrorResponse(403, $expected_error_message, $unauthorized_filter_url, $response, FALSE, $expected_cache_tags, $expected_cache_contexts, FALSE, 'MISS');
+      $this->assertResourceErrorResponse(403, $expected_error_message, $unauthorized_filter_url, $response, FALSE, $expected_cache_tags, $expected_cache_contexts, 'UNCACHEABLE (request policy)', 'MISS');
     }
 
     // Remove an entity from the collection, then filter it out.
@@ -1193,8 +1175,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $expected_document = $expected_response->getResponseData();
     $response = $this->request('GET', $filtered_collection_url, $request_options);
     // MISS or UNCACHEABLE depends on the collection data. It must not be HIT.
-    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
-    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache);
 
     // Filtered collection with includes.
     $relationship_field_names = array_reduce($filtered_entity_collection, function ($relationship_field_names, $entity) {
@@ -1209,8 +1191,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $expected_document = $expected_response->getResponseData();
     $response = $this->request('GET', $filtered_collection_include_url, $request_options);
     // MISS or UNCACHEABLE depends on the included data. It must not be HIT.
-    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
-    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache);
 
     // If the response should vary by a user's authorizations, grant permissions
     // for the included resources and execute another request.
@@ -1229,8 +1211,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $response = $this->request('GET', $filtered_collection_include_url, $request_options);
       $requires_include_only_permissions = !empty($flattened_permissions);
       $uncacheable = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts()));
-      $dynamic_cache = !$uncacheable ? $requires_include_only_permissions ? 'MISS' : 'HIT' : 'UNCACHEABLE';
-      $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+      $dynamic_cache = !$uncacheable ? $requires_include_only_permissions ? 'MISS' : 'HIT' : 'UNCACHEABLE (poor cacheability)';
+      $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache);
     }
 
     // Sorted collection with includes.
@@ -1247,8 +1229,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $expected_document = $expected_response->getResponseData();
     $response = $this->request('GET', $sorted_collection_include_url, $request_options);
     // MISS or UNCACHEABLE depends on the included data. It must not be HIT.
-    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 ? 'UNCACHEABLE' : 'MISS';
-    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
+    $dynamic_cache = $expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+    $this->assertResourceResponse(200, $expected_document, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache);
   }
 
   /**
@@ -1404,8 +1386,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $expected_cacheability->getCacheContexts(),
         FALSE,
         $actual_response->getStatusCode() === 200
-          ? ($expected_cacheability->getCacheMaxAge() === 0 ? 'UNCACHEABLE' : 'MISS')
-          : (!empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : FALSE)
+          ? ($expected_cacheability->getCacheMaxAge() === 0 ? 'UNCACHEABLE (poor cacheability)' : 'MISS')
+          : (!empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : FALSE)
       );
     }
   }
@@ -1439,10 +1421,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $actual_response,
         $expected_cacheability->getCacheTags(),
         $expected_cacheability->getCacheContexts(),
-        FALSE,
+        'UNCACHEABLE (request policy)',
         empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts()))
           ? $expected_resource_response->isSuccessful() ? 'MISS' : FALSE
-          : 'UNCACHEABLE'
+          : 'UNCACHEABLE (poor cacheability)'
       );
     }
   }
@@ -1710,7 +1692,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    */
   protected function getExpectedGetRelationshipResponse($relationship_field_name, ?EntityInterface $entity = NULL) {
     $entity = $entity ?: $this->entity;
-    $access = AccessResult::neutral()->addCacheContexts($entity->getEntityType()->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
+    $access = AccessResult::neutral()->addCacheContexts($entity->getEntityType()->isRevisionable() ? ['url.query_args'] : []);
     $access = $access->orIf(static::entityFieldAccess($entity, $this->resourceType->getInternalName($relationship_field_name), 'view', $this->account));
     if (!$access->isAllowed()) {
       $via_link = Url::fromRoute(
@@ -1724,8 +1706,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       ->addCacheTags(['http_response'])
       ->addCacheContexts([
         'url.site',
-        'url.query_args:include',
-        'url.query_args:fields',
+        'url.query_args',
       ])
       ->addCacheableDependency($entity)
       ->addCacheableDependency($access);
@@ -1922,7 +1903,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // every related resource.
     $base_resource_identifier = static::toResourceIdentifier($entity);
     $internal_name = $this->resourceType->getInternalName($relationship_field_name);
-    $access = AccessResult::neutral()->addCacheContexts($entity->getEntityType()->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
+    $access = AccessResult::neutral()->addCacheContexts($entity->getEntityType()->isRevisionable() ? ['url.query_args'] : []);
     $access = $access->orIf(static::entityFieldAccess($entity, $internal_name, 'view', $this->account));
     if (!$access->isAllowed()) {
       $detail = 'The current user is not allowed to view this relationship.';
@@ -1944,8 +1925,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       if (empty($relationship_document['data'])) {
         $cache_contexts = Cache::mergeContexts([
           // Cache contexts for JSON:API URL query parameters.
-          'url.query_args:fields',
-          'url.query_args:include',
+          'url.query_args',
           // Drupal defaults.
           'url.site',
         ], $this->entity->getEntityType()->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
@@ -1982,9 +1962,24 @@ abstract class ResourceTestBase extends BrowserTestBase {
   }
 
   /**
+   * Tests POST/PATCH/DELETE for an individual resource.
+   */
+  public function testIndividual(): void {
+    $this->doTestPostIndividual();
+    $this->entity = $this->resaveEntity($this->entity, $this->account);
+    $this->revokePermissions();
+    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
+    $this->doTestPatchIndividual();
+    $this->entity = $this->resaveEntity($this->entity, $this->account);
+    $this->revokePermissions();
+    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
+    $this->doTestDeleteIndividual();
+  }
+
+  /**
    * Tests POSTing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testPostIndividual(): void {
+  protected function doTestPostIndividual(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('POSTing config entities is not yet supported.');
@@ -2199,7 +2194,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests PATCHing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testPatchIndividual(): void {
+  protected function doTestPatchIndividual(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('PATCHing config entities is not yet supported.');
@@ -2527,7 +2522,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests DELETEing an individual resource, plus edge cases to ensure good DX.
    */
-  public function testDeleteIndividual(): void {
+  protected function doTestDeleteIndividual(): void {
     // @todo Remove this in https://www.drupal.org/node/2300677.
     if ($this->entity instanceof ConfigEntityInterface) {
       $this->markTestSkipped('DELETEing config entities is not yet supported.');
@@ -2729,21 +2724,21 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $response = $this->request('GET', $url, $request_options);
       // Dynamic Page Cache MISS because cache should vary based on the 'field'
       // query param. (Or uncacheable if expensive cache context.)
-      $dynamic_cache = !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
+      $dynamic_cache = !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
       $this->assertResourceResponse(
         200,
         $expected_document,
         $response,
         $expected_cacheability->getCacheTags(),
         $expected_cacheability->getCacheContexts(),
-        FALSE,
+        'UNCACHEABLE (request policy)',
         $dynamic_cache
       );
     }
     // Test Dynamic Page Cache HIT for a query with the same field set (unless
     // expensive cache context is present).
     $response = $this->request('GET', $url, $request_options);
-    $this->assertResourceResponse(200, FALSE, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache === 'MISS' ? 'HIT' : 'UNCACHEABLE');
+    $this->assertResourceResponse(200, FALSE, $response, $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), 'UNCACHEABLE (request policy)', $dynamic_cache === 'MISS' ? 'HIT' : 'UNCACHEABLE (poor cacheability)');
   }
 
   /**
@@ -2788,7 +2783,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // 'include' query param.
       $expected_cacheability = $expected_response->getCacheableMetadata();
       // MISS or UNCACHEABLE depends on data. It must not be HIT.
-      $dynamic_cache = ($expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $this->getExpectedCacheContexts()))) ? 'UNCACHEABLE' : 'MISS';
+      $dynamic_cache = ($expected_cacheability->getCacheMaxAge() === 0 || !empty(array_intersect(['user', 'session'], $this->getExpectedCacheContexts()))) ? FALSE : 'MISS';
       $this->assertResourceResponse(
         200,
         $expected_document,
@@ -2900,7 +2895,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $detail .= ' ' . $reason;
     }
     // MISS or UNCACHEABLE depends on data. It must not be HIT.
-    $dynamic_cache = !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
+    $dynamic_cache = !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
     $this->assertResourceErrorResponse(403, $detail, $url, $actual_response, '/data', $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
 
     // Ensure that targeting a revision does not bypass access.
@@ -2911,7 +2906,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $detail .= ' ' . $reason;
     }
     // MISS or UNCACHEABLE depends on data. It must not be HIT.
-    $dynamic_cache = !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
+    $dynamic_cache = !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
     $this->assertResourceErrorResponse(403, $detail, $url, $actual_response, '/data', $expected_cacheability->getCacheTags(), $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
 
     $this->setUpRevisionAuthorization('GET');
@@ -3041,8 +3036,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $actual_response = $this->request('GET', $rel_working_copy_collection_url_filtered, $request_options);
     $filtered_collection_expected_cache_contexts = [
       'url.path',
-      'url.query_args:filter',
-      'url.query_args:resourceVersion',
+      'url.query_args',
       'url.site',
     ];
     $this->assertResourceErrorResponse(501, 'JSON:API does not support filtering on revisions other than the latest version because a secure Drupal core API does not yet exist to do so.', $rel_working_copy_collection_url_filtered, $actual_response, FALSE, ['http_response'], $filtered_collection_expected_cache_contexts);
@@ -3050,7 +3044,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $actual_response = $this->request('GET', $rel_invalid_collection_url, $request_options);
     $invalid_version_expected_cache_contexts = [
       'url.path',
-      'url.query_args:resourceVersion',
+      'url.query_args',
       'url.site',
     ];
     $this->assertResourceErrorResponse(400, 'Collection resources only support the following resource version identifiers: rel:latest-version, rel:working-copy', $rel_invalid_collection_url, $actual_response, FALSE, ['4xx-response', 'http_response'], $invalid_version_expected_cache_contexts);
@@ -3235,7 +3229,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_cacheability = $expected_response->getCacheableMetadata();
       // Only add node type check tags for non-default revisions.
       $expected_cache_tags = !in_array($relationship_type, $default_revision_types, TRUE) ? Cache::mergeTags($expected_cacheability->getCacheTags(), $this->getExtraRevisionCacheTags()) : $expected_cacheability->getCacheTags();
-      $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), FALSE, 'MISS');
+      $dynamic_cache = !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
+      $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
       // Request the related route.
       $actual_response = $this->request('GET', $related_url, $request_options);
       $expected_response = $this->getExpectedRelatedResponse('field_jsonapi_test_entity_ref', $request_options, $revision);
@@ -3243,7 +3238,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_cacheability = $expected_response->getCacheableMetadata();
       $expected_document['links']['self']['href'] = $related_url->toString();
       // MISS or UNCACHEABLE depends on data. It must not be HIT.
-      $dynamic_cache = !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE' : 'MISS';
+      $dynamic_cache = !empty(array_intersect(['user', 'session'], $expected_cacheability->getCacheContexts())) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
       $expected_cache_tags = !in_array($relationship_type, $default_revision_types, TRUE) ? Cache::mergeTags($expected_cacheability->getCacheTags(), $this->getExtraRevisionCacheTags()) : $expected_cacheability->getCacheTags();
       $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), FALSE, $dynamic_cache);
     }
@@ -3508,7 +3503,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   TRUE if the field definition is found to be a reference field. FALSE
    *   otherwise.
    */
-  protected static function isReferenceFieldDefinition(FieldDefinitionInterface $field_definition) {
+  protected static function isReferenceFieldDefinition(FieldDefinitionInterface $field_definition): bool {
     /** @var \Drupal\Core\Field\TypedData\FieldItemDataDefinition $item_definition */
     $item_definition = $field_definition->getItemDefinition();
     $main_property = $item_definition->getMainPropertyName();
@@ -3581,6 +3576,25 @@ abstract class ResourceTestBase extends BrowserTestBase {
       unset($expected_document['data']['attributes'][$field_name]);
     }
     return $expected_document;
+  }
+
+  /**
+   * Ensure the anonymous and authenticated roles have no permissions at all.
+   */
+  protected function revokePermissions(): void {
+    $user_role = Role::load(RoleInterface::ANONYMOUS_ID);
+    foreach ($user_role->getPermissions() as $permission) {
+      $user_role->revokePermission($permission);
+    }
+    $user_role->save();
+    assert([] === $user_role->getPermissions(), 'The anonymous user role has no permissions at all.');
+
+    $user_role = Role::load(RoleInterface::AUTHENTICATED_ID);
+    foreach ($user_role->getPermissions() as $permission) {
+      $user_role->revokePermission($permission);
+    }
+    $user_role->save();
+    assert([] === $user_role->getPermissions(), 'The authenticated user role has no permissions at all.');
   }
 
 }

@@ -64,7 +64,7 @@ class TestDiscoveryTest extends UnitTestCase {
       [
         'name' => 'Drupal\FunctionalTests\BrowserTestBaseTest',
         'group' => 'browsertestbase',
-        'groups' => ['browsertestbase', '#slow'],
+        'groups' => ['browsertestbase'],
         'description' => 'Tests BrowserTestBase functionality.',
         'type' => 'PHPUnit-Functional',
       ],
@@ -72,7 +72,7 @@ class TestDiscoveryTest extends UnitTestCase {
       'Drupal\FunctionalTests\BrowserTestBaseTest',
     ];
 
-    // kernel PHPUnit test.
+    // Kernel PHPUnit test.
     $tests['phpunit-kernel'] = [
       // Expected result.
       [
@@ -231,7 +231,7 @@ EOT;
     $this->assertEmpty($info['description']);
   }
 
-  protected function setupVfsWithTestClasses() {
+  protected function setupVfsWithTestClasses(): void {
     vfsStream::setup('drupal');
 
     $test_file = <<<EOF
