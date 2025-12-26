@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\mysql\Unit;
 
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\Tests\UnitTestCase;
 use Pdo\Mysql;
@@ -126,6 +127,29 @@ class ConnectionTest extends UnitTestCase {
         '5.7.28-31',
       ],
     ];
+  }
+
+  /**
+   * Confirms legacy array access to the ConnectionParameters.
+   */
+  public function testConnectionParametersArrayAccess(): void {
+    $mysql_connection = new Connection(
+      // @phpstan-ignore class.notFound
+      $this->createStub(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class),
+      ['driver' => 'mysql', 'database' => 'kaboom', 'foo' => 'bar'],
+    );
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()->driver);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()->database);
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()['driver']);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    $this->assertEquals('bar', $mysql_connection->getConnectionOptions()['foo']);
+
+    $mysql_connection->getConnectionOptions()['driver'] = 'qux';
+    $mysql_connection->getConnectionOptions()['database'] = 'qux';
+    $mysql_connection->getConnectionOptions()['foo'] = 'qux';
+    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['driver']);
+    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['database']);
+    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['foo']);
   }
 
 }

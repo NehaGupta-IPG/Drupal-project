@@ -108,7 +108,7 @@ abstract class ConnectionParametersFactory {
     }
 
     // Return the driver's ConnectionParameters object if the driver supports
-    // it, otherwise a closure wrapper.
+    // it, otherwise a wrapper closure.
     // @todo in drupal:43.0.0 remove the wrapper.
     $class = $options['namespace'] . '\\ConnectionParameters';
     if (class_exists($class)) {
@@ -133,13 +133,6 @@ abstract class ConnectionParametersFactory {
           'dependencies' => NULL,
         ], $optionsBackfill);
         parent::__construct($optionsBackfill);
-      }
-
-      /**
-       * This is for BC support only.
-       */
-      public function &offsetGet(mixed $offset): mixed {
-        return $this->optionsBackfill[$offset];
       }
 
     };
