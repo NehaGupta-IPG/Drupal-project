@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\mysql\Unit;
 
-use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\Tests\UnitTestCase;
 use Pdo\Mysql;
