@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Asset;
 
-use Drupal;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\File\FileUrlGeneratorInterface;
@@ -84,7 +83,7 @@ class JsCollectionRenderer implements AssetCollectionRendererInterface {
           break;
 
         case 'inline-file':
-          $element['#value'] = Markup::create(file_get_contents(Drupal::root() . '/' . $js_asset['data']));
+          $element['#value'] = Markup::create(file_get_contents(\Drupal::root() . '/' . $js_asset['data']));
           $element['#attributes']['type'] = 'text/javascript';
           break;
 
