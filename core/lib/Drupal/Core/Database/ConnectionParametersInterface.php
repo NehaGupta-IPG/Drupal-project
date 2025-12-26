@@ -12,17 +12,6 @@ namespace Drupal\Core\Database;
 interface ConnectionParametersInterface {
 
   /**
-   * Returns the parameters.
-   *
-   * For BC reasons, we may need to return the parameters as an array and
-   * not as an object.
-   *
-   * @return static|ConnectionInfoArray
-   *   The connection parameters.
-   */
-  public function getParameters(): static|array;
-
-  /**
    * Returns the PHP class name of the connection.
    *
    * @return class-string

@@ -20,13 +20,6 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
-  public function getParameters(): static|array {
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getConnectionClass(): string {
     // @phpstan-ignore property.notFound
     return $this->namespace . '\\Connection';

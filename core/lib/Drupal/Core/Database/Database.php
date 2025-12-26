@@ -361,10 +361,13 @@ abstract class Database {
       throw new DriverNotSpecifiedException('Driver not specified for this database connection: ' . $key);
     }
 
-    $driver_class = self::$databaseInfo[$key][$target]->getConnectionClass();
-    $parameters = self::$databaseInfo[$key][$target]->getParameters();
-    $client_connection = $driver_class::open($parameters);
-    $new_connection = new $driver_class($client_connection, $parameters);
+    $connection_parameters = self::$databaseInfo[$key][$target];
+    $driver_class = $connection_parameters->getConnectionClass();
+    $client_connection = $driver_class::open($connection_parameters);
+    $new_connection = new $driver_class(
+      $client_connection,
+      property_exists($connection_parameters, 'driver') ? $connection_parameters : $connection_parameters->toArray(),
+    );
     assert($new_connection instanceof Connection);
     $new_connection->setTarget($target);
     $new_connection->setKey($key);

@@ -136,13 +136,6 @@ abstract class ConnectionParametersFactory {
       }
 
       /**
-       * {@inheritdoc}
-       */
-      public function getParameters(): array {
-        return $this->optionsBackfill;
-      }
-
-      /**
        * This is for BC support only.
        */
       public function &offsetGet(mixed $offset): mixed {
