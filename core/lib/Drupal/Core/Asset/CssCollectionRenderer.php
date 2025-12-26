@@ -3,6 +3,7 @@
 namespace Drupal\Core\Asset;
 
 use Drupal\Core\File\FileUrlGeneratorInterface;
+use Drupal\Core\Render\Markup;
 
 /**
  * Renders CSS assets.
@@ -58,6 +59,12 @@ class CssCollectionRenderer implements AssetCollectionRendererInterface {
             $query_string_separator = str_contains($css_asset['data'], '?') ? '&' : '?';
             $element['#attributes']['href'] .= $query_string_separator . $query_string;
           }
+          break;
+
+        case 'inline-file':
+          $element['#tag'] = 'style';
+          $element['#value'] = Markup::create(file_get_contents(\Drupal::root() . '/' . $css_asset['data']));
+          unset($element['#attributes']);
           break;
 
         case 'external':
