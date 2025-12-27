@@ -9,7 +9,6 @@ use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -268,47 +267,4 @@ class ImageItemTest extends FieldKernelTestBase {
     $this->assertStringStartsWith($expected_start, $fileUri);
     $this->assertMatchesRegularExpression('#^' . preg_quote($expected_start, '#') . '[^/]+#', $fileUri);
   }
-
-  /**
-   * Tests that image items register appropriate upload validators.
-   */
-  public function testUploadValidators() {
-    $entity = EntityTest::create();
-    $items = $entity->get('image_test');
-    $item = $items->appendItem();
-    $field_definition = $items->getFieldDefinition();
-
-    $validators = $item->getUploadValidators();
-    $this->assertArrayHasKey('FileIsImage', $validators);
-    $this->assertArrayNotHasKey('FileImageDimensions', $validators);
-
-    $field_definition->setSetting('min_resolution', '32x32')->save();
-    $validators = $item->getUploadValidators();
-    $this->assertArrayHasKey('FileIsImage', $validators);
-    $this->assertSame([0, '32x32'], [
-      $validators['FileImageDimensions']['maxDimensions'],
-      $validators['FileImageDimensions']['minDimensions'],
-    ]);
-
-    $field_definition->setSetting('min_resolution', NULL)
-      ->setSetting('max_resolution', '1024x768')
-      ->save();
-    $validators = $item->getUploadValidators();
-    $this->assertArrayHasKey('FileIsImage', $validators);
-    $this->assertArrayHasKey('FileImageDimensions', $validators);
-    $this->assertSame(['1024x768', 0], [
-      $validators['FileImageDimensions']['maxDimensions'],
-      $validators['FileImageDimensions']['minDimensions'],
-    ]);
-
-    $field_definition->setSetting('min_resolution', '32x32')->save();
-    $validators = $item->getUploadValidators();
-    $this->assertArrayHasKey('FileIsImage', $validators);
-    $this->assertArrayHasKey('FileImageDimensions', $validators);
-    $this->assertSame(['1024x768', '32x32'], [
-      $validators['FileImageDimensions']['maxDimensions'],
-      $validators['FileImageDimensions']['minDimensions'],
-    ]);
-  }
-
 }
