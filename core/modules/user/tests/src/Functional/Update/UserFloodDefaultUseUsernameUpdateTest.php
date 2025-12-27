@@ -10,12 +10,12 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests User configuration updates.
+ * Tests the addition of the default user.flood `use_username` setting.
  */
 #[Group('Update')]
-#[CoversFunction('user_update_11201')]
+#[CoversFunction('user_post_update_user_flood_default_use_username')]
 #[RunTestsInSeparateProcesses]
-class ConfigUpdateTest extends UpdatePathTestBase {
+class UserFloodDefaultUseUsernameUpdateTest extends UpdatePathTestBase {
 
   /**
    * {@inheritdoc}

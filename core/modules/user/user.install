@@ -113,12 +113,3 @@ function user_install(): void {
 function user_update_last_removed(): int {
   return 10000;
 }
-
-/**
- * Adds the use_username setting.
- */
-function user_update_11201(): void {
-  $config = \Drupal::configFactory()->getEditable('user.flood');
-  $config->set('use_username', 0);
-  $config->save();
-}
