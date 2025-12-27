@@ -124,7 +124,8 @@ variables:
 ################
 
 '🖱️️️ PHPUnit Functional Javascript':
-  <<: [ *with-composer-and-yarn, *run-tests, *default-job-settings ]
+  <<: [ *yarn-install-from-cache ]
+  <<: [ *with-composer, *run-tests, *default-job-settings ]
   parallel: 3
   variables:
     TESTSUITE: PHPUnit-FunctionalJavascript
@@ -169,12 +170,11 @@ variables:
     - <<: *with-database
 
 '🦉️️️ Nightwatch':
+  <<: [ *yarn-install-from-cache ]
   <<: [ *with-composer, *default-job-settings ]
   retry: 1
   variables:
     KUBERNETES_CPU_REQUEST: "16"
-    YARN_ENABLE_GLOBAL_CACHE: false
-    YARN_ENABLE_MIRROR: false
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
@@ -195,9 +195,6 @@ variables:
     - echo "COLUMNS=1000" >> ./core/.env
     - chown -R www-data:www-data ./sites /var/www
     - cd core
-    - corepack enable
-    - yarn install
-    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
     - cp /builds/chromedriver.log ./
