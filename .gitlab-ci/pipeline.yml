@@ -134,10 +134,14 @@ variables:
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
+  before_script:
+    # Install `yarn` before `.run-tests:script` executes.
+    - !reference [.yarn-install-from-cache, before_script]
   after_script:
     - echo $MINK_DRIVER_ARGS_WEBDRIVER
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
     - cp /builds/chromedriver.log ./
+  cache: !reference [.yarn-install-from-cache, cache]
 
 '👷️️️ PHPUnit Build':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
@@ -194,7 +198,9 @@ variables:
     - echo "DRUPAL_NIGHTWATCH_OUTPUT='"../nightwatch_output"'" >> ./core/.env
     - echo "COLUMNS=1000" >> ./core/.env
     - chown -R www-data:www-data ./sites /var/www
+    - !reference [.yarn-install-from-cache, before_script]
     - cd core
+    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
     - cp /builds/chromedriver.log ./
@@ -206,14 +212,7 @@ variables:
     paths:
       - ./nightwatch_output
       - '*.log'
-  cache:
-    key:
-      files:
-        - ./core/package.json
-        - ./core/yarn.lock
-    paths:
-      - ./core/.yarn/cache
-    policy: pull
+  cache: !reference [.yarn-install-from-cache, cache]
 
 '🖱️️️ PHPUnit Functional Javascript (non W3C legacy)':
   <<: [ *with-composer, *default-job-settings ]
