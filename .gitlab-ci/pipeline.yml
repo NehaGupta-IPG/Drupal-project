@@ -124,7 +124,6 @@ variables:
 ################
 
 '🖱️️️ PHPUnit Functional Javascript':
-  <<: [ *yarn-install-from-cache ]
   <<: [ *with-composer, *run-tests, *default-job-settings ]
   parallel: 3
   variables:
@@ -174,7 +173,6 @@ variables:
     - <<: *with-database
 
 '🦉️️️ Nightwatch':
-  <<: [ *yarn-install-from-cache ]
   <<: [ *with-composer, *default-job-settings ]
   retry: 1
   variables:
