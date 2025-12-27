@@ -9,6 +9,7 @@ use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -267,4 +268,5 @@ class ImageItemTest extends FieldKernelTestBase {
     $this->assertStringStartsWith($expected_start, $fileUri);
     $this->assertMatchesRegularExpression('#^' . preg_quote($expected_start, '#') . '[^/]+#', $fileUri);
   }
+
 }
