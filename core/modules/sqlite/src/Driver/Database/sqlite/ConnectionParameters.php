@@ -17,16 +17,7 @@ class ConnectionParameters extends ConnectionParametersBase {
     public readonly string $autoload,
     public readonly string $database,
     public readonly string $prefix = '',
-    public readonly ?string $module = NULL,
-    #[\SensitiveParameter]
-    public readonly ?string $username = NULL,
-    #[\SensitiveParameter]
-    public readonly ?string $password = NULL,
-    #[\SensitiveParameter]
-    public readonly ?string $host = NULL,
-    #[\SensitiveParameter]
-    public readonly ?int $port = NULL,
-    public readonly ?array $dependencies = NULL,
+    public readonly string $module = 'sqlite',
     public readonly array $init_commands = [],
     public readonly array $pdo = [],
     // Backfill connection options. This is meant for BC to ensure options
@@ -69,7 +60,6 @@ class ConnectionParameters extends ConnectionParametersBase {
     }
     $options['optionsBackfill'] = $optionsBackfill;
 
-dump($options);
     return $options;
   }
 
