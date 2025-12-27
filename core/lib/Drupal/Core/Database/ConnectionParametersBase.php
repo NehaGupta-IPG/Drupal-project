@@ -120,10 +120,12 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    */
   public function &offsetGet(mixed $offset): mixed {
     if (property_exists($this, $offset)) {
-      // Need to use get_object_vars() and not $this->{$offset} here because if
-      // properties are defined as readonly, the & operator in the method name
-      // would result in an attempt to modify the property value.
-      return get_object_vars($this)[$offset];
+      // Need to use a temp variable and not $this->{$offset} directly here
+      // because if properties are defined as readonly, the & reference
+      // operator in the method name would result in an attempt to modify the
+      // property value.
+      $tmp = $this->{$offset};
+      return $tmp;
     }
     return $this->optionsBackfill[$offset];
   }

@@ -11,28 +11,6 @@ use Drupal\Core\Database\ConnectionParametersBase;
  */
 class ConnectionParameters extends ConnectionParametersBase {
 
-  /**
-   * The list of parameters expected for an SQLite connection.
-   *
-   * Additional keys found in the options array will be stored in the
-   * $optionsBackfill property.
-   */
-  protected const CANONICAL_PARAMETERS = [
-    'driver',
-    'namespace',
-    'autoload',
-    'database',
-    'prefix',
-    'module',
-    'username',
-    'password',
-    'host',
-    'port',
-    'dependencies',
-    'init_commands',
-    'pdo',
-  ];
-
   public function __construct(
     public readonly string $driver,
     public readonly string $namespace,
@@ -79,12 +57,19 @@ class ConnectionParameters extends ConnectionParametersBase {
       'wal' => "PRAGMA journal_mode=WAL",
     ];
 
-    $optionsBackfill = array_diff_key($options, array_flip(static::CANONICAL_PARAMETERS));
+    // Additional keys found in the options array, that are not first-class
+    // properties, will be stored in the $optionsBackfill property.
+    $properties = [];
+    foreach ((new \ReflectionClass(self::class))->getProperties() as $prop) {
+      $properties[] = $prop->getName();
+    }
+    $optionsBackfill = array_diff_key($options, array_flip($properties));
     foreach (array_keys($optionsBackfill) as $key) {
       unset($options[$key]);
     }
     $options['optionsBackfill'] = $optionsBackfill;
 
+dump($options);
     return $options;
   }
 
