@@ -441,11 +441,11 @@ abstract class FileUploadResourceTestBase extends ResourceTestBase {
 
     // It is important that the filename starts with a unicode character. See
     // https://bugs.php.net/bug.php?id=77239.
-    $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'file; filename="Ãˆxample-âœ“.' . $this->fileExtension . '"']);
+    $response = $this->fileRequest($uri, $this->testFileData, ['Content-Disposition' => 'file; filename="Èxample-✓.' . $this->fileExtension . '"']);
     $this->assertSame(201, $response->getStatusCode());
-    $expected = $this->getExpectedNormalizedEntity(1, 'Ãˆxample-âœ“.' . $this->fileExtension, TRUE);
+    $expected = $this->getExpectedNormalizedEntity(1, 'Èxample-✓.' . $this->fileExtension, TRUE);
     $this->assertResponseData($expected, $response);
-    $this->assertSame($this->testFileData, file_get_contents('public://foobar/Ãˆxample-âœ“.' . $this->fileExtension));
+    $this->assertSame($this->testFileData, file_get_contents('public://foobar/Èxample-✓.' . $this->fileExtension));
   }
 
   /**

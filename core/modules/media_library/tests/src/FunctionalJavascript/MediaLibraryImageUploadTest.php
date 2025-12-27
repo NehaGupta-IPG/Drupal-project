@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 
 /**
  * Tests the handling of images uploaded to the media library.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaLibraryImageUploadTest extends MediaLibraryTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -20,7 +22,7 @@ class MediaLibraryImageUploadTest extends MediaLibraryTestBase {
   /**
    * Tests that oversized images are automatically resized on upload.
    */
-  public function testImageResizing() {
+  public function testImageResizing(): void {
     // Create a media type that only accepts images up to 16x16 in size.
     $media_type = $this->createMediaType('image');
     $media_type->getSource()
