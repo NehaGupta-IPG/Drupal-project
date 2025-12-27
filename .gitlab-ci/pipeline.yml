@@ -113,6 +113,27 @@ variables:
         sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --color --keep-results --concurrency "$CONCURRENCY" --repeat "$REPEAT_COUNT" --sqlite ":memory:" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
       fi
 
+.yarn-install-from-cache: &yarn-install-from-cache
+  # Installation steps are defined under `script` so that it does not
+  # override `default:before_script`.
+  # However, this `script` key will likely be overridden when configuration
+  # is merged.
+  # Use YAML `!reference` to merge the steps in the appropriate location.
+  script:
+    - cd core
+    - corepack enable
+    - yarn install
+    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
+    - cd ..
+  cache:
+    key:
+      files:
+        - ./core/package.json
+        - ./core/yarn.lock
+    paths:
+      - ./core/.yarn/cache
+    policy: pull
+
 ################
 # Jobs
 #
@@ -124,6 +145,7 @@ variables:
 ################
 
 '🖱️️️ PHPUnit Functional Javascript':
+  <<: [ *yarn-install-from-cache ]
   <<: [ *with-composer, *run-tests, *default-job-settings ]
   parallel: 3
   variables:
@@ -135,12 +157,11 @@ variables:
     - <<: *with-selenium-chrome
   before_script:
     # Install `yarn` before `.run-tests:script` executes.
-    - !reference [.yarn-install-from-cache, before_script]
+    - !reference [.yarn-install-from-cache, script]
   after_script:
     - echo $MINK_DRIVER_ARGS_WEBDRIVER
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
     - cp /builds/chromedriver.log ./
-  cache: !reference [.yarn-install-from-cache, cache]
 
 '👷️️️ PHPUnit Build':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
@@ -173,6 +194,7 @@ variables:
     - <<: *with-database
 
 '🦉️️️ Nightwatch':
+  <<: [ *yarn-install-from-cache ]
   <<: [ *with-composer, *default-job-settings ]
   retry: 1
   variables:
@@ -196,9 +218,8 @@ variables:
     - echo "DRUPAL_NIGHTWATCH_OUTPUT='"../nightwatch_output"'" >> ./core/.env
     - echo "COLUMNS=1000" >> ./core/.env
     - chown -R www-data:www-data ./sites /var/www
-    - !reference [.yarn-install-from-cache, before_script]
+    - !reference [.yarn-install-from-cache, script]
     - cd core
-    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
     - cp /builds/chromedriver.log ./
@@ -210,7 +231,6 @@ variables:
     paths:
       - ./nightwatch_output
       - '*.log'
-  cache: !reference [.yarn-install-from-cache, cache]
 
 '🖱️️️ PHPUnit Functional Javascript (non W3C legacy)':
   <<: [ *with-composer, *default-job-settings ]
