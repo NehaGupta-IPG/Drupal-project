@@ -8,12 +8,15 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Tests the History endpoints.
- *
- * @group history
  */
+#[Group('history')]
+#[RunTestsInSeparateProcesses]
 class HistoryTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -68,7 +71,7 @@ class HistoryTest extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The response object.
    */
-  protected function getNodeReadTimestamps(array $node_ids) {
+  protected function getNodeReadTimestamps(array $node_ids): ResponseInterface {
     // Perform HTTP request.
     $http_client = $this->getHttpClient();
     $url = Url::fromRoute('history.get_last_node_view')
@@ -91,7 +94,7 @@ class HistoryTest extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The response body.
    */
-  protected function markNodeAsRead($node_id) {
+  protected function markNodeAsRead($node_id): ResponseInterface {
     $http_client = $this->getHttpClient();
     $url = Url::fromRoute('history.read_node', ['node' => $node_id], ['absolute' => TRUE])->toString();
 
