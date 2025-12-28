@@ -21,12 +21,14 @@ use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity content source plugin.
  */
 #[Group('migrate')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ContentEntityTest extends KernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -47,9 +49,7 @@ class ContentEntityTest extends KernelTestBase {
     'media',
     'media_test_source',
     'text',
-    'filter',
     'language',
-    'content_translation',
   ];
 
   /**

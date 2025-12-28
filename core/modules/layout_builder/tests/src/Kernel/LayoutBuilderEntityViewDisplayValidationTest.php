@@ -11,12 +11,16 @@ use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of Layout Builder's entity_view_display entities.
  */
 #[Group('layout_builder')]
 #[Group('#slow')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderEntityViewDisplayValidationTest extends ConfigEntityValidationTestBase {
 
   use ContentTypeCreationTrait;

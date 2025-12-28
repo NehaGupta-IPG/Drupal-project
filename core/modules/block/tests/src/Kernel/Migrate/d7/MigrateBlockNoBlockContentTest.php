@@ -8,11 +8,13 @@ use Drupal\block\Entity\Block;
 use Drupal\block\Hook\BlockHooks;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the migration of blocks without Block Content installed.
  */
 #[Group('block')]
+#[RunTestsInSeparateProcesses]
 class MigrateBlockNoBlockContentTest extends MigrateDrupal7TestBase {
 
   /**
@@ -20,14 +22,7 @@ class MigrateBlockNoBlockContentTest extends MigrateDrupal7TestBase {
    */
   protected static $modules = [
     'block',
-    'views',
-    'comment',
-    'menu_ui',
-    'node',
-    'text',
-    'filter',
     'path_alias',
-    'user',
   ];
 
   /**
