@@ -53,7 +53,12 @@ class MediaLibraryImageUploadTest extends MediaLibraryTestBase {
     $this->assertNotEmpty($image_path);
     $this->assertFileExists($image_path);
 
-    $this->waitForFieldExists('Add file')->attachFile($image_path);
+    // Find the file input inside the media library modal and attach the file.
+    $file_input = $this->getSession()->getPage()->find('css', '.media-library input[type="file"], input[type="file"]');
+    if (!$file_input) {
+      $this->fail('File upload input not found in media library modal.');
+    }
+    $file_input->attachFile($image_path);
     $this->waitForText('The image was resized to fit within the maximum allowed dimensions of 16x16 pixels.');
   }
 
