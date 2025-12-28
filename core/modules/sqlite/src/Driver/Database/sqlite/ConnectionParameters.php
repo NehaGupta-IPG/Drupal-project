@@ -32,17 +32,6 @@ class ConnectionParameters extends ConnectionParametersBase {
    * {@inheritdoc}
    */
   public static function processOptionsArray(array $options): array {
-    // The driver does not need the following parameters, but the installer
-    // does. We keep them in the optionsBackfill storage.
-    // @todo remove this in drupal:43.0.0.
-    $options = array_merge([
-      'username' => NULL,
-      'password' => NULL,
-      'host' => NULL,
-      'port' => NULL,
-      'dependencies' => NULL,
-    ], $options);
-
     // Initialize 'init_commands' and 'pdo' if not defined in the input array.
     $options = array_merge([
       'init_commands' => [],
