@@ -140,7 +140,9 @@ class MachineNameTest extends UnitTestCase {
     $form_state = $this->createMock(FormStateInterface::class);
     $form_state->expects($this->never())
       ->method('setError');
-    // Set the initial_values to avoid the unique machine name check.
+    // validateMachineName() checks the uniqueness of machine names, which is
+    // not relevant to this test. Setting machine_name.initial_values in the
+    // form state can prevent this validation.
     $form_state->expects($this->once())
       ->method('get')
       ->with('machine_name.initial_values')
