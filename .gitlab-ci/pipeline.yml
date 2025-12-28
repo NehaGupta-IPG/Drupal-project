@@ -114,12 +114,10 @@ variables:
       fi
 
 .yarn-install-from-cache: &yarn-install-from-cache
-  # Installation steps are defined under `script` so that it does not
-  # override `default:before_script`.
-  # However, this `script` key will likely be overridden when configuration
-  # is merged.
+  # Installation steps are defined under `install` so that it does not
+  # override default and job keys.
   # Use YAML `!reference` to merge the steps in the appropriate location.
-  script:
+  install:
     - cd core
     - corepack enable
     - yarn install
@@ -157,7 +155,7 @@ variables:
     - <<: *with-selenium-chrome
   before_script:
     # Install `yarn` before `.run-tests:script` executes.
-    - !reference [.yarn-install-from-cache, script]
+    - !reference [.yarn-install-from-cache, install]
   after_script:
     - echo $MINK_DRIVER_ARGS_WEBDRIVER
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
@@ -218,7 +216,7 @@ variables:
     - echo "DRUPAL_NIGHTWATCH_OUTPUT='"../nightwatch_output"'" >> ./core/.env
     - echo "COLUMNS=1000" >> ./core/.env
     - chown -R www-data:www-data ./sites /var/www
-    - !reference [.yarn-install-from-cache, script]
+    - !reference [.yarn-install-from-cache, install]
     - cd core
     - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
