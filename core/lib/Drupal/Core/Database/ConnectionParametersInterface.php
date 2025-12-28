@@ -12,6 +12,17 @@ namespace Drupal\Core\Database;
 interface ConnectionParametersInterface {
 
   /**
+   * Returns the list of parameters.
+   *
+   * Only the paraemters defined as properties are returned, those added to
+   * static::$optionsBackfill are ignored.
+   *
+   * @return list<string>
+   *   The list of parameters' names.
+   */
+  public static function getNames(): array;
+
+    /**
    * Returns the PHP class name of the connection.
    *
    * @return class-string

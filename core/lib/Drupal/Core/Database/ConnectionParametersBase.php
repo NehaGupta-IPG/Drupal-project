@@ -20,6 +20,20 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
   /**
    * {@inheritdoc}
    */
+  public static function getNames(): array {
+    $properties = [];
+    foreach ((new \ReflectionClass(static::class))->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+      $name = $property->getName();
+      if ($name !== 'optionsBackfill') {
+        $properties[] = $property->getName();
+      }
+    }
+    return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getConnectionClass(): string {
     // @phpstan-ignore property.notFound
     return $this->namespace . '\\Connection';

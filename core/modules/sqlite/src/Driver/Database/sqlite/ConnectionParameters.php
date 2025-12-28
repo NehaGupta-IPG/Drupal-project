@@ -32,7 +32,22 @@ class ConnectionParameters extends ConnectionParametersBase {
    * {@inheritdoc}
    */
   public static function processOptionsArray(array $options): array {
-    $options = array_merge(['init_commands' => [], 'pdo' => []], $options);
+    // The driver does not need the following parameters, but the installer
+    // does. We keep them in the optionsBackfill storage.
+    // @todo remove this in drupal:43.0.0.
+    $options = array_merge([
+      'username' => NULL,
+      'password' => NULL,
+      'host' => NULL,
+      'port' => NULL,
+      'dependencies' => NULL,
+    ], $options);
+
+    // Initialize 'init_commands' and 'pdo' if not defined in the input array.
+    $options = array_merge([
+      'init_commands' => [],
+      'pdo' => [],
+    ], $options);
 
     // Allow PDO options to be overridden.
     $options['pdo'] += [
@@ -50,11 +65,7 @@ class ConnectionParameters extends ConnectionParametersBase {
 
     // Additional keys found in the options array, that are not first-class
     // properties, will be stored in the $optionsBackfill property.
-    $properties = [];
-    foreach ((new \ReflectionClass(self::class))->getProperties() as $prop) {
-      $properties[] = $prop->getName();
-    }
-    $optionsBackfill = array_diff_key($options, array_flip($properties));
+    $optionsBackfill = array_diff_key($options, array_flip(static::getNames()));
     foreach (array_keys($optionsBackfill) as $key) {
       unset($options[$key]);
     }
