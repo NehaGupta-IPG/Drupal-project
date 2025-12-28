@@ -14,7 +14,7 @@ interface ConnectionParametersInterface {
   /**
    * Returns the list of parameters.
    *
-   * Only the paraemters defined as properties are returned, those added to
+   * Only the parameters defined as properties are returned, those added to
    * static::$optionsBackfill are ignored.
    *
    * @return list<string>
@@ -22,7 +22,7 @@ interface ConnectionParametersInterface {
    */
   public static function getNames(): array;
 
-    /**
+  /**
    * Returns the PHP class name of the connection.
    *
    * @return class-string
