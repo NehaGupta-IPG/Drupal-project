@@ -332,6 +332,9 @@ class ImageWidget extends FileWidget {
     $element = parent::errorElement($element, $error, $form, $form_state);
 
     $property_path_array = explode('.', $error->getPropertyPath());
+    if (count($property_path_array) < 2) {
+      return FALSE;
+    }
     return ($element === FALSE) ? FALSE : $element[$property_path_array[1]];
   }
 
