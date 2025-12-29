@@ -1,9 +1,0 @@
-diff a/core/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateTest.php b/core/tests/Drupal/KernelTests/Core/Entity/EntityDefinitionUpdateTest.php	(rejected hunks)
-@@ -123,6 +123,7 @@ public function testEntityTypeUpdateWithoutData() {
-         // created.
-         t('The %field_name field needs to be installed.', ['%field_name' => 'Revision ID']),
-         t('The %field_name field needs to be installed.', ['%field_name' => 'Default revision']),
-+        t('The %field_name field needs to be installed.', ['%field_name' => $this->entityManager->getFieldStorageDefinitions('entity_test_update')['revision_uuid']->getLabel()]),
-       ],
-     ];
-     $this->assertEqual($this->entityDefinitionUpdateManager->getChangeSummary(), $expected, 'EntityDefinitionUpdateManager reports the expected change summary.');
