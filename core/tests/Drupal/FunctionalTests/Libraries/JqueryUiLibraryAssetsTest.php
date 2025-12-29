@@ -8,12 +8,14 @@ use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the loading of jQuery UI CSS and JS assets.
  */
 #[Group('libraries')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class JqueryUiLibraryAssetsTest extends BrowserTestBase {
 
   /**
@@ -342,7 +344,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
    *     library prior to the change from jQuery UI library dependencies to
    *     direct file inclusion.
    */
-  public static function providerTestAssetLoading() {
+  public static function providerTestAssetLoading(): array {
     return [
       'drupal.autocomplete' => [
         'library' => 'drupal.autocomplete',
