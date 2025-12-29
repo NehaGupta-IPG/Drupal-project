@@ -298,13 +298,9 @@
 /**
  * Focus styles.
  */
-
-/**
- * Active has to be here for Firefox.
- */
 [open] > .claro-details__summary--accordion:not(:focus)::after,
 [open] > .claro-details__summary--accordion-item:not(:focus)::after,
-[open] > .claro-details__summary--vertical-tabs-item:not(:focus, :active)::after {
+[open] > .claro-details__summary--vertical-tabs-item:not(:focus)::after {
   opacity: 1;
   border: var(--details-summary-focus-border-size) solid var(--color-absolutezero);
   border-width: 0 0 0 var(--details-summary-focus-border-size); /* LTR */
