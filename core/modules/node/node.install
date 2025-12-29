@@ -6,8 +6,6 @@
  */
 
 use Drupal\Core\Database\Database;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\RoleInterface;
 
 /**
@@ -132,20 +130,4 @@ function node_uninstall(): void {
  */
 function node_update_last_removed(): int {
   return 8700;
-}
-
- /**
- * Install revision_uuid base field.
- */
-function node_update_11001() {
-  $revision_uuid = BaseFieldDefinition::create('uuid')
-    ->setLabel(new TranslatableMarkup('Revision UUID'))
-    ->setRevisionable(TRUE)
-    ->setReadOnly(TRUE);
-  \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('revision_uuid', 'node', 'node', $revision_uuid);
-
-  $state = \Drupal::state();
-  $revision_uuid_update = $state->get('revision_uuid_update');
-  $revision_uuid_update[] = 'node';
-  $state->set('revision_uuid_update', $revision_uuid_update);
 }

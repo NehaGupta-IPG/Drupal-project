@@ -5,28 +5,9 @@
  * Install, update and uninstall functions for the block_content module.
  */
 
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-
 /**
  * Implements hook_update_last_removed().
  */
 function block_content_update_last_removed(): int {
   return 10300;
-}
-
-/**
- * Install revision_uuid base field.
- */
-function block_content_update_11001(): void {
-  $revision_uuid = BaseFieldDefinition::create('uuid')
-    ->setLabel(new TranslatableMarkup('Revision UUID'))
-    ->setRevisionable(TRUE)
-    ->setReadOnly(TRUE);
-  \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('revision_uuid', 'block_content', 'block_content', $revision_uuid);
-
-  $state = \Drupal::state();
-  $revision_uuid_update = $state->get('revision_uuid_update');
-  $revision_uuid_update[] = 'block_content';
-  $state->set('revision_uuid_update', $revision_uuid_update);
 }

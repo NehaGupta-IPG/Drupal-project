@@ -6,6 +6,9 @@
  */
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
+use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
 
@@ -165,4 +168,29 @@ function system_update_11300(): TranslatableMarkup|null {
     return $equivalent_update->toSkipMessage();
   }
   return NULL;
+}
+
+/**
+ * Install revision_uuid base field.
+ */
+function system_update_11301(): void {
+  $revision_uuid = BaseFieldDefinition::create('uuid')
+    ->setLabel(new TranslatableMarkup('Revision UUID'))
+    ->setRevisionable(TRUE)
+    ->setReadOnly(TRUE);
+
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  $state = \Drupal::state();
+
+  foreach ($manager->getEntityTypes() as $entityTypeId => $entityType) {
+    if (!$entityType instanceof ContentEntityTypeInterface || !$entityType->hasKey('revision_uuid')) {
+      continue;
+    }
+
+    $manager->installFieldStorageDefinition($entityType->getKey('revision_uuid'), $entityTypeId,  $entityType->getProvider(), $revision_uuid);
+    $revision_uuid_update = $state->get('revision_uuid_update', []);
+    $revision_uuid_update[] = $entityTypeId;
+    $state->set('revision_uuid_update', $revision_uuid_update);
+  }
+
 }
