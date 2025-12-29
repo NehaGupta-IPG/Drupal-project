@@ -284,7 +284,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 18,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 11,
+      'CacheTagLookupQueryCount' => 6,
       'StylesheetCount' => 1,
       'StylesheetBytes' => 1150,
     ];
