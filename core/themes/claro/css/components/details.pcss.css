@@ -320,27 +320,6 @@
 }
 
 /**
- * Firefox on OSX only applies :focus state to details summary if it was reached
- * by keyboard navigation.
- *
- * Previously, Claro had a workaround for this behavior (which made this :focus
- * state consistent across browsers) but that was removed in
- * https://drupal.org/node/3085794.
- *
- * The rules below remove the weird flash of the focus outline that is
- * illustrated in comment #17 https://drupal.org/node/3085794#comment-13334325.
- *
- * We might consider using media query @supports (-moz-osx-font-smoothing: auto)
- * or @-moz-document url-prefix() here...
- */
-.claro-details:not([open]) > .claro-details__summary--accordion:not(:focus)::after,
-.claro-details:not([open]) > .claro-details__summary--accordion-item:not(:focus)::after {
-  opacity: 0;
-  border-color: transparent;
-  box-shadow: none;
-}
-
-/**
  * Safari workaround.
  */
 /* stylelint-disable-next-line unit-allowed-list */
