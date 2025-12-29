@@ -6,7 +6,7 @@ namespace Drupal\Tests\Component\Plugin\Discovery;
 
 use Drupal\Component\Plugin\Discovery\DiscoveryTrait;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -15,9 +15,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests Drupal\Component\Plugin\Discovery\DiscoveryTrait.
  */
-#[CoversClass(DiscoveryTrait::class)]
+#[CoversTrait(DiscoveryTrait::class)]
 #[Group('Plugin')]
-#[UsesClass(PluginNotFoundException::class)]
 #[UsesClass(PluginNotFoundException::class)]
 class DiscoveryTraitTest extends TestCase {
 
@@ -29,7 +28,7 @@ class DiscoveryTraitTest extends TestCase {
    *   - Plugin definition array, to pass to doGetDefinition().
    *   - Plugin ID to get, passed to doGetDefinition().
    */
-  public static function providerDoGetDefinition() {
+  public static function providerDoGetDefinition(): array {
     return [
       ['definition', ['plugin_name' => 'definition'], 'plugin_name'],
       [NULL, ['plugin_name' => 'definition'], 'bad_plugin_name'],
@@ -59,7 +58,7 @@ class DiscoveryTraitTest extends TestCase {
    *   - Plugin definition array, to pass to doGetDefinition().
    *   - Plugin ID to get, passed to doGetDefinition().
    */
-  public static function providerDoGetDefinitionException() {
+  public static function providerDoGetDefinitionException(): array {
     return [
       [FALSE, ['plugin_name' => 'definition'], 'bad_plugin_name'],
     ];
@@ -125,7 +124,7 @@ class DiscoveryTraitTest extends TestCase {
    *   - Expected TRUE or FALSE.
    *   - Plugin ID to look for.
    */
-  public static function providerHasDefinition() {
+  public static function providerHasDefinition(): array {
     return [
       [TRUE, 'valid'],
       [FALSE, 'not_valid'],

@@ -10,18 +10,19 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the entity display configuration entities.
  */
 #[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class EntityFormDisplayTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'field_ui',
     'field',
     'entity_test',
     'field_test',

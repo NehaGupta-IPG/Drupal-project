@@ -72,7 +72,7 @@ class ParamConverterManagerTest extends UnitTestCase {
    *
    * @see ParamConverterManagerTest::testAddConverter()
    */
-  public function providerTestAddConverter() {
+  public function providerTestAddConverter(): array {
     $converters[0]['unsorted'] = [
       ['name' => 'strawberry'],
       ['name' => 'raspberry'],
@@ -115,7 +115,7 @@ class ParamConverterManagerTest extends UnitTestCase {
    *
    * @see ParamConverterManagerTest::testGetConverter()
    */
-  public static function providerTestGetConverter() {
+  public static function providerTestGetConverter(): array {
     return [
       ['ape', 'ApeConverterClass'],
       ['cat', 'CatConverterClass'],
@@ -163,7 +163,7 @@ class ParamConverterManagerTest extends UnitTestCase {
   /**
    * Provides data for testSetRouteParameterConverters().
    */
-  public static function providerTestSetRouteParameterConverters() {
+  public static function providerTestSetRouteParameterConverters(): array {
     return [
       ['/test'],
       ['/test/{id}', ['id' => []], 'applied'],
@@ -201,7 +201,7 @@ class ParamConverterManagerTest extends UnitTestCase {
     $converter = $this->createMock('Drupal\Core\ParamConverter\ParamConverterInterface');
     $converter->expects($this->any())
       ->method('convert')
-      ->with(1, $this->isType('array'), 'id', $this->isType('array'))
+      ->with(1, $this->isArray(), 'id', $this->isArray())
       ->willReturn('something_better!');
     $this->manager->addConverter($converter, 'test_convert');
 
@@ -251,7 +251,7 @@ class ParamConverterManagerTest extends UnitTestCase {
     $converter = $this->createMock('Drupal\Core\ParamConverter\ParamConverterInterface');
     $converter->expects($this->any())
       ->method('convert')
-      ->with(1, $this->isType('array'), 'id', $this->isType('array'))
+      ->with(1, $this->isArray(), 'id', $this->isArray())
       ->willReturn(NULL);
     $this->manager->addConverter($converter, 'test_convert');
 

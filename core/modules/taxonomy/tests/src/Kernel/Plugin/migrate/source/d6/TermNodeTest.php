@@ -8,15 +8,15 @@ use Drupal\taxonomy\Plugin\migrate\source\d6\TermNode;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore tnid
 /**
  * Tests d6_term_node source plugin.
- *
- * @legacy-covers \Drupal\taxonomy\Plugin\migrate\source\d6\TermNode
  */
 #[CoversClass(TermNode::class)]
 #[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TermNodeTest extends MigrateSqlSourceTestBase {
 
   /**

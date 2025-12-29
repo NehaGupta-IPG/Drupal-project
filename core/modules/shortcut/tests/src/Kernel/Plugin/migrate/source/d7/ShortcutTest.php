@@ -8,15 +8,15 @@ use Drupal\shortcut\Plugin\migrate\source\d7\Shortcut;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore mlid plid
 /**
  * Tests D7 Shortcut source plugin.
- *
- * @legacy-covers Drupal\shortcut\Plugin\migrate\source\d7\Shortcut
  */
 #[CoversClass(Shortcut::class)]
 #[Group('shortcut')]
+#[RunTestsInSeparateProcesses]
 class ShortcutTest extends MigrateSqlSourceTestBase {
 
   /**

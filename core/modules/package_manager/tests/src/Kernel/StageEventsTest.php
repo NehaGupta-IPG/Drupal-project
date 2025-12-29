@@ -18,17 +18,20 @@ use Drupal\package_manager\Event\StatusCheckEvent;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
 use PhpTuf\ComposerStager\API\Path\Value\PathListInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Tests that the stage fires events during its lifecycle.
  *
  * @internal
- * @legacy-covers \Drupal\package_manager\Event\SandboxEvent
  */
 #[Group('package_manager')]
+#[CoversClass(SandboxEvent::class)]
+#[RunTestsInSeparateProcesses]
 class StageEventsTest extends PackageManagerKernelTestBase implements EventSubscriberInterface {
 
   use StringTranslationTrait;

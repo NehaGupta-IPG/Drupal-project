@@ -12,6 +12,7 @@ use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[CoversClass(OEmbedIframeController::class)]
 #[Group('media')]
+#[RunTestsInSeparateProcesses]
 class OEmbedIframeControllerTest extends MediaKernelTestBase {
 
   /**
@@ -31,7 +33,7 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
    * Data provider for testBadHashParameter().
    *
    * @return array
-   *   An array of test cases.OffCanvasDialogTest.php
+   *   An array of test cases.
    */
   public static function providerBadHashParameter() {
     return [

@@ -8,15 +8,15 @@ use Drupal\field\Plugin\migrate\source\d6\FieldInstancePerFormDisplay;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore filefield
 /**
  * Tests d6_field_instance_per_form_display source plugin.
- *
- * @legacy-covers \Drupal\field\Plugin\migrate\source\d6\FieldInstancePerFormDisplay
  */
 #[CoversClass(FieldInstancePerFormDisplay::class)]
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldInstancePerFormDisplayTest extends MigrateSqlSourceTestBase {
 
   /**

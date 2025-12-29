@@ -18,14 +18,12 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\FullyValidatableConstrai
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 
 // cspell:ignore kthxbai
+
 /**
  * Base class for testing validation of config entities.
  */
-#[Group('config')]
-#[Group('Validation')]
 abstract class ConfigEntityValidationTestBase extends KernelTestBase {
 
   /**
@@ -509,7 +507,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
 
     $mapping_properties = array_keys(array_filter(
       ConfigEntityAdapter::createFromEntity($this->entity)->getProperties(FALSE),
-      fn (TypedDataInterface $v) => $v instanceof Mapping
+      fn (TypedDataInterface $v): bool => $v instanceof Mapping
     ));
 
     $required_property_keys = $this->getRequiredPropertyKeys();

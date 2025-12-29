@@ -8,14 +8,14 @@ use Drupal\system\Plugin\migrate\source\Extension;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests legacy extension source plugin.
- *
- * @legacy-covers \Drupal\system\Plugin\migrate\source\Extension
  */
 #[CoversClass(Extension::class)]
 #[Group('migrate_drupal')]
+#[RunTestsInSeparateProcesses]
 class ExtensionTest extends MigrateSqlSourceTestBase {
 
   /**

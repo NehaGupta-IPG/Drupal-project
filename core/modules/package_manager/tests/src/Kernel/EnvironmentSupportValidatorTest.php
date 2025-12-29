@@ -10,15 +10,18 @@ use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Event\StatusCheckEvent;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\EnvironmentSupportValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Environment Support Validator.
  *
  * @internal
- * @legacy-covers \Drupal\package_manager\Validator\EnvironmentSupportValidator
  */
 #[Group('package_manager')]
+#[CoversClass(EnvironmentSupportValidator::class)]
+#[RunTestsInSeparateProcesses]
 class EnvironmentSupportValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

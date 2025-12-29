@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Menu;
 
+use Drupal\Core\Template\Attribute;
+
 /**
  * Menu theme preprocess.
  *
@@ -40,6 +42,13 @@ class MenuPreprocess {
       '#url' => $link['url'],
       '#options' => $link['localized_options'],
     ];
+
+    if (isset($variables['primary_attributes']) && is_array($variables['primary_attributes'])) {
+      $variables['primary_attributes'] = new Attribute($variables['primary_attributes']);
+    }
+    if (isset($variables['secondary_attributes']) && is_array($variables['secondary_attributes'])) {
+      $variables['secondary_attributes'] = new Attribute($variables['secondary_attributes']);
+    }
   }
 
   /**
