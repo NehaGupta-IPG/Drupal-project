@@ -85,7 +85,7 @@ class FormTest extends FieldTestBase {
     $this->fieldStorageUnlimited = [
       'field_name' => 'field_unlimited',
       'entity_type' => 'entity_test',
-      'type' => 'test_field',
+      'type' => 'string',
       'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
     ];
 
@@ -96,6 +96,7 @@ class FormTest extends FieldTestBase {
       'description' => '[site:name]_description',
       'weight' => mt_rand(0, 127),
       'settings' => [
+        'orderable' => TRUE,
         'test_field_setting' => $this->randomMachineName(),
       ],
     ];
@@ -639,6 +640,276 @@ class FormTest extends FieldTestBase {
     $this->assertSession()->pageTextContains('A field with multiple values');
     // Test if labels were XSS filtered.
     $this->assertSession()->assertEscaped("<script>alert('a configurable field');</script>");
+  }
+
+  /**
+   * Tests orderable form rendering with existing field infrastructure.
+   */
+  public function testOrderableFormRendering(): void {
+    // Create a dedicated field for this test to avoid conflicts.
+    $field_storage = [
+      'field_name' => 'field_test_orderable',
+      'entity_type' => 'entity_test',
+      'type' => 'string',
+      'cardinality' => -1,
+    ];
+    $field = [
+      'field_name' => 'field_test_orderable',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Test Orderable Field',
+    ];
+    $field_name = $field_storage['field_name'];
+    FieldStorageConfig::create($field_storage)->save();
+    FieldConfig::create($field)->save();
+
+    // Test with orderable = TRUE (default behavior).
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay($field['entity_type'], $field['bundle'])
+      ->setComponent($field_name, [
+        'type' => 'string_textfield',
+        'settings' => ['orderable' => TRUE],
+      ])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+
+    // Should see draggable table structure.
+    $this->assertSession()->elementExists('xpath', '//table[@id="field-test-orderable-values"]');
+    $this->assertSession()->fieldExists("{$field_name}[0][_weight]");
+
+    // Test with orderable = FALSE (new functionality).
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay($field['entity_type'], $field['bundle'])
+      ->setComponent($field_name, [
+        'type' => 'string_textfield',
+        'settings' => ['orderable' => FALSE],
+      ])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+
+    // Should NOT see draggable table structure.
+    $this->assertSession()->elementNotExists('xpath', '//table[@id="field-test-orderable-values"]');
+    $this->assertSession()->fieldNotExists("{$field_name}[0][_weight]");
+
+    // But should still have field input and add more button.
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+    $this->assertSession()->buttonExists('Add another item');
+  }
+
+  /**
+   * Tests drag handle visibility based on orderable setting.
+   */
+  public function testOrderableDragHandleVisibility(): void {
+    // Create a dedicated field for this test to avoid conflicts.
+    $field_storage = [
+      'field_name' => 'field_test_drag',
+      'entity_type' => 'entity_test',
+      'type' => 'string',
+      'cardinality' => -1,
+    ];
+    $field = [
+      'field_name' => 'field_test_drag',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Test Drag Field',
+    ];
+    $field_name = $field_storage['field_name'];
+    FieldStorageConfig::create($field_storage)->save();
+    FieldConfig::create($field)->save();
+
+    // Configure with orderable = TRUE.
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay($field['entity_type'], $field['bundle'])
+      ->setComponent($field_name, [
+        'type' => 'string_textfield',
+        'settings' => ['orderable' => TRUE],
+      ])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+
+    // Add multiple items to see drag handles.
+    $this->submitForm([], 'Add another item');
+    $this->submitForm([], 'Add another item');
+
+    // Should see weight fields for ordering.
+    $this->assertSession()->fieldExists("{$field_name}[0][_weight]");
+    $this->assertSession()->fieldExists("{$field_name}[1][_weight]");
+    $this->assertSession()->fieldExists("{$field_name}[2][_weight]");
+
+    // Should see draggable table rows.
+    $this->assertSession()->elementExists('css', 'tr.draggable');
+
+    // Now test with orderable = FALSE.
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay($field['entity_type'], $field['bundle'])
+      ->setComponent($field_name, [
+        'type' => 'string_textfield',
+        'settings' => ['orderable' => FALSE],
+      ])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+
+    // Add multiple items.
+    $this->submitForm([], 'Add another item');
+    $this->submitForm([], 'Add another item');
+
+    // Should NOT see weight fields.
+    $this->assertSession()->fieldNotExists("{$field_name}[0][_weight]");
+    $this->assertSession()->fieldNotExists("{$field_name}[1][_weight]");
+    $this->assertSession()->fieldNotExists("{$field_name}[2][_weight]");
+
+    // Should NOT see draggable table structure.
+    $this->assertSession()->elementNotExists('css', 'tr.draggable');
+
+    // But should still see the field inputs.
+    $this->assertSession()->fieldExists("{$field_name}[0][value]");
+    $this->assertSession()->fieldExists("{$field_name}[1][value]");
+    $this->assertSession()->fieldExists("{$field_name}[2][value]");
+  }
+
+  /**
+   * Tests form submission works correctly in both orderable modes.
+   */
+  public function testOrderableFormSubmission(): void {
+    // Create a dedicated field for this test to avoid conflicts.
+    $field_storage = [
+      'field_name' => 'field_test_submit',
+      'entity_type' => 'entity_test',
+      'type' => 'string',
+      'cardinality' => -1,
+    ];
+    $field = [
+      'field_name' => 'field_test_submit',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Test Submit Field',
+    ];
+    $field_name = $field_storage['field_name'];
+    FieldStorageConfig::create($field_storage)->save();
+    FieldConfig::create($field)->save();
+
+    // Test submission with orderable = FALSE.
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay($field['entity_type'], $field['bundle'])
+      ->setComponent($field_name, [
+        'type' => 'string_textfield',
+        'settings' => ['orderable' => FALSE],
+      ])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+
+    // Add multiple values.
+    $this->submitForm([], 'Add another item');
+    $this->submitForm([], 'Add another item');
+
+    // Fill in values and submit.
+    $edit = [
+      "{$field_name}[0][value]" => 'First non-orderable value',
+      "{$field_name}[1][value]" => 'Second non-orderable value',
+      "{$field_name}[2][value]" => 'Third non-orderable value',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    // Verify entity was created.
+    $this->assertSession()->pageTextContains('entity_test 1 has been created.');
+
+    // Load entity and verify values were saved.
+    $entity = \Drupal::entityTypeManager()->getStorage('entity_test')->load(1);
+    $field_values = $entity->get($field_name)->getValue();
+
+    $this->assertCount(3, $field_values, 'Three field values should be saved with orderable=FALSE.');
+    $this->assertEquals('First non-orderable value', $field_values[0]['value']);
+    $this->assertEquals('Second non-orderable value', $field_values[1]['value']);
+    $this->assertEquals('Third non-orderable value', $field_values[2]['value']);
+
+    // Test that the same data structure works with orderable = TRUE.
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay($field['entity_type'], $field['bundle'])
+      ->setComponent($field_name, [
+        'type' => 'string_textfield',
+        'settings' => ['orderable' => TRUE],
+      ])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+
+    // Add multiple values.
+    $this->submitForm([], 'Add another item');
+    $this->submitForm([], 'Add another item');
+
+    // Fill in values and submit (including weight fields).
+    $edit = [
+      "{$field_name}[0][value]" => 'First orderable value',
+      "{$field_name}[0][_weight]" => '0',
+      "{$field_name}[1][value]" => 'Second orderable value',
+      "{$field_name}[1][_weight]" => '1',
+      "{$field_name}[2][value]" => 'Third orderable value',
+      "{$field_name}[2][_weight]" => '2',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    // Verify second entity was created.
+    $this->assertSession()->pageTextContains('entity_test 2 has been created.');
+
+    // Load entity and verify values were saved.
+    $entity2 = \Drupal::entityTypeManager()->getStorage('entity_test')->load(2);
+    $field_values2 = $entity2->get($field_name)->getValue();
+
+    $this->assertCount(3, $field_values2, 'Three field values should be saved with orderable=TRUE.');
+    $this->assertEquals('First orderable value', $field_values2[0]['value']);
+    $this->assertEquals('Second orderable value', $field_values2[1]['value']);
+    $this->assertEquals('Third orderable value', $field_values2[2]['value']);
+  }
+
+  /**
+   * Tests backward compatibility with existing multi-value forms.
+   */
+  public function testOrderableBackwardCompatibility(): void {
+    // Create a dedicated field for this test to avoid conflicts.
+    $field_storage = [
+      'field_name' => 'field_test_compat',
+      'entity_type' => 'entity_test',
+      'type' => 'string',
+      'cardinality' => -1,
+    ];
+    $field = [
+      'field_name' => 'field_test_compat',
+      'entity_type' => 'entity_test',
+      'bundle' => 'entity_test',
+      'label' => 'Test Compat Field',
+    ];
+    $field_name = $field_storage['field_name'];
+    FieldStorageConfig::create($field_storage)->save();
+    FieldConfig::create($field)->save();
+
+    // Test that existing form displays continue to work (orderable defaults to TRUE).
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay($field['entity_type'], $field['bundle'])
+      ->setComponent($field_name, [
+        'type' => 'string_textfield',
+        // Explicitly not setting orderable to test default behavior.
+      ])
+      ->save();
+
+    $this->drupalGet('entity_test/add');
+
+    // Should see existing behavior with draggable table.
+    $this->assertSession()->elementExists('xpath', '//table[@id="field-test-compat-values"]');
+    $this->assertSession()->fieldExists("{$field_name}[0][_weight]");
+
+    // Add more functionality should work as before.
+    $this->submitForm([], 'Add another item');
+    $this->assertSession()->fieldExists("{$field_name}[1][_weight]");
+
+    // The existing test expectations from testFieldFormUnlimited should still pass.
+    $this->assertSession()->fieldValueEquals("{$field_name}[0][value]", '');
+    $this->assertSession()->fieldValueEquals("{$field_name}[1][value]", '');
+    $this->assertSession()->fieldNotExists("{$field_name}[2][value]");
   }
 
 }

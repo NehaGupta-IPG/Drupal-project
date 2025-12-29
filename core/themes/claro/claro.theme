@@ -1006,6 +1006,14 @@ function claro_preprocess_field_multiple_value_form(&$variables): void {
 }
 
 /**
+ * Implements hook_preprocess_HOOK() for field_multiple_value_without_order_form.
+ */
+function claro_preprocess_field_multiple_value_without_order_form(&$variables): void {
+  // Make disabled available for the template.
+  $variables['disabled'] = !empty($variables['element']['#disabled']);
+}
+
+/**
  * Implements hook_preprocess_HOOK() for form_element__password_confirm.
  */
 function claro_preprocess_form_element__password_confirm(&$variables): void {
