@@ -1,0 +1,8 @@
+<?php
+$autoloader = require_once __DIR__ . '/autoload.php';
+return static function($app) {
+  $_ENV['APP_RUNTIME'] = $runtimeClass = $_SERVER['APP_RUNTIME'] ?? $_ENV['APP_RUNTIME'] ?? Drupal\Core\Runtime\DrupalRuntime::class;
+  $runtime = new $runtimeClass(($_SERVER['APP_RUNTIME_OPTIONS'] ?? $_ENV['APP_RUNTIME_OPTIONS'] ?? []) + array (
+));
+  exit($runtime->getRunner($app)->run());
+};

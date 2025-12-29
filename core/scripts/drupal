@@ -19,7 +19,8 @@ if (PHP_SAPI !== 'cli') {
   return;
 }
 
-$classloader = require_once __DIR__ . '/../../autoload.php';
+
+$classloader = require __DIR__ . '/../../autoload.php';
 
 $application = new Application('drupal', \Drupal::VERSION);
 
@@ -31,4 +32,5 @@ $application->addCommand(new RecipeCommand($classloader));
 $application->addCommand(new RecipeInfoCommand($classloader));
 $application->addCommand(new ContentExportCommand($classloader));
 
-$application->run();
+$runner = require_once __DIR__ . '/../../autoload_runtime.php';
+$runner($application);
