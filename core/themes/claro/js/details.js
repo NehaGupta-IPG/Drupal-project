@@ -3,7 +3,7 @@
  * Claro's polyfill enhancements for HTML5 details.
  */
 
-(($, Drupal) => {
+((Drupal) => {
   /**
    * Theme override providing a wrapper for summarized details content.
    *
@@ -22,4 +22,4 @@
    *   The formatted summarized content text.
    */
   Drupal.theme.detailsSummarizedContentText = (text) => text || '';
-})(jQuery, Drupal);
+})(Drupal);
