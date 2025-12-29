@@ -184,7 +184,7 @@ class EntityUrlTest extends UnitTestCase {
    * @return array
    *   An array of test cases for testToUrlLinkTemplates().
    */
-  public static function providerTestToUrlLinkTemplates() {
+  public static function providerTestToUrlLinkTemplates(): array {
     $test_cases = [];
 
     $test_cases['canonical'] = ['canonical', 'entity.test_entity.canonical'];
@@ -241,11 +241,26 @@ class EntityUrlTest extends UnitTestCase {
     $test_cases = [];
 
     $route_parameters = ['test_entity' => static::ENTITY_ID];
-    $test_cases['default_revision'] = [static::DEFAULT_REVISION, 'canonical', 'entity.test_entity.canonical', $route_parameters];
+    $test_cases['default_revision'] = [
+      static::DEFAULT_REVISION,
+      'canonical',
+      'entity.test_entity.canonical',
+      $route_parameters,
+    ];
     // Add the revision ID to the expected route parameters.
     $route_parameters['test_entity_revision'] = static::REVISION_ID;
-    $test_cases['non_default_revision'] = [static::NON_DEFAULT_REVISION, 'revision', 'entity.test_entity.revision', $route_parameters];
-    $test_cases['revision-delete'] = [static::NON_DEFAULT_REVISION, 'revision-delete-form', 'entity.test_entity.revision_delete_form', $route_parameters];
+    $test_cases['non_default_revision'] = [
+      static::NON_DEFAULT_REVISION,
+      'revision',
+      'entity.test_entity.revision',
+      $route_parameters,
+    ];
+    $test_cases['revision-delete'] = [
+      static::NON_DEFAULT_REVISION,
+      'revision-delete-form',
+      'entity.test_entity.revision_delete_form',
+      $route_parameters,
+    ];
 
     return $test_cases;
   }
@@ -278,7 +293,7 @@ class EntityUrlTest extends UnitTestCase {
    * @return array
    *   An array of test cases for testToUrlLinkTemplateNoId().
    */
-  public static function providerTestToUrlLinkTemplateNoId() {
+  public static function providerTestToUrlLinkTemplateNoId(): array {
     $test_cases = [];
 
     $test_cases['collection'] = ['collection', 'entity.test_entity.collection'];
@@ -369,7 +384,7 @@ class EntityUrlTest extends UnitTestCase {
    * @return array
    *   An array of test cases for testToUrlUriCallbackUndefined().
    */
-  public static function providerTestToUrlUriCallbackUndefined() {
+  public static function providerTestToUrlUriCallbackUndefined(): array {
     $test_cases = [];
 
     $test_cases['no_callback'] = [[], NULL];
