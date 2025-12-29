@@ -7,7 +7,7 @@
         "webflo/drupal-core-strict": "*"
     },
     "require": {
-        "drupal/core": "11.3.x-dev",
+        "drupal/core": "11.x-dev",
         "asm89/stack-cors": "~v2.3.0",
         "composer/semver": "~3.4.4",
         "doctrine/lexer": "~3.0.1",
@@ -15,6 +15,8 @@
         "guzzlehttp/guzzle": "~7.10.0",
         "guzzlehttp/promises": "~2.3.0",
         "guzzlehttp/psr7": "~2.8.0",
+        "justinrainbow/json-schema": "~6.6.1",
+        "marc-mabe/php-enum": "~v4.7.2",
         "masterminds/html5": "~2.10.0",
         "mck89/peast": "~v1.17.4",
         "pear/archive_tar": "~1.6.0",
