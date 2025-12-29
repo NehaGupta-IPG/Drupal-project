@@ -16,10 +16,10 @@ interface RevisionUuidInterface {
    *
    * Note, all translations share the same revision UUID.
    *
-   * @return string
+   * @return string|null
    *   The revision UUID of the entity, or NULL if the entity does not
    *   support revision UUID's.
    */
-  public function getRevisionUuid();
+  public function getRevisionUuid(): ?string;
 
 }

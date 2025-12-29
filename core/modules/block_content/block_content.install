@@ -18,7 +18,7 @@ function block_content_update_last_removed(): int {
 /**
  * Install revision_uuid base field.
  */
-function block_content_update_11001() {
+function block_content_update_11001(): void {
   $revision_uuid = BaseFieldDefinition::create('uuid')
     ->setLabel(new TranslatableMarkup('Revision UUID'))
     ->setRevisionable(TRUE)

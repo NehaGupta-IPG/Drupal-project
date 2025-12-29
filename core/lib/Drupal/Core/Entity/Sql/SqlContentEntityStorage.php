@@ -66,11 +66,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   protected $revisionKey = FALSE;
 
   /**
-   * The entity revision_uuid key.
-   *
-   * @var string|bool
+   * The entity revision_uuid key, if any.
    */
-  protected $revisionUuidKey = FALSE;
+  protected string|false|null $revisionUuidKey = FALSE;
 
   /**
    * The entity langcode key.
