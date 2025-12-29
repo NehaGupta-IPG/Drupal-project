@@ -34,6 +34,7 @@ class WorkflowTest extends UnitTestCase {
     $workflow_manager = $this->prophesize(WorkflowTypeManager::class);
     $workflow_manager->createInstance('test_type', Argument::any())->willReturn(new TestType([], '', []));
     $container->set('plugin.manager.workflows.type', $workflow_manager->reveal());
+    $container->set('string_translation', self::getStringTranslationStub());
     \Drupal::setContainer($container);
   }
 
@@ -154,15 +155,14 @@ class WorkflowTest extends UnitTestCase {
   }
 
   /**
-   * Tests get states exception.
-   *
-   * @legacy-covers ::getStates
+   * Tests getStates on non-existent state.
    */
-  public function testGetStatesException(): void {
-    $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("The state 'state_that_does_not_exist' does not exist in workflow.");
+  public function testGetStatesDeletedState(): void {
     $workflow = new Workflow(['id' => 'test', 'type' => 'test_type'], 'workflow');
-    $workflow->getTypePlugin()->getStates(['state_that_does_not_exist']);
+    $deleted_states = $workflow->getTypePlugin()->getStates(['state_that_does_not_exist']);
+    $deleted_state = $deleted_states['state_that_does_not_exist'];
+    $this->assertNull($deleted_state->id());
+    $this->assertEquals('Deleted State', $deleted_state->label());
   }
 
   /**
@@ -197,15 +197,14 @@ class WorkflowTest extends UnitTestCase {
   }
 
   /**
-   * Tests get state exception.
-   *
-   * @legacy-covers ::getState
+   * Tests getState on a non-existent state.
    */
-  public function testGetStateException(): void {
-    $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("The state 'state_that_does_not_exist' does not exist in workflow.");
+  public function testGetStateDeletedState(): void {
     $workflow = new Workflow(['id' => 'test', 'type' => 'test_type'], 'workflow');
-    $workflow->getTypePlugin()->getState('state_that_does_not_exist');
+    $deleted_state = $workflow->getTypePlugin()->getState('state_that_does_not_exist');
+
+    $this->assertNull($deleted_state->id());
+    $this->assertEquals('Deleted State', $deleted_state->label());
   }
 
   /**
