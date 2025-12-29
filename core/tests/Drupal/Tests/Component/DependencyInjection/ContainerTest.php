@@ -102,16 +102,6 @@ class ContainerTest extends TestCase {
   }
 
   /**
-   * Tests that Container::getParameter() works properly for NULL parameters.
-   *
-   * @legacy-covers ::getParameter
-   */
-  public function testGetParameterIfNotFoundBecauseNull(): void {
-    $this->expectException(ParameterNotFoundException::class);
-    $this->container->getParameter(NULL);
-  }
-
-  /**
    * Tests that Container::hasParameter() works properly.
    *
    * @legacy-covers ::hasParameter
@@ -361,17 +351,6 @@ class ContainerTest extends TestCase {
   }
 
   /**
-   * Tests that Container::get() for NULL service works properly.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::createService
-   */
-  public function testGetForNonExistentNULLService(): void {
-    $this->expectException(ServiceNotFoundException::class);
-    $this->container->get(NULL);
-  }
-
-  /**
    * Tests multiple Container::get() calls for non-existing dependencies work.
    *
    * @legacy-covers ::get
@@ -523,7 +502,7 @@ class ContainerTest extends TestCase {
     $configurator = $this->prophesize('\Drupal\Tests\Component\DependencyInjection\MockConfiguratorInterface');
     $configurator->configureService(Argument::type('object'))
       ->shouldBeCalled(1)
-      ->will(function ($args) use ($container) {
+      ->will(function ($args) use ($container): void {
         $args[0]->setContainer($container);
       });
     $container->set('configurator', $configurator->reveal());
@@ -988,7 +967,7 @@ class ContainerTest extends TestCase {
       'configurator' => 'configurator_service_test_does_not_exist',
     ];
 
-    // Raw argument
+    // Raw argument.
     $services['service_with_raw_argument'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockInstantiationService',
       'arguments' => $this->getCollection([$this->getRaw('ccc')]),

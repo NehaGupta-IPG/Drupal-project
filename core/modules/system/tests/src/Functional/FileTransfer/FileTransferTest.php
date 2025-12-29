@@ -7,13 +7,16 @@ namespace Drupal\Tests\system\Functional\FileTransfer;
 use Drupal\Core\FileTransfer\FileTransferException;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests recursive file copy operations with the file transfer jail.
- *
- * @group FileTransfer
- * @group legacy
  */
+#[Group('FileTransfer')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class FileTransferTest extends BrowserTestBase {
 
   /**
@@ -77,7 +80,7 @@ class FileTransferTest extends BrowserTestBase {
         $this->_writeDirectory($base . DIRECTORY_SEPARATOR . $key, $file);
       }
       else {
-        // Just write the filename into the file
+        // Just write the filename into the file.
         file_put_contents($base . DIRECTORY_SEPARATOR . $file, $file);
       }
     }
