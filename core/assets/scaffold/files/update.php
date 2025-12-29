@@ -9,9 +9,10 @@
  */
 
 use Drupal\Core\Update\UpdateKernel;
-use Symfony\Component\HttpFoundation\Request;
 
-$autoloader = require_once 'autoload.php';
+// This includes the autoloader and that loads bootstrap.inc which is needed
+// to detect test runs.
+$glue = require_once 'autoload_runtime.php';
 
 // Disable garbage collection during test runs. Under certain circumstances the
 // update path will create so many objects that garbage collection causes
@@ -21,10 +22,4 @@ if (drupal_valid_test_ua()) {
   gc_disable();
 }
 
-$kernel = new UpdateKernel('prod', $autoloader, FALSE);
-$request = Request::createFromGlobals();
-
-$response = $kernel->handle($request);
-$response->send();
-
-$kernel->terminate($request, $response);
+$glue(new UpdateKernel($glue->appContext, $glue->autoloader, FALSE));

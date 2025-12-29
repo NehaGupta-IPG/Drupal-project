@@ -290,8 +290,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @param \Composer\Autoload\ClassLoader $class_loader
    *   The class loader. Normally Composer's ClassLoader, as included by the
    *   front controller, but may also be decorated.
-   * @param string $environment
-   *   String indicating the environment, e.g. 'prod' or 'dev'.
+   * @param string|\Drupal\Core\AppContext $environment
+   *   String indicating the environment, e.g. 'prod' or 'dev'. Or an app
+   *   context object.
    * @param bool $allow_dumping
    *   (optional) FALSE to stop the container from being written to or read
    *   from disk. Defaults to TRUE.
@@ -314,8 +315,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Constructs a DrupalKernel object.
    *
-   * @param string $environment
-   *   String indicating the environment, e.g. 'prod' or 'dev'.
+   * @param string|\Drupal\Core\AppContext $environment
+   *   String indicating the environment, e.g. 'prod' or 'dev'. Or an app
+   *   context object.
    * @param \Composer\Autoload\ClassLoader $class_loader
    *   The class loader. Normally \Composer\Autoload\ClassLoader, as included by
    *   the front controller, but may also be decorated.
@@ -327,6 +329,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   the application root will be computed.
    */
   public function __construct($environment, $class_loader, $allow_dumping = TRUE, $app_root = NULL) {
+    if ($environment instanceof AppContext) {
+      $environment = $environment->getEnvironment();
+    }
     $this->environment = $environment;
     $this->classLoader = $class_loader;
     $this->allowDumping = $allow_dumping;
