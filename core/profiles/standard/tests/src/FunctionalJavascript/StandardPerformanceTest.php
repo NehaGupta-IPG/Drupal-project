@@ -444,7 +444,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 12,
+      'CacheTagLookupQueryCount' => 7,
       'CacheTagGroupedLookups' => [
         // Form submission and login.
         [
@@ -482,18 +482,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
           'config:search.settings',
         ],
         ['config:system.menu.account', 'config:system.menu.main'],
-        ['config:block.block.stark_search_form_wide'],
-        ['config:block.block.stark_messages'],
-        ['config:block.block.stark_help'],
-        ['config:block.block.stark_powered'],
         [
-          'config:block.block.stark_account_menu',
-          'config:block.block.stark_breadcrumbs',
-          'config:block.block.stark_main_menu',
-          'config:block.block.stark_primary_admin_actions',
-        ],
-        [
-          'config:block.block.stark_primary_local_tasks',
           'config:user.role.authenticated',
         ],
       ],
