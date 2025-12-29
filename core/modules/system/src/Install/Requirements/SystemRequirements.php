@@ -987,6 +987,17 @@ class SystemRequirements implements InstallRequirementsInterface {
         $requirements['entity_update']['value'] = t('Mismatched entity and/or field definitions');
         $requirements['entity_update']['description'] = t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]);
       }
+
+      $revision_uuid_update = \Drupal::state()->get('revision_uuid_update');
+      if (!empty($revision_uuid_update)) {
+        $requirements['entity_field_value_update'] = [
+          'severity' => RequirementSeverity::Warning,
+          'value' => t('Field value updates required'),
+          'description' => t('There are fields with the incorrect value which need updating. <a href=":update">Update field values</a>.', [
+            ':update' => Url::fromRoute('system.field_value_updater')
+          ]),
+        ];
+      }
     }
 
     // Display the deployment identifier if set.

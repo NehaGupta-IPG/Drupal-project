@@ -443,6 +443,7 @@ trait EntityDefinitionTestTrait {
     if ($revisionable) {
       $keys = $entity_type->getKeys();
       $keys['revision'] = 'revision_id';
+      $keys['revision_uuid'] = 'revision_uuid';
       $entity_type->set('entity_keys', $keys);
       $entity_type->set('revision_table', 'entity_test_update_revision');
     }

@@ -42,6 +42,7 @@ use Drupal\block_content\BlockContentInterface;
   entity_keys: [
     'id' => 'id',
     'revision' => 'revision_id',
+    'revision_uuid' => 'revision_uuid',
     'bundle' => 'type',
     'label' => 'info',
     'langcode' => 'langcode',

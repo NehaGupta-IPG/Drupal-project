@@ -129,9 +129,9 @@ class EntityTypeTest extends UnitTestCase {
    */
   public static function providerTestGetKeys(): array {
     return [
-      [[], ['revision' => '', 'bundle' => '', 'langcode' => '']],
-      [['id' => 'id'], ['id' => 'id', 'revision' => '', 'bundle' => '', 'langcode' => '']],
-      [['bundle' => 'bundle'], ['bundle' => 'bundle', 'revision' => '', 'langcode' => '']],
+      [[], ['revision' => '', 'revision_uuid' => '', 'bundle' => '', 'langcode' => '']],
+      [['id' => 'id'], ['id' => 'id', 'revision' => '', 'revision_uuid' => '', 'bundle' => '', 'langcode' => '']],
+      [['bundle' => 'bundle'], ['bundle' => 'bundle', 'revision' => '', 'revision_uuid' => '', 'langcode' => '']],
     ];
   }
 

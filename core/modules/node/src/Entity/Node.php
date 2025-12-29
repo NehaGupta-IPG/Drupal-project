@@ -34,6 +34,7 @@ use Drupal\user\EntityOwnerTrait;
   entity_keys: [
     'id' => 'nid',
     'revision' => 'vid',
+    'revision_uuid' => 'revision_uuid',
     'bundle' => 'type',
     'label' => 'title',
     'langcode' => 'langcode',

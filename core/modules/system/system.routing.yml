@@ -526,6 +526,14 @@ system.linkset_settings:
   requirements:
     _permission: 'administer site configuration'
 
+system.field_value_updater:
+  path: '/admin/reports/field_value_updater'
+  defaults:
+    _controller: '\Drupal\system\Controller\FieldValueUpdater::update'
+    _title: 'Field value updater'
+  requirements:
+    _permission: 'access site reports'
+
 route_callbacks:
   - '\Drupal\system\Routing\AssetRoutes::routes'
   - '\Drupal\system\Routing\MenuLinksetRoutes::routes'

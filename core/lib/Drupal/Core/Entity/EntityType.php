@@ -346,6 +346,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
     // Ensure defaults.
     $this->entity_keys += [
       'revision' => '',
+      'revision_uuid' => '',
       'bundle' => '',
       'langcode' => '',
       'default_langcode' => 'default_langcode',

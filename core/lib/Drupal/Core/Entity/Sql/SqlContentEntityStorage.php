@@ -66,6 +66,13 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   protected $revisionKey = FALSE;
 
   /**
+   * The entity revision_uuid key.
+   *
+   * @var string|bool
+   */
+  protected $revisionUuidKey = FALSE;
+
+  /**
    * The entity langcode key.
    *
    * @var string|bool
@@ -197,6 +204,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     // are correctly reflected in the table layout.
     $this->tableMapping = NULL;
     $this->revisionKey = NULL;
+    $this->revisionUuidKey = NULL;
     $this->revisionTable = NULL;
     $this->dataTable = NULL;
     $this->revisionDataTable = NULL;
@@ -206,6 +214,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $revisionable = $this->entityType->isRevisionable();
     if ($revisionable) {
       $this->revisionKey = $this->entityType->getKey('revision') ?: 'revision_id';
+      $this->revisionUuidKey = $this->entityType->getKey('revision_uuid');
       $this->revisionTable = $table_mapping->getRevisionTable();
     }
     $translatable = $this->entityType->isTranslatable();

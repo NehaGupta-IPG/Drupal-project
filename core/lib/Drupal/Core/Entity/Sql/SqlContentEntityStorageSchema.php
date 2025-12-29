@@ -1625,6 +1625,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
             if (!empty($schema[$table_name]['unique keys'])) {
               foreach ($schema[$table_name]['unique keys'] as $name => $specifier) {
                 $schema_handler->addUniqueKey($table_name, $name, $specifier);
+                // Check if the unique key exists because it might already have
+                // been created as part of the earlier entity type update event.
+                $this->addUniqueKey($table_name, $name, $specifier);
               }
             }
           }
@@ -2477,7 +2480,20 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   Returns TRUE if there are schema changes in the column definitions.
    */
   protected function hasColumnChanges(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
-    if ($storage_definition->getColumns() != $original->getColumns()) {
+    // Remove any fields that can be changed in the column array structure such
+    // as initial.
+    $new_columns = $storage_definition->getColumns();
+    $original_columns = $original->getColumns();
+    foreach ($new_columns as $delta => $column) {
+      foreach ($column as $key => $value) {
+        if (in_array($key, ['initial', 'initial_from_field'], TRUE)) {
+          unset($new_columns[$delta][$key]);
+          unset($original_columns[$delta][$key]);
+        }
+      }
+    }
+    if ($new_columns != $original_columns) {
+
       // Base field definitions have schema data stored in the original
       // definition.
       return TRUE;
