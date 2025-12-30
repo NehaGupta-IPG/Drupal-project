@@ -42,7 +42,6 @@ use Drupal\block_content\BlockContentInterface;
   entity_keys: [
     'id' => 'id',
     'revision' => 'revision_id',
-    'revision_uuid' => 'revision_uuid',
     'bundle' => 'type',
     'label' => 'info',
     'langcode' => 'langcode',
@@ -101,6 +100,7 @@ use Drupal\block_content\BlockContentInterface;
     'revision_user' => 'revision_user',
     'revision_created' => 'revision_created',
     'revision_log_message' => 'revision_log',
+    'revision_uuid' => 'revision_uuid',
   ],
 )]
 class BlockContent extends EditorialContentEntityBase implements BlockContentInterface {

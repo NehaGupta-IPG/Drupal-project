@@ -548,12 +548,4 @@ class SystemHooks {
     }
   }
 
-  /**
-   * Updates the revisions UUID field.
-   */
-  #[Hook('cron')]
-  public function updateRevisionsUuid(): void {
-    \Drupal::service('system.revision_uuid_updater')->update();
-  }
-
 }

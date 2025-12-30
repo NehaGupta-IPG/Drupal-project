@@ -970,11 +970,13 @@ class SystemRequirements implements InstallRequirementsInterface {
         'title' => t('Entity/field definitions'),
         'value' => t('Up to date'),
       ];
+
+      $entity_type_manager = \Drupal::entityTypeManager();
       // Verify that no entity updates are pending.
       if ($change_list = \Drupal::entityDefinitionUpdateManager()->getChangeSummary()) {
         $build = [];
         foreach ($change_list as $entity_type_id => $changes) {
-          $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+          $entity_type = $entity_type_manager->getDefinition($entity_type_id);
           $build[] = [
             '#theme' => 'item_list',
             '#title' => $entity_type->getLabel(),
@@ -988,13 +990,25 @@ class SystemRequirements implements InstallRequirementsInterface {
         $requirements['entity_update']['description'] = t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]);
       }
 
-      $revision_uuid_update = \Drupal::state()->get('revision_uuid_update');
-      if (!empty($revision_uuid_update)) {
-        $requirements['entity_field_value_update'] = [
+      $queue_worker_manager = \Drupal::service('plugin.manager.queue_worker');
+      $unprocessed_entity_types = [];
+      foreach ($queue_worker_manager->getDefinitions() as $pluginId => $definition) {
+        if (str_starts_with($pluginId, 'revision_uuid_update:')) {
+          $worker = $queue_worker_manager->createInstance($pluginId);
+          $queue = \Drupal::queue($pluginId);
+          $queue->createQueue();
+          if ($queue->numberOfItems()) {
+            $unprocessed_entity_types[] = $entity_type_manager->getDefinition($worker->getDerivativeId())->getLabel();
+          }
+        }
+      }
+
+      if ($unprocessed_entity_types) {
+        $requirements['entity_revision_missing_uuid'] = [
           'severity' => RequirementSeverity::Warning,
-          'value' => t('Field value updates required'),
-          'description' => t('There are fields with the incorrect value which need updating. <a href=":update">Update field values</a>.', [
-            ':update' => Url::fromRoute('system.field_value_updater')
+          'value' => t('Revisions missing UUID'),
+          'description' => t('The following entity types have revisions with empty UUIDs: %types. The update process is queued and runs on cron. Is the cron processing enabled? To speed up the process, you can use a command-line tool, such as Drush, and run the queue for each unprocessed entity type. E.g., for the Node entity type run the <code>revision_uuid_update:node</code> queue.', [
+            '%types' => implode(', ', $unprocessed_entity_types),
           ]),
         ];
       }
