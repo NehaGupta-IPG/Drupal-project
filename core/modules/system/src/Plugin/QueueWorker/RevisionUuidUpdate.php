@@ -17,6 +17,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Updates the UUIDs for the entity revisions missing them.
+ *
+ * Each instance is derived by an entity type which supports revisions UUID. The
+ * queue item data has no importance, usually is NULL. When the worker is called
+ * to process an item, it updates a limited set of entities. If there are still
+ * unprocessed entities left, it re-queues itself and resolve the rest of the
+ * entities on the following run.
  */
 #[QueueWorker(
   id: 'revision_uuid_update',
