@@ -108,7 +108,6 @@ class EntityDefinitionUpdateMultipleTypesTest extends EntityKernelTestBase {
         // created.
         'The Revision ID field needs to be installed.',
         'The Default revision field needs to be installed.',
-        'The ' . $this->entityFieldManager->getFieldStorageDefinitions('entity_test_update')['revision_uuid']->getLabel() . ' field needs to be installed.',
       ],
     ];
     $this->assertEquals($expected, $this->entityDefinitionUpdateManager->getChangeSummary(), 'EntityDefinitionUpdateManager reports the expected change summary.');

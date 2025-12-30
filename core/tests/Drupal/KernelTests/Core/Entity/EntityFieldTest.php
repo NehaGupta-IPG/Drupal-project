@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\Entity;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -645,8 +646,9 @@ class EntityFieldTest extends EntityKernelTestBase {
     ];
 
     // Adding empty string for revision message.
-    if ($uuid = $entity->getRevisionUuid()) {
-      $target_strings[] = $uuid;
+    if ($entity instanceof RevisionLogInterface) {
+      // Adding empty string for revision message.
+      $target_strings[] = '';
     }
 
     asort($strings);
