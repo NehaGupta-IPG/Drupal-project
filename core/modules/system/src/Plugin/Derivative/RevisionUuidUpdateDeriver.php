@@ -11,6 +11,9 @@ use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Derives the revision_uuid_update plugin by entities supporting revision UUID.
+ */
 class RevisionUuidUpdateDeriver extends DeriverBase implements ContainerDeriverInterface {
 
   use StringTranslationTrait;

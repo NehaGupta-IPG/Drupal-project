@@ -190,7 +190,7 @@ function system_update_11301(): void {
 
       // Install the new field storage definition.
       $provider = $entity_type->getProvider();
-      $update_manager->installFieldStorageDefinition($field_name, $entity_type_id,  $provider, $definition);
+      $update_manager->installFieldStorageDefinition($field_name, $entity_type_id, $provider, $definition);
 
       // Queue this entity type to update revisions UUIDs.
       $queue = \Drupal::queue("revision_uuid_update:$entity_type_id");

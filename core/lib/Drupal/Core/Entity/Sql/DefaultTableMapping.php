@@ -206,9 +206,6 @@ class DefaultTableMapping implements TableMappingInterface {
         $revision_key_fields[] = $table_mapping->revisionUuidKey;
       }
       $table_mapping->setFieldNames($table_mapping->revisionTable, array_unique(array_merge($revision_key_fields, $revisionable_fields)));
-
-
-
     }
     elseif (!$revisionable && $translatable) {
       // Multilingual layouts store key field values in the base table. The
@@ -246,7 +243,10 @@ class DefaultTableMapping implements TableMappingInterface {
       $table_mapping->setFieldNames($table_mapping->revisionTable, $revision_base_fields);
 
       $revision_data_key_fields = [$id_key, $revision_key, $langcode_key];
-      $revision_data_fields = array_diff($revisionable_fields, $revision_metadata_fields, [$langcode_key, $revision_uuid_key]);
+      $revision_data_fields = array_diff($revisionable_fields, $revision_metadata_fields, [
+        $langcode_key,
+        $revision_uuid_key,
+      ]);
       $table_mapping->setFieldNames($table_mapping->revisionDataTable, array_unique(array_merge($revision_data_key_fields, $revision_data_fields)));
     }
 

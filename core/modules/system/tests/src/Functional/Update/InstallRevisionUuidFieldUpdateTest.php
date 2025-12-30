@@ -38,7 +38,6 @@ class InstallRevisionUuidFieldUpdateTest extends UpdatePathTestBase {
     $this->runUpdates();
     $this->runQueues();
 
-
     $manager = \Drupal::entityTypeManager();
     \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
 
