@@ -91,8 +91,6 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *     revision ID of the entity. It is assumed that all revision IDs are
    *     unique across all entities of a type. If this entry is omitted the
    *     entities of this type are not revisionable.
-   *   - revision_uuid: (optional) The name of the property that contains the
-   *     revision UUID of the entity.
    *   - bundle: (optional) The name of the property that contains the bundle
    *     name for the entity. The bundle name defines which set of fields are
    *     attached to the entity (e.g. what nodes call "content type"). This

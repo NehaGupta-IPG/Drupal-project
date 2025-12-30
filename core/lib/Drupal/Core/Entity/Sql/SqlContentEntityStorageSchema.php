@@ -2480,20 +2480,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   Returns TRUE if there are schema changes in the column definitions.
    */
   protected function hasColumnChanges(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
-    // Remove any fields that can be changed in the column array structure such
-    // as initial.
-    $new_columns = $storage_definition->getColumns();
-    $original_columns = $original->getColumns();
-    foreach ($new_columns as $delta => $column) {
-      foreach ($column as $key => $value) {
-        if (in_array($key, ['initial', 'initial_from_field'], TRUE)) {
-          unset($new_columns[$delta][$key]);
-          unset($original_columns[$delta][$key]);
-        }
-      }
-    }
-    if ($new_columns != $original_columns) {
-
+    if ($storage_definition->getColumns() != $original->getColumns()) {
       // Base field definitions have schema data stored in the original
       // definition.
       return TRUE;

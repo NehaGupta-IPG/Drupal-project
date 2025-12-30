@@ -170,7 +170,6 @@ class DefaultTableMapping implements TableMappingInterface {
     $revision_key = $entity_type->getKey('revision');
     $bundle_key = $entity_type->getKey('bundle');
     $uuid_key = $entity_type->getKey('uuid');
-    $revision_uuid_key = $entity_type->getKey('revision_uuid');
     $langcode_key = $entity_type->getKey('langcode');
 
     $shared_table_definitions = array_filter($storage_definitions, function (FieldStorageDefinitionInterface $definition) use ($table_mapping) {
@@ -202,10 +201,6 @@ class DefaultTableMapping implements TableMappingInterface {
       $table_mapping->setFieldNames($table_mapping->baseTable, array_diff($all_fields, $revision_metadata_fields));
       $revision_key_fields = [$id_key, $revision_key];
       $table_mapping->setFieldNames($table_mapping->revisionTable, array_merge($revision_key_fields, $revisionable_fields));
-      if (!empty($table_mapping->revisionUuidKey)) {
-        $revision_key_fields[] = $table_mapping->revisionUuidKey;
-      }
-      $table_mapping->setFieldNames($table_mapping->revisionTable, array_unique(array_merge($revision_key_fields, $revisionable_fields)));
     }
     elseif (!$revisionable && $translatable) {
       // Multilingual layouts store key field values in the base table. The
@@ -232,22 +227,16 @@ class DefaultTableMapping implements TableMappingInterface {
       // Like in the multilingual, non-revisionable case the UUID is not
       // in the data table. Additionally, do not store revision metadata
       // fields in the data table.
-      $data_fields = array_values(array_diff($all_fields, [$uuid_key, $revision_uuid_key], $revision_metadata_fields));
+      $data_fields = array_values(array_unique(array_merge([$id_key], array_diff($all_fields, [$uuid_key], $revision_metadata_fields))));
 
       $table_mapping->setFieldNames($table_mapping->dataTable, $data_fields);
 
       $revision_base_fields = array_merge([$id_key, $revision_key, $langcode_key], $revision_metadata_fields);
-      if (!empty($revision_uuid_key)) {
-        $revision_base_fields[] = $revision_uuid_key;
-      }
       $table_mapping->setFieldNames($table_mapping->revisionTable, $revision_base_fields);
 
       $revision_data_key_fields = [$id_key, $revision_key, $langcode_key];
-      $revision_data_fields = array_diff($revisionable_fields, $revision_metadata_fields, [
-        $langcode_key,
-        $revision_uuid_key,
-      ]);
-      $table_mapping->setFieldNames($table_mapping->revisionDataTable, array_unique(array_merge($revision_data_key_fields, $revision_data_fields)));
+      $revision_data_fields = array_diff($revisionable_fields, $revision_metadata_fields, [$langcode_key]);
+      $table_mapping->setFieldNames($table_mapping->revisionDataTable, array_merge($revision_data_key_fields, $revision_data_fields));
     }
 
     // Add dedicated tables.
