@@ -123,6 +123,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function offsetExists(mixed $offset): bool {
+    @trigger_error('Accessing ' . $offset . ' via array access in ' . __METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use the -> operator on the ConnectionParameters object instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     if (property_exists($this, $offset)) {
       return TRUE;
     }
@@ -133,6 +134,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function &offsetGet(mixed $offset): mixed {
+    @trigger_error('Accessing ' . $offset . ' via array access in ' . __METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use the -> operator on the ConnectionParameters object instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     if (property_exists($this, $offset)) {
       // Need to use a temp variable and not $this->{$offset} directly here
       // because if properties are defined as readonly, the & reference
@@ -148,6 +150,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function offsetSet(mixed $offset, mixed $value): void {
+    @trigger_error('Accessing ' . $offset . ' via array access in ' . __METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use the -> operator on the ConnectionParameters object instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     if (property_exists($this, $offset)) {
       $this->{$offset} = $value;
       return;
@@ -159,6 +162,7 @@ abstract class ConnectionParametersBase implements ConnectionParametersInterface
    * This is for BC support only.
    */
   public function offsetUnset(mixed $offset): void {
+    @trigger_error('Accessing ' . $offset . ' via array access in ' . __METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Use the -> operator on the ConnectionParameters object instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     if (property_exists($this, $offset)) {
       $this->{$offset} = NULL;
       return;
