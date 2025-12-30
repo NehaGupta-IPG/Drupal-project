@@ -201,17 +201,17 @@ class TextareaWithSummaryTest extends WebDriverTestBase {
     $summary = "This is summary text with a newline.\r\n";
     $value = "This is the body value text with a newline.\r\n";
     $edit = [
-      'body[0][summary]' => $summary,
-      'body[0][value]' => $value,
+      'body_test[0][summary]' => $summary,
+      'body_test[0][value]' => $value,
     ];
-    $widget = $this->getSession()->getPage()->findById('edit-body-wrapper');
-    $summary_field = $widget->findField('edit-body-0-summary');
+    $widget = $this->getSession()->getPage()->findById('edit-body-test-wrapper');
+    $summary_field = $widget->findField('edit-body-test-0-summary');
     $this->assertEquals(FALSE, $summary_field->isVisible());
     $widget->pressButton('Edit summary');
     $this->submitForm($edit, 'Save');
     $node = Node::load($node->id());
-    $this->assertEquals($summary, $node->get('body')->summary);
-    $this->assertEquals($value, $node->get('body')->value);
+    $this->assertEquals($summary, $node->get('body_test')->summary);
+    $this->assertEquals($value, $node->get('body_test')->value);
   }
 
 }
