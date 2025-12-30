@@ -5,6 +5,7 @@
  * Functions to support Olivero theme settings.
  */
 
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -125,6 +126,7 @@ function olivero_form_system_theme_settings_alter(&$form, FormStateInterface $fo
       'before' => t('Before comments'),
       'after' => t('After comments'),
     ],
-    '#default_value' => theme_get_setting('comment_form_position'),
+    '#default_value' => \Drupal::service(ThemeSettingsProvider::class)
+      ->getSetting('comment_form_position'),
   ];
 }
