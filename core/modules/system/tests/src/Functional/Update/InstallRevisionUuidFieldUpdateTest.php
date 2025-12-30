@@ -7,7 +7,6 @@ namespace Drupal\Tests\node\Functional\Update;
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
-use Drupal\Tests\Traits\Core\CronRunTrait;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,8 +18,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('Update')]
 #[RunTestsInSeparateProcesses]
 class InstallRevisionUuidFieldUpdateTest extends UpdatePathTestBase {
-
-  use CronRunTrait;
 
   /**
    * {@inheritdoc}
