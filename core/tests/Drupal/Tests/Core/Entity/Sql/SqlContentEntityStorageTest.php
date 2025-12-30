@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Entity\Sql;
 
 use Drupal\Component\Datetime\Time;
+use Drupal\Component\Uuid\Php;
 use Drupal\Core\Cache\MemoryCache\MemoryCache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityFieldManager;
@@ -438,6 +439,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
         new MemoryCache(new Time()),
         $this->entityTypeBundleInfo,
         $this->entityTypeManager->reveal(),
+        new Php(),
       ])
       ->onlyMethods(['getStorageSchema'])
       ->getMock();
@@ -1208,7 +1210,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->getActiveFieldStorageDefinitions($this->entityType->id())
       ->willReturn($this->fieldDefinitions);
 
-    $this->entityStorage = new SqlContentEntityStorage($this->entityType, $this->connection, $this->entityFieldManager->reveal(), $this->cache, $this->languageManager, new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal());
+    $this->entityStorage = new SqlContentEntityStorage($this->entityType, $this->connection, $this->entityFieldManager->reveal(), $this->cache, $this->languageManager, new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal(), new Php());
     $this->entityStorage->setModuleHandler($this->moduleHandler);
   }
 
@@ -1303,6 +1305,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
         $this->cache,
         $this->languageManager,
         new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal(),
+        new Php(),
       ])
       ->onlyMethods(['getFromStorage', 'invokeStorageLoadHook', 'initTableLayout'])
       ->getMock();
@@ -1378,6 +1381,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
         $this->cache,
         $this->languageManager,
         new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal(),
+        new Php(),
       ])
       ->onlyMethods(['getFromStorage', 'invokeStorageLoadHook', 'initTableLayout'])
       ->getMock();
@@ -1441,7 +1445,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
       ->getActiveFieldStorageDefinitions($this->entityType->id())
       ->willReturn($this->fieldDefinitions);
 
-    $this->entityStorage = new SqlContentEntityStorage($this->entityType, $database, $this->entityFieldManager->reveal(), $this->cache, $this->languageManager, new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal());
+    $this->entityStorage = new SqlContentEntityStorage($this->entityType, $database, $this->entityFieldManager->reveal(), $this->cache, $this->languageManager, new MemoryCache(new Time()), $this->entityTypeBundleInfo, $this->entityTypeManager->reveal(), new Php());
 
     $result = $this->entityStorage->hasData();
 
