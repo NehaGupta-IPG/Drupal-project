@@ -24,24 +24,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class FieldFormatter extends Plugin {
 
-  /**
-   * Constructs a FieldFormatter attribute.
-   *
-   * @param string $id
-   *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
-   *   (optional) The human-readable name of the formatter type.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
-   *   (optional) A short description of the formatter type.
-   * @param string[] $field_types
-   *   (optional) An array of field types the formatter supports.
-   * @param int|null $weight
-   *   (optional) An integer to determine the weight of this formatter.
-   *   Weight is relative to other formatters in the Field UI when selecting a
-   *   formatter for a given field instance.
-   * @param class-string|null $deriver
-   *   (optional) The deriver class.
-   */
   public function __construct(
     public readonly string $id,
     public readonly ?TranslatableMarkup $label = NULL,

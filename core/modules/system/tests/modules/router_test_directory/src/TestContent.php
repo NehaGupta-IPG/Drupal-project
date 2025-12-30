@@ -21,9 +21,6 @@ class TestContent extends ControllerBase {
    */
   protected $httpKernel;
 
-  /**
-   * Constructs a TestContent instance.
-   */
   public function __construct(HttpKernelInterface $http_kernel) {
     $this->httpKernel = $http_kernel;
   }

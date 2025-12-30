@@ -34,9 +34,6 @@ final class PhpRequirements {
     '8.3' => '2027-12-31',
   ];
 
-  /**
-   * This class should not be instantiated.
-   */
   private function __construct() {
   }
 

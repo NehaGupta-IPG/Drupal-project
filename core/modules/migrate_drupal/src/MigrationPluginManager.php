@@ -46,20 +46,6 @@ class MigrationPluginManager extends BaseMigrationPluginManager {
    */
   protected $enforcedSourceModuleTags;
 
-  /**
-   * MigrationPluginManager constructor.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager service.
-   * @param \Drupal\migrate\Plugin\MigrateSourcePluginManager $source_manager
-   *   The Migrate source plugin manager service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   */
   public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager, MigrateSourcePluginManager $source_manager, ConfigFactoryInterface $config_factory) {
     parent::__construct($module_handler, $cache_backend, $language_manager);
     $this->sourceManager = $source_manager;

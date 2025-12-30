@@ -17,9 +17,6 @@ class BatchController implements ContainerInjectionInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new BatchController.
-   */
   public function __construct(
     protected string $root,
     protected BatchStorageInterface $batchStorage,

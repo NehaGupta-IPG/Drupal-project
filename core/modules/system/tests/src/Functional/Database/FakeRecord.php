@@ -38,12 +38,6 @@ class FakeRecord {
    */
   public string $job;
 
-  /**
-   * Constructs a FakeRecord object with an optional constructor argument.
-   *
-   * @param int $fakeArg
-   *   A class variable.
-   */
   public function __construct($fakeArg = 0) {
     $this->fakeArg = $fakeArg;
   }

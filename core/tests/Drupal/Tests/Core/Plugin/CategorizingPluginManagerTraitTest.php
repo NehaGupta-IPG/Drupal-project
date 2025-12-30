@@ -128,14 +128,6 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
 
   use CategorizingPluginManagerTrait;
 
-  /**
-   * Replace the constructor so we can instantiate a stub.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
-   *   The module extension list.
-   */
   public function __construct(ModuleHandlerInterface $module_handler, ModuleExtensionList $module_extension_list) {
     $this->moduleHandler = $module_handler;
     $this->moduleExtensionList = $module_extension_list;

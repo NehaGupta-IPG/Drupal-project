@@ -18,12 +18,6 @@ class LanguageConfigOverrideCrudEvent extends Event {
    */
   protected $override;
 
-  /**
-   * Constructs a configuration event object.
-   *
-   * @param \Drupal\language\Config\LanguageConfigOverride $override
-   *   Configuration object.
-   */
   public function __construct(LanguageConfigOverride $override) {
     $this->override = $override;
   }

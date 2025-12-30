@@ -25,16 +25,6 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
    */
   protected $entityTypes;
 
-  /**
-   * Constructs a new EntityDisplayModeListBuilder object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
-   * @param \Drupal\Core\Entity\EntityTypeInterface[] $entity_types
-   *   List of all entity types.
-   */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, array $entity_types) {
     parent::__construct($entity_type, $storage);
 

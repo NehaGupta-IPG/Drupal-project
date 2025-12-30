@@ -22,9 +22,6 @@ use Drupal\Core\TypedData\TypedDataInterface;
  */
 class Mapping extends ArrayElement {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
     assert($definition instanceof MapDataDefinition);
     // Validate basic structure.

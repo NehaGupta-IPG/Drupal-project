@@ -19,9 +19,6 @@ use Symfony\Component\Validator\Constraints\EmailValidator;
 )]
 class EmailConstraint extends Email {
 
-  /**
-   * {@inheritdoc}
-   */
   #[HasNamedArguments]
   public function __construct(...$args) {
     $this->mode = static::VALIDATION_MODE_STRICT;

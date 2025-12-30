@@ -34,24 +34,6 @@ class ShortcutSetStorage extends ConfigEntityStorage implements ShortcutSetStora
    */
   protected $connection;
 
-  /**
-   * Constructs a ShortcutSetStorageController object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
-   *   The entity info for the entity type.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
-   *   The UUID service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
-   *   The memory cache.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   */
   public function __construct(EntityTypeInterface $entity_info, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, Connection $connection) {
     parent::__construct($entity_info, $config_factory, $uuid_service, $language_manager, $memory_cache);
 

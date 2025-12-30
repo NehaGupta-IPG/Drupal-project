@@ -41,9 +41,6 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
    */
   protected $entityFieldManager;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $values, $entity_type) {
     // Set $entityFieldManager before calling the parent constructor because the
     // constructor will call init() which then calls setComponent() which needs

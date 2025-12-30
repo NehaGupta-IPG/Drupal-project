@@ -21,9 +21,6 @@ use Symfony\Component\Validator\Constraints\Range;
 )]
 class RangeConstraint extends Range {
 
-  /**
-   * {@inheritdoc}
-   */
   #[HasNamedArguments]
   public function __construct(...$args) {
     $this->notInRangeMessage = 'This value should be between %min and %max.';

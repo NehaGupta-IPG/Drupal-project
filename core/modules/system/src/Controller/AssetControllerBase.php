@@ -63,26 +63,6 @@ abstract class AssetControllerBase extends FileDownloadController {
    */
   protected const CACHE_CONTROL = 'private, no-store';
 
-  /**
-   * Constructs an object derived from AssetControllerBase.
-   *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
-   *   The stream wrapper manager.
-   * @param \Drupal\Core\Asset\LibraryDependencyResolverInterface $libraryDependencyResolver
-   *   The library dependency resolver.
-   * @param \Drupal\Core\Asset\AssetResolverInterface $assetResolver
-   *   The asset resolver.
-   * @param \Drupal\Core\Theme\ThemeInitializationInterface $themeInitialization
-   *   The theme initializer.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
-   *   The theme manager.
-   * @param \Drupal\Core\Asset\AssetCollectionGrouperInterface $grouper
-   *   The asset grouper.
-   * @param \Drupal\Core\Asset\AssetCollectionOptimizerInterface $optimizer
-   *   The asset collection optimizer.
-   * @param \Drupal\Core\Asset\AssetDumperUriInterface $dumper
-   *   The asset dumper.
-   */
   public function __construct(
     StreamWrapperManagerInterface $streamWrapperManager,
     protected readonly LibraryDependencyResolverInterface $libraryDependencyResolver,

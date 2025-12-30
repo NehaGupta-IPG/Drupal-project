@@ -16,18 +16,6 @@ class EnforcedResponseException extends \Exception {
    */
   protected $response;
 
-  /**
-   * Constructs a new enforced response exception.
-   *
-   * @param \Symfony\Component\HttpFoundation\Response $response
-   *   The response to be enforced.
-   * @param string $message
-   *   (optional) The exception message.
-   * @param int $code
-   *   (optional) A user defined exception code.
-   * @param \Throwable $previous
-   *   (optional) The previous exception for nested exceptions.
-   */
   public function __construct(Response $response, $message = "", $code = 0, ?\Throwable $previous = NULL) {
     parent::__construct($message, $code, $previous);
 

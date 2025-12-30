@@ -34,14 +34,6 @@ class LayoutBuilderOverridesPermissions implements ContainerInjectionInterface {
    */
   protected $bundleInfo;
 
-  /**
-   * LayoutBuilderOverridesPermissions constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
-   *   The bundle info service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info) {
     $this->entityTypeManager = $entity_type_manager;
     $this->bundleInfo = $bundle_info;

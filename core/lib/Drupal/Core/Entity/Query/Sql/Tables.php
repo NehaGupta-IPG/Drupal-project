@@ -64,10 +64,6 @@ class Tables implements TablesInterface {
    */
   protected $caseSensitiveFields = [];
 
-  /**
-   * @param \Drupal\Core\Database\Query\SelectInterface $sql_query
-   *   The SQL query.
-   */
   public function __construct(SelectInterface $sql_query) {
     $this->sqlQuery = $sql_query;
     $this->entityTypeManager = \Drupal::entityTypeManager();

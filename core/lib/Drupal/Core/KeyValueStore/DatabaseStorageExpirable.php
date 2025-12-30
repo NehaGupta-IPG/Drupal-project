@@ -14,20 +14,6 @@ use Drupal\Core\Database\Connection;
  */
 class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreExpirableInterface {
 
-  /**
-   * Overrides Drupal\Core\KeyValueStore\StorageBase::__construct().
-   *
-   * @param string $collection
-   *   The name of the collection holding key and value pairs.
-   * @param \Drupal\Component\Serialization\SerializationInterface $serializer
-   *   The serialization class to use.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection to use.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param string $table
-   *   The name of the SQL table to use, defaults to key_value_expire.
-   */
   public function __construct(
     $collection,
     SerializationInterface $serializer,

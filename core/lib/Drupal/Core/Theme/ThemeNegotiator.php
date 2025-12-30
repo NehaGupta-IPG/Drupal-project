@@ -34,16 +34,6 @@ class ThemeNegotiator implements ThemeNegotiatorInterface {
    */
   protected $classResolver;
 
-  /**
-   * Constructs a new ThemeNegotiator.
-   *
-   * @param \Drupal\Core\Theme\ThemeAccessCheck $theme_access
-   *   The access checker for themes.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   The class resolver.
-   * @param string[] $negotiators
-   *   An array of negotiator IDs.
-   */
   public function __construct(ThemeAccessCheck $theme_access, ClassResolverInterface $class_resolver, array $negotiators) {
     $this->themeAccess = $theme_access;
     $this->negotiators = $negotiators;

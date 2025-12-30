@@ -30,38 +30,6 @@ class CompiledRoute extends SymfonyCompiledRoute {
    */
   protected $numParts;
 
-  /**
-   * Constructs a new compiled route object.
-   *
-   * This is a ridiculously long set of constructor parameters, but as this
-   * object is little more than a collection of values it's not a serious
-   * problem. The parent Symfony class does the same, as well, making it
-   * difficult to override differently.
-   *
-   * @param int $fit
-   *   The fitness of the route.
-   * @param string $pattern_outline
-   *   The pattern outline for this route.
-   * @param int $num_parts
-   *   The number of parts in the path.
-   * @param string $staticPrefix
-   *   The static prefix of the compiled route.
-   * @param string $regex
-   *   The regular expression to use to match this route.
-   * @param array $tokens
-   *   An array of tokens to use to generate URL for this route.
-   * @param array $pathVariables
-   *   An array of path variables.
-   * @param string|null $hostRegex
-   *   Host regex.
-   * @param array $hostTokens
-   *   Host tokens.
-   * @param array $hostVariables
-   *   An array of host variables.
-   * @param array $variables
-   *   An array of variables (variables defined in the path and in the host
-   *   patterns)
-   */
   public function __construct($fit, $pattern_outline, $num_parts, $staticPrefix, $regex, array $tokens, array $pathVariables, $hostRegex = NULL, array $hostTokens = [], array $hostVariables = [], array $variables = []) {
     parent::__construct($staticPrefix, $regex, $tokens, $pathVariables, $hostRegex, $hostTokens, $hostVariables, $variables);
 

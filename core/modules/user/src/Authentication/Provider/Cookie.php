@@ -46,16 +46,6 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
    */
   protected $messenger;
 
-  /**
-   * Constructs a new cookie authentication provider.
-   *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
-   *   The session configuration.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
   public function __construct(SessionConfigurationInterface $session_configuration, Connection $connection, MessengerInterface $messenger) {
     $this->sessionConfiguration = $session_configuration;
     $this->connection = $connection;

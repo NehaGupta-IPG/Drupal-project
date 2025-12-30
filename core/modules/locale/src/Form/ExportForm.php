@@ -33,14 +33,6 @@ class ExportForm extends FormBase {
    */
   protected $fileSystem;
 
-  /**
-   * Constructs a new ExportForm.
-   *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file system service.
-   */
   public function __construct(LanguageManagerInterface $language_manager, FileSystemInterface $file_system) {
     $this->languageManager = $language_manager;
     $this->fileSystem = $file_system;

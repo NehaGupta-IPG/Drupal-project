@@ -69,25 +69,6 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    */
   protected $language;
 
-  /**
-   * ResourceObject constructor.
-   *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
-   *   The cacheability for the resource object.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
-   *   The JSON:API resource type of the resource object.
-   * @param string $id
-   *   The resource object's ID.
-   * @param mixed|null $revision_id
-   *   The resource object's version identifier. NULL, if the resource object is
-   *   not versionable.
-   * @param array $fields
-   *   An array of the resource object's fields, keyed by public field name.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
-   *   The links for the resource object.
-   * @param \Drupal\Core\Language\LanguageInterface|null $language
-   *   (optional) The resource language.
-   */
   public function __construct(CacheableDependencyInterface $cacheability, ResourceType $resource_type, $id, $revision_id, array $fields, LinkCollection $links, ?LanguageInterface $language = NULL) {
     assert(is_null($revision_id) || $resource_type->isVersionable());
     $this->setCacheability($cacheability);

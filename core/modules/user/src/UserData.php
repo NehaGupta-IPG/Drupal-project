@@ -16,12 +16,6 @@ class UserData implements UserDataInterface {
    */
   protected $connection;
 
-  /**
-   * Constructs a new user data service.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection to use.
-   */
   public function __construct(Connection $connection) {
     $this->connection = $connection;
   }

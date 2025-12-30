@@ -40,16 +40,6 @@ class LinkGenerator implements LinkGeneratorInterface {
    */
   protected $renderer;
 
-  /**
-   * Constructs a LinkGenerator instance.
-   *
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
-   *   The URL generator.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   */
   public function __construct(UrlGeneratorInterface $url_generator, ModuleHandlerInterface $module_handler, RendererInterface $renderer) {
     $this->urlGenerator = $url_generator;
     $this->moduleHandler = $module_handler;

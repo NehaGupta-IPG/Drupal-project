@@ -39,16 +39,6 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a new UserMultipleCancelConfirm.
-   *
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *   The temp store factory.
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(PrivateTempStoreFactory $temp_store_factory, UserStorageInterface $user_storage, EntityTypeManagerInterface $entity_type_manager) {
     $this->tempStoreFactory = $temp_store_factory;
     $this->userStorage = $user_storage;

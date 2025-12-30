@@ -42,14 +42,6 @@ class HandlerStackConfigurator {
    */
   protected $container;
 
-  /**
-   * Constructs a new HandlerStackConfigurator object.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The service container.
-   * @param string[] $middleware_ids
-   *   The middleware IDs.
-   */
   public function __construct(ContainerInterface $container, array $middleware_ids) {
     $this->middlewareIds = $middleware_ids;
     $this->container = $container;

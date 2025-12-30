@@ -51,9 +51,6 @@ final class NavigationRenderer {
    */
   protected array $localTasks;
 
-  /**
-   * Construct a new NavigationRenderer object.
-   */
   public function __construct(
     private ConfigFactoryInterface $configFactory,
     private ModuleHandlerInterface $moduleHandler,

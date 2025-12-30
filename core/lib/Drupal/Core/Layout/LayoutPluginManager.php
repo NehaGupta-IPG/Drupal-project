@@ -30,19 +30,6 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    */
   protected $themeHandler;
 
-  /**
-   * LayoutPluginManager constructor.
-   *
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler to invoke the alter hook with.
-   */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
     parent::__construct('Plugin/Layout', $namespaces, $module_handler, LayoutInterface::class, Layout::class, 'Drupal\Core\Layout\Annotation\Layout');
     $this->themeHandler = $theme_handler;

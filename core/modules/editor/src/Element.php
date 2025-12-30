@@ -20,12 +20,6 @@ class Element implements TrustedCallbackInterface {
    */
   protected $pluginManager;
 
-  /**
-   * Constructs a new Element object.
-   *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager
-   *   The Text Editor plugin manager service.
-   */
   public function __construct(PluginManagerInterface $plugin_manager) {
     $this->pluginManager = $plugin_manager;
   }

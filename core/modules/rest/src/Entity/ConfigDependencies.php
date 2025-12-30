@@ -27,14 +27,6 @@ class ConfigDependencies implements ContainerInjectionInterface {
    */
   protected $authProviders;
 
-  /**
-   * Creates a new ConfigDependencies instance.
-   *
-   * @param string[] $format_providers
-   *   The serialization format providers, keyed by format.
-   * @param string[] $auth_providers
-   *   The authentication providers, keyed by ID.
-   */
   public function __construct(array $format_providers, array $auth_providers) {
     $this->formatProviders = $format_providers;
     $this->authProviders = $auth_providers;

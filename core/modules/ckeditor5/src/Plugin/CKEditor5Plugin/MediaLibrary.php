@@ -33,18 +33,6 @@ class MediaLibrary extends CKEditor5PluginDefault implements ContainerFactoryPlu
    */
   protected $mediaTypeStorage;
 
-  /**
-   * MediaLibrary constructor.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(array $configuration, string $plugin_id, CKEditor5PluginDefinition $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->mediaTypeStorage = $entity_type_manager->getStorage('media_type');

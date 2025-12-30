@@ -13,26 +13,6 @@ use Drupal\Core\Datetime\DrupalDateTime;
  */
 final class Announcement {
 
-  /**
-   * Construct an Announcement object.
-   *
-   * @param string $id
-   *   Unique identifier of the announcement.
-   * @param string $title
-   *   Title of the announcement.
-   * @param string $url
-   *   URL where the announcement can be seen.
-   * @param string $date_modified
-   *   When was the announcement last modified.
-   * @param string $date_published
-   *   When was the announcement published.
-   * @param string $content_html
-   *   HTML content of the announcement.
-   * @param string $version
-   *   Target Drupal version of the announcement.
-   * @param bool $featured
-   *   Whether this announcement is featured or not.
-   */
   public function __construct(
     public readonly string $id,
     public readonly string $title,

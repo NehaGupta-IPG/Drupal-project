@@ -53,18 +53,6 @@ class ConfigSubscriber implements EventSubscriberInterface {
    */
   protected $pathProcessorLanguage;
 
-  /**
-   * Constructs a new class object.
-   *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Language\LanguageDefault $language_default
-   *   The default language.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Drupal\language\LanguageNegotiatorInterface $language_negotiator
-   *   The language negotiator.
-   */
   public function __construct(LanguageManagerInterface $language_manager, LanguageDefault $language_default, ConfigFactoryInterface $config_factory, LanguageNegotiatorInterface $language_negotiator) {
     $this->languageManager = $language_manager;
     $this->languageDefault = $language_default;

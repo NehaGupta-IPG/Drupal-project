@@ -20,16 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SiteSettingsForm extends FormBase {
 
-  /**
-   * Constructs a new SiteSettingsForm.
-   *
-   * @param string $sitePath
-   *   The site path.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Extension\DatabaseDriverList $databaseDriverList
-   *   The list provider of database drivers.
-   */
   public function __construct(
     protected string $sitePath,
     protected RendererInterface $renderer,

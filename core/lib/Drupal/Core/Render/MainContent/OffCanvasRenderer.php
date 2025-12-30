@@ -30,16 +30,6 @@ class OffCanvasRenderer extends DialogRenderer {
    */
   protected $position;
 
-  /**
-   * Constructs a new OffCanvasRenderer.
-   *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
-   *   The title resolver.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param string $position
-   *   (optional) The position to render the off-canvas dialog.
-   */
   public function __construct(TitleResolverInterface $title_resolver, RendererInterface $renderer, $position = 'side') {
     parent::__construct($title_resolver, $renderer);
     $this->renderer = $renderer;

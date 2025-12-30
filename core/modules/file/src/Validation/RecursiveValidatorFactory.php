@@ -14,14 +14,6 @@ use Drupal\Core\Validation\DrupalTranslator;
  */
 class RecursiveValidatorFactory {
 
-  /**
-   * Constructs a new RecursiveValidatorFactory.
-   *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
-   *   The class resolver.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
-   *   The typed data manager.
-   */
   public function __construct(
     protected ClassResolverInterface $classResolver,
     protected TypedDataManagerInterface $typedDataManager,

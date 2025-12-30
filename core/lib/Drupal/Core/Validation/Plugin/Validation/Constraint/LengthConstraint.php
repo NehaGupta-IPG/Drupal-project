@@ -21,9 +21,6 @@ use Symfony\Component\Validator\Constraints\Length;
 )]
 class LengthConstraint extends Length {
 
-  /**
-   * {@inheritdoc}
-   */
   #[HasNamedArguments]
   public function __construct(...$args) {
     $this->maxMessage = 'This value is too long. It should have %limit character or less.|This value is too long. It should have %limit characters or less.';

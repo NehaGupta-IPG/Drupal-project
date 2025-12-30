@@ -242,26 +242,6 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    */
   protected static $inDeletion = FALSE;
 
-  /**
-   * Constructs a FieldStorageConfig object.
-   *
-   * In most cases, Field entities are created via
-   * FieldStorageConfig::create($values)), where $values is the same parameter
-   * as in this constructor.
-   *
-   * @param array $values
-   *   An array of field properties, keyed by property name. Most array
-   *   elements will be used to set the corresponding properties on the class;
-   *   see the class property documentation for details. Some array elements
-   *   have special meanings and a few are required. Special elements are:
-   *   - name: required. As a temporary Backwards Compatibility layer right now,
-   *     a 'field_name' property can be accepted in place of 'id'.
-   *   - entity_type: required.
-   *   - type: required.
-   * @param string $entity_type
-   *   (optional) The entity type on which the field should be created.
-   *   Defaults to "field_storage_config".
-   */
   public function __construct(array $values, $entity_type = 'field_storage_config') {
     // Check required properties.
     if (empty($values['field_name'])) {

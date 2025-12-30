@@ -15,9 +15,6 @@ use Drupal\Core\Session\AccountInterface;
  */
 class HistoryManager {
 
-  /**
-   * Constructs a new HistoryManager object.
-   */
   public function __construct(
     protected AccountInterface $currentUser,
     protected ModuleHandlerInterface $moduleHandler,

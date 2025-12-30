@@ -24,9 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * Creates a SystemBrandingBlock instance.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

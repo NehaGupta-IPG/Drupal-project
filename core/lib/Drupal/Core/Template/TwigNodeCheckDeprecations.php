@@ -20,9 +20,6 @@ class TwigNodeCheckDeprecations extends Node {
    */
   protected array $usedNames = [];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $usedNames) {
     $this->usedNames = $usedNames;
     parent::__construct();

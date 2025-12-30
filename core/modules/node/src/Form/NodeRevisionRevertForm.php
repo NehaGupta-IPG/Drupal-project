@@ -46,16 +46,6 @@ class NodeRevisionRevertForm extends ConfirmFormBase {
    */
   protected $time;
 
-  /**
-   * Constructs a new NodeRevisionRevertForm.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
-   *   The node storage.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(EntityStorageInterface $node_storage, DateFormatterInterface $date_formatter, TimeInterface $time) {
     $this->nodeStorage = $node_storage;
     $this->dateFormatter = $date_formatter;

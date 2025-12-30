@@ -24,12 +24,6 @@ class PostApplySubscriber implements EventSubscriberInterface {
    */
   private $pathLocator;
 
-  /**
-   * Constructs a PostApplySubscriber.
-   *
-   * @param \Drupal\package_manager\PathLocator $path_locator
-   *   The path locator service.
-   */
   public function __construct(PathLocator $path_locator) {
     $this->pathLocator = $path_locator;
   }

@@ -124,13 +124,6 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   private array $groupIncludes = [];
 
-  /**
-   * Constructor.
-   *
-   * @param list<string> $modules
-   *   Names of installed modules.
-   *   When used as a compiler pass, this parameter should be omitted.
-   */
   public function __construct(
     protected readonly array $modules = [],
   ) {}

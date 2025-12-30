@@ -52,22 +52,6 @@ class EntityFieldRenderer extends RendererBase {
    */
   protected $processedRows = [];
 
-  /**
-   * Constructs an EntityFieldRenderer object.
-   *
-   * @param \Drupal\views\ViewExecutable $view
-   *   The view whose fields are being rendered.
-   * @param string $relationship
-   *   The relationship to be handled.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   */
   public function __construct(ViewExecutable $view, $relationship, LanguageManagerInterface $language_manager, EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
     parent::__construct($view, $language_manager, $entity_type);
     $this->relationship = $relationship;

@@ -26,14 +26,6 @@ class BatchNegotiator implements ThemeNegotiatorInterface {
    */
   protected $requestStack;
 
-  /**
-   * Constructs a BatchNegotiator.
-   *
-   * @param \Drupal\Core\Batch\BatchStorageInterface $batch_storage
-   *   The batch storage.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack used to retrieve the current request.
-   */
   public function __construct(BatchStorageInterface $batch_storage, RequestStack $request_stack) {
     $this->batchStorage = $batch_storage;
     $this->requestStack = $request_stack;

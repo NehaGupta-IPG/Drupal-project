@@ -20,12 +20,6 @@ class ThemeRegistryLoader extends FilesystemLoader {
    */
   protected $themeRegistry;
 
-  /**
-   * Constructs a new ThemeRegistryLoader object.
-   *
-   * @param \Drupal\Core\Theme\Registry $theme_registry
-   *   The theme registry.
-   */
   public function __construct(Registry $theme_registry) {
     $this->themeRegistry = $theme_registry;
   }

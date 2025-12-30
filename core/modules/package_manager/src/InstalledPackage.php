@@ -11,18 +11,6 @@ use Drupal\Component\Serialization\Yaml;
  */
 final class InstalledPackage {
 
-  /**
-   * Constructs an InstalledPackage object.
-   *
-   * @param string $name
-   *   The package name.
-   * @param string $version
-   *   The package version.
-   * @param string|null $path
-   *   The package path, or NULL if the package type is `metapackage`.
-   * @param string $type
-   *   The package type.
-   */
   private function __construct(
     public readonly string $name,
     public readonly string $version,

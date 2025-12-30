@@ -38,9 +38,6 @@ final class ProcessOutputCallback implements OutputCallbackInterface, LoggerAwar
    */
   private array $errorBuffer = [];
 
-  /**
-   * Constructs a ProcessOutputCallback object.
-   */
   public function __construct() {
     $this->setLogger(new NullLogger());
   }

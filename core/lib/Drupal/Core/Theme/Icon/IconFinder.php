@@ -92,16 +92,6 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    */
   private const ALLOWED_EXTENSION = ['svg', 'png', 'gif'];
 
-  /**
-   * Constructs a new IconFinder object.
-   *
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
-   *   The file URL generator service.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param string $appRoot
-   *   The application root.
-   */
   public function __construct(
     private readonly FileUrlGeneratorInterface $fileUrlGenerator,
     private readonly LoggerInterface $logger,

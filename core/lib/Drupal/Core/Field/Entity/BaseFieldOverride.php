@@ -79,30 +79,6 @@ class BaseFieldOverride extends FieldConfigBase {
     return \Drupal::entityTypeManager()->getStorage('base_field_override')->create($values);
   }
 
-  /**
-   * Constructs a BaseFieldOverride object.
-   *
-   * In most cases, base field override entities are created via
-   * BaseFieldOverride::createFromBaseFieldDefinition($definition, 'bundle')
-   *
-   * @param array $values
-   *   An array of base field bundle override properties, keyed by property
-   *   name. The field to override is specified by referring to an existing
-   *   field with:
-   *   - field_name: The field name.
-   *   - entity_type: The entity type.
-   *   Additionally, a 'bundle' property is required to indicate the entity
-   *   bundle to which the bundle field override is attached to. Other array
-   *   elements will be used to set the corresponding properties on the class;
-   *   see the class property documentation for details.
-   * @param string $entity_type
-   *   (optional) The type of the entity to create. Defaults to
-   *   'base_field_override'.
-   *
-   * @throws \Drupal\Core\Field\FieldException
-   *   Exception thrown if $values does not contain a field_name, entity_type or
-   *   bundle value.
-   */
   public function __construct(array $values, $entity_type = 'base_field_override') {
     if (empty($values['field_name'])) {
       throw new FieldException('Attempt to create a base field bundle override of a field without a field_name');

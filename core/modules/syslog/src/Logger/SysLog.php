@@ -36,14 +36,6 @@ class SysLog implements LoggerInterface {
    */
   protected $connectionOpened = FALSE;
 
-  /**
-   * Constructs a SysLog object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory object.
-   * @param \Drupal\Core\Logger\LogMessageParserInterface $parser
-   *   The parser to use when extracting message variables.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, LogMessageParserInterface $parser) {
     $this->config = $config_factory->get('syslog.settings');
     $this->parser = $parser;

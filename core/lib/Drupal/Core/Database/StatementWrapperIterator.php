@@ -21,20 +21,6 @@ class StatementWrapperIterator extends StatementBase {
    */
   protected FetchAs $defaultFetchMode = FetchAs::Object;
 
-  /**
-   * Constructs a StatementWrapperIterator object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   Drupal database connection object.
-   * @param object $clientConnection
-   *   Client database connection object, for example \PDO.
-   * @param string $query
-   *   The SQL query string.
-   * @param array $options
-   *   Array of query options.
-   * @param bool $rowCountEnabled
-   *   (optional) Enables counting the rows matched. Defaults to FALSE.
-   */
   public function __construct(
     Connection $connection,
     object $clientConnection,

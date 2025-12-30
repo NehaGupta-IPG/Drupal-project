@@ -26,20 +26,6 @@ class MenuLinkContentForm extends ContentEntityForm {
    */
   protected $entity;
 
-  /**
-   * Constructs a MenuLinkContentForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $menuParentSelector
-   *   The menu parent form selector service.
-   * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
-   *   The path validator.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
-   *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     EntityRepositoryInterface $entity_repository,
     protected MenuParentFormSelectorInterface $menuParentSelector,

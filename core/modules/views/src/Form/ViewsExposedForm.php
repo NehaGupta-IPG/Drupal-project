@@ -34,14 +34,6 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
    */
   protected $currentPathStack;
 
-  /**
-   * Constructs a new ViewsExposedForm.
-   *
-   * @param \Drupal\views\ExposedFormCache $exposed_form_cache
-   *   The exposed form cache.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path_stack
-   *   The current path stack.
-   */
   public function __construct(ExposedFormCache $exposed_form_cache, CurrentPathStack $current_path_stack) {
     $this->exposedFormCache = $exposed_form_cache;
     $this->currentPathStack = $current_path_stack;

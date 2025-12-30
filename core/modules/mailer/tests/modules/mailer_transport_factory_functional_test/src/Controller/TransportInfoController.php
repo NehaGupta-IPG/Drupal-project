@@ -16,14 +16,6 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  */
 class TransportInfoController implements ContainerInjectionInterface {
 
-  /**
-   * Constructs a new transport info controller.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
-   * @param \Symfony\Component\Mailer\Transport\TransportInterface $transport
-   *   The mailer transport.
-   */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
     protected TransportInterface $transport,

@@ -43,14 +43,6 @@ class EntityRevisionParamConverter implements ParamConverterInterface {
    */
   protected $entityRepository;
 
-  /**
-   * Creates a new EntityRevisionParamConverter instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityRepository = $entity_repository;

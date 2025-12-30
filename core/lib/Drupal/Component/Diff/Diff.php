@@ -21,16 +21,6 @@ class Diff {
    */
   protected $edits;
 
-  /**
-   * Constructor.
-   * Computes diff between sequences of strings.
-   *
-   * @param array $from_lines
-   *   An array of strings.
-   *   (Typically these are lines from a file.)
-   * @param array $to_lines
-   *   An array of strings.
-   */
   public function __construct($from_lines, $to_lines) {
     $diffOpBuilder = new DiffOpOutputBuilder();
     $differ = new Differ($diffOpBuilder);

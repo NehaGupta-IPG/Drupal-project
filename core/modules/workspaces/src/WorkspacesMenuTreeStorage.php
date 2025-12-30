@@ -16,26 +16,6 @@ use Drupal\Core\Menu\MenuTreeStorage as CoreMenuTreeStorage;
  */
 class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
 
-  /**
-   * WorkspacesMenuTreeStorage constructor.
-   *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspaceManager
-   *   The workspace manager service.
-   * @param \Drupal\workspaces\WorkspaceTrackerInterface $workspaceTracker
-   *   The workspace tracker service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   A Database connection to use for reading and writing configuration data.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $menu_cache_backend
-   *   Cache backend instance for the extracted tree data.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
-   *   The cache tags invalidator.
-   * @param string $table
-   *   A database table name to store configuration data in.
-   * @param array $options
-   *   (optional) Any additional database connection options to use in queries.
-   */
   public function __construct(
     protected readonly WorkspaceManagerInterface $workspaceManager,
     protected readonly WorkspaceTrackerInterface $workspaceTracker,

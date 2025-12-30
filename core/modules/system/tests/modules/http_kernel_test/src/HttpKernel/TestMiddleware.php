@@ -27,14 +27,6 @@ class TestMiddleware implements HttpKernelInterface {
    */
   protected $optionalArgument;
 
-  /**
-   * Constructs a new TestMiddleware object.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The decorated kernel.
-   * @param mixed $optional_argument
-   *   (optional) An optional argument.
-   */
   public function __construct(HttpKernelInterface $http_kernel, $optional_argument = NULL) {
     $this->httpKernel = $http_kernel;
     $this->optionalArgument = $optional_argument;

@@ -21,12 +21,6 @@ class ImageEffectAddForm extends ImageEffectFormBase {
    */
   protected $effectManager;
 
-  /**
-   * Constructs a new ImageEffectAddForm.
-   *
-   * @param \Drupal\image\ImageEffectManager $effect_manager
-   *   The image effect manager.
-   */
   public function __construct(ImageEffectManager $effect_manager) {
     $this->effectManager = $effect_manager;
   }

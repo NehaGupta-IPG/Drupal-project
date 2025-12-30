@@ -53,18 +53,6 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
    */
   protected $languageManager;
 
-  /**
-   * Constructs a new ActiveLinkResponseFilter instance.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
-   *   The current path.
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
-   *   The path matcher.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   */
   public function __construct(AccountInterface $current_user, CurrentPathStack $current_path, PathMatcherInterface $path_matcher, LanguageManagerInterface $language_manager) {
     $this->currentUser = $current_user;
     $this->currentPath = $current_path;

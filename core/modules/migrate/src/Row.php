@@ -84,20 +84,6 @@ class Row {
    */
   protected $emptyDestinationProperties = [];
 
-  /**
-   * Constructs a \Drupal\migrate\Row object.
-   *
-   * @param array $values
-   *   An array of values to add as properties on the object.
-   * @param array $source_ids
-   *   An array containing the IDs of the source using the keys as the field
-   *   names.
-   * @param bool $is_stub
-   *   TRUE if the row being created is a stub.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown when a source ID property does not exist.
-   */
   public function __construct(array $values = [], array $source_ids = [], $is_stub = FALSE) {
     $this->source = $values;
     $this->sourceIds = $source_ids;

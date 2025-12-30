@@ -16,13 +16,6 @@ class RedirectCommand implements CommandInterface {
    */
   protected $url;
 
-  /**
-   * Constructs an RedirectCommand object.
-   *
-   * @param string $url
-   *   The URL that will be loaded into window.location. This should be a full
-   *   URL.
-   */
   public function __construct($url) {
     $this->url = $url;
   }

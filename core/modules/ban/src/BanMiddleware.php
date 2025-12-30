@@ -26,14 +26,6 @@ class BanMiddleware implements HttpKernelInterface {
    */
   protected $banIpManager;
 
-  /**
-   * Constructs a BanMiddleware object.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The decorated kernel.
-   * @param \Drupal\ban\BanIpManagerInterface $manager
-   *   The ban IP manager.
-   */
   public function __construct(HttpKernelInterface $http_kernel, BanIpManagerInterface $manager) {
     $this->httpKernel = $http_kernel;
     $this->banIpManager = $manager;

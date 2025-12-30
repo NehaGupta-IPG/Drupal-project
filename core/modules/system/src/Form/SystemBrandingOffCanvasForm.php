@@ -41,14 +41,6 @@ class SystemBrandingOffCanvasForm extends PluginFormBase implements ContainerInj
    */
   protected $currentUser;
 
-  /**
-   * SystemBrandingOffCanvasForm constructor.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, AccountInterface $current_user) {
     $this->configFactory = $config_factory;
     $this->currentUser = $current_user;

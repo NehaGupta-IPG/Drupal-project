@@ -35,19 +35,6 @@ class FileCache implements FileCacheInterface {
    */
   protected $cache;
 
-  /**
-   * Constructs a FileCache object.
-   *
-   * @param string $prefix
-   *   The cache prefix.
-   * @param string $collection
-   *   A collection identifier to ensure that the same files could be cached for
-   *   different purposes without clashing.
-   * @param string|null $cache_backend_class
-   *   (optional) The class that should be used as cache backend.
-   * @param array $cache_backend_configuration
-   *   (optional) The configuration for the backend class.
-   */
   public function __construct($prefix, $collection, $cache_backend_class = NULL, array $cache_backend_configuration = []) {
 
     if (empty($prefix)) {

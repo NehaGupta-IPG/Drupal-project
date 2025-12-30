@@ -96,26 +96,6 @@ class ConfigController implements ContainerInjectionInterface {
     );
   }
 
-  /**
-   * Constructs a ConfigController object.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $target_storage
-   *   The target storage.
-   * @param \Drupal\Core\Config\StorageInterface $sync_storage
-   *   The sync storage.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The config manager.
-   * @param \Drupal\system\FileDownloadController $file_download_controller
-   *   The file download controller.
-   * @param \Drupal\Core\Diff\DiffFormatter $diff_formatter
-   *   The diff formatter.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file system.
-   * @param \Drupal\Core\Config\StorageInterface $export_storage
-   *   The export storage.
-   * @param \Drupal\Core\Config\ImportStorageTransformer $import_transformer
-   *   The import transformer service.
-   */
   public function __construct(StorageInterface $target_storage, StorageInterface $sync_storage, ConfigManagerInterface $config_manager, FileDownloadController $file_download_controller, DiffFormatter $diff_formatter, FileSystemInterface $file_system, StorageInterface $export_storage, ImportStorageTransformer $import_transformer) {
     $this->targetStorage = $target_storage;
     $this->syncStorage = $sync_storage;

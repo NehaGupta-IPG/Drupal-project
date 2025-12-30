@@ -84,9 +84,6 @@ class EntityReference extends ManyToOne {
     $this->definition['options arguments'] = [$this->getSelectionHandler($this->options['sub_handler'])];
   }
 
-  /**
-   * Constructs an EntityReference object.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

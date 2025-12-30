@@ -21,12 +21,6 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
    */
   protected $account;
 
-  /**
-   * ToolbarHandler constructor.
-   *
-   * @param \Drupal\Core\Session\AccountProxyInterface $account
-   *   The current user.
-   */
   public function __construct(AccountProxyInterface $account) {
     $this->account = $account;
   }

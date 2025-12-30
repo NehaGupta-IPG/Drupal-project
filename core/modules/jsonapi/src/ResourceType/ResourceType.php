@@ -326,28 +326,6 @@ class ResourceType {
     return $this->isVersionable;
   }
 
-  /**
-   * Instantiates a ResourceType object.
-   *
-   * @param string $entity_type_id
-   *   An entity type ID.
-   * @param string $bundle
-   *   A bundle.
-   * @param string $deserialization_target_class
-   *   The deserialization target class.
-   * @param bool $internal
-   *   (optional) Whether the resource type should be internal.
-   * @param bool $is_locatable
-   *   (optional) Whether the resource type is locatable.
-   * @param bool $is_mutable
-   *   (optional) Whether the resource type is mutable.
-   * @param bool $is_versionable
-   *   (optional) Whether the resource type is versionable.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeField[] $fields
-   *   (optional) The resource type fields, keyed by internal field name.
-   * @param null|string $type_name
-   *   The resource type name.
-   */
   public function __construct($entity_type_id, $bundle, $deserialization_target_class, $internal = FALSE, $is_locatable = TRUE, $is_mutable = TRUE, $is_versionable = FALSE, array $fields = [], $type_name = NULL) {
     $this->entityTypeId = $entity_type_id;
     $this->bundle = $bundle;

@@ -30,9 +30,6 @@ class FilterNull extends FilterBase {
    */
   protected $logged = FALSE;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     // Once per filter, log that a filter plugin was missing.
     if (!$this->logged) {

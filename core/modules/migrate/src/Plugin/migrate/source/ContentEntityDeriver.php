@@ -13,12 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterface {
 
-  /**
-   * Constructs a new ContentEntityDeriver.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {}

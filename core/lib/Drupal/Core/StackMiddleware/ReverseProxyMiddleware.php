@@ -26,14 +26,6 @@ class ReverseProxyMiddleware implements HttpKernelInterface {
    */
   protected $settings;
 
-  /**
-   * Constructs a ReverseProxyMiddleware object.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The decorated kernel.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The site settings.
-   */
   public function __construct(HttpKernelInterface $http_kernel, Settings $settings) {
     $this->httpKernel = $http_kernel;
     $this->settings = $settings;

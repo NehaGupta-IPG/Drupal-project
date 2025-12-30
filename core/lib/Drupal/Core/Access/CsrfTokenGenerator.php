@@ -28,14 +28,6 @@ class CsrfTokenGenerator {
    */
   protected $sessionMetadata;
 
-  /**
-   * Constructs the token generator.
-   *
-   * @param \Drupal\Core\PrivateKey $private_key
-   *   The private key service.
-   * @param \Drupal\Core\Session\MetadataBag $session_metadata
-   *   The session metadata bag.
-   */
   public function __construct(PrivateKey $private_key, MetadataBag $session_metadata) {
     $this->privateKey = $private_key;
     $this->sessionMetadata = $session_metadata;

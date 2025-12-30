@@ -13,9 +13,6 @@ use Behat\Mink\Selector\PartialNamedSelector;
  */
 class HiddenFieldSelector extends PartialNamedSelector {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct() {
     $xpath = ".//input[%lowercaseType% = 'hidden' and (%idOrNameMatch% or %valueMatch%)]";
     $this->registerNamedXpath('hidden_field', $xpath);

@@ -11,12 +11,6 @@ use Drupal\Core\Ajax\CommandInterface;
  */
 class SetBrowserUrl implements CommandInterface {
 
-  /**
-   * Constructs a new command instance.
-   *
-   * @param string $url
-   *   The URL to be set in the browser.
-   */
   public function __construct(protected string $url) {
   }
 

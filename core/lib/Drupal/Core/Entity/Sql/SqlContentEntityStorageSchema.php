@@ -103,20 +103,6 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    */
   protected $deletedFieldsRepository;
 
-  /**
-   * Constructs a SqlContentEntityStorageSchema.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
-   *   The entity type.
-   * @param \Drupal\Core\Entity\Sql\SqlContentEntityStorage $storage
-   *   The storage of the entity type. This must be an SQL-based storage.
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection to be used.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ContentEntityTypeInterface $entity_type, SqlContentEntityStorage $storage, Connection $database, EntityFieldManagerInterface $entity_field_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->storage = clone $storage;

@@ -24,14 +24,6 @@ abstract class EntityActionDeriverBase extends DeriverBase implements ContainerD
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a new EntityActionDeriverBase object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
     $this->entityTypeManager = $entity_type_manager;
     $this->stringTranslation = $string_translation;

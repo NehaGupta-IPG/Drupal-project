@@ -43,17 +43,6 @@ class MTimeProtectedFastFileStorage extends FileStorage {
    */
   protected $secret;
 
-  /**
-   * Constructs this MTimeProtectedFastFileStorage object.
-   *
-   * @param array $configuration
-   *   An associated array, containing at least these keys (the rest are
-   *   ignored):
-   *   - directory: The directory where the files should be stored.
-   *   - secret: A cryptographically hard to guess secret string.
-   *   -bin. The storage bin. Multiple storage objects can be instantiated with
-   *   the same configuration, but for different bins.
-   */
   public function __construct(array $configuration) {
     parent::__construct($configuration);
     $this->secret = $configuration['secret'];

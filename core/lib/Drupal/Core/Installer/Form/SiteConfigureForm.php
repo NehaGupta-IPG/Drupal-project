@@ -19,22 +19,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class SiteConfigureForm extends ConfigFormBase {
 
-  /**
-   * Constructs a new SiteConfigureForm.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $sitePath
-   *   The site path.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $moduleInstaller
-   *   The module installer.
-   * @param \Drupal\user\UserNameValidator $userNameValidator
-   *   The user validator.
-   * @param bool $superUserAccessPolicy
-   *   The value of the 'security.enable_super_user' container parameter.
-   */
   public function __construct(
     protected $root,
     protected $sitePath,

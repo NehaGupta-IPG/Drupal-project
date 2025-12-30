@@ -43,9 +43,6 @@ class VariableTranslation extends DrupalSqlBase {
    */
   protected $variables;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, StateInterface $state, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $state, $entity_type_manager);
     $this->variables = $this->configuration['variables'];

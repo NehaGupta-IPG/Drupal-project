@@ -19,16 +19,6 @@ class HtmlEntityFormController extends FormController {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a new \Drupal\Core\Routing\Enhancer\FormEnhancer object.
-   *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
-   *   The argument resolver.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   */
   public function __construct(ArgumentResolverInterface $argument_resolver, FormBuilderInterface $form_builder, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($argument_resolver, $form_builder);
     $this->entityTypeManager = $entity_type_manager;

@@ -27,16 +27,6 @@ class RegionalForm extends ConfigFormBase {
    */
   protected $countryManager;
 
-  /**
-   * Constructs a RegionalForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Locale\CountryManagerInterface $country_manager
-   *   The country manager.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, CountryManagerInterface $country_manager) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->countryManager = $country_manager;

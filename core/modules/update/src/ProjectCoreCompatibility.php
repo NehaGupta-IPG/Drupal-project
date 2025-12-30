@@ -44,23 +44,6 @@ final class ProjectCoreCompatibility {
    */
   protected $compatibilityMessages = [];
 
-  /**
-   * Constructs a ProjectCoreCompatibility object.
-   *
-   * @param array $core_data
-   *   The project data for Drupal core as returned by
-   *   \Drupal\update\UpdateManagerInterface::getProjects() and then processed
-   *   by update_process_project_info() and
-   *   update_calculate_project_update_status().
-   * @param array $core_releases
-   *   The Drupal core available releases.
-   * @param array $supported_branches
-   *   An array for supported branches as returned by drupal.org update XML.
-   *
-   * @see \Drupal\update\UpdateManagerInterface::getProjects()
-   * @see update_process_project_info()
-   * @see update_calculate_project_update_status()
-   */
   public function __construct(array $core_data, array $core_releases, array $supported_branches) {
     if (isset($core_data['existing_version'])) {
       $this->existingCoreVersion = $core_data['existing_version'];

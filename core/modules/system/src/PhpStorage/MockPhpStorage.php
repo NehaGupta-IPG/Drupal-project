@@ -14,12 +14,6 @@ class MockPhpStorage {
    */
   protected $configuration;
 
-  /**
-   * Constructs a MockPhpStorage object.
-   *
-   * @param array $configuration
-   *   The storage configuration.
-   */
   public function __construct(array $configuration) {
     $this->configuration = $configuration;
   }

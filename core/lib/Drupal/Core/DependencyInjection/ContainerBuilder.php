@@ -18,9 +18,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInterface {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(?ParameterBagInterface $parameterBag = NULL) {
     parent::__construct($parameterBag);
     $this->setResourceTracking(FALSE);

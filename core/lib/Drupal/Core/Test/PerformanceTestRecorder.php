@@ -24,15 +24,6 @@ class PerformanceTestRecorder implements EventSubscriberInterface {
    */
   protected static $record = [];
 
-  /**
-   * PerformanceTestRecorder constructor.
-   *
-   * @param bool $persistent
-   *   Whether to save the record to state.
-   * @param \Drupal\Core\State\StateInterface|null $state
-   *   (optional) The state service for persistent storage. Required if
-   *   $persistent is TRUE.
-   */
   public function __construct(bool $persistent, ?StateInterface $state) {
     if ($persistent && !$state) {
       throw new \InvalidArgumentException('If $persistent is TRUE then $state must be set');

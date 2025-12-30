@@ -12,12 +12,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class VersionHistoryLocalTasks extends DeriverBase implements ContainerDeriverInterface {
 
-  /**
-   * Creates a new VersionHistoryLocalTasks instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {

@@ -26,16 +26,6 @@ class RedirectResponseSubscriber implements EventSubscriberInterface {
    */
   protected bool $ignoreDestination = FALSE;
 
-  /**
-   * Constructs a RedirectResponseSubscriber object.
-   *
-   * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $unroutedUrlAssembler
-   *   The unrouted URL assembler service.
-   * @param \Drupal\Core\Routing\RequestContext $requestContext
-   *   The request context.
-   * @param \Closure $loggerClosure
-   *   A closure that wraps the 'logger.channel.php' service.
-   */
   public function __construct(
     protected UnroutedUrlAssemblerInterface $unroutedUrlAssembler,
     protected RequestContext $requestContext,

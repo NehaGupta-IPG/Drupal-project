@@ -32,47 +32,6 @@ class Layout extends Plugin {
    */
   public readonly array $additional;
 
-  /**
-   * Constructs a Layout attribute.
-   *
-   * @param string $id
-   *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
-   *   (optional) The human-readable name. @todo Deprecate optional label in
-   *   https://www.drupal.org/project/drupal/issues/3392572.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $category
-   *   (optional) The human-readable category. @todo Deprecate optional category
-   *   in https://www.drupal.org/project/drupal/issues/3392572.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
-   *   (optional) The description for advanced layouts.
-   * @param string|null $template
-   *   (optional) The template file to render the layout.
-   * @param string $theme_hook
-   *   (optional) The template hook to render the layout.
-   * @param string|null $path
-   *   (optional) Path (relative to the module or theme) to resources like icon
-   *   or template.
-   * @param string|null $library
-   *   (optional) The asset library.
-   * @param string|null $icon
-   *   (optional) The path to the preview image (relative to the 'path' given).
-   * @param string[][]|null $icon_map
-   *   (optional) The icon map.
-   * @param array $regions
-   *   (optional) An associative array of regions in this layout.
-   * @param string|null $default_region
-   *   (optional) The default region.
-   * @param class-string $class
-   *   (optional) The layout plugin class.
-   * @param \Drupal\Core\Plugin\Context\ContextDefinitionInterface[] $context_definitions
-   *   (optional) The context definition.
-   * @param array $config_dependencies
-   *   (optional) The config dependencies.
-   * @param class-string|null $deriver
-   *   (optional) The deriver class.
-   * @param mixed $additional
-   *   (optional) Additional properties passed in that can be used by a deriver.
-   */
   public function __construct(
     public readonly string $id,
     public readonly ?TranslatableMarkup $label = NULL,

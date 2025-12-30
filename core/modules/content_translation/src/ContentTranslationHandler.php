@@ -54,30 +54,6 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
    */
   protected $fieldStorageDefinitions;
 
-  /**
-   * Initializes an instance of the content translation controller.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
-   *   The info array of the given entity type.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager.
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $manager
-   *   The content translation manager service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger service.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
-   *   The installed entity definition repository service.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
-   *   The request stack.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     protected EntityTypeInterface $entityType,
     protected LanguageManagerInterface $languageManager,

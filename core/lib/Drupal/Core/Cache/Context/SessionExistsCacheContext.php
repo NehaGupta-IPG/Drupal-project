@@ -27,14 +27,6 @@ class SessionExistsCacheContext implements CacheContextInterface {
    */
   protected $requestStack;
 
-  /**
-   * Constructs a new SessionExistsCacheContext class.
-   *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
-   *   The session configuration.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   */
   public function __construct(SessionConfigurationInterface $session_configuration, RequestStack $request_stack) {
     $this->sessionConfiguration = $session_configuration;
     $this->requestStack = $request_stack;

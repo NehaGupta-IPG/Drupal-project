@@ -50,12 +50,6 @@ class PostgresqlDateSql implements DateSqlInterface {
     'A' => 'AM',
   ];
 
-  /**
-   * Constructs the PostgreSQL-specific date sql class.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
-   */
   public function __construct(Connection $database) {
     $this->database = $database;
   }

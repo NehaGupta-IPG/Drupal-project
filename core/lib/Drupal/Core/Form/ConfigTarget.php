@@ -51,35 +51,6 @@ final class ConfigTarget {
    */
   public readonly mixed $toConfig;
 
-  /**
-   * Constructs a ConfigTarget object.
-   *
-   * @param string $configName
-   *   The name of the config object being read from or written to, e.g.
-   *   `system.site`.
-   * @param string|array $propertyPath
-   *   The property path(s) being read or written, e.g., `page.front`.
-   * @param callable|null $fromConfig
-   *   (optional) A callback which should transform the value loaded from
-   *   config before it gets displayed by the form. If NULL, no transformation
-   *   will be done. The callback will receive all of the values loaded from
-   *   config as separate arguments, in the order specified by
-   *   $this->propertyPaths. Defaults to NULL.
-   * @param callable|null $toConfig
-   *   (optional) A callback which should transform the value submitted by the
-   *   form before it is set in the config object. If NULL, no transformation
-   *   will be done. The callback will receive the value submitted through the
-   *   form; if this object is targeting multiple property paths, the value will
-   *   be an array of the submitted values, keyed by property path, and must
-   *   return an array with the transformed values, also keyed by property path.
-   *   The callback will receive the form state object as its second argument.
-   *   The callback may return a special values:
-   *   - ToConfig::NoOp, to indicate that the given form value does not need to
-   *     be mapped onto the Config object
-   *   - ToConfig::DeleteKey to indicate that the targeted property path should
-   *     be deleted from config.
-   *   Defaults to NULL.
-   */
   public function __construct(
     public readonly string $configName,
     string|array $propertyPath,

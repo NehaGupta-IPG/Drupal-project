@@ -59,20 +59,6 @@ class MediaLibraryUiBuilder {
    */
   protected $openerResolver;
 
-  /**
-   * Constructs a MediaLibraryUiBuilder instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Drupal\views\ViewExecutableFactory $views_executable_factory
-   *   The views executable factory.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The currently active request object.
-   * @param \Drupal\media_library\OpenerResolverInterface $opener_resolver
-   *   The opener resolver.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, RequestStack $request_stack, ViewExecutableFactory $views_executable_factory, FormBuilderInterface $form_builder, OpenerResolverInterface $opener_resolver) {
     $this->entityTypeManager = $entity_type_manager;
     $this->request = $request_stack->getCurrentRequest();

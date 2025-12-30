@@ -95,9 +95,6 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
    */
   protected $currentUser;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, SectionStorageManagerInterface $section_storage_manager, EntityRepositoryInterface $entity_repository, AccountInterface $current_user) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

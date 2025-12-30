@@ -52,18 +52,6 @@ class ImageStyleDownloadController extends FileDownloadController {
    */
   protected $fileSystem;
 
-  /**
-   * Constructs an ImageStyleDownloadController object.
-   *
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param \Drupal\Core\Image\ImageFactory $image_factory
-   *   The image factory.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
-   *   The stream wrapper manager.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The system service.
-   */
   public function __construct(
     #[Autowire(service: 'lock')]
     LockBackendInterface $lock,

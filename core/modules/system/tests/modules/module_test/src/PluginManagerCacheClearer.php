@@ -24,14 +24,6 @@ class PluginManagerCacheClearer extends DefaultPluginManager {
    */
   protected $optionalService;
 
-  /**
-   * PluginManagerCacheClearer constructor.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service for recording what happens.
-   * @param null $optional_service
-   *   An optional service for testing.
-   */
   public function __construct(StateInterface $state, $optional_service = NULL) {
     $this->state = $state;
     $this->optionalService = $optional_service;

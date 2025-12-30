@@ -37,14 +37,6 @@ class PagerSelectExtender extends SelectExtender {
    */
   protected $customCountQuery = FALSE;
 
-  /**
-   * Constructs a PagerSelectExtender object.
-   *
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
-   *   Select query object.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   Database connection object.
-   */
   public function __construct(SelectInterface $query, Connection $connection) {
     parent::__construct($query, $connection);
 

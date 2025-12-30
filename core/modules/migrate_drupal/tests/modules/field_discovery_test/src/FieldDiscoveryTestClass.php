@@ -22,19 +22,6 @@ class FieldDiscoveryTestClass extends FieldDiscovery {
    */
   protected $testData;
 
-  /**
-   * Constructs a FieldDiscoveryTestClass object.
-   *
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $field_plugin_manager
-   *   The field plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
-   *   The migration plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   * @param array $test_data
-   *   An array of test data, keyed by method name, for overridden methods to
-   *   return for the purposes of testing other methods.
-   */
   public function __construct(MigrateFieldPluginManagerInterface $field_plugin_manager, MigrationPluginManagerInterface $migration_plugin_manager, LoggerInterface $logger, array $test_data = []) {
     parent::__construct($field_plugin_manager, $migration_plugin_manager, $logger);
     $this->testData = $test_data;

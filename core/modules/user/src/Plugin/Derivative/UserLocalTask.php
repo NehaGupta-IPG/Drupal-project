@@ -22,14 +22,6 @@ class UserLocalTask extends DeriverBase implements ContainerDeriverInterface {
    */
   protected $entityTypeManager;
 
-  /**
-   * Creates a UserLocalTask object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The translation manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
     $this->entityTypeManager = $entity_type_manager;
     $this->stringTranslation = $string_translation;

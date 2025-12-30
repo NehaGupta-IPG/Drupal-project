@@ -16,12 +16,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class RoleExistsConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
-  /**
-   * Create a new RoleExistsConstraintValidator instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(private readonly EntityTypeManagerInterface $entity_type_manager) {}
 
   /**

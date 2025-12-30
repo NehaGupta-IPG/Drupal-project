@@ -28,12 +28,6 @@ class CurrentPathStack {
    */
   protected $requestStack;
 
-  /**
-   * Constructs a new CurrentPathStack instance.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   */
   public function __construct(RequestStack $request_stack) {
     $this->requestStack = $request_stack;
     $this->paths = new \SplObjectStorage();

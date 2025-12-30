@@ -19,12 +19,6 @@ class WorkspaceCacheContext implements CacheContextInterface {
    */
   protected $workspaceManager;
 
-  /**
-   * Constructs a new WorkspaceCacheContext service.
-   *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
-   *   The workspace manager.
-   */
   public function __construct(WorkspaceManagerInterface $workspace_manager) {
     $this->workspaceManager = $workspace_manager;
   }

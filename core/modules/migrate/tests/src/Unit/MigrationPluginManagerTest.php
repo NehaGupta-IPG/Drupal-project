@@ -212,9 +212,6 @@ class TestMigrationMock extends Migration {
    */
   public $set = [];
 
-  /**
-   * TestMigrationMock constructor.
-   */
   public function __construct($id, $migration_dependencies) {
     // Intentionally ignore parent constructor.
     $this->id = $id;

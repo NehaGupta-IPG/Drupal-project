@@ -96,42 +96,6 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
    */
   protected $eventDispatcher;
 
-  /**
-   * Constructs a ConfigNamesMapper.
-   *
-   * @param string $plugin_id
-   *   The config mapper plugin ID.
-   * @param mixed $plugin_definition
-   *   An array of plugin information with the following keys:
-   *   - title: The title of the mapper, used for generating page titles.
-   *   - base_route_name: The route name of the base route this mapper is
-   *     attached to.
-   *   - names: (optional) An array of configuration names.
-   *   - weight: (optional) The weight of this mapper, used in mapper listings.
-   *     Defaults to 20.
-   *   - list_controller: (optional) Class name for list controller used to
-   *     generate lists of this type of configuration.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
-   *   The typed configuration manager.
-   * @param \Drupal\locale\LocaleConfigManager $locale_config_manager
-   *   The locale configuration manager.
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $config_mapper_manager
-   *   The mapper plugin discovery service.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   (optional) The event dispatcher.
-   *
-   * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
-   *   Throws an exception if the route specified by the 'base_route_name' in
-   *   the plugin definition could not be found by the route provider.
-   */
   public function __construct($plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config, LocaleConfigManager $locale_config_manager, ConfigMapperManagerInterface $config_mapper_manager, RouteProviderInterface $route_provider, TranslationInterface $string_translation, LanguageManagerInterface $language_manager, ?EventDispatcherInterface $event_dispatcher = NULL) {
     $this->pluginId = $plugin_id;
     $this->pluginDefinition = $plugin_definition;

@@ -15,19 +15,6 @@ use Psr\Http\Client\ClientExceptionInterface;
  */
 class ResourceFetcher implements ResourceFetcherInterface {
 
-  /**
-   * Constructs a ResourceFetcher object.
-   *
-   * @param \GuzzleHttp\ClientInterface $httpClient
-   *   The HTTP client.
-   * @param \Drupal\media\OEmbed\ProviderRepositoryInterface $providers
-   *   The oEmbed provider repository service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   The cache backend.
-   * @param int $timeout
-   *   The length of time to wait for the request before the request
-   *   should time out.
-   */
   public function __construct(
     protected ClientInterface $httpClient,
     protected ProviderRepositoryInterface $providers,

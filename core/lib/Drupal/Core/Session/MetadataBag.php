@@ -16,12 +16,6 @@ class MetadataBag extends SymfonyMetadataBag {
    */
   const CSRF_TOKEN_SEED = 's';
 
-  /**
-   * Constructs a new metadata bag instance.
-   *
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings instance.
-   */
   public function __construct(Settings $settings) {
     $update_threshold = $settings->get('session_write_interval', 180);
     parent::__construct('_sf2_meta', $update_threshold);

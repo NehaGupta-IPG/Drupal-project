@@ -77,24 +77,6 @@ class ConfigInstaller implements ConfigInstallerInterface {
    */
   protected $extensionPathResolver;
 
-  /**
-   * Constructs the configuration installer.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Drupal\Core\Config\StorageInterface $active_storage
-   *   The active configuration storage.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
-   *   The typed configuration manager.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The configuration manager.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   * @param string $install_profile
-   *   The name of the currently active installation profile.
-   * @param \Drupal\Core\Extension\ExtensionPathResolver $extension_path_resolver
-   *   The extension path resolver.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, StorageInterface $active_storage, TypedConfigManagerInterface $typed_config, ConfigManagerInterface $config_manager, EventDispatcherInterface $event_dispatcher, $install_profile, ExtensionPathResolver $extension_path_resolver) {
     $this->configFactory = $config_factory;
     $this->activeStorages[$active_storage->getCollectionName()] = $active_storage;

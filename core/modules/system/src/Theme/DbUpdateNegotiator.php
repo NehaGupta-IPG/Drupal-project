@@ -26,14 +26,6 @@ class DbUpdateNegotiator implements ThemeNegotiatorInterface {
    */
   protected $themeHandler;
 
-  /**
-   * Constructs a DbUpdateNegotiator.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, ThemeHandlerInterface $theme_handler) {
     $this->configFactory = $config_factory;
     $this->themeHandler = $theme_handler;

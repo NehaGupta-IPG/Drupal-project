@@ -23,12 +23,6 @@ class EventSubscriber implements EventSubscriberInterface {
    */
   protected $state;
 
-  /**
-   * Constructs the event subscriber.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The key value store.
-   */
   public function __construct(StateInterface $state) {
     $this->state = $state;
   }

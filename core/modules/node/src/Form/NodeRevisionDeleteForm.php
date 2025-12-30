@@ -25,9 +25,6 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
    */
   protected $revision;
 
-  /**
-   * Constructs a new NodeRevisionDeleteForm.
-   */
   public function __construct(
     protected EntityStorageInterface $nodeStorage,
     protected EntityStorageInterface $nodeTypeStorage,

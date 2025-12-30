@@ -17,12 +17,6 @@ class DefaultNegotiator implements ThemeNegotiatorInterface {
    */
   protected $configFactory;
 
-  /**
-   * Constructs a DefaultNegotiator object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
   }

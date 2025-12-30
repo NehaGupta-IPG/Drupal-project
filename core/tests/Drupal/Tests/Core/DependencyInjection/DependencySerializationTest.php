@@ -68,12 +68,6 @@ class DependencySerializationTestDummy {
    */
   public $container;
 
-  /**
-   * Constructs a new TestClass object.
-   *
-   * @param object $service
-   *   A test service.
-   */
   public function __construct(\stdClass $service) {
     $this->service = $service;
   }

@@ -57,22 +57,6 @@ class FieldBlockDeriver extends DeriverBase implements ContainerDeriverInterface
    */
   protected $formatterManager;
 
-  /**
-   * Constructs new FieldBlockDeriver.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeRepositoryInterface $entity_type_repository
-   *   The entity type repository.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
-   *   The field type manager.
-   * @param \Drupal\Core\Field\FormatterPluginManager $formatter_manager
-   *   The formatter manager.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $entityViewDisplayStorage
-   *   The entity view display storage.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   */
   public function __construct(
     EntityTypeRepositoryInterface $entity_type_repository,
     EntityFieldManagerInterface $entity_field_manager,

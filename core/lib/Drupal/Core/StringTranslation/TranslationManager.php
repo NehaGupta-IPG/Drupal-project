@@ -43,12 +43,6 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    */
   protected $defaultLangcode;
 
-  /**
-   * Constructs a TranslationManager object.
-   *
-   * @param \Drupal\Core\Language\LanguageDefault $default_language
-   *   The default language.
-   */
   public function __construct(LanguageDefault $default_language) {
     $this->defaultLangcode = $default_language->get()->getId();
   }

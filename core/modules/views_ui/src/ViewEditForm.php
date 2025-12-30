@@ -70,22 +70,6 @@ class ViewEditForm extends ViewFormBase {
    */
   protected $moduleHandler;
 
-  /**
-   * Constructs a new ViewEditForm object.
-   *
-   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
-   *   The factory for the temp store object.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack object.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date Formatter service.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $element_info
-   *   The element info manager.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
-   *   The theme manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   */
   public function __construct(SharedTempStoreFactory $temp_store_factory, RequestStack $requestStack, DateFormatterInterface $date_formatter, ElementInfoManagerInterface $element_info, ThemeManagerInterface $theme_manager, ModuleHandlerInterface $module_handler) {
     $this->tempStore = $temp_store_factory->get('views');
     $this->requestStack = $requestStack;

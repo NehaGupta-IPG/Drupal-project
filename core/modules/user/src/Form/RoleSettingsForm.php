@@ -20,12 +20,6 @@ class RoleSettingsForm extends FormBase {
    */
   protected $roleStorage;
 
-  /**
-   * Constructs a \Drupal\user\Form\RoleSettingsForm object.
-   *
-   * @param \Drupal\user\RoleStorageInterface $role_storage
-   *   The role storage.
-   */
   public function __construct(RoleStorageInterface $role_storage) {
     $this->roleStorage = $role_storage;
   }

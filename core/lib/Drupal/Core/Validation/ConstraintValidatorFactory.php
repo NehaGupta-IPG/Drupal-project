@@ -20,12 +20,6 @@ class ConstraintValidatorFactory extends BaseConstraintValidatorFactory {
    */
   protected ClassResolverInterface $classResolver;
 
-  /**
-   * Constructs a new ConstraintValidatorFactory.
-   *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   The class resolver.
-   */
   public function __construct(ClassResolverInterface $class_resolver) {
     $this->classResolver = $class_resolver;
   }

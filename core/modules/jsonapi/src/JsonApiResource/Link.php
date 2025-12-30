@@ -54,24 +54,6 @@ final class Link implements CacheableDependencyInterface {
    */
   protected $attributes;
 
-  /**
-   * JSON:API Link constructor.
-   *
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
-   *   Any cacheability metadata associated with the link. For example, a
-   *   'call-to-action' link might reference a registration resource if an event
-   *   has vacancies or a wait-list resource otherwise. Therefore, the link's
-   *   cacheability might be depend on a certain entity's values other than the
-   *   entity on which the link will appear.
-   * @param \Drupal\Core\Url $url
-   *   The Url object for the link.
-   * @param string $link_relation_type
-   *   An array of registered or extension RFC8288 link relation types.
-   * @param array $target_attributes
-   *   An associative array of target attributes for the link.
-   *
-   * @see https://tools.ietf.org/html/rfc8288#section-2.1
-   */
   public function __construct(CacheableMetadata $cacheability, Url $url, string $link_relation_type, array $target_attributes = []) {
     assert(Inspector::assertAllStrings(array_keys($target_attributes)));
     assert(Inspector::assertAll(function ($target_attribute_value) {

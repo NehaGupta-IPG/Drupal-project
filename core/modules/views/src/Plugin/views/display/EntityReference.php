@@ -55,18 +55,6 @@ class EntityReference extends DisplayPluginBase {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $id_field_alias;
 
-  /**
-   * Constructs a new EntityReference object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $connection) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->connection = $connection;

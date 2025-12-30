@@ -45,18 +45,6 @@ class ModerationStateConstraintValidator extends ConstraintValidator implements 
    */
   protected $stateTransitionValidation;
 
-  /**
-   * Creates a new ModerationStateConstraintValidator instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
-   *   The moderation information.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\content_moderation\StateTransitionValidationInterface $state_transition_validation
-   *   The state transition validation service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ModerationInformationInterface $moderation_information, AccountInterface $current_user, StateTransitionValidationInterface $state_transition_validation) {
     $this->entityTypeManager = $entity_type_manager;
     $this->moderationInformation = $moderation_information;

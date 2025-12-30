@@ -62,12 +62,6 @@ class TestAnnotation extends Plugin {
  */
 class ObjectDefinition extends PluginDefinition {
 
-  /**
-   * ObjectDefinition constructor.
-   *
-   * @param array $definition
-   *   An array of definition values.
-   */
   public function __construct(array $definition) {
     foreach ($definition as $property => $value) {
       $this->{$property} = $value;

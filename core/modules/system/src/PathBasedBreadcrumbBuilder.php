@@ -98,28 +98,6 @@ class PathBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
    */
   protected $pathMatcher;
 
-  /**
-   * Constructs the PathBasedBreadcrumbBuilder.
-   *
-   * @param \Drupal\Core\Routing\RequestContext $context
-   *   The router request context.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   The access check service.
-   * @param \Symfony\Component\Routing\Matcher\RequestMatcherInterface $router
-   *   The dynamic router service.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
-   *   The inbound path processor.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
-   *   The title resolver service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user object.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
-   *   The current path.
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
-   *   The path matcher service.
-   */
   public function __construct(RequestContext $context, AccessManagerInterface $access_manager, RequestMatcherInterface $router, InboundPathProcessorInterface $path_processor, ConfigFactoryInterface $config_factory, TitleResolverInterface $title_resolver, AccountInterface $current_user, CurrentPathStack $current_path, ?PathMatcherInterface $path_matcher = NULL) {
     $this->context = $context;
     $this->accessManager = $access_manager;

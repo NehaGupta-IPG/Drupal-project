@@ -14,29 +14,6 @@ class OpenOffCanvasDialogCommand extends OpenDialogCommand {
    */
   const DEFAULT_DIALOG_WIDTH = 300;
 
-  /**
-   * Constructs an OpenOffCanvasDialogCommand object.
-   *
-   * The off-canvas dialog differs from the normal modal provided by
-   * OpenDialogCommand in that an off-canvas has built in positioning and
-   * behaviors. Drupal provides a built-in off-canvas dialog for this purpose,
-   * so the selector is hard-coded in the call to the parent constructor.
-   *
-   * @param string|\Stringable|null $title
-   *   The title of the dialog.
-   * @param string|array $content
-   *   The content that will be placed in the dialog, either a render array
-   *   or an HTML string.
-   * @param array $dialog_options
-   *   (optional) Settings to be passed to the dialog implementation. Any
-   *   jQuery UI option can be used. See http://api.jqueryui.com/dialog.
-   * @param array|null $settings
-   *   (optional) Custom settings that will be passed to the Drupal behaviors
-   *   on the content of the dialog. If left empty, the settings will be
-   *   populated automatically from the current request.
-   * @param string $position
-   *   (optional) The position to render the off-canvas dialog.
-   */
   public function __construct(string|\Stringable|null $title, $content, array $dialog_options = [], $settings = NULL, $position = 'side') {
     $classes = [];
     if (isset($dialog_options['classes']['ui-dialog'])) {

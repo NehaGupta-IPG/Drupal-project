@@ -23,14 +23,6 @@ class TestRun {
    */
   protected $testClass;
 
-  /**
-   * TestRun constructor.
-   *
-   * @param \Drupal\Core\Test\TestRunResultsStorageInterface $testRunResultsStorage
-   *   The test run results storage.
-   * @param int|string $testId
-   *   A unique test run id.
-   */
   public function __construct(
     protected TestRunResultsStorageInterface $testRunResultsStorage,
     protected int|string $testId,

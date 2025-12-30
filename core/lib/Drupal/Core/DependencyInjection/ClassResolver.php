@@ -11,12 +11,6 @@ class ClassResolver implements ClassResolverInterface {
 
   use DependencySerializationTrait;
 
-  /**
-   * Constructs a new ClassResolver object.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The service container.
-   */
   public function __construct(protected ContainerInterface $container) {
   }
 

@@ -25,12 +25,6 @@ class OptionsRequestSubscriber implements EventSubscriberInterface {
    */
   protected $routeProvider;
 
-  /**
-   * Creates a new OptionsRequestSubscriber instance.
-   *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   */
   public function __construct(RouteProviderInterface $route_provider) {
     $this->routeProvider = $route_provider;
   }

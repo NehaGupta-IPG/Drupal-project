@@ -32,14 +32,6 @@ class FileTestSaveUploadFromForm extends FormBase {
    */
   protected $messenger;
 
-  /**
-   * Constructs a FileTestSaveUploadFromForm object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state key value store.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
   public function __construct(StateInterface $state, MessengerInterface $messenger) {
     $this->state = $state;
     $this->messenger = $messenger;

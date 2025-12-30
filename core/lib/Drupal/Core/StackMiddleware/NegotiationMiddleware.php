@@ -25,12 +25,6 @@ class NegotiationMiddleware implements HttpKernelInterface {
    */
   protected $formats = [];
 
-  /**
-   * Constructs a new NegotiationMiddleware.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The wrapper HTTP kernel.
-   */
   public function __construct(HttpKernelInterface $http_kernel) {
     $this->httpKernel = $http_kernel;
   }

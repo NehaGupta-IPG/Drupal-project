@@ -16,12 +16,6 @@ class ChainEntityResolver implements ChainEntityResolverInterface {
    */
   protected $resolvers = [];
 
-  /**
-   * Constructs a ChainEntityResolver object.
-   *
-   * @param \Drupal\serialization\EntityResolver\EntityResolverInterface[] $resolvers
-   *   The array of concrete resolvers.
-   */
   public function __construct(array $resolvers = []) {
     $this->resolvers = $resolvers;
   }

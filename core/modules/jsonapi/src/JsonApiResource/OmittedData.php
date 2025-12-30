@@ -16,14 +16,6 @@ use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
  */
 class OmittedData extends ResourceObjectData {
 
-  /**
-   * OmittedData constructor.
-   *
-   * @param \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException[] $data
-   *   Resource objects that are the primary data for the response.
-   *
-   * @see \Drupal\jsonapi\JsonApiResource\Data::__construct
-   */
   public function __construct(array $data) {
     assert(Inspector::assertAllObjects($data, EntityAccessDeniedHttpException::class));
     parent::__construct($data, -1);

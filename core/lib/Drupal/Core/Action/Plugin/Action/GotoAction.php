@@ -40,20 +40,6 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
    */
   protected $unroutedUrlAssembler;
 
-  /**
-   * Constructs a GotoAction object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
-   *   The tempstore factory.
-   * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $url_assembler
-   *   The unrouted URL assembler service.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $dispatcher, UnroutedUrlAssemblerInterface $url_assembler) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

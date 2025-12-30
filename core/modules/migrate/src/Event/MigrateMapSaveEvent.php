@@ -24,14 +24,6 @@ class MigrateMapSaveEvent extends Event {
    */
   protected $fields;
 
-  /**
-   * Constructs a migration map event object.
-   *
-   * @param \Drupal\migrate\Plugin\MigrateIdMapInterface $map
-   *   Map plugin.
-   * @param array $fields
-   *   Array of fields being saved to the map.
-   */
   public function __construct(MigrateIdMapInterface $map, array $fields) {
     $this->map = $map;
     $this->fields = $fields;

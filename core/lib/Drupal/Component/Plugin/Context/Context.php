@@ -25,14 +25,6 @@ class Context implements ContextInterface {
    */
   protected $contextDefinition;
 
-  /**
-   * Create a context object.
-   *
-   * @param \Drupal\Component\Plugin\Context\ContextDefinitionInterface $context_definition
-   *   The context definition.
-   * @param mixed|null $context_value
-   *   The value of the context.
-   */
   public function __construct(ContextDefinitionInterface $context_definition, $context_value = NULL) {
     $this->contextDefinition = $context_definition;
     $this->contextValue = $context_value;

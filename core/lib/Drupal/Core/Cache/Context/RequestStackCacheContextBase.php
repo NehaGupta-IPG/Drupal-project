@@ -20,12 +20,6 @@ abstract class RequestStackCacheContextBase {
    */
   protected $requestStack;
 
-  /**
-   * Constructs a new RequestStackCacheContextBase class.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   */
   public function __construct(RequestStack $request_stack) {
     $this->requestStack = $request_stack;
   }

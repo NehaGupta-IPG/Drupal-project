@@ -292,26 +292,6 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
     self::STATUS_DISABLED => 'Disabled',
   ];
 
-  /**
-   * Constructs a Migration.
-   *
-   * @param array $configuration
-   *   Plugin configuration.
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param mixed $plugin_definition
-   *   The plugin definition.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
-   *   The migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigratePluginManagerInterface $source_plugin_manager
-   *   The source migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigratePluginManagerInterface $process_plugin_manager
-   *   The process migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrateDestinationPluginManager $destination_plugin_manager
-   *   The destination migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigratePluginManagerInterface $id_map_plugin_manager
-   *   The ID map migration plugin manager.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationPluginManagerInterface $migration_plugin_manager, MigratePluginManagerInterface $source_plugin_manager, MigratePluginManagerInterface $process_plugin_manager, MigrateDestinationPluginManager $destination_plugin_manager, MigratePluginManagerInterface $id_map_plugin_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migrationPluginManager = $migration_plugin_manager;

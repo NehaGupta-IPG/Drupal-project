@@ -24,14 +24,6 @@ class ImageStyleEditForm extends ImageStyleFormBase {
    */
   protected $imageEffectManager;
 
-  /**
-   * Constructs an ImageStyleEditForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
-   *   The storage.
-   * @param \Drupal\image\ImageEffectManager $image_effect_manager
-   *   The image effect manager service.
-   */
   public function __construct(EntityStorageInterface $image_style_storage, ImageEffectManager $image_effect_manager) {
     parent::__construct($image_style_storage);
     $this->imageEffectManager = $image_effect_manager;

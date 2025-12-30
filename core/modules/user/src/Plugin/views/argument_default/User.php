@@ -29,18 +29,6 @@ class User extends ArgumentDefaultPluginBase implements CacheableDependencyInter
    */
   protected $routeMatch;
 
-  /**
-   * Constructs a new User instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

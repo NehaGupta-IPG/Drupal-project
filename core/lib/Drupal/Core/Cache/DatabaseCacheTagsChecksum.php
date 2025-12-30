@@ -19,12 +19,6 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
    */
   protected $connection;
 
-  /**
-   * Constructs a DatabaseCacheTagsChecksum object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   */
   public function __construct(Connection $connection) {
     $this->connection = $connection;
   }

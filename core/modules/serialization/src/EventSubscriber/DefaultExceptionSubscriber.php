@@ -28,14 +28,6 @@ class DefaultExceptionSubscriber extends HttpExceptionSubscriberBase {
    */
   protected $serializerFormats = [];
 
-  /**
-   * DefaultExceptionSubscriber constructor.
-   *
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
-   *   The serializer service.
-   * @param array $serializer_formats
-   *   The available serialization formats.
-   */
   public function __construct(SerializerInterface $serializer, array $serializer_formats) {
     $this->serializer = $serializer;
     $this->serializerFormats = $serializer_formats;

@@ -89,16 +89,6 @@ class FieldDiscovery implements FieldDiscoveryInterface {
     FieldDiscoveryInterface::DRUPAL_7,
   ];
 
-  /**
-   * Constructs a FieldDiscovery object.
-   *
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $field_plugin_manager
-   *   The field plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
-   *   The migration plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger channel service.
-   */
   public function __construct(MigrateFieldPluginManagerInterface $field_plugin_manager, MigrationPluginManagerInterface $migration_plugin_manager, LoggerInterface $logger) {
     $this->fieldPluginManager = $field_plugin_manager;
     $this->migrationPluginManager = $migration_plugin_manager;

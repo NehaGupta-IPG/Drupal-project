@@ -20,12 +20,6 @@ final class Psr7RequestValueResolver implements ValueResolverInterface {
    */
   protected $httpMessageFactory;
 
-  /**
-   * Constructs a new ControllerResolver.
-   *
-   * @param \Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface $http_message_factory
-   *   The PSR-7 converter.
-   */
   public function __construct(HttpMessageFactoryInterface $http_message_factory) {
     $this->httpMessageFactory = $http_message_factory;
   }

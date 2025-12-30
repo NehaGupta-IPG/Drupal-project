@@ -32,18 +32,6 @@ class AccountSettingsForm extends ConfigFormBase {
    */
   protected $roleStorage;
 
-  /**
-   * Constructs a \Drupal\user\AccountSettingsForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
-   *   The role storage.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $module_handler, RoleStorageInterface $role_storage) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->moduleHandler = $module_handler;

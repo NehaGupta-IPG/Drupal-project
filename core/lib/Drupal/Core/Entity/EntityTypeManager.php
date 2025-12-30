@@ -63,25 +63,6 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    */
   protected $entityLastInstalledSchemaRepository;
 
-  /**
-   * Constructs a new Entity plugin manager.
-   *
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend to use.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   The class resolver.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
-   *   The entity last installed schema repository.
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The service container.
-   */
   public function __construct(\Traversable $namespaces, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, TranslationInterface $string_translation, ClassResolverInterface $class_resolver, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, protected ContainerInterface $container) {
     parent::__construct('Entity', $namespaces, $module_handler, EntityInterface::class);
 

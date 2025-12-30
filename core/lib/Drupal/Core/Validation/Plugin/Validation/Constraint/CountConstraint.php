@@ -19,9 +19,6 @@ use Symfony\Component\Validator\Constraints\Count;
 )]
 class CountConstraint extends Count {
 
-  /**
-   * {@inheritdoc}
-   */
   #[HasNamedArguments]
   public function __construct(...$args) {
     $this->minMessage = 'This collection should contain %limit element or more.|This collection should contain %limit elements or more.';

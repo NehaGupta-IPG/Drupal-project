@@ -174,9 +174,6 @@ abstract class BrowserTestBase extends TestCase {
    */
   protected $originalShutdownCallbacks = [];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(string $name) {
     parent::__construct($name);
     $this->setRunTestInSeparateProcess(TRUE);

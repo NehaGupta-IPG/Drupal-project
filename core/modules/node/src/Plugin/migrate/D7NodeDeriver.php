@@ -39,16 +39,6 @@ class D7NodeDeriver extends DeriverBase implements ContainerDeriverInterface {
    */
   protected $fieldDiscovery;
 
-  /**
-   * D7NodeDeriver constructor.
-   *
-   * @param string $base_plugin_id
-   *   The base plugin ID for the plugin ID.
-   * @param bool $translations
-   *   Whether or not to include translations.
-   * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $field_discovery
-   *   The migration field discovery service.
-   */
   public function __construct($base_plugin_id, $translations, FieldDiscoveryInterface $field_discovery) {
     $this->basePluginId = $base_plugin_id;
     $this->includeTranslations = $translations;

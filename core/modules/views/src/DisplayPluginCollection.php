@@ -27,14 +27,6 @@ class DisplayPluginCollection extends DefaultLazyPluginCollection {
    */
   protected $pluginKey = 'display_plugin';
 
-  /**
-   * Constructs a DisplayPluginCollection object.
-   *
-   * @param \Drupal\views\ViewExecutable $view
-   *   The view which has this displays attached.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
-   *   The manager to be used for instantiating plugins.
-   */
   public function __construct(ViewExecutable $view, PluginManagerInterface $manager) {
     parent::__construct($manager, $view->storage->get('display'));
 

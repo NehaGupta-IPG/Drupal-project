@@ -19,12 +19,6 @@ class FormUploadedFile implements UploadedFileInterface {
    */
   protected $uploadedFile;
 
-  /**
-   * Creates a new FormUploadedFile.
-   *
-   * @param \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
-   *   The wrapped Symfony uploaded file.
-   */
   public function __construct(UploadedFile $uploadedFile) {
     $this->uploadedFile = $uploadedFile;
   }

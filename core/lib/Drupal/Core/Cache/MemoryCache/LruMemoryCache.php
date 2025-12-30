@@ -16,14 +16,6 @@ use Drupal\Core\Cache\Cache;
  */
 class LruMemoryCache extends MemoryCache {
 
-  /**
-   * Constructs an LruMemoryCache object.
-   *
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param int $allowedSlots
-   *   The number of slots to allocate for items in the cache.
-   */
   public function __construct(
     TimeInterface $time,
     protected readonly int $allowedSlots,

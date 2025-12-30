@@ -38,33 +38,6 @@ use Drupal\Core\TypedData\Plugin\DataType\ItemList;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DataType extends Plugin {
 
-  /**
-   * Constructs a new DataType attribute.
-   *
-   * @param string $id
-   *   The data type plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
-   *   The human-readable name of the data type.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
-   *   (optional) The description of the data type.
-   * @param string|null $definition_class
-   *   (optional) The definition class to use for defining data of this type.
-   * @param string|null $list_class
-   *   (optional) The typed data class used for wrapping multiple data items of
-   *   the type.
-   * @param string|null $list_definition_class
-   *   (optional) The definition class to use for defining a list of items of
-   *   this type.
-   * @param array $constraints
-   *   (optional) An array of validation constraints for this type.
-   * @param bool $unwrap_for_canonical_representation
-   *   Whether the typed object wraps the canonical representation of the data.
-   * @param class-string|null $deriver
-   *   (optional) The deriver class for the data type.
-   *
-   * @see \Drupal\Core\TypedData\TypedDataManager::getConstraints()
-   * @see \Drupal\Core\TypedData\TypedDataManager::getCanonicalRepresentation()
-   */
   public function __construct(
     public readonly string $id,
     public readonly TranslatableMarkup $label,

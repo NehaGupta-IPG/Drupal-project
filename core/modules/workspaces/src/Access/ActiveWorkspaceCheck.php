@@ -19,12 +19,6 @@ class ActiveWorkspaceCheck implements AccessInterface {
    */
   protected $workspaceManager;
 
-  /**
-   * Constructs a new ActiveWorkspaceCheck.
-   *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
-   *   The workspace manager.
-   */
   public function __construct(WorkspaceManagerInterface $workspace_manager) {
     $this->workspaceManager = $workspace_manager;
   }

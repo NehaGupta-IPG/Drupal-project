@@ -59,15 +59,6 @@ abstract class EntityBase implements EntityInterface {
    */
   protected ?EntityInterface $originalEntity = NULL;
 
-  /**
-   * Constructs an Entity object.
-   *
-   * @param array $values
-   *   An array of values to set, keyed by property name. If the entity type
-   *   has bundles, the bundle key has to be specified.
-   * @param string $entity_type
-   *   The type of the entity to create.
-   */
   public function __construct(array $values, $entity_type) {
     $this->entityTypeId = $entity_type;
     // Set initial values.

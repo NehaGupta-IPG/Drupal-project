@@ -20,12 +20,6 @@ class DeletedWorkspaceConstraintValidator extends ConstraintValidator implements
    */
   protected $state;
 
-  /**
-   * Creates a new DeletedWorkspaceConstraintValidator instance.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   */
   public function __construct(StateInterface $state) {
     $this->state = $state;
   }

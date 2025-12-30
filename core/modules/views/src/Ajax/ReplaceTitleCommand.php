@@ -19,12 +19,6 @@ class ReplaceTitleCommand implements CommandInterface {
    */
   protected $title;
 
-  /**
-   * Constructs a \Drupal\views\Ajax\ReplaceTitleCommand object.
-   *
-   * @param string $title
-   *   The title of the page.
-   */
   public function __construct($title) {
     $this->title = $title;
   }

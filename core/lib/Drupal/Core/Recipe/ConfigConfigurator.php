@@ -25,14 +25,6 @@ final class ConfigConfigurator {
    */
   private readonly bool|array $strict;
 
-  /**
-   * @param array $config
-   *   Config options for a recipe.
-   * @param string $recipe_directory
-   *   The path to the recipe.
-   * @param \Drupal\Core\Config\StorageInterface $active_configuration
-   *   The active configuration storage.
-   */
   public function __construct(public readonly array $config, string $recipe_directory, StorageInterface $active_configuration) {
     $this->recipeConfigDirectory = is_dir($recipe_directory . '/config') ? $recipe_directory . '/config' : NULL;
     // @todo Consider defaulting this to FALSE in https://drupal.org/i/3478669.

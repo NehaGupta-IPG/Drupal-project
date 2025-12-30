@@ -128,12 +128,6 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
    */
   protected $additional = [];
 
-  /**
-   * LayoutDefinition constructor.
-   *
-   * @param array $definition
-   *   An array of values from the attribute.
-   */
   public function __construct(array $definition) {
     // If there are context definitions in the plugin definition, they should
     // be added to this object using ::addContextDefinition() so that they can

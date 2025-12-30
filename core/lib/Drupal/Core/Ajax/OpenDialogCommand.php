@@ -54,24 +54,6 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
    */
   protected $settings;
 
-  /**
-   * Constructs an OpenDialogCommand object.
-   *
-   * @param string $selector
-   *   The selector of the dialog.
-   * @param string|\Stringable|null $title
-   *   The title of the dialog.
-   * @param string|array $content
-   *   The content that will be placed in the dialog, either a render array
-   *   or an HTML string.
-   * @param array $dialog_options
-   *   (optional) Options to be passed to the dialog implementation. Any
-   *   jQuery UI option can be used. See http://api.jqueryui.com/dialog.
-   * @param array|null $settings
-   *   (optional) Custom settings that will be passed to the Drupal behaviors
-   *   on the content of the dialog. If left empty, the settings will be
-   *   populated automatically from the current request.
-   */
   public function __construct($selector, string|\Stringable|null $title, $content, array $dialog_options = [], $settings = NULL) {
     $title = PlainTextOutput::renderFromHtml($title);
     $dialog_options += ['title' => $title];

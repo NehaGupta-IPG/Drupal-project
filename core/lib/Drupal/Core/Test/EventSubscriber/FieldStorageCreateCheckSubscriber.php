@@ -27,17 +27,6 @@ final class FieldStorageCreateCheckSubscriber implements EventSubscriberInterfac
    */
   protected Schema $schema;
 
-  /**
-   * Constructs the FieldStorageCreateCheckSubscriber object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager service.
-   * @param bool $throwLogicExceptionOrDeprecationWarning
-   *   When the value is TRUE a LogicException will be thrown, when the value is
-   *   FALSE a deprecation warning will be given. The value defaults to FALSE.
-   */
   public function __construct(
     protected Connection $connection,
     protected EntityTypeManagerInterface $entityTypeManager,

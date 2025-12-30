@@ -36,16 +36,6 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
    */
   protected $moduleHandler;
 
-  /**
-   * Constructs a new file URL generator object.
-   *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
-   *   The stream wrapper manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager, RequestStack $request_stack, ModuleHandlerInterface $module_handler) {
     $this->streamWrapperManager = $stream_wrapper_manager;
     $this->requestStack = $request_stack;

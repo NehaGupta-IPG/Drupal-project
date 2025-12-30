@@ -31,16 +31,6 @@ class AuditResult implements MarkupInterface, \Countable {
    */
   protected $reasons = [];
 
-  /**
-   * AuditResult constructor.
-   *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The audited migration.
-   * @param bool $status
-   *   The result of the audit (TRUE if passed, FALSE otherwise).
-   * @param string[] $reasons
-   *   (optional) The reasons why the migration passed or failed the audit.
-   */
   public function __construct(MigrationInterface $migration, $status, array $reasons = []) {
     if (!is_bool($status)) {
       throw new \InvalidArgumentException('Audit results must have a boolean status.');

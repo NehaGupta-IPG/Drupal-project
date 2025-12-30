@@ -35,16 +35,6 @@ class EntityRepository implements EntityRepositoryInterface {
    */
   protected $contextRepository;
 
-  /**
-   * Constructs a new EntityRepository.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
-   *   The context repository service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, ContextRepositoryInterface $context_repository) {
     $this->entityTypeManager = $entity_type_manager;
     $this->languageManager = $language_manager;

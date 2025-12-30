@@ -59,16 +59,6 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
    */
   protected $configFactoryOverrides = [];
 
-  /**
-   * Constructs the Config factory.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $storage
-   *   The configuration storage engine.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   An event dispatcher instance to use for configuration events.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
-   *   The typed configuration manager.
-   */
   public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
     $this->storage = $storage;
     $this->eventDispatcher = $event_dispatcher;

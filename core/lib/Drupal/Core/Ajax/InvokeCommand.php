@@ -41,16 +41,6 @@ class InvokeCommand implements CommandInterface {
    */
   protected $arguments;
 
-  /**
-   * Constructs an InvokeCommand object.
-   *
-   * @param string $selector
-   *   A jQuery selector.
-   * @param string $method
-   *   The name of a jQuery method to invoke.
-   * @param array $arguments
-   *   An optional array of arguments to pass to the method.
-   */
   public function __construct($selector, $method, array $arguments = []) {
     $this->selector = $selector;
     $this->method = $method;

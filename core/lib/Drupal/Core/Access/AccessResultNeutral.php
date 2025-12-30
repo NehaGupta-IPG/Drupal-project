@@ -14,12 +14,6 @@ class AccessResultNeutral extends AccessResult implements AccessResultReasonInte
    */
   protected $reason;
 
-  /**
-   * Constructs a new AccessResultNeutral instance.
-   *
-   * @param null|string $reason
-   *   (optional) A message to provide details about this access result.
-   */
   public function __construct($reason = NULL) {
     $this->reason = $reason;
   }

@@ -22,27 +22,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Filter extends Plugin {
 
-  /**
-   * Constructs a Filter attribute.
-   *
-   * @param string $id
-   *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $title
-   *   The human-readable name of the filter. This is used as an administrative
-   *   summary of what the filter does.
-   * @param int $type
-   *   The filter type. Values are defined in
-   *   \Drupal\filter\Plugin\FilterInterface.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
-   *   (optional) Additional administrative information about the filter's
-   *   behavior.
-   * @param int $weight
-   *   (optional) A default weight for the filter in new text formats.
-   * @param bool $status
-   *   (optional) Whether this filter is enabled or disabled by default.
-   * @param array $settings
-   *   (optional) The default settings for the filter.
-   */
   public function __construct(
     public readonly string $id,
     public readonly TranslatableMarkup $title,

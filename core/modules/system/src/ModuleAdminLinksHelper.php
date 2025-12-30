@@ -18,14 +18,6 @@ class ModuleAdminLinksHelper {
    */
   const ADMIN_LINKS_MENU_TREE = 'admin_links_menu_tree';
 
-  /**
-   * Constructs a new service instance.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
-   *   The menu link tree service.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memoryCache
-   *   The memory cache.
-   */
   public function __construct(
     protected MenuLinkTreeInterface $menuLinkTree,
     protected MemoryCacheInterface $memoryCache,

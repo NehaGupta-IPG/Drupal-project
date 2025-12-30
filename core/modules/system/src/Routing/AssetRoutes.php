@@ -12,12 +12,6 @@ use Symfony\Component\Routing\Route;
  */
 class AssetRoutes implements ContainerInjectionInterface {
 
-  /**
-   * Constructs an asset routes object.
-   *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
-   *   The stream wrapper manager service.
-   */
   public function __construct(
     protected readonly StreamWrapperManagerInterface $streamWrapperManager,
   ) {}

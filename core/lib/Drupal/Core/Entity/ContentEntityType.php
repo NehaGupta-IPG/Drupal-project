@@ -15,9 +15,6 @@ class ContentEntityType extends EntityType implements ContentEntityTypeInterface
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $revision_metadata_keys = [];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($definition) {
     parent::__construct($definition);
 

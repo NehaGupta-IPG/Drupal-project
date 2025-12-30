@@ -42,9 +42,6 @@ final class DeprecationHandler {
    */
   private static array $collectedDeprecations = [];
 
-  /**
-   * This class should not be instantiated.
-   */
   private function __construct() {
     throw new \LogicException(__CLASS__ . ' should not be instantiated');
   }

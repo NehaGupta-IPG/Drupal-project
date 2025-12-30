@@ -52,22 +52,6 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
    */
   protected $emailValidator;
 
-  /**
-   * Constructs a UserPasswordForm object.
-   *
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Flood\FloodInterface $flood
-   *   The flood service.
-   * @param \Drupal\user\UserNameValidator $userNameValidator
-   *   The user validator service.
-   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
-   *   The email validator service.
-   */
   public function __construct(
     UserStorageInterface $user_storage,
     LanguageManagerInterface $language_manager,

@@ -30,18 +30,6 @@ class SetDialogOptionCommand implements CommandInterface {
    */
   protected $optionValue;
 
-  /**
-   * Constructs a SetDialogOptionCommand object.
-   *
-   * @param string $selector
-   *   The selector of the dialog whose title will be set. If set to an empty
-   *   value, the default modal dialog will be selected.
-   * @param string $option_name
-   *   The name of the option to set. May be any jQuery UI dialog option.
-   *   See http://api.jqueryui.com/dialog.
-   * @param mixed $option_value
-   *   The value of the option to be passed to the dialog.
-   */
   public function __construct($selector, $option_name, $option_value) {
     $this->selector = $selector ?: '#drupal-modal';
     $this->optionName = $option_name;

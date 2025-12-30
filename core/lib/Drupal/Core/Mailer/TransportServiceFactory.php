@@ -16,14 +16,6 @@ class TransportServiceFactory implements TransportServiceFactoryInterface {
 
   use TransportServiceFactoryTrait;
 
-  /**
-   * Constructs a new transport service factory.
-   *
-   * @param Iterable<TransportFactoryInterface> $factories
-   *   A list of transport factories.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory service.
-   */
   public function __construct(
     #[AutowireIterator(tag: 'mailer.transport_factory')]
     iterable $factories,

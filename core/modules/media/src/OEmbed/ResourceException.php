@@ -25,19 +25,6 @@ class ResourceException extends \Exception {
    */
   protected $data = [];
 
-  /**
-   * ResourceException constructor.
-   *
-   * @param string $message
-   *   The exception message.
-   * @param string $url
-   *   The URL of the resource. Can be the actual endpoint URL or the canonical
-   *   URL.
-   * @param array $data
-   *   (optional) The raw resource data, if available.
-   * @param \Throwable $previous
-   *   (optional) The previous exception, if any.
-   */
   public function __construct($message, $url, array $data = [], ?\Throwable $previous = NULL) {
     $this->url = $url;
     $this->data = $data;

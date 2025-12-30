@@ -34,14 +34,6 @@ class FileUploadSanitizeNameEvent extends Event {
    */
   protected $isSecurityRename = FALSE;
 
-  /**
-   * Constructs a file upload sanitize name event object.
-   *
-   * @param string $filename
-   *   The full filename (with extension, but not directory) being uploaded.
-   * @param string $allowed_extensions
-   *   A list of allowed extensions. If empty all extensions are allowed.
-   */
   public function __construct(string $filename, string $allowed_extensions) {
     $this->setFilename($filename);
     if ($allowed_extensions !== '') {

@@ -56,18 +56,6 @@ final class SmartDefaultSettings {
    */
   protected $logger;
 
-  /**
-   * Constructs a SmartDefaultSettings object.
-   *
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $plugin_manager
-   *   The CKEditor 5 plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   */
   public function __construct(CKEditor5PluginManagerInterface $plugin_manager, LoggerInterface $logger, ModuleHandlerInterface $module_handler, AccountInterface $current_user) {
     $this->pluginManager = $plugin_manager;
     $this->logger = $logger;

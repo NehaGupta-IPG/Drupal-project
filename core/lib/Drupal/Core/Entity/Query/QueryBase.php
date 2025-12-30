@@ -136,17 +136,6 @@ abstract class QueryBase implements QueryInterface {
    */
   protected string $conjunction;
 
-  /**
-   * Constructs this object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param string $conjunction
-   *   - AND: all of the conditions on the query need to match.
-   *   - OR: at least one of the conditions on the query need to match.
-   * @param array $namespaces
-   *   List of potential namespaces of the classes belonging to this query.
-   */
   public function __construct(EntityTypeInterface $entity_type, $conjunction, array $namespaces) {
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;

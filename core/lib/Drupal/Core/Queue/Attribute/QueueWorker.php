@@ -37,19 +37,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class QueueWorker extends Plugin {
 
-  /**
-   * @param string $id
-   *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $title
-   *   The human-readable title of the plugin.
-   * @param array|null $cron
-   *   (optional) An associative array of settings for cron. The array has one
-   *   key, time, which is set to the time Drupal cron should spend on calling
-   *   this worker in seconds. The default is set in
-   *   \Drupal\Core\Queue\QueueWorkerManager::processDefinition().
-   * @param class-string|null $deriver
-   *   (optional) The deriver class.
-   */
   public function __construct(
     public readonly string $id,
     public readonly ?TranslatableMarkup $title = NULL,

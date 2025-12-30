@@ -17,12 +17,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EntityBundleExistsConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
-  /**
-   * Constructs an EntityBundleExistsConstraintValidator object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundleInfo
-   *   The entity type bundle info service.
-   */
   public function __construct(private readonly EntityTypeBundleInfoInterface $bundleInfo) {}
 
   /**

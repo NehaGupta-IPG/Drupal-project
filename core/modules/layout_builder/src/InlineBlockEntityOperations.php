@@ -41,16 +41,6 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a new EntityOperations object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager service.
-   * @param \Drupal\layout_builder\InlineBlockUsageInterface $usage
-   *   Inline block usage tracking service.
-   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
-   *   The section storage manager.
-   */
   public function __construct(EntityTypeManagerInterface $entityTypeManager, InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager) {
     $this->entityTypeManager = $entityTypeManager;
     $this->blockContentStorage = $entityTypeManager->getStorage('block_content');

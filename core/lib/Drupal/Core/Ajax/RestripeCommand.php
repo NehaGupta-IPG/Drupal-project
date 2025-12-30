@@ -25,12 +25,6 @@ class RestripeCommand implements CommandInterface {
    */
   protected $selector;
 
-  /**
-   * Constructs a RestripeCommand object.
-   *
-   * @param string $selector
-   *   A CSS selector for the table to be restriped.
-   */
   public function __construct($selector) {
     $this->selector = $selector;
   }

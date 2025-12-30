@@ -42,16 +42,6 @@ class AttributeClassDiscovery implements DiscoveryInterface {
    */
   protected readonly array $rootTwoLevelNamespaces;
 
-  /**
-   * Constructs a new instance.
-   *
-   * @param string[] $pluginNamespaces
-   *   (optional) An array of namespace that may contain plugin implementations.
-   *   Defaults to an empty array.
-   * @param string $pluginDefinitionAttributeName
-   *   (optional) The name of the attribute that contains the plugin definition.
-   *   Defaults to 'Drupal\Component\Plugin\Attribute\Plugin'.
-   */
   public function __construct(
     protected readonly array $pluginNamespaces = [],
     protected readonly string $pluginDefinitionAttributeName = Plugin::class,

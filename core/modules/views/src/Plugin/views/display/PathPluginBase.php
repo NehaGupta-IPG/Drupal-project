@@ -37,20 +37,6 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    */
   protected $state;
 
-  /**
-   * Constructs a PathPluginBase object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state key value store.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

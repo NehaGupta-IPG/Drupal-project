@@ -18,12 +18,6 @@ class InjectedService {
    */
   protected $service;
 
-  /**
-   * InjectedService constructor.
-   *
-   * @param \Drupal\new_dependency_test_with_service\NewService $service
-   *   The service of the new module.
-   */
   public function __construct(NewService $service) {
     $this->service = $service;
   }

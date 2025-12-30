@@ -20,9 +20,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 )]
 class AutowireBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

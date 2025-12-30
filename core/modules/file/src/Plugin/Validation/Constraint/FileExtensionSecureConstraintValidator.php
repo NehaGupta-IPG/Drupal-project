@@ -16,12 +16,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FileExtensionSecureConstraintValidator extends BaseFileConstraintValidator implements ContainerInjectionInterface {
 
-  /**
-   * Creates a new FileExtensionSecureConstraintValidator.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
-   */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
   ) {}

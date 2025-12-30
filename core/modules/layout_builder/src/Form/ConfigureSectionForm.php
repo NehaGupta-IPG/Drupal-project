@@ -91,14 +91,6 @@ class ConfigureSectionForm extends FormBase implements WorkspaceDynamicSafeFormI
    */
   protected $isUpdate;
 
-  /**
-   * Constructs a new ConfigureSectionForm.
-   *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
-   *   The layout tempstore repository.
-   * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $plugin_form_manager
-   *   The plugin form manager.
-   */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, PluginFormFactoryInterface $plugin_form_manager) {
     $this->layoutTempstoreRepository = $layout_tempstore_repository;
     $this->pluginFormFactory = $plugin_form_manager;

@@ -153,24 +153,6 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    */
   protected $migrationPluginManager;
 
-  /**
-   * Constructs an SQL object.
-   *
-   * Sets up the tables and builds the maps,
-   *
-   * @param array $configuration
-   *   The configuration.
-   * @param string $plugin_id
-   *   The plugin ID for the migration process to do.
-   * @param mixed $plugin_definition
-   *   The configuration for the plugin.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The migration to do.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
-   *   The migration plugin manager.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EventDispatcherInterface $event_dispatcher, ?MigrationPluginManagerInterface $migration_plugin_manager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;

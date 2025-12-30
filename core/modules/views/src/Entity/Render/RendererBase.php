@@ -43,16 +43,6 @@ abstract class RendererBase implements CacheableDependencyInterface {
    */
   protected $build;
 
-  /**
-   * Constructs a renderer object.
-   *
-   * @param \Drupal\views\ViewExecutable $view
-   *   The entity row being rendered.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type.
-   */
   public function __construct(ViewExecutable $view, LanguageManagerInterface $language_manager, EntityTypeInterface $entity_type) {
     $this->view = $view;
     $this->languageManager = $language_manager;

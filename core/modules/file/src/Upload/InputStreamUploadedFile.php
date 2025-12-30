@@ -11,9 +11,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class InputStreamUploadedFile implements UploadedFileInterface {
 
-  /**
-   * Creates a new InputStreamUploadedFile.
-   */
   public function __construct(
     protected readonly string $clientOriginalName,
     protected readonly string $filename,

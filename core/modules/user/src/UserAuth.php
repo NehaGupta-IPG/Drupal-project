@@ -24,14 +24,6 @@ class UserAuth implements UserAuthInterface {
    */
   protected $passwordChecker;
 
-  /**
-   * Constructs a UserAuth object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Password\PasswordInterface $password_checker
-   *   The password service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, PasswordInterface $password_checker) {
     @trigger_error(__CLASS__ . ' is deprecated in drupal:10.3.0 and will be removed from drupal:12.0.0. Implement \Drupal\user\UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
     $this->entityTypeManager = $entity_type_manager;

@@ -25,14 +25,6 @@ class ConfigEntityDependency {
    */
   protected $dependencies = [];
 
-  /**
-   * Constructs the configuration entity dependency from the entity values.
-   *
-   * @param string $name
-   *   The configuration entity's configuration object name.
-   * @param array $values
-   *   (optional) The configuration entity's values.
-   */
   public function __construct($name, $values = []) {
     $this->name = $name;
     if (isset($values['dependencies']) && isset($values['dependencies']['enforced'])) {

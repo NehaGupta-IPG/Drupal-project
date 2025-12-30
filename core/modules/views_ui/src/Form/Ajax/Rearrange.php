@@ -17,9 +17,6 @@ use Drupal\views\ViewExecutable;
  */
 class Rearrange extends ViewsFormBase {
 
-  /**
-   * Constructs a new Rearrange object.
-   */
   public function __construct($type = NULL) {
     $this->setType($type);
   }

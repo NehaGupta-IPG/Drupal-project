@@ -16,16 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class CommentTypeListBuilder extends ConfigEntityListBuilder {
 
-  /**
-   * Constructs a new CommentTypeListBuilder object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected EntityTypeManagerInterface $entityTypeManager) {
     parent::__construct($entity_type, $storage);
   }

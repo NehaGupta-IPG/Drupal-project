@@ -43,16 +43,6 @@ class MediaTypeForm extends EntityForm {
    */
   protected $entityDisplayRepository;
 
-  /**
-   * Constructs a new class instance.
-   *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $source_manager
-   *   Media source plugin manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   Entity field manager service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
-   *   Entity display repository service.
-   */
   public function __construct(PluginManagerInterface $source_manager, EntityFieldManagerInterface $entity_field_manager, EntityDisplayRepositoryInterface $entityDisplayRepository) {
     $this->sourceManager = $source_manager;
     $this->entityFieldManager = $entity_field_manager;

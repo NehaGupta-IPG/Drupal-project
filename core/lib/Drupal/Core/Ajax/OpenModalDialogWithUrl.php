@@ -17,15 +17,6 @@ use Drupal\Component\Utility\UrlHelper;
  */
 class OpenModalDialogWithUrl implements CommandInterface {
 
-  /**
-   * Constructs a OpenModalDialogWithUrl object.
-   *
-   * @param string $url
-   *   Only Internal URLs or URLs with the same domain and base path are
-   *   allowed.
-   * @param array $settings
-   *   The dialog settings.
-   */
   public function __construct(
     protected string $url,
     protected array $settings,

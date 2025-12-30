@@ -14,9 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class DateFormatDeleteForm extends EntityDeleteForm {
 
-  /**
-   * Constructs a DateFormatDeleteForm object.
-   */
   public function __construct(
     protected DateFormatterInterface $dateFormatter,
     protected TimeInterface $time,

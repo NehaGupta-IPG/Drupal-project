@@ -77,9 +77,6 @@ use Drupal\migrate\Row;
 #[MigrateProcess('callback')]
 class Callback extends ProcessPluginBase {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     if (!isset($configuration['callable'])) {
       throw new \InvalidArgumentException('The "callable" must be set.');

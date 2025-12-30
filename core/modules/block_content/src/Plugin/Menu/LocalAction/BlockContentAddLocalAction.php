@@ -13,9 +13,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class BlockContentAddLocalAction extends LocalActionDefault {
 
-  /**
-   * Constructs a BlockContentAddLocalAction object.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

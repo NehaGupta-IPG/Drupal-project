@@ -61,24 +61,6 @@ final class SecurityAdvisory {
    */
   protected $url;
 
-  /**
-   * Constructs a SecurityAdvisories object.
-   *
-   * @param string $title
-   *   The title of the advisory.
-   * @param string $project
-   *   The project name.
-   * @param string $type
-   *   The project type.
-   * @param bool $is_psa
-   *   Whether this advisory is a public service announcement.
-   * @param string $url
-   *   The URL to the advisory.
-   * @param string[] $insecure_versions
-   *   The versions of the project that are currently insecure. For public
-   *   service announcements this list does not include versions that will be
-   *   marked as insecure when the new security release is published.
-   */
   private function __construct(string $title, string $project, string $type, bool $is_psa, string $url, array $insecure_versions) {
     $this->title = $title;
     $this->project = $project;

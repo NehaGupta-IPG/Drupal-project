@@ -48,16 +48,6 @@ class FieldTypeCategoryManager extends DefaultPluginManager implements FieldType
     'class' => FieldTypeCategory::class,
   ];
 
-  /**
-   * Constructs a new FieldTypeCategoryManager.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   */
   public function __construct(protected readonly string $root, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {
     $this->moduleHandler = $module_handler;
     $this->alterInfo('field_type_category_info');

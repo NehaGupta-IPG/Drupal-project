@@ -17,9 +17,6 @@ class LayoutOverrideFieldHelper implements ContainerInjectionInterface {
 
   use LayoutEntityHelperTrait;
 
-  /**
-   * Constructs a new LayoutOverrideFieldHelper.
-   */
   public function __construct(
     protected SectionStorageManagerInterface $sectionStorageManager,
     protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository,

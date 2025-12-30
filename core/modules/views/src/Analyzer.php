@@ -26,12 +26,6 @@ class Analyzer {
    */
   protected $moduleHandler;
 
-  /**
-   * Constructs an Analyzer object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler that invokes the 'views_analyze' hook.
-   */
   public function __construct(ModuleHandlerInterface $module_handler) {
     $this->moduleHandler = $module_handler;
   }

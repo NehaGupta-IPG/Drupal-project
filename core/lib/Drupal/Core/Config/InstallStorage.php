@@ -47,16 +47,6 @@ class InstallStorage extends FileStorage {
    */
   protected $directory;
 
-  /**
-   * Constructs an InstallStorage object.
-   *
-   * @param string $directory
-   *   The directory to scan in each extension to scan for files. Defaults to
-   *   'config/install'.
-   * @param string $collection
-   *   (optional) The collection to store configuration in. Defaults to the
-   *   default collection.
-   */
   public function __construct($directory = self::CONFIG_INSTALL_DIRECTORY, $collection = StorageInterface::DEFAULT_COLLECTION) {
     parent::__construct($directory, $collection);
   }

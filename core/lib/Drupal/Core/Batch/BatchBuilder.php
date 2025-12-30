@@ -134,9 +134,6 @@ class BatchBuilder {
    */
   protected static array $registeredSetIds = [];
 
-  /**
-   * Sets the default values for the batch builder.
-   */
   public function __construct() {
     $this->title = new TranslatableMarkup('Processing');
     $this->initMessage = new TranslatableMarkup('Initializing.');

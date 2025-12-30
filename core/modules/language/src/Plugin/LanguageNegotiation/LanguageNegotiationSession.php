@@ -60,12 +60,6 @@ class LanguageNegotiationSession extends LanguageNegotiationMethodBase implement
    */
   const METHOD_ID = 'language-session';
 
-  /**
-   * Constructs a LanguageNegotiationSession object.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   */
   public function __construct(RequestStack $request_stack) {
     $this->requestStack = $request_stack;
   }

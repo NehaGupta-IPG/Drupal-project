@@ -17,17 +17,6 @@ use Drupal\package_manager\Event\SandboxEvent;
  */
 class SandboxEventException extends SandboxException {
 
-  /**
-   * Constructs a StageEventException object.
-   *
-   * @param \Drupal\package_manager\Event\SandboxEvent $event
-   *   The stage event during which this exception is thrown.
-   * @param string|null $message
-   *   (optional) The exception message. Defaults to a plain text representation
-   *   of the validation results.
-   * @param mixed ...$arguments
-   *   Additional arguments to pass to the parent constructor.
-   */
   public function __construct(public readonly SandboxEvent $event, ?string $message = NULL, ...$arguments) {
     parent::__construct($event->sandboxManager, $message ?: $this->getResultsAsText(), ...$arguments);
   }

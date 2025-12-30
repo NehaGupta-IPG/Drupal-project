@@ -46,12 +46,6 @@ class MysqlDateSql implements DateSqlInterface {
     'A' => '%p',
   ];
 
-  /**
-   * Constructs the MySQL-specific date sql class.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
-   */
   public function __construct(Connection $database) {
     $this->database = $database;
   }

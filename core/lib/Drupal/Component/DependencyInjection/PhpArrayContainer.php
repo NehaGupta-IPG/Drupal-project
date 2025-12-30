@@ -25,9 +25,6 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class PhpArrayContainer extends Container {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $container_definition = []) {
     if (isset($container_definition['machine_format']) && $container_definition['machine_format'] === TRUE) {
       throw new InvalidArgumentException('The machine-optimized format is not supported by this class. Use a human-readable format instead, e.g. as produced by \Drupal\Component\DependencyInjection\Dumper\PhpArrayDumper.');

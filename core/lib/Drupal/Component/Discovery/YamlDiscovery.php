@@ -25,15 +25,6 @@ class YamlDiscovery implements DiscoverableInterface {
    */
   protected $directories = [];
 
-  /**
-   * Constructs a YamlDiscovery object.
-   *
-   * @param string $name
-   *   The base filename to look for in each directory. The format will be
-   *   $provider.$name.yml.
-   * @param array $directories
-   *   An array of directories to scan, keyed by the provider.
-   */
   public function __construct($name, array $directories) {
     $this->name = $name;
     $this->directories = $directories;

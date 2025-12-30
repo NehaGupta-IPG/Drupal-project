@@ -54,18 +54,6 @@ class CommentAdminOverview extends FormBase {
    */
   protected $tempStoreFactory;
 
-  /**
-   * Creates a CommentAdminOverview form.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *   The tempstore factory.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, ModuleHandlerInterface $module_handler, PrivateTempStoreFactory $temp_store_factory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->commentStorage = $entity_type_manager->getStorage('comment');

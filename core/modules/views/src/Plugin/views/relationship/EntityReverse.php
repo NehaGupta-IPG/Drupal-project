@@ -26,18 +26,6 @@ class EntityReverse extends RelationshipPluginBase {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $first_alias;
 
-  /**
-   * Constructs an EntityReverse object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param array $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\views\Plugin\ViewsHandlerManager $join_manager
-   *   The views plugin join manager.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ViewsHandlerManager $join_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->joinManager = $join_manager;

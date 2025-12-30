@@ -26,12 +26,6 @@ final class ReverseContainer {
    */
   private static array $recordedServices = [];
 
-  /**
-   * Constructs a ReverseContainer object.
-   *
-   * @param \Drupal\Component\DependencyInjection\Container|\Symfony\Component\DependencyInjection\Container $serviceContainer
-   *   The service container.
-   */
   public function __construct(private readonly Container|SymfonyContainer $serviceContainer) {
     $this->getServiceId = \Closure::bind(function ($service): ?string {
       return array_search($service, $this->services, TRUE) ?: NULL;

@@ -49,19 +49,6 @@ class Config extends StorableConfigBase {
    */
   protected $settingsOverrides;
 
-  /**
-   * Constructs a configuration object.
-   *
-   * @param string $name
-   *   The name of the configuration object being constructed.
-   * @param \Drupal\Core\Config\StorageInterface $storage
-   *   A storage object to use for reading and writing the
-   *   configuration data.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   An event dispatcher instance to use for configuration events.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
-   *   The typed configuration manager service.
-   */
   public function __construct($name, StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
     $this->name = $name;
     $this->storage = $storage;

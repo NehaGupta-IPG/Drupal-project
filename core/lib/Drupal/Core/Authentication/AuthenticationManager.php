@@ -24,12 +24,6 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
    */
   protected $authCollector;
 
-  /**
-   * Creates a new authentication manager instance.
-   *
-   * @param \Drupal\Core\Authentication\AuthenticationCollectorInterface $auth_collector
-   *   The authentication provider collector.
-   */
   public function __construct(AuthenticationCollectorInterface $auth_collector) {
     $this->authCollector = $auth_collector;
   }

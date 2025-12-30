@@ -52,20 +52,6 @@ class JsonApiDocumentTopLevel {
    */
   protected $omissions;
 
-  /**
-   * Instantiates a JsonApiDocumentTopLevel object.
-   *
-   * @param \Drupal\jsonapi\JsonApiResource\TopLevelDataInterface|\Drupal\jsonapi\JsonApiResource\ErrorCollection $data
-   *   The data to normalize. It can be either a ResourceObject, or a stand-in
-   *   for one, or a collection of the same.
-   * @param \Drupal\jsonapi\JsonApiResource\IncludedData $includes
-   *   A JSON:API Data object containing resources to be included in the
-   *   response document or NULL if there should not be includes.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
-   *   A collection of links to resources related to the top-level document.
-   * @param array $meta
-   *   (optional) The metadata to normalize.
-   */
   public function __construct($data, IncludedData $includes, LinkCollection $links, array $meta = []) {
     assert($data instanceof TopLevelDataInterface || $data instanceof ErrorCollection);
     assert(!$data instanceof ErrorCollection || $includes instanceof NullIncludedData);

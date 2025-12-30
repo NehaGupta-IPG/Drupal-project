@@ -27,14 +27,6 @@ class BundleConfigImportValidate extends ConfigImportValidateEventSubscriberBase
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs the event subscriber.
-   *
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The config manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   */
   public function __construct(ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager) {
     $this->configManager = $config_manager;
     $this->entityTypeManager = $entity_type_manager;

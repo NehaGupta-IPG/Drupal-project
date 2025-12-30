@@ -18,9 +18,6 @@ abstract class DraggableListBuilder extends ConfigEntityListBuilder implements F
 
   use DraggableListBuilderTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage) {
     parent::__construct($entity_type, $storage);
 

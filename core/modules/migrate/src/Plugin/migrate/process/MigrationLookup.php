@@ -146,22 +146,6 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
    */
   protected $migrateStub;
 
-  /**
-   * Constructs a MigrationLookup object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The Migration the plugin is being used in.
-   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
-   *   The migrate lookup service.
-   * @param \Drupal\migrate\MigrateStubInterface $migrate_stub
-   *   The migrate stub service.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, MigrateLookupInterface $migrate_lookup, MigrateStubInterface $migrate_stub) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;

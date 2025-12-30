@@ -46,22 +46,6 @@ class EntityPermissionsForm extends UserPermissionsForm {
    */
   protected $bundle;
 
-  /**
-   * Constructs a new EntityPermissionsForm.
-   *
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
-   *   The permission handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
-   *   The role storage.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The configuration entity manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|null $module_extension_list
-   *   The module extension list.
-   */
   public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager, ?ModuleExtensionList $module_extension_list = NULL) {
     if ($module_extension_list === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);

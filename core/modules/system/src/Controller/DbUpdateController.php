@@ -80,28 +80,6 @@ class DbUpdateController extends ControllerBase {
    */
   protected $postUpdateRegistry;
 
-  /**
-   * Constructs a new UpdateController.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_expirable_factory
-   *   The keyvalue expirable factory.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   A cache backend interface.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_page_renderer
-   *   The bare HTML page renderer.
-   * @param \Drupal\Core\Update\UpdateRegistry $post_update_registry
-   *   The post update registry.
-   * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
-   *   The asset query string.
-   */
   public function __construct(
     $root,
     KeyValueExpirableFactoryInterface $key_value_expirable_factory,

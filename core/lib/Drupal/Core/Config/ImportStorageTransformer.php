@@ -53,18 +53,6 @@ final class ImportStorageTransformer {
    */
   protected $persistentLock;
 
-  /**
-   * ImportStorageTransformer constructor.
-   *
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Lock\LockBackendInterface $requestLock
-   *   The lock for the request.
-   * @param \Drupal\Core\Lock\LockBackendInterface $persistentLock
-   *   The persistent lock used by the config importer.
-   */
   public function __construct(EventDispatcherInterface $event_dispatcher, Connection $connection, LockBackendInterface $requestLock, LockBackendInterface $persistentLock) {
     $this->eventDispatcher = $event_dispatcher;
     $this->connection = $connection;

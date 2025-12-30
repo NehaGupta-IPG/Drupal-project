@@ -15,9 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ConfigHandler extends ViewsFormBase {
 
-  /**
-   * Constructs a new ConfigHandler object.
-   */
   public function __construct($type = NULL, $id = NULL) {
     $this->setType($type);
     $this->setID($id);

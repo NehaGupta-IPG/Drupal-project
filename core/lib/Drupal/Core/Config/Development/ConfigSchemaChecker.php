@@ -46,18 +46,6 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
    */
   protected $exclude = [];
 
-  /**
-   * Constructs the ConfigSchemaChecker object.
-   *
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_manager
-   *   The typed config manager.
-   * @param string[] $exclude
-   *   An array of config object names that are excluded from schema checking.
-   * @param bool $validateConstraints
-   *   Determines if constraints will be validated. If TRUE, constraint
-   *   validation errors will be added to the errors found by
-   *   SchemaCheckTrait::checkConfigSchema().
-   */
   public function __construct(TypedConfigManagerInterface $typed_manager, array $exclude = [], private readonly bool $validateConstraints = FALSE) {
     $this->typedManager = $typed_manager;
     $this->exclude = $exclude;

@@ -25,9 +25,6 @@ class EntityLinkSuggestions extends CKEditor5PluginDefault implements CKEditor5P
   use CKEditor5PluginConfigurableTrait;
   use DynamicPluginConfigWithCsrfTokenUrlTrait;
 
-  /**
-   * EntityLinkSuggestions constructor.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

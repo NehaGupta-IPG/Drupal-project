@@ -21,22 +21,6 @@ class AnnotatedClassDiscoveryAutomatedProviders extends AnnotatedClassDiscovery 
 
   use AnnotatedDiscoveryAutomatedProvidersTrait;
 
-  /**
-   * Constructs an AnnotatedClassDiscoveryAutomatedProviders object.
-   *
-   * @param string $subdir
-   *   Either the plugin's subdirectory, for example 'Plugin/views/filter', or
-   *   empty string if plugins are located at the top level of the namespace.
-   * @param \Traversable $root_namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   *   If $subdir is not an empty string, it will be appended to each namespace.
-   * @param string $plugin_definition_annotation_name
-   *   The name of the annotation that contains the plugin definition.
-   *   Defaults to 'Drupal\Component\Annotation\Plugin'.
-   * @param string[] $annotation_namespaces
-   *   Additional namespaces to scan for annotation definitions.
-   */
   public function __construct($subdir, \Traversable $root_namespaces, $plugin_definition_annotation_name = 'Drupal\Component\Annotation\Plugin', array $annotation_namespaces = []) {
     parent::__construct($subdir, $root_namespaces, $plugin_definition_annotation_name, $annotation_namespaces);
     $this->finder = new ClassFinder();

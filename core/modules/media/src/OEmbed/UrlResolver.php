@@ -61,20 +61,6 @@ class UrlResolver implements UrlResolverInterface {
    */
   protected $cacheBackend;
 
-  /**
-   * Constructs a UrlResolver object.
-   *
-   * @param \Drupal\media\OEmbed\ProviderRepositoryInterface $providers
-   *   The oEmbed provider repository service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
-   *   The OEmbed resource fetcher service.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   The HTTP client.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   */
   public function __construct(ProviderRepositoryInterface $providers, ResourceFetcherInterface $resource_fetcher, ClientInterface $http_client, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {
     $this->providers = $providers;
     $this->resourceFetcher = $resource_fetcher;

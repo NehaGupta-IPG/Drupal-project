@@ -14,16 +14,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RenderCache implements RenderCacheInterface {
 
-  /**
-   * Constructs a new RenderCache object.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack.
-   * @param \Drupal\Core\Cache\VariationCacheFactoryInterface $cacheFactory
-   *   The variation cache factory.
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cacheContextsManager
-   *   The cache contexts manager.
-   */
   public function __construct(
     protected RequestStack $requestStack,
     protected VariationCacheFactoryInterface $cacheFactory,

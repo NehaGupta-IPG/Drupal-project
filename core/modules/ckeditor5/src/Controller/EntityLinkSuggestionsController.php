@@ -37,9 +37,6 @@ class EntityLinkSuggestionsController extends ControllerBase {
    */
   const DEFAULT_LIMIT = 100;
 
-  /**
-   * Constructs a EntityLinkSuggestionsController.
-   */
   public function __construct(
     protected readonly SelectionPluginManagerInterface $selectionPluginManager,
     protected readonly EntityTypeBundleInfoInterface $entityTypeBundleInfo,

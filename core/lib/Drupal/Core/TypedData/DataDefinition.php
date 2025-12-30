@@ -37,12 +37,6 @@ class DataDefinition implements DataDefinitionInterface, \ArrayAccess {
     return self::create($type);
   }
 
-  /**
-   * Constructs a new data definition object.
-   *
-   * @param array $values
-   *   (optional) If given, an array of initial values to set on the definition.
-   */
   public function __construct(array $values = []) {
     $this->definition = $values;
   }

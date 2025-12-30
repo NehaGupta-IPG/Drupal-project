@@ -16,12 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AnnounceController extends ControllerBase implements ContainerInjectionInterface {
 
-  /**
-   * Constructs an AnnounceController object.
-   *
-   * @param \Drupal\announcements_feed\AnnounceRenderer $announceRenderer
-   *   The AnnounceRenderer service.
-   */
   public function __construct(
     protected AnnounceRenderer $announceRenderer,
   ) {

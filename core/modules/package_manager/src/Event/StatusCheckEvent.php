@@ -24,16 +24,6 @@ final class StatusCheckEvent extends SandboxValidationEvent {
    */
   public readonly ?ImmutablePathList $excludedPaths;
 
-  /**
-   * Constructs a StatusCheckEvent object.
-   *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandboxManager
-   *   The stage which fired this event.
-   * @param \PhpTuf\ComposerStager\API\Path\Value\PathListInterface|\Throwable $excluded_paths
-   *   The list of paths to exclude or, if an error occurred while they were
-   *   being collected, the throwable from that error. If this is a throwable,
-   *   it will be converted to a validation error.
-   */
   public function __construct(SandboxManagerBase $sandboxManager, PathListInterface|\Throwable $excluded_paths) {
     parent::__construct($sandboxManager);
 

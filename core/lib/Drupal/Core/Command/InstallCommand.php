@@ -34,12 +34,6 @@ class InstallCommand extends Command {
    */
   protected $classLoader;
 
-  /**
-   * Constructs a new InstallCommand command.
-   *
-   * @param object $class_loader
-   *   The class loader.
-   */
   public function __construct($class_loader) {
     parent::__construct('install');
     $this->classLoader = $class_loader;

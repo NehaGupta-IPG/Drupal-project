@@ -17,16 +17,6 @@ class SessionHandler extends AbstractSessionHandler implements \SessionHandlerIn
 
   use DependencySerializationTrait;
 
-  /**
-   * Constructs a new SessionHandler instance.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     protected RequestStack $requestStack,
     protected Connection $connection,

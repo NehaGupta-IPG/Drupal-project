@@ -90,14 +90,6 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
    */
   protected $viewsToSave = [];
 
-  /**
-   * Constructs a ViewsEntitySchemaSubscriber.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger) {
     $this->entityTypeManager = $entity_type_manager;
     $this->logger = $logger;

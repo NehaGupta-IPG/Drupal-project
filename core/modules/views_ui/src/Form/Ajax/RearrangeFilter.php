@@ -13,9 +13,6 @@ use Drupal\views\ViewExecutable;
  */
 class RearrangeFilter extends ViewsFormBase {
 
-  /**
-   * Constructs a new RearrangeFilter object.
-   */
   public function __construct($type = NULL) {
     $this->setType($type);
   }

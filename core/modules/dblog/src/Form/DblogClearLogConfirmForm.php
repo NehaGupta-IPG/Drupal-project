@@ -22,12 +22,6 @@ class DblogClearLogConfirmForm extends ConfirmFormBase {
    */
   protected $connection;
 
-  /**
-   * Constructs a new DblogClearLogConfirmForm.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   */
   public function __construct(Connection $connection) {
     $this->connection = $connection;
   }

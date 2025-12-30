@@ -21,20 +21,6 @@ use Drupal\migrate\Plugin\Discovery\ProviderFilterDecorator;
  */
 class MigrateSourcePluginManager extends MigratePluginManager {
 
-  /**
-   * MigrateSourcePluginManager constructor.
-   *
-   * @param string $type
-   *   The type of the plugin: row, source, process, destination, entity_field,
-   *   id_map.
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke the alter hook with.
-   */
   public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct($type, $namespaces, $cache_backend, $module_handler, MigrateSource::class, 'Drupal\migrate\Annotation\MigrateSource');
   }

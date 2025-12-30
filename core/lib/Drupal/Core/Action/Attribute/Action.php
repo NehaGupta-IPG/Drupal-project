@@ -19,25 +19,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Action extends Plugin {
 
-  /**
-   * Constructs an Action attribute.
-   *
-   * @param string $id
-   *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
-   *   The label of the action.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $action_label
-   *   (optional) A label that can be used by the action deriver.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $category
-   *   (optional) The category under which the action should be listed in the
-   *   UI.
-   * @param class-string|null $deriver
-   *   (optional) The deriver class.
-   * @param string|null $confirm_form_route_name
-   *   (optional) The route name for a confirmation form for this action.
-   * @param string|null $type
-   *   (optional) The entity type the action can apply to.
-   */
   public function __construct(
     public readonly string $id,
     public readonly ?TranslatableMarkup $label = NULL,

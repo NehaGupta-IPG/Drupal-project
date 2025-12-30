@@ -40,19 +40,6 @@ class DatabaseStorage implements StorageInterface {
    */
   protected $collection = StorageInterface::DEFAULT_COLLECTION;
 
-  /**
-   * Constructs a new DatabaseStorage.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   A Database connection to use for reading and writing configuration data.
-   * @param string $table
-   *   A database table name to store configuration data in.
-   * @param array $options
-   *   (optional) Any additional database connection options to use in queries.
-   * @param string $collection
-   *   (optional) The collection to store configuration in. Defaults to the
-   *   default collection.
-   */
   public function __construct(Connection $connection, $table, array $options = [], $collection = StorageInterface::DEFAULT_COLLECTION) {
     $this->connection = $connection;
     $this->table = $table;

@@ -28,14 +28,6 @@ abstract class DateFormatFormBase extends EntityForm {
    */
   protected $dateFormatStorage;
 
-  /**
-   * Constructs a new date format form.
-   *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date service.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $date_format_storage
-   *   The date format storage.
-   */
   public function __construct(DateFormatterInterface $date_formatter, ConfigEntityStorageInterface $date_format_storage) {
     $this->dateFormatter = $date_formatter;
     $this->dateFormatStorage = $date_format_storage;

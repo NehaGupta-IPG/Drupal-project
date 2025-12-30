@@ -23,12 +23,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class TestErrorHandler {
 
-  /**
-   * @param \Drupal\TestTools\ErrorHandler\BootstrapErrorHandler $parentHandler
-   *   The parent error handler.
-   * @param \PHPUnit\Framework\TestCase $testCase
-   *   The test case being executed.
-   */
   public function __construct(
     private readonly BootstrapErrorHandler $parentHandler,
     private readonly TestCase $testCase,

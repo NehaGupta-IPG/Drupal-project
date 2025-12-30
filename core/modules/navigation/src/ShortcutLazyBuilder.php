@@ -15,12 +15,6 @@ use Drupal\shortcut\ShortcutLazyBuilders;
  */
 final class ShortcutLazyBuilder {
 
-  /**
-   * Constructs a ShortcutLazyBuilders object.
-   *
-   * @param \Drupal\shortcut\ShortcutLazyBuilders $shortcutLazyBuilder
-   *   The original shortcuts lazy builder service.
-   */
   public function __construct(
     protected readonly ShortcutLazyBuilders $shortcutLazyBuilder,
   ) {}

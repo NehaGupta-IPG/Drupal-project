@@ -29,14 +29,6 @@ class DialogRenderer implements MainContentRendererInterface {
    */
   protected $renderer;
 
-  /**
-   * Constructs a new DialogRenderer.
-   *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
-   *   The title resolver.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
   public function __construct(TitleResolverInterface $title_resolver, RendererInterface $renderer) {
     $this->titleResolver = $title_resolver;
     $this->renderer = $renderer;

@@ -19,12 +19,6 @@ class EntityResourcePostRouteSubscriber implements EventSubscriberInterface {
    */
   protected $resourceConfigStorage;
 
-  /**
-   * Constructs a new EntityResourcePostRouteSubscriber instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->resourceConfigStorage = $entity_type_manager->getStorage('rest_resource_config');
   }

@@ -49,22 +49,6 @@ class Transition implements TransitionInterface {
    */
   protected $weight;
 
-  /**
-   * Transition constructor.
-   *
-   * @param \Drupal\workflows\WorkflowTypeInterface $workflow
-   *   The workflow the state is attached to.
-   * @param string $id
-   *   The transition's ID.
-   * @param string $label
-   *   The transition's label.
-   * @param array $from_state_ids
-   *   A list of from state IDs.
-   * @param string $to_state_id
-   *   The to state ID.
-   * @param int $weight
-   *   (optional) The transition's weight. Defaults to 0.
-   */
   public function __construct(WorkflowTypeInterface $workflow, $id, $label, array $from_state_ids, $to_state_id, $weight = 0) {
     $this->workflow = $workflow;
     $this->id = $id;

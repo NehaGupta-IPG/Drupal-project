@@ -18,9 +18,6 @@ class TrustedRedirectResponse extends CacheableSecuredRedirectResponse {
    */
   protected $trustedUrls = [];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($url, $status = 302, $headers = []) {
     $this->trustedUrls[$url] = TRUE;
     parent::__construct($url, $status, $headers);

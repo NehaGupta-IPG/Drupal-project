@@ -20,30 +20,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 final class ConfigImporterFactory {
 
-  /**
-   * Creates a ConfigImporterFactory instance.
-   *
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-   *   The event dispatcher service.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
-   *   The config manager.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend to prevent multiple imports occurring at the same time.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $moduleInstaller
-   *   The module installer service.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
-   *   The theme handler service.
-   * @param \Drupal\Core\StringTranslation\TranslationManager $stringTranslation
-   *   The string translation service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
-   *   The module extension list service.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
-   *   The theme extension list service.
-   */
   public function __construct(
     protected EventDispatcherInterface $eventDispatcher,
     protected ConfigManagerInterface $configManager,

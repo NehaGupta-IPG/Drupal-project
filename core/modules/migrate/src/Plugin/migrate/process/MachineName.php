@@ -76,18 +76,6 @@ class MachineName extends ProcessPluginBase implements ContainerFactoryPluginInt
    */
   protected $replacePattern;
 
-  /**
-   * Constructs a MachineName plugin.
-   *
-   * @param array $configuration
-   *   The plugin configuration.
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param mixed $plugin_definition
-   *   The plugin definition.
-   * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
-   *   The transliteration service.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, TransliterationInterface $transliteration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->transliteration = $transliteration;

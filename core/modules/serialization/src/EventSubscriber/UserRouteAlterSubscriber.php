@@ -18,12 +18,6 @@ class UserRouteAlterSubscriber implements EventSubscriberInterface {
    */
   protected $serializerFormats = [];
 
-  /**
-   * UserRouteAlterSubscriber constructor.
-   *
-   * @param array $serializer_formats
-   *   The available serializer formats.
-   */
   public function __construct(array $serializer_formats) {
     $this->serializerFormats = $serializer_formats;
   }

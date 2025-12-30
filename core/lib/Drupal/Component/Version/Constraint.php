@@ -25,15 +25,6 @@ class Constraint {
    */
   protected $constraintArray = [];
 
-  /**
-   * Constraint constructor.
-   *
-   * @param string $constraint
-   *   The constraint string to create the object from. For example, '>8.x-1.1'.
-   * @param string $core_compatibility
-   *   Core compatibility declared for the current version of Drupal core.
-   *   Normally this is set to \Drupal::CORE_COMPATIBILITY by the caller.
-   */
   public function __construct($constraint, $core_compatibility) {
     $this->constraint = $constraint;
     $this->parseConstraint($constraint, $core_compatibility);

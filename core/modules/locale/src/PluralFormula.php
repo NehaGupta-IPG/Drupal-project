@@ -41,12 +41,6 @@ class PluralFormula implements PluralFormulaInterface {
    */
   protected $formulae;
 
-  /**
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
-   */
   public function __construct(LanguageManagerInterface $language_manager, StateInterface $state) {
     $this->languageManager = $language_manager;
     $this->state = $state;

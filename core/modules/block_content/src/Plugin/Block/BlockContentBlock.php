@@ -35,9 +35,6 @@ class BlockContentBlock extends BlockBase implements ContainerFactoryPluginInter
    */
   protected $blockContent;
 
-  /**
-   * Constructs a new BlockContentBlock.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

@@ -22,9 +22,6 @@ class HistoryCommentLinkBuilder implements CommentLinkBuilderInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new HistoryCommentLinkBuilder object.
-   */
   public function __construct(
     protected CommentLinkBuilderInterface $inner,
     protected CommentManagerInterface $commentManager,

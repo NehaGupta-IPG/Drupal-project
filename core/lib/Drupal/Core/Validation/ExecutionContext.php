@@ -67,21 +67,6 @@ class ExecutionContext implements ExecutionContextInterface {
    */
   protected array $validatedConstraints = [];
 
-  /**
-   * Creates a new ExecutionContext.
-   *
-   * @param \Symfony\Component\Validator\Validator\ValidatorInterface $validator
-   *   The validator.
-   * @param mixed $root
-   *   The root.
-   * @param \Drupal\Core\Validation\TranslatorInterface $translator
-   *   The translator.
-   * @param string|null $translationDomain
-   *   (optional) The translation domain.
-   *
-   * @internal Called by \Drupal\Core\Validation\ExecutionContextFactory.
-   *    Should not be used in user code.
-   */
   public function __construct(
     protected ValidatorInterface $validator,
     protected mixed $root,

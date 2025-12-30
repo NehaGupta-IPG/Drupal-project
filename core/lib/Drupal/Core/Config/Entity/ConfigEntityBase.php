@@ -107,9 +107,6 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    */
   protected $trustedData = FALSE;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
 

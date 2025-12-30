@@ -30,12 +30,6 @@ class MediaLibraryEditorOpener implements MediaLibraryOpenerInterface {
    */
   protected $mediaStorage;
 
-  /**
-   * The MediaLibraryEditorOpener constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->filterStorage = $entity_type_manager->getStorage('filter_format');
     $this->mediaStorage = $entity_type_manager->getStorage('media');

@@ -24,12 +24,6 @@ use Twig\NodeVisitor\NodeVisitorInterface;
  */
 class ComponentNodeVisitor implements NodeVisitorInterface {
 
-  /**
-   * Creates a new ComponentNodeVisitor object.
-   *
-   * @param \Drupal\Core\Theme\ComponentPluginManager $pluginManager
-   *   The plugin manager for components.
-   */
   public function __construct(protected ComponentPluginManager $pluginManager) {}
 
   /**

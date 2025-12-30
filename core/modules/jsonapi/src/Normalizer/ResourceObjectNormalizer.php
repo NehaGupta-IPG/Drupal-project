@@ -57,18 +57,6 @@ class ResourceObjectNormalizer extends NormalizerBase {
    */
   private EntityTypeManagerInterface $entityTypeManager;
 
-  /**
-   * Constructs a ResourceObjectNormalizer object.
-   *
-   * @param \Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher $cacher
-   *   The entity normalization cacher.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(ResourceObjectNormalizationCacher $cacher, ?EventDispatcherInterface $event_dispatcher = NULL, ?EntityFieldManagerInterface $entity_field_manager = NULL, ?EntityTypeManagerInterface $entity_type_manager = NULL) {
     $this->cacher = $cacher;
 

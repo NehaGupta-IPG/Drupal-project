@@ -68,9 +68,6 @@ class TestAuthenticationProvider implements AuthenticationProviderInterface {
    */
   public $providerId;
 
-  /**
-   * Constructor.
-   */
   public function __construct($provider_id) {
     $this->providerId = $provider_id;
   }

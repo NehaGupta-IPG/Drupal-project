@@ -55,18 +55,6 @@ class SectionComponent {
    */
   protected $additional = [];
 
-  /**
-   * Constructs a new SectionComponent.
-   *
-   * @param string $uuid
-   *   The UUID.
-   * @param string $region
-   *   The region.
-   * @param mixed[] $configuration
-   *   The plugin configuration.
-   * @param mixed[] $additional
-   *   An additional values.
-   */
   public function __construct($uuid, $region, array $configuration = [], array $additional = []) {
     $this->uuid = $uuid;
     $this->region = $region;

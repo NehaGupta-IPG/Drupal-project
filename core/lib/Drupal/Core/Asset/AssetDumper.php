@@ -19,12 +19,6 @@ class AssetDumper implements AssetDumperUriInterface {
    */
   protected $fileSystem;
 
-  /**
-   * AssetDumper constructor.
-   *
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file handler.
-   */
   public function __construct(FileSystemInterface $file_system) {
     $this->fileSystem = $file_system;
   }

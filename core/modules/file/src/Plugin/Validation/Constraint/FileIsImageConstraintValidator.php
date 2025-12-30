@@ -15,12 +15,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FileIsImageConstraintValidator extends BaseFileConstraintValidator implements ContainerInjectionInterface {
 
-  /**
-   * Creates a new FileIsImageConstraintValidator.
-   *
-   * @param \Drupal\Core\Image\ImageFactory $imageFactory
-   *   The image factory.
-   */
   public function __construct(
     protected ImageFactory $imageFactory,
   ) {}

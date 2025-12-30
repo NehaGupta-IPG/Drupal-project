@@ -36,9 +36,6 @@ class TestableSqlContentEntityStorage extends SqlContentEntityStorage {
    */
   protected $tableMapping;
 
-  /**
-   * Override the constructor to bypass the parent's constructor.
-   */
   public function __construct() {
     // Do nothing to bypass parent's constructor.
   }

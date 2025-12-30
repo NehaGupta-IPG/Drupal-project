@@ -113,18 +113,6 @@ class DefaultTableMapping implements TableMappingInterface {
    */
   protected $allColumns = [];
 
-  /**
-   * Constructs a DefaultTableMapping.
-   *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $storage_definitions
-   *   A list of field storage definitions that should be available for the
-   *   field columns of this table mapping.
-   * @param string $prefix
-   *   (optional) A prefix to be used by all the tables of this mapping.
-   *   Defaults to an empty string.
-   */
   public function __construct(ContentEntityTypeInterface $entity_type, array $storage_definitions, $prefix = '') {
     $this->entityType = $entity_type;
     $this->fieldStorageDefinitions = $storage_definitions;

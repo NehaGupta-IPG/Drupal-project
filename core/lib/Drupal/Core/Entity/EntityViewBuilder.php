@@ -80,20 +80,6 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
    */
   protected $singleFieldDisplays;
 
-  /**
-   * Constructs a new EntityViewBuilder.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Theme\Registry $theme_registry
-   *   The theme registry.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
-   *   The entity display repository.
-   */
   public function __construct(EntityTypeInterface $entity_type, EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, Registry $theme_registry, EntityDisplayRepositoryInterface $entity_display_repository) {
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;

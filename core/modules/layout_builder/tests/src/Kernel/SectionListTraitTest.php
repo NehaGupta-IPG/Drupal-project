@@ -55,9 +55,6 @@ class TestSectionList implements SectionListInterface {
    */
   protected $sections;
 
-  /**
-   * TestSectionList constructor.
-   */
   public function __construct(array $sections) {
     // Loop through each section and reconstruct it to ensure that all default
     // values are present.

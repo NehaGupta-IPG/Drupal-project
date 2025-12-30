@@ -21,20 +21,6 @@ class FormAjaxException extends \Exception {
    */
   protected $formState;
 
-  /**
-   * Constructs a FormAjaxException object.
-   *
-   * @param array $form
-   *   The form definition.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state.
-   * @param string $message
-   *   (optional) The exception message.
-   * @param int $code
-   *   (optional) A user defined exception code.
-   * @param \Throwable $previous
-   *   (optional) The previous exception for nested exceptions.
-   */
   public function __construct(array $form, FormStateInterface $form_state, $message = "", $code = 0, ?\Throwable $previous = NULL) {
     parent::__construct($message, $code, $previous);
     $this->form = $form;

@@ -30,14 +30,6 @@ class MenuLinkContentDeriver extends DeriverBase implements ContainerDeriverInte
    */
   protected $menuLinkManager;
 
-  /**
-   * Constructs a MenuLinkContentDeriver instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
-   *   The menu link manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, MenuLinkManagerInterface $menu_link_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->menuLinkManager = $menu_link_manager;

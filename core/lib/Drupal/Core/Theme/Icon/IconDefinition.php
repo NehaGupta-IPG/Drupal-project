@@ -18,22 +18,6 @@ class IconDefinition implements IconDefinitionInterface {
 
   public const ICON_SEPARATOR = ':';
 
-  /**
-   * Constructor for IconDefinition.
-   *
-   * @param string $pack_id
-   *   The id of the icon pack.
-   * @param string $icon_id
-   *   The id of the icon.
-   * @param string $template
-   *   The template of the icon.
-   * @param string|null $source
-   *   The source, url or path of the icon.
-   * @param string|null $group
-   *   The group of the icon.
-   * @param array $data
-   *   The additional data of the icon.
-   */
   private function __construct(
     private string $pack_id,
     private string $icon_id,

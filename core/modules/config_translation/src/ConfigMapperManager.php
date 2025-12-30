@@ -53,20 +53,6 @@ class ConfigMapperManager extends DefaultPluginManager implements ConfigMapperMa
     'class' => '\Drupal\config_translation\ConfigNamesMapper',
   ];
 
-  /**
-   * Constructs a ConfigMapperManager.
-   *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
-   *   The typed config manager.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   */
   public function __construct(CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler, TypedConfigManagerInterface $typed_config_manager, ThemeHandlerInterface $theme_handler) {
     $this->typedConfigManager = $typed_config_manager;
     $this->languageManager = $language_manager;

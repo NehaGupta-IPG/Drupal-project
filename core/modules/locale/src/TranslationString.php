@@ -39,9 +39,6 @@ class TranslationString extends StringBase {
    */
   protected $isNew;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($values = []) {
     parent::__construct($values);
     if (!isset($this->isNew)) {

@@ -44,12 +44,6 @@ class BigPipeResponse extends HtmlResponse implements ResponseKeepSessionOpenInt
    */
   protected $originalHtmlResponse;
 
-  /**
-   * Constructs a new BigPipeResponse.
-   *
-   * @param \Drupal\Core\Render\HtmlResponse $response
-   *   The original HTML response.
-   */
   public function __construct(HtmlResponse $response) {
     parent::__construct('', $response->getStatusCode(), []);
 

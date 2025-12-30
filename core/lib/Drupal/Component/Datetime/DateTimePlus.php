@@ -219,26 +219,6 @@ class DateTimePlus {
     return $datetime_plus;
   }
 
-  /**
-   * Constructs a date object set to a requested date and timezone.
-   *
-   * @param string $time
-   *   (optional) A date/time string. Defaults to 'now'.
-   * @param mixed $timezone
-   *   (optional) \DateTimeZone object, time zone string or NULL. NULL uses the
-   *   default system time zone. Defaults to NULL. Note that the $timezone
-   *   parameter and the current timezone are ignored when the $time parameter
-   *   either is a UNIX timestamp (e.g. @946684800) or specifies a timezone
-   *   (e.g. 2010-01-28T15:00:00+02:00).
-   *   phpcs:ignore Drupal.Commenting.FunctionComment.ParamCommentFullStop
-   *   @see http://php.net/manual/datetime.construct.php
-   * @param array $settings
-   *   (optional) Keyed array of settings. Defaults to empty array.
-   *   - langcode: (optional) String two letter language code used to control
-   *     the result of the format(). Defaults to NULL.
-   *   - debug: (optional) Boolean choice to leave debug values in the
-   *     date object for debugging purposes. Defaults to FALSE.
-   */
   public function __construct($time = 'now', $timezone = NULL, $settings = []) {
 
     // Unpack settings.

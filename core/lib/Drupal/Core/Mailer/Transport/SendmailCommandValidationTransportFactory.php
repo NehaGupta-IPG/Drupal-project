@@ -15,12 +15,6 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  */
 class SendmailCommandValidationTransportFactory implements TransportFactoryInterface {
 
-  /**
-   * Construct command validation decorator for sendmail transport factory.
-   *
-   * @param \Symfony\Component\Mailer\Transport\TransportFactoryInterface $inner
-   *   The decorated sendmail transport factory.
-   */
   public function __construct(
     #[AutowireDecorated]
     protected TransportFactoryInterface $inner,

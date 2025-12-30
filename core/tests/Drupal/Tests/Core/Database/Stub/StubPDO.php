@@ -18,14 +18,6 @@ namespace Drupal\Tests\Core\Database\Stub;
  */
 class StubPDO extends \PDO {
 
-  /**
-   * Construction method.
-   *
-   * We override this construction method with a no-op in order to mock \PDO
-   * under unit tests.
-   *
-   * @see http://stackoverflow.com/questions/3138946/mocking-the-pdo-object-using-phpunit
-   */
   public function __construct() {
     // No-op.
   }

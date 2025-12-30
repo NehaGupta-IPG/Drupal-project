@@ -90,16 +90,6 @@ final class ExtensionVersion {
     return new static($major_version, $minor_version, $version_extra);
   }
 
-  /**
-   * Constructs an ExtensionVersion object.
-   *
-   * @param string $major_version
-   *   The major version.
-   * @param string|null $minor_version
-   *   The minor version.
-   * @param string|null $version_extra
-   *   The extra version string.
-   */
   private function __construct(string $major_version, ?string $minor_version, ?string $version_extra) {
     $this->majorVersion = $major_version;
     $this->minorVersion = $minor_version;

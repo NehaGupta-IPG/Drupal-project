@@ -70,26 +70,6 @@ final class ProjectRelease {
    */
   private $date;
 
-  /**
-   * Constructs a ProjectRelease object.
-   *
-   * @param bool $published
-   *   Whether the release is published.
-   * @param string $version
-   *   The release version.
-   * @param string $release_url
-   *   The URL for the release.
-   * @param string[]|null $release_types
-   *   The release types or NULL if not set.
-   * @param bool|null $core_compatible
-   *   Whether the release is compatible with the site's version of Drupal core.
-   * @param string|null $core_compatibility_message
-   *   The core compatibility message or NULL if not set.
-   * @param string|null $download_url
-   *   The download URL or NULL if not available.
-   * @param int|null $date
-   *   The release date in Unix timestamp format.
-   */
   private function __construct(bool $published, string $version, string $release_url, ?array $release_types, ?bool $core_compatible, ?string $core_compatibility_message, ?string $download_url, ?int $date) {
     $this->published = $published;
     $this->version = $version;

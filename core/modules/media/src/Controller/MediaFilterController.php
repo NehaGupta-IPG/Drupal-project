@@ -46,16 +46,6 @@ class MediaFilterController implements ContainerInjectionInterface {
    */
   protected $entityRepository;
 
-  /**
-   * Constructs an MediaFilterController instance.
-   *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\Entity\ContentEntityStorageInterface $media_storage
-   *   The media storage.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   */
   public function __construct(RendererInterface $renderer, ContentEntityStorageInterface $media_storage, EntityRepositoryInterface $entity_repository) {
     $this->renderer = $renderer;
     $this->mediaStorage = $media_storage;

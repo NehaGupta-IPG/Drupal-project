@@ -38,12 +38,6 @@ class PagerManager implements PagerManagerInterface {
    */
   protected $maxPagerElementId = -1;
 
-  /**
-   * Construct a PagerManager object.
-   *
-   * @param \Drupal\Core\Pager\PagerParametersInterface $pager_params
-   *   The pager parameters.
-   */
   public function __construct(PagerParametersInterface $pager_params) {
     $this->pagerParams = $pager_params;
   }

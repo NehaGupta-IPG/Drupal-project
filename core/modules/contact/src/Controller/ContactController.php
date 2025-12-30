@@ -21,12 +21,6 @@ class ContactController extends ControllerBase {
    */
   protected $renderer;
 
-  /**
-   * Constructs a ContactController object.
-   *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
   public function __construct(RendererInterface $renderer) {
     $this->renderer = $renderer;
   }

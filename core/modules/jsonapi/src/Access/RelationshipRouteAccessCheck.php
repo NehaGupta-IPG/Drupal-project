@@ -37,12 +37,6 @@ final class RelationshipRouteAccessCheck implements AccessInterface {
    */
   protected $entityAccessChecker;
 
-  /**
-   * RelationshipRouteAccessCheck constructor.
-   *
-   * @param \Drupal\jsonapi\Access\EntityAccessChecker $entity_access_checker
-   *   The JSON:API entity access checker.
-   */
   public function __construct(EntityAccessChecker $entity_access_checker) {
     $this->entityAccessChecker = $entity_access_checker;
   }

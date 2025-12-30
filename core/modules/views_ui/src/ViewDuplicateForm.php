@@ -31,14 +31,6 @@ class ViewDuplicateForm extends ViewFormBase {
     );
   }
 
-  /**
-   * Constructs a ViewDuplicateForm.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   Drupal's module handler.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   */
   public function __construct(ModuleHandlerInterface $moduleHandler, LanguageManagerInterface $language_manager) {
     $this->setModuleHandler($moduleHandler);
     $this->languageManager = $language_manager;

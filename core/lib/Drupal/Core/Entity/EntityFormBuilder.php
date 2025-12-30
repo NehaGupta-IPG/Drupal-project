@@ -24,14 +24,6 @@ class EntityFormBuilder implements EntityFormBuilderInterface {
    */
   protected $formBuilder;
 
-  /**
-   * Constructs a new EntityFormBuilder.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, FormBuilderInterface $form_builder) {
     $this->entityTypeManager = $entity_type_manager;
     $this->formBuilder = $form_builder;

@@ -23,12 +23,6 @@ class MemoryBackend implements FloodInterface, PrefixFloodInterface {
    */
   protected $events = [];
 
-  /**
-   * Construct the MemoryBackend.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack used to retrieve the current request.
-   */
   public function __construct(RequestStack $request_stack) {
     $this->requestStack = $request_stack;
   }

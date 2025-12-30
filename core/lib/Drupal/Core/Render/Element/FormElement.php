@@ -14,9 +14,6 @@ use Drupal\Core\Form\FormStateInterface;
  */
 abstract class FormElement extends FormElementBase {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     @trigger_error('\Drupal\Core\Render\Element\FormElement is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Render\Element\FormElementBase instead. See https://www.drupal.org/node/3436275', E_USER_DEPRECATED);

@@ -111,12 +111,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    */
   public bool $triggerWarningWhenUnpilingOnVoidTransaction = FALSE;
 
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   */
   public function __construct(
     protected readonly Connection $connection,
   ) {

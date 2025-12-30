@@ -7,15 +7,6 @@ namespace Drupal\Core\Plugin\Discovery;
  */
 class RegexRecursiveFilterIterator extends \RecursiveFilterIterator {
 
-  /**
-   * RegexRecursiveFilterIterator constructor.
-   *
-   * @param \RecursiveIterator $iterator
-   *   The iterator.
-   * @param string $regex
-   *   The regular expression to match, including delimiters. For example,
-   *   /\.yml$/ would list only files ending in .yml.
-   */
   public function __construct(\RecursiveIterator $iterator, protected string $regex = '') {
     parent::__construct($iterator);
   }

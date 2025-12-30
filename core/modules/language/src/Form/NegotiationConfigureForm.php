@@ -64,24 +64,6 @@ class NegotiationConfigureForm extends ConfigFormBase {
    */
   protected $themeHandler;
 
-  /**
-   * Constructs a NegotiationConfigureForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\language\LanguageNegotiatorInterface $negotiator
-   *   The language negotiation methods manager.
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
-   *   The block manager.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_storage
-   *   The block storage, or NULL if not available.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ConfigurableLanguageManagerInterface $language_manager, LanguageNegotiatorInterface $negotiator, BlockManagerInterface $block_manager, ThemeHandlerInterface $theme_handler, ?EntityStorageInterface $block_storage = NULL) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->languageTypes = $this->config('language.types');

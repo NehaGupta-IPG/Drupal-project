@@ -86,25 +86,6 @@ class ContextDefinition implements ContextDefinitionInterface {
     );
   }
 
-  /**
-   * Constructs a new context definition object.
-   *
-   * @param string $data_type
-   *   The required data type.
-   * @param string|null|\Stringable $label
-   *   The label of this context definition for the UI.
-   * @param bool $required
-   *   Whether the context definition is required.
-   * @param bool $multiple
-   *   Whether the context definition is multivalue.
-   * @param string|null $description
-   *   The description of this context definition for the UI.
-   * @param mixed $default_value
-   *   The default value of this definition.
-   * @param array $constraints
-   *   An array of constraints keyed by the constraint name and a value of an
-   *   array constraint options or a NULL.
-   */
   public function __construct($data_type = 'any', $label = NULL, $required = TRUE, $multiple = FALSE, $description = NULL, $default_value = NULL, array $constraints = []) {
     $this->dataType = $data_type;
     $this->label = $label;

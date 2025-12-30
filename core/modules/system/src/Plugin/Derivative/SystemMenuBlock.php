@@ -21,12 +21,6 @@ class SystemMenuBlock extends DeriverBase implements ContainerDeriverInterface {
    */
   protected $menuStorage;
 
-  /**
-   * Constructs new SystemMenuBlock.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $menu_storage
-   *   The menu storage.
-   */
   public function __construct(EntityStorageInterface $menu_storage) {
     $this->menuStorage = $menu_storage;
   }

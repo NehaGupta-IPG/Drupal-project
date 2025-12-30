@@ -13,12 +13,6 @@ use Drupal\Core\State\StateInterface;
  */
 class NavigationTestHooks {
 
-  /**
-   * NavigationTestHooks constructor.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   */
   public function __construct(
     protected StateInterface $state,
   ) {

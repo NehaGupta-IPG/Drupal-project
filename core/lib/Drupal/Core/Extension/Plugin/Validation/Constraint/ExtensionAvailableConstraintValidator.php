@@ -35,20 +35,6 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
    */
   protected static ?bool $inTestEnvironment;
 
-  /**
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profileExtensionList
-   *   The profile extension list.
-   * @param string $appRoot
-   *   The app root.
-   * @param string|false|null $installProfile
-   *   The install profile used by the environment.
-   * @param string $sitePath
-   *   The site path.
-   */
   public function __construct(
     protected ModuleExtensionList $moduleExtensionList,
     protected ThemeExtensionList $themeExtensionList,

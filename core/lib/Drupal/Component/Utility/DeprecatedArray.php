@@ -14,14 +14,6 @@ class DeprecatedArray extends \ArrayObject {
    */
   protected $message;
 
-  /**
-   * DeprecatedArray constructor.
-   *
-   * @param array $values
-   *   The array values.
-   * @param string $message
-   *   The deprecation message.
-   */
   public function __construct(array $values, $message) {
     $this->message = $message;
     parent::__construct($values);

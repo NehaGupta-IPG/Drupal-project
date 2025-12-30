@@ -47,14 +47,6 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
    */
   protected $accountProxy;
 
-  /**
-   * Constructs an authentication subscriber.
-   *
-   * @param \Drupal\Core\Authentication\AuthenticationProviderInterface $authentication_provider
-   *   An authentication provider.
-   * @param \Drupal\Core\Session\AccountProxyInterface $account_proxy
-   *   Account proxy.
-   */
   public function __construct(AuthenticationProviderInterface $authentication_provider, AccountProxyInterface $account_proxy) {
     $this->authenticationProvider = $authentication_provider;
     $this->filter = ($authentication_provider instanceof AuthenticationProviderFilterInterface) ? $authentication_provider : NULL;

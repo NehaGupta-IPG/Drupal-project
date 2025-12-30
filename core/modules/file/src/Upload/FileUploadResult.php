@@ -47,9 +47,6 @@ class FileUploadResult {
    */
   protected ConstraintViolationListInterface $violations;
 
-  /**
-   * Creates a new FileUploadResult.
-   */
   public function __construct() {
     $this->violations = new ConstraintViolationList();
   }

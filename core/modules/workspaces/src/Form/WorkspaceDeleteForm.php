@@ -52,21 +52,6 @@ class WorkspaceDeleteForm extends ContentEntityDeleteForm {
     );
   }
 
-  /**
-   * Constructs a WorkspaceDeleteForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository service.
-   * @param \Drupal\workspaces\WorkspaceTrackerInterface $workspace_tracker
-   *   The workspace tracker service to check how many revisions will be
-   *   deleted.
-   * @param \Drupal\workspaces\WorkspaceRepositoryInterface $workspace_repository
-   *   The workspace repository service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
-   *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(EntityRepositoryInterface $entity_repository, WorkspaceTrackerInterface $workspace_tracker, WorkspaceRepositoryInterface $workspace_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->workspaceTracker = $workspace_tracker;

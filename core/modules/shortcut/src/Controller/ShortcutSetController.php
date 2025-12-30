@@ -20,12 +20,6 @@ class ShortcutSetController extends ControllerBase {
    */
   protected $pathValidator;
 
-  /**
-   * Creates a new ShortcutSetController instance.
-   *
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
-   *   The path validator.
-   */
   public function __construct(PathValidatorInterface $path_validator) {
     $this->pathValidator = $path_validator;
   }

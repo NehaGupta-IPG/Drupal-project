@@ -107,27 +107,6 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    */
   protected $extraCacheKeyParts = [];
 
-  /**
-   * Constructs a new PathMatcher.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   A database connection object.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
-   *   The current path.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
-   *   The path processor.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tag_invalidator
-   *   The cache tag invalidator.
-   * @param string $table
-   *   (Optional) The table in the database to use for matching. Defaults to
-   *   'router'.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   (Optional) The language manager.
-   */
   public function __construct(Connection $connection, StateInterface $state, CurrentPathStack $current_path, CacheBackendInterface $cache_backend, InboundPathProcessorInterface $path_processor, CacheTagsInvalidatorInterface $cache_tag_invalidator, $table = 'router', ?LanguageManagerInterface $language_manager = NULL) {
     $this->connection = $connection;
     $this->state = $state;

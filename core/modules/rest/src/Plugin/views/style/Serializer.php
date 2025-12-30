@@ -69,9 +69,6 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
     );
   }
 
-  /**
-   * Constructs a Plugin object.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, SerializerInterface $serializer, array $serializer_formats, array $serializer_format_providers) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

@@ -127,30 +127,6 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    */
   protected $additionalAnnotationNamespaces = [];
 
-  /**
-   * Constructs a new \Drupal\Core\Plugin\DefaultPluginManager object.
-   *
-   * @param string|bool $subdir
-   *   The plugin's subdirectory, for example Plugin/views/filter.
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param string|null $plugin_interface
-   *   (optional) The interface each plugin should implement.
-   * @param string|null $plugin_definition_attribute_name
-   *   (optional) The name of the attribute that contains the plugin definition.
-   * @param string|array|null $plugin_definition_annotation_name
-   *   (optional) The name of the annotation that contains the plugin
-   *   definition. Defaults to 'Drupal\Component\Annotation\Plugin'.
-   * @param string[] $additional_annotation_namespaces
-   *   (optional) Additional namespaces to scan for annotation definitions.
-   *
-   * @todo $plugin_definition_attribute_name should default to
-   * 'Drupal\Component\Plugin\Attribute\Plugin' once annotations are no longer
-   * supported.
-   */
   public function __construct($subdir, \Traversable $namespaces, ModuleHandlerInterface $module_handler, $plugin_interface = NULL, ?string $plugin_definition_attribute_name = NULL, string|array|null $plugin_definition_annotation_name = NULL, array $additional_annotation_namespaces = []) {
     $this->subdir = $subdir;
     $this->namespaces = $namespaces;

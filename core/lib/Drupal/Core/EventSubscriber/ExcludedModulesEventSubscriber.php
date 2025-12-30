@@ -35,16 +35,6 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
    */
   private $manager;
 
-  /**
-   * EnvironmentModulesEventSubscriber constructor.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $active_storage
-   *   The active config storage.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The Drupal settings.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $manager
-   *   The config manager.
-   */
   public function __construct(StorageInterface $active_storage, Settings $settings, ConfigManagerInterface $manager) {
     $this->activeStorage = $active_storage;
     $this->settings = $settings;

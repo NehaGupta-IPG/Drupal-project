@@ -16,20 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class NodeDateArgumentDefaultPluginBase extends ArgumentDefaultPluginBase implements CacheableDependencyInterface {
 
-  /**
-   * Constructs a new NodeDateArgumentDefaultPluginBase instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
-   *   The route match.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
-   *   The date formatter service.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected RouteMatchInterface $routeMatch, protected DateFormatterInterface $dateFormatter) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

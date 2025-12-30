@@ -51,18 +51,6 @@ class UserFloodEvent extends Event {
    */
   protected $ip = NULL;
 
-  /**
-   * Constructs a user flood event object.
-   *
-   * @param string $name
-   *   The name of the flood event.
-   * @param int $threshold
-   *   The threshold for the flood event.
-   * @param int $window
-   *   The window for the flood event.
-   * @param string $identifier
-   *   The identifier of the flood event.
-   */
   public function __construct($name, $threshold, $window, $identifier) {
     $this->name = $name;
     $this->threshold = $threshold;

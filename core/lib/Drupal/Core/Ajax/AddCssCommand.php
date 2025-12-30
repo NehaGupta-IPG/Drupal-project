@@ -21,13 +21,6 @@ class AddCssCommand implements CommandInterface {
    */
   protected $styles;
 
-  /**
-   * Constructs an AddCssCommand.
-   *
-   * @param string[][] $styles
-   *   Arrays containing attributes of the stylesheets to be added to the page.
-   *   i.e. `['href' => 'someURL']` becomes `<link href="someURL">`.
-   */
   public function __construct(array $styles) {
     $this->styles = $styles;
   }

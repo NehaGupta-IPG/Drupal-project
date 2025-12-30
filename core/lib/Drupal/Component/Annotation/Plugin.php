@@ -26,12 +26,6 @@ class Plugin implements AnnotationInterface {
    */
   protected $definition;
 
-  /**
-   * Constructs a Plugin object.
-   *
-   * Builds up the plugin definition and invokes the get() method for any
-   * classed annotations that were used.
-   */
   public function __construct($values) {
     $reflection = new \ReflectionClass($this);
     // Only keep actual default values by ignoring NULL values.

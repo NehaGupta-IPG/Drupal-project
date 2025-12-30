@@ -32,18 +32,6 @@ class MediaSettingsForm extends ConfigFormBase {
    */
   protected $entityTypeManager;
 
-  /**
-   * MediaSettingsForm constructor.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
-   *   The iFrame URL helper service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, IFrameUrlHelper $iframe_url_helper, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->iFrameUrlHelper = $iframe_url_helper;

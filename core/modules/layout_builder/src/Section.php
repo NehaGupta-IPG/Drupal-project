@@ -50,18 +50,6 @@ class Section implements ThirdPartySettingsInterface {
    */
   protected $thirdPartySettings = [];
 
-  /**
-   * Constructs a new Section.
-   *
-   * @param string $layout_id
-   *   The layout plugin ID.
-   * @param array $layout_settings
-   *   (optional) The layout plugin settings.
-   * @param \Drupal\layout_builder\SectionComponent[] $components
-   *   (optional) The components.
-   * @param array[] $third_party_settings
-   *   (optional) Any third party settings.
-   */
   public function __construct($layout_id, array $layout_settings = [], array $components = [], array $third_party_settings = []) {
     $this->layoutId = $layout_id;
     $this->layoutSettings = $layout_settings;

@@ -20,12 +20,6 @@ final class LazyBuilders implements TrustedCallbackInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs LazyBuilders object.
-   *
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfo
-   *   Element info.
-   */
   public function __construct(
     protected ElementInfoManagerInterface $elementInfo,
   ) {

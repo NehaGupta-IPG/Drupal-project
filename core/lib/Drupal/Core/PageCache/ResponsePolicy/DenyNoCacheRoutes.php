@@ -22,12 +22,6 @@ class DenyNoCacheRoutes implements ResponsePolicyInterface {
    */
   protected $routeMatch;
 
-  /**
-   * Constructs a deny node preview page cache policy.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   */
   public function __construct(RouteMatchInterface $route_match) {
     $this->routeMatch = $route_match;
   }

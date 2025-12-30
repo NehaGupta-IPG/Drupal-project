@@ -21,12 +21,6 @@ class TypedDataMetadata implements MetadataInterface {
    */
   protected $typedData;
 
-  /**
-   * Constructs the object.
-   *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $typed_data
-   *   The typed data object the metadata is about.
-   */
   public function __construct(TypedDataInterface $typed_data) {
     $this->typedData = $typed_data;
   }

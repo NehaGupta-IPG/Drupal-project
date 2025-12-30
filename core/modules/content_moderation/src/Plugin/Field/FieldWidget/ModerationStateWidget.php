@@ -53,28 +53,6 @@ class ModerationStateWidget extends OptionsSelectWidget {
    */
   protected $validator;
 
-  /**
-   * Constructs a new ModerationStateWidget object.
-   *
-   * @param string $plugin_id
-   *   Plugin id.
-   * @param mixed $plugin_definition
-   *   Plugin definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   Field definition.
-   * @param array $settings
-   *   Field settings.
-   * @param array $third_party_settings
-   *   Third party settings.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   Current user service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   Entity type manager.
-   * @param \Drupal\content_moderation\ModerationInformation $moderation_information
-   *   Moderation information service.
-   * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
-   *   Moderation state transition validation service.
-   */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, ModerationInformation $moderation_information, StateTransitionValidationInterface $validator) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->entityTypeManager = $entity_type_manager;

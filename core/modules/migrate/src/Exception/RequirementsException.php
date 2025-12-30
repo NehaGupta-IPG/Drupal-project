@@ -16,18 +16,6 @@ class RequirementsException extends \RuntimeException {
    */
   protected $requirements;
 
-  /**
-   * Constructs a new RequirementsException instance.
-   *
-   * @param string $message
-   *   (optional) The Exception message to throw.
-   * @param array $requirements
-   *   (optional) The missing requirements.
-   * @param int $code
-   *   (optional) The Exception code.
-   * @param \Throwable $previous
-   *   (optional) The previous exception used for the exception chaining.
-   */
   public function __construct($message = "", array $requirements = [], $code = 0, ?\Throwable $previous = NULL) {
     parent::__construct($message, $code, $previous);
 

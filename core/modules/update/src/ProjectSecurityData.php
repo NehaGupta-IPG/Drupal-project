@@ -67,14 +67,6 @@ final class ProjectSecurityData {
    */
   protected $releases;
 
-  /**
-   * Constructs a ProjectSecurityData object.
-   *
-   * @param string $existing_version
-   *   The existing (currently installed) version of the project.
-   * @param array $releases
-   *   Project releases as returned by update_get_available().
-   */
   private function __construct($existing_version = NULL, array $releases = []) {
     $this->existingVersion = $existing_version;
     $this->releases = $releases;

@@ -13,15 +13,6 @@ namespace Drupal\Core\Hook;
  */
 class ImplementationList {
 
-  /**
-   * Constructor.
-   *
-   * @param list<callable> $listeners
-   *   List of hook implementation callbacks.
-   * @param list<string> $modules
-   *   The module name associated with each hook implementation.
-   *   This must have the same keys as $listeners.
-   */
   public function __construct(
     public readonly array $listeners,
     public readonly array $modules,

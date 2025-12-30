@@ -26,12 +26,6 @@ class DatabaseLockBackend extends LockBackendAbstract {
    */
   protected $database;
 
-  /**
-   * Constructs a new DatabaseLockBackend.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
-   */
   public function __construct(Connection $database) {
     // __destruct() is causing problems with garbage collections, register a
     // shutdown function instead.

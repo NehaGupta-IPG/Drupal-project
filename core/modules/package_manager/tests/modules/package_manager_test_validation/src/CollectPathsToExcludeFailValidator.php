@@ -14,14 +14,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class CollectPathsToExcludeFailValidator implements EventSubscriberInterface {
 
-  /**
-   * Constructs a CollectPathsToExcludeFailValidator object.
-   *
-   * @param \Drupal\package_manager\ComposerInspector $composerInspector
-   *   The Composer inspector service.
-   * @param \Drupal\package_manager\PathLocator $pathLocator
-   *   The path locator service.
-   */
   public function __construct(
     private readonly ComposerInspector $composerInspector,
     private readonly PathLocator $pathLocator,

@@ -31,9 +31,6 @@ use Twig\Node\PrintNode;
 #[YieldReady]
 class TwigNodeTrans extends Node {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(Node $body, ?Node $plural = NULL, ?AbstractExpression $count = NULL, ?AbstractExpression $options = NULL, $lineno = 0) {
     $nodes['body'] = $body;
     if ($count !== NULL) {

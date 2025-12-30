@@ -53,19 +53,6 @@ class FormattableMarkup implements MarkupInterface, \Countable {
    */
   protected $arguments = [];
 
-  /**
-   * Constructs a new class instance.
-   *
-   * @param string $string
-   *   A string containing placeholders. The string itself will not be escaped,
-   *   any unsafe content must be in $args and inserted via placeholders.
-   * @param array $arguments
-   *   An array with placeholder replacements, keyed by placeholder. See
-   *   \Drupal\Component\Render\FormattableMarkup::placeholderFormat() for
-   *   additional information about correct and secure use of placeholders.
-   *
-   * @see \Drupal\Component\Render\FormattableMarkup::placeholderFormat()
-   */
   public function __construct($string, array $arguments) {
     $this->string = (string) $string;
     $this->arguments = $arguments;

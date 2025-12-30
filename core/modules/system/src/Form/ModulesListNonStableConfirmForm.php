@@ -47,18 +47,6 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
    */
   protected bool $contribDeprecatedModules;
 
-  /**
-   * Constructs a new ModulesListNonStableConfirmForm.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
-   *   The module installer.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable
-   *   The key value expirable factory.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
-   *   The module extension list.
-   */
   public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, ModuleExtensionList $moduleExtensionList) {
     parent::__construct($module_handler, $module_installer, $key_value_expirable);
     $this->moduleExtensionList = $moduleExtensionList;

@@ -34,16 +34,6 @@ class EntityDeleteMultipleAccessCheck implements AccessInterface {
    */
   protected $requestStack;
 
-  /**
-   * Constructs a new EntityDeleteMultipleAccessCheck.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *   The tempstore factory service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, PrivateTempStoreFactory $temp_store_factory, RequestStack $request_stack) {
     $this->entityTypeManager = $entity_type_manager;
     $this->tempStore = $temp_store_factory->get('entity_delete_multiple_confirm');

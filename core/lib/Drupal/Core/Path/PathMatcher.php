@@ -46,14 +46,6 @@ class PathMatcher implements PathMatcherInterface {
    */
   protected $routeMatch;
 
-  /**
-   * Creates a new PathMatcher.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, RouteMatchInterface $route_match) {
     $this->configFactory = $config_factory;
     $this->routeMatch = $route_match;

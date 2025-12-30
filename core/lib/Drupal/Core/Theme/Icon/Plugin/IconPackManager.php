@@ -156,22 +156,6 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
    */
   private ?Validator $validator = NULL;
 
-  /**
-   * Constructs the IconPackPluginManager object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
-   *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   The cache backend.
-   * @param \Drupal\Core\Theme\Icon\IconExtractorPluginManager $iconPackExtractorManager
-   *   The icon plugin extractor service.
-   * @param \Drupal\Core\Theme\Icon\IconCollector $iconCollector
-   *   The icon cache collector service.
-   * @param string $appRoot
-   *   The application root.
-   */
   public function __construct(
     ModuleHandlerInterface $module_handler,
     protected readonly ThemeHandlerInterface $themeHandler,

@@ -32,14 +32,6 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
    */
   protected $themeInstaller;
 
-  /**
-   * Constructs a ThemeExperimentalConfirmForm object.
-   *
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer
-   *   The theme installer.
-   */
   public function __construct(ThemeExtensionList $theme_list, ThemeInstallerInterface $theme_installer) {
     $this->themeList = $theme_list;
     $this->themeInstaller = $theme_installer;

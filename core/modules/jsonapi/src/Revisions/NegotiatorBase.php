@@ -23,12 +23,6 @@ abstract class NegotiatorBase implements VersionNegotiatorInterface {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a version negotiator instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
   }

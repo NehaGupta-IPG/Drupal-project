@@ -20,18 +20,6 @@ class EntityRevisionViewController implements ContainerInjectionInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * Creates a new EntityRevisionViewController.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
-   *   The date formatter.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The string translation manager.
-   */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected EntityRepositoryInterface $entityRepository,

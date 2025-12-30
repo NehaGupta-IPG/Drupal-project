@@ -45,18 +45,6 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
    */
   protected $accessUnawareRouter;
 
-  /**
-   * Constructs a new DefaultExceptionHtmlSubscriber.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The HTTP kernel.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger service.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
-   *   The redirect destination service.
-   * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $access_unaware_router
-   *   A router implementation which does not check access.
-   */
   public function __construct(HttpKernelInterface $http_kernel, LoggerInterface $logger, RedirectDestinationInterface $redirect_destination, UrlMatcherInterface $access_unaware_router) {
     $this->httpKernel = $http_kernel;
     $this->logger = $logger;

@@ -47,18 +47,6 @@ class WorkflowType extends Plugin {
    */
   public array $forms = [];
 
-  /**
-   * Constructs an Action attribute.
-   *
-   * @param string $id
-   *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
-   *   The label of the action.
-   * @param string[] $forms
-   *   A list of optional form classes implementing PluginFormInterface.
-   * @param string[] $required_states
-   *   States required to exist.
-   */
   public function __construct(
     public readonly string $id,
     public readonly ?TranslatableMarkup $label = NULL,

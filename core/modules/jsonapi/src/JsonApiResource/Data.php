@@ -44,17 +44,6 @@ abstract class Data implements \IteratorAggregate, \Countable {
    */
   protected $count;
 
-  /**
-   * Instantiates a Data object.
-   *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface[] $data
-   *   The resources or resource identifiers for the collection.
-   * @param int $cardinality
-   *   The number of resources that this collection may contain. Related
-   *   resource collections may handle both to-one or to-many relationships. A
-   *   to-one relationship should have a cardinality of 1. Use -1 for unlimited
-   *   cardinality.
-   */
   public function __construct(array $data, $cardinality = -1) {
     assert(Inspector::assertAllObjects($data, ResourceIdentifierInterface::class));
     assert($cardinality >= -1 && $cardinality !== 0, 'Cardinality must be -1 for unlimited cardinality or a positive integer.');

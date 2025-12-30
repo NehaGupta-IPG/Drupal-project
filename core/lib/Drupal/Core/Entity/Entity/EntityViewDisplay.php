@@ -179,9 +179,6 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
     return $displays[$entity->bundle()];
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $values, $entity_type) {
     $this->pluginManager = \Drupal::service('plugin.manager.field.formatter');
 

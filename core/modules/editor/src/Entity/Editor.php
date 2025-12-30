@@ -97,9 +97,6 @@ class Editor extends ConfigEntityBase implements EditorInterface {
     return $this->format;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
 

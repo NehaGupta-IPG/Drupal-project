@@ -50,23 +50,6 @@ class Endpoint {
    */
   protected $supportsDiscovery;
 
-  /**
-   * Endpoint constructor.
-   *
-   * @param string $url
-   *   The endpoint URL. May contain a "{format}" placeholder.
-   * @param \Drupal\media\OEmbed\Provider $provider
-   *   The provider this endpoint belongs to.
-   * @param string[] $schemes
-   *   List of URL schemes supported by the provider.
-   * @param string[] $formats
-   *   List of supported formats. Can be "json", "xml" or both.
-   * @param bool $supports_discovery
-   *   Whether the provider supports oEmbed discovery.
-   *
-   * @throws \InvalidArgumentException
-   *   If the endpoint URL is empty.
-   */
   public function __construct($url, Provider $provider, array $schemes = [], array $formats = [], $supports_discovery = FALSE) {
     $this->provider = $provider;
     $this->schemes = $schemes;

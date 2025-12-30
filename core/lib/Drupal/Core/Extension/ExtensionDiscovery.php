@@ -105,20 +105,6 @@ class ExtensionDiscovery {
    */
   protected ?InfoParser $infoParser;
 
-  /**
-   * Constructs a new ExtensionDiscovery object.
-   *
-   * @param string $root
-   *   The app root.
-   * @param bool $use_info_parser
-   *   Whether the info_parser should be used. Note this argument also
-   *   determines if the deprecated file cache property is set to maintain BC in
-   *   Drupal 11.
-   * @param string[] $profile_directories
-   *   The available profile directories.
-   * @param string $site_path
-   *   The path to the site.
-   */
   public function __construct(string $root, $use_info_parser = TRUE, ?array $profile_directories = NULL, ?string $site_path = NULL) {
     $this->root = $root;
     // @phpstan-ignore property.deprecated

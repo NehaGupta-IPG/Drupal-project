@@ -47,20 +47,6 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
     return new static($definition, $name, $parent);
   }
 
-  /**
-   * Constructs a TypedData object given its definition and context.
-   *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
-   *   The data definition.
-   * @param string $name
-   *   (optional) The name of the created property, or NULL if it is the root
-   *   of a typed data tree. Defaults to NULL.
-   * @param \Drupal\Core\TypedData\TypedDataInterface $parent
-   *   (optional) The parent object of the data property, or NULL if it is the
-   *   root of a typed data tree. Defaults to NULL.
-   *
-   * @see \Drupal\Core\TypedData\TypedDataManager::create()
-   */
   public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
     $this->definition = $definition;
     $this->parent = $parent;

@@ -28,17 +28,6 @@ class ArgumentsResolver implements ArgumentsResolverInterface {
    */
   protected $wildcards;
 
-  /**
-   * Constructs a new ArgumentsResolver.
-   *
-   * @param array $scalars
-   *   An associative array of parameter names to scalar candidate values.
-   * @param object[] $objects
-   *   An associative array of parameter names to object candidate values.
-   * @param object[] $wildcards
-   *   An array object candidates tried on every parameter regardless of its
-   *   name.
-   */
   public function __construct(array $scalars, array $objects, array $wildcards) {
     $this->scalars = $scalars;
     $this->objects = $objects;

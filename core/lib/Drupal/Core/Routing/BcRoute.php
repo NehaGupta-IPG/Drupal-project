@@ -21,9 +21,6 @@ use Symfony\Component\Routing\Route;
  */
 class BcRoute extends Route {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct() {
     parent::__construct('');
     $this->setOption('bc_route', TRUE);

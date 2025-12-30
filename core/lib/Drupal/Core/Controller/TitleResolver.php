@@ -29,16 +29,6 @@ class TitleResolver implements TitleResolverInterface {
    */
   protected $argumentResolver;
 
-  /**
-   * Constructs a TitleResolver instance.
-   *
-   * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
-   *   The controller resolver.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The translation manager.
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
-   *   The argument resolver.
-   */
   public function __construct(ControllerResolverInterface $controller_resolver, TranslationInterface $string_translation, ArgumentResolverInterface $argument_resolver) {
     $this->controllerResolver = $controller_resolver;
     $this->stringTranslation = $string_translation;

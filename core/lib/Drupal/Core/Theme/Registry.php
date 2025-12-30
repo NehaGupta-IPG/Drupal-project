@@ -204,32 +204,6 @@ class Registry implements DestructableInterface {
    */
   protected $keyValueFactory;
 
-  /**
-   * Constructs a \Drupal\Core\Theme\Registry object.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend interface to use for the complete theme registry data.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to use to load modules.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Theme\ThemeInitializationInterface $theme_initialization
-   *   The theme initialization.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $runtime_cache
-   *   The cache backend interface to use for the runtime theme registry data.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
-   *   The module list.
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $kernel
-   *   The kernel.
-   * @param string $theme_name
-   *   (optional) The name of the theme for which to construct the registry.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|null $key_value_factory
-   *   The key value factory.
-   */
   public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, ?KeyValueFactoryInterface $key_value_factory = NULL) {
     $this->root = $root;
     $this->cache = $cache;

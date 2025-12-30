@@ -29,14 +29,6 @@ class MenuDeleteForm extends EntityDeleteForm {
    */
   protected $connection;
 
-  /**
-   * Constructs a new MenuDeleteForm.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
-   *   The menu link manager.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   */
   public function __construct(MenuLinkManagerInterface $menu_link_manager, Connection $connection) {
     $this->menuLinkManager = $menu_link_manager;
     $this->connection = $connection;

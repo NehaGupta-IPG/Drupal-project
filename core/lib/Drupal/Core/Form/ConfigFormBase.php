@@ -33,14 +33,6 @@ abstract class ConfigFormBase extends FormBase {
    */
   protected const CONFIG_KEY_TO_FORM_ELEMENT_MAP = 'config_targets';
 
-  /**
-   * Constructs a \Drupal\system\ConfigFormBase object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   */
   public function __construct(
     ConfigFactoryInterface $config_factory,
     protected TypedConfigManagerInterface $typedConfigManager,

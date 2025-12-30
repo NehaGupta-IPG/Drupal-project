@@ -18,12 +18,6 @@ class RouteProcessorCurrent implements OutboundRouteProcessorInterface {
    */
   protected $routeMatch;
 
-  /**
-   * Constructs a new RouteProcessorCurrent.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   */
   public function __construct(RouteMatchInterface $route_match) {
     $this->routeMatch = $route_match;
   }

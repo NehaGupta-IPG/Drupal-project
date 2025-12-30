@@ -13,9 +13,6 @@ class CacheableUnauthorizedHttpException extends UnauthorizedHttpException imple
 
   use CacheableDependencyTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(CacheableDependencyInterface $cacheability, $challenge, $message = '', ?\Throwable $previous = NULL, $code = 0) {
     $this->setCacheability($cacheability);
     parent::__construct($challenge, $message, $previous, $code);

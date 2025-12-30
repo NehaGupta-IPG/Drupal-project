@@ -25,12 +25,6 @@ class EntityPermissionsRouteProvider implements EntityRouteProviderInterface, En
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a new EntityPermissionsRouteProvider.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
   }

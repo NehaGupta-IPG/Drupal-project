@@ -22,18 +22,6 @@ class Vid extends NumericArgument {
    */
   protected $nodeStorage;
 
-  /**
-   * Constructs a \Drupal\node\Plugin\views\argument\Vid object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\node\NodeStorageInterface $node_storage
-   *   The node storage.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, NodeStorageInterface $node_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->nodeStorage = $node_storage;

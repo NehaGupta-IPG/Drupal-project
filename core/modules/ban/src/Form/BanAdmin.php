@@ -20,12 +20,6 @@ class BanAdmin extends FormBase {
    */
   protected $ipManager;
 
-  /**
-   * Constructs a new BanAdmin object.
-   *
-   * @param \Drupal\ban\BanIpManagerInterface $ip_manager
-   *   The ban IP manager.
-   */
   public function __construct(BanIpManagerInterface $ip_manager) {
     $this->ipManager = $ip_manager;
   }

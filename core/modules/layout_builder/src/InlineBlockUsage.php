@@ -17,12 +17,6 @@ class InlineBlockUsage implements InlineBlockUsageInterface {
    */
   protected $database;
 
-  /**
-   * Creates an InlineBlockUsage object.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
-   */
   public function __construct(Connection $database) {
     $this->database = $database;
   }

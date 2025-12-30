@@ -29,14 +29,6 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a ValidReferenceConstraintValidator object.
-   *
-   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
-   *   The selection plugin manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(SelectionPluginManagerInterface $selection_manager, EntityTypeManagerInterface $entity_type_manager) {
     $this->selectionManager = $selection_manager;
     $this->entityTypeManager = $entity_type_manager;

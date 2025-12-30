@@ -81,27 +81,6 @@ class FormCache implements FormCacheInterface {
    */
   protected $root;
 
-  /**
-   * Constructs a new FormCache.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_expirable_factory
-   *   The key value expirable factory, used to create key value expirable
-   *   stores for the form cache and form state cache.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
-   *   The CSRF token generator.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Drupal\Core\PageCache\RequestPolicyInterface $request_policy
-   *   A policy rule determining the cacheability of a request.
-   */
   public function __construct($root, KeyValueExpirableFactoryInterface $key_value_expirable_factory, ModuleHandlerInterface $module_handler, AccountInterface $current_user, CsrfTokenGenerator $csrf_token, LoggerInterface $logger, RequestStack $request_stack, RequestPolicyInterface $request_policy) {
     $this->root = $root;
     $this->keyValueExpirableFactory = $key_value_expirable_factory;

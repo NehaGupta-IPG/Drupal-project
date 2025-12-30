@@ -22,13 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class LinksetController extends ControllerBase {
 
-  /**
-   * Linkset constructor.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuTree
-   *   The menu tree loader service. This is used to load a menu's link
-   *   elements so that they can be serialized into a linkset response.
-   */
   public function __construct(protected readonly MenuLinkTreeInterface $menuTree) {
   }
 

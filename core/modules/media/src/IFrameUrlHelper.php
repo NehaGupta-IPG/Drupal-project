@@ -30,14 +30,6 @@ class IFrameUrlHelper {
    */
   protected $privateKey;
 
-  /**
-   * IFrameUrlHelper constructor.
-   *
-   * @param \Drupal\Core\Routing\RequestContext $request_context
-   *   The request context service.
-   * @param \Drupal\Core\PrivateKey $private_key
-   *   The private key service.
-   */
   public function __construct(RequestContext $request_context, PrivateKey $private_key) {
     $this->requestContext = $request_context;
     $this->privateKey = $private_key;

@@ -42,22 +42,6 @@ class NodeForm extends ContentEntityForm {
    */
   protected $dateFormatter;
 
-  /**
-   * Constructs a NodeForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *   The factory for the temp store object.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
-   *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   */
   public function __construct(
     EntityRepositoryInterface $entity_repository,
     PrivateTempStoreFactory $temp_store_factory,

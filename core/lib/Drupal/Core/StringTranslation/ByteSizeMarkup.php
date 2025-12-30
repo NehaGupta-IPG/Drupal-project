@@ -11,9 +11,6 @@ use Drupal\Component\Utility\Bytes;
  */
 final class ByteSizeMarkup {
 
-  /**
-   * This class should not be instantiated.
-   */
   private function __construct() {}
 
   /**

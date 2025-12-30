@@ -23,14 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 final class EntityCreate implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
-  /**
-   * Constructs a EntityCreate object.
-   *
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
-   *   The config manager.
-   * @param \Drupal\Core\Config\Action\Exists $exists
-   *   Determines behavior of action depending on entity existence.
-   */
   public function __construct(
     protected readonly ConfigManagerInterface $configManager,
     protected readonly Exists $exists,

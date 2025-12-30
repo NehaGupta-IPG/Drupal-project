@@ -25,12 +25,6 @@ class DatabaseTestController extends ControllerBase {
    */
   protected $connection;
 
-  /**
-   * Constructs a DatabaseTestController object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   A database connection.
-   */
   public function __construct(Connection $connection) {
     $this->connection = $connection;
   }

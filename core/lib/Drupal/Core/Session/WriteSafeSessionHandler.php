@@ -24,14 +24,6 @@ class WriteSafeSessionHandler extends SessionHandlerProxy implements \SessionHan
    */
   private $readSessions;
 
-  /**
-   * Constructs a new write safe session handler.
-   *
-   * @param \SessionHandlerInterface $handler
-   *   The underlying session handler.
-   * @param bool $session_writable
-   *   Whether or not the session should be initially writable.
-   */
   public function __construct(\SessionHandlerInterface $handler, $session_writable = TRUE) {
     parent::__construct($handler);
     $this->sessionWritable = $session_writable;

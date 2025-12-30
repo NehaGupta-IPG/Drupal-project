@@ -57,12 +57,6 @@ class Filter {
    */
   protected $root;
 
-  /**
-   * Constructs a new Filter object.
-   *
-   * @param \Drupal\jsonapi\Query\EntityConditionGroup $root
-   *   An entity condition group which can be applied to an entity query.
-   */
   public function __construct(EntityConditionGroup $root) {
     $this->root = $root;
   }

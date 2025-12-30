@@ -27,18 +27,6 @@ class BlockRegion extends StaticMap implements ContainerFactoryPluginInterface {
    */
   protected $regions;
 
-  /**
-   * Constructs a BlockRegion plugin instance.
-   *
-   * @param array $configuration
-   *   The plugin configuration.
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param mixed $plugin_definition
-   *   The plugin definition.
-   * @param array $regions
-   *   Array of region maps, keyed by theme.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, array $regions) {
     @trigger_error(__CLASS__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533560', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition);

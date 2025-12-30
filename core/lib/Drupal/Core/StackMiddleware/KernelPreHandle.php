@@ -26,14 +26,6 @@ class KernelPreHandle implements HttpKernelInterface {
    */
   protected $drupalKernel;
 
-  /**
-   * Constructs a new KernelPreHandle instance.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The wrapped HTTP kernel.
-   * @param \Drupal\Core\DrupalKernelInterface $drupal_kernel
-   *   The main Drupal kernel.
-   */
   public function __construct(HttpKernelInterface $http_kernel, DrupalKernelInterface $drupal_kernel) {
     $this->httpKernel = $http_kernel;
     $this->drupalKernel = $drupal_kernel;

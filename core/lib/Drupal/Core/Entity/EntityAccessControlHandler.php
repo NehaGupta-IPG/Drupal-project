@@ -44,12 +44,6 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
    */
   protected $viewLabelOperation = FALSE;
 
-  /**
-   * Constructs an access control handler instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   */
   public function __construct(EntityTypeInterface $entity_type) {
     $this->entityTypeId = $entity_type->id();
     $this->entityType = $entity_type;

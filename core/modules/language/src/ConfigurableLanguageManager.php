@@ -104,22 +104,6 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     \Drupal::service('kernel')->invalidateContainer();
   }
 
-  /**
-   * Constructs a new ConfigurableLanguageManager object.
-   *
-   * @param \Drupal\Core\Language\LanguageDefault $default_language
-   *   The default language service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\language\Config\LanguageConfigFactoryOverrideInterface $config_override
-   *   The language configuration override service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack object.
-   * @param \Drupal\Core\Cache\CacheBackendInterface|null $cacheBackend
-   *   The cache backend.
-   */
   public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected ?CacheBackendInterface $cacheBackend = NULL) {
     $this->defaultLanguage = $default_language;
     $this->configFactory = $config_factory;

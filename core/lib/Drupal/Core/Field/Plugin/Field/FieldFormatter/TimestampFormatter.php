@@ -37,30 +37,6 @@ class TimestampFormatter extends FormatterBase {
    */
   protected const CUSTOM_DATE_FORMAT = 'custom';
 
-  /**
-   * Constructs a new TimestampFormatter.
-   *
-   * @param string $plugin_id
-   *   The plugin ID for the formatter.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   The definition of the field to which the formatter is associated.
-   * @param array $settings
-   *   The formatter settings.
-   * @param string $label
-   *   The formatter label display setting.
-   * @param string $view_mode
-   *   The view mode.
-   * @param array $third_party_settings
-   *   Third party settings.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $dateFormatStorage
-   *   The date format storage.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     $plugin_id,
     $plugin_definition,

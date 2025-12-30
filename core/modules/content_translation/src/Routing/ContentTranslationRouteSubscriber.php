@@ -21,12 +21,6 @@ class ContentTranslationRouteSubscriber extends RouteSubscriberBase {
    */
   protected $contentTranslationManager;
 
-  /**
-   * Constructs a ContentTranslationRouteSubscriber object.
-   *
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
-   *   The content translation manager.
-   */
   public function __construct(ContentTranslationManagerInterface $content_translation_manager) {
     $this->contentTranslationManager = $content_translation_manager;
   }

@@ -15,21 +15,6 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 final class InvalidConfigException extends \RuntimeException {
 
-  /**
-   * Constructs an InvalidConfigException object.
-   *
-   * @param \Symfony\Component\Validator\ConstraintViolationList $violations
-   *   The validation constraint violations.
-   * @param \Drupal\Core\Config\Schema\Mapping $data
-   *   A typed data wrapper around the invalid config data.
-   * @param string $message
-   *   (optional) The exception message. Defaults to the string representation
-   *   of the constraint violation list.
-   * @param int $code
-   *   (optional) The exception code. Defaults to 0.
-   * @param \Throwable|null $previous
-   *   (optional) The previous exception, if any.
-   */
   public function __construct(
     public readonly ConstraintViolationList $violations,
     public readonly Mapping $data,

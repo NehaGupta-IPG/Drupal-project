@@ -23,12 +23,6 @@ class LayoutTempstoreRepository implements LayoutTempstoreRepositoryInterface {
    */
   protected array $cache = [];
 
-  /**
-   * LayoutTempstoreRepository constructor.
-   *
-   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
-   *   The shared tempstore factory.
-   */
   public function __construct(SharedTempStoreFactory $temp_store_factory) {
     $this->tempStoreFactory = $temp_store_factory;
   }

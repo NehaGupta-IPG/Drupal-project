@@ -41,9 +41,6 @@ class EntityTypeTest extends KernelTestBase {
 
     $translation_service = new class () extends TranslationManager {
 
-      /**
-       * Constructs a UnserializableTranslationManager object.
-       */
       public function __construct() {
       }
 

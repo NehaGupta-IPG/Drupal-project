@@ -27,15 +27,6 @@ class CacheableNormalization extends TemporaryArrayObjectThrowingExceptions impl
    */
   protected $normalization;
 
-  /**
-   * CacheableNormalization constructor.
-   *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
-   *   The cacheability metadata for the normalized data.
-   * @param array|string|int|float|bool|null $normalization
-   *   The normalized data. This value must not contain any
-   *   CacheableNormalizations.
-   */
   public function __construct(CacheableDependencyInterface $cacheability, $normalization) {
     assert((is_array($normalization) && static::hasNoNestedInstances($normalization)) || is_string($normalization) || is_int($normalization) || is_float($normalization) || is_bool($normalization) || is_null($normalization));
     $this->normalization = $normalization;

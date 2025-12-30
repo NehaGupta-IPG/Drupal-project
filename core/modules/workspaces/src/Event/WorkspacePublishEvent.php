@@ -26,14 +26,6 @@ abstract class WorkspacePublishEvent extends Event {
    */
   protected string $publishingStoppedReason = '';
 
-  /**
-   * Constructs a new WorkspacePublishEvent.
-   *
-   * @param \Drupal\workspaces\WorkspaceInterface $workspace
-   *   The workspace.
-   * @param array $published_revision_ids
-   *   The IDs of the entities that are being published.
-   */
   public function __construct(
     protected readonly WorkspaceInterface $workspace,
     array $published_revision_ids,

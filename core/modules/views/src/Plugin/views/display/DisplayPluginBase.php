@@ -133,24 +133,6 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public DisplayPluginInterface $default_display;
 
-  /**
-   * Constructs a new DisplayPluginBase object.
-   *
-   * Because DisplayPluginBase::initDisplay() takes the display configuration by
-   * reference and handles it differently than usual plugin configuration, pass
-   * an empty array of configuration to the parent. This prevents our
-   * configuration from being duplicated.
-   *
-   * @todo Replace DisplayPluginBase::$display with
-   *   DisplayPluginBase::$configuration to standardize with other plugins.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct([], $plugin_id, $plugin_definition);
   }

@@ -311,21 +311,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     return $kernel;
   }
 
-  /**
-   * Constructs a DrupalKernel object.
-   *
-   * @param string $environment
-   *   String indicating the environment, e.g. 'prod' or 'dev'.
-   * @param \Composer\Autoload\ClassLoader $class_loader
-   *   The class loader. Normally \Composer\Autoload\ClassLoader, as included by
-   *   the front controller, but may also be decorated.
-   * @param bool $allow_dumping
-   *   (optional) FALSE to stop the container from being written to or read
-   *   from disk. Defaults to TRUE.
-   * @param string $app_root
-   *   (optional) The path to the application root as a string. If not supplied,
-   *   the application root will be computed.
-   */
   public function __construct($environment, $class_loader, $allow_dumping = TRUE, $app_root = NULL) {
     $this->environment = $environment;
     $this->classLoader = $class_loader;

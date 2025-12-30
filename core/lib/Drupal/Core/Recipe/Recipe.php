@@ -38,32 +38,6 @@ final class Recipe {
 
   const COMPOSER_PROJECT_TYPE = 'drupal-recipe';
 
-  /**
-   * @param string $name
-   *   The human-readable name of the recipe.
-   * @param string $description
-   *   A short description of the recipe.
-   * @param string $type
-   *   The recipe type.
-   * @param \Drupal\Core\Recipe\RecipeConfigurator $recipes
-   *   The recipe configurator, which lists the recipes that will be applied
-   *   before this one.
-   * @param \Drupal\Core\Recipe\InstallConfigurator $install
-   *   The install configurator, which lists the extensions this recipe will
-   *   install.
-   * @param \Drupal\Core\Recipe\ConfigConfigurator $config
-   *   The config configurator, which lists the config that this recipe will
-   *   install, and what config actions will be taken.
-   * @param \Drupal\Core\Recipe\InputConfigurator $input
-   *   The input configurator, which collects any input values used by the
-   *   recipe.
-   * @param \Drupal\Core\DefaultContent\Finder $content
-   *   The default content finder.
-   * @param string $path
-   *   The recipe's path.
-   * @param array $extra
-   *   Any extra information to expose to specific modules.
-   */
   public function __construct(
     public readonly string $name,
     public readonly string $description,

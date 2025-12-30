@@ -37,12 +37,6 @@ class CachedDiscoveryClearer implements CachedDiscoveryClearerInterface {
     $this->legacyCachedDiscoveries[] = $cached_discovery;
   }
 
-  /**
-   * Constructs the CachedDiscoveryClearer service.
-   *
-   * @param \Traversable $cachedDiscoveries
-   *   The cached discoveries.
-   */
   public function __construct(
     #[AutowireIterator(tag: 'plugin_manager_cache_clear')]
     protected \Traversable $cachedDiscoveries,

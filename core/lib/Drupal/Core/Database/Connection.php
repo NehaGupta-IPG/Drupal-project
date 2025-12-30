@@ -166,17 +166,6 @@ abstract class Connection {
    */
   protected TransactionManagerInterface $transactionManager;
 
-  /**
-   * Constructs a Connection object.
-   *
-   * @param object $connection
-   *   An object of the client class representing a database connection.
-   * @param array $connection_options
-   *   An array of options for the connection. May include the following:
-   *   - prefix
-   *   - namespace
-   *   - Other driver-specific options.
-   */
   public function __construct(object $connection, array $connection_options) {
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 

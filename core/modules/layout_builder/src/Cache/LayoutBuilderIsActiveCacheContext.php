@@ -28,12 +28,6 @@ class LayoutBuilderIsActiveCacheContext implements CalculatedCacheContextInterfa
    */
   protected $routeMatch;
 
-  /**
-   * LayoutBuilderCacheContext constructor.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   */
   public function __construct(RouteMatchInterface $route_match) {
     $this->routeMatch = $route_match;
   }

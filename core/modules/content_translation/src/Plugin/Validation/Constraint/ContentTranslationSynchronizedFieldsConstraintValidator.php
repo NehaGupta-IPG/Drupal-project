@@ -55,16 +55,6 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
    */
   protected $synchronizer;
 
-  /**
-   * ContentTranslationSynchronizedFieldsConstraintValidator constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
-   *   The content translation manager.
-   * @param \Drupal\content_translation\FieldTranslationSynchronizerInterface $synchronizer
-   *   The field translation synchronizer.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ContentTranslationManagerInterface $content_translation_manager, FieldTranslationSynchronizerInterface $synchronizer) {
     $this->entityTypeManager = $entity_type_manager;
     $this->contentTranslationManager = $content_translation_manager;

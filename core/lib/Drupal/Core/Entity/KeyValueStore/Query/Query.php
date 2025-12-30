@@ -18,19 +18,6 @@ class Query extends QueryBase {
    */
   protected $keyValueFactory;
 
-  /**
-   * Constructs a new Query.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type.
-   * @param string $conjunction
-   *   - AND: all of the conditions on the query need to match.
-   *   - OR: at least one of the conditions on the query need to match.
-   * @param array $namespaces
-   *   List of potential namespaces of the classes belonging to this query.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key value factory.
-   */
   public function __construct(EntityTypeInterface $entity_type, $conjunction, array $namespaces, KeyValueFactoryInterface $key_value_factory) {
     parent::__construct($entity_type, $conjunction, $namespaces);
     $this->keyValueFactory = $key_value_factory;

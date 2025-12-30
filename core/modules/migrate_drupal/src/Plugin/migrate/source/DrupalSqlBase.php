@@ -57,9 +57,6 @@ abstract class DrupalSqlBase extends SqlBase implements DependentPluginInterface
    */
   protected $entityTypeManager;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, StateInterface $state, EntityTypeManagerInterface $entity_type_manager) {
     @trigger_error('Class "' . __CLASS__ . '" as extended by "' . static::class . '" is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533564', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $state);

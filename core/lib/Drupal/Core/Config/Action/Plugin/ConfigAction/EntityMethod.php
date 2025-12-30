@@ -42,24 +42,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 final class EntityMethod implements ConfigActionPluginInterface, ContainerFactoryPluginInterface {
 
-  /**
-   * Constructs a EntityMethod object.
-   *
-   * @param string $pluginId
-   *   The config action plugin ID.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
-   *   The config manager.
-   * @param string $method
-   *   The method to call on the config entity.
-   * @param \Drupal\Core\Config\Action\Exists $exists
-   *   Determines behavior of action depending on entity existence.
-   * @param int $numberOfParams
-   *   The number of parameters the method has.
-   * @param int $numberOfRequiredParams
-   *   The number of required parameters the method has.
-   * @param bool $pluralized
-   *   Determines whether an array maps to multiple calls.
-   */
   public function __construct(
     protected readonly string $pluginId,
     protected readonly ConfigManagerInterface $configManager,

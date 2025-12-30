@@ -28,20 +28,6 @@ class Language extends CKEditor5PluginDefault implements CKEditor5PluginConfigur
 
   use CKEditor5PluginConfigurableTrait;
 
-  /**
-   * Language constructor.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
-   *   The route provider.
-   */
   public function __construct(array $configuration, string $plugin_id, CKEditor5PluginDefinition $plugin_definition, protected LanguageManagerInterface $languageManager, protected RouteProviderInterface $routeProvider) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

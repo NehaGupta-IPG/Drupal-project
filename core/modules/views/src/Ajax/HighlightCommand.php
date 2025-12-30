@@ -18,12 +18,6 @@ class HighlightCommand implements CommandInterface {
    */
   protected $selector;
 
-  /**
-   * Constructs a \Drupal\views\Ajax\HighlightCommand object.
-   *
-   * @param string $selector
-   *   A CSS selector.
-   */
   public function __construct($selector) {
     $this->selector = $selector;
   }

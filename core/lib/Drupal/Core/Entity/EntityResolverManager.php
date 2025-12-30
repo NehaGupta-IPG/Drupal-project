@@ -36,14 +36,6 @@ class EntityResolverManager {
    */
   protected ?array $entityTypes;
 
-  /**
-   * Constructs a new EntityRouteAlterSubscriber.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   The class resolver.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ClassResolverInterface $class_resolver) {
     $this->entityTypeManager = $entity_type_manager;
     $this->classResolver = $class_resolver;

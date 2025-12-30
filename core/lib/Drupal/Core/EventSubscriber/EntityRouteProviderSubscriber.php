@@ -20,12 +20,6 @@ class EntityRouteProviderSubscriber implements EventSubscriberInterface {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a new EntityRouteProviderSubscriber instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
   }

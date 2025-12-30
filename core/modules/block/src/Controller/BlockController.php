@@ -20,12 +20,6 @@ class BlockController extends ControllerBase {
    */
   protected $themeHandler;
 
-  /**
-   * Constructs a new BlockController instance.
-   *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   */
   public function __construct(ThemeHandlerInterface $theme_handler) {
     $this->themeHandler = $theme_handler;
   }

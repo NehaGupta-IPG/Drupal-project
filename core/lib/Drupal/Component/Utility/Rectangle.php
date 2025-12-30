@@ -52,14 +52,6 @@ class Rectangle {
    */
   protected $boundingHeight;
 
-  /**
-   * Constructs a new Rectangle object.
-   *
-   * @param int $width
-   *   The width of the rectangle.
-   * @param int $height
-   *   The height of the rectangle.
-   */
   public function __construct($width, $height) {
     if ($width > 0 && $height > 0) {
       $this->width = $width;

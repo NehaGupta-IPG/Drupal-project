@@ -19,12 +19,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class ImmutablePropertiesConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
-  /**
-   * Constructs an ImmutablePropertiesConstraintValidator object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager service.
-   */
   public function __construct(protected EntityTypeManagerInterface $entityTypeManager) {
   }
 

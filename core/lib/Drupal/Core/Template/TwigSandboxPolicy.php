@@ -44,9 +44,6 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $allowed_classes;
 
-  /**
-   * Constructs a new TwigSandboxPolicy object.
-   */
   public function __construct() {
     // Allow settings.php to override our default allowed classes, methods, and
     // prefixes.

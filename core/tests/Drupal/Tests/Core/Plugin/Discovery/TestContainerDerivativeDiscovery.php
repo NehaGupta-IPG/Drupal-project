@@ -13,12 +13,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class TestContainerDerivativeDiscovery extends TestDerivativeDiscovery implements ContainerDeriverInterface {
 
-  /**
-   * Constructs a TestContainerDerivativeDiscovery object.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $example_service
-   *   Some service.
-   */
   public function __construct(EventDispatcherInterface $example_service) {
   }
 

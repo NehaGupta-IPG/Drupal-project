@@ -73,20 +73,6 @@ class UrlGenerator implements UrlGeneratorInterface {
     '/',
   ];
 
-  /**
-   * Constructs a new generator object.
-   *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $provider
-   *   The route provider to be searched for routes.
-   * @param \Drupal\Core\PathProcessor\OutboundPathProcessorInterface $path_processor
-   *   The path processor to convert the system path to one suitable for URLs.
-   * @param \Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface $route_processor
-   *   The route processor.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   A request stack object.
-   * @param string[] $filter_protocols
-   *   (optional) An array of protocols allowed for URL generation.
-   */
   public function __construct(
     RouteProviderInterface $provider,
     OutboundPathProcessorInterface $path_processor,

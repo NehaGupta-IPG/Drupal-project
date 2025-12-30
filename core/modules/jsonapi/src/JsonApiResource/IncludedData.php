@@ -16,14 +16,6 @@ use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
  */
 class IncludedData extends ResourceObjectData {
 
-  /**
-   * IncludedData constructor.
-   *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject[]|\Drupal\jsonapi\Exception\EntityAccessDeniedHttpException[] $data
-   *   Resource objects that are the primary data for the response.
-   *
-   * @see \Drupal\jsonapi\JsonApiResource\Data::__construct
-   */
   public function __construct($data) {
     assert(Inspector::assertAllObjects($data, ResourceObject::class, EntityAccessDeniedHttpException::class));
     parent::__construct($data, -1);

@@ -106,9 +106,6 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
    */
   protected $batchSize = 0;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, StateInterface $state) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->state = $state;

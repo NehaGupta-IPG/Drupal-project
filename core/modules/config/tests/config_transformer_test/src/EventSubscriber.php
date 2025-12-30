@@ -41,16 +41,6 @@ class EventSubscriber implements EventSubscriberInterface {
    */
   protected $state;
 
-  /**
-   * EventSubscriber constructor.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $active
-   *   The active config storage.
-   * @param \Drupal\Core\Config\StorageInterface $sync
-   *   The sync config storage.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The Drupal state.
-   */
   public function __construct(StorageInterface $active, StorageInterface $sync, StateInterface $state) {
     $this->active = $active;
     $this->sync = $sync;

@@ -149,30 +149,6 @@ class Resource implements CacheableDependencyInterface {
    */
   protected $html;
 
-  /**
-   * Resource constructor.
-   *
-   * @param \Drupal\media\OEmbed\Provider $provider
-   *   (optional) The resource provider.
-   * @param string $title
-   *   (optional) A text title, describing the resource.
-   * @param string $author_name
-   *   (optional) The name of the author/owner of the resource.
-   * @param string $author_url
-   *   (optional) A URL for the author/owner of the resource.
-   * @param int $cache_age
-   *   (optional) The suggested cache lifetime for this resource, in seconds.
-   * @param string $thumbnail_url
-   *   (optional) A URL to a thumbnail image representing the resource. If this
-   *   parameter is present, $thumbnail_width and $thumbnail_height must also be
-   *   present.
-   * @param int $thumbnail_width
-   *   (optional) The width of the thumbnail, in pixels. If this parameter is
-   *   present, $thumbnail_url and $thumbnail_height must also be present.
-   * @param int $thumbnail_height
-   *   (optional) The height of the thumbnail, in pixels. If this parameter is
-   *   present, $thumbnail_url and $thumbnail_width must also be present.
-   */
   protected function __construct(?Provider $provider = NULL, $title = NULL, $author_name = NULL, $author_url = NULL, $cache_age = NULL, $thumbnail_url = NULL, $thumbnail_width = NULL, $thumbnail_height = NULL) {
     $this->provider = $provider;
     $this->title = $title;

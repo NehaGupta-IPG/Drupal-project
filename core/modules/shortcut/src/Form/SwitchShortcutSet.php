@@ -31,12 +31,6 @@ class SwitchShortcutSet extends FormBase {
    */
   protected $shortcutSetStorage;
 
-  /**
-   * Constructs a SwitchShortcutSet object.
-   *
-   * @param \Drupal\shortcut\ShortcutSetStorageInterface $shortcut_set_storage
-   *   The shortcut set storage.
-   */
   public function __construct(ShortcutSetStorageInterface $shortcut_set_storage) {
     $this->shortcutSetStorage = $shortcut_set_storage;
   }

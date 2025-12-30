@@ -77,15 +77,6 @@ class FrontMatter {
    */
   protected $source;
 
-  /**
-   * FrontMatter constructor.
-   *
-   * @param string $source
-   *   A string source.
-   * @param string $serializer
-   *   The name of a class that implements
-   *   \Drupal\Component\Serialization\SerializationInterface.
-   */
   public function __construct(string $source, string $serializer = '\Drupal\Component\Serialization\Yaml') {
     assert(is_subclass_of($serializer, SerializationInterface::class), sprintf('The $serializer parameter must reference a class that implements %s.', SerializationInterface::class));
     $this->serializer = $serializer;

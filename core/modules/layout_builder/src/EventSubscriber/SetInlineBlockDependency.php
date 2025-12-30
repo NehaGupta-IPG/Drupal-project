@@ -57,18 +57,6 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    */
   protected $usage;
 
-  /**
-   * Constructs SetInlineBlockDependency object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Database\Connection $database
-   *   The database connection.
-   * @param \Drupal\layout_builder\InlineBlockUsageInterface $usage
-   *   The inline block usage service.
-   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
-   *   The section storage manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, Connection $database, InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->database = $database;

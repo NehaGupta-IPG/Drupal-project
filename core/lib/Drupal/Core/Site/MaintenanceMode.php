@@ -27,14 +27,6 @@ class MaintenanceMode implements MaintenanceModeInterface {
    */
   protected $config;
 
-  /**
-   * Constructs a new maintenance mode service.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   */
   public function __construct(StateInterface $state, ConfigFactoryInterface $config_factory) {
     $this->state = $state;
     $this->config = $config_factory;

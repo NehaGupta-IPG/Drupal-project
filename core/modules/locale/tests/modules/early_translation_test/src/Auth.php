@@ -20,12 +20,6 @@ class Auth implements AuthenticationProviderInterface {
    */
   protected $userStorage;
 
-  /**
-   * Constructs an authentication provider object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     // Authentication providers are called early during in the bootstrap.
     // Getting the user storage used to result in a circular reference since

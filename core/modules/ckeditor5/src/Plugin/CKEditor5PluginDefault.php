@@ -18,9 +18,6 @@ use Drupal\editor\EditorInterface;
  */
 class CKEditor5PluginDefault extends PluginBase implements CKEditor5PluginInterface {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

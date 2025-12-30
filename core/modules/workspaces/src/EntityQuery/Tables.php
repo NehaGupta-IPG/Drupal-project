@@ -37,9 +37,6 @@ class Tables extends BaseTables {
    */
   protected $baseTablesEntityType = [];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(SelectInterface $sql_query) {
     parent::__construct($sql_query);
 

@@ -13,18 +13,6 @@ use Psr\Log\LoggerInterface;
  */
 class LenientConfigSchemaChecker extends ConfigSchemaChecker {
 
-  /**
-   * Constructs the ConfigSchemaChecker object.
-   *
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_manager
-   *   The typed config manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger service to display the warning.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger to save the warning.
-   * @param string[] $exclude
-   *   An array of config object names that are excluded from schema checking.
-   */
   public function __construct(TypedConfigManagerInterface $typed_manager, protected readonly MessengerInterface $messenger, protected readonly LoggerInterface $logger, array $exclude = []) {
     parent::__construct($typed_manager, $exclude);
   }

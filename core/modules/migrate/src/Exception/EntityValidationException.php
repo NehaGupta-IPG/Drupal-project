@@ -31,12 +31,6 @@ class EntityValidationException extends MigrateException {
    */
   protected $violations;
 
-  /**
-   * EntityValidationException constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityConstraintViolationListInterface $violations
-   *   The list of violations generated during the entity validation.
-   */
   public function __construct(EntityConstraintViolationListInterface $violations) {
     $this->violations = $violations;
 

@@ -37,16 +37,6 @@ class Dependency {
    */
   protected $constraint;
 
-  /**
-   * Dependency constructor.
-   *
-   * @param string $name
-   *   The name of the dependency.
-   * @param string $project
-   *   The project namespace for the dependency.
-   * @param string $constraint
-   *   The constraint string. For example, '>8.x-1.1'.
-   */
   public function __construct($name, $project, $constraint) {
     $this->name = $name;
     $this->project = $project;

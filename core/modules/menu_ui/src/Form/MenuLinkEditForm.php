@@ -26,12 +26,6 @@ class MenuLinkEditForm extends FormBase {
    */
   protected $classResolver;
 
-  /**
-   * Constructs a MenuLinkEditForm object.
-   *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   The class resolver.
-   */
   public function __construct(ClassResolverInterface $class_resolver) {
     $this->classResolver = $class_resolver;
   }

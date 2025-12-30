@@ -30,22 +30,6 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new PageContext instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\navigation\EntityRouteHelper $entityRouteHelper
-   *   The entity route helper service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
-   *   The entity repository.
-   * @param \Drupal\content_moderation\ModerationInformationInterface|null $moderationInformation
-   *   The moderation information service.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

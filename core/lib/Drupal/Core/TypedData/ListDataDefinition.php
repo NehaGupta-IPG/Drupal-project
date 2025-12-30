@@ -44,9 +44,6 @@ class ListDataDefinition extends DataDefinition implements ListDataDefinitionInt
     return new static([], \Drupal::typedDataManager()->createDataDefinition($item_type));
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $values = [], ?DataDefinitionInterface $item_definition = NULL) {
     $this->definition = $values;
     $this->itemDefinition = $item_definition;

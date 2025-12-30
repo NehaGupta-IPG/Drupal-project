@@ -97,20 +97,6 @@ class MessageCommand implements CommandInterface, CommandWithAttachedAssetsInter
    */
   protected $options;
 
-  /**
-   * Constructs a MessageCommand object.
-   *
-   * @param string|\Drupal\Component\Render\MarkupInterface $message
-   *   The text of the message.
-   * @param string|null $wrapper_query_selector
-   *   The query selector of the element to display messages in when they
-   *   should be displayed somewhere other than the default.
-   *   @see Drupal.Message.defaultWrapper()
-   * @param array $options
-   *   The options passed to Drupal.message().add().
-   * @param bool $clear_previous
-   *   If TRUE, previous messages will be cleared first.
-   */
   public function __construct($message, $wrapper_query_selector = NULL, array $options = [], $clear_previous = TRUE) {
     $this->message = $message;
     $this->wrapperQuerySelector = $wrapper_query_selector;

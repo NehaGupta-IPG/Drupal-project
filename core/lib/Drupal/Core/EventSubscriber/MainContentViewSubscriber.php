@@ -53,16 +53,6 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
    */
   const WRAPPER_FORMAT = '_wrapper_format';
 
-  /**
-   * Constructs a new MainContentViewSubscriber object.
-   *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   The class resolver service.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   * @param array $main_content_renderers
-   *   The available main content renderer service IDs, keyed by format.
-   */
   public function __construct(ClassResolverInterface $class_resolver, RouteMatchInterface $route_match, array $main_content_renderers) {
     $this->classResolver = $class_resolver;
     $this->routeMatch = $route_match;

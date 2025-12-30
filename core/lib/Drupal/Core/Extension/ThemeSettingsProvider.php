@@ -31,9 +31,6 @@ class ThemeSettingsProvider {
     'comment_user_verification',
   ];
 
-  /**
-   * Builds a new service instance.
-   */
   public function __construct(
     protected readonly ThemeManagerInterface $themeManager,
     protected readonly ThemeInitializationInterface $themeInitialization,

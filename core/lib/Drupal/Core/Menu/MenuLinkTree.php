@@ -15,20 +15,6 @@ use Drupal\Core\Utility\CallableResolver;
  */
 class MenuLinkTree implements MenuLinkTreeInterface {
 
-  /**
-   * Constructs a \Drupal\Core\Menu\MenuLinkTree object.
-   *
-   * @param \Drupal\Core\Menu\MenuTreeStorageInterface $treeStorage
-   *   The menu link tree storage.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
-   *   The menu link plugin manager.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
-   *   The route provider to load routes by name.
-   * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menuActiveTrail
-   *   The active menu trail service.
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
-   *   The callable resolver.
-   */
   public function __construct(
     protected MenuTreeStorageInterface $treeStorage,
     protected MenuLinkManagerInterface $menuLinkManager,

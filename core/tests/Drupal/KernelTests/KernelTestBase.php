@@ -105,9 +105,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use ProphecyTrait;
   use ExpectDeprecationTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(string $name) {
     parent::__construct($name);
     $this->setRunTestInSeparateProcess(TRUE);

@@ -35,26 +35,6 @@ class UserRegistrationResource extends ResourceBase {
   use EntityResourceValidationTrait;
   use EntityResourceAccessTrait;
 
-  /**
-   * Constructs a new UserRegistrationResource instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param array $serializer_formats
-   *   The available serialization formats.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\Config\ImmutableConfig $userSettings
-   *   A user settings config instance.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   * @param \Drupal\Core\Password\PasswordGeneratorInterface $passwordGenerator
-   *   The password generator.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

@@ -98,20 +98,6 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
    */
   protected $requestPolicyResults;
 
-  /**
-   * Constructs a new DynamicPageCacheSubscriber object.
-   *
-   * @param \Drupal\Core\PageCache\RequestPolicyInterface $request_policy
-   *   A policy rule determining the cacheability of a request.
-   * @param \Drupal\Core\PageCache\ResponsePolicyInterface $response_policy
-   *   A policy rule determining the cacheability of the response.
-   * @param \Drupal\Core\Cache\VariationCacheInterface $cache
-   *   The variation cache.
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cache_contexts_manager
-   *   The cache contexts manager service.
-   * @param array $renderer_config
-   *   The renderer configuration array.
-   */
   public function __construct(RequestPolicyInterface $request_policy, ResponsePolicyInterface $response_policy, VariationCacheInterface $cache, CacheContextsManager $cache_contexts_manager, array $renderer_config) {
     $this->requestPolicy = $request_policy;
     $this->responsePolicy = $response_policy;

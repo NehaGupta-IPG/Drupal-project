@@ -48,18 +48,6 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a HTTP basic authentication provider object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface $user_auth
-   *   The user authentication service.
-   * @param \Drupal\Core\Flood\FloodInterface $flood
-   *   The flood service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, UserAuthInterface|UserAuthenticationInterface $user_auth, FloodInterface $flood, EntityTypeManagerInterface $entity_type_manager) {
     $this->configFactory = $config_factory;
     if (!$user_auth instanceof UserAuthenticationInterface) {

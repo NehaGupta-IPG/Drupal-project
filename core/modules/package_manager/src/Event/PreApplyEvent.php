@@ -20,17 +20,6 @@ final class PreApplyEvent extends SandboxValidationEvent {
    */
   public readonly ImmutablePathList $excludedPaths;
 
-  /**
-   * Constructs a PreApplyEvent object.
-   *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandboxManager
-   *   The stage which fired this event.
-   * @param \PhpTuf\ComposerStager\API\Path\Value\PathListInterface $excluded_paths
-   *   The list of paths to exclude. These will not be copied from the stage
-   *   directory to the active directory, nor be deleted from the active
-   *   directory if they exist, when the stage directory is copied back into
-   *   the active directory.
-   */
   public function __construct(SandboxManagerBase $sandboxManager, PathListInterface $excluded_paths) {
     parent::__construct($sandboxManager);
     $this->excludedPaths = new ImmutablePathList($excluded_paths);

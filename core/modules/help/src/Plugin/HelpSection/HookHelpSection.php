@@ -27,20 +27,6 @@ class HookHelpSection extends HelpSectionPluginBase implements ContainerFactoryP
    */
   protected $moduleHandler;
 
-  /**
-   * Constructs a HookHelpSection object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
-   *   The module extension list.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

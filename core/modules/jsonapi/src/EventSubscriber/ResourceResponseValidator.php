@@ -57,16 +57,6 @@ class ResourceResponseValidator implements EventSubscriberInterface {
    */
   protected $appRoot;
 
-  /**
-   * Constructs a ResourceResponseValidator object.
-   *
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The JSON:API logger channel.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param string $app_root
-   *   The application's root file path.
-   */
   public function __construct(LoggerInterface $logger, ModuleHandlerInterface $module_handler, $app_root) {
     $this->logger = $logger;
     $this->moduleHandler = $module_handler;

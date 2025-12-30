@@ -195,9 +195,6 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   protected static $fieldsToSkipFromTranslationChangesCheck = [];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $values, $entity_type, $bundle = FALSE, $translations = []) {
     $this->entityTypeId = $entity_type;
     $this->entityKeys['bundle'] = $bundle ?: $this->entityTypeId;

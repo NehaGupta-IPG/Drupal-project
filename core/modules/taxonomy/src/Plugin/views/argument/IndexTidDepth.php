@@ -24,9 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPluginInterface {
   use TaxonomyIndexDepthQueryTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityRepositoryInterface $entityRepository) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

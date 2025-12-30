@@ -19,12 +19,6 @@ class ImageStyleRoutes implements ContainerInjectionInterface {
    */
   protected $streamWrapperManager;
 
-  /**
-   * Constructs a new ImageStyleRoutes object.
-   *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
-   *   The stream wrapper manager service.
-   */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager) {
     $this->streamWrapperManager = $stream_wrapper_manager;
   }

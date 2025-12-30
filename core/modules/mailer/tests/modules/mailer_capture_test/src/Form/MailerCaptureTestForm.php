@@ -23,12 +23,6 @@ class MailerCaptureTestForm extends FormBase implements FormInterface {
     return new static($container->get(MailerInterface::class));
   }
 
-  /**
-   * Constructs the mailer capture test form.
-   *
-   * @param \Symfony\Component\Mailer\MailerInterface $mailer
-   *   The mailer service.
-   */
   public function __construct(protected MailerInterface $mailer) {
   }
 

@@ -16,12 +16,6 @@ final class AccountSetEvent extends Event {
    */
   protected $account;
 
-  /**
-   * AccountSetEvent constructor.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The set account.
-   */
   public function __construct(AccountInterface $account) {
     $this->account = $account;
   }

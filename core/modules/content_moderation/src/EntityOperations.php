@@ -59,20 +59,6 @@ class EntityOperations implements ContainerInjectionInterface {
    */
   protected $routerBuilder;
 
-  /**
-   * Constructs a new EntityOperations object.
-   *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
-   *   Moderation information service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   Entity type manager service.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
-   *   The entity bundle information service.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
-   *   The router builder service.
-   */
   public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entity_type_manager, FormBuilderInterface $form_builder, EntityTypeBundleInfoInterface $bundle_info, RouteBuilderInterface $router_builder) {
     $this->moderationInfo = $moderation_info;
     $this->entityTypeManager = $entity_type_manager;

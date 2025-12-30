@@ -43,9 +43,6 @@ class IncludeResolver {
    */
   protected $entityAccessChecker;
 
-  /**
-   * IncludeResolver constructor.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityAccessChecker $entity_access_checker) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityAccessChecker = $entity_access_checker;

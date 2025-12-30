@@ -62,12 +62,6 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
    */
   protected $layoutTempstore;
 
-  /**
-   * Constructs a new MoveBlockForm.
-   *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
-   *   The layout tempstore.
-   */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {
     $this->layoutTempstore = $layout_tempstore_repository;
   }

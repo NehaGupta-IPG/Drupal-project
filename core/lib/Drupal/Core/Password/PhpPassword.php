@@ -9,16 +9,6 @@ namespace Drupal\Core\Password;
  */
 class PhpPassword implements PasswordInterface {
 
-  /**
-   * Constructs a new password hashing instance.
-   *
-   * @param string $algorithm
-   *   The hashing algorithm to use. Defaults to PHP default.
-   * @param array $options
-   *   List of options. Refer to password_hash() for available options.
-   *
-   * @see https://www.php.net/password_hash
-   */
   public function __construct(
     protected string $algorithm = PASSWORD_DEFAULT,
     protected array $options = [],

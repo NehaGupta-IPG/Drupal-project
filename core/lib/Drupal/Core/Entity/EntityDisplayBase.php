@@ -126,9 +126,6 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
    */
   protected $initialized = FALSE;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $values, $entity_type) {
     if (!isset($values['targetEntityType']) || !isset($values['bundle'])) {
       throw new \InvalidArgumentException('Missing required properties for an EntityDisplay entity.');

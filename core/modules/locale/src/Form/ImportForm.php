@@ -48,14 +48,6 @@ class ImportForm extends FormBase {
     );
   }
 
-  /**
-   * Constructs a form for language import.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
-   *   The configurable language manager.
-   */
   public function __construct(ModuleHandlerInterface $module_handler, ConfigurableLanguageManagerInterface $language_manager) {
     $this->moduleHandler = $module_handler;
     $this->languageManager = $language_manager;

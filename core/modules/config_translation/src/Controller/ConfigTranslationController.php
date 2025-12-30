@@ -75,24 +75,6 @@ class ConfigTranslationController extends ControllerBase {
    */
   protected $renderer;
 
-  /**
-   * Constructs a ConfigTranslationController.
-   *
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $config_mapper_manager
-   *   The configuration mapper manager.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   The menu link access service.
-   * @param \Symfony\Component\Routing\Matcher\RequestMatcherInterface $router
-   *   The dynamic router service.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
-   *   The inbound path processor.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
   public function __construct(
     ConfigMapperManagerInterface $config_mapper_manager,
     AccessManagerInterface $access_manager,

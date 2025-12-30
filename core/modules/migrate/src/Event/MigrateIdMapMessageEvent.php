@@ -38,18 +38,6 @@ class MigrateIdMapMessageEvent extends Event {
    */
   protected $level;
 
-  /**
-   * Constructs a post-save event object.
-   *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   Migration entity.
-   * @param array $source_id_values
-   *   Values represent the source ID.
-   * @param string $message
-   *   The message.
-   * @param int $level
-   *   Severity level (one of the MigrationInterface::MESSAGE_* constants).
-   */
   public function __construct(MigrationInterface $migration, array $source_id_values, $message, $level) {
     $this->migration = $migration;
     $this->sourceIdValues = $source_id_values;

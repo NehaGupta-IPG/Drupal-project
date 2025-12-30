@@ -38,21 +38,6 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
    */
   protected $handlerType;
 
-  /**
-   * Constructs a ViewsHandlerManager object.
-   *
-   * @param string $handler_type
-   *   The plugin type, for example filter.
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\views\ViewsData $views_data
-   *   The views data cache.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke the alter hook with.
-   */
   public function __construct($handler_type, \Traversable $namespaces, ViewsData $views_data, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     $plugin_definition_annotation_name = 'Drupal\views\Annotation\Views' . Container::camelize($handler_type);
     // Special handling until all views plugins have attribute classes.

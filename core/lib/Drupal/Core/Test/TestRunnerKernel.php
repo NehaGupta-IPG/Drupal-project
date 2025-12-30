@@ -20,9 +20,6 @@ class TestRunnerKernel extends DrupalKernel {
     return parent::createFromRequest($request, $class_loader, $environment, $allow_dumping, $app_root);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($environment, $class_loader, $allow_dumping = FALSE, $app_root = NULL) {
     // Force $allow_dumping to FALSE, because the test runner kernel should
     // always have to rebuild its container, and potentially avoid isolation

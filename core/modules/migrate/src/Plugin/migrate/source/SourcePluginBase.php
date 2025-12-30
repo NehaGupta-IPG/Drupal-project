@@ -235,9 +235,6 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    */
   protected $iterator;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;

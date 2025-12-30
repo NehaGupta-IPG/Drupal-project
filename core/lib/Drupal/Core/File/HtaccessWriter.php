@@ -14,16 +14,6 @@ use Psr\Log\LoggerInterface;
  */
 class HtaccessWriter implements HtaccessWriterInterface {
 
-  /**
-   * Htaccess constructor.
-   *
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
-   *   The stream wrapper manager.
-   * @param \Drupal\Core\Site\Settings|null $settings
-   *   The settings.
-   */
   public function __construct(
     protected LoggerInterface $logger,
     protected StreamWrapperManagerInterface $streamWrapperManager,

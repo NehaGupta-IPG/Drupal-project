@@ -27,20 +27,6 @@ class NavigationHooks {
 
   use StringTranslationTrait;
 
-  /**
-   * NavigationHooks constructor.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   * @param \Drupal\navigation\NavigationRenderer $navigationRenderer
-   *   The navigation renderer.
-   * @param \Drupal\Core\Config\Action\ConfigActionManager $configActionManager
-   *   The config action manager.
-   * @param \Drupal\navigation\TopBarItemManagerInterface $topBarItemManager
-   *   The Top Bar Item manager.
-   */
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
     protected AccountInterface $currentUser,

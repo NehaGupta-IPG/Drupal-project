@@ -21,12 +21,6 @@ class LayoutSectionStorageParamConverter implements ParamConverterInterface {
    */
   protected $sectionStorageManager;
 
-  /**
-   * Constructs a new LayoutSectionStorageParamConverter.
-   *
-   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
-   *   The section storage manager.
-   */
   public function __construct(SectionStorageManagerInterface $section_storage_manager) {
     $this->sectionStorageManager = $section_storage_manager;
   }

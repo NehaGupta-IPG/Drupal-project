@@ -14,9 +14,6 @@ use Drupal\Core\PageCache\RequestPolicy\CommandLineOrUnsafeMethod;
  */
 class DefaultRequestPolicy extends ChainRequestPolicy {
 
-  /**
-   * Constructs the default Dynamic Page Cache request policy.
-   */
   public function __construct() {
     $this->addPolicy(new CommandLineOrUnsafeMethod());
   }

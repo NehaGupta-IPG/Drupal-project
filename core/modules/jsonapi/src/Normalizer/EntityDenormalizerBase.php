@@ -48,16 +48,6 @@ abstract class EntityDenormalizerBase extends NormalizerBase implements Denormal
    */
   protected $pluginManager;
 
-  /**
-   * Constructs an EntityDenormalizerBase object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $plugin_manager
-   *   The plugin manager for fields.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, FieldTypePluginManagerInterface $plugin_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->fieldManager = $field_manager;

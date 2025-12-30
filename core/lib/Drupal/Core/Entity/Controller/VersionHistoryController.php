@@ -38,18 +38,6 @@ class VersionHistoryController extends ControllerBase {
 
   const REVISIONS_PER_PAGE = 50;
 
-  /**
-   * Constructs a new VersionHistoryController.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     LanguageManagerInterface $languageManager,

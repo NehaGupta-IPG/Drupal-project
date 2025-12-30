@@ -21,12 +21,6 @@ use Symfony\Component\Routing\Route;
  */
 class LayoutBuilderAccessCheck implements AccessInterface {
 
-  /**
-   * Constructs a new LayoutBuilderAccessCheck class.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match.
-   */
   public function __construct(
     protected RouteMatchInterface $route_match,
   ) {}

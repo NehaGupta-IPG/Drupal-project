@@ -38,14 +38,6 @@ class SettingsCommand implements CommandInterface {
    */
   protected $merge;
 
-  /**
-   * Constructs a SettingsCommand object.
-   *
-   * @param array $settings
-   *   An array of key/value pairs of JavaScript settings.
-   * @param bool $merge
-   *   Whether the settings should be merged into the global drupalSettings.
-   */
   public function __construct(array $settings, $merge = FALSE) {
     $this->settings = $settings;
     $this->merge = $merge;

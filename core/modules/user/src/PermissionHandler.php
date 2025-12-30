@@ -75,18 +75,6 @@ class PermissionHandler implements PermissionHandlerInterface {
    */
   protected CallableResolver $callableResolver;
 
-  /**
-   * Constructs a new PermissionHandler.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation.
-   * @param \Drupal\Core\Utility\CallableResolver $callable_resolver
-   *   The callable resolver.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
-   *   The module extension list.
-   */
   public function __construct(ModuleHandlerInterface $module_handler, TranslationInterface $string_translation, CallableResolver $callable_resolver, protected ModuleExtensionList $moduleExtensionList) {
     $this->callableResolver = $callable_resolver;
 

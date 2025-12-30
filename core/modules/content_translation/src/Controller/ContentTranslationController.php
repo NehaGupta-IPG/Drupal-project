@@ -19,16 +19,6 @@ use Drupal\Core\Url;
  */
 class ContentTranslationController extends ControllerBase {
 
-  /**
-   * Initializes a content translation controller.
-   *
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $manager
-   *   A content translation manager instance.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
-   *   The entity field manager service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     protected ContentTranslationManagerInterface $manager,
     protected EntityFieldManagerInterface $entityFieldManager,

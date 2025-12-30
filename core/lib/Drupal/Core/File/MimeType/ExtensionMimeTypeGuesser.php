@@ -912,12 +912,6 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
    */
   protected MimeTypeMapInterface $map;
 
-  /**
-   * Constructs a new ExtensionMimeTypeGuesser.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface|\Drupal\Core\File\MimeType\MimeTypeMapInterface $map
-   *   The MIME type map.
-   */
   public function __construct(
     MimeTypeMapInterface|ModuleHandlerInterface $map,
   ) {

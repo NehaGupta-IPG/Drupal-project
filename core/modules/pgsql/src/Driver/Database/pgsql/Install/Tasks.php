@@ -30,9 +30,6 @@ class Tasks extends InstallTasks {
    */
   protected $pdoDriver = 'pgsql';
 
-  /**
-   * Constructs a \Drupal\pgsql\Driver\Database\pgsql\Install\Tasks object.
-   */
   public function __construct() {
     $this->tasks[] = [
       'function' => 'checkEncoding',

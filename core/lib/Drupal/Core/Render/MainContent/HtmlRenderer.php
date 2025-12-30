@@ -91,26 +91,6 @@ class HtmlRenderer implements MainContentRendererInterface {
    */
   protected $themeManager;
 
-  /**
-   * Constructs a new HtmlRenderer.
-   *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
-   *   The title resolver.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $display_variant_manager
-   *   The display variant manager.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\Render\RenderCacheInterface $render_cache
-   *   The render cache service.
-   * @param array $renderer_config
-   *   The renderer configuration array.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
-   *   The theme manager.
-   */
   public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager) {
     $this->titleResolver = $title_resolver;
     $this->displayVariantManager = $display_variant_manager;

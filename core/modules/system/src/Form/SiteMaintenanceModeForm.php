@@ -32,18 +32,6 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
    */
   protected $permissionHandler;
 
-  /**
-   * Constructs a new SiteMaintenanceModeForm.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state keyvalue collection to use.
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
-   *   The permission handler.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, StateInterface $state, PermissionHandlerInterface $permission_handler) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->state = $state;

@@ -67,18 +67,6 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
    */
   private ?Checkpoint $readFromCheckpoint = NULL;
 
-  /**
-   * Constructs a CheckpointStorage object.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $activeStorage
-   *   The active configuration storage.
-   * @param \Drupal\Core\Config\Checkpoint\CheckpointListInterface $checkpoints
-   *   The list of checkpoints.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $keyValueFactory
-   *   The key value factory.
-   * @param string $collection
-   *   (optional) The configuration collection.
-   */
   public function __construct(
     private readonly StorageInterface $activeStorage,
     private readonly CheckpointListInterface $checkpoints,

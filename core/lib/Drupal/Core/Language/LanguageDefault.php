@@ -21,12 +21,6 @@ class LanguageDefault {
    */
   protected $language;
 
-  /**
-   * Constructs the default language object.
-   *
-   * @param array $values
-   *   The properties used to construct the default language.
-   */
   public function __construct(array $values) {
     $this->set(new Language($values));
   }

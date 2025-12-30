@@ -13,14 +13,6 @@ use Drupal\Core\Hook\OrderOperation\OrderOperation;
  */
 abstract readonly class RelativeOrderBase implements OrderInterface {
 
-  /**
-   * Constructor.
-   *
-   * @param list<string> $modules
-   *   A list of modules the implementations should order against.
-   * @param list<array{class-string, string}> $classesAndMethods
-   *   A list of implementations to order against, as [$class, $method].
-   */
   public function __construct(
     public array $modules = [],
     public array $classesAndMethods = [],

@@ -18,12 +18,6 @@ class ServiceWithDependency {
    */
   protected $service;
 
-  /**
-   * ServiceWithDependency constructor.
-   *
-   * @param \Drupal\new_dependency_test\InjectedService|null $service
-   *   The service of the same module which has the new dependency.
-   */
   public function __construct(?InjectedService $service = NULL) {
     $this->service = $service;
   }

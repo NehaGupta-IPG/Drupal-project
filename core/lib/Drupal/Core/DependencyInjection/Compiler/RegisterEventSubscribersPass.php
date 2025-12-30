@@ -11,12 +11,6 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
  */
 class RegisterEventSubscribersPass implements CompilerPassInterface {
 
-  /**
-   * Constructs a RegisterEventSubscribersPass object.
-   *
-   * @param \Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass $pass
-   *   The Symfony compiler pass that registers event subscribers.
-   */
   public function __construct(
     protected RegisterListenersPass $pass,
   ) {}

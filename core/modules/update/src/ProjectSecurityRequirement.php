@@ -49,20 +49,6 @@ final class ProjectSecurityRequirement {
    */
   private $existingMajorMinorVersion;
 
-  /**
-   * Constructs a ProjectSecurityRequirement object.
-   *
-   * @param string|null $project_title
-   *   The project title.
-   * @param array $security_coverage_info
-   *   Security coverage information as set by
-   *   \Drupal\update\ProjectSecurityData::getCoverageInfo().
-   * @param string|null $existing_major_minor_version
-   *   The existing (currently installed) version in the format [MAJOR].[MINOR].
-   * @param string|null $next_major_minor_version
-   *   The next version after the installed version in the format
-   *   [MAJOR].[MINOR].
-   */
   private function __construct($project_title = NULL, array $security_coverage_info = [], $existing_major_minor_version = NULL, $next_major_minor_version = NULL) {
     $this->projectTitle = $project_title;
     $this->securityCoverageInfo = $security_coverage_info;

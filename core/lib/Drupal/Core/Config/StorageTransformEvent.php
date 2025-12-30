@@ -23,12 +23,6 @@ class StorageTransformEvent extends Event {
    */
   protected $storage;
 
-  /**
-   * StorageTransformEvent constructor.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $storage
-   *   The storage with the configuration to transform.
-   */
   public function __construct(StorageInterface $storage) {
     $this->storage = $storage;
   }

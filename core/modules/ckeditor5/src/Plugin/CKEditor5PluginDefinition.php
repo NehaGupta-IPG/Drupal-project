@@ -35,14 +35,6 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
    */
   private $drupal;
 
-  /**
-   * CKEditor5PluginDefinition constructor.
-   *
-   * @param array $definition
-   *   An array of values from the annotation/YAML.
-   *
-   * @throws \InvalidArgumentException
-   */
   public function __construct(array $definition) {
     foreach ($definition as $property => $value) {
       if (property_exists($this, $property)) {

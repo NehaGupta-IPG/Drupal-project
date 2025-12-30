@@ -53,9 +53,6 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
    */
   protected $sections;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->configFactory = $config_factory;

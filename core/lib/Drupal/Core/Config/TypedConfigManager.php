@@ -42,20 +42,6 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
    */
   protected $definitions;
 
-  /**
-   * Creates a new typed configuration manager.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $configStorage
-   *   The storage object to use for reading schema data.
-   * @param \Drupal\Core\Config\StorageInterface $schemaStorage
-   *   The storage object to use for reading schema data.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend to use for caching the definitions.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   (optional) The class resolver.
-   */
   public function __construct(StorageInterface $configStorage, StorageInterface $schemaStorage, CacheBackendInterface $cache, ModuleHandlerInterface $module_handler, ?ClassResolverInterface $class_resolver = NULL) {
     $this->configStorage = $configStorage;
     $this->schemaStorage = $schemaStorage;

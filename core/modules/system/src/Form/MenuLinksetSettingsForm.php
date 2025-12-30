@@ -14,16 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class MenuLinksetSettingsForm extends ConfigFormBase {
 
-  /**
-   * Constructs a MenuLinksetSettingsForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $routerBuilder
-   *   The router builder service.
-   */
   public function __construct(
     ConfigFactoryInterface $config_factory,
     TypedConfigManagerInterface $typedConfigManager,

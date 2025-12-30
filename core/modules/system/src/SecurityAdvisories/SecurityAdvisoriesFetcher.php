@@ -69,26 +69,6 @@ final class SecurityAdvisoriesFetcher {
    */
   protected $withHttpFallback;
 
-  /**
-   * Constructs a new SecurityAdvisoriesFetcher object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_factory
-   *   The expirable key/value factory.
-   * @param \GuzzleHttp\ClientInterface $client
-   *   The HTTP client.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_list
-   *   The profile extension list.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings instance.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, KeyValueExpirableFactoryInterface $key_value_factory, ClientInterface $client, ModuleExtensionList $module_list, ThemeExtensionList $theme_list, ProfileExtensionList $profile_list, LoggerInterface $logger, Settings $settings) {
     $this->config = $config_factory->get('system.advisories');
     $this->keyValueExpirable = $key_value_factory->get('system');

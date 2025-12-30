@@ -17,18 +17,6 @@ class ExtensionPathResolver {
    */
   protected $extensionLists;
 
-  /**
-   * ExtensionPathResolver constructor.
-   *
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_extension_list
-   *   The profile extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ThemeEngineExtensionList $theme_engine_extension_list
-   *   The theme engine extension list.
-   */
   public function __construct(ModuleExtensionList $module_extension_list, ProfileExtensionList $profile_extension_list, ThemeExtensionList $theme_extension_list, ThemeEngineExtensionList $theme_engine_extension_list) {
     $this->extensionLists['module'] = $module_extension_list;
     $this->extensionLists['profile'] = $profile_extension_list;

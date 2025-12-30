@@ -106,9 +106,6 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     );
   }
 
-  /**
-   * Constructs a \Drupal\node\Plugin\Search\NodeSearch object.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

@@ -23,16 +23,6 @@ class ResourceResponse extends Response implements CacheableResponseInterface, R
   use CacheableResponseTrait;
   use ResourceResponseTrait;
 
-  /**
-   * Constructor for ResourceResponse objects.
-   *
-   * @param mixed $data
-   *   Response data that should be serialized.
-   * @param int $status
-   *   The response status code.
-   * @param array $headers
-   *   An array of response headers.
-   */
   public function __construct($data = NULL, $status = 200, $headers = []) {
     $this->responseData = $data;
     parent::__construct('', $status, $headers);

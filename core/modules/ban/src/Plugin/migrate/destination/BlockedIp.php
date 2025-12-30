@@ -23,20 +23,6 @@ class BlockedIp extends DestinationBase implements ContainerFactoryPluginInterfa
    */
   protected $banManager;
 
-  /**
-   * Constructs a BlockedIp object.
-   *
-   * @param array $configuration
-   *   Plugin configuration.
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param mixed $plugin_definition
-   *   The plugin definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The current migration.
-   * @param \Drupal\ban\BanIpManagerInterface $ban_manager
-   *   The IP manager service.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, BanIpManagerInterface $ban_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->banManager = $ban_manager;

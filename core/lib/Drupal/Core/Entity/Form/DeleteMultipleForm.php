@@ -71,18 +71,6 @@ class DeleteMultipleForm extends ConfirmFormBase implements BaseFormIdInterface,
    */
   protected $entityType;
 
-  /**
-   * Constructs a new DeleteMultiple object.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *   The tempstore factory.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger service.
-   */
   public function __construct(AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, PrivateTempStoreFactory $temp_store_factory, MessengerInterface $messenger) {
     $this->currentUser = $current_user;
     $this->entityTypeManager = $entity_type_manager;

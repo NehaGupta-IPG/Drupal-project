@@ -19,9 +19,6 @@ use Drupal\Component\Annotation\Plugin;
  */
 class MigrateField extends Plugin {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($values) {
     parent::__construct($values);
     // Provide default value for core property, in case it's missing.

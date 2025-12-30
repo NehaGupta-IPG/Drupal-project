@@ -12,21 +12,6 @@ use Symfony\Component\Validator\ConstraintViolationList;
  */
 final class RecipeFileException extends \RuntimeException {
 
-  /**
-   * Constructs a RecipeFileException object.
-   *
-   * @param string $path
-   *   The path of the offending recipe file.
-   * @param string $message
-   *   (optional) The exception message.
-   * @param \Symfony\Component\Validator\ConstraintViolationList|null $violations
-   *   (optional) A list of validation constraint violations in the recipe file,
-   *   if any.
-   * @param int $code
-   *   (optional) The exception code.
-   * @param \Throwable|null $previous
-   *   (optional) The previous exception, if any.
-   */
   public function __construct(
     public readonly string $path,
     string $message = '',

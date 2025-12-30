@@ -20,18 +20,6 @@ class DatabaseDriver extends Extension {
    */
   private Tasks $installTasks;
 
-  /**
-   * Constructs a new DatabaseDriver object.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\Extension\Extension $module
-   *   The module containing the database driver.
-   * @param string $driverName
-   *   The database driver name.
-   * @param \Drupal\Core\Extension\Extension[] $discoveredModules
-   *   The modules discovered in the installation.
-   */
   public function __construct(
     string $root,
     protected Extension $module,

@@ -12,12 +12,6 @@ use Psr\Container\ContainerInterface;
  */
 class StreamWrapperManager implements StreamWrapperManagerInterface {
 
-  /**
-   * Constructs a StreamWrapperManager object.
-   *
-   * @param \Psr\Container\ContainerInterface $container
-   *   The stream wrapper service locator.
-   */
   public function __construct(
     protected readonly ContainerInterface $container,
   ) {}

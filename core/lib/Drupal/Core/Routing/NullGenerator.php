@@ -12,12 +12,6 @@ use Symfony\Component\Routing\Route;
  */
 class NullGenerator extends UrlGenerator {
 
-  /**
-   * Override the parent constructor.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   */
   public function __construct(RequestStack $request_stack) {
     $this->requestStack = $request_stack;
     $this->context = new RequestContext();

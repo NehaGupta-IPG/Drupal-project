@@ -58,18 +58,6 @@ class NodeTranslationExceptionSubscriber implements EventSubscriberInterface {
    */
   protected $state;
 
-  /**
-   * Constructs the NodeTranslationExceptionSubscriber.
-   *
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value
-   *   The key value factory.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
-   *   The URL generator.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   */
   public function __construct(KeyValueFactoryInterface $key_value, LanguageManagerInterface $language_manager, UrlGeneratorInterface $url_generator, StateInterface $state) {
     $this->keyValue = $key_value;
     $this->languageManager = $language_manager;

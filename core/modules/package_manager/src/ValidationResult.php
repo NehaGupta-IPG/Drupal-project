@@ -16,24 +16,6 @@ use PhpTuf\ComposerStager\API\Exception\ExceptionInterface;
  */
 final class ValidationResult {
 
-  /**
-   * Creates a ValidationResult object.
-   *
-   * @param int $severity
-   *   The severity of the result. Should be one of the
-   *   SystemManager::REQUIREMENT_* constants.
-   *   @todo Refactor this to use RequirementSeverity in https://www.drupal.org/i/3525121.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[]|string[] $messages
-   *   The result messages.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
-   *   A succinct summary of the result.
-   * @param bool $assert_translatable
-   *   Whether to assert the messages are translatable. Internal use only.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown if $messages is empty, or if it has 2 or more items but $summary
-   *   is NULL.
-   */
   private function __construct(
     public readonly int $severity,
     private readonly array $messages,

@@ -59,13 +59,6 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
    */
   protected array $preprocessForSuggestions;
 
-  /**
-   * Constructor.
-   *
-   * @param list<string> $themes
-   *   Names of installed themes.
-   *   When used as a compiler pass, this parameter should be omitted.
-   */
   public function __construct(
     protected readonly array $themes = [],
   ) {}

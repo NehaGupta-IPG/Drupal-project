@@ -35,14 +35,6 @@ class UpdateBuildIdCommand implements CommandInterface {
    */
   protected $new;
 
-  /**
-   * Constructs an UpdateBuildIdCommand object.
-   *
-   * @param string $old
-   *   The old build_id.
-   * @param string $new
-   *   The new build_id.
-   */
   public function __construct($old, $new) {
     $this->old = $old;
     $this->new = $new;

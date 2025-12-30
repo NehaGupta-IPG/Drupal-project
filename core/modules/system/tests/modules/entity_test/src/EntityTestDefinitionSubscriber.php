@@ -68,9 +68,6 @@ class EntityTestDefinitionSubscriber implements EventSubscriberInterface, Entity
    */
   protected $updateLiveDefinitions = FALSE;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(StateInterface $state, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
     $this->state = $state;
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;

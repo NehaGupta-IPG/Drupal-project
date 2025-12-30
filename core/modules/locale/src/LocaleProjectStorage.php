@@ -37,12 +37,6 @@ class LocaleProjectStorage implements LocaleProjectStorageInterface {
    */
   protected bool $sorted = FALSE;
 
-  /**
-   * Constructs a State object.
-   *
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key value store to use.
-   */
   public function __construct(KeyValueFactoryInterface $key_value_factory) {
     $this->keyValueStore = $key_value_factory->get('locale.project');
   }

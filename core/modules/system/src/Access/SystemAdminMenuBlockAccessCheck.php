@@ -21,16 +21,6 @@ use Drupal\Core\Session\AccountInterface;
  */
 class SystemAdminMenuBlockAccessCheck implements AccessInterface {
 
-  /**
-   * Constructs a new SystemAdminMenuBlockAccessCheck.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
-   *   The menu link tree service.
-   * @param \Drupal\Core\Routing\AccessAwareRouter $router
-   *   The router service.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
-   *   The menu link manager service.
-   */
   public function __construct(
     private readonly MenuLinkTreeInterface $menuLinkTree,
     private readonly AccessAwareRouter $router,

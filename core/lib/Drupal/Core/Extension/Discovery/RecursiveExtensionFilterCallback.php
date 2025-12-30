@@ -73,19 +73,6 @@ class RecursiveExtensionFilterCallback {
     'Drupal',
   ];
 
-  /**
-   * Construct a RecursiveExtensionFilterCallback.
-   *
-   * @param array $skipped_folders
-   *   (optional) Add to the list of directories that should be filtered out
-   *   during the iteration.
-   * @param bool $accept_tests
-   *   (optional) Pass FALSE to skip all test directories in the discovery. If
-   *   TRUE, extensions in test directories will be discovered and only the
-   *   global directory skip list in
-   *   RecursiveExtensionFilterCallback::$skippedFolders and $skipped_folders
-   *   are applied.
-   */
   public function __construct(array $skipped_folders = [], bool $accept_tests = FALSE) {
     $this->skippedFolders = array_merge($this->skippedFolders, $skipped_folders);
     if (!$accept_tests) {

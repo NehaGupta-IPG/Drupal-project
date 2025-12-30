@@ -42,14 +42,6 @@ class ConfigSingleExportForm extends FormBase {
    */
   protected $definitions = [];
 
-  /**
-   * Constructs a new ConfigSingleImportForm.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Config\StorageInterface $config_storage
-   *   The config storage.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, StorageInterface $config_storage) {
     $this->entityTypeManager = $entity_type_manager;
     $this->configStorage = $config_storage;

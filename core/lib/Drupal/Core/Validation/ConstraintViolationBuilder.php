@@ -34,28 +34,6 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface 
    */
   protected mixed $cause = NULL;
 
-  /**
-   * Constructs a new ConstraintViolationBuilder instance.
-   *
-   * @param \Symfony\Component\Validator\ConstraintViolationList $violations
-   *   The violation list.
-   * @param \Symfony\Component\Validator\Constraint $constraint
-   *   The constraint.
-   * @param string $message
-   *   The message.
-   * @param array $parameters
-   *   The message parameters.
-   * @param mixed $root
-   *   The root.
-   * @param string $propertyPath
-   *   The property string.
-   * @param mixed $invalidValue
-   *   The invalid value.
-   * @param \Drupal\Core\Validation\TranslatorInterface $translator
-   *   The translator.
-   * @param string|false|null $translationDomain
-   *   (optional) The translation domain.
-   */
   public function __construct(
     protected ConstraintViolationList $violations,
     protected Constraint $constraint,

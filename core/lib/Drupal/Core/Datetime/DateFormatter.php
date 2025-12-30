@@ -79,20 +79,6 @@ class DateFormatter implements DateFormatterInterface {
     '@count sec|@count sec' => 1,
   ];
 
-  /**
-   * Constructs a Date object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The string translation.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, TranslationInterface $translation, ConfigFactoryInterface $config_factory, RequestStack $request_stack) {
     $this->dateFormatStorage = $entity_type_manager->getStorage('date_format');
     $this->languageManager = $language_manager;

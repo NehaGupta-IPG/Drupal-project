@@ -83,18 +83,6 @@ class HelpTopicPluginManager extends DefaultPluginManager implements HelpTopicPl
     'class' => '',
   ];
 
-  /**
-   * Constructs a new HelpTopicManager object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
-   *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   Cache backend instance to use.
-   * @param string $root
-   *   The app root.
-   */
   public function __construct(ModuleHandlerInterface $module_handler, protected ThemeHandlerInterface $themeHandler, CacheBackendInterface $cache_backend, protected string $root) {
     // Note that the parent construct is not called because this class does not
     // use annotated class discovery.

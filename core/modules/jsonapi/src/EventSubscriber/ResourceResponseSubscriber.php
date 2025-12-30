@@ -45,12 +45,6 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    */
   protected $serializer;
 
-  /**
-   * Constructs a ResourceResponseSubscriber object.
-   *
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
-   *   The serializer.
-   */
   public function __construct(SerializerInterface $serializer) {
     $this->serializer = $serializer;
   }

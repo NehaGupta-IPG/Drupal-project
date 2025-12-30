@@ -56,24 +56,6 @@ class Renderer implements RendererInterface {
    */
   protected static $contextCollection;
 
-  /**
-   * Constructs a new Renderer.
-   *
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
-   *   The callable resolver.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme
-   *   The theme manager.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfo
-   *   The element info.
-   * @param \Drupal\Core\Render\PlaceholderGeneratorInterface $placeholderGenerator
-   *   The placeholder generator.
-   * @param \Drupal\Core\Render\RenderCacheInterface $renderCache
-   *   The render cache service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack.
-   * @param array $renderer_config
-   *   The renderer configuration array.
-   */
   public function __construct(
     protected CallableResolver $callableResolver,
     protected ThemeManagerInterface $theme,

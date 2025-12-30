@@ -54,20 +54,6 @@ class CommentController extends ControllerBase {
    */
   protected $entityRepository;
 
-  /**
-   * Constructs a CommentController object.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   HTTP kernel to handle requests.
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
-   *   The comment manager service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository service.
-   */
   public function __construct(HttpKernelInterface $http_kernel, CommentManagerInterface $comment_manager, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EntityRepositoryInterface $entity_repository) {
     $this->httpKernel = $http_kernel;
     $this->commentManager = $comment_manager;

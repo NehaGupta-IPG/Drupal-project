@@ -41,14 +41,6 @@ class NodePreviewForm extends FormBase {
     );
   }
 
-  /**
-   * Constructs a new NodePreviewForm.
-   *
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
-   *   The entity display repository.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   */
   public function __construct(EntityDisplayRepositoryInterface $entity_display_repository, ConfigFactoryInterface $config_factory) {
     $this->entityDisplayRepository = $entity_display_repository;
     $this->configFactory = $config_factory;

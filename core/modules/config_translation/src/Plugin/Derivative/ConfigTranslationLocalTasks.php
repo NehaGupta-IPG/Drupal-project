@@ -26,14 +26,6 @@ class ConfigTranslationLocalTasks extends DeriverBase implements ContainerDerive
    */
   protected $basePluginId;
 
-  /**
-   * Constructs a new ConfigTranslationLocalTasks.
-   *
-   * @param string $base_plugin_id
-   *   The base plugin ID.
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $mapper_manager
-   *   The mapper plugin discovery service.
-   */
   public function __construct($base_plugin_id, ConfigMapperManagerInterface $mapper_manager) {
     $this->basePluginId = $base_plugin_id;
     $this->mapperManager = $mapper_manager;

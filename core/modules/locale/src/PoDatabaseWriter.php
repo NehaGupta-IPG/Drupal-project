@@ -55,9 +55,6 @@ class PoDatabaseWriter implements PoWriterInterface {
    */
   private $report;
 
-  /**
-   * Constructor, initialize reporting array.
-   */
   public function __construct() {
     $this->setReport();
   }

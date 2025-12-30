@@ -53,20 +53,6 @@ class VocabularyListBuilder extends DraggableListBuilder {
    */
   protected $messenger;
 
-  /**
-   * Constructs a new VocabularyListBuilder object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
   public function __construct(
     EntityTypeInterface $entity_type,
     AccountInterface $current_user,

@@ -41,12 +41,6 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
    */
   protected $entityTypeManager;
 
-  /**
-   * FieldItemNormalizer constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
   }

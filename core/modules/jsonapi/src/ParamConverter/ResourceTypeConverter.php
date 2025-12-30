@@ -31,12 +31,6 @@ class ResourceTypeConverter implements ParamConverterInterface {
    */
   protected $resourceTypeRepository;
 
-  /**
-   * ResourceTypeConverter constructor.
-   *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON:API resource type repository.
-   */
   public function __construct(ResourceTypeRepositoryInterface $resource_type_repository) {
     $this->resourceTypeRepository = $resource_type_repository;
   }

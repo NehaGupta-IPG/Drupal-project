@@ -26,9 +26,6 @@ class QueryFactory implements QueryFactoryInterface {
    */
   protected $namespaces;
 
-  /**
-   * Constructs a QueryFactory object.
-   */
   public function __construct(KeyValueFactoryInterface $key_value_factory) {
     $this->keyValueFactory = $key_value_factory;
     $this->namespaces = Query::getNamespaces($this);

@@ -205,18 +205,6 @@ class MigrationState {
    */
   protected $enabledModules = [];
 
-  /**
-   * Construct a new MigrationState object.
-   *
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $fieldPluginManager
-   *   Field plugin manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   Module handler.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   Messenger service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $stringTranslation
-   *   String translation service.
-   */
   public function __construct(MigrateFieldPluginManagerInterface $fieldPluginManager, ModuleHandlerInterface $moduleHandler, MessengerInterface $messenger, TranslationInterface $stringTranslation) {
     $this->fieldPluginManager = $fieldPluginManager;
     $this->moduleHandler = $moduleHandler;

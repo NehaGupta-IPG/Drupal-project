@@ -28,14 +28,6 @@ class BlockContentAccessControlHandler extends EntityAccessControlHandler implem
    */
   protected $eventDispatcher;
 
-  /**
-   * BlockContentAccessControlHandler constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
-   *   The event dispatcher.
-   */
   public function __construct(EntityTypeInterface $entity_type, EventDispatcherInterface $dispatcher) {
     parent::__construct($entity_type);
     $this->eventDispatcher = $dispatcher;

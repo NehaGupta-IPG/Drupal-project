@@ -33,18 +33,6 @@ class Broken extends PluginBase implements BlockPluginInterface, ContainerFactor
    */
   protected $currentUser;
 
-  /**
-   * Creates a Broken Block instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, AccountInterface $current_user) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->currentUser = $current_user;

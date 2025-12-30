@@ -20,12 +20,6 @@ abstract class UserCacheContextBase {
    */
   protected $user;
 
-  /**
-   * Constructs a new UserCacheContextBase class.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user.
-   */
   public function __construct(AccountInterface $user) {
     $this->user = $user;
   }

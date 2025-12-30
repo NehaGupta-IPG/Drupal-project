@@ -23,14 +23,6 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * Construct a new NavigationContentLinks object.
-   *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
-   *   The route provider.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
   public function __construct(private RouteProviderInterface $routeProvider, private EntityTypeManagerInterface $entityTypeManager) {}
 
   /**

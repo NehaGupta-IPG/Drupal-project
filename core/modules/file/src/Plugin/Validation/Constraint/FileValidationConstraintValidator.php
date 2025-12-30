@@ -14,12 +14,6 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class FileValidationConstraintValidator extends ConstraintValidator implements ContainerInjectionInterface {
 
-  /**
-   * Creates a new FileValidationConstraintValidator.
-   *
-   * @param \Drupal\file\Validation\FileValidatorInterface $fileValidator
-   *   The file validator.
-   */
   public function __construct(
     protected FileValidatorInterface $fileValidator,
   ) {}

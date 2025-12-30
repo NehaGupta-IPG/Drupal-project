@@ -20,12 +20,6 @@ class EntityBundleRouteEnhancer implements EnhancerInterface {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a EntityBundleRouteEnhancer object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
   }

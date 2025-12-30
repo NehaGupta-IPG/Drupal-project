@@ -34,18 +34,6 @@ use Symfony\Component\Mime\MimeTypes;
  */
 class CKEditor5ImageController extends ControllerBase {
 
-  /**
-   * Constructs a new CKEditor5ImageController.
-   *
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
-   *   The file system service.
-   * @param \Drupal\file\Upload\FileUploadHandlerInterface $fileUploadHandler
-   *   The file upload handler.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock service.
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $pluginManager
-   *   The CKEditor 5 plugin manager.
-   */
   public function __construct(
     protected FileSystemInterface $fileSystem,
     protected FileUploadHandlerInterface $fileUploadHandler,
