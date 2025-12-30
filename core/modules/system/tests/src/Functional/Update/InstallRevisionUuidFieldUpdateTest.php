@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\node\Functional\Update;
+namespace Drupal\Tests\system\Functional\Update;
 
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
