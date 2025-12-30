@@ -1233,6 +1233,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if ($entity_type->isRevisionable()) {
       $duplicate->{$entity_type->getKey('revision')}->value = NULL;
       $duplicate->loadedRevisionId = NULL;
+      // Allow the storage to set a new revision UUID.
+      $duplicate->set($entity_type->getRevisionMetadataKey('revision_uuid'), NULL);
     }
 
     // Modules might need to add or change the data initially held by the new

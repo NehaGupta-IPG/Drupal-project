@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
@@ -74,13 +75,20 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   The memory cache backend.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
+   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
+   *   The UUID service.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface $cache, MemoryCacheInterface $memory_cache, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
+  public function __construct(EntityTypeInterface $entity_type, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface $cache, MemoryCacheInterface $memory_cache, EntityTypeBundleInfoInterface $entity_type_bundle_info, UuidInterface $uuid_service = NULL) {
     parent::__construct($entity_type, $memory_cache);
     $this->bundleKey = $this->entityType->getKey('bundle');
     $this->entityFieldManager = $entity_field_manager;
     $this->cacheBackend = $cache;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
+    if (!$uuid_service) {
+      $uuid_service = \Drupal::service('uuid');
+      @trigger_error('Calling ' . __METHOD__ . ' without the $uuid_service argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3565175', E_USER_DEPRECATED);
+    }
+    $this->uuidService = $uuid_service;
   }
 
   /**
@@ -119,7 +127,8 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $container->get('entity_field.manager'),
       $container->get('cache.entity'),
       $container->get('entity.memory_cache'),
-      $container->get('entity_type.bundle.info')
+      $container->get('entity_type.bundle.info'),
+      $container->get('uuid'),
     );
   }
 
@@ -836,6 +845,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     if ($this->entityType->isRevisionable() && ($entity->isNewRevision() || $entity->isDefaultRevision())) {
       $revision_default_key = $this->entityType->getRevisionMetadataKey('revision_default');
       $entity->set($revision_default_key, $entity->isDefaultRevision());
+    }
+    if ($this->entityType->isRevisionable() && $entity->isNewRevision() && $this->entityType->hasRevisionMetadataKey('revision_uuid')) {
+      // Generate a new UUID for a new revision.
+      $entity->set($this->entityType->getRevisionMetadataKey('revision_uuid'), $this->uuidService->generate());
     }
 
     $this->doSaveFieldItems($entity);
