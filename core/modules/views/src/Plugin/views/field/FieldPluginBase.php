@@ -1297,7 +1297,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     $value_is_safe = $this->last_render instanceof MarkupInterface;
     // Cast to a string so that empty checks and string functions work as
     // expected.
-    $value = (string) $this->last_render;
+    $value = $this->last_render === NULL ? '' : (string) $this->last_render;
 
     if (!empty($alter['alter_text']) && $alter['text'] !== '') {
       $tokens = $this->getRenderTokens($alter);
