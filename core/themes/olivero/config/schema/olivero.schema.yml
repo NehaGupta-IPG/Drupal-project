@@ -43,5 +43,6 @@ olivero.settings:
       label: 'Comment form position'
       constraints:
         Choice:
-          - before
-          - after
+          choices:
+            - before
+            - after
