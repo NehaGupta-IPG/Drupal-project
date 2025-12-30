@@ -528,12 +528,9 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    */
   public function getBundles() {
     if (!$this->isDeleted()) {
-      $map = \Drupal::service('entity_field.manager')->getFieldMap();
-      if (isset($map[$this->getTargetEntityTypeId()][$this->getName()]['bundles'])) {
-        return $map[$this->getTargetEntityTypeId()][$this->getName()]['bundles'];
-      }
+      $entity_field_manager = \Drupal::service('entity_field.manager');
+      return $entity_field_manager->getFieldBundles($this->getTargetEntityTypeId(), $this->field_name);
     }
-    return [];
   }
 
   /**

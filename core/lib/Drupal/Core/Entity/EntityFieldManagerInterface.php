@@ -141,6 +141,20 @@ interface EntityFieldManagerInterface {
   public function getExtraFields($entity_type_id, $bundle);
 
   /**
+   * Returns the bundles on which a field appears for an entity type.
+   *
+   * @param string $entity_type
+   *   The entity type.
+   * @param string $field_name
+   *   The machine name of the field.
+   *
+   * @return string[]
+   *   An array of bundle names on which the field appears.
+   *
+   */
+  public function getFieldLabels(string $entity_type, string $field_name): array;
+
+  /**
    * Returns the labels used for a field on an entity type.
    *
    * @param string $entity_type
