@@ -48,6 +48,9 @@ class ContextualLinks extends TokenizeAreaPluginBase {
     // @fixme Add a contextual-links css class to the view.
     if (!$empty || !empty($this->options['empty'])) {
       $markup = $this->renderTextarea($this->options['content']);
+      if ($markup === NULL) {
+        return [];
+      }
       $links = $this->extractLinks($markup);
 
       // Renders a contextual links placeholder.
@@ -63,18 +66,14 @@ class ContextualLinks extends TokenizeAreaPluginBase {
 
         // Add a placeholder, but no contextual-links region, as this would have
         // no dimensions, and we can leverage the region of the view anyway.
-        $element = [
+        return [
           '#type' => 'contextual_links_placeholder',
           '#id' => _contextual_links_to_id($contextual_links),
         ];
-        return $element;
-      }
-      else {
-        return '';
       }
     }
 
-    return '';
+    return [];
   }
 
   /**
