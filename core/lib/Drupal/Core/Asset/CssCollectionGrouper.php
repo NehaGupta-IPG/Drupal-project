@@ -88,7 +88,7 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         // the group and record the index.
         $seen_index = $first_seen_libraries[$item['library']][$item['category']] ?? NULL;
         if ($seen_index === NULL) {
-          $first_seen_libraries[$item['library']][$item['category']]= $i;
+          $first_seen_libraries[$item['library']][$item['category']] = $i;
           $groups[$i]['libraries'][] = $item['library'];
           $seen_index = $i;
         }
