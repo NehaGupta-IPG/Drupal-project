@@ -614,7 +614,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function getRevisionUuid(): ?string {
-    return $this->getEntityKey('revision_uuid');
+    if (!$this->getEntityType()->hasRevisionMetadataKey('revision_uuid')) {
+      return NULL;
+    }
+    return $this->get($this->getEntityType()->getRevisionMetadataKey('revision_uuid'))->value;
   }
 
   /**
