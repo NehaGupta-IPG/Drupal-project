@@ -1005,6 +1005,7 @@ class SystemRequirements implements InstallRequirementsInterface {
 
       if ($unprocessed_entity_types) {
         $requirements['entity_revision_missing_uuid'] = [
+          'title' => t('Revisions UUID'),
           'severity' => RequirementSeverity::Warning,
           'value' => t('Revisions missing UUID'),
           'description' => t('The following entity types have revisions with empty UUIDs: %types. The update process is queued and runs on cron. Is the cron processing enabled? To speed up the process, you can use a command-line tool, such as Drush, and run the queue for each unprocessed entity type. E.g., for the Node entity type run the <code>revision_uuid_update:node</code> queue.', [
