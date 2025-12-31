@@ -44,7 +44,13 @@ abstract class FieldFieldAccessTestBase extends ViewsKernelTestBase {
 
     $role_with_access = Role::create([
       'id' => 'with_access',
-      'permissions' => ['view test entity field', 'access content', 'view usernames', 'view user information', 'access user profiles'],
+      'permissions' => [
+        'access content',
+        'access user profiles',
+        'view test entity field',
+        'view user information',
+        'view usernames',
+      ],
       'label' => 'With access',
     ]);
     $role_with_access->save();
