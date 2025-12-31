@@ -17,6 +17,9 @@ default:
   revision_translation_affected:
     -
       value: true
+  revision_uuid:
+    -
+      value: 836c25f9-448f-4d33-99e0-6b30d7a2f8af
   body:
     -
       value: "I'd love to put some useful info here."

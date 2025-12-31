@@ -10,6 +10,9 @@ default:
   revision_uid:
     -
       target_id: 1
+  revision_uuid:
+    -
+      value: 4d1ccf69-57d3-4cdf-9e7e-edc76cd20e17
   status:
     -
       value: false
@@ -66,6 +69,9 @@ translations:
     revision_uid:
       -
         target_id: 1
+    revision_uuid:
+      -
+        value: 4d1ccf69-57d3-4cdf-9e7e-edc76cd20e17
     revision_translation_affected:
       -
         value: true
