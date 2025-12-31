@@ -1,0 +1,6 @@
+services:
+  _defaults:
+    autoconfigure: true
+    autowire: true
+  cache.backend.syslog_cache:
+    class: Drupal\syslog_cache\Cache\LoggingBackendFactory
