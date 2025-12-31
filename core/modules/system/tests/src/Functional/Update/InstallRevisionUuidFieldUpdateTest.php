@@ -32,8 +32,26 @@ class InstallRevisionUuidFieldUpdateTest extends UpdatePathTestBase {
    * Tests system_update_11301().
    */
   public function testRevisionUuidUpdate(): void {
+    $assert = $this->assertSession();
+    $this->drupalLogin($this->createUser(admin: TRUE));
+
     $this->runUpdates();
+
+    // Check the warning message on Status Report page.
+    $this->drupalGet('/admin/reports/status');
+    $assert->pageTextContains('Revisions UUID');
+    $assert->pageTextContains('Some revision UUIDs are not yet updated');
+    $assert->pageTextContains('The following entity types have revisions with empty UUIDs:');
+    $assert->pageTextContains('Content block: 1 revision');
+    $assert->pageTextContains('Content: 1 revision');
+    $assert->pageTextContains('The update process is queued and runs on cron. Is the cron processing enabled? To speed up the process, you can use a command-line tool, such as Drush, and run the queue for each unprocessed entity type. E.g., for the Node entity type run the revision_uuid_update:node queue.');
+
     $this->runQueues();
+
+    // Check again the Status Report page.
+    $this->drupalGet('/admin/reports/status');
+    $assert->pageTextContains('Revisions UUID');
+    $assert->pageTextContains('All revisions have assigned UUID values');
 
     $manager = \Drupal::entityTypeManager();
     \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
