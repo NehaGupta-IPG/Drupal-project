@@ -2,8 +2,6 @@ global:
   unique_css_aggregate: TRUE
   version: VERSION
   css:
-    base:
-      css/base.css: {}
     component:
       css/components/blocks/help/help.css: {}
       css/components/blocks/page-title/page-title.css: {}
@@ -11,7 +9,6 @@ global:
       css/components/blocks/search/search.css: {}
       css/components/blocks/search/search-results.css: {}
       css/components/blocks/articles-aside/articles-aside.css: {}
-      css/components/forms/form.css: {}
       css/components/forms/content-moderation.css: {}
       css/components/content/node.css: {}
       css/components/content/full/node-full.css: {}
@@ -40,6 +37,16 @@ global:
       css/components/regions/tabs/tabs.css: {}
       css/components/toolbar/toolbar.css: {}
       css/components/layout_builder/layout-builder.css: {}
+  dependencies:
+    - umami/global_tweaks
+
+global_tweaks:
+  version: VERSION
+  css:
+    base:
+      css/base.css: {}
+    component:
+      css/components/forms/form.css: { weight: -10}
     layout:
       css/layout/layout.css: {}
 
