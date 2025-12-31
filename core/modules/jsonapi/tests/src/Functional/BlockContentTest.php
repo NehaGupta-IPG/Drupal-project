@@ -167,6 +167,7 @@ class BlockContentTest extends ResourceTestBase {
           'info' => 'Llama',
           'revision_created' => (new \DateTime())->setTimestamp((int) $this->entity->getRevisionCreationTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
           'revision_translation_affected' => TRUE,
+          'revision_uuid' => $this->entity->getRevisionUuid(),
           'status' => FALSE,
           'langcode' => 'en',
           'default_langcode' => TRUE,
