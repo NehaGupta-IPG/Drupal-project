@@ -846,7 +846,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       $revision_default_key = $this->entityType->getRevisionMetadataKey('revision_default');
       $entity->set($revision_default_key, $entity->isDefaultRevision());
     }
-    if ($this->entityType->isRevisionable() && $entity->isNewRevision() && $this->entityType->hasRevisionMetadataKey('revision_uuid')) {
+    if ($this->entityType->isRevisionable() && $this->entityType->hasRevisionMetadataKey('revision_uuid') && $entity->isNewRevision() && !$entity->isNew()) {
       // Generate a new UUID for a new revision.
       $entity->set($this->entityType->getRevisionMetadataKey('revision_uuid'), $this->uuidService->generate());
     }
