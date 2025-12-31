@@ -234,6 +234,9 @@ class AssetResolver implements AssetResolverInterface {
         // order.
         $options['weight'] += count($css) / 30000;
 
+        $options['library'] = $library;
+        $options['unique_css_aggregate'] = $definition['unique_css_aggregate'] ?? FALSE;
+
         // CSS files are being keyed by the full path.
         $css[$options['data']] = $options;
       }
@@ -473,6 +476,12 @@ class AssetResolver implements AssetResolverInterface {
       return -1;
     }
     elseif ($a['group'] > $b['group']) {
+      return 1;
+    }
+    elseif (isset($a['library']) && $a['library'] < $b['library']) {
+      return -1;
+    }
+    elseif (isset($a['library']) && $a['library'] > $b['library']) {
       return 1;
     }
     // Finally, order by weight.
