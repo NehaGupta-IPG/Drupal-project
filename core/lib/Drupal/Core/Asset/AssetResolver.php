@@ -478,17 +478,18 @@ class AssetResolver implements AssetResolverInterface {
     elseif ($a['group'] > $b['group']) {
       return 1;
     }
-    elseif (isset($a['library']) && $a['library'] < $b['library']) {
-      return -1;
-    }
-    elseif (isset($a['library']) && $a['library'] > $b['library']) {
-      return 1;
-    }
-    // Finally, order by weight.
     elseif ($a['weight'] < $b['weight']) {
       return -1;
     }
     elseif ($a['weight'] > $b['weight']) {
+      return 1;
+    }
+    // Then order by library so that files within the same library are kept
+    // together where possible.
+    elseif (isset($a['library']) && $a['library'] < $b['library']) {
+      return -1;
+    }
+    elseif (isset($a['library']) && $a['library'] > $b['library']) {
       return 1;
     }
     else {
