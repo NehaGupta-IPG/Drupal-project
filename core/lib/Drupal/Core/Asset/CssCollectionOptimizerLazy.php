@@ -127,6 +127,7 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
         if (isset($css_asset['libraries'])) {
           unset($query['include'], $query['exclude'], $query['delta']);
           $query['libraries'] = UrlHelper::compressQueryParameter(implode(',', $css_asset['libraries']));
+          $query['category'] = $css_asset['category'];
         }
         $filename = 'css_' . $this->generateHash($css_asset) . '.css';
         $uri = 'assets://css/' . $filename;

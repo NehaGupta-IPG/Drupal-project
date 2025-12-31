@@ -205,6 +205,7 @@ class LibraryDiscoveryParser {
               }
               // Apply the corresponding weight defined by CSS_* constants.
               $options['weight'] += constant($category_weight);
+              $options['category'] = $category;
               $library[$type][$source] = $options;
             }
             unset($library[$type][$category]);

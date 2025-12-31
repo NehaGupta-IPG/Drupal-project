@@ -56,7 +56,18 @@ class CssAssetController extends AssetControllerBase {
       $attached_assets->setAlreadyLoadedLibraries($already_loaded);
     }
     $assets = $this->assetResolver->getCssAssets($attached_assets, FALSE, $language);
-    return $this->grouper->group($assets);
+
+    if ($request->query->has('libraries') && $request->query->has('category')) {
+      // Filter out files that don't belong to this group.
+      $category = $request->query->get('category');
+      foreach ($assets as $key => $asset) {
+        if ($asset['category'] != $category) {
+          unset($assets[$key]);
+        }
+      }
+    }
+    $return = $this->grouper->group($assets);
+    return $return;
   }
 
 }

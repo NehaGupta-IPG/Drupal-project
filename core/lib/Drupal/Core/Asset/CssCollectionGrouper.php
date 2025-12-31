@@ -57,6 +57,7 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
           $group_keys = $item['preprocess'] ? [$item['type'], $item['group'], $item['media'] === 'print'] : FALSE;
           if ($item['unique_css_aggregate']) {
             $group_keys[] = $item['library'];
+            $group_keys[] = $item['category'];
           }
           break;
 
@@ -85,10 +86,11 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
       if ($item['unique_css_aggregate']) {
         // The first time a library is seen, add it to the list of libraries for
         // the group and record the index.
-        $seen_index = $first_seen_libraries[$item['library']] ?? NULL;
+        $seen_index = $first_seen_libraries[$item['library']][$item['category']] ?? NULL;
         if ($seen_index === NULL) {
-          $first_seen_libraries[$item['library']] = $i;
+          $first_seen_libraries[$item['library']][$item['category']]= $i;
           $groups[$i]['libraries'][] = $item['library'];
+          $seen_index = $i;
         }
         // If a library has been seen in a previous index, this means that index
         // does not contain all of the assets for that library, so unset the
