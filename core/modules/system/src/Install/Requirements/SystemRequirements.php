@@ -990,6 +990,9 @@ class SystemRequirements implements InstallRequirementsInterface {
         $requirements['entity_update']['description'] = t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]);
       }
 
+      $requirements['entity_revision_missing_uuid'] = [
+        'title' => t('Revisions UUID'),
+      ];
       $queue_worker_manager = \Drupal::service('plugin.manager.queue_worker');
       $unprocessed_entity_types = [];
       foreach ($queue_worker_manager->getDefinitions() as $pluginId => $definition) {
@@ -998,20 +1001,40 @@ class SystemRequirements implements InstallRequirementsInterface {
           $queue = \Drupal::queue($pluginId);
           $queue->createQueue();
           if ($queue->numberOfItems()) {
-            $unprocessed_entity_types[] = $entity_type_manager->getDefinition($worker->getDerivativeId())->getLabel();
+            $unprocessed_entity_types[$worker->getDerivativeId()] = $queue->numberOfItems();
           }
         }
       }
 
       if ($unprocessed_entity_types) {
-        $requirements['entity_revision_missing_uuid'] = [
-          'title' => t('Revisions UUID'),
-          'severity' => RequirementSeverity::Warning,
-          'value' => t('Revisions missing UUID'),
-          'description' => t('The following entity types have revisions with empty UUIDs: %types. The update process is queued and runs on cron. Is the cron processing enabled? To speed up the process, you can use a command-line tool, such as Drush, and run the queue for each unprocessed entity type. E.g., for the Node entity type run the <code>revision_uuid_update:node</code> queue.', [
-            '%types' => implode(', ', $unprocessed_entity_types),
-          ]),
+        $items = [];
+        foreach ($unprocessed_entity_types as $entity_type_id => $count) {
+          $items[] = new PluralTranslatableMarkup($count, '@type: @count revision', '@type: @count revisions', [
+            '@type' => $entity_type_manager->getDefinition($entity_type_id)->getLabel(),
+          ]);
+        }
+        $requirements['entity_revision_missing_uuid']['severity'] = RequirementSeverity::Warning;
+        $requirements['entity_revision_missing_uuid']['value'] = t('Some revision UUIDs are not yet updated');
+        $requirements['entity_revision_missing_uuid']['description'] = [
+          [
+            '#markup' => t('The following entity types have revisions with empty UUIDs:'),
+            '#prefix' => '<p>',
+            '#suffix' => '</p>',
+          ],
+          [
+            '#theme' => 'item_list',
+            '#items' => $items,
+          ],
+          [
+            '#markup' => t('The update process is queued and runs on cron. Is the cron processing enabled? To speed up the process, you can use a command-line tool, such as Drush, and run the queue for each unprocessed entity type. E.g., for the Node entity type run the <code>revision_uuid_update:node</code> queue.'),
+            '#prefix' => '<p>',
+            '#suffix' => '</p>',
+          ],
         ];
+      }
+      else {
+        $requirements['entity_revision_missing_uuid']['severity'] = RequirementSeverity::OK;
+        $requirements['entity_revision_missing_uuid']['value'] = t('All revisions have assigned UUID values');
       }
     }
 
