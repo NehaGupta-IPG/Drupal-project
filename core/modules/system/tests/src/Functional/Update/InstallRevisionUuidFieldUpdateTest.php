@@ -37,6 +37,10 @@ class InstallRevisionUuidFieldUpdateTest extends UpdatePathTestBase {
 
     $this->runUpdates();
 
+    // Check update return message.
+    $assert->pageTextContains('Update #11301');
+    $assert->pageTextMatches('~The following entity types are converted to support revision UUID: block_content, node. Existing entity revisions are queued to update their UUID, and the process is handled gradually on cron. You can check the status of update at https?://[^/].*/update.php/admin/reports/status~');
+
     // Check the warning message on Status Report page.
     $this->drupalGet('/admin/reports/status');
     $assert->pageTextContains('Revisions UUID');
