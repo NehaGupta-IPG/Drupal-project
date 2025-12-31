@@ -5,15 +5,15 @@ namespace Drupal\contextual\Plugin\views\area;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
+use Drupal\views\Attribute\ViewsArea;
 use Drupal\views\Plugin\views\area\TokenizeAreaPluginBase;
 
 /**
- * Views area text handler.
+ * Views area handler for contextual links.
  *
  * @ingroup views_area_handlers
- *
- * @ViewsArea("contextual_links")
  */
+#[ViewsArea("contextual_links")]
 class ContextualLinks extends TokenizeAreaPluginBase {
 
   use RedirectDestinationTrait;
