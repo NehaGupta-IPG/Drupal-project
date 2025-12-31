@@ -436,7 +436,7 @@ class SystemRequirements implements InstallRequirementsInterface {
             'title' => t('PHP runtime assertions'),
             'value' => t('Enabled (zend.assertions = 1)'),
             'severity' => RequirementSeverity::Warning,
-            'description' => t('PHP runtime assertions are currently enabled. This is recommended only for development environments, because assertion checks are executed on every request and can significantly impact performance. On production sites, set <code>zend.assertions = -1</code> in your PHP configuration to disable runtime assertions. See the <a href=":runtime_assertions">runtime assertions documentation</a> for more information.', [
+            'description' => t('Runtime assertions can negatively impact performance and are not recommended on production sites. Disable them in your PHP configuration to improve performance. Refer to the <a href=":runtime_assertions">runtime assertions documentation</a> for more information.', [
               ':runtime_assertions' => 'https://api.drupal.org/api/drupal/core%21core.api.php/group/php_assert/11.x',
             ]),
           ];
