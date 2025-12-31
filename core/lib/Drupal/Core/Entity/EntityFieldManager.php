@@ -352,6 +352,10 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
    * {@inheritdoc}
    */
   public function getFieldDefinitions($entity_type_id, $bundle) {
+    $bundles = $this->entityTypeBundleInfo->getBundleInfo($entity_type_id);
+    if (!isset($bundles[$bundle])) {
+      throw new \Exception($bundle . ' does not exist.');
+    }
     $langcode = $this->languageManager->getCurrentLanguage()->getId();
     if (!isset($this->fieldDefinitions[$entity_type_id][$bundle][$langcode])) {
       $base_field_definitions = $this->getBaseFieldDefinitions($entity_type_id);
