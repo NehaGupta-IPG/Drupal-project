@@ -228,7 +228,6 @@ class DefaultTableMapping implements TableMappingInterface {
       // in the data table. Additionally, do not store revision metadata
       // fields in the data table.
       $data_fields = array_values(array_unique(array_merge([$id_key], array_diff($all_fields, [$uuid_key], $revision_metadata_fields))));
-
       $table_mapping->setFieldNames($table_mapping->dataTable, $data_fields);
 
       $revision_base_fields = array_merge([$id_key, $revision_key, $langcode_key], $revision_metadata_fields);
