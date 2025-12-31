@@ -94,6 +94,10 @@ Array
         (
         )
 
+    [revision_uuid] => Array
+        (
+        )
+
     [langcode] => Array
         (
         )
