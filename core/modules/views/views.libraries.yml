@@ -22,3 +22,15 @@ views.responsive-grid:
   css:
     layout:
       css/views-responsive-grid.css: {}
+
+views.grid:
+  version: VERSION
+  css:
+    layout:
+      css/views-grid.css: {}
+
+views.display_link:
+  version: VERSION
+  css:
+    layout:
+      css/views-display-link.css: {}
