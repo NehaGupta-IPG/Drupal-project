@@ -1,4 +1,5 @@
 global-styling:
+  unique_css_aggregate: TRUE
   version: VERSION
   css:
     base:
