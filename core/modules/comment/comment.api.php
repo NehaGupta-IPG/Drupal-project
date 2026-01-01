@@ -81,9 +81,9 @@ function hook_comment_links_alter(array &$links, CommentInterface $entity, array
  * Unlike 'view', this operation limit its scope only to view the field list
  * of comments. Such an operation will be allowed only if the user can access at
  * least one comment from the thread. This is typically used to assemble the
- * access check for 'view', as the later is a composite operation but also in
+ * access check for 'view', as the latter is a composite operation but also in
  * other places, like comment_node_search_result(), where the number of comments
- * is attached to the nodes search result and we need to check if the user is
+ * is attached to the nodes search result, and we need to check if the user is
  * able to view the comments.
  *
  * @see comment_node_search_result()
