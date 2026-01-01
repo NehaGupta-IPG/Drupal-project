@@ -49,22 +49,21 @@ class HistoryCommentLinkBuilder implements CommentLinkBuilderInterface {
         continue;
       }
       $links = [];
-      $commenting_status = $entity->get($field_name)->status;
+      $field = $entity->get($field_name);
+      $commenting_status = $field->status;
       if ($commenting_status != CommentItemInterface::HIDDEN) {
         // Entity has commenting status open or closed.
-        if ($this->currentUser->hasPermission('access comments')) {
-          if (!empty($entity->get($field_name)->comment_count)) {
-            $links['comment-new-comments'] = [
-              'title' => '',
-              'url' => Url::fromRoute('<current>'),
-              'attributes' => [
-                'class' => 'hidden',
-                'title' => new TranslatableMarkup('Jump to the first new comment.'),
-                'data-history-node-last-comment-timestamp' => $entity->get($field_name)->last_comment_timestamp,
-                'data-history-node-field-name' => $field_name,
-              ],
-            ];
-          }
+        if ($field->comment_count > 0 && $field->access('view comment list', $this->currentUser)) {
+          $links['comment-new-comments'] = [
+            'title' => '',
+            'url' => Url::fromRoute('<current>'),
+            'attributes' => [
+              'class' => 'hidden',
+              'title' => new TranslatableMarkup('Jump to the first new comment.'),
+              'data-history-node-last-comment-timestamp' => $entity->get($field_name)->last_comment_timestamp,
+              'data-history-node-field-name' => $field_name,
+            ],
+          ];
         }
       }
       if (!empty($links)) {
