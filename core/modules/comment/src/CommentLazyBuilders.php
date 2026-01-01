@@ -118,7 +118,7 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
 
     /** @var \Drupal\Core\Access\AccessResultInterface $access */
     $access = $comment->access('create', $this->currentUser, TRUE);
-    $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($comment, $comment_type_id) : [];
+    $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($comment) : [];
     CacheableMetadata::createFromObject($access)->applyTo($form);
 
     return $form;
