@@ -181,7 +181,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ['config:system.menu.main'],
         ['config:user.role.anonymous'],
       ],
-      'StylesheetCount' => 1,
+      'StylesheetCount' => 2,
       'StylesheetBytes' => 1450,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -378,7 +378,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ],
         ['config:core.extension', 'views_data'],
       ],
-      'StylesheetCount' => 1,
+      'StylesheetCount' => 2,
       'StylesheetBytes' => 1300,
     ];
     $this->assertMetrics($expected, $performance_data);
