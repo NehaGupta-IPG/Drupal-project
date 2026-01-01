@@ -19,6 +19,8 @@ final class Configuration {
 
   /**
    * The configuration instance.
+   *
+   * @var self
    */
   protected static ?self $instance = NULL;
 
@@ -68,6 +70,10 @@ final class Configuration {
     }
     catch (ConsoleRuntimeException $e) {
       throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
+    }
+
+    if (count($arguments) < 2) {
+      throw new \RuntimeException("No command line arguments found.");
     }
 
     // Validate the concurrency argument.
