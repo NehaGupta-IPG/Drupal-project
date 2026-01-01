@@ -324,6 +324,16 @@ libraries-override:
       component:
         css/views.module.css: css/views/views.module.css
 
+  views/views.grid:
+    css:
+      layout:
+        css/views-grid.css: css/views/views-grid.css
+
+  views/views.display_link:
+    css:
+      layout:
+        css/views-display-link.css: css/views/views-display-link.css
+
   views_ui/admin.styling:
     css:
       component:
