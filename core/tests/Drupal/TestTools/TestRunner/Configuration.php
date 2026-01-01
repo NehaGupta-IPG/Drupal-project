@@ -6,18 +6,20 @@ namespace Drupal\TestTools\TestRunner;
 
 use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputAwareInterface;
 use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+
+// cspell:ignore testbots
 
 /**
  * Helper class to manage run-tests.sh configuration.
  */
 final class Configuration {
 
+  /**
+   * The configuration instance.
+   */
   protected static ?self $instance = NULL;
 
   protected function __construct(
@@ -30,6 +32,9 @@ final class Configuration {
    * Gets a config element.
    */
   public static function get(string $name): mixed {
+    if (self::$instance === NULL) {
+      return NULL;
+    }
     if (array_key_exists($name, self::$instance->options)) {
       return self::$instance->options[$name];
     }
@@ -62,16 +67,13 @@ final class Configuration {
       $input = new ArgvInput($arguments, self::commandLineDefinition());
     }
     catch (ConsoleRuntimeException $e) {
-      simpletest_script_print_error(NULL, $e->getMessage() . ' ' . "Use the --help option for the list and usage of the options available.\n");
-      simpletest_script_print(NULL, self::commandLineDefinition()->getSynopsis(), SIMPLETEST_SCRIPT_COLOR_PASS);
-      exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
+      throw new \RuntimeException($e->getMessage(), $e->getCode(), $e);
     }
 
     // Validate the concurrency argument.
     $concurrency = $input->getOption('concurrency');
     if (!is_numeric($concurrency) || $concurrency <= 0) {
-      simpletest_script_print_error($input, "--concurrency must be a strictly positive integer.");
-      exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
+      throw new \RuntimeException("--concurrency must be a strictly positive integer.");
     }
 
     if ($input->getArgument('tests')) {

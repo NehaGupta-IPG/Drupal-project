@@ -74,11 +74,18 @@ $console_output = new ConsoleOutput();
 
 // Get the configuration from the command line.
 $script_basename = basename($_SERVER['argv'][0]);
-Config::createFromCommandLine($_SERVER['argv']);
+try {
+  Config::createFromCommandLine($_SERVER['argv']);
+}
+catch (\RuntimeException $e) {
+  simpletest_script_print_error($e->getMessage() . ' ' . "Use the --help option for the list and usage of the options available.\n");
+  simpletest_script_print(Config::commandLineDefinition()->getSynopsis(), SIMPLETEST_SCRIPT_COLOR_PASS);
+  exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
+}
 
 // If --help requested, show it and exit.
 if (Config::get('help')) {
-  simpletest_script_help(Configuration::commandLineDefinition(), $script_basename, $console_output);
+  simpletest_script_help(Config::commandLineDefinition(), $script_basename, $console_output);
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
@@ -818,7 +825,7 @@ function simpletest_script_get_test_list() {
     }
     elseif (Config::get('file')) {
       // Extract test case class names from specified files.
-      foreach (Config::getArgument('tests') as $file) {
+      foreach (Config::getTests() as $file) {
         if (!file_exists($file) || is_dir($file)) {
           simpletest_script_print_error('File not found: ' . $file);
           exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
@@ -842,7 +849,7 @@ function simpletest_script_get_test_list() {
       // Store all the groups so we can suggest alternatives if we need to.
       $all_groups = array_keys($groups);
       // Verify that the groups exist.
-      if (!empty($unknown_groups = array_diff(Config::getArgument('tests'), $all_groups))) {
+      if (!empty($unknown_groups = array_diff(Config::getTests(), $all_groups))) {
         $first_group = reset($unknown_groups);
         simpletest_script_print_error('Test group not found: ' . $first_group);
         simpletest_script_print_alternatives($first_group, $all_groups);
