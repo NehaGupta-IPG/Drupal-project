@@ -28,12 +28,11 @@ use Drupal\BuildTests\Framework\BuildTestBase;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\TestTools\TestRunner\Configuration;
+use Drupal\TestTools\TestRunner\Configuration as Config;
 
 use Composer\Autoload\ClassLoader;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Version;
-use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -75,16 +74,15 @@ $console_output = new ConsoleOutput();
 
 // Get the configuration from the command line.
 $script_basename = basename($_SERVER['argv'][0]);
-$config = Configuration::createFromCommandLine();
+Config::createFromCommandLine($_SERVER['argv']);
 
 // If --help requested, show it and exit.
-if ($config->get('help')) {
+if (Config::get('help')) {
   simpletest_script_help(Configuration::commandLineDefinition(), $script_basename, $console_output);
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
-simpletest_script_init($config, $autoloader);
-$config = Configuration::createFromCommandLine();
+simpletest_script_init($autoloader);
 
 if (!class_exists(TestCase::class)) {
   echo "\nrun-tests.sh requires the PHPUnit testing framework. Use 'composer install' to ensure that it is present.\n\n";
@@ -92,27 +90,27 @@ if (!class_exists(TestCase::class)) {
 }
 
 // Defaults the PHPUnit configuration file path.
-if (empty($config->get('phpunit-configuration'))) {
-  $config->set('phpunit-configuration', \Drupal::root() . \DIRECTORY_SEPARATOR . 'core');
+if (empty(Config::get('phpunit-configuration'))) {
+  Config::set('phpunit-configuration', \Drupal::root() . \DIRECTORY_SEPARATOR . 'core');
 }
 
-if ($config->get('execute-test')) {
-  simpletest_script_setup_database($config);
-  $test_run_results_storage = simpletest_script_setup_test_run_results_storage($config);
-  $test_run = TestRun::get($test_run_results_storage, $config->get('test-id'));
-  simpletest_script_run_one_test($config, $test_run, $config->get('execute-test'));
+if (Config::get('execute-test')) {
+  simpletest_script_setup_database();
+  $test_run_results_storage = simpletest_script_setup_test_run_results_storage();
+  $test_run = TestRun::get($test_run_results_storage, Config::get('test-id'));
+  simpletest_script_run_one_test($test_run, Config::get('execute-test'));
   // Sub-process exited already; this is just for clarity.
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
-if ($config->get('list')) {
+if (Config::get('list')) {
   // Display all available tests organized by one @group annotation.
   echo "\nAvailable test groups & classes\n";
   echo "-------------------------------\n\n";
-  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($config->get('phpunit-configuration'));
+  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath(Config::get('phpunit-configuration'));
   try {
-    $groups = $test_discovery->getTestClasses($config->get('module'));
-    dump_discovery_warnings($config);
+    $groups = $test_discovery->getTestClasses(Config::get('module'));
+    dump_discovery_warnings();
   }
   catch (Exception $e) {
     error_log((string) $e);
@@ -138,14 +136,14 @@ if ($config->get('list')) {
 // List-files and list-files-json provide a way for external tools such as the
 // testbot to prioritize running changed tests.
 // @see https://www.drupal.org/node/2569585
-if ($config->get('list-files') || $config->get('list-files-json')) {
+if (Config::get('list-files') || Config::get('list-files-json')) {
   // List all files which could be run as tests.
-  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($config->get('phpunit-configuration'));
+  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath(Config::get('phpunit-configuration'));
   // PhpUnitTestDiscovery::findAllClassFiles() gives us a classmap similar to a
   // Composer 'classmap' array.
   $test_classes = $test_discovery->findAllClassFiles();
   // JSON output is the easiest.
-  if ($config->get('list-files-json')) {
+  if (Config::get('list-files-json')) {
     echo json_encode($test_classes);
     exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
   }
@@ -158,13 +156,13 @@ if ($config->get('list-files') || $config->get('list-files-json')) {
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
-simpletest_script_setup_database($config, TRUE);
+simpletest_script_setup_database(TRUE);
 
 // Setup the test run results storage environment. Currently, this coincides
 // with the simpletest database schema.
-$test_run_results_storage = simpletest_script_setup_test_run_results_storage($config, TRUE);
+$test_run_results_storage = simpletest_script_setup_test_run_results_storage(TRUE);
 
-if ($config->get('clean')) {
+if (Config::get('clean')) {
   // Clean up left-over tables and directories.
   $cleaner = new EnvironmentCleaner(
     DRUPAL_ROOT,
@@ -191,7 +189,7 @@ if ($config->get('clean')) {
 }
 
 if (!Composer::upgradePHPUnitCheck(Version::id())) {
-  simpletest_script_print_error($config, "PHPUnit testing framework version 11 or greater is required when running on PHP 8.4 or greater. Run the command 'composer run-script drupal-phpunit-upgrade' in order to fix this.");
+  simpletest_script_print_error("PHPUnit testing framework version 11 or greater is required when running on PHP 8.4 or greater. Run the command 'composer run-script drupal-phpunit-upgrade' in order to fix this.");
   exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
 }
 
@@ -201,8 +199,8 @@ echo sprintf("Drupal Version.......: %s\n", \Drupal::VERSION);
 echo sprintf("PHP Version..........: %s\n", \PHP_VERSION);
 echo sprintf("PHP Binary...........: %s\n", $php ?? getenv('_'));
 echo sprintf("PHPUnit Version......: %s\n", Version::id());
-echo sprintf("PHPUnit configuration: %s\n", $config->get('phpunit-configuration'));
-if ($config->get('dburl')) {
+echo sprintf("PHPUnit configuration: %s\n", Config::get('phpunit-configuration'));
+if (Config::get('dburl')) {
   $sut_connection_info = Database::getConnectionInfo();
   $sut_tasks_class = $sut_connection_info['default']['namespace'] . "\\Install\\Tasks";
   $sut_installer = new $sut_tasks_class();
@@ -214,19 +212,19 @@ echo sprintf("Working directory....: %s\n", getcwd());
 echo "-------------------------------\n";
 echo "\n";
 
-$test_list = simpletest_script_get_test_list($config);
+$test_list = simpletest_script_get_test_list();
 
 // Try to allocate unlimited time to run the tests.
 Environment::setTimeLimit(0);
-simpletest_script_reporter_init($config);
+simpletest_script_reporter_init();
 
 $tests_to_run = [];
-for ($i = 0; $i < $config->get('repeat'); $i++) {
+for ($i = 0; $i < Config::get('repeat'); $i++) {
   $tests_to_run = array_merge($tests_to_run, $test_list);
 }
 
 // Execute tests.
-$status = simpletest_script_execute_batch($config, $test_run_results_storage, $tests_to_run, $script_basename);
+$status = simpletest_script_execute_batch($test_run_results_storage, $tests_to_run, $script_basename);
 
 // Stop the timer.
 simpletest_script_reporter_timer_stop();
@@ -238,14 +236,14 @@ simpletest_script_reporter_timer_stop();
 TestDatabase::releaseAllTestLocks();
 
 // Display results before database is cleared.
-simpletest_script_reporter_display_results($config, $test_run_results_storage);
+simpletest_script_reporter_display_results($test_run_results_storage);
 
-if ($config->get('xml')) {
-  simpletest_script_reporter_write_xml_results($config, $test_run_results_storage);
+if (Config::get('xml')) {
+  simpletest_script_reporter_write_xml_results($test_run_results_storage);
 }
 
 // Clean up all test results.
-if (!$config->get('keep-results')) {
+if (!Config::get('keep-results')) {
   try {
     $cleaner = new EnvironmentCleaner(
       DRUPAL_ROOT,
@@ -310,7 +308,7 @@ EOF;
 /**
  * Initialize script variables and perform general setup requirements.
  */
-function simpletest_script_init(Configuration $config, ClassLoader $autoloader): void {
+function simpletest_script_init(ClassLoader $autoloader): void {
   $host = 'localhost';
   $path = '';
   $port = '80';
@@ -336,17 +334,17 @@ function simpletest_script_init(Configuration $config, ClassLoader $autoloader):
     }
   }
 
-  if ($config->get('php')) {
+  if (Config::get('php')) {
     // Caller has specified path to php. Override auto-detection.
-    $php = $config->get('php');
+    $php = Config::get('php');
   }
 
   if ($php == "") {
-    simpletest_script_print_error($config, 'Unable to automatically determine the path to the PHP interpreter. Supply the --php command line argument.');
+    simpletest_script_print_error('Unable to automatically determine the path to the PHP interpreter. Supply the --php command line argument.');
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
   else {
-    $config->set('php', $php);
+    Config::set('php', $php);
   }
 
   // Detect if we're in the top-level process using the private 'execute-test'
@@ -354,7 +352,7 @@ function simpletest_script_init(Configuration $config, ClassLoader $autoloader):
   // using the presence of 'drupalci' in the sqlite argument.
   // @todo https://www.drupal.org/project/drupalci_testbot/issues/2860941 Use
   //   better environment variable to detect DrupalCI.
-  if (!$config->get('execute-test') && preg_match('/drupalci/', $config->get('sqlite') ?? '')) {
+  if (!Config::get('execute-test') && preg_match('/drupalci/', Config::get('sqlite') ?? '')) {
     // Update PHPUnit if needed and possible. There is a later check once the
     // autoloader is in place to ensure we're on the correct version. We need to
     // do this before the autoloader is in place to ensure that it is correct.
@@ -365,8 +363,8 @@ function simpletest_script_init(Configuration $config, ClassLoader $autoloader):
   }
 
   // Get URL from arguments.
-  if ($config->get('url')) {
-    $parsed_url = parse_url($config->get('url'));
+  if (Config::get('url')) {
+    $parsed_url = parse_url(Config::get('url'));
     $host = $parsed_url['host'] . (isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '');
     $path = isset($parsed_url['path']) ? rtrim(rtrim($parsed_url['path']), '/') : '';
     $port = $parsed_url['port'] ?? $port;
@@ -404,14 +402,14 @@ function simpletest_script_init(Configuration $config, ClassLoader $autoloader):
   $_SERVER['PHP_SELF'] = $path . '/index.php';
   $_SERVER['HTTP_USER_AGENT'] = 'Drupal command line';
 
-  if ($config->get('concurrency') > 1) {
+  if (Config::get('concurrency') > 1) {
     $directory = FileSystem::getOsTemporaryDirectory();
     $test_symlink = @symlink(__FILE__, $directory . '/test_symlink');
     if (!$test_symlink) {
       throw new \RuntimeException('In order to use a concurrency higher than 1 the test system needs to be able to create symlinks in ' . $directory);
     }
     unlink($directory . '/test_symlink');
-    putenv('RUN_TESTS_CONCURRENCY=' . $config->get('concurrency'));
+    putenv('RUN_TESTS_CONCURRENCY=' . Config::get('concurrency'));
   }
 
   if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
@@ -466,7 +464,7 @@ function simpletest_script_init(Configuration $config, ClassLoader $autoloader):
  *   database file specified by --sqlite (if any) is set up. Otherwise, database
  *   connections are prepared only.
  */
-function simpletest_script_setup_database(Configuration $config, $new = FALSE): void {
+function simpletest_script_setup_database($new = FALSE): void {
   // If there is an existing Drupal installation that contains a database
   // connection info in settings.php, then $databases['default']['default'] will
   // hold the default database connection already. This connection is assumed to
@@ -474,14 +472,14 @@ function simpletest_script_setup_database(Configuration $config, $new = FALSE): 
   // against e.g. MySQL instead of SQLite.
   // However, in case no Drupal installation exists, this default database
   // connection can be set and/or overridden with the --dburl parameter.
-  if ($config->get('dburl')) {
+  if (Config::get('dburl')) {
     // Remove a possibly existing default connection (from settings.php).
     Database::removeConnection('default');
     try {
-      $databases['default']['default'] = Database::convertDbUrlToConnectionInfo($config->get('dburl'), TRUE);
+      $databases['default']['default'] = Database::convertDbUrlToConnectionInfo(Config::get('dburl'), TRUE);
     }
     catch (\InvalidArgumentException $e) {
-      simpletest_script_print_error($config, 'Invalid --dburl. Reason: ' . $e->getMessage());
+      simpletest_script_print_error('Invalid --dburl. Reason: ' . $e->getMessage());
       exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
     }
   }
@@ -498,12 +496,12 @@ function simpletest_script_setup_database(Configuration $config, $new = FALSE): 
 /**
  * Sets up the test runs results storage.
  */
-function simpletest_script_setup_test_run_results_storage(Configuration $config, $new = FALSE) {
+function simpletest_script_setup_test_run_results_storage($new = FALSE) {
   $databases['default'] = Database::getConnectionInfo('default');
 
   // If no --sqlite parameter has been passed, then the test runner database
   // connection is the default database connection.
-  $sqlite = $config->get('sqlite');
+  $sqlite = Config::get('sqlite');
   if (!$sqlite) {
     $sqlite = FALSE;
     $databases['test-runner']['default'] = $databases['default']['default'];
@@ -535,12 +533,12 @@ function simpletest_script_setup_test_run_results_storage(Configuration $config,
     $test_run_results_storage = new SimpletestTestRunResultsStorage(Database::getConnection('default', 'test-runner'));
   }
   catch (\PDOException $e) {
-    simpletest_script_print_error($config, $databases['test-runner']['default']['driver'] . ': ' . $e->getMessage());
+    simpletest_script_print_error($databases['test-runner']['default']['driver'] . ': ' . $e->getMessage());
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
   if ($new && $sqlite) {
     try {
-      $test_run_results_storage->buildTestingResultsEnvironment($config->get('keep-results-table'));
+      $test_run_results_storage->buildTestingResultsEnvironment(Config::get('keep-results-table'));
     }
     catch (Exception $e) {
       echo (string) $e;
@@ -550,7 +548,7 @@ function simpletest_script_setup_test_run_results_storage(Configuration $config,
   // Verify that the test result database schema exists by checking one table.
   try {
     if (!$test_run_results_storage->validateTestingResultsEnvironment()) {
-      simpletest_script_print_error($config, 'Missing test result database schema. Use the --sqlite parameter.');
+      simpletest_script_print_error('Missing test result database schema. Use the --sqlite parameter.');
       exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
     }
   }
@@ -565,7 +563,7 @@ function simpletest_script_setup_test_run_results_storage(Configuration $config,
 /**
  * Execute a batch of tests.
  */
-function simpletest_script_execute_batch(Configuration $config, TestRunResultsStorageInterface $test_run_results_storage, $test_classes, string $script_basename) {
+function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_run_results_storage, $test_classes, string $script_basename) {
   global $test_ids;
 
   $total_status = SIMPLETEST_SCRIPT_EXIT_SUCCESS;
@@ -573,7 +571,7 @@ function simpletest_script_execute_batch(Configuration $config, TestRunResultsSt
   // Multi-process execution.
   $children = [];
   while (!empty($test_classes) || !empty($children)) {
-    while (count($children) < $config->get('concurrency')) {
+    while (count($children) < Config::get('concurrency')) {
       if (empty($test_classes)) {
         break;
       }
@@ -589,7 +587,7 @@ function simpletest_script_execute_batch(Configuration $config, TestRunResultsSt
 
       $test_class = array_shift($test_classes);
       // Fork a child process.
-      $command = simpletest_script_command($config, $test_run, $test_class, $script_basename);
+      $command = simpletest_script_command($test_run, $test_class, $script_basename);
       try {
         $process = new Process($command);
         $process->start();
@@ -627,13 +625,13 @@ function simpletest_script_execute_batch(Configuration $config, TestRunResultsSt
           $message = 'FATAL ' . $child['class'] . ': test runner returned an unexpected error code (' . $child['process']->getExitCode() . ').';
           echo $message . "\n";
           $total_status = max(SIMPLETEST_SCRIPT_EXIT_EXCEPTION, $total_status);
-          if ($config->get('die-on-fail')) {
+          if (Config::get('die-on-fail')) {
             $test_db = new TestDatabase($child['test_run']->getDatabasePrefix());
             $test_directory = $test_db->getTestSitePath();
             echo 'Test database and files kept and test exited immediately on fail so should be reproducible if you change settings.php to use the database prefix ' . $child['test_run']->getDatabasePrefix() . ' and config directories in ' . $test_directory . "\n";
-            $input->setOption('keep-results', TRUE);
+            Config::set('keep-results', TRUE);
             // Exit repeat loop immediately.
-            $input->setOption('repeat', -1);
+            Config::set('repeat', -1);
           }
         }
 
@@ -648,17 +646,17 @@ function simpletest_script_execute_batch(Configuration $config, TestRunResultsSt
 /**
  * Run a PHPUnit-based test.
  */
-function simpletest_script_run_phpunit(Configuration $config, TestRun $test_run, $class) {
-  $runner = PhpUnitTestRunner::create(\Drupal::getContainer())->setConfigurationFilePath($config->get('phpunit-configuration'));
+function simpletest_script_run_phpunit(TestRun $test_run, $class) {
+  $runner = PhpUnitTestRunner::create(\Drupal::getContainer())->setConfigurationFilePath(Config::get('phpunit-configuration'));
   $start = microtime(TRUE);
-  $results = $runner->execute($test_run, $class, $status, $config->get('color'));
+  $results = $runner->execute($test_run, $class, $status, Config::get('color'));
   $time = microtime(TRUE) - $start;
 
   $runner->processPhpUnitResults($test_run, $results);
 
   $summaries = $runner->summarizeResults($results);
   foreach ($summaries as $class => $summary) {
-    simpletest_script_reporter_display_summary($config, $class, $summary, $time);
+    simpletest_script_reporter_display_summary($class, $summary, $time);
   }
   return $status;
 }
@@ -666,12 +664,12 @@ function simpletest_script_run_phpunit(Configuration $config, TestRun $test_run,
 /**
  * Run a single test, bootstrapping Drupal if needed.
  */
-function simpletest_script_run_one_test(Configuration $config, TestRun $test_run, $test_class): void {
+function simpletest_script_run_one_test(TestRun $test_run, $test_class): void {
   try {
-    if ($config->get('suppress-deprecations')) {
+    if (Config::get('suppress-deprecations')) {
       putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
     }
-    $status = simpletest_script_run_phpunit($config, $test_run, $test_class);
+    $status = simpletest_script_run_phpunit($test_run, $test_class);
     exit($status);
   }
   // DrupalTestCase::run() catches exceptions already, so this is only reached
@@ -691,26 +689,26 @@ function simpletest_script_run_one_test(Configuration $config, TestRun $test_run
  * @return list<string>
  *   The list of command-line elements.
  */
-function simpletest_script_command(Configuration $config, TestRun $test_run, string $test_class, string $script_basename): array {
+function simpletest_script_command(TestRun $test_run, string $test_class, string $script_basename): array {
   $command = [];
-  $command[] = $config->get('php');
+  $command[] = Config::get('php');
   $command[] = './core/scripts/' . $script_basename;
   $command[] = '--url';
-  $command[] = $config->get('url');
-  if ($config->get('sqlite')) {
+  $command[] = Config::get('url');
+  if (Config::get('sqlite')) {
     $command[] = '--sqlite';
-    $command[] = $config->get('sqlite');
+    $command[] = Config::get('sqlite');
   }
-  if ($config->get('dburl')) {
+  if (Config::get('dburl')) {
     $command[] = '--dburl';
-    $command[] = $config->get('dburl');
+    $command[] = Config::get('dburl');
   }
   $command[] = '--php';
-  $command[] = $config->get('php');
+  $command[] = Config::get('php');
   $command[] = '--test-id';
   $command[] = $test_run->id();
   foreach (['verbose', 'keep-results', 'color', 'die-on-fail', 'suppress-deprecations'] as $arg) {
-    if ($config->get($arg)) {
+    if (Config::get($arg)) {
       $command[] = '--' . $arg;
     }
   }
@@ -730,14 +728,14 @@ function simpletest_script_command(Configuration $config, TestRun $test_run, str
  * @return array
  *   List of tests.
  */
-function simpletest_script_get_test_list(Configuration $config) {
-  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($config->get('phpunit-configuration'));
+function simpletest_script_get_test_list() {
+  $test_discovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath(Config::get('phpunit-configuration'));
   $test_list = [];
   $slow_tests = [];
-  if ($config->get('all') || $config->get('module') || $config->get('directory')) {
+  if (Config::get('all') || Config::get('module') || Config::get('directory')) {
     try {
-      $groups = $test_discovery->getTestClasses($config->get('module'), $config->get('types'), $config->get('directory'));
-      dump_discovery_warnings($config);
+      $groups = $test_discovery->getTestClasses(Config::get('module'), Config::get('types'), Config::get('directory'));
+      dump_discovery_warnings();
     }
     catch (Exception $e) {
       echo (string) $e;
@@ -758,12 +756,12 @@ function simpletest_script_get_test_list(Configuration $config) {
 
     // If the tests are not being run in parallel, then ensure slow tests run
     // all together first.
-    if ((int) $config->get('ci-parallel-node-total') <= 1 ) {
+    if ((int) Config::get('ci-parallel-node-total') <= 1 ) {
       sort_tests_by_type_and_methods($slow_tests);
       sort_tests_by_type_and_methods($not_slow_tests);
       $all_tests_list = array_merge($slow_tests, $not_slow_tests);
       assign_tests_sequence($all_tests_list);
-      dump_tests_sequence($all_tests_list, $config);
+      dump_tests_sequence($all_tests_list);
       $test_list = array_keys($all_tests_list);
     }
     else {
@@ -776,33 +774,33 @@ function simpletest_script_get_test_list(Configuration $config) {
       assign_tests_sequence($all_tests_list);
 
       // Now set up a bin per test runner.
-      $bin_count = (int) $config->get('ci-parallel-node-total');
+      $bin_count = (int) Config::get('ci-parallel-node-total');
 
       // Now loop over the slow tests and add them to a bin one by one, this
       // distributes the tests evenly across the bins.
       $binned_slow_tests = place_tests_into_bins($slow_tests, $bin_count);
-      $slow_tests_for_job = $binned_slow_tests[$config->get('ci-parallel-node-index') - 1];
+      $slow_tests_for_job = $binned_slow_tests[Config::get('ci-parallel-node-index') - 1];
 
       // And the same for the rest of the tests.
       $binned_other_tests = place_tests_into_bins($not_slow_tests, $bin_count);
-      $other_tests_for_job = $binned_other_tests[$config->get('ci-parallel-node-index') - 1];
+      $other_tests_for_job = $binned_other_tests[Config::get('ci-parallel-node-index') - 1];
       $test_list = array_merge($slow_tests_for_job, $other_tests_for_job);
-      dump_bin_tests_sequence($config->get('ci-parallel-node-index'), $all_tests_list, $test_list, $config);
+      dump_bin_tests_sequence(Config::get('ci-parallel-node-index'), $all_tests_list, $test_list);
       $test_list = array_keys($test_list);
     }
   }
   else {
-    if ($config->get('class')) {
+    if (Config::get('class')) {
       $test_list = [];
-      foreach ($input->getArgument('tests') as $test_class) {
+      foreach (Config::getTests() as $test_class) {
         [$class_name] = explode('::', $test_class, 2);
         if (class_exists($class_name)) {
           $test_list[] = $test_class;
         }
         else {
           try {
-            $groups = $test_discovery->getTestClasses(NULL, $config->get('types'));
-            dump_discovery_warnings($config);
+            $groups = $test_discovery->getTestClasses(NULL, Config::get('types'));
+            dump_discovery_warnings();
           }
           catch (Exception $e) {
             echo (string) $e;
@@ -812,30 +810,30 @@ function simpletest_script_get_test_list(Configuration $config) {
           foreach ($groups as $group) {
             $all_classes = array_merge($all_classes, array_keys($group));
           }
-          simpletest_script_print_error($config, 'Test class not found: ' . $class_name);
-          simpletest_script_print_alternatives($config, $class_name, $all_classes, 6);
+          simpletest_script_print_error('Test class not found: ' . $class_name);
+          simpletest_script_print_alternatives($class_name, $all_classes, 6);
           exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
         }
       }
     }
-    elseif ($config->get('file')) {
+    elseif (Config::get('file')) {
       // Extract test case class names from specified files.
-      foreach ($config->getArgument('tests') as $file) {
+      foreach (Config::getArgument('tests') as $file) {
         if (!file_exists($file) || is_dir($file)) {
-          simpletest_script_print_error($config, 'File not found: ' . $file);
+          simpletest_script_print_error('File not found: ' . $file);
           exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
         }
         $fileTests = current($test_discovery->getTestClasses(NULL, [], $file));
         $test_list = array_merge($test_list, $fileTests);
       }
       assign_tests_sequence($test_list);
-      dump_tests_sequence($test_list, $config);
+      dump_tests_sequence($test_list);
       $test_list = array_keys($test_list);
     }
     else {
       try {
-        $groups = $test_discovery->getTestClasses(NULL, $config->get('types'));
-        dump_discovery_warnings($config);
+        $groups = $test_discovery->getTestClasses(NULL, Config::get('types'));
+        dump_discovery_warnings();
       }
       catch (Exception $e) {
         echo (string) $e;
@@ -844,25 +842,25 @@ function simpletest_script_get_test_list(Configuration $config) {
       // Store all the groups so we can suggest alternatives if we need to.
       $all_groups = array_keys($groups);
       // Verify that the groups exist.
-      if (!empty($unknown_groups = array_diff($config->getArgument('tests'), $all_groups))) {
+      if (!empty($unknown_groups = array_diff(Config::getArgument('tests'), $all_groups))) {
         $first_group = reset($unknown_groups);
-        simpletest_script_print_error($config, 'Test group not found: ' . $first_group);
-        simpletest_script_print_alternatives($config, $first_group, $all_groups);
+        simpletest_script_print_error('Test group not found: ' . $first_group);
+        simpletest_script_print_alternatives($first_group, $all_groups);
         exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
       }
       // Merge the tests from the groups together.
-      foreach ($input->getArgument('tests') as $group_name) {
+      foreach (Config::getTests() as $group_name) {
         $test_list = array_merge($test_list, $groups[$group_name]);
       }
       assign_tests_sequence($test_list);
-      dump_tests_sequence($test_list, $config);
+      dump_tests_sequence($test_list);
       // Ensure our list of tests contains only one entry for each test.
       $test_list = array_keys($test_list);
     }
   }
 
   if (empty($test_list)) {
-    simpletest_script_print_error($config, 'No valid tests were specified.');
+    simpletest_script_print_error('No valid tests were specified.');
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
 
@@ -933,11 +931,9 @@ function assign_tests_sequence(array &$tests): void {
  *
  * @param array $tests
  *   The array of test class info.
- * @param \Symfony\Component\Console\Input\InputInterface $config
- *   The command line arguments.
  */
-function dump_tests_sequence(array $tests, Configuration $config): void {
-  if (!$config->get('debug-discovery')) {
+function dump_tests_sequence(array $tests): void {
+  if (!Config::get('debug-discovery')) {
     return;
   }
   echo "Test execution sequence\n";
@@ -994,11 +990,9 @@ function place_tests_into_bins(array $tests, int $bin_count) {
  *   The list of all test classes discovered.
  * @param array $tests
  *   The list of test class to run for this bin.
- * @param \Symfony\Component\Console\Input\InputInterface $config
- *   The command line arguments.
  */
-function dump_bin_tests_sequence(int $bin, array $allTests, array $tests, Configuration $config): void {
-  if (!$config->get('debug-discovery')) {
+function dump_bin_tests_sequence(int $bin, array $allTests, array $tests): void {
+  if (!Config::get('debug-discovery')) {
     return;
   }
   echo "Test execution sequence. ";
@@ -1017,7 +1011,7 @@ function dump_bin_tests_sequence(int $bin, array $allTests, array $tests, Config
       $testInfo['tests_count'],
       trim_with_ellipsis($testInfo['name'], 60, \STR_PAD_LEFT),
     );
-    simpletest_script_print($config, $message, $inBin ? SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE : SIMPLETEST_SCRIPT_COLOR_GRAY);
+    simpletest_script_print($message, $inBin ? SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE : SIMPLETEST_SCRIPT_COLOR_GRAY);
   }
   echo "-------------------------------------------------\n\n";
 }
@@ -1025,7 +1019,7 @@ function dump_bin_tests_sequence(int $bin, array $allTests, array $tests, Config
 /**
  * Initialize the reporter.
  */
-function simpletest_script_reporter_init(Configuration $config): void {
+function simpletest_script_reporter_init(): void {
   global $test_list, $results_map;
 
   $results_map = [
@@ -1039,7 +1033,7 @@ function simpletest_script_reporter_init(Configuration $config): void {
   ];
 
   // Tell the user about what tests are to be run.
-  if ($config->get('all')) {
+  if (Config::get('all')) {
     echo "All tests will run.\n\n";
   }
   else {
@@ -1070,7 +1064,7 @@ function simpletest_script_reporter_init(Configuration $config): void {
  * @param float|null $duration
  *   The time taken for the test to complete.
  */
-function simpletest_script_reporter_display_summary(Configuration $config, $class, $results, $duration = NULL): void {
+function simpletest_script_reporter_display_summary($class, $results, $duration = NULL): void {
   // Output all test results vertically aligned.
   $summary = [str_pad($results['#pass'], 4, " ", STR_PAD_LEFT) . ' passed'];
   if ($results['#fail']) {
@@ -1102,17 +1096,17 @@ function simpletest_script_reporter_display_summary(Configuration $config, $clas
 
   $output = vsprintf('%s %s %s', [$time, trim_with_ellipsis($class, 70, STR_PAD_LEFT), implode(', ', $summary)]);
   $status = ($results['#fail'] || $results['#cli_fail'] || $results['#exception'] || $results['#error'] ? 'fail' : 'pass');
-  simpletest_script_print($config, $output . "\n", simpletest_script_color_code($status));
+  simpletest_script_print($output . "\n", simpletest_script_color_code($status));
 }
 
 /**
  * Display jUnit XML test results.
  */
-function simpletest_script_reporter_write_xml_results(Configuration $config, TestRunResultsStorageInterface $test_run_results_storage): void {
+function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInterface $test_run_results_storage): void {
   global $test_ids, $results_map;
 
   try {
-    $results = simpletest_script_load_messages_by_test_id($config, $test_run_results_storage, $test_ids);
+    $results = simpletest_script_load_messages_by_test_id($test_run_results_storage, $test_ids);
   }
   catch (Exception $e) {
     echo (string) $e;
@@ -1128,7 +1122,7 @@ function simpletest_script_reporter_write_xml_results(Configuration $config, Tes
         // We've moved onto a new class, so write the last classes results to a
         // file:
         if (isset($xml_files[$test_class])) {
-          file_put_contents($config->get('xml') . '/' . str_replace('\\', '_', $test_class) . '.xml', $xml_files[$test_class]['doc']->saveXML());
+          file_put_contents(Config::get('xml') . '/' . str_replace('\\', '_', $test_class) . '.xml', $xml_files[$test_class]['doc']->saveXML());
           unset($xml_files[$test_class]);
         }
         $test_class = $result->test_class;
@@ -1183,7 +1177,7 @@ function simpletest_script_reporter_write_xml_results(Configuration $config, Tes
   }
   // The last test case hasn't been saved to a file yet, so do that now:
   if (isset($xml_files[$test_class])) {
-    file_put_contents($config->get('xml') . '/' . str_replace('\\', '_', $test_class) . '.xml', $xml_files[$test_class]['doc']->saveXML());
+    file_put_contents(Config::get('xml') . '/' . str_replace('\\', '_', $test_class) . '.xml', $xml_files[$test_class]['doc']->saveXML());
     unset($xml_files[$test_class]);
   }
 }
@@ -1201,16 +1195,16 @@ function simpletest_script_reporter_timer_stop(): void {
 /**
  * Display test results.
  */
-function simpletest_script_reporter_display_results(Configuration $config, TestRunResultsStorageInterface $test_run_results_storage): void {
+function simpletest_script_reporter_display_results(TestRunResultsStorageInterface $test_run_results_storage): void {
   global $test_ids, $results_map;
 
-  if ($config->get('verbose')) {
+  if (Config::get('verbose')) {
     // Report results.
     echo "Detailed test results\n";
     echo "---------------------\n";
 
     try {
-      $results = simpletest_script_load_messages_by_test_id($config, $test_run_results_storage, $test_ids);
+      $results = simpletest_script_load_messages_by_test_id($test_run_results_storage, $test_ids);
     }
     catch (Exception $e) {
       echo (string) $e;
@@ -1229,7 +1223,7 @@ function simpletest_script_reporter_display_results(Configuration $config, TestR
           echo "--------------------------------------------------------------------------------------------------------\n";
         }
 
-        simpletest_script_format_result($config, $result);
+        simpletest_script_format_result($result);
       }
     }
   }
@@ -1241,7 +1235,7 @@ function simpletest_script_reporter_display_results(Configuration $config, TestR
  * @param object $result
  *   The result object to format.
  */
-function simpletest_script_format_result(Configuration $config, $result): void {
+function simpletest_script_format_result($result): void {
   global $results_map, $color;
 
   if ($result->time == 0) {
@@ -1256,14 +1250,14 @@ function simpletest_script_format_result(Configuration $config, $result): void {
 
   $summary = sprintf("%-9.9s %s %s\n", $results_map[$result->status], $duration, trim_with_ellipsis($result->function, 80, STR_PAD_LEFT));
 
-  simpletest_script_print($config, $summary, simpletest_script_color_code($result->status));
+  simpletest_script_print($summary, simpletest_script_color_code($result->status));
 
   if ($result->message === '' || in_array($result->status, ['pass', 'fail', 'error'])) {
     return;
   }
 
   $message = trim(strip_tags($result->message));
-  if ($config->get('non-html')) {
+  if (Config::get('non-html')) {
     $message = Html::decodeEntities($message);
   }
   $lines = explode("\n", $message);
@@ -1281,8 +1275,8 @@ function simpletest_script_format_result(Configuration $config, $result): void {
  * @param string $message
  *   The message to print.
  */
-function simpletest_script_print_error(?Configuration $config, $message): void {
-  simpletest_script_print($config, "  ERROR: $message\n", SIMPLETEST_SCRIPT_COLOR_FAIL);
+function simpletest_script_print_error($message): void {
+  simpletest_script_print("  ERROR: $message\n", SIMPLETEST_SCRIPT_COLOR_FAIL);
 }
 
 /**
@@ -1293,8 +1287,8 @@ function simpletest_script_print_error(?Configuration $config, $message): void {
  * @param string|int $color_code
  *   The color code to use for coloring.
  */
-function simpletest_script_print(?Configuration $config, $message, $color_code): void {
-  if ($config && $config->get('color')) {
+function simpletest_script_print($message, $color_code): void {
+  if (Config::get('color')) {
     echo "\033[" . $color_code . "m" . $message . "\033[0m";
   }
   else {
@@ -1340,7 +1334,7 @@ function simpletest_script_color_code($status) {
  *
  * @see http://php.net/manual/function.levenshtein.php
  */
-function simpletest_script_print_alternatives(Configuration $config, $string, $array, $degree = 4): void {
+function simpletest_script_print_alternatives($string, $array, $degree = 4): void {
   $alternatives = [];
   foreach ($array as $item) {
     $lev = levenshtein($string, $item);
@@ -1349,9 +1343,9 @@ function simpletest_script_print_alternatives(Configuration $config, $string, $a
     }
   }
   if (!empty($alternatives)) {
-    simpletest_script_print($config, "  Did you mean?\n", SIMPLETEST_SCRIPT_COLOR_FAIL);
+    simpletest_script_print("  Did you mean?\n", SIMPLETEST_SCRIPT_COLOR_FAIL);
     foreach ($alternatives as $alternative) {
-      simpletest_script_print($config, "  - $alternative\n", SIMPLETEST_SCRIPT_COLOR_FAIL);
+      simpletest_script_print("  - $alternative\n", SIMPLETEST_SCRIPT_COLOR_FAIL);
     }
   }
 }
@@ -1367,12 +1361,12 @@ function simpletest_script_print_alternatives(Configuration $config, $string, $a
  * @return array
  *   Array of test result messages from the database.
  */
-function simpletest_script_load_messages_by_test_id(Configuration $config, TestRunResultsStorageInterface $test_run_results_storage, $test_ids) {
+function simpletest_script_load_messages_by_test_id(TestRunResultsStorageInterface $test_run_results_storage, $test_ids) {
   $results = [];
 
   // Sqlite has a maximum number of variables per query. If required, the
   // database query is split into chunks.
-  if (count($test_ids) > SIMPLETEST_SCRIPT_SQLITE_VARIABLE_LIMIT && $config->get('sqlite')) {
+  if (count($test_ids) > SIMPLETEST_SCRIPT_SQLITE_VARIABLE_LIMIT && Config::get('sqlite')) {
     $test_id_chunks = array_chunk($test_ids, SIMPLETEST_SCRIPT_SQLITE_VARIABLE_LIMIT);
   }
   else {
@@ -1428,16 +1422,16 @@ function trim_with_ellipsis(string $input, int $length, int $side): string {
 /**
  * Outputs the discovery warning messages.
  */
-function dump_discovery_warnings(Configuration $config): void {
+function dump_discovery_warnings(): void {
   $warnings = PhpUnitTestDiscovery::instance()->getWarnings();
   if (!empty($warnings)) {
-    simpletest_script_print($config, "Test discovery warnings\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
-    simpletest_script_print($config, "-----------------------\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
+    simpletest_script_print("Test discovery warnings\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
+    simpletest_script_print("-----------------------\n", SIMPLETEST_SCRIPT_COLOR_BRIGHT_WHITE);
     foreach ($warnings as $warning) {
       $tmp = explode("\n", $warning);
-      simpletest_script_print($config, '* ' . array_shift($tmp) . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
+      simpletest_script_print('* ' . array_shift($tmp) . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
       foreach ($tmp as $sub) {
-        simpletest_script_print($config, '  ' . $sub . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
+        simpletest_script_print('  ' . $sub . "\n", SIMPLETEST_SCRIPT_COLOR_EXCEPTION);
       }
       echo "\n";
     }

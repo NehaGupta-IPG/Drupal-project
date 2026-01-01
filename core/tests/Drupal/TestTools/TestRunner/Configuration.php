@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\TestRunner;
 
+use Symfony\Component\Console\Exception\RuntimeException as ConsoleRuntimeException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,27 +29,37 @@ final class Configuration {
   /**
    * Gets a config element.
    */
-  public function get(string $name): mixed {
-    if (array_key_exists($name, $this->options)) {
-      return $this->options[$name];
+  public static function get(string $name): mixed {
+    if (array_key_exists($name, self::$instance->options)) {
+      return self::$instance->options[$name];
     }
     throw new \RuntimeException("There is no '{$name}' element in config");
   }
 
   /**
-   * Sets a config element.
+   * Gets the tests to execute.
    */
-  public function set(string $name, mixed $value): void {
-    $this->options[$name] = $value;
+  public static function getTests(): array {
+    return self::$instance->arguments['tests'];
   }
 
-  public static function createFromCommandLine(): self {
+  /**
+   * Sets a config element.
+   */
+  public static function set(string $name, mixed $value): void {
+    self::$instance->options[$name] = $value;
+  }
+
+  /**
+   * Builds the test runner configuration from command line arguments.
+   */
+  public static function createFromCommandLine(array $arguments): self {
     if (self::$instance) {
       return(self::$instance);
     }
 
     try {
-      $input = new ArgvInput(NULL, self::commandLineDefinition());
+      $input = new ArgvInput($arguments, self::commandLineDefinition());
     }
     catch (ConsoleRuntimeException $e) {
       simpletest_script_print_error(NULL, $e->getMessage() . ' ' . "Use the --help option for the list and usage of the options available.\n");
