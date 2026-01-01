@@ -109,3 +109,11 @@ early_rendering_controller_test.cacheable-domain-object.early:
     _controller: '\Drupal\early_rendering_controller_test\EarlyRenderingTestController::cacheableDomainObjectEarly'
   requirements:
     _access: 'TRUE'
+
+# Controller with argument.
+early_rendering_controller_test.with-argument:
+  path: '/early-rendering-controller-test/with-argument/{argument}'
+  defaults:
+    _controller: '\Drupal\early_rendering_controller_test\EarlyRenderingTestController::withArgument'
+  requirements:
+    _access: 'TRUE'

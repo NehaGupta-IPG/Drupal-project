@@ -107,6 +107,12 @@ class EarlyRenderingControllerTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(500);
     $this->assertSession()->pageTextContains('The controller result claims to be providing relevant cache metadata, but leaked metadata was detected. Ensure you are not rendering content too early. Returned object class: Drupal\early_rendering_controller_test\CacheableTestDomainObject.');
 
+    // With argument.
+    $this->drupalGet(Url::fromRoute('early_rendering_controller_test.with-argument', ['argument' => 'foo']));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextNotContains('foo');
+    $this->assertSession()->pageTextContains('bar');
+
     // The exceptions are expected. Do not interpret them as a test failure.
     // Not using File API; a potential error must trigger a PHP warning.
     unlink($this->root . '/' . $this->siteDirectory . '/error.log');

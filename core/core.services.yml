@@ -1142,6 +1142,10 @@ services:
     class: Drupal\Core\Routing\AccessAwareRouter
     arguments: ['@router.no_access_checks', '@access_manager', '@current_user']
   Drupal\Core\Routing\AccessAwareRouterInterface: '@router'
+  drupal.argument_resolver:
+    class: Drupal\Core\Routing\ArgumentResolver
+    decorates: http_kernel.controller.argument_resolver
+    arguments: ['@drupal.argument_resolver.inner']
   router.no_access_checks:
     class: \Drupal\Core\Routing\Router
     arguments: ['@router.route_provider', '@path.current']
