@@ -65,7 +65,7 @@ class MediaSourceImageTest extends MediaFunctionalTestBase {
 
     // Custom name should stay.
     $this->drupalGet($media->toUrl('edit-form'));
-    $assert_session->fieldValueEquals('name[0][value]', 'Custom name');
+    $assert_session->fieldValueEquals('name[0][value]', 'image-test.png');
 
     // Remove image and attach a new one.
     $this->submitForm([], 'Remove');
@@ -75,6 +75,62 @@ class MediaSourceImageTest extends MediaFunctionalTestBase {
 
     $this->drupalGet($media->toUrl('edit-form'));
     $assert_session->fieldValueEquals('name[0][value]', 'example_1.jpeg');
+  }
+
+  /**
+   * Tests that changing image alt text updates mapped metadata.
+   */
+  public function testAltChangeUpdatesMappedMetadata(): void {
+    $assert_session = $this->assertSession();
+
+    // Create image media type.
+    $media_type = $this->createMediaType('image');
+    $media_type_id = $media_type->id();
+
+    // Map thumbnail alt metadata to the media name.
+    $media_type->setFieldMap([
+      'thumbnail_alt_value' => 'name',
+    ]);
+    $media_type->save();
+
+    // Ensure alt field is enabled and optional.
+    /** @var \Drupal\field\FieldConfigInterface $field */
+    $field = FieldConfig::load("media.$media_type_id.field_media_image");
+    $settings = $field->getSettings();
+    $settings['alt_field'] = TRUE;
+    $settings['alt_field_required'] = FALSE;
+    $field->set('settings', $settings);
+    $field->save();
+
+    // Create image file.
+    $file = File::create([
+      'uri' => $this->getTestFiles('image')[0]->uri,
+    ]);
+    $file->save();
+
+    // Create media with explicit name and initial alt.
+    $media = Media::create([
+      'bundle' => $media_type_id,
+      'name' => 'Initial name',
+      'field_media_image' => [
+        'target_id' => $file->id(),
+        'alt' => 'Initial alt',
+      ],
+    ]);
+    $media->save();
+
+    // Explicit name should NOT be overridden on initial save.
+    $this->drupalGet($media->toUrl('edit-form'));
+    $assert_session->fieldValueEquals('name[0][value]', 'Initial name');
+
+    // Change only the alt text.
+    $this->submitForm([
+      'field_media_image[0][alt]' => 'Updated alt',
+    ], 'Save');
+
+    // Name should now reflect updated alt text.
+    $this->drupalGet($media->toUrl('edit-form'));
+    $assert_session->fieldValueEquals('name[0][value]', 'Updated alt');
   }
 
 }
