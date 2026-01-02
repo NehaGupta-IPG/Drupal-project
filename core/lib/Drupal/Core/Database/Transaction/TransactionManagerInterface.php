@@ -150,10 +150,10 @@ interface TransactionManagerInterface {
    *
    * In some cases the active transaction is automatically committed by the
    * database server when a DDL statement is executed during a transaction
-   * (for example, MySql). In such cases we void the remaining items on the
-   * stack, and emit a TransactionAutoCommitEvent to notify that a db commit
-   * happened while the Drupal transaction was still active. Later, a normal
-   * TransactionCommitEvent is triggered when the Drupal transaction is
+   * (for example, MySQL). In such cases we void the remaining items on the
+   * stack, and emit a TransactionAutoCommitEvent to notify that a database
+   * commit happened while the Drupal transaction was still active. Later, a
+   * normal TransactionCommitEvent is triggered when the Drupal transaction is
    * finalized.
    *
    * This method should only be called internally by a database driver.

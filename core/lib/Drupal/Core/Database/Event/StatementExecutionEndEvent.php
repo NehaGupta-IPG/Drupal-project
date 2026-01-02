@@ -29,7 +29,7 @@ class StatementExecutionEndEvent extends DatabaseEvent {
    * @param float $startTime
    *   The time of the statement execution start.
    * @param string|null $transactionId
-   *   The current transaction id if active.
+   *   The current transaction ID if active.
    * @param string|null $transactionName
    *   The current transaction name if active.
    */

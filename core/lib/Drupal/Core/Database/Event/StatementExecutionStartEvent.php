@@ -27,7 +27,7 @@ class StatementExecutionStartEvent extends DatabaseEvent {
    *   A normalized debug backtrace entry representing the last non-db method
    *   called.
    * @param string|null $transactionId
-   *   The current transaction id if active.
+   *   The current transaction ID if active.
    * @param string|null $transactionName
    *   The current transaction name if active.
    */

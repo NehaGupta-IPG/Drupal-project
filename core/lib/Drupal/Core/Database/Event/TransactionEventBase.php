@@ -22,7 +22,7 @@ abstract class TransactionEventBase extends DatabaseEvent {
    * @param string $target
    *   The database connection target.
    * @param string $id
-   *   The id of the transaction.
+   *   The ID of the transaction.
    * @param string $name
    *   The name of the transaction.
    * @param \Drupal\Core\Database\Transaction\ClientConnectionTransactionState $transactionState

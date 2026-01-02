@@ -23,7 +23,7 @@ abstract class TransactionCommitOrReleaseFailureEventBase extends TransactionFai
    * @param string $target
    *   The database connection target.
    * @param string $id
-   *   The id of the transaction.
+   *   The ID of the transaction.
    * @param string $name
    *   The name of the transaction.
    * @param \Drupal\Core\Database\Transaction\ClientConnectionTransactionState $transactionState
@@ -31,7 +31,7 @@ abstract class TransactionCommitOrReleaseFailureEventBase extends TransactionFai
    * @param array $stackItems
    *   The current transaction stack items.
    * @param class-string $className
-   *   The FQCN of the exception.
+   *   The fully qualified class name of the exception.
    * @param string $message
    *   The message of the exception.
    * @param \Drupal\Core\Database\Transaction\CommitType $type

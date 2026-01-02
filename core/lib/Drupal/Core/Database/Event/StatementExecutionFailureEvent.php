@@ -35,7 +35,7 @@ class StatementExecutionFailureEvent extends StatementExecutionEndEvent {
    * @param string $exceptionMessage
    *   The message of the exception that was thrown.
    * @param string|null $transactionId
-   *   The current transaction id if active.
+   *   The current transaction ID if active.
    * @param string|null $transactionName
    *   The current transaction name if active.
    */
