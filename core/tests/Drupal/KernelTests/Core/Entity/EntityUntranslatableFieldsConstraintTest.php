@@ -130,7 +130,7 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
       ->validate()
       ->getEntityViolations();
     // If access is allowed, we expect one violation, when denied, zero
-    // violations is expected.
+    // violations are expected.
     $this->assertCount((int) $access, $violations);
     // If there is a violation, make sure it's the right one.
     foreach ($violations as $violation) {
