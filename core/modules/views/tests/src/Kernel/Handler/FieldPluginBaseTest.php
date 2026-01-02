@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\views\Kernel\Handler;
 
+use Drupal\views\ResultRow;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\Component\Render\MarkupInterface;
@@ -35,22 +36,47 @@ class FieldPluginBaseTest extends ViewsKernelTestBase {
 
     // Create a concrete test field handler with correct signature.
     $this->handler = new class([], 'test_field', []) extends FieldPluginBase {
-      public function getValue(\Drupal\views\ResultRow $values, $field = NULL) {
+
+      /**
+       * Override renderText to test the patched line safely.
+       */
+      public function getValue(ResultRow $values, $field = NULL) {
         return $this->last_render;
       }
 
-      // Override renderText to test the patched line safely.
+      /**
+       * Override renderText to test the patched line safely.
+       */
       public function renderText($alter) {
         $value = $this->last_render === NULL ? '' : (string) $this->last_render;
         return $value;
       }
+
     };
 
     // Minimal mock of view environment so FieldPluginBase does not crash.
-    $this->handler->view = new class {
+    $this->handler->view = new class() {
+      /**
+       * A placeholder for field values in the test handler.
+       *
+       * @var array
+       */
       public $field = [];
-      public function displayHandler() { return $this; }
-      public function getPlugin() { return $this; }
+
+      /**
+       * Returns the display handler for the test.
+       */
+      public function displayHandler() {
+        return $this;
+      }
+
+      /**
+       * Returns the plugin instance.
+       */
+      public function getPlugin() {
+        return $this;
+      }
+
     };
   }
 
