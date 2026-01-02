@@ -42,7 +42,7 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
    *
    * @var \Drupal\user\Entity\User
    */
-  protected $user;
+  protected UserInterface $user;
 
   /**
    * {@inheritdoc}
