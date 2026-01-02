@@ -11,6 +11,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\user\UserInterface;
 
 /**
  * Tests the constraint used to enforce untranslatable fields as read-only.
@@ -40,7 +41,7 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
   /**
    * A user account used to author entities.
    *
-   * @var \Drupal\user\Entity\User
+   * @var \Drupal\user\UserInterface
    */
   protected UserInterface $user;
 
