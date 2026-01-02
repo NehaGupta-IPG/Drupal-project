@@ -42,7 +42,7 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
   protected $storage;
 
   /**
-   * A user account used to author entities.
+   * A user account used to create entities.
    *
    * @var \Drupal\user\UserInterface
    */
