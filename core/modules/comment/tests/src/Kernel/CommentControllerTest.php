@@ -49,10 +49,8 @@ class CommentControllerTest extends KernelTestBase {
 
   /**
    * The tested comment controller.
-   *
-   * @var \Drupal\comment\Controller\CommentController
    */
-  protected $controller;
+  protected CommentController $controller;
 
   /**
    * {@inheritdoc}
@@ -134,7 +132,7 @@ class CommentControllerTest extends KernelTestBase {
 
     // Check that users granted with proper permissions can reply to a comment.
     $access_result = $this->controller->replyFormAccess($node, 'comment', $comment->id());
-    $this->assertEquals($expectation, $access_result->isAllowed());
+    $this->assertSame($expectation, $access_result->isAllowed());
     // Now the parent comment cache metadata should have been merged.
     $expected_cache_tags = Cache::mergeTags($node->getCacheTags(), $comment->getCacheTags());
     $this->assertSame($expected_cache_tags, $access_result->getCacheTags());
