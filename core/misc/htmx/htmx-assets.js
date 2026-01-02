@@ -89,14 +89,8 @@
       return;
     }
 
-    const contentType = (detail.xhr.getResponseHeader('Content-Type') || '')
-      .split(';', 1)[0]
-      .trim();
-    if (
-      contentType === 'application/json' ||
-      contentType === 'application/xml'
-    ) {
-      // No assets to load on JSON or XML responses.
+    if (!detail.xhr.getResponseHeader('Content-Type').includes('text/html')) {
+      // Only process HTML responses.
       return;
     }
 
