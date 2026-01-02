@@ -64,7 +64,7 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
    *
    * @dataProvider accessValues
    */
-  public function testEntityUntranslatableFieldsConstraint($access): void {
+  public function testEntityUntranslatableFieldsConstraint(bool $access): void {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->storage->create([
       'name' => $this->randomString(),
