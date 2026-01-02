@@ -85,13 +85,31 @@
       // Remove the question mark and Drupal path component if any.
       queryString = queryString.slice(1);
 
-      // Remove current exposed filters.
+      // Remove current exposed filters. Collect all form input/select names
+      // from the exposed form to identify params to remove.
+      const formInputNames = new Set();
+      this.$exposed_form.find('input, select, textarea').each(function() {
+        const inputName = $(this).attr('name');
+        if (inputName) {
+          formInputNames.add(inputName);
+          // Also add the base name without [] for array inputs.
+          if (inputName.endsWith('[]')) {
+            formInputNames.add(inputName.slice(0, -2));
+          }
+        }
+      });
+
       const params = decodeURI(queryString)
         .split('&')
         .filter((param) => {
           const [name, value] = param.split('=');
+          // Extract base parameter name without array indices (e.g. [0]).
+          const baseParamName = name.replace(/\[\d+\]$/, '');
+          // Check if this parameter matches any form input.
+          const matchesFormInput = formInputNames.has(name) ||
+                                    formInputNames.has(baseParamName);
           return (
-            this.$exposed_form.find(`input[name="${name}"]`).length === 0 &&
+            !matchesFormInput &&
             /*
             Submitting filters should reset paging and sorting
             because that is what happens without AJAX.
