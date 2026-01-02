@@ -10,6 +10,8 @@ use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\Component\Render\MarkupInterface;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\Group;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\Plugin\views\field\FieldPluginBase;
 
 /**
  * Tests FieldPluginBase::renderText() with NULL values.
@@ -68,14 +70,14 @@ class FieldPluginBaseTest extends ViewsKernelTestBase {
       /**
        * Returns the display handler for the test.
        */
-      public function displayHandler() {
+      public function displayHandler(): DisplayPluginBase {
         return $this;
       }
 
       /**
        * Returns the plugin instance.
        */
-      public function getPlugin() {
+      public function getPlugin(): FieldPluginBase {
         return $this;
       }
 
