@@ -2,7 +2,9 @@
 
 namespace Drupal\Core\DependencyInjection;
 
+use Drupal\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\DependencyInjection\ReverseContainer;
+use Drupal\Core\DependencyInjection\Attribute\ServiceClosure;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -10,6 +12,10 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  * Provides dependency injection friendly methods for serialization.
  */
 trait DependencySerializationTrait {
+
+  use ServiceClosureTrait {
+    getServiceClosure as originalGetServiceClosure;
+  }
 
   /**
    * An array of service IDs keyed by property name used for serialization.
@@ -29,6 +35,16 @@ trait DependencySerializationTrait {
    */
   // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
   protected $_serviceClosureIds = [];
+
+  /**
+   * An array of service IDs keyed by identifiers for service closures.
+   *
+   * This maps the service closures objects to service IDs.
+   *
+   * @var array
+   */
+  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  protected static $_serviceClosureUniqueIds = [];
 
   /**
    * An array of entity type IDs keyed by the property name of their storages.
@@ -71,15 +87,17 @@ trait DependencySerializationTrait {
         }
         elseif (($value instanceof \Closure) &&
                 ($reflection_closure = new \ReflectionFunction($value)) &&
-                ($reflection_closure->getNumberOfParameters() === 0) &&
-                ($closure_return = ($value)()) &&
-                (is_object($closure_return)) &&
-                ($service_id = $reverse_container->getId($closure_return))) {
+                !empty($reflection_closure->getAttributes(ServiceClosure::class))) {
           // If a class member is a closure that returns a service object, only
           // store its ID so it can be used to create a new closure that returns
           // the service object on unserialization.
-          $this->_serviceClosureIds[$key] = $service_id;
-          unset($vars[$key]);
+          $closure_spl_id = spl_object_id($value);
+          $service_closure_id = static::$_serviceClosureUniqueIds[$closure_spl_id] ?? '';
+          if ($service_closure_id) {
+            unset(static::$_serviceClosureUniqueIds[$closure_spl_id]);
+            $this->_serviceClosureIds[$key] = $service_closure_id;
+            unset($vars[$key]);
+          }
         }
       }
     }
@@ -105,7 +123,7 @@ trait DependencySerializationTrait {
     $this->_serviceIds = [];
 
     foreach ($this->_serviceClosureIds as $key => $service_closure_id) {
-      $this->$key = static fn() => $container->get($service_closure_id);
+      $this->$key = static::getServiceClosure($service_closure_id, $container);
     }
     $this->_serviceClosureIds = [];
 
@@ -117,6 +135,18 @@ trait DependencySerializationTrait {
       }
     }
     $this->_entityStorages = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getServiceClosure(string $serviceId, ?ContainerInterface $container = NULL): \Closure {
+    $closure = static::originalGetServiceClosure($serviceId, $container);
+    // Track the service ID associated with the closure, so that the closure
+    // will not need to be invoked during serialization in order to determine
+    // which service the closure returns.
+    static::$_serviceClosureUniqueIds[spl_object_id($closure)] = $serviceId;
+    return $closure;
   }
 
 }
