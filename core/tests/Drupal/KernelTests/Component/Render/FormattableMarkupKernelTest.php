@@ -9,11 +9,13 @@ use Drupal\Core\Url;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Provides a test covering integration of FormattableMarkup with other systems.
  */
 #[Group('Render')]
+#[RunTestsInSeparateProcesses]
 class FormattableMarkupKernelTest extends KernelTestBase {
 
   /**
@@ -50,10 +52,12 @@ class FormattableMarkupKernelTest extends KernelTestBase {
   }
 
   /**
+   * Provides data for testFormattableMarkupUri().
+   *
    * @return array
    *   Data provider for testFormattableMarkupUri().
    */
-  public static function providerTestFormattableMarkupUri() {
+  public static function providerTestFormattableMarkupUri(): array {
     $data = [];
     $data['routed-url'] = [
       'Hey giraffe <a href=":url">example</a>',
@@ -114,10 +118,12 @@ class FormattableMarkupKernelTest extends KernelTestBase {
   }
 
   /**
+   * Provides data for testFormattableMarkupUriWithExceptionUri().
+   *
    * @return array
    *   Data provider for testFormattableMarkupUriWithExceptionUri().
    */
-  public static function providerTestFormattableMarkupUriWithException() {
+  public static function providerTestFormattableMarkupUriWithException(): array {
     $data = [];
     $data['js-protocol'] = [
       'Hey giraffe <a href=":url">example</a>',

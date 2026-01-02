@@ -182,11 +182,11 @@ class BlockTest extends ConfigEntityResourceTestBase {
     return parent::getExpectedUnauthorizedAccessCacheability()
       ->setCacheTags([
         '4xx-response',
-        'config:block.block.llama',
+        'config:block_list',
         'http_response',
         'user:2',
       ])
-      ->setCacheContexts(['url.query_args', 'url.site', 'user.roles']);
+      ->setCacheContexts(['url.query_args', 'url.site', 'user.permissions', 'user.roles']);
   }
 
   /**

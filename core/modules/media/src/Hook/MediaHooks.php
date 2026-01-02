@@ -198,10 +198,7 @@ class MediaHooks {
       if ($overview_url->access()) {
         $elements['#media_help']['#media_list_link'] = $this->t('See the <a href=":list_url" target="_blank">media list</a> (opens a new window) to help locate media.', [':list_url' => $overview_url->toString()]);
       }
-      $all_bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('media');
-      $bundle_labels = array_map(function ($bundle) use ($all_bundles) {
-          return $all_bundles[$bundle]['label'];
-      }, $allowed_bundles);
+      $bundle_labels = array_intersect_key(\Drupal::service('entity_type.bundle.info')->getBundleLabels('media'), $allowed_bundles);
       $elements['#media_help']['#allowed_types_help'] = $this->t('Allowed media types: %types', ['%types' => implode(", ", $bundle_labels)]);
     }
   }
@@ -224,8 +221,12 @@ class MediaHooks {
   #[Hook('form_filter_format_edit_form_alter')]
   public function formFilterFormatEditFormAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
     // Add an additional validate callback so we can ensure the order of filters
-    // is correct.
-    $form['#validate'][] = 'media_filter_format_edit_form_validate';
+    // is correct, this is not necessary when using ckeditor5 since allowed tags
+    // are added automatically by CKEditor 5. The validator would conflict with
+    // the automatic addition of those allowed tags.
+    if ($form_state->getValue('editor') !== 'ckeditor5') {
+      $form['#validate'][] = 'media_filter_format_edit_form_validate';
+    }
   }
 
   /**
@@ -234,8 +235,12 @@ class MediaHooks {
   #[Hook('form_filter_format_add_form_alter')]
   public function formFilterFormatAddFormAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
     // Add an additional validate callback so we can ensure the order of filters
-    // is correct.
-    $form['#validate'][] = 'media_filter_format_edit_form_validate';
+    // is correct, this is not necessary when using ckeditor5 since allowed tags
+    // are added automatically by CKEditor 5. The validator would conflict with
+    // the automatic addition of those allowed tags.
+    if ($form_state->getValue('editor') !== 'ckeditor5') {
+      $form['#validate'][] = 'media_filter_format_edit_form_validate';
+    }
   }
 
   /**

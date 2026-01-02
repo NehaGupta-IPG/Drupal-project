@@ -8,17 +8,19 @@ use Drupal\Core\Config\ManagedStorage;
 use Drupal\Core\Config\MemoryStorage;
 use Drupal\Core\Config\StorageManagerInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ManagedStorage operations.
  */
 #[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ManagedStorageTest extends ConfigStorageTestBase implements StorageManagerInterface {
 
   /**
    * {@inheritdoc}
    */
-  public function getStorage() {
+  public function getStorage(): MemoryStorage {
     // We return a new storage every time to make sure the managed storage
     // only calls this once and retains the configuration by itself.
     return new MemoryStorage();

@@ -13,12 +13,14 @@ use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\jsonapi\Controller\FileUpload.
  */
 #[CoversClass(FileUpload::class)]
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class FileUploadTest extends JsonapiKernelTestBase {
 
   /**
@@ -27,7 +29,6 @@ class FileUploadTest extends JsonapiKernelTestBase {
   protected static $modules = [
     'node',
     'field',
-    'jsonapi',
     'serialization',
     'system',
     'user',

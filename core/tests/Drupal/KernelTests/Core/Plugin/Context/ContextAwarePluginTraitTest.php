@@ -21,6 +21,7 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore sisko
 /**
@@ -28,6 +29,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(ContextAwarePluginTrait::class)]
 #[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class ContextAwarePluginTraitTest extends KernelTestBase {
 
   /**
@@ -151,14 +153,14 @@ class TestConfigurableContextAwarePlugin extends PluginBase implements Configura
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getConfiguration() {
+  public function getConfiguration(): array {
     return [
       'context' => [
         'nato_letter' => 'Alpha',
