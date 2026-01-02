@@ -15,9 +15,8 @@ use Drupal\user\UserInterface;
 
 /**
  * Tests the constraint used to enforce untranslatable fields as read-only.
- *
- * @group Entity
  */
+#[Group('Entity')]
 class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
 
   const LANGCODE = 'de';
