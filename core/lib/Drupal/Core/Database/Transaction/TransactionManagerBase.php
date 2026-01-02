@@ -880,7 +880,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function handleAutomaticCommitUponDDL(): void {
+  public function handleAutomaticCommit(): void {
     if ($this->connection->isEventEnabled(TransactionAutoCommitEvent::class)) {
       $i = array_key_first($this->stack);
       assert($this->stack[$i]->type === StackItemType::Root);

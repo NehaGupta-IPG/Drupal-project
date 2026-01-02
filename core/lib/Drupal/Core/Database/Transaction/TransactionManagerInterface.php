@@ -150,7 +150,7 @@ interface TransactionManagerInterface {
   public function voidClientTransaction(): void;
 
   /**
-   * Manages the occurence of an automatic commit.
+   * Manages the occurrence of an automatic commit.
    *
    * In some cases the active transaction is automatically committed by the
    * database server when a DDL statement is executed during a transaction
@@ -162,7 +162,7 @@ interface TransactionManagerInterface {
    *
    * This method should only be called internally by a database driver.
    */
-  public function handleAutomaticCommitUponDDL(): void;
+  public function handleAutomaticCommit(): void;
 
   /**
    * Adds a root transaction end callback.
