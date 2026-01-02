@@ -103,11 +103,11 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
     $form = [];
     $form_state = new FormState();
     $display->buildForm($entity, $form, $form_state);
-    // This is what the bug under testing is about, see comment below.
+    // This relates to the bug under test, see the comment below.
     $form[$field_name]['widget']['#access'] = $access;
 
     /** @var \Drupal\Core\Entity\ContentEntityFormInterface $form_object */
-    // Pretend the form has been built.
+    // Build the form.
     $form_object = $this->entityTypeManager
       ->getFormObject(self::ENTITY_TYPE, 'default')
       ->setEntity($entity);
@@ -117,10 +117,10 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
     $form_builder = $this->container->get('form_builder');
     $form_builder->prepareForm($form_id, $form, $form_state);
     $form_builder->processForm($form_id, $form, $form_state);
-    // This is an untranslatable field so changing it the translation of a
-    // non-default revision should trigger a constraint violation except
-    // when the widget is access denied because then the change should not
-    // make it into the new entity.
+    // Attempt to change an untranslatable field in a translation of a
+    // non-default revision. This should trigger a constraint violation.
+    // However, if the widget has access denied, the change will not be
+    // applied to the entity. In that case, no violation should occur.
     $form_state->setValueForElement($form[$field_name]['widget'], [['value' => 1]]);
 
     // Validate the field constraint.
