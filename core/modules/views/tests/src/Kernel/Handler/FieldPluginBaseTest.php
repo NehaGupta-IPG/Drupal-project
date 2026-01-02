@@ -9,13 +9,13 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\Component\Render\MarkupInterface;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests FieldPluginBase::renderText() with NULL values.
- *
- * @group views
  */
 #[RunTestsInSeparateProcesses]
+#[Group('views')]
 class FieldPluginBaseTest extends ViewsKernelTestBase {
 
   /**
