@@ -206,7 +206,7 @@ class DisplayLink extends AreaPluginBase {
         'attributes' => ['class' => $classes],
       ],
       '#attached' => [
-        'libraries' => [
+        'library' => [
           'views.display_link',
         ],
       ],
