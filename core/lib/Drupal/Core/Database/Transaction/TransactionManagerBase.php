@@ -462,6 +462,8 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * @param \Drupal\Core\Database\Transaction\CommitType|null $commitType
    *   The type of commit.
    *
+   * @throws \Drupal\Core\Database\TransactionNoActiveException
+   *   When there is no client transaction active.
    * @throws \Drupal\Core\Database\TransactionOutOfOrderException
    *   If a Drupal Transaction with the specified name does not exist.
    * @throws \Drupal\Core\Database\TransactionCommitFailedException
@@ -812,6 +814,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *
    * @return bool
    *   Returns TRUE on success or FALSE on failure.
+   *
+   * @throws \Drupal\Core\Database\TransactionNoActiveException
+   *   When there is no client transaction active.
    */
   protected function rollbackClientSavepoint(string $name): bool {
     $this->connection->query('ROLLBACK TO SAVEPOINT ' . $name);
@@ -829,6 +834,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *
    * @return bool
    *   Returns TRUE on success or FALSE on failure.
+   *
+   * @throws \Drupal\Core\Database\TransactionNoActiveException
+   *   When there is no client transaction active.
    */
   protected function releaseClientSavepoint(string $name): bool {
     $this->connection->query('RELEASE SAVEPOINT ' . $name);
@@ -840,6 +848,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *
    * @return bool
    *   Returns TRUE on success or FALSE on failure.
+   *
+   * @throws \Drupal\Core\Database\TransactionNoActiveException
+   *   When there is no client transaction active.
    */
   abstract protected function rollbackClientTransaction(): bool;
 
@@ -848,6 +859,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *
    * @return bool
    *   Returns TRUE on success or FALSE on failure.
+   *
+   * @throws \Drupal\Core\Database\TransactionNoActiveException
+   *   When there is no client transaction active.
    */
   abstract protected function commitClientTransaction(): bool;
 

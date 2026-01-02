@@ -76,6 +76,8 @@ interface TransactionManagerInterface {
    * @param string $id
    *   The id of the transaction.
    *
+   * @throws \Drupal\Core\Database\TransactionNoActiveException
+   *   When there is no client transaction active.
    * @throws \Drupal\Core\Database\TransactionOutOfOrderException
    *   If a Drupal Transaction with the specified name does not exist.
    * @throws \Drupal\Core\Database\TransactionCommitFailedException
@@ -99,6 +101,8 @@ interface TransactionManagerInterface {
    * @param string $id
    *   The id of the transaction.
    *
+   * @throws \Drupal\Core\Database\TransactionNoActiveException
+   *   When there is no client transaction active.
    * @throws \Drupal\Core\Database\TransactionOutOfOrderException
    *   If a Drupal Transaction with the specified name does not exist.
    * @throws \Drupal\Core\Database\TransactionCommitFailedException
@@ -124,7 +128,7 @@ interface TransactionManagerInterface {
    *   The id of the transaction.
    *
    * @throws \Drupal\Core\Database\TransactionNoActiveException
-   *   If there is no active client connection.
+   *   When there is no client transaction active.
    * @throws \Drupal\Core\Database\TransactionOutOfOrderException
    *   If the order of rollback is not in reverse sequence against the pushes
    *   to the stack.
@@ -146,7 +150,7 @@ interface TransactionManagerInterface {
   public function voidClientTransaction(): void;
 
   /**
-   * Handles automatic commit occurred upon execution of a DDL statement.
+   * Manages the occurence of an automatic commit.
    *
    * In some cases the active transaction is automatically committed by the
    * database server when a DDL statement is executed during a transaction
