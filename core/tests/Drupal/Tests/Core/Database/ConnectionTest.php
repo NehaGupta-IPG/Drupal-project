@@ -722,7 +722,12 @@ class ConnectionTest extends UnitTestCase {
     $mock_builder = $this->getMockBuilder(StubConnection::class);
     $connection = $mock_builder
       ->onlyMethods(['getDebugBacktrace', 'getConnectionOptions'])
-      ->setConstructorArgs([$this->createMock(StubPDO::class), [], ['', ''], $this->createMock(EventDispatcherFactoryInterface::class)])
+      ->setConstructorArgs([
+        $this->createStub(StubPDO::class),
+        [],
+        ['', ''],
+        $this->createStub(EventDispatcherFactoryInterface::class)
+      ])
       ->getMock();
     $connection->expects($this->once())
       ->method('getConnectionOptions')
