@@ -89,6 +89,12 @@
       return;
     }
 
+    const contentType = (detail.xhr.getResponseHeader('Content-Type') || '').split(';', 1)[0].trim();
+    if (contentType === 'application/json' || contentType === 'application/xml') {
+      // No assets to load on JSON or XML responses.
+      return;
+    }
+
     // We need to parse the response to find all the assets to load.
     // htmx cleans up too many things to be able to rely on their dom fragment.
     let responseHTML = Document.parseHTMLUnsafe(detail.serverResponse);
