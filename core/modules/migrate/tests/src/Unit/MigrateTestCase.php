@@ -116,7 +116,7 @@ abstract class MigrateTestCase extends UnitTestCase {
     if (extension_loaded('pdo_sqlite')) {
       $connection_options['database'] = ':memory:';
       $pdo = Connection::open($connection_options);
-      $connection = new Connection($pdo, $connection_options, $this->createMock(EventDispatcherFactoryInterface::class));
+      $connection = new Connection($pdo, $connection_options, $this->createStub(EventDispatcherFactoryInterface::class));
     }
     else {
       $this->markTestSkipped('The pdo_sqlite extension is not available.');

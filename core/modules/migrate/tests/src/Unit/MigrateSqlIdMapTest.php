@@ -1018,7 +1018,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
       'prefix' => 'prefix',
     ];
     $pdo = Connection::open($connection_options);
-    $this->database = new Connection($pdo, $connection_options, $this->createMock(EventDispatcherFactoryInterface::class));
+    $this->database = new Connection($pdo, $connection_options, $this->createStub(EventDispatcherFactoryInterface::class));
     $qualified_map_table = $this->getIdMap()->getQualifiedMapTableName();
     // The SQLite driver is a special flower. It will prefix tables with
     // PREFIX.TABLE, instead of the standard PREFIXTABLE.

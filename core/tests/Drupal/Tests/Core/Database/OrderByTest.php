@@ -32,7 +32,7 @@ class OrderByTest extends UnitTestCase {
     parent::setUp();
 
     $mockPdo = $this->createMock(StubPDO::class);
-    $connection = new StubConnection($mockPdo, [], ['', ''], $this->createMock(EventDispatcherFactoryInterface::class));
+    $connection = new StubConnection($mockPdo, [], ['', ''], $this->createStub(EventDispatcherFactoryInterface::class));
     $this->query = new Select($connection, 'test', NULL);
   }
 

@@ -42,7 +42,7 @@ class DatabaseEventsTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->connection = new StubConnection($this->createMock(StubPDO::class), [], ['', ''], new EventDispatcherFactory());
+    $this->connection = new StubConnection($this->createStub(StubPDO::class), [], ['', ''], new EventDispatcherFactory());
   }
 
   /**

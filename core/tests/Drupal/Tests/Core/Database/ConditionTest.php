@@ -236,13 +236,13 @@ class ConditionTest extends UnitTestCase {
    */
   public function testContribCondition(): void {
     $connection = new StubConnection(
-      $this->createMock(StubPDO::class),
+      $this->createStub(StubPDO::class),
       [
         'namespace' => 'Drupal\mock\Driver\Database\mock',
         'prefix' => '',
       ],
       ['', ''],
-      $this->createMock(EventDispatcherFactoryInterface::class),
+      $this->createStub(EventDispatcherFactoryInterface::class),
     );
     $condition = $connection->condition('AND');
     $this->assertSame(StubCondition::class, get_class($condition));
