@@ -333,13 +333,13 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $field->save();
 
     // Create nodes with different tags.
-    $node1 = $this->createNode([
+    $this->createNode([
       'title' => 'Node with Term 1',
       'type' => 'page',
       'field_tags' => [$term1->id()],
     ]);
 
-    $node2 = $this->createNode([
+    $this->createNode([
       'title' => 'Node with Term 2',
       'type' => 'page',
       'field_tags' => [$term2->id()],

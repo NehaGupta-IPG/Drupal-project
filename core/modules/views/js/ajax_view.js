@@ -88,7 +88,7 @@
       // Remove current exposed filters. Collect all form input/select names
       // from the exposed form to identify params to remove.
       const formInputNames = new Set();
-      this.$exposed_form.find('input, select, textarea').each(function() {
+      this.$exposed_form.find('input, select, textarea').each(function () {
         const inputName = $(this).attr('name');
         if (inputName) {
           formInputNames.add(inputName);
@@ -106,8 +106,8 @@
           // Extract base parameter name without array indices (e.g. [0]).
           const baseParamName = name.replace(/\[\d+\]$/, '');
           // Check if this parameter matches any form input.
-          const matchesFormInput = formInputNames.has(name) ||
-                                    formInputNames.has(baseParamName);
+          const matchesFormInput =
+            formInputNames.has(name) || formInputNames.has(baseParamName);
           return (
             !matchesFormInput &&
             /*
