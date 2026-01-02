@@ -12,12 +12,15 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the constraint used to enforce untranslatable fields as read-only.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
 
   const LANGCODE = 'de';
@@ -62,9 +65,8 @@ class EntityUntranslatableFieldsConstraintTest extends EntityKernelTestBase {
 
   /**
    * Ensure empty fields with a default value are not changed when translating.
-   *
-   * @dataProvider accessValues
    */
+  #[DataProvider('accessValues')]
   public function testEntityUntranslatableFieldsConstraint(bool $access): void {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->storage->create([
