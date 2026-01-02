@@ -11,7 +11,6 @@ use Drupal\Component\Render\MarkupInterface;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\Group;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
-use Drupal\views\Plugin\views\field\FieldPluginBase;
 
 /**
  * Tests FieldPluginBase::renderText() with NULL values.
@@ -87,7 +86,7 @@ class FieldPluginBaseTest extends ViewsKernelTestBase {
   /**
    * Tests renderText() with NULL, empty string, non-empty string, and Markup.
    */
-  public function testRenderTextWithNullAndStrings() {
+  public function testRenderTextWithNullAndStrings(): void {
     // NULL value should become empty string.
     $this->handler->last_render = NULL;
     $this->assertSame('', $this->handler->renderText([]));
