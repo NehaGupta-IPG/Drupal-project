@@ -7,6 +7,7 @@ namespace Drupal\Tests\migrate\Unit\destination;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
@@ -16,41 +17,59 @@ use Drupal\migrate\Plugin\migrate\destination\EntityRevision as RealEntityRevisi
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * Tests entity revision destination.
- *
- * @group migrate
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\destination\EntityRevision
  */
+#[CoversClass(RealEntityRevision::class)]
+#[Group('migrate')]
 class EntityRevisionTest extends UnitTestCase {
 
   /**
+   * The migration.
+   *
    * @var \Drupal\migrate\Plugin\MigrationInterface
    */
   protected MigrationInterface $migration;
 
   /**
+   * The destination storage.
+   *
    * @var \Prophecy\Prophecy\ObjectProphecy
    */
   protected ObjectProphecy $storage;
 
   /**
+   * The entity field manager.
+   *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
+   * The field type manager.
+   *
    * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
    */
   protected FieldTypePluginManagerInterface $fieldTypeManager;
 
   /**
+   * The account switcher.
+   *
    * @var \Drupal\Core\Session\AccountSwitcherInterface
    */
   protected AccountSwitcherInterface $accountSwitcher;
+
+  /**
+   * The entity type bundle information.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected EntityTypeBundleInfoInterface $entityTypeBundle;
 
   /**
    * {@inheritdoc}
@@ -72,12 +91,13 @@ class EntityRevisionTest extends UnitTestCase {
     $this->entityFieldManager = $this->prophesize(EntityFieldManagerInterface::class)->reveal();
     $this->fieldTypeManager = $this->prophesize(FieldTypePluginManagerInterface::class)->reveal();
     $this->accountSwitcher = $this->prophesize(AccountSwitcherInterface::class)->reveal();
+    $this->entityTypeBundle = $this->prophesize(EntityTypeBundleInfoInterface::class)->reveal();
   }
 
   /**
    * Tests that passed old destination values are used by default.
    *
-   * @covers ::getEntity
+   * @legacy-covers ::getEntity
    */
   public function testGetEntityDestinationValues(): void {
     $destination = $this->getEntityRevisionDestination([]);
@@ -95,7 +115,7 @@ class EntityRevisionTest extends UnitTestCase {
   /**
    * Tests that revision updates update.
    *
-   * @covers ::getEntity
+   * @legacy-covers ::getEntity
    */
   public function testGetEntityUpdateRevision(): void {
     $destination = $this->getEntityRevisionDestination([]);
@@ -107,7 +127,7 @@ class EntityRevisionTest extends UnitTestCase {
       ->willReturn($entity->reveal());
     // Make sure its set as an update and not the default revision.
     $entity->setNewRevision(FALSE)->shouldBeCalled();
-    $entity->isDefaultRevision(FALSE)->shouldBeCalled();
+    $entity->isDefaultRevision()->shouldNotBeCalled();
 
     $row = new Row(['nid' => 1, 'vid' => 2], ['nid' => 1, 'vid' => 2]);
     $row->setDestinationProperty('vid', 2);
@@ -117,7 +137,7 @@ class EntityRevisionTest extends UnitTestCase {
   /**
    * Tests that new revisions are flagged to be written as new.
    *
-   * @covers ::getEntity
+   * @legacy-covers ::getEntity
    */
   public function testGetEntityNewRevision(): void {
     $destination = $this->getEntityRevisionDestination([]);
@@ -142,7 +162,7 @@ class EntityRevisionTest extends UnitTestCase {
   /**
    * Tests entity load failure.
    *
-   * @covers ::getEntity
+   * @legacy-covers ::getEntity
    */
   public function testGetEntityLoadFailure(): void {
     $destination = $this->getEntityRevisionDestination([]);
@@ -160,7 +180,7 @@ class EntityRevisionTest extends UnitTestCase {
   /**
    * Tests entity revision save.
    *
-   * @covers ::save
+   * @legacy-covers ::save
    */
   public function testSave(): void {
     $entity = $this->prophesize(ContentEntityInterface::class);
@@ -199,6 +219,7 @@ class EntityRevisionTest extends UnitTestCase {
       $this->entityFieldManager,
       $this->fieldTypeManager,
       $this->accountSwitcher,
+      $this->entityTypeBundle,
     );
   }
 

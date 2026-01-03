@@ -10,12 +10,18 @@ use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Event\StatusCheckEvent;
 use Drupal\package_manager\ValidationResult;
 use Drupal\package_manager\Validator\EnvironmentSupportValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\package_manager\Validator\EnvironmentSupportValidator
- * @group package_manager
+ * Tests Environment Support Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[CoversClass(EnvironmentSupportValidator::class)]
+#[RunTestsInSeparateProcesses]
 class EnvironmentSupportValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;
@@ -30,7 +36,12 @@ class EnvironmentSupportValidatorTest extends PackageManagerKernelTestBase {
       $this->t('Package Manager is not supported by your environment.'),
     ]);
     foreach ([PreCreateEvent::class, StatusCheckEvent::class] as $event_class) {
-      $this->assertEventPropagationStopped($event_class, [$this->container->get(EnvironmentSupportValidator::class), 'validate']);
+      $this->assertEventPropagationStopped(
+        $event_class,
+        [
+          $this->container->get(EnvironmentSupportValidator::class),
+          'validate',
+        ]);
     }
     $this->assertStatusCheckResults([$result]);
     $this->assertResults([$result], PreCreateEvent::class);
@@ -48,7 +59,9 @@ class EnvironmentSupportValidatorTest extends PackageManagerKernelTestBase {
       $this->t('Package Manager is not supported by your environment.'),
     ]);
 
-    $this->assertEventPropagationStopped(PreApplyEvent::class, [$this->container->get(EnvironmentSupportValidator::class), 'validate']);
+    $this->assertEventPropagationStopped(
+      PreApplyEvent::class,
+      [$this->container->get(EnvironmentSupportValidator::class), 'validate']);
     $this->assertResults([$result], PreApplyEvent::class);
   }
 

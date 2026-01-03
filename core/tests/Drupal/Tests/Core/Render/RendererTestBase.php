@@ -292,7 +292,9 @@ abstract class RendererTestBase extends UnitTestCase {
 class PlaceholdersTest implements TrustedCallbackInterface {
 
   /**
-   * #lazy_builder callback; attaches setting, generates markup.
+   * Render API callback: Attaches setting and generates markup.
+   *
+   * This function is assigned as an #lazy_builder callback.
    *
    * @param string $animal
    *   An animal.
@@ -303,7 +305,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return array
    *   A renderable array.
    */
-  public static function callback($animal, $use_animal_as_array_key = FALSE) {
+  public static function callback($animal, $use_animal_as_array_key = FALSE): array {
     $value = $animal;
     if ($use_animal_as_array_key) {
       $value = [$animal => TRUE];
@@ -319,7 +321,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; attaches setting, generates markup, user-specific.
+   * The #lazy_builder callback; attaches setting, generates markup, user-specific.
    *
    * @param string $animal
    *   An animal.
@@ -339,7 +341,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
   }
 
   /**
-   * #lazy_builder callback; attaches setting, generates markup, cache tag.
+   * The #lazy_builder callback; attaches setting, generates markup, cache tag.
    *
    * @param string $animal
    *   An animal.
@@ -359,14 +361,14 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return bool
    *   TRUE, which is not a valid return value for a lazy builder.
    */
-  public static function callbackNonArrayReturn() {
+  public static function callbackNonArrayReturn(): bool {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['callbackTagCurrentTemperature', 'callbackPerUser', 'callback', 'callbackNonArrayReturn'];
   }
 

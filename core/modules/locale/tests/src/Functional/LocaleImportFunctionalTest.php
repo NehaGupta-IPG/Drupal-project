@@ -10,15 +10,16 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore chien chiens deutsch januari lundi montag moutons műveletek
-// cspell:ignore svibanj räme
-
+// cspell:ignore svibanj svib räme
 /**
  * Tests the import of locale files.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleImportFunctionalTest extends BrowserTestBase {
 
   use StringTranslationTrait;
@@ -122,7 +123,7 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
 
     $this->assertSession()->pageTextContains("2 translation strings were skipped because of disallowed or malformed HTML. See the log for details.");
 
-    // Check empty files import with a user that cannot access site reports..
+    // Check empty files import with a user that cannot access site reports.
     $this->drupalLogin($this->adminUser);
     // Try importing a zero byte sized .po file.
     $this->importPoFile($this->getEmptyPoFile(), [
@@ -270,7 +271,14 @@ class LocaleImportFunctionalTest extends BrowserTestBase {
     // We cast the return value of t() to string so as to retrieve the
     // translated value, rendered as a string.
     $this->assertSame('Svibanj', (string) $this->t('May', [], ['langcode' => 'hr', 'context' => 'Long month name']), 'Long month name context is working.');
+    $this->assertSame('Svib.', (string) $this->t('May', [], ['langcode' => 'hr', 'context' => 'Abbreviated month name']), 'Abbreviated month name context is working.');
     $this->assertSame('Svi.', (string) $this->t('May', [], ['langcode' => 'hr']), 'Default context is working.');
+    $this->assertSame('sv', (string) $this->t('st', [], ['langcode' => 'hr']), 'Default context for "saint" is working.');
+    $this->assertSame('.', (string) $this->t('st', [], ['langcode' => 'hr', 'context' => 'Day ordinal suffix']), 'Day ordinal suffix context is working.');
+
+    // Ensure that the date formatter applies the right translation context.
+    $formatted_date = $this->container->get('date.formatter')->format(483820620, 'custom', 'jS F Y', 'America/New_York', 'hr');
+    $this->assertEquals('1. Svibanj 1985', $formatted_date, 'Got the right formatted date using the date format translation pattern.');
   }
 
   /**
@@ -596,8 +604,19 @@ msgctxt "Long month name"
 msgid "May"
 msgstr "Svibanj"
 
+msgctxt "Abbreviated month name"
+msgid "May"
+msgstr "Svib."
+
 msgid "May"
 msgstr "Svi."
+
+msgctxt "Day ordinal suffix"
+msgid "st"
+msgstr "."
+
+msgid "st"
+msgstr "sv"
 EOF;
   }
 
