@@ -74,7 +74,8 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
       $this->translateEnglish = \Drupal::getContainer()->getParameter('language.translate_english');
     }
     if ($this->getLanguageManager === NULL) {
-      @trigger_error('Not passing the language.translate_english parameter to LanguageConfigFactoryOverride::__construct() is deprecated in drupal:11.3.0 and it will be required in drupal::12.0.0. See https://www.drupal.org/project/drupal/issues/3518992');
+      // @fixme Set deprecation version.
+      @trigger_error('Not passing the getLanguageManager parameter to LanguageConfigFactoryOverride::__construct() is deprecated in drupal:XXXXXXX and it will be required in drupal::12.0.0. See https://www.drupal.org/project/drupal/issues/3518992');
       // @fixme Defer on serializable service closures https://www.drupal.org/i/3544994
       $this->getLanguageManager = fn() => \Drupal::service(LanguageManagerInterface::class);
     }
