@@ -40,14 +40,14 @@ class BlockVisibilityTest extends WebDriverTestBase {
    *
    * @var string
    */
-  const FIELD_UI_PREFIX = 'admin/structure/types/manage/bundle_with_section_field';
+  protected const FIELD_UI_PREFIX = 'admin/structure/types/manage/bundle_with_section_field';
 
   /**
    * CSS selector for the body field block.
    *
    * @var string
    */
-  const BODY_FIELDBLOCK_SELECTOR = '.block-field-blocknodebundle-with-section-fieldbody';
+  protected const BODY_FIELD_BLOCK_SELECTOR = '.block-field-blocknodebundle-with-section-fieldbody';
 
   /**
    * {@inheritdoc}
@@ -174,7 +174,7 @@ class BlockVisibilityTest extends WebDriverTestBase {
 
     // Confirm that editing an existing condition works.
     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default/layout');
-    $this->clickContextualLink(static::BODY_FIELDBLOCK_SELECTOR, 'Control visibility');
+    $this->clickContextualLink(static::BODY_FIELD_BLOCK_SELECTOR, 'Control visibility');
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas'));
     $page->clickLink('Edit');
@@ -195,7 +195,7 @@ class BlockVisibilityTest extends WebDriverTestBase {
     $page->findField('settings[pages]')->setValue('/node/2');
     $page->pressButton('Add condition');
     $assert_session->assertWaitOnAjaxRequest();
-    $this->clickContextualLink(static::BODY_FIELDBLOCK_SELECTOR, 'Control visibility');
+    $this->clickContextualLink(static::BODY_FIELD_BLOCK_SELECTOR, 'Control visibility');
     $assert_session->assertWaitOnAjaxRequest();
     $page->findField('operator')->setValue('or');
     $page->pressButton('Update operator');
@@ -251,7 +251,7 @@ class BlockVisibilityTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
 
     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default/layout');
-    $this->clickContextualLink(static::BODY_FIELDBLOCK_SELECTOR, 'Control visibility');
+    $this->clickContextualLink(static::BODY_FIELD_BLOCK_SELECTOR, 'Control visibility');
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas'));
     $page->pressButton('Add a visibility condition');
@@ -268,7 +268,7 @@ class BlockVisibilityTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
 
     $this->drupalGet(static::FIELD_UI_PREFIX . '/display/default/layout');
-    $this->clickContextualLink(static::BODY_FIELDBLOCK_SELECTOR, 'Control visibility');
+    $this->clickContextualLink(static::BODY_FIELD_BLOCK_SELECTOR, 'Control visibility');
     $assert_session->assertWaitOnAjaxRequest();
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-off-canvas'));
     $page->clickLink('Delete');
@@ -278,7 +278,7 @@ class BlockVisibilityTest extends WebDriverTestBase {
     $assert_session->assertWaitOnAjaxRequest();
 
     // If multiple conditions present, this method will need to run again.
-    $this->clickContextualLink(static::BODY_FIELDBLOCK_SELECTOR, 'Control visibility');
+    $this->clickContextualLink(static::BODY_FIELD_BLOCK_SELECTOR, 'Control visibility');
     $assert_session->assertWaitOnAjaxRequest();
     $close_button = $assert_session->waitForElementVisible('css', '[title="Close"]');
     if ($page->hasLink('Delete')) {
