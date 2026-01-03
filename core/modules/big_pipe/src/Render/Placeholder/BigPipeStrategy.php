@@ -7,9 +7,10 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
-use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -67,10 +68,18 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
    */
   const NOJS_COOKIE = 'big_pipe_nojs';
 
-  public function __construct(protected SessionConfigurationInterface $sessionConfiguration, protected RequestStack $requestStack, protected RouteMatchInterface $routeMatch, protected ?ModuleHandlerInterface $moduleHandler = NULL) {
+  public function __construct(protected SessionConfigurationInterface $sessionConfiguration, protected RequestStack $requestStack, protected RouteMatchInterface $routeMatch, protected ?ModuleHandlerInterface $moduleHandler = NULL, protected ?RedirectDestinationInterface $redirectDestination = NULL, protected ?UrlGeneratorInterface $urlGenerator = NULL) {
     if (!isset($moduleHandler)) {
       trigger_error('Calling ' . __METHOD__ . ' without the module handler service is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3508508.');
       $this->moduleHandler = \Drupal::service('module_handler');
+    }
+    if (!isset($redirectDestination)) {
+      trigger_error('Calling ' . __METHOD__ . ' without the redirect destination service is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3508508.');
+      $this->moduleHandler = \Drupal::service('redirect.destination');
+    }
+    if (!isset($urlGenerator)) {
+      trigger_error('Calling ' . __METHOD__ . ' without the URL generator service is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3508508.');
+      $this->urlGenerator = \Drupal::service('url_generator');
     }
   }
 
@@ -138,17 +147,14 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       else {
         // If the current request/session doesn't have JavaScript, fall back to
         // no-JS BigPipe.
-        if ($this->requestStack->getCurrentRequest()->cookies->has(static::NOJS_COOKIE)) {
+        $has_big_pipe_nojs_cookie = $this->requestStack->getCurrentRequest()->cookies->has(static::NOJS_COOKIE);
+        if ($has_big_pipe_nojs_cookie) {
           $overridden_placeholders[$placeholder] = static::createBigPipeNoJsPlaceholder($placeholder, $placeholder_elements, FALSE);
         }
         else {
           $overridden_placeholders[$placeholder] = static::createBigPipeJsPlaceholder($placeholder, $placeholder_elements);
         }
         $overridden_placeholders[$placeholder]['#cache']['contexts'][] = 'cookies:' . static::NOJS_COOKIE;
-
-        $request = $this->requestStack->getCurrentRequest();
-        $has_big_pipe_nojs_cookie = $request->cookies->has(BigPipeStrategy::NOJS_COOKIE);
-
         if (!$has_big_pipe_nojs_cookie) {
           // Let server set the BigPipe no-JS cookie.
           // Redirect through a 'Refresh' meta tag if JavaScript is disabled.
@@ -158,9 +164,9 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
               '#noscript' => TRUE,
               '#attributes' => [
                 'http-equiv' => 'Refresh',
-                'content' => '0; URL=' . Url::fromRoute('big_pipe.nojs', [], [
-                  'query' => \Drupal::service('redirect.destination')->getAsArray(),
-                ])->toString(),
+                'content' => '0; URL=' . $this->urlGenerator->generateFromRoute('big_pipe.nojs', [], [
+                  'query' => $this->redirectDestination->getAsArray(),
+                ]),
               ],
             ],
             'big_pipe_detect_nojs',

@@ -7,7 +7,9 @@ namespace Drupal\Tests\big_pipe\Unit\Render\Placeholder;
 use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\big_pipe_test\BigPipePlaceholderTestCases;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -52,7 +54,18 @@ class BigPipeStrategyTest extends UnitTestCase {
 
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $module_handler->moduleExists('dynamic_page_cache')->willReturn($dynamic_page_cache_installed);
-    $big_pipe_strategy = new BigPipeStrategy($session_configuration->reveal(), $request_stack->reveal(), $route_match->reveal(), $module_handler->reveal());
+    $redirect_destination = $this->prophesize(RedirectDestinationInterface::class);
+    $redirect_destination->get()
+      ->willReturn('/');
+    $redirect_destination->getAsArray()
+      ->willReturn(['destination' => '/']);
+    $url_generator = $this->prophesize(UrlGeneratorInterface::class);
+    $url_generator->generateFromRoute(
+     "big_pipe.nojs",
+        [],
+        ["query" => ["destination" => "/"]]
+    )->willReturn('/');
+    $big_pipe_strategy = new BigPipeStrategy($session_configuration->reveal(), $request_stack->reveal(), $route_match->reveal(), $module_handler->reveal(), $redirect_destination->reveal(), $url_generator->reveal());
     $processed_placeholders = $big_pipe_strategy->processPlaceholders($placeholders);
 
     if ($request->isMethodCacheable() && !$route_match_has_no_big_pipe_option) {
