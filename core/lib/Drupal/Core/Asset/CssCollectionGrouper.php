@@ -49,12 +49,10 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
       // be part of that HTML tag.
       switch ($item['type']) {
         case 'file':
-          // Group file items if their 'preprocess' flag is TRUE.
-          // Help ensure maximum reuse of aggregate files by only grouping
-          // together items that share the same 'group' value. The CSS optimizer
-          // adds inline 'media' statements for everything except 'print', so
-          // only vary groups based on that.
-          $group_keys = $item['preprocess'] ? [$item['type'], $item['group'], $item['media'] === 'print'] : FALSE;
+          // Group file items if their 'preprocess' flag is TRUE. The CSS
+          // optimizer adds inline 'media' statements for everything except
+          // 'print', so only vary groups based on that.
+          $group_keys = $item['preprocess'] ? [$item['type'], $item['media'] === 'print'] : FALSE;
           if ($item['unique_css_aggregate']) {
             $group_keys[] = $item['library'];
             $group_keys[] = $item['category'];
