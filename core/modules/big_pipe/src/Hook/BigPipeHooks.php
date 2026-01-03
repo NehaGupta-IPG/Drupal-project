@@ -48,8 +48,9 @@ class BigPipeHooks {
       return;
     }
     $request = \Drupal::request();
-    // BigPipe is only used when there is an actual session, so only add the
-    // no-JS detection when there actually is a session. @see
+    // BigPipe is only used when there is an actual session, or when
+    // dynamic_page_cache module is enabled, so only add the
+    // no-JS detection in either case. @see
     // \Drupal\big_pipe\Render\Placeholder\BigPipeStrategy.
     $session_exists = \Drupal::service('session_configuration')->hasSession($request);
     $page['#cache']['contexts'][] = 'session.exists';
@@ -57,7 +58,7 @@ class BigPipeHooks {
     // avoid endless redirect loops.
     $has_big_pipe_nojs_cookie = $request->cookies->has(BigPipeStrategy::NOJS_COOKIE);
     $page['#cache']['contexts'][] = 'cookies:' . BigPipeStrategy::NOJS_COOKIE;
-    if ($session_exists) {
+    if ($session_exists || \Drupal::moduleHandler()->moduleExists('dynamic_page_cache')) {
       if (!$has_big_pipe_nojs_cookie) {
         // Let server set the BigPipe no-JS cookie.
         $page['#attached']['html_head'][] = [
