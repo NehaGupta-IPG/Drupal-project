@@ -69,7 +69,7 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
 
   public function __construct(protected SessionConfigurationInterface $sessionConfiguration, protected RequestStack $requestStack, protected RouteMatchInterface $routeMatch, protected ?ModuleHandlerInterface $moduleHandler = NULL) {
     if (!isset($moduleHandler)) {
-      trigger_error('Calling ' . __METHOD__ . ' without the module handler service is deprecated in drupal:11.3.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3508508.');
+      trigger_error('Calling ' . __METHOD__ . ' without the module handler service is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3508508.');
       $this->moduleHandler = \Drupal::service('module_handler');
     }
   }
@@ -147,39 +147,34 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
         $overridden_placeholders[$placeholder]['#cache']['contexts'][] = 'cookies:' . static::NOJS_COOKIE;
 
         $request = $this->requestStack->getCurrentRequest();
-        $session_exists = \Drupal::service('session_configuration')->hasSession($request);
-        // Only do the no-JS detection while we don't know if there's no JS support:
-        // avoid endless redirect loops.
         $has_big_pipe_nojs_cookie = $request->cookies->has(BigPipeStrategy::NOJS_COOKIE);
 
-        if ($session_exists || \Drupal::moduleHandler()->moduleExists('dynamic_page_cache')) {
-          if (!$has_big_pipe_nojs_cookie) {
-            // Let server set the BigPipe no-JS cookie.
-            $overridden_placeholders[$placeholder]['#attached']['html_head'][] = [
-              [
-                // Redirect through a 'Refresh' meta tag if JavaScript is disabled.
-                '#tag' => 'meta',
-                '#noscript' => TRUE,
-                '#attributes' => [
-                  'http-equiv' => 'Refresh',
-                  'content' => '0; URL=' . Url::fromRoute('big_pipe.nojs', [], [
-                    'query' => \Drupal::service('redirect.destination')->getAsArray(),
-                  ])->toString(),
-                ],
+        if (!$has_big_pipe_nojs_cookie) {
+          // Let server set the BigPipe no-JS cookie.
+          // Redirect through a 'Refresh' meta tag if JavaScript is disabled.
+          $overridden_placeholders[$placeholder]['#attached']['html_head'][] = [
+            [
+              '#tag' => 'meta',
+              '#noscript' => TRUE,
+              '#attributes' => [
+                'http-equiv' => 'Refresh',
+                'content' => '0; URL=' . Url::fromRoute('big_pipe.nojs', [], [
+                  'query' => \Drupal::service('redirect.destination')->getAsArray(),
+                ])->toString(),
               ],
-              'big_pipe_detect_nojs',
-            ];
-          }
-          else {
-            // Let client delete the BigPipe no-JS cookie.
-            $overridden_placeholders[$placeholder]['#attached']['html_head'][] = [
-              [
-                '#tag' => 'script',
-                '#value' => 'document.cookie = "' . BigPipeStrategy::NOJS_COOKIE . '=1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"',
-              ],
-              'big_pipe_detect_js',
-            ];
-          }
+            ],
+            'big_pipe_detect_nojs',
+          ];
+        }
+        else {
+          // Let client delete the BigPipe no-JS cookie.
+          $overridden_placeholders[$placeholder]['#attached']['html_head'][] = [
+            [
+              '#tag' => 'script',
+              '#value' => 'document.cookie = "' . BigPipeStrategy::NOJS_COOKIE . '=1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"',
+            ],
+            'big_pipe_detect_js',
+          ];
         }
       }
     }

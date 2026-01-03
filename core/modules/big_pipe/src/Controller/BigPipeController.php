@@ -36,10 +36,9 @@ class BigPipeController {
   public function setNoJsCookie(Request $request) {
     // This controller may only be accessed when the browser does not support
     // JavaScript. It is accessed automatically when that's the case thanks to
-    // HtmlResponseBigPipeSubscriber. When this controller is executed, deny
-    // access when he no-JS cookie is already set: this indicates a redirect
-    // loop, since the cookie was already set, yet the user is executing this
-    // controller.
+    // BigPipePolicy. When this controller is executed, deny access when the
+    // no-JS cookie is already set: this indicates a redirect loop, since the
+    // cookie was already set, yet the user is executing this controller.
     if ($request->cookies->has(BigPipeStrategy::NOJS_COOKIE)) {
       throw new AccessDeniedHttpException();
     }

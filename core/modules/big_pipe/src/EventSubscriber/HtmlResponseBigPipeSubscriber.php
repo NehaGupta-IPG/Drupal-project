@@ -3,10 +3,8 @@
 namespace Drupal\big_pipe\EventSubscriber;
 
 use Drupal\Core\Render\HtmlResponse;
-use Drupal\Core\Url;
 use Drupal\big_pipe\Render\BigPipe;
 use Drupal\big_pipe\Render\BigPipeResponse;
-use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -91,42 +89,6 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
     // there is no point in sending this response using BigPipe.
     if (empty($attachments['big_pipe_placeholders']) && empty($attachments['big_pipe_nojs_placeholders'])) {
       return;
-    }
-
-    $request = $event->getRequest();
-    $session_exists = \Drupal::service('session_configuration')->hasSession($request);
-    // Only do the no-JS detection while we don't know if there's no JS support:
-    // avoid endless redirect loops.
-    $has_big_pipe_nojs_cookie = $request->cookies->has(BigPipeStrategy::NOJS_COOKIE);
-    $page['#cache']['contexts'][] = 'cookies:' . BigPipeStrategy::NOJS_COOKIE;
-    if ($session_exists || \Drupal::moduleHandler()->moduleExists('dynamic_page_cache')) {
-      if (!$has_big_pipe_nojs_cookie) {
-        // Let server set the BigPipe no-JS cookie.
-        $attachments['html_head'][] = [
-          [
-            // Redirect through a 'Refresh' meta tag if JavaScript is disabled.
-            '#tag' => 'meta',
-            '#noscript' => TRUE,
-            '#attributes' => [
-              'http-equiv' => 'Refresh',
-              'content' => '0; URL=' . Url::fromRoute('big_pipe.nojs', [], [
-                'query' => \Drupal::service('redirect.destination')->getAsArray(),
-              ])->toString(),
-            ],
-          ],
-          'big_pipe_detect_nojs',
-        ];
-      }
-      else {
-        // Let client delete the BigPipe no-JS cookie.
-        $attachments['html_head'][] = [
-          [
-            '#tag' => 'script',
-            '#value' => 'document.cookie = "' . BigPipeStrategy::NOJS_COOKIE . '=1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"',
-          ],
-          'big_pipe_detect_js',
-        ];
-      }
     }
 
     $response->setAttachments($attachments);
