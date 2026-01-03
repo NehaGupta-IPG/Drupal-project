@@ -77,7 +77,7 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         if ($item['media'] !== 'print') {
           $groups[$i]['media'] = 'all';
         }
-        unset($groups[$i]['data'], $groups[$i]['weight'], $groups[$i]['basename'], $groups[$i]['library']);
+        unset($groups[$i]['data'], $groups[$i]['weight'], $groups[$i]['basename'], $groups[$i]['library'], $groups[$i]['group']);
         $groups[$i]['items'] = [];
         $current_group_keys = $group_keys ?: NULL;
       }

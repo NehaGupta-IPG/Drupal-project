@@ -109,30 +109,21 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
 
     $groups = $this->grouper->group($css_assets);
 
-    $this->assertCount(5, $groups, "5 groups created.");
+    $this->assertCount(4, $groups, "4 groups created.");
 
     // Check group 1.
     $group = $groups[0];
-    $this->assertSame(-100, $group['group']);
     $this->assertSame('file', $group['type']);
     $this->assertSame('all', $group['media']);
     $this->assertTrue($group['preprocess']);
-    $this->assertCount(3, $group['items']);
+    $this->assertCount(4, $group['items']);
     $this->assertContainsEquals($css_assets['system.base.css'], $group['items']);
     $this->assertContainsEquals($css_assets['js.module.css'], $group['items']);
-
-    // Check group 2.
-    $group = $groups[1];
-    $this->assertSame(0, $group['group']);
-    $this->assertSame('file', $group['type']);
-    $this->assertSame('all', $group['media']);
-    $this->assertTrue($group['preprocess']);
-    $this->assertCount(1, $group['items']);
+    $this->assertContainsEquals($css_assets['jquery.ui.core.css'], $group['items']);
     $this->assertContainsEquals($css_assets['field.css'], $group['items']);
 
     // Check group 3.
-    $group = $groups[2];
-    $this->assertSame(0, $group['group']);
+    $group = $groups[1];
     $this->assertSame('external', $group['type']);
     $this->assertSame('all', $group['media']);
     $this->assertTrue($group['preprocess']);
@@ -140,8 +131,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
     $this->assertContainsEquals($css_assets['external.css'], $group['items']);
 
     // Check group 4.
-    $group = $groups[3];
-    $this->assertSame(100, $group['group']);
+    $group = $groups[2];
     $this->assertSame('file', $group['type']);
     $this->assertSame('all', $group['media']);
     $this->assertTrue($group['preprocess']);
@@ -149,8 +139,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
     $this->assertContainsEquals($css_assets['elements.css'], $group['items']);
 
     // Check group 5.
-    $group = $groups[4];
-    $this->assertSame(100, $group['group']);
+    $group = $groups[3];
     $this->assertSame('file', $group['type']);
     $this->assertSame('print', $group['media']);
     $this->assertTrue($group['preprocess']);
