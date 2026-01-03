@@ -23,13 +23,15 @@ use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
 use Drupal\layout_builder\EventSubscriber\SectionComponentVisibility;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Covers class responsible for section component visibility.
- *
- * @group layout_builder
- * @coversDefaultClass \Drupal\layout_builder\EventSubscriber\SectionComponentVisibility
  */
+#[CoversClass(SectionComponentVisibility::class)]
+#[Group('layout_builder')]
 class SectionComponentVisibilityTest extends UnitTestCase {
 
   /**
@@ -59,8 +61,6 @@ class SectionComponentVisibilityTest extends UnitTestCase {
 
   /**
    * Ensure that nothing happens when previewing.
-   *
-   * @covers ::onBuildRender
    */
   public function testOnBuildRenderPreview(): void {
     $subscriber = new SectionComponentVisibility(
@@ -79,8 +79,6 @@ class SectionComponentVisibilityTest extends UnitTestCase {
 
   /**
    * Ensure no conditions are applied when visibility isn't set.
-   *
-   * @covers ::onBuildRender
    */
   public function testOnBuildRenderNonPreviewEmpty(): void {
     $subscriber = new SectionComponentVisibility(
@@ -98,8 +96,6 @@ class SectionComponentVisibilityTest extends UnitTestCase {
 
   /**
    * Ensure no conditions are applied when visibility isn't set.
-   *
-   * @covers ::onBuildRender
    */
   public function testOnBuildRenderNonPreviewBadPlugin(): void {
     $subscriber = new SectionComponentVisibility(
@@ -124,8 +120,6 @@ class SectionComponentVisibilityTest extends UnitTestCase {
 
   /**
    * Ensure context aware plugins get their context applied.
-   *
-   * @covers ::onBuildRender
    */
   public function testOnBuildRenderNonPreviewResolveContextAware(): void {
     // Mock context aware plugin that will be used to assert we receive context.
@@ -179,10 +173,8 @@ class SectionComponentVisibilityTest extends UnitTestCase {
 
   /**
    * Ensure visibility plugins control event propagation.
-   *
-   * @covers ::onBuildRender
-   * @dataProvider buildRenderResolves
    */
+  #[DataProvider('buildRenderResolves')]
   public function testOnBuildRenderNonPreviewResolve($result, $context_results): void {
     $uuid_factory = new UuidFactory();
     $visibility_def = [];

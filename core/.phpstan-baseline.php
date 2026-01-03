@@ -21082,24 +21082,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutRestTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Test class Drupal\\\\Tests\\\\layout_builder\\\\FunctionalJavascript\\\\BlockVisibilityTest must have attribute \\\\PHPUnit\\\\Framework\\\\Attributes\\\\Group\\.$#',
-	'identifier' => 'testClass.missingAttribute.Group',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/FunctionalJavascript/BlockVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test class Drupal\\\\Tests\\\\layout_builder\\\\FunctionalJavascript\\\\BlockVisibilityTest must have attribute \\\\PHPUnit\\\\Framework\\\\Attributes\\\\RunInSeparateProcesses\\.$#',
-	'identifier' => 'testClass.missingAttribute.RunInSeparateProcesses',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/FunctionalJavascript/BlockVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test class Drupal\\\\Tests\\\\layout_builder\\\\FunctionalJavascript\\\\BlockVisibilityTest must not add annotation @group\\.$#',
-	'identifier' => 'testClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/FunctionalJavascript/BlockVisibilityTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\FunctionalJavascript\\\\ContextualLinksTest\\:\\:assertCacheContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -21278,60 +21260,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/DefaultsSectionStorageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test class Drupal\\\\Tests\\\\layout_builder\\\\Unit\\\\EventSubscriber\\\\SectionComponentVisibilityTest must have attribute \\\\PHPUnit\\\\Framework\\\\Attributes\\\\Group\\.$#',
-	'identifier' => 'testClass.missingAttribute.Group',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/EventSubscriber/SectionComponentVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test class Drupal\\\\Tests\\\\layout_builder\\\\Unit\\\\EventSubscriber\\\\SectionComponentVisibilityTest must not add annotation @coversDefaultClass\\.$#',
-	'identifier' => 'testClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/EventSubscriber/SectionComponentVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test class Drupal\\\\Tests\\\\layout_builder\\\\Unit\\\\EventSubscriber\\\\SectionComponentVisibilityTest must not add annotation @group\\.$#',
-	'identifier' => 'testClass.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/EventSubscriber/SectionComponentVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test method testOnBuildRenderNonPreviewBadPlugin must not add annotation @covers\\.$#',
-	'identifier' => 'testMethod.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/EventSubscriber/SectionComponentVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test method testOnBuildRenderNonPreviewEmpty must not add annotation @covers\\.$#',
-	'identifier' => 'testMethod.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/EventSubscriber/SectionComponentVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test method testOnBuildRenderNonPreviewResolve must not add annotation @covers\\.$#',
-	'identifier' => 'testMethod.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/EventSubscriber/SectionComponentVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test method testOnBuildRenderNonPreviewResolve must not add annotation @dataProvider\\.$#',
-	'identifier' => 'testMethod.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/EventSubscriber/SectionComponentVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test method testOnBuildRenderNonPreviewResolveContextAware must not add annotation @covers\\.$#',
-	'identifier' => 'testMethod.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/EventSubscriber/SectionComponentVisibilityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Test method testOnBuildRenderPreview must not add annotation @covers\\.$#',
-	'identifier' => 'testMethod.metadataForbidden',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/EventSubscriber/SectionComponentVisibilityTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Unit\\\\LayoutBuilderIsActiveCacheContextTest\\:\\:providerTestGetContext\\(\\) has no return type specified\\.$#',
