@@ -91,8 +91,6 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $response->setAttachments($attachments);
-
     $big_pipe_response = new BigPipeResponse($response);
     $big_pipe_response->setBigPipeService($this->getBigPipeService($event));
 
