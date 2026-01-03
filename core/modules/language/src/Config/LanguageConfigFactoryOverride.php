@@ -52,9 +52,6 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    */
   protected bool $isNegotiating = FALSE;
 
-  /**
-   * @param \Closure():\Drupal\Core\Language\LanguageManagerInterface|null $getLanguageManager
-   */
   public function __construct(
     protected StorageInterface $baseStorage,
     protected EventDispatcherInterface $eventDispatcher,
