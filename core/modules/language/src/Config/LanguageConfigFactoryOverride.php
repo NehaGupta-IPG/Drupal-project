@@ -85,10 +85,10 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    * Checks whether overrides should be loaded.
    */
   protected function shouldSkipOverrides(): bool {
-    return $this->getLanguage()
-      && $this->getLanguage()->getId() === 'en'
-      && $this->defaultLanguageValues['id'] === 'en'
-      && !$this->translateEnglish;
+    return $this->defaultLanguageValues['id'] === 'en'
+      && !$this->translateEnglish
+      && $this->getLanguage()
+      && $this->getLanguage()->getId() === 'en';
   }
 
   /**
