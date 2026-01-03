@@ -26,7 +26,7 @@ class BigPipeController {
    *   location.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-   *   Thrown when the no-JS cookie is already set or when there is no session.
+   *   Thrown when the no-JS cookie is already set.
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    *   Thrown when the original location is missing, i.e. when no 'destination'
    *   query argument is set.
@@ -36,12 +36,10 @@ class BigPipeController {
   public function setNoJsCookie(Request $request) {
     // This controller may only be accessed when the browser does not support
     // JavaScript. It is accessed automatically when that's the case thanks to
-    // big_pipe_page_attachments(). When this controller is executed, deny
-    // access when either:
-    // - the no-JS cookie is already set: this indicates a redirect loop, since
-    //   the cookie was already set, yet the user is executing this controller;
-    // - there is no session, in which case BigPipe is not enabled anyway, so it
-    //   is pointless to set this cookie.
+    // HtmlResponseBigPipeSubscriber. When this controller is executed, deny
+    // access when he no-JS cookie is already set: this indicates a redirect
+    // loop, since the cookie was already set, yet the user is executing this
+    // controller.
     if ($request->cookies->has(BigPipeStrategy::NOJS_COOKIE)) {
       throw new AccessDeniedHttpException();
     }

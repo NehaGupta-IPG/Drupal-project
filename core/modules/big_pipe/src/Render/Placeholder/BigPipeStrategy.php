@@ -9,6 +9,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -144,6 +145,42 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
           $overridden_placeholders[$placeholder] = static::createBigPipeJsPlaceholder($placeholder, $placeholder_elements);
         }
         $overridden_placeholders[$placeholder]['#cache']['contexts'][] = 'cookies:' . static::NOJS_COOKIE;
+
+        $request = $this->requestStack->getCurrentRequest();
+        $session_exists = \Drupal::service('session_configuration')->hasSession($request);
+        // Only do the no-JS detection while we don't know if there's no JS support:
+        // avoid endless redirect loops.
+        $has_big_pipe_nojs_cookie = $request->cookies->has(BigPipeStrategy::NOJS_COOKIE);
+
+        if ($session_exists || \Drupal::moduleHandler()->moduleExists('dynamic_page_cache')) {
+          if (!$has_big_pipe_nojs_cookie) {
+            // Let server set the BigPipe no-JS cookie.
+            $overridden_placeholders[$placeholder]['#attached']['html_head'][] = [
+              [
+                // Redirect through a 'Refresh' meta tag if JavaScript is disabled.
+                '#tag' => 'meta',
+                '#noscript' => TRUE,
+                '#attributes' => [
+                  'http-equiv' => 'Refresh',
+                  'content' => '0; URL=' . Url::fromRoute('big_pipe.nojs', [], [
+                    'query' => \Drupal::service('redirect.destination')->getAsArray(),
+                  ])->toString(),
+                ],
+              ],
+              'big_pipe_detect_nojs',
+            ];
+          }
+          else {
+            // Let client delete the BigPipe no-JS cookie.
+            $overridden_placeholders[$placeholder]['#attached']['html_head'][] = [
+              [
+                '#tag' => 'script',
+                '#value' => 'document.cookie = "' . BigPipeStrategy::NOJS_COOKIE . '=1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"',
+              ],
+              'big_pipe_detect_js',
+            ];
+          }
+        }
       }
     }
 
@@ -198,9 +235,6 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       '#suffix' => '</span>',
       '#cache' => [
         'max-age' => 0,
-        'contexts' => [
-          'session.exists',
-        ],
       ],
       '#attached' => [
         'library' => [
