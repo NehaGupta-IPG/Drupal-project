@@ -96,7 +96,7 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    */
   public function loadOverrides($names) {
     if ($this->getLanguage()) {
-      $storage = $this->getStorage($this->language->getId());
+      $storage = $this->getStorage($this->getLanguage()->getId());
       return $storage->readMultiple($names);
     }
     return [];
