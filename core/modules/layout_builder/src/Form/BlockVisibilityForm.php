@@ -2,12 +2,14 @@
 
 namespace Drupal\layout_builder\Form;
 
+use Drupal\block\BlockInterface;
 use Drupal\Core\Ajax\AjaxFormHelperTrait;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Executable\ExecutableManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\FilteredPluginManagerInterface;
 use Drupal\Core\Url;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
 use Drupal\layout_builder\Controller\LayoutRebuildTrait;
@@ -55,7 +57,11 @@ class BlockVisibilityForm extends FormBase {
   /**
    * Constructs a BlockVisibilityForm object.
    */
-  public function __construct(protected ExecutableManagerInterface $conditionManager, protected FormBuilderInterface $formBuilder, protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository) {
+  public function __construct(
+    protected ExecutableManagerInterface|FilteredPluginManagerInterface $conditionManager,
+    protected FormBuilderInterface $formBuilder,
+    protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository,
+  ) {
   }
 
   /**
@@ -266,13 +272,14 @@ class BlockVisibilityForm extends FormBase {
    *   The title for the block visibility form.
    */
   public function title(SectionStorageInterface $section_storage, int $delta, string $uuid): string {
-    $block_label = $section_storage
+    $block = $section_storage
       ->getSection($delta)
       ->getComponent($uuid)
-      ->getPlugin()
-      ->label();
+      ->getPlugin();
 
-    return $this->t('Configure visibility rules for the @block_label block', ['@block_label' => $block_label]);
+    assert($block instanceof BlockInterface);
+
+    return $this->t('Configure visibility rules for the @block_label block', ['@block_label' => $block->label()]);
   }
 
 }
