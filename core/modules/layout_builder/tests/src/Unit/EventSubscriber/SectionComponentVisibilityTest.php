@@ -91,8 +91,8 @@ class SectionComponentVisibilityTest extends UnitTestCase {
 
     $component = new SectionComponent('', 'top');
     $event->getComponent()->willReturn($component);
+    $event->stopPropagation()->shouldNotBeCalled();
     $subscriber->onBuildRender($event->reveal());
-    $this->assertFalse($event->isPropagationStopped());
   }
 
   /**
