@@ -29,7 +29,7 @@ class EntityType extends Plugin {
    *
    * @var string
    */
-  public $entity_type_class = 'Drupal\Core\Entity\EntityType';
+  public $entity_type_class = \Drupal\Core\Entity\EntityType::class;
 
   /**
    * The group machine name.

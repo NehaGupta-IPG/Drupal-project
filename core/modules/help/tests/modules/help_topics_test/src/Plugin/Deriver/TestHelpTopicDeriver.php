@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\help_topics_test\Plugin\Deriver;
 
+use Drupal\help_topics_test\Plugin\HelpTopic\TestHelpTopicPlugin;
 use Drupal\Component\Plugin\Derivative\DeriverInterface;
 
 /**
@@ -21,7 +22,7 @@ class TestHelpTopicDeriver implements DeriverInterface {
     $definitions[$id] = [
       'plugin_id' => $plugin_id,
       'id' => $plugin_id,
-      'class' => 'Drupal\\help_topics_test\\Plugin\\HelpTopic\\TestHelpTopicPlugin',
+      'class' => TestHelpTopicPlugin::class,
       'label' => 'Label for ' . $id,
       'body' => 'Body for ' . $id,
       'top_level' => TRUE,

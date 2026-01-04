@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\plugin_test\Plugin;
 
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\MockComplexContextBlock;
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\TypedDataStringBlock;
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserNameBlock;
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\MockLayoutBlockDeriver;
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\MockLayoutBlock;
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\MockMenuBlockDeriver;
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\MockMenuBlock;
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\Discovery\StaticDiscovery;
 use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
@@ -44,7 +52,7 @@ class MockBlockManager extends PluginManagerBase {
     $this->discovery->setDefinition('user_login', [
       'id' => 'user_login',
       'label' => $this->t('User login'),
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock',
+      'class' => MockUserLoginBlock::class,
     ]);
 
     // A plugin that requires derivatives: the menu block plugin. We do not want
@@ -55,14 +63,14 @@ class MockBlockManager extends PluginManagerBase {
     // base plugin, are available to the system.
     $this->discovery->setDefinition('menu', [
       'id' => 'menu',
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockMenuBlock',
-      'deriver' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockMenuBlockDeriver',
+      'class' => MockMenuBlock::class,
+      'deriver' => MockMenuBlockDeriver::class,
     ]);
     // A plugin defining itself as a derivative.
     $this->discovery->setDefinition('menu:foo', [
       'id' => 'menu',
       'label' => $this->t('Base label'),
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockMenuBlock',
+      'class' => MockMenuBlock::class,
     ]);
 
     // A block plugin that can optionally be derived: the layout block plugin.
@@ -74,8 +82,8 @@ class MockBlockManager extends PluginManagerBase {
     $this->discovery->setDefinition('layout', [
       'id' => 'layout',
       'label' => $this->t('Layout'),
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockLayoutBlock',
-      'deriver' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockLayoutBlockDeriver',
+      'class' => MockLayoutBlock::class,
+      'deriver' => MockLayoutBlockDeriver::class,
     ]);
 
     // A block plugin that requires context to function. This block requires a
@@ -83,7 +91,7 @@ class MockBlockManager extends PluginManagerBase {
     $this->discovery->setDefinition('user_name', [
       'id' => 'user_name',
       'label' => $this->t('User name'),
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserNameBlock',
+      'class' => MockUserNameBlock::class,
       'context_definitions' => [
         'user' => $this->createContextDefinition('entity:user', $this->t('User')),
       ],
@@ -93,7 +101,7 @@ class MockBlockManager extends PluginManagerBase {
     $this->discovery->setDefinition('user_name_optional', [
       'id' => 'user_name_optional',
       'label' => $this->t('User name optional'),
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserNameBlock',
+      'class' => MockUserNameBlock::class,
       'context_definitions' => [
         'user' => $this->createContextDefinition('entity:user', $this->t('User'), FALSE),
       ],
@@ -103,14 +111,14 @@ class MockBlockManager extends PluginManagerBase {
     $this->discovery->setDefinition('string_context', [
       'id' => 'string_context',
       'label' => $this->t('String typed data'),
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\TypedDataStringBlock',
+      'class' => TypedDataStringBlock::class,
     ]);
 
     // A complex context plugin that requires both a user and node for context.
     $this->discovery->setDefinition('complex_context', [
       'id' => 'complex_context',
       'label' => $this->t('Complex context'),
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockComplexContextBlock',
+      'class' => MockComplexContextBlock::class,
       'context_definitions' => [
         'user' => $this->createContextDefinition('entity:user', $this->t('User')),
         'node' => $this->createContextDefinition('entity:node', $this->t('Node')),

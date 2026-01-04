@@ -167,7 +167,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
    */
   public function getPluginDefinition() {
     $definition = [];
-    $definition['class'] = 'Drupal\menu_link_content\Plugin\Menu\MenuLinkContent';
+    $definition['class'] = \Drupal\menu_link_content\Plugin\Menu\MenuLinkContent::class;
     $definition['menu_name'] = $this->getMenuName();
 
     if ($url_object = $this->getUrlObject()) {
@@ -189,7 +189,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     $definition['weight'] = $this->getWeight();
     $definition['id'] = $this->getPluginId();
     $definition['metadata'] = ['entity_id' => $this->id()];
-    $definition['form_class'] = '\Drupal\menu_link_content\Form\MenuLinkContentForm';
+    $definition['form_class'] = MenuLinkContentForm::class;
     $definition['enabled'] = $this->isEnabled() ? 1 : 0;
     $definition['expanded'] = $this->isExpanded() ? 1 : 0;
     $definition['provider'] = 'menu_link_content';

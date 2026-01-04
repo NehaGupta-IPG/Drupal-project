@@ -27,7 +27,7 @@ class EntityType extends Plugin {
     public readonly ?TranslatableMarkup $label_collection = NULL,
     public readonly ?TranslatableMarkup $label_singular = NULL,
     public readonly ?TranslatableMarkup $label_plural = NULL,
-    public readonly string $entity_type_class = 'Drupal\Core\Entity\EntityType',
+    public readonly string $entity_type_class = \Drupal\Core\Entity\EntityType::class,
     public readonly string $group = 'default',
     public readonly TranslatableMarkup $group_label = new TranslatableMarkup('Other', [], ['context' => 'Entity type group']),
     public readonly bool $static_cache = TRUE,

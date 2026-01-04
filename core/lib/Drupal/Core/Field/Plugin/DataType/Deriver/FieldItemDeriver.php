@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Field\Plugin\DataType\Deriver;
 
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\TypedData\FieldItemDataDefinition;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -72,8 +74,8 @@ class FieldItemDeriver implements ContainerDeriverInterface {
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
     foreach ($this->fieldTypePluginManager->getDefinitions() as $plugin_id => $definition) {
-      $definition['definition_class'] = '\Drupal\Core\Field\TypedData\FieldItemDataDefinition';
-      $definition['list_definition_class'] = '\Drupal\Core\Field\BaseFieldDefinition';
+      $definition['definition_class'] = FieldItemDataDefinition::class;
+      $definition['list_definition_class'] = BaseFieldDefinition::class;
       $definition['unwrap_for_canonical_representation'] = FALSE;
       $this->derivatives[$plugin_id] = $definition;
     }

@@ -20,6 +20,7 @@
  * @link authorize Authorized operation helper functions @endlink
  */
 
+use Drupal\Core\FileTransfer\Form\FileTransferAuthorizeForm;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Url;
@@ -170,7 +171,7 @@ if ($is_allowed) {
     elseif (!$batch = batch_get()) {
       // We have a batch to process, show the filetransfer form.
       try {
-        $content = \Drupal::formBuilder()->getForm('Drupal\Core\FileTransfer\Form\FileTransferAuthorizeForm');
+        $content = \Drupal::formBuilder()->getForm(FileTransferAuthorizeForm::class);
       }
       catch (EnforcedResponseException $e) {
         $e->getResponse()->send();

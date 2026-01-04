@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Unit;
 
+use Drupal\layout_builder\Form\LayoutBuilderDisableForm;
+use Drupal\layout_builder\Form\DiscardLayoutChangesForm;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityType;
@@ -319,7 +321,7 @@ class DefaultsSectionStorageTest extends UnitTestCase {
           'bundle_key' => 'my_bundle_type',
           'section_storage_type' => 'defaults',
           'section_storage' => '',
-          '_form' => '\Drupal\layout_builder\Form\DiscardLayoutChangesForm',
+          '_form' => DiscardLayoutChangesForm::class,
         ],
         [
           '_field_ui_view_mode_access' => 'administer with_bundle_key display',
@@ -340,7 +342,7 @@ class DefaultsSectionStorageTest extends UnitTestCase {
           'bundle_key' => 'my_bundle_type',
           'section_storage_type' => 'defaults',
           'section_storage' => '',
-          '_form' => '\Drupal\layout_builder\Form\LayoutBuilderDisableForm',
+          '_form' => LayoutBuilderDisableForm::class,
         ],
         [
           '_field_ui_view_mode_access' => 'administer with_bundle_key display',
@@ -379,7 +381,7 @@ class DefaultsSectionStorageTest extends UnitTestCase {
           'entity_type_id' => 'with_bundle_parameter',
           'section_storage_type' => 'defaults',
           'section_storage' => '',
-          '_form' => '\Drupal\layout_builder\Form\DiscardLayoutChangesForm',
+          '_form' => DiscardLayoutChangesForm::class,
         ],
         [
           '_field_ui_view_mode_access' => 'administer with_bundle_parameter display',
@@ -399,7 +401,7 @@ class DefaultsSectionStorageTest extends UnitTestCase {
           'entity_type_id' => 'with_bundle_parameter',
           'section_storage_type' => 'defaults',
           'section_storage' => '',
-          '_form' => '\Drupal\layout_builder\Form\LayoutBuilderDisableForm',
+          '_form' => LayoutBuilderDisableForm::class,
         ],
         [
           '_field_ui_view_mode_access' => 'administer with_bundle_parameter display',

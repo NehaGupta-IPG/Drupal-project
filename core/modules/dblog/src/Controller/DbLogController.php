@@ -2,6 +2,7 @@
 
 namespace Drupal\dblog\Controller;
 
+use Drupal\dblog\Form\DblogFilterForm;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
@@ -111,7 +112,7 @@ class DbLogController extends ControllerBase {
 
     $this->moduleHandler()->loadInclude('dblog', 'admin.inc');
 
-    $build['dblog_filter_form'] = $this->formBuilder()->getForm('Drupal\dblog\Form\DblogFilterForm');
+    $build['dblog_filter_form'] = $this->formBuilder()->getForm(DblogFilterForm::class);
 
     $header = [
       // Icon column.

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Unit\Views\Argument;
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\UnitTestCase;
@@ -35,7 +37,7 @@ class RolesRidTest extends UnitTestCase {
     ], 'user_role');
 
     // Creates a stub entity storage.
-    $role_storage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');
+    $role_storage = $this->createMock(EntityStorageInterface::class);
     $role_storage->expects($this->any())
       ->method('loadMultiple')
       ->willReturnMap([
@@ -47,7 +49,7 @@ class RolesRidTest extends UnitTestCase {
         ],
       ]);
 
-    $entity_type = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
+    $entity_type = $this->createMock(EntityTypeInterface::class);
     $entity_type->expects($this->any())
       ->method('getKey')
       ->with('label')

@@ -1055,12 +1055,12 @@ function hook_update_last_removed(): int {
 function hook_updater_info(): array {
   return [
     'module' => [
-      'class' => 'Drupal\Core\Updater\Module',
+      'class' => \Drupal\Core\Updater\Module::class,
       'name' => t('Update modules'),
       'weight' => 0,
     ],
     'theme' => [
-      'class' => 'Drupal\Core\Updater\Theme',
+      'class' => \Drupal\Core\Updater\Theme::class,
       'name' => t('Update themes'),
       'weight' => 0,
     ],

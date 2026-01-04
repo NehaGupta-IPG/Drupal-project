@@ -88,7 +88,7 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
     $this->setCacheBackend($cache, 'entity_type', ['entity_types']);
     $this->alterInfo('entity_type');
 
-    $this->discovery = new AttributeDiscoveryWithAnnotations($this->subdir, $this->namespaces, EntityType::class, 'Drupal\Core\Entity\Annotation\EntityType');
+    $this->discovery = new AttributeDiscoveryWithAnnotations($this->subdir, $this->namespaces, EntityType::class, \Drupal\Core\Entity\Annotation\EntityType::class);
     $this->stringTranslation = $string_translation;
     $this->classResolver = $class_resolver;
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;
@@ -276,7 +276,7 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    * {@inheritdoc}
    */
   public function createHandlerInstance($class, ?EntityTypeInterface $definition = NULL) {
-    if (is_subclass_of($class, 'Drupal\Core\Entity\EntityHandlerInterface')) {
+    if (is_subclass_of($class, EntityHandlerInterface::class)) {
       $handler = $class::createInstance($this->container, $definition);
     }
     else {

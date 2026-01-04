@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\DependencyInjection\Compiler;
 
+use Drupal\Core\Session\SuperUserAccessPolicy;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -16,7 +17,7 @@ class SuperUserAccessPolicyPass implements CompilerPassInterface {
   public function process(ContainerBuilder $container): void {
     if ($container->getParameter('security.enable_super_user') === FALSE) {
       $container->removeDefinition('access_policy.super_user');
-      $container->removeAlias('Drupal\Core\Session\SuperUserAccessPolicy');
+      $container->removeAlias(SuperUserAccessPolicy::class);
     }
   }
 

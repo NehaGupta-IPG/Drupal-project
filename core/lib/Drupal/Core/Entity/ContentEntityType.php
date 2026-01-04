@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+
 /**
  * Provides an implementation of a content entity type and its metadata.
  */
@@ -22,8 +24,8 @@ class ContentEntityType extends EntityType implements ContentEntityTypeInterface
     parent::__construct($definition);
 
     $this->handlers += [
-      'storage' => 'Drupal\Core\Entity\Sql\SqlContentEntityStorage',
-      'view_builder' => 'Drupal\Core\Entity\EntityViewBuilder',
+      'storage' => SqlContentEntityStorage::class,
+      'view_builder' => EntityViewBuilder::class,
     ];
 
     $this->revision_metadata_keys += [

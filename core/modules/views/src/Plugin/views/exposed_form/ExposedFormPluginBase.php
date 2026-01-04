@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\exposed_form;
 
+use Drupal\views\Form\ViewsExposedForm;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormState;
@@ -131,7 +132,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       $form_state->set('ajax', TRUE);
     }
 
-    $form = \Drupal::formBuilder()->buildForm('\Drupal\views\Form\ViewsExposedForm', $form_state);
+    $form = \Drupal::formBuilder()->buildForm(ViewsExposedForm::class, $form_state);
     $errors = $form_state->getErrors();
 
     // If the exposed form had errors, do not build the view.

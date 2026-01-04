@@ -2,6 +2,7 @@
 
 namespace Drupal\Component\Annotation\Plugin\Discovery;
 
+use Drupal\Component\Annotation\Plugin;
 use Drupal\Component\Annotation\AnnotationInterface;
 use Drupal\Component\Annotation\Doctrine\AnnotationRegistry;
 use Drupal\Component\FileCache\FileCacheFactory;
@@ -69,7 +70,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
    * @param string[] $annotation_namespaces
    *   (optional) Additional namespaces to be scanned for annotation classes.
    */
-  public function __construct($plugin_namespaces = [], $plugin_definition_annotation_name = 'Drupal\Component\Annotation\Plugin', array $annotation_namespaces = []) {
+  public function __construct($plugin_namespaces = [], $plugin_definition_annotation_name = Plugin::class, array $annotation_namespaces = []) {
     $this->pluginNamespaces = $plugin_namespaces;
     $this->pluginDefinitionAnnotationName = $plugin_definition_annotation_name;
     $this->annotationNamespaces = $annotation_namespaces;

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Unit;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\comment\CommentManager;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -28,7 +32,7 @@ class CommentManagerTest extends UnitTestCase {
    */
   public function testGetFields(): void {
     // Set up a content entity type.
-    $entity_type = $this->createMock('Drupal\Core\Entity\ContentEntityTypeInterface');
+    $entity_type = $this->createMock(ContentEntityTypeInterface::class);
     $entity_type->expects($this->any())
       ->method('getClass')
       ->willReturn('Node');
@@ -56,9 +60,9 @@ class CommentManagerTest extends UnitTestCase {
 
     $comment_manager = new CommentManager(
       $entity_type_manager,
-      $this->createMock('Drupal\Core\Config\ConfigFactoryInterface'),
-      $this->createMock('Drupal\Core\StringTranslation\TranslationInterface'),
-      $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface'),
+      $this->createMock(ConfigFactoryInterface::class),
+      $this->createMock(TranslationInterface::class),
+      $this->createMock(ModuleHandlerInterface::class),
       $this->createMock(AccountInterface::class),
       $entity_field_manager,
       $this->prophesize(EntityDisplayRepositoryInterface::class)->reveal()

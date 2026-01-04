@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\locale\Unit;
 
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\locale\LocaleConfigManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
@@ -22,11 +25,11 @@ class LocaleBulkDeprecationTest extends UnitTestCase {
     parent::setUp();
 
     $container = new ContainerBuilder();
-    $container->set('locale.config_manager', $this->createMock('Drupal\locale\LocaleConfigManager'));
-    $language_manager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $container->set('locale.config_manager', $this->createMock(LocaleConfigManager::class));
+    $language_manager = $this->createMock(LanguageManagerInterface::class);
     $language_manager->expects($this->any())
       ->method('getDefaultLanguage')
-      ->willReturn($this->createMock('Drupal\Core\Language\LanguageInterface'));
+      ->willReturn($this->createMock(LanguageInterface::class));
     $container->set('language_manager', $language_manager);
 
     \Drupal::setContainer($container);

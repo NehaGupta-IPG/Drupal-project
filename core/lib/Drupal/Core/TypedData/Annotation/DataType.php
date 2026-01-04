@@ -2,6 +2,9 @@
 
 namespace Drupal\Core\TypedData\Annotation;
 
+use Drupal\Core\TypedData\ListDataDefinition;
+use Drupal\Core\TypedData\Plugin\DataType\ItemList;
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Component\Annotation\Plugin;
 
 /**
@@ -65,7 +68,7 @@ class DataType extends Plugin {
    *
    * @var string
    */
-  public $definition_class = '\Drupal\Core\TypedData\DataDefinition';
+  public $definition_class = DataDefinition::class;
 
   /**
    * The typed data class used for wrapping multiple data items of the type.
@@ -74,7 +77,7 @@ class DataType extends Plugin {
    *
    * @var string
    */
-  public $list_class = '\Drupal\Core\TypedData\Plugin\DataType\ItemList';
+  public $list_class = ItemList::class;
 
   /**
    * The definition class to use for defining a list of items of this type.
@@ -83,7 +86,7 @@ class DataType extends Plugin {
    *
    * @var string
    */
-  public $list_definition_class = '\Drupal\Core\TypedData\ListDataDefinition';
+  public $list_definition_class = ListDataDefinition::class;
 
   /**
    * An array of validation constraints for this type.

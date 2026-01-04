@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\migrate\Plugin\Discovery;
 
+use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser as BaseStaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\ClassFinder\ClassFinder;
@@ -26,8 +27,8 @@ class AttributeDiscoveryWithAnnotationsAutomatedProviders extends AttributeDisco
   public function __construct(
     string $subdir,
     \Traversable $rootNamespaces,
-    string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
-    string $pluginDefinitionAnnotationName = 'Drupal\Component\Annotation\Plugin',
+    string $pluginDefinitionAttributeName = Plugin::class,
+    string $pluginDefinitionAnnotationName = \Drupal\Component\Annotation\Plugin::class,
     array $additionalNamespaces = [],
   ) {
     parent::__construct($subdir, $rootNamespaces, $pluginDefinitionAttributeName, $pluginDefinitionAnnotationName, $additionalNamespaces);

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Plugin\Discovery;
 
+use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Component\Annotation\AnnotationInterface;
 use Drupal\Component\Annotation\Doctrine\AnnotationRegistry;
 use Drupal\Component\Annotation\Doctrine\SimpleAnnotationReader;
@@ -43,8 +44,8 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
   public function __construct(
     string $subdir,
     \Traversable $rootNamespaces,
-    string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
-    protected readonly string $pluginDefinitionAnnotationName = 'Drupal\Component\Annotation\Plugin',
+    string $pluginDefinitionAttributeName = Plugin::class,
+    protected readonly string $pluginDefinitionAnnotationName = \Drupal\Component\Annotation\Plugin::class,
     protected readonly array $additionalNamespaces = [],
   ) {
     parent::__construct($subdir, $rootNamespaces, $pluginDefinitionAttributeName);

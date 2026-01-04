@@ -2,6 +2,7 @@
 
 namespace Drupal\Component\Plugin\Discovery;
 
+use Drupal\Component\Plugin\Derivative\DeriverInterface;
 use Drupal\Component\Plugin\Definition\DerivablePluginDefinitionInterface;
 use Drupal\Component\Plugin\Exception\InvalidDeriverException;
 
@@ -217,7 +218,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
       if (!class_exists($class)) {
         throw new InvalidDeriverException(sprintf('Plugin (%s) deriver "%s" does not exist.', $id, $class));
       }
-      if (!is_subclass_of($class, '\Drupal\Component\Plugin\Derivative\DeriverInterface')) {
+      if (!is_subclass_of($class, DeriverInterface::class)) {
         throw new InvalidDeriverException(sprintf('Plugin (%s) deriver "%s" must implement \Drupal\Component\Plugin\Derivative\DeriverInterface.', $id, $class));
       }
     }

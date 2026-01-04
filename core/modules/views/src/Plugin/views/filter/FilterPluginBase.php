@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\filter;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormHelper;
@@ -919,7 +920,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
   protected function buildGroupSubmit($form, FormStateInterface $form_state) {
     $groups = [];
     $group_items = $form_state->getValue(['options', 'group_info', 'group_items']);
-    uasort($group_items, ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    uasort($group_items, [SortArray::class, 'sortByWeightElement']);
     // Filter out removed items.
 
     // Start from 1 to avoid problems with #default_value in the widget.

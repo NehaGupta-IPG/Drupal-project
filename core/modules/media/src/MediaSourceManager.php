@@ -24,7 +24,7 @@ class MediaSourceManager extends DefaultPluginManager {
    *   The module handler.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct('Plugin/media/Source', $namespaces, $module_handler, MediaSourceInterface::class, MediaSource::class, '\Drupal\media\Annotation\MediaSource');
+    parent::__construct('Plugin/media/Source', $namespaces, $module_handler, MediaSourceInterface::class, MediaSource::class, \Drupal\media\Annotation\MediaSource::class);
 
     $this->alterInfo('media_source_info');
     $this->setCacheBackend($cache_backend, 'media_source_plugins');

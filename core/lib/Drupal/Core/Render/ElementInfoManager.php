@@ -58,7 +58,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
     protected ThemeManagerInterface $themeManager,
   ) {
     $this->setCacheBackend($cache_backend, 'element_info');
-    parent::__construct('Element', $namespaces, $module_handler, ElementInterface::class, RenderElement::class, 'Drupal\Core\Render\Annotation\RenderElement');
+    parent::__construct('Element', $namespaces, $module_handler, ElementInterface::class, RenderElement::class, \Drupal\Core\Render\Annotation\RenderElement::class);
     $this->alterInfo('element_plugin');
   }
 

@@ -2,6 +2,8 @@
 
 namespace Drupal\field_ui\Routing;
 
+use Drupal\field_ui\Form\FieldStorageReuseForm;
+use Drupal\field_ui\Form\FieldStorageAddForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteSubscriberBase;
 use Drupal\Core\Routing\RoutingEvents;
@@ -120,7 +122,7 @@ class RouteSubscriber extends RouteSubscriberBase {
         $route = new Route(
           "$path/fields/add-field/{selected_field_type}/{display_as_group}",
           [
-            '_form' => '\Drupal\field_ui\Form\FieldStorageAddForm',
+            '_form' => FieldStorageAddForm::class,
             '_title' => 'Add Sub-field',
           ] + $defaults,
           ['_permission' => 'administer ' . $entity_type_id . ' fields'],
@@ -142,7 +144,7 @@ class RouteSubscriber extends RouteSubscriberBase {
         $route = new Route(
           "$path/fields/reuse",
           [
-            '_form' => '\Drupal\field_ui\Form\FieldStorageReuseForm',
+            '_form' => FieldStorageReuseForm::class,
             '_title' => 'Re-use an existing field',
           ] + $defaults,
           ['_field_ui_field_reuse_access' => 'administer ' . $entity_type_id . ' fields'],

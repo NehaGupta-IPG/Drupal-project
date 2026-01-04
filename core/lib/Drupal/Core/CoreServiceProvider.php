@@ -2,6 +2,9 @@
 
 namespace Drupal\Core;
 
+use Drupal\Component\Uuid\Com;
+use Drupal\Component\Uuid\Pecl;
+use Drupal\Core\StreamWrapper\PrivateStream;
 use Drupal\Core\Cache\Context\CacheContextsPass;
 use Drupal\Core\Cache\ListCacheBinsPass;
 use Drupal\Core\DependencyInjection\Compiler\AuthenticationProviderPass;
@@ -60,7 +63,7 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     // Only register the private file stream wrapper if a file path has been
     // set.
     if (Settings::get('file_private_path')) {
-      $container->register('stream_wrapper.private', 'Drupal\Core\StreamWrapper\PrivateStream')
+      $container->register('stream_wrapper.private', PrivateStream::class)
         ->addTag('stream_wrapper', ['scheme' => 'private']);
     }
 
@@ -155,11 +158,11 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     // implementation. The OSSP implementation is not compatible with the
     // PECL functions.
     if (function_exists('uuid_create') && !function_exists('uuid_make')) {
-      $uuid_service->setClass('Drupal\Component\Uuid\Pecl');
+      $uuid_service->setClass(Pecl::class);
     }
     // Try to use the COM implementation for Windows users.
     elseif (function_exists('com_create_guid')) {
-      $uuid_service->setClass('Drupal\Component\Uuid\Com');
+      $uuid_service->setClass(Com::class);
     }
   }
 

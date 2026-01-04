@@ -2,6 +2,12 @@
 
 namespace Drupal\Core\Installer;
 
+use Drupal\Core\Routing\NullMatcherDumper;
+use Drupal\Core\PathProcessor\NullPathProcessorManager;
+use Drupal\Core\Routing\NullGenerator;
+use Drupal\Core\KeyValueStore\KeyValueNullExpirableFactory;
+use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
+use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
@@ -23,27 +29,27 @@ class InstallerServiceProvider extends NormalInstallerServiceProvider implements
     // Inject the special configuration storage for the installer.
     // This special implementation MUST NOT be used anywhere else than the early
     // installer environment.
-    $container->register('config.storage', 'Drupal\Core\Config\InstallStorage');
+    $container->register('config.storage', InstallStorage::class);
 
     // Replace services with in-memory implementations.
     $container
-      ->register('keyvalue', 'Drupal\Core\KeyValueStore\KeyValueMemoryFactory');
+      ->register('keyvalue', KeyValueMemoryFactory::class);
     $container
-      ->register('keyvalue.expirable', 'Drupal\Core\KeyValueStore\KeyValueNullExpirableFactory');
+      ->register('keyvalue.expirable', KeyValueNullExpirableFactory::class);
 
     // Replace services with no-op implementations.
     $container
-      ->register('url_generator', 'Drupal\Core\Routing\NullGenerator')
+      ->register('url_generator', NullGenerator::class)
       ->addArgument(new Reference('request_stack'));
     $container
-      ->register('path_processor_manager', 'Drupal\Core\PathProcessor\NullPathProcessorManager');
+      ->register('path_processor_manager', NullPathProcessorManager::class);
     $container
-      ->register('router.dumper', 'Drupal\Core\Routing\NullMatcherDumper');
+      ->register('router.dumper', NullMatcherDumper::class);
 
     // Replace the route builder with an empty implementation.
     // @todo Convert installer steps into routes; add an installer.routing.yml.
     $definition = $container->getDefinition('router.builder');
-    $definition->setClass('Drupal\Core\Installer\InstallerRouteBuilder')
+    $definition->setClass(InstallerRouteBuilder::class)
       // The core router builder, but there is no reason here to be lazy, so
       // we don't need to ship with a custom proxy class.
       ->setLazy(FALSE);

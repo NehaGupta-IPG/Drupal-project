@@ -2,6 +2,7 @@
 
 namespace Drupal\node\Form;
 
+use Drupal\node\Entity\NodeType;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -81,7 +82,7 @@ class NodeTypeForm extends BundleEntityFormBase {
       '#maxlength' => EntityTypeInterface::BUNDLE_MAX_LENGTH,
       '#disabled' => $type->isLocked(),
       '#machine_name' => [
-        'exists' => ['Drupal\node\Entity\NodeType', 'load'],
+        'exists' => [NodeType::class, 'load'],
         'source' => ['name'],
       ],
       '#description' => $this->t('Unique machine-readable name: lowercase letters, numbers, and underscores only.', [

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Unit;
 
+use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\block\Controller\CategoryAutocompleteController;
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\UnitTestCase;
@@ -32,7 +33,7 @@ class CategoryAutocompleteTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $block_manager = $this->createMock('Drupal\Core\Block\BlockManagerInterface');
+    $block_manager = $this->createMock(BlockManagerInterface::class);
     $block_manager->expects($this->any())
       ->method('getCategories')
       ->willReturn(['Comment', 'Node', 'None & Such', 'User']);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\ckeditor5\Controller;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
@@ -184,7 +185,7 @@ class EntityLinkSuggestionsController extends ControllerBase {
       return [];
     }
     // Sort the selection plugins by weight and select the best match.
-    uasort($selection_handler_groups['default'], ['Drupal\Component\Utility\SortArray', 'sortByWeightElement']);
+    uasort($selection_handler_groups['default'], [SortArray::class, 'sortByWeightElement']);
     end($selection_handler_groups['default']);
     // Select the link_target variant of the default selection plugin for the
     // entity type, if it exists. Otherwise, select the next best match.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\block_test\Plugin\Block;
 
+use Drupal\block_test\Form\TestForm;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -21,7 +22,7 @@ class TestFormBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function build() {
-    return \Drupal::formBuilder()->getForm('Drupal\block_test\Form\TestForm');
+    return \Drupal::formBuilder()->getForm(TestForm::class);
   }
 
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\plugin_test\Plugin;
 
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\MockTestBlock;
+use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\Discovery\StaticDiscovery;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -26,7 +28,7 @@ class DefaultsTestPluginManager extends DefaultPluginManager {
     // discovery implementation, but StaticDiscovery lets us add some simple
     // mock plugins for unit testing.
     $this->discovery = new StaticDiscovery();
-    $this->factory = new DefaultFactory($this, 'Drupal\Component\Plugin\PluginInspectionInterface');
+    $this->factory = new DefaultFactory($this, PluginInspectionInterface::class);
     $this->moduleHandler = $module_handler;
 
     // Specify default values.
@@ -38,14 +40,14 @@ class DefaultsTestPluginManager extends DefaultPluginManager {
 
     // Add a plugin with a custom value.
     $this->discovery->setDefinition('test_block1', [
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockTestBlock',
+      'class' => MockTestBlock::class,
       'metadata' => [
         'custom' => TRUE,
       ],
     ]);
     // Add a plugin that overrides the default value.
     $this->discovery->setDefinition('test_block2', [
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockTestBlock',
+      'class' => MockTestBlock::class,
       'metadata' => [
         'custom' => TRUE,
         'default' => FALSE,

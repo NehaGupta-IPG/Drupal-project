@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Kernel\ResourceType;
 
+use Drupal\system\Entity\Menu;
+use Drupal\node\Entity\Node;
 use Drupal\Core\Cache\Cache;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepository;
@@ -110,10 +112,10 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
    */
   public static function getProvider() {
     return [
-      ['node', 'article', 'Drupal\node\Entity\Node'],
-      ['node', '42', 'Drupal\node\Entity\Node'],
-      ['node_type', 'node_type', 'Drupal\node\Entity\NodeType'],
-      ['menu', 'menu', 'Drupal\system\Entity\Menu'],
+      ['node', 'article', Node::class],
+      ['node', '42', Node::class],
+      ['node_type', 'node_type', NodeType::class],
+      ['menu', 'menu', Menu::class],
     ];
   }
 

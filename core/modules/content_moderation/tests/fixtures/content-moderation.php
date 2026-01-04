@@ -477,7 +477,7 @@ $connection->insert('config')
      'url' => '',
      'title' => 'O:48:"Drupal\Core\StringTranslation\TranslatableMarkup":3:{s:9:"�*�string";s:9:"Workflows";s:12:"�*�arguments";a:0:{}s:10:"�*�options";a:0:{}}',
      'description' => 'O:48:"Drupal\Core\StringTranslation\TranslatableMarkup":3:{s:9:"�*�string";s:20:"Configure workflows.";s:12:"�*�arguments";a:0:{}s:10:"�*�options";a:0:{}}',
-     'class' => 'Drupal\Core\Menu\MenuLinkDefault',
+     'class' => \Drupal\Core\Menu\MenuLinkDefault::class,
      'options' => 'a:0:{}',
      'provider' => 'workflows',
      'enabled' => '1',
@@ -496,7 +496,7 @@ $connection->insert('config')
      'p7' => '0',
      'p8' => '0',
      'p9' => '0',
-     'form_class' => 'Drupal\Core\Menu\Form\MenuLinkDefaultForm',
+     'form_class' => \Drupal\Core\Menu\Form\MenuLinkDefaultForm::class,
    ])
    ->execute();
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\theme_test\Hook;
 
+use Drupal\theme_test\ThemeTestPreprocess;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -169,7 +170,7 @@ class ThemeTestHooks {
   #[Hook('theme_registry_alter')]
   public function themeRegistryAlter(&$registry): void {
     $registry['theme_test_preprocess_callback']['preprocess functions'][] = [
-      '\Drupal\theme_test\ThemeTestPreprocess',
+      ThemeTestPreprocess::class,
       'preprocess',
     ];
   }

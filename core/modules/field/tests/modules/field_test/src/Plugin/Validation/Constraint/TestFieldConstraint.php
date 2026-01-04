@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\field_test\Plugin\Validation\Constraint;
 
+use Symfony\Component\Validator\Constraints\NotEqualToValidator;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
@@ -29,7 +30,7 @@ class TestFieldConstraint extends NotEqualTo {
    * {@inheritdoc}
    */
   public function validatedBy(): string {
-    return '\Symfony\Component\Validator\Constraints\NotEqualToValidator';
+    return NotEqualToValidator::class;
   }
 
 }

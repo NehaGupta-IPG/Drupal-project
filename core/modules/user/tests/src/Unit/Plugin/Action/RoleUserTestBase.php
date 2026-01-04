@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Unit\Plugin\Action;
 
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\user\Entity\User;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -32,10 +34,10 @@ abstract class RoleUserTestBase extends UnitTestCase {
     parent::setUp();
 
     $this->account = $this
-      ->getMockBuilder('Drupal\user\Entity\User')
+      ->getMockBuilder(User::class)
       ->disableOriginalConstructor()
       ->getMock();
-    $this->userRoleEntityType = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
+    $this->userRoleEntityType = $this->createMock(EntityTypeInterface::class);
   }
 
 }

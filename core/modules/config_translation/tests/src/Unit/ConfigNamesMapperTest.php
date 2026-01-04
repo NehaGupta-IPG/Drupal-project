@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config_translation\Unit;
 
+use Drupal\config_translation\Form\ConfigTranslationDeleteForm;
+use Drupal\config_translation\Form\ConfigTranslationEditForm;
+use Drupal\config_translation\Form\ConfigTranslationAddForm;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Routing\UrlGeneratorInterface;
+use Drupal\config_translation\ConfigMapperManagerInterface;
+use Drupal\locale\LocaleConfigManager;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\config_translation\ConfigNamesMapper;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -99,25 +109,25 @@ class ConfigNamesMapperTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
+    $this->routeProvider = $this->createMock(RouteProviderInterface::class);
 
     $this->pluginDefinition = [
-      'class' => '\Drupal\config_translation\ConfigNamesMapper',
+      'class' => ConfigNamesMapper::class,
       'base_route_name' => 'system.site_information_settings',
       'title' => 'System information',
       'names' => ['system.site'],
       'weight' => 42,
     ];
 
-    $this->typedConfigManager = $this->createMock('Drupal\Core\Config\TypedConfigManagerInterface');
+    $this->typedConfigManager = $this->createMock(TypedConfigManagerInterface::class);
 
-    $this->localeConfigManager = $this->getMockBuilder('Drupal\locale\LocaleConfigManager')
+    $this->localeConfigManager = $this->getMockBuilder(LocaleConfigManager::class)
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->configMapperManager = $this->createMock('Drupal\config_translation\ConfigMapperManagerInterface');
+    $this->configMapperManager = $this->createMock(ConfigMapperManagerInterface::class);
 
-    $this->urlGenerator = $this->createMock('Drupal\Core\Routing\UrlGeneratorInterface');
+    $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
     $container = new ContainerBuilder();
     $container->set('url_generator', $this->urlGenerator);
     \Drupal::setContainer($container);
@@ -130,9 +140,9 @@ class ConfigNamesMapperTest extends UnitTestCase {
       ->with('system.site_information_settings')
       ->willReturn($this->baseRoute);
 
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $this->languageManager = $this->createMock(LanguageManagerInterface::class);
 
-    $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
+    $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
     $this->configNamesMapper = new TestConfigNamesMapper(
       'system.site_information_settings',
@@ -266,7 +276,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
   public function testGetAddRoute(): void {
     $expected = new Route('/admin/config/system/site-information/translate/{langcode}/add',
       [
-        '_form' => '\Drupal\config_translation\Form\ConfigTranslationAddForm',
+        '_form' => ConfigTranslationAddForm::class,
         'plugin_id' => 'system.site_information_settings',
       ],
       [
@@ -304,7 +314,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
   public function testGetEditRoute(): void {
     $expected = new Route('/admin/config/system/site-information/translate/{langcode}/edit',
       [
-        '_form' => '\Drupal\config_translation\Form\ConfigTranslationEditForm',
+        '_form' => ConfigTranslationEditForm::class,
         'plugin_id' => 'system.site_information_settings',
       ],
       [
@@ -342,7 +352,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
   public function testGetDeleteRoute(): void {
     $expected = new Route('/admin/config/system/site-information/translate/{langcode}/delete',
       [
-        '_form' => '\Drupal\config_translation\Form\ConfigTranslationDeleteForm',
+        '_form' => ConfigTranslationDeleteForm::class,
         'plugin_id' => 'system.site_information_settings',
       ],
       [

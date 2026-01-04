@@ -44,7 +44,7 @@ class LocalActionManager extends DefaultPluginManager implements LocalActionMana
     // The route names where this local action appears.
     'appears_on' => [],
     // Default class for local action implementations.
-    'class' => 'Drupal\Core\Menu\LocalActionDefault',
+    'class' => LocalActionDefault::class,
   ];
 
   /**
@@ -128,7 +128,7 @@ class LocalActionManager extends DefaultPluginManager implements LocalActionMana
   public function __construct(ArgumentResolverInterface $argument_resolver, RequestStack $request_stack, RouteMatchInterface $route_match, RouteProviderInterface $route_provider, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager, AccessManagerInterface $access_manager, AccountInterface $account) {
     // Skip calling the parent constructor, since that assumes annotation-based
     // discovery.
-    $this->factory = new ContainerFactory($this, 'Drupal\Core\Menu\LocalActionInterface');
+    $this->factory = new ContainerFactory($this, LocalActionInterface::class);
     $this->argumentResolver = $argument_resolver;
     $this->requestStack = $request_stack;
     $this->routeMatch = $route_match;

@@ -2,6 +2,17 @@
 
 namespace Drupal\config_translation\Hook;
 
+use Drupal\config_translation\FormElement\PluralVariants;
+use Drupal\config_translation\FormElement\ListElement;
+use Drupal\config_translation\FormElement\TextFormat;
+use Drupal\config_translation\FormElement\DateFormat;
+use Drupal\config_translation\FormElement\Textarea;
+use Drupal\config_translation\FormElement\Textfield;
+use Drupal\config_translation\ConfigEntityMapper;
+use Drupal\config_translation\ConfigFieldMapper;
+use Drupal\config_translation\Controller\ConfigTranslationEntityListBuilder;
+use Drupal\config_translation\Controller\ConfigTranslationFieldListBuilder;
+use Drupal\config_translation\Controller\ConfigTranslationBlockListBuilder;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldConfigInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -111,16 +122,16 @@ class ConfigTranslationHooks {
     foreach ($entity_types as $entity_type_id => $entity_type) {
       if ($entity_type->entityClassImplements(ConfigEntityInterface::class)) {
         if ($entity_type_id == 'block') {
-          $class = 'Drupal\config_translation\Controller\ConfigTranslationBlockListBuilder';
+          $class = ConfigTranslationBlockListBuilder::class;
         }
         elseif ($entity_type_id == 'field_config') {
-          $class = 'Drupal\config_translation\Controller\ConfigTranslationFieldListBuilder';
+          $class = ConfigTranslationFieldListBuilder::class;
           // Will be filled in dynamically, see
           // \Drupal\field\Entity\FieldConfig::linkTemplates().
           $entity_type->setLinkTemplate('config-translation-overview', $entity_type->getLinkTemplate('edit-form') . '/translate');
         }
         else {
-          $class = 'Drupal\config_translation\Controller\ConfigTranslationEntityListBuilder';
+          $class = ConfigTranslationEntityListBuilder::class;
         }
         $entity_type->setHandlerClass('config_translation_list', $class);
         if ($entity_type->hasLinkTemplate('edit-form')) {
@@ -146,7 +157,7 @@ class ConfigTranslationHooks {
           $info[$entity_type_id . '_fields'] = [
             'base_route_name' => "entity.field_config.{$entity_type_id}_field_edit_form",
             'entity_type' => 'field_config',
-            'class' => '\Drupal\config_translation\ConfigFieldMapper',
+            'class' => ConfigFieldMapper::class,
             'base_entity_type' => $entity_type_id,
             'weight' => 10,
           ];
@@ -167,7 +178,7 @@ class ConfigTranslationHooks {
       // Use the entity type as the plugin ID.
       $base_route_name = "entity.{$entity_type_id}.edit_form";
       $info[$entity_type_id] = [
-        'class' => '\Drupal\config_translation\ConfigEntityMapper',
+        'class' => ConfigEntityMapper::class,
         'base_route_name' => $base_route_name,
         'title' => $entity_type->getSingularLabel(),
         'names' => [],
@@ -204,13 +215,13 @@ class ConfigTranslationHooks {
   #[Hook('config_schema_info_alter')]
   public function configSchemaInfoAlter(&$definitions): void {
     $map = [
-      'label' => '\Drupal\config_translation\FormElement\Textfield',
-      'text' => '\Drupal\config_translation\FormElement\Textarea',
-      'date_format' => '\Drupal\config_translation\FormElement\DateFormat',
-      'text_format' => '\Drupal\config_translation\FormElement\TextFormat',
-      'mapping' => '\Drupal\config_translation\FormElement\ListElement',
-      'sequence' => '\Drupal\config_translation\FormElement\ListElement',
-      'plural_label' => '\Drupal\config_translation\FormElement\PluralVariants',
+      'label' => Textfield::class,
+      'text' => Textarea::class,
+      'date_format' => DateFormat::class,
+      'text_format' => TextFormat::class,
+      'mapping' => ListElement::class,
+      'sequence' => ListElement::class,
+      'plural_label' => PluralVariants::class,
     ];
     // Enhance the text and date type definitions with classes to generate
     // proper form elements in ConfigTranslationFormBase. Other translatable

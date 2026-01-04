@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\search_embedded_form\Hook;
 
+use Drupal\search_embedded_form\Form\SearchEmbeddedForm;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -25,7 +26,7 @@ class SearchEmbeddedFormThemeHooks {
    */
   #[Hook('preprocess_search_result')]
   public function preprocessSearchResult(&$variables): void {
-    $form = $this->formBuilder->getForm('Drupal\search_embedded_form\Form\SearchEmbeddedForm');
+    $form = $this->formBuilder->getForm(SearchEmbeddedForm::class);
     $variables['snippet'] = array_merge($variables['snippet'], $form);
   }
 

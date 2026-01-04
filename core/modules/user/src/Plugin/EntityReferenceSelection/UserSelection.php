@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Plugin\EntityReferenceSelection;
 
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
@@ -129,7 +130,7 @@ class UserSelection extends DefaultSelection {
     $form['filter']['settings'] = [
       '#type' => 'container',
       '#attributes' => ['class' => ['entity_reference-settings']],
-      '#process' => [['\Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem', 'formProcessMergeParent']],
+      '#process' => [[EntityReferenceItem::class, 'formProcessMergeParent']],
     ];
 
     if ($configuration['filter']['type'] == 'role') {

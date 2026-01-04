@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\node\Hook;
 
+use Drupal\node\ConfigTranslation\NodeTypeMapper;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
@@ -16,7 +17,7 @@ class NodeConfigTranslationHooks {
    */
   #[Hook('config_translation_info_alter')]
   public function configTranslationInfoAlter(&$info): void {
-    $info['node_type']['class'] = 'Drupal\node\ConfigTranslation\NodeTypeMapper';
+    $info['node_type']['class'] = NodeTypeMapper::class;
   }
 
 }

@@ -45,7 +45,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
     // The default link options.
     'options' => [],
     // Default class for local task implementations.
-    'class' => 'Drupal\Core\Menu\LocalTaskDefault',
+    'class' => LocalTaskDefault::class,
     // The plugin id. Set by the plugin system based on the top-level YAML key.
     'id' => '',
   ];
@@ -135,7 +135,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    *   The current user.
    */
   public function __construct(ArgumentResolverInterface $argument_resolver, RequestStack $request_stack, RouteMatchInterface $route_match, RouteProviderInterface $route_provider, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, AccessManagerInterface $access_manager, AccountInterface $account) {
-    $this->factory = new ContainerFactory($this, '\Drupal\Core\Menu\LocalTaskInterface');
+    $this->factory = new ContainerFactory($this, LocalTaskInterface::class);
     $this->argumentResolver = $argument_resolver;
     $this->requestStack = $request_stack;
     $this->routeMatch = $route_match;

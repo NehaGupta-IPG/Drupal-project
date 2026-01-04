@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\file_test\Hook;
 
+use Drupal\file_test\FileTestAccessControlHandler;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\file\Entity\File;
 use Drupal\file_test\FileTestCdn;
@@ -173,7 +174,7 @@ class FileTestHooks {
   public function entityTypeAlter(&$entity_types) : void {
     if (\Drupal::state()->get('file_test_alternate_access_handler', FALSE)) {
       /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
-      $entity_types['file']->setAccessClass('Drupal\file_test\FileTestAccessControlHandler');
+      $entity_types['file']->setAccessClass(FileTestAccessControlHandler::class);
     }
   }
 

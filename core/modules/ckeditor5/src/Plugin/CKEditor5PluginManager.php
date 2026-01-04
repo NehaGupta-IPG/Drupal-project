@@ -52,7 +52,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
       $module_handler,
       CKEditor5PluginInterface::class,
       CKEditor5Plugin::class,
-      '\Drupal\ckeditor5\Annotation\CKEditor5Plugin',
+      \Drupal\ckeditor5\Annotation\CKEditor5Plugin::class,
     );
 
     $this->alterInfo('ckeditor5_plugin_info');

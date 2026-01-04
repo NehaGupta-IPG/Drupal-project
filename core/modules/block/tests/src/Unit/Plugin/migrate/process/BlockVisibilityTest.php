@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Unit\Plugin\migrate\process;
 
+use Drupal\migrate\Row;
 use Drupal\block\Plugin\migrate\process\BlockVisibility;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\migrate\MigrateLookupInterface;
@@ -105,7 +106,7 @@ class BlockVisibilityTest extends MigrateProcessTestCase {
   public function testTransformException(): void {
     $this->moduleHandler->moduleExists('php')->willReturn(FALSE);
     $migrate_lookup = $this->prophesize(MigrateLookupInterface::class);
-    $this->row = $this->getMockBuilder('Drupal\migrate\Row')
+    $this->row = $this->getMockBuilder(Row::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getSourceProperty'])
       ->getMock();

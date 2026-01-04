@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Hook;
 
+use Drupal\user\Plugin\views\argument_validator\User;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
@@ -18,7 +19,7 @@ class UserViewsHooks {
   #[Hook('views_plugins_argument_validator_alter')]
   public function viewsPluginsArgumentValidatorAlter(array &$plugins): void {
     $plugins['entity:user']['title'] = $this->t('User ID');
-    $plugins['entity:user']['class'] = 'Drupal\user\Plugin\views\argument_validator\User';
+    $plugins['entity:user']['class'] = User::class;
     $plugins['entity:user']['provider'] = 'user';
   }
 

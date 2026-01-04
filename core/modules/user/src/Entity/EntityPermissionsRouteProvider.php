@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Entity;
 
+use Drupal\user\Form\EntityPermissionsForm;
 use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -85,7 +86,7 @@ class EntityPermissionsRouteProvider implements EntityRouteProviderInterface, En
       $entity_type->getLinkTemplate('entity-permissions-form'),
       [
         '_title' => 'Manage permissions',
-        '_form' => 'Drupal\user\Form\EntityPermissionsForm',
+        '_form' => EntityPermissionsForm::class,
         'entity_type_id' => $bundle_of_id,
         'bundle_entity_type' => $entity_type_id,
       ],

@@ -146,7 +146,7 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
       $step = 'views_form_views_form';
       $form_state->set('step', $step);
     }
-    $form_state->set(['step_controller', 'views_form_views_form'], 'Drupal\views\Form\ViewsFormMainForm');
+    $form_state->set(['step_controller', 'views_form_views_form'], ViewsFormMainForm::class);
 
     // Views forms without view arguments return the same Base Form ID and
     // Form ID. Base form ID should only be added when different.
@@ -201,7 +201,7 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
    */
   protected function getFormObject(FormStateInterface $form_state) {
     // If this is a class, instantiate it.
-    $form_step_class = $form_state->get(['step_controller', $form_state->get('step')]) ?: 'Drupal\views\Form\ViewsFormMainForm';
+    $form_step_class = $form_state->get(['step_controller', $form_state->get('step')]) ?: ViewsFormMainForm::class;
     return $this->classResolver->getInstanceFromDefinition($form_step_class);
   }
 

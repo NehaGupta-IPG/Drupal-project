@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\contact_storage_test\Hook;
 
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\contact\ContactFormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -35,7 +36,7 @@ class ContactStorageTestHooks {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
     // Set the controller class for nodes to an alternate implementation of the
     // Drupal\Core\Entity\EntityStorageInterface interface.
-    $entity_types['contact_message']->setStorageClass('\Drupal\Core\Entity\Sql\SqlContentEntityStorage');
+    $entity_types['contact_message']->setStorageClass(SqlContentEntityStorage::class);
     $keys = $entity_types['contact_message']->getKeys();
     $keys['id'] = 'id';
     $entity_types['contact_message']->set('entity_keys', $keys);

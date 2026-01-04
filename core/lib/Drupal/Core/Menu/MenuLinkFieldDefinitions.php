@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Menu;
 
+use Drupal\Core\Menu\Form\MenuLinkDefaultForm;
+
 /**
  * Provides default values for menu link plugin definitions.
  *
@@ -41,8 +43,8 @@ trait MenuLinkFieldDefinitions {
     'provider' => '',
     'metadata' => [],
     // Default class for local task implementations.
-    'class' => 'Drupal\Core\Menu\MenuLinkDefault',
-    'form_class' => 'Drupal\Core\Menu\Form\MenuLinkDefaultForm',
+    'class' => MenuLinkDefault::class,
+    'form_class' => MenuLinkDefaultForm::class,
     // The plugin ID. Set by the plugin system based on the top-level YAML key.
     'id' => '',
   ];

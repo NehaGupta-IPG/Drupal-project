@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\destination;
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\migrate\Plugin\migrate\destination\PerComponentEntityFormDisplay;
 use Drupal\migrate\Row;
 use Drupal\Tests\migrate\Unit\MigrateTestCase;
@@ -30,7 +31,7 @@ class PerComponentEntityFormDisplayTest extends MigrateTestCase {
     foreach ($values as $key => $value) {
       $row->setDestinationProperty($key, $value);
     }
-    $entity = $this->getMockBuilder('Drupal\Core\Entity\Entity\EntityFormDisplay')
+    $entity = $this->getMockBuilder(EntityFormDisplay::class)
       ->disableOriginalConstructor()
       ->getMock();
     $entity->expects($this->once())

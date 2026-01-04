@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\datetime\Unit\Plugin\migrate\field;
 
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\datetime\Plugin\migrate\field\DateField;
 use Drupal\migrate\MigrateException;
 use Drupal\Tests\UnitTestCase;
@@ -26,7 +27,7 @@ class DateFieldTest extends UnitTestCase {
    */
   #[DataProvider('providerTestDefineValueProcessPipeline')]
   public function testDefineValueProcessPipeline($data, $from_format, $to_format): void {
-    $migration = $this->createMock('Drupal\migrate\Plugin\MigrationInterface');
+    $migration = $this->createMock(MigrationInterface::class);
     $pipeline = [
       'plugin' => 'sub_process',
       'source' => 'field_date',
@@ -134,7 +135,7 @@ class DateFieldTest extends UnitTestCase {
    * @legacy-covers ::defineValueProcessPipeline
    */
   public function testDefineValueProcessPipelineException(): void {
-    $migration = $this->createMock('Drupal\migrate\Plugin\MigrationInterface');
+    $migration = $this->createMock(MigrationInterface::class);
 
     $plugin = new DateField([], '', []);
 

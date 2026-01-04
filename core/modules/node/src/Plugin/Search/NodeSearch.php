@@ -2,6 +2,7 @@
 
 namespace Drupal\node\Plugin\Search;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -550,7 +551,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     ];
 
     // Add node types.
-    $types = array_map(['\Drupal\Component\Utility\Html', 'escape'], $this->entityTypeBundleInfo->getBundleLabels('node'));
+    $types = array_map([Html::class, 'escape'], $this->entityTypeBundleInfo->getBundleLabels('node'));
     $form['advanced']['types-fieldset'] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Types'),

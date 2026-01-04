@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\path_alias\Unit;
 
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\path_alias\AliasPrefixListInterface;
 use Drupal\Component\Datetime\Time;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
@@ -76,9 +79,9 @@ class AliasManagerTest extends UnitTestCase {
     parent::setUp();
 
     $this->aliasRepository = $this->createMock(AliasRepositoryInterface::class);
-    $this->aliasPrefixList = $this->createMock('Drupal\path_alias\AliasPrefixListInterface');
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
-    $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
+    $this->aliasPrefixList = $this->createMock(AliasPrefixListInterface::class);
+    $this->languageManager = $this->createMock(LanguageManagerInterface::class);
+    $this->cache = $this->createMock(CacheBackendInterface::class);
 
     $this->aliasManager = new AliasManager($this->aliasRepository, $this->aliasPrefixList, $this->languageManager, $this->cache, new Time());
 

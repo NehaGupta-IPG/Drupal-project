@@ -62,7 +62,7 @@ class FileCacheFactory {
 
     // Ensure that all properties are set.
     $fallback_configuration = [
-      'class' => '\Drupal\Component\FileCache\FileCache',
+      'class' => FileCache::class,
       'collection' => $collection,
       'cache_backend_class' => NULL,
       'cache_backend_configuration' => [],

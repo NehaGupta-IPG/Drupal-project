@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\PhpStorage;
 
+use Drupal\Component\PhpStorage\MTimeProtectedFileStorage;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PublicStream;
 
@@ -38,7 +39,7 @@ class PhpStorageFactory {
       $configuration = $overrides['default'];
     }
     // Make sure all the necessary configuration values are set.
-    $class = $configuration['class'] ?? 'Drupal\Component\PhpStorage\MTimeProtectedFileStorage';
+    $class = $configuration['class'] ?? MTimeProtectedFileStorage::class;
     if (!isset($configuration['secret'])) {
       $configuration['secret'] = Settings::getHashSalt();
     }

@@ -45,7 +45,7 @@ class ImageToolkitManager extends DefaultPluginManager {
       $module_handler,
       ImageToolkitInterface::class,
       ImageToolkit::class,
-      'Drupal\Core\ImageToolkit\Annotation\ImageToolkit',
+      \Drupal\Core\ImageToolkit\Annotation\ImageToolkit::class,
     );
 
     $this->setCacheBackend($cache_backend, 'image_toolkit_plugins');

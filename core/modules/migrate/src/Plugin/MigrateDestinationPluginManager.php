@@ -48,7 +48,7 @@ class MigrateDestinationPluginManager extends MigratePluginManager {
    *   (optional) The annotation class name. Defaults to
    *   'Drupal\migrate\Annotation\MigrateDestination'.
    */
-  public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, $attribute = MigrateDestination::class, $annotation = 'Drupal\migrate\Annotation\MigrateDestination') {
+  public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, $attribute = MigrateDestination::class, $annotation = \Drupal\migrate\Annotation\MigrateDestination::class) {
     parent::__construct($type, $namespaces, $cache_backend, $module_handler, $attribute, $annotation);
     $this->entityTypeManager = $entity_type_manager;
   }

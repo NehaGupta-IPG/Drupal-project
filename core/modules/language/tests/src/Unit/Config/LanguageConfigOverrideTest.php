@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Unit\Config;
 
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\language\Config\LanguageConfigOverride;
 use Drupal\Tests\UnitTestCase;
@@ -59,11 +63,11 @@ class LanguageConfigOverrideTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->storage = $this->createMock('Drupal\Core\Config\StorageInterface');
-    $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
-    $this->typedConfig = $this->createMock('\Drupal\Core\Config\TypedConfigManagerInterface');
+    $this->storage = $this->createMock(StorageInterface::class);
+    $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+    $this->typedConfig = $this->createMock(TypedConfigManagerInterface::class);
     $this->configTranslation = new LanguageConfigOverride('config.test', $this->storage, $this->typedConfig, $this->eventDispatcher);
-    $this->cacheTagsInvalidator = $this->createMock('Drupal\Core\Cache\CacheTagsInvalidatorInterface');
+    $this->cacheTagsInvalidator = $this->createMock(CacheTagsInvalidatorInterface::class);
 
     $container = new ContainerBuilder();
     $container->set('cache_tags.invalidator', $this->cacheTagsInvalidator);

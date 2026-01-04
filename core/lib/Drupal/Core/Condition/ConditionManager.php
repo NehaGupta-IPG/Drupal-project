@@ -49,7 +49,7 @@ class ConditionManager extends DefaultPluginManager implements ExecutableManager
       $module_handler,
       ConditionInterface::class,
       Condition::class,
-      'Drupal\Core\Condition\Annotation\Condition'
+      \Drupal\Core\Condition\Annotation\Condition::class
     );
   }
 

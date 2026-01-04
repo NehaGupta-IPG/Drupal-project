@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\Form;
 
+use Drupal\form_test\Form\FormTestNumberForm;
+use Drupal\form_test\Form\FormTestSelectForm;
+use Drupal\form_test\Form\FormTestValidateRequiredForm;
 use Behat\Mink\Element\NodeElement;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
@@ -209,7 +212,7 @@ class FormTest extends BrowserTestBase {
    * @see \Drupal\form_test\Form\FormTestValidateRequiredForm
    */
   public function testRequiredCheckboxesRadio(): void {
-    $form = \Drupal::formBuilder()->getForm('\Drupal\form_test\Form\FormTestValidateRequiredForm');
+    $form = \Drupal::formBuilder()->getForm(FormTestValidateRequiredForm::class);
 
     // Attempt to submit the form with no required fields set.
     $edit = [];
@@ -444,7 +447,7 @@ class FormTest extends BrowserTestBase {
    * Tests validation of #type 'select' elements.
    */
   public function testSelect(): void {
-    $form = \Drupal::formBuilder()->getForm('Drupal\form_test\Form\FormTestSelectForm');
+    $form = \Drupal::formBuilder()->getForm(FormTestSelectForm::class);
     $this->drupalGet('form-test/select');
 
     // Verify that the options are escaped as expected.
@@ -646,7 +649,7 @@ class FormTest extends BrowserTestBase {
    * Tests validation of #type 'number' and 'range' elements.
    */
   public function testNumber(): void {
-    $form = \Drupal::formBuilder()->getForm('\Drupal\form_test\Form\FormTestNumberForm');
+    $form = \Drupal::formBuilder()->getForm(FormTestNumberForm::class);
 
     // The expected errors.
     $expected = [
@@ -859,7 +862,7 @@ class FormTest extends BrowserTestBase {
    */
   public function testDisabledMarkup(): void {
     $this->drupalGet('form-test/disabled-elements');
-    $form = \Drupal::formBuilder()->getForm('\Drupal\form_test\Form\FormTestDisabledElementsForm');
+    $form = \Drupal::formBuilder()->getForm(FormTestDisabledElementsForm::class);
     $type_map = [
       'textarea' => 'textarea',
       'select' => 'select',

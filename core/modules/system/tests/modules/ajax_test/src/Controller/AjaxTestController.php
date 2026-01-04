@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\ajax_test\Controller;
 
+use Drupal\ajax_test\Form\AjaxTestDialogForm;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AlertCommand;
@@ -242,7 +243,7 @@ class AjaxTestController {
     $build['dialog_wrappers'] = ['#markup' => '<div id="ajax-test-dialog-wrapper-1"></div><div id="ajax-test-dialog-wrapper-2"></div>'];
 
     // Dialog behavior applied to a button.
-    $build['form'] = \Drupal::formBuilder()->getForm('Drupal\ajax_test\Form\AjaxTestDialogForm');
+    $build['form'] = \Drupal::formBuilder()->getForm(AjaxTestDialogForm::class);
 
     // Dialog behavior applied to a #type => 'link'.
     $build['link'] = [

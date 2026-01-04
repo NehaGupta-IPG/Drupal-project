@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\Derivative;
 
+use Drupal\views\Plugin\views\wizard\Standard;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\views\Views;
 
@@ -26,7 +27,7 @@ class DefaultWizardDeriver extends DeriverBase {
           'id' => 'standard',
           'base_table' => $table,
           'title' => $views_info['table']['base']['title'],
-          'class' => 'Drupal\views\Plugin\views\wizard\Standard',
+          'class' => Standard::class,
         ];
       }
     }

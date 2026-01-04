@@ -32,7 +32,7 @@ class FieldItemSerializationTest extends NormalizerTestBase {
    *
    * @var string
    */
-  protected $entityClass = 'Drupal\entity_test\Entity\EntityTestMulRev';
+  protected $entityClass = EntityTestMulRev::class;
 
   /**
    * The test values.

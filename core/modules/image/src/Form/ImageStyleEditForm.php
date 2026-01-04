@@ -211,7 +211,7 @@ class ImageStyleEditForm extends ImageStyleFormBase {
     $effect = $this->imageEffectManager->getDefinition($form_state->getValue('new'));
 
     // Load the configuration form for this option.
-    if (is_subclass_of($effect['class'], '\Drupal\image\ConfigurableImageEffectInterface')) {
+    if (is_subclass_of($effect['class'], ConfigurableImageEffectInterface::class)) {
       $form_state->setRedirect(
         'image.effect_add_form',
         [

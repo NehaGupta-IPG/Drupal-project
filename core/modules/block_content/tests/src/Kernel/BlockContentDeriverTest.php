@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Kernel;
 
+use Drupal\block_content\Plugin\Block\BlockContentBlock;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\block_content\Plugin\Derivative\BlockContent as DerivativeBlockContent;
@@ -32,8 +33,8 @@ class BlockContentDeriverTest extends KernelTestBase {
   protected $baseDefinition = [
     'id' => 'block_content',
     'provider' => 'block_content',
-    'class' => '\Drupal\block_content\Plugin\Block\BlockContentBlock',
-    'deriver' => '\Drupal\block_content\Plugin\Derivative\BlockContent',
+    'class' => BlockContentBlock::class,
+    'deriver' => \Drupal\block_content\Plugin\Derivative\BlockContent::class,
   ];
 
   /**

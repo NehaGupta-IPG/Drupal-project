@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\form_test\Plugin\Block;
 
+use Drupal\form_test\Form\RedirectBlockForm;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormBuilderInterface;
@@ -64,7 +65,7 @@ class RedirectFormBlock extends BlockBase implements ContainerFactoryPluginInter
    * {@inheritdoc}
    */
   public function build() {
-    return $this->formBuilder->getForm('Drupal\form_test\Form\RedirectBlockForm');
+    return $this->formBuilder->getForm(RedirectBlockForm::class);
   }
 
 }

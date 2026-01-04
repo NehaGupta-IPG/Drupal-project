@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\migrate\source;
 
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -248,7 +249,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
   public function fields(): array {
     // Retrieving fields from a non-fieldable content entity will throw a
     // LogicException. Return an empty list of fields instead.
-    if (!$this->entityType->entityClassImplements('Drupal\Core\Entity\FieldableEntityInterface')) {
+    if (!$this->entityType->entityClassImplements(FieldableEntityInterface::class)) {
       return [];
     }
     $field_definitions = $this->entityFieldManager->getBaseFieldDefinitions($this->entityType->id());

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_drupal\Unit;
 
+use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Schema;
+use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\migrate_drupal\MigrationConfigurationTrait;
 use Drupal\Tests\UnitTestCase;
@@ -26,18 +29,18 @@ class MigrationConfigurationTraitTest extends UnitTestCase {
   #[DataProvider('providerTestGetLegacyDrupalVersion')]
   public function testGetLegacyDrupalVersion($expected_version_string, $schema_version, $exception, $system_table_exists): void {
     if ($schema_version) {
-      $statement = $this->createMock('\Drupal\Core\Database\StatementInterface');
+      $statement = $this->createMock(StatementInterface::class);
       $statement->expects($this->any())
         ->method('fetchField')
         ->willReturn($schema_version);
     }
 
-    $schema = $this->createMock('\Drupal\Core\Database\Schema');
+    $schema = $this->createMock(Schema::class);
     $schema->expects($this->once())
       ->method('tableExists')
       ->willReturn($system_table_exists);
 
-    $connection = $this->getMockBuilder('Drupal\Core\Database\Connection')
+    $connection = $this->getMockBuilder(Connection::class)
       ->disableOriginalConstructor()
       ->getMock();
 

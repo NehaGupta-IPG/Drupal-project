@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\locale\Unit;
 
+use Drupal\locale\StringInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Lock\LockBackendInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\locale\StringStorageInterface;
 use Drupal\Component\Gettext\PoItem;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\locale\LocaleLookup;
@@ -76,20 +82,20 @@ class LocaleLookupTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->storage = $this->createMock('Drupal\locale\StringStorageInterface');
-    $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
+    $this->storage = $this->createMock(StringStorageInterface::class);
+    $this->cache = $this->createMock(CacheBackendInterface::class);
+    $this->lock = $this->createMock(LockBackendInterface::class);
     $this->lock->expects($this->never())
       ->method($this->anything());
 
-    $this->user = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $this->user = $this->createMock(AccountInterface::class);
     $this->user->expects($this->any())
       ->method('getRoles')
       ->willReturn(['anonymous']);
 
     $this->configFactory = $this->getConfigFactoryStub(['locale.settings' => ['cache_strings' => FALSE]]);
 
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $this->languageManager = $this->createMock(LanguageManagerInterface::class);
     $this->requestStack = new RequestStack();
 
     $container = new ContainerBuilder();
@@ -122,7 +128,7 @@ class LocaleLookupTest extends UnitTestCase {
       ->with($this->equalTo($args))
       ->willReturn($result);
 
-    $locale_lookup = $this->getMockBuilder('Drupal\locale\LocaleLookup')
+    $locale_lookup = $this->getMockBuilder(LocaleLookup::class)
       ->setConstructorArgs([
         'en',
         'irrelevant',
@@ -248,7 +254,7 @@ class LocaleLookupTest extends UnitTestCase {
       ->willReturn($result);
 
     $this->configFactory = $this->getConfigFactoryStub(['locale.settings' => ['cache_strings' => TRUE]]);
-    $locale_lookup = $this->getMockBuilder('Drupal\locale\LocaleLookup')
+    $locale_lookup = $this->getMockBuilder(LocaleLookup::class)
       ->setConstructorArgs([
         'en',
         'irrelevant',
@@ -273,7 +279,7 @@ class LocaleLookupTest extends UnitTestCase {
    * @legacy-covers ::resolveCacheMiss
    */
   public function testResolveCacheMissNoTranslation(): void {
-    $string = $this->createMock('Drupal\locale\StringInterface');
+    $string = $this->createMock(StringInterface::class);
     $string->expects($this->once())
       ->method('addLocation')
       ->willReturnSelf();
@@ -287,7 +293,7 @@ class LocaleLookupTest extends UnitTestCase {
     $request = Request::create('/test');
     $this->requestStack->push($request);
 
-    $locale_lookup = $this->getMockBuilder('Drupal\locale\LocaleLookup')
+    $locale_lookup = $this->getMockBuilder(LocaleLookup::class)
       ->setConstructorArgs([
         'en',
         'irrelevant',
@@ -381,7 +387,7 @@ class LocaleLookupTest extends UnitTestCase {
    */
   #[DataProvider('getCidProvider')]
   public function testGetCid(array $roles, $expected): void {
-    $this->user = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $this->user = $this->createMock(AccountInterface::class);
     $this->user->expects($this->any())
       ->method('getRoles')
       ->willReturn($roles);
@@ -390,7 +396,7 @@ class LocaleLookupTest extends UnitTestCase {
     $container->set('current_user', $this->user);
     \Drupal::setContainer($container);
 
-    $locale_lookup = $this->getMockBuilder('Drupal\locale\LocaleLookup')
+    $locale_lookup = $this->getMockBuilder(LocaleLookup::class)
       ->setConstructorArgs([
         'en',
         'irrelevant',

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Kernel;
 
+use Drupal\media\OEmbed\ResourceFetcherInterface;
+use Drupal\media\OEmbed\UrlResolverInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\media\Controller\OEmbedIframeController;
 use Drupal\media\OEmbed\Provider;
@@ -63,7 +66,7 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
 
     $this->assertIsCallable($controller);
 
-    $this->expectException('\Symfony\Component\HttpKernel\Exception\BadRequestHttpException');
+    $this->expectException(BadRequestHttpException::class);
     $this->expectExceptionMessage('This resource is not available');
     $request = new Request([
       'url' => 'https://example.com/path/to/resource',
@@ -83,8 +86,8 @@ class OEmbedIframeControllerTest extends MediaKernelTestBase {
     $hash = $this->container->get('media.oembed.iframe_url_helper')
       ->getHash('', 0, 0);
 
-    $url_resolver = $this->prophesize('\Drupal\media\OEmbed\UrlResolverInterface');
-    $resource_fetcher = $this->prophesize('\Drupal\media\OEmbed\ResourceFetcherInterface');
+    $url_resolver = $this->prophesize(UrlResolverInterface::class);
+    $resource_fetcher = $this->prophesize(ResourceFetcherInterface::class);
 
     $provider = new Provider('YouTube', 'https://youtube.com', [
       [

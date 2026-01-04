@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Kernel;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Logger\LoggerChannelFactory;
@@ -45,7 +46,7 @@ class LanguageNegotiatorPluginTest extends KernelTestBase {
     ]);
     $config->save();
     $languageNegotiator = $this->container->get('language_negotiator');
-    $languageNegotiator->setCurrentUser($this->prophesize('Drupal\Core\Session\AccountInterface')->reveal());
+    $languageNegotiator->setCurrentUser($this->prophesize(AccountInterface::class)->reveal());
     try {
       $languageNegotiator->initializeType(LanguageInterface::TYPE_URL);
     }

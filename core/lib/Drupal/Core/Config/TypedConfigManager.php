@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
@@ -302,7 +303,7 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
     }
     // Add type and default definition class.
     $definition += [
-      'definition_class' => '\Drupal\Core\TypedData\DataDefinition',
+      'definition_class' => DataDefinition::class,
       'type' => $type,
       'unwrap_for_canonical_representation' => TRUE,
     ];

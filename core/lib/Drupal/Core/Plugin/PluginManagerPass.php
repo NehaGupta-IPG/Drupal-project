@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Plugin;
 
+use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -16,7 +17,7 @@ class PluginManagerPass implements CompilerPassInterface {
   public function process(ContainerBuilder $container): void {
     foreach ($container->getDefinitions() as $service_id => $definition) {
       if (str_starts_with($service_id, 'plugin.manager.') && !$definition->hasTag('plugin_manager_cache_clear')) {
-        if (is_subclass_of($definition->getClass(), '\Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface')) {
+        if (is_subclass_of($definition->getClass(), CachedDiscoveryInterface::class)) {
           $definition->addTag('plugin_manager_cache_clear');
         }
       }

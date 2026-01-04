@@ -28,7 +28,7 @@ class ConfigEntityType extends EntityType {
     public readonly ?TranslatableMarkup $label_singular = NULL,
     public readonly ?TranslatableMarkup $label_plural = NULL,
     public readonly ?string $config_prefix = NULL,
-    public readonly string $entity_type_class = 'Drupal\Core\Config\Entity\ConfigEntityType',
+    public readonly string $entity_type_class = \Drupal\Core\Config\Entity\ConfigEntityType::class,
     public readonly string $group = 'configuration',
     public readonly TranslatableMarkup $group_label = new TranslatableMarkup('Configuration', [], ['context' => 'Entity type group']),
     public readonly bool $static_cache = FALSE,

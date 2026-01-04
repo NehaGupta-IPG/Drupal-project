@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Plugin\Discovery;
 
+use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Discovery\AttributeClassDiscovery as ComponentAttributeClassDiscovery;
 
@@ -45,7 +46,7 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
   public function __construct(
     string $subdir,
     protected \Traversable $rootNamespacesIterator,
-    string $pluginDefinitionAttributeName = 'Drupal\Component\Plugin\Attribute\Plugin',
+    string $pluginDefinitionAttributeName = Plugin::class,
   ) {
     if ($subdir) {
       // Prepend a directory separator to $subdir,

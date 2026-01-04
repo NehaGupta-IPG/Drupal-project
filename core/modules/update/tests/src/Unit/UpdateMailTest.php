@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Unit;
 
+use Drupal\Core\Config\Config;
+use Drupal\Core\Render\MetadataBubblingUrlGenerator;
+use Drupal\Core\Config\ConfigFactory;
+use Drupal\language\ConfigurableLanguageManagerInterface;
+use Drupal\Core\Session\AccountProxy;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use Drupal\update\Hook\UpdateHooks;
@@ -67,10 +72,10 @@ class UpdateMailTest extends UnitTestCase {
     \Drupal::setContainer($this->container);
 
     // Get needed mocks.
-    $this->currentUser = $this->createMock('\Drupal\Core\Session\AccountProxy');
-    $this->languageManager = $this->createMock('Drupal\language\ConfigurableLanguageManagerInterface');
-    $this->configFactory = $this->createMock('Drupal\Core\Config\ConfigFactory');
-    $this->urlGenerator = $this->createMock('\Drupal\Core\Render\MetadataBubblingUrlGenerator');
+    $this->currentUser = $this->createMock(AccountProxy::class);
+    $this->languageManager = $this->createMock(ConfigurableLanguageManagerInterface::class);
+    $this->configFactory = $this->createMock(ConfigFactory::class);
+    $this->urlGenerator = $this->createMock(MetadataBubblingUrlGenerator::class);
   }
 
   /**
@@ -99,13 +104,13 @@ class UpdateMailTest extends UnitTestCase {
       ->willReturn($langcode);
 
     // Create three config entities.
-    $config_site_name = $this->createMock('Drupal\Core\Config\Config');
+    $config_site_name = $this->createMock(Config::class);
     $config_site_name
       ->expects($this->once())
       ->method('get')
       ->with('name')
       ->willReturn($site_name);
-    $config_notification = $this->createMock('Drupal\Core\Config\Config');
+    $config_notification = $this->createMock(Config::class);
     $config_notification
       ->expects($this->once())
       ->method('get')

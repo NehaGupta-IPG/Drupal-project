@@ -2,6 +2,7 @@
 
 namespace Drupal\comment;
 
+use Drupal\history\HistoryManager;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
@@ -200,7 +201,7 @@ class CommentManager implements CommentManagerInterface {
     if (!$this->moduleHandler->moduleExists('history')) {
       return FALSE;
     }
-    return \Drupal::service('Drupal\history\HistoryManager')->getCountNewComments($entity, $field_name, $timestamp);
+    return \Drupal::service(HistoryManager::class)->getCountNewComments($entity, $field_name, $timestamp);
   }
 
 }

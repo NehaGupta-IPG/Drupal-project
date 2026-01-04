@@ -2,6 +2,7 @@
 
 namespace Drupal\datetime\Plugin\Field\FieldType;
 
+use Drupal\datetime\DateTimeComputed;
 use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemBase;
@@ -60,7 +61,7 @@ class DateTimeItem extends FieldItemBase implements DateTimeItemInterface {
       ->setLabel(new TranslatableMarkup('Computed date'))
       ->setDescription(new TranslatableMarkup('The computed DateTime object.'))
       ->setComputed(TRUE)
-      ->setClass('\Drupal\datetime\DateTimeComputed')
+      ->setClass(DateTimeComputed::class)
       ->setSetting('date source', 'value');
 
     return $properties;

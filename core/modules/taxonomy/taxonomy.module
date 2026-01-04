@@ -4,6 +4,7 @@
  * @file
  */
 
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\taxonomy\Entity\Term;
@@ -87,7 +88,7 @@ function taxonomy_build_node_index($node): void {
   if ($status && $node->isDefaultRevision()) {
     // Collect a unique list of all the term IDs from all node fields.
     $tid_all = [];
-    $entity_reference_class = 'Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem';
+    $entity_reference_class = EntityReferenceItem::class;
     foreach ($node->getFieldDefinitions() as $field) {
       $field_name = $field->getName();
       $class = $field->getItemDefinition()->getClass();

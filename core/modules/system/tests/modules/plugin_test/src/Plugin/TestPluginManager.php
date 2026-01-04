@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\plugin_test\Plugin;
 
+use Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\Discovery\StaticDiscovery;
 use Drupal\Component\Plugin\Factory\DefaultFactory;
@@ -24,7 +25,7 @@ class TestPluginManager extends PluginManagerBase {
     // A simple plugin: a mock user login block.
     $this->discovery->setDefinition('user_login', [
       'label' => 'User login',
-      'class' => 'Drupal\plugin_test\Plugin\plugin_test\mock_block\MockUserLoginBlock',
+      'class' => MockUserLoginBlock::class,
     ]);
 
     // In addition to finding all of the plugins available for a type, a plugin

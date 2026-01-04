@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ban\Unit;
 
+use Drupal\ban\BanIpManagerInterface;
 use Drupal\ban\BanMiddleware;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -48,8 +49,8 @@ class BanMiddlewareTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
-    $this->banManager = $this->createMock('Drupal\ban\BanIpManagerInterface');
+    $this->kernel = $this->createMock(HttpKernelInterface::class);
+    $this->banManager = $this->createMock(BanIpManagerInterface::class);
     $this->banMiddleware = new BanMiddleware($this->kernel, $this->banManager);
   }
 

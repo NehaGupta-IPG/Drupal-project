@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
@@ -63,8 +65,8 @@ class ContentEntityNormalizerTest extends UnitTestCase {
    * @legacy-covers ::supportsNormalization
    */
   public function testSupportsNormalization(): void {
-    $content_mock = $this->createMock('Drupal\Core\Entity\ContentEntityInterface');
-    $config_mock = $this->createMock('Drupal\Core\Config\Entity\ConfigEntityInterface');
+    $content_mock = $this->createMock(ContentEntityInterface::class);
+    $config_mock = $this->createMock(ConfigEntityInterface::class);
     $this->assertTrue($this->contentEntityNormalizer->supportsNormalization($content_mock));
     $this->assertFalse($this->contentEntityNormalizer->supportsNormalization($config_mock));
   }
@@ -101,7 +103,7 @@ class ContentEntityNormalizerTest extends UnitTestCase {
    * @legacy-covers ::normalize
    */
   public function testNormalizeWithAccountContext(): void {
-    $mock_account = $this->createMock('Drupal\Core\Session\AccountInterface');
+    $mock_account = $this->createMock(AccountInterface::class);
 
     $context = [
       'account' => $mock_account,

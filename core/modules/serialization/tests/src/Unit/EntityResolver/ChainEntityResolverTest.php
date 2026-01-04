@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\EntityResolver;
 
+use Drupal\serialization\EntityResolver\EntityResolverInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Drupal\serialization\EntityResolver\ChainEntityResolver;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -43,7 +45,7 @@ class ChainEntityResolverTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->testNormalizer = $this->createMock('Symfony\Component\Serializer\Normalizer\NormalizerInterface');
+    $this->testNormalizer = $this->createMock(NormalizerInterface::class);
     $this->testData = new \stdClass();
   }
 
@@ -141,7 +143,7 @@ class ChainEntityResolverTest extends UnitTestCase {
    *   The mocked entity resolver.
    */
   protected function createEntityResolverMock($return = NULL, $called = TRUE) {
-    $mock = $this->createMock('Drupal\serialization\EntityResolver\EntityResolverInterface');
+    $mock = $this->createMock(EntityResolverInterface::class);
 
     if ($called) {
       $mock->expects($this->once())

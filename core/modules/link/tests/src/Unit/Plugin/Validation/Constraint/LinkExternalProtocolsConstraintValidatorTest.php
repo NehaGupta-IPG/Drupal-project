@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\link\Unit\Plugin\Validation\Constraint;
 
+use Drupal\link\LinkItemInterface;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Url;
 use Drupal\link\Plugin\Validation\Constraint\LinkExternalProtocolsConstraint;
@@ -31,7 +32,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
   #[DataProvider('providerValidate')]
   #[RunInSeparateProcess]
   public function testValidate($url, $valid): void {
-    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link = $this->createMock(LinkItemInterface::class);
     $link->expects($this->any())
       ->method('getUrl')
       ->willReturn(Url::fromUri($url));
@@ -87,7 +88,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
    * @legacy-covers ::validate
    */
   public function testValidateWithMalformedUri(): void {
-    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link = $this->createMock(LinkItemInterface::class);
     $link->expects($this->any())
       ->method('getUrl')
       ->willThrowException(new \InvalidArgumentException());
@@ -109,7 +110,7 @@ class LinkExternalProtocolsConstraintValidatorTest extends UnitTestCase {
    * @legacy-covers ::validate
    */
   public function testValidateIgnoresInternalUrls(): void {
-    $link = $this->createMock('Drupal\link\LinkItemInterface');
+    $link = $this->createMock(LinkItemInterface::class);
     $link->expects($this->any())
       ->method('getUrl')
       ->willReturn(Url::fromRoute('example.test'));

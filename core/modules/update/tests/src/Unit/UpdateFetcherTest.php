@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Unit;
 
+use GuzzleHttp\ClientInterface;
 use ColinODell\PsrTestLogger\TestLogger;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
@@ -73,7 +74,7 @@ class UpdateFetcherTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->mockConfigFactory = $this->getConfigFactoryStub(['update.settings' => ['fetch_url' => 'http://www.example.com']]);
-    $this->mockHttpClient = $this->createMock('\GuzzleHttp\ClientInterface');
+    $this->mockHttpClient = $this->createMock(ClientInterface::class);
     $settings = new Settings([]);
     $this->logger = new TestLogger();
     $this->updateFetcher = new UpdateFetcher($this->mockConfigFactory, $this->mockHttpClient, $settings, $this->logger);

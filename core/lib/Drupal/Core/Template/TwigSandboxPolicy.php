@@ -53,7 +53,7 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
     $allowed_classes = Settings::get('twig_sandbox_allowed_classes', [
       // Allow any operations on the Attribute object as it is intended to be
       // changed from a Twig template, for example calling addClass().
-      'Drupal\Core\Template\Attribute',
+      Attribute::class,
     ]);
     // Flip the array so we can check using isset().
     $this->allowed_classes = array_flip($allowed_classes);

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit\Event;
 
+use Drupal\migrate\Row;
+use Drupal\migrate\MigrateMessageInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Event\MigratePreRowSaveEvent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -22,9 +25,9 @@ class MigratePreRowSaveEventTest extends EventBaseTest {
    * @legacy-covers ::getRow
    */
   public function testGetRow(): void {
-    $migration = $this->prophesize('\Drupal\migrate\Plugin\MigrationInterface')->reveal();
-    $message_service = $this->prophesize('\Drupal\migrate\MigrateMessageInterface')->reveal();
-    $row = $this->prophesize('\Drupal\migrate\Row')->reveal();
+    $migration = $this->prophesize(MigrationInterface::class)->reveal();
+    $message_service = $this->prophesize(MigrateMessageInterface::class)->reveal();
+    $row = $this->prophesize(Row::class)->reveal();
     $event = new MigratePreRowSaveEvent($migration, $message_service, $row);
     $this->assertSame($row, $event->getRow());
   }

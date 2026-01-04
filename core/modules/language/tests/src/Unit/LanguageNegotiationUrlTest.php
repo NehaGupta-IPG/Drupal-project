@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Unit;
 
+use Drupal\Core\Cache\Context\CacheContextsManager;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -48,11 +51,11 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     parent::setUp();
 
     // Set up some languages to be used by the language-based path processor.
-    $language_de = $this->createMock('\Drupal\Core\Language\LanguageInterface');
+    $language_de = $this->createMock(LanguageInterface::class);
     $language_de->expects($this->any())
       ->method('getId')
       ->willReturn('de');
-    $language_en = $this->createMock('\Drupal\Core\Language\LanguageInterface');
+    $language_en = $this->createMock(LanguageInterface::class);
     $language_en->expects($this->any())
       ->method('getId')
       ->willReturn('en');
@@ -63,7 +66,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     $this->languages = $languages;
 
     // Create a language manager stub.
-    $language_manager = $this->getMockBuilder('Drupal\language\ConfigurableLanguageManagerInterface')
+    $language_manager = $this->getMockBuilder(ConfigurableLanguageManagerInterface::class)
       ->getMock();
     $language_manager->expects($this->any())
       ->method('getLanguages')
@@ -71,10 +74,10 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     $this->languageManager = $language_manager;
 
     // Create a user stub.
-    $this->user = $this->getMockBuilder('Drupal\Core\Session\AccountInterface')
+    $this->user = $this->getMockBuilder(AccountInterface::class)
       ->getMock();
 
-    $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
+    $cache_contexts_manager = $this->getMockBuilder(CacheContextsManager::class)
       ->disableOriginalConstructor()
       ->getMock();
     $cache_contexts_manager->method('assertValidTokens')->willReturn(TRUE);

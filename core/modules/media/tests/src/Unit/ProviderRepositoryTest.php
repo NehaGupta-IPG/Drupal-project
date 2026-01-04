@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Unit;
 
+use Drupal\media\OEmbed\Provider;
+use Psr\Log\LoggerInterface;
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\media\OEmbed\ProviderException;
@@ -75,10 +78,10 @@ class ProviderRepositoryTest extends UnitTestCase {
     $this->keyValue = $key_value_factory->get('media');
 
     $this->currentTime = time();
-    $time = $this->prophesize('\Drupal\Component\Datetime\TimeInterface');
+    $time = $this->prophesize(TimeInterface::class);
     $time->getCurrentTime()->willReturn($this->currentTime);
 
-    $this->logger = $this->prophesize('\Psr\Log\LoggerInterface');
+    $this->logger = $this->prophesize(LoggerInterface::class);
     $logger_factory = $this->prophesize(LoggerChannelFactoryInterface::class);
     $logger_factory->get('media')->willReturn($this->logger);
 
@@ -139,7 +142,7 @@ END;
    */
   #[DataProvider('providerInvalidResponse')]
   public function testInvalidResponse(int $expiration_offset): void {
-    $provider = $this->prophesize('\Drupal\media\OEmbed\Provider')
+    $provider = $this->prophesize(Provider::class)
       ->reveal();
 
     // This stored data should be returned, irrespective of whether it's fresh.
@@ -181,7 +184,7 @@ END;
    * Tests handling of exceptions when fetching the provider database.
    */
   public function testRequestException(): void {
-    $provider = $this->prophesize('\Drupal\media\OEmbed\Provider')
+    $provider = $this->prophesize(Provider::class)
       ->reveal();
 
     // This data is expired (stale), but it should be returned anyway.

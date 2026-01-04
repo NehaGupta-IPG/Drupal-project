@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\mysql\Kernel\mysql;
 
+use Drupal\Core\Cache\DatabaseBackendFactory;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Command\DbDumpApplication;
 use Drupal\Core\Config\DatabaseStorage;
@@ -74,7 +75,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
    */
   public function register(ContainerBuilder $container): void {
     parent::register($container);
-    $container->register('cache_factory', 'Drupal\Core\Cache\DatabaseBackendFactory')
+    $container->register('cache_factory', DatabaseBackendFactory::class)
       ->addArgument(new Reference('database'))
       ->addArgument(new Reference('cache_tags.invalidator.checksum'))
       ->addArgument(new Reference('settings'))

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\locale\Unit;
 
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\locale\StringStorageInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\locale\LocaleTranslation;
@@ -60,10 +62,10 @@ class LocaleTranslationTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->storage = $this->createMock('Drupal\locale\StringStorageInterface');
-    $this->cache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $this->storage = $this->createMock(StringStorageInterface::class);
+    $this->cache = $this->createMock(CacheBackendInterface::class);
+    $this->lock = $this->createMock(LockBackendInterface::class);
+    $this->languageManager = $this->createMock(LanguageManagerInterface::class);
     $this->requestStack = new RequestStack();
   }
 

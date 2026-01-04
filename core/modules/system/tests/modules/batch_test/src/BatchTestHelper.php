@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\batch_test;
 
+use Drupal\batch_test\Form\BatchTestMockForm;
 use Drupal\Core\Form\FormState;
 
 /**
@@ -17,7 +18,7 @@ class BatchTestHelper {
   public function nestedDrupalFormSubmitCallback($value): void {
     $form_state = (new FormState())
       ->setValue('test_value', $value);
-    \Drupal::formBuilder()->submitForm('Drupal\batch_test\Form\BatchTestMockForm', $form_state);
+    \Drupal::formBuilder()->submitForm(BatchTestMockForm::class, $form_state);
   }
 
   /**

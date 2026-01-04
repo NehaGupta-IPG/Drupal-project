@@ -20,7 +20,7 @@ class ServiceProviderTestServiceProvider implements ServiceModifierInterface {
     if ($container->has('file.usage')) {
       // Override the class used for the file.usage service.
       $definition = $container->getDefinition('file.usage');
-      $definition->setClass('Drupal\service_provider_test\TestFileUsage');
+      $definition->setClass(TestFileUsage::class);
     }
 
     // Make sure a cached service can be also called in a service provider.

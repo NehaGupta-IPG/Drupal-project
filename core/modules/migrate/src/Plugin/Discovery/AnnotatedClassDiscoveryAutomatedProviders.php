@@ -2,6 +2,7 @@
 
 namespace Drupal\migrate\Plugin\Discovery;
 
+use Drupal\Component\Annotation\Plugin;
 use Drupal\Component\Annotation\Doctrine\AnnotationRegistry;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser as BaseStaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
@@ -37,7 +38,7 @@ class AnnotatedClassDiscoveryAutomatedProviders extends AnnotatedClassDiscovery 
    * @param string[] $annotation_namespaces
    *   Additional namespaces to scan for annotation definitions.
    */
-  public function __construct($subdir, \Traversable $root_namespaces, $plugin_definition_annotation_name = 'Drupal\Component\Annotation\Plugin', array $annotation_namespaces = []) {
+  public function __construct($subdir, \Traversable $root_namespaces, $plugin_definition_annotation_name = Plugin::class, array $annotation_namespaces = []) {
     parent::__construct($subdir, $root_namespaces, $plugin_definition_annotation_name, $annotation_namespaces);
     $this->finder = new ClassFinder();
   }

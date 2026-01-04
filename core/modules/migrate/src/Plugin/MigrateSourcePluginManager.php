@@ -36,7 +36,7 @@ class MigrateSourcePluginManager extends MigratePluginManager {
    *   The module handler to invoke the alter hook with.
    */
   public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
-    parent::__construct($type, $namespaces, $cache_backend, $module_handler, MigrateSource::class, 'Drupal\migrate\Annotation\MigrateSource');
+    parent::__construct($type, $namespaces, $cache_backend, $module_handler, MigrateSource::class, \Drupal\migrate\Annotation\MigrateSource::class);
   }
 
   /**
