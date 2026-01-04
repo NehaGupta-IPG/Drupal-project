@@ -125,7 +125,8 @@ class FileUsage extends FieldPluginBase {
     // Use pre-loaded data from preRender().
     $usage = $this->usageData[$entity->id()] ?? [];
     $total = $this->sumUsages($usage);
-    return (string) $total;
+
+    return $this->formatPlural($total, '@count place', '@count places');
   }
 
 }
