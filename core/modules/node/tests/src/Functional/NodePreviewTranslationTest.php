@@ -8,11 +8,13 @@ use Drupal\node\Form\NodePreviewForm;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Node Preview with translations.
  */
 #[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodePreviewTranslationTest extends BrowserTestBase {
 
   use LanguageTestTrait;
