@@ -131,6 +131,9 @@ function file_post_update_files_view_file_usage(array &$sandbox = []): void {
     $displays['default']['display_options']['style']['options']['info']['file_usage'] = $displays['default']['display_options']['style']['options']['info']['count'];
     unset($displays['default']['display_options']['style']['options']['info']['count']);
 
+    // Disable view caching since file_usage is dynamically computed.
+    $displays['default']['display_options']['cache']['type'] = 'none';
+
     $view->set('display', $displays);
     return TRUE;
   });

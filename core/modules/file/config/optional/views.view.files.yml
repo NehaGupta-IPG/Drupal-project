@@ -540,7 +540,7 @@ display:
         options:
           perm: 'access files overview'
       cache:
-        type: tag
+        type: none
         options: {  }
       empty:
         area_text_custom:
