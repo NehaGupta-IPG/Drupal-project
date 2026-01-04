@@ -4,6 +4,14 @@ namespace Drupal\Core\Extension;
 
 /**
  * Provides method for checking requirements during install time.
+ *
+ * @phpstan-type RequirementInfo array{
+ *   'title'?: string|\Drupal\Core\Entity\TranslatableInterface,
+ *   'value'?: string|\Drupal\Core\Entity\TranslatableInterface,
+ *   'description'?: string|\Drupal\Core\Entity\TranslatableInterface,
+ *   'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
+ *   'weight'?: int,
+ * }
  */
 interface InstallRequirementsInterface {
 
@@ -29,7 +37,7 @@ interface InstallRequirementsInterface {
    * During installation, if you need to load a class from your module,
    * you'll need to include the class file directly.
    *
-   * @return array
+   * @return array<string, RequirementInfo>
    *   An associative array where the keys are arbitrary but must be unique (it
    *   is suggested to use the module short name as a prefix) and the values are
    *   themselves associative arrays with the following elements:
