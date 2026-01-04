@@ -54,7 +54,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
    *
    * @var mixed[]
    *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0.
    * Additional component properties should be set via ::setThirdPartySetting().
    *
    * @see https://www.drupal.org/node/3100177
@@ -153,7 +153,7 @@ class SectionComponent implements ThirdPartySettingsInterface {
    * @param mixed $value
    *   The value to set.
    *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0.
    * Additional properties should be set via ::setThirdPartySetting().
    *
    * @see https://www.drupal.org/node/3100177
