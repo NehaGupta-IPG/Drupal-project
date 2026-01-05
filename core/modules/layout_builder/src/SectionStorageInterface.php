@@ -7,6 +7,7 @@ use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -149,5 +150,14 @@ interface SectionStorageInterface extends SectionListInterface, PluginInspection
    * @ingroup layout_builder_access
    */
   public function access($operation, ?AccountInterface $account = NULL, $return_as_object = FALSE);
+
+  /**
+   * Provides a base method to return title for the layout builder edit page.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   Title of the edit page.
+   */
+  public function getEditLabel(): TranslatableMarkup;
+
 
 }

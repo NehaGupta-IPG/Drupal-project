@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_builder\Kernel;
 
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContext;
@@ -12,6 +14,7 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\layout_builder\Entity\SampleEntityGeneratorInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
@@ -214,6 +217,19 @@ class DefaultsSectionStorageTest extends KernelTestBase {
 
     $result = $this->plugin->getTempstoreKey();
     $this->assertSame('entity_test.entity_test.default', $result);
+  }
+
+  /**
+   * Test that the absence of "entity_display.repository" triggers warning.
+   *
+   * @group legacy
+   */
+  public function testRequiredServiceTriggerError(): void {
+    $this->expectDeprecation("The entity_display.repository service must be passed to Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage::__construct(). It was added in drupal:10.1.x and will be required before drupal:11.0.0. See https://www.drupal.org/node/3356831");
+    $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
+    $entity_type_bundle_info = $this->prophesize(EntityTypeBundleInfoInterface::class);
+    $sample_entity_generator = $this->prophesize(SampleEntityGeneratorInterface::class);
+    $this->assertNotNull(new DefaultsSectionStorage([], 'test', [], $entity_type_manager->reveal(), $entity_type_bundle_info->reveal(), $sample_entity_generator->reveal()));
   }
 
   /**

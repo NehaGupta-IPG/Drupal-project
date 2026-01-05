@@ -2,11 +2,13 @@
 
 namespace Drupal\layout_builder\Plugin\SectionStorage;
 
+use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\ContextAwarePluginTrait;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\layout_builder\Routing\LayoutBuilderRoutesTrait;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionStorageInterface;
@@ -109,6 +111,14 @@ abstract class SectionStorageBase extends PluginBase implements SectionStorageIn
    */
   public function getTempstoreKey() {
     return $this->getStorageId();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEditLabel(): TranslatableMarkup {
+    assert(Inspector::assertStringable($this->label()), 'Section storage label is expected to be a string.');
+    return $this->t('Edit layout for %label', ['%label' => $this->label() ?? $this->getStorageType() . ' ' . $this->getStorageId()]);
   }
 
 }

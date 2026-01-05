@@ -46,6 +46,7 @@ class LayoutSectionTest extends BrowserTestBase {
     ]);
     $this->createContentType([
       'type' => 'bundle_with_section_field',
+      'name' => 'Bundle with section field',
     ]);
 
     LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default')
@@ -222,6 +223,11 @@ class LayoutSectionTest extends BrowserTestBase {
     $this->drupalGet($node->toUrl('canonical')->toString() . '/layout');
     $this->assertSession()->titleEquals('Edit layout for The node title | Drupal');
     $this->assertEquals('Edit layout for The node title', $this->cssSelect('h1.page-title')[0]->getText());
+
+    // Test that manage layout page has title that contains view mode as well.
+    $this->drupalGet('/admin/structure/types/manage/bundle_with_section_field/display/default/layout');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Edit Default layout for Bundle with section field content items');
   }
 
   /**

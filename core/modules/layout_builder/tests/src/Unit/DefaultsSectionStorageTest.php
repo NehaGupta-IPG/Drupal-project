@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\layout_builder\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityType;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -64,12 +65,13 @@ class DefaultsSectionStorageTest extends UnitTestCase {
     $this->entityTypeManager = $this->prophesize(EntityTypeManagerInterface::class);
     $entity_type_bundle_info = $this->prophesize(EntityTypeBundleInfoInterface::class);
     $this->sampleEntityGenerator = $this->prophesize(SampleEntityGeneratorInterface::class);
+    $entity_display_repository = $this->prophesize(EntityDisplayRepositoryInterface::class);
 
     $definition = new SectionStorageDefinition([
       'id' => 'defaults',
       'class' => DefaultsSectionStorage::class,
     ]);
-    $this->plugin = new DefaultsSectionStorage([], '', $definition, $this->entityTypeManager->reveal(), $entity_type_bundle_info->reveal(), $this->sampleEntityGenerator->reveal());
+    $this->plugin = new DefaultsSectionStorage([], '', $definition, $this->entityTypeManager->reveal(), $entity_type_bundle_info->reveal(), $this->sampleEntityGenerator->reveal(), $entity_display_repository->reveal());
   }
 
   /**
