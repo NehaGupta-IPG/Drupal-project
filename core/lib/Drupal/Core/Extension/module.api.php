@@ -1137,7 +1137,7 @@ function hook_updater_info_alter(&$updaters) {
  *     status report page.
  *
  * @return array<string, array{
- *     'title': \Drupal\Core\StringTranslation\TranslatableMarkup,
+ *     'title'?: \Drupal\Core\StringTranslation\TranslatableMarkup,
  *     'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
  *     'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
  *     'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
@@ -1146,7 +1146,7 @@ function hook_updater_info_alter(&$updaters) {
  *   An associative array where the keys are arbitrary but must be unique (it
  *   is suggested to use the module short name as a prefix) and the values are
  *   themselves associative arrays with the following elements:
- *   - title: The name of the requirement.
+ *   - title: (optional) The name of the requirement.
  *   - value: (optional) The current value (e.g., version, time, level, etc).
  *     During install phase, this should only be used for version numbers, do
  *     not set it if not applicable.

@@ -41,7 +41,7 @@ interface InstallRequirementsInterface {
    *   An associative array where the keys are arbitrary but must be unique (it
    *   is suggested to use the module short name as a prefix) and the values
    *   are themselves associative arrays with the following elements:
-   *   - title: The name of the requirement.
+   *   - title: (optional) The name of the requirement.
    *   - value: (optional) The current value (e.g., version, time, level,
    *     status, etc). During install phase, this should only be used for
    *     version numbers, do not set it if not applicable.
