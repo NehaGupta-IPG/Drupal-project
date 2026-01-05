@@ -70,11 +70,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   protected $transactionalDDLSupport = TRUE;
 
   /**
-   * {@inheritdoc}
-   */
-  protected $identifierQuotes = ['"', '"'];
-
-  /**
    * An array of transaction savepoints.
    *
    * The main use for this array is to store information about transaction
@@ -95,17 +90,18 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   public function __construct(\PDO $connection, array $connection_options) {
     // @phpstan-ignore class.notFound
     assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Pgsql : TRUE);
-    // Sanitize the schema name here, so we do not have to do it in other
-    // functions.
-    if (isset($connection_options['schema']) && ($connection_options['schema'] !== 'public')) {
-      $connection_options['schema'] = preg_replace('/[^A-Za-z0-9_]+/', '', $connection_options['schema']);
-    }
 
-    // We need to set the connectionOptions before the parent, because setPrefix
-    // needs this.
-    $this->connectionOptions = $connection_options;
+    // Manage the table prefix.
+    $prefix = $connection_options['prefix'] ?? '';
 
-    parent::__construct($connection, $connection_options);
+    // Manage the schema name.
+    $defaultSchema = $connection_options['schema'] ?? '';
+
+    parent::__construct(
+      $connection,
+      $connection_options,
+      new IdentifierHandler($prefix, $defaultSchema),
+    );
 
     // Force PostgreSQL to use the UTF-8 character set by default.
     $this->connection->exec("SET NAMES 'UTF8'");
@@ -114,26 +110,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     if (isset($connection_options['init_commands'])) {
       $this->connection->exec(implode('; ', $connection_options['init_commands']));
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setPrefix($prefix) {
-    assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
-    $this->prefix = $prefix;
-
-    // Add the schema name if it is not set to public, otherwise it will use the
-    // default schema name.
-    $quoted_schema = '';
-    if (isset($this->connectionOptions['schema']) && ($this->connectionOptions['schema'] !== 'public')) {
-      $quoted_schema = $this->identifierQuotes[0] . $this->connectionOptions['schema'] . $this->identifierQuotes[1] . '.';
-    }
-
-    $this->tablePlaceholderReplacements = [
-      $quoted_schema . $this->identifierQuotes[0] . str_replace('.', $this->identifierQuotes[1] . '.' . $this->identifierQuotes[0], $prefix),
-      $this->identifierQuotes[1],
-    ];
   }
 
   /**
@@ -296,16 +272,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   }
 
   /**
-   * Overrides \Drupal\Core\Database\Connection::createDatabase().
-   *
-   * @param string $database
-   *   The name of the database to create.
-   *
-   * @throws \Drupal\Core\Database\DatabaseNotFoundException
+   * {@inheritdoc}
    */
   public function createDatabase($database) {
     // Escape the database name.
-    $database = Database::getConnection()->escapeDatabase($database);
+    $database = Database::getConnection()->identifiers->database($database)->forMachine();
     $db_created = FALSE;
 
     // Try to determine the proper locales for character classification and
@@ -363,19 +334,25 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     $sequence_name = $this->prefixTables('{' . $table . '}_' . $field . '_seq');
     // Remove identifier quotes as we are constructing a new name from a
     // prefixed and quoted table name.
-    return str_replace($this->identifierQuotes, '', $sequence_name);
+    return str_replace($this->identifiers->identifierQuotes, '', $sequence_name);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getFullQualifiedTableName($table) {
+    $tableIdentifier = $this->identifiers->table($table);
+    // If already fully qualified, just pass it on.
+    if ($tableIdentifier->database || $tableIdentifier->schema) {
+      return $tableIdentifier->forMachine();
+    }
+    // The fully qualified table name in PostgreSQL is in the form of
+    // "<database>"."<schema>"."<table>".
     $options = $this->getConnectionOptions();
     $schema = $options['schema'] ?? 'public';
-
-    // The fully qualified table name in PostgreSQL is in the form of
-    // <database>.<schema>.<table>.
-    return $options['database'] . '.' . $schema . '.' . $this->getPrefix() . $table;
+    return $this->identifiers->database($options['database'])->quotedMachineName . '.' .
+      $this->identifiers->schema($schema)->quotedMachineName . '.' .
+      $tableIdentifier->quotedMachineName;
   }
 
   /**

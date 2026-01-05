@@ -75,10 +75,10 @@ class Truncate extends Query {
     // The statement actually built depends on whether a transaction is active.
     // @see ::execute()
     if ($this->connection->inTransaction()) {
-      return $comments . 'DELETE FROM {' . $this->connection->escapeTable($this->table) . '}';
+      return $comments . 'DELETE FROM ' . $this->connection->identifiers->table($this->table)->forMachine();
     }
     else {
-      return $comments . 'TRUNCATE {' . $this->connection->escapeTable($this->table) . '} ';
+      return $comments . 'TRUNCATE ' . $this->connection->identifiers->table($this->table)->forMachine();
     }
   }
 

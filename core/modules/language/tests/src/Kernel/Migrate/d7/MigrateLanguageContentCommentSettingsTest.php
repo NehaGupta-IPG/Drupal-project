@@ -44,7 +44,7 @@ class MigrateLanguageContentCommentSettingsTest extends MigrateDrupal7TestBase {
    */
   public function testLanguageCommentSettings(): void {
     // Confirm there is no message about a missing bundle.
-    $this->assertEmpty($this->migrateMessages, $this->migrateMessages['error'][0] ?? '');
+    $this->assertEmpty($this->migrateMessages, isset($this->migrateMessages['error'][0]) ? (string) $this->migrateMessages['error'][0] : '');
 
     // Article and Blog content type have multilingual settings of 'Enabled,
     // with Translation'. Assert that comments are translatable and the default

@@ -36,7 +36,6 @@ class SchemaTest extends UnitTestCase {
 
     $connection = $this->prophesize('\Drupal\pgsql\Driver\Database\pgsql\Connection');
     $connection->getConnectionOptions()->willReturn([]);
-    $connection->getPrefix()->willReturn('');
 
     $statement = $this->prophesize('\Drupal\Core\Database\StatementInterface');
     $statement->fetchField()->willReturn($max_identifier_length);

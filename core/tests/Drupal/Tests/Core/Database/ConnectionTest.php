@@ -51,15 +51,19 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * Exercise setPrefix() and getPrefix().
+   * Exercise legacy setPrefix() and getPrefix().
    */
+  #[IgnoreDeprecations]
   #[DataProvider('providerPrefixRoundTrip')]
   public function testPrefixRoundTrip($expected, $prefix_info): void {
-    $mock_pdo = $this->createMock('Drupal\Tests\Core\Database\Stub\StubPDO');
-    $connection = new StubConnection($mock_pdo, []);
+    $this->expectDeprecation('Drupal\\Core\\Database\\Connection::setPrefix() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Pass the table prefix to the IdentifierHandler constructor instead. See https://www.drupal.org/node/3513282');
+    $this->expectDeprecation('Drupal\\Core\\Database\\Connection::getPrefix() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
+
+    $mock_pdo = $this->createMock(StubPDO::class);
+    $connection = new StubConnection($mock_pdo, ['prefix' => $prefix_info]);
 
     // setPrefix() is protected, so we make it accessible with reflection.
-    $reflection = new \ReflectionClass('Drupal\Tests\Core\Database\Stub\StubConnection');
+    $reflection = new \ReflectionClass(StubConnection::class);
     $set_prefix = $reflection->getMethod('setPrefix');
 
     // Set the prefix data.
@@ -319,8 +323,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests get driver class.
-   *
-   * @legacy-covers ::getDriverClass
    */
   #[DataProvider('providerGetDriverClass')]
   #[IgnoreDeprecations]
@@ -474,12 +476,12 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * Tests escape table.
-   *
-   * @legacy-covers ::escapeTable
+   * Tests legacy ::escapeTable.
    */
+  #[IgnoreDeprecations]
   #[DataProvider('providerEscapeTables')]
   public function testEscapeTable($expected, $name, array $identifier_quote = ['"', '"']): void {
+    $this->expectDeprecation('Drupal\\Core\\Database\\Connection::escapeTable() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $mock_pdo = $this->createMock(StubPDO::class);
     $connection = new StubConnection($mock_pdo, [], $identifier_quote);
 
@@ -508,8 +510,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests escape alias.
-   *
-   * @legacy-covers ::escapeAlias
    */
   #[DataProvider('providerEscapeAlias')]
   public function testEscapeAlias($expected, $name, array $identifier_quote = ['"', '"']): void {
@@ -544,14 +544,11 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests escape field.
-   *
-   * @legacy-covers ::escapeField
    */
   #[DataProvider('providerEscapeFields')]
   public function testEscapeField($expected, $name, array $identifier_quote = ['"', '"']): void {
     $mock_pdo = $this->createMock(StubPDO::class);
     $connection = new StubConnection($mock_pdo, [], $identifier_quote);
-
     $this->assertEquals($expected, $connection->escapeField($name));
   }
 
@@ -574,12 +571,12 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * Tests escape database.
-   *
-   * @legacy-covers ::escapeDatabase
+   * Tests legacy ::escapeDatabase.
    */
+  #[IgnoreDeprecations]
   #[DataProvider('providerEscapeDatabase')]
   public function testEscapeDatabase($expected, $name, array $identifier_quote = ['"', '"']): void {
+    $this->expectDeprecation('Drupal\\Core\\Database\\Connection::escapeDatabase() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282');
     $mock_pdo = $this->createMock(StubPDO::class);
     $connection = new StubConnection($mock_pdo, [], $identifier_quote);
 
@@ -588,32 +585,26 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests identifier quotes assert count.
-   *
-   * @legacy-covers ::__construct
    */
   public function testIdentifierQuotesAssertCount(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
+    $this->expectExceptionMessage('Drupal\\Core\\Database\\Identifier\\IdentifierHandlerBase::$identifierQuotes must contain 2 string values');
     $mock_pdo = $this->createMock(StubPDO::class);
     new StubConnection($mock_pdo, [], ['"']);
   }
 
   /**
    * Tests identifier quotes assert string.
-   *
-   * @legacy-covers ::__construct
    */
   public function testIdentifierQuotesAssertString(): void {
     $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessage('\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
+    $this->expectExceptionMessage('Drupal\\Core\\Database\\Identifier\\IdentifierHandlerBase::$identifierQuotes must contain 2 string values');
     $mock_pdo = $this->createMock(StubPDO::class);
     new StubConnection($mock_pdo, [], [0, '1']);
   }
 
   /**
    * Tests namespace default.
-   *
-   * @legacy-covers ::__construct
    */
   public function testNamespaceDefault(): void {
     $mock_pdo = $this->createMock(StubPDO::class);
@@ -679,10 +670,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests that the proper caller is retrieved from the backtrace.
-   *
-   * @legacy-covers ::findCallerFromDebugBacktrace
-   * @legacy-covers ::removeDatabaseEntriesFromDebugBacktrace
-   * @legacy-covers ::getDebugBacktrace
    */
   public function testFindCallerFromDebugBacktrace(): void {
     Database::addConnectionInfo('default', 'default', [
@@ -710,9 +697,6 @@ class ConnectionTest extends UnitTestCase {
    *   A test debug_backtrace stack.
    * @param array $expected_entry
    *   The expected stack entry.
-   *
-   * @legacy-covers ::findCallerFromDebugBacktrace
-   * @legacy-covers ::removeDatabaseEntriesFromDebugBacktrace
    */
   #[DataProvider('providerMockedBacktrace')]
   #[IgnoreDeprecations]

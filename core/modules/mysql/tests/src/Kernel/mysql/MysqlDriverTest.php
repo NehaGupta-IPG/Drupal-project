@@ -25,7 +25,7 @@ class MysqlDriverTest extends DriverSpecificKernelTestBase {
    */
   public function testConnection(): void {
     // @phpstan-ignore class.notFound
-    $connection = new Connection($this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : StubPDO::class), []);
+    $connection = new Connection($this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : StubPDO::class), ['prefix' => '']);
     $this->assertInstanceOf(Connection::class, $connection);
   }
 

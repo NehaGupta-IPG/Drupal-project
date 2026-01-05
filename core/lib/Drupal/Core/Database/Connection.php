@@ -2,9 +2,10 @@
 
 namespace Drupal\Core\Database;
 
-use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Event\DatabaseEvent;
 use Drupal\Core\Database\Exception\EventException;
+use Drupal\Core\Database\Identifier\IdentifierHandlerBase;
+use Drupal\Core\Database\Identifier\IdentifierType;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
@@ -102,30 +103,6 @@ abstract class Connection {
   protected $schema = NULL;
 
   /**
-   * The prefix used by this database connection.
-   *
-   * @var string
-   */
-  protected string $prefix;
-
-  /**
-   * Replacements to fully qualify {table} placeholders in SQL strings.
-   *
-   * An array of two strings, the first being the replacement for opening curly
-   * brace '{', the second for closing curly brace '}'.
-   *
-   * @var string[]
-   */
-  protected array $tablePlaceholderReplacements;
-
-  /**
-   * List of escaped table names, keyed by unescaped names.
-   *
-   * @var array
-   */
-  protected $escapedTables = [];
-
-  /**
    * List of escaped field names, keyed by unescaped names.
    *
    * There are cases in which escapeField() is called on an empty string. In
@@ -143,17 +120,6 @@ abstract class Connection {
   protected $escapedAliases = [];
 
   /**
-   * The identifier quote characters for the database type.
-   *
-   * An array containing the start and end identifier quote characters for the
-   * database type. The ANSI SQL standard identifier quote character is a double
-   * quotation mark.
-   *
-   * @var string[]
-   */
-  protected $identifierQuotes;
-
-  /**
    * Tracks the database API events to be dispatched.
    *
    * For performance reasons, database API events are not yielded by default.
@@ -167,6 +133,18 @@ abstract class Connection {
   protected TransactionManagerInterface $transactionManager;
 
   /**
+   * The identifiers handler.
+   */
+  public readonly IdentifierHandlerBase $identifiers;
+
+  /**
+   * Storage for handling deprecated properties via magic methods.
+   *
+   * @var array<string,mixed>
+   */
+  private array $deprecatedProperties = [];
+
+  /**
    * Constructs a Connection object.
    *
    * @param object $connection
@@ -176,13 +154,16 @@ abstract class Connection {
    *   - prefix
    *   - namespace
    *   - Other driver-specific options.
+   * @param \Drupal\Core\Database\Identifier\IdentifierHandlerBase|null $identifierHandler
+   *   The identifiers handler.
    */
-  public function __construct(object $connection, array $connection_options) {
-    assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
-
+  public function __construct(
+    object $connection,
+    array $connection_options,
+    ?IdentifierHandlerBase $identifierHandler = NULL,
+  ) {
     // Manage the table prefix.
     $connection_options['prefix'] = $connection_options['prefix'] ?? '';
-    $this->setPrefix($connection_options['prefix']);
 
     // Work out the database driver namespace if none is provided. This normally
     // written to setting.php by installer or set by
@@ -191,8 +172,120 @@ abstract class Connection {
       $connection_options['namespace'] = (new \ReflectionObject($this))->getNamespaceName();
     }
 
+    if ($identifierHandler) {
+      $this->identifiers = $identifierHandler;
+    }
+    else {
+      @trigger_error("Not passing an IdentifierHandler object to " . __METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+      $this->identifiers = new class($connection_options['prefix'] ?? '') extends IdentifierHandlerBase {
+
+        /**
+         * {@inheritdoc}
+         */
+        public function getMaxLength(IdentifierType $type): int {
+          return 128;
+        }
+
+      };
+    }
+
     $this->connection = $connection;
     $this->connectionOptions = $connection_options;
+  }
+
+  /**
+   * Implements the magic __get() method.
+   */
+  public function __get(string $name): mixed {
+    switch ($name) {
+      case 'prefix':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return $this->deprecatedProperties[$name] ?? $this->identifiers->tablePrefix;
+
+      case 'escapedTables':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return [];
+
+      case 'identifierQuotes':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return $this->identifiers->identifierQuotes ?? '';
+
+      case 'tablePlaceholderReplacements':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        $identifierQuotes = $this->identifiers->identifierQuotes ?? ['"', '"'];
+        return [
+          $identifierQuotes[0] . str_replace('.', $identifierQuotes[1] . '.' . $identifierQuotes[0], $this->prefix ?? ''),
+          $identifierQuotes[1],
+        ];
+
+      default:
+        throw new \LogicException("The \${$name} property is undefined in " . __CLASS__);
+
+    }
+  }
+
+  /**
+   * Implements the magic __set() method.
+   */
+  public function __set(string $name, mixed $value): void {
+    switch ($name) {
+      case 'prefix':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        $this->deprecatedProperties[$name] = $value;
+        return;
+
+      case 'escapedTables':
+      case 'identifierQuotes':
+      case 'tablePlaceholderReplacements':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return;
+
+      default:
+        throw new \LogicException("The \${$name} property is undefined in " . __CLASS__);
+    }
+  }
+
+  /**
+   * Implements the magic __isset() method.
+   */
+  public function __isset(string $name): bool {
+    switch ($name) {
+      case 'prefix':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return isset($this->deprecatedProperties[$name]) ?
+          TRUE :
+          (bool) $this->identifiers->tablePrefix;
+
+      case 'escapedTables':
+      case 'identifierQuotes':
+      case 'tablePlaceholderReplacements':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return TRUE;
+
+      default:
+        throw new \LogicException("The \${$name} property is undefined in " . __CLASS__);
+    }
+  }
+
+  /**
+   * Implements the magic __unset() method.
+   */
+  public function __unset(string $name): void {
+    switch ($name) {
+      case 'prefix':
+        unset($this->deprecatedProperties[$name]);
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return;
+
+      case 'escapedTables':
+      case 'identifierQuotes':
+      case 'tablePlaceholderReplacements':
+        @trigger_error("Accessing Connection::\${$name} is deprecated in drupal:11.3.0 and the property is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+        return;
+
+      default:
+        throw new \LogicException("The \${$name} property is undefined in " . __CLASS__);
+    }
   }
 
   /**
@@ -327,8 +420,15 @@ abstract class Connection {
    *
    * @return string
    *   The table prefix.
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use
+   *   IdentifierHandler methods instead.
+   *
+   * @see https://www.drupal.org/node/3513282
    */
   public function getPrefix(): string {
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+    // @phpstan-ignore property.notFound
     return $this->prefix;
   }
 
@@ -337,14 +437,17 @@ abstract class Connection {
    *
    * @param string $prefix
    *   A single prefix.
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Pass the
+   *   table prefix to the IdentifierHandler constructor instead.
+   *
+   * @see https://www.drupal.org/node/3513282
    */
   protected function setPrefix($prefix) {
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Pass the table prefix to the IdentifierHandler constructor instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
     assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
+    // @phpstan-ignore property.notFound
     $this->prefix = $prefix;
-    $this->tablePlaceholderReplacements = [
-      $this->identifierQuotes[0] . str_replace('.', $this->identifierQuotes[1] . '.' . $this->identifierQuotes[0], $prefix),
-      $this->identifierQuotes[1],
-    ];
   }
 
   /**
@@ -362,7 +465,12 @@ abstract class Connection {
    *   The properly-prefixed string.
    */
   public function prefixTables($sql) {
-    return str_replace(['{', '}'], $this->tablePlaceholderReplacements, $sql);
+    $replacements = $tables = [];
+    preg_match_all('/(\{(\S*)\})/', $sql, $tables, PREG_SET_ORDER, 0);
+    foreach ($tables as $table) {
+      $replacements[$table[1]] = $this->identifiers->table($table[2])->forMachine();
+    }
+    return str_replace(array_keys($replacements), array_values($replacements), $sql);
   }
 
   /**
@@ -386,7 +494,7 @@ abstract class Connection {
    *   This method should only be called by database API code.
    */
   public function quoteIdentifiers($sql) {
-    return str_replace(['[', ']'], $this->identifierQuotes, $sql);
+    return str_replace(['[', ']'], $this->identifiers->identifierQuotes, $sql);
   }
 
   /**
@@ -399,9 +507,13 @@ abstract class Connection {
    *   The fully qualified table name.
    */
   public function getFullQualifiedTableName($table) {
-    $options = $this->getConnectionOptions();
-    $prefix = $this->getPrefix();
-    return $options['database'] . '.' . $prefix . $table;
+    $tableIdentifier = $this->identifiers->table($table);
+    // If already fully qualified, just pass it on.
+    if ($tableIdentifier->database || $tableIdentifier->schema) {
+      return $tableIdentifier->forMachine();
+    }
+    // Return as "<schema>"."<table>".
+    return $this->identifiers->schema($this->getConnectionOptions()['database'])->quotedMachineName . '.' . $tableIdentifier->quotedMachineName;
   }
 
   /**
@@ -983,11 +1095,15 @@ abstract class Connection {
    *
    * @return string
    *   The sanitized database name.
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use
+   *   IdentifierHandler methods instead.
+   *
+   * @see https://www.drupal.org/node/3513282
    */
   public function escapeDatabase($database) {
-    $database = preg_replace('/[^A-Za-z0-9_]+/', '', $database);
-    [$start_quote, $end_quote] = $this->identifierQuotes;
-    return $start_quote . $database . $end_quote;
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+    return $this->identifiers->schema($database)->forMachine();
   }
 
   /**
@@ -1004,14 +1120,16 @@ abstract class Connection {
    * @return string
    *   The sanitized table name.
    *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use
+   *   IdentifierHandler methods instead.
+   *
+   * @see https://www.drupal.org/node/3513282
    * @see \Drupal\Core\Database\Connection::prefixTables()
    * @see \Drupal\Core\Database\Connection::setPrefix()
    */
   public function escapeTable($table) {
-    if (!isset($this->escapedTables[$table])) {
-      $this->escapedTables[$table] = preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
-    }
-    return $this->escapedTables[$table];
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use IdentifierHandler methods instead. See https://www.drupal.org/node/3513282", E_USER_DEPRECATED);
+    return $this->identifiers->table($table)->canonical();
   }
 
   /**
@@ -1030,7 +1148,7 @@ abstract class Connection {
   public function escapeField($field) {
     if (!isset($this->escapedFields[$field])) {
       $escaped = preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
-      [$start_quote, $end_quote] = $this->identifierQuotes;
+      [$start_quote, $end_quote] = $this->identifiers->identifierQuotes;
       // Sometimes fields have the format table_alias.field. In such cases
       // both identifiers should be quoted, for example, "table_alias"."field".
       $this->escapedFields[$field] = $start_quote . str_replace('.', $end_quote . '.' . $start_quote, $escaped) . $end_quote;
@@ -1054,7 +1172,7 @@ abstract class Connection {
    */
   public function escapeAlias($field) {
     if (!isset($this->escapedAliases[$field])) {
-      [$start_quote, $end_quote] = $this->identifierQuotes;
+      [$start_quote, $end_quote] = $this->identifiers->identifierQuotes;
       $this->escapedAliases[$field] = $start_quote . preg_replace('/[^A-Za-z0-9_]+/', '', $field) . $end_quote;
     }
     return $this->escapedAliases[$field];
@@ -1242,6 +1360,8 @@ abstract class Connection {
    *
    * @param string $database
    *   The name of the database to create.
+   *
+   * @throws \Drupal\Core\Database\DatabaseNotFoundException
    */
   abstract public function createDatabase($database);
 

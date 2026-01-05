@@ -41,8 +41,11 @@ class StubConnection extends Connection {
    *   The identifier quote characters. Defaults to an empty strings.
    */
   public function __construct(\PDO $connection, array $connection_options, $identifier_quotes = ['', '']) {
-    $this->identifierQuotes = $identifier_quotes;
-    parent::__construct($connection, $connection_options);
+    parent::__construct(
+      $connection,
+      $connection_options,
+      new StubIdentifierHandler($connection_options['prefix'] ?? '', $identifier_quotes),
+    );
   }
 
   /**

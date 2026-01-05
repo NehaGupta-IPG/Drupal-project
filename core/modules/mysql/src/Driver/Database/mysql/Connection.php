@@ -64,11 +64,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  protected $identifierQuotes = ['"', '"'];
-
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(\PDO $connection, array $connection_options) {
     // @phpstan-ignore class.notFound
     assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Mysql : TRUE);
@@ -91,10 +86,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       }
     }
 
-    if ($this->identifierQuotes === ['"', '"'] && !$is_ansi_quotes_mode) {
-      $this->identifierQuotes = ['`', '`'];
-    }
-    parent::__construct($connection, $connection_options);
+    // Manage the table prefix.
+    $connection_options['prefix'] = $connection_options['prefix'] ?? '';
+
+    parent::__construct(
+      $connection,
+      $connection_options,
+      new IdentifierHandler($connection_options['prefix'], $is_ansi_quotes_mode ? ['"', '"'] : ['`', '`']),
+    );
   }
 
   /**
@@ -307,16 +306,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   }
 
   /**
-   * Overrides \Drupal\Core\Database\Connection::createDatabase().
-   *
-   * @param string $database
-   *   The name of the database to create.
-   *
-   * @throws \Drupal\Core\Database\DatabaseNotFoundException
+   * {@inheritdoc}
    */
   public function createDatabase($database) {
     // Escape the database name.
-    $database = Database::getConnection()->escapeDatabase($database);
+    $database = Database::getConnection()->identifiers->schema($database)->forMachine();
 
     try {
       // Create the database and set it as active.

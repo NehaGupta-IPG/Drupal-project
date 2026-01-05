@@ -290,18 +290,18 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     // Retrieves a sequence name that is owned by the table and column.
     $sequence_name = $this->connection
       ->query("SELECT pg_get_serial_sequence(:table, :column)", [
-        ':table' => $this->connection->getPrefix() . 'sequence_test',
+        ':table' => $this->connection->identifiers->tablePrefix . 'sequence_test',
         ':column' => 'uid',
       ])
       ->fetchField();
 
     $schema = $this->connection->getConnectionOptions()['schema'] ?? 'public';
-    $this->assertEquals($schema . '.' . $this->connection->getPrefix() . 'sequence_test_uid_seq', $sequence_name);
+    $this->assertEquals($schema . '.' . $this->connection->identifiers->tablePrefix . 'sequence_test_uid_seq', $sequence_name);
 
     // Checks if the sequence exists.
     $this->assertTrue((bool) \Drupal::database()
       ->query("SELECT c.relname FROM pg_class as c WHERE c.relkind = 'S' AND c.relname = :name", [
-        ':name' => $this->connection->getPrefix() . 'sequence_test_uid_seq',
+        ':name' => $this->connection->identifiers->tablePrefix . 'sequence_test_uid_seq',
       ])
       ->fetchField());
 
@@ -313,7 +313,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       AND d.refobjsubid > 0
       AND d.classid = 'pg_class'::regclass", [':seq_name' => $sequence_name])->fetchObject();
 
-    $this->assertEquals($this->connection->getPrefix() . 'sequence_test', $sequence_owner->table_name);
+    $this->assertEquals($this->connection->identifiers->tablePrefix . 'sequence_test', $sequence_owner->table_name);
     $this->assertEquals('uid', $sequence_owner->field_name, 'New sequence is owned by its table.');
 
   }
@@ -332,7 +332,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       ],
     ];
     $this->schema->createTable($table_name, $table_specification);
-    $prefixed_table_name = $this->connection->getPrefix($table_name) . $table_name;
+    $prefixed_table_name = $this->connection->identifiers->tablePrefix . $table_name;
 
     // Three different calls to the method Schema::tableExists() with an
     // unprefixed table name.

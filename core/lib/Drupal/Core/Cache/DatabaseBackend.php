@@ -128,7 +128,14 @@ class DatabaseBackend implements CacheBackendInterface {
     // ::select() is a much smaller proportion of the request.
     $result = [];
     try {
-      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $this->connection->escapeTable($this->bin) . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)])->fetchAll();
+      if (property_exists($this->connection, 'identifiers')) {
+        $table = $this->connection->identifiers->table($this->bin)->canonical();
+      }
+      else {
+        // @phpstan-ignore method.deprecated
+        $table = $this->connection->escapeTable($this->bin);
+      }
+      $result = $this->connection->query('SELECT [cid], [data], [created], [expire], [serialized], [tags], [checksum] FROM {' . $table . '} WHERE [cid] IN ( :cids[] ) ORDER BY [cid]', [':cids[]' => array_keys($cid_mapping)])->fetchAll();
     }
     catch (\Exception) {
       // Nothing to do.

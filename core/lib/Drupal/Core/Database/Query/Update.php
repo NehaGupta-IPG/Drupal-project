@@ -166,7 +166,7 @@ class Update extends Query implements ConditionInterface {
       $update_fields[] = $this->connection->escapeField($field) . '=' . $placeholders[$max_placeholder++];
     }
 
-    $query = $comments . 'UPDATE {' . $this->connection->escapeTable($this->table) . '} SET ' . implode(', ', $update_fields);
+    $query = $comments . 'UPDATE ' . $this->connection->identifiers->table($this->table)->forMachine() . ' SET ' . implode(', ', $update_fields);
 
     if (count($this->condition)) {
       $this->condition->compile($this->connection, $this);

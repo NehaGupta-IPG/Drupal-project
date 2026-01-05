@@ -128,7 +128,7 @@ class Schema extends DatabaseSchema {
    */
   public function queryTableInformation($table) {
     // Generate a key to reference this table's information on.
-    $prefixed_table = $this->connection->getPrefix() . $table;
+    $prefixed_table = $this->connection->identifiers->tablePrefix . $table;
     $key = $this->connection->prefixTables('{' . $table . '}');
 
     // Take into account that temporary tables are stored in a different schema.
@@ -220,7 +220,7 @@ EOD;
    *   The non-prefixed name of the table.
    */
   protected function resetTableInformation($table) {
-    $key = $this->defaultSchema . '.' . $this->connection->getPrefix() . $table;
+    $key = $this->defaultSchema . '.' . $this->connection->identifiers->tablePrefix . $table;
     unset($this->tableInformation[$key]);
   }
 
@@ -524,7 +524,7 @@ EOD;
    * {@inheritdoc}
    */
   public function findTables($table_expression) {
-    $prefix = $this->connection->getPrefix();
+    $prefix = $this->connection->identifiers->tablePrefix;
     $prefix_length = strlen($prefix);
     $tables = [];
 
@@ -570,7 +570,7 @@ EOD;
     }
 
     // Get the schema and tablename for the old table.
-    $table_name = $this->connection->getPrefix() . $table;
+    $table_name = $this->connection->identifiers->tablePrefix . $table;
     // Index names and constraint names are global in PostgreSQL, so we need to
     // rename them when renaming the table.
     $indexes = $this->connection->query('SELECT indexname FROM pg_indexes WHERE schemaname = :schema AND tablename = :table', [
@@ -743,7 +743,7 @@ EOD;
 
     $sql_params = [
       ':schema' => $this->defaultSchema,
-      ':table' => $this->connection->getPrefix() . $table,
+      ':table' => $this->connection->identifiers->tablePrefix . $table,
       ':index' => $index_name,
     ];
     return (bool) $this->connection->query("SELECT 1 FROM pg_indexes WHERE schemaname = :schema AND tablename = :table AND indexname = :index", $sql_params)->fetchField();
@@ -1142,7 +1142,7 @@ EOD;
   protected function getSequenceName(string $table, string $column): ?string {
     return $this->connection
       ->query("SELECT pg_get_serial_sequence(:table, :column)", [
-        ':table' => $this->defaultSchema . '.' . $this->connection->getPrefix() . $table,
+        ':table' => $this->defaultSchema . '.' . $this->connection->identifiers->tablePrefix . $table,
         ':column' => $column,
       ])
       ->fetchField();

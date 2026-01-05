@@ -84,7 +84,7 @@ abstract class Schema implements PlaceholderInterface {
   protected function getPrefixInfo($table = 'default', $add_prefix = TRUE) {
     $info = [
       'schema' => $this->defaultSchema,
-      'prefix' => $this->connection->getPrefix(),
+      'prefix' => isset($this->connection->identifiers) ? $this->connection->identifiers->tablePrefix : '',
     ];
     if ($add_prefix) {
       $table = $info['prefix'] . $table;
@@ -225,7 +225,7 @@ abstract class Schema implements PlaceholderInterface {
     $condition->condition('table_type', 'BASE TABLE');
     $condition->compile($this->connection, $this);
 
-    $prefix = $this->connection->getPrefix();
+    $prefix = $this->connection->identifiers->tablePrefix;
     $prefix_length = strlen($prefix);
     $tables = [];
     // Normally, we would heartily discourage the use of string

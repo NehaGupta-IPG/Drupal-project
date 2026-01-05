@@ -11,6 +11,7 @@ use Drupal\Core\Database\DatabaseAccessDeniedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 use Drupal\mysql\Driver\Database\mysql\Connection as BaseMySqlConnection;
+use Drupal\mysql\Driver\Database\mysql\IdentifierHandler as BaseMySqlIdentifierHandler;
 
 /**
  * MySQLi implementation of \Drupal\Core\Database\Connection.
@@ -45,11 +46,14 @@ class Connection extends BaseMySqlConnection {
       }
     }
 
-    if ($this->identifierQuotes === ['"', '"'] && !$isAnsiQuotesMode) {
-      $this->identifierQuotes = ['`', '`'];
-    }
+    // Manage the table prefix.
+    $connectionOptions['prefix'] = $connectionOptions['prefix'] ?? '';
 
-    BaseConnection::__construct($connection, $connectionOptions);
+    BaseConnection::__construct(
+      $connection,
+      $connectionOptions,
+      new BaseMySqlIdentifierHandler($connectionOptions['prefix'], $isAnsiQuotesMode ? ['"', '"'] : ['`', '`']),
+    );
   }
 
   /**
@@ -148,7 +152,7 @@ class Connection extends BaseMySqlConnection {
    */
   public function createDatabase($database): void {
     // Escape the database name.
-    $database = Database::getConnection()->escapeDatabase($database);
+    $database = Database::getConnection()->identifiers->schema($database)->forMachine();
 
     try {
       // Create the database and set it as active.

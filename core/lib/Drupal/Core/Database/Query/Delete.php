@@ -70,7 +70,7 @@ class Delete extends Query implements ConditionInterface {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);
 
-    $query = $comments . 'DELETE FROM {' . $this->connection->escapeTable($this->table) . '} ';
+    $query = $comments . 'DELETE FROM ' . $this->connection->identifiers->table($this->table)->forMachine();
 
     if (count($this->condition)) {
 

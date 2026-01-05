@@ -55,7 +55,7 @@ class Schema extends DatabaseSchema {
     }
 
     $sql = [];
-    $sql[] = "CREATE TABLE {" . $name . "} (\n" . $this->createColumnsSql($name, $table) . "\n)\n";
+    $sql[] = "CREATE TABLE " . $this->connection->identifiers->table($name)->forMachine() . " (\n" . $this->createColumnsSql($name, $table) . "\n)\n";
     return array_merge($sql, $this->createIndexSql($name, $table));
   }
 
@@ -63,16 +63,21 @@ class Schema extends DatabaseSchema {
    * Build the SQL expression for indexes.
    */
   protected function createIndexSql($tablename, $schema) {
+    // In SQLite, the 'CREATE [UNIQUE] INDEX' DDL statements requires that the
+    // table name be NOT prefixed by the schema name. We cannot use the
+    // Table::forMachine() method but should rather pick
+    // Table->quotedMachineName directly.
+    // @see https://www.sqlite.org/syntax/create-index-stmt.html
     $sql = [];
     $info = $this->getPrefixInfo($tablename);
     if (!empty($schema['unique keys'])) {
       foreach ($schema['unique keys'] as $key => $fields) {
-        $sql[] = 'CREATE UNIQUE INDEX [' . $info['schema'] . '].[' . $info['table'] . '_' . $key . '] ON [' . $info['table'] . '] (' . $this->createKeySql($fields) . ")\n";
+        $sql[] = 'CREATE UNIQUE INDEX [' . $info['schema'] . '].[' . $info['table'] . '_' . $key . '] ON ' . $this->connection->identifiers->table($info['table'])->quotedMachineName . ' (' . $this->createKeySql($fields) . ")\n";
       }
     }
     if (!empty($schema['indexes'])) {
       foreach ($schema['indexes'] as $key => $fields) {
-        $sql[] = 'CREATE INDEX [' . $info['schema'] . '].[' . $info['table'] . '_' . $key . '] ON [' . $info['table'] . '] (' . $this->createKeySql($fields) . ")\n";
+        $sql[] = 'CREATE INDEX [' . $info['schema'] . '].[' . $info['table'] . '_' . $key . '] ON ' . $this->connection->identifiers->table($info['table'])->quotedMachineName . ' (' . $this->createKeySql($fields) . ")\n";
       }
     }
     return $sql;
@@ -274,13 +279,13 @@ class Schema extends DatabaseSchema {
 
     $schema = $this->introspectSchema($table);
 
-    // SQLite doesn't allow you to rename tables outside of the current
-    // database. So the syntax '... RENAME TO database.table' would fail.
-    // So we must determine the full table name here rather than surrounding
-    // the table with curly braces in case the db_prefix contains a reference
-    // to a database outside of our existing database.
+    // SQLite doesn't allow you to rename tables outside of the current schema,
+    // so the syntax '... RENAME TO schema.table' would fail. We cannot use the
+    // Table::forMachine() method but should rather pick
+    // Table->quotedMachineName directly.
+    // @see https://www.sqlite.org/syntax/alter-table-stmt.html
     $info = $this->getPrefixInfo($new_name);
-    $this->executeDdlStatement('ALTER TABLE {' . $table . '} RENAME TO [' . $info['table'] . ']');
+    $this->executeDdlStatement('ALTER TABLE ' . $this->connection->identifiers->table($table)->forMachine() . ' RENAME TO ' . $this->connection->identifiers->table($info['table'])->quotedMachineName);
 
     // Drop the indexes, there is no RENAME INDEX command in SQLite.
     if (!empty($schema['unique keys'])) {
@@ -309,7 +314,7 @@ class Schema extends DatabaseSchema {
       return FALSE;
     }
     $this->connection->tableDropped = TRUE;
-    $this->executeDdlStatement('DROP TABLE {' . $table . '}');
+    $this->executeDdlStatement('DROP TABLE ' . $this->connection->identifiers->table($table)->forMachine());
     return TRUE;
   }
 
@@ -333,7 +338,7 @@ class Schema extends DatabaseSchema {
     if (empty($keys_new) && (empty($specification['not null']) || isset($specification['default']))) {
       // When we don't have to create new keys and we are not creating a NOT
       // NULL column without a default value, we can use the quicker version.
-      $query = 'ALTER TABLE {' . $table . '} ADD ' . $this->createFieldSql($field, $this->processField($specification));
+      $query = 'ALTER TABLE ' . $this->connection->identifiers->table($table)->forMachine() . ' ADD ' . $this->createFieldSql($field, $this->processField($specification));
       $this->executeDdlStatement($query);
 
       // Apply the initial value if set.

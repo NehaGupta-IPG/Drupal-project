@@ -125,7 +125,7 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
     $this->assertTrue($this->testingFakeConnection->schema()->tableExists('faking_table'));
 
     // Hardcoded assertion that we created the table in the non-public schema.
-    $this->assertCount(1, $this->testingFakeConnection->query("SELECT * FROM pg_tables WHERE schemaname = 'testing_fake' AND tablename = :prefixedTable", [':prefixedTable' => $this->testingFakeConnection->getPrefix() . "faking_table"])->fetchAll());
+    $this->assertCount(1, $this->testingFakeConnection->query("SELECT * FROM pg_tables WHERE schemaname = 'testing_fake' AND tablename = :prefixedTable", [':prefixedTable' => $this->testingFakeConnection->identifiers->tablePrefix . "faking_table"])->fetchAll());
   }
 
   /**
@@ -309,11 +309,11 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
 
     $this->assertTrue($this->testingFakeConnection->schema()->indexExists('faking_table', 'test_field'));
 
-    $results = $this->testingFakeConnection->query("SELECT * FROM pg_indexes WHERE indexname = :indexname", [':indexname' => $this->testingFakeConnection->getPrefix() . 'faking_table__test_field__idx'])->fetchAll();
+    $results = $this->testingFakeConnection->query("SELECT * FROM pg_indexes WHERE indexname = :indexname", [':indexname' => $this->testingFakeConnection->identifiers->tablePrefix . 'faking_table__test_field__idx'])->fetchAll();
 
     $this->assertCount(1, $results);
     $this->assertSame('testing_fake', $results[0]->schemaname);
-    $this->assertSame($this->testingFakeConnection->getPrefix() . 'faking_table', $results[0]->tablename);
+    $this->assertSame($this->testingFakeConnection->identifiers->tablePrefix . 'faking_table', $results[0]->tablename);
     $this->assertStringContainsString('USING btree (test_field)', $results[0]->indexdef);
 
     $this->testingFakeConnection->schema()->dropIndex('faking_table', 'test_field');
@@ -338,12 +338,12 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
     // phpcs:ignore
     // $this->assertTrue($this->testingFakeConnection->schema()->indexExists('faking_table', 'test_field'));
 
-    $results = $this->testingFakeConnection->query("SELECT * FROM pg_indexes WHERE indexname = :indexname", [':indexname' => $this->testingFakeConnection->getPrefix() . 'faking_table__test_field__key'])->fetchAll();
+    $results = $this->testingFakeConnection->query("SELECT * FROM pg_indexes WHERE indexname = :indexname", [':indexname' => $this->testingFakeConnection->identifiers->tablePrefix . 'faking_table__test_field__key'])->fetchAll();
 
     // Check the unique key columns.
     $this->assertCount(1, $results);
     $this->assertSame('testing_fake', $results[0]->schemaname);
-    $this->assertSame($this->testingFakeConnection->getPrefix() . 'faking_table', $results[0]->tablename);
+    $this->assertSame($this->testingFakeConnection->identifiers->tablePrefix . 'faking_table', $results[0]->tablename);
     $this->assertStringContainsString('USING btree (test_field)', $results[0]->indexdef);
 
     $this->testingFakeConnection->schema()->dropUniqueKey('faking_table', 'test_field');
@@ -373,7 +373,7 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
 
     $this->assertCount(1, $results);
     $this->assertSame('testing_fake', $results[0]->schemaname);
-    $this->assertSame($this->testingFakeConnection->getPrefix() . 'faking_table', $results[0]->tablename);
+    $this->assertSame($this->testingFakeConnection->identifiers->tablePrefix . 'faking_table', $results[0]->tablename);
     $this->assertStringContainsString('USING btree (id)', $results[0]->indexdef);
 
     $find_primary_keys_columns = new \ReflectionMethod(get_class($this->testingFakeConnection->schema()), 'findPrimaryKeyColumns');
@@ -398,7 +398,7 @@ class NonPublicSchemaTest extends DriverSpecificKernelTestBase {
     $result = $this->testingFakeConnection->query("SELECT * FROM information_schema.tables WHERE table_schema = 'testing_fake'")->fetchAll();
     $this->assertFalse($this->testingFakeConnection->schema()->tableExists('faking_table'));
     $this->assertTrue($this->testingFakeConnection->schema()->tableExists('new_faking_table'));
-    $this->assertEquals($this->testingFakeConnection->getPrefix() . 'new_faking_table', $result[0]->table_name);
+    $this->assertEquals($this->testingFakeConnection->identifiers->tablePrefix . 'new_faking_table', $result[0]->table_name);
     $this->assertEquals('testing_fake', $result[0]->table_schema);
     sort($tables);
     $this->assertEquals(['new_faking_table'], $tables);
