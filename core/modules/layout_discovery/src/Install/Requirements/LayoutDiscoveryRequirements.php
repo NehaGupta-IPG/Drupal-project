@@ -17,7 +17,7 @@ class LayoutDiscoveryRequirements implements InstallRequirementsInterface {
   /**
    * {@inheritdoc}
    *
-   * @return array{}|array{'layout_plugin': RequirementInfo}
+   * @return array{}|array{'layout_discovery': RequirementInfo}
    *   The module's requirements.
    */
   public static function getRequirements(): array {
