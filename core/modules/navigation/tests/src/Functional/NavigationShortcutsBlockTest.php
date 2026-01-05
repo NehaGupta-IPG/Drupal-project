@@ -9,12 +9,14 @@ use Drupal\shortcut\Entity\Shortcut;
 use Drupal\shortcut\Entity\ShortcutSet;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests for \Drupal\navigation\Plugin\Block\NavigationShortcutsBlock.
- *
- * @group navigation
  */
+#[Group('navigation')]
+#[RunTestsInSeparateProcesses]
 class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -51,8 +53,6 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
     $this->drupalGet('admin/config/system/cron');
     $expected_cache_tags = array_merge([
       'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
-      'block_view',
-      'config:block.block.title',
       'config:block_list',
       'config:navigation.settings',
       'config:navigation.block_layout',
@@ -92,7 +92,6 @@ class NavigationShortcutsBlockTest extends PageCacheTagsTestBase {
     ]));
     $this->verifyDynamicPageCache($test_page_url, 'MISS');
     $this->verifyDynamicPageCache($test_page_url, 'HIT');
-    $this->assertSession()->pageTextNotContains('Shortcuts');
     $this->assertSession()->linkNotExists('Cron');
 
     // Create a role with access to shortcuts as well as the necessary

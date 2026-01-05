@@ -162,7 +162,7 @@ class Sql extends QueryPluginBase {
   /**
    * The count field definition.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public array $count_field;
 
   /**
@@ -516,7 +516,7 @@ class Sql extends QueryPluginBase {
    */
   public function queueTable($table, $relationship = NULL, ?JoinPluginBase $join = NULL, $alias = NULL) {
     // If the alias is set, make sure it doesn't already exist.
-    if (isset($this->tableQueue[$alias])) {
+    if (isset($alias, $this->tableQueue[$alias])) {
       return $alias;
     }
 
@@ -539,7 +539,7 @@ class Sql extends QueryPluginBase {
 
     // Check this again to make sure we don't blow up existing aliases for
     // already adjusted joins.
-    if (isset($this->tableQueue[$alias])) {
+    if (isset($alias, $this->tableQueue[$alias])) {
       return $alias;
     }
 
@@ -846,7 +846,7 @@ class Sql extends QueryPluginBase {
    * This will automatically call ensureTable to make sure the required table
    * exists, *unless* $table is unset.
    *
-   * @param string $table
+   * @param string|null $table
    *   The table this field is attached to. If NULL, it is assumed this will
    *   be a formula; otherwise, ensureTable is used to make sure the
    *   table exists.
@@ -912,8 +912,10 @@ class Sql extends QueryPluginBase {
       $this->fields[$alias] = $field_info;
     }
 
-    // Keep track of all aliases used.
-    $this->fieldAliases[$table][$field] = $alias;
+    if ($table) {
+      // Keep track of all aliases used.
+      $this->fieldAliases[$table][$field] = $alias;
+    }
 
     return $alias;
   }
@@ -1062,7 +1064,7 @@ class Sql extends QueryPluginBase {
   /**
    * Add an ORDER BY clause to the query.
    *
-   * @param string $table
+   * @param string|null $table
    *   The table this field is part of. If a formula, enter NULL.
    *   If you want to orderby random use "rand" as table and nothing else.
    * @param string|null $field
