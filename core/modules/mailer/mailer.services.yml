@@ -53,4 +53,4 @@ services:
     autowire: true
   plugin.manager.email:
     class: Drupal\Core\Mailer\EmailManager
-    arguments: ['@module_handler', '@renderer', '@Symfony\Component\Mailer\Mailer', '@theme.registry', '@cache.discovery']
+    arguments: ['@container.namespaces', '@module_handler', '@renderer', '@Symfony\Component\Mailer\Mailer', '@theme.registry', '@cache.discovery']

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Mailer;
 
+use Drupal\Component\Plugin\Discovery\AttributeBridgeDecorator;
 use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Mailer\Attribute\Email as EmailAttribute;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Plugin\Discovery\AttributeClassDiscovery;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
-use Drupal\Core\Plugin\Discovery\YamlDiscovery;
+use Drupal\Core\Plugin\Discovery\YamlDiscoveryDecorator;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\RenderableInterface;
@@ -68,7 +71,8 @@ class EmailManager extends DefaultPluginManager {
   /**
    * Constructs EmailPluginManager object.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, RendererInterface $renderer, MailerInterface $mailer, Registry $themeRegistry, CacheBackendInterface $cache_backend) {
+  public function __construct(\Traversable $namespaces, ModuleHandlerInterface $module_handler, RendererInterface $renderer, MailerInterface $mailer, Registry $themeRegistry, CacheBackendInterface $cache_backend) {
+    parent::__construct('Plugin/Email', $namespaces, $module_handler, EmailPluginInterface::class, EmailAttribute::class);
     $this->factory = new ContainerFactory($this, EmailPluginInterface::class);
     $this->moduleHandler = $module_handler;
     $this->renderer = $renderer;
@@ -83,9 +87,11 @@ class EmailManager extends DefaultPluginManager {
    */
   protected function getDiscovery(): DiscoveryInterface {
     if (!isset($this->discovery)) {
-      $this->discovery = new YamlDiscovery('emails', $this->moduleHandler->getModuleDirectories());
+      $this->discovery = new AttributeClassDiscovery($this->subdir, $this->namespaces, $this->pluginDefinitionAttributeName);
+      $this->discovery = new YamlDiscoveryDecorator($this->discovery, 'emails', $this->moduleHandler->getModuleDirectories());
       $this->discovery->addTranslatableProperty('label', 'label_context');
       $this->discovery->addTranslatableProperty('description', 'description_context');
+      $this->discovery = new AttributeBridgeDecorator($this->discovery, $this->pluginDefinitionAttributeName);
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     }
     return $this->discovery;
