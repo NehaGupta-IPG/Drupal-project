@@ -181,14 +181,11 @@ class EmailManager extends DefaultPluginManager {
 
   /**
    * @param EmailPluginInterface $email
-   * @param Email|null $symfony_email
    * @return bool
    * @throws TransportExceptionInterface
    */
-  public function send(EmailPluginInterface $email, ?Email $symfony_email = NULL): bool {
-    if ($symfony_email === NULL) {
-      $symfony_email = $this->build($email);
-    }
+  public function send(EmailPluginInterface $email): bool {
+    $symfony_email = $this->build($email);
 
     $this->moduleHandler->alter('email_pre_send', $email, $symfony_email);
 
