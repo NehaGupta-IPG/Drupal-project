@@ -221,8 +221,6 @@ class DefaultsSectionStorageTest extends KernelTestBase {
 
   /**
    * Test that the absence of "entity_display.repository" triggers warning.
-   *
-   * @group legacy
    */
   public function testRequiredServiceTriggerError(): void {
     $this->expectDeprecation("The entity_display.repository service must be passed to Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage::__construct(). It was added in drupal:10.1.x and will be required before drupal:11.0.0. See https://www.drupal.org/node/3356831");

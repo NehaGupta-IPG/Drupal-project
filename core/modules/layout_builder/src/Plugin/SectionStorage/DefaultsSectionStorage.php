@@ -81,14 +81,14 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, SampleEntityGeneratorInterface $sample_entity_generator, EntityDisplayRepositoryInterface $entity_display_repository = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, SampleEntityGeneratorInterface $sample_entity_generator, ?EntityDisplayRepositoryInterface $entity_display_repository = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->sampleEntityGenerator = $sample_entity_generator;
     if (!$entity_display_repository) {
-      @trigger_error('The entity_display.repository service must be passed to ' . __NAMESPACE__ . '\DefaultsSectionStorage::__construct(). It was added in drupal:10.1.x and will be required before drupal:11.0.0. See https://www.drupal.org/node/3356831', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $entity_display_repository parameter is deprecated in drupal:11.3.0 and must be provided in drupal:12.0.0. See https://www.drupal.org/node/3356831', E_USER_DEPRECATED);
       $entity_display_repository = \Drupal::service('entity_display.repository');
     }
     $this->entityDisplayRepository = $entity_display_repository;

@@ -159,5 +159,4 @@ interface SectionStorageInterface extends SectionListInterface, PluginInspection
    */
   public function getEditLabel(): TranslatableMarkup;
 
-
 }

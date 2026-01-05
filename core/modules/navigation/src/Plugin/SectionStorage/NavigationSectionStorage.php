@@ -99,7 +99,7 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
    * {@inheritdoc}
    */
   public function label(): string {
-    return 'Navigation layout';
+    return $this->t('Navigation layout');
   }
 
   /**
@@ -211,6 +211,13 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
    */
   public function getContextMapping(): array {
     return ['navigation' => 'navigation'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEditLabel(): TranslatableMarkup {
+    return $this->label();
   }
 
 }
