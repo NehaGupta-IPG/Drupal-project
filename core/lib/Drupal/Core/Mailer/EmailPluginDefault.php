@@ -58,6 +58,10 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return (string) $this->pluginDefinition['key'];
   }
 
+  public function getLangcode(): ?string {
+    return $this->environment['langcode'] ?? NULL;
+  }
+
   public function getHtmlBodyTemplate(): ?string {
     return $this->pluginDefinition['html_body_template'];
   }
