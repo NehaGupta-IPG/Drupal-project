@@ -168,13 +168,6 @@ class EmailManager extends DefaultPluginManager {
         $metadata->merge(BubbleableMetadata::createFromRenderArray($body['text']));
       }
 
-      $context = [
-        'email' => $email,
-        'body' => $body,
-        'cacheable_metadata' => $metadata,
-      ];
-      $this->moduleHandler->alter('email_post_render', $symfony_email, $context);
-
       return $symfony_email;
     });
   }
