@@ -10,7 +10,7 @@ use Drupal\Core\Extension\Requirement\RequirementSeverity;
 /**
  * Install time requirements for the layout_discovery module.
  *
- * @phpstan-import-type RequirementInfo from \DDrupal\Core\Extension\InstallRequirementsInterface
+ * @phpstan-import-type RequirementInfo from \Drupal\Core\Extension\InstallRequirementsInterface
  */
 class LayoutDiscoveryRequirements implements InstallRequirementsInterface {
 
@@ -18,6 +18,7 @@ class LayoutDiscoveryRequirements implements InstallRequirementsInterface {
    * {@inheritdoc}
    *
    * @return array{}|array{'layout_plugin': RequirementInfo}
+   *   The module's requirements.
    */
   public static function getRequirements(): array {
     $requirements = [];
