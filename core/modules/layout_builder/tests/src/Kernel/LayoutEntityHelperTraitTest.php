@@ -6,6 +6,7 @@ namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\EntityContext;
@@ -36,6 +37,7 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'layout_discovery',
     'layout_builder',
     'entity_test',
     'user',
@@ -254,6 +256,66 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
     $this->assertSame([], $class->getEntitySections($entity));
   }
 
+  /**
+   * Test getSectionStorageContextsForEntity.
+   *
+   * Tests that getSectionStorageContextsForEntity respect
+   * hook_entity_view_mode_alter.
+   *
+   * @legacy-covers ::getSectionStorageContextsForEntity
+   */
+  public function testGetSectionStorageContextsForEntityRespectsViewModeAlter(): void {
+    // Install layout_builder_test module which implements hook_entity_view_mode_alter.
+    $this->enableModules(['layout_builder_test']);
+    $this->installEntitySchema('entity_view_mode');
+
+    // Create the teaser view mode.
+    $this->container->get('entity_type.manager')
+      ->getStorage('entity_view_mode')
+      ->create([
+        'id' => 'entity_test.teaser',
+        'targetEntityType' => 'entity_test',
+        'status' => TRUE,
+        'enabled' => TRUE,
+        'label' => 'Teaser',
+      ])
+      ->save();
+
+    // Create an entity view display for the 'default' view mode.
+    EntityViewDisplay::create([
+      'targetEntityType' => 'entity_test',
+      'bundle' => 'entity_test',
+      'mode' => 'default',
+      'status' => TRUE,
+    ])->save();
+
+    // Create an entity view display for the 'teaser' view mode.
+    EntityViewDisplay::create([
+      'targetEntityType' => 'entity_test',
+      'bundle' => 'entity_test',
+      'mode' => 'teaser',
+      'status' => TRUE,
+    ])->save();
+
+    // Create a test entity.
+    $entity = EntityTest::create([
+      'name' => 'Test entity',
+    ]);
+    $entity->save();
+
+    // Set a state variable that will trigger view mode alteration in the test module.
+    // The layout_builder_test module will alter the view mode from 'default' to 'teaser'.
+    \Drupal::state()->set('layout_builder_test_alter_view_mode', 'teaser');
+
+    $class = new TestLayoutEntityHelperTrait();
+    $contexts = $class->getSectionStorageContextsForEntity($entity);
+
+    // Verify that the view mode context reflects the altered view mode.
+    $this->assertArrayHasKey('view_mode', $contexts);
+    $this->assertInstanceOf(Context::class, $contexts['view_mode']);
+    $this->assertEquals('teaser', $contexts['view_mode']->getContextData()->getValue());
+  }
+
 }
 
 /**
@@ -262,8 +324,23 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
 class TestLayoutEntityHelperTrait {
   use LayoutEntityHelperTrait {
     getSectionStorageForEntity as public;
+    getSectionStorageContextsForEntity as public;
     originalEntityUsesDefaultStorage as public;
     getEntitySections as public;
+  }
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
+   * Constructs a new TestLayoutEntityHelperTrait.
+   */
+  public function __construct() {
+    $this->entityTypeManager = \Drupal::entityTypeManager();
   }
 
 }

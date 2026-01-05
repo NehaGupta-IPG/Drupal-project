@@ -8,11 +8,16 @@ use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\State\StateInterface;
 
 /**
  * Entity hook implementations for layout_builder_test.
  */
 class LayoutBuilderTestEntityHooks {
+
+  public function __construct(
+    protected readonly StateInterface $state,
+  ) {}
 
   /**
    * Implements hook_ENTITY_TYPE_view().
@@ -57,6 +62,18 @@ class LayoutBuilderTestEntityHooks {
   public function layoutBuilderEntityFormDisplayAlter(EntityFormDisplayInterface $form_display, array $context): void {
     if ($context['form_mode'] === 'layout_builder') {
       $form_display->setComponent('status', ['type' => 'boolean_checkbox', 'settings' => ['display_label' => TRUE]]);
+    }
+  }
+
+  /**
+   * Implements hook_entity_view_mode_alter().
+   */
+  #[Hook('entity_view_mode_alter')]
+  public function entityViewModeAlter(string &$view_mode, EntityInterface $entity): void {
+    // Allow tests to alter the view mode via state API.
+    $altered_view_mode = $this->state->get('layout_builder_test_alter_view_mode');
+    if ($altered_view_mode) {
+      $view_mode = $altered_view_mode;
     }
   }
 
