@@ -1136,18 +1136,24 @@ function hook_updater_info_alter(&$updaters) {
  *   - runtime: The runtime requirements are being checked and shown on the
  *     status report page.
  *
- * @return array<string, array{'title': \Drupal\Core\StringTranslation\TranslatableMarkup, 'value': mixed, description: \Drupal\Core\StringTranslation\TranslatableMarkup, 'severity': \Drupal\Core\Extension\Requirement\RequirementSeverity}>
+ * @return array<string, array{
+ *     'title': \Drupal\Core\StringTranslation\TranslatableMarkup,
+ *     'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
+ *     'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
+ *     'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
+ *     'weight'?: int,
+ *   }>
  *   An associative array where the keys are arbitrary but must be unique (it
  *   is suggested to use the module short name as a prefix) and the values are
  *   themselves associative arrays with the following elements:
  *   - title: The name of the requirement.
- *   - value: The current value (e.g., version, time, level, etc). During
- *     install phase, this should only be used for version numbers, do not set
- *     it if not applicable.
- *   - description: The description of the requirement/status.
- *     - REQUIREMENT_ERROR: The requirement failed with an error.
- *   - severity: The requirement's severity. Defaults to RequirementSeverity::OK
- *     when installing, or RequirementSeverity::Info otherwise.
+ *   - value: (optional) The current value (e.g., version, time, level, etc).
+ *     During install phase, this should only be used for version numbers, do
+ *     not set it if not applicable.
+ *   - description: (optional) The description of the requirement/status.
+ *   - severity: (optional) The requirement's severity. Defaults to
+ *     RequirementSeverity::OK when installing, or RequirementSeverity::Info
+ *     otherwise.
  */
 function hook_requirements($phase): array {
   $requirements = [];

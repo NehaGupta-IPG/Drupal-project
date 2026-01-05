@@ -6,9 +6,9 @@ namespace Drupal\Core\Extension;
  * Provides method for checking requirements during install time.
  *
  * @phpstan-type RequirementInfo array{
- *   'title'?: string|\Drupal\Core\Entity\TranslatableInterface,
- *   'value'?: string|\Drupal\Core\Entity\TranslatableInterface,
- *   'description'?: string|\Drupal\Core\Entity\TranslatableInterface,
+ *   'title'?: \Drupal\Core\StringTranslation\TranslatableMarkup,
+ *   'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
+ *   'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
  *   'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
  *   'weight'?: int,
  * }
@@ -39,12 +39,13 @@ interface InstallRequirementsInterface {
    *
    * @return array<string, RequirementInfo>
    *   An associative array where the keys are arbitrary but must be unique (it
-   *   is suggested to use the module short name as a prefix) and the values are
-   *   themselves associative arrays with the following elements:
+   *   is suggested to use the module short name as a prefix) and the values
+   *   are themselves associative arrays with the following elements:
    *   - title: The name of the requirement.
-   *   - value: This should only be used for version numbers, do not set it if
-   *     not applicable.
-   *   - description: The description of the requirement/status.
+   *   - value: (optional) The current value (e.g., version, time, level,
+   *     status, etc). During install phase, this should only be used for
+   *     version numbers, do not set it if not applicable.
+   *   - description: (optional) The description of the requirement/status.
    *   - severity: (optional) An instance of
    *     \Drupal\Core\Extension\Requirement\RequirementSeverity enum. Defaults
    *     to RequirementSeverity::OK when installing.
