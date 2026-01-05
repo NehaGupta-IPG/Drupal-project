@@ -39,8 +39,4 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
 
   public function getHeaders(): array;
 
-  public function setTextBody(RenderableInterface|array $text_body): static;
-
-  public function setHtmlBody(RenderableInterface|array $html_body): static;
-
 }

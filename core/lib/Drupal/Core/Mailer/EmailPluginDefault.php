@@ -66,48 +66,24 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return $this->pluginDefinition['text_body_template'];
   }
 
-  public function setHtmlBody(RenderableInterface|array $html_body): static {
-    $this->htmlBody = $html_body;
-    return $this;
-  }
-
-  public function setTextBody(RenderableInterface|array $text_body): static {
-    $this->textBody = $text_body;
-    return $this;
-  }
-
   public function htmlBody(): RenderableInterface|array|null {
-    if ($this->htmlBody !== NULL) {
-      return $this->htmlBody;
+    if ($template_id = $this->getHtmlBodyTemplate()) {
+      return [
+        '#theme' => $template_id,
+        '#params' => $this->params,
+      ];
     }
-    $template_id = $this->getHtmlBodyTemplate();
-    if (empty($template_id)) {
-      return NULL;
-    }
-    $build = [
-      '#theme' => $template_id,
-    ];
-    foreach ($this->params as $key => $value) {
-      $build['#' . $key] = $value;
-    }
-    return $build;
+    return NULL;
   }
 
   public function textBody(): RenderableInterface|array|null {
-    if ($this->textBody !== NULL) {
-      return $this->textBody;
+    if ($template_id = $this->getTextBodyTemplate()) {
+      return [
+        '#theme' => $template_id,
+        '#params' => $this->params,
+      ];
     }
-    $template_id = $this->getTextBodyTemplate();
-    if (empty($template_id)) {
-      return NULL;
-    }
-    $build = [
-      '#theme' => $template_id,
-    ];
-    foreach ($this->params as $key => $value) {
-      $build['#' . $key] = $value;
-    }
-    return $build;
+    return NULL;
   }
 
   public function getHeaders(): array {
@@ -147,7 +123,7 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return $this;
   }
 
-  public function subject(string $subject): static {
+  public function subject(\Stringable $subject): static {
     $this->setHeader('Subject', $subject);
     return $this;
   }
