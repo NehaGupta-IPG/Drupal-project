@@ -336,6 +336,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     $fields['menu_name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Menu name'))
       ->setDescription(t('The menu name. All links with the same menu name (such as "tools") are part of the same menu.'))
+      ->setSetting('max_length', \Drupal::state()->get('menu_link_content_menu_name_max_length', 32))
       ->setDefaultValue('tools')
       ->setSetting('is_ascii', TRUE);
 
