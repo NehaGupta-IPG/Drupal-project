@@ -22,6 +22,7 @@ use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -222,8 +223,9 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   /**
    * Test that the absence of "entity_display.repository" triggers warning.
    */
+  #[IgnoreDeprecations]
   public function testRequiredServiceTriggerError(): void {
-    $this->expectDeprecation("The entity_display.repository service must be passed to Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage::__construct(). It was added in drupal:10.1.x and will be required before drupal:11.0.0. See https://www.drupal.org/node/3356831");
+    $this->expectDeprecation('Calling Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage::__construct() without the $entity_display_repository parameter is deprecated in drupal:11.3.0 and must be provided in drupal:12.0.0. See https://www.drupal.org/node/3356831');
     $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
     $entity_type_bundle_info = $this->prophesize(EntityTypeBundleInfoInterface::class);
     $sample_entity_generator = $this->prophesize(SampleEntityGeneratorInterface::class);
