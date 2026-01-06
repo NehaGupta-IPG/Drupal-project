@@ -7,15 +7,17 @@ namespace Drupal\Tests\menu_link_content\Functional\Update;
 use Drupal\Core\Database\Connection;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\Core\Serialization\Yaml;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path for setting menu_name length state variable.
  *
  * @see system_update_10101()
- *
- * @group Update
- * @group legacy
  */
+#[Group('Update')]
+#[Group('legacy')]
+#[RunTestsInSeparateProcesses]
 class MenuLinkContentLengthUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -32,7 +34,7 @@ class MenuLinkContentLengthUpdateTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setDatabaseDumpFiles() {
+  protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-9.4.0.bare.standard.php.gz',
     ];
@@ -50,7 +52,7 @@ class MenuLinkContentLengthUpdateTest extends UpdatePathTestBase {
   /**
    * Tests the upgrade path for menu_link_content_menu_name_max_length variable.
    */
-  public function testMenuLinkContentLengthStateVariable() {
+  public function testMenuLinkContentLengthStateVariable(): void {
     $length = \Drupal::state()->get('menu_link_content_menu_name_max_length', NULL);
     $this->assertEquals($length, NULL);
 

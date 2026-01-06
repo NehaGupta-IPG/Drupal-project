@@ -235,5 +235,5 @@ function system_update_11301(): string {
   $entity_type = $entityUpdateManager->getEntityType('menu_link_content');
   $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('menu_link_content');
   $entityUpdateManager->updateFieldableEntityType($entity_type, $field_storage_definitions);
-  return t("Changed maximum length of menu_link_content menu_name field to {$length}");
+  return t('Changed maximum length of menu_link_content menu_name field to @length', ['@length' => $length]);
 }
