@@ -1501,16 +1501,20 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       if (!empty($selected_group_id)) {
         $selected_group = $selected_group_id;
       }
-      else {
-        $selected_group = $input[$this->options['group_info']['identifier']] ?? NULL;
+      elseif (isset($input[$this->options['group_info']['identifier']])) {
+        $selected_group = $input[$this->options['group_info']['identifier']];
       }
+      else {
+        return FALSE;
+      }
+
       if ($selected_group == 'All' && !empty($this->options['group_info']['optional'])) {
         return NULL;
       }
       if ($selected_group != 'All' && empty($this->options['group_info']['group_items'][$selected_group])) {
         return FALSE;
       }
-      if (isset($selected_group) && isset($this->options['group_info']['group_items'][$selected_group])) {
+      if (isset($this->options['group_info']['group_items'][$selected_group])) {
         $selected_group_options = $this->options['group_info']['group_items'][$selected_group];
 
         $operator_id = $this->options['expose']['operator'];
@@ -1527,9 +1531,8 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         $this->group_info = $input[$this->options['group_info']['identifier']];
         return TRUE;
       }
-      else {
-        return FALSE;
-      }
+
+      return FALSE;
     }
   }
 
