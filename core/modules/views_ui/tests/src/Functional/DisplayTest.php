@@ -8,12 +8,14 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the display UI.
  */
 #[Group('views_ui')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class DisplayTest extends UITestBase {
 
   /**
@@ -131,9 +133,6 @@ class DisplayTest extends UITestBase {
    * Tests display areas.
    */
   public function testDisplayAreas(): void {
-    // Show the advanced column.
-    $this->config('views.settings')->set('ui.show.advanced_column', TRUE)->save();
-
     // Add a new data display to the view.
     $view = Views::getView('test_display');
     $view->storage->addDisplay('display_no_area_test');

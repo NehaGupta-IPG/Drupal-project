@@ -25,7 +25,7 @@ class AttributeHelperTest extends UnitTestCase {
    *   An array of test data each containing an array of attributes, the name
    *   of the attribute to check existence of, and the expected result.
    */
-  public static function providerTestAttributeExists() {
+  public static function providerTestAttributeExists(): array {
     return [
       [['class' => ['example-class']], 'class', TRUE],
       [[], 'class', FALSE],
@@ -54,14 +54,30 @@ class AttributeHelperTest extends UnitTestCase {
    *   An array of test data each containing an initial attribute collection, an
    *   Attribute object or array to be merged, and the expected result.
    */
-  public static function providerTestMergeCollections() {
+  public static function providerTestMergeCollections(): array {
     return [
       [[], ['class' => ['class1']], ['class' => ['class1']]],
       [[], new Attribute(['class' => ['class1']]), ['class' => ['class1']]],
-      [['class' => ['example-class']], ['class' => ['class1']], ['class' => ['example-class', 'class1']]],
-      [['class' => ['example-class']], new Attribute(['class' => ['class1']]), ['class' => ['example-class', 'class1']]],
-      [['class' => ['example-class']], ['id' => 'foo', 'href' => 'bar'], ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar']],
-      [['class' => ['example-class']], new Attribute(['id' => 'foo', 'href' => 'bar']), ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar']],
+      [
+        ['class' => ['example-class']],
+        ['class' => ['class1']],
+        ['class' => ['example-class', 'class1']],
+      ],
+      [
+        ['class' => ['example-class']],
+        new Attribute(['class' => ['class1']]),
+        ['class' => ['example-class', 'class1']],
+      ],
+      [
+        ['class' => ['example-class']],
+        ['id' => 'foo', 'href' => 'bar'],
+        ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar'],
+      ],
+      [
+        ['class' => ['example-class']],
+        new Attribute(['id' => 'foo', 'href' => 'bar']),
+        ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar'],
+      ],
     ];
   }
 

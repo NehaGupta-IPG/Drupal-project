@@ -7,18 +7,15 @@ namespace Drupal\KernelTests\Core\Extension;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests hook_module_implements_alter().
  */
 #[Group('Module')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class ModuleImplementsAlterTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Tests hook_module_implements_alter() adding an implementation.

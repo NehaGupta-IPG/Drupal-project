@@ -19,11 +19,13 @@ use Drupal\Tests\WaitTerminateTestTrait;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "Node" content entity type.
  */
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class NodeTest extends ResourceTestBase {
 
   use CommonCollectionFilterAccessTestPatternsTrait;
@@ -405,7 +407,8 @@ class NodeTest extends ResourceTestBase {
     // the internal properties of our variation cache. Reset it.
     $variation_cache->reset();
 
-    $cache = $variation_cache->get(['node--camelids', $this->entity->uuid(), $this->entity->language()->getId()], new CacheableMetadata());
+    $cache = $variation_cache
+      ->get(['node--camelids', $this->entity->uuid(), $this->entity->language()->getId()], new CacheableMetadata());
     $cached_fields = $cache->data['fields'];
     $this->assertSameSize($field_names, $cached_fields);
     array_walk($field_names, function ($field_name) use ($cached_fields) {

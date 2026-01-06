@@ -16,11 +16,13 @@ use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "Term" content entity type.
  */
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class TermTest extends ResourceTestBase {
 
   use CommonCollectionFilterAccessTestPatternsTrait;
@@ -480,7 +482,11 @@ class TermTest extends ResourceTestBase {
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
     $this->setUpAuthorization('GET');
     $response = $this->request('GET', $url, $request_options);
-    $this->assertSameDocument($this->getExpectedDocument(), Json::decode($response->getBody()));
+    $expected_document = $this->getExpectedDocument();
+    $working_copy_url = clone $url;
+    $working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
+    $expected_document['data']['links']['working-copy']['href'] = $working_copy_url->setAbsolute()->toString();
+    $this->assertSameDocument($expected_document, Json::decode($response->getBody()));
   }
 
   /**
