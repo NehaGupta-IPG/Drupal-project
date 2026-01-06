@@ -264,4 +264,36 @@ class DialogTest extends WebDriverTestBase {
     $this->assertSame(808, $width);
   }
 
+  /**
+   * Tests checkbox controls textfield visibility in dialog forms.
+   */
+  public function testDialogCheckbox(): void {
+    $this->drupalGet('ajax-test/dialog');
+    $page = $this->getSession()->getPage();
+
+    // Open the form in a modal dialog.
+    $page->clickLink('Link 5 (form)');
+
+    // Wait for dialog to open.
+    $this->assertSession()->waitForElementVisible('css', '.ui-dialog');
+
+    // Find the trigger checkbox and conditional textfield.
+    $trigger = $page->findField('trigger_checkbox');
+    $this->assertNotNull($trigger, 'Trigger checkbox found in dialog');
+    $this->assertFalse($trigger->isChecked(), 'Checkbox is initially unchecked');
+
+    $conditional_field = $page->findField('conditional_textfield');
+    $this->assertNotNull($conditional_field, 'Conditional textfield found in dialog');
+
+    // Check the checkbox to show the conditional textfield.
+    $trigger->check();
+    $this->getSession()->wait(500);
+    $this->assertTrue($conditional_field->isVisible(), 'Conditional textfield is visible when checkbox is checked');
+
+    // Uncheck to hide the textfield.
+    $trigger->uncheck();
+    $this->getSession()->wait(500);
+    $this->assertFalse($conditional_field->isVisible(), 'Conditional textfield is hidden when checkbox is unchecked');
+  }
+
 }
