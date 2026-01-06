@@ -703,7 +703,7 @@
         .prop('disabled', e.value);
       // Only trigger dialog button updates if the target is a submit button
       if (e.target.matches('input[type="submit"], button[type="submit"]')) {
-        const dialog = document.querySelector('.ui-dialog-content');
+        const dialog = e.target.closest('.ui-dialog-content');
         if (dialog) {
           dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
         }
@@ -755,7 +755,7 @@
       $element.toggle(e.value);
       // Only trigger dialog button updates if the target is a submit button
       if (e.target.matches('input[type="submit"], button[type="submit"]')) {
-        const dialog = document.querySelector('.ui-dialog-content');
+        const dialog = e.target.closest('.ui-dialog-content');
         if (dialog) {
           dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
         }
