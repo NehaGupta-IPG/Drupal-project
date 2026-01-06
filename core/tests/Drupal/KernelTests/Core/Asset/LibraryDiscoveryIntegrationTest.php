@@ -196,7 +196,7 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
     $overridden_assets = array_column($this->libraryDiscovery->getLibraryByName('test_base_theme', 'global-styling')['css'], 'data');
 
     // Remove the sub-removed from overridden.
-    $sub_remove_key = array_search('base-add.sub-remove.css', $original_assets);
+    $sub_remove_key = array_search('core/modules/system/tests/themes/test_base_theme/base-add.sub-remove.css', $original_assets);
     unset($original_assets[$sub_remove_key]);
     $original_assets = array_values($original_assets);
 
@@ -245,16 +245,15 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
 
   /**
    * Tests previous behavior of using the last overridden path.
-   *
-   * @group legacy
    */
+  #[Group('legacy')]
   public function testLibrariesOverrideLegacyOverride(): void {
     // Activate a sub-theme that overrides a library override.
     $this->activateTheme('test_legacy_subtheme');
     // Assert that effective libraries override is from the test_legacy_subtheme.
     $this->assertNoAssetInLibrary('core/modules/system/tests/themes/test_base_theme/base-add.sub-remove.css', 'test_base_theme', 'global-styling', 'css');
     $this->assertAssetInLibrary('core/modules/system/tests/themes/test_legacy_subtheme/css/legacy-sub-theme-libraries-extend.css', 'test_base_theme', 'global-styling', 'css');
-    $this->expectDeprecation('Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Use the original path (/core/modules/system/tests/themes/test_base_theme/css/base-libraries-extend.css) as the key. See https://www.drupal.org/node/3489303');
+    $this->expectDeprecation('Overriding a library asset using an overridden path as the key is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the original path (/core/modules/system/tests/themes/test_base_theme/css/base-libraries-extend.css) as the key. See https://www.drupal.org/node/3489303');
   }
 
   /**
@@ -357,7 +356,11 @@ class LibraryDiscoveryIntegrationTest extends KernelTestBase {
 
     $theme_manager->setActiveTheme($theme_initializer->getActiveThemeByName($theme_name));
 
+    // The library discovery instance must be recreated since theme
+    // installations reset the system, and the theme manager referenced within
+    // the library discovery service must also be recreated.
     $this->libraryDiscovery->clear();
+    $this->libraryDiscovery = $this->container->get('library.discovery');
 
     $this->assertSame($theme_name, $theme_manager->getActiveTheme()->getName());
   }

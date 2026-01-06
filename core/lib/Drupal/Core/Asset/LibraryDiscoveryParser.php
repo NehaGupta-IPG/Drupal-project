@@ -171,7 +171,7 @@ class LibraryDiscoveryParser {
     }
 
     $libraries = $this->parseLibraryInfo($extension, $path);
-    $libraries = $this->applyLibrariesOverride($libraries, $extension);
+    $libraries = $this->applyLibrariesOverride($libraries, $extension, $path);
 
     foreach ($libraries as $id => &$library) {
       if (!isset($library['js']) && !isset($library['css']) && !isset($library['drupalSettings']) && !isset($library['dependencies'])) {
@@ -542,15 +542,44 @@ class LibraryDiscoveryParser {
    *   The libraries definitions.
    * @param string $extension
    *   The extension in which these libraries are defined.
+   * @param string $extension_path
+   *   The extension path.
    *
    * @return array
    *   The modified libraries definitions.
    */
-  protected function applyLibrariesOverride($libraries, $extension) {
+  protected function applyLibrariesOverride($libraries, $extension, $extension_path) {
     $active_theme = $this->themeManager->getActiveTheme();
     // ActiveTheme::getLibrariesOverride() returns libraries-overrides for the
     // current theme as well as all its base themes.
     $all_libraries_overrides = $active_theme->getLibrariesOverride();
+    if ($all_libraries_overrides) {
+      // Populate the original library paths if there are library overrides.
+      // It'll be used to check if the original path is being referenced in a
+      // libraries override.
+      // @todo Remove BC in Drupal 12.0.0 https://www.drupal.org/node/2852314.
+      foreach ($libraries as $library) {
+        foreach (['js', 'css'] as $type) {
+          if (!isset($library[$type]) || !is_array($library[$type])) {
+            continue;
+          }
+          $value = $library[$type];
+          if ($type === 'css') {
+            // Loop through the CSS categories.
+            foreach ($value as $library_entries) {
+              foreach (array_keys($library_entries) as $library_path) {
+                $this->originalLibraryPaths[$this->resolveThemeAssetPath($extension_path, $library_path)] = $library_path;
+              }
+            }
+          }
+          else {
+            foreach (array_keys($value) as $library_path) {
+              $this->originalLibraryPaths[$this->resolveThemeAssetPath($extension_path, $library_path)] = $library_path;
+            }
+          }
+        }
+      }
+    }
     foreach ($libraries as $library_name => $library) {
       foreach ($all_libraries_overrides as $theme_path => $libraries_overrides) {
         $libraries_overrides = $this->applyLibrariesMovedOverrides($library, $library_name, $extension, $libraries_overrides, $active_theme);
@@ -641,7 +670,7 @@ class LibraryDiscoveryParser {
         // base theme), so get the actual original path by which the library
         // asset was keyed.
         @trigger_error(sprintf(
-          'Overriding a library asset using an overridden path as the key is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. Use the original path (%s) as the key. See https://www.drupal.org/node/3489303',
+          'Overriding a library asset using an overridden path as the key is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use the original path (%s) as the key. See https://www.drupal.org/node/3489303',
           $original
         ), E_USER_DEPRECATED);
         $original = $this->originalLibraryPaths[$original];

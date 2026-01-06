@@ -782,8 +782,8 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getLatestOverridePath
-   * @covers ::setLatestOverridePath
+   * @legacy-covers ::getLatestOverridePath
+   * @legacy-covers ::setLatestOverridePath
    */
   public function testLatestOverridePath(): void {
     $latest = $this->libraryDiscoveryParser->getLatestOverridePath('original-path', 'type', 'library_name', 'extension');
