@@ -169,12 +169,27 @@ class Image extends File {
   /**
    * {@inheritdoc}
    */
-  public function hasChanged(MediaInterface $media, MediaInterface $original) {
-    $image_has_changed = parent::hasChanged($media, $original);
-    $source_field = $this->configuration['source_field'];
-    $alt = $media->get($source_field)->alt;
-    $original_alt = $original->get($source_field)->alt;
-    return $image_has_changed || $alt != $original_alt;
+  public function hasChanged(MediaInterface $media, MediaInterface $original): bool {
+    // Preserve base behavior: compare source field main property.
+    if (parent::hasChanged($media, $original)) {
+      return TRUE;
+    }
+
+    // Alt comparison is optional and only applies when supported.
+    $source_field = $this->configuration['source_field'] ?? NULL;
+    if (!$source_field || !$media->hasField($source_field) || !$original->hasField($source_field)) {
+      return FALSE;
+    }
+
+    $items = $media->get($source_field);
+    $original_items = $original->get($source_field);
+
+    // Ensure both have values and support alt.
+    if ($items->isEmpty() || $original_items->isEmpty() || !isset($items->alt)) {
+      return FALSE;
+    }
+
+    return $items->alt !== $original_items->alt;
   }
 
 }
