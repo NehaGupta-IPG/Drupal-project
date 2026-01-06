@@ -6,7 +6,6 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InfoParser;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Extend DrupalKernel to handle force some kernel behaviors.
