@@ -106,7 +106,7 @@ class ThemeSettingsProvider {
       }
 
       /** @var \Drupal\Core\Theme\ActiveTheme $active_theme */
-      $active_theme = \Drupal::service('theme.initialization')->getActiveThemeByName($theme);
+      $active_theme = $this->themeInitialization->getActiveThemeByName($theme);
 
       // Generate the path to the logo image.
       if ($themeSettings->get('logo.use_default')) {
