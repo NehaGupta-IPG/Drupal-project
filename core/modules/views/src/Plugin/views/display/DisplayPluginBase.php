@@ -1992,7 +1992,29 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           /** @var \Drupal\views\Plugin\views\ViewsPluginInterface $plugin */
           $plugin = Views::pluginManager($plugin_type)->createInstance($type);
           if ($plugin) {
-            $plugin->init($this->view, $this, $plugin_options['options']);
+            // Initialize with defaults plugin options.
+            $plugin->init($this->view, $this);
+
+            // Filter stored plugin options to keep only type-compatible ones.
+            // This prevents issues like Table style's 'columns' (array)
+            // overwriting Grid style's 'columns' (integer).
+            $compatible_options = [];
+            foreach ($plugin_options['options'] as $key => $value) {
+              if (!isset($plugin->options[$key])) {
+                // Option doesn't exist in target plugin, skip it.
+                continue;
+              }
+              // Only keep if types are compatible.
+              if (is_array($plugin->options[$key]) === is_array($value)) {
+                $compatible_options[$key] = $value;
+              }
+            }
+
+            // Merge compatible options from stored plugin options.
+            if (!empty($compatible_options)) {
+              $plugin->unpackOptions($plugin->options, $compatible_options);
+            }
+
             $plugin_options = [
               'type' => $type,
               'options' => $plugin->options,
