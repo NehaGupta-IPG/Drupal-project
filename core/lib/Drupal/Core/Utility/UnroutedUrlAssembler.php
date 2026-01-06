@@ -56,13 +56,15 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
    * based on a check of whether the path is a valid external URL.
    */
   public function assemble($uri, array $options = [], $collect_bubbleable_metadata = FALSE) {
+    $allowed_protocols = !empty($options['allowed_protocols']) ? $options['allowed_protocols'] : [];
+
     // Note that UrlHelper::isExternal will return FALSE if the $uri has a
     // disallowed protocol.  This is later made safe since we always add at
     // least a leading slash.
     if (parse_url($uri, PHP_URL_SCHEME) === 'base') {
       return $this->buildLocalUrl($uri, $options, $collect_bubbleable_metadata);
     }
-    elseif (UrlHelper::isExternal($uri)) {
+    elseif (UrlHelper::isExternal($uri, $allowed_protocols)) {
       // UrlHelper::isExternal() only returns true for safe protocols.
       return $this->buildExternalUrl($uri, $options, $collect_bubbleable_metadata);
     }
