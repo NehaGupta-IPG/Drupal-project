@@ -1453,6 +1453,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $persist = [];
     if (isset($this->container)) {
       $persist = $this->getServicesToPersist($this->container);
+      // Reset any existing container in order to avoid holding on to old object
+      // references, otherwise memory usage grows with each rebuild.
+      $this->container->reset();
     }
     $this->persistServices($container, $persist);
 

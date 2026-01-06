@@ -110,19 +110,6 @@ class InstallerKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
-  protected function attachSynthetic(ContainerInterface $container): void {
-    parent::attachSynthetic($container);
-
-    // Reset any existing container in order to avoid holding on to old object
-    // references, otherwise memory usage grows exponentially with each rebuild
-    // when multiple modules are being installed.
-    // @todo Move this to the parent class after https://www.drupal.org/i/2066993
-    $this->container?->reset();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function getExtensions(): array {
     $extensions = parent::getExtensions() ?: [];
     if (!static::installationAttempted()) {
