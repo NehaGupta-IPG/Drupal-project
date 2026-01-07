@@ -252,7 +252,7 @@ final class NavigationRenderer {
       // Exclude current route local task, since it is not going to be included
       // in the page actions link list.
       $url = $local_task['#link']['url'] ?? NULL;
-      if ($url?->getRouteName() === $entity_local_tasks['route_name']) {
+      if ($url?->getRouteName() && $url->getRouteName() === $entity_local_tasks['route_name']) {
         continue;
       }
       // The $local_task array that we get here is tailor-made for use
