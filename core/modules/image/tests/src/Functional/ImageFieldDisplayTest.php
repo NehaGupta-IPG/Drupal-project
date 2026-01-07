@@ -634,8 +634,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     ];
     $this->drupalGet("admin/structure/types/manage/article/fields/node.article.$private_field_name");
     $this->submitForm($edit, 'Save');
-    // Clear the cache and reload the field configuration
-    // to retrieve the UUID of the default image file.
+    // Clear the cache and reload the field configuration to retrieve the UUID
+    // of the default image file.
     $this->container->get('entity_field.manager')->clearCachedFieldDefinitions();
     $private_field = FieldConfig::loadByName('node', 'article', $private_field_name);
     $file_uuid = $private_field->getSetting('default_image')['uuid'];
