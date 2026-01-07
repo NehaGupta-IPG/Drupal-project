@@ -61,7 +61,7 @@ class ImageItem extends FileItem {
   /**
    * The default image directory.
    */
-  public const string DEFAULT_IMAGE_DIRECTORY = 'default_images';
+  final public const string DEFAULT_IMAGE_DIRECTORY = 'default_images';
 
   /**
    * {@inheritdoc}
