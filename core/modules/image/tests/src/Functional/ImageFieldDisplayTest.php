@@ -624,8 +624,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalGet($private_default_image_url);
     $this->assertSession()->statusCodeEquals(403);
 
-    // Override the default image with the field configuration for
-    // the next access check.
+    // Override the default image with the field configuration for the next
+    // access check.
     $edit = [
       // Get the path of the 'image-test-transparent-out-of-range.gif' file.
       'files[settings_default_image_uuid]' => $this->container->get('file_system')->realpath($images[3]->uri),
