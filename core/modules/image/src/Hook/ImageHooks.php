@@ -14,6 +14,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\image\ImageDerivativeUtilities;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
+use Drupal\image\Plugin\Field\FieldType\ImageItem;
 
 /**
  * Hook implementations for image.
@@ -172,7 +173,7 @@ class ImageHooks {
     }
     // If the upload destination changed, then move the file.
     if ($file_new && StreamWrapperManager::getScheme($file_new->getFileUri()) != $field_storage->getSetting('uri_scheme')) {
-      $directory = $field_storage->getSetting('uri_scheme') . '://default_images/';
+      $directory = $field_storage->getSetting('uri_scheme') . '://' . ImageItem::DEFAULT_IMAGE_DIRECTORY . '/';
       \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
       \Drupal::service('file.repository')->move($file_new, $directory . $file_new->getFilename());
     }
@@ -207,7 +208,7 @@ class ImageHooks {
     }
     // If the upload destination changed, then move the file.
     if ($file_new && StreamWrapperManager::getScheme($file_new->getFileUri()) != $field_storage->getSetting('uri_scheme')) {
-      $directory = $field_storage->getSetting('uri_scheme') . '://default_images/';
+      $directory = $field_storage->getSetting('uri_scheme') . '://' . ImageItem::DEFAULT_IMAGE_DIRECTORY . '/';
       \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
       \Drupal::service('file.repository')->move($file_new, $directory . $file_new->getFilename());
     }
