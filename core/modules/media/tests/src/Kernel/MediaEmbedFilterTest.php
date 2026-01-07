@@ -242,6 +242,13 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
       'alt' => '""',
       'title' => 'title 4',
     ] + $base);
+    $input .= $this->createEmbedCode([
+      'data-entity-type' => 'media',
+      'data-entity-uuid' => 'invalid_uuid',
+      'alt' => 'alt 5',
+      'title' => 'title 5',
+      'class' => 'invalid_uuid',
+    ]);
 
     $this->applyFilter($input);
 
@@ -267,6 +274,13 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
       'alt' => '',
       'title' => $expected_title_attributes[4],
     ]);
+
+    // Test media_embed_error.
+    $invalid_uuid_nodes = $this->cssSelect('div.invalid_uuid');
+    $this->assertCount(1, $invalid_uuid_nodes);
+    $this->assertNull($invalid_uuid_nodes[0]['alt']);
+    $this->assertNull($invalid_uuid_nodes[0]['title']);
+    $this->assertSame('The referenced media source is missing and needs to be re-embedded.', (string) $invalid_uuid_nodes[0]);
   }
 
   /**
