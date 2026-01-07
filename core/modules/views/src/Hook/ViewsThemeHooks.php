@@ -187,14 +187,6 @@ class ViewsThemeHooks {
 
   /**
    * Implements hook_preprocess_HOOK().
-   */
-  #[Hook('preprocess_views_view_grid')]
-  public function preprocessViewsViewGrid(&$variables): void {
-    $variables['#attached']['library'][] = 'views/views.grid';
-  }
-
-  /**
-   * Implements hook_preprocess_HOOK().
    *
    * Allows view-based node templates if called from a view.
    */
@@ -1027,6 +1019,7 @@ class ViewsThemeHooks {
 
     // Add items to the variables array.
     $variables['items'] = $items;
+    $variables['#attached']['library'][] = 'views/views.grid';
   }
 
   /**
