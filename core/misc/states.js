@@ -701,13 +701,7 @@
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
-      // Only trigger dialog button updates if the target is a submit button
-      if (e.target.matches('input[type="submit"], button[type="submit"]')) {
-        const dialog = e.target.closest('.ui-dialog-content');
-        if (dialog) {
-          dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
-        }
-      }
+      // Dialog button state sync is now handled by MutationObserver in dialog.ajax.js
     }
   });
 
@@ -753,13 +747,7 @@
         $element = $(e.target);
       }
       $element.toggle(e.value);
-      // Only trigger dialog button updates if the target is a submit button
-      if (e.target.matches('input[type="submit"], button[type="submit"]')) {
-        const dialog = e.target.closest('.ui-dialog-content');
-        if (dialog) {
-          dialog.dispatchEvent(new CustomEvent('dialogButtonsChange'));
-        }
-      }
+      // Dialog button state sync is now handled by MutationObserver in dialog.ajax.js
     }
   });
 

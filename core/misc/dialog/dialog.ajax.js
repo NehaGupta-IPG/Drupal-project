@@ -173,23 +173,83 @@
         Drupal.behaviors.dialog.prepareDialogButtons($(dialog));
     }
 
+    /**
+     * Rebuilds dialog buttons from form buttons.
+     */
     const dialogButtonsChange = () => {
       const buttons = Drupal.behaviors.dialog.prepareDialogButtons($(dialog));
       $(dialog).dialog('option', 'buttons', buttons);
     };
 
-    // Bind dialogButtonsChange.
     dialog.addEventListener('dialogButtonsChange', dialogButtonsChange);
-    dialog.addEventListener('dialog:beforeclose', (event) => {
-      dialog.removeEventListener('dialogButtonsChange', dialogButtonsChange);
-    });
 
-    // Open the dialog itself.
+    const buttonObservers = [];
+
+    /**
+     * Clean up observers and event listeners when dialog closes.
+     */
+    const cleanupDialog = () => {
+      dialog.removeEventListener('dialogButtonsChange', dialogButtonsChange);
+      buttonObservers.forEach((observer) => observer.disconnect());
+    };
+
+    dialog.addEventListener('dialog:beforeclose', cleanupDialog);
+
+    // Open the dialog.
     const createdDialog = Drupal.dialog(dialog, response.dialogOptions);
     if (response.dialogOptions.modal) {
       createdDialog.showModal();
-    } else {
+    }
+    else {
       createdDialog.show();
+    }
+
+    /**
+     * Set up automatic button state synchronization using MutationObserver.
+     *
+     * This watches form buttons for disabled/style changes and mirrors them
+     * to dialog buttons, avoiding expensive full button rebuilds.
+     */
+    if (response.dialogOptions.drupalAutoButtons) {
+      const formButtons = dialog.querySelectorAll(
+        '.form-actions input[type=submit], .form-actions a.button, .form-actions a.action-link'
+      );
+      const buttonPane = dialog.parentElement?.querySelector('.ui-dialog-buttonpane');
+
+      if (buttonPane && formButtons.length > 0) {
+        const dialogButtons = buttonPane.querySelectorAll('button.ui-button');
+
+        formButtons.forEach((formButton, index) => {
+          const dialogButton = dialogButtons[index];
+          if (!dialogButton) {
+            return;
+          }
+
+          /**
+           * Sync form button state to dialog button.
+           */
+          const syncButtonState = () => {
+            if (!document.body.contains(dialog) || !document.body.contains(dialogButton)) {
+              return;
+            }
+
+            // Sync disabled state.
+            dialogButton.disabled = formButton.disabled;
+
+            // Sync visibility.
+            const computedStyle = window.getComputedStyle(formButton);
+            dialogButton.style.display = computedStyle.display === 'none' ? 'none' : '';
+          };
+
+          const observer = new MutationObserver(syncButtonState);
+          observer.observe(formButton, {
+            attributes: true,
+            attributeFilter: ['disabled', 'style'],
+          });
+
+          buttonObservers.push(observer);
+        });
+      }
     }
 
     // Add the standard Drupal class for buttons for style consistency.
