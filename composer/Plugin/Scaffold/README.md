@@ -68,6 +68,11 @@ Example: Permit scaffolding from the project `upstream/project`
     }
   }
 ```
+Note, however, that the package `drupal/core` is always implicitly allowed, and
+therefore does not need to appear in the `allowed-packages` section. Other
+packages that your project might require must be explicitly listed if they also
+scaffold any files.
+
 Allowing a package to scaffold files also permits it to delegate permission to
 scaffold to any project that it requires itself. This allows a package to
 organize its scaffold assets as it sees fit. For example, if `upstream/project`
@@ -100,7 +105,7 @@ so via the `locations` mapping, as shown below:
   "extra": {
     "drupal-scaffold": {
       "locations": {
-        "web-root": "./docroot"
+        "web-root": "./web"
       },
       ...
     }
@@ -119,8 +124,8 @@ Sometimes, a project might wish to use a scaffold file provided by a dependency,
 but alter it in some way. Two forms of alteration are supported: appending and
 patching.
 
-The example below shows a project that appends additional entries onto the end
-of the `robots.txt` file provided by `drupal/core`:
+The example below shows a project that prepends additional entries onto the
+beginning of the `robots.txt` file provided by `drupal/core`:
 ```
   "name": "my/project",
   ...
@@ -128,7 +133,7 @@ of the `robots.txt` file provided by `drupal/core`:
     "drupal-scaffold": {
       "file-mapping": {
         "[web-root]/robots.txt": {
-          "append": "assets/my-robots-additions.txt",
+          "prepend": "scaffold-modifications/robots.txt.prepend"
         }
       }
     }
@@ -145,10 +150,24 @@ to patch the `.htaccess` file using a patch.
   ...
   "scripts": {
     "post-drupal-scaffold-cmd": [
-      "cd docroot && patch -p1 <../patches/htaccess-ssl.patch"
+      "cd web && patch -p1 < ../scaffold-modifications/htaccess.patch"
     ]
   }
 ```
+To create an `htaccess.patch` file:
+
+- Use a git clone of a Composer-managed site.
+- Create a directory `scaffold-modifications` at the project root.
+- Go to the scaffold assets directory via `cd core/assets/scaffold/files`.
+- Edit the `.htaccess` file there, and insert your desired modifications.
+- Create the patch via `git diff --no-prefix web/.htaccess > htaccess.patch`.
+- Move the `htaccess.patch` file into `scaffold-modifications` in your site.
+- Remove your modifications via `git checkout -- .htaccess`.
+- Copy the example script command above into your project's composer.json file.
+
+Once you have completed these steps, your `.htaccess` customizations will be
+inserted into the `.htaccess` file scaffolded by `drupal/core` every time that
+file is written. Run the command `composer scaffold` to test.
 
 ### Defining Scaffold Files
 
@@ -354,7 +373,7 @@ may be used in placing scaffold files. The only required location is `web-root`.
 Other locations may also be defined if desired.
 ```
 "locations": {
-  "web-root": "./docroot"
+  "web-root": "./web"
 },
 ```
 ### symlink
@@ -403,7 +422,7 @@ Sample composer.json for a project that relies on packages that use composer-sca
   "extra": {
     "drupal-scaffold": {
       "locations": {
-        "web-root": "./docroot"
+        "web-root": "./web"
       },
       "symlink": true,
       "file-mapping": {
@@ -494,7 +513,7 @@ Patch a file after it's copied:
 
 ```
 "post-drupal-scaffold-cmd": [
-  "cd docroot && patch -p1 <../patches/htaccess-ssl.patch"
+  "cd web && patch -p1 <../patches/htaccess-ssl.patch"
 ]
 ```
 
