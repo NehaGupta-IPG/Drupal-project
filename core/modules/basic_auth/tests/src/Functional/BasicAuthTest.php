@@ -155,16 +155,6 @@ class BasicAuthTest extends BrowserTestBase {
     $this->basicAuthGet($url, $user->getAccountName(), $user->pass_raw);
     $this->assertSession()->statusCodeEquals(200);
 
-    // Disable the username enumeration.
-    $this->writeSettings([
-      'settings' => [
-        'basic_auth_3241232_sa_username_enumeration' => (object) [
-          'value' => FALSE,
-          'required' => TRUE,
-        ],
-      ],
-    ]);
-
     // 2 failed logins with valid usernames should cause the user to be banned
     // as normal.
     $this->basicAuthGet($url, $user->getAccountName(), $incorrect_user->pass_raw);
