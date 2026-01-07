@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\System;
 
+use Drupal\Core\Extension\ThemeInstallerInterface;
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\node\Entity\Node;
@@ -590,8 +593,7 @@ class ThemeTest extends BrowserTestBase {
    * @throws \Behat\Mink\Exception\ExpectationException
    */
   public function testThemeSettingsLogoUpload() {
-    /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
-    $theme_installer = \Drupal::service('theme_installer');
+    $theme_installer = \Drupal::service(ThemeInstallerInterface::class);
     $theme_installer->install(['olivero']);
     $this->config('system.theme')->set('default', 'olivero')->save();
 
@@ -618,20 +620,18 @@ class ThemeTest extends BrowserTestBase {
    * @throws \Behat\Mink\Exception\ExpectationException
    */
   public function doTestLogoUpload($uploadedFilename, $uploadedFilename2) {
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
-    $file_system = \Drupal::service('file_system');
-
-    /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
-    $file_url_generator = \Drupal::service('file_url_generator');
+    $file_system = \Drupal::service(FileSystemInterface::class);
+    $file_url_generator = \Drupal::service(FileUrlGeneratorInterface::class);
 
     // Upload the logo and save.
     $this->drupalGet('admin/appearance/settings/olivero');
+    $drupal_root = \Drupal::root();
     $edit = [
-      'files[logo_upload]' => $file_system->realpath(DRUPAL_ROOT . '/core/misc/druplicon.png'),
+      'files[logo_upload]' => $file_system->realpath($drupal_root . '/core/misc/druplicon.png'),
       'default_favicon' => FALSE,
-      'files[favicon_upload]' => $file_system->realpath(DRUPAL_ROOT . '/core/misc/favicon.ico'),
+      'files[favicon_upload]' => $file_system->realpath($drupal_root . '/core/misc/favicon.ico'),
     ];
-    $this->submitForm($edit, t('Save configuration'));
+    $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()
       ->responseContains('The configuration options have been saved.');
