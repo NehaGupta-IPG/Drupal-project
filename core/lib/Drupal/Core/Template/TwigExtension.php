@@ -616,19 +616,29 @@ class TwigExtension extends AbstractExtension {
    *   The delimiter with which to join the string. Defaults to an empty string.
    *   This value is expected to be safe for output and user provided data
    *   should never be used as a glue.
+   * @param string|null $and
+   *   The separator for the last pair. Defaults to null.
+   *   This value is expected to be safe for output and user provided data
+   *   should never be used as a value.
    *
    * @return string
    *   The strings joined together.
    */
-  public function safeJoin(Environment $env, $value, $glue = '') {
+  public function safeJoin(Environment $env, $value, $glue = '', ?string $and = NULL) {
     if ($value instanceof \Traversable) {
       $value = iterator_to_array($value, FALSE);
     }
 
-    return implode($glue, array_map(function ($item) use ($env) {
+    $value = array_values(array_map(function ($item) use ($env) {
       // If $item is not marked safe then it will be escaped.
       return $this->escapeFilter($env, $item, 'html', NULL, TRUE);
     }, (array) $value));
+
+    if ($and === NULL || $and === $glue || count($value) < 2) {
+      return implode($glue, $value);
+    }
+
+    return implode($glue, array_slice($value, 0, -1)) . $and . $value[count($value) - 1];
   }
 
   /**

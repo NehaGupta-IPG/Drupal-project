@@ -288,6 +288,26 @@ class TwigExtensionTest extends UnitTestCase {
     $items = NULL;
     $result = $this->systemUnderTest->safeJoin($twig_environment, $items, '<br>');
     $this->assertEmpty($result);
+
+    // Test "and" parameter.
+    $items = [
+      1,
+      2,
+      3,
+    ];
+    $result = $this->systemUnderTest->safeJoin($twig_environment, $items, ', ', ' and ');
+    $this->assertEquals('1, 2 and 3', $result);
+
+    // Test "and" parameter with escaping.
+    $items = [
+      1,
+      2,
+      3,
+      '<em>will be escaped</em>',
+    ];
+    $result = $this->systemUnderTest->safeJoin($twig_environment, $items, ', ', ' and ');
+    $this->assertEquals('1, 2, 3 and &lt;em&gt;will be escaped&lt;/em&gt;', $result);
+
   }
 
   /**
