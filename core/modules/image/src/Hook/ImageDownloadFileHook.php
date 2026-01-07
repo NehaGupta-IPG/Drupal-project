@@ -136,7 +136,7 @@ class ImageDownloadFileHook {
     $private_default_images = [];
     $field_map = $this->entityFieldManager->getFieldMapByFieldType('image');
     $cache_tags = [
-      'image_default_images',
+      'image_private_default_images',
       'entity_field_info',
     ];
     foreach ($field_map as $entity_type_id => $fields) {
