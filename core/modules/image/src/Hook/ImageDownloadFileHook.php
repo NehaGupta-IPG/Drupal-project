@@ -25,13 +25,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[Hook('file_download')]
 class ImageDownloadFileHook {
 
-  /**
-   * Cache for private default images.
-   *
-   * @var array<string, \Drupal\Core\Field\FieldDefinitionInterface[]>
-   */
-  protected array $cachedPrivateDefaultImages;
-
   public function __construct(
     #[Autowire(service: 'cache.default')]
     protected readonly CacheBackendInterface $cache,
@@ -134,59 +127,54 @@ class ImageDownloadFileHook {
    *   arrays of field definitions that reference these images as defaults.
    */
   protected function getPrivateDefaultImages(): array {
-    if (!isset($this->cachedPrivateDefaultImages)) {
-      $cid = 'image:default_images';
-      if ($cache = $this->cache->get($cid)) {
-        $this->cachedPrivateDefaultImages = $cache->data;
-      }
-      else {
-        // Save a map of all default image UUIDs and their corresponding field
-        // definitions for quick lookup.
-        $private_default_images = [];
-        $field_map = $this->entityFieldManager->getFieldMapByFieldType('image');
-        $cache_tags = [
-          'image_default_images',
-          'entity_field_info',
-        ];
-        foreach ($field_map as $entity_type_id => $fields) {
-          // Do not filter field storages by uri_scheme, as file entities may
-          // change regardless of the field storage configuration.
-          $field_storages = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
-          foreach ($fields as $field_name => $field_info) {
-            // First, check if the default image is set on the field storage.
-            $uri_from_storage = NULL;
-            $file_uuid = $field_storages[$field_name]->getSetting('default_image')['uuid'];
-            if ($file_uuid && $file = $this->entityRepository->loadEntityByUuid('file', $file_uuid)) {
-              /** @var \Drupal\file\FileInterface $file */
-              $uri_from_storage = $file->getFileUri();
-              $cache_tags = Cache::mergeTags($cache_tags, $file->getCacheTags());
-            }
+    $cid = 'image:private_default_images';
+    if ($cache = $this->cache->get($cid)) {
+      return $cache->data;
+    }
+    // Save a map of all default image UUIDs and their corresponding field
+    // definitions for quick lookup.
+    $private_default_images = [];
+    $field_map = $this->entityFieldManager->getFieldMapByFieldType('image');
+    $cache_tags = [
+      'image_default_images',
+      'entity_field_info',
+    ];
+    foreach ($field_map as $entity_type_id => $fields) {
+      // Do not filter field storages by uri_scheme, as file entities may
+      // change regardless of the field storage configuration.
+      $field_storages = $this->entityFieldManager->getFieldStorageDefinitions($entity_type_id);
+      foreach ($fields as $field_name => $field_info) {
+        // First, check if the default image is set on the field storage.
+        $uri_from_storage = NULL;
+        $file_uuid = $field_storages[$field_name]->getSetting('default_image')['uuid'];
+        if ($file_uuid && $file = $this->entityRepository->loadEntityByUuid('file', $file_uuid)) {
+          /** @var \Drupal\file\FileInterface $file */
+          $uri_from_storage = $file->getFileUri();
+          $cache_tags = Cache::mergeTags($cache_tags, $file->getCacheTags());
+        }
 
-            foreach ($field_info['bundles'] as $bundle) {
-              $field_definition = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle)[$field_name];
-              $default_uri = $uri_from_storage;
-              $file_uuid = $field_definition->getSetting('default_image')['uuid'];
-              // If the default image is overridden in the field definition, use
-              // that instead of the one set on the field storage.
-              if ($file_uuid && $file = $this->entityRepository->loadEntityByUuid('file', $file_uuid)) {
-                /** @var \Drupal\file\FileInterface $file */
-                $default_uri = $file->getFileUri();
-                $cache_tags = Cache::mergeTags($cache_tags, $file->getCacheTags());
-              }
-              // Finally, if a private default image URI was found,
-              // add it to the list.
-              if ($default_uri && StreamWrapperManager::getScheme($default_uri) === 'private') {
-                $private_default_images[$default_uri][] = $field_definition;
-              }
-            }
+        foreach ($field_info['bundles'] as $bundle) {
+          $field_definition = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle)[$field_name];
+          $default_uri = $uri_from_storage;
+          $file_uuid = $field_definition->getSetting('default_image')['uuid'];
+          // If the default image is overridden in the field definition, use
+          // that instead of the one set on the field storage.
+          if ($file_uuid && $file = $this->entityRepository->loadEntityByUuid('file', $file_uuid)) {
+            /** @var \Drupal\file\FileInterface $file */
+            $default_uri = $file->getFileUri();
+            $cache_tags = Cache::mergeTags($cache_tags, $file->getCacheTags());
+          }
+          // Finally, if a private default image URI was found,
+          // add it to the list.
+          if ($default_uri && StreamWrapperManager::getScheme($default_uri) === 'private') {
+            $private_default_images[$default_uri][] = $field_definition;
           }
         }
-        // Cache the default image list.
-        $this->cachedPrivateDefaultImages = $private_default_images;
-        $this->cache->set($cid, $private_default_images, CacheBackendInterface::CACHE_PERMANENT, $cache_tags);
       }
     }
-    return $this->cachedPrivateDefaultImages;
+    // Cache the default image list.
+    $this->cache->set($cid, $private_default_images, CacheBackendInterface::CACHE_PERMANENT, $cache_tags);
+    return $private_default_images;
   }
 
 }
