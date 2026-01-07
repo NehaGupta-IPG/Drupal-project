@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\block\Kernel;
 
 use Drupal\block\Entity\Block;
+use Drupal\block\Plugin\ConfigAction\PlaceBlock;
+use Drupal\block\Plugin\ConfigAction\PlaceBlockDeriver;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionManager;
@@ -12,16 +14,18 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ThemeInstallerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\block\Traits\BlockCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests Config Actions.
- *
- * @legacy-covers \Drupal\block\Plugin\ConfigAction\PlaceBlock
- * @legacy-covers \Drupal\block\Plugin\ConfigAction\PlaceBlockDeriver
  */
 #[Group('block')]
+#[CoversClass(PlaceBlock::class)]
+#[CoversClass(PlaceBlockDeriver::class)]
+#[RunTestsInSeparateProcesses]
 class ConfigActionsTest extends KernelTestBase {
 
   use BlockCreationTrait;
@@ -41,10 +45,11 @@ class ConfigActionsTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig('system');
     $this->container->get(ThemeInstallerInterface::class)->install([
       'olivero',
       'claro',
-      'umami',
+      'block_test_theme',
     ]);
     $this->config('system.theme')
       ->set('default', 'olivero')
@@ -156,8 +161,8 @@ class ConfigActionsTest extends KernelTestBase {
    * Tests placing a block in the default theme's region.
    */
   public function testPlaceBlockInDefaultRegion(): void {
-    $this->config('system.theme')->set('default', 'umami')->save();
-    $this->testPlaceBlockInDynamicRegion('placeBlockInDefaultTheme', 'umami', 'content');
+    $this->config('system.theme')->set('default', 'block_test_theme')->save();
+    $this->testPlaceBlockInDynamicRegion('placeBlockInDefaultTheme', 'block_test_theme', 'content');
   }
 
   /**

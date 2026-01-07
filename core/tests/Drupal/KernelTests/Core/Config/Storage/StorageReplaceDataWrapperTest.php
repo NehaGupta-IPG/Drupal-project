@@ -8,11 +8,13 @@ use Drupal\config\StorageReplaceDataWrapper;
 use Drupal\Core\Config\StorageInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests StorageReplaceDataWrapper operations.
  */
 #[Group('config')]
+#[RunTestsInSeparateProcesses]
 class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
 
   /**
@@ -82,7 +84,7 @@ class StorageReplaceDataWrapperTest extends ConfigStorageTestBase {
    * @return array
    *   Returns an array of collection names.
    */
-  public static function providerCollections() {
+  public static function providerCollections(): array {
     return [
       [StorageInterface::DEFAULT_COLLECTION],
       ['foo.bar'],

@@ -8,16 +8,20 @@ use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\MultisiteValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Multisite Validator.
  *
  * @internal
- * @legacy-covers \Drupal\package_manager\Validator\MultisiteValidator
  */
 #[Group('package_manager')]
+#[CoversClass(MultisiteValidator::class)]
+#[RunTestsInSeparateProcesses]
 class MultisiteValidatorTest extends PackageManagerKernelTestBase {
 
   /**

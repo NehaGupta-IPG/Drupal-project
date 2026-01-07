@@ -8,15 +8,15 @@ use Drupal\system\Plugin\migrate\source\d7\MenuTranslation;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore objectid objectindex plid textgroup
 /**
  * Tests the menu translation source plugin.
- *
- * @legacy-covers Drupal\system\Plugin\migrate\source\d7\MenuTranslation
  */
 #[CoversClass(MenuTranslation::class)]
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 class MenuTranslationTest extends MigrateSqlSourceTestBase {
 
   /**

@@ -9,15 +9,19 @@ use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\AllowedScaffoldPackagesValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Allowed Scaffold Packages Validator.
  *
  * @internal
- * @legacy-covers \Drupal\package_manager\Validator\AllowedScaffoldPackagesValidator
  */
 #[Group('package_manager')]
+#[CoversClass(AllowedScaffoldPackagesValidator::class)]
+#[RunTestsInSeparateProcesses]
 class AllowedScaffoldPackagesValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

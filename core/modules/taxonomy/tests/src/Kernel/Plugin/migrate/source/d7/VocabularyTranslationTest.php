@@ -8,15 +8,15 @@ use Drupal\taxonomy\Plugin\migrate\source\d7\VocabularyTranslation;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore objectid objectindex plid textgroup
 /**
  * Tests D7 i18n vocabulary source plugin.
- *
- * @legacy-covers \Drupal\taxonomy\Plugin\migrate\source\d7\VocabularyTranslation
  */
 #[CoversClass(VocabularyTranslation::class)]
 #[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class VocabularyTranslationTest extends MigrateSqlSourceTestBase {
 
   /**

@@ -8,14 +8,14 @@ use Drupal\shortcut\Plugin\migrate\source\d7\ShortcutSet;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests D7 ShortcutSet source plugin.
- *
- * @legacy-covers Drupal\shortcut\Plugin\migrate\source\d7\ShortcutSet
  */
 #[CoversClass(ShortcutSet::class)]
 #[Group('shortcut')]
+#[RunTestsInSeparateProcesses]
 class ShortcutSetTest extends MigrateSqlSourceTestBase {
 
   /**

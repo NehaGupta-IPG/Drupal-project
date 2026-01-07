@@ -7,15 +7,17 @@ namespace Drupal\Tests\package_manager\Kernel;
 use Drupal\package_manager\TranslatableStringAdapter;
 use Drupal\package_manager\TranslatableStringFactory;
 use PhpTuf\ComposerStager\API\Translation\Factory\TranslatableFactoryInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Translatable String.
- *
- * @legacy-covers \Drupal\package_manager\TranslatableStringFactory
- * @legacy-covers \Drupal\package_manager\TranslatableStringAdapter
  */
 #[Group('package_manager')]
+#[CoversClass(TranslatableStringFactory::class)]
+#[CoversClass(TranslatableStringAdapter::class)]
+#[RunTestsInSeparateProcesses]
 class TranslatableStringTest extends PackageManagerKernelTestBase {
 
   /**

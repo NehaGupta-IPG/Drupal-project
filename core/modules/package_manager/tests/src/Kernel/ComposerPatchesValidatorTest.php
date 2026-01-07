@@ -10,17 +10,21 @@ use Drupal\fixture_manipulator\ActiveFixtureManipulator;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\ComposerPatchesValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Composer Patches Validator.
  *
  * @internal
- * @legacy-covers \Drupal\package_manager\Validator\ComposerPatchesValidator
  */
 #[Group('package_manager')]
 #[Group('#slow')]
+#[CoversClass(ComposerPatchesValidator::class)]
+#[RunTestsInSeparateProcesses]
 class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

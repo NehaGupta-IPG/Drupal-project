@@ -8,15 +8,15 @@ use Drupal\block_content\Plugin\migrate\source\d6\BoxTranslation;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore objectid objectindex plid
 /**
  * Tests i18n content block translations source plugin.
- *
- * @legacy-covers \Drupal\block_content\Plugin\migrate\source\d6\BoxTranslation
  */
 #[CoversClass(BoxTranslation::class)]
 #[Group('content_translation')]
+#[RunTestsInSeparateProcesses]
 class BoxTranslationTest extends MigrateSqlSourceTestBase {
 
   /**

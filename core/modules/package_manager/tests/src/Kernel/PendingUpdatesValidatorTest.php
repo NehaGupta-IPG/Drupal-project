@@ -8,16 +8,20 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\PendingUpdatesValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Pending Updates Validator.
  *
  * @internal
- * @legacy-covers \Drupal\package_manager\Validator\PendingUpdatesValidator
  */
 #[Group('package_manager')]
+#[CoversClass(PendingUpdatesValidator::class)]
+#[RunTestsInSeparateProcesses]
 class PendingUpdatesValidatorTest extends PackageManagerKernelTestBase {
 
   use StringTranslationTrait;

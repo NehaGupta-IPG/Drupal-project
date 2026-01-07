@@ -10,7 +10,6 @@ use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
-use Pdo\Sqlite;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Connection.
@@ -78,8 +77,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * Constructs a \Drupal\sqlite\Driver\Database\sqlite\Connection object.
    */
   public function __construct(\PDO $connection, array $connection_options) {
-    // @phpstan-ignore class.notFound
-    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Sqlite : TRUE);
+    assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof SqliteConnection : TRUE);
     parent::__construct($connection, $connection_options);
 
     // Empty prefix means query the main database -- no need to attach anything.
@@ -111,8 +109,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
 
     try {
       if (\PHP_VERSION_ID >= 80400) {
-        // @phpstan-ignore class.notFound
-        $sqlite = new Sqlite('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
+        // @phpstan-ignore new.noConstructor
+        $sqlite = new SqliteConnection('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
       }
       else {
         $sqlite = new PDOConnection('sqlite:' . $connection_options['database'], '', '', $connection_options['pdo']);
@@ -210,7 +208,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
         // Check if the database is now empty, ignore the internal SQLite
         // tables.
         try {
-          $count = $this->query('SELECT COUNT(*) FROM ' . $prefix . '.sqlite_master WHERE type = :type AND name NOT LIKE :pattern', [':type' => 'table', ':pattern' => 'sqlite_%'])->fetchField();
+          $count = $this->query('SELECT COUNT(*) FROM ' . $prefix . '.sqlite_master WHERE type = :type AND name NOT LIKE :pattern', [
+            ':type' => 'table',
+            ':pattern' => 'sqlite_%',
+          ])->fetchField();
 
           // We can prune the database file if it doesn't have any tables.
           if ($count == 0 && $this->connectionOptions['database'] != ':memory:' && file_exists($this->connectionOptions['database'] . '-' . $prefix)) {
@@ -239,7 +240,10 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       // http://www.sqlite.org/inmemorydb.html it will open a unique database so
       // attaching it twice is not a problem.
       $database_file = $this->connectionOptions['database'] !== ':memory:' ? $this->connectionOptions['database'] . '-' . $database : $this->connectionOptions['database'];
-      $this->query('ATTACH DATABASE :database_file AS :database', [':database_file' => $database_file, ':database' => $database]);
+      $this->query('ATTACH DATABASE :database_file AS :database', [
+        ':database_file' => $database_file,
+        ':database' => $database,
+      ]);
       $this->attachedDatabases[$database] = $database;
     }
   }

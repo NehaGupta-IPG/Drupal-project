@@ -7,16 +7,20 @@ namespace Drupal\Tests\package_manager\Kernel;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\SettingsValidator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Settings Validator.
  *
  * @internal
- * @legacy-covers \Drupal\package_manager\Validator\SettingsValidator
  */
 #[Group('package_manager')]
+#[CoversClass(SettingsValidator::class)]
+#[RunTestsInSeparateProcesses]
 class SettingsValidatorTest extends PackageManagerKernelTestBase {
 
   /**

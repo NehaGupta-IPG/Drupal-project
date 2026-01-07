@@ -309,7 +309,7 @@ class MenuUiNodeTest extends BrowserTestBase {
       $languages[$langcode] = ConfigurableLanguage::load($langcode);
     }
 
-    // Enable translation for pages and menu link content..
+    // Enable translation for pages and menu link content.
     $this->enableContentTranslation('node', 'page');
     $this->enableContentTranslation('menu_link_content', 'menu_link_content');
 
@@ -329,7 +329,11 @@ class MenuUiNodeTest extends BrowserTestBase {
 
     // Create translation.
     $translated_node_title = $this->randomMachineName(8);
-    $node->addTranslation($langcodes[1], ['title' => $translated_node_title, 'body' => $this->randomMachineName(16), 'status' => 1]);
+    $node->addTranslation($langcodes[1], [
+      'title' => $translated_node_title,
+      'body' => $this->randomMachineName(16),
+      'status' => 1,
+    ]);
     $node->save();
 
     // Edit the node and create a menu link.
