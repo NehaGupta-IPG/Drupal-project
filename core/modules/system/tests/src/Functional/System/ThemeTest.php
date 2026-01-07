@@ -584,4 +584,86 @@ class ThemeTest extends BrowserTestBase {
     $this->assertSession()->elementExists('css', ".theme-info:contains(\"$theme_name\") .incompatible:contains(\"$expected_text\")");
   }
 
+  /**
+   * Tests logo is always saved to public scheme.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
+   */
+  public function testThemeSettingsLogoUpload() {
+    /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
+    $theme_installer = \Drupal::service('theme_installer');
+    $theme_installer->install(['olivero']);
+    $this->config('system.theme')->set('default', 'olivero')->save();
+
+    // Visit olivero theme settings page to replace the logo.
+    $this->drupalPlaceBlock('system_branding_block', ['region' => 'header']);
+
+    $config = $this->config('system.file');
+    $config->set('default_scheme', 'public')->save();
+    $this->doTestLogoUpload('druplicon.png', 'favicon.ico');
+
+    $config = $this->config('system.file');
+    $config->set('default_scheme', 'private')->save();
+    $this->doTestLogoUpload('druplicon_0.png', 'favicon_0.ico');
+  }
+
+  /**
+   * Helper to test logo upload.
+   *
+   * @param string $uploadedFilename
+   *   The filename of the uploaded logo.
+   * @param string $uploadedFilename2
+   *   The filename of the uploaded favicon.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
+   */
+  public function doTestLogoUpload($uploadedFilename, $uploadedFilename2) {
+    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    $file_system = \Drupal::service('file_system');
+
+    /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
+    $file_url_generator = \Drupal::service('file_url_generator');
+
+    // Upload the logo and save.
+    $this->drupalGet('admin/appearance/settings/olivero');
+    $edit = [
+      'files[logo_upload]' => $file_system->realpath(DRUPAL_ROOT . '/core/misc/druplicon.png'),
+      'default_favicon' => FALSE,
+      'files[favicon_upload]' => $file_system->realpath(DRUPAL_ROOT . '/core/misc/favicon.ico'),
+    ];
+    $this->submitForm($edit, t('Save configuration'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()
+      ->responseContains('The configuration options have been saved.');
+    $this->assertSession()->fieldValueEquals('default_logo', FALSE);
+    $this->assertSession()->fieldValueEquals('logo_path', $uploadedFilename);
+    $this->assertSession()->fieldValueEquals('default_favicon', FALSE);
+    $this->assertSession()->fieldValueEquals('favicon_path', $uploadedFilename2);
+
+    $logoFilepath = 'public://' . $uploadedFilename;
+
+    $this->drupalGet('');
+    $logoElements = $this->xpath('//header//a[@rel=:rel]/img', [':rel' => 'home']);
+    $this->assertEquals($logoElements[0]->getAttribute('src'), $file_url_generator->transformRelative($file_url_generator->generateAbsoluteString($logoFilepath)));
+
+    $faviconFilepath = 'public://' . $uploadedFilename2;
+
+    $faviconElements = $this->xpath('//head/link[@rel=:rel]', [':rel' => 'icon']);
+    $this->assertEquals($faviconElements[0]->getAttribute('href'), $file_url_generator->transformRelative($file_url_generator->generateAbsoluteString($faviconFilepath)));
+    // Test the configuration uses the public scheme.
+    $config = $this->config('olivero.settings');
+    $expected = [
+      'path' => $logoFilepath,
+      'use_default' => FALSE,
+    ];
+    $this->assertSame($expected, $config->get('logo'));
+
+    $expected = [
+      'mimetype' => 'image/vnd.microsoft.icon',
+      'path' => $faviconFilepath,
+      'use_default' => FALSE,
+    ];
+    $this->assertSame($expected, $config->get('favicon'));
+  }
+
 }

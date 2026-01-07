@@ -493,6 +493,11 @@ class ThemeSettingsForm extends ConfigFormBase {
     // If the user uploaded a new logo or favicon, save it to a permanent
     // location and use it in place of the default theme-provided file.
     $default_scheme = $this->config('system.file')->get('default_scheme');
+    // Can't use private for these files as they will not be accessible.
+    if ($default_scheme === 'private') {
+      $default_scheme = 'public';
+    }
+
     try {
       if (!empty($values['logo_upload'])) {
         $filename = $this->fileSystem->copy($values['logo_upload']->getFileUri(), $default_scheme . '://');
