@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Image\ImageFactory;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\image\Controller\ImageStyleDownloadController;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
@@ -31,7 +30,6 @@ class ImageDownloadFileHook {
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly EntityRepositoryInterface $entityRepository,
     protected readonly EntityFieldManagerInterface $entityFieldManager,
-    protected readonly AccountInterface $currentUser,
     protected readonly ImageFactory $imageFactory,
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly ModuleHandlerInterface $moduleHandler,
@@ -90,7 +88,7 @@ class ImageDownloadFileHook {
 
     // Private file access for image fields' default images. Default images are
     // displayed as a fallback when an image is not uploaded to an image field.
-    if (str_starts_with($path, ImageItem::DEFAULT_IMAGE_DIRECTORY . DIRECTORY_SEPARATOR)) {
+    if (str_starts_with($path, ImageItem::DEFAULT_IMAGE_DIRECTORY . '/')) {
       $image = $this->imageFactory->get($uri);
       if ($image->isValid()) {
         $private_default_images = $this->getPrivateDefaultImages();
