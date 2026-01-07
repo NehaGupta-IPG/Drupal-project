@@ -199,8 +199,7 @@
     const createdDialog = Drupal.dialog(dialog, response.dialogOptions);
     if (response.dialogOptions.modal) {
       createdDialog.showModal();
-    }
-    else {
+    } else {
       createdDialog.show();
     }
 
@@ -212,9 +211,11 @@
      */
     if (response.dialogOptions.drupalAutoButtons) {
       const formButtons = dialog.querySelectorAll(
-        '.form-actions input[type=submit], .form-actions a.button, .form-actions a.action-link'
+        '.form-actions input[type=submit], .form-actions a.button, .form-actions a.action-link',
       );
-      const buttonPane = dialog.parentElement?.querySelector('.ui-dialog-buttonpane');
+      const buttonPane = dialog.parentElement?.querySelector(
+        '.ui-dialog-buttonpane',
+      );
 
       if (buttonPane && formButtons.length > 0) {
         const dialogButtons = buttonPane.querySelectorAll('button.ui-button');
@@ -229,7 +230,10 @@
            * Sync form button state to dialog button.
            */
           const syncButtonState = () => {
-            if (!document.body.contains(dialog) || !document.body.contains(dialogButton)) {
+            if (
+              !document.body.contains(dialog) ||
+              !document.body.contains(dialogButton)
+            ) {
               return;
             }
 
@@ -238,7 +242,8 @@
 
             // Sync visibility.
             const computedStyle = window.getComputedStyle(formButton);
-            dialogButton.style.display = computedStyle.display === 'none' ? 'none' : '';
+            dialogButton.style.display =
+              computedStyle.display === 'none' ? 'none' : '';
           };
 
           const observer = new MutationObserver(syncButtonState);
