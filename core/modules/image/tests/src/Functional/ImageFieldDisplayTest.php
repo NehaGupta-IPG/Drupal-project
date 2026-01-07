@@ -648,8 +648,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $private_field->setThirdPartySetting('image_field_display_test', 'access_denied', FALSE)->save();
     $this->drupalGet($private_default_image_url);
     $this->assertSession()->statusCodeEquals(200);
-    // Now disable access to the field and check that the
-    // same user now receives a 403 Access Denied.
+    // Now disable access to the field and check that the same user now receives
+    // a 403 Access Denied.
     $private_field->setThirdPartySetting('image_field_display_test', 'access_denied', TRUE)->save();
     $this->drupalGet($private_default_image_url);
     $this->assertSession()->statusCodeEquals(403);
