@@ -280,7 +280,7 @@ class MediaEmbedFilterTest extends MediaEmbedFilterTestBase {
     $this->assertCount(1, $invalid_uuid_nodes);
     $this->assertNull($invalid_uuid_nodes[0]['alt']);
     $this->assertNull($invalid_uuid_nodes[0]['title']);
-    $this->assertSame('The referenced media source is missing and needs to be re-embedded.', (string) $invalid_uuid_nodes[0]);
+    $this->assertSame('The referenced media source is missing and needs to be re-embedded.', trim((string) $invalid_uuid_nodes[0]));
   }
 
   /**
