@@ -642,8 +642,8 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $file = $this->container->get('entity.repository')->loadEntityByUuid('file', $file_uuid);
     $this->assertInstanceOf(FileInterface::class, $file);
 
-    // Check if the default image overridden by the field configuration
-    // can be downloaded.
+    // Check if the default image overridden by the field configuration can be
+    // downloaded.
     $private_default_image_url = $file->createFileUrl();
     $private_field->setThirdPartySetting('image_field_display_test', 'access_denied', FALSE)->save();
     $this->drupalGet($private_default_image_url);
