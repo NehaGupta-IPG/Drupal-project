@@ -252,7 +252,6 @@ class SystemHooks {
       'pathPrefix' => $pathPrefix,
       'currentPath' => $current_path,
       'currentPathIsAdmin' => $current_path_is_admin,
-      'isFront' => \Drupal::service('path.matcher')->isFrontPage(),
       'currentLanguage' => \Drupal::languageManager()->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId(),
     ];
     if (!empty($current_query)) {
