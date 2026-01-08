@@ -592,7 +592,7 @@ class ThemeTest extends BrowserTestBase {
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    */
-  public function testThemeSettingsLogoUpload() {
+  public function testThemeSettingsLogoUpload(): void {
     $theme_installer = \Drupal::service(ThemeInstallerInterface::class);
     $theme_installer->install(['olivero']);
     $this->config('system.theme')->set('default', 'olivero')->save();
@@ -619,7 +619,7 @@ class ThemeTest extends BrowserTestBase {
    *
    * @throws \Behat\Mink\Exception\ExpectationException
    */
-  public function doTestLogoUpload($uploadedFilename, $uploadedFilename2) {
+  public function doTestLogoUpload(string $uploadedFilename, string $uploadedFilename2): void {
     $file_system = \Drupal::service(FileSystemInterface::class);
     $file_url_generator = \Drupal::service(FileUrlGeneratorInterface::class);
 
