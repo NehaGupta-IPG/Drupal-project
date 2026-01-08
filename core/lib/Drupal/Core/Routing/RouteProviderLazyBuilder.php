@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -75,12 +76,18 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
    *   The route provider service.
    */
   protected function getRouteProvider() {
-    // Use static flag to prevent repeated rebuilds across container rebuilds.
-    // During module installation, the container is rebuilt multiple times,
+    // During site installation, use static flag to prevent repeated rebuilds
+    // across container rebuilds. The container is rebuilt multiple times,
     // creating new instances with $this->rebuilt = FALSE. The static flag
-    // persists across these rebuilds, ensuring only one rebuild per request.
+    // persists and prevents redundant rebuilds until install_finished().
+    // During normal operation, don't use static flag so lazy rebuilds can
+    // occur when new modules are installed and routes are needed.
     // @see https://www.drupal.org/project/drupal/issues/3492438
-    if (!$this->rebuilt && !$this->rebuilding && !self::$globalRebuilt) {
+    $skipRebuild = $this->rebuilt || $this->rebuilding;
+    if (InstallerKernel::installationAttempted()) {
+      $skipRebuild = $skipRebuild || self::$globalRebuilt;
+    }
+    if (!$skipRebuild) {
       $this->routeBuilder->rebuild();
     }
     return $this->routeProvider;
