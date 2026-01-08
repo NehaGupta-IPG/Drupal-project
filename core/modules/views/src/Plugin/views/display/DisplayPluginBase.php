@@ -21,6 +21,8 @@ use Drupal\views\Plugin\views\area\AreaPluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Views;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Base class for views display plugins.
@@ -150,9 +152,21 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param \Psr\Container\ContainerInterface|null $pluginManagers
+   *   The plugin manager locator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    #[Autowire(service: 'views.plugin_managers')]
+    protected ?ContainerInterface $pluginManagers = NULL,
+  ) {
     parent::__construct([], $plugin_id, $plugin_definition);
+    if ($this->pluginManagers === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $pluginManagers argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/7654321', E_USER_DEPRECATED);
+      $this->pluginManagers = \Drupal::service('views.plugin_managers');
+    }
   }
 
   /**
@@ -165,7 +179,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $display['display_options'] += ['display_extenders' => []];
     $this->extenders = [];
     if ($extenders = Views::getEnabledDisplayExtenders()) {
-      $manager = \Drupal::service('plugin.manager.views.display_extender');
+      $manager = $this->pluginManagers->get('display_extender');
       $display_extender_options = $display['display_options']['display_extenders'];
       foreach ($extenders as $extender) {
         /** @var \Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase $plugin */
@@ -818,7 +832,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
     // Plugin instances are stored on the display for re-use.
     if (!isset($this->plugins[$type][$name])) {
-      $plugin = \Drupal::service('views.plugin_managers')->get($type)->createInstance($name);
+      $plugin = $this->pluginManagers->get($type)->createInstance($name);
 
       // Initialize the plugin.
       $plugin->init($this->view, $this, $options['options']);
@@ -890,7 +904,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
           $handler_type = $type;
         }
 
-        if ($handler = \Drupal::service('views.plugin_managers')->get($handler_type)->getHandler($info, $override)) {
+        if ($handler = $this->pluginManagers->get($handler_type)->getHandler($info, $override)) {
           // Special override for area types so they know where they come from.
           if ($handler instanceof AreaPluginBase) {
             $handler->areaType = $type;
@@ -1205,7 +1219,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $pager_plugin = $this->getPlugin('pager');
     if (!$pager_plugin) {
       // Default to the no pager plugin.
-      $pager_plugin = \Drupal::service('plugin.manager.views.pager')->createInstance('none');
+      $pager_plugin = $this->pluginManagers->get('pager')->createInstance('none');
     }
 
     $pager_str = $pager_plugin->summaryTitle();
@@ -1266,7 +1280,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $access_plugin = $this->getPlugin('access');
     if (!$access_plugin) {
       // Default to the no access control plugin.
-      $access_plugin = \Drupal::service('plugin.manager.views.access')->createInstance('none');
+      $access_plugin = $this->pluginManagers->get('access')->createInstance('none');
     }
 
     $access_str = $access_plugin->summaryTitle();
@@ -1286,7 +1300,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $cache_plugin = $this->getPlugin('cache');
     if (!$cache_plugin) {
       // Default to the no cache control plugin.
-      $cache_plugin = \Drupal::service('plugin.manager.views.cache')->createInstance('none');
+      $cache_plugin = $this->pluginManagers->get('cache')->createInstance('none');
     }
 
     $cache_str = $cache_plugin->summaryTitle();
@@ -1343,7 +1357,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $exposed_form_plugin = $this->getPlugin('exposed_form');
     if (!$exposed_form_plugin) {
       // Default to the no cache control plugin.
-      $exposed_form_plugin = \Drupal::service('plugin.manager.views.exposed_form')->createInstance('basic');
+      $exposed_form_plugin = $this->pluginManagers->get('exposed_form')->createInstance('basic');
     }
 
     $exposed_form_str = $exposed_form_plugin->summaryTitle();
@@ -2002,7 +2016,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         $type = $form_state->getValue([$plugin_type, 'type']);
         if ($plugin_options['type'] != $type) {
           /** @var \Drupal\views\Plugin\views\ViewsPluginInterface $plugin */
-          $plugin = \Drupal::service('views.plugin_managers')->get($plugin_type)->createInstance($type);
+          $plugin = $this->pluginManagers->get($plugin_type)->createInstance($type);
           if ($plugin) {
             $plugin->init($this->view, $this, $plugin_options['options']);
             $plugin_options = [
