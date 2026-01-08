@@ -34,12 +34,8 @@ class FieldViewsDataProviderTest extends UnitTestCase {
    */
   #[DataProvider('providerGetHandlers')]
   public function testGetHandlers(string $column_type, string $field_type, array $expected): void {
-    $entity_type_manager = $this->createMock(EntityTypeManager::class);
-    $field_type_plugin_manager = $this->createMock(FieldTypePluginManagerInterface::class);
-    $entity_field_manager = $this->createMock(EntityFieldManagerInterface::class);
-
-    $provider = new FieldViewsDataProvider($entity_type_manager, $field_type_plugin_manager, $entity_field_manager);
-    $this->assertSame($expected, $provider->getHandlers($column_type, $field_type));
+    $method = new \ReflectionMethod(FieldViewsDataProvider::class, 'getHandlers');
+    $this->assertSame($expected, $method->invoke(NULL, $column_type, $field_type));
   }
 
   /**

@@ -332,7 +332,7 @@ class FieldViewsDataProvider {
         $allow_sort = FALSE;
       }
 
-      [$filter, $argument, $sort] = $this->getHandlers($attributes['type'], $field_storage->getType());
+      [$filter, $argument, $sort] = self::getHandlers($attributes['type'], $field_storage->getType());
 
       if (count($field_columns) == 1 || $column == 'value') {
         $title = $this->t('@label (@name)', ['@label' => $label, '@name' => $field_name]);
@@ -511,7 +511,7 @@ class FieldViewsDataProvider {
    *   An array containing the IDs of Views handlers in the following order:
    *   filter, argument, sort.
    */
-  public function getHandlers(string $column_type, string $field_type): array {
+  protected static function getHandlers(string $column_type, string $field_type): array {
     switch ($column_type) {
       case 'int':
       case 'mediumint':
