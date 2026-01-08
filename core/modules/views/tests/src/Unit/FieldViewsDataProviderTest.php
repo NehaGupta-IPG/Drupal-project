@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit;
 
-use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Drupal\Core\Entity\EntityTypeManager;
-use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\FieldViewsDataProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
