@@ -32,6 +32,18 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   protected $rebuilt = FALSE;
 
   /**
+   * Static flag to track if routes were rebuilt during this request.
+   *
+   * This persists across container rebuilds during module installation,
+   * preventing repeated route rebuilds when the container is rebuilt.
+   *
+   * @var bool
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3492438
+   */
+  protected static $globalRebuilt = FALSE;
+
+  /**
    * Flag to determine if router is currently being rebuilt.
    *
    * Used to prevent recursive router rebuilds during module installation.
@@ -63,7 +75,12 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
    *   The route provider service.
    */
   protected function getRouteProvider() {
-    if (!$this->rebuilt && !$this->rebuilding) {
+    // Use static flag to prevent repeated rebuilds across container rebuilds.
+    // During module installation, the container is rebuilt multiple times,
+    // creating new instances with $this->rebuilt = FALSE. The static flag
+    // persists across these rebuilds, ensuring only one rebuild per request.
+    // @see https://www.drupal.org/project/drupal/issues/3492438
+    if (!$this->rebuilt && !$this->rebuilding && !self::$globalRebuilt) {
       $this->routeBuilder->rebuild();
     }
     return $this->routeProvider;
@@ -130,6 +147,19 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   }
 
   /**
+   * Resets the static rebuilt state.
+   *
+   * This should be called after a full router rebuild (e.g., in
+   * install_finished()) to allow subsequent rebuilds in the same request
+   * if needed, and to ensure clean state for tests.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3492438
+   */
+  public static function resetStaticState(): void {
+    self::$globalRebuilt = FALSE;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
@@ -151,6 +181,9 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   public function routerRebuildFinished() {
     $this->rebuilding = FALSE;
     $this->rebuilt = TRUE;
+    // Set static flag to prevent rebuilds in new instances after
+    // container rebuild.
+    self::$globalRebuilt = TRUE;
   }
 
   /**
