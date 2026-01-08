@@ -121,7 +121,7 @@ class ContentTranslationFormLanguageHooks {
             // the entity might have fields and if there are fields to
             // translate.
             $form['settings'][$entity_type_id][$bundle]['translatable'] = [
-              '#title' => t('Translatable'),
+              '#title' => $this->t('Translatable'),
               '#title_display' => 'invisible',
               '#type' => 'checkbox',
               '#default_value' => $this->contentTranslationManager->isEnabled($entity_type_id, $bundle),
