@@ -188,6 +188,14 @@ trait LayoutEntityHelperTrait {
     // Retrieve the actual view mode from the returned view display as the
     // requested view mode may not exist and a fallback will be used.
     $view_mode = LayoutBuilderEntityViewDisplay::collectRenderDisplay($entity, $view_mode)->getMode();
+    // Build the entity to get the view mode in use, because modules might
+    // alter the full view mode per entity with 'entity_view_mode_alter' hook.
+    if (property_exists($this, 'entityTypeManager')) {
+      $build = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId())->view($entity, $view_mode);
+      if (isset($build['#view_mode']) && $build['#view_mode'] !== $view_mode) {
+        $view_mode = $build['#view_mode'];
+      }
+    }
     $contexts['view_mode'] = new Context(new ContextDefinition('string'), $view_mode);
 
     return $contexts;
