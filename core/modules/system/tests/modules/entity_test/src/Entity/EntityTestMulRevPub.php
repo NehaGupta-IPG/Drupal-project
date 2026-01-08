@@ -7,6 +7,7 @@ namespace Drupal\entity_test\Entity;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\Form\DeleteMultipleForm;
 use Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider;
+use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityPublishedTrait;
@@ -72,6 +73,7 @@ class EntityTestMulRevPub extends EntityTestMulRev implements EntityPublishedInt
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type) + static::publishedBaseFieldDefinitions($entity_type);
 
+    assert($fields['status'] instanceof FieldDefinition);
     $fields['status']
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',

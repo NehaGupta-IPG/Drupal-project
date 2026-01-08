@@ -16930,18 +16930,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/src/CommentStorage.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\CommentTranslationHandler\\:\\:entityFormAlter\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/CommentTranslationHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\comment\\\\CommentTranslationHandler\\:\\:entityFormEntityBuild\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/src/CommentTranslationHandler.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getDescription\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -35982,18 +35970,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/NodeStorageInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$created\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/NodeTranslationHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Access to an undefined property Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:\\$uid\\.$#',
-	'identifier' => 'property.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/NodeTranslationHandler.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:getBundleEntity\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -36012,12 +35988,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/NodeTranslationHandler.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Entity\\\\EntityInterface\\:\\:isPublished\\(\\)\\.$#',
-	'identifier' => 'method.notFound',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/NodeTranslationHandler.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Call to an undefined method Drupal\\\\Core\\\\Form\\\\FormInterface\\:\\:getFormLangcode\\(\\)\\.$#',
 	'identifier' => 'method.notFound',
 	'count' => 1,
@@ -36025,12 +35995,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\NodeTranslationHandler\\:\\:entityFormAlter\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/src/NodeTranslationHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\node\\\\NodeTranslationHandler\\:\\:entityFormEntityBuild\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/src/NodeTranslationHandler.php',
