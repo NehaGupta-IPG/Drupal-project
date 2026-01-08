@@ -149,7 +149,7 @@ class ContentTranslationFormLanguageHooks {
 
           $translatable_fields = isset($settings[$entity_type][$bundle]['fields']) ? array_filter($settings[$entity_type][$bundle]['fields']) : FALSE;
           if (empty($translatable_fields)) {
-            $t_args = ['%bundle' => $form['settings'][$entity_type][$bundle]['settings']['#label']];
+            $t_args = ['%bundle' => $form['settings'][$entity_type][$bundle]['settings']['#title']];
             $form_state->setErrorByName($name, t('At least one field needs to be translatable to enable %bundle for translation.', $t_args));
           }
 
