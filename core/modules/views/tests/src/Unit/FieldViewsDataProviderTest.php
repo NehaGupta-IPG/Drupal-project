@@ -27,7 +27,7 @@ class FieldViewsDataProviderTest extends UnitTestCase {
    *   The type of data stored in the field's database table column.
    * @param string $field_type
    *   The ID of the field's type plugin.
-   * @param array $expected
+   * @param list{string, string, string} $expected
    *   The expected output of getHandlers().
    *
    * @legacy-covers ::getHandlers
@@ -41,7 +41,7 @@ class FieldViewsDataProviderTest extends UnitTestCase {
   /**
    * Provides test data for testGetHandlers().
    *
-   * @return array[]
+   * @return list<list{string, string, list{string, string, string}}>
    *   Test cases. See testGetHandlers() for key documentation.
    */
   public static function providerGetHandlers(): array {

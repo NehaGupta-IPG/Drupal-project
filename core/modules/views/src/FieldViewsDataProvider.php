@@ -507,7 +507,7 @@ class FieldViewsDataProvider {
    * @param string $field_type
    *   The ID of the field's type plugin.
    *
-   * @return string[]
+   * @return list{string, string, string}
    *   An array containing the IDs of Views handlers in the following order:
    *   filter, argument, sort.
    */
