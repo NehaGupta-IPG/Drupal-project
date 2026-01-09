@@ -55,6 +55,7 @@ class TermName extends Entity {
     $form['transform'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Transform dashes in URL to spaces in term name filter values'),
+      '#description' => $this->t('If there are terms with spaces and terms with dashes, like "co worker" and "co-worker", then only the last created term will be matched.'),
       '#default_value' => $this->options['transform'],
     ];
   }
@@ -63,16 +64,32 @@ class TermName extends Entity {
    * {@inheritdoc}
    */
   public function validateArgument($argument) {
+    $query = $this->termStorage->getQuery();
+    $query->sort('tid');
+
     if ($this->options['transform']) {
-      $argument = str_replace('-', ' ', $argument);
-      $this->argument->argument = $argument;
-    }
-    // If bundles is set then restrict the loaded terms to the given bundles.
-    if (!empty($this->options['bundles'])) {
-      $terms = $this->termStorage->loadByProperties(['name' => $argument, 'vid' => $this->options['bundles']]);
+      // If there is a term "co-worker", no matches will be found when the dash
+      // will be removed. Try to load both terms with spaces and terms with
+      // dashes if any exist.
+      $argument_pattern = str_replace('-', '[- ]', $argument);
+      $query->condition('name', $argument_pattern, 'REGEXP');
     }
     else {
-      $terms = $this->termStorage->loadByProperties(['name' => $argument]);
+      $query->condition('name', $argument);
+    }
+     $query->accessCheck(FALSE);
+
+    // If bundles is set then restrict the loaded terms to the given bundles.
+    if (!empty($this->options['bundles'])) {
+      $query->condition('vid', $this->options['bundles'], 'IN');
+    }
+    $terms_ids = $query->execute();
+
+    $terms = $terms_ids ? $this->termStorage->loadMultiple($terms_ids) : [];
+
+    // If multiple terms match, set the name of the latest term as an argument.
+    if ($this->options['transform']) {
+      $this->argument->argument = end($terms)->label();
     }
 
     // $terms are already bundle tested but we need to test access control.
