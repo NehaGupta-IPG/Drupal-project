@@ -107,4 +107,25 @@ class RouteProvider implements PreloadableRouteProviderInterface {
     return $this->lazyLoadItself()->getRouteAliases($route_name);
   }
 
+  /**
+   * Determines if the router has been rebuilt.
+   *
+   * @return bool
+   *   TRUE is the router has been rebuilt, FALSE if not.
+   */
+  public function hasRebuilt(): bool {
+    return isset($this->service);
+  }
+
+  /**
+   * Sets the rebuilt flag.
+   *
+   * @param bool $rebuilt
+   *   The rebuilt state to set.
+   */
+  public function setRebuilt(bool $rebuilt): void {
+    // No-op for test route provider. The state is determined by
+    // whether the service has been lazy-loaded.
+  }
+
 }
