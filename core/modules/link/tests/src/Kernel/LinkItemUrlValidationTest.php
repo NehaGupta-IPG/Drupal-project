@@ -40,9 +40,9 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
         foreach ($expected_violations as $error_msg) {
           // If the expected message contains a '%' add the current link value.
           if (strpos($error_msg, '%')) {
-            $error_msg = sprintf($error_msg, $value);
+            $error_msg = sprintf($error_msg, htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
           }
-          $this->assertEquals($error_msg, $violations[$i++]->getMessage());
+          $this->assertEquals($error_msg, (string) $violations[$i++]->getMessage());
         }
       }
     }
@@ -58,6 +58,7 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
   protected function getTestLinks(): array {
     $violation_0 = "The path '%s' is invalid.";
     $violation_1 = 'This value should be of the correct primitive type.';
+    $violation_2 = 'The path <em class="placeholder">&quot;%s&quot;</em> contains invalid characters.';
     return [
       ['invalid://not-a-valid-protocol', [$violation_0]],
       ['http://www.example.com/', []],
@@ -91,6 +92,7 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
       ["http://⌘.ws/", []],
       ["http://foo.com/blah_(wikipedia)#cite-1", []],
       ["http://foo.com/blah_(wikipedia)_blah#cite-1", []],
+      ["mailto:valid@example.com", []],
       // The following invalid URLs produce false positives.
       ["http://foo.com/unicode_(✪)_in_parens", []],
       ["http://foo.com/(something)?after=parens", []],
@@ -101,7 +103,7 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
       ["http://foo.bar/?q=Test%20URL-encoded%20stuff", []],
       ["http://مثال.إختبار", []],
       ["http://例子.测试", []],
-      ["http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com", []],
+      ["http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com", [$violation_2]],
       ["http://1337.net", []],
       ["http://a.b-c.de", []],
       ["radar://1234", [$violation_0]],
@@ -120,6 +122,9 @@ class LinkItemUrlValidationTest extends FieldKernelTestBase {
       ["///a", [$violation_0, $violation_1]],
       ["///", [$violation_0, $violation_1]],
       ["http:///a", [$violation_0, $violation_1]],
+      ["http://www.example.com/invalid space", [$violation_2]],
+      ["http://www.example.com,http://www.example.com", [$violation_2]],
+      ["mailto:invalid-email", [$violation_2]],
     ];
   }
 
