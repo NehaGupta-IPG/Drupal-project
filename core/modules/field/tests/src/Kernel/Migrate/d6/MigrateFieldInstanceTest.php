@@ -6,6 +6,7 @@ namespace Drupal\Tests\field\Kernel\Migrate\d6;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\link\LinkItemInterface;
+use Drupal\link\LinkTitleVisibility;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -102,7 +103,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal6TestBase {
     // Test a link field.
     $field = FieldConfig::load('node.story.field_test_link');
     $this->assertSame('Link Field', $field->label());
-    $expected = ['title' => 2, 'link_type' => LinkItemInterface::LINK_GENERIC];
+    $expected = ['title' => 2, 'language' => LinkTitleVisibility::Disabled->value, 'link_type' => LinkItemInterface::LINK_GENERIC];
     $this->assertSame($expected, $field->getSettings());
     $this->assertSame('default link title', $entity->field_test_link->title, 'Field field_test_link default title is correct.');
     $this->assertSame('https://www.drupal.org', $entity->field_test_link->uri);

@@ -19,4 +19,5 @@ default_value_callback: ''
 settings:
   title: 2
   link_type: 17
+  language: 0
 field_type: link

@@ -39,6 +39,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
   public static function defaultFieldSettings() {
     return [
       'title' => LinkTitleVisibility::Optional->value,
+      'language' => LinkTitleVisibility::Disabled->value,
       'link_type' => LinkItemInterface::LINK_GENERIC,
     ] + parent::defaultFieldSettings();
   }
@@ -110,6 +111,17 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
       '#title' => $this->t('Allow link text'),
       '#default_value' => $this->getSetting('title'),
       '#options' => LinkTitleVisibility::asOptions(),
+    ];
+
+    $element['language'] = [
+      '#type' => 'radios',
+      '#title' => $this->t('Allow link language'),
+      '#default_value' => $this->getSetting('language'),
+      '#options' => [
+        LinkTitleVisibility::Disabled->value => $this->t('Disabled'),
+        LinkTitleVisibility::Optional->value => $this->t('Optional'),
+        LinkTitleVisibility::Required->value => $this->t('Required'),
+      ],
     ];
 
     return $element;
