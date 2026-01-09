@@ -10,11 +10,13 @@ use Drupal\Tests\image\Functional\ImageFieldTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
 
 /**
  * Tests responsive image dimensions are from the selected image style.
  */
 #[Group('responsive_image')]
+#[RunInSeparateProcesses]
 class ResponsiveImageDimensionsTest extends ImageFieldTestBase {
 
   use TestFileCreationTrait;
@@ -92,7 +94,9 @@ class ResponsiveImageDimensionsTest extends ImageFieldTestBase {
     $responsive_image_style
       ->addImageStyleMapping('responsive_image_test_module.empty', '1x', [
         'image_mapping_type' => 'image_style',
-        'image_mapping' => 'medium',  // Use medium (220x220), not large (480x480)
+
+        // Use medium (220x220), not large (480x480)
+        'image_mapping' => 'medium',
       ])
       ->save();
 
