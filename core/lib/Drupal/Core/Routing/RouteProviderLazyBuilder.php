@@ -45,6 +45,21 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   protected $rebuilding = FALSE;
 
   /**
+   * Static flag to track if router was rebuilt during site installation.
+   *
+   * This static flag persists across container rebuilds during installation,
+   * preventing redundant route rebuilds. It is only used when
+   * InstallerKernel::installationAttempted() returns TRUE; outside of
+   * installation (e.g., config import), this flag is ignored to ensure
+   * new modules get their routes rebuilt.
+   *
+   * @var bool
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3492438
+   */
+  protected static $installerRebuilt = FALSE;
+
+  /**
    * RouteProviderLazyBuilder constructor.
    *
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
@@ -60,7 +75,7 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   /**
    * Gets the real route provider service and rebuilds the router if necessary.
    *
-   * During site installation, the rebuilt flag is used to prevent redundant
+   * During site installation, a static flag is used to prevent redundant
    * route rebuilds across container rebuilds. Outside of installation, routes
    * are always rebuilt when needed to ensure new modules have their routes
    * available.
@@ -71,11 +86,11 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
    * @see https://www.drupal.org/project/drupal/issues/3492438
    */
   protected function getRouteProvider() {
-    // Only use the rebuilt flag to skip rebuilds during site installation.
+    // Only use the static rebuilt flag during site installation.
     // Outside of installation, routes must rebuild for new modules.
     $skipRebuild = $this->rebuilding;
     if (InstallerKernel::installationAttempted()) {
-      $skipRebuild = $skipRebuild || $this->rebuilt;
+      $skipRebuild = $skipRebuild || static::$installerRebuilt;
     }
     if (!$skipRebuild) {
       $this->routeBuilder->rebuild();
@@ -180,6 +195,9 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   public function routerRebuildFinished() {
     $this->rebuilding = FALSE;
     $this->rebuilt = TRUE;
+    if (InstallerKernel::installationAttempted()) {
+      static::$installerRebuilt = TRUE;
+    }
   }
 
   /**
