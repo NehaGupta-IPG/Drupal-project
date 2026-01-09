@@ -304,7 +304,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
       if ($is_translation) {
         $t_args = [
           '%language' => $languages[$form_langcode]->getName(),
-          '%title' => $entity->label(),
+          '%title' => $entity->label() ?? $entity->id(),
           '@title' => $title,
         ];
         $title = $new_translation ? $this->t('Create %language translation of %title', $t_args) : $this->t('@title [%language translation]', $t_args);
