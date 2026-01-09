@@ -90,7 +90,6 @@ class NumberTest extends TestCase {
       [-10, 4, FALSE],
       [1000, -10, FALSE],
 
-
       // Invalid float steps.
       [6, 5 / 7, FALSE],
       [10.3, 10.25, FALSE],

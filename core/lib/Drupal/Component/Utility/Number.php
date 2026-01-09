@@ -8,7 +8,7 @@ namespace Drupal\Component\Utility;
  * @ingroup utility
  */
 class Number {
-	
+
   /**
    * Normalizes a numeric value to a lossless, easily parseable numeric string.
    *
@@ -72,8 +72,7 @@ class Number {
     // decimal digits.
     return strlen($number) - strrpos($number, '.') - 1;
   }
-	
-	
+
 
   /**
    * Verifies that a number is a multiple of a given step.
@@ -137,7 +136,7 @@ class Number {
     if ($float_value / (2 ** 53) > $step) {
       return TRUE;
     }
-	
+
     $expected_float_value = (float) round($step * round($float_value / $step), $expected_significant_decimals);
     // Now compute that remainder of a division by $step.
     $remainder = (float) abs($float_value - $expected_float_value);
