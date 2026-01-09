@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -57,13 +58,26 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
   }
 
   /**
-   * Gets the real route provider service and rebuilds the router id necessary.
+   * Gets the real route provider service and rebuilds the router if necessary.
+   *
+   * During site installation, the rebuilt flag is used to prevent redundant
+   * route rebuilds across container rebuilds. Outside of installation, routes
+   * are always rebuilt when needed to ensure new modules have their routes
+   * available.
    *
    * @return \Drupal\Core\Routing\RouteProviderInterface
    *   The route provider service.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3492438
    */
   protected function getRouteProvider() {
-    if (!$this->rebuilt && !$this->rebuilding) {
+    // Only use the rebuilt flag to skip rebuilds during site installation.
+    // Outside of installation, routes must rebuild for new modules.
+    $skipRebuild = $this->rebuilding;
+    if (InstallerKernel::installationAttempted()) {
+      $skipRebuild = $skipRebuild || $this->rebuilt;
+    }
+    if (!$skipRebuild) {
       $this->routeBuilder->rebuild();
     }
     return $this->routeProvider;
