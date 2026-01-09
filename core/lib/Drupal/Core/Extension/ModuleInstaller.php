@@ -719,7 +719,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
     // Save route provider rebuilt state before container rebuild.
     // @see https://www.drupal.org/project/drupal/issues/3492438
-    $route_provider = $this->kernel->getContainer()->get('router.route_provider');
+    $route_provider = $this->kernel->getContainer()->get('router.route_provider.lazy_builder');
     $route_rebuilt = $route_provider->hasRebuilt();
 
     if (!empty($module_filenames)) {
@@ -751,7 +751,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // This prevents redundant route rebuilds during module installation.
     // @see https://www.drupal.org/project/drupal/issues/3492438
     if ($route_rebuilt) {
-      $container->get('router.route_provider')->setRebuilt(TRUE);
+      $container->get('router.route_provider.lazy_builder')->setRebuilt(TRUE);
     }
   }
 
