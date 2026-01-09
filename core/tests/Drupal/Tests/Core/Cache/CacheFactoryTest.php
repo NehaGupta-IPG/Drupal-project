@@ -150,4 +150,66 @@ class CacheFactoryTest extends UnitTestCase {
     $this->assertSame($render_bin, $actual_bin);
   }
 
+  /**
+   * Tests cache factory that specified bin service does not exist.
+   *
+   * @covers ::__construct
+   * @covers ::get
+   */
+  public function testCacheFactoryBinBackendServiceExist() {
+    $settings = new Settings([
+      'cache' => [
+        'bins' => [
+          'render' => 'cache.backend.custom',
+        ],
+      ],
+    ]);
+    $cache_factory = new CacheFactory($settings);
+
+    $container = new ContainerBuilder();
+    $cache_factory->setContainer($container);
+
+    $builtin_default_backend_factory = $this->createMock('\Drupal\Core\Cache\CacheFactoryInterface');
+    $container->set('cache.backend.database', $builtin_default_backend_factory);
+
+    $render_bin = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
+    $builtin_default_backend_factory->expects($this->once())
+      ->method('get')
+      ->with('render')
+      ->will($this->returnValue($render_bin));
+
+    $actual_bin = $cache_factory->get('render');
+    $this->assertSame($render_bin, $actual_bin);
+  }
+
+  /**
+   * Tests cache factory that specified default bin service does not exist.
+   *
+   * @covers ::__construct
+   * @covers ::get
+   */
+  public function testCacheFactoryBinBackendDefaultServiceExist() {
+    $settings = new Settings([
+      'cache' => [
+        'default' => 'cache.backend.custom',
+      ],
+    ]);
+    $cache_factory = new CacheFactory($settings);
+
+    $container = new ContainerBuilder();
+    $cache_factory->setContainer($container);
+
+    $builtin_default_backend_factory = $this->createMock('\Drupal\Core\Cache\CacheFactoryInterface');
+    $container->set('cache.backend.database', $builtin_default_backend_factory);
+
+    $render_bin = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
+    $builtin_default_backend_factory->expects($this->once())
+      ->method('get')
+      ->with('render')
+      ->will($this->returnValue($render_bin));
+
+    $actual_bin = $cache_factory->get('render');
+    $this->assertSame($render_bin, $actual_bin);
+  }
+
 }
