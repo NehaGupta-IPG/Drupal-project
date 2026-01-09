@@ -77,7 +77,7 @@ class TermName extends Entity {
     else {
       $query->condition('name', $argument);
     }
-     $query->accessCheck(FALSE);
+    $query->accessCheck(FALSE);
 
     // If bundles is set then restrict the loaded terms to the given bundles.
     if (!empty($this->options['bundles'])) {
