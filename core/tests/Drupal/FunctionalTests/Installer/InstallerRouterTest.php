@@ -60,8 +60,8 @@ class InstallerRouterTest extends InstallerTestBase {
     // is rebuilt during:
     // - router_test_install() - triggers lazy rebuild which includes all routes
     // - install_finished()
-    // The static $globalRebuilt flag prevents redundant rebuilds during
-    // installation, so hook_modules_installed does not trigger another rebuild.
+    // ModuleInstaller::updateKernel() preserves the route provider's rebuilt
+    // state across container rebuilds, preventing redundant route rebuilds.
     // @see https://www.drupal.org/project/drupal/issues/3492438
     $this->assertSame(2, \Drupal::service('core.performance.test.recorder')->getCount('event', RoutingEvents::FINISHED));
     $this->assertStringEndsWith('/core/install.php/router_installer_test/test1', \Drupal::state()->get('router_installer_test_modules_installed'));

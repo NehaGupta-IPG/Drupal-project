@@ -717,6 +717,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $sync_status = $config_installer->isSyncing();
     $source_storage = $config_installer->getSourceStorage();
 
+    // Save route provider rebuilt state before container rebuild.
+    // @see https://www.drupal.org/project/drupal/issues/3492438
+    $route_provider = $this->kernel->getContainer()->get('router.route_provider');
+    $route_rebuilt = $route_provider->hasRebuilt();
+
     if (!empty($module_filenames)) {
       // This reboots the kernel to register the module's bundle and its
       // services in the service container. The $module_filenames argument is
@@ -740,6 +745,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $container->get('config.installer')
         ->setSyncing(TRUE)
         ->setSourceStorage($source_storage);
+    }
+
+    // Restore route provider rebuilt state after container rebuild.
+    // This prevents redundant route rebuilds during module installation.
+    // @see https://www.drupal.org/project/drupal/issues/3492438
+    if ($route_rebuilt) {
+      $container->get('router.route_provider')->setRebuilt(TRUE);
     }
   }
 

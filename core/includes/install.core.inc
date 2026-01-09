@@ -44,7 +44,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 use Drupal\user\Entity\User;
-use Drupal\Core\Routing\RouteProviderLazyBuilder;
 
 /**
  * Do not run the task during the current installation request.
@@ -1911,10 +1910,6 @@ function install_finished(&$install_state): void {
   // This would normally happen upon KernelEvents::TERMINATE, but since the
   // installer does not use an HttpKernel, that event is never triggered.
   \Drupal::service('router.builder')->rebuild();
-
-  // Reset the static state to allow subsequent rebuilds after installation.
-  // @see https://www.drupal.org/project/drupal/issues/3492438
-  RouteProviderLazyBuilder::resetStaticState();
 
   if ($install_state['interactive']) {
     // Load current user and perform final login tasks.
