@@ -60,6 +60,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
   public function testStandardPerformance(): void {
     $this->testAnonymous();
     $this->testCacheInvalidation();
+    $this->testDynamicPageCacheHit();
     $this->testLogin();
     $this->testLoginBlock();
   }
@@ -540,6 +541,50 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 10,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Tests dynamic page cache hit for authenticated user.
+   */
+  protected function testDynamicPageCacheHit() {
+    $this->drupalLogin($this->user);
+    // Test node page dynamic page cache hit and page cache miss. We have to
+    // first prepare a dynamic page cache hit to warm caches, because routes are
+    // individually loaded on dynamic page cache hits, but preloaded in bulk on
+    // dynamic page cache misses with different caches.
+    $this->drupalGet('node/2');
+    $this->drupalGet('node/2');
+    sleep(2);
+    \Drupal::cache('data')->deleteAll();
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('node/2');
+    }, 'standardNodePageDynamicPageCacheHit');
+
+    $expected_queries = [
+      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
+      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
+      'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
+      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
+      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
+      'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
+      'SELECT 1 AS "expression" FROM "history" "history" WHERE ("uid" = "2") AND ("nid" = "2")',
+      'UPDATE "history" SET "timestamp"="TIMESTAMP" WHERE ("uid" = "2") AND ("nid" = "2")',
+    ];
+    $recorded_queries = $performance_data->getQueries();
+    $this->assertSame($expected_queries, $recorded_queries);
+    $expected = [
+      'QueryCount' => 8,
+      'CacheGetCount' => 37,
+      'CacheSetCount' => 0,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 4,
+      'StylesheetCount' => 1,
+      'StylesheetBytes' => 2400,
+      'ScriptCount' => 2,
+      'ScriptBytes' => 122500,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
