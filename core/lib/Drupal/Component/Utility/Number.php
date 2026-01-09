@@ -73,7 +73,6 @@ class Number {
     return strlen($number) - strrpos($number, '.') - 1;
   }
 
-
   /**
    * Verifies that a number is a multiple of a given step.
    *
