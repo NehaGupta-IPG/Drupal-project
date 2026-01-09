@@ -736,6 +736,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $container = $this->kernel->resetContainer();
     }
 
+    // Restore route provider rebuilt state immediately after container rebuild.
+    // This must happen before any other service access to prevent redundant
+    // route rebuilds during module installation.
+    // @see https://www.drupal.org/project/drupal/issues/3492438
+    if ($route_rebuilt) {
+      $container->get('router.route_provider.lazy_builder')->setRebuilt(TRUE);
+    }
+
     // After rebuilding the container we need to update the injected
     // dependencies.
     $this->moduleHandler = $container->get('module_handler');
@@ -747,13 +755,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $container->get('config.installer')
         ->setSyncing(TRUE)
         ->setSourceStorage($source_storage);
-    }
-
-    // Restore route provider rebuilt state after container rebuild.
-    // This prevents redundant route rebuilds during module installation.
-    // @see https://www.drupal.org/project/drupal/issues/3492438
-    if ($route_rebuilt) {
-      $container->get('router.route_provider.lazy_builder')->setRebuilt(TRUE);
     }
   }
 
