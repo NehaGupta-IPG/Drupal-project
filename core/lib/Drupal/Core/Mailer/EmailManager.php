@@ -135,12 +135,6 @@ class EmailManager extends DefaultPluginManager {
 
     return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($email) {
       $metadata = new BubbleableMetadata();
-      // @todo Allow contrib and custom code to provide a custom Email class.
-      $symfony_email = new Email();
-
-      foreach ($email->getHeaders() as $name => $value) {
-        $symfony_email->getHeaders()->addHeader($name, $value);
-      }
 
       // Build and render the HTML body
       $html = $email->htmlBody();
@@ -154,16 +148,25 @@ class EmailManager extends DefaultPluginManager {
         $text = $text->toRenderable();
       }
 
-      $body = [
-        'html' => $html,
-        'text' => $text,
+      $email_data = [
+        'body' => [
+          'html' => $html,
+          'text' => $text,
+        ],
+        'headers' => $email->getHeaders(),
+        'symfony_email_class' => Email::class,
       ];
       $context = [
         'email' => $email,
-        'symfony_email' => $symfony_email,
         'cacheable_metadata' => $metadata,
       ];
-      $this->moduleHandler->alter('email_pre_render', $body, $context);
+      $this->moduleHandler->alter('email_pre_render', $email_data, $context);
+
+      $symfony_email = new $email_data['symfony_email_class']();
+
+      foreach ($email_data['headers'] as $name => $value) {
+        $symfony_email->getHeaders()->addHeader($name, $value);
+      }
 
       if (isset($body['html'])) {
         $symfony_email->html((string) $this->renderer->render($body['html']));
