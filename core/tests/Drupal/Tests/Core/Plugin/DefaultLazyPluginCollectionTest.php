@@ -74,7 +74,7 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
    * @return array
    *   The test data.
    */
-  public static function providerTestSortHelper() {
+  public static function providerTestSortHelper(): array {
     return [
       ['apple', 'apple', 0],
       ['apple', 'cherry', -1],
@@ -102,6 +102,18 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
       $expected = $expected > 0 ? 1 : -1;
     }
     $this->assertEquals($expected, $this->defaultPluginCollection->sortHelper($plugin_id_1, $plugin_id_2));
+  }
+
+  /**
+   * Tests the sort helper exception if plugin not found.
+   *
+   * @legacy-covers ::sortHelper
+   */
+  public function testSortHelperException(): void {
+    $this->setupPluginCollection($this->any());
+    $this->expectException(PluginNotFoundException::class);
+    $this->expectExceptionMessage("Plugin ID 'pear' was not found.");
+    $this->defaultPluginCollection->sortHelper("apple", "pear");
   }
 
   /**
@@ -266,7 +278,7 @@ class DefaultLazyPluginCollectionTest extends LazyPluginCollectionTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getPluginMock($plugin_id, array $definition) {
+  protected function getPluginMock($plugin_id, array $definition): TestConfigurablePlugin {
     return new TestConfigurablePlugin($this->config[$plugin_id], $plugin_id, $definition);
   }
 

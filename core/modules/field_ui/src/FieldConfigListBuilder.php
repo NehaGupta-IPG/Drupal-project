@@ -187,7 +187,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
           'label' => [
             '#type' => 'html_tag',
             '#tag' => 'span',
-            '#value' => $field_config->getLabel(),
+            '#plain_text' => $field_config->getLabel(),
             '#attributes' => [
               'class' => ['field-label-text'],
             ],
@@ -195,7 +195,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
           'machine_name' => [
             '#type' => 'html_tag',
             '#tag' => 'span',
-            '#value' => ' ' . $field_config->getName(),
+            '#plain_text' => ' ' . $field_config->getName(),
             '#attributes' => [
               'class' => ['field-ui-secondary-text', 'field-machine-name'],
             ],
@@ -250,7 +250,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
+  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
     /** @var \Drupal\field\FieldConfigInterface $entity */
     $operations = parent::getDefaultOperations($entity);
 
