@@ -718,9 +718,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $source_storage = $config_installer->getSourceStorage();
 
     // Save route provider rebuilt state before container rebuild.
+    // Only during site installation to prevent redundant rebuilds.
+    // During normal operation, routes must rebuild for newly installed modules.
     // @see https://www.drupal.org/project/drupal/issues/3492438
-    $route_provider = $this->kernel->getContainer()->get('router.route_provider.lazy_builder');
-    $route_rebuilt = $route_provider->hasRebuilt();
+    $route_rebuilt = FALSE;
+    if (InstallerKernel::installationAttempted()) {
+      $route_provider = $this->kernel->getContainer()->get('router.route_provider.lazy_builder');
+      $route_rebuilt = $route_provider->hasRebuilt();
+    }
 
     if (!empty($module_filenames)) {
       // This reboots the kernel to register the module's bundle and its
