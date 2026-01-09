@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
@@ -56,17 +60,19 @@ class InstallerTranslationTest extends InstallerTestBase {
     // it will try and create the drupal_install_test table as this is part of
     // the standard database tests performed by the installer in
     // Drupal\Core\Database\Install\Tasks.
-    $spec = [
-      'fields' => [
-        'id' => [
-          'type' => 'int',
-          'not null' => TRUE,
+    Database::getConnection('default')->schema()->createTableFromDefinition(
+      new Table(
+        name: 'drupal_install_test',
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
         ],
-      ],
-      'primary key' => ['id'],
-    ];
-
-    Database::getConnection('default')->schema()->createTable('drupal_install_test', $spec);
+        primaryKey: new PrimaryKey(['id']),
+      ),
+    );
     parent::setUpSettings();
 
     // Ensure that the error message translation is working.

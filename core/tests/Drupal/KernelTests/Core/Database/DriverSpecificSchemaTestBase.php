@@ -6,6 +6,10 @@ namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
@@ -949,127 +953,162 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $method = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
 
     // Test with single column primary key.
-    $this->schema->createTable('table_with_pk_0', [
-      'description' => 'Table with primary key.',
-      'fields' => [
-        'id'  => [
-          'type' => 'int',
-          'not null' => TRUE,
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: 'table_with_pk_0',
+        description: 'Table with primary key.',
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'test_field',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
         ],
-        'test_field'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-      ],
-      'primary key' => ['id'],
-    ]);
+        primaryKey: new PrimaryKey(['id']),
+      ),
+    );
     $this->assertSame(['id'], $method->invoke($this->schema, 'table_with_pk_0'));
 
     // Test with multiple column primary key.
-    $this->schema->createTable('table_with_pk_1', [
-      'description' => 'Table with primary key with multiple columns.',
-      'fields' => [
-        'id0'  => [
-          'type' => 'int',
-          'not null' => TRUE,
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: 'table_with_pk_1',
+        description: 'Table with primary key with multiple columns.',
+        columns: [
+          new Column(
+            name: 'id0',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'id1',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'test_field',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
         ],
-        'id1'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-        'test_field'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-      ],
-      'primary key' => ['id0', 'id1'],
-    ]);
+        primaryKey: new PrimaryKey(['id0', 'id1']),
+      ),
+    );
     $this->assertSame(['id0', 'id1'], $method->invoke($this->schema, 'table_with_pk_1'));
 
     // Test with multiple column primary key and not being the first column of
     // the table definition.
-    $this->schema->createTable('table_with_pk_2', [
-      'description' => 'Table with primary key with multiple columns at the end and in reverted sequence.',
-      'fields' => [
-        'test_field_1'  => [
-          'type' => 'int',
-          'not null' => TRUE,
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: 'table_with_pk_2',
+        description: 'Table with primary key with multiple columns at the end and in reverted sequence.',
+        columns: [
+          new Column(
+            name: 'test_field_1',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'test_field_2',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'id3',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'id4',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
         ],
-        'test_field_2'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-        'id3'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-        'id4'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-      ],
-      'primary key' => ['id4', 'id3'],
-    ]);
+        primaryKey: new PrimaryKey(['id4', 'id3']),
+      ),
+    );
     $this->assertSame(['id4', 'id3'], $method->invoke($this->schema, 'table_with_pk_2'));
 
     // Test with multiple column primary key in a different order. For the
     // PostgreSQL and the SQLite drivers is sorting used to get the primary key
     // columns in the right order.
-    $this->schema->createTable('table_with_pk_3', [
-      'description' => 'Table with primary key with multiple columns at the end and in reverted sequence.',
-      'fields' => [
-        'test_field_1'  => [
-          'type' => 'int',
-          'not null' => TRUE,
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: 'table_with_pk_3',
+        description: 'Table with primary key with multiple columns at the end and in reverted sequence.',
+        columns: [
+          new Column(
+            name: 'test_field_1',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'test_field_2',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'id3',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'id4',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
         ],
-        'test_field_2'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-        'id3'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-        'id4'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-      ],
-      'primary key' => ['id3', 'test_field_2', 'id4'],
-    ]);
+        primaryKey: new PrimaryKey(['id3', 'test_field_2', 'id4']),
+      ),
+    );
     $this->assertSame(['id3', 'test_field_2', 'id4'], $method->invoke($this->schema, 'table_with_pk_3'));
 
     // Test with table without a primary key.
-    $this->schema->createTable('table_without_pk_1', [
-      'description' => 'Table without primary key.',
-      'fields' => [
-        'id'  => [
-          'type' => 'int',
-          'not null' => TRUE,
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: 'table_without_pk_1',
+        description: 'Table without primary key.',
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'test_field',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
         ],
-        'test_field'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-      ],
-    ]);
+      ),
+    );
     $this->assertSame([], $method->invoke($this->schema, 'table_without_pk_1'));
 
     // Test with table with an empty primary key.
-    $this->schema->createTable('table_without_pk_2', [
-      'description' => 'Table without primary key.',
-      'fields' => [
-        'id'  => [
-          'type' => 'int',
-          'not null' => TRUE,
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: 'table_without_pk_2',
+        description: 'Table without primary key.',
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
+          new Column(
+            name: 'test_field',
+            type: ColumnType::Int,
+            notNull: TRUE,
+          ),
         ],
-        'test_field'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-      ],
-      'primary key' => [],
-    ]);
+        primaryKey: new PrimaryKey([]),
+      ),
+    );
     $this->assertSame([], $method->invoke($this->schema, 'table_without_pk_2'));
 
     // Test with non existing table.
