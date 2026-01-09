@@ -131,6 +131,7 @@ class FormHelperTest extends UnitTestCase {
       'empty item' => [
         [
           '#type' => 'item',
+          '#states_attributes_target_key' => '#wrapper_attributes',
           '#states' => [
             'visible' => [
               ':input[name="foo"]' => ['value' => 'bar'],
@@ -143,6 +144,7 @@ class FormHelperTest extends UnitTestCase {
       'empty item with input' => [
         [
           '#type' => 'item',
+          '#states_attributes_target_key' => '#wrapper_attributes',
           '#states' => [
             'visible' => [
               ':input[name="foo"]' => ['value' => 'bar'],
@@ -156,6 +158,7 @@ class FormHelperTest extends UnitTestCase {
       'item with markup' => [
         [
           '#type' => 'item',
+          '#states_attributes_target_key' => '#wrapper_attributes',
           '#states' => [
             'visible' => [
               ':input[name="foo"]' => ['value' => 'bar'],
@@ -168,6 +171,7 @@ class FormHelperTest extends UnitTestCase {
       'item with markup and input' => [
         [
           '#type' => 'item',
+          '#states_attributes_target_key' => '#wrapper_attributes',
           '#states' => [
             'visible' => [
               ':input[name="foo"]' => ['value' => 'bar'],
@@ -181,6 +185,7 @@ class FormHelperTest extends UnitTestCase {
       'password_confirm' => [
         [
           '#type' => 'password_confirm',
+          '#states_attributes_target_key' => '#wrapper_attributes',
           '#states' => [
             'visible' => [
               ':input[name="foo"]' => ['value' => 'bar'],

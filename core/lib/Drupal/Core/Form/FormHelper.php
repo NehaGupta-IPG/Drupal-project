@@ -196,6 +196,12 @@ class FormHelper {
    *   ],
    * @endcode
    *
+   * On rare occasions, authors of form elements may need to specify a location
+   * other than '#attributes' to store the data-drupal-states attribute. In such
+   * cases, they may set the '#states_attributes_target_key' property to the
+   * desired key, for example: '#wrapper_attributes', in the form element
+   * definition.
+   *
    * @param array $elements
    *   A render array element having a #states property as described above.
    *
@@ -204,11 +210,7 @@ class FormHelper {
    */
   public static function processStates(array &$elements) {
     $elements['#attached']['library'][] = 'core/drupal.states';
-    // Elements that are actual form input elements, use '#attributes'.
-    // In cases like 'item' that are not actual form input elements or
-    // those like 'password_confirm' that have child elements,
-    // use #wrapper_attributes.
-    $key = ($elements['#type'] == 'item' || $elements['#type'] == 'password_confirm') ? '#wrapper_attributes' : '#attributes';
+    $key = $elements['#states_attributes_target_key'] ?? '#attributes';
     $elements[$key]['data-drupal-states'] = Json::encode($elements['#states']);
   }
 
