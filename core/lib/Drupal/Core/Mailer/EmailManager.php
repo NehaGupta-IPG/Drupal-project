@@ -168,13 +168,13 @@ class EmailManager extends DefaultPluginManager {
         $symfony_email->getHeaders()->addHeader($name, $value);
       }
 
-      if (isset($body['html'])) {
-        $symfony_email->html((string) $this->renderer->render($body['html']));
-        $metadata->merge(BubbleableMetadata::createFromRenderArray($body['html']));
+      if (isset($email_data['body']['html'])) {
+        $symfony_email->html((string) $this->renderer->render($email_data['body']['html']));
+        $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['html']));
       }
-      if (isset($body['text'])) {
-        $symfony_email->text((string) $this->renderer->render($body['text']));
-        $metadata->merge(BubbleableMetadata::createFromRenderArray($body['text']));
+      if (isset($email_data['body']['text'])) {
+        $symfony_email->text((string) $this->renderer->render($email_data['body']['text']));
+        $metadata->merge(BubbleableMetadata::createFromRenderArray($email_data['body']['text']));
       }
 
       return $symfony_email;
