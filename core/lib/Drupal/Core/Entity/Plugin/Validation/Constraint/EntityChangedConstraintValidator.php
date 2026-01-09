@@ -31,8 +31,13 @@ class EntityChangedConstraintValidator extends ConstraintValidator {
             // been edited and saved in the meanwhile. Therefore, compare the
             // changed timestamps of each entity translation individually.
             if ($saved_entity->getTranslation($langcode)->getChangedTime() > $entity->getTranslation($langcode)->getChangedTime()) {
-              $this->context->addViolation($constraint->message);
-              break;
+              // Further compare the revision IDs, solves rare cases where
+              // users were not allowed to edit content in installations with
+              // workflows content moderation enabled.
+              if ($saved_entity->getLoadedRevisionId() == $entity->getLoadedRevisionId()) {
+                $this->context->addViolation($constraint->message);
+                break;
+              }
             }
           }
         }
