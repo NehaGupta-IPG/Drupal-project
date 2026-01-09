@@ -10,13 +10,13 @@ use Drupal\Tests\image\Functional\ImageFieldTestBase;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests responsive image dimensions are from the selected image style.
  */
 #[Group('responsive_image')]
-#[RunInSeparateProcesses]
+#[RunTestsInSeparateProcesses]
 class ResponsiveImageDimensionsTest extends ImageFieldTestBase {
 
   use TestFileCreationTrait;
