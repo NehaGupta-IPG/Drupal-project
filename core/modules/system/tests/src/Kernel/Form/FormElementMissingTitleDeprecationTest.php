@@ -8,12 +8,14 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the the deprecation message for empty #title property.
  */
 #[Group('form')]
 #[Group('legacy')]
+#[RunTestsInSeparateProcesses]
 class FormElementMissingTitleDeprecationTest extends KernelTestBase implements FormInterface {
 
   /**

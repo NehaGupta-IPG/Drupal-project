@@ -388,9 +388,8 @@ class FormTest extends BrowserTestBase {
    * messages.
    *
    * @see \Drupal\form_test\Form\FormTestValidateRequiredNoTitleForm
-   *
-   * @group legacy
    */
+  #[Group('legacy')]
   public function testRequiredTextfieldNoTitle(): void {
     $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield" of #type "textfield" from form "form_test_validate_required_form_no_title" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
 
