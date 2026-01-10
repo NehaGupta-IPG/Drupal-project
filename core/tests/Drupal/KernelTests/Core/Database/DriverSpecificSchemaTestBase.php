@@ -459,7 +459,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
           ],
           [
             'notNull' => FALSE,
-            'default' => $type === ColumnType::Int ? new IntValue(7) : new FloatValue(7)
+            'default' => $type === ColumnType::Int ? new IntValue(7) : new FloatValue(7),
           ],
           [
             'notNull' => TRUE,
