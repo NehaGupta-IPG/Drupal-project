@@ -43,7 +43,7 @@ class LogMessageParserTest extends UnitTestCase {
   /**
    * Data provider for testParseMessagePlaceholders().
    */
-  public static function providerTestParseMessagePlaceholders() {
+  public static function providerTestParseMessagePlaceholders(): array {
     return [
       'PSR3-style placeholder' => [
         ['message' => 'User {username} created', 'context' => ['username' => 'Dries']],
@@ -62,12 +62,24 @@ class LogMessageParserTest extends UnitTestCase {
         ['message' => 'User W-\\};~{&! created @', 'context' => []],
       ],
       'Multiple PSR3-style placeholders' => [
-        ['message' => 'Test {with} two {{encapsuled}} strings', 'context' => ['with' => 'together', 'encapsuled' => 'awesome']],
-        ['message' => 'Test @with two {@encapsuled} strings', 'context' => ['@with' => 'together', '@encapsuled' => 'awesome']],
+        [
+          'message' => 'Test {with} two {{encapsuled}} strings',
+          'context' => ['with' => 'together', 'encapsuled' => 'awesome'],
+        ],
+        [
+          'message' => 'Test @with two {@encapsuled} strings',
+          'context' => ['@with' => 'together', '@encapsuled' => 'awesome'],
+        ],
       ],
       'Disallowed placeholder' => [
-        ['message' => 'Test placeholder with :url and old !bang parameter', 'context' => [':url' => 'https://example.com', '!bang' => 'foo bar']],
-        ['message' => 'Test placeholder with :url and old !bang parameter', 'context' => [':url' => 'https://example.com']],
+        [
+          'message' => 'Test placeholder with :url and old !bang parameter',
+          'context' => [':url' => 'https://example.com', '!bang' => 'foo bar'],
+        ],
+        [
+          'message' => 'Test placeholder with :url and old !bang parameter',
+          'context' => [':url' => 'https://example.com'],
+        ],
       ],
       'Stringable object placeholder' => [
         ['message' => 'object @b', 'context' => ['@b' => new FormattableMarkup('convertible', [])]],
@@ -86,7 +98,7 @@ class LogMessageParserTest extends UnitTestCase {
         ['message' => 'object @b', 'context' => []],
       ],
       'Non-stringable closure placeholder' => [
-        ['message' => 'closure @c', 'context' => ['@c' => function () {}]],
+        ['message' => 'closure @c', 'context' => ['@c' => function (): void {}]],
         ['message' => 'closure @c', 'context' => []],
       ],
       'Non-stringable resource placeholder' => [
