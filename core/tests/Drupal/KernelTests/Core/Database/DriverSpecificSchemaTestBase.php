@@ -8,8 +8,13 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\FloatValue;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\SchemaException;
@@ -145,42 +150,48 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    */
   public function testSchema(): void {
     // Try creating a table.
-    $table_specification = [
-      'description' => 'Schema table description may contain "quotes" and could be long—very long indeed.',
-      'fields' => [
-        'id'  => [
-          'type' => 'int',
-          'default' => NULL,
-        ],
-        'test_field'  => [
-          'type' => 'int',
-          'not null' => TRUE,
-          'description' => 'Schema table description may contain "quotes" and could be long—very long indeed. There could be "multiple quoted regions".',
-        ],
-        'test_field_string'  => [
-          'type' => 'varchar',
-          'length' => 20,
-          'not null' => TRUE,
-          'default' => "'\"funky default'\"",
-          'description' => 'Schema column description for string.',
-        ],
-        'test_field_string_ascii'  => [
-          'type' => 'varchar_ascii',
-          'length' => 255,
-          'description' => 'Schema column description for ASCII string.',
-        ],
+    $test_field_definition = new Column(
+      name: 'test_field',
+      description: 'Schema table description may contain "quotes" and could be long—very long indeed. There could be "multiple quoted regions".',
+      type: ColumnType::Int,
+      notNull: TRUE,
+    );
+    $table_definition = new Table(
+      name: 'test_table',
+      description: 'Schema table description may contain "quotes" and could be long—very long indeed.',
+      columns: [
+        new Column(
+          name: 'id',
+          type: ColumnType::Int,
+          default: new NullValue(),
+        ),
+        $test_field_definition,
+        new Column(
+          name: 'test_field_string',
+          description: 'Schema column description for string.',
+          type: ColumnType::Varchar,
+          length: 20,
+          notNull: TRUE,
+          default: new StringValue("'\"funky default'\""),
+        ),
+        new Column(
+          name: 'test_field_string_ascii',
+          description: 'Schema column description for ASCII string.',
+          type: ColumnType::VarcharAscii,
+          length: 255,
+        ),
       ],
-    ];
-    $this->schema->createTable('test_table', $table_specification);
+    );
+    $this->schema->createTableFromDefinition($table_definition);
 
     // Assert that the table exists.
-    $this->assertTrue($this->schema->tableExists('test_table'), 'The table exists.');
+    $this->assertTrue($this->schema->tableExists('test_table'));
 
     // Assert that the table comment has been set.
-    $this->checkSchemaComment($table_specification['description'], 'test_table');
+    $this->checkSchemaComment($table_definition->description, 'test_table');
 
     // Assert that the column comment has been set.
-    $this->checkSchemaComment($table_specification['fields']['test_field']['description'], 'test_table', 'test_field');
+    $this->checkSchemaComment($test_field_definition->description, 'test_table', 'test_field');
 
     // Make sure that fields have the correct collation, if supported.
     $this->assertCollation();
@@ -207,7 +218,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $index_exists = $this->schema->indexExists('test_table', 'test_field');
     $this->assertFalse($index_exists, 'Fake index does not exist');
     // Add index.
-    $this->schema->addIndex('test_table', 'test_field', ['test_field'], $table_specification);
+    $this->schema->addIndex('test_table', 'test_field', ['test_field'], $table_definition->toArray());
     // Test for created index and test for the boolean result of indexExists().
     $index_exists = $this->schema->indexExists('test_table', 'test_field');
     $this->assertTrue($index_exists, 'Index created.');
@@ -238,7 +249,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertFalse($this->schema->tableExists('test_table2'), 'The dropped table does not exist.');
 
     // Recreate the table.
-    $this->schema->createTable('test_table', $table_specification);
+    $this->schema->createTableFromDefinition($table_definition);
     $this->schema->changeField(
       'test_table',
       'test_field',
@@ -277,7 +288,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Test adding a serial field to an existing table.
     $this->schema->dropTable('test_table');
-    $this->schema->createTable('test_table', $table_specification);
+    $this->schema->createTableFromDefinition($table_definition);
     $this->schema->changeField(
       'test_table',
       'test_field',
@@ -322,29 +333,32 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Test renaming of keys and constraints.
     $this->schema->dropTable('test_table');
-    $table_specification = [
-      'fields' => [
-        'id'  => [
-          'type' => 'serial',
-          'not null' => TRUE,
-        ],
-        'test_field'  => [
-          'type' => 'int',
-          'default' => 0,
-        ],
-      ],
-      'primary key' => ['id'],
-      'unique keys' => [
-        'test_field' => ['test_field'],
-      ],
-    ];
 
     // PostgreSQL has a max identifier length of 63 characters, MySQL has 64 and
     // SQLite does not have any limit. Use the lowest common value and create a
     // table name as long as possible in order to cover edge cases around
     // identifier names for the table's primary or unique key constraints.
     $table_name = strtolower($this->getRandomGenerator()->name(63 - strlen($this->getDatabasePrefix())));
-    $this->schema->createTable($table_name, $table_specification);
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: $table_name,
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Serial,
+          ),
+          new Column(
+            name: 'test_field',
+            type: ColumnType::Int,
+            default: new IntValue(0),
+          ),
+        ],
+        primaryKey: new PrimaryKey(['id']),
+        uniqueKeys: [
+          new UniqueKey(name: 'test_field', columns: ['test_field']),
+        ],
+      ),
+    );
 
     $this->assertIndexOnColumns($table_name, ['id'], 'primary');
     $this->assertIndexOnColumns($table_name, ['test_field'], 'unique');
@@ -1125,16 +1139,20 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     // Create the tables.
     $table_specification = [
       'description' => 'Test table.',
-      'fields' => [
-        'id'  => [
-          'type' => 'int',
-          'default' => NULL,
-        ],
+      'columns' => [
+        new Column(
+          name: 'id',
+          type: ColumnType::Int,
+          default: new NullValue(),
+        ),
       ],
     ];
-    $test_schema->createTable('test_1_table', $table_specification);
-    $test_schema->createTable('test_2_table', $table_specification);
-    $test_schema->createTable('the_third_table', $table_specification);
+    $table_specification['name'] = 'test_1_table';
+    $test_schema->createTableFromDefinition(new Table(...$table_specification));
+    $table_specification['name'] = 'test_2_table';
+    $test_schema->createTableFromDefinition(new Table(...$table_specification));
+    $table_specification['name'] = 'the_third_table';
+    $test_schema->createTableFromDefinition(new Table(...$table_specification));
 
     // Check the "all tables" syntax.
     $tables = $test_schema->findTables('%');
@@ -1160,10 +1178,14 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertEquals($expected, $tables, 'Two tables were found.');
 
     // Check '_' and '%' wildcards.
-    $test_schema->createTable('test3table', $table_specification);
-    $test_schema->createTable('test4', $table_specification);
-    $test_schema->createTable('testTable', $table_specification);
-    $test_schema->createTable('test', $table_specification);
+    $table_specification['name'] = 'test3table';
+    $test_schema->createTableFromDefinition(new Table(...$table_specification));
+    $table_specification['name'] = 'test4';
+    $test_schema->createTableFromDefinition(new Table(...$table_specification));
+    $table_specification['name'] = 'testTable';
+    $test_schema->createTableFromDefinition(new Table(...$table_specification));
+    $table_specification['name'] = 'test';
+    $test_schema->createTableFromDefinition(new Table(...$table_specification));
 
     $tables = $test_schema->findTables('test%');
     sort($tables);
@@ -1221,21 +1243,26 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   public function testUpperCaseTableName(): void {
     $table_name = 'A_UPPER_CASE_TABLE_NAME';
 
-    // Create the tables.
-    $table_specification = [
-      'description' => 'Test table.',
-      'fields' => [
-        'id'  => [
-          'type' => 'int',
-          'default' => NULL,
+    // Create the table.
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: $table_name,
+        description: 'Test table.',
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Int,
+            default: new NullValue(),
+          ),
         ],
-      ],
-    ];
-    $this->schema->createTable($table_name, $table_specification);
-
+      ),
+    );
     $this->assertTrue($this->schema->tableExists($table_name), 'Table with uppercase table name exists');
     $this->assertContains($table_name, $this->schema->findTables('%'));
+
     $this->assertTrue($this->schema->dropTable($table_name), 'Table with uppercase table name dropped');
+    $this->assertNotContains($table_name, $this->schema->findTables('%'));
+    $this->assertFalse($this->schema->tableExists($table_name));
   }
 
   /**
@@ -1246,17 +1273,20 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $test_schema = Database::getConnection()->schema();
 
     // Create the tables.
-    $table_specification = [
-      'description' => 'Test table.',
-      'fields' => [
-        'id'  => [
-          'type' => 'int',
-          'default' => NULL,
-          'description' => 'Test field.',
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: 'test_table',
+        description: 'Test table.',
+        columns: [
+          new Column(
+            name: 'id',
+            description: 'Test field.',
+            type: ColumnType::Int,
+            default: new NullValue(),
+          ),
         ],
-      ],
-    ];
-    $test_schema->createTable('test_table', $table_specification);
+      ),
+    );
 
     // Create a view to ensure it is not found.
     Database::getConnection()->query('create view {test_view} as select * from {test_table}');
@@ -1288,44 +1318,53 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $table_name = 'test_table';
 
     // Create the table.
-    $table_specification = [
-      'description' => 'Test table.',
-      'fields' => [
-        'column1'  => [
-          'type' => 'int',
-          'default' => NULL,
+    $this->schema->createTableFromDefinition(
+      new Table(
+        name: $table_name,
+        description: 'Test table.',
+        columns: [
+          new Column(
+            name: 'column1',
+            type: ColumnType::Int,
+            default: new NullValue(),
+          ),
+          new Column(
+            name: 'column2',
+            type: ColumnType::Varchar,
+            length: 20,
+            default: new NullValue(),
+          ),
+          new Column(
+            name: 'column3',
+            type: ColumnType::Int,
+            default: new IntValue(200),
+          ),
+          new Column(
+            name: 'column4',
+            type: ColumnType::Float,
+            default: new FloatValue(1.23),
+          ),
+          new Column(
+            name: 'column5',
+            type: ColumnType::Varchar,
+            length: 20,
+            default: new StringValue("'s o'clock'"),
+          ),
+          new Column(
+            name: 'column6',
+            type: ColumnType::Varchar,
+            length: 20,
+            default: new StringValue("o'clock"),
+          ),
+          new Column(
+            name: 'column7',
+            type: ColumnType::Varchar,
+            length: 20,
+            default: new StringValue('default value'),
+          ),
         ],
-        'column2'  => [
-          'type' => 'varchar',
-          'length' => 20,
-          'default' => NULL,
-        ],
-        'column3'  => [
-          'type' => 'int',
-          'default' => 200,
-        ],
-        'column4'  => [
-          'type' => 'float',
-          'default' => 1.23,
-        ],
-        'column5'  => [
-          'type' => 'varchar',
-          'length' => 20,
-          'default' => "'s o'clock'",
-        ],
-        'column6'  => [
-          'type' => 'varchar',
-          'length' => 20,
-          'default' => "o'clock",
-        ],
-        'column7'  => [
-          'type' => 'varchar',
-          'length' => 20,
-          'default' => 'default value',
-        ],
-      ],
-    ];
-    $this->schema->createTable($table_name, $table_specification);
+      ),
+    );
 
     // Insert a row and check that columns have the expected default values.
     $this->connection->insert($table_name)->fields(['column1' => 1])->execute();
