@@ -180,16 +180,18 @@ class AssetOptimizationTest extends BrowserTestBase {
       $this->assertSession()->statusCodeEquals(200);
     }
     else {
-      $session->visit($this->omitCategory($url));
-      $this->assertSession()->statusCodeEquals(400);
+      if (isset($parts['query']['category'])) {
+        $session->visit($this->omitCategory($url));
+        $this->assertSession()->statusCodeEquals(400);
+
+        $session->visit($this->invalidCategory($url));
+        $this->assertSession()->statusCodeEquals(400);
+      }
 
       $session->visit($this->omitLibraries($url));
       $this->assertSession()->statusCodeEquals(400);
 
       $session->visit($this->invalidLibraries($url));
-      $this->assertSession()->statusCodeEquals(400);
-
-      $session->visit($this->invalidCategory($url));
       $this->assertSession()->statusCodeEquals(400);
     }
 

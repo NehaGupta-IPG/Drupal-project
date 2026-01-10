@@ -143,7 +143,7 @@ abstract class AssetControllerBase extends FileDownloadController {
       }
     }
     if ($request->query->has('category')) {
-      if (!$this->assetType !== 'css') {
+      if ($this->assetType !== 'css') {
         throw new BadRequestHttpException('Category must only passed for CSS.');
       }
       if (!$request->query->has('libraries')) {
