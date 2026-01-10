@@ -30,7 +30,7 @@ ckeditor5:
     # (if it exists). The files loaded after this one will include CKEditor 5
     # translations, enabled plugins, and the rest of the JavaScript needed on
     # the page.
-    assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js: { minified: true }
+    assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js: { minified: true, preprocess: false }
   dependencies:
     - core/ckeditor5.translations
 
@@ -340,6 +340,7 @@ ckeditor5.autoformat:
     - core/ckeditor5
 
 drupal:
+  unique_css_aggregate: true
   version: VERSION
   js:
     misc/drupal.js: { weight: -18 }
@@ -616,6 +617,7 @@ drupal.form:
     - core/once
 
 drupal.htmx:
+  unique_js_aggregate: true
   version: VERSION
   js:
     misc/htmx/htmx-utils.js: {}
@@ -843,6 +845,7 @@ htmx:
     assets/vendor/htmx/htmx.min.js: { minified: true, preprocess: false }
 
 internal.floating-ui:
+  unique_css_aggregate: true
   remote: https://github.com/floating-ui/floating-ui
   version: "1.7.4"
   license:
