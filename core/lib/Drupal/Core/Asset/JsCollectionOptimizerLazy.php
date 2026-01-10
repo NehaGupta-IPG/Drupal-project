@@ -134,7 +134,8 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
           ] + $query_args;
 
           // When an asset corresponds 1-1 with a single library, we don't need
-          // either the include or exclude query arguments. Replace this wit
+          // either the include or exclude query arguments. Replace this with
+          // the explicit list of libraries in the aggregate.
           if (isset($js_asset['libraries'])) {
             unset($query['include'], $query['exclude'], $query['delta']);
             $query['libraries'] = UrlHelper::compressQueryParameter(implode(',', $js_asset['libraries']));

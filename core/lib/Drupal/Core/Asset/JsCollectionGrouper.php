@@ -71,12 +71,14 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
       // the group and record the index.
       if ($seen_index === NULL) {
         $first_seen_libraries[$item['library']] = $index;
-        $groups[$index]['libraries'][] = $item['library'];
+        if ($item['unique_js_aggregate']) {
+          $groups[$index]['libraries'][] = $item['library'];
+        }
       }
 
       // If a library has been seen in a previous index, this means that index
       // does not contain all of the assets for that library, so unset the
-      // libraries key from that group.
+      // libraries key from that group and this one.
       if ($seen_index && $seen_index !== $index) {
         unset($groups[$seen_index]['libraries']);
         unset($groups[$index]['libraries']);
