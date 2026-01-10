@@ -45,7 +45,7 @@ class JsAssetController extends AssetControllerBase {
   /**
    * {@inheritdoc}
    */
-  protected function getGroups(AttachedAssetsInterface $attached_assets, Request $request, $with_dependencies = TRUE): array {
+  protected function getGroups(AttachedAssetsInterface $attached_assets, Request $request): array {
     // The header and footer scripts are two distinct sets of asset groups. The
     // $group_key is not sufficient to find the group, we also need to locate it
     // within either the header or footer set.
