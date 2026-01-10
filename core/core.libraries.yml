@@ -416,7 +416,7 @@ loadjs:
     url: https://raw.githubusercontent.com/muicss/loadjs/4.3.0/LICENSE.txt
     gpl-compatible: true
   js:
-    assets/vendor/loadjs/loadjs.min.js: { minified: true }
+    assets/vendor/loadjs/loadjs.min.js: { minified: true, preprocess: false }
 
 # Common files for libraries that still rely on jQuery UI components.
 # @todo Remove when no longer required by drupal.autocomplete and drupal.dialog.
@@ -814,7 +814,6 @@ drupal.timezone:
     - core/drupal
 
 drupal.touchevents-test:
-  unique_js_aggregate: true
   header: true
   version: VERSION
   js:
@@ -911,7 +910,7 @@ once:
     url: https://git.drupalcode.org/project/once/-/raw/v1.0.1/LICENSE.md
     gpl-compatible: true
   js:
-    assets/vendor/once/once.min.js: { weight: -19, minified: true }
+    assets/vendor/once/once.min.js: { weight: -19, minified: true, preprocess: false }
 
 sortable:
   remote: https://github.com/SortableJS/Sortable
@@ -921,7 +920,7 @@ sortable:
     url: https://raw.githubusercontent.com/SortableJS/Sortable/1.15.6/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/sortable/Sortable.min.js: { minified: true }
+    assets/vendor/sortable/Sortable.min.js: { minified: true, preprocess: false }
 
 tabbable:
   remote: https://github.com/focus-trap/tabbable
@@ -931,7 +930,7 @@ tabbable:
     url: https://raw.githubusercontent.com/focus-trap/tabbable/v6.3.0/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/tabbable/index.umd.min.js: { weight: -1, minified: true }
+    assets/vendor/tabbable/index.umd.min.js: { weight: -1, minified: true, preprocess: false }
 
 transliteration:
   remote: https://github.com/dzcpy/transliteration
@@ -941,7 +940,7 @@ transliteration:
     url: https://raw.githubusercontent.com/dzcpy/transliteration/1.6.5/LICENSE.txt
     gpl-compatible: true
   js:
-    assets/vendor/transliteration/bundle.umd.min.js: { minified: true }
+    assets/vendor/transliteration/bundle.umd.min.js: { minified: true, preprocess: false }
 
 internal.underscore:
   # Internal library. Do not depend on it outside core nor add new core usage.
