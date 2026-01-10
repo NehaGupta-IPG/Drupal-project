@@ -13,7 +13,7 @@ internal.backbone:
     url: https://raw.githubusercontent.com/jashkenas/backbone/1.6.1/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/backbone/backbone-min.js: { weight: -19, minified: true }
+    assets/vendor/backbone/backbone-min.js: { weight: -19, minified: true, preprocess: false }
   dependencies:
     - core/internal.underscore
 
@@ -421,7 +421,6 @@ loadjs:
 # Common files for libraries that still rely on jQuery UI components.
 # @todo Remove when no longer required by drupal.autocomplete and drupal.dialog.
 internal.jquery_ui:
-  unique_js_aggregate: true
   version: VERSION
   js:
     # All weights are based on the requirements defined within each file.
@@ -958,7 +957,7 @@ internal.underscore:
     url: https://raw.githubusercontent.com/jashkenas/underscore/1.13.7/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/underscore/underscore-min.js: { weight: -20, minified: true }
+    assets/vendor/underscore/underscore-min.js: { weight: -20, minified: true, preprocess: false }
 
 
 drupal.dialog.off_canvas:
