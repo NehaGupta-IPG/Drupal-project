@@ -25,14 +25,6 @@ class EventBase extends Event {
    */
   protected $message;
 
-  /**
-   * Constructs a Migrate event object.
-   *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The migration being run.
-   * @param \Drupal\migrate\MigrateMessageInterface $message
-   *   The Migrate message service.
-   */
   public function __construct(MigrationInterface $migration, MigrateMessageInterface $message) {
     $this->migration = $migration;
     $this->message = $message;

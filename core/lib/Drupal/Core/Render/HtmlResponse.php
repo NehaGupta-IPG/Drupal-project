@@ -25,19 +25,6 @@ class HtmlResponse extends Response implements CacheableResponseInterface, Attac
   use CacheableResponseTrait;
   use AttachmentsTrait;
 
-  /**
-   * Constructs a HtmlResponse object.
-   *
-   * @param array|string $content
-   *   The response content, see setContent().
-   * @param int $status
-   *   The response status code.
-   * @param array $headers
-   *   An array of response headers.
-   *
-   * @throws \InvalidArgumentException
-   *   When the HTTP status code is not valid.
-   */
   public function __construct($content = '', int $status = 200, array $headers = []) {
     parent::__construct('', $status, $headers);
     $this->setContent($content);

@@ -28,12 +28,6 @@ class UpdateCacheBackendFactory implements CacheFactoryInterface {
    */
   protected $bins = [];
 
-  /**
-   * UpdateCacheBackendFactory constructor.
-   *
-   * @param \Drupal\Core\Cache\CacheFactoryInterface $cache_factory
-   *   The regular runtime cache_factory service.
-   */
   public function __construct(CacheFactoryInterface $cache_factory) {
     $this->cacheFactory = $cache_factory;
   }

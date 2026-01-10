@@ -41,14 +41,6 @@ class EntryPoint extends ControllerBase {
    */
   protected $user;
 
-  /**
-   * EntryPoint constructor.
-   *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The resource type repository.
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user.
-   */
   public function __construct(ResourceTypeRepositoryInterface $resource_type_repository, AccountInterface $user) {
     $this->resourceTypeRepository = $resource_type_repository;
     $this->user = $user;

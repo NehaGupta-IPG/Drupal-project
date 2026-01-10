@@ -34,28 +34,6 @@ class Cron implements CronInterface {
    */
   protected array $queueConfig;
 
-  /**
-   * Constructs a cron object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock service.
-   * @param \Drupal\Core\Queue\QueueFactory $queueFactory
-   *   The queue service.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface $accountSwitcher
-   *   The account switching service.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\Queue\QueueWorkerManagerInterface $queueManager
-   *   The queue plugin manager.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param array $queue_config
-   *   Queue configuration from the service container.
-   */
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
     protected LockBackendInterface $lock,

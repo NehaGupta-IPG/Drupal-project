@@ -13,16 +13,6 @@ use Drupal\Core\Lock\LockBackendInterface;
  */
 class IconCollector extends CacheCollector {
 
-  /**
-   * Constructs a IconCollector instance.
-   *
-   * @param \Drupal\Core\Theme\Icon\IconExtractorPluginManager $iconPackExtractorManager
-   *   The icon plugin extractor service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   */
   public function __construct(
     protected readonly IconExtractorPluginManager $iconPackExtractorManager,
     CacheBackendInterface $cache,

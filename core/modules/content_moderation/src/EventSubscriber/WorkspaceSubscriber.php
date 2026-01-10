@@ -14,14 +14,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class WorkspaceSubscriber implements EventSubscriberInterface {
 
-  /**
-   * Constructs a new WorkspaceSubscriber instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager service.
-   * @param \Drupal\workspaces\WorkspaceTrackerInterface|null $workspaceTracker
-   *   The workspace tracker service.
-   */
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly ?WorkspaceTrackerInterface $workspaceTracker,

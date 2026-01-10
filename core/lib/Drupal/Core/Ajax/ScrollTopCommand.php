@@ -16,12 +16,6 @@ class ScrollTopCommand implements CommandInterface {
    */
   protected $selector;
 
-  /**
-   * Constructs a \Drupal\Core\Ajax\ScrollTopCommand object.
-   *
-   * @param string $selector
-   *   A CSS selector.
-   */
   public function __construct($selector) {
     $this->selector = $selector;
   }

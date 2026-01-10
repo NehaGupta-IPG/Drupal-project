@@ -37,14 +37,6 @@ class ContentTranslationDeleteAccess implements AccessInterface {
    */
   protected $contentTranslationManager;
 
-  /**
-   * Constructs a ContentTranslationDeleteAccess object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $manager
-   *   The entity type manager.
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
-   *   The content translation manager.
-   */
   public function __construct(EntityTypeManagerInterface $manager, ContentTranslationManagerInterface $content_translation_manager) {
     $this->entityTypeManager = $manager;
     $this->contentTranslationManager = $content_translation_manager;

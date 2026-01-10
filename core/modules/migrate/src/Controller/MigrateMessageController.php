@@ -23,16 +23,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class MigrateMessageController extends ControllerBase {
 
-  /**
-   * Constructs a MigrateController.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   A database connection.
-   * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
-   *   The form builder service.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migrationPluginManager
-   *   The migration plugin manager.
-   */
   public function __construct(
     protected Connection $database,
     FormBuilderInterface $formBuilder,

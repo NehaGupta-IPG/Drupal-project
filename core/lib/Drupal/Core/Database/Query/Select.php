@@ -129,18 +129,6 @@ class Select extends Query implements SelectInterface {
    */
   public array $alterTags;
 
-  /**
-   * Constructs a Select object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   Database connection object.
-   * @param string|\Drupal\Core\Database\Query\SelectInterface $table
-   *   The table name or subquery that is being queried.
-   * @param string $alias
-   *   The alias for the table.
-   * @param array $options
-   *   Array of query options.
-   */
   public function __construct(Connection $connection, $table, $alias = NULL, $options = []) {
     parent::__construct($connection, $options);
     $conjunction = $options['conjunction'] ?? 'AND';

@@ -23,12 +23,6 @@ class LinkAccessConstraintValidator extends ConstraintValidator implements Conta
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $current_user;
 
-  /**
-   * Constructs an instance of the LinkAccessConstraintValidator class.
-   *
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
-   *   The current user account.
-   */
   public function __construct(AccountProxyInterface $current_user) {
     $this->current_user = $current_user;
   }

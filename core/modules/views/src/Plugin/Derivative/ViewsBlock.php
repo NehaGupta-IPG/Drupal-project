@@ -45,14 +45,6 @@ class ViewsBlock implements ContainerDeriverInterface {
     );
   }
 
-  /**
-   * Constructs a ViewsBlock object.
-   *
-   * @param string $base_plugin_id
-   *   The base plugin ID.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $view_storage
-   *   The entity storage to load views.
-   */
   public function __construct($base_plugin_id, EntityStorageInterface $view_storage) {
     $this->basePluginId = $base_plugin_id;
     $this->viewStorage = $view_storage;

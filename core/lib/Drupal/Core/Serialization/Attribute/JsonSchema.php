@@ -12,12 +12,6 @@ namespace Drupal\Core\Serialization\Attribute;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class JsonSchema {
 
-  /**
-   * Constructor.
-   *
-   * @param array $schema
-   *   Schema.
-   */
   public function __construct(
     public readonly array $schema = [],
   ) {

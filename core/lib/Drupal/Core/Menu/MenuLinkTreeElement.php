@@ -83,22 +83,6 @@ class MenuLinkTreeElement {
    */
   public $options = [];
 
-  /**
-   * Constructs a new \Drupal\Core\Menu\MenuLinkTreeElement.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $link
-   *   The menu link for this element in the menu link tree.
-   * @param bool $has_children
-   *   A flag as to whether this element has children even if they are not
-   *   included in the tree (i.e. this may be TRUE even if $subtree is empty).
-   * @param int $depth
-   *   The depth of this element relative to the tree root.
-   * @param bool $in_active_trail
-   *   A flag as to whether this link was included in the list of active trail
-   *   IDs used to build the tree.
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $subtree
-   *   The children of this element in the menu link tree.
-   */
   public function __construct(MenuLinkInterface $link, $has_children, $depth, $in_active_trail, array $subtree) {
     // Essential properties.
     $this->link = $link;

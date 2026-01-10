@@ -21,20 +21,6 @@ class SuspendQueueException extends \RuntimeException {
    */
   protected $delay = NULL;
 
-  /**
-   * Constructs a SuspendQueueException.
-   *
-   * @param string $message
-   *   The error message.
-   * @param int $code
-   *   The error code.
-   * @param \Throwable|null $previous
-   *   The previous throwable used for the exception chaining.
-   * @param float|null $delay
-   *   If the time for when the queue will be ready to resume processing is
-   *   known, pass an interval in seconds. Otherwise NULL if the time to resume
-   *   processing the queue is not known.
-   */
   public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = NULL, ?float $delay = NULL) {
     parent::__construct($message, $code, $previous);
     $this->delay = $delay;

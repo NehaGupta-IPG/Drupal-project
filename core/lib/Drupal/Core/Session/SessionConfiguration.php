@@ -16,16 +16,6 @@ class SessionConfiguration implements SessionConfigurationInterface {
    */
   protected $options;
 
-  /**
-   * Constructs a new session configuration instance.
-   *
-   * @param array $options
-   *   An associative array of session ini settings.
-   *
-   * @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::__construct()
-   * @see http://php.net/manual/session.configuration.php
-   * @see https://www.php.net/manual/session.security.ini.php
-   */
   public function __construct($options = []) {
     // Provide sensible defaults for name_suffix.
     // @see core/assets/scaffold/files/default.services.yml

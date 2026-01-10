@@ -16,14 +16,6 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
 
   use RoutePathGenerationTrait;
 
-  /**
-   * Constructs a RouteProcessorCsrf object.
-   *
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
-   *   The CSRF token generator.
-   * @param \Symfony\Component\HttpFoundation\RequestStack|null $requestStack
-   *   The request stack.
-   */
   public function __construct(
     protected CsrfTokenGenerator $csrfToken,
     protected ?RequestStack $requestStack = NULL,

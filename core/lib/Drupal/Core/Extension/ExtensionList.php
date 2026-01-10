@@ -116,24 +116,6 @@ abstract class ExtensionList {
    */
   protected $installProfile;
 
-  /**
-   * Constructs a new instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $type
-   *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache.
-   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
-   *   The info parser.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
-   * @param string $install_profile
-   *   The install profile used by the site.
-   */
   public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, $install_profile) {
     $this->root = $root;
     $this->type = $type;

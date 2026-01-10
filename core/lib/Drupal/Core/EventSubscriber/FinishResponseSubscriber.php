@@ -29,24 +29,6 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    */
   protected $config;
 
-  /**
-   * Constructs a FinishResponseSubscriber object.
-   *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager object for retrieving the correct language code.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   A config factory for retrieving required config objects.
-   * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
-   *   A policy rule determining the cacheability of a request.
-   * @param \Drupal\Core\PageCache\ResponsePolicyInterface $responsePolicy
-   *   A policy rule determining the cacheability of a response.
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cacheContextsManager
-   *   The cache contexts manager service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param bool $debugCacheabilityHeaders
-   *   (optional) Whether to send cacheability headers for debugging purposes.
-   */
   public function __construct(
     protected LanguageManagerInterface $languageManager,
     ConfigFactoryInterface $config_factory,

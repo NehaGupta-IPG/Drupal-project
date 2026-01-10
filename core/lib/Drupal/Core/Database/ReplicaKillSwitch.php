@@ -35,16 +35,6 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
    */
   protected $session;
 
-  /**
-   * Constructs a ReplicaKillSwitch object.
-   *
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings object.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
-   *   The session.
-   */
   public function __construct(Settings $settings, TimeInterface $time, SessionInterface $session) {
     $this->settings = $settings;
     $this->time = $time;

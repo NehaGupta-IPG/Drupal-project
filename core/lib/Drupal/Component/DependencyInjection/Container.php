@@ -97,19 +97,6 @@ class Container implements ContainerInterface, ResetInterface {
    */
   protected $frozen = TRUE;
 
-  /**
-   * Constructs a new Container instance.
-   *
-   * @param array $container_definition
-   *   An array containing the following keys:
-   *   - aliases: The aliases of the container.
-   *   - parameters: The parameters of the container.
-   *   - services: The service definitions of the container.
-   *   - frozen: Whether the container definition came from a frozen
-   *     container builder or not.
-   *   - machine_format: Whether this container definition uses the optimized
-   *     machine-readable container format.
-   */
   public function __construct(array $container_definition = []) {
     if (!empty($container_definition) && (!isset($container_definition['machine_format']) || $container_definition['machine_format'] !== TRUE)) {
       throw new InvalidArgumentException('The non-optimized format is not supported by this class. Use an optimized machine-readable format instead, e.g. as produced by \Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper.');

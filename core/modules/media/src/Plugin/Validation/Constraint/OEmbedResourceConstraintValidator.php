@@ -43,16 +43,6 @@ class OEmbedResourceConstraintValidator extends ConstraintValidator implements C
    */
   protected $logger;
 
-  /**
-   * Constructs a new OEmbedResourceConstraintValidator.
-   *
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
-   *   The oEmbed URL resolver service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
-   *   The resource fetcher service.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
-   *   The logger service.
-   */
   public function __construct(UrlResolverInterface $url_resolver, ResourceFetcherInterface $resource_fetcher, LoggerChannelFactoryInterface $logger_factory) {
     $this->urlResolver = $url_resolver;
     $this->resourceFetcher = $resource_fetcher;

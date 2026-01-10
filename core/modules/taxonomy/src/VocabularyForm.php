@@ -23,12 +23,6 @@ class VocabularyForm extends BundleEntityFormBase {
    */
   protected $vocabularyStorage;
 
-  /**
-   * Constructs a new vocabulary form.
-   *
-   * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage
-   *   The vocabulary storage.
-   */
   public function __construct(VocabularyStorageInterface $vocabulary_storage) {
     $this->vocabularyStorage = $vocabulary_storage;
   }

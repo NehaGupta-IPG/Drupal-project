@@ -16,12 +16,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class FieldConfigAddController extends ControllerBase {
 
-  /**
-   * FieldConfigAddController constructor.
-   *
-   * @param \Drupal\Core\TempStore\PrivateTempStore $tempStore
-   *   The private tempstore.
-   */
   public function __construct(
     protected readonly PrivateTempStore $tempStore,
   ) {}

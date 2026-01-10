@@ -84,29 +84,6 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
    */
   protected $fieldStorage;
 
-  /**
-   * Constructs a FieldConfig object.
-   *
-   * In most cases, Field entities are created via
-   * FieldConfig::create($values), where $values is the same
-   * parameter as in this constructor.
-   *
-   * @param array $values
-   *   An array of field properties, keyed by property name. The
-   *   storage associated with the field can be specified either with:
-   *   - field_storage: the FieldStorageConfigInterface object,
-   *   or by referring to an existing field storage in the current configuration
-   *   with:
-   *   - field_name: The field name.
-   *   - entity_type: The entity type.
-   *   Additionally, a 'bundle' property is required to indicate the entity
-   *   bundle to which the field is attached to. Other array elements will be
-   *   used to set the corresponding properties on the class; see the class
-   *   property documentation for details.
-   * @param string $entity_type
-   *   (optional) The entity type on which the field should be created.
-   *   Defaults to "field_config".
-   */
   public function __construct(array $values, $entity_type = 'field_config') {
     // Allow either an injected FieldStorageConfig object, or a field_name and
     // entity_type.

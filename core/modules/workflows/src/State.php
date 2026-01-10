@@ -35,18 +35,6 @@ class State implements StateInterface {
    */
   protected $weight;
 
-  /**
-   * State constructor.
-   *
-   * @param \Drupal\workflows\WorkflowTypeInterface $workflow
-   *   The workflow the state is attached to.
-   * @param string $id
-   *   The state's ID.
-   * @param string $label
-   *   The state's label.
-   * @param int $weight
-   *   The state's weight.
-   */
   public function __construct(WorkflowTypeInterface $workflow, $id, $label, $weight = 0) {
     $this->workflow = $workflow;
     $this->id = $id;

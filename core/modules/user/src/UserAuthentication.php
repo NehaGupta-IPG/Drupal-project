@@ -24,14 +24,6 @@ class UserAuthentication implements UserAuthInterface, UserAuthenticationInterfa
    */
   protected $passwordChecker;
 
-  /**
-   * Constructs a UserAuth object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Password\PasswordInterface $password_checker
-   *   The password service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, PasswordInterface $password_checker) {
     $this->entityTypeManager = $entity_type_manager;
     $this->passwordChecker = $password_checker;

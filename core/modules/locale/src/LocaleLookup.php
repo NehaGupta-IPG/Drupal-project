@@ -71,26 +71,6 @@ class LocaleLookup extends CacheCollector {
    */
   protected $requestStack;
 
-  /**
-   * Constructs a LocaleLookup object.
-   *
-   * @param string $langcode
-   *   The language code.
-   * @param string $context
-   *   The string context.
-   * @param \Drupal\locale\StringStorageInterface $string_storage
-   *   The string storage.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   */
   public function __construct($langcode, $context, StringStorageInterface $string_storage, CacheBackendInterface $cache, LockBackendInterface $lock, ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, RequestStack $request_stack) {
     $this->langcode = $langcode;
     $this->context = (string) $context;

@@ -1107,9 +1107,6 @@ class MockInstantiationService {
    */
   protected $arguments;
 
-  /**
-   * Construct a mock instantiation service.
-   */
   public function __construct() {
     $this->arguments = func_get_args();
   }
@@ -1159,14 +1156,6 @@ class MockService {
    */
   public string $someProperty;
 
-  /**
-   * Constructs a MockService object.
-   *
-   * @param object $some_other_service
-   *   (optional) Another injected service.
-   * @param string $some_parameter
-   *   (optional) An injected parameter.
-   */
   public function __construct($some_other_service = NULL, $some_parameter = NULL) {
     if (is_array($some_other_service)) {
       $some_other_service = $some_other_service[0];

@@ -36,16 +36,6 @@ class UserFloodControl implements UserFloodControlInterface {
    */
   protected $requestStack;
 
-  /**
-   * Construct the UserFloodControl.
-   *
-   * @param \Drupal\Core\Flood\FloodInterface $flood
-   *   The flood service.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack used to retrieve the current request.
-   */
   public function __construct(FloodInterface $flood, EventDispatcherInterface $event_dispatcher, RequestStack $request_stack) {
     $this->flood = $flood;
     $this->eventDispatcher = $event_dispatcher;

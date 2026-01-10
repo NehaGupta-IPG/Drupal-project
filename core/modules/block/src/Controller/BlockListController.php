@@ -19,12 +19,6 @@ class BlockListController extends EntityListController {
    */
   protected $themeHandler;
 
-  /**
-   * Constructs the BlockListController.
-   *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   */
   public function __construct(ThemeHandlerInterface $theme_handler) {
     $this->themeHandler = $theme_handler;
   }

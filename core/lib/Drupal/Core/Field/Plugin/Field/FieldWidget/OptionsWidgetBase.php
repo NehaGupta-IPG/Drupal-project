@@ -53,9 +53,6 @@ abstract class OptionsWidgetBase extends WidgetBase {
    */
   protected array $options;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $property_names = $this->fieldDefinition->getFieldStorageDefinition()->getPropertyNames();

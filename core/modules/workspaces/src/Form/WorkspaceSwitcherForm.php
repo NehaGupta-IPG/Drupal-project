@@ -45,18 +45,6 @@ class WorkspaceSwitcherForm extends FormBase implements WorkspaceSafeFormInterfa
    */
   protected $selectionManager;
 
-  /**
-   * Constructs a new WorkspaceSwitcherForm.
-   *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
-   *   The workspace manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger service.
-   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
-   *   The entity reference selection plugin manager.
-   */
   public function __construct(WorkspaceManagerInterface $workspace_manager, EntityTypeManagerInterface $entity_type_manager, MessengerInterface $messenger, SelectionPluginManagerInterface $selection_manager) {
     $this->workspaceManager = $workspace_manager;
     $this->workspaceStorage = $entity_type_manager->getStorage('workspace');

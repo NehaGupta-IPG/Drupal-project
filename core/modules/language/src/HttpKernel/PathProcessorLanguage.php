@@ -60,20 +60,6 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
    */
   protected $configSubscriber;
 
-  /**
-   * Constructs a PathProcessorLanguage object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
-   *   A config factory object for retrieving configuration settings.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
-   *   The configurable language manager.
-   * @param \Drupal\language\LanguageNegotiatorInterface $negotiator
-   *   The language negotiator.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current active user.
-   * @param \Drupal\language\EventSubscriber\ConfigSubscriber $config_subscriber
-   *   The language configuration event subscriber.
-   */
   public function __construct(ConfigFactoryInterface $config, ConfigurableLanguageManagerInterface $language_manager, LanguageNegotiatorInterface $negotiator, AccountInterface $current_user, ConfigSubscriber $config_subscriber) {
     $this->config = $config;
     $this->languageManager = $language_manager;

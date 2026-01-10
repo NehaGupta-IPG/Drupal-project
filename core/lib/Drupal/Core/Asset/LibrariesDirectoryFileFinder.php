@@ -37,18 +37,6 @@ class LibrariesDirectoryFileFinder {
    */
   protected $installProfile;
 
-  /**
-   * Constructs a new LibrariesDirectoryFileFinder instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $site_path
-   *   The site path.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_extension_list
-   *   The profile extension list.
-   * @param string $install_profile
-   *   The install profile.
-   */
   public function __construct($root, $site_path, ProfileExtensionList $profile_extension_list, $install_profile) {
     $this->root = $root;
     $this->sitePath = $site_path;

@@ -49,15 +49,6 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
    */
   protected $originalOrder = [];
 
-  /**
-   * Constructs a new DefaultLazyPluginCollection object.
-   *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
-   *   The manager to be used for instantiating plugins.
-   * @param array $configurations
-   *   (optional) An associative array containing the initial configuration for
-   *   each plugin in the collection, keyed by plugin instance ID.
-   */
   public function __construct(PluginManagerInterface $manager, array $configurations = []) {
     $this->manager = $manager;
     $this->configurations = $configurations;

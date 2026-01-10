@@ -140,9 +140,6 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
     );
   }
 
-  /**
-   * Constructs a WizardPluginBase object.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

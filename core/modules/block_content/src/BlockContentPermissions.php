@@ -17,12 +17,6 @@ class BlockContentPermissions implements ContainerInjectionInterface {
   use StringTranslationTrait;
   use BundlePermissionHandlerTrait;
 
-  /**
-   * Constructs a BlockContentPermissions instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   Entity type manager.
-   */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {

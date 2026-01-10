@@ -26,12 +26,6 @@ class AccessDeniedSubscriber extends HttpExceptionSubscriberBase {
    */
   protected $account;
 
-  /**
-   * Constructs a new redirect subscriber.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   */
   public function __construct(AccountInterface $account) {
     $this->account = $account;
   }

@@ -18,12 +18,6 @@ class CronController extends ControllerBase {
    */
   protected $cron;
 
-  /**
-   * Constructs a CronController object.
-   *
-   * @param \Drupal\Core\CronInterface $cron
-   *   The cron service.
-   */
   public function __construct(CronInterface $cron) {
     $this->cron = $cron;
   }

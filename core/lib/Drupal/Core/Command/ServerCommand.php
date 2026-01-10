@@ -32,12 +32,6 @@ class ServerCommand extends Command {
    */
   protected $classLoader;
 
-  /**
-   * Constructs a new ServerCommand command.
-   *
-   * @param object $class_loader
-   *   The class loader.
-   */
   public function __construct($class_loader) {
     parent::__construct('server');
     $this->classLoader = $class_loader;

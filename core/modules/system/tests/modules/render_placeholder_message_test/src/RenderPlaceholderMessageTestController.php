@@ -15,12 +15,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class RenderPlaceholderMessageTestController implements TrustedCallbackInterface, ContainerInjectionInterface {
 
-  /**
-   * Constructs a new RenderPlaceholderMessageTestController object.
-   *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   */
   public function __construct(protected RendererInterface $renderer) {
   }
 

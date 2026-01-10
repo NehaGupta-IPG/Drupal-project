@@ -31,12 +31,6 @@ final class RecipeCommand extends Command {
   use BootableCommandTrait;
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new RecipeCommand command.
-   *
-   * @param object $class_loader
-   *   The class loader.
-   */
   public function __construct($class_loader) {
     parent::__construct('recipe');
     $this->classLoader = $class_loader;

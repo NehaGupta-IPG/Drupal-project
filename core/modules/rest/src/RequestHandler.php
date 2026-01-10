@@ -30,12 +30,6 @@ class RequestHandler implements ContainerInjectionInterface {
    */
   protected $serializer;
 
-  /**
-   * Creates a new RequestHandler instance.
-   *
-   * @param \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Encoder\DecoderInterface $serializer
-   *   The serializer.
-   */
   public function __construct(SerializerInterface $serializer) {
     $this->serializer = $serializer;
   }

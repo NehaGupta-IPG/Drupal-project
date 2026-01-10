@@ -48,17 +48,6 @@ class AnnounceCommand implements CommandInterface, CommandWithAttachedAssetsInte
    */
   protected $priority;
 
-  /**
-   * Constructs an AnnounceCommand object.
-   *
-   * @param string $text
-   *   The text to be announced.
-   * @param string|null $priority
-   *   (optional) The priority that will be used for the announcement. Defaults
-   *   to NULL which will not set a 'priority' in the response sent to the
-   *   client and therefore the JavaScript Drupal.announce() default of 'polite'
-   *   will be used for the message.
-   */
   public function __construct($text, $priority = NULL) {
     $this->text = $text;
     $this->priority = $priority;

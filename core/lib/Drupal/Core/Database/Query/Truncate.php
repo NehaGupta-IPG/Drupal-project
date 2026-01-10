@@ -16,16 +16,6 @@ class Truncate extends Query {
    */
   protected $table;
 
-  /**
-   * Constructs a Truncate query object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   A Connection object.
-   * @param string $table
-   *   Name of the table to associate with this query.
-   * @param array $options
-   *   Array of database options.
-   */
   public function __construct(Connection $connection, $table, array $options = []) {
     parent::__construct($connection, $options);
     $this->table = $table;

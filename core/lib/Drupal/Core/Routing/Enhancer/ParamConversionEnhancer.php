@@ -25,12 +25,6 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
    */
   protected $paramConverterManager;
 
-  /**
-   * Constructs a new ParamConversionEnhancer.
-   *
-   * @param \Drupal\Core\ParamConverter\ParamConverterManagerInterface $param_converter_manager
-   *   The parameter conversion manager.
-   */
   public function __construct(ParamConverterManagerInterface $param_converter_manager) {
     $this->paramConverterManager = $param_converter_manager;
   }

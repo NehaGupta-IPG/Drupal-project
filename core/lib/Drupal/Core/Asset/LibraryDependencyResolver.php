@@ -21,12 +21,6 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
    */
   protected $librariesDependencies = [];
 
-  /**
-   * Constructs a new LibraryDependencyResolver instance.
-   *
-   * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery
-   *   The library discovery service.
-   */
   public function __construct(LibraryDiscoveryInterface $library_discovery) {
     $this->libraryDiscovery = $library_discovery;
   }

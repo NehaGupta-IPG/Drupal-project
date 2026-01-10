@@ -35,14 +35,6 @@ class EntityCreateAnyAccessCheck implements AccessInterface {
    */
   protected $requirementsKey = '_entity_create_any_access';
 
-  /**
-   * Constructs an EntityCreateAnyAccessCheck object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
-   *   The entity type bundle info.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;

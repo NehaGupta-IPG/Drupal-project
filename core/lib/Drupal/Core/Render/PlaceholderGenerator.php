@@ -28,14 +28,6 @@ class PlaceholderGenerator implements PlaceholderGeneratorInterface {
    */
   protected $rendererConfig;
 
-  /**
-   * Constructs a new Placeholder service.
-   *
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cache_contexts_manager
-   *   The cache contexts manager service.
-   * @param array $renderer_config
-   *   The renderer configuration array.
-   */
   public function __construct(CacheContextsManager $cache_contexts_manager, array $renderer_config) {
     $this->cacheContextsManager = $cache_contexts_manager;
     $this->rendererConfig = $renderer_config;

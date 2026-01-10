@@ -54,14 +54,6 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    */
   protected $languageManager;
 
-  /**
-   * Constructs a LocaleConfigSubscriber.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Drupal\locale\LocaleConfigManager $locale_config_manager
-   *   The typed configuration manager.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, LocaleConfigManager $locale_config_manager) {
     $this->configFactory = $config_factory;
     $this->localeConfigManager = $locale_config_manager;

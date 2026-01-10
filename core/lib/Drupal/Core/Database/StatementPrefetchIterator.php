@@ -72,20 +72,6 @@ class StatementPrefetchIterator extends StatementBase {
    */
   protected FetchAs $defaultFetchMode = FetchAs::Object;
 
-  /**
-   * Constructs a StatementPrefetchIterator object.
-   *
-   * @param object $clientConnection
-   *   Client database connection object, for example \PDO.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param string $queryString
-   *   The query string.
-   * @param array $driverOptions
-   *   Driver-specific options.
-   * @param bool $rowCountEnabled
-   *   (optional) Enables counting the rows matched. Defaults to FALSE.
-   */
   public function __construct(
     object $clientConnection,
     Connection $connection,

@@ -12,16 +12,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class TestWaitTerminateMiddleware implements HttpKernelInterface {
 
-  /**
-   * Constructs a test wait terminate stack middleware object.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
-   *   The decorated kernel.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param bool $waitForTerminate
-   *   Container parameter to toggle this behavior.
-   */
   public function __construct(
     protected HttpKernelInterface $httpKernel,
     protected LockBackendInterface $lock,

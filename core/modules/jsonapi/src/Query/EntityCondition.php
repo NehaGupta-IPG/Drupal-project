@@ -72,9 +72,6 @@ class EntityCondition {
    */
   protected $value;
 
-  /**
-   * Constructs a new EntityCondition object.
-   */
   public function __construct($field, $value, $operator = NULL) {
     $this->field = $field;
     $this->value = $value;

@@ -13,22 +13,6 @@ use Drupal\search\Exception\SearchIndexException;
  */
 class SearchIndex implements SearchIndexInterface {
 
-  /**
-   * SearchIndex constructor.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Database\Connection $replica
-   *   The database replica connection.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cacheTagsInvalidator
-   *   The cache tags invalidator.
-   * @param \Drupal\search\SearchTextProcessorInterface $textProcessor
-   *   The text processor.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
     protected Connection $connection,

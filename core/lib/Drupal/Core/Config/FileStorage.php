@@ -34,15 +34,6 @@ class FileStorage implements StorageInterface {
    */
   protected $fileCache;
 
-  /**
-   * Constructs a new FileStorage.
-   *
-   * @param string $directory
-   *   A directory path to use for reading and writing of configuration files.
-   * @param string $collection
-   *   (optional) The collection to store configuration in. Defaults to the
-   *   default collection.
-   */
   public function __construct($directory, $collection = StorageInterface::DEFAULT_COLLECTION) {
     $this->directory = $directory;
     $this->collection = $collection;

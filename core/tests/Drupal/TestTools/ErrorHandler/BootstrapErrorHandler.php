@@ -24,11 +24,6 @@ use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
  */
 final class BootstrapErrorHandler {
 
-  /**
-   * @param \PHPUnit\Runner\ErrorHandler $phpUnitErrorHandler
-   *   An instance of PHPUnit's runner own error handler. Any error not
-   *   managed here will fall back to it.
-   */
   public function __construct(
     private readonly PhpUnitErrorHandler $phpUnitErrorHandler,
   ) {

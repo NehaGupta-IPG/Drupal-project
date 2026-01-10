@@ -19,12 +19,6 @@ class PagerParameters implements PagerParametersInterface {
    */
   protected $requestStack;
 
-  /**
-   * Construct a PagerManager object.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $stack
-   *   The current HTTP request stack.
-   */
   public function __construct(RequestStack $stack) {
     $this->requestStack = $stack;
   }

@@ -39,14 +39,6 @@ class Context extends ComponentContext implements ContextInterface {
    */
   protected $cacheabilityMetadata;
 
-  /**
-   * Create a context object.
-   *
-   * @param \Drupal\Core\Plugin\Context\ContextDefinitionInterface $context_definition
-   *   The context definition.
-   * @param mixed|null $context_value
-   *   The context value object.
-   */
   public function __construct(ContextDefinitionInterface $context_definition, $context_value = NULL) {
     parent::__construct($context_definition, NULL);
     $this->cacheabilityMetadata = new CacheableMetadata();

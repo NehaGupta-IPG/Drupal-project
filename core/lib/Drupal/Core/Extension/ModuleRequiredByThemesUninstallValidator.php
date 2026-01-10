@@ -27,16 +27,6 @@ class ModuleRequiredByThemesUninstallValidator implements ConfigImportModuleUnin
    */
   protected $themeExtensionList;
 
-  /**
-   * Constructs a new ModuleRequiredByThemesUninstallValidator.
-   *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $extension_list_theme
-   *   The theme extension list.
-   */
   public function __construct(TranslationInterface $string_translation, ModuleExtensionList $extension_list_module, ThemeExtensionList $extension_list_theme) {
     $this->stringTranslation = $string_translation;
     $this->moduleExtensionList = $extension_list_module;

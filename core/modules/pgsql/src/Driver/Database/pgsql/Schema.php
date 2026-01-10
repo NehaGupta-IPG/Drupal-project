@@ -51,9 +51,6 @@ class Schema extends DatabaseSchema {
    */
   protected $tempNamespaceName;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($connection) {
     parent::__construct($connection);
 

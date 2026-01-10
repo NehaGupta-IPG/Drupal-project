@@ -21,12 +21,6 @@ class PagersCacheContext implements CalculatedCacheContextInterface {
    */
   protected $pagerParams;
 
-  /**
-   * Constructs a new PagersCacheContext object.
-   *
-   * @param \Drupal\Core\Pager\PagerParametersInterface $pager_params
-   *   The pager parameters.
-   */
   public function __construct(PagerParametersInterface $pager_params) {
     $this->pagerParams = $pager_params;
   }

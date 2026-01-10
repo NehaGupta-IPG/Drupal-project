@@ -99,14 +99,6 @@ class StorageComparer implements StorageComparerInterface {
    */
   protected bool $writeMode = FALSE;
 
-  /**
-   * Constructs the Configuration storage comparer.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $source_storage
-   *   Storage object used to read configuration.
-   * @param \Drupal\Core\Config\StorageInterface $target_storage
-   *   Storage object used to write configuration.
-   */
   public function __construct(StorageInterface $source_storage, StorageInterface $target_storage) {
     if ($source_storage->getCollectionName() !== StorageInterface::DEFAULT_COLLECTION) {
       $source_storage = $source_storage->createCollection(StorageInterface::DEFAULT_COLLECTION);

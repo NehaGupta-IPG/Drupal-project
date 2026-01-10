@@ -77,24 +77,6 @@ class ContextDefinition extends Plugin {
    */
   protected $definition;
 
-  /**
-   * Constructs a new context definition object.
-   *
-   * @param array $values
-   *   An associative array with the following keys:
-   *   - value: The required data type.
-   *   - label: (optional) The UI label of this context definition.
-   *   - required: (optional) Whether the context definition is required.
-   *   - multiple: (optional) Whether the context definition is multivalue.
-   *   - description: (optional) The UI description of this context definition.
-   *   - default_value: (optional) The default value in case the underlying
-   *     value is not set.
-   *   - class: (optional) A custom ContextDefinitionInterface class.
-   *
-   * @throws \Exception
-   *   Thrown when the class key is specified with a non
-   *   ContextDefinitionInterface implementing class.
-   */
   public function __construct(array $values) {
     $values += [
       'required' => TRUE,

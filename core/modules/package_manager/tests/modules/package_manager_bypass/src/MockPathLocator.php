@@ -22,14 +22,6 @@ final class MockPathLocator extends BasePathLocator {
    */
   private $state;
 
-  /**
-   * Constructs a PathLocator object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param mixed ...$arguments
-   *   Additional arguments to pass to the parent constructor.
-   */
   public function __construct(StateInterface $state, ...$arguments) {
     parent::__construct(...$arguments);
     $this->state = $state;

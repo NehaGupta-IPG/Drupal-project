@@ -40,20 +40,6 @@ class SiteInformationForm extends ConfigFormBase {
    */
   protected $requestContext;
 
-  /**
-   * Constructs a SiteInformationForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
-   *   The path alias manager.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
-   *   The path validator.
-   * @param \Drupal\Core\Routing\RequestContext $request_context
-   *   The request context.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, AliasManagerInterface $alias_manager, PathValidatorInterface $path_validator, RequestContext $request_context) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->aliasManager = $alias_manager;

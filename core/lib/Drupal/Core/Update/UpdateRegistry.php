@@ -45,22 +45,6 @@ class UpdateRegistry implements EventSubscriberInterface {
    */
   protected static array $loadedFiles = [];
 
-  /**
-   * Constructs a new UpdateRegistry.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $sitePath
-   *   The site path.
-   * @param array $module_list
-   *   An associative array whose keys are the names of installed modules.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $keyValue
-   *   The key value store.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param string $updateType
-   *   The used update name.
-   */
   public function __construct(
     protected $root,
     protected $sitePath,

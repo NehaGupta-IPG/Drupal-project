@@ -26,12 +26,6 @@ class TrustedHostsRequestFactory {
    */
   protected $host;
 
-  /**
-   * Creates a new TrustedHostsRequestFactory.
-   *
-   * @param string $host
-   *   The host of the main request.
-   */
   public function __construct($host) {
     $this->host = (string) $host;
   }

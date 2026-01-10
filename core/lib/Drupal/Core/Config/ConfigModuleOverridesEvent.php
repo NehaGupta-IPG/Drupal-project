@@ -32,14 +32,6 @@ class ConfigModuleOverridesEvent extends Event {
    */
   protected $language;
 
-  /**
-   * Constructs a configuration overrides event object.
-   *
-   * @param array $names
-   *   A list of configuration names.
-   * @param \Drupal\Core\Language\LanguageInterface $language
-   *   (optional) The language for this configuration.
-   */
   public function __construct(array $names, ?LanguageInterface $language = NULL) {
     $this->names = $names;
     $this->language = $language;

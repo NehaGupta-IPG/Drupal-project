@@ -22,18 +22,6 @@ class UnapprovedComments extends LocalTaskDefault implements ContainerFactoryPlu
    */
   protected $commentStorage;
 
-  /**
-   * Construct the UnapprovedComments object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param array $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\comment\CommentStorageInterface $comment_storage
-   *   The comment storage service.
-   */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, CommentStorageInterface $comment_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->commentStorage = $comment_storage;

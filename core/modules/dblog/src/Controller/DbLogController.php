@@ -48,18 +48,6 @@ class DbLogController extends ControllerBase {
    */
   protected $userStorage;
 
-  /**
-   * Constructs a DbLogController object.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   A database connection.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   A module handler.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder service.
-   */
   public function __construct(Connection $database, ModuleHandlerInterface $module_handler, DateFormatterInterface $date_formatter, FormBuilderInterface $form_builder) {
     $this->database = $database;
     $this->moduleHandler = $module_handler;

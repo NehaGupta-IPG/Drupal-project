@@ -29,19 +29,6 @@ class ArchiverManager extends DefaultPluginManager {
    */
   protected $fileSystem;
 
-  /**
-   * Constructs an ArchiverManager object.
-   *
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file handler.
-   */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, FileSystemInterface $file_system) {
     @trigger_error(__CLASS__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3556927', E_USER_DEPRECATED);
     parent::__construct('Plugin/Archiver', $namespaces, $module_handler, ArchiverInterface::class, Archiver::class, 'Drupal\Core\Archiver\Annotation\Archiver');

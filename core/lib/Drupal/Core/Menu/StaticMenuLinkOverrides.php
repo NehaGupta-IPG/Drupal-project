@@ -34,12 +34,6 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
    */
   protected $configFactory;
 
-  /**
-   * Constructs a StaticMenuLinkOverrides object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   A configuration factory instance.
-   */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
   }

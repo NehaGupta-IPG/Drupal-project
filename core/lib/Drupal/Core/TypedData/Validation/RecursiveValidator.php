@@ -35,16 +35,6 @@ class RecursiveValidator implements ValidatorInterface {
    */
   protected $typedDataManager;
 
-  /**
-   * Creates a new validator.
-   *
-   * @param \Symfony\Component\Validator\Context\ExecutionContextFactoryInterface $context_factory
-   *   The factory for creating new contexts.
-   * @param \Symfony\Component\Validator\ConstraintValidatorFactoryInterface $validator_factory
-   *   The constraint validator factory.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager
-   *   The typed data manager.
-   */
   public function __construct(ExecutionContextFactoryInterface $context_factory, ConstraintValidatorFactoryInterface $validator_factory, TypedDataManagerInterface $typed_data_manager) {
     $this->contextFactory = $context_factory;
     $this->constraintValidatorFactory = $validator_factory;

@@ -13,16 +13,6 @@ use Drupal\Core\Site\Settings;
  */
 class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
 
-  /**
-   * Constructs a PermissionsHashGenerator object.
-   *
-   * @param \Drupal\Core\PrivateKey $privateKey
-   *   The private key service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $static
-   *   The cache backend interface to use for the static cache.
-   * @param \Drupal\Core\Session\AccessPolicyProcessorInterface $processor
-   *   The access policy processor.
-   */
   public function __construct(
     protected PrivateKey $privateKey,
     protected CacheBackendInterface $static,

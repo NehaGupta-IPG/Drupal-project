@@ -71,20 +71,6 @@ class OEmbedIframeController implements ContainerInjectionInterface {
    */
   protected $iFrameUrlHelper;
 
-  /**
-   * Constructs an OEmbedIframeController instance.
-   *
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
-   *   The oEmbed resource fetcher service.
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
-   *   The oEmbed URL resolver service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger channel.
-   * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
-   *   The iFrame URL helper service.
-   */
   public function __construct(ResourceFetcherInterface $resource_fetcher, UrlResolverInterface $url_resolver, RendererInterface $renderer, LoggerInterface $logger, IFrameUrlHelper $iframe_url_helper) {
     $this->resourceFetcher = $resource_fetcher;
     $this->urlResolver = $url_resolver;

@@ -97,18 +97,6 @@ class InstallHelper implements ContainerInjectionInterface {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected string $module_path;
 
-  /**
-   * Constructs a new InstallHelper object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   Entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   Module handler.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   State service.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
-   *   The file system.
-   */
   public function __construct(EntityTypeManagerInterface $entityTypeManager, ModuleHandlerInterface $moduleHandler, StateInterface $state, FileSystemInterface $fileSystem) {
     $this->entityTypeManager = $entityTypeManager;
     $this->moduleHandler = $moduleHandler;

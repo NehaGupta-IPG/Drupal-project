@@ -33,14 +33,6 @@ class TimeZoneResolver implements EventSubscriberInterface {
    */
   private $currentUser;
 
-  /**
-   * TimeZoneResolver constructor.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   */
   public function __construct(AccountInterface $current_user, ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
     $this->currentUser = $current_user;

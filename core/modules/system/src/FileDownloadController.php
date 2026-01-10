@@ -22,12 +22,6 @@ class FileDownloadController extends ControllerBase {
    */
   protected $streamWrapperManager;
 
-  /**
-   * FileDownloadController constructor.
-   *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
-   *   The stream wrapper manager.
-   */
   public function __construct(StreamWrapperManagerInterface $streamWrapperManager) {
     $this->streamWrapperManager = $streamWrapperManager;
   }

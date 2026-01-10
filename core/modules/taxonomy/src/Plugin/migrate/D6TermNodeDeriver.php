@@ -28,14 +28,6 @@ class D6TermNodeDeriver extends DeriverBase implements ContainerDeriverInterface
    */
   protected $migrationPluginManager;
 
-  /**
-   * D6TermNodeDeriver constructor.
-   *
-   * @param string $base_plugin_id
-   *   The base plugin ID this derivative is for.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $migration_plugin_manager
-   *   The migration plugin manager.
-   */
   public function __construct($base_plugin_id, PluginManagerInterface $migration_plugin_manager) {
     $this->basePluginId = $base_plugin_id;
     $this->migrationPluginManager = $migration_plugin_manager;

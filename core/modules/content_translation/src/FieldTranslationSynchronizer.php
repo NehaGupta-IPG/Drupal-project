@@ -27,14 +27,6 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
    */
   protected $fieldTypeManager;
 
-  /**
-   * Constructs a FieldTranslationSynchronizer object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
-   *   The field type plugin manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->fieldTypeManager = $field_type_manager;

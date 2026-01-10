@@ -51,14 +51,6 @@ class PageDisplayVariantSelectionEvent extends Event implements RefinableCacheab
    */
   protected $contexts = [];
 
-  /**
-   * Constructs the page display variant plugin selection event.
-   *
-   * @param string $plugin_id
-   *   The ID of the page display variant plugin to use by default.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match, for context.
-   */
   public function __construct($plugin_id, RouteMatchInterface $route_match) {
     $this->pluginId = $plugin_id;
     $this->routeMatch = $route_match;

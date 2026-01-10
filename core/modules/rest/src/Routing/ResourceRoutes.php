@@ -37,16 +37,6 @@ class ResourceRoutes implements EventSubscriberInterface {
    */
   protected $logger;
 
-  /**
-   * Constructs a RouteSubscriber object.
-   *
-   * @param \Drupal\rest\Plugin\Type\ResourcePluginManager $manager
-   *   The resource plugin manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   */
   public function __construct(ResourcePluginManager $manager, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger) {
     $this->manager = $manager;
     $this->resourceConfigStorage = $entity_type_manager->getStorage('rest_resource_config');

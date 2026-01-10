@@ -18,18 +18,6 @@ class BlockPluginCollection extends DefaultSingleLazyPluginCollection {
    */
   protected $blockId;
 
-  /**
-   * Constructs a new BlockPluginCollection.
-   *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
-   *   The manager to be used for instantiating plugins.
-   * @param string $instance_id
-   *   The ID of the plugin instance.
-   * @param array $configuration
-   *   An array of configuration.
-   * @param string $block_id
-   *   The unique ID of the block entity using this plugin.
-   */
   public function __construct(PluginManagerInterface $manager, $instance_id, array $configuration, $block_id) {
     parent::__construct($manager, $instance_id, $configuration);
 

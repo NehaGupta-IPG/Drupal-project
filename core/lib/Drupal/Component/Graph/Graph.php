@@ -33,16 +33,6 @@ class Graph {
    */
   protected $graph;
 
-  /**
-   * Instantiates the directed acyclic graph object.
-   *
-   * @param array $graph
-   *   A three-dimensional associative array, with the first keys being the
-   *   names of the vertices, which can be strings or numbers. The second key is
-   *   'edges', whose value is an array keyed by the names of the vertices
-   *   connected to it; the values in this array can be simply TRUE or may
-   *   contain other data.
-   */
   public function __construct($graph) {
     $this->graph = $graph;
   }

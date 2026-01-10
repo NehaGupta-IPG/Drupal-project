@@ -25,12 +25,6 @@ class TermRouteContext implements ContextProviderInterface {
    */
   protected $routeMatch;
 
-  /**
-   * Constructs a new TermRouteContext.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The route match object.
-   */
   public function __construct(RouteMatchInterface $route_match) {
     $this->routeMatch = $route_match;
   }

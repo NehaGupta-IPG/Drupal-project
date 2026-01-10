@@ -63,9 +63,6 @@ class EmbeddedDataSource extends SourcePluginBase {
    */
   protected $ids = [];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     $this->dataRows = $configuration['data_rows'];

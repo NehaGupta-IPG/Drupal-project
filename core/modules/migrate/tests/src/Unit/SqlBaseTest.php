@@ -158,9 +158,6 @@ class TestSqlBase extends SqlBase {
    */
   protected $ids;
 
-  /**
-   * Override the constructor so we can create one easily.
-   */
   public function __construct() {}
 
   /**

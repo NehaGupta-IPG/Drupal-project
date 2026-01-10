@@ -11,9 +11,6 @@ use Drupal\Core\DrupalKernel;
  */
 class TestKernel extends DrupalKernel {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($environment, $class_loader, $allow_dumping = TRUE) {
     // Exit if we should be in a test environment but aren't.
     if (!drupal_valid_test_ua()) {

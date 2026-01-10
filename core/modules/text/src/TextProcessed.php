@@ -25,9 +25,6 @@ class TextProcessed extends TypedData implements CacheableDependencyInterface {
    */
   protected $processed = NULL;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
 

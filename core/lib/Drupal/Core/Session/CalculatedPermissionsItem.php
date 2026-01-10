@@ -9,18 +9,6 @@ namespace Drupal\Core\Session;
  */
 class CalculatedPermissionsItem implements CalculatedPermissionsItemInterface {
 
-  /**
-   * Constructs a new CalculatedPermissionsItem.
-   *
-   * @param string[] $permissions
-   *   The permission names.
-   * @param bool $isAdmin
-   *   (optional) Whether the item grants admin privileges.
-   * @param string $scope
-   *   (optional) The scope name, defaults to 'drupal'.
-   * @param string|int $identifier
-   *   (optional) The identifier within the scope, defaults to 'drupal'.
-   */
   public function __construct(
     protected array $permissions,
     protected bool $isAdmin = FALSE,

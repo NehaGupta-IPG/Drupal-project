@@ -36,20 +36,6 @@ class MediaListBuilder extends EntityListBuilder {
    */
   protected $thumbnailStyleExists = FALSE;
 
-  /**
-   * Constructs a new MediaListBuilder object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager service.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
-   *   The entity storage class for image styles.
-   */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, DateFormatterInterface $date_formatter, LanguageManagerInterface $language_manager, EntityStorageInterface $image_style_storage) {
     parent::__construct($entity_type, $storage);
 

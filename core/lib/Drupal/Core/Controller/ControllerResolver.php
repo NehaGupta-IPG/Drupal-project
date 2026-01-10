@@ -18,12 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ControllerResolver implements ControllerResolverInterface {
 
-  /**
-   * Constructs a new ControllerResolver.
-   *
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
-   *   The callable resolver.
-   */
   public function __construct(protected CallableResolver $callableResolver) {
   }
 

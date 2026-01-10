@@ -53,18 +53,6 @@ class CacheFactory implements CacheFactoryInterface {
     $this->container = $container;
   }
 
-  /**
-   * Constructs CacheFactory object.
-   *
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The site settings.
-   * @param array $default_bin_backends
-   *   (optional) A mapping of bin to backend service name. Mappings in
-   *   $settings take precedence over this.
-   * @param array $memory_default_bin_backends
-   *   (optional) A mapping of bin to backend service name. Mappings in
-   *   $settings take precedence over this.
-   */
   public function __construct(Settings $settings, array $default_bin_backends = [], array $memory_default_bin_backends = []) {
     $this->settings = $settings;
     $this->defaultBinBackends = $default_bin_backends;

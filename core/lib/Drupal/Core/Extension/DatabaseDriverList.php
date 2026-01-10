@@ -28,16 +28,6 @@ class DatabaseDriverList extends ExtensionList {
    */
   private ?bool $includeTestDrivers = NULL;
 
-  /**
-   * Constructs a new instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $type
-   *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache.
-   */
   public function __construct($root, $type, CacheBackendInterface $cache) {
     $this->root = $root;
     $this->type = $type;

@@ -71,14 +71,6 @@ final class HTMLRestrictions {
     '$text-container' => 'getTextContainerElementList',
   ];
 
-  /**
-   * Constructs a set of HTML restrictions.
-   *
-   * @param array $elements
-   *   The allowed elements.
-   *
-   * @see \Drupal\filter\Plugin\FilterInterface::getHTMLRestrictions()
-   */
   public function __construct(array $elements) {
     self::validateAllowedRestrictionsPhase1($elements);
     self::validateAllowedRestrictionsPhase2($elements);

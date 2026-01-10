@@ -33,9 +33,6 @@ final class Serializer extends SymfonySerializer implements JsonSchemaProviderSe
    */
   protected $fallbackNormalizer;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $normalizers = [], array $encoders = []) {
     foreach ($normalizers as $normalizer) {
       if (!str_starts_with(get_class($normalizer), 'Drupal\jsonapi\Normalizer')) {

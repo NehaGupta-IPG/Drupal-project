@@ -46,30 +46,6 @@ class ModuleExtensionList extends ExtensionList {
    */
   protected $profileList;
 
-  /**
-   * Constructs a new ModuleExtensionList instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $type
-   *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache.
-   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
-   *   The info parser.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Extension\ExtensionList $profile_list
-   *   The site profile listing.
-   * @param string $install_profile
-   *   The install profile used by the site.
-   * @param array[] $container_modules_info
-   *   (optional) The module locations coming from the compiled container.
-   */
   public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, ConfigFactoryInterface $config_factory, ExtensionList $profile_list, $install_profile, array $container_modules_info = []) {
     parent::__construct($root, $type, $cache, $info_parser, $module_handler, $state, $install_profile);
 

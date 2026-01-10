@@ -32,12 +32,6 @@ class SystemInfoController implements ContainerInjectionInterface {
     );
   }
 
-  /**
-   * Constructs a SystemInfoController object.
-   *
-   * @param \Drupal\system\SystemManager $systemManager
-   *   System manager service.
-   */
   public function __construct(SystemManager $systemManager) {
     $this->systemManager = $systemManager;
   }

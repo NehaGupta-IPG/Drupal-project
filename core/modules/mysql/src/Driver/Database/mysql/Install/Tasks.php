@@ -33,9 +33,6 @@ class Tasks extends InstallTasks {
    */
   protected $pdoDriver = 'mysql';
 
-  /**
-   * Constructs a \Drupal\mysql\Driver\Database\mysql\Install\Tasks object.
-   */
   public function __construct() {
     $this->tasks[] = [
       'arguments' => [],

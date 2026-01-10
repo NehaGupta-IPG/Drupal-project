@@ -89,9 +89,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   protected array $savepoints = [];
 
-  /**
-   * Constructs a connection object.
-   */
   public function __construct(\PDO $connection, array $connection_options) {
     // @phpstan-ignore class.notFound
     assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Pgsql : TRUE);

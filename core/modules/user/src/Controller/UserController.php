@@ -59,22 +59,6 @@ class UserController extends ControllerBase {
    */
   protected $flood;
 
-  /**
-   * Constructs a UserController object.
-   *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\user\UserDataInterface $user_data
-   *   The user data service.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\Core\Flood\FloodInterface $flood
-   *   The flood service.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
-   *   The time service.
-   */
   public function __construct(
     DateFormatterInterface $date_formatter,
     UserStorageInterface $user_storage,

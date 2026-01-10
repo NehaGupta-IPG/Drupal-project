@@ -20,18 +20,6 @@ class DateFormatListBuilder extends ConfigEntityListBuilder {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new DateFormatListBuilder object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
-   *   The date formatter service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     EntityTypeInterface $entity_type,
     EntityStorageInterface $storage,

@@ -15,14 +15,6 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class FileSizeLimitConstraintValidator extends BaseFileConstraintValidator implements ContainerInjectionInterface {
 
-  /**
-   * Creates a new FileSizeConstraintValidator.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
   public function __construct(
     protected AccountInterface $currentUser,
     protected EntityTypeManagerInterface $entityTypeManager,

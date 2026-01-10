@@ -19,9 +19,6 @@ abstract class ConfigurableSearchPluginBase extends SearchPluginBase implements 
    */
   protected $searchPageId;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

@@ -58,16 +58,6 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
     'delete revision' => ['delete', 'delete'],
   ];
 
-  /**
-   * Constructs a NodeAccessControlHandler object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\node\NodeGrantDatabaseStorageInterface $grant_storage
-   *   The node grant storage.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(EntityTypeInterface $entity_type, NodeGrantDatabaseStorageInterface $grant_storage, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($entity_type);
     $this->grantStorage = $grant_storage;

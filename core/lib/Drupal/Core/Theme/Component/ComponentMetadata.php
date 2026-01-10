@@ -107,18 +107,6 @@ class ComponentMetadata {
    */
   public readonly bool $noUi;
 
-  /**
-   * ComponentMetadata constructor.
-   *
-   * @param array $metadata_info
-   *   The metadata info.
-   * @param string $app_root
-   *   The application root.
-   * @param bool $enforce_schemas
-   *   Enforces the definition of schemas for props and slots.
-   *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
-   */
   public function __construct(array $metadata_info, string $app_root, bool $enforce_schemas) {
     $path = $metadata_info['path'];
     // Make the absolute path, relative to the Drupal root.

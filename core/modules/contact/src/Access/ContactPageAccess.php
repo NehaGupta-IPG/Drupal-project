@@ -28,14 +28,6 @@ class ContactPageAccess implements AccessInterface {
    */
   protected $userData;
 
-  /**
-   * Constructs a ContactPageAccess instance.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\user\UserDataInterface $user_data
-   *   The user data service.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, UserDataInterface $user_data) {
     $this->configFactory = $config_factory;
     $this->userData = $user_data;

@@ -82,22 +82,6 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
    */
   protected $requestStack;
 
-  /**
-   * Constructs a translator using a string storage.
-   *
-   * @param \Drupal\locale\StringStorageInterface $storage
-   *   Storage to use when looking for new translations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   */
   public function __construct(StringStorageInterface $storage, CacheBackendInterface $cache, LockBackendInterface $lock, ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, RequestStack $request_stack) {
     $this->storage = $storage;
     $this->cache = $cache;

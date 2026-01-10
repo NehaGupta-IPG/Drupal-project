@@ -37,16 +37,6 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
    */
   protected $contentTranslationManager;
 
-  /**
-   * Constructs a ContentTranslationPermissions instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
-   *   The content translation manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
-   *   The entity type bundle info.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ContentTranslationManagerInterface $content_translation_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     $this->entityTypeManager = $entity_type_manager;
     $this->contentTranslationManager = $content_translation_manager;

@@ -27,12 +27,6 @@ class FieldStorageConfigEditForm extends EntityForm {
    */
   protected $entity;
 
-  /**
-   * FieldStorageConfigEditForm constructor.
-   *
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
-   *   The typed data manager.
-   */
   public function __construct(
     protected TypedDataManagerInterface $typedDataManager,
   ) {

@@ -21,16 +21,6 @@ class FileValidationException extends \RuntimeException {
    */
   protected $fileName;
 
-  /**
-   * Constructs a new FileValidationException.
-   *
-   * @param string $message
-   *   The message.
-   * @param string $file_name
-   *   The file name.
-   * @param array $errors
-   *   The validation errors.
-   */
   public function __construct(string $message, string $file_name, array $errors) {
     parent::__construct($message, 0, NULL);
     $this->fileName = $file_name;

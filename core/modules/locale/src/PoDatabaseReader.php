@@ -41,9 +41,6 @@ class PoDatabaseReader implements PoReaderInterface {
    */
   private $result;
 
-  /**
-   * Constructor, initializes with default options.
-   */
   public function __construct() {
     $this->setOptions([]);
   }

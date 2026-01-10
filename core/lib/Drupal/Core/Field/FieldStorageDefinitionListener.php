@@ -50,20 +50,6 @@ class FieldStorageDefinitionListener implements FieldStorageDefinitionListenerIn
    */
   protected $deletedFieldsRepository;
 
-  /**
-   * Constructs a new FieldStorageDefinitionListener.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
-   *   The entity last installed schema repository.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Field\DeletedFieldsRepositoryInterface $deleted_fields_repository
-   *   The deleted fields repository.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityFieldManagerInterface $entity_field_manager, DeletedFieldsRepositoryInterface $deleted_fields_repository) {
     $this->entityTypeManager = $entity_type_manager;
     $this->eventDispatcher = $event_dispatcher;

@@ -50,16 +50,6 @@ class CommentTypeForm extends EntityForm {
     );
   }
 
-  /**
-   * Constructs a CommentTypeFormController.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
-   *   The comment manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger, CommentManagerInterface $comment_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->logger = $logger;

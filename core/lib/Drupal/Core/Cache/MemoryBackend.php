@@ -29,12 +29,6 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
    */
   protected $cache = [];
 
-  /**
-   * Constructs a MemoryBackend object.
-   *
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(protected TimeInterface $time) {
   }
 

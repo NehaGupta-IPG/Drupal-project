@@ -43,14 +43,6 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
    */
   protected $rebuilding = FALSE;
 
-  /**
-   * RouteProviderLazyBuilder constructor.
-   *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider service.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $route_builder
-   *   The route building service.
-   */
   public function __construct(RouteProviderInterface $route_provider, RouteBuilderInterface $route_builder) {
     $this->routeProvider = $route_provider;
     $this->routeBuilder = $route_builder;

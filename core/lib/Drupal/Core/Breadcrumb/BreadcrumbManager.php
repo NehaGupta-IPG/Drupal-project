@@ -41,12 +41,6 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
    */
   protected $sortedBuilders;
 
-  /**
-   * Constructs a \Drupal\Core\Breadcrumb\BreadcrumbManager object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   */
   public function __construct(ModuleHandlerInterface $module_handler) {
     $this->moduleHandler = $module_handler;
   }

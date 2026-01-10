@@ -113,30 +113,6 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    */
   protected LanguageMapper $languageMapper;
 
-  /**
-   * Constructs a CKEditor 5 editor plugin.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $ckeditor5_plugin_manager
-   *   The CKEditor 5 plugin manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\ckeditor5\SmartDefaultSettings $smart_default_settings
-   *   The smart default settings utility.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   A logger instance.
-   * @param \Drupal\ckeditor5\LanguageMapper $languageMapper
-   *   The ckeditor language mapper.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, CKEditor5PluginManagerInterface $ckeditor5_plugin_manager, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler, SmartDefaultSettings $smart_default_settings, CacheBackendInterface $cache, LoggerInterface $logger, LanguageMapper $languageMapper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->ckeditor5PluginManager = $ckeditor5_plugin_manager;

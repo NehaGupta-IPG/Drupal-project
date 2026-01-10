@@ -17,12 +17,6 @@ class MemoryCacheFactory implements CacheFactoryInterface {
    */
   protected $bins = [];
 
-  /**
-   * Constructs a MemoryCounterBackendFactory object.
-   *
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(protected TimeInterface $time) {
   }
 

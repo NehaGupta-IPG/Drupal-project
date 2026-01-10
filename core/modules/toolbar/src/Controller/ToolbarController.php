@@ -17,12 +17,6 @@ use Drupal\toolbar\Ajax\SetSubtreesCommand;
  */
 class ToolbarController extends ControllerBase implements TrustedCallbackInterface {
 
-  /**
-   * Constructs a ToolbarController object.
-   *
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     protected ?TimeInterface $time = NULL,
   ) {

@@ -17,9 +17,6 @@ class LazyRouteCollection extends RouteCollection {
    */
   protected $provider;
 
-  /**
-   * Constructs a LazyRouteCollection.
-   */
   public function __construct(RouteProviderInterface $provider) {
     $this->provider = $provider;
   }

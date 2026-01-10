@@ -25,12 +25,6 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
    */
   protected $bigPipe;
 
-  /**
-   * Constructs a HtmlResponseBigPipeSubscriber object.
-   *
-   * @param \Drupal\big_pipe\Render\BigPipe $big_pipe
-   *   The BigPipe service.
-   */
   public function __construct(BigPipe $big_pipe) {
     $this->bigPipe = $big_pipe;
   }

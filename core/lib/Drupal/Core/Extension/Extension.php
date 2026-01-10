@@ -57,19 +57,6 @@ class Extension {
    */
   public array $info;
 
-  /**
-   * Constructs a new Extension object.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $type
-   *   The type of the extension; e.g., 'module'.
-   * @param string $pathname
-   *   The relative path and filename of the extension's info file; e.g.,
-   *   'core/modules/node/node.info.yml'.
-   * @param string $filename
-   *   (optional) The filename of the main extension file; e.g., 'node.module'.
-   */
   public function __construct($root, $type, $pathname, $filename = NULL) {
     // @see \Drupal\Core\Theme\ThemeInitialization::getActiveThemeByName()
     assert($pathname === 'core/core.info.yml' || ($pathname[0] !== '/' && file_exists($root . '/' . $pathname)), sprintf('The file specified by the given app root, relative path and file name (%s) do not exist.', $root . '/' . $pathname));

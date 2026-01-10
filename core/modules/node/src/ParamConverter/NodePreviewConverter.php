@@ -18,12 +18,6 @@ class NodePreviewConverter implements ParamConverterInterface {
    */
   protected $tempStoreFactory;
 
-  /**
-   * Constructs a new NodePreviewConverter.
-   *
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *   The factory for the temp store object.
-   */
   public function __construct(PrivateTempStoreFactory $temp_store_factory) {
     $this->tempStoreFactory = $temp_store_factory;
   }

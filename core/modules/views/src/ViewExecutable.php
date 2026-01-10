@@ -494,20 +494,6 @@ class ViewExecutable {
    */
   protected $serializationData;
 
-  /**
-   * Constructs a new ViewExecutable object.
-   *
-   * @param \Drupal\views\ViewEntityInterface $storage
-   *   The view config entity the actual information is stored on.
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user.
-   * @param \Drupal\views\ViewsData $views_data
-   *   The views data.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
-   *   The plugin manager for display.
-   */
   public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
     // Reference the storage and the executable to each other.
     $this->storage = $storage;

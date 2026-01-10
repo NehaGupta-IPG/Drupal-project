@@ -88,20 +88,6 @@ class BreakpointManager extends DefaultPluginManager implements BreakpointManage
    */
   protected $instances = [];
 
-  /**
-   * Constructs a new BreakpointManager instance.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|null $module_extension_list
-   *   The module extension list.
-   */
   public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, CacheBackendInterface $cache_backend, TranslationInterface $string_translation, ?ModuleExtensionList $module_extension_list = NULL) {
     $this->factory = new ContainerFactory($this);
     $this->moduleHandler = $module_handler;

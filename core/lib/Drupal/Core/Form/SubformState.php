@@ -25,18 +25,6 @@ class SubformState extends FormStateDecoratorBase implements SubformStateInterfa
    */
   protected $subform;
 
-  /**
-   * Constructs a new instance.
-   *
-   * @param mixed[] $subform
-   *   The subform for which to create a form state.
-   * @param mixed[] $parent_form
-   *   The subform's parent form.
-   * @param \Drupal\Core\Form\FormStateInterface $parent_form_state
-   *   The parent form state.
-   * @param \Drupal\Core\Form\FormInterface|null $subformFormObject
-   *   The subform form object when it's not the same as the parent form.
-   */
   protected function __construct(array &$subform, array &$parent_form, FormStateInterface $parent_form_state, protected readonly ?FormInterface $subformFormObject = NULL) {
     $this->decoratedFormState = $parent_form_state;
     $this->parentForm = $parent_form;

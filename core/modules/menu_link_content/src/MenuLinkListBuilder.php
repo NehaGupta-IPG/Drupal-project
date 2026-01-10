@@ -32,16 +32,6 @@ class MenuLinkListBuilder extends EntityListBuilder {
     );
   }
 
-  /**
-   * Constructs a new instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
-   *   The redirect destination.
-   */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, RedirectDestinationInterface $redirect_destination) {
     parent::__construct($entity_type, $storage);
 

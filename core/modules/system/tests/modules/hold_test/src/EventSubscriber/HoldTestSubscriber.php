@@ -29,12 +29,6 @@ class HoldTestSubscriber implements EventSubscriberInterface {
    */
   protected $sitePath;
 
-  /**
-   * HoldTestSubscriber constructor.
-   *
-   * @param string $site_path
-   *   The site path.
-   */
   public function __construct(string $site_path) {
     $this->sitePath = $site_path;
   }

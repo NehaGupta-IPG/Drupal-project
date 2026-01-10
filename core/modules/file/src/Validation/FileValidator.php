@@ -15,18 +15,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class FileValidator implements FileValidatorInterface {
 
-  /**
-   * Creates a new FileValidator.
-   *
-   * @param \Symfony\Component\Validator\Validator\ValidatorInterface $validator
-   *   The validator.
-   * @param \Drupal\Core\Validation\ConstraintManager $constraintManager
-   *   The constraint factory.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
-   *   The event dispatcher.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   */
   public function __construct(
     #[Autowire(service: 'file.recursive_validator')]
     protected ValidatorInterface $validator,

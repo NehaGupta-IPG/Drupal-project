@@ -16,14 +16,6 @@ use Twig\Source;
  */
 class ComponentLoader implements LoaderInterface {
 
-  /**
-   * Constructs a new ComponentLoader object.
-   *
-   * @param \Drupal\Core\Theme\ComponentPluginManager $pluginManager
-   *   The plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   */
   public function __construct(
     protected ComponentPluginManager $pluginManager,
     protected LoggerInterface $logger,

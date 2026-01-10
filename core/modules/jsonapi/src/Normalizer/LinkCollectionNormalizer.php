@@ -68,12 +68,6 @@ class LinkCollectionNormalizer extends NormalizerBase {
    */
   protected $currentUser;
 
-  /**
-   * LinkCollectionNormalizer constructor.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   */
   public function __construct(AccountInterface $current_user) {
     $this->currentUser = $current_user;
   }

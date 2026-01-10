@@ -27,22 +27,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class SettingsForm extends ConfigFormBase {
 
-  /**
-   * Constructs a Navigation SettingsForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
-   *   The typed config manager.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
-   *   The file system.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\Image\ImageFactory $imageFactory
-   *   The image factory.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
-   *   The theme manager.
-   */
   public function __construct(
     ConfigFactoryInterface $config_factory,
     TypedConfigManagerInterface $typed_config_manager,

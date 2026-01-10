@@ -94,16 +94,6 @@ class EntityConverter implements ParamConverterInterface {
    */
   protected $entityRepository;
 
-  /**
-   * Constructs a new EntityConverter.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   *
-   * @see https://www.drupal.org/node/2938929
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityRepository = $entity_repository;

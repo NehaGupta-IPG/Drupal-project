@@ -49,16 +49,6 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
    */
   protected ConfigManagerInterface $configManager;
 
-  /**
-   * Constructs a QueryFactory object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config storage used by the config entity query.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value
-   *   The key value factory.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The configuration manager.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, KeyValueFactoryInterface $key_value, ConfigManagerInterface $config_manager) {
     $this->configFactory = $config_factory;
     $this->keyValueFactory = $key_value;

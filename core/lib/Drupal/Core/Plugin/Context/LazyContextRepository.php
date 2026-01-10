@@ -31,14 +31,6 @@ class LazyContextRepository implements ContextRepositoryInterface {
    */
   protected $contexts = [];
 
-  /**
-   * Constructs a LazyContextRepository object.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The current service container.
-   * @param string[] $context_provider_service_ids
-   *   The set of the available context provider service IDs.
-   */
   public function __construct(ContainerInterface $container, array $context_provider_service_ids) {
     $this->container = $container;
     $this->contextProviderServiceIDs = $context_provider_service_ids;

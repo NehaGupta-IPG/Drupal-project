@@ -76,28 +76,6 @@ class ThemeExtensionList extends ExtensionList {
    */
   protected $installedThemes;
 
-  /**
-   * Constructs a new ThemeExtensionList instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param string $type
-   *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache.
-   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
-   *   The info parser.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Extension\ThemeEngineExtensionList $engine_list
-   *   The theme engine extension listing.
-   * @param string $install_profile
-   *   The install profile used by the site.
-   */
   public function __construct($root, $type, CacheBackendInterface $cache, InfoParserInterface $info_parser, ModuleHandlerInterface $module_handler, StateInterface $state, ConfigFactoryInterface $config_factory, ThemeEngineExtensionList $engine_list, $install_profile) {
     parent::__construct($root, $type, $cache, $info_parser, $module_handler, $state, $install_profile);
 

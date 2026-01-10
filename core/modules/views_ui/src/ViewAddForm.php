@@ -30,14 +30,6 @@ class ViewAddForm extends ViewFormBase {
    */
   protected $moduleHandler;
 
-  /**
-   * Constructs a new ViewAddForm object.
-   *
-   * @param \Drupal\views\Plugin\ViewsPluginManager $wizard_manager
-   *   The wizard plugin manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   */
   public function __construct(ViewsPluginManager $wizard_manager, ModuleHandlerInterface $module_handler) {
     $this->wizardManager = $wizard_manager;
     $this->moduleHandler = $module_handler;

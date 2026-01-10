@@ -20,9 +20,6 @@ class TestController extends ControllerBase {
    */
   protected $tokenGenerator;
 
-  /**
-   * Controller constructor.
-   */
   public function __construct(CsrfTokenGenerator $token_generator) {
     $this->tokenGenerator = $token_generator;
   }

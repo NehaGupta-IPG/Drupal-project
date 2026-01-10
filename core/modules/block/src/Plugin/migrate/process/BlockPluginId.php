@@ -37,21 +37,6 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
    */
   protected $blockContentStorage;
 
-  /**
-   * Constructs a BlockPluginId object.
-   *
-   * @param array $configuration
-   *   The plugin configuration.
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param array $plugin_definition
-   *   The plugin definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface|null $storage
-   *   The block content storage object. NULL if the block_content module is
-   *   not installed.
-   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
-   *   The migrate lookup service.
-   */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, ?EntityStorageInterface $storage, MigrateLookupInterface $migrate_lookup) {
     @trigger_error(__CLASS__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533560', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition);

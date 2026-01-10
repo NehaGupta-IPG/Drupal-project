@@ -40,18 +40,6 @@ class RouteMatch implements RouteMatchInterface {
    */
   protected $rawParameters;
 
-  /**
-   * Constructs a RouteMatch object.
-   *
-   * @param string $route_name
-   *   The name of the route.
-   * @param \Symfony\Component\Routing\Route $route
-   *   The route.
-   * @param array $parameters
-   *   The parameters array.
-   * @param array $raw_parameters
-   *   The raw $parameters array.
-   */
   public function __construct($route_name, Route $route, array $parameters = [], array $raw_parameters = []) {
     $this->routeName = $route_name;
     $this->route = $route;

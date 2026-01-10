@@ -22,12 +22,6 @@ class SwitchToLiveForm extends ConfirmFormBase implements ContainerInjectionInte
    */
   protected $workspaceManager;
 
-  /**
-   * Constructs a new SwitchToLiveForm.
-   *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
-   *   The workspace manager.
-   */
   public function __construct(WorkspaceManagerInterface $workspace_manager) {
     $this->workspaceManager = $workspace_manager;
   }

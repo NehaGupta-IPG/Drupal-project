@@ -43,18 +43,6 @@ abstract class ResourceTypeField {
    */
   protected $hasOne;
 
-  /**
-   * ResourceTypeField constructor.
-   *
-   * @param string $internal_name
-   *   The internal field name.
-   * @param string $public_name
-   *   (optional) The public field name. Defaults to the internal field name.
-   * @param bool $enabled
-   *   (optional) Whether the field is enabled. Defaults to TRUE.
-   * @param bool $has_one
-   *   (optional) Whether the field can only have ony value. Defaults to TRUE.
-   */
   public function __construct($internal_name, $public_name = NULL, $enabled = TRUE, $has_one = TRUE) {
     $this->internalName = $internal_name;
     $this->publicName = $public_name ?: $internal_name;

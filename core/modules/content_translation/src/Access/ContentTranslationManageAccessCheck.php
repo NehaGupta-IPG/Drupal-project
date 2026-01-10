@@ -31,14 +31,6 @@ class ContentTranslationManageAccessCheck implements AccessInterface {
    */
   protected $languageManager;
 
-  /**
-   * Constructs a ContentTranslationManageAccessCheck object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->languageManager = $language_manager;

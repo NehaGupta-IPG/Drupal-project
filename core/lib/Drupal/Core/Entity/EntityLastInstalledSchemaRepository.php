@@ -33,14 +33,6 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
    */
   protected $entityTypeDefinitions = NULL;
 
-  /**
-   * Constructs a new EntityLastInstalledSchemaRepository.
-   *
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key-value factory.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   */
   public function __construct(KeyValueFactoryInterface $key_value_factory, CacheBackendInterface $cache) {
     $this->keyValueFactory = $key_value_factory;
     $this->cacheBackend = $cache;

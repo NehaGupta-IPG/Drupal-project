@@ -24,12 +24,6 @@ class LatestRevisionCheck implements AccessInterface {
    */
   protected $moderationInfo;
 
-  /**
-   * Constructs a new LatestRevisionCheck.
-   *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
-   *   The moderation information service.
-   */
   public function __construct(ModerationInformationInterface $moderation_information) {
     $this->moderationInfo = $moderation_information;
   }

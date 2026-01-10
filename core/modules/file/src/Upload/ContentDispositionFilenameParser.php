@@ -15,9 +15,6 @@ final class ContentDispositionFilenameParser {
    */
   const REQUEST_HEADER_FILENAME_REGEX = '@\bfilename(?<star>\*?)=\"(?<filename>.+)\"@';
 
-  /**
-   * Private constructor to prevent instantiation.
-   */
   private function __construct() {}
 
   /**

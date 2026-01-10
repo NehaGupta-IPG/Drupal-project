@@ -29,14 +29,6 @@ abstract class FormController {
    */
   protected $formBuilder;
 
-  /**
-   * Constructs a new \Drupal\Core\Controller\FormController object.
-   *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
-   *   The argument resolver.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
-   */
   public function __construct(ArgumentResolverInterface $argument_resolver, FormBuilderInterface $form_builder) {
     $this->argumentResolver = $argument_resolver;
     $this->formBuilder = $form_builder;

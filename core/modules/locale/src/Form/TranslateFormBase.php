@@ -43,16 +43,6 @@ abstract class TranslateFormBase extends FormBase {
    */
   protected static $filterValues;
 
-  /**
-   * Constructs a new TranslationFormBase object.
-   *
-   * @param \Drupal\locale\StringStorageInterface $locale_storage
-   *   The locale storage.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   */
   public function __construct(StringStorageInterface $locale_storage, StateInterface $state, LanguageManagerInterface $language_manager) {
     $this->localeStorage = $locale_storage;
     $this->state = $state;

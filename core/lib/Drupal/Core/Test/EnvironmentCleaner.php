@@ -13,20 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class EnvironmentCleaner implements EnvironmentCleanerInterface {
 
-  /**
-   * Constructs a test environment cleaner.
-   *
-   * @param string $root
-   *   The path to the root of the Drupal installation.
-   * @param \Drupal\Core\Database\Connection $testDatabase
-   *   Connection to the database against which tests were run.
-   * @param \Drupal\Core\Test\TestRunResultsStorageInterface $testRunResultsStorage
-   *   The test run results storage.
-   * @param \Symfony\Component\Console\Output\OutputInterface $output
-   *   A Symfony console output object.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
-   *   Drupal's file_system service.
-   */
   public function __construct(
     protected string $root,
     protected Connection $testDatabase,

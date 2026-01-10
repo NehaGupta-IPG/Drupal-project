@@ -18,9 +18,6 @@ use Symfony\Component\Validator\Constraints\Choice;
 )]
 class AllowedValuesConstraint extends Choice {
 
-  /**
-   * {@inheritdoc}
-   */
   #[HasNamedArguments]
   public function __construct(...$args) {
     $this->strict = TRUE;

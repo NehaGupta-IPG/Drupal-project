@@ -36,20 +36,6 @@ class OEmbedForm extends AddFormBase {
    */
   protected $resourceFetcher;
 
-  /**
-   * Constructs a new OEmbedForm.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\media_library\MediaLibraryUiBuilder $library_ui_builder
-   *   The media library UI builder.
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
-   *   The oEmbed URL resolver service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
-   *   The oEmbed resource fetcher service.
-   * @param \Drupal\media_library\OpenerResolverInterface $opener_resolver
-   *   The opener resolver.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, MediaLibraryUiBuilder $library_ui_builder, UrlResolverInterface $url_resolver, ResourceFetcherInterface $resource_fetcher, ?OpenerResolverInterface $opener_resolver = NULL) {
     parent::__construct($entity_type_manager, $library_ui_builder, $opener_resolver);
     $this->urlResolver = $url_resolver;

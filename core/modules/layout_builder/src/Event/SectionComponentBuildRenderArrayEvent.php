@@ -54,16 +54,6 @@ class SectionComponentBuildRenderArrayEvent extends Event {
    */
   protected $build = [];
 
-  /**
-   * Creates a new SectionComponentBuildRenderArrayEvent object.
-   *
-   * @param \Drupal\layout_builder\SectionComponent $component
-   *   The section component whose render array is being built.
-   * @param \Drupal\Core\Plugin\Context\ContextInterface[] $contexts
-   *   The available contexts.
-   * @param bool $in_preview
-   *   (optional) Whether the component is in preview mode or not.
-   */
   public function __construct(SectionComponent $component, array $contexts, $in_preview = FALSE) {
     $this->component = $component;
     $this->contexts = $contexts;

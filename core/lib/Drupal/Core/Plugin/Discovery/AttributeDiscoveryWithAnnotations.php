@@ -21,25 +21,6 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
    */
   protected $annotationReader;
 
-  /**
-   * Constructs an AttributeDiscoveryWithAnnotations object.
-   *
-   * @param string $subdir
-   *   Either the plugin's subdirectory, for example 'Plugin/views/filter', or
-   *   empty string if plugins are located at the top level of the namespace.
-   * @param \Traversable $rootNamespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   *   If $subdir is not an empty string, it will be appended to each namespace.
-   * @param string $pluginDefinitionAttributeName
-   *   (optional) The name of the attribute that contains the plugin definition.
-   *   Defaults to 'Drupal\Component\Plugin\Attribute\Plugin'.
-   * @param string $pluginDefinitionAnnotationName
-   *   (optional) The name of the attribute that contains the plugin definition.
-   *   Defaults to 'Drupal\Component\Annotation\Plugin'.
-   * @param string[] $additionalNamespaces
-   *   (optional) Additional namespaces to scan for attribute definitions.
-   */
   public function __construct(
     string $subdir,
     \Traversable $rootNamespaces,

@@ -29,9 +29,6 @@ class ShortcutSetDeleteForm extends EntityDeleteForm {
    */
   protected $storage;
 
-  /**
-   * Constructs a ShortcutSetDeleteForm object.
-   */
   public function __construct(Connection $database, ShortcutSetStorageInterface $storage) {
     $this->database = $database;
     $this->storage = $storage;

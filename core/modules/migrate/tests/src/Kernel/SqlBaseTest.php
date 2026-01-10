@@ -265,14 +265,6 @@ class TestSqlBase extends SqlBase {
    */
   protected $query;
 
-  /**
-   * Overrides the constructor so we can create one easily.
-   *
-   * @param array $configuration
-   *   The plugin instance configuration.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   (optional) The migration being run.
-   */
   public function __construct(array $configuration = [], ?MigrationInterface $migration = NULL) {
     parent::__construct($configuration, 'sql_base', ['requirements_met' => TRUE], $migration, \Drupal::state());
   }

@@ -21,12 +21,6 @@ class DiffFormatter extends DiffFormatterBase {
    */
   protected $rows = [];
 
-  /**
-   * Creates a DiffFormatter to render diffs in a table.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $config = $config_factory->get('system.diff');
     $this->leading_context_lines = $config->get('context.lines_leading');

@@ -15,30 +15,6 @@ class HtmxLocationResponseData implements \Stringable {
    */
   protected CacheableMetadata $cacheableMetadata;
 
-  /**
-   * Data for HX-Location headers.
-   *
-   * @param \Drupal\Core\Url $path
-   *   The path for the GET request.
-   * @param string $source
-   *   The source element of the request.
-   * @param string $event
-   *   An event that “triggered” the request.
-   * @param string $handler
-   *   A callback that will handle the response HTML.
-   * @param string $target
-   *   The target for the swap.
-   * @param string $swap
-   *   The swap strategy.
-   * @param array<string, string> $values
-   *   A set of values to submit with the request.
-   * @param array<string, string> $headers
-   *   Headers to submit with the request.
-   * @param string $select
-   *   A selector for the content to swap into the target.
-   *
-   * @see https://htmx.org/headers/hx-location/
-   */
   public function __construct(
     public readonly Url $path,
     public readonly string $source = '',

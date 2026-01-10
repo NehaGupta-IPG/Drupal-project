@@ -23,18 +23,6 @@ class PrefetchedResult extends ResultBase {
    */
   protected ?int $currentRowIndex = NULL;
 
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
-   *   The fetch mode.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
-   *   The fetch options.
-   * @param array $data
-   *   The prefetched data, in FetchAs::Associative format.
-   * @param int|null $rowCount
-   *   The row count.
-   */
   public function __construct(
     FetchAs $fetchMode,
     array $fetchOptions,

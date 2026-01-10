@@ -23,15 +23,6 @@ class FieldStorageDefinitionEvent extends Event {
    */
   protected $original;
 
-  /**
-   * Constructs a new FieldStorageDefinitionEvent.
-   *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_storage_definition
-   *   The field storage definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
-   *   (optional) The original field storage definition. This should be passed
-   *   only when updating the storage definition.
-   */
   public function __construct(FieldStorageDefinitionInterface $field_storage_definition, ?FieldStorageDefinitionInterface $original = NULL) {
     $this->fieldStorageDefinition = $field_storage_definition;
     $this->original = $original;

@@ -36,9 +36,6 @@ class EntityController implements ContainerInjectionInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new EntityController.
-   */
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly EntityTypeBundleInfoInterface $entityTypeBundleInfo,

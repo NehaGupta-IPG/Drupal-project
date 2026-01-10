@@ -29,12 +29,6 @@ class EntityModerationRouteProvider implements EntityRouteProviderInterface, Ent
    */
   protected $entityFieldManager;
 
-  /**
-   * Constructs a new DefaultHtmlRouteProvider.
-   *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   */
   public function __construct(EntityFieldManagerInterface $entity_field_manager) {
     $this->entityFieldManager = $entity_field_manager;
   }

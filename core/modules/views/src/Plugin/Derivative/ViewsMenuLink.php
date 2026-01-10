@@ -23,12 +23,6 @@ class ViewsMenuLink extends DeriverBase implements ContainerDeriverInterface {
    */
   protected $viewStorage;
 
-  /**
-   * Constructs a \Drupal\views\Plugin\Derivative\ViewsLocalTask instance.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $view_storage
-   *   The view storage.
-   */
   public function __construct(EntityStorageInterface $view_storage) {
     $this->viewStorage = $view_storage;
   }

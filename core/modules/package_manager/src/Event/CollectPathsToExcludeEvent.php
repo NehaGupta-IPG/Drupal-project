@@ -18,18 +18,6 @@ use PhpTuf\ComposerStager\API\Path\Value\PathListInterface;
  */
 final class CollectPathsToExcludeEvent extends SandboxEvent implements PathListInterface {
 
-  /**
-   * Constructs a CollectPathsToExcludeEvent object.
-   *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandboxManager
-   *   The stage which fired this event.
-   * @param \Drupal\package_manager\PathLocator $pathLocator
-   *   The path locator service.
-   * @param \PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface $pathFactory
-   *   The path factory service.
-   * @param \PhpTuf\ComposerStager\API\Path\Value\PathListInterface|null $pathList
-   *   (optional) The list of paths to exclude.
-   */
   public function __construct(
     SandboxManagerBase $sandboxManager,
     private readonly PathLocator $pathLocator,

@@ -36,14 +36,6 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
    */
   protected $findByPrefixCache = [];
 
-  /**
-   * Constructs a new CachedStorage.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $storage
-   *   A configuration storage to be cached.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   A cache backend used to store configuration.
-   */
   public function __construct(StorageInterface $storage, CacheBackendInterface $cache) {
     $this->storage = $storage;
     $this->cache = $cache;

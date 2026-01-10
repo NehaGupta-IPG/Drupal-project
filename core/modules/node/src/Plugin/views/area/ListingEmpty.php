@@ -23,18 +23,6 @@ class ListingEmpty extends AreaPluginBase {
    */
   protected $accessManager;
 
-  /**
-   * Constructs a new ListingEmpty.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   The access manager.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, AccessManagerInterface $access_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

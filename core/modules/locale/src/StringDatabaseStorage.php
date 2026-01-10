@@ -24,14 +24,6 @@ class StringDatabaseStorage implements StringStorageInterface {
    */
   protected $options = [];
 
-  /**
-   * Constructs a new StringDatabaseStorage class.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   A Database connection to use for reading and writing configuration data.
-   * @param array $options
-   *   (optional) Any additional database connection options to use in queries.
-   */
   public function __construct(Connection $connection, array $options = []) {
     $this->connection = $connection;
     $this->options = $options;

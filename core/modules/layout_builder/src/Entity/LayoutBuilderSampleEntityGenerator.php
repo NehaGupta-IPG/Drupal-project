@@ -25,14 +25,6 @@ class LayoutBuilderSampleEntityGenerator implements SampleEntityGeneratorInterfa
    */
   protected $entityTypeManager;
 
-  /**
-   * LayoutBuilderSampleEntityGenerator constructor.
-   *
-   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
-   *   The tempstore factory.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(SharedTempStoreFactory $temp_store_factory, EntityTypeManagerInterface $entity_type_manager) {
     $this->tempStoreFactory = $temp_store_factory;
     $this->entityTypeManager = $entity_type_manager;

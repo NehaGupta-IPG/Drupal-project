@@ -84,23 +84,6 @@ class ContentLanguageSettings extends ConfigEntityBase implements ContentLanguag
    */
   protected $language_alterable = FALSE;
 
-  /**
-   * Constructs a ContentLanguageSettings object.
-   *
-   * In most cases, Field entities are created via
-   * FieldConfig::create($values), where $values is the same
-   * parameter as in this constructor.
-   *
-   * @param array $values
-   *   An array of the referring entity bundle with:
-   *   - target_entity_type_id: The entity type.
-   *   - target_bundle: The bundle.
-   *   Other array elements will be used to set the corresponding properties on
-   *   the class; see the class property documentation for details.
-   * @param string $entity_type
-   *   (optional) The entity type ID that is being created. Defaults to
-   *   "language_content_settings".
-   */
   public function __construct(array $values, $entity_type = 'language_content_settings') {
     if (empty($values['target_entity_type_id'])) {
       throw new ContentLanguageSettingsException('Attempt to create content language settings without a target_entity_type_id.');

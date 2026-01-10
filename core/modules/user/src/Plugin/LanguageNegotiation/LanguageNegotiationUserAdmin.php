@@ -65,18 +65,6 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
    */
   protected $stackedRouteMatch;
 
-  /**
-   * Constructs a new LanguageNegotiationUserAdmin instance.
-   *
-   * @param \Drupal\Core\Routing\AdminContext $admin_context
-   *   The admin context.
-   * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $router
-   *   The router.
-   * @param \Drupal\Core\PathProcessor\PathProcessorManager $path_processor_manager
-   *   The path processor manager.
-   * @param \Drupal\Core\Routing\StackedRouteMatchInterface $stacked_route_match
-   *   The stacked route match.
-   */
   public function __construct(AdminContext $admin_context, UrlMatcherInterface $router, PathProcessorManager $path_processor_manager, StackedRouteMatchInterface $stacked_route_match) {
     $this->adminContext = $admin_context;
     $this->router = $router;

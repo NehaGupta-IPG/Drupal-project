@@ -20,14 +20,6 @@ class ThemeInstallController extends ControllerBase {
    */
   protected $themeInstaller;
 
-  /**
-   * Constructs a new ThemeInstallController.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer
-   *   The theme installer.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, ThemeInstallerInterface $theme_installer) {
     $this->configFactory = $config_factory;
     $this->themeInstaller = $theme_installer;

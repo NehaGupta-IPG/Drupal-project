@@ -51,14 +51,6 @@ class EnforcedResponse extends Response {
     }
   }
 
-  /**
-   * Constructs an enforced response.
-   *
-   * Use EnforcedResponse::createFromException() instead.
-   *
-   * @param \Symfony\Component\HttpFoundation\Response $response
-   *   The response to wrap.
-   */
   public function __construct(Response $response) {
     parent::__construct('', 500);
     $this->response = $response;

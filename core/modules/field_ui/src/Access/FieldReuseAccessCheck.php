@@ -19,16 +19,6 @@ use Symfony\Component\Routing\Route;
  */
 class FieldReuseAccessCheck implements AccessInterface {
 
-  /**
-   * Creates a new FieldReuseAccessCheck.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $fieldTypePluginManager
-   *   The field type plugin manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
-   *   The entity field manager.
-   */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected FieldTypePluginManagerInterface $fieldTypePluginManager,

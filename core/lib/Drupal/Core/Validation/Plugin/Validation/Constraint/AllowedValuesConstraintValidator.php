@@ -34,12 +34,6 @@ class AllowedValuesConstraintValidator extends ChoiceValidator implements Contai
     return new static($container->get('current_user'));
   }
 
-  /**
-   * Constructs a new AllowedValuesConstraintValidator.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   */
   public function __construct(AccountInterface $current_user) {
     $this->currentUser = $current_user;
   }

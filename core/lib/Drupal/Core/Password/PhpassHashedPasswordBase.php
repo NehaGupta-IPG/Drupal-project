@@ -36,12 +36,6 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public static $ITOA64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-  /**
-   * Constructs a new password hashing instance.
-   *
-   * @param \Drupal\Core\Password\PasswordInterface $corePassword
-   *   The core PHP password interface.
-   */
   public function __construct(protected PasswordInterface $corePassword) {
   }
 

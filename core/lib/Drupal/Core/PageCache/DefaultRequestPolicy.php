@@ -15,12 +15,6 @@ use Drupal\Core\Session\SessionConfigurationInterface;
  */
 class DefaultRequestPolicy extends ChainRequestPolicy {
 
-  /**
-   * Constructs the default page cache request policy.
-   *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
-   *   The session configuration.
-   */
   public function __construct(SessionConfigurationInterface $session_configuration) {
     $this->addPolicy(new CommandLineOrUnsafeMethod());
     $this->addPolicy(new NoSessionOpen($session_configuration));

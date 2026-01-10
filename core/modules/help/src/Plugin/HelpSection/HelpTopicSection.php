@@ -45,27 +45,6 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    */
   protected $cacheableMetadata;
 
-  /**
-   * Constructs a HelpTopicSection object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\help\HelpTopicPluginManagerInterface $pluginManager
-   *   The help topic plugin manager service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Language\LanguageDefault $defaultLanguage
-   *   The default language object.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager.
-   * @param \Drupal\Core\StringTranslation\TranslationManager $translationManager
-   *   The translation manager. We are using a method that doesn't exist on an
-   *   interface, so require this class.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected HelpTopicPluginManagerInterface $pluginManager, protected RendererInterface $renderer, protected LanguageDefault $defaultLanguage, protected LanguageManagerInterface $languageManager, protected TranslationManager $translationManager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }

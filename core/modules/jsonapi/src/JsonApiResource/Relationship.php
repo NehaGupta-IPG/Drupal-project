@@ -68,28 +68,6 @@ class Relationship implements TopLevelDataInterface {
    */
   protected $meta;
 
-  /**
-   * Relationship constructor.
-   *
-   * This constructor is protected by design. To create a new relationship, use
-   * static::createFromEntityReferenceField().
-   *
-   * @param string $public_field_name
-   *   The public field name of the relationship field.
-   * @param \Drupal\jsonapi\JsonApiResource\RelationshipData $data
-   *   The relationship data.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
-   *   Any links for the resource object, if a `self` link is not
-   *   provided, one will be automatically added if the resource is locatable
-   *   and is not internal.
-   * @param array $meta
-   *   Any relationship metadata.
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $context
-   *   The relationship's context resource object. Use the
-   *   self::withContext() method to establish a context.
-   *
-   * @see \Drupal\jsonapi\JsonApiResource\Relationship::createFromEntityReferenceField()
-   */
   protected function __construct($public_field_name, RelationshipData $data, LinkCollection $links, array $meta, ResourceObject $context) {
     $this->fieldName = $public_field_name;
     $this->data = $data;

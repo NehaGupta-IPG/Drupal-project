@@ -35,14 +35,6 @@ final class StageFixtureManipulator extends FixtureManipulator implements Beginn
    */
   private BeginnerInterface $inner;
 
-  /**
-   * Constructions a StageFixtureManipulator object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \PhpTuf\ComposerStager\API\Core\BeginnerInterface $inner
-   *   The decorated beginner service.
-   */
   public function __construct(StateInterface $state, BeginnerInterface $inner) {
     $this->state = $state;
     $this->inner = $inner;

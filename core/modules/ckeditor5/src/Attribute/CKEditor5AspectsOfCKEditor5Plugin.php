@@ -12,16 +12,6 @@ use Drupal\Component\Plugin\Attribute\Plugin;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class CKEditor5AspectsOfCKEditor5Plugin extends Plugin {
 
-  /**
-   * Constructs a CKEditor5AspectsOfCKEditor5Plugin attribute.
-   *
-   * @param class-string[] $plugins
-   *   The CKEditor 5 plugin classes provided. Found in the CKEditor5 global js
-   *   object as {package.Class}.
-   * @param array $config
-   *   (optional) A keyed array of additional values for the CKEditor 5
-   *   configuration.
-   */
   public function __construct(
     public readonly array $plugins,
     public readonly array $config = [],

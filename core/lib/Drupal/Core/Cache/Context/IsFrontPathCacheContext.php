@@ -17,12 +17,6 @@ class IsFrontPathCacheContext implements CacheContextInterface {
    */
   protected $pathMatcher;
 
-  /**
-   * Constructs an IsFrontPathCacheContext object.
-   *
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
-   *   The path matcher.
-   */
   public function __construct(PathMatcherInterface $path_matcher) {
     $this->pathMatcher = $path_matcher;
   }

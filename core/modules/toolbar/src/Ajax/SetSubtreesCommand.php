@@ -16,12 +16,6 @@ class SetSubtreesCommand implements CommandInterface {
    */
   protected $subtrees;
 
-  /**
-   * Constructs a SetSubtreesCommand object.
-   *
-   * @param array $subtrees
-   *   The toolbar subtrees that will be set.
-   */
   public function __construct($subtrees) {
     $this->subtrees = $subtrees;
   }

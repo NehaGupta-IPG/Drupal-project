@@ -68,14 +68,6 @@ class EarlyRenderingControllerWrapperSubscriber implements EventSubscriberInterf
    */
   protected $renderer;
 
-  /**
-   * Constructs a new EarlyRenderingControllerWrapperSubscriber instance.
-   *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
-   *   The argument resolver.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
   public function __construct(ArgumentResolverInterface $argument_resolver, RendererInterface $renderer) {
     $this->argumentResolver = $argument_resolver;
     $this->renderer = $renderer;

@@ -41,14 +41,6 @@ class CacheContextsManager {
    */
   protected array $validContextTokens;
 
-  /**
-   * Constructs a CacheContextsManager object.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The current service container.
-   * @param string[] $contexts
-   *   An array of the available cache context IDs.
-   */
   public function __construct(ContainerInterface $container, array $contexts) {
     $this->container = $container;
     $this->contexts = $contexts;

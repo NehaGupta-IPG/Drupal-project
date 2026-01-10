@@ -18,16 +18,6 @@ class KeyValueDatabaseExpirableFactory implements KeyValueExpirableFactoryInterf
    */
   protected $storages = [];
 
-  /**
-   * Constructs this factory object.
-   *
-   * @param \Drupal\Component\Serialization\SerializationInterface $serializer
-   *   The serialization class to use.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The Connection object containing the key-value tables.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     protected SerializationInterface $serializer,
     protected Connection $connection,

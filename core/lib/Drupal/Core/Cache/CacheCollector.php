@@ -98,18 +98,6 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    */
   protected $cacheLoaded = FALSE;
 
-  /**
-   * Constructs a CacheCollector object.
-   *
-   * @param string $cid
-   *   The cid for the array being cached.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param array $tags
-   *   (optional) The tags to specify for the cache item.
-   */
   public function __construct($cid, CacheBackendInterface $cache, LockBackendInterface $lock, array $tags = []) {
     assert(Inspector::assertAllStrings($tags), 'Cache tags must be strings.');
     $this->cid = $cid;

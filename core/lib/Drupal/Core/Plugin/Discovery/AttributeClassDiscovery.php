@@ -28,20 +28,6 @@ class AttributeClassDiscovery extends ComponentAttributeClassDiscovery {
    */
   protected $namespaceSuffix = '';
 
-  /**
-   * Constructs an AttributeClassDiscovery object.
-   *
-   * @param string $subdir
-   *   Either the plugin's subdirectory, for example 'Plugin/views/filter', or
-   *   empty string if plugins are located at the top level of the namespace.
-   * @param \Traversable $rootNamespacesIterator
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   *   If $subdir is not an empty string, it will be appended to each namespace.
-   * @param string $pluginDefinitionAttributeName
-   *   (optional) The name of the attribute that contains the plugin definition.
-   *   Defaults to 'Drupal\Component\Plugin\Attribute\Plugin'.
-   */
   public function __construct(
     string $subdir,
     protected \Traversable $rootNamespacesIterator,

@@ -19,9 +19,6 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  */
 class SelectionPluginManager extends DefaultPluginManager implements SelectionPluginManagerInterface, FallbackPluginManagerInterface {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     $this->alterInfo('entity_reference_selection');
     $this->setCacheBackend($cache_backend, 'entity_reference_selection_plugins');

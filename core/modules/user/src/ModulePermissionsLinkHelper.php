@@ -16,16 +16,6 @@ class ModulePermissionsLinkHelper {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new service instance.
-   *
-   * @param \Drupal\user\PermissionHandlerInterface $permissionHandler
-   *   The user permissions handler service.
-   * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
-   *   The access manager service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
-   *   The module handler service.
-   */
   public function __construct(
     protected PermissionHandlerInterface $permissionHandler,
     protected AccessManagerInterface $accessManager,

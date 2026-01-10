@@ -14,9 +14,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ConfigCacheTag implements EventSubscriberInterface {
 
-  /**
-   * Constructs a ConfigCacheTag object.
-   */
   public function __construct(
     protected ThemeHandlerInterface $themeHandler,
     protected CacheTagsInvalidatorInterface $cacheTagsInvalidator,

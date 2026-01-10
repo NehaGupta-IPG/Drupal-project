@@ -9,14 +9,6 @@ namespace Drupal\Core\Database\Transaction;
  */
 final class StackItem {
 
-  /**
-   * Constructor.
-   *
-   * @param string $name
-   *   The name of the transaction.
-   * @param StackItemType $type
-   *   The stack item type.
-   */
   public function __construct(
     public readonly string $name,
     public readonly StackItemType $type,

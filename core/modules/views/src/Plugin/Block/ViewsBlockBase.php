@@ -46,22 +46,6 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
    */
   protected $user;
 
-  /**
-   * Constructs a \Drupal\views\Plugin\Block\ViewsBlockBase object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\views\ViewExecutableFactory $executable_factory
-   *   The view executable factory.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The views storage.
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ViewExecutableFactory $executable_factory, EntityStorageInterface $storage, AccountInterface $user) {
     $this->pluginId = $plugin_id;
     $delta = $this->getDerivativeId();

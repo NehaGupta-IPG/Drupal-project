@@ -70,25 +70,6 @@ class ConfigActionManager extends DefaultPluginManager {
     ],
   ];
 
-  /**
-   * Constructs a new \Drupal\Core\Config\Action\ConfigActionManager object.
-   *
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
-   *   The config manager.
-   * @param \Drupal\Core\Config\StorageInterface $configStorage
-   *   The active config storage.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfig
-   *   The typed configuration manager service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory service.
-   */
   public function __construct(
     \Traversable $namespaces,
     CacheBackendInterface $cache_backend,

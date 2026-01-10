@@ -24,12 +24,6 @@ class ComponentNegotiator {
    */
   protected array $cache = [];
 
-  /**
-   * Constructs ComponentNegotiator objects.
-   *
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
-   *   The theme manager.
-   */
   public function __construct(
     protected ThemeManagerInterface $themeManager,
   ) {

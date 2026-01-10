@@ -76,12 +76,6 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    */
   protected $storage = [];
 
-  /**
-   * Constructs a \Drupal\Core\Template\Attribute object.
-   *
-   * @param array $attributes
-   *   An associative array of key-value pairs to be converted to attributes.
-   */
   public function __construct($attributes = []) {
     foreach ($attributes as $name => $value) {
       $this->offsetSet($name, $value);

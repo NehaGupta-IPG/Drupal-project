@@ -24,12 +24,6 @@ class WorkflowStateAddForm extends EntityForm {
    */
   protected $pluginFormFactory;
 
-  /**
-   * Creates an instance of WorkflowStateEditForm.
-   *
-   * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $pluginFormFactory
-   *   The plugin form factory.
-   */
   public function __construct(PluginFormFactoryInterface $pluginFormFactory) {
     $this->pluginFormFactory = $pluginFormFactory;
   }

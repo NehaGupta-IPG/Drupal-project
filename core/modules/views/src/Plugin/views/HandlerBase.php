@@ -89,16 +89,6 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public bool $is_handler;
 
-  /**
-   * Constructs a Handler object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->is_handler = TRUE;

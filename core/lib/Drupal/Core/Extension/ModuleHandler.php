@@ -102,25 +102,6 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   protected array $orderingRules = [];
 
-  /**
-   * Constructs a ModuleHandler object.
-   *
-   * @param string $root
-   *   The app root.
-   * @param array<string, array{type: string, pathname: string, filename: string}> $module_list
-   *   An associative array whose keys are the names of installed modules and
-   *   whose values are Extension class parameters. This is normally the
-   *   %container.modules% parameter being set up by DrupalKernel.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $keyValueFactory
-   *   The key value factory.
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
-   *   The callable resolver.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The bootstrap cache.
-   *
-   * @see \Drupal\Core\DrupalKernel
-   * @see \Drupal\Core\CoreServiceProvider
-   */
   public function __construct(
     protected $root,
     array $module_list,

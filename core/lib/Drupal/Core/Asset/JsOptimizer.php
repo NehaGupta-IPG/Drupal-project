@@ -15,12 +15,6 @@ use Psr\Log\LoggerInterface;
  */
 class JsOptimizer implements AssetOptimizerInterface {
 
-  /**
-   * Constructs a new JsOptimizer object.
-   *
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   */
   public function __construct(protected readonly LoggerInterface $logger) {}
 
   /**

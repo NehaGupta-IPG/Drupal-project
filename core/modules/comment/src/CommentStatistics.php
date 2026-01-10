@@ -55,22 +55,6 @@ class CommentStatistics implements CommentStatisticsInterface {
    */
   protected $state;
 
-  /**
-   * Constructs the CommentStatistics service.
-   *
-   * @param \Drupal\Core\Database\Connection $database
-   *   The active database connection.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current logged in user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Drupal\Core\Database\Connection|null $database_replica
-   *   (Optional) the replica database connection.
-   */
   public function __construct(
     Connection $database,
     AccountInterface $current_user,

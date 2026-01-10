@@ -7,9 +7,6 @@ namespace Drupal\Core\Test;
  */
 class ObjectSerialization {
 
-  /**
-   * ObjectSerialization constructor.
-   */
   public function __construct() {
     throw new \Exception('This object should never be constructed');
   }

@@ -32,16 +32,6 @@ class AddJsCommand implements CommandInterface {
    */
   protected $selector;
 
-  /**
-   * Constructs an AddJsCommand.
-   *
-   * @param array $scripts
-   *   An array containing the attributes of the 'script' tags to be added to
-   *   the page. i.e. `['src' => 'someURL', 'defer' => TRUE]` becomes
-   *   `<script src="someURL" defer>`.
-   * @param string $selector
-   *   A CSS selector of the element where the script tags will be appended.
-   */
   public function __construct(array $scripts, string $selector = 'body') {
     $this->scripts = $scripts;
     $this->selector = $selector;

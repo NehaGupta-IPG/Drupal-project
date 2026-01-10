@@ -34,14 +34,6 @@ class CssCommand implements CommandInterface {
    */
   protected $css = [];
 
-  /**
-   * Constructs a CssCommand object.
-   *
-   * @param string $selector
-   *   A CSS selector for elements to which the CSS will be applied.
-   * @param array $css
-   *   An array of CSS property/value pairs to set.
-   */
   public function __construct($selector, array $css = []) {
     $this->selector = $selector;
     $this->css = $css;

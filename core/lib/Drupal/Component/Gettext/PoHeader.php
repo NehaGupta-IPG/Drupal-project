@@ -64,12 +64,6 @@ class PoHeader {
    */
   protected $projectName;
 
-  /**
-   * Constructor, creates a PoHeader with default values.
-   *
-   * @param string $langcode
-   *   Language code.
-   */
   public function __construct($langcode = NULL) {
     $this->langcode = $langcode;
     // Ignore errors when run during site installation before

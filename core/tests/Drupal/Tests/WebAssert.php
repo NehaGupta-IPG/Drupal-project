@@ -31,14 +31,6 @@ class WebAssert extends MinkWebAssert {
    */
   protected $baseUrl = '';
 
-  /**
-   * Constructor.
-   *
-   * @param \Behat\Mink\Session $session
-   *   The Behat session object.
-   * @param string $base_url
-   *   The base URL of the site under test.
-   */
   public function __construct(Session $session, $base_url = '') {
     parent::__construct($session);
     $this->baseUrl = $base_url;

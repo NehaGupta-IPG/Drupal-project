@@ -93,11 +93,6 @@ class Htmx {
    */
   protected const string ATTRIBUTE_PREFIX = 'data-';
 
-  /**
-   * Initialize empty storage.
-   *
-   * Allows for passing a populated HeaderBag to support merging.
-   */
   public function __construct(
     protected Attribute $attributes = new Attribute(),
     protected HeaderBag $headers = new HeaderBag(),

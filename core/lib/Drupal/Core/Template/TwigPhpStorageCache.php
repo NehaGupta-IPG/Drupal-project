@@ -45,14 +45,6 @@ class TwigPhpStorageCache implements CacheInterface {
    */
   protected $templateCacheFilenamePrefix;
 
-  /**
-   * Store cache backend and other information internally.
-   *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache bin.
-   * @param string $twig_cache_prefix
-   *   A Twig cache file prefix that changes when Twig extensions change.
-   */
   public function __construct(CacheBackendInterface $cache, $twig_cache_prefix) {
     $this->cache = $cache;
     $this->templateCacheFilenamePrefix = $twig_cache_prefix;

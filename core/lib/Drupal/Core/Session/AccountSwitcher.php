@@ -39,14 +39,6 @@ class AccountSwitcher implements AccountSwitcherInterface {
    */
   protected $originalSessionSaving;
 
-  /**
-   * Constructs a new AccountSwitcher.
-   *
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
-   *   The current user service.
-   * @param \Drupal\Core\Session\WriteSafeSessionHandlerInterface $write_safe_handler
-   *   The write-safe session handler.
-   */
   public function __construct(AccountProxyInterface $current_user, WriteSafeSessionHandlerInterface $write_safe_handler) {
     $this->currentUser = $current_user;
     $this->writeSafeHandler = $write_safe_handler;

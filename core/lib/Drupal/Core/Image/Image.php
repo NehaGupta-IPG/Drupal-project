@@ -35,15 +35,6 @@ class Image implements ImageInterface {
    */
   protected $fileSize;
 
-  /**
-   * Constructs a new Image object.
-   *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
-   *   The image toolkit.
-   * @param string|null $source
-   *   (optional) The path to an image file, or NULL to construct the object
-   *   with no image source.
-   */
   public function __construct(ImageToolkitInterface $toolkit, $source = NULL) {
     $this->toolkit = $toolkit;
     if ($source) {

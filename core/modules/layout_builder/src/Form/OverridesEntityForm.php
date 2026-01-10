@@ -42,18 +42,6 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
    */
   protected $sectionStorage;
 
-  /**
-   * Constructs a new OverridesEntityForm.
-   *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
-   *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
-   *   The layout tempstore repository.
-   */
   public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->layoutTempstoreRepository = $layout_tempstore_repository;

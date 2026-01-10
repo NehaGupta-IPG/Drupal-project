@@ -43,17 +43,6 @@ class CKEditor5Plugin extends Plugin {
    */
   public $drupal;
 
-  /**
-   * {@inheritdoc}
-   *
-   * Overridden for compatibility with the AnnotationBridgeDecorator, which
-   * ensures YAML-defined CKEditor 5 plugin definitions are also processed by
-   * annotations. Unfortunately it does not (yet) support nested annotations.
-   * Force YAML-defined plugin definitions to be parsed by the
-   * annotations, to ensure consistent handling of defaults.
-   *
-   * @see \Drupal\Component\Annotation\Plugin\Discovery\AnnotationBridgeDecorator::getDefinitions()
-   */
   public function __construct($values) {
     if (isset($values['ckeditor5']) && is_array($values['ckeditor5'])) {
       $values['ckeditor5'] = new CKEditor5AspectsOfCKEditor5Plugin($values['ckeditor5']);

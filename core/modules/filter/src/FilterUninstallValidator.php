@@ -29,16 +29,6 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
    */
   protected $filterStorage;
 
-  /**
-   * Constructs a new FilterUninstallValidator.
-   *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $filter_manager
-   *   The filter plugin manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
   public function __construct(PluginManagerInterface $filter_manager, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
     $this->filterManager = $filter_manager;
     $this->filterStorage = $entity_type_manager->getStorage('filter_format');

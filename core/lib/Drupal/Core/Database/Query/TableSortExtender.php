@@ -10,9 +10,6 @@ use Drupal\Core\Utility\TableSort;
  */
 class TableSortExtender extends SelectExtender {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(SelectInterface $query, Connection $connection) {
     parent::__construct($query, $connection);
 

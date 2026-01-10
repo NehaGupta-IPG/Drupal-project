@@ -62,14 +62,6 @@ abstract class Query implements PlaceholderInterface {
    */
   protected $comments = [];
 
-  /**
-   * Constructs a Query object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   Database connection object.
-   * @param array $options
-   *   Array of query options.
-   */
   public function __construct(Connection $connection, $options) {
     $this->uniqueIdentifier = uniqid('', TRUE);
 

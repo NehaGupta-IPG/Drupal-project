@@ -14,9 +14,6 @@ use Drupal\views\Views;
  */
 class AddHandler extends ViewsFormBase {
 
-  /**
-   * Constructs a new AddHandler object.
-   */
   public function __construct($type = NULL) {
     $this->setType($type);
   }

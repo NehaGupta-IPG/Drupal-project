@@ -24,14 +24,6 @@ class KeyValueDatabaseFactory implements KeyValueFactoryInterface {
    */
   protected $connection;
 
-  /**
-   * Constructs this factory object.
-   *
-   * @param \Drupal\Component\Serialization\SerializationInterface $serializer
-   *   The serialization class to use.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The Connection object containing the key-value tables.
-   */
   public function __construct(SerializationInterface $serializer, Connection $connection) {
     $this->serializer = $serializer;
     $this->connection = $connection;

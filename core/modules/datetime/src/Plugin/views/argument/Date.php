@@ -38,9 +38,6 @@ class Date extends NumericDate {
    */
   protected $calculateOffset = TRUE;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

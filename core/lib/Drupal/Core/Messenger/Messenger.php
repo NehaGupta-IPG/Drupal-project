@@ -26,14 +26,6 @@ class Messenger implements MessengerInterface {
    */
   protected $killSwitch;
 
-  /**
-   * Messenger constructor.
-   *
-   * @param \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface $flash_bag
-   *   The flash bag.
-   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch $killSwitch
-   *   The kill switch.
-   */
   public function __construct(FlashBagInterface $flash_bag, KillSwitch $killSwitch) {
     $this->flashBag = $flash_bag;
     $this->killSwitch = $killSwitch;

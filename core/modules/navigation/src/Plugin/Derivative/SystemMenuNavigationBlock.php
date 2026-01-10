@@ -17,12 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class SystemMenuNavigationBlock extends DeriverBase implements ContainerDeriverInterface {
 
-  /**
-   * Constructs new SystemMenuNavigationBlock.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $menuStorage
-   *   The menu storage.
-   */
   public function __construct(protected EntityStorageInterface $menuStorage) {}
 
   /**

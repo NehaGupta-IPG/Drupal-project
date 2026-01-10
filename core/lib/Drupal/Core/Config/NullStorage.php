@@ -25,13 +25,6 @@ class NullStorage implements StorageInterface {
    */
   protected $collection;
 
-  /**
-   * Constructs a new NullStorage.
-   *
-   * @param string $collection
-   *   (optional) The collection to store configuration in. Defaults to the
-   *   default collection.
-   */
   public function __construct($collection = StorageInterface::DEFAULT_COLLECTION) {
     $this->collection = $collection;
   }

@@ -17,16 +17,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class FileEventSubscriber implements EventSubscriberInterface {
 
-  /**
-   * Constructs a new file event listener.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
-   * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
-   *   The transliteration service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager.
-   */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
     #[Autowire(service: 'transliteration')]

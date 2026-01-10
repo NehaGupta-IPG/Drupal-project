@@ -40,18 +40,6 @@ class FieldDefinitionListener implements FieldDefinitionListenerInterface {
    */
   protected $entityFieldManager;
 
-  /**
-   * Constructs a new FieldDefinitionListener.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key-value factory.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, KeyValueFactoryInterface $key_value_factory, CacheBackendInterface $cache_backend) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;

@@ -23,18 +23,6 @@ class FilesystemLoader extends TwigFilesystemLoader {
    */
   protected $allowedFileExtensions = ['css', 'html', 'js', 'svg', 'twig'];
 
-  /**
-   * Constructs a new FilesystemLoader object.
-   *
-   * @param string|array $paths
-   *   A path or an array of paths to check for templates.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler service.
-   * @param mixed[] $twig_config
-   *   Twig configuration from the service container.
-   */
   public function __construct($paths, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, array $twig_config = []) {
     parent::__construct($paths);
 

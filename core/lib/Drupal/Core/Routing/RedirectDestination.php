@@ -31,14 +31,6 @@ class RedirectDestination implements RedirectDestinationInterface {
    */
   protected $destination;
 
-  /**
-   * Constructs a new RedirectDestination instance.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
-   *   The URL generator.
-   */
   public function __construct(RequestStack $request_stack, UrlGeneratorInterface $url_generator) {
     $this->requestStack = $request_stack;
     $this->urlGenerator = $url_generator;

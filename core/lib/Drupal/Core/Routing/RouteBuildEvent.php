@@ -17,12 +17,6 @@ class RouteBuildEvent extends Event {
    */
   protected $routeCollection;
 
-  /**
-   * Constructs a RouteBuildEvent object.
-   *
-   * @param \Symfony\Component\Routing\RouteCollection $route_collection
-   *   The route collection.
-   */
   public function __construct(RouteCollection $route_collection) {
     $this->routeCollection = $route_collection;
   }

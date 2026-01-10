@@ -35,16 +35,6 @@ class Pager {
    */
   protected $limit;
 
-  /**
-   * Pager constructor.
-   *
-   * @param int $totalItems
-   *   The total number of items.
-   * @param int $limit
-   *   The maximum number of items per page.
-   * @param int $currentPage
-   *   The current page.
-   */
   public function __construct($totalItems, $limit, $currentPage = 0) {
     $this->totalItems = $totalItems;
     $this->limit = $limit;

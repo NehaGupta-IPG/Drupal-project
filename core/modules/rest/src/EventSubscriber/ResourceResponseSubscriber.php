@@ -42,16 +42,6 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    */
   protected $routeMatch;
 
-  /**
-   * Constructs a ResourceResponseSubscriber object.
-   *
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
-   *   The serializer.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   */
   public function __construct(SerializerInterface $serializer, RendererInterface $renderer, RouteMatchInterface $route_match) {
     $this->serializer = $serializer;
     $this->renderer = $renderer;

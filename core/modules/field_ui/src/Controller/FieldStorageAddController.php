@@ -39,9 +39,6 @@ final class FieldStorageAddController extends ControllerBase {
    */
   protected $bundle;
 
-  /**
-   * Constructs a new FieldStorageAddController.
-   */
   public function __construct(
     protected FieldTypePluginManagerInterface $fieldTypePluginManager,
     protected FieldTypeCategoryManagerInterface $fieldTypeCategoryManager,

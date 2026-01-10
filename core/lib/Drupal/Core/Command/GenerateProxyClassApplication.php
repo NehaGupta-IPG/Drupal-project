@@ -22,12 +22,6 @@ class GenerateProxyClassApplication extends Application {
    */
   protected $proxyBuilder;
 
-  /**
-   * Constructs a new GenerateProxyClassApplication instance.
-   *
-   * @param \Drupal\Component\ProxyBuilder\ProxyBuilder $proxy_builder
-   *   The proxy builder.
-   */
   public function __construct(ProxyBuilder $proxy_builder) {
     $this->proxyBuilder = $proxy_builder;
 

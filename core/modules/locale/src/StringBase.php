@@ -53,12 +53,6 @@ abstract class StringBase implements StringInterface {
    */
   protected $storage;
 
-  /**
-   * Constructs a new locale string object.
-   *
-   * @param object|array $values
-   *   Object or array with initial values.
-   */
   public function __construct($values = []) {
     $this->setValues((array) $values);
   }

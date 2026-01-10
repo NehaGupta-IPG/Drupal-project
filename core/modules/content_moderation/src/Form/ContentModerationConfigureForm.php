@@ -41,9 +41,6 @@ class ContentModerationConfigureForm extends WorkflowTypeConfigureFormBase imple
    */
   protected $entityTypeBundleInfo;
 
-  /**
-   * Create an instance of ContentModerationConfigureForm.
-   */
   public function __construct(EntityTypeManagerInterface $entityTypeManager, ModerationInformationInterface $moderationInformation, EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
     $this->entityTypeManager = $entityTypeManager;
     $this->moderationInfo = $moderationInformation;

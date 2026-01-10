@@ -45,12 +45,6 @@ final class Settings {
     ],
   ];
 
-  /**
-   * Constructor.
-   *
-   * @param array $settings
-   *   Array with the settings.
-   */
   public function __construct(array $settings) {
     $this->storage = $settings;
     self::$instance = $this;

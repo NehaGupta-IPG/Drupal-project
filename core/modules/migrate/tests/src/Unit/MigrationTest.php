@@ -445,13 +445,6 @@ class MigrationTest extends UnitTestCase {
  */
 class TestMigration extends Migration {
 
-  /**
-   * Constructs an instance of TestMigration object.
-   *
-   * @param string[]|null $initial_dependency
-   *   An associative array of required and optional migrations IDs, keyed by
-   *   'required' and 'optional'.
-   */
   public function __construct(?array $initial_dependency = NULL) {
     $this->migration_dependencies = ($this->migration_dependencies ?: []) + ['required' => [], 'optional' => []];
     if ($initial_dependency) {

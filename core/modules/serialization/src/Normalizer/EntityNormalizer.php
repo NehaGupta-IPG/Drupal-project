@@ -16,16 +16,6 @@ class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInte
 
   use FieldableEntityNormalizerTrait;
 
-  /**
-   * Constructs an EntityNormalizer object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeRepositoryInterface $entity_type_repository
-   *   The entity type repository.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeRepositoryInterface $entity_type_repository, EntityFieldManagerInterface $entity_field_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeRepository = $entity_type_repository;

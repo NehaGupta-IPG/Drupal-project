@@ -19,13 +19,6 @@ class ParamConverterSubscriber implements EventSubscriberInterface {
    */
   protected $paramConverterManager;
 
-  /**
-   * Constructs a new ParamConverterSubscriber.
-   *
-   * @param \Drupal\Core\ParamConverter\ParamConverterManagerInterface $param_converter_manager
-   *   The parameter converter manager that will be responsible for upcasting
-   *   request attributes.
-   */
   public function __construct(ParamConverterManagerInterface $param_converter_manager) {
     $this->paramConverterManager = $param_converter_manager;
   }

@@ -71,14 +71,6 @@ class UpdateHookRegistry {
    */
   protected $allAvailableSchemaVersions = [];
 
-  /**
-   * Constructs a new UpdateHookRegistry.
-   *
-   * @param array $module_list
-   *   An associative array whose keys are the names of installed modules.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key value factory.
-   */
   public function __construct(
     array $module_list,
     KeyValueFactoryInterface $key_value_factory,

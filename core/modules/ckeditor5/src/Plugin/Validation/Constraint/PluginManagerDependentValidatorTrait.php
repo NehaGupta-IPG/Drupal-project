@@ -25,12 +25,6 @@ trait PluginManagerDependentValidatorTrait {
    */
   protected $pluginManager;
 
-  /**
-   * Constructs a CKEditor5ConstraintValidatorTrait object.
-   *
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $plugin_manager
-   *   The CKEditor 5 plugin manager.
-   */
   public function __construct(CKEditor5PluginManagerInterface $plugin_manager) {
     $this->pluginManager = $plugin_manager;
   }

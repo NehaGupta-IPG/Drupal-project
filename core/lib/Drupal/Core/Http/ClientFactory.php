@@ -20,12 +20,6 @@ class ClientFactory {
    */
   protected $stack;
 
-  /**
-   * Constructs a new ClientFactory instance.
-   *
-   * @param \GuzzleHttp\HandlerStack $stack
-   *   The handler stack.
-   */
   public function __construct(HandlerStack $stack) {
     $this->stack = $stack;
   }

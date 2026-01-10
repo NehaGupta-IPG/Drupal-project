@@ -12,12 +12,6 @@ use Drupal\Core\Lock\LockBackendInterface;
  */
 class BrokenSystemTestController extends ControllerBase {
 
-  /**
-   * Constructs the BrokenSystemTestController.
-   *
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock service.
-   */
   public function __construct(
     protected LockBackendInterface $lock,
   ) {}

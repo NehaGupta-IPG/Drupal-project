@@ -50,18 +50,6 @@ class PathValidator implements PathValidatorInterface {
    */
   protected $pathProcessor;
 
-  /**
-   * Creates a new PathValidator.
-   *
-   * @param \Drupal\Core\Routing\AccessAwareRouterInterface $access_aware_router
-   *   The access aware router.
-   * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $access_unaware_router
-   *   A router implementation which does not check access.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
-   *   The path processor.
-   */
   public function __construct(AccessAwareRouterInterface $access_aware_router, UrlMatcherInterface $access_unaware_router, AccountInterface $account, InboundPathProcessorInterface $path_processor) {
     $this->accessAwareRouter = $access_aware_router;
     $this->accessUnawareRouter = $access_unaware_router;

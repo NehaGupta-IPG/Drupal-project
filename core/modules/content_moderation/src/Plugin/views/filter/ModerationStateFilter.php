@@ -49,9 +49,6 @@ class ModerationStateFilter extends InOperator implements DependentWithRemovalPl
    */
   protected $workflowStorage;
 
-  /**
-   * Creates an instance of ModerationStateFilter.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, EntityStorageInterface $workflow_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;

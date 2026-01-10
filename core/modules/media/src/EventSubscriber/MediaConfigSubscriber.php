@@ -35,16 +35,6 @@ class MediaConfigSubscriber implements EventSubscriberInterface {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs the MediaConfigSubscriber.
-   *
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
-   *   The route builder.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
-   *   The cache tags invalidator.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(RouteBuilderInterface $router_builder, CacheTagsInvalidatorInterface $cache_tags_invalidator, EntityTypeManagerInterface $entity_type_manager) {
     $this->routeBuilder = $router_builder;
     $this->cacheTagsInvalidator = $cache_tags_invalidator;

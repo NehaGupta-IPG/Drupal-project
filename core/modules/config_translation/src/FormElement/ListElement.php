@@ -25,12 +25,6 @@ class ListElement implements ElementInterface {
    */
   protected $element;
 
-  /**
-   * Constructs a ListElement.
-   *
-   * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $element
-   *   The schema element this form element is for.
-   */
   public function __construct(TraversableTypedDataInterface $element) {
     $this->element = $element;
   }

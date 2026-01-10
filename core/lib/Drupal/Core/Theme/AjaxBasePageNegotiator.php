@@ -45,16 +45,6 @@ class AjaxBasePageNegotiator implements ThemeNegotiatorInterface {
    */
   protected $requestStack;
 
-  /**
-   * Constructs a new AjaxBasePageNegotiator.
-   *
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $token_generator
-   *   The CSRF token generator.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack used to retrieve the current request.
-   */
   public function __construct(CsrfTokenGenerator $token_generator, ConfigFactoryInterface $config_factory, RequestStack $request_stack) {
     $this->csrfGenerator = $token_generator;
     $this->configFactory = $config_factory;

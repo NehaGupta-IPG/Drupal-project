@@ -23,12 +23,6 @@ class ImageFactory {
    */
   protected $toolkitId;
 
-  /**
-   * Constructs a new ImageFactory object.
-   *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkit_manager
-   *   The image toolkit plugin manager.
-   */
   public function __construct(ImageToolkitManager $toolkit_manager) {
     $this->toolkitManager = $toolkit_manager;
   }

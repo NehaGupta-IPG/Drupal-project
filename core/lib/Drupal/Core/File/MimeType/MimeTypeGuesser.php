@@ -38,12 +38,6 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface {
    */
   protected $streamWrapperManager;
 
-  /**
-   * Constructs a MimeTypeGuesser object.
-   *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
-   *   The stream wrapper manager.
-   */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager) {
     $this->streamWrapperManager = $stream_wrapper_manager;
   }

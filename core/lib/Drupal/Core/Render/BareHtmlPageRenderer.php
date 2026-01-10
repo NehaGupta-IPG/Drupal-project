@@ -24,16 +24,6 @@ class BareHtmlPageRenderer implements BareHtmlPageRendererInterface {
    */
   protected $htmlResponseAttachmentsProcessor;
 
-  /**
-   * Constructs a new BareHtmlPageRenderer.
-   *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\Render\AttachmentsResponseProcessorInterface $html_response_attachments_processor
-   *   The HTML response attachments processor service.
-   * @param \Drupal\Core\Extension\ThemeSettingsProvider|null $themeSettingsProvider
-   *   The theme settings provider service.
-   */
   public function __construct(
     RendererInterface $renderer,
     AttachmentsResponseProcessorInterface $html_response_attachments_processor,

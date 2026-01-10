@@ -19,12 +19,6 @@ class MigrateLookup implements MigrateLookupInterface {
    */
   protected $migrationPluginManager;
 
-  /**
-   * Constructs a MigrateLookup object.
-   *
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
-   *   The migration plugin manager.
-   */
   public function __construct(MigrationPluginManagerInterface $migration_plugin_manager) {
     $this->migrationPluginManager = $migration_plugin_manager;
   }

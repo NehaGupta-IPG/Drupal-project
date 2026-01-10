@@ -63,26 +63,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    */
   protected $messenger;
 
-  /**
-   * Constructs the SystemTestController.
-   *
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock service.
-   * @param \Drupal\Core\Lock\LockBackendInterface $persistent_lock
-   *   The persistent lock service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger service.
-   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch|null $killSwitch
-   *   The page cache kill switch. This is here to test nullable types with
-   *   \Drupal\Core\DependencyInjection\AutowireTrait::create().
-   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch|null $killSwitch2
-   *   The page cache kill switch. This is here to test nullable types with
-   *   \Drupal\Core\DependencyInjection\AutowireTrait::create().
-   */
   public function __construct(
     #[Autowire(service: 'lock')]
     LockBackendInterface $lock,

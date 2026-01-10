@@ -21,16 +21,6 @@ class NodePreviewController extends EntityViewController {
    */
   protected $entityRepository;
 
-  /**
-   * Creates a NodeViewController object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, EntityRepositoryInterface $entity_repository) {
     parent::__construct($entity_type_manager, $renderer);
     $this->entityRepository = $entity_repository;

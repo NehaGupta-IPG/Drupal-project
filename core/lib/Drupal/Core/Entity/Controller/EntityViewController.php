@@ -29,14 +29,6 @@ class EntityViewController implements ContainerInjectionInterface, TrustedCallba
    */
   protected $renderer;
 
-  /**
-   * Creates an EntityViewController object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer) {
     $this->entityTypeManager = $entity_type_manager;
     $this->renderer = $renderer;

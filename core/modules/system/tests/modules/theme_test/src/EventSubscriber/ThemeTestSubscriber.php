@@ -40,14 +40,6 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
    */
   protected $renderer;
 
-  /**
-   * Constructs a new ThemeTestSubscriber.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $current_route_match
-   *   The route match handler.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
   public function __construct(RouteMatchInterface $current_route_match, RendererInterface $renderer) {
     $this->currentRouteMatch = $current_route_match;
     $this->renderer = $renderer;

@@ -104,26 +104,6 @@ class Url implements TrustedCallbackInterface {
    */
   protected $internalPath;
 
-  /**
-   * Constructs a new Url object.
-   *
-   * In most cases, use Url::fromRoute() or Url::fromUri() rather than
-   * constructing Url objects directly in order to avoid ambiguity and make your
-   * code more self-documenting.
-   *
-   * @param string $route_name
-   *   The name of the route.
-   * @param array $route_parameters
-   *   (optional) An associative array of parameter names and values.
-   * @param array $options
-   *   See \Drupal\Core\Url::fromUri() for details.
-   *
-   * @see static::fromRoute()
-   * @see static::fromUri()
-   *
-   * @todo Update this documentation for non-routed URIs in
-   *   https://www.drupal.org/node/2346787
-   */
   public function __construct($route_name, $route_parameters = [], $options = []) {
     $this->routeName = $route_name;
     $this->routeParameters = $route_parameters;

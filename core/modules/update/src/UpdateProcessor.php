@@ -84,26 +84,6 @@ class UpdateProcessor implements UpdateProcessorInterface {
    */
   protected array $fetchTasks;
 
-  /**
-   * Constructs an UpdateProcessor.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Queue\QueueFactory $queue_factory
-   *   The queue factory.
-   * @param \Drupal\update\UpdateFetcherInterface $update_fetcher
-   *   The update fetcher service.
-   * @param \Drupal\Core\State\StateInterface $state_store
-   *   The state service.
-   * @param \Drupal\Core\PrivateKey $private_key
-   *   The private key factory service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key/value factory.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_expirable_factory
-   *   The expirable key/value factory.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     ConfigFactoryInterface $config_factory,
     QueueFactory $queue_factory,

@@ -29,12 +29,6 @@ class ViewsUIController extends ControllerBase {
    */
   protected $viewsData;
 
-  /**
-   * Constructs a new \Drupal\views_ui\Controller\ViewsUIController object.
-   *
-   * @param \Drupal\views\ViewsData $views_data
-   *   The Views data cache object.
-   */
   public function __construct(ViewsData $views_data) {
     $this->viewsData = $views_data;
   }

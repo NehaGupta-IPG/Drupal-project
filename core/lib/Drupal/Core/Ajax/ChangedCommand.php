@@ -32,14 +32,6 @@ class ChangedCommand implements CommandInterface {
    */
   protected $asterisk;
 
-  /**
-   * Constructs a ChangedCommand object.
-   *
-   * @param string $selector
-   *   CSS selector for elements to be marked as changed.
-   * @param string $asterisk
-   *   CSS selector for elements to which an asterisk will be appended.
-   */
   public function __construct($selector, $asterisk = '') {
     $this->selector = $selector;
     $this->asterisk = $asterisk;

@@ -29,15 +29,6 @@ class QueryFactory implements QueryFactoryInterface {
    */
   protected $namespaces;
 
-  /**
-   * Constructs a QueryFactory object.
-   *
-   * Initializes the list of namespaces used to locate query
-   * classes for different entity types.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection used by the entity query.
-   */
   public function __construct(Connection $connection) {
     $this->connection = $connection;
     $this->namespaces = QueryBase::getNamespaces($this);

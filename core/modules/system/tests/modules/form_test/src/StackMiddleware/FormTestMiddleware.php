@@ -20,12 +20,6 @@ class FormTestMiddleware implements HttpKernelInterface {
    */
   protected $httpKernel;
 
-  /**
-   * Constructs a FormTestMiddleware object.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The decorated kernel.
-   */
   public function __construct(HttpKernelInterface $http_kernel) {
     $this->httpKernel = $http_kernel;
   }

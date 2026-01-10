@@ -31,14 +31,6 @@ class FileTranslation extends StaticTranslation {
    */
   protected $fileSystem;
 
-  /**
-   * Constructs a StaticTranslation object.
-   *
-   * @param string $directory
-   *   The directory to retrieve file translations from.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file system service.
-   */
   public function __construct($directory, FileSystemInterface $file_system) {
     parent::__construct();
     $this->directory = $directory;

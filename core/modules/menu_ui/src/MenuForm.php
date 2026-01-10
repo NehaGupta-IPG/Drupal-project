@@ -63,18 +63,6 @@ class MenuForm extends EntityForm {
    */
   protected $overviewTreeForm = ['#tree' => TRUE];
 
-  /**
-   * Constructs a MenuForm object.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
-   *   The menu link manager.
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree
-   *   The menu tree service.
-   * @param \Drupal\Core\Utility\LinkGeneratorInterface $link_generator
-   *   The link generator.
-   * @param \Drupal\menu_link_content\MenuLinkContentStorageInterface $menu_link_content_storage
-   *   The menu link content storage handler.
-   */
   public function __construct(MenuLinkManagerInterface $menu_link_manager, MenuLinkTreeInterface $menu_tree, LinkGeneratorInterface $link_generator, MenuLinkContentStorageInterface $menu_link_content_storage) {
     $this->menuLinkManager = $menu_link_manager;
     $this->menuTree = $menu_tree;

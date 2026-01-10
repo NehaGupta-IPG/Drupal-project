@@ -39,18 +39,6 @@ class DatabaseStorage extends StorageBase {
    */
   protected $table;
 
-  /**
-   * Overrides Drupal\Core\KeyValueStore\StorageBase::__construct().
-   *
-   * @param string $collection
-   *   The name of the collection holding key and value pairs.
-   * @param \Drupal\Component\Serialization\SerializationInterface $serializer
-   *   The serialization class to use.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection to use.
-   * @param string $table
-   *   The name of the SQL table to use, defaults to key_value.
-   */
   public function __construct($collection, SerializationInterface $serializer, Connection $connection, $table = 'key_value') {
     parent::__construct($collection);
     $this->serializer = $serializer;

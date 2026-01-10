@@ -29,14 +29,6 @@ class ViewsData {
    */
   protected $moderationInformation;
 
-  /**
-   * Creates a new ViewsData instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
-   *   The moderation information.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ModerationInformationInterface $moderation_information) {
     $this->entityTypeManager = $entity_type_manager;
     $this->moderationInformation = $moderation_information;

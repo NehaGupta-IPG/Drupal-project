@@ -19,12 +19,6 @@ class BlockContent extends DeriverBase implements ContainerDeriverInterface {
    */
   protected $blockContentStorage;
 
-  /**
-   * Constructs a BlockContent object.
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_content_storage
-   *   The content block storage.
-   */
   public function __construct(EntityStorageInterface $block_content_storage) {
     $this->blockContentStorage = $block_content_storage;
   }

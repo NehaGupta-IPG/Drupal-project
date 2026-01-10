@@ -33,9 +33,6 @@ class OverviewTerms extends EntityForm {
    */
   protected EntityListBuilderInterface $termListBuilder;
 
-  /**
-   * Constructs an OverviewTerms object.
-   */
   public function __construct(
     ModuleHandlerInterface $module_handler,
     EntityTypeManagerInterface $entity_type_manager,

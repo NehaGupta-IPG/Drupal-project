@@ -18,24 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class NodeViewsData extends EntityViewsData {
 
-  /**
-   * Constructs an NodeViewsData object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type to provide views integration for.
-   * @param \Drupal\Core\Entity\Sql\SqlEntityStorageInterface $storage_controller
-   *   The storage handler used for this entity type.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
-   *   The translation manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
-   *   The module extension list.
-   */
   public function __construct(
     EntityTypeInterface $entity_type,
     SqlEntityStorageInterface $storage_controller,

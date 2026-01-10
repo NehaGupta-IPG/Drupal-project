@@ -27,16 +27,6 @@ class EntityRouteHelper {
    */
   protected array $contentEntityPaths;
 
-  /**
-   * EntityRouteHelper constructor.
-   *
-   * @param \Drupal\Core\Routing\CurrentRouteMatch $routeMatch
-   *   The route match.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   The cache backend.
-   */
   public function __construct(
     protected CurrentRouteMatch $routeMatch,
     protected EntityTypeManagerInterface $entityTypeManager,

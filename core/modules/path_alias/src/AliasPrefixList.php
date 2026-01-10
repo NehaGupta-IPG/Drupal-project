@@ -26,20 +26,6 @@ class AliasPrefixList extends CacheCollector implements AliasPrefixListInterface
    */
   protected $pathAliasRepository;
 
-  /**
-   * Constructs an AliasPrefixList object.
-   *
-   * @param string $cid
-   *   The cache id to use.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state keyvalue store.
-   * @param \Drupal\path_alias\AliasRepositoryInterface $alias_repository
-   *   The path alias repository.
-   */
   public function __construct($cid, CacheBackendInterface $cache, LockBackendInterface $lock, StateInterface $state, AliasRepositoryInterface $alias_repository) {
     parent::__construct($cid, $cache, $lock);
     $this->state = $state;

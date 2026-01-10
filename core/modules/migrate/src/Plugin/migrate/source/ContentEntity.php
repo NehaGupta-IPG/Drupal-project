@@ -88,9 +88,6 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
     'add_revision_id' => TRUE,
   ];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(
     array $configuration,
     string $plugin_id,

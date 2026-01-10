@@ -41,20 +41,6 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
    */
   protected $pathMatcher;
 
-  /**
-   * Constructs a LanguageBlock object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
-   *   The path matcher.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, LanguageManagerInterface $language_manager, PathMatcherInterface $path_matcher) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->languageManager = $language_manager;

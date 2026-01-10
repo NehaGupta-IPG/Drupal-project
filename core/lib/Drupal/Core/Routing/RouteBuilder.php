@@ -81,22 +81,6 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
    */
   protected $checkProvider;
 
-  /**
-   * Constructs the RouteBuilder using the passed MatcherDumperInterface.
-   *
-   * @param \Drupal\Core\Routing\MatcherDumperInterface $dumper
-   *   The matcher dumper used to store the route information.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
-   *   The event dispatcher to notify of routes.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
-   *   The controller resolver.
-   * @param \Drupal\Core\Access\CheckProviderInterface $check_provider
-   *   The check provider.
-   */
   public function __construct(MatcherDumperInterface $dumper, LockBackendInterface $lock, EventDispatcherInterface $dispatcher, ModuleHandlerInterface $module_handler, ControllerResolverInterface $controller_resolver, CheckProviderInterface $check_provider) {
     $this->dumper = $dumper;
     $this->lock = $lock;

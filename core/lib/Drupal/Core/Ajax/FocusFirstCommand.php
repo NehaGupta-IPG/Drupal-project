@@ -28,12 +28,6 @@ class FocusFirstCommand implements CommandInterface {
    */
   protected $selector;
 
-  /**
-   * Constructs an FocusFirstCommand object.
-   *
-   * @param string $selector
-   *   The selector of the container with tabbable elements.
-   */
   public function __construct($selector) {
     $this->selector = $selector;
   }

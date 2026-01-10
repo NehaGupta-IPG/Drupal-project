@@ -12,9 +12,6 @@ use Drupal\views\ViewEntityInterface;
  */
 class Display extends ViewsFormBase {
 
-  /**
-   * Constructs a new Display object.
-   */
   public function __construct($type = NULL) {
     $this->setType($type);
   }

@@ -11,22 +11,6 @@ namespace Drupal\Core\Hook\OrderOperation;
  */
 class BeforeOrAfter extends OrderOperation {
 
-  /**
-   * Constructor.
-   *
-   * @param string $identifier
-   *   Identifier of the implementation to move to a new position. The format
-   *   is the class followed by "::" then the method name. For example,
-   *   "Drupal\my_module\Hook\MyModuleHooks::methodName".
-   * @param list<string> $modulesToOrderAgainst
-   *   Module names of listeners to order against.
-   * @param list<string> $identifiersToOrderAgainst
-   *   Identifiers of listeners to order against.
-   *   The format is "$class::$method".
-   * @param bool $isAfter
-   *   TRUE, if the listener to move should be moved after the listener to order
-   *   against, FALSE if it should be moved before.
-   */
   public function __construct(
     protected readonly string $identifier,
     protected readonly array $modulesToOrderAgainst,

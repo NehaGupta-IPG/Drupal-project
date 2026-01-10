@@ -71,18 +71,6 @@ class EntityAccessChecker {
    */
   protected $latestRevisionCheck = NULL;
 
-  /**
-   * EntityAccessChecker constructor.
-   *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON:API resource type repository.
-   * @param \Symfony\Component\Routing\RouterInterface $router
-   *   The router.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   */
   public function __construct(ResourceTypeRepositoryInterface $resource_type_repository, RouterInterface $router, AccountInterface $account, EntityRepositoryInterface $entity_repository) {
     $this->resourceTypeRepository = $resource_type_repository;
     $this->router = $router;

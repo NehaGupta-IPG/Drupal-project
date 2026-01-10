@@ -31,29 +31,6 @@ final class InputConfigurator {
    */
   private ?array $values = NULL;
 
-  /**
-   * @param array<string, array<string, mixed>> $definitions
-   *   The recipe's input definitions, keyed by name. This is an array of arrays
-   *   where each sub-array has, at minimum:
-   *   - `description`: A short, human-readable description of the input (e.g.,
-   *      what the recipe uses it for).
-   *   - `data_type`: A primitive data type known to the typed data system.
-   *   - `constraints`: An optional array of validation constraints to apply
-   *     to the value. This should be an associative array of arrays, keyed by
-   *     constraint name, where each sub-array is a set of options for that
-   *     constraint (identical to the way validation constraints are defined in
-   *     config schema).
-   *   - `default`: A default value for the input, if it cannot be collected
-   *     the user. See ::getDefaultValue() for more information.
-   * @param \Drupal\Core\Recipe\RecipeConfigurator $dependencies
-   *   The recipes that this recipe depends on.
-   * @param string $prefix
-   *   A prefix for each input definition, to give each one a unique name
-   *   when collecting input for multiple recipes. Usually this is the unique
-   *   name of the recipe.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
-   *   The typed data manager service.
-   */
   public function __construct(
     array $definitions,
     private readonly RecipeConfigurator $dependencies,

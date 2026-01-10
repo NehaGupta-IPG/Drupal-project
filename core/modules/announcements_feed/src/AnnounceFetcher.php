@@ -35,20 +35,6 @@ final class AnnounceFetcher {
    */
   protected KeyValueStoreInterface $tempStore;
 
-  /**
-   * Construct an AnnounceFetcher service.
-   *
-   * @param \GuzzleHttp\ClientInterface $httpClient
-   *   The http client.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
-   *   The config factory service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $temp_store
-   *   The tempstore factory service.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger service.
-   * @param string $feedUrl
-   *   The feed url path.
-   */
   public function __construct(
     protected ClientInterface $httpClient,
     ConfigFactoryInterface $config,

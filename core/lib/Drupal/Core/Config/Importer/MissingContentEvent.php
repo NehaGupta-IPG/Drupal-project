@@ -18,12 +18,6 @@ class MissingContentEvent extends Event {
    */
   protected $missingContent;
 
-  /**
-   * Constructs a configuration import missing content event object.
-   *
-   * @param array $missing_content
-   *   Missing content information.
-   */
   public function __construct(array $missing_content) {
     $this->missingContent = $missing_content;
   }

@@ -48,14 +48,6 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
     $this->displayContext = str_replace(['entity_', '_mode'], '', $this->entityType->id());
   }
 
-  /**
-   * Constructs a EntityDisplayModeFormBase object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
-   *   The entity type bundle service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepository $entityDisplayRepository
-   *   The entity display repository.
-   */
   public function __construct(protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {}
 
   /**

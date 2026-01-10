@@ -43,9 +43,6 @@ class PhpMail implements MailInterface {
    */
   protected $request;
 
-  /**
-   * PhpMail constructor.
-   */
   public function __construct() {
     $this->configFactory = \Drupal::configFactory();
     $this->request = \Drupal::request();

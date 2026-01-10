@@ -34,14 +34,6 @@ class MetadataBubblingUrlGenerator implements UrlGeneratorInterface {
    */
   protected $renderer;
 
-  /**
-   * Constructs a new bubbling URL generator service.
-   *
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
-   *   The non-bubbling URL generator.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   */
   public function __construct(UrlGeneratorInterface $url_generator, RendererInterface $renderer) {
     $this->urlGenerator = $url_generator;
     $this->renderer = $renderer;

@@ -24,14 +24,6 @@ class ContentTranslationMetadataWrapper implements ContentTranslationMetadataWra
    */
   protected $handler;
 
-  /**
-   * Initializes an instance of the content translation metadata handler.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $translation
-   *   The entity translation to be wrapped.
-   * @param ContentTranslationHandlerInterface $handler
-   *   The content translation handler.
-   */
   public function __construct(EntityInterface $translation, ContentTranslationHandlerInterface $handler) {
     $this->translation = $translation;
     $this->handler = $handler;

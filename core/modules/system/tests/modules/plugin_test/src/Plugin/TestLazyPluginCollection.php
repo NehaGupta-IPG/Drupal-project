@@ -19,12 +19,6 @@ class TestLazyPluginCollection extends LazyPluginCollection {
    */
   protected $manager;
 
-  /**
-   * Constructs a TestLazyPluginCollection object.
-   *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
-   *   The plugin manager that handles test plugins.
-   */
   public function __construct(PluginManagerInterface $manager) {
     $this->manager = $manager;
 

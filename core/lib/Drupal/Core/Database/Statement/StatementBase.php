@@ -65,18 +65,6 @@ abstract class StatementBase implements \Iterator, StatementInterface {
     'column' => 0,
   ];
 
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   Drupal database connection object.
-   * @param object $clientConnection
-   *   Client database connection object, for example \PDO.
-   * @param string $queryString
-   *   The query string.
-   * @param bool $rowCountEnabled
-   *   (optional) Enables counting the rows matched. Defaults to FALSE.
-   */
   public function __construct(
     protected readonly Connection $connection,
     protected readonly object $clientConnection,

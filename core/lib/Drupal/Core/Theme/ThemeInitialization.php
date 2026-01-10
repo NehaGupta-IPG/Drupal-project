@@ -50,20 +50,6 @@ class ThemeInitialization implements ThemeInitializationInterface {
    */
   protected $moduleHandler;
 
-  /**
-   * Constructs a new ThemeInitialization object.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler to use to load modules.
-   * @param \Psr\Container\ContainerInterface $themeEngines
-   *   The theme engines.
-   */
   public function __construct(
     #[Autowire(param: 'app.root')]
     $root,

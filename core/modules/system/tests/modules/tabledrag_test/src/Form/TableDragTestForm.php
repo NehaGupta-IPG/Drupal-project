@@ -21,12 +21,6 @@ class TableDragTestForm extends FormBase {
    */
   protected $state;
 
-  /**
-   * Constructs a TableDragTestForm object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   */
   public function __construct(StateInterface $state) {
     $this->state = $state;
   }

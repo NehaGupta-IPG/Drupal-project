@@ -36,14 +36,6 @@ class JsonapiMaintenanceModeSubscriber implements EventSubscriberInterface {
    */
   protected $config;
 
-  /**
-   * Constructs a new JsonapiMaintenanceModeSubscriber.
-   *
-   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenance_mode
-   *   The maintenance mode.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   */
   public function __construct(MaintenanceModeInterface $maintenance_mode, ConfigFactoryInterface $config_factory) {
     $this->maintenanceMode = $maintenance_mode;
     $this->config = $config_factory;

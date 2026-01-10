@@ -19,14 +19,6 @@ class FileImageDimensionsConstraintValidator extends BaseFileConstraintValidator
 
   use StringTranslationTrait;
 
-  /**
-   * Creates a new FileImageDimensionsConstraintValidator.
-   *
-   * @param \Drupal\Core\Image\ImageFactory $imageFactory
-   *   The image factory.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   */
   public function __construct(
     protected ImageFactory $imageFactory,
     protected MessengerInterface $messenger,

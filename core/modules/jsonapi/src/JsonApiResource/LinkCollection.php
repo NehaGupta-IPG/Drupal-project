@@ -34,16 +34,6 @@ final class LinkCollection implements \IteratorAggregate {
    */
   protected $context;
 
-  /**
-   * LinkCollection constructor.
-   *
-   * @param \Drupal\jsonapi\JsonApiResource\Link[] $links
-   *   An associated array of key names and JSON:API Link objects.
-   * @param \Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel|\Drupal\jsonapi\JsonApiResource\ResourceObject|\Drupal\jsonapi\JsonApiResource\Relationship $context
-   *   (internal use only) The context object. Use the self::withContext()
-   *   method to establish a context. This should be done automatically when
-   *   a LinkCollection is passed into a context object.
-   */
   public function __construct(array $links, $context = NULL) {
     assert(Inspector::assertAll(function ($key) {
       return static::validKey($key);

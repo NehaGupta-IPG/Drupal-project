@@ -30,12 +30,6 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
    */
   protected $fieldManager;
 
-  /**
-   * RelationshipNormalizer constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
-   *   The entity field manager.
-   */
   public function __construct(EntityFieldManagerInterface $field_manager) {
     $this->fieldManager = $field_manager;
   }

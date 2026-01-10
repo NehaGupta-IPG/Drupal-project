@@ -26,12 +26,6 @@ class RequiredConfigDependenciesConstraintValidator extends ConstraintValidator 
    */
   protected EntityTypeManagerInterface $entityTypeManager;
 
-  /**
-   * Constructs a RequiredConfigDependenciesConstraintValidator object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
   }

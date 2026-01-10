@@ -34,12 +34,6 @@ class TestSubscriber implements EventSubscriberInterface {
    */
   protected $state;
 
-  /**
-   * Creates a TestSubscriber object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   */
   public function __construct(StateInterface $state) {
     $this->state = $state;
   }

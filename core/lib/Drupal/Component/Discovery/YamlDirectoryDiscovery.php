@@ -41,20 +41,6 @@ class YamlDirectoryDiscovery implements DiscoverableInterface {
    */
   protected $idKey;
 
-  /**
-   * Constructs a YamlDirectoryDiscovery object.
-   *
-   * @param array $directories
-   *   An array of directories to scan, keyed by the provider. The value can
-   *   either be a string or an array of strings. The string values should be
-   *   the path of a directory to scan.
-   * @param string $file_cache_key_suffix
-   *   The file cache key suffix. This should be unique for each type of
-   *   discovery.
-   * @param string $key
-   *   (optional) The key contained in the discovered data that identifies it.
-   *   Defaults to 'id'.
-   */
   public function __construct(array $directories, $file_cache_key_suffix, $key = 'id') {
     $this->directories = $directories;
     $this->fileCacheKeySuffix = $file_cache_key_suffix;

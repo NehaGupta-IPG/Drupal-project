@@ -40,18 +40,6 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
    */
   protected ThemeExtensionList $themeList;
 
-  /**
-   * Constructs the ConfigImportSubscriber.
-   *
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
-   *   The theme extension list.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
-   *   The module extension list.
-   * @param \Traversable $uninstallValidators
-   *   The uninstall validator services.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   */
   public function __construct(
     ThemeExtensionList $theme_extension_list,
     ModuleExtensionList $extension_list_module,

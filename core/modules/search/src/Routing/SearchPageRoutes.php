@@ -19,12 +19,6 @@ class SearchPageRoutes implements ContainerInjectionInterface {
    */
   protected $searchPageRepository;
 
-  /**
-   * Constructs a new search route subscriber.
-   *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
-   *   The search page repository.
-   */
   public function __construct(SearchPageRepositoryInterface $search_page_repository) {
     $this->searchPageRepository = $search_page_repository;
   }

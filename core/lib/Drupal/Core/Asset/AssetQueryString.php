@@ -20,14 +20,6 @@ class AssetQueryString implements AssetQueryStringInterface {
    */
   const STATE_KEY = 'asset.css_js_query_string';
 
-  /**
-   * Creates a new AssetQueryString instance.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   State service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   System time service.
-   */
   public function __construct(
     protected StateInterface $state,
     protected TimeInterface $time,

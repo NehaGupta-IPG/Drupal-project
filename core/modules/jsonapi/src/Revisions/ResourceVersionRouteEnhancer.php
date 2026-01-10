@@ -69,12 +69,6 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
    */
   protected $versionNegotiator;
 
-  /**
-   * ResourceVersionRouteEnhancer constructor.
-   *
-   * @param \Drupal\jsonapi\Revisions\VersionNegotiator $version_negotiator_manager
-   *   The version negotiator.
-   */
   public function __construct(VersionNegotiator $version_negotiator_manager) {
     $this->versionNegotiator = $version_negotiator_manager;
   }

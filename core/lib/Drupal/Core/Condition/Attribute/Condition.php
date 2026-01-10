@@ -27,24 +27,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Condition extends Plugin {
 
-  /**
-   * Constructs a Condition attribute.
-   *
-   * @param string $id
-   *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
-   *   (optional) The human-readable name of the condition.
-   * @param string|null $module
-   *   (optional) The name of the module providing the type.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $category
-   *   (optional) The category under which the condition should be listed in the
-   *   UI.
-   * @param array $context_definitions
-   *   (optional) An array of context definitions describing the context used by
-   *   the plugin.
-   * @param class-string|null $deriver
-   *   (optional) The deriver class.
-   */
   public function __construct(
     public readonly string $id,
     public readonly ?TranslatableMarkup $label = NULL,

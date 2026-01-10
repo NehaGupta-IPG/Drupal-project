@@ -14,12 +14,6 @@ class CalculatedPermissions implements CalculatedPermissionsInterface {
   use CacheableDependencyTrait;
   use CalculatedPermissionsTrait;
 
-  /**
-   * Constructs a new CalculatedPermissions.
-   *
-   * @param \Drupal\Core\Session\CalculatedPermissionsInterface $source
-   *   The calculated permission to create a value object from.
-   */
   public function __construct(CalculatedPermissionsInterface $source) {
     foreach ($source->getItems() as $item) {
       $this->items[$item->getScope()][$item->getIdentifier()] = $item;

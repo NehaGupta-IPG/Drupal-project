@@ -14,12 +14,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class EventSubscriber implements EventSubscriberInterface {
 
-  /**
-   * Constructs the Event Subscriber object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state key value store.
-   */
   public function __construct(private StateInterface $state) {
   }
 

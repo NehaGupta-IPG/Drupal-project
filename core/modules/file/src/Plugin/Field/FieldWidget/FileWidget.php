@@ -33,9 +33,6 @@ class FileWidget extends WidgetBase {
    */
   protected ElementInfoManagerInterface $elementInfo;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
     $this->elementInfo = $element_info;

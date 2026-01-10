@@ -49,17 +49,6 @@ class PathChangedHelper {
    */
   protected Url $oldUrl;
 
-  /**
-   * Constructs a PathChangedHelper object.
-   *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   A route match object, used for the route name and the parameters.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   A request object, used for the query parameters.
-   *
-   * @throws \InvalidArgumentException
-   *   The route name from $route_match must end with ".bc".
-   */
   public function __construct(RouteMatchInterface $route_match, Request $request) {
     $bc_route_name = $route_match->getRouteName();
     if (!str_ends_with($bc_route_name, '.bc')) {

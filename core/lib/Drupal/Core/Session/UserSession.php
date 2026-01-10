@@ -68,12 +68,6 @@ class UserSession implements AccountInterface {
    */
   protected $timezone;
 
-  /**
-   * Constructs a new user session.
-   *
-   * @param array $values
-   *   Array of initial values for the user session.
-   */
   public function __construct(array $values = []) {
     foreach ($values as $key => $value) {
       $this->$key = $value;

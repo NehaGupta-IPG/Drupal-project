@@ -24,9 +24,6 @@ class DateTimeComputed extends TypedData {
    */
   protected $date = NULL;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
     parent::__construct($definition, $name, $parent);
     if (!$definition->getSetting('date source')) {

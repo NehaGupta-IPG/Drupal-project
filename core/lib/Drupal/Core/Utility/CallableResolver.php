@@ -36,12 +36,6 @@ use Drupal\Core\DependencyInjection\ClassResolverInterface;
  */
 class CallableResolver {
 
-  /**
-   * Constructs a CallableResolver object.
-   *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
-   *   The class resolver.
-   */
   public function __construct(
     protected readonly ClassResolverInterface $classResolver,
   ) {

@@ -7,15 +7,6 @@ namespace Drupal\Component\FileSystem;
  */
 class RegexDirectoryIterator extends \RegexIterator {
 
-  /**
-   * RegexDirectoryIterator constructor.
-   *
-   * @param string $path
-   *   The path to scan.
-   * @param string $regex
-   *   The regular expression to match, including delimiters. For example,
-   *   /\.yml$/ would list only files ending in .yml.
-   */
   public function __construct($path, $regex) {
     parent::__construct(new \FilesystemIterator($path), $regex);
   }

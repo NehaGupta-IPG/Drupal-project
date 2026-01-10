@@ -19,17 +19,6 @@ class YamlDiscoveryDecorator extends YamlDiscovery {
    */
   protected $decorated;
 
-  /**
-   * Constructs a YamlDiscoveryDecorator object.
-   *
-   * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $decorated
-   *   The discovery object that is being decorated.
-   * @param string $name
-   *   The file name suffix to use for discovery; for instance, 'test' will
-   *   become 'MODULE.test.yml'.
-   * @param array $directories
-   *   An array of directories to scan.
-   */
   public function __construct(DiscoveryInterface $decorated, $name, array $directories) {
     parent::__construct($name, $directories);
 

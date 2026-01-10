@@ -15,12 +15,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class AjaxResponseSubscriber implements EventSubscriberInterface {
 
-  /**
-   * Constructs an AjaxResponseSubscriber object.
-   *
-   * @param \Closure $processorClosure
-   *   The AJAX response attachments processor service, wrapped in a closure.
-   */
   public function __construct(
     #[AutowireServiceClosure('ajax_response.attachments_processor')]
     protected \Closure $processorClosure,

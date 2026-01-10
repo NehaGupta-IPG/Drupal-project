@@ -14,9 +14,6 @@ use Drupal\user\UserInterface;
  */
 class NodeUserHooks {
 
-  /**
-   * NodeHooks constructor.
-   */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected NodeBulkUpdate $nodeBulkUpdate,

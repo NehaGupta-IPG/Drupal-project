@@ -67,22 +67,6 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
    */
   protected $viewArguments;
 
-  /**
-   * Constructs a ViewsForm object.
-   *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   The class resolver to get the subform form objects.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
-   *   The URL generator to generate the form action.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack.
-   * @param string $view_id
-   *   The ID of the view.
-   * @param string $view_display_id
-   *   The ID of the active view's display.
-   * @param string[] $view_args
-   *   The arguments passed to the active view.
-   */
   public function __construct(ClassResolverInterface $class_resolver, UrlGeneratorInterface $url_generator, RequestStack $requestStack, $view_id, $view_display_id, array $view_args) {
     $this->classResolver = $class_resolver;
     $this->urlGenerator = $url_generator;

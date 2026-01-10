@@ -54,19 +54,6 @@ class Query extends QueryBase implements QueryInterface {
    */
   protected $connection;
 
-  /**
-   * Constructs a query object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param string $conjunction
-   *   - AND: all of the conditions on the query need to match.
-   *   - OR: at least one of the conditions on the query need to match.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection to run the query against.
-   * @param array $namespaces
-   *   List of potential namespaces of the classes belonging to this query.
-   */
   public function __construct(EntityTypeInterface $entity_type, $conjunction, Connection $connection, array $namespaces) {
     parent::__construct($entity_type, $conjunction, $namespaces);
     $this->connection = $connection;

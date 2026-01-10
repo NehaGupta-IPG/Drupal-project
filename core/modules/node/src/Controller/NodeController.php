@@ -40,16 +40,6 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    */
   protected $entityRepository;
 
-  /**
-   * Constructs a NodeController object.
-   *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
-   *   The date formatter service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   */
   public function __construct(DateFormatterInterface $date_formatter, RendererInterface $renderer, EntityRepositoryInterface $entity_repository) {
     $this->dateFormatter = $date_formatter;
     $this->renderer = $renderer;

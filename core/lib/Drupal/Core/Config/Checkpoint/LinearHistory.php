@@ -36,14 +36,6 @@ final class LinearHistory implements CheckpointListInterface {
    */
   private array $checkpoints;
 
-  /**
-   * Constructs a checkpoints object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(
     private readonly StateInterface $state,
     private readonly TimeInterface $time,

@@ -18,12 +18,6 @@ class NullNormalizer extends NormalizerBase {
    */
   protected array $supportedTypes = ['*' => FALSE];
 
-  /**
-   * Constructs a NullNormalizer object.
-   *
-   * @param string|array $supported_interface_of_class
-   *   The supported interface(s) or class(es).
-   */
   public function __construct($supported_interface_of_class) {
     $this->supportedTypes = [$supported_interface_of_class => TRUE];
   }

@@ -97,24 +97,6 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    */
   protected $logger;
 
-  /**
-   * Constructs a new FieldBlock.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   * @param \Drupal\Core\Field\FormatterPluginManager $formatter_manager
-   *   The formatter manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, FormatterPluginManager $formatter_manager, ModuleHandlerInterface $module_handler, LoggerInterface $logger) {
     $this->entityFieldManager = $entity_field_manager;
     $this->formatterManager = $formatter_manager;

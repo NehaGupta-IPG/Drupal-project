@@ -48,16 +48,6 @@ class ChooseBlockController implements ContainerInjectionInterface {
    */
   protected $currentUser;
 
-  /**
-   * ChooseBlockController constructor.
-   *
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
-   *   The block manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   */
   public function __construct(BlockManagerInterface $block_manager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user) {
     $this->blockManager = $block_manager;
     $this->entityTypeManager = $entity_type_manager;

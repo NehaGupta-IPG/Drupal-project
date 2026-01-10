@@ -20,18 +20,6 @@ use Drupal\node\NodeInterface;
  */
 class DefaultMenuLinkTreeManipulators {
 
-  /**
-   * Constructs a \Drupal\Core\Menu\DefaultMenuLinkTreeManipulators object.
-   *
-   * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
-   *   The access manager.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   */
   public function __construct(
     protected AccessManagerInterface $accessManager,
     protected AccountInterface $account,

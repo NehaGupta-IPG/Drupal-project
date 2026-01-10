@@ -75,12 +75,6 @@ class Condition implements ConditionInterface, \Countable {
    */
   protected $stringVersion;
 
-  /**
-   * Constructs a Condition object.
-   *
-   * @param string $conjunction
-   *   The operator to use to combine conditions: 'AND' or 'OR'.
-   */
   public function __construct($conjunction) {
     $this->conditions['#conjunction'] = $conjunction;
   }

@@ -7,9 +7,6 @@ namespace Drupal\Core\Field;
  */
 class FallbackFieldTypeCategory extends FieldTypeCategory {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, string $plugin_id, array $plugin_definition) {
     $plugin_id = $configuration['unique_identifier'];
     $plugin_definition = [

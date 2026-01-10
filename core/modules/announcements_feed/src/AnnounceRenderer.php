@@ -15,14 +15,6 @@ final class AnnounceRenderer {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs an AnnouncementRenderer object.
-   *
-   * @param \Drupal\announcements_feed\AnnounceFetcher $announceFetcher
-   *   The AnnounceFetcher service.
-   * @param string $feedLink
-   *   The feed url path.
-   */
   public function __construct(
     protected AnnounceFetcher $announceFetcher,
     protected string $feedLink,

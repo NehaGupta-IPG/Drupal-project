@@ -32,19 +32,6 @@ class MatcherDumper implements MatcherDumperInterface {
    */
   protected $tableName;
 
-  /**
-   * Construct the MatcherDumper.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection which will be used to store the route
-   *   information.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   * @param string $table
-   *   (optional) The table to store the route info in. Defaults to 'router'.
-   */
   public function __construct(
     protected Connection $connection,
     protected StateInterface $state,

@@ -19,9 +19,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 )]
 class AutowireErrorBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

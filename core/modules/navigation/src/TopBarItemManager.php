@@ -14,9 +14,6 @@ use Drupal\navigation\Attribute\TopBarItem;
  */
 final class TopBarItemManager extends DefaultPluginManager implements TopBarItemManagerInterface {
 
-  /**
-   * Constructs the object.
-   */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/TopBarItem', $namespaces, $module_handler, TopBarItemPluginInterface::class, TopBarItem::class);
     $this->alterInfo('top_bar_item');

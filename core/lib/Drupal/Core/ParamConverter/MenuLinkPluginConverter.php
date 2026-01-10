@@ -18,12 +18,6 @@ class MenuLinkPluginConverter implements ParamConverterInterface {
    */
   protected $menuLinkManager;
 
-  /**
-   * Constructs a new MenuLinkPluginConverter.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
-   *   The menu link plugin manager.
-   */
   public function __construct(MenuLinkManagerInterface $menu_link_manager) {
     $this->menuLinkManager = $menu_link_manager;
   }

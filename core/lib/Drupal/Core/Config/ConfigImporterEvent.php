@@ -15,12 +15,6 @@ class ConfigImporterEvent extends Event {
    */
   protected $configImporter;
 
-  /**
-   * Constructs ConfigImporterEvent.
-   *
-   * @param \Drupal\Core\Config\ConfigImporter $config_importer
-   *   A config import object to notify listeners about.
-   */
   public function __construct(ConfigImporter $config_importer) {
     $this->configImporter = $config_importer;
   }

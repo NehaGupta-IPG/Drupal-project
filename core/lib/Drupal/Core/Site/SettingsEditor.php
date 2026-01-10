@@ -9,13 +9,6 @@ use Drupal\Component\Utility\OpCodeCache;
  */
 final class SettingsEditor {
 
-  /**
-   * This class should not be instantiated.
-   *
-   * Use a static ::rewrite() method call instead.
-   *
-   * @see \Drupal\Core\Site\SettingsEditor::rewrite()
-   */
   private function __construct() {}
 
   /**

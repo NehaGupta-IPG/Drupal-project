@@ -24,9 +24,6 @@ class ComplexDataConstraint extends SymfonyConstraint {
    */
   public $properties;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($options = NULL) {
     // Allow skipping the 'properties' key in the options.
     if (is_array($options) && !array_key_exists('properties', $options)) {

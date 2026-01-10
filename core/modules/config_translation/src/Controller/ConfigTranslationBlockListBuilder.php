@@ -20,9 +20,6 @@ class ConfigTranslationBlockListBuilder extends ConfigTranslationEntityListBuild
    */
   protected $themes = [];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ThemeHandlerInterface $theme_handler) {
     parent::__construct($entity_type, $storage);
     $this->themes = $theme_handler->listInfo();

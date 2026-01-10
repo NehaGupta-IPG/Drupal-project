@@ -30,12 +30,6 @@ final class NoOpStager implements StagerInterface {
   use ComposerStagerExceptionTrait;
   use LoggingDecoratorTrait;
 
-  /**
-   * Constructs a Stager object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   */
   public function __construct(StateInterface $state) {
     $this->state = $state;
   }

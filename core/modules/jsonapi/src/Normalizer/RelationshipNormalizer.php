@@ -18,12 +18,6 @@ class RelationshipNormalizer extends NormalizerBase {
 
   use SchematicNormalizerTrait;
 
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resourceTypeRepository
-   *   Resource type repository.
-   */
   public function __construct(
     protected ResourceTypeRepositoryInterface $resourceTypeRepository,
   ) {}

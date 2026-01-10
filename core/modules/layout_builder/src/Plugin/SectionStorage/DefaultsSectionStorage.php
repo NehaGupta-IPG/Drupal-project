@@ -70,9 +70,6 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
    */
   protected $sampleEntityGenerator;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, SampleEntityGeneratorInterface $sample_entity_generator) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

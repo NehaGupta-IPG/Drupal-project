@@ -22,18 +22,6 @@ class Type extends StringArgument {
    */
   protected $nodeTypeStorage;
 
-  /**
-   * Constructs a new Node Type object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_type_storage
-   *   The entity storage class.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $node_type_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

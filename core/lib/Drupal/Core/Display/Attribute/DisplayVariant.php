@@ -31,16 +31,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class DisplayVariant extends Plugin {
 
-  /**
-   * Constructs a DisplayVariant plugin attribute object.
-   *
-   * @param string $id
-   *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $admin_label
-   *   The administrative label.
-   * @param class-string|null $deriver
-   *   (optional) The deriver class.
-   */
   public function __construct(
     public readonly string $id,
     public readonly TranslatableMarkup $admin_label,

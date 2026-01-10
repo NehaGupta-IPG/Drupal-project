@@ -1690,12 +1690,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
  */
 class NonAbstractFormStateDecoratorBase extends FormStateDecoratorBase {
 
-  /**
-   * Creates a new instance.
-   *
-   * @param \Drupal\Core\Form\FormStateInterface $decorated_form_state
-   *   The decorated form state.
-   */
   public function __construct(FormStateInterface $decorated_form_state) {
     $this->decoratedFormState = $decorated_form_state;
   }

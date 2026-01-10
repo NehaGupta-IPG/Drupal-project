@@ -90,12 +90,6 @@ class ActiveTheme {
    */
   protected $librariesExtend;
 
-  /**
-   * Constructs an ActiveTheme object.
-   *
-   * @param array $values
-   *   The properties of the object, keyed by the names.
-   */
   public function __construct(array $values) {
     $values += [
       'path' => '',

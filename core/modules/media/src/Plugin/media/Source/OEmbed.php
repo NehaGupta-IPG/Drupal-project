@@ -137,40 +137,6 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    */
   protected $token;
 
-  /**
-   * Constructs a new OEmbed instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
-   *   The field type plugin manager service.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger channel for media.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger service.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   The HTTP client.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
-   *   The oEmbed resource fetcher service.
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
-   *   The oEmbed URL resolver service.
-   * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
-   *   The iFrame URL helper service.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file system.
-   * @param \Drupal\Core\Utility\Token $token
-   *   The token replacement service.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory, FieldTypePluginManagerInterface $field_type_manager, LoggerInterface $logger, MessengerInterface $messenger, ClientInterface $http_client, ResourceFetcherInterface $resource_fetcher, UrlResolverInterface $url_resolver, IFrameUrlHelper $iframe_url_helper, FileSystemInterface $file_system, Token $token) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $entity_field_manager, $field_type_manager, $config_factory);
     $this->logger = $logger;

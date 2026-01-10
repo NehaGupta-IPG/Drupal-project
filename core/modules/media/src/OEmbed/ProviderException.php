@@ -20,17 +20,6 @@ class ProviderException extends \Exception {
    */
   protected $provider;
 
-  /**
-   * ProviderException constructor.
-   *
-   * @param string $message
-   *   The exception message. '@name' will be replaced with the provider name
-   *   if available, or '<unknown>' if not.
-   * @param \Drupal\media\OEmbed\Provider $provider
-   *   (optional) The provider information.
-   * @param \Throwable $previous
-   *   (optional) The previous exception, if any.
-   */
   public function __construct($message, ?Provider $provider = NULL, ?\Throwable $previous = NULL) {
     $this->provider = $provider;
     $message = str_replace('@name', $provider ? $provider->getName() : '<unknown>', $message);

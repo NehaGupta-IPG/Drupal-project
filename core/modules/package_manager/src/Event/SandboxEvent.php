@@ -12,12 +12,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 abstract class SandboxEvent extends Event {
 
-  /**
-   * Constructs a StageEvent object.
-   *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandboxManager
-   *   The stage which fired this event.
-   */
   public function __construct(public readonly SandboxManagerBase $sandboxManager) {
   }
 

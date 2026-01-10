@@ -23,12 +23,6 @@ class ViewsDataHelper {
    */
   protected $fields;
 
-  /**
-   * Constructs a ViewsData object.
-   *
-   * @param \Drupal\views\ViewsData $views_data
-   *   The views data object, containing the cached table information.
-   */
   public function __construct(ViewsData $views_data) {
     $this->data = $views_data;
   }

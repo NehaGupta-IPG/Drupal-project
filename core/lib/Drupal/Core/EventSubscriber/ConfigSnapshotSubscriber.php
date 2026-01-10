@@ -34,16 +34,6 @@ class ConfigSnapshotSubscriber implements EventSubscriberInterface {
    */
   protected $snapshotStorage;
 
-  /**
-   * Constructs the ConfigSnapshotSubscriber object.
-   *
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
-   *   The configuration manager.
-   * @param \Drupal\Core\Config\StorageInterface $source_storage
-   *   The source storage used to discover configuration changes.
-   * @param \Drupal\Core\Config\StorageInterface $snapshot_storage
-   *   The snapshot storage used to write configuration changes.
-   */
   public function __construct(ConfigManagerInterface $config_manager, StorageInterface $source_storage, StorageInterface $snapshot_storage) {
     $this->configManager = $config_manager;
     $this->sourceStorage = $source_storage;

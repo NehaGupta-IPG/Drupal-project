@@ -32,18 +32,6 @@ abstract class MigrateUpgradeFormBase extends FormBase {
    */
   protected $destinationSiteVersion;
 
-  /**
-   * Constructs the Migrate Upgrade Form Base.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
-   *   The migration plugin manager service.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempstore_private
-   *   The private tempstore factory service.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, MigrationPluginManagerInterface $migration_plugin_manager, StateInterface $state, PrivateTempStoreFactory $tempstore_private) {
     $this->configFactory = $config_factory;
     $this->migrationPluginManager = $migration_plugin_manager;

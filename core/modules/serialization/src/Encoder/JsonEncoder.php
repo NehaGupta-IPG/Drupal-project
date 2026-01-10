@@ -22,9 +22,6 @@ class JsonEncoder extends BaseJsonEncoder {
    */
   protected static $format = ['json', 'ajax'];
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(?JsonEncode $encodingImpl = NULL, ?JsonDecode $decodingImpl = NULL) {
     // Encode <, >, ', &, and " for RFC4627-compliant JSON, which may also be
     // embedded into HTML.

@@ -26,19 +26,6 @@ class TestDatabase {
    */
   protected $databasePrefix;
 
-  /**
-   * TestDatabase constructor.
-   *
-   * @param string|null $db_prefix
-   *   If not provided a new test lock is generated.
-   * @param bool $create_lock
-   *   (optional) Whether or not to create a lock file. Defaults to FALSE. If
-   *   the environment variable RUN_TESTS_CONCURRENCY is greater than 1 it will
-   *   be overridden to TRUE regardless of its initial value.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown when $db_prefix does not match the regular expression.
-   */
   public function __construct($db_prefix = NULL, bool $create_lock = FALSE) {
     if ($db_prefix === NULL) {
       $this->lockId = $this->getTestLock($create_lock);

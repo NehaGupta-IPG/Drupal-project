@@ -11,12 +11,6 @@ use Drupal\Core\Serialization\Yaml;
  */
 class InfoParserDynamic implements InfoParserInterface {
 
-  /**
-   * InfoParserDynamic constructor.
-   *
-   * @param string $root
-   *   The root directory of the Drupal installation.
-   */
   public function __construct(protected string $root) {
   }
 

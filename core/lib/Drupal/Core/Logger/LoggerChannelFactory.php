@@ -25,14 +25,6 @@ class LoggerChannelFactory implements LoggerChannelFactoryInterface {
    */
   protected $loggers = [];
 
-  /**
-   * Constructs a LoggerChannelFactory.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   (optional) The request stack.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   (optional) The current user.
-   */
   public function __construct(
     protected RequestStack $requestStack,
     protected AccountInterface $currentUser,

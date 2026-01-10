@@ -19,12 +19,6 @@ class ThemeCacheContext implements CacheContextInterface {
    */
   protected $themeManager;
 
-  /**
-   * Constructs a new ThemeCacheContext service.
-   *
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
-   *   The theme manager.
-   */
   public function __construct(ThemeManagerInterface $theme_manager) {
     $this->themeManager = $theme_manager;
   }

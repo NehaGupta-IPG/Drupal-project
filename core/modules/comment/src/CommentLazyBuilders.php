@@ -63,22 +63,6 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
    */
   protected $renderer;
 
-  /**
-   * Constructs a new CommentLazyBuilders object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityFormBuilderInterface $entity_form_builder
-   *   The entity form builder service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current logged in user.
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
-   *   The comment manager service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, AccountInterface $current_user, CommentManagerInterface $comment_manager, ModuleHandlerInterface $module_handler, RendererInterface $renderer) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFormBuilder = $entity_form_builder;

@@ -45,18 +45,6 @@ class BlockLibraryController extends ControllerBase {
    */
   protected $localActionManager;
 
-  /**
-   * Constructs a BlockLibraryController object.
-   *
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
-   *   The block manager.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
-   *   The context repository.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   * @param \Drupal\Core\Menu\LocalActionManagerInterface $local_action_manager
-   *   The local action manager.
-   */
   public function __construct(BlockManagerInterface $block_manager, ContextRepositoryInterface $context_repository, RouteMatchInterface $route_match, LocalActionManagerInterface $local_action_manager) {
     $this->blockManager = $block_manager;
     $this->routeMatch = $route_match;

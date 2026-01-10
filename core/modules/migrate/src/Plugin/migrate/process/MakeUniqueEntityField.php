@@ -95,9 +95,6 @@ class MakeUniqueEntityField extends MakeUniqueBase implements ContainerFactoryPl
    */
   protected $migration;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;

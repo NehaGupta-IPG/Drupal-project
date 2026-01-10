@@ -27,9 +27,6 @@ class Subquery extends JoinPluginBase {
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $left_query;
 
-  /**
-   * Constructs a Subquery object.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

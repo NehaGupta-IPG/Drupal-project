@@ -9,14 +9,6 @@ use Drupal\Core\File\FileUrlGeneratorInterface;
  */
 class CssCollectionRenderer implements AssetCollectionRendererInterface {
 
-  /**
-   * Constructs a CssCollectionRenderer.
-   *
-   * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
-   *   The asset query string.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
-   *   The file URL generator.
-   */
   public function __construct(
     protected AssetQueryStringInterface $assetQueryString,
     protected FileUrlGeneratorInterface $fileUrlGenerator,

@@ -52,13 +52,6 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
    */
   protected $mergedConfigExport = [];
 
-  /**
-   * {@inheritdoc}
-   *
-   * @throws \Drupal\Core\Config\Entity\Exception\ConfigEntityStorageClassException
-   *   Exception thrown when the provided class is not an instance of
-   *   \Drupal\Core\Config\Entity\ConfigEntityStorage.
-   */
   public function __construct($definition) {
     // Ensure a default list cache tag is set; do this before calling the parent
     // constructor, because we want "Configuration System style" cache tags.

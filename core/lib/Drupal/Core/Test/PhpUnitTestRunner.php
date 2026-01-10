@@ -33,15 +33,6 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    */
   private string $configurationFilePath;
 
-  /**
-   * Constructs a test runner.
-   *
-   * @param string $appRoot
-   *   Path to the application root.
-   * @param string $workingDirectory
-   *   Path to the working directory. JUnit log files will be stored in this
-   *   directory.
-   */
   public function __construct(
     protected string $appRoot,
     protected string $workingDirectory,

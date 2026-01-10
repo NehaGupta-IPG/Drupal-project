@@ -14,12 +14,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
 
-  /**
-   * Constructs a new file event listener.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
-   */
   public function __construct(
     protected ConfigFactoryInterface $configFactory,
   ) {}

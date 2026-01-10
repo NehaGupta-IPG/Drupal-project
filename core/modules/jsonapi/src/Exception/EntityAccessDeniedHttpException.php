@@ -39,25 +39,6 @@ class EntityAccessDeniedHttpException extends CacheableAccessDeniedHttpException
    */
   protected $error = [];
 
-  /**
-   * EntityAccessDeniedHttpException constructor.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
-   *   The entity, or NULL when an entity is being created.
-   * @param \Drupal\Core\Access\AccessResultInterface $entity_access
-   *   The access result.
-   * @param string $pointer
-   *   (optional) The pointer.
-   * @param string $message
-   *   (Optional) The display to display.
-   * @param string $relationship_field
-   *   (Optional) A relationship field name if access was denied because the
-   *   user does not have permission to view an entity's relationship field.
-   * @param \Throwable|null $previous
-   *   The previous exception.
-   * @param int $code
-   *   The code.
-   */
   public function __construct($entity, AccessResultInterface $entity_access, $pointer, $message = 'The current user is not allowed to GET the selected resource.', $relationship_field = NULL, ?\Throwable $previous = NULL, $code = 0) {
     assert(is_null($entity) || $entity instanceof EntityInterface);
     parent::__construct(CacheableMetadata::createFromObject($entity_access), $message, $previous, $code);

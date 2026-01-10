@@ -33,22 +33,6 @@ class CustomPageExceptionHtmlSubscriber extends DefaultExceptionHtmlSubscriber {
    */
   protected $accessManager;
 
-  /**
-   * Constructs a new CustomPageExceptionHtmlSubscriber.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The HTTP Kernel service.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger service.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
-   *   The redirect destination service.
-   * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $access_unaware_router
-   *   A router implementation which does not check access.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   The access manager.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, HttpKernelInterface $http_kernel, LoggerInterface $logger, RedirectDestinationInterface $redirect_destination, UrlMatcherInterface $access_unaware_router, AccessManagerInterface $access_manager) {
     parent::__construct($http_kernel, $logger, $redirect_destination, $access_unaware_router);
     $this->configFactory = $config_factory;

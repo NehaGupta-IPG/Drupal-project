@@ -20,12 +20,6 @@ class BrokenInboundPathProcessor implements InboundPathProcessorInterface {
    */
   protected $state;
 
-  /**
-   * Constructs a new BrokenInboundPathProcessor instance.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state.
-   */
   public function __construct(StateInterface $state) {
     $this->state = $state;
   }

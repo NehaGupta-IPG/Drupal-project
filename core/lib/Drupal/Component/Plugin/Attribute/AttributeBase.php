@@ -30,10 +30,6 @@ abstract class AttributeBase implements AttributeInterface {
    */
   protected array|null $dependencies = NULL;
 
-  /**
-   * @param string $id
-   *   The attribute class ID.
-   */
   public function __construct(
     protected readonly string $id,
   ) {}

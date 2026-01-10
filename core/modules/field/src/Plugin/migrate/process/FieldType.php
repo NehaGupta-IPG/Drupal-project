@@ -37,20 +37,6 @@ class FieldType extends StaticMap implements ContainerFactoryPluginInterface {
    */
   protected $migration;
 
-  /**
-   * Constructs a FieldType plugin.
-   *
-   * @param array $configuration
-   *   The plugin configuration.
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param mixed $plugin_definition
-   *   The plugin definition.
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $field_plugin_manager
-   *   The field plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The migration being run.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateFieldPluginManagerInterface $field_plugin_manager, ?MigrationInterface $migration = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->fieldPluginManager = $field_plugin_manager;

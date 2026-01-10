@@ -11,18 +11,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 final class EquivalentUpdate {
 
-  /**
-   * Constructs a EquivalentUpdate object.
-   *
-   * @param string $module
-   *   The module the update is for.
-   * @param int $future_update
-   *   The equivalent future update.
-   * @param int $ran_update
-   *   The update that already ran and registered the equivalent update.
-   * @param string $future_version
-   *   The future version that has the expected update.
-   */
   public function __construct(
     public readonly string $module,
     public readonly int $future_update,

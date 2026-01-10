@@ -39,12 +39,6 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
    */
   protected $systemDateConfig;
 
-  /**
-   * Constructs a new DateTimeNormalizer instance.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   A config factory for retrieving required config objects.
-   */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->systemDateConfig = $config_factory->get('system.date');
   }

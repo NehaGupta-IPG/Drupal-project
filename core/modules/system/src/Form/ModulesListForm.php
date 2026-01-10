@@ -104,24 +104,6 @@ class ModulesListForm extends FormBase {
     );
   }
 
-  /**
-   * Constructs a ModulesListForm object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
-   *   The module installer.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable
-   *   The key value expirable factory.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   Access manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
-   *   The permission handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
-   *   The module extension list.
-   */
   public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, AccessManagerInterface $access_manager, AccountInterface $current_user, PermissionHandlerInterface $permission_handler, ModuleExtensionList $extension_list_module) {
     $this->moduleExtensionList = $extension_list_module;
     $this->moduleHandler = $module_handler;

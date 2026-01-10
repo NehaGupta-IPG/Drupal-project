@@ -9,12 +9,6 @@ use Drupal\Core\StringTranslation\TranslationInterface;
  */
 class AlreadyInstalledException extends InstallerException {
 
-  /**
-   * Constructs a new "already installed" exception.
-   *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation manager.
-   */
   public function __construct(TranslationInterface $string_translation) {
     $this->stringTranslation = $string_translation;
 

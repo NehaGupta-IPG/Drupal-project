@@ -23,14 +23,6 @@ class Session implements HttpKernelInterface {
    */
   protected $httpKernel;
 
-  /**
-   * Constructs a Session stack middleware object.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
-   *   The decorated kernel.
-   * @param \Closure $sessionClosure
-   *   A closure that wraps the session service.
-   */
   public function __construct(
     HttpKernelInterface $http_kernel,
     #[AutowireServiceClosure('session')]

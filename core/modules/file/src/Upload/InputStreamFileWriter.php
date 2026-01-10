@@ -12,9 +12,6 @@ use Symfony\Component\HttpFoundation\File\Exception\UploadException;
  */
 class InputStreamFileWriter implements InputStreamFileWriterInterface {
 
-  /**
-   * Creates a new InputStreamFileUploader.
-   */
   public function __construct(
     protected FileSystemInterface $fileSystem,
   ) {}

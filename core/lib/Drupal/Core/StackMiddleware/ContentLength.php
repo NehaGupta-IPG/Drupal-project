@@ -11,12 +11,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class ContentLength implements HttpKernelInterface {
 
-  /**
-   * Constructs a new ContentLength instance.
-   *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
-   *   The wrapped HTTP kernel.
-   */
   public function __construct(
     protected readonly HttpKernelInterface $httpKernel,
   ) {}

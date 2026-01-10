@@ -45,9 +45,6 @@ final class LayoutForm extends FormBase {
    */
   protected $sectionStorage;
 
-  /**
-   * Constructs a new LayoutForm.
-   */
   public function __construct(protected LayoutTempstoreRepositoryInterface $layoutTempstoreRepository) {
   }
 

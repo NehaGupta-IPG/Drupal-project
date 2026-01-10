@@ -23,14 +23,6 @@ class TestSessionHandlerProxy implements \SessionHandlerInterface, \SessionUpdat
    */
   protected $optionalArgument;
 
-  /**
-   * Constructs a new TestSessionHandlerProxy object.
-   *
-   * @param \SessionHandlerInterface $session_handler
-   *   The decorated session handler.
-   * @param mixed $optional_argument
-   *   (optional) An optional argument.
-   */
   public function __construct(\SessionHandlerInterface&\SessionUpdateTimestampHandlerInterface $session_handler, $optional_argument = NULL) {
     $this->sessionHandler = $session_handler;
     $this->optionalArgument = $optional_argument;

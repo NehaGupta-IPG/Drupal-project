@@ -54,16 +54,6 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    */
   protected $moduleHandler;
 
-  /**
-   * Constructs a \Drupal\Core\Menu\MenuLinkManager object.
-   *
-   * @param \Drupal\Core\Menu\MenuTreeStorageInterface $tree_storage
-   *   The menu link tree storage.
-   * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface $overrides
-   *   The service providing overrides for static links.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   */
   public function __construct(MenuTreeStorageInterface $tree_storage, StaticMenuLinkOverridesInterface $overrides, ModuleHandlerInterface $module_handler) {
     $this->treeStorage = $tree_storage;
     $this->overrides = $overrides;

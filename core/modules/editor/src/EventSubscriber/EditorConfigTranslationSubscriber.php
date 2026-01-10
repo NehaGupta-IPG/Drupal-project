@@ -20,12 +20,6 @@ class EditorConfigTranslationSubscriber implements EventSubscriberInterface {
    */
   protected $configFactory;
 
-  /**
-   * EditorConfigTranslationSubscriber constructor.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
   }

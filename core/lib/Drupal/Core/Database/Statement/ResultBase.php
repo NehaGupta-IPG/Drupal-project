@@ -13,14 +13,6 @@ abstract class ResultBase {
 
   use FetchModeTrait;
 
-  /**
-   * Constructor.
-   *
-   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
-   *   The fetch mode.
-   * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
-   *   The fetch options.
-   */
   public function __construct(
     protected FetchAs $fetchMode,
     protected array $fetchOptions,

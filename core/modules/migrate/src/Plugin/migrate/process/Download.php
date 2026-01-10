@@ -76,20 +76,6 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
    */
   protected $httpClient;
 
-  /**
-   * Constructs a download process plugin.
-   *
-   * @param array $configuration
-   *   The plugin configuration.
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param array $plugin_definition
-   *   The plugin definition.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file system service.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   The HTTP client.
-   */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, FileSystemInterface $file_system, ClientInterface $http_client) {
     $configuration += [
       'guzzle_options' => [],

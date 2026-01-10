@@ -33,20 +33,6 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
    */
   protected array $themes;
 
-  /**
-   * Constructs a BlockTheme object.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Config\Config $theme_config
-   *   The system.theme configuration factory object.
-   * @param array $themes
-   *   The list of themes available on the destination.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Config $theme_config, array $themes) {
     @trigger_error(__CLASS__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533560', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition);

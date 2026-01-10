@@ -13,12 +13,6 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
  */
 class BasicRecursiveValidatorFactory {
 
-  /**
-   * Constructs a new RecursiveValidatorFactory.
-   *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
-   *   The class resolver.
-   */
   public function __construct(
     protected readonly ClassResolverInterface $classResolver,
   ) {}

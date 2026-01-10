@@ -13,9 +13,6 @@ use PHPUnit\Runner\Version;
  */
 final class RunnerVersion {
 
-  /**
-   * This class should not be instantiated.
-   */
   private function __construct() {
   }
 

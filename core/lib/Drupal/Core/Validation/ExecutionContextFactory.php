@@ -13,14 +13,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ExecutionContextFactory implements ExecutionContextFactoryInterface {
 
-  /**
-   * Constructs a new ExecutionContextFactory instance.
-   *
-   * @param \Drupal\Core\Validation\TranslatorInterface $translator
-   *   The translator instance.
-   * @param string|null $translationDomain
-   *   (optional) The translation domain.
-   */
   public function __construct(
     protected TranslatorInterface $translator,
     protected ?string $translationDomain = NULL,

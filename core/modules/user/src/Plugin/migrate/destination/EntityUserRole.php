@@ -29,28 +29,6 @@ class EntityUserRole extends EntityConfigBase {
    */
   protected $destinationPermissions = [];
 
-  /**
-   * Builds a user role entity destination.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The migration.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The storage for this entity type.
-   * @param array $bundles
-   *   The list of bundles this entity type has.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   * @param array $destination_permissions
-   *   All available permissions.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, LanguageManagerInterface $language_manager, ConfigFactoryInterface $config_factory, array $destination_permissions) {
     @trigger_error(__CLASS__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533565', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles, $language_manager, $config_factory);

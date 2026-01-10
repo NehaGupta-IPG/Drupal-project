@@ -26,22 +26,6 @@ class DatabaseBackendFactory implements CacheFactoryInterface {
    */
   protected $checksumProvider;
 
-  /**
-   * Constructs the DatabaseBackendFactory object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   Database connection.
-   * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
-   *   The cache tags checksum provider.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   (optional) The site settings.
-   * @param \Drupal\Component\Serialization\ObjectAwareSerializationInterface|null $serializer
-   *   (optional) The serializer to use.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
-   *   The time service.
-   *
-   * @throws \BadMethodCallException
-   */
   public function __construct(
     Connection $connection,
     CacheTagsChecksumInterface $checksum_provider,

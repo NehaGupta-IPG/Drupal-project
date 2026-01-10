@@ -45,20 +45,6 @@ class WorkspaceListBuilder extends EntityListBuilder {
    */
   protected $renderer;
 
-  /**
-   * Constructs a new EntityListBuilder object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
-   *   The workspace manager service.
-   * @param \Drupal\workspaces\WorkspaceRepositoryInterface $workspace_repository
-   *   The workspace repository service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer service.
-   */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, WorkspaceManagerInterface $workspace_manager, WorkspaceRepositoryInterface $workspace_repository, RendererInterface $renderer) {
     parent::__construct($entity_type, $storage);
     $this->workspaceManager = $workspace_manager;

@@ -28,14 +28,6 @@ class NodeAdminRouteSubscriber extends RouteSubscriberBase {
    */
   protected $routerBuilder;
 
-  /**
-   * Constructs a new NodeAdminRouteSubscriber.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
-   *   The router builder service.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, RouteBuilderInterface $router_builder) {
     $this->configFactory = $config_factory;
     $this->routerBuilder = $router_builder;

@@ -30,18 +30,6 @@ class Provider {
    */
   protected $endpoints = [];
 
-  /**
-   * Provider constructor.
-   *
-   * @param string $name
-   *   The provider name.
-   * @param string $url
-   *   The provider URL.
-   * @param array[] $endpoints
-   *   List of endpoints this provider exposes.
-   *
-   * @throws \Drupal\media\OEmbed\ProviderException
-   */
   public function __construct($name, $url, array $endpoints) {
     $this->name = $name;
 

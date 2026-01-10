@@ -22,22 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ConfigSync extends FormBase {
 
-  /**
-   * Constructs the object.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $syncStorage
-   *   The source storage.
-   * @param \Drupal\Core\Config\StorageInterface $activeStorage
-   *   The target storage.
-   * @param \Drupal\Core\Config\StorageInterface $snapshotStorage
-   *   The snapshot storage.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Config\ImportStorageTransformer $importTransformer
-   *   The import transformer service.
-   * @param \Drupal\Core\Config\ConfigImporterFactory $configImporterFactory
-   *   The config importer factory.
-   */
   public function __construct(
     protected StorageInterface $syncStorage,
     protected StorageInterface $activeStorage,

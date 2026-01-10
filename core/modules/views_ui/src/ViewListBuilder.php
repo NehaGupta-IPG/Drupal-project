@@ -38,16 +38,6 @@ class ViewListBuilder extends ConfigEntityListBuilder {
     );
   }
 
-  /**
-   * Constructs a new ViewListBuilder object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $display_manager
-   *   The views display plugin manager to use.
-   */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, PluginManagerInterface $display_manager) {
     parent::__construct($entity_type, $storage);
 

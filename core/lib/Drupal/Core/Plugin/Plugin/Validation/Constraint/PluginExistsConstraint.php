@@ -56,19 +56,6 @@ class PluginExistsConstraint extends SymfonyConstraint implements ContainerFacto
    */
   public bool $allowFallback = FALSE;
 
-  /**
-   * Constructs a PluginExistsConstraint.
-   *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $pluginManager
-   *   The plugin manager associated with the constraint.
-   * @param mixed|null $options
-   *   The options (as associative array) or the value for the default option
-   *   (any other type).
-   * @param array|null $groups
-   *   An array of validation groups.
-   * @param mixed|null $payload
-   *   Domain-specific data attached to a constraint.
-   */
   public function __construct(public readonly PluginManagerInterface $pluginManager, mixed $options = NULL, ?array $groups = NULL, mixed $payload = NULL) {
     parent::__construct($options, $groups, $payload);
   }

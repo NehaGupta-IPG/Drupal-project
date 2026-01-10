@@ -26,9 +26,6 @@ abstract class ChangeUserRoleBase extends ConfigurableActionBase implements Cont
    */
   protected $entityType;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeInterface $entity_type) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityType = $entity_type;

@@ -25,12 +25,6 @@ class Time implements TimeInterface {
    */
   protected float $proxyRequestTime;
 
-  /**
-   * Constructs a Time object.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack|null $request_stack
-   *   (Optional) The request stack.
-   */
   public function __construct(?RequestStack $request_stack = NULL) {
     $this->requestStack = $request_stack;
   }

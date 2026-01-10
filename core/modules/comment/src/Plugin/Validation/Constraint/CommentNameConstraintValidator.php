@@ -21,12 +21,6 @@ class CommentNameConstraintValidator extends ConstraintValidator implements Cont
    */
   protected $userStorage;
 
-  /**
-   * Constructs a new CommentNameConstraintValidator.
-   *
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage handler.
-   */
   public function __construct(UserStorageInterface $user_storage) {
     $this->userStorage = $user_storage;
   }

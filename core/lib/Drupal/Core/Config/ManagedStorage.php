@@ -29,12 +29,6 @@ final class ManagedStorage implements StorageInterface {
    */
   protected $manager;
 
-  /**
-   * ManagedStorage constructor.
-   *
-   * @param \Drupal\Core\Config\StorageManagerInterface $manager
-   *   The storage manager.
-   */
   public function __construct(StorageManagerInterface $manager) {
     $this->manager = $manager;
   }

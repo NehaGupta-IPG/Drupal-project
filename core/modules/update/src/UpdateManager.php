@@ -83,26 +83,6 @@ class UpdateManager implements UpdateManagerInterface {
    */
   protected ThemeExtensionList $themeExtensionList;
 
-  /**
-   * Constructs an UpdateManager.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The Module Handler service.
-   * @param \Drupal\update\UpdateProcessorInterface $update_processor
-   *   The Update Processor service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The translation service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_expirable_factory
-   *   The expirable key/value factory.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
-   *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $extension_list_theme
-   *   The theme extension list.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, UpdateProcessorInterface $update_processor, TranslationInterface $translation, KeyValueFactoryInterface $key_value_expirable_factory, ThemeHandlerInterface $theme_handler, ModuleExtensionList $extension_list_module, ThemeExtensionList $extension_list_theme) {
     $this->updateSettings = $config_factory->get('update.settings');
     $this->moduleHandler = $module_handler;

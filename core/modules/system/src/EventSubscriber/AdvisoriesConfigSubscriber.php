@@ -19,12 +19,6 @@ class AdvisoriesConfigSubscriber implements EventSubscriberInterface {
    */
   protected $securityAdvisoriesFetcher;
 
-  /**
-   * Constructs a new ConfigSubscriber object.
-   *
-   * @param \Drupal\system\SecurityAdvisories\SecurityAdvisoriesFetcher $security_advisories_fetcher
-   *   The security advisory fetcher service.
-   */
   public function __construct(SecurityAdvisoriesFetcher $security_advisories_fetcher) {
     $this->securityAdvisoriesFetcher = $security_advisories_fetcher;
   }

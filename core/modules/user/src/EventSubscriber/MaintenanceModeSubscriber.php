@@ -27,14 +27,6 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
    */
   protected $account;
 
-  /**
-   * Constructs a new MaintenanceModeSubscriber.
-   *
-   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenance_mode
-   *   The maintenance mode.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   */
   public function __construct(MaintenanceModeInterface $maintenance_mode, AccountInterface $account) {
     $this->maintenanceMode = $maintenance_mode;
     $this->account = $account;

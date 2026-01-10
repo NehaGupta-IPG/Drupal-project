@@ -50,20 +50,6 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
    */
   protected $entityLastInstalledSchemaRepository;
 
-  /**
-   * Constructs a new EntityDefinitionUpdateManager.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
-   *   The last installed schema repository service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager service.
-   * @param \Drupal\Core\Entity\EntityTypeListenerInterface $entity_type_listener
-   *   The entity type listener interface.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionListenerInterface $field_storage_definition_listener
-   *   The field storage definition listener service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityFieldManagerInterface $entity_field_manager, EntityTypeListenerInterface $entity_type_listener, FieldStorageDefinitionListenerInterface $field_storage_definition_listener) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;

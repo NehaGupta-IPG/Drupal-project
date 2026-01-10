@@ -21,12 +21,6 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
    */
   protected $logger;
 
-  /**
-   * Constructs a new ExceptionLoggingSubscriber.
-   *
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger
-   *   The logger channel factory.
-   */
   public function __construct(LoggerChannelFactoryInterface $logger) {
     $this->logger = $logger;
   }

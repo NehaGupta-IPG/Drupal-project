@@ -16,12 +16,6 @@ class ContextCacheKeys extends CacheableMetadata {
    */
   protected $keys;
 
-  /**
-   * Constructs a ContextCacheKeys object.
-   *
-   * @param string[] $keys
-   *   The cache context keys.
-   */
   public function __construct(array $keys) {
     // Domain invariant: cache keys must be always sorted.
     // Sorting keys warrants that different combination of the same keys

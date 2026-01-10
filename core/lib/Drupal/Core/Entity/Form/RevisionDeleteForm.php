@@ -46,22 +46,6 @@ class RevisionDeleteForm extends ConfirmFormBase implements EntityFormInterface 
    */
   protected ModuleHandlerInterface $moduleHandler;
 
-  /**
-   * Creates a new RevisionDeleteForm instance.
-   *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
-   *   The date formatter.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   Entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundleInformation
-   *   The bundle information.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   */
   public function __construct(
     protected DateFormatterInterface $dateFormatter,
     protected EntityTypeManagerInterface $entityTypeManager,

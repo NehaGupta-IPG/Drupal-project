@@ -35,17 +35,6 @@ class ResourceTypeBuildEvent extends Event {
    */
   protected $disabled = FALSE;
 
-  /**
-   * ResourceTypeBuildEvent constructor.
-   *
-   * This constructor is protected by design. Use
-   * static::createFromEntityTypeAndBundle() instead.
-   *
-   * @param string $resource_type_name
-   *   A JSON:API resource type name.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeField[] $fields
-   *   The fields of the resource type to be built.
-   */
   protected function __construct($resource_type_name, array $fields) {
     assert(Inspector::assertAllObjects($fields, ResourceTypeField::class));
     $this->resourceTypeName = $resource_type_name;

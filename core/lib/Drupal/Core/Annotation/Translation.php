@@ -59,19 +59,6 @@ class Translation extends AnnotationBase {
    */
   protected $translation;
 
-  /**
-   * Constructs a new class instance.
-   *
-   * Parses values passed into this class through the t() function in Drupal and
-   * handles an optional context for the string.
-   *
-   * @param array $values
-   *   Possible array keys:
-   *   - value (required): the string that is to be translated.
-   *   - arguments (optional): an array with placeholder replacements, keyed by
-   *     placeholder.
-   *   - context (optional): a string that describes the context of "value".
-   */
   public function __construct(array $values) {
     $string = $values['value'];
     $arguments = $values['arguments'] ?? [];

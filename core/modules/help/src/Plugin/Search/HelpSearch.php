@@ -117,32 +117,6 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
     );
   }
 
-  /**
-   * Constructs a \Drupal\help_search\Plugin\Search\HelpSearch object.
-   *
-   * @param array $configuration
-   *   Configuration for the plugin.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Database\Connection $database
-   *   The current database connection.
-   * @param \Drupal\Core\Config\Config $search_settings
-   *   A config object for 'search.settings'.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The $account object to use for checking for access to view help.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state object.
-   * @param \Drupal\help\HelpSectionManager $help_section_manager
-   *   The help section manager.
-   * @param \Drupal\search\SearchIndexInterface $search_index
-   *   The search index.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database, Config $search_settings, LanguageManagerInterface $language_manager, MessengerInterface $messenger, AccountInterface $account, StateInterface $state, HelpSectionManager $help_section_manager, SearchIndexInterface $search_index) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->database = $database;

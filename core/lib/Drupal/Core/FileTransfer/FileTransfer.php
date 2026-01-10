@@ -65,14 +65,6 @@ abstract class FileTransfer {
    */
   protected $jail;
 
-  /**
-   * Constructs a Drupal\Core\FileTransfer\FileTransfer object.
-   *
-   * @param string $jail
-   *   The full path where all file operations performed by this object will
-   *   be restricted to. This prevents the FileTransfer classes from being
-   *   able to touch other parts of the filesystem.
-   */
   public function __construct($jail) {
     @trigger_error(__CLASS__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 

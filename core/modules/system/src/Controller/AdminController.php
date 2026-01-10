@@ -12,9 +12,6 @@ use Drupal\user\ModulePermissionsLinkHelper;
  */
 class AdminController extends ControllerBase {
 
-  /**
-   * AdminController constructor.
-   */
   public function __construct(
     protected ModuleExtensionList $moduleExtensionList,
     protected ModuleAdminLinksHelper $moduleAdminLinks,

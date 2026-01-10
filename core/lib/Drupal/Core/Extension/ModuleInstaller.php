@@ -66,27 +66,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
    */
   protected $updateRegistry;
 
-  /**
-   * Constructs a new ModuleInstaller instance.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
-   *   The drupal kernel.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Update\UpdateHookRegistry $update_registry
-   *   The update registry service.
-   * @param \Psr\Log\LoggerInterface|null $logger
-   *   The logger.
-   * @param \Traversable|null $uninstallValidators
-   *   The uninstall validator services.
-   *
-   * @see \Drupal\Core\DrupalKernel
-   * @see \Drupal\Core\CoreServiceProvider
-   */
   public function __construct(
     #[Autowire(param: 'app.root')]
     string $root,

@@ -38,16 +38,6 @@ class ThemeHandler implements ThemeHandlerInterface {
    */
   protected $root;
 
-  /**
-   * Constructs a new ThemeHandler.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory to get the installed themes.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
-   *   An extension discovery instance.
-   */
   public function __construct($root, ConfigFactoryInterface $config_factory, ThemeExtensionList $theme_list) {
     $this->root = $root;
     $this->configFactory = $config_factory;

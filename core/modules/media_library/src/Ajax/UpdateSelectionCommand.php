@@ -30,12 +30,6 @@ class UpdateSelectionCommand implements CommandInterface {
    */
   protected $mediaIds;
 
-  /**
-   * Constructs an UpdateSelectionCommand object.
-   *
-   * @param int[] $media_ids
-   *   An array of media IDs to add to the current selection.
-   */
   public function __construct(array $media_ids) {
     $this->mediaIds = $media_ids;
   }

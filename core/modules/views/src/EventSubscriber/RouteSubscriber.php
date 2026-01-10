@@ -50,14 +50,6 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   protected $viewRouteNames = [];
 
-  /**
-   * Constructs a \Drupal\views\EventSubscriber\RouteSubscriber instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state key value store.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, StateInterface $state) {
     $this->viewStorage = $entity_type_manager->getStorage('view');
     $this->state = $state;

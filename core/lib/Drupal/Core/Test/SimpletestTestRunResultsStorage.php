@@ -13,12 +13,6 @@ use Drupal\Core\Database\ConnectionNotDefinedException;
  */
 class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface {
 
-  /**
-   * SimpletestTestRunResultsStorage constructor.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection to use for inserting assertions.
-   */
   public function __construct(
     protected Connection $connection,
   ) {

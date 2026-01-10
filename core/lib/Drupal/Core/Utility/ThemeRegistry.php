@@ -36,20 +36,6 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
    */
   protected $completeRegistry;
 
-  /**
-   * Constructs a ThemeRegistry object.
-   *
-   * @param string $cid
-   *   The cid for the array being cached.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param array $tags
-   *   (optional) The tags to specify for the cache item.
-   * @param bool $modules_loaded
-   *   Whether all modules have already been loaded.
-   */
   public function __construct($cid, CacheBackendInterface $cache, LockBackendInterface $lock, $tags = [], $modules_loaded = FALSE) {
     $this->cid = $cid;
     $this->cache = $cache;

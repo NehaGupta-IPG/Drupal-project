@@ -18,16 +18,6 @@ use Drupal\migrate\ProcessPluginBase;
  */
 abstract class FileProcessBase extends ProcessPluginBase {
 
-  /**
-   * Constructs a file process plugin.
-   *
-   * @param array $configuration
-   *   The plugin configuration.
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param array $plugin_definition
-   *   The plugin definition.
-   */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition) {
     if (array_key_exists('file_exists', $configuration)) {
       switch ($configuration['file_exists']) {

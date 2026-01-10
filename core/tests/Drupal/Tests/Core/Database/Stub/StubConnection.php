@@ -30,16 +30,6 @@ class StubConnection extends Connection {
    */
   public $driver = 'stub';
 
-  /**
-   * Constructs a Connection object.
-   *
-   * @param \PDO $connection
-   *   An object of the PDO class representing a database connection.
-   * @param array $connection_options
-   *   An array of options for the connection.
-   * @param string[]|null $identifier_quotes
-   *   The identifier quote characters. Defaults to an empty strings.
-   */
   public function __construct(\PDO $connection, array $connection_options, $identifier_quotes = ['', '']) {
     $this->identifierQuotes = $identifier_quotes;
     parent::__construct($connection, $connection_options);

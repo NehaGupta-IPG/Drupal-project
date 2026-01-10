@@ -51,12 +51,6 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    */
   protected $configFactory;
 
-  /**
-   * Constructs a new FinalExceptionSubscriber.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   */
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->configFactory = $config_factory;
   }

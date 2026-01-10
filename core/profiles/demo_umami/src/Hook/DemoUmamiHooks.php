@@ -19,18 +19,6 @@ class DemoUmamiHooks {
 
   use StringTranslationTrait;
 
-  /**
-   * DemoUmamiHooks constructor.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   * @param \Drupal\Core\Routing\AdminContext $adminContext
-   *   The admin context.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
     protected AccountInterface $currentUser,

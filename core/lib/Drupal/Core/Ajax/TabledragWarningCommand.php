@@ -18,14 +18,6 @@ use Drupal\Core\Asset\AttachedAssets;
  */
 class TabledragWarningCommand implements CommandInterface, CommandWithAttachedAssetsInterface {
 
-  /**
-   * Constructs a TableDragWarningCommand object.
-   *
-   * @param string $id
-   *   The id of the changed row.
-   * @param string $tabledrag_instance
-   *   The identifier of the tabledrag instance.
-   */
   public function __construct(
     protected string $id,
     protected string $tabledrag_instance,

@@ -18,12 +18,6 @@ class InaccessibleMenuLink extends MenuLinkBase {
    */
   protected $wrappedLink;
 
-  /**
-   * Constructs a new InaccessibleMenuLink.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $wrapped_link
-   *   The menu link to wrap.
-   */
   public function __construct(MenuLinkInterface $wrapped_link) {
     $this->wrappedLink = $wrapped_link;
     $plugin_definition = [

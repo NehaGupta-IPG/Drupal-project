@@ -24,20 +24,6 @@ class Statement extends StatementBase {
    */
   protected array $paramsPositions;
 
-  /**
-   * Constructs a Statement object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   Drupal database connection object.
-   * @param \mysqli $clientConnection
-   *   Client database connection object.
-   * @param string $queryString
-   *   The SQL query string.
-   * @param array $driverOpts
-   *   (optional) Array of query options.
-   * @param bool $rowCountEnabled
-   *   (optional) Enables counting the rows affected. Defaults to FALSE.
-   */
   public function __construct(
     Connection $connection,
     \mysqli $clientConnection,

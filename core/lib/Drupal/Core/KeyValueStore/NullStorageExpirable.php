@@ -21,9 +21,6 @@ class NullStorageExpirable implements KeyValueStoreExpirableInterface {
    */
   protected $collection;
 
-  /**
-   * Creates a new expirable null key/value store.
-   */
   public function __construct($collection) {
     $this->collection = $collection;
   }

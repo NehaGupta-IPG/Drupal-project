@@ -67,13 +67,6 @@ class Language implements LanguageInterface {
    */
   protected $locked = FALSE;
 
-  /**
-   * Constructs a new class instance.
-   *
-   * @param array $values
-   *   An array of property values, keyed by property name, used to construct
-   *   the language.
-   */
   public function __construct(array $values = []) {
     // Set all the provided properties for the language.
     foreach ($values as $key => $value) {

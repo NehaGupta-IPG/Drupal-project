@@ -41,9 +41,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class MediaLibraryState extends ParameterBag implements CacheableDependencyInterface {
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $parameters = []) {
     $this->validateRequiredParameters($parameters['media_library_opener_id'], $parameters['media_library_allowed_types'], $parameters['media_library_selected_type'], $parameters['media_library_remaining']);
     $parameters += [

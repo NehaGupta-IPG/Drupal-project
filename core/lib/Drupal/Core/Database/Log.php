@@ -43,12 +43,6 @@ class Log {
    */
   protected $connectionKey = 'default';
 
-  /**
-   * Constructor.
-   *
-   * @param string $key
-   *   The database connection key for which to enable logging.
-   */
   public function __construct($key = 'default') {
     $this->connectionKey = $key;
   }

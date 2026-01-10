@@ -32,14 +32,6 @@ class ModerationInformation implements ModerationInformationInterface {
    */
   protected $bundleInfo;
 
-  /**
-   * Creates a new ModerationInformation instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
-   *   The bundle information service.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info) {
     $this->entityTypeManager = $entity_type_manager;
     $this->bundleInfo = $bundle_info;

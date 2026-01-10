@@ -17,14 +17,6 @@ use Twig\TwigFunction;
  */
 final class ComponentsTwigExtension extends AbstractExtension {
 
-  /**
-   * Creates TwigExtension.
-   *
-   * @param \Drupal\Core\Theme\ComponentPluginManager $pluginManager
-   *   The component plugin manager.
-   * @param \Drupal\Core\Theme\Component\ComponentValidator $componentValidator
-   *   The component validator.
-   */
   public function __construct(
     protected ComponentPluginManager $pluginManager,
     protected ComponentValidator $componentValidator,

@@ -41,30 +41,6 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     'class' => Component::class,
   ];
 
-  /**
-   * Constructs ComponentPluginManager object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
-   *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   Cache backend instance to use.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The configuration factory.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
-   *   The theme manager.
-   * @param \Drupal\Core\Theme\ComponentNegotiator $componentNegotiator
-   *   The component negotiator.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
-   *   The file system service.
-   * @param \Drupal\Core\Theme\Component\SchemaCompatibilityChecker $compatibilityChecker
-   *   The compatibility checker.
-   * @param \Drupal\Core\Theme\Component\ComponentValidator $componentValidator
-   *   The component validator.
-   * @param string $appRoot
-   *   The application root.
-   */
   public function __construct(
     ModuleHandlerInterface $module_handler,
     protected ThemeHandlerInterface $themeHandler,

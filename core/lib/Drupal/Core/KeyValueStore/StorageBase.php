@@ -14,9 +14,6 @@ abstract class StorageBase implements KeyValueStoreInterface {
    */
   protected $collection;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct($collection) {
     $this->collection = $collection;
   }

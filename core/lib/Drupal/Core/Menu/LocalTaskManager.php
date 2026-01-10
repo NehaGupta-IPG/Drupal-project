@@ -111,29 +111,6 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    */
   protected bool $loadingLocalTasks = FALSE;
 
-  /**
-   * Constructs a \Drupal\Core\Menu\LocalTaskManager object.
-   *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
-   *   An object to use in resolving route arguments.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request object to use for building titles and paths for plugin
-   *   instances.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider to load routes by name.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   The access manager.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   */
   public function __construct(ArgumentResolverInterface $argument_resolver, RequestStack $request_stack, RouteMatchInterface $route_match, RouteProviderInterface $route_provider, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, AccessManagerInterface $access_manager, AccountInterface $account) {
     $this->factory = new ContainerFactory($this, '\Drupal\Core\Menu\LocalTaskInterface');
     $this->argumentResolver = $argument_resolver;

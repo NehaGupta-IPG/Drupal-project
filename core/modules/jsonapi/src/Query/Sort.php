@@ -51,25 +51,6 @@ class Sort {
    */
   protected $fields;
 
-  /**
-   * Constructs a new Sort object.
-   *
-   * Takes an array of sort fields. Example:
-   *   [
-   *     [
-   *       'path' => 'changed',
-   *       'direction' => 'DESC',
-   *     ],
-   *     [
-   *       'path' => 'title',
-   *       'direction' => 'ASC',
-   *       'langcode' => 'en-US',
-   *     ],
-   *   ]
-   *
-   * @param array $fields
-   *   The entity query sort fields.
-   */
   public function __construct(array $fields) {
     $this->fields = $fields;
   }

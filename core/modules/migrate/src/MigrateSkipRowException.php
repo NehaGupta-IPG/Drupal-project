@@ -19,14 +19,6 @@ class MigrateSkipRowException extends \Exception {
    */
   protected $saveToMap;
 
-  /**
-   * Constructs a MigrateSkipRowException object.
-   *
-   * @param string $message
-   *   The message for the exception.
-   * @param bool $save_to_map
-   *   TRUE to record as STATUS_IGNORED in the map, FALSE to skip silently.
-   */
   public function __construct($message = '', $save_to_map = TRUE) {
     parent::__construct($message);
     $this->saveToMap = $save_to_map;

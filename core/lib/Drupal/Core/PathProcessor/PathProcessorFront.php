@@ -18,12 +18,6 @@ class PathProcessorFront implements InboundPathProcessorInterface {
    */
   protected $config;
 
-  /**
-   * Constructs a PathProcessorFront object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
-   *   A config factory for retrieving the site front page configuration.
-   */
   public function __construct(ConfigFactoryInterface $config) {
     $this->config = $config;
   }

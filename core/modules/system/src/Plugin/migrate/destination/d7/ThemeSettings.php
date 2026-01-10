@@ -28,20 +28,6 @@ class ThemeSettings extends DestinationBase implements ContainerFactoryPluginInt
    */
   protected $configFactory;
 
-  /**
-   * Constructs a theme settings destination object.
-   *
-   * @param array $configuration
-   *   Plugin configuration.
-   * @param string $plugin_id
-   *   The plugin ID.
-   * @param mixed $plugin_definition
-   *   The plugin definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The current migration.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, ConfigFactoryInterface $config_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
     @trigger_error(__CLASS__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533565', E_USER_DEPRECATED);

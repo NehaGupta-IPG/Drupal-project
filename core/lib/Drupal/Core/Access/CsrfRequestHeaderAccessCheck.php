@@ -31,14 +31,6 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
    */
   protected $csrfToken;
 
-  /**
-   * Constructs a new rest CSRF access check.
-   *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
-   *   The session configuration.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
-   *   The token generator.
-   */
   public function __construct(SessionConfigurationInterface $session_configuration, CsrfTokenGenerator $csrf_token) {
     $this->sessionConfiguration = $session_configuration;
     $this->csrfToken = $csrf_token;

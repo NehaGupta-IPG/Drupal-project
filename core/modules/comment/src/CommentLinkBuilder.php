@@ -47,16 +47,6 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
    */
   protected $commentManager;
 
-  /**
-   * Constructs a new CommentLinkBuilder object.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   Current user.
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
-   *   Comment manager service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface|\Drupal\Core\Extension\ModuleHandlerInterface $string_translation
-   *   String translation service.
-   */
   public function __construct(
     AccountInterface $current_user,
     CommentManagerInterface $comment_manager,

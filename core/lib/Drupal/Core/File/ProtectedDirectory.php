@@ -28,16 +28,6 @@ class ProtectedDirectory {
    */
   protected $private;
 
-  /**
-   * ProtectedDirectory constructor.
-   *
-   * @param string $title
-   *   The directory title.
-   * @param string $path
-   *   The path to the directory.
-   * @param bool $private
-   *   (optional) Whether the directory is private or public (default).
-   */
   public function __construct($title, $path, $private = FALSE) {
     $this->title = $title;
     $this->path = $path;

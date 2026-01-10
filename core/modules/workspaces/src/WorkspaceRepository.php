@@ -34,14 +34,6 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
    */
   protected $tree;
 
-  /**
-   * Constructs a new WorkspaceRepository instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   The cache backend.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache_backend) {
     $this->entityTypeManager = $entity_type_manager;
     $this->cache = $cache_backend;

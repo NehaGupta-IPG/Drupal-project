@@ -18,12 +18,6 @@ class PluginFormFactory implements PluginFormFactoryInterface {
    */
   protected $classResolver;
 
-  /**
-   * PluginFormFactory constructor.
-   *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
-   *   The class resolver.
-   */
   public function __construct(ClassResolverInterface $class_resolver) {
     $this->classResolver = $class_resolver;
   }

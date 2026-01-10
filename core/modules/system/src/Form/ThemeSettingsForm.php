@@ -69,26 +69,6 @@ class ThemeSettingsForm extends ConfigFormBase {
    */
   protected $fileSystem;
 
-  /**
-   * Constructs a ThemeSettingsForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler instance to use.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   * @param \Symfony\Component\Mime\MimeTypeGuesserInterface $mime_type_guesser
-   *   The MIME type guesser instance to use.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
-   *   The theme manager.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
-   *   The file system.
-   * @param \Drupal\Core\Extension\ThemeSettingsProvider|null $themeSettingsProvider
-   *   The theme settings helper service.
-   */
   public function __construct(
     ConfigFactoryInterface $config_factory,
     TypedConfigManagerInterface $typedConfigManager,

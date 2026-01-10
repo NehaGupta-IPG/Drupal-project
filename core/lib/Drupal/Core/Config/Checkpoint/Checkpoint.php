@@ -12,18 +12,6 @@ namespace Drupal\Core\Config\Checkpoint;
  */
 final class Checkpoint {
 
-  /**
-   * Constructs a checkpoint object.
-   *
-   * @param string $id
-   *   The checkpoint's ID.
-   * @param \Stringable|string $label
-   *   The human-readable label.
-   * @param int $timestamp
-   *   The timestamp when the checkpoint was created.
-   * @param string|null $parent
-   *   The ID of the checkpoint's parent.
-   */
   public function __construct(
     public readonly string $id,
     public readonly \Stringable|string $label,

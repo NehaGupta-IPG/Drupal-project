@@ -39,21 +39,6 @@ class ChainedFastBackendFactory implements CacheFactoryInterface {
     $this->container = $container;
   }
 
-  /**
-   * Constructs ChainedFastBackendFactory object.
-   *
-   * @param \Drupal\Core\Site\Settings|null $settings
-   *   (optional) The settings object.
-   * @param string|null $consistent_service_name
-   *   (optional) The service name of the consistent backend factory. Defaults
-   *   to:
-   *   - $settings->get('cache')['default'] (if specified)
-   *   - 'cache.backend.database' (if the above isn't specified)
-   * @param string|null $fast_service_name
-   *   (optional) The service name of the fast backend factory. Defaults to:
-   *   - 'cache.backend.apcu' (if the PHP process has APCu enabled)
-   *   - NULL (if the PHP process doesn't have APCu enabled)
-   */
   public function __construct(?Settings $settings = NULL, $consistent_service_name = NULL, $fast_service_name = NULL) {
     // Default the consistent backend to the site's default backend.
     if (!isset($consistent_service_name)) {

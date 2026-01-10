@@ -14,12 +14,6 @@ use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
  */
 class ExtraFieldBlockCacheTagInvalidator implements CacheTagsInvalidatorInterface {
 
-  /**
-   * Constructs a new ExtraFieldBlockCacheTagInvalidator.
-   *
-   * @param \Drupal\Core\Block\BlockManagerInterface $blockManager
-   *   The block manager.
-   */
   public function __construct(protected BlockManagerInterface $blockManager) {
   }
 

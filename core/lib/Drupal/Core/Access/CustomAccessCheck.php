@@ -21,14 +21,6 @@ use Symfony\Component\Routing\Route;
  */
 class CustomAccessCheck implements RoutingAccessInterface {
 
-  /**
-   * Constructs a CustomAccessCheck instance.
-   *
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
-   *   The callable resolver.
-   * @param \Drupal\Core\Access\AccessArgumentsResolverFactoryInterface $argumentsResolverFactory
-   *   The arguments resolver factory.
-   */
   public function __construct(
     protected CallableResolver $callableResolver,
     protected AccessArgumentsResolverFactoryInterface $argumentsResolverFactory,

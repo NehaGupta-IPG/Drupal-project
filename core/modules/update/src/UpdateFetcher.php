@@ -50,18 +50,6 @@ class UpdateFetcher implements UpdateFetcherInterface {
    */
   protected $withHttpFallback;
 
-  /**
-   * Constructs an UpdateFetcher.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   A Guzzle client object.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The settings instance.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   */
   public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $http_client, Settings $settings, protected LoggerInterface $logger) {
     $this->fetchUrl = $config_factory->get('update.settings')->get('fetch.url');
     $this->httpClient = $http_client;

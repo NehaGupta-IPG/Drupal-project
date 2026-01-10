@@ -40,14 +40,6 @@ class HelpTopicDiscovery implements DiscoveryInterface {
    */
   protected $directories = [];
 
-  /**
-   * Constructs a HelpTopicDiscovery object.
-   *
-   * @param array $directories
-   *   An array of directories to scan, keyed by the provider. The value can
-   *   either be a string or an array of strings. The string values should be
-   *   the path of a directory to scan.
-   */
   public function __construct(array $directories) {
     $this->directories = $directories;
   }

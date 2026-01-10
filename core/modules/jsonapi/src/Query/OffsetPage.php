@@ -65,14 +65,6 @@ class OffsetPage {
    */
   protected $size;
 
-  /**
-   * Instantiates an OffsetPage object.
-   *
-   * @param int $offset
-   *   The query offset.
-   * @param int $size
-   *   The query size limit.
-   */
   public function __construct($offset, $size) {
     $this->offset = $offset;
     $this->size = $size;

@@ -30,16 +30,6 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a \Drupal\Core\Menu\MenuParentFormSelector.
-   *
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_link_tree
-   *   The menu link tree service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
   public function __construct(MenuLinkTreeInterface $menu_link_tree, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
     $this->menuLinkTree = $menu_link_tree;
     $this->entityTypeManager = $entity_type_manager;

@@ -30,14 +30,6 @@ final class CollectResourceObjectMetaEvent extends Event implements RefinableCac
    */
   private array $meta = [];
 
-  /**
-   * Constructs a new CollectResourceObjectMetaEvent object.
-   *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $resourceObject
-   *   The resource object.
-   * @param array $context
-   *   The context options for the normalizer.
-   */
   public function __construct(
     private readonly ResourceObject $resourceObject,
     private readonly array $context,

@@ -24,12 +24,6 @@ class MigrateEntity implements ContainerDeriverInterface {
    */
   protected $entityDefinitions;
 
-  /**
-   * Constructs a MigrateEntity object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[] $entity_definitions
-   *   A list of entity definition objects.
-   */
   public function __construct(array $entity_definitions) {
     $this->entityDefinitions = $entity_definitions;
   }

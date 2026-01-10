@@ -21,12 +21,6 @@ class VocabularyResetForm extends EntityConfirmFormBase {
    */
   protected $termStorage;
 
-  /**
-   * Constructs a new VocabularyResetForm object.
-   *
-   * @param \Drupal\taxonomy\TermStorageInterface $term_storage
-   *   The term storage.
-   */
   public function __construct(TermStorageInterface $term_storage) {
     $this->termStorage = $term_storage;
   }

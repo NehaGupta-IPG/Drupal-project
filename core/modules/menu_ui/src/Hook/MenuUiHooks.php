@@ -27,12 +27,6 @@ class MenuUiHooks {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new MenuUiHooks object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
   ) {}

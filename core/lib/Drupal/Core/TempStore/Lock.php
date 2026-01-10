@@ -21,14 +21,6 @@ final class Lock {
    */
   private $updated;
 
-  /**
-   * Constructs a new Lock object.
-   *
-   * @param int $owner_id
-   *   The owner ID.
-   * @param int $updated
-   *   The updated timestamp.
-   */
   public function __construct($owner_id, $updated) {
     $this->ownerId = $owner_id;
     $this->updated = $updated;

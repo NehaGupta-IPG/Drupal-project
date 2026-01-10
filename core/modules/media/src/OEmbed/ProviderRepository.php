@@ -57,22 +57,6 @@ class ProviderRepository implements ProviderRepositoryInterface {
    */
   protected $logger;
 
-  /**
-   * Constructs a ProviderRepository instance.
-   *
-   * @param \GuzzleHttp\ClientInterface $http_client
-   *   The HTTP client.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key-value store factory.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
-   *   The logger channel factory.
-   * @param int $max_age
-   *   (optional) How long the cache data should be kept. Defaults to a week.
-   */
   public function __construct(ClientInterface $http_client, ConfigFactoryInterface $config_factory, TimeInterface $time, KeyValueFactoryInterface $key_value_factory, LoggerChannelFactoryInterface $logger_factory, int $max_age = 604800) {
     $this->httpClient = $http_client;
     $this->providersUrl = $config_factory->get('media.settings')->get('oembed_providers_url');

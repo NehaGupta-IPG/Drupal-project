@@ -31,16 +31,6 @@ class VariationCache implements VariationCacheInterface {
    */
   protected array $redirectChainCache = [];
 
-  /**
-   * Constructs a new VariationCache object.
-   *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
-   *   The cache backend to wrap.
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cacheContextsManager
-   *   The cache contexts manager.
-   */
   public function __construct(
     protected RequestStack $requestStack,
     protected CacheBackendInterface $cacheBackend,

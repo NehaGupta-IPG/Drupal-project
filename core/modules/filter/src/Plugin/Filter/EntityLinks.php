@@ -28,9 +28,6 @@ use Drupal\filter\Plugin\FilterInterface;
 )]
 class EntityLinks extends FilterBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * Constructs a EntityLinks object.
-   */
   public function __construct(
     array $configuration,
     $plugin_id,

@@ -29,16 +29,6 @@ class UserRequestSubscriber implements EventSubscriberInterface {
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a new UserRequestSubscriber.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
   public function __construct(AccountInterface $account, EntityTypeManagerInterface $entity_type_manager, protected TimeInterface $time) {
     $this->account = $account;
     $this->entityTypeManager = $entity_type_manager;

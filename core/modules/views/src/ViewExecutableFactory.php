@@ -40,20 +40,6 @@ class ViewExecutableFactory {
    */
   protected $routeProvider;
 
-  /**
-   * Constructs a new ViewExecutableFactory.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Drupal\views\ViewsData $views_data
-   *   The views data.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
-   *   The display plugin manager.
-   */
   public function __construct(AccountInterface $user, RequestStack $request_stack, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
     $this->user = $user;
     $this->requestStack = $request_stack;

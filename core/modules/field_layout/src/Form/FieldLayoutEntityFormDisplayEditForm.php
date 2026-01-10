@@ -19,20 +19,6 @@ class FieldLayoutEntityFormDisplayEditForm extends EntityFormDisplayEditForm {
 
   use FieldLayoutEntityDisplayFormTrait;
 
-  /**
-   * FieldLayoutEntityFormDisplayEditForm constructor.
-   *
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
-   *   The field type manager.
-   * @param \Drupal\Component\Plugin\PluginManagerBase $plugin_manager
-   *   The widget plugin manager.
-   * @param \Drupal\Core\Layout\LayoutPluginManagerInterface $layout_plugin_manager
-   *   The layout plugin manager.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
-   *   The entity display_repository.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   */
   public function __construct(FieldTypePluginManagerInterface $field_type_manager, PluginManagerBase $plugin_manager, LayoutPluginManagerInterface $layout_plugin_manager, ?EntityDisplayRepositoryInterface $entity_display_repository = NULL, ?EntityFieldManagerInterface $entity_field_manager = NULL) {
     parent::__construct($field_type_manager, $plugin_manager, $entity_display_repository, $entity_field_manager);
     $this->layoutPluginManager = $layout_plugin_manager;

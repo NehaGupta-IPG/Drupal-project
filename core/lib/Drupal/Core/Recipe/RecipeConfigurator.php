@@ -22,13 +22,6 @@ final class RecipeConfigurator {
    */
   private static array $cache = [];
 
-  /**
-   * @param string[] $recipes
-   *   A list of recipes for a recipe to apply. The recipes will be applied in
-   *   the order listed.
-   * @param string $include_path
-   *   The recipe's include path.
-   */
   public function __construct(array $recipes, string $include_path) {
     $this->recipes = array_map(fn(string $name) => static::getIncludedRecipe($include_path, $name), $recipes);
   }

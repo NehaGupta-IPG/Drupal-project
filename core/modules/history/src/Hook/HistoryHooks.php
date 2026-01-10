@@ -18,12 +18,6 @@ class HistoryHooks {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a new HistoryHooks object.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user account.
-   */
   public function __construct(
     protected AccountInterface $currentUser,
   ) {

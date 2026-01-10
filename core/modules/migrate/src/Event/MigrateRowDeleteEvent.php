@@ -24,14 +24,6 @@ class MigrateRowDeleteEvent extends Event {
    */
   protected $destinationIdValues;
 
-  /**
-   * Constructs a row deletion event object.
-   *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   Migration entity.
-   * @param array $destination_id_values
-   *   Values represent the destination ID.
-   */
   public function __construct(MigrationInterface $migration, $destination_id_values) {
     $this->migration = $migration;
     $this->destinationIdValues = $destination_id_values;

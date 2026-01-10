@@ -24,25 +24,6 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class RestResource extends Plugin {
 
-  /**
-   * Constructs a RestResource attribute.
-   *
-   * @param string $id
-   *   The REST resource plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
-   *   The human-readable name of the REST resource plugin.
-   * @param string|null $serialization_class
-   *   (optional) The serialization class to deserialize serialized data into.
-   * @param class-string|null $deriver
-   *   (optional) The deriver class for the rest resource.
-   * @param array $uri_paths
-   *   (optional) The URI paths that this REST resource plugin provides.
-   *   - key: The link relation type plugin ID.
-   *   - value: The URL template.
-   *
-   * @see \Symfony\Component\Serializer\SerializerInterface
-   * @see core/core.link_relation_types.yml
-   */
   public function __construct(
     public readonly string $id,
     public readonly TranslatableMarkup $label,

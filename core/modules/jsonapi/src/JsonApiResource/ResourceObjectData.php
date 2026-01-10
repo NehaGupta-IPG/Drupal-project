@@ -16,16 +16,6 @@ use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
  */
 class ResourceObjectData extends Data implements TopLevelDataInterface {
 
-  /**
-   * ResourceObjectData constructor.
-   *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject[]|\Drupal\jsonapi\Exception\EntityAccessDeniedHttpException[] $data
-   *   Resource objects that are the primary data for the response.
-   * @param int $cardinality
-   *   The number of resources that this collection may contain.
-   *
-   * @see \Drupal\jsonapi\JsonApiResource\Data::__construct
-   */
   public function __construct($data, $cardinality = -1) {
     assert(Inspector::assertAllObjects($data, ResourceObject::class, EntityAccessDeniedHttpException::class));
     parent::__construct($data, $cardinality);

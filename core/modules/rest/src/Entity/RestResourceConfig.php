@@ -75,9 +75,6 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
    */
   protected $pluginManager;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $values, $entity_type) {
     parent::__construct($values, $entity_type);
     // The config entity id looks like the plugin id but uses __ instead of :

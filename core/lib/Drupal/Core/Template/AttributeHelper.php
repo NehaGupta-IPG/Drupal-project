@@ -11,9 +11,6 @@ use Drupal\Component\Utility\NestedArray;
  */
 class AttributeHelper {
 
-  /**
-   * This class should not be instantiated.
-   */
   private function __construct() {
   }
 

@@ -49,22 +49,6 @@ class TwigEnvironment extends Environment {
    */
   protected $twigCachePrefix = '';
 
-  /**
-   * Creates a TwigEnvironment object, including its cache and storage.
-   *
-   * @param string $root
-   *   The app root.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache bin.
-   * @param string $twig_extension_hash
-   *   The Twig extension hash.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state service.
-   * @param \Twig\Loader\LoaderInterface $loader
-   *   The Twig loader or loader chain.
-   * @param array $options
-   *   The options for the Twig environment.
-   */
   public function __construct($root, CacheBackendInterface $cache, $twig_extension_hash, StateInterface $state, LoaderInterface $loader, array $options = []) {
     $this->state = $state;
 

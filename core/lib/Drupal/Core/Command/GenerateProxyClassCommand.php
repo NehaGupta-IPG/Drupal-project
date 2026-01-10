@@ -23,12 +23,6 @@ class GenerateProxyClassCommand extends Command {
    */
   protected $proxyBuilder;
 
-  /**
-   * Constructs a new GenerateProxyClassCommand instance.
-   *
-   * @param \Drupal\Component\ProxyBuilder\ProxyBuilder $proxy_builder
-   *   The proxy builder.
-   */
   public function __construct(ProxyBuilder $proxy_builder) {
     parent::__construct();
 

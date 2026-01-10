@@ -21,12 +21,6 @@ class TestController extends ControllerBase {
    */
   protected $token;
 
-  /**
-   * Constructs a new TestController instance.
-   *
-   * @param \Drupal\Core\Utility\Token $token
-   *   The token replacement system.
-   */
   public function __construct(Token $token) {
     $this->token = $token;
   }

@@ -18,30 +18,6 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
 
   use AssetGroupSetHashTrait;
 
-  /**
-   * Constructs a CssCollectionOptimizerLazy.
-   *
-   * @param \Drupal\Core\Asset\AssetCollectionGrouperInterface $grouper
-   *   The grouper for CSS assets.
-   * @param \Drupal\Core\Asset\AssetOptimizerInterface $optimizer
-   *   The asset optimizer.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
-   *   The theme manager.
-   * @param \Drupal\Core\Asset\LibraryDependencyResolverInterface $dependencyResolver
-   *   The library dependency resolver.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   *   The request stack.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
-   *   The file system service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
-   *   The config factory.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
-   *   The file URL generator.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
-   *   The language manager.
-   */
   public function __construct(
     protected readonly AssetCollectionGrouperInterface $grouper,
     protected readonly AssetOptimizerInterface $optimizer,

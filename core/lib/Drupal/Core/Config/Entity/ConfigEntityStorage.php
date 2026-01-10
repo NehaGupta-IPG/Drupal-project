@@ -83,20 +83,6 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    */
   protected $overrideFree = FALSE;
 
-  /**
-   * Constructs a ConfigEntityStorage object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
-   *   The UUID service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
-   *   The memory cache backend.
-   */
   public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache) {
     parent::__construct($entity_type, $memory_cache);
 

@@ -29,14 +29,6 @@ class FieldUiLocalAction extends DeriverBase implements ContainerDeriverInterfac
    */
   protected $entityTypeManager;
 
-  /**
-   * Constructs a FieldUiLocalAction object.
-   *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider to load routes by name.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(RouteProviderInterface $route_provider, EntityTypeManagerInterface $entity_type_manager) {
     $this->routeProvider = $route_provider;
     $this->entityTypeManager = $entity_type_manager;

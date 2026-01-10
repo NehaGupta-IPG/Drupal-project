@@ -37,9 +37,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class HtmxRenderer implements MainContentRendererInterface {
 
-  /**
-   * Constructs a new HtmxRenderer.
-   */
   public function __construct(
     protected TitleResolverInterface $titleResolver,
     protected RendererInterface $renderer,

@@ -29,14 +29,6 @@ class MultipleStaticContext implements ContextProviderInterface {
    */
   protected $userStorage;
 
-  /**
-   * Constructs a new MultipleStaticContext.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
   public function __construct(AccountInterface $account, EntityTypeManagerInterface $entity_type_manager) {
     $this->account = $account;
     $this->userStorage = $entity_type_manager->getStorage('user');

@@ -19,12 +19,6 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   protected $mapperManager;
 
-  /**
-   * Constructs a new RouteSubscriber.
-   *
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $mapper_manager
-   *   The mapper plugin discovery service.
-   */
   public function __construct(ConfigMapperManagerInterface $mapper_manager) {
     $this->mapperManager = $mapper_manager;
   }

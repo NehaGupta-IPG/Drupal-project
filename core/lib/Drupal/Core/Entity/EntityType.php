@@ -324,15 +324,6 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    */
   protected $additional = [];
 
-  /**
-   * Constructs a new EntityType.
-   *
-   * @param array $definition
-   *   An array of values from the annotation.
-   *
-   * @throws \Drupal\Core\Entity\Exception\EntityTypeIdLengthException
-   *   Thrown when attempting to instantiate an entity type with too long ID.
-   */
   public function __construct($definition) {
     // Throw an exception if the entity type ID is longer than 32 characters.
     if (mb_strlen($definition['id']) > static::ID_MAX_LENGTH) {

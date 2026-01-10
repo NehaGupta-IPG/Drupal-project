@@ -63,19 +63,6 @@ class PluralTranslation extends AnnotationBase {
    */
   protected $context;
 
-  /**
-   * Constructs a new class instance.
-   *
-   * @param array $values
-   *   An associative array with the following keys:
-   *   - singular: The string for the singular case.
-   *   - plural: The string for the plural case.
-   *   - context: The context the source strings belong to.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown when the keys 'singular' or 'plural' are missing from the $values
-   *   array.
-   */
   public function __construct(array $values) {
     if (!isset($values['singular'])) {
       throw new \InvalidArgumentException('Missing "singular" value in the PluralTranslation annotation');

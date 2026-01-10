@@ -21,22 +21,6 @@ use Drupal\Core\Utility\CallableResolver;
  */
 final class NavigationMenuLinkTree extends MenuLinkTree {
 
-  /**
-   * Constructs a \Drupal\navigation\Menu\NavigationMenuLinkTree object.
-   *
-   * @param \Drupal\Core\Menu\MenuTreeStorageInterface $treeStorage
-   *   The menu link tree storage.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
-   *   The menu link plugin manager.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
-   *   The route provider to load routes by name.
-   * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menuActiveTrail
-   *   The active menu trail service.
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
-   *   The callable resolver.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   */
   public function __construct(
     MenuTreeStorageInterface $treeStorage,
     MenuLinkManagerInterface $menuLinkManager,

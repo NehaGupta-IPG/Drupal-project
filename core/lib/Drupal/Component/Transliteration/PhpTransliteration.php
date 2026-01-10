@@ -77,14 +77,6 @@ class PhpTransliteration implements TransliterationInterface {
     'zh' => 'ʒ',
   ];
 
-  /**
-   * Constructs a transliteration object.
-   *
-   * @param string $data_directory
-   *   (optional) The directory where data files reside. If omitted, defaults
-   *   to subdirectory 'data' underneath the directory where the class's PHP
-   *   file resides.
-   */
   public function __construct($data_directory = NULL) {
     $this->dataDirectory = (isset($data_directory)) ? $data_directory : __DIR__ . '/data';
   }

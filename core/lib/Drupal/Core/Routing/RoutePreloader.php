@@ -24,14 +24,6 @@ class RoutePreloader implements EventSubscriberInterface {
    */
   protected $nonAdminRoutesOnRebuild = [];
 
-  /**
-   * Constructs a new RoutePreloader.
-   *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
-   *   The route provider.
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state key value store.
-   */
   public function __construct(
     protected RouteProviderInterface $routeProvider,
     protected StateInterface $state,

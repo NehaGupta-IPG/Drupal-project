@@ -26,9 +26,6 @@ class ViewsConfigUpdater {
    */
   protected array $triggeredDeprecations = [];
 
-  /**
-   * ViewsConfigUpdater constructor.
-   */
   public function __construct(
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly EntityFieldManagerInterface $entityFieldManager,

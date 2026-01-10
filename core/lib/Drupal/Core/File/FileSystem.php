@@ -55,14 +55,6 @@ class FileSystem implements FileSystemInterface {
    */
   protected $streamWrapperManager;
 
-  /**
-   * Constructs a new FileSystem.
-   *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
-   *   The stream wrapper manager.
-   * @param \Drupal\Core\Site\Settings $settings
-   *   The site settings.
-   */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager, Settings $settings) {
     $this->streamWrapperManager = $stream_wrapper_manager;
     $this->settings = $settings;

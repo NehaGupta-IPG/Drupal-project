@@ -62,22 +62,6 @@ class CommentForm extends ContentEntityForm {
     );
   }
 
-  /**
-   * Constructs a new CommentForm.
-   *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
-   *   The entity repository.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
-   *   The renderer.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
-   *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entity_field_manager
-   *   (optional) The entity field manager service.
-   */
   public function __construct(
     EntityRepositoryInterface $entity_repository,
     AccountInterface $current_user,

@@ -50,20 +50,6 @@ class KeyValueEntityStorage extends EntityStorageBase {
    */
   protected $languageManager;
 
-  /**
-   * Constructs a new KeyValueEntityStorage.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $key_value_store
-   *   The key value store.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
-   *   The UUID service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
-   *   The memory cache.
-   */
   public function __construct(EntityTypeInterface $entity_type, KeyValueStoreInterface $key_value_store, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache) {
     parent::__construct($entity_type, $memory_cache);
     $this->keyValueStore = $key_value_store;

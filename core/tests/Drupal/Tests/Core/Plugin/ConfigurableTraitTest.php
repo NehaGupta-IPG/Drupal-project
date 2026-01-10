@@ -177,9 +177,6 @@ class ConfigurableTestClass extends PluginBase implements ConfigurableInterface 
    */
   protected ?array $defaultConfiguration = NULL;
 
-  /**
-   * {@inheritdoc}
-   */
   public function __construct(array $configuration = [], string $plugin_id = '', array $plugin_definition = []) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->setConfiguration($configuration);

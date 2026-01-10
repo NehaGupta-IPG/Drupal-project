@@ -24,16 +24,6 @@ class HelpTwigExtension extends AbstractExtension {
 
   use StringTranslationTrait;
 
-  /**
-   * Constructs a \Drupal\help\HelpTwigExtension.
-   *
-   * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
-   *   The access manager.
-   * @param \Drupal\help\HelpTopicPluginManagerInterface $pluginManager
-   *   The help topic plugin manager service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
-   *   The string translation service.
-   */
   public function __construct(protected AccessManagerInterface $accessManager, protected HelpTopicPluginManagerInterface $pluginManager, TranslationInterface $string_translation) {
     $this->stringTranslation = $string_translation;
   }

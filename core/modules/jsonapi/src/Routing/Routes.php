@@ -68,16 +68,6 @@ class Routes implements ContainerInjectionInterface {
    */
   protected $jsonApiBasePath;
 
-  /**
-   * Instantiates a Routes object.
-   *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
-   *   The JSON:API resource type repository.
-   * @param string[] $authentication_providers
-   *   The authentication providers, keyed by ID.
-   * @param string $jsonapi_base_path
-   *   The JSON:API base path.
-   */
   public function __construct(ResourceTypeRepositoryInterface $resource_type_repository, array $authentication_providers, $jsonapi_base_path) {
     $this->resourceTypeRepository = $resource_type_repository;
     $this->providerIds = array_keys($authentication_providers);

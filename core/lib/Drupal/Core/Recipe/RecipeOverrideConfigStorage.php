@@ -14,15 +14,6 @@ use Drupal\Core\Config\StorageInterface;
  */
 final class RecipeOverrideConfigStorage implements StorageInterface {
 
-  /**
-   * @param \Drupal\Core\Config\StorageInterface $recipeStorage
-   *   The recipe's configuration storage.
-   * @param \Drupal\Core\Config\StorageInterface $wrappedStorage
-   *   The storage to override.
-   * @param string $collection
-   *   (optional) The collection to store configuration in. Defaults to the
-   *   default collection.
-   */
   public function __construct(
     protected readonly StorageInterface $recipeStorage,
     protected readonly StorageInterface $wrappedStorage,

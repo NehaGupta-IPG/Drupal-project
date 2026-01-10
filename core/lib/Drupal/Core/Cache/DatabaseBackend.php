@@ -68,23 +68,6 @@ class DatabaseBackend implements CacheBackendInterface {
    */
   protected $checksumProvider;
 
-  /**
-   * Constructs a DatabaseBackend object.
-   *
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
-   *   The cache tags checksum provider.
-   * @param string $bin
-   *   The cache bin for which the object is created.
-   * @param \Drupal\Component\Serialization\ObjectAwareSerializationInterface|int|string|null $serializer
-   *   (optional) The serializer to use.
-   * @param \Drupal\Component\Datetime\TimeInterface|int|string|null $time
-   *   The time service.
-   * @param int $max_rows
-   *   (optional) The maximum number of rows that are allowed in this cache bin
-   *   table.
-   */
   public function __construct(
     Connection $connection,
     CacheTagsChecksumInterface $checksum_provider,

@@ -25,14 +25,6 @@ class ExtensionNameConstraint extends RegexConstraint {
    */
   public string $message = 'This value is not a valid extension name.';
 
-  /**
-   * Constructs an ExtensionNameConstraint object.
-   *
-   * @param string|array|null $pattern
-   *   The regular expression to test for.
-   * @param mixed ...$arguments
-   *   Arguments to pass to the parent constructor.
-   */
   public function __construct(string|array|null $pattern, ...$arguments) {
     // Always use the regular expression that ExtensionDiscovery uses to find
     // valid extensions.

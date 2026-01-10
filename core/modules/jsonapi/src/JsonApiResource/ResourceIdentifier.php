@@ -67,16 +67,6 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
    */
   protected $meta;
 
-  /**
-   * ResourceIdentifier constructor.
-   *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType|string $resource_type
-   *   The JSON:API resource type or a JSON:API resource type name.
-   * @param string $id
-   *   The resource ID.
-   * @param array $meta
-   *   Any metadata for the ResourceIdentifier.
-   */
   public function __construct($resource_type, $id, array $meta = []) {
     assert(is_string($resource_type) || $resource_type instanceof ResourceType);
     assert(!isset($meta[static::ARITY_KEY]) || is_int($meta[static::ARITY_KEY]) && $meta[static::ARITY_KEY] >= 0);

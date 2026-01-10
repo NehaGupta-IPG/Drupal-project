@@ -26,12 +26,6 @@ class HtmlResponsePlaceholderStrategySubscriber implements EventSubscriberInterf
    */
   protected $placeholderStrategy;
 
-  /**
-   * Constructs a HtmlResponsePlaceholderStrategySubscriber object.
-   *
-   * @param \Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface $placeholder_strategy
-   *   The placeholder strategy to use.
-   */
   public function __construct(PlaceholderStrategyInterface $placeholder_strategy) {
     $this->placeholderStrategy = $placeholder_strategy;
   }

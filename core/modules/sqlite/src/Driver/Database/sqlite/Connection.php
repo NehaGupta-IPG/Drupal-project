@@ -73,9 +73,6 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    */
   protected $identifierQuotes = ['"', '"'];
 
-  /**
-   * Constructs a \Drupal\sqlite\Driver\Database\sqlite\Connection object.
-   */
   public function __construct(\PDO $connection, array $connection_options) {
     assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof SqliteConnection : TRUE);
     parent::__construct($connection, $connection_options);

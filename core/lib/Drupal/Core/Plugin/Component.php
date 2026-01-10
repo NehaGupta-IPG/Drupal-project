@@ -38,11 +38,6 @@ class Component extends PluginBase {
    */
   public readonly array $library;
 
-  /**
-   * Component constructor.
-   *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
-   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     if (str_contains($plugin_id, '/')) {

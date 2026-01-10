@@ -1008,9 +1008,6 @@ class UncacheableTestAccessResult implements AccessResultInterface {
    */
   protected $value;
 
-  /**
-   * Constructs a new UncacheableTestAccessResult object.
-   */
   public function __construct($value) {
     $this->value = $value;
   }

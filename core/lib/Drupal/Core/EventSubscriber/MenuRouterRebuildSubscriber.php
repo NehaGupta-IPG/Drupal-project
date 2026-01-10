@@ -17,20 +17,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class MenuRouterRebuildSubscriber implements EventSubscriberInterface {
 
-  /**
-   * Constructs the MenuRouterRebuildSubscriber object.
-   *
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
-   *   The menu link plugin manager.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
-   * @param \Drupal\Core\Database\ReplicaKillSwitch $replicaKillSwitch
-   *   The replica kill switch.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
-   */
   public function __construct(
     protected LockBackendInterface $lock,
     protected MenuLinkManagerInterface $menuLinkManager,

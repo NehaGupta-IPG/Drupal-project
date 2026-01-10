@@ -38,15 +38,6 @@ class YamlDiscovery implements DiscoveryInterface {
    */
   protected $translatableProperties = [];
 
-  /**
-   * Construct a YamlDiscovery object.
-   *
-   * @param string $name
-   *   The file name suffix to use for discovery; for example, 'test' will
-   *   become 'MODULE.test.yml'.
-   * @param array $directories
-   *   An array of directories to scan.
-   */
   public function __construct($name, array $directories) {
     $this->discovery = new CoreYamlDiscovery($name, $directories);
   }

@@ -31,16 +31,6 @@ class HelpTopicTwigLoader extends FilesystemLoader {
    */
   const MAIN_NAMESPACE = 'help_topics';
 
-  /**
-   * Constructs a new HelpTopicTwigLoader object.
-   *
-   * @param string $root_path
-   *   The root path.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler service.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler service.
-   */
   public function __construct($root_path, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
     parent::__construct([], $root_path);
     // Add help_topics directories for modules and themes in the 'help_topic'

@@ -21,12 +21,6 @@ class MenuController extends ControllerBase {
    */
   protected $menuParentSelector;
 
-  /**
-   * Creates a new MenuController object.
-   *
-   * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $menu_parent_form
-   *   The menu parent form service.
-   */
   public function __construct(MenuParentFormSelectorInterface $menu_parent_form) {
     $this->menuParentSelector = $menu_parent_form;
   }

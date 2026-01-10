@@ -13,9 +13,6 @@ namespace Drupal\jsonapi\JsonApiResource;
  */
 class NullIncludedData extends IncludedData {
 
-  /**
-   * NullData constructor.
-   */
   public function __construct() {
     parent::__construct([]);
   }

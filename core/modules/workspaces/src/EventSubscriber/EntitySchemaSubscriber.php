@@ -41,16 +41,6 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
    */
   protected $workspaceInfo;
 
-  /**
-   * Constructs a new EntitySchemaSubscriber.
-   *
-   * @param \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager
-   *   Definition update manager.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository
-   *   Last definitions.
-   * @param \Drupal\workspaces\WorkspaceInformationInterface $workspace_information
-   *   The workspace information service.
-   */
   public function __construct(EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager, EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository, WorkspaceInformationInterface $workspace_information) {
     $this->entityDefinitionUpdateManager = $entityDefinitionUpdateManager;
     $this->entityLastInstalledSchemaRepository = $entityLastInstalledSchemaRepository;

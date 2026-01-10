@@ -35,14 +35,6 @@ class WorkflowAccessControlHandler extends EntityAccessControlHandler implements
     );
   }
 
-  /**
-   * Constructs the workflow access control handler instance.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $workflow_type_manager
-   *   The workflow type plugin manager.
-   */
   public function __construct(EntityTypeInterface $entity_type, PluginManagerInterface $workflow_type_manager) {
     parent::__construct($entity_type);
     $this->workflowTypeManager = $workflow_type_manager;

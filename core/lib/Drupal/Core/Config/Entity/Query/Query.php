@@ -34,21 +34,6 @@ class Query extends QueryBase implements QueryInterface {
    */
   protected $keyValueFactory;
 
-  /**
-   * Constructs a Query object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param string $conjunction
-   *   - AND: all of the conditions on the query need to match.
-   *   - OR: at least one of the conditions on the query need to match.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
-   *   The key value factory.
-   * @param array $namespaces
-   *   List of potential namespaces of the classes belonging to this query.
-   */
   public function __construct(EntityTypeInterface $entity_type, $conjunction, ConfigFactoryInterface $config_factory, KeyValueFactoryInterface $key_value_factory, array $namespaces) {
     parent::__construct($entity_type, $conjunction, $namespaces);
     $this->configFactory = $config_factory;

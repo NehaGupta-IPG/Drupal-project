@@ -44,14 +44,6 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
    */
   protected $entityFieldManager;
 
-  /**
-   * Constructs a new DefaultHtmlRouteProvider.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
-   *   The entity field manager.
-   */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;

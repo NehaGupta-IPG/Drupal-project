@@ -14,12 +14,6 @@ class ReadOnlyStorage implements StorageInterface {
    */
   protected $storage;
 
-  /**
-   * Create a ReadOnlyStorage decorating another storage.
-   *
-   * @param \Drupal\Core\Config\StorageInterface $storage
-   *   The decorated storage.
-   */
   public function __construct(StorageInterface $storage) {
     $this->storage = $storage;
   }

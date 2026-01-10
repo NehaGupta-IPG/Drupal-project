@@ -15,15 +15,6 @@ use Drupal\Core\Config\StorageInterface;
  */
 final class RecipeConfigStorageWrapper implements StorageInterface {
 
-  /**
-   * @param \Drupal\Core\Config\StorageInterface $storageA
-   *   First config storage to wrap.
-   * @param \Drupal\Core\Config\StorageInterface $storageB
-   *   Second config storage to wrap.
-   * @param string $collection
-   *   (optional) The collection to store configuration in. Defaults to the
-   *   default collection.
-   */
   public function __construct(
     protected readonly StorageInterface $storageA,
     protected readonly StorageInterface $storageB,

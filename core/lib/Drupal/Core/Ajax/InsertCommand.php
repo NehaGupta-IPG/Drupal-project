@@ -44,17 +44,6 @@ class InsertCommand implements CommandInterface, CommandWithAttachedAssetsInterf
    */
   protected $settings;
 
-  /**
-   * Constructs an InsertCommand object.
-   *
-   * @param string|null $selector
-   *   A CSS selector.
-   * @param string|array $content
-   *   The content that will be inserted in the matched element(s), either a
-   *   render array or an HTML string.
-   * @param array $settings
-   *   An array of JavaScript settings to be passed to any attached behaviors.
-   */
   public function __construct($selector, $content, ?array $settings = NULL) {
     $this->selector = $selector;
     $this->content = $content;

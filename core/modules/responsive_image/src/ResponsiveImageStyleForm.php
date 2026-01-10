@@ -31,12 +31,6 @@ class ResponsiveImageStyleForm extends EntityForm {
     );
   }
 
-  /**
-   * Constructs the responsive image style form.
-   *
-   * @param \Drupal\breakpoint\BreakpointManagerInterface $breakpoint_manager
-   *   The breakpoint manager.
-   */
   public function __construct(BreakpointManagerInterface $breakpoint_manager) {
     $this->breakpointManager = $breakpoint_manager;
   }
