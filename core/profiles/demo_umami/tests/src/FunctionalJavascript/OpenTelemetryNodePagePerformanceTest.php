@@ -60,9 +60,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagLookupQueryCount' => 24,
       'CacheTagInvalidationCount' => 0,
-      'ScriptCount' => 2,
+      'ScriptCount' => 4,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 5,
+      'StylesheetCount' => 7,
       'StylesheetBytes' => 40800,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -91,9 +91,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 1,
-      'ScriptCount' => 2,
+      'ScriptCount' => 4,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 5,
+      'StylesheetCount' => 7,
       'StylesheetBytes' => 40800,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -123,9 +123,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 20,
-      'ScriptCount' => 2,
+      'ScriptCount' => 4,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 5,
+      'StylesheetCount' => 7,
       'StylesheetBytes' => 40800,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -334,9 +334,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         ['config:workflows.workflow.editorial'],
         ['config:user.role.anonymous'],
       ],
-      'ScriptCount' => 2,
+      'ScriptCount' => 4,
       'ScriptBytes' => 12000,
-      'StylesheetCount' => 5,
+      'StylesheetCount' => 7,
       'StylesheetBytes' => 40500,
     ];
     $this->assertMetrics($expected, $performance_data);

@@ -340,7 +340,7 @@ ckeditor5.autoformat:
     - core/ckeditor5
 
 drupal:
-  unique_css_aggregate: true
+  unique_js_aggregate: true
   version: VERSION
   js:
     misc/drupal.js: { weight: -18 }

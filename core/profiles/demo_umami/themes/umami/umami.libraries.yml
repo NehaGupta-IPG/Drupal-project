@@ -90,6 +90,7 @@ filter:
       css/theme/filter.admin.css: {}
 
 classy.base:
+  unique_css_aggregate: TRUE
   version: VERSION
   css:
     component:
