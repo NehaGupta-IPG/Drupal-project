@@ -440,9 +440,8 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       foreach ($variations as $variation) {
         $field_spec = $variation + $base_field_spec;
         $initial = $field_spec['initial'] ?? NULL;
-        $initial_from_field = $field_spec['initial_from_field'] ?? NULL;
-        unset($field_spec['initial'], $field_spec['initial_from_field']);
-        $this->assertFieldAdditionRemoval(new Column(...$field_spec), $initial, $initial_from_field);
+        unset($field_spec['initial']);
+        $this->assertFieldAdditionRemoval(new Column(...$field_spec), $initial);
       }
     }
 
@@ -455,11 +454,26 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
           'size' => $size,
         ];
         $variations = [
-          ['notNull' => FALSE],
-          ['notNull' => FALSE, 'default' => $type === ColumnType::Int ? new IntValue(7) : new FloatValue(7)],
-          ['notNull' => TRUE, 'initial' => 1],
-          ['notNull' => TRUE, 'initial' => 1, 'default' => $type === ColumnType::Int ? new IntValue(7) : new FloatValue(7)],
-          ['notNull' => TRUE, 'initial_from_field' => 'serial_column'],
+          [
+            'notNull' => FALSE,
+          ],
+          [
+            'notNull' => FALSE,
+            'default' => $type === ColumnType::Int ? new IntValue(7) : new FloatValue(7)
+          ],
+          [
+            'notNull' => TRUE,
+            'initial' => 1,
+          ],
+          [
+            'notNull' => TRUE,
+            'initial' => 1,
+            'default' => $type === ColumnType::Int ? new IntValue(7) : new FloatValue(7),
+          ],
+          [
+            'notNull' => TRUE,
+            'initial_from_field' => 'serial_column',
+          ],
           [
             'notNull' => TRUE,
             'initial_from_field' => 'test_nullable_field',
@@ -518,6 +532,11 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    *
    * @param array $field_spec
    *   The schema specification of the field.
+   * @param int|float|string|null $initial
+   *   (Optional) The value to use for new field initialization.
+   * @param string|null $initial_from_field
+   *   (Optional) The field whose values should be used use for new field
+   *   initialization.
    *
    * @internal
    */
