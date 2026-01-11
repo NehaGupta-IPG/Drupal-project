@@ -843,7 +843,7 @@ htmx:
     assets/vendor/htmx/htmx.min.js: { minified: true, preprocess: false }
 
 internal.floating-ui:
-  unique_css_aggregate: true
+  unique_js_aggregate: true
   remote: https://github.com/floating-ui/floating-ui
   version: "1.7.4"
   license:
