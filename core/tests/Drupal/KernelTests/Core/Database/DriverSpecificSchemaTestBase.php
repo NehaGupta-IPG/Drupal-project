@@ -10,6 +10,7 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
+use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
@@ -699,9 +700,9 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   /**
    * Tests various schema changes' effect on the table's primary key.
    *
-   * @param array $initial_primary_key
+   * @param \Drupal\Core\Database\SchemaDefinition\PrimaryKey $initial_primary_key
    *   The initial primary key of the test table.
-   * @param array $renamed_primary_key
+   * @param \Drupal\Core\Database\SchemaDefinition\PrimaryKey $renamed_primary_key
    *   The primary key of the test table after renaming the test field.
    *
    * @legacy-covers ::addField
@@ -710,21 +711,29 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * @legacy-covers ::findPrimaryKeyColumns
    */
   #[DataProvider('providerTestSchemaCreateTablePrimaryKey')]
-  public function testSchemaChangePrimaryKey(array $initial_primary_key, array $renamed_primary_key): void {
+  public function testSchemaChangePrimaryKey(PrimaryKey $initial_primary_key, PrimaryKey $renamed_primary_key): void {
     $find_primary_key_columns = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
 
     // Test making the field the primary key of the table upon creation.
     $table_name = 'test_table';
-    $table_spec = [
-      'fields' => [
-        'test_field' => ['type' => 'int', 'not null' => TRUE],
-        'other_test_field' => ['type' => 'int', 'not null' => TRUE],
+    $this->schema->createTableFromDefinition(new Table(
+      name: $table_name,
+      columns: [
+        new Column(
+          name: 'test_field',
+          type: ColumnType::Int,
+          notNull: TRUE,
+        ),
+        new Column(
+          name: 'other_test_field',
+          type: ColumnType::Int,
+          notNull: TRUE,
+        ),
       ],
-      'primary key' => $initial_primary_key,
-    ];
-    $this->schema->createTable($table_name, $table_spec);
+      primaryKey: $initial_primary_key,
+    ));
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_field'));
-    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+    $this->assertEquals($initial_primary_key, new PrimaryKey($find_primary_key_columns->invoke($this->schema, $table_name)));
 
     // Change the field type and make sure the primary key stays in place.
     $this->schema->changeField(
@@ -734,7 +743,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ['type' => 'varchar', 'length' => 32, 'not null' => TRUE]
     );
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_field'));
-    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+    $this->assertEquals($initial_primary_key, new PrimaryKey($find_primary_key_columns->invoke($this->schema, $table_name)));
 
     // Add some data and change the field type back, to make sure that changing
     // the type leaves the primary key in place even with existing data.
@@ -744,20 +753,20 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       ->execute();
     $this->schema->changeField($table_name, 'test_field', 'test_field', ['type' => 'int', 'not null' => TRUE]);
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_field'));
-    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+    $this->assertEquals($initial_primary_key, new PrimaryKey($find_primary_key_columns->invoke($this->schema, $table_name)));
 
     // Make sure that adding the primary key can be done as part of changing
     // a field, as well.
     $this->schema->dropPrimaryKey($table_name);
     $this->assertEquals([], $find_primary_key_columns->invoke($this->schema, $table_name));
-    $this->schema->changeField($table_name, 'test_field', 'test_field', ['type' => 'int', 'not null' => TRUE], ['primary key' => $initial_primary_key]);
+    $this->schema->changeField($table_name, 'test_field', 'test_field', ['type' => 'int', 'not null' => TRUE], ['primary key' => $initial_primary_key->toArray()]);
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_field'));
-    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+    $this->assertEquals($initial_primary_key, new PrimaryKey($find_primary_key_columns->invoke($this->schema, $table_name)));
 
     // Rename the field and make sure the primary key was updated.
     $this->schema->changeField($table_name, 'test_field', 'test_field_renamed', ['type' => 'int', 'not null' => TRUE]);
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_field_renamed'));
-    $this->assertEquals($renamed_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+    $this->assertEquals($renamed_primary_key, new PrimaryKey($find_primary_key_columns->invoke($this->schema, $table_name)));
 
     // Drop the field and make sure the primary key was dropped, as well.
     $this->schema->dropField($table_name, 'test_field_renamed');
@@ -766,9 +775,9 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Add the field again and make sure adding the primary key can be done at
     // the same time.
-    $this->schema->addField($table_name, 'test_field', ['type' => 'int', 'default' => 0, 'not null' => TRUE], ['primary key' => $initial_primary_key]);
+    $this->schema->addField($table_name, 'test_field', ['type' => 'int', 'default' => 0, 'not null' => TRUE], ['primary key' => $initial_primary_key->toArray()]);
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_field'));
-    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+    $this->assertEquals($initial_primary_key, new PrimaryKey($find_primary_key_columns->invoke($this->schema, $table_name)));
 
     // Drop the field again and explicitly add a primary key.
     $this->schema->dropField($table_name, 'test_field');
@@ -778,9 +787,9 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Test that adding a field with a primary key will work even with a
     // pre-existing primary key.
-    $this->schema->addField($table_name, 'test_field', ['type' => 'int', 'default' => 0, 'not null' => TRUE], ['primary key' => $initial_primary_key]);
+    $this->schema->addField($table_name, 'test_field', ['type' => 'int', 'default' => 0, 'not null' => TRUE], ['primary key' => $initial_primary_key->toArray()]);
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_field'));
-    $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
+    $this->assertEquals($initial_primary_key, new PrimaryKey($find_primary_key_columns->invoke($this->schema, $table_name)));
   }
 
   /**
@@ -793,16 +802,16 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $tests = [];
 
     $tests['simple_primary_key'] = [
-      'initial_primary_key' => ['test_field'],
-      'renamed_primary_key' => ['test_field_renamed'],
+      'initial_primary_key' => new PrimaryKey(['test_field']),
+      'renamed_primary_key' => new PrimaryKey(['test_field_renamed']),
     ];
     $tests['composite_primary_key'] = [
-      'initial_primary_key' => ['test_field', 'other_test_field'],
-      'renamed_primary_key' => ['test_field_renamed', 'other_test_field'],
+      'initial_primary_key' => new PrimaryKey(['test_field', 'other_test_field']),
+      'renamed_primary_key' => new PrimaryKey(['test_field_renamed', 'other_test_field']),
     ];
     $tests['composite_primary_key_different_order'] = [
-      'initial_primary_key' => ['other_test_field', 'test_field'],
-      'renamed_primary_key' => ['other_test_field', 'test_field_renamed'],
+      'initial_primary_key' => new PrimaryKey(['other_test_field', 'test_field']),
+      'renamed_primary_key' => new PrimaryKey(['other_test_field', 'test_field_renamed']),
     ];
 
     return $tests;
@@ -813,16 +822,18 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    */
   public function testInvalidPrimaryKeyOnTableCreation(): void {
     // Test making an invalid field the primary key of the table upon creation.
-    $table_name = 'test_table';
-    $table_spec = [
-      'fields' => [
-        'test_field' => ['type' => 'int'],
-      ],
-      'primary key' => ['test_field'],
-    ];
     $this->expectException(SchemaException::class);
     $this->expectExceptionMessage("The 'test_field' field specification does not define 'not null' as TRUE.");
-    $this->schema->createTable($table_name, $table_spec);
+    $this->schema->createTableFromDefinition(new Table(
+      name: 'test_table',
+      columns: [
+        new Column(
+          name: 'test_field',
+          type: ColumnType::Int,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['test_field']),
+    ));
   }
 
   /**
@@ -831,14 +842,22 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   public function testChangePrimaryKeyToSerial(): void {
     // Test making an invalid field the primary key of the table upon creation.
     $table_name = 'test_table';
-    $table_spec = [
-      'fields' => [
-        'test_field' => ['type' => 'int', 'not null' => TRUE],
-        'test_field_string'  => ['type' => 'varchar', 'length' => 20],
+    $this->schema->createTableFromDefinition(new Table(
+      name: $table_name,
+      columns: [
+        new Column(
+          name: 'test_field',
+          type: ColumnType::Int,
+          notNull: TRUE,
+        ),
+        new Column(
+          name: 'test_field_string',
+          type: ColumnType::Varchar,
+          length: 20,
+        ),
       ],
-      'primary key' => ['test_field'],
-    ];
-    $this->schema->createTable($table_name, $table_spec);
+      primaryKey: new PrimaryKey(['test_field']),
+    ));
 
     $this->tryInsertExpectsIntegrityConstraintViolationException($table_name);
 
@@ -890,13 +909,17 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   public function testInvalidPrimaryKeyAddition(): void {
     // Test adding a new invalid field to the primary key.
     $table_name = 'test_table';
-    $table_spec = [
-      'fields' => [
-        'test_field' => ['type' => 'int', 'not null' => TRUE],
+    $this->schema->createTableFromDefinition(new Table(
+      name: $table_name,
+      columns: [
+        new Column(
+          name: 'test_field',
+          type: ColumnType::Int,
+          notNull: TRUE,
+        ),
       ],
-      'primary key' => ['test_field'],
-    ];
-    $this->schema->createTable($table_name, $table_spec);
+      primaryKey: new PrimaryKey(['test_field']),
+    ));
 
     $this->expectException(SchemaException::class);
     $this->expectExceptionMessage("The 'new_test_field' field specification does not define 'not null' as TRUE.");
@@ -914,13 +937,17 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
   public function testInvalidPrimaryKeyChange(): void {
     // Test adding a new invalid field to the primary key.
     $table_name = 'test_table';
-    $table_spec = [
-      'fields' => [
-        'test_field' => ['type' => 'int', 'not null' => TRUE],
+    $this->schema->createTableFromDefinition(new Table(
+      name: $table_name,
+      columns: [
+        new Column(
+          name: 'test_field',
+          type: ColumnType::Int,
+          notNull: TRUE,
+        ),
       ],
-      'primary key' => ['test_field'],
-    ];
-    $this->schema->createTable($table_name, $table_spec);
+      primaryKey: new PrimaryKey(['test_field']),
+    ));
 
     $this->expectException(SchemaException::class);
     $this->expectExceptionMessage("The 'changed_test_field' field specification does not define 'not null' as TRUE.");
@@ -1570,32 +1597,34 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * Tests handling with reserved keywords for naming tables, fields and more.
    */
   public function testReservedKeywordsForNaming(): void {
-    $table_specification = [
-      'description' => 'A test table with an ANSI reserved keywords for naming.',
-      'fields' => [
-        'primary' => [
-          'description' => 'Simple unique ID.',
-          'type' => 'int',
-          'not null' => TRUE,
-        ],
-        'update' => [
-          'description' => 'A column with reserved name.',
-          'type' => 'varchar',
-          'length' => 255,
-        ],
-      ],
-      'primary key' => ['primary'],
-      'unique keys' => [
-        'having' => ['update'],
-      ],
-      'indexes' => [
-        'in' => ['primary', 'update'],
-      ],
-    ];
-
     // Creating a table.
     $table_name = 'select';
-    $this->schema->createTable($table_name, $table_specification);
+    $table_specification = new Table(
+      name: $table_name,
+      description: 'A test table with an ANSI reserved keywords for naming.',
+      columns: [
+        new Column(
+          name: 'primary',
+          description: 'Simple unique ID.',
+          type: ColumnType::Int,
+          notNull: TRUE,
+        ),
+        new Column(
+          name: 'update',
+          description: 'A column with reserved name.',
+          type: ColumnType::Varchar,
+          length: 255,
+        ),
+      ],
+      primaryKey: new PrimaryKey(['primary']),
+      uniqueKeys: [
+        new UniqueKey(name: 'having', columns: ['update']),
+      ],
+      indexes: [
+        new Index(name: 'in', columns: ['primary', 'update']),
+      ],
+    );
+    $this->schema->createTableFromDefinition($table_specification);
     $this->assertTrue($this->schema->tableExists($table_name));
 
     // Finding all tables.
@@ -1650,7 +1679,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Adding an index.
     $index_name = $index_introspect_name = 'index';
-    $this->schema->addIndex($table_name_new, $index_name, ['update'], $table_specification);
+    $this->schema->addIndex($table_name_new, $index_name, ['update'], $table_specification->toArray());
     $this->assertTrue($this->schema->indexExists($table_name_new, $index_name));
 
     // Check the index columns.
@@ -1669,21 +1698,22 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    * Tests changing a field length.
    */
   public function testChangeSerialFieldLength(): void {
-    $specification = [
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'not null' => TRUE,
-          'description' => 'Primary Key: Unique ID.',
-        ],
-        'text' => [
-          'type' => 'text',
-          'description' => 'A text field',
-        ],
+    $this->schema->createTableFromDefinition(new Table(
+      name: 'change_serial_to_big',
+      columns: [
+        new Column(
+          name: 'id',
+          description: 'Primary Key: Unique ID.',
+          type: ColumnType::Serial,
+        ),
+        new Column(
+          name: 'text',
+          description: 'A text field',
+          type: ColumnType::Text,
+        ),
       ],
-      'primary key' => ['id'],
-    ];
-    $this->schema->createTable('change_serial_to_big', $specification);
+      primaryKey: new PrimaryKey(['id']),
+    ));
 
     // Increase the size of the field.
     $new_specification = [

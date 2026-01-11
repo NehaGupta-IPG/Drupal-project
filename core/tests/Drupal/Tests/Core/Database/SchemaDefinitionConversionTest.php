@@ -20,6 +20,7 @@ use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * Tests conversion of SchemaDefinition objects to legacy array-based structure.
@@ -185,8 +186,8 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
         ],
       ],
     );
-
-    $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
+dump(VarExporter::export($schemaDefinition));
+    $this->assertEquals($arraySpecification, $schemaDefinition->toArrayx());
   }
 
   /**
@@ -246,7 +247,8 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
       ],
     );
 
-    $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
+dump(VarExporter::export($schemaDefinition));
+    $this->assertEquals($arraySpecification, $schemaDefinition->toArrayx());
   }
 
 }

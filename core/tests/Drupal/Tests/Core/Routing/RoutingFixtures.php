@@ -5,6 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -23,9 +32,9 @@ class RoutingFixtures {
     $tables = $this->routingTableDefinition();
     $schema = $connection->schema();
 
-    foreach ($tables as $name => $table) {
-      $schema->dropTable($name);
-      $schema->createTable($name, $table);
+    foreach ($tables as $table) {
+      $schema->dropTable($table->name);
+      $schema->createTableFromDefinition($table);
     }
   }
 
@@ -39,8 +48,8 @@ class RoutingFixtures {
     $tables = $this->routingTableDefinition();
     $schema = $connection->schema();
 
-    foreach ($tables as $name => $table) {
-      $schema->dropTable($name);
+    foreach ($tables as $table) {
+      $schema->dropTable($table->name);
     }
   }
 
@@ -261,88 +270,101 @@ class RoutingFixtures {
   /**
    * Returns the table definition for the routing fixtures.
    *
-   * @return array
+   * @return \Drupal\Core\Database\SchemaDefinition\Schema
    *   Table definitions.
    */
-  public function routingTableDefinition(): array {
-
-    $tables['test_routes'] = [
-      'description' => 'Maps paths to various callbacks (access, page and title)',
-      'fields' => [
-        'name' => [
-          'description' => 'Primary Key: Machine name of this route',
-          'type' => 'varchar_ascii',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'path' => [
-          'description' => 'The path for this URI',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'pattern_outline' => [
-          'description' => 'The pattern',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'provider' => [
-          'description' => 'The provider grouping to which a route belongs.',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'access_callback' => [
-          'description' => 'The callback which determines the access to this router path. Defaults to \Drupal\Core\Session\AccountInterface::hasPermission.',
-          'type' => 'varchar',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'access_arguments' => [
-          'description' => 'A serialized array of arguments for the access callback.',
-          'type' => 'blob',
-          'not null' => FALSE,
-        ],
-        'fit' => [
-          'description' => 'A numeric representation of how specific the path is.',
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-        ],
-        'number_parts' => [
-          'description' => 'Number of parts in this router path.',
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-          'size' => 'small',
-        ],
-        'route' => [
-          'description' => 'A serialized Route object',
-          'type' => 'blob',
-          'size' => 'big',
-        ],
-        'alias' => [
-          'description' => 'The alias of the route, if applicable.',
-          'type' => 'varchar_ascii',
-          'length' => 255,
-        ],
+  public function routingTableDefinition(): Schema {
+    return new Schema(
+      name: 'routing_fixtures',
+      tables: [
+        new Table(
+          name: 'test_routes',
+          description: 'Maps paths to various callbacks (access, page and title)',
+          columns: [
+            new Column(
+              name: 'name',
+              description: 'Primary Key: Machine name of this route',
+              type: ColumnType::VarcharAscii,
+              length: 255,
+              notNull: TRUE,
+              default: new StringValue(''),
+            ),
+            new Column(
+              name: 'path',
+              description: 'The path for this URI',
+              type: ColumnType::Varchar,
+              length: 255,
+              notNull: TRUE,
+              default: new StringValue(''),
+            ),
+            new Column(
+              name: 'pattern_outline',
+              description: 'The pattern',
+              type: ColumnType::Varchar,
+              length: 255,
+              notNull: TRUE,
+              default: new StringValue(''),
+            ),
+            new Column(
+              name: 'provider',
+              description: 'The provider grouping to which a route belongs.',
+              type: ColumnType::Varchar,
+              length: 255,
+              notNull: TRUE,
+              default: new StringValue(''),
+            ),
+            new Column(
+              name: 'access_callback',
+              description: 'The callback which determines the access to this router path. Defaults to \Drupal\Core\Session\AccountInterface::hasPermission.',
+              type: ColumnType::Varchar,
+              length: 255,
+              notNull: TRUE,
+              default: new StringValue(''),
+            ),
+            new Column(
+              name: 'access_arguments',
+              description: 'A serialized array of arguments for the access callback.',
+              type: ColumnType::Blob,
+              notNull: FALSE,
+            ),
+            new Column(
+              name: 'fit',
+              description: 'A numeric representation of how specific the path is.',
+              type: ColumnType::Int,
+              notNull: TRUE,
+              default: new IntValue(0),
+            ),
+            new Column(
+              name: 'number_parts',
+              description: 'Number of parts in this router path.',
+              type: ColumnType::Int,
+              size: ColumnSize::Small,
+              notNull: TRUE,
+              default: new IntValue(0),
+            ),
+            new Column(
+              name: 'route',
+              description: 'A serialized Route object',
+              type: ColumnType::Blob,
+              size: ColumnSize::Big,
+            ),
+            new Column(
+              name: 'alias',
+              description: 'The alias of the route, if applicable.',
+              type: ColumnType::VarcharAscii,
+              length: 255,
+            ),
+          ],
+          primaryKey: new PrimaryKey(['name']),
+          indexes: [
+            new Index(name: 'fit', columns: ['fit']),
+            new Index(name: 'pattern_outline', columns: ['pattern_outline']),
+            new Index(name: 'provider', columns: ['provider']),
+            new Index(name: 'alias', columns: ['alias']),
+          ],
+        ),
       ],
-      'indexes' => [
-        'fit' => ['fit'],
-        'pattern_outline' => ['pattern_outline'],
-        'provider' => ['provider'],
-        'alias' => ['alias'],
-      ],
-      'primary key' => ['name'],
-    ];
-
-    return $tables;
+    );
   }
 
 }

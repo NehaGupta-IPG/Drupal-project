@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Database;
 
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\StackItem;
@@ -174,17 +178,16 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
     $this->assertTrue($this->connection->inTransaction(), 'In transaction inside nested transaction.');
 
     if ($ddl_statement) {
-      $table = [
-        'fields' => [
-          'id' => [
-            'type' => 'serial',
-            'unsigned' => TRUE,
-            'not null' => TRUE,
-          ],
+      $this->connection->schema()->createTableFromDefinition(new Table(
+        name: 'database_test_1',
+        columns: [
+          new Column(
+            name: 'id',
+            type: ColumnType::Serial,
+          ),
         ],
-        'primary key' => ['id'],
-      ];
-      $this->connection->schema()->createTable('database_test_1', $table);
+        primaryKey: new PrimaryKey(['id']),
+      ));
 
       $this->assertTrue($this->connection->inTransaction(), 'In transaction inside nested transaction.');
     }
@@ -487,17 +490,16 @@ abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseT
    */
   protected function executeDDLStatement() {
     static $count = 0;
-    $table = [
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'unsigned' => TRUE,
-          'not null' => TRUE,
-        ],
+    $this->connection->schema()->createTableFromDefinition(new Table(
+      name: 'database_test_' . ++$count,
+      columns: [
+        new Column(
+          name: 'id',
+          type: ColumnType::Serial,
+        ),
       ],
-      'primary key' => ['id'],
-    ];
-    $this->connection->schema()->createTable('database_test_' . ++$count, $table);
+      primaryKey: new PrimaryKey(['id']),
+    ));
   }
 
   /**
