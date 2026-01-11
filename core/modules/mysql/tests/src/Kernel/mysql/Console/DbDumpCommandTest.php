@@ -52,6 +52,8 @@ class DbDumpCommandTest extends DriverSpecificKernelTestBase {
 
     // Assert that insert exists and that some expected fields exist.
     $output = $command_tester->getDisplay();
+    dump($output);
+    $this->assertEquals(1, 2);
     $this->assertStringContainsString("createTable('router", $output, 'Table router found');
     $this->assertStringContainsString("insert('router", $output, 'Insert found');
     $this->assertStringContainsString("'name' => 'test", $output, 'Insert name field found');
@@ -72,6 +74,8 @@ class DbDumpCommandTest extends DriverSpecificKernelTestBase {
 
     // Assert that insert statement doesn't exist for schema only table.
     $output = $command_tester->getDisplay();
+    dump($output);
+    $this->assertEquals(1, 2);
     $this->assertStringContainsString("createTable('router", $output, 'Table router found');
     $this->assertStringNotContainsString("insert('router", $output, 'Insert not found');
     $this->assertStringNotContainsString("'name' => 'test", $output, 'Insert name field not found');

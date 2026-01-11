@@ -149,7 +149,6 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
     $command = $application->find('dump-database-d8-mysql');
     $command_tester = new CommandTester($command);
     $command_tester->execute([]);
-    dump($command_tester->getDisplay());
 
     // Tables that are schema-only should not have data exported.
     $pattern = preg_quote("\$connection->insert('sessions')");
