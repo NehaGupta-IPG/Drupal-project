@@ -4,9 +4,21 @@ namespace Drupal\Core\Command;
 
 use Drupal\Component\Utility\Variable;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\FloatValue;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\NullValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * Provides a command to dump the current database to a script.
@@ -86,8 +98,11 @@ class DbDumpCommand extends DbCommandBase {
       $schema_only_patterns[] = '/^' . $match . '$/';
     }
 
+    /** @var list<\Drupal\Core\Database\SchemaDefinition\Table> $table_definitions */
+    $table_definitions = [];
     foreach ($this->getTables($connection) as $table) {
-      $schema = $this->getTableSchema($connection, $table);
+      $table_definition = $this->getTableSchema($connection, $table);
+      $table_definitions[] = $table_definition;
       // Check for schema only.
       if (empty($schema_only_patterns) || preg_replace($schema_only_patterns, '', $table)) {
         $data = $this->getTableData($connection, $table);
@@ -95,11 +110,20 @@ class DbDumpCommand extends DbCommandBase {
       else {
         $data = [];
       }
-      $tables .= $this->getTableScript($table, $schema, $data, $insert_count);
+      $tables .= $this->getTableScript($table, $table_definition, $data, $insert_count);
     }
+
+    // Create the schema with all the tables dumped.
+    $schema = new Schema(
+      name: 'db-dump',
+      tables: $table_definitions,
+    );
+
     $script = $this->getTemplate();
     // Substitute in the version.
     $script = str_replace('{{VERSION}}', \Drupal::VERSION, $script);
+    // Substitute in the schema.
+    $script = str_replace('{{SCHEMA}}', VarExporter::export($schema), $script);
     // Substitute in the tables.
     $script = str_replace('{{TABLES}}', trim($tables), $script);
     return trim($script);
@@ -111,10 +135,10 @@ class DbDumpCommand extends DbCommandBase {
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection to use.
    *
-   * @return array
+   * @return list<string>
    *   An array of table names.
    */
-  protected function getTables(Connection $connection) {
+  protected function getTables(Connection $connection): array {
     $tables = array_values($connection->schema()->findTables('%'));
 
     foreach ($tables as $key => $table) {
@@ -140,91 +164,121 @@ class DbDumpCommand extends DbCommandBase {
    * @param string $table
    *   The table name.
    *
-   * @return array
-   *   A schema array (as defined by hook_schema()).
+   * @return \Drupal\Core\Database\SchemaDefinition\Table
+   *   A table definition.
    *
    * @todo This implementation is hard-coded for MySQL.
    */
-  protected function getTableSchema(Connection $connection, $table) {
+  protected function getTableSchema(Connection $connection, string $table): Table {
     // Check this is MySQL.
     if ($connection->databaseType() !== 'mysql') {
       throw new \RuntimeException('This script can only be used with MySQL database backends.');
     }
 
     $query = $connection->query("SHOW FULL COLUMNS FROM {" . $table . "}");
-    $definition = [];
+    $columns = [];
     while (($row = $query->fetchAssoc()) !== FALSE) {
-      $name = $row['Field'];
+      $column_args = ['name' => $row['Field']];
       // Parse out the field type and meta information.
       preg_match('@([a-z]+)(?:\((\d+)(?:,(\d+))?\))?\s*(unsigned)?@', $row['Type'], $matches);
       $type = $this->fieldTypeMap($connection, $matches[1]);
       if ($row['Extra'] === 'auto_increment') {
         // If this is an auto increment, then the type is 'serial'.
-        $type = 'serial';
+        $type = ColumnType::Serial;
       }
-      $definition['fields'][$name] = [
-        'type' => $type,
-        'not null' => $row['Null'] === 'NO',
-      ];
+      if (!is_string($type)) {
+        $column_args['type'] = $type;
+      }
+      if ($type !== ColumnType::Serial) {
+        $column_args['notNull'] = $row['Null'] === 'NO';
+      }
       if ($size = $this->fieldSizeMap($connection, $matches[1])) {
-        $definition['fields'][$name]['size'] = $size;
+        $column_args['size'] = $size;
       }
-      if (isset($matches[2]) && $type === 'numeric') {
+      if (isset($matches[2]) && $type === ColumnType::Numeric) {
         // Add precision and scale.
-        $definition['fields'][$name]['precision'] = $matches[2];
-        $definition['fields'][$name]['scale'] = $matches[3];
+        $column_args['precision'] = (int) $matches[2];
+        $column_args['scale'] = (int) $matches[3];
       }
       elseif ($type === 'time') {
         // @todo Core doesn't support these, but copied from `migrate-db.sh` for now.
         // Convert to varchar.
-        $definition['fields'][$name]['type'] = 'varchar';
-        $definition['fields'][$name]['length'] = '100';
+        $column_args['type'] = ColumnType::Varchar;
+        $column_args['length'] = 100;
       }
       elseif ($type === 'datetime') {
         // Adjust for other database types.
-        $definition['fields'][$name]['mysql_type'] = 'datetime';
-        $definition['fields'][$name]['pgsql_type'] = 'timestamp without time zone';
-        $definition['fields'][$name]['sqlite_type'] = 'varchar';
-        $definition['fields'][$name]['sqlsrv_type'] = 'smalldatetime';
+        $column_args['dbSpecificExtra'] = [
+          'mysql' => [
+            'mysql_type' => 'datetime',
+          ],
+          'pgsql' => [
+            'pgsql_type' => 'timestamp without time zone',
+          ],
+          'sqlite' => [
+            'sqlite_type' => 'varchar',
+          ],
+          'sqlsrv' => [
+            'sqlsrv_type' => 'smalldatetime',
+          ],
+        ];
       }
-      elseif (!isset($definition['fields'][$name]['size'])) {
+      elseif (!isset($column_args['size'])) {
         // Try use the provided length, if it doesn't exist default to 100. It's
         // not great but good enough for our dumps at this point.
-        $definition['fields'][$name]['length'] = $matches[2] ?? 100;
+        $$default['length'] = (int) $matches[2] ?? 100;
       }
 
       if (isset($row['Default'])) {
-        $definition['fields'][$name]['default'] = $row['Default'];
+        $default = $row['Default'];
+        if ($default === 'NULL') {
+          $column_args['default'] = new NullValue();
+        }
+        else {
+          $column_args['default'] = match ($type) {
+            ColumnType::Int => new IntValue($default),
+            ColumnType::Float, ColumnType::Numeric => new FloatValue($default),
+            default => new StringValue($default),
+          };
+        }
       }
 
-      if (isset($matches[4])) {
-        $definition['fields'][$name]['unsigned'] = TRUE;
+      if ($type !== ColumnType::Serial && isset($matches[4])) {
+        $column_args['unsigned'] = TRUE;
       }
 
       // Check for the 'varchar_ascii' type that should be 'binary'.
       if (isset($row['Collation']) && $row['Collation'] == 'ascii_bin') {
-        $definition['fields'][$name]['type'] = 'varchar_ascii';
-        $definition['fields'][$name]['binary'] = TRUE;
+        $column_args['type'] = ColumnType::VarcharAscii;
+        $column_args['binary'] = TRUE;
       }
 
       // Check for the non-binary 'varchar_ascii'.
       if (isset($row['Collation']) && $row['Collation'] == 'ascii_general_ci') {
-        $definition['fields'][$name]['type'] = 'varchar_ascii';
+        $column_args['type'] = ColumnType::VarcharAscii;
       }
 
       // Check for the 'utf8_bin' collation.
       if (isset($row['Collation']) && $row['Collation'] == 'utf8_bin') {
-        $definition['fields'][$name]['binary'] = TRUE;
+        $column_args['binary'] = TRUE;
       }
+
+      $columns[] = new Column(...$column_args);
     }
 
     // Set primary key, unique keys, and indexes.
-    $this->getTableIndexes($connection, $table, $definition);
+    // $this->getTableIndexes($connection, $table, $definition);
 
-    // Set table collation.
-    $this->getTableCollation($connection, $table, $definition);
-
-    return $definition;
+    $table_args = [
+      'name' => $table,
+      'columns' => $columns,
+      'dbSpecificExtra' => [
+        'mysql' => [
+          'mysql_character_set' => $this->getTableCollation($connection, $table),
+        ],
+      ],
+    ];
+    return new Table(...$table_args);
   }
 
   /**
@@ -265,16 +319,17 @@ class DbDumpCommand extends DbCommandBase {
   }
 
   /**
-   * Set the table collation.
+   * Returns the table charset.
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection to use.
    * @param string $table
    *   The table to find indexes for.
-   * @param array &$definition
-   *   The schema definition to modify.
+   *
+   * @return string
+   *   The table charset.
    */
-  protected function getTableCollation(Connection $connection, $table, &$definition) {
+  protected function getTableCollation(Connection $connection, string $table): string {
     // Remove identifier quotes from the table name. See
     // \Drupal\mysql\Driver\Database\mysql\Connection::$identifierQuotes.
     $table = trim($connection->prefixTables('{' . $table . '}'), '"');
@@ -285,8 +340,7 @@ class DbDumpCommand extends DbCommandBase {
     // (MySQL 5) or 'utf8mb4_0900_ai_ci' (MySQL 8) will be mapped to 'utf8mb4'.
     [$charset] = explode('_', $data['Collation'], 2);
 
-    // Set `mysql_character_set`. This will be ignored by other backends.
-    $definition['mysql_character_set'] = $charset;
+    return $charset;
   }
 
   /**
@@ -302,7 +356,7 @@ class DbDumpCommand extends DbCommandBase {
    * @return array
    *   The data from the table as an array.
    */
-  protected function getTableData(Connection $connection, $table) {
+  protected function getTableData(Connection $connection, string $table): array {
     $order = $this->getFieldOrder($connection, $table);
     $query = $connection->query("SELECT * FROM {" . $table . "} " . $order);
     $results = [];
@@ -320,17 +374,19 @@ class DbDumpCommand extends DbCommandBase {
    * @param string $type
    *   The MySQL field type.
    *
-   * @return string
-   *   The Drupal schema field type. If there is no mapping, the original field
-   *   type is returned.
+   * @return \Drupal\Core\Database\SchemaDefinition\ColumnType|string
+   *   The Drupal schema enumerated column type. If there is no mapping, the
+   *   original field type is returned as a string.
    */
-  protected function fieldTypeMap(Connection $connection, $type) {
+  protected function fieldTypeMap(Connection $connection, string $type): ColumnType|string {
     // Convert everything to lowercase.
     $map = array_map('strtolower', $connection->schema()->getFieldTypeMap());
     $map = array_flip($map);
 
     // The MySql map contains type:size. Remove the size part.
-    return isset($map[$type]) ? explode(':', $map[$type])[0] : $type;
+    $mapped_type = isset($map[$type]) ? explode(':', $map[$type])[0] : $type;
+    $return_type = ColumnType::tryFrom($mapped_type);
+    return $return_type ?? $mapped_type;
   }
 
   /**
@@ -341,10 +397,10 @@ class DbDumpCommand extends DbCommandBase {
    * @param string $type
    *   The MySQL field type.
    *
-   * @return string|null
-   *   The Drupal schema field size.
+   * @return \Drupal\Core\Database\SchemaDefinition\ColumnSize|null
+   *   The Drupal schema enumerated field size, or NULL if there is no mapping,
    */
-  protected function fieldSizeMap(Connection $connection, $type) {
+  protected function fieldSizeMap(Connection $connection, string $type): ColumnSize|null {
     // Convert everything to lowercase.
     $map = array_map('strtolower', $connection->schema()->getFieldTypeMap());
     $map = array_flip($map);
@@ -358,7 +414,8 @@ class DbDumpCommand extends DbCommandBase {
     // Only specify size on these types.
     if (in_array($schema_type, ['blob', 'float', 'int', 'text'])) {
       // The MySql map contains type:size. Remove the type part.
-      return explode(':', $map[$type])[1];
+      $mapped_size = explode(':', $map[$type])[1];
+      return ColumnType::tryFrom($mapped_size);
     }
   }
 
@@ -373,7 +430,7 @@ class DbDumpCommand extends DbCommandBase {
    * @return string
    *   The order string to append to the query.
    */
-  protected function getFieldOrder(Connection $connection, $table) {
+  protected function getFieldOrder(Connection $connection, string $table): string {
     // @todo this is MySQL only since there are no Database API functions for
     // table column data.
     // @todo this code is duplicated in `core/scripts/migrate-db.sh`.
@@ -400,7 +457,7 @@ class DbDumpCommand extends DbCommandBase {
    * @return string
    *   The template for the generated PHP script.
    */
-  protected function getTemplate() {
+  protected function getTemplate(): string {
     // The template contains an instruction for the file to be ignored by PHPCS.
     // This is because the files can be huge and coding standards are
     // irrelevant.
@@ -415,6 +472,8 @@ class DbDumpCommand extends DbCommandBase {
  */
 
 use Drupal\Core\Database\Database;
+
+$schema = {{SCHEMA}};
 
 $connection = Database::getConnection();
 // Ensure any tables with a serial column with a value of 0 are created as
@@ -439,8 +498,8 @@ END_OF_SCRIPT;
    *
    * @param string $table
    *   Table name.
-   * @param array $schema
-   *   Drupal schema definition.
+   * @param \Drupal\Core\Database\SchemaDefinition\Table $schema
+   *   Drupal schema definition for the table.
    * @param array $data
    *   Data for the table.
    * @param int $insert_count
@@ -449,9 +508,9 @@ END_OF_SCRIPT;
    * @return string
    *   The table create statement, and if there is data, the insert command.
    */
-  protected function getTableScript($table, array $schema, array $data, int $insert_count = 1000) {
+  protected function getTableScript(string $table, Table $schema, array $data, int $insert_count = 1000): string {
     $output = '';
-    $output .= "\$connection->schema()->createTable('" . $table . "', " . Variable::export($schema) . ");\n\n";
+    $output .= "\$connection->schema()->createTableFromDefinition(\$schema->getTableDefinition('" . $table . "'));\n\n";
     if (!empty($data)) {
       $data_chunks = array_chunk($data, $insert_count);
       foreach ($data_chunks as $data_chunk) {
@@ -459,7 +518,7 @@ END_OF_SCRIPT;
         foreach ($data_chunk as $record) {
           $insert .= "->values(" . Variable::export($record) . ")\n";
         }
-        $fields = Variable::export(array_keys($schema['fields']));
+        $fields = Variable::export(array_keys($schema->toArray()['fields']));
         $output .= <<<EOT
 \$connection->insert('$table')
 ->fields($fields)
