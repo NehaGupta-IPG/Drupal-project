@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Utility;
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Utility\Error;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,6 +18,51 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(Error::class)]
 #[Group('Utility')]
 class ErrorTest extends UnitTestCase {
+
+  /**
+   * Tests the renderExceptionSafe() method.
+   */
+  public function testRenderExceptionSafe(): void {
+    // Use the class name as namespace, to avoid collisions.
+    $namespace = self::class;
+    $this->defineTestFunctions(
+      [
+        'foo10' => 10,
+        'foo70' => 70,
+        'foo30' => 30,
+        'foo20' => 20,
+      ],
+      $namespace,
+      \RuntimeException::class,
+    );
+    $exception = "$namespace\\foo10"();
+
+    $output = Error::renderExceptionSafe($exception);
+
+    $this->assertInstanceOf(FormattableMarkup::class, $output);
+
+    $this->assertStringStartsWith(strtr(
+      '<em class="placeholder">:exception</em>: Something went wrong. in <em class="placeholder">:function</em> (line <em class="placeholder">:line</em> of <em class="placeholder">:file</em>). <pre class="backtrace">:trace',
+      [
+        ':exception' => \RuntimeException::class,
+        ':function' => "$namespace\\foo20()",
+        // The line number inside foo20() where the exception is thrown.
+        ':line' => '21',
+        ':file' => Html::escape($exception->getFile()),
+        // The function name from above is repeated in the first backtrace item, but
+        // the line number is not.
+        ':trace' => <<<EOT
+$namespace\\foo20() (Line: 31)
+$namespace\\foo30() (Line: 71)
+$namespace\\foo70() (Line: 11)
+$namespace\\foo10() (Line:
+EOT,
+      ],
+    ), (string) $output);
+
+    // Do not assert the other backtrace items.
+    $this->assertStringEndsWith('</pre>', (string) $output);
+  }
 
   /**
    * Tests the getLastCaller() method.
