@@ -149,4 +149,45 @@ class ErrorTest extends UnitTestCase {
     return $backtrace;
   }
 
+  /**
+   * Defines a number of functions with guaranteed line numbers.
+   *
+   * Each of the functions will call the next function in the list, except the
+   * last one, which will throw an exception.
+   *
+   * @param array<string, int> $functions_lines
+   *   Line numbers by function name without namespace.
+   * @param string $namespace
+   *   Namespace to prepend to the function names, without leading or trailing
+   *   namespace separator.
+   * @param string $exception_class
+   *   Exception class to throw in the last function.
+   */
+  protected function defineTestFunctions(array $functions_lines, string $namespace, string $exception_class): void {
+    $next_function = NULL;
+    assert($functions_lines !== []);
+    foreach (array_reverse($functions_lines) as $function => $line) {
+      $newlines = str_repeat("\n", $line - 1);
+      $return_expression = ($next_function !== NULL)
+        ? "$next_function()"
+        : "new \\$exception_class('Something went wrong.')";
+      // Use eval() to get fixed line numbers.
+      // This is safe, because all values are hard-coded in this class.
+      $php = <<<PHP
+namespace $namespace;{$newlines}function $function(): \Exception {
+  return $return_expression;
+}
+PHP;
+      $wrapper_line = $line + 1000;
+      $eval_newlines = str_repeat("\n", $wrapper_line - 1);
+      // Use a second layer of eval() to get distinguishable file names.
+      eval($eval_newlines . 'eval(' . var_export($php, TRUE) . ');');
+      $eval_line = __LINE__ - 1;
+      $reflection_function = new \ReflectionFunction("$namespace\\$function");
+      $this->assertSame($line, $reflection_function->getStartLine());
+      $this->assertSame(__FILE__ . "($eval_line) : eval()'d code($wrapper_line) : eval()'d code", $reflection_function->getFileName());
+      $next_function = $function;
+    }
+  }
+
 }
