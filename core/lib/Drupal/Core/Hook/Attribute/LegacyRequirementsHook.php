@@ -23,4 +23,4 @@ namespace Drupal\Core\Hook\Attribute;
  * later.
  */
 #[\Attribute(\Attribute::TARGET_FUNCTION)]
-class LegacyRequirementsHook {}
+class LegacyRequirementsHook extends LegacyHook {}
