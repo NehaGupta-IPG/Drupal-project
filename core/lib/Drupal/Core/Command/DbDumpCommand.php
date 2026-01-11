@@ -221,10 +221,15 @@ class DbDumpCommand extends DbCommandBase {
           ],
         ];
       }
-      elseif (!isset($column_args['size'])) {
+      elseif (!isset($column_args['size']) && (is_string($type) || in_array($type, [
+        ColumnType::Char,
+        ColumnType::Varchar,
+        ColumnType::VarcharAscii,
+        ColumnType::Text,
+      ]))) {
         // Try use the provided length, if it doesn't exist default to 100. It's
         // not great but good enough for our dumps at this point.
-        $column_args['length'] = (int) $matches[2] ?? 100;
+        $column_args['length'] = (int) ($matches[2] ?? 100);
       }
 
       if (isset($row['Default'])) {
