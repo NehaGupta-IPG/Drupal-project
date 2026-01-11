@@ -101,14 +101,16 @@ class Error {
    * @param \Exception|\Throwable $exception
    *   The exception object that was thrown.
    *
-   * @return string
-   *   An error message.
+   * @return string|\Drupal\Component\Render\MarkupInterface
+   *   An error message, as a markup object.
+   *   In future versions of Drupal, or in overridden versions of this method,
+   *   it may return a regular string instead.
    */
   public static function renderExceptionSafe($exception) {
     $decode = static::decodeException($exception);
     $backtrace = $decode['backtrace'];
     unset($decode['backtrace'], $decode['exception']);
-    // Remove 'main()'.
+    // Remove the artificial item that was prepended in ::decodeException().
     array_shift($backtrace);
 
     // Even though it is possible that this method is called on a public-facing
