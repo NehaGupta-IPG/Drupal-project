@@ -8,11 +8,14 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
+use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -269,9 +272,6 @@ class DbDumpCommand extends DbCommandBase {
       $columns[] = new Column(...$column_args);
     }
 
-    // Set primary key, unique keys, and indexes.
-    // $this->getTableIndexes($connection, $table, $definition);
-
     $table_args = [
       'name' => $table,
       'columns' => $columns,
@@ -281,6 +281,9 @@ class DbDumpCommand extends DbCommandBase {
         ],
       ],
     ];
+    // Set primary key, unique keys, and indexes.
+    $table_args = array_merge($table_args, $this->getTableIndexes($connection, $table));
+
     return new Table(...$table_args);
   }
 
@@ -291,13 +294,16 @@ class DbDumpCommand extends DbCommandBase {
    *   The database connection to use.
    * @param string $table
    *   The table to find indexes for.
-   * @param array &$definition
-   *   The schema definition to modify.
+   *
+   * @return array
+   *   The indexes as schema definition objects.
    */
-  protected function getTableIndexes(Connection $connection, $table, &$definition) {
+  protected function getTableIndexes(Connection $connection, string $table): array {
     // Note, this query doesn't support ordering, so that is worked around
     // below by keying the array on Seq_in_index.
     $query = $connection->query("SHOW INDEX FROM {" . $table . "}");
+
+    $definition = [];
     while (($row = $query->fetchAssoc()) !== FALSE) {
       $index_name = $row['Key_name'];
       $column = $row['Column_name'];
@@ -319,6 +325,26 @@ class DbDumpCommand extends DbCommandBase {
         $definition['indexes'][$index_name][$order] = $column;
       }
     }
+
+    $ret = [];
+    if (isset($definition['primary key'])) {
+      ksort($definition['primary key']);
+      $ret['primaryKey'] = new PrimaryKey($definition['primary key']);
+    }
+    if (isset($definition['unique keys'])) {
+      foreach ($definition['unique keys'] as $name => $key) {
+        ksort($key);
+        $ret['uniqueKeys'][] = new UniqueKey(name: $name, columns: $key);
+      }
+    }
+    if (isset($definition['indexes'])) {
+      foreach ($definition['indexes'] as $name => $key) {
+        ksort($key);
+        $ret['indexes'][] = new Index(name: $name, columns: $key);
+      }
+    }
+
+    return $ret;
   }
 
   /**
