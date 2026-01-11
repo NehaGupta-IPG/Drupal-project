@@ -75,9 +75,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 5,
-      'ScriptCount' => 2,
+      'ScriptCount' => 4,
       'ScriptBytes' => 13150,
-      'StylesheetCount' => 5,
+      'StylesheetCount' => 7,
       'StylesheetBytes' => 39163,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -145,9 +145,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 30,
-      'ScriptCount' => 11,
-      'ScriptBytes' => 198900,
-      'StylesheetCount' => 10,
+      'ScriptCount' => 12,
+      'ScriptBytes' => 199404,
+      'StylesheetCount' => 12,
       'StylesheetBytes' => 78297,
     ];
     $this->assertMetrics($expected, $performance_data);
