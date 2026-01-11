@@ -8,10 +8,8 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\FloatValue;
-use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
-use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
@@ -226,7 +224,7 @@ class DbDumpCommand extends DbCommandBase {
       elseif (!isset($column_args['size'])) {
         // Try use the provided length, if it doesn't exist default to 100. It's
         // not great but good enough for our dumps at this point.
-        $$default['length'] = (int) $matches[2] ?? 100;
+        $column_args['length'] = (int) $matches[2] ?? 100;
       }
 
       if (isset($row['Default'])) {
@@ -417,6 +415,8 @@ class DbDumpCommand extends DbCommandBase {
       $mapped_size = explode(':', $map[$type])[1];
       return ColumnType::tryFrom($mapped_size);
     }
+
+    return NULL;
   }
 
   /**
