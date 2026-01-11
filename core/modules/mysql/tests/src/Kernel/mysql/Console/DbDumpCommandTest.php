@@ -52,9 +52,7 @@ class DbDumpCommandTest extends DriverSpecificKernelTestBase {
 
     // Assert that insert exists and that some expected fields exist.
     $output = $command_tester->getDisplay();
-    dump(substr($output, 0, 4000));
-    $this->assertEquals(1, 2);
-    $this->assertStringContainsString("createTable('router", $output, 'Table router found');
+    $this->assertStringContainsString("createTableFromDefinition(\$schema->getTableDefinition('router", $output, 'Table router found');
     $this->assertStringContainsString("insert('router", $output, 'Insert found');
     $this->assertStringContainsString("'name' => 'test", $output, 'Insert name field found');
     $this->assertStringContainsString("'path' => 'test", $output, 'Insert path field found');
