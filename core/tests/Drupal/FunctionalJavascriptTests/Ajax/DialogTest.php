@@ -322,7 +322,7 @@ class DialogTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests #states conditions on dialog buttons matching webform issue #3008172.
+   * Tests #states conditions on dialog buttons matching issue #3008172.
    *
    * Verifies that #states on form-actions containers and form elements
    * are properly synchronized to dialog buttons.
@@ -341,8 +341,8 @@ class DialogTest extends WebDriverTestBase {
     $this->assertTrue($send_button->isVisible());
     $this->assertFalse($subject_field->isVisible());
 
-    // Subject field visible when name = "Webform".
-    $name_field->setValue('Webform');
+    // Subject field visible when name = "Admin".
+    $name_field->setValue('Admin');
     $this->getSession()->wait(700);
     $this->assertTrue($subject_field->isVisible());
     $this->assertTrue($send_button->isVisible());

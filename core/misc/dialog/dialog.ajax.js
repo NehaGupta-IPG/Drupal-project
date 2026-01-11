@@ -229,9 +229,14 @@
           // Find the element that #states modifies (form-actions container,
           // button itself, or a js-form-* wrapper).
           const findStateElement = () => {
-            const element = formButton.closest('.form-actions') ||
-              (formButton.classList.contains('js-form-submit') ? formButton : null) ||
-              formButton.closest('.js-form-item, .js-form-submit, .js-form-wrapper');
+            const element =
+              formButton.closest('.form-actions') ||
+              (formButton.classList.contains('js-form-submit')
+                ? formButton
+                : null) ||
+              formButton.closest(
+                '.js-form-item, .js-form-submit, .js-form-wrapper',
+              );
             return element !== dialog ? element : null;
           };
 
@@ -244,7 +249,9 @@
             dialogButton.disabled = formButton.disabled;
             if (stateElement) {
               dialogButton.style.display =
-                window.getComputedStyle(stateElement).display === 'none' ? 'none' : '';
+                window.getComputedStyle(stateElement).display === 'none'
+                  ? 'none'
+                  : '';
             }
           };
 
@@ -347,7 +354,7 @@
    *   Dialog settings.
    */
   window.addEventListener('dialog:aftercreate', (event) => {
-    const dialog = event.dialog;
+    const { dialog } = event;
     const cancelButton = event.target.querySelector('.dialog-cancel');
     const cancelClick = (e) => {
       dialog.close('cancel');

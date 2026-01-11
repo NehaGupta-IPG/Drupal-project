@@ -37,13 +37,13 @@ class AjaxTestButtonStatesForm extends FormBase {
       '#required' => TRUE,
     ];
 
-    // Visible only when name = "Webform".
+    // Visible only when name = "Admin".
     $form['subject'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Subject'),
       '#required' => TRUE,
       '#states' => [
-        'visible' => [':input[name="name"]' => ['value' => 'Webform']],
+        'visible' => [':input[name="name"]' => ['value' => 'Admin']],
       ],
     ];
 
@@ -72,7 +72,7 @@ class AjaxTestButtonStatesForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // Form submission not needed for this test.
   }
 
