@@ -312,7 +312,7 @@ class DbDumpCommand extends DbCommandBase {
 
       // If specified, add length to the index.
       if ($row['Sub_part']) {
-        $column = [$column, $row['Sub_part']];
+        $column = [$column, (int) $row['Sub_part']];
       }
 
       if ($index_name === 'PRIMARY') {
