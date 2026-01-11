@@ -183,11 +183,11 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
 
     // Store original schemas and drop tables to avoid errors.
     $connection = Database::getConnection();
-    $schema = $connection->schema();
+    $schema_handler = $connection->schema();
     foreach ($this->tables as $table) {
       $this->originalTableSchemas[$table] = $this->getTableSchema($table);
       $this->originalTableIndexes[$table] = $this->getTableIndexes($table);
-      $schema->dropTable($table);
+      $schema_handler->dropTable($table);
     }
 
     // This will load the data.
@@ -197,7 +197,7 @@ class DbDumpTest extends DriverSpecificKernelTestBase {
 
     // The tables should now exist and the schemas should match the originals.
     foreach ($this->tables as $table) {
-      $this->assertTrue($schema
+      $this->assertTrue($schema_handler
         ->tableExists($table), "Table $table created by the database script.");
       $this->assertSame($this->originalTableSchemas[$table], $this->getTableSchema($table), "The schema for $table was properly restored.");
       $this->assertSame($this->originalTableIndexes[$table], $this->getTableIndexes($table), "The indexes for $table were properly restored.");
