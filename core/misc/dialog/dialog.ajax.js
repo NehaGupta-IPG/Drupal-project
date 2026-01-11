@@ -210,49 +210,63 @@
      * to dialog buttons, avoiding expensive full button rebuilds.
      */
     if (response.dialogOptions.drupalAutoButtons) {
-      const formButtons = dialog.querySelectorAll(
+      const formButtonElements = dialog.querySelectorAll(
         '.form-actions input[type=submit], .form-actions a.button, .form-actions a.action-link',
       );
       const buttonPane = dialog.parentElement?.querySelector(
         '.ui-dialog-buttonpane',
       );
 
-      if (buttonPane && formButtons.length > 0) {
+      if (buttonPane && formButtonElements.length > 0) {
         const dialogButtons = buttonPane.querySelectorAll('button.ui-button');
 
-        formButtons.forEach((formButton, index) => {
+        formButtonElements.forEach((formButton, index) => {
           const dialogButton = dialogButtons[index];
           if (!dialogButton) {
             return;
           }
 
-          /**
-           * Sync form button state to dialog button.
-           */
-          const syncButtonState = () => {
-            if (
-              !document.body.contains(dialog) ||
-              !document.body.contains(dialogButton)
-            ) {
-              return;
-            }
-
-            // Sync disabled state.
-            dialogButton.disabled = formButton.disabled;
-
-            // Sync visibility.
-            const computedStyle = window.getComputedStyle(formButton);
-            dialogButton.style.display =
-              computedStyle.display === 'none' ? 'none' : '';
+          // Find the element that #states modifies (form-actions container,
+          // button itself, or a js-form-* wrapper).
+          const findStateElement = () => {
+            const element = formButton.closest('.form-actions') ||
+              (formButton.classList.contains('js-form-submit') ? formButton : null) ||
+              formButton.closest('.js-form-item, .js-form-submit, .js-form-wrapper');
+            return element !== dialog ? element : null;
           };
 
-          const observer = new MutationObserver(syncButtonState);
-          observer.observe(formButton, {
-            attributes: true,
-            attributeFilter: ['disabled', 'style'],
-          });
+          const stateElement = findStateElement();
 
-          buttonObservers.push(observer);
+          // Sync disabled state and visibility from form button to dialog button.
+          const syncButtonState = () => {
+            if (!document.body.contains(dialogButton)) return;
+
+            dialogButton.disabled = formButton.disabled;
+            if (stateElement) {
+              dialogButton.style.display =
+                window.getComputedStyle(stateElement).display === 'none' ? 'none' : '';
+            }
+          };
+
+          const buttonObserver = new MutationObserver(syncButtonState);
+          buttonObserver.observe(formButton, {
+            attributes: true,
+            attributeFilter: ['disabled'],
+          });
+          buttonObservers.push(buttonObserver);
+
+          if (stateElement) {
+            const stateObserver = new MutationObserver(syncButtonState);
+            // Watch style and class changes (jQuery's toggle() uses both).
+            stateObserver.observe(stateElement, {
+              attributes: true,
+              attributeFilter: ['style', 'class'],
+            });
+            buttonObservers.push(stateObserver);
+
+            // Delay initial sync until #states API postponed callbacks complete.
+            setTimeout(syncButtonState, 100);
+          }
         });
       }
     }
