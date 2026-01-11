@@ -33,36 +33,77 @@ class ErrorTest extends UnitTestCase {
   /**
    * Data provider for testGetLastCaller.
    *
-   * @return array
-   *   An array of parameter data.
+   * @return \Iterator<string, array{list<array>, array}>
+   *   An iterator with named datasets.
+   *   (Using an iterator instead of an array helps to avoid duplicate dataset
+   *   names.)
    */
-  public static function providerTestGetLastCaller(): array {
-    $data = [];
-
+  public static function providerTestGetLastCaller(): \Iterator {
     // Test with just one item. This should default to the function being
     // main().
-    $single_item = [self::createBacktraceItem()];
-    $data[] = [$single_item, self::createBacktraceItem('main()')];
+    yield 'single item' => [
+      [
+        self::createBacktraceItem('foo', line: 51, file: 'main.php'),
+      ],
+      self::createBacktraceItem('main()', line: 51, file: 'main.php'),
+    ];
 
-    // Add a second item, without a class.
-    $two_items = $single_item;
-    $two_items[] = self::createBacktraceItem('test_function_two');
-    $data[] = [$two_items, self::createBacktraceItem('test_function_two()')];
+    // Test with more procedural items.
+    // The function name from the first item is always ignored.
+    yield 'bar, foo, other' => [
+      [
+        self::createBacktraceItem('bar', line: 55, file: 'foo.php'),
+        self::createBacktraceItem('foo', line: 66, file: 'other.php'),
+        self::createBacktraceItem('other', line: 77, file: 'main.php'),
+      ],
+      self::createBacktraceItem('foo()', line: 55, file: 'foo.php'),
+    ];
 
-    // Add a second item, with a class.
-    $two_items = $single_item;
-    $two_items[] = self::createBacktraceItem('test_function_two', 'TestClass');
-    $data[] = [$two_items, self::createBacktraceItem('TestClass->test_function_two()')];
+    // Test with a class method as second item.
+    yield 'TestClass' => [
+      [
+        self::createBacktraceItem('foo', file: 'TestClass.php'),
+        self::createBacktraceItem('testMethod', 'TestClass', file: 'other.php'),
+        self::createBacktraceItem('other', file: 'main.php'),
+      ],
+      self::createBacktraceItem('TestClass->testMethod()', file: 'TestClass.php'),
+    ];
 
-    // Add ignored functions to backtrace. They should get removed.
+    // Test with NULL as the first item's function name.
+    // This replicates the behavior from Error::decodeException(), which
+    // prepends an artificial item without function name.
+    yield 'NULL, bar, foo' => [
+      [
+        self::createBacktraceItem(NULL, line: 77, file: 'bar.php'),
+        self::createBacktraceItem('bar', file: 'foo.php'),
+        self::createBacktraceItem('foo', file: 'index.php'),
+      ],
+      self::createBacktraceItem('bar()', line: 77, file: 'bar.php'),
+    ];
+
+    // Prepend ignored functions to backtrace. They should get removed.
     foreach (['debug', '_drupal_error_handler', '_drupal_exception_handler'] as $function) {
-      $two_items = $single_item;
-      // Push to the start of the backtrace.
-      array_unshift($two_items, self::createBacktraceItem($function));
-      $data[] = [$single_item, self::createBacktraceItem('main()')];
+      yield "NULL, $function, bar, foo" => [
+        [
+          self::createBacktraceItem(NULL),
+          self::createBacktraceItem($function, file: 'bar.php'),
+          self::createBacktraceItem('bar', file: 'foo.php'),
+          self::createBacktraceItem('foo', file: 'index.php'),
+        ],
+        self::createBacktraceItem('bar()', file: 'bar.php'),
+      ];
     }
 
-    return $data;
+    // Test removal of multiple ignored functions.
+    yield 'NULL, debug, debug' => [
+      [
+        self::createBacktraceItem(NULL),
+        self::createBacktraceItem('debug'),
+        self::createBacktraceItem('_drupal_exception_handler'),
+        self::createBacktraceItem('foo'),
+      ],
+      self::createBacktraceItem('foo()'),
+    ];
   }
 
   /**
@@ -125,13 +166,15 @@ class ErrorTest extends UnitTestCase {
    *   (optional) An array of function arguments to add to the backtrace item.
    * @param int $line
    *   (optional) The line where the function was called.
+   * @param string|null $file
+   *   (optional) The file where the function was called.
    *
    * @return array
    *   A backtrace array item.
    */
-  protected static function createBacktraceItem(?string $function = 'test_function', ?string $class = NULL, array $args = [], int $line = 10): array {
+  protected static function createBacktraceItem(?string $function = 'test_function', ?string $class = NULL, array $args = [], int $line = 10, ?string $file = 'test_file'): array {
     $backtrace = [
-      'file' => 'test_file',
+      'file' => $file,
       'line' => $line,
       'function' => $function,
       'args' => [],
