@@ -109,14 +109,9 @@ class FileSystemForm extends ConfigFormBase {
     $form['file_public_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Public file system path'),
-      'item' => [
-        '#type' => 'html_tag',
-        '#tag' => 'span',
-        '#value' => PublicStream::basePath(),
-      ],
+      '#markup' => PublicStream::basePath(),
       '#description' => $this->t('A local file system path where public files will be stored. This directory must exist and be writable by Drupal. This directory must be relative to the Drupal installation directory and be accessible over the web. This must be changed in settings.php'),
     ];
-    $this->processAbsolute($form['file_public_path']['item']);
 
     $form['file_public_base_url'] = [
       '#type' => 'item',
@@ -128,38 +123,23 @@ class FileSystemForm extends ConfigFormBase {
     $form['file_assets_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Optimized assets file system path'),
-      'item' => [
-        '#type' => 'html_tag',
-        '#tag' => 'span',
-        '#value' => AssetsStream::basePath(),
-      ],
+      '#markup' => AssetsStream::basePath(),
       '#description' => $this->t('A local file system path where optimized assets files will be stored. This directory must exist and be writable by Drupal. This directory must be relative to the Drupal installation directory and be accessible over the web. This must be changed in settings.php'),
     ];
-    $this->processAbsolute($form['file_assets_path']['item']);
 
     $form['file_private_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Private file system path'),
-      'item' => [
-        '#type' => 'html_tag',
-        '#tag' => 'span',
-        '#value' => (PrivateStream::basePath() ?: $this->t('Not set')),
-      ],
+      '#markup' => (PrivateStream::basePath() ?: $this->t('Not set')),
       '#description' => $this->t('An existing local file system path for storing private files. It should be writable by Drupal and not accessible over the web. This must be changed in settings.php'),
     ];
-    $this->processAbsolute($form['file_private_path']['item']);
 
     $form['file_temporary_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Temporary directory'),
-      'item' => [
-        '#type' => 'html_tag',
-        '#tag' => 'span',
-        '#value' => $this->fileSystem->getTempDirectory(),
-      ],
+      '#markup' => $this->fileSystem->getTempDirectory(),
       '#description' => $this->t('A local file system path where temporary files will be stored. This directory should not be accessible over the web. This must be changed in settings.php.'),
     ];
-    $this->processAbsolute($form['file_temporary_path']['item']);
     // Any visible, writable wrapper can potentially be used for the files
     // directory, including a remote file system that integrates with a CDN.
     $options = $this->streamWrapperManager->getDescriptions(StreamWrapperInterface::WRITE_VISIBLE);
@@ -186,41 +166,6 @@ class FileSystemForm extends ConfigFormBase {
     ];
 
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * Absolute path resolver.
-   *
-   * @param string $path
-   *   A given path.
-   *
-   * @return string
-   *   Resolved an absolute path, initial otherwise.
-   */
-  protected function resolveAbsolutePath(string $path): string {
-    if (!$path || str_starts_with($path, '/') || str_contains($path, '://')) {
-      return $path;
-    }
-    $absolute = $this->fileSystem->realpath($this->appRoot . '/' . $path);
-    return $absolute ?: $path;
-  }
-
-  /**
-   * Processes an element to assign an absolute path as a title attribute.
-   *
-   * @param array &$element
-   *   An associative array representing an element,
-   *   which may contain a '#markup' key.
-   */
-  protected function processAbsolute(array &$element): void {
-    if (!isset($element['#value'])) {
-      return;
-    }
-    $absolute = $this->resolveAbsolutePath($element['#value']);
-    if ($absolute === $element['#value']) {
-      return;
-    }
-    $element['#attributes']['title'] = $absolute;
   }
 
 }
