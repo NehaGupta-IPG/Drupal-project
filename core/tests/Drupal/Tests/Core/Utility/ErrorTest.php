@@ -107,6 +107,96 @@ class ErrorTest extends UnitTestCase {
   }
 
   /**
+   * Tests the getLastCaller() method with a real stack trace.
+   */
+  public function testGetLastCallerReal(): void {
+    $namespace = self::class;
+    $exception_class = \RuntimeException::class;
+    $this->defineTestFunctions([
+      'foo900' => 900,
+      'foo300' => 300,
+      'foo600' => 600,
+      'foo500' => 500,
+    ], $namespace, $exception_class);
+
+    $exception = "$namespace\\foo300"();
+    $this->assertInstanceOf($exception_class, $exception);
+    $this->assertInstanceOf(\Throwable::class, $exception);
+    $this->assertSame(501, $exception->getLine());
+
+    $file_template = __FILE__ . "(%s) : eval()'d code(%s) : eval()'d code";
+    $this->assertGreaterThan(0, preg_match(
+      '@^' . sprintf(preg_quote($file_template, '@'), '(\d+)', '(\d+)') . '$@',
+      $exception->getFile(),
+      $matches,
+    ));
+    $this->assertSame('1500', $matches[2]);
+    $get_file = fn (int $line) => sprintf($file_template, $matches[1], $line);
+    $this->assertSame($get_file(1500), $exception->getFile());
+
+    // The exception is thrown in the first line of foo500().
+    $this->assertSame(501, $exception->getLine());
+    // The stack trace is as expected.
+    $this->assertSame("$namespace\\foo500", $exception->getTrace()[0]['function']);
+    $this->assertSame($get_file(1600), $exception->getTrace()[0]['file']);
+    $this->assertSame("$namespace\\foo600", $exception->getTrace()[1]['function']);
+    $this->assertSame("$namespace\\foo300", $exception->getTrace()[2]['function']);
+
+    // The top item is skipped with ::getLastCaller().
+    $backtrace = $exception->getTrace();
+    $this->assertEqualsCanonicalizing([
+      'file' => $get_file(1600),
+      'line' => 601,
+      'function' => 'Drupal\Tests\Core\Utility\ErrorTest\foo600()',
+    ], Error::getLastCaller($backtrace));
+    $this->assertSame($exception->getTrace(), $backtrace);
+
+    // Prepend the additional item as in Error::decodeException().
+    $get_enhanced_backtrace = fn () => [
+      ['line' => $exception->getLine(), 'file' => $exception->getFile()],
+      ...$exception->getTrace(),
+    ];
+    $enhanced_backtrace = $get_enhanced_backtrace();
+    // The extra item is skipped, and we get the first "real" item.
+    $this->assertEqualsCanonicalizing([
+      'file' => $exception->getFile(),
+      'line' => 501,
+      'function' => 'Drupal\Tests\Core\Utility\ErrorTest\foo500()',
+    ], Error::getLastCaller($enhanced_backtrace));
+    $this->assertSame($get_enhanced_backtrace(), $enhanced_backtrace);
+
+    // Simulate ignored functions.
+    $ignored_functions_property = new \ReflectionProperty(Error::class, 'ignoredFunctions');
+    $original_ignored_functions = $ignored_functions_property->getValue();
+    try {
+      $ignored_functions_property->setValue(NULL, [
+        ...$original_ignored_functions,
+        "$namespace\\foo500",
+        "$namespace\\foo600",
+      ]);
+
+      $backtrace = $exception->getTrace();
+      $this->assertEqualsCanonicalizing([
+        'file' => $get_file(1300),
+        'line' => 301,
+        'function' => 'Drupal\Tests\Core\Utility\ErrorTest\foo300()',
+      ], Error::getLastCaller($backtrace));
+      $this->assertSame(array_slice($exception->getTrace(), 1), $backtrace);
+
+      $enhanced_backtrace = $get_enhanced_backtrace();
+      $this->assertEqualsCanonicalizing([
+        'file' => $get_file(1300),
+        'line' => 301,
+        'function' => 'Drupal\Tests\Core\Utility\ErrorTest\foo300()',
+      ], Error::getLastCaller($enhanced_backtrace));
+      $this->assertSame(array_slice($exception->getTrace(), 1), $enhanced_backtrace);
+    }
+    finally {
+      $ignored_functions_property->setValue(NULL, $original_ignored_functions);
+    }
+  }
+
+  /**
    * Tests the formatBacktrace() method.
    *
    * @param array $backtrace
