@@ -186,8 +186,8 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
         ],
       ],
     );
-dump(VarExporter::export($schemaDefinition));
-    $this->assertEquals($arraySpecification, $schemaDefinition->toArrayx());
+
+    $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
   }
 
   /**
@@ -247,8 +247,7 @@ dump(VarExporter::export($schemaDefinition));
       ],
     );
 
-dump(VarExporter::export($schemaDefinition));
-    $this->assertEquals($arraySpecification, $schemaDefinition->toArrayx());
+    $this->assertEquals($arraySpecification, $schemaDefinition->toArray());
   }
 
 }
