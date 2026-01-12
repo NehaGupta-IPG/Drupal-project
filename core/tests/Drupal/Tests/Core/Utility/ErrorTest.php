@@ -181,7 +181,9 @@ PHP;
       $wrapper_line = $line + 1000;
       $eval_newlines = str_repeat("\n", $wrapper_line - 1);
       // Use a second layer of eval() to get distinguishable file names.
+      // phpcs:ignore
       eval($eval_newlines . 'eval(' . var_export($php, TRUE) . ');');
+      // phpcs:enable
       $eval_line = __LINE__ - 1;
       $reflection_function = new \ReflectionFunction("$namespace\\$function");
       $this->assertSame($line, $reflection_function->getStartLine());
