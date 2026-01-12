@@ -200,9 +200,19 @@ class ViewAjaxController implements ContainerInjectionInterface {
         // than inline with the view), we need to replace those blocks during
         // AJAX updates to maintain consistency.
         if ($view->display_handler->usesExposedFormInBlock()) {
-          $exposed_form_block_render_array = $view->display_handler->viewExposedFormBlocks();
           // Only act if the form is exposed in a block.
-          if ($exposed_form_block_render_array !== NULL) {
+          if ($view->display_handler->usesExposed() && $view->display_handler->getOption('exposed_block')) {
+            /** @var BlockManagerInterface $block_manager */
+            $block_manager = \Drupal::service('plugin.manager.block');
+            $plugin_id = "views_exposed_filter_block:". $view->id() . "-" . $view->current_display;
+
+            $block = $block_manager->createInstance($plugin_id, [
+              'label' => $view->display_handler->getOption('exposed_block_label'),
+              'label_display' => FALSE,
+            ]);
+
+            $exposed_form_block_render_array = $block->build();
+
             /** @var \Drupal\views\Plugin\views\exposed_form\ExposedFormPluginInterface $exposed_form_plugin */
             $exposed_form_plugin = $view->display_handler->getPlugin('exposed_form');
             $exposed_form_data_attribute_value = $exposed_form_block_render_array['#attributes'][$exposed_form_plugin::DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER];
