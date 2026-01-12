@@ -269,7 +269,21 @@ class DbDumpCommand extends DbCommandBase {
         $column_args['binary'] = TRUE;
       }
 
-      $column = new Column(...$column_args);
+      $column = new Column(
+        name: $column_args['name'],
+        type: $column_args['type'] ?? NULL,
+        description: $column_args['description'] ?? NULL,
+        serialize: $column_args['serialize'] ?? NULL,
+        size: $column_args['size'] ?? NULL,
+        notNull: $column_args['notNull'] ?? NULL,
+        default: $column_args['default'] ?? NULL,
+        length: $column_args['length'] ?? NULL,
+        unsigned: $column_args['unsigned'] ?? NULL,
+        precision: $column_args['precision'] ?? NULL,
+        scale: $column_args['scale'] ?? NULL,
+        binary: $column_args['binary'] ?? NULL,
+        dbSpecificExtra: $column_args['dbSpecificExtra'] ?? NULL,
+      );
       if ($row['Field'] == 'wid') {
         dump([$table, $row, $column_args, $column]);
       }
@@ -508,7 +522,7 @@ class DbDumpCommand extends DbCommandBase {
 
 use Drupal\Core\Database\Database;
 
-$schema = {{SCHEMA}};
+$schema_dump = {{SCHEMA}};
 
 $connection = Database::getConnection();
 // Ensure any tables with a serial column with a value of 0 are created as
@@ -545,7 +559,7 @@ END_OF_SCRIPT;
    */
   protected function getTableScript(string $table, Table $schema, array $data, int $insert_count = 1000): string {
     $output = '';
-    $output .= "\$connection->schema()->createTableFromDefinition(\$schema->getTableDefinition('" . $table . "'));\n\n";
+    $output .= "\$connection->schema()->createTableFromDefinition(\$schema_dump->getTableDefinition('" . $table . "'));\n\n";
     if (!empty($data)) {
       $data_chunks = array_chunk($data, $insert_count);
       foreach ($data_chunks as $data_chunk) {
