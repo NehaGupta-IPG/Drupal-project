@@ -61,6 +61,7 @@ abstract class FieldStorageConfigResourceTestBase extends ConfigEntityResourceTe
       'field_name' => 'true_llama',
       'id' => 'node.true_llama',
       'indexes' => [],
+      'interned' => FALSE,
       'langcode' => 'en',
       'locked' => FALSE,
       'module' => 'core',

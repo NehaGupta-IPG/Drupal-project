@@ -311,6 +311,22 @@ interface FieldStorageDefinitionInterface extends CacheableDependencyInterface {
   public function hasCustomStorage();
 
   /**
+   * Returns whether the field supports being interned.
+   *
+   * @return bool
+   *   TRUE if the field supports interning, FALSE otherwise.
+   */
+  public function supportsInterning(): bool;
+
+  /**
+   * Returns whether the field is stored as interned.
+   *
+   * @return bool
+   *   TRUE if the field is stored interned, FALSE otherwise.
+   */
+  public function isInterned(): bool;
+
+  /**
    * Determines whether the field is a base field.
    *
    * Base fields are not specific to a given bundle or a set of bundles. This

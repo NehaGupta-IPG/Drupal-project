@@ -121,6 +121,15 @@ class FieldStorageConfigEditForm extends EntityForm {
     $item = $items->first() ?: $items->appendItem();
     $form['settings'] += $item->storageSettingsForm($form, $form_state, $this->entity->hasData());
 
+    if ($this->entity->supportsInterning()) {
+      $form['interned'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Deduplicate data storage'),
+        '#default_value' => $this->entity->isInterned(),
+        '#disabled' => !$this->entity->isNew(),
+      ];
+    }
+
     return $form;
   }
 

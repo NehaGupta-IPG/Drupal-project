@@ -98,6 +98,7 @@ class FieldStorageConfigTest extends ConfigEntityResourceTestBase {
           'entity_type' => 'node',
           'field_name' => 'true_llama',
           'indexes' => [],
+          'interned' => FALSE,
           'langcode' => 'en',
           'locked' => FALSE,
           'module' => 'core',

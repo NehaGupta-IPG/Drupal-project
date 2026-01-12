@@ -1319,15 +1319,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // Ensure that only values having valid languages are retrieved. Since we
       // are loading values for multiple entities, we cannot limit the query to
       // the available translations.
-      $results = $this->database->select($table, 't')
+      $query = $this->database->select($table, 't')
         ->fields('t')
         ->condition(!$load_from_revision ? 'entity_id' : 'revision_id', $ids, 'IN')
         ->condition('deleted', 0)
         ->condition('langcode', $langcodes, 'IN')
-        ->orderBy('delta')
-        ->execute();
+        ->orderBy('delta');
 
-      foreach ($results as $row) {
+      if ($load_from_revision && $storage_definition->isInterned()) {
+        $query->innerJoin($table . '__interned', 'i', '[t].[interned_hash] = [i].[interned_hash]');
+        $query->fields('i');
+      }
+
+      foreach ($query->execute() as $row) {
         $bundle = $row->bundle;
 
         $value_key = !$load_from_revision ? $row->entity_id : $row->revision_id;
@@ -1434,13 +1438,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
       // Prepare the multi-insert query.
       $do_insert = FALSE;
-      $columns = ['entity_id', 'revision_id', 'bundle', 'delta', 'langcode'];
+      $base_columns = ['entity_id', 'revision_id', 'bundle', 'delta', 'langcode'];
+      $columns = [];
       foreach ($storage_definition->getColumns() as $column => $attributes) {
         $columns[] = $table_mapping->getFieldColumnName($storage_definition, $column);
       }
-      $query = $this->database->insert($table_name)->fields($columns);
+      $query = $this->database->insert($table_name)->fields(array_merge($base_columns, $columns));
       if ($this->entityType->isRevisionable()) {
-        $revision_query = $this->database->insert($revision_name)->fields($columns);
+        if ($storage_definition->isInterned()) {
+          $revision_query = $this->database->insert($revision_name)->fields(array_merge($base_columns, ['interned_hash']));
+        }
+        else {
+          $revision_query = $this->database->insert($revision_name)->fields(array_merge($base_columns, $columns));
+        }
       }
 
       $langcodes = $field_definition->isTranslatable() ? $translation_langcodes : [$default_langcode];
@@ -1458,6 +1468,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
             'delta' => $delta,
             'langcode' => $langcode,
           ];
+          $values = [];
           foreach ($storage_definition->getColumns() as $column => $attributes) {
             $column_name = $table_mapping->getFieldColumnName($storage_definition, $column);
             // Serialize the value if specified in the column schema.
@@ -1465,11 +1476,21 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
             if (!empty($attributes['serialize'])) {
               $value = serialize($value);
             }
-            $record[$column_name] = SqlContentEntityStorageSchema::castValue($attributes, $value);
+            $values[$column_name] = SqlContentEntityStorageSchema::castValue($attributes, $value);
           }
-          $query->values($record);
+          $query->values($record + $values);
           if ($this->entityType->isRevisionable()) {
-            $revision_query->values($record);
+            if ($storage_definition->isInterned()) {
+              $hash = hash('xxh128', serialize($values));
+              $revision_query->values($record + ['interned_hash' => $hash]);
+              $this->database->merge($revision_name . '__interned')
+                ->key('interned_hash', $hash)
+                ->fields($values)
+                ->execute();
+            }
+            else {
+              $revision_query->values($record + $values);
+            }
           }
 
           if ($storage_definition->getCardinality() != FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED && ++$delta_count == $storage_definition->getCardinality()) {
@@ -1834,6 +1855,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         $table_name = $table_mapping->getDedicatedDataTableName($storage_definition, $is_deleted);
       }
       $query = $this->database->select($table_name, 't');
+      if ($this->entityType->isRevisionable() && $storage_definition->isInterned()) {
+        $query->innerJoin($table_name . '__interned', 'i', '[t].[interned_hash] = [i].[interned_hash]');
+      }
       $or = $query->orConditionGroup();
       foreach ($storage_definition->getColumns() as $column_name => $data) {
         $or->isNotNull($table_mapping->getFieldColumnName($storage_definition, $column_name));
