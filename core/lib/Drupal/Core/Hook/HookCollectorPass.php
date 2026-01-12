@@ -13,6 +13,7 @@ use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\LegacyModuleImplementsAlter;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
+use Drupal\Core\Hook\Attribute\LegacyRequirementsHook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ReorderHook;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
@@ -28,8 +29,17 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * Services for procedural implementation of hooks are also registered.
  *
- * Finally, a hook_implementations_map container parameter is added. This
- * contains a mapping from [hook,class,method] to the module name.
+ * Finally, a temporary .hook_data container parameter is added. This
+ * contains:
+ *  - hook_list a mapping from [hook,class,method] to the module name.
+ *  - preprocess_for_suggestions preprocess hooks with double underscores.
+ *  - includes files that contain hooks that are not defined by hook_hook_info
+ *    or in .module files
+ *  - group_includes files identified by hook_hook_info
+ *  - packed_order_operations ordering rules for runtime evaluation
+ *
+ * The parameter hook_data is processed in HookCollectorKeyValueWritePass and
+ * removed automatically.
  *
  * @internal
  */
@@ -185,15 +195,6 @@ class HookCollectorPass implements CompilerPassInterface {
       'group_includes' => $groupIncludes,
       'packed_order_operations' => $packed_order_operations,
     ]);
-
-    // Remove converted flags, they are only needed while building the
-    // container.
-    $parameters = $container->getParameterBag();
-    foreach ($parameters->all() as $name => $value) {
-      if (str_ends_with($name, '.skip_procedural_hook_scan')) {
-        $parameters->remove($name);
-      }
-    }
   }
 
   /**
@@ -308,10 +309,18 @@ class HookCollectorPass implements CompilerPassInterface {
    *   Order operations by hook name.
    */
   protected function getOrderOperations(): array {
+    $implementationsByHook = $this->getFilteredImplementations();
     $operations_by_hook = [];
     foreach ($this->orderOperations as $hook => $order_operations_by_weight) {
       ksort($order_operations_by_weight);
-      $operations_by_hook[$hook] = array_merge(...$order_operations_by_weight);
+      $order_operations = array_merge(...$order_operations_by_weight);
+      foreach ($order_operations as $key => $operation) {
+        if (!isset($implementationsByHook[$hook][$operation->identify()])) {
+          unset($order_operations[$key]);
+        }
+      }
+      $operations_by_hook[$hook] = array_values($order_operations);
+
     }
     return $operations_by_hook;
   }
@@ -442,7 +451,11 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
-    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . $all_modules_preg);
+    // List of modules must be included in the cache key to ensure rediscovery
+    // takes place when a new module is installed. Some modules define hooks
+    // on behalf of other modules and those hooks need to be found.
+    // Hash to prevent massive key sizes.
+    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . hash('xxh3', $all_modules_preg));
 
     $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
@@ -509,7 +522,8 @@ class HookCollectorPass implements CompilerPassInterface {
               break;
             }
 
-            if (!StaticReflectionParser::hasAttribute($attributes, LegacyHook::class) && (preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches)) && !StaticReflectionParser::hasAttribute($attributes, LegacyModuleImplementsAlter::class)) {
+            $legacy_attributes = [LegacyHook::class, LegacyModuleImplementsAlter::class, LegacyRequirementsHook::class];
+            if (!static::hasAnyAttribute($attributes, $legacy_attributes) && (preg_match($current_module_preg, $function, $matches) || preg_match($all_modules_preg, $function, $matches))) {
               // Skip hooks that are not supported by the new hook system, they
               // do not need to be added to the BC layer. Note that is different
               // from static::checkForProceduralOnlyHooks(). hook_requirements
@@ -548,6 +562,29 @@ class HookCollectorPass implements CompilerPassInterface {
         }
       }
     }
+  }
+
+  /**
+   * Returns whether the existing attributes match any of the expected ones.
+   *
+   * @param array $existingAttributes
+   *   List of attribute classes.
+   * @param array $attributesLookingFor
+   *   List of expected attribute classes.
+   *
+   * @return bool
+   *   Whether an expected attribute class exists.
+   */
+  public static function hasAnyAttribute(array $existingAttributes, array $attributesLookingFor): bool {
+    foreach ($existingAttributes as $existingAttribute) {
+      foreach ($attributesLookingFor as $attributeLookingFor) {
+        if (is_a($existingAttribute, $attributeLookingFor, TRUE)) {
+          return TRUE;
+        }
+      }
+    }
+
+    return FALSE;
   }
 
   /**
@@ -592,6 +629,10 @@ class HookCollectorPass implements CompilerPassInterface {
       $this->moduleImplementsAlters[] = $function;
       include_once $fileinfo->getPathname();
     }
+    elseif (in_array($hook, ['requirements', 'requirements_alter'])) {
+      $message = "$function without a #[LegacyRequirementsHook] attribute is deprecated in drupal:11.3.0 and removed in drupal:13.0.0. See https://www.drupal.org/node/3549685";
+      @trigger_error($message, E_USER_DEPRECATED);
+    }
     $this->proceduralImplementations[$hook][] = $module;
     if ($fileinfo->getExtension() !== 'module') {
       $this->includes[$function] = $fileinfo->getPathname();
@@ -609,39 +650,6 @@ class HookCollectorPass implements CompilerPassInterface {
     foreach ($this->includes as $include) {
       include_once $include;
     }
-  }
-
-  /**
-   * Returns implementations suitable for adding in ModuleHandler::add().
-   *
-   * This contains only procedural implementations, because the services for OOP
-   * implementations might not be available at this point.
-   *
-   * This method is only to be used by ModuleHandler::add().
-   *
-   * @return array<string, array<string, callable-string>>
-   *   Procedural implementations, as functions keyed by hook and module.
-   *
-   * @todo Remove when ModuleHandler::add() is removed in Drupal 12.0.0.
-   *
-   * @internal
-   */
-  public function getAddableImplementations(): array {
-    $implementationsByHook = $this->getFilteredImplementations();
-
-    // List of modules implementing hooks with the implementation details.
-    $implementations = [];
-    foreach ($implementationsByHook as $hook => $hookImplementations) {
-      foreach ($this->modules as $module) {
-        foreach (array_keys($hookImplementations, $module, TRUE) as $identifier) {
-          if (!str_contains($identifier, '::')) {
-            $implementations[$hook][$module] = $identifier;
-          }
-        }
-      }
-    }
-
-    return $implementations;
   }
 
   /**

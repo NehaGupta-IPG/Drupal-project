@@ -211,7 +211,8 @@ class ThemeSettingsForm extends ConfigFormBase {
         $form['theme_settings']['toggle_' . $name] = [
           '#type' => 'checkbox',
           '#title' => $title,
-          '#default_value' => $this->themeSettingsProvider->getSetting('features.' . $name, $theme),
+          '#default_value' => $this->themeSettingsProvider
+            ->getSetting('features.' . $name, $theme),
         ];
         // Disable checkboxes for features not supported in the current
         // configuration.
@@ -350,6 +351,7 @@ class ThemeSettingsForm extends ConfigFormBase {
       // Call engine-specific settings.
       $function = $themes[$theme]->prefix . '_engine_settings';
       if (function_exists($function)) {
+        @trigger_error('The theme-engine-specific settings function ' . $function . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Implement hook_form_system_theme_settings_alter() in a module instead. See https://www.drupal.org/node/3547356', E_USER_DEPRECATED);
         $form['engine_specific'] = [
           '#type' => 'details',
           '#title' => $this->t('Theme-engine-specific settings'),
@@ -376,7 +378,11 @@ class ThemeSettingsForm extends ConfigFormBase {
       $default_theme = $default_active_theme->getName();
       /** @var \Drupal\Core\Theme\ThemeInitialization $theme_initialization */
       $theme_initialization = \Drupal::service('theme.initialization');
-      $this->themeManager->setActiveTheme($theme_initialization->getActiveThemeByName($theme));
+
+      // We need to account for viewing themes that are not currently active so
+      // we temporarily set the theme we are viewing as active.
+      $editing_active_theme = $theme_initialization->getActiveThemeByName($theme);
+      $this->themeManager->setActiveTheme($editing_active_theme);
 
       // Process the theme and all its base themes.
       foreach ($theme_keys as $theme) {
@@ -397,13 +403,10 @@ class ThemeSettingsForm extends ConfigFormBase {
             $form_state->addBuildInfo('files', $files);
           }
         }
-
-        // Call theme-specific settings.
-        $function = $theme . '_form_system_theme_settings_alter';
-        if (function_exists($function)) {
-          $function($form, $form_state);
-        }
       }
+
+      // Call theme-specific settings.
+      $this->themeManager->alterForTheme($editing_active_theme, 'form_system_theme_settings', $form, $form_state);
 
       // Restore the original current theme.
       if (isset($default_theme)) {

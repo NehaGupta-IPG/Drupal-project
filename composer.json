@@ -13,8 +13,7 @@
         "drupal/core": "self.version",
         "drupal/core-project-message": "self.version",
         "drupal/core-recipe-unpack": "self.version",
-        "drupal/core-vendor-hardening": "self.version",
-        "justinrainbow/json-schema": "^5.2 || ^6.5.2"
+        "drupal/core-vendor-hardening": "self.version"
     },
     "conflict": {
         "dealerdirect/phpcodesniffer-composer-installer": "1.1.0"
@@ -38,13 +37,13 @@
         "phpstan/extension-installer": "^1.4.3",
         "phpstan/phpstan": "^1.12.27 || ^2.1.26",
         "phpstan/phpstan-phpunit": "^1.4.2 || ^2.0.7",
-        "phpunit/phpunit": "^10.5.19 || ^11.5.42",
-        "symfony/browser-kit": "^7.3",
-        "symfony/css-selector": "^7.3",
-        "symfony/dom-crawler": "^7.3",
-        "symfony/error-handler": "^7.3",
-        "symfony/lock": "^7.3",
-        "symfony/var-dumper": "^7.3"
+        "phpunit/phpunit": "^11.5.42",
+        "symfony/browser-kit": "^7.4",
+        "symfony/css-selector": "^7.4",
+        "symfony/dom-crawler": "^7.4",
+        "symfony/error-handler": "^7.4",
+        "symfony/lock": "^7.4",
+        "symfony/var-dumper": "^7.4"
     },
     "replace": {
         "symfony/polyfill-php72": "*",
@@ -83,6 +82,9 @@
             "You can read more about this composer repository at:",
             "https://www.drupal.org/node/2718229"
         ],
+        "branch-alias": {
+            "dev-main": "11.x-dev"
+        },
         "installer-paths": {
             "core": ["type:drupal-core"],
             "libraries/{$name}": ["type:drupal-library"],
