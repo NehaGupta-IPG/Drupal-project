@@ -241,15 +241,15 @@ class Tableselect extends Table {
         // Do not overwrite manually created children.
         if (!isset($element[$key])) {
           $disabled = !empty($element['#options'][$key]['#disabled']);
-          if ($element['#multiple']) {
-            $title = '';
-            if (isset($element['#options'][$key]['title']) && is_array($element['#options'][$key]['title'])) {
-              if (!empty($element['#options'][$key]['title']['data']['#title'])) {
-                $title = new TranslatableMarkup('Update @title', [
-                  '@title' => $element['#options'][$key]['title']['data']['#title'],
-                ]);
-              }
+          $title = '';
+          if (isset($element['#options'][$key]['title']) && is_array($element['#options'][$key]['title'])) {
+            if (!empty($element['#options'][$key]['title']['data']['#title'])) {
+              $title = new TranslatableMarkup('Update @title', [
+                '@title' => $element['#options'][$key]['title']['data']['#title'],
+              ]);
             }
+          }
+          if ($element['#multiple']) {
             $element[$key] = [
               '#type' => 'checkbox',
               '#title' => $title,
@@ -267,7 +267,8 @@ class Tableselect extends Table {
             $parents_for_id = array_merge($element['#parents'], [$key]);
             $element[$key] = [
               '#type' => 'radio',
-              '#title' => '',
+              '#title' => $title,
+              '#title_display' => 'invisible',
               '#return_value' => $key,
               '#default_value' => ($element['#default_value'] == $key) ? $key : NULL,
               '#attributes' => $element['#attributes'],
