@@ -270,9 +270,6 @@ class DbDumpCommand extends DbCommandBase {
       }
 
       $column = new Column(...$column_args);
-      if ($row['Field'] == 'reusable') {
-        dump([$row, $column_args, $column]);
-      }
       $columns[] = $column;
     }
 
@@ -448,7 +445,7 @@ class DbDumpCommand extends DbCommandBase {
     if (in_array($schema_type, ['blob', 'float', 'int', 'text'])) {
       // The MySql map contains type:size. Remove the type part.
       $mapped_size = explode(':', $map[$type])[1];
-      return ColumnType::tryFrom($mapped_size);
+      return ColumnSize::tryFrom($mapped_size);
     }
 
     return NULL;
