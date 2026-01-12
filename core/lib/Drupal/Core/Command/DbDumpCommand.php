@@ -270,6 +270,9 @@ class DbDumpCommand extends DbCommandBase {
       }
 
       $column = new Column(...$column_args);
+      if ($row['Field'] == 'wid') {
+        dump([$table, $row, $column_args, $column]);
+      }
       $columns[] = $column;
     }
 
