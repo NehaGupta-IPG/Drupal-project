@@ -31,8 +31,8 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     $expected = [
       'ScriptCount' => 4,
       'ScriptBytes' => 11700,
-      'StylesheetCount' => 15,
-      'StylesheetBytes' => 71359,
+      'StylesheetCount' => 13,
+      'StylesheetBytes' => 70000,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -51,8 +51,8 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     $expected = [
       'ScriptCount' => 14,
       'ScriptBytes' => 189394,
-      'StylesheetCount' => 12,
-      'StylesheetBytes' => 58901,
+      'StylesheetCount' => 11,
+      'StylesheetBytes' => 58250,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -72,8 +72,8 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     $expected = [
       'ScriptCount' => 20,
       'ScriptBytes' => 330386,
-      'StylesheetCount' => 12,
-      'StylesheetBytes' => 181192,
+      'StylesheetCount' => 11,
+      'StylesheetBytes' => 180500,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
