@@ -6,6 +6,8 @@ use Drupal\Core\Session\ResponseKeepSessionOpenInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session as HttpFoundationSession;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -28,13 +30,13 @@ class Session implements HttpKernelInterface {
    *
    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
    *   The decorated kernel.
-   * @param \Closure $sessionClosure
+   * @param \Closure $sessionFactoryClosure
    *   A closure that wraps the session service.
    */
   public function __construct(
     HttpKernelInterface $http_kernel,
-    #[AutowireServiceClosure('session')]
-    protected \Closure $sessionClosure,
+    #[AutowireServiceClosure(SessionFactoryInterface::class)]
+    protected \Closure $sessionFactoryClosure,
   ) {
     $this->httpKernel = $http_kernel;
   }
@@ -77,7 +79,15 @@ class Session implements HttpKernelInterface {
    */
   protected function initializePersistentSession(Request $request): void {
     /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface $session */
-    $session = ($this->sessionClosure)();
+    $sessionFactory = ($this->sessionFactoryClosure)();
+    if ($sessionFactory instanceof HttpFoundationSession) {
+      // BC compatibility. TODO: Add trigger_error for deprecation.
+      $session = $sessionFactory;
+    }
+    else {
+      assert($sessionFactory instanceof SessionFactoryInterface);
+      $session = $sessionFactory->createSession();
+    }
     $session->start();
     $request->setSession($session);
   }

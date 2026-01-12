@@ -1007,7 +1007,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         unset($session);
       }
 
-      $all_messages = $this->container->get('messenger')->all();
+      if ($this->container->initialized('messenger')) {
+        $all_messages = $this->container->get('messenger')->all();
+      }
     }
 
     // If the module list hasn't already been set in updateModules and we are
