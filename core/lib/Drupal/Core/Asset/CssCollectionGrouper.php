@@ -54,7 +54,12 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
           // 'print', so only vary groups based on that.
           $group_keys = $item['preprocess'] ? [$item['type'], $item['media'] === 'print'] : FALSE;
           if ($item['unique_css_aggregate']) {
-            $group_keys[] = $item['library'];
+            if ($item['unique_css_aggregate'] === TRUE) {
+              $group_keys[] = $item['library'];
+            }
+            else {
+              $group_keys[] = $item['unique_css_aggregate'];
+            }
             $group_keys[] = $item['category'];
           }
           break;

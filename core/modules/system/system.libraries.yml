@@ -1,5 +1,5 @@
 base:
-  unique_css_aggregate: TRUE
+  unique_css_aggregate: 'every_page'
   version: VERSION
   css:
     # Adjust the weights to load these early.
