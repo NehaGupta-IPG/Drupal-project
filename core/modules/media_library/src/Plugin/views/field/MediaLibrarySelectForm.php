@@ -157,6 +157,20 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
     $selected_ids = $form_state->getValue($field_id);
     $selected_ids = $selected_ids ? array_filter(explode(',', $selected_ids)) : [];
 
+    // Check if selected ids are empty.
+    if (empty($selected_ids)) {
+      // If selected ids are empty let look at the media library select form.
+      $media_library_select_form = $form_state->getValue('media_library_select_form');
+      // If the value exist and it not empty process the values.
+      if (isset($media_library_select_form) && !empty($media_library_select_form)) {
+        foreach ($media_library_select_form as $id) {
+          if ($id) {
+            $selected_ids[] = $id;
+          }
+        }
+      }
+    }
+
     // Allow the opener service to handle the selection.
     $state = MediaLibraryState::fromRequest($request);
 
