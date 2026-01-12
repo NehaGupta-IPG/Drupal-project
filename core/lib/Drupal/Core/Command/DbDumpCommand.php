@@ -269,7 +269,11 @@ class DbDumpCommand extends DbCommandBase {
         $column_args['binary'] = TRUE;
       }
 
-      $columns[] = new Column(...$column_args);
+      $column = new Column(...$column_args);
+      if ($row['Field'] == 'reusable') {
+        dump([$row, $column_args, $column]);
+      }
+      $columns[] = $column;
     }
 
     $table_args = [
