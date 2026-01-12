@@ -283,30 +283,29 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
 
     // Add a reasonable default event handler if none was specified.
     if (isset($element['#ajax']) && !isset($element['#ajax']['event'])) {
-    switch ($element['#type']) {
-    case 'submit':
-    case 'button':
-    case 'image_button':
-      // Bind to mouseup instead of click to support WCAG 2.5.2 Pointer Cancellation.
-      // This ensures the user can start a press, move away, and release without
-      // unintentionally activating the button. Activation should only occur on
-      // intentional release.
-      // @see https://www.drupal.org/node/216059
-      $element['#ajax']['event'] = 'mouseup';
+      switch ($element['#type']) {
+        case 'submit':
+        case 'button':
+        case 'image_button':
+          // Bind to mouseup instead of click to support WCAG 2.5.2 Pointer
+          // Cancellation. This ensures the user can start a press, move away,
+          // and release without unintentionally activating the button.
+          // Activation should only occur on intentional release.
+          // @see https://www.drupal.org/node/216059
+          $element['#ajax']['event'] = 'mouseup';
 
-      // Retain keyboard accessibility by setting 'keypress'. This causes ajax.js
-      // to trigger the mouseup event when SPACE or ENTER are pressed while the
-      // button has focus.
-      $element['#ajax']['keypress'] = TRUE;
+          // Retain keyboard accessibility by setting 'keypress'. This causes
+          // ajax.js to trigger 'event' when SPACE or ENTER are pressed while
+          // the button has focus.
+          $element['#ajax']['keypress'] = TRUE;
 
-      // Prevent a native click event from triggering a non-Ajax form submission.
-      // This is necessary because binding to mouseup does not automatically
-      // suppress the browser’s default click behavior.
-      if (!isset($element['#ajax']['prevent'])) {
-        $element['#ajax']['prevent'] = 'click';
-      }
-      break;
-
+          // Prevent a native click event from triggering a non-Ajax form
+          // submission. This is necessary because binding to mouseup does not
+          // automatically suppress the browser’s default click behavior.
+          if (!isset($element['#ajax']['prevent'])) {
+            $element['#ajax']['prevent'] = 'click';
+          }
+          break;
 
         case 'password':
         case 'textfield':
@@ -328,9 +327,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
           break;
 
         default:
-       
+
           break;
-         
+
       }
     }
 
