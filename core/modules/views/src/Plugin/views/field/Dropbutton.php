@@ -45,7 +45,7 @@ class Dropbutton extends Links {
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state): void {
     parent::buildOptionsForm($form, $form_state);
-    // Add option to select the dropbutton type.
+    // Add an option to select the dropbutton type.
     // @see \Drupal\Core\Render\Element\Dropbutton
     $options = self::getDropbuttonTypes(TRUE);
     $form['dropbutton_type'] = [
