@@ -40,15 +40,6 @@ class EarlyRenderingTestController extends ControllerBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('renderer')
-    );
-  }
-
-  /**
    * Returns markup with a cache tag for early rendering.
    */
   protected function earlyRenderContent() {
