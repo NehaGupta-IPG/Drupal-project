@@ -173,35 +173,7 @@
         Drupal.behaviors.dialog.prepareDialogButtons($(dialog));
     }
 
-    /**
-     * Rebuilds dialog buttons from form buttons.
-     */
-    const dialogButtonsChange = () => {
-      const buttons = Drupal.behaviors.dialog.prepareDialogButtons($(dialog));
-      $(dialog).dialog('option', 'buttons', buttons);
-    };
-
-    dialog.addEventListener('dialogButtonsChange', dialogButtonsChange);
-
     const buttonObservers = [];
-
-    /**
-     * Clean up observers and event listeners when dialog closes.
-     */
-    const cleanupDialog = () => {
-      dialog.removeEventListener('dialogButtonsChange', dialogButtonsChange);
-      buttonObservers.forEach((observer) => observer.disconnect());
-    };
-
-    dialog.addEventListener('dialog:beforeclose', cleanupDialog);
-
-    // Open the dialog.
-    const createdDialog = Drupal.dialog(dialog, response.dialogOptions);
-    if (response.dialogOptions.modal) {
-      createdDialog.showModal();
-    } else {
-      createdDialog.show();
-    }
 
     /**
      * Set up automatic button state synchronization using MutationObserver.
@@ -209,7 +181,15 @@
      * This watches form buttons for disabled/style changes and mirrors them
      * to dialog buttons, avoiding expensive full button rebuilds.
      */
-    if (response.dialogOptions.drupalAutoButtons) {
+    const setupButtonObservers = () => {
+      // Disconnect any existing observers before creating new ones.
+      buttonObservers.forEach((observer) => observer.disconnect());
+      buttonObservers.length = 0;
+
+      if (!response.dialogOptions.drupalAutoButtons) {
+        return;
+      }
+
       const formButtonElements = dialog.querySelectorAll(
         '.form-actions input[type=submit], .form-actions a.button, .form-actions a.action-link',
       );
@@ -276,7 +256,40 @@
           }
         });
       }
+    };
+
+    /**
+     * Rebuilds dialog buttons from form buttons.
+     */
+    const dialogButtonsChange = () => {
+      const buttons = Drupal.behaviors.dialog.prepareDialogButtons($(dialog));
+      $(dialog).dialog('option', 'buttons', buttons);
+      // Reconnect observers after buttons are rebuilt (e.g., after validation).
+      setupButtonObservers();
+    };
+
+    dialog.addEventListener('dialogButtonsChange', dialogButtonsChange);
+
+    /**
+     * Clean up observers and event listeners when dialog closes.
+     */
+    const cleanupDialog = () => {
+      dialog.removeEventListener('dialogButtonsChange', dialogButtonsChange);
+      buttonObservers.forEach((observer) => observer.disconnect());
+    };
+
+    dialog.addEventListener('dialog:beforeclose', cleanupDialog);
+
+    // Open the dialog.
+    const createdDialog = Drupal.dialog(dialog, response.dialogOptions);
+    if (response.dialogOptions.modal) {
+      createdDialog.showModal();
+    } else {
+      createdDialog.show();
     }
+
+    // Set up initial button state observers.
+    setupButtonObservers();
 
     // Add the standard Drupal class for buttons for style consistency.
     dialog.parentElement
