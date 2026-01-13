@@ -1743,8 +1743,8 @@ services:
       - '@database'
       - '@session_configuration'
       - '@datetime.time'
-      - '@session_handler'
       - '@session_handler.write_safe'
+      - '@session_handler'
     tags:
       - { name: backend_overridable }
   Drupal\Core\Session\SessionFactoryCompat:

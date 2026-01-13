@@ -28,10 +28,10 @@ class SessionManagerFactory implements SessionStorageFactoryInterface {
    *   The session configuration interface.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
-   *   The object to register as a PHP session handler.
    * @param \Drupal\Core\Session\WriteSafeSessionHandler $writeSafeHandler
    *   The write safe session handler.
+   * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
+   *   The object to register as a PHP session handler.
    *
    * @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()
    */
@@ -40,8 +40,8 @@ class SessionManagerFactory implements SessionStorageFactoryInterface {
     protected Connection $connection,
     protected SessionConfigurationInterface $sessionConfiguration,
     protected TimeInterface $time,
-    protected AbstractProxy|\SessionHandlerInterface|null $handler = NULL,
     protected WriteSafeSessionHandler $writeSafeHandler,
+    protected AbstractProxy|\SessionHandlerInterface|null $handler = NULL,
   ) {
   }
 

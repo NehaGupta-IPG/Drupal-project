@@ -21,7 +21,8 @@ class MetadataBagTest extends UnitTestCase {
    * Tests stamp new.
    */
   public function testStampNew(): void {
-    $metadata = new MetadataBag(new Settings([]));
+    new Settings([]);
+    $metadata = new MetadataBag();
     $metadata->setCsrfTokenSeed('a_cryptographically_secure_long_random_string_should_used_here');
     $metadata->stampNew();
     $this->assertNotEquals('a_cryptographically_secure_long_random_string_should_used_here', $metadata->getCsrfTokenSeed());

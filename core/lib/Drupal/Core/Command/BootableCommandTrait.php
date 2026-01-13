@@ -11,6 +11,8 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface as ComponentEventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -45,6 +47,7 @@ trait BootableCommandTrait {
     // reachable, at least has a valid *form*, so that Drupal can correctly
     // generate links and URLs.
     $request = Request::create('http://' . basename($kernel->getSitePath()) . '/core/scripts/drupal');
+    $request->setSession(new Session(new MockArraySessionStorage()));
     $kernel->preHandle($request);
 
     // Try to register an event listener to properly terminate the Drupal kernel
