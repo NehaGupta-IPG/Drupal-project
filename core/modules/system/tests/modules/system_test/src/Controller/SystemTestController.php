@@ -8,6 +8,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\CacheableRedirectResponse;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Link;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
@@ -151,6 +152,11 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
 
     // Test auto-escape of non safe strings.
     $this->messenger->addStatus('<em>This<span>markup will be</span> escaped</em>.');
+
+    // Test that CSRF token placeholders are replaced properly by outputting a
+    // link to a route which uses CSRF protection.
+    $link = Link::createFromRoute('Run cron', 'system.run_cron');
+    drupal_set_message(t('@cron_link', ['@cron_link' => $link->toString()]));
 
     return [];
   }
