@@ -42,8 +42,11 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
           // Help ensure maximum reuse of aggregate files by only grouping
           // together items that share the same 'group' value.
           $group_keys = $item['preprocess'] ? [$item['type'], $item['group']] : FALSE;
-          if ($item['unique_js_aggregate']) {
+          if ($item['unique_js_aggregate'] === TRUE) {
             $group_keys[] = $item['library'];
+          }
+          elseif ($item['unique_js_aggregate']) {
+            $group_keys[] = $item['unique_js_aggregate'];
           }
           break;
 

@@ -340,7 +340,7 @@ ckeditor5.autoformat:
     - core/ckeditor5
 
 drupal:
-  unique_js_aggregate: true
+  unique_js_aggregate: 'drupal'
   version: VERSION
   js:
     misc/drupal.js: { weight: -18 }
@@ -351,6 +351,7 @@ drupal:
     suppressDeprecationErrors: true
 
 drupalSettings:
+  unique_js_aggregate: 'drupal'
   version: VERSION
   js:
     # Need to specify a negative weight like drupal.js until
