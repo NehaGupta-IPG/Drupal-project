@@ -684,7 +684,8 @@ function user_logout(): void {
   // Session::invalidate(). Regrettably this method is currently broken and may
   // lead to the creation of spurious session records in the database.
   // @see https://github.com/symfony/symfony/issues/12375
-  // @todo check whether invalide still is leaves stray session records behind.
+  // @todo check whether invalidate() still is leaves stray session records
+  // behind.
   \Drupal::requestStack()->getSession()->invalidate();
   $user->setAccount(new AnonymousUserSession());
 }

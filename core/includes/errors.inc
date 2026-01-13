@@ -288,7 +288,7 @@ function _drupal_log_error($error, $fatal = FALSE): void {
     }
 
     if ($message) {
-      if (\Drupal::hasService('session')) {
+      if (\Drupal::hasRequest()) {
         // Message display is dependent on sessions being available.
         \Drupal::messenger()->addMessage($message, $class, TRUE);
       }

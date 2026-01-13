@@ -141,7 +141,7 @@ class User extends ContentEntityBase implements UserInterface {
       // @todo Extract SessionManagerInterface::delete() to a new/
       // AccountSessionRepository service.
       $session_manager_factory = \Drupal::service(SessionStorageFactoryInterface::class);
-      $session_manager = $session_manager_factory->createStorage();
+      $session_manager = $session_manager_factory->createStorage(NULL);
       assert($session_manager instanceof SessionManagerInterface);
       // If the password has been changed, delete all open sessions for the
       // user and recreate the current one.
