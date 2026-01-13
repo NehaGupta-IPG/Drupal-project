@@ -156,7 +156,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
     // Test that CSRF token placeholders are replaced properly by outputting a
     // link to a route which uses CSRF protection.
     $link = Link::createFromRoute('Run cron', 'system.run_cron');
-    drupal_set_message(t('@cron_link', ['@cron_link' => $link->toString()]));
+    $this->messenger->addStatus(Markup::create($link->toString()));
 
     return [];
   }

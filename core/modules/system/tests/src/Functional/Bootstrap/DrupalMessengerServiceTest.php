@@ -53,9 +53,10 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
     // Ensure that strings that are not marked as safe are escaped.
     $this->assertSession()->assertEscaped('<em>This<span>markup will be</span> escaped</em>.');
 
-    $this->assertLink('Run cron');
+    // Ensure that CSRF-protected links in messages work as expected.
+    $this->assertSession()->linkExists('Run cron');
     $this->clickLink('Run cron');
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     // Ensure messages survive a container rebuild.
     $assert = $this->assertSession();
