@@ -11,7 +11,6 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Flood\PrefixFloodInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Session\SessionManagerFactory;
 use Drupal\Core\Session\SessionManagerInterface;
 use Drupal\user\Form\UserCancelForm;
 use Drupal\user\ProfileForm;
@@ -139,7 +138,7 @@ class User extends ContentEntityBase implements UserInterface {
     parent::postSave($storage, $update);
 
     if ($update) {
-      // @todo: Extract SessionManagerInterface::delete() to a new/
+      // @todo Extract SessionManagerInterface::delete() to a new/
       // AccountSessionRepository service.
       $session_manager_factory = \Drupal::service(SessionStorageFactoryInterface::class);
       $session_manager = $session_manager_factory->createStorage();
