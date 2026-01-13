@@ -92,6 +92,20 @@ class ContentTranslationFormLanguageHooks {
               ],
             ],
           ];
+          $form['settings'][$entity_type_id][$bundle]['settings']['content_translation']['untranslatable_fields_disabled'] = [
+            '#type' => 'checkbox',
+            '#title' => t('Disable non translatable fields on translation forms'),
+            '#default_value' => $force_hidden || !empty($settings['untranslatable_fields_disabled']),
+            '#disabled' => $force_hidden,
+            '#description' => $force_hidden ? t('Moderated content requires non-translatable fields to be edited in the original language form.') : '',
+            '#states' => [
+              'visible' => [
+                ':input[name="settings[' . $entity_type_id . '][' . $bundle . '][translatable]"]' => [
+                  'checked' => TRUE,
+                ],
+              ],
+            ],
+          ];
         }
 
         $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
