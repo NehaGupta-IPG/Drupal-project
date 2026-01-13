@@ -778,8 +778,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
   protected function installSchema(string $module): void {
     $tables = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
-    foreach ($tables as $name => $table) {
-      $schema->createTableFromDefinition($name, $table);
+    if ($tables instanceof Schema) {
+      $schema->createSchemaFromDefinition($tables);
+    }
+    else {
+      foreach ($tables as $name => $table) {
+        $schema->createTable($name, $table);
+      }
     }
   }
 

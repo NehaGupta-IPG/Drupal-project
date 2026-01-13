@@ -3,6 +3,8 @@
 namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Query\PlaceholderInterface;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
+use Drupal\Core\Database\SchemaDefinition\SchemaType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
 
 /**
@@ -632,46 +634,57 @@ abstract class Schema implements PlaceholderInterface {
   abstract public function changeField($table, $field, $field_new, $spec, $keys_new = []);
 
   /**
-   * Create a new table from a table schema definition.
+   * Creates the tables in a schema definition.
    *
-   * @param \Drupal\Core\Database\SchemaDefinition\Table|string|int $table
-   *   A Schema API table definition, or the name of the table if $data is
-   *   specified, or an index of an array of TableDefinition objects.
-   * @param array|\Drupal\Core\Database\SchemaDefinition\Table|null $data
-   *   (optional) A legacy table data definition in array format, or a
-   *   TableDefinition object.
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
+   *   A Schema definition.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If any of the specified tables already exists.
+   * @throws \BadMethodCallException
+   *   When concrete driver class is missing implementations.
+   */
+  final public function createSchemaFromDefinition(SchemaDefinition $schema): void {
+    foreach ($schema as $table) {
+      $this->createTableFromDefinition($schema->type, $schema->name, $table);
+    }
+  }
+
+  /**
+   * Creates a new table from a table schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\SchemaType $schemaType
+   *   The type of Drupal feature providing the schema.
+   * @param string $schemaName
+   *   The schema name.
+   * @param \Drupal\Core\Database\SchemaDefinition\Table $table
+   *   The table definition.
    *
    * @throws \Drupal\Core\Database\SchemaObjectExistsException
    *   If the specified table already exists.
    * @throws \BadMethodCallException
    *   When concrete driver class is missing implementations.
    */
-  final public function createTableFromDefinition(TableDefinition|string|int $table, array|TableDefinition|null $data = NULL): void {
-    if ($table instanceof TableDefinition) {
-      $this->createTable($table->name, $table->toArray());
-      $this->schemaRegistry->register(
-        'schema',
-        get_class($table),
-        $table->name,
-        'abstract',
-        $table,
-        0
-      );
-    }
-    elseif ($data instanceof TableDefinition) {
-      $this->createTable($data->name, $data->toArray());
-      $this->schemaRegistry->register(
-        'schema',
-        get_class($data),
-        $data->name,
-        'abstract',
-        $data,
-        0
-      );
-    }
-    else {
-      $this->createTable($table, $data);
-    }
+  final public function createTableFromDefinition(SchemaType $schemaType, string $schemaName, TableDefinition $table): void {
+    $this->schemaRegistry->register(
+      $schemaType,
+      $schemaName,
+      'table',
+      $table->name,
+      'abstract',
+      $table,
+      0,
+    );
+    $this->createTable($table->name, $table->toArray());
+    $this->schemaRegistry->registerUpdate(
+      $schemaType,
+      $schemaName,
+      'table',
+      $table->name,
+      'abstract',
+      $table,
+      1,
+    );
   }
 
   /**

@@ -10,6 +10,7 @@ use Drupal\Core\Database\SchemaDefinition\Column;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
@@ -41,22 +42,23 @@ function system_schema(): Schema {
   // @deprecated The sequences table has been deprecated in drupal:10.2.0 and is
   // removed from drupal:12.0.0. See https://www.drupal.org/node/3220378.
   // @todo Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
-  return new Schema(
-    name: 'system',
-    tables: [
-      new Table(
-        name: 'sequences',
-        description: 'Stores IDs.',
-        columns: [
-          new Column(
-            name: 'value',
-            description: 'The value of the sequence.',
-            type: ColumnType::Serial,
-          ),
-        ],
-        primaryKey: new PrimaryKey(['value']),
+  $tables[] = new Table(
+    name: 'sequences',
+    description: 'Stores IDs.',
+    columns: [
+      new Column(
+        name: 'value',
+        description: 'The value of the sequence.',
+        type: ColumnType::Serial,
       ),
     ],
+    primaryKey: new PrimaryKey(['value']),
+  );
+
+  return new Schema(
+    type: SchemaType::Module,
+    name: 'system',
+    tables: $tables,
   );
 }
 

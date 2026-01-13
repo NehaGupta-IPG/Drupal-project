@@ -11,6 +11,8 @@ use Drupal\Core\Database\SchemaDefinition\ColumnSize;
 use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -175,7 +177,7 @@ class BatchStorage implements BatchStorageInterface {
    */
   protected function ensureTableExists() {
     try {
-      $this->connection->schema()->createTableFromDefinition($this->schemaDefinition());
+      $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition());
     }
     // If another process has already created the batch table, attempting to
     // recreate it will throw an exception. In this case just catch the
@@ -211,8 +213,8 @@ class BatchStorage implements BatchStorageInterface {
    *
    * @internal
    */
-  public function schemaDefinition(): Table {
-    return new Table(
+  public function schemaDefinition(): Schema {
+    $tables[] = new Table(
       name: static::TABLE_NAME,
       description: 'Stores details about batches (processes that run in multiple HTTP requests).',
       columns: [
@@ -246,6 +248,12 @@ class BatchStorage implements BatchStorageInterface {
       indexes: [
         new Index(name: 'token', columns: ['token']),
       ],
+    );
+
+    return new Schema(
+      type: SchemaType::Storage,
+      name: 'batch',
+      tables: $tables,
     );
   }
 

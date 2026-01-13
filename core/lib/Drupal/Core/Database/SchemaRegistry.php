@@ -8,6 +8,8 @@ use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 
 /**
@@ -26,16 +28,20 @@ final class SchemaRegistry {
   }
 
   public function register(
+    SchemaType $schemaType,
     string $schemaName,
-    string $objectClass,
+    string $objectType,
     string $objectName,
     string $infoQualifier,
     mixed $info,
     int $status,
   ): int {
+    if ($schemaType === SchemaType::Storage && $schemaName === 'schema_definition' && $objectType === 'table' && $objectName === static::TABLE_NAME) {
+      return 0;
+    }
     $try_again = FALSE;
     try {
-      return $this->doInsert($schemaName, $objectClass, $objectName, $infoQualifier, $info, $status);
+      return $this->doInsert($schemaType->value, $schemaName, $objectType, $objectName, $infoQualifier, $info, $status);
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
@@ -47,13 +53,14 @@ final class SchemaRegistry {
     }
     // Now that the table has been created, try again if necessary.
     if ($try_again) {
-      return $this->doInsert($schemaName, $objectClass, $objectName, $infoQualifier, $info, $status);
+      return $this->doInsert($schemaType->value, $schemaName, $objectType, $objectName, $infoQualifier, $info, $status);
     }
   }
 
   private function doInsert(
+    string $schemaType,
     string $schemaName,
-    string $objectClass,
+    string $objectType,
     string $objectName,
     string $infoQualifier,
     mixed $info,
@@ -61,8 +68,9 @@ final class SchemaRegistry {
   ): int {
     return $this->connection->insert(static::TABLE_NAME)
       ->fields([
+        'schema_type' => $schemaType,
         'schema_name' => $schemaName,
-        'object_class' => $objectClass,
+        'object_type' => $objectType,
         'object_name' => $objectName,
         'info_qualifier' => $infoQualifier,
         'info' => serialize($info),
@@ -71,7 +79,52 @@ final class SchemaRegistry {
       ->execute();
   }
 
-  private function catchException(\Exception $e) {
+  public function registerUpdate(
+    SchemaType $schemaType,
+    string $schemaName,
+    string $objectType,
+    string $objectName,
+    string $infoQualifier,
+    mixed $info,
+    int $status,
+  ): int {
+    $exist = $this->connection->select(static::TABLE_NAME, 'r')
+      ->fields('r', ['object_name'])
+      ->condition('object_type', $objectType)
+      ->condition('object_name', $objectName)
+      ->condition('info_qualifier', $infoQualifier)
+      ->execute()
+      ->fetchField();
+
+    if ($exist) {
+      $this->connection->update(static::TABLE_NAME)
+        ->fields([
+          'schema_type' => $schemaType->value,
+          'schema_name' => $schemaName,
+          'info' => serialize($info),
+          'status' => $status,
+        ])
+        ->condition('object_type', $objectType)
+        ->condition('object_name', $objectName)
+        ->condition('info_qualifier', $infoQualifier)
+        ->execute();
+    }
+    else {
+      return $this->register(
+        $schemaType,
+        $schemaName,
+        $objectType,
+        $objectName,
+        $infoQualifier,
+        $info,
+        $status,
+      );
+    }
+
+    return 0;
+  }
+
+  private function catchException(\Exception $e): void {
     if ($this->connection->schema()->tableExists(static::TABLE_NAME)) {
       throw $e;
     }
@@ -79,7 +132,7 @@ final class SchemaRegistry {
 
   private function ensureTableExists(): bool {
     try {
-      $this->connection->schema()->createTableFromDefinition($this->schemaDefinition());
+      $this->connection->schema()->createSchemaFromDefinition($this->schemaDefinition());
     }
     catch (DatabaseException) {
     }
@@ -94,11 +147,18 @@ final class SchemaRegistry {
    *
    * @internal
    */
-  private function schemaDefinition(): Table {
-    return new Table(
+  private function schemaDefinition(): Schema {
+    $tables[] = new Table(
       name: static::TABLE_NAME,
       description: 'Stores metadata information about the Drupal database schema implemented.',
       columns: [
+        new Column(
+          name: 'schema_type',
+          description: 'The Drupal schema type implementing the db object.',
+          type: ColumnType::VarcharAscii,
+          length: 30,
+          notNull: TRUE
+        ),
         new Column(
           name: 'schema_name',
           description: 'The name of the Drupal schema implementing the db object.',
@@ -107,15 +167,15 @@ final class SchemaRegistry {
           notNull: TRUE
         ),
         new Column(
-          name: 'object_class',
-          description: 'The Drupal class representing the db object.',
+          name: 'object_type',
+          description: 'The db object type.',
           type: ColumnType::VarcharAscii,
-          length: 255,
+          length: 30,
           notNull: TRUE
         ),
         new Column(
           name: 'object_name',
-          description: 'The Drupal name of the Drupal Schema implementing the db object.',
+          description: 'The Drupal name of the db object.',
           type: ColumnType::VarcharAscii,
           length: 255,
           notNull: TRUE
@@ -124,7 +184,7 @@ final class SchemaRegistry {
           name: 'info_qualifier',
           description: 'The qualifier of the information stored in the row.',
           type: ColumnType::VarcharAscii,
-          length: 80,
+          length: 30,
           notNull: TRUE
         ),
         new Column(
@@ -141,7 +201,13 @@ final class SchemaRegistry {
           default: new IntValue(0),
         ),
       ],
-      primaryKey: new PrimaryKey(['schema_name', 'object_class', 'object_name', 'info_qualifier']),
+      primaryKey: new PrimaryKey(['object_type', 'object_name', 'info_qualifier']),
+    );
+
+    return new Schema(
+      type: SchemaType::Storage,
+      name: 'schema_definition',
+      tables: $tables,
     );
   }
 

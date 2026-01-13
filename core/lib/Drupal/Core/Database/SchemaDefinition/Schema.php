@@ -22,12 +22,15 @@ final class Schema implements SchemaDefinitionInterface, \Iterator {
   /**
    * Constructor.
    *
+   * @param SchemaType $type
+   *   The type of Drupal feature providing the schema.
    * @param string $name
    *   The schema name.
    * @param list<Table> $tables
    *   A list of Table objects.
    */
   public function __construct(
+    public readonly SchemaType $type,
     public readonly string $name,
     public readonly array $tables,
   ) {
