@@ -22,11 +22,19 @@ class ViewsEntityTestHooks {
    * Implements hook_entity_base_field_info().
    */
   #[Hook('entity_base_field_info')]
-  public function entityBaseFieldInfo(EntityTypeInterface $entity_type) {
+  public function entityBaseFieldInfo(EntityTypeInterface $entity_type): array {
     if ($entity_type->id() == 'entity_test') {
-      $definitions['test_text_access'] = BaseFieldDefinition::create('string')->setLabel(t('Test access'))->setTranslatable(FALSE)->setSetting('max_length', 64)->setDisplayOptions('form', ['type' => 'string_textfield', 'weight' => 10]);
+      $definitions['test_text_access'] = BaseFieldDefinition::create('string')
+        ->setLabel('Test access')
+        ->setTranslatable(FALSE)
+        ->setSetting('max_length', 64)
+        ->setDisplayOptions('form', [
+          'type' => 'string_textfield',
+          'weight' => 10,
+        ]);
       return $definitions;
     }
+    return [];
   }
 
   /**
@@ -53,7 +61,7 @@ class ViewsEntityTestHooks {
    * @see \Drupal\Tests\views\Kernel\Handler\FieldFieldTest::testSimpleExecute()
    */
   #[Hook('entity_load')]
-  public function entityLoad(array $entities, $entity_type_id) {
+  public function entityLoad(array $entities, $entity_type_id): void {
     if ($entity_type_id === 'entity_test') {
       // Cast the value of an entity field to be something else than a string so
       // we can check that

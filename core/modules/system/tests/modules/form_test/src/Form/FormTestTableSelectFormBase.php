@@ -22,7 +22,7 @@ abstract class FormTestTableSelectFormBase extends FormBase {
    *   An associative array containing the structure of the form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   * @param $element_properties
+   * @param array $element_properties
    *   An array of element properties for the tableselect element.
    *
    * @return array
@@ -40,7 +40,7 @@ abstract class FormTestTableSelectFormBase extends FormBase {
       '#header' => $header,
       '#options' => $options,
       '#multiple' => FALSE,
-      '#empty' => t('Empty text.'),
+      '#empty' => $this->t('Empty text.'),
       '#ajax' => [
         'callback' => '::tableselectAjaxCallback',
         'wrapper' => 'tableselect-wrapper',
@@ -49,7 +49,7 @@ abstract class FormTestTableSelectFormBase extends FormBase {
 
     $form['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Submit'),
+      '#value' => $this->t('Submit'),
     ];
 
     return $form;
