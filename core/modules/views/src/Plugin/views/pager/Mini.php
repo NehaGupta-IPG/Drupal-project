@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\pager;
 
+use Drupal\Core\Ajax\AjaxHelperTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsPager;
 
@@ -18,6 +19,8 @@ use Drupal\views\Attribute\ViewsPager;
   theme: "views_mini_pager",
 )]
 class Mini extends SqlBase {
+
+  use AjaxHelperTrait;
 
   /**
    * Overrides \Drupal\views\Plugin\views\pager\PagerPlugin::defineOptions().
@@ -109,7 +112,7 @@ class Mini extends SqlBase {
       '#element' => $this->options['id'],
       '#pagination_heading_level' => parent::getHeadingLevel(),
       '#parameters' => $input,
-      '#route_name' => !empty($this->view->live_preview) ? '<current>' : '<none>',
+      '#route_name' => (!empty($this->view->live_preview) || $this->isAjax()) ? '<current>' : '<none>',
     ];
   }
 
