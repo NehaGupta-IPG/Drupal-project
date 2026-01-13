@@ -6,6 +6,11 @@
  */
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
 
@@ -32,24 +37,27 @@ function system_install(): void {
 /**
  * Implements hook_schema().
  */
-function system_schema(): array {
+function system_schema(): Schema {
   // @deprecated The sequences table has been deprecated in drupal:10.2.0 and is
   // removed from drupal:12.0.0. See https://www.drupal.org/node/3220378.
   // @todo Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
-  $schema['sequences'] = [
-    'description' => 'Stores IDs.',
-    'fields' => [
-      'value' => [
-        'description' => 'The value of the sequence.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
+  return new Schema(
+    name: 'system',
+    tables: [
+      new Table(
+        name: 'sequences',
+        description: 'Stores IDs.',
+        columns: [
+          new Column(
+            name: 'value',
+            description: 'The value of the sequence.',
+            type: ColumnType::Serial,
+          ),
+        ],
+        primaryKey: new PrimaryKey(['value']),
+      ),
     ],
-    'primary key' => ['value'],
-  ];
-
-  return $schema;
+  );
 }
 
 /**
