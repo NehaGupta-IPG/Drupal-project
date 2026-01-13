@@ -12,13 +12,16 @@
 
 {% for featured_page_action in featured_page_actions %}
   {% set link = featured_page_action.page_action['#link'] %}
-  {% include 'navigation:toolbar-button' with {
+  {% set toolbar_button_props = {
     text: link['#title'],
     html_tag: 'a',
     attributes: create_attribute(link['#attributes']|default([])).setAttribute('href', link['#url']|render|default(null)),
     modifiers: ['primary'],
-    icon: featured_page_action.icon,
-  } only %}
+  } %}
+  {% if featured_page_action.icon %}
+    {% set toolbar_button_props = toolbar_button_props|merge({ icon: featured_page_action.icon }) %}
+  {% endif %}
+  {% include 'navigation:toolbar-button' with toolbar_button_props only %}
 {% endfor %}
 
 {% if page_actions %}
