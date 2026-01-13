@@ -81,7 +81,7 @@ user:
 
 oneplusfourgrid_section:
   css:
-    theme:
+    layout:
       layouts/oneplusfourgrid_section/oneplusfourgrid_section.css: {}
 
 filter:
