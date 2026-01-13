@@ -15,6 +15,7 @@ use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
 use Drupal\Tests\UnitTestCase;
@@ -219,6 +220,7 @@ class SchemaDefinitionConversionTest extends UnitTestCase {
     ];
 
     $schemaDefinition = new Schema(
+      type: SchemaType::Test,
       name: 'test_foo_bar',
       tables: [
         new Table(
