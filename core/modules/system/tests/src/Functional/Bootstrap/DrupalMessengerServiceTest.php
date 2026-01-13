@@ -53,11 +53,6 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
     // Ensure that strings that are not marked as safe are escaped.
     $this->assertSession()->assertEscaped('<em>This<span>markup will be</span> escaped</em>.');
 
-    // Ensure that CSRF-protected links in messages work as expected.
-    $this->assertSession()->linkExists('Run cron');
-    $this->clickLink('Run cron');
-    $this->assertSession()->statusCodeEquals(200);
-
     // Ensure messages survive a container rebuild.
     $assert = $this->assertSession();
     $this->drupalLogin($this->drupalCreateUser(['administer modules']));
@@ -68,6 +63,13 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
     $this->submitForm($edit, 'Install');
     $assert->pageTextContains('Help has been installed');
     $assert->pageTextContains('system_test_preinstall_module called');
+
+    // Ensure that CSRF-protected links in messages work as expected.
+    $this->drupalLogin($this->drupalCreateUser(['administer site configuration']));
+    $this->drupalGet(Url::fromRoute('system_test.messenger_service'));
+    $this->assertSession()->linkExists('Run cron');
+    $this->clickLink('Run cron');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
   /**
