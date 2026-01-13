@@ -11,6 +11,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Flood\PrefixFloodInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Session\SessionManagerFactory;
+use Drupal\Core\Session\SessionManagerInterface;
 use Drupal\user\Form\UserCancelForm;
 use Drupal\user\ProfileForm;
 use Drupal\user\ProfileTranslationHandler;
@@ -24,6 +26,7 @@ use Drupal\user\UserListBuilder;
 use Drupal\user\UserStorage;
 use Drupal\user\UserStorageSchema;
 use Drupal\user\UserViewsData;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
 
 /**
  * Defines the user entity class.
@@ -136,13 +139,17 @@ class User extends ContentEntityBase implements UserInterface {
     parent::postSave($storage, $update);
 
     if ($update) {
-      $session_manager = \Drupal::service('session_manager');
+      // @todo: Extract SessionManagerInterface::delete() to a new/
+      // AccountSessionRepository service.
+      $session_manager_factory = \Drupal::service(SessionStorageFactoryInterface::class);
+      $session_manager = $session_manager_factory->createStorage();
+      assert($session_manager instanceof SessionManagerInterface);
       // If the password has been changed, delete all open sessions for the
       // user and recreate the current one.
       if ($this->pass->value != $this->getOriginal()->pass->value) {
         $session_manager->delete($this->id());
         if ($this->id() == \Drupal::currentUser()->id()) {
-          \Drupal::service('session')->migrate();
+          \Drupal::requestStack()->getSession()->migrate();
         }
 
         $flood_config = \Drupal::config('user.flood');

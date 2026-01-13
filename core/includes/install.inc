@@ -15,6 +15,7 @@ use Drupal\Core\Extension\InstallRequirementsInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 
 /**
  * Requirement severity -- Informational message only.
@@ -247,7 +248,9 @@ function drupal_install_system($install_state): void {
   $kernel->preHandle($request);
   // Ensure our request includes the session if appropriate.
   if (PHP_SAPI !== 'cli') {
-    $request->setSession($kernel->getContainer()->get('session'));
+    /** @var \Symfony\Component\HttpFoundation\Session\SessionFactoryInterface $sessionFactory */
+    $sessionFactory = \Drupal::service(SessionFactoryInterface::class);
+    $request->setSession($sessionFactory->createSession());
   }
 
   // Before having installed the system module and being able to do a module

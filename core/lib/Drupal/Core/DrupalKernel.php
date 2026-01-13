@@ -33,6 +33,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -998,13 +999,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->container->get(ReverseContainer::class)->recordContainer();
 
       // If there is a session, close and save it.
-      if ($this->container->initialized('session')) {
-        $session = $this->container->get('session');
-        if ($session->isStarted()) {
-          $session_started = TRUE;
-          $session->save();
+      if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
+        if ($request = $request_stack->getMainRequest()) {
+          $session = $request->getSession();
+          if ($session->isStarted()) {
+            $session_started = TRUE;
+            $session->save();
+          }
+          unset($session);
         }
-        unset($session);
       }
 
       if ($this->container->initialized('messenger')) {
@@ -1048,8 +1051,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->attachSynthetic($container);
 
     $this->container = $container;
+    $session_factory = $this->container->get(SessionFactoryInterface::class);
+    $session = $session_factory->createSession();
     if ($session_started) {
-      $this->container->get('session')->start();
+      $session->start();
     }
 
     // The request stack is preserved across container rebuilds. Re-inject the
@@ -1057,7 +1062,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
         $subrequest = TRUE;
-        $request->setSession($this->container->get('session'));
+        $request->setSession($session);
       }
     }
 
@@ -1302,16 +1307,20 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->container->get(ReverseContainer::class)->recordContainer();
 
     // If there is a session, close and save it.
-    if ($this->container->initialized('session')) {
-      $session = $this->container->get('session');
-      if ($session->isStarted()) {
-        $session_started = TRUE;
-        $session->save();
+    if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
+      if ($request = $request_stack->getMainRequest()) {
+        $session = $request->getSession();
+        if ($session->isStarted()) {
+          $session_started = TRUE;
+          $session->save();
+        }
+        unset($session);
       }
-      unset($session);
     }
 
-    $all_messages = $this->container->get('messenger')->all();
+    if ($this->container->initialized('messenger')) {
+      $all_messages = $this->container->get('messenger')->all();
+    }
 
     $persist = $this->getServicesToPersist($this->container);
     $this->container->reset();
@@ -1326,8 +1335,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->container->get('module_handler')->reload();
     }
 
+    $session_factory = $this->container->get(SessionFactoryInterface::class);
+    $session = $session_factory->createSession();
     if ($session_started) {
-      $this->container->get('session')->start();
+      $session->start();
     }
 
     // The request stack is preserved across container rebuilds. Re-inject the
@@ -1335,7 +1346,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
         $subrequest = TRUE;
-        $request->setSession($this->container->get('session'));
+        $request->setSession($session);
       }
     }
 

@@ -50,7 +50,8 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
           // file is positively allowed access to it. See file_save_upload().
           // @todo Implement \Drupal\Core\Entity\EntityHandlerInterface so that
           //   services can be more properly injected.
-          $allowed_fids = \Drupal::service('session')->get('anonymous_allowed_file_ids', []);
+          $session = \Drupal::requestStack()->getSession();
+          $allowed_fids = $session->get('anonymous_allowed_file_ids', []);
           if (!empty($allowed_fids[$entity->id()])) {
             return AccessResult::allowed()->addCacheContexts(['session', 'user']);
           }

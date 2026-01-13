@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\ckeditor5\Traits;
 
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\MetadataBag;
 
 /**
  * Synchronizes the child site's CSRF token seed back to the test runner.
@@ -30,7 +31,9 @@ trait SynchronizeCsrfTokenSeedTrait {
     parent::drupalLogin($account);
     $session_data = $this->container->get('session_handler.write_safe')->read($this->getSession()->getCookie($this->getSessionName()));
     $csrf_token_seed = unserialize(explode('_sf2_meta|', $session_data)[1])['s'];
-    $this->container->get('session_manager.metadata_bag')->setCsrfTokenSeed($csrf_token_seed);
+    $metadata_bag = $this->container->get('request_stack')->getSession()->getMetadataBag();
+    assert($metadata_bag instanceof MetadataBag);
+    $metadata_bag->setCsrfTokenSeed($csrf_token_seed);
   }
 
   /**
@@ -52,7 +55,9 @@ trait SynchronizeCsrfTokenSeedTrait {
    */
   protected function drupalLogout() {
     parent::drupalLogout();
-    $this->container->get('session_manager.metadata_bag')->stampNew();
+    $metadata_bag = $this->container->get('request_stack')->getSession()->getMetadataBag();
+    assert($metadata_bag instanceof MetadataBag);
+    $metadata_bag->stampNew();
   }
 
 }
