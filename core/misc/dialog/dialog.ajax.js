@@ -218,7 +218,7 @@
       );
 
       if (buttonPane && formButtonElements.length > 0) {
-        const dialogButtons = buttonPane.querySelectorAll('button.ui-button');
+        const dialogButtons = buttonPane.querySelectorAll('button');
 
         formButtonElements.forEach((formButton, index) => {
           const dialogButton = dialogButtons[index];
