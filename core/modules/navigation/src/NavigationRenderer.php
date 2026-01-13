@@ -252,9 +252,10 @@ final class NavigationRenderer {
       // Exclude current route local task, since it is not going to be included
       // in the page actions link list.
       $url = $local_task['#link']['url'] ?? NULL;
-      if ($url?->getRouteName() && $url->getRouteName() === $entity_local_tasks['route_name']) {
+      if ($url && $url->isRouted() && $url->getRouteName() === $entity_local_tasks['route_name']) {
         continue;
       }
+
       // The $local_task array that we get here is tailor-made for use
       // with the menu-local-tasks.html.twig, eg. the menu_local_task
       // theme hook. It has all the information we need, but we're not
@@ -264,18 +265,20 @@ final class NavigationRenderer {
       // them to render a simple link.
       // @see \Drupal\Core\Menu\LocalTaskManager::getTasksBuild()
       $link = $local_task['#link'];
-      $link['localized_options'] += [
+      $localized_options = $link['localized_options'] ?? [];
+      $localized_options += [
         'set_active_class' => TRUE,
       ];
+
       $this->localTasks['page_actions'][$local_task_name] = [
         '#theme' => 'top_bar_page_action',
         '#link' => [
           '#type' => 'link',
           '#title' => $link['title'],
           '#url' => $link['url'],
-          '#options' => $link['localized_options'],
+          '#options' => $localized_options,
         ],
-        '#access' => $local_task['#access'],
+        '#access' => $local_task['#access'] ?? TRUE,
       ];
     }
     $this->localTasks['cacheability'] = $cacheability->merge($entity_local_tasks['cacheability']);
