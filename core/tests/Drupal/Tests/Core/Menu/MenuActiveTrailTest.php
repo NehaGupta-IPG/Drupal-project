@@ -116,7 +116,7 @@ class MenuActiveTrailTest extends UnitTestCase {
    *     - expected_link: The expected active link for the given menu.
    *     - expected_trail: The expected active trail for the given menu.
    */
-  public static function provider() {
+  public static function provider(): array {
     $data = [];
 
     $mock_route = new Route('');
@@ -126,8 +126,18 @@ class MenuActiveTrailTest extends UnitTestCase {
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, $mock_route);
     $request->attributes->set('_raw_variables', new InputBag([]));
 
-    $link_1 = MenuLinkMock::createMock(['id' => 'baby_llama_link_1', 'route_name' => 'baby_llama', 'title' => 'Baby llama', 'parent' => 'mama_llama_link']);
-    $link_2 = MenuLinkMock::createMock(['id' => 'baby_llama_link_2', 'route_name' => 'baby_llama', 'title' => 'Baby llama', 'parent' => 'papa_llama_link']);
+    $link_1 = MenuLinkMock::createMock([
+      'id' => 'baby_llama_link_1',
+      'route_name' => 'baby_llama',
+      'title' => 'Baby llama',
+      'parent' => 'mama_llama_link',
+    ]);
+    $link_2 = MenuLinkMock::createMock([
+      'id' => 'baby_llama_link_2',
+      'route_name' => 'baby_llama',
+      'title' => 'Baby llama',
+      'parent' => 'papa_llama_link',
+    ]);
 
     // @see \Drupal\Core\Menu\MenuLinkManagerInterface::getParentIds()
     $link_1_parent_ids = ['baby_llama_link_1', 'mama_llama_link', ''];
@@ -142,7 +152,13 @@ class MenuActiveTrailTest extends UnitTestCase {
 
     // The first of multiple matching links is returned when multiple links
     // match the current route, where "first" is determined by sorting by key.
-    $data[] = [$request, ['baby_llama_link_1' => $link_1, 'baby_llama_link_2' => $link_2], Random::machineName(), $link_1, $link_1_parent_ids];
+    $data[] = [
+      $request,
+      ['baby_llama_link_1' => $link_1, 'baby_llama_link_2' => $link_2],
+      Random::machineName(),
+      $link_1,
+      $link_1_parent_ids,
+    ];
 
     // No active link is returned in case of a 403.
     $request = new Request();
@@ -158,8 +174,6 @@ class MenuActiveTrailTest extends UnitTestCase {
 
   /**
    * Tests getActiveLink().
-   *
-   * @legacy-covers ::getActiveLink
    */
   #[DataProvider('provider')]
   public function testGetActiveLink(Request $request, $links, $menu_name, $expected_link): void {
@@ -178,8 +192,6 @@ class MenuActiveTrailTest extends UnitTestCase {
 
   /**
    * Tests that getActiveLink() returns a <front> route link for a route that is the front page and has no other links.
-   *
-   * @legacy-covers ::getActiveLink
    */
   public function testGetActiveLinkReturnsFrontPageLinkAtTheFrontPage(): void {
 
@@ -197,7 +209,12 @@ class MenuActiveTrailTest extends UnitTestCase {
       ->willReturn(TRUE);
 
     // Make 'link_1' route to have no links and the '<front>' route to have a link.
-    $home_link = MenuLinkMock::createMock(['id' => 'home_link', 'route_name' => 'home_link', 'title' => 'Home', 'parent' => NULL]);
+    $home_link = MenuLinkMock::createMock([
+      'id' => 'home_link',
+      'route_name' => 'home_link',
+      'title' => 'Home',
+      'parent' => NULL,
+    ]);
     $this->menuLinkManager
       ->method('loadLinksByRoute')
       ->willReturnCallback(function ($route_name) use ($home_link) {
@@ -214,8 +231,6 @@ class MenuActiveTrailTest extends UnitTestCase {
 
   /**
    * Tests getActiveTrailIds().
-   *
-   * @legacy-covers ::getActiveTrailIds
    */
   #[DataProvider('provider')]
   public function testGetActiveTrailIds(Request $request, $links, $menu_name, $expected_link, $expected_trail): void {
@@ -244,10 +259,15 @@ class MenuActiveTrailTest extends UnitTestCase {
 
     $this->cacheTagsInvalidator->expects($this->exactly(2))
       ->method('invalidateTags')
-      ->willReturnCallback(fn($tags) =>
+      ->willReturnCallback(fn($tags): NULL =>
         match($tags) {
           ['config:system.menu.' . $menu_name] => NULL,
-          ['config:system.menu.' . $menu_name, 'config:system.menu.' . $menu_name, 'config:menu_list', 'menu_link_content_list'] => NULL,
+          [
+            'config:system.menu.' . $menu_name,
+            'config:system.menu.' . $menu_name,
+            'config:menu_list',
+            'menu_link_content_list',
+          ] => NULL,
         }
       );
     $this->menuActiveTrail->clear();
@@ -261,8 +281,6 @@ class MenuActiveTrailTest extends UnitTestCase {
 
   /**
    * Tests getCid()
-   *
-   * @legacy-covers ::getCid
    */
   public function testGetCid(): void {
     $data = $this->provider()[1];

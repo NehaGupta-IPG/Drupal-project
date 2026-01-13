@@ -162,8 +162,6 @@ class FilterTest extends JsonapiKernelTestBase {
 
   /**
    * Tests query condition.
-   *
-   * @legacy-covers ::queryCondition
    */
   public function testQueryCondition(): void {
     // Can't use a data provider because we need access to the container.
@@ -329,12 +327,10 @@ class FilterTest extends JsonapiKernelTestBase {
 
   /**
    * Tests create from query parameter.
-   *
-   * @legacy-covers ::createFromQueryParameter
    */
   #[DataProvider('parameterProvider')]
   public function testCreateFromQueryParameter($case, $expected): void {
-    $resource_type = new ResourceType('foo', 'bar', NULL);
+    $resource_type = new ResourceType('foo', 'bar', \stdClass::class);
     $actual = Filter::createFromQueryParameter($case, $resource_type, $this->getFieldResolverMock($resource_type));
     $conditions = $actual->root()->members();
     for ($i = 0; $i < count($case); $i++) {
@@ -362,8 +358,6 @@ class FilterTest extends JsonapiKernelTestBase {
 
   /**
    * Tests create from query parameter nested.
-   *
-   * @legacy-covers ::createFromQueryParameter
    */
   public function testCreateFromQueryParameterNested(): void {
     $parameter = [
@@ -403,7 +397,7 @@ class FilterTest extends JsonapiKernelTestBase {
         ],
       ],
     ];
-    $resource_type = new ResourceType('foo', 'bar', NULL);
+    $resource_type = new ResourceType('foo', 'bar', \stdClass::class);
     $filter = Filter::createFromQueryParameter($parameter, $resource_type, $this->getFieldResolverMock($resource_type));
     $root = $filter->root();
 

@@ -69,8 +69,6 @@ class UnroutedUrlTest extends UnitTestCase {
 
   /**
    * Tests the fromUri() method.
-   *
-   * @legacy-covers ::fromUri
    */
   #[DataProvider('providerFromUri')]
   public function testFromUri($uri, $is_external): void {
@@ -82,7 +80,7 @@ class UnroutedUrlTest extends UnitTestCase {
   /**
    * Data provider for testFromUri().
    */
-  public static function providerFromUri() {
+  public static function providerFromUri(): array {
     return [
       // [$uri, $is_external]
       // An external URI.
@@ -116,7 +114,7 @@ class UnroutedUrlTest extends UnitTestCase {
   /**
    * Data provider for testFromInvalidUri().
    */
-  public static function providerFromInvalidUri() {
+  public static function providerFromInvalidUri(): array {
     return [
       // Schemeless paths.
       ['test'],
@@ -135,8 +133,6 @@ class UnroutedUrlTest extends UnitTestCase {
 
   /**
    * Tests the createFromRequest method.
-   *
-   * @legacy-covers ::createFromRequest
    */
   public function testCreateFromRequest(): void {
     $request = Request::create('/test-path');
@@ -152,8 +148,6 @@ class UnroutedUrlTest extends UnitTestCase {
 
   /**
    * Tests the isExternal() method.
-   *
-   * @legacy-covers ::isExternal
    */
   #[DataProvider('providerFromUri')]
   #[Depends('testFromUri')]
@@ -164,8 +158,6 @@ class UnroutedUrlTest extends UnitTestCase {
 
   /**
    * Tests the toString() method.
-   *
-   * @legacy-covers ::toString
    */
   #[DataProvider('providerFromUri')]
   #[Depends('testFromUri')]
@@ -176,8 +168,6 @@ class UnroutedUrlTest extends UnitTestCase {
 
   /**
    * Tests the getRouteName() method.
-   *
-   * @legacy-covers ::getRouteName
    */
   #[DataProvider('providerFromUri')]
   #[Depends('testFromUri')]
@@ -189,8 +179,6 @@ class UnroutedUrlTest extends UnitTestCase {
 
   /**
    * Tests the getRouteParameters() method.
-   *
-   * @legacy-covers ::getRouteParameters
    */
   #[DataProvider('providerFromUri')]
   #[Depends('testFromUri')]
@@ -202,8 +190,6 @@ class UnroutedUrlTest extends UnitTestCase {
 
   /**
    * Tests the getInternalPath() method.
-   *
-   * @legacy-covers ::getInternalPath
    */
   #[DataProvider('providerFromUri')]
   #[Depends('testFromUri')]
@@ -215,8 +201,6 @@ class UnroutedUrlTest extends UnitTestCase {
 
   /**
    * Tests the getPath() method.
-   *
-   * @legacy-covers ::getUri
    */
   #[DataProvider('providerFromUri')]
   #[Depends('testFromUri')]
@@ -227,8 +211,6 @@ class UnroutedUrlTest extends UnitTestCase {
 
   /**
    * Tests the getOptions() method.
-   *
-   * @legacy-covers ::getOptions
    */
   #[DataProvider('providerFromUri')]
   #[Depends('testFromUri')]
