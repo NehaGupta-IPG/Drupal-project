@@ -18,9 +18,11 @@ class RequestPagerTest extends KernelTestBase {
 
   /**
    * @covers ::findPage
+   *
+   * @dataProvider findPageDataProvider
    */
-  public function testFindPage(): void {
-    $request = Request::create('http://example.com', 'GET', ['page' => '0,10']);
+  public function testFindPage(string $page, mixed $pager_id, int $expected): void {
+    $request = Request::create('http://example.com', 'GET', ['page' => $page]);
     $request->setSession(new Session(new MockArraySessionStorage()));
 
     /** @var \Symfony\Component\HttpFoundation\RequestStack $request_stack */
@@ -29,7 +31,21 @@ class RequestPagerTest extends KernelTestBase {
 
     $pager_params = $this->container->get('pager.parameters');
 
-    $this->assertEquals(10, $pager_params->findPage(1));
+    $this->assertEquals($expected, $pager_params->findPage($pager_id));
+  }
+
+  /**
+   * Data provider for testFindPage().
+   */
+  public static function findPageDataProvider(): \Generator {
+    yield 'find on multi-pager with id 0' => ['page' => '3,10', 'pager_id' => 0, 'expected' => 3];
+    yield 'find on multi-pager with id 1' => ['page' => '3,10', 'pager_id' => 1, 'expected' => 10];
+    yield 'find on out of range pager id' => ['page' => '3,10', 'pager_id' => 'index not exists', 'expected' => 0];
+    yield 'find on empty page number' => ['page' => '3,,10', 'pager_id' => 1, 'expected' => 0];
+    yield 'find on float page number' => ['page' => '1.99', 'pager_id' => 0, 'expected' => 1];
+    yield 'find on negative page number' => ['page' => '-1', 'pager_id' => 0, 'expected' => 0];
+    yield 'find on string page number' => ['page' => 'drupal', 'pager_id' => 0, 'expected' => 0];
+    yield 'find on non utf-8 character page number' => ['page' => 'ð', 'pager_id' => 0, 'expected' => 0];
   }
 
   /**
