@@ -17,6 +17,8 @@ abstract class Schema implements PlaceholderInterface {
    */
   protected $connection;
 
+  protected readonly SchemaRegistry $schemaRegistry;
+
   /**
    * The placeholder counter.
    *
@@ -47,6 +49,7 @@ abstract class Schema implements PlaceholderInterface {
   public function __construct($connection) {
     $this->uniqueIdentifier = uniqid('', TRUE);
     $this->connection = $connection;
+    $this->schemaRegistry = new SchemaRegistry($connection);
   }
 
   /**
@@ -646,9 +649,25 @@ abstract class Schema implements PlaceholderInterface {
   final public function createTableFromDefinition(TableDefinition|string|int $table, array|TableDefinition|null $data = NULL): void {
     if ($table instanceof TableDefinition) {
       $this->createTable($table->name, $table->toArray());
+      $this->schemaRegistry->register(
+        'schema',
+        get_class($table),
+        $table->name,
+        'abstract',
+        $table,
+        0
+      );
     }
     elseif ($data instanceof TableDefinition) {
       $this->createTable($data->name, $data->toArray());
+      $this->schemaRegistry->register(
+        'schema',
+        get_class($data),
+        $data->name,
+        'abstract',
+        $data,
+        0
+      );
     }
     else {
       $this->createTable($table, $data);
