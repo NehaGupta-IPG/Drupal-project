@@ -210,9 +210,12 @@ class ThemeCommonElements {
         'initial preprocess' => MenuPreprocess::class . ':preprocessMenuLocalAction',
       ],
       'menu_local_tasks' => [
+        'initial preprocess' => MenuPreprocess::class . ':preprocessMenuLocalTasks',
         'variables' => [
           'primary' => [],
+          'primary_attributes' => [],
           'secondary' => [],
+          'secondary_attributes' => [],
         ],
       ],
       // From form system.

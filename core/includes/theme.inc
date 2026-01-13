@@ -931,6 +931,21 @@ function template_preprocess_menu_local_task(&$variables): void {
 }
 
 /**
+ * Prepares variables for local tasks templates.
+ *
+ * Default template: menu-local-tasks.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - primary: HTML list items representing primary tasks.
+ *   - secondary: HTML list items representing secondary tasks.
+ */
+function template_preprocess_menu_local_tasks(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(MenuPreprocess::class)->preprocessMenuLocalTasks($variables);
+}
+
+/**
  * Prepares variables for single local action link templates.
  *
  * Default template: menu-local-action.html.twig.

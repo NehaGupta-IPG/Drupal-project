@@ -97,6 +97,17 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
       }
     }
 
+    $userAdminLangcode = \Drupal::currentUser()->getPreferredAdminLangcode(FALSE);
+    $negotiation_method_enabled = \Drupal::moduleHandler()->moduleExists('language') && \Drupal::service('language_negotiator')->isNegotiationMethodEnabled('language-user-admin');
+
+    $primary_attributes = [];
+    $secondary_attributes = [];
+    if ($negotiation_method_enabled && !empty($userAdminLangcode)) {
+      $language = \Drupal::languageManager()->getLanguage($userAdminLangcode);
+      $primary_attributes = ['dir' => $language->getDirection(), 'lang' => $language->getId()];
+      $secondary_attributes = $primary_attributes;
+    }
+
     $tabs = [
       '#theme' => 'menu_local_tasks',
     ];
@@ -108,6 +119,7 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
       // Do not display single tabs.
       $tabs += [
         '#primary' => count(Element::getVisibleChildren($links['tabs'])) > 1 ? $links['tabs'] : [],
+        '#primary_attributes' => $primary_attributes,
       ];
     }
     if ($config['secondary']) {
@@ -116,6 +128,7 @@ class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterfa
       // Do not display single tabs.
       $tabs += [
         '#secondary' => count(Element::getVisibleChildren($links['tabs'])) > 1 ? $links['tabs'] : [],
+        '#secondary_attributes' => $secondary_attributes,
       ];
     }
 

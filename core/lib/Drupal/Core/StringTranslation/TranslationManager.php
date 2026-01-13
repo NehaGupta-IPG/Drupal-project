@@ -154,9 +154,14 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    *
    * @param string $langcode
    *   A language code.
+   *
+   * @return string
+   *   The overridden langcode.
    */
-  public function setDefaultLangcode($langcode) {
+  public function setDefaultLangcode(string $langcode) {
+    $overridden_langcode = $this->defaultLangcode;
     $this->defaultLangcode = $langcode;
+    return $overridden_langcode;
   }
 
   /**
