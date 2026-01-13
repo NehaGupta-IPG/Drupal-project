@@ -77,7 +77,7 @@ try {
   $kernel->preHandle($request);
   // Ensure our request includes the session if appropriate.
   if (PHP_SAPI !== 'cli') {
-    $session_factory = $container->get(SessionFactoryInterface::class);
+    $session_factory = \Drupal::service(SessionFactoryInterface::class);
     $session = $session_factory->createSession();
     $request->setSession($session);
   }

@@ -45,7 +45,7 @@ class ReplicaKillSwitchTest extends KernelTestBase {
     $this->assertSame($db1, $db2, 'System Init ignores secondaries when requested.');
 
     // Makes sure that session value set right.
-    $session = \Drupal::service('session');
+    $session = \Drupal::requestStack()->getSession();
     $this->assertTrue($session->has('ignore_replica_server'));
     $expected = \Drupal::time()->getRequestTime() + Settings::get('maximum_replication_lag', 300);
     $this->assertEquals($expected, $session->get('ignore_replica_server'));

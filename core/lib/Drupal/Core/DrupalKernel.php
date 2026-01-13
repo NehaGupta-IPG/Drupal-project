@@ -1287,6 +1287,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public function resetContainer(): ContainerInterface {
     $session_started = FALSE;
+    $all_messages = [];
     $subrequest = FALSE;
     $reload_module_handler = FALSE;
 
