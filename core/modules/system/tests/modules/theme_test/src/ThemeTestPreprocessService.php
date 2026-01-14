@@ -15,7 +15,7 @@ class ThemeTestPreprocessService {
    * @param array $variables
    *   An associative array of variables.
    */
-  public function preprocessServiceCallback(&$variables): void {
+  public function preprocessServiceCallback(array &$variables): void {
     $variables['foo'] = 'Preprocessed via service!';
   }
 
