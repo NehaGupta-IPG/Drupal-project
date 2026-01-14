@@ -127,39 +127,7 @@ class UserController extends ControllerBase {
     // When processing the one-time login link, we have to make sure that a user
     // isn't already logged in.
     if ($account->isAuthenticated()) {
-      // The current user is already logged in.
-      if ($account->id() == $uid) {
-        user_logout();
-        // We need to begin the redirect process again because logging out will
-        // destroy the session.
-        return $this->redirect(
-          'user.reset',
-          [
-            'uid' => $uid,
-            'timestamp' => $timestamp,
-            'hash' => $hash,
-          ]
-        );
-      }
-      // A different user is already logged in on the computer.
-      else {
-        /** @var \Drupal\user\UserInterface $reset_link_user */
-        $reset_link_user = $this->userStorage->load($uid);
-        if ($reset_link_user && $this->validatePathParameters($reset_link_user, $timestamp, $hash)) {
-          $this->messenger()
-            ->addWarning($this->t('Another user (%other_user) is already logged into the site on this computer, but you tried to use a one-time link for user %resetting_user. <a href=":logout">Log out</a> and try using the link again.',
-              [
-                '%other_user' => $account->getAccountName(),
-                '%resetting_user' => $reset_link_user->getAccountName(),
-                ':logout' => Url::fromRoute('user.logout')->toString(),
-              ]));
-        }
-        else {
-          // Invalid one-time link specifies an unknown user.
-          $this->messenger()->addError($this->t('The one-time login link you clicked is invalid.'));
-        }
-        return $this->redirect('<front>');
-      }
+      return $this->resetPassLogin($uid, $timestamp, $hash, $request);
     }
 
     /** @var \Drupal\user\UserInterface $reset_link_user */
@@ -223,6 +191,10 @@ class UserController extends ControllerBase {
   /**
    * Validates user, hash, and timestamp; logs the user in if correct.
    *
+   * This method is used (directly or indirectly) by the user.reset and
+   * user.reset.login routes. In order to never disclose a reset link via a
+   * referrer header this controller must always return a redirect response.
+   *
    * @param int $uid
    *   User ID of the user requesting reset.
    * @param int $timestamp
@@ -233,14 +205,49 @@ class UserController extends ControllerBase {
    *   The request.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   Returns a redirect to the user edit form if the information is correct.
-   *   If the information is incorrect redirects to 'user.pass' route with a
-   *   message for the user.
-   *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-   *   If $uid is for a blocked user or invalid user ID.
+   *   Returns a redirect to the user edit form or password reset form
+   *   (depending on the current request) if the information is correct. If the
+   *   information is incorrect or inconsistent, redirects to 'user.pass' or
+   *   '<front>' route with a message for the user.
    */
   public function resetPassLogin($uid, $timestamp, $hash, Request $request) {
+    $account = $this->currentUser();
+    // The current user is already logged in.
+    if ($account->id() == $uid) {
+      user_logout();
+      // We need to begin the redirect process again because logging out will
+      // destroy the session.
+      return $this->redirect(
+        'user.reset',
+        [
+          'uid' => $uid,
+          'timestamp' => $timestamp,
+          'hash' => $hash,
+        ]
+      );
+    }
+    // A different user is already logged in on the computer.
+    else {
+      /** @var \Drupal\user\UserInterface $reset_link_user */
+      $reset_link_user = $this->userStorage->load($uid);
+      if ($reset_link_user && $this->validatePathParameters($reset_link_user, $timestamp, $hash)) {
+        $this->messenger()
+          ->addWarning($this->t('Another user (%other_user) is already logged into the site on this computer, but you tried to use a one-time link for user %resetting_user. <a href=":logo
+ut">Log out</a> and try using the link again.',
+            [
+              '%other_user' => $account->getAccountName(),
+              '%resetting_user' => $reset_link_user->getAccountName(),
+              ':logout' => Url::fromRoute('user.logout')->toString(),
+            ]));
+      }
+      else {
+        // Invalid one-time link specifies an unknown user.
+        $this->messenger()
+          ->addError($this->t('The one-time login link you clicked is invalid.'));
+      }
+      return $this->redirect('<front>');
+    }
+
     /** @var \Drupal\user\UserInterface $user */
     $user = $this->userStorage->load($uid);
     if ($redirect = $this->determineErrorRedirect($user, $timestamp, $hash)) {
@@ -306,9 +313,18 @@ class UserController extends ControllerBase {
     $current = $this->time->getRequestTime();
     // Verify that the user exists and is active.
     if ($user === NULL || !$user->isActive()) {
-      // Blocked or invalid user ID, so deny access. The parameters will be in
-      // the watchdog's URL for the administrator to check.
-      throw new AccessDeniedHttpException();
+      if ($user === NULL) {
+        $this->logger->notice('One-time login attempted for unknown user: %path', ['%path' => "$timestamp/$hash"]);
+      }
+      else {
+        $this->logger->notice('One-time login attempted for blocked user %name: %path', [
+          '%name' => $user->getDisplayName(),
+          '%path' => $user->id() . "/$timestamp/$hash",
+        ]);
+      }
+      // Redirect to the password reset form (like the user.reset route does),
+      // which will deny access without leaking information.
+      return $this->redirect('user.reset.form', ['uid' => $user->id()]);
     }
 
     // Time out, in seconds, until login URL expires.
