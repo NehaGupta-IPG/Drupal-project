@@ -165,6 +165,10 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
    * {@inheritdoc}
    */
   public function save() {
+    if ($this->isSyncing()) {
+      return parent::save();
+    }
+
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()
       ->getStorage($this->content_entity_type_id->value);
