@@ -1051,18 +1051,18 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->attachSynthetic($container);
 
     $this->container = $container;
-    $session_factory = $this->container->get(SessionFactoryInterface::class);
-    $session = $session_factory->createSession();
-    if ($session_started) {
-      $session->start();
-    }
 
     // The request stack is preserved across container rebuilds. Re-inject the
     // new session into the main request if one was present before.
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
         $subrequest = TRUE;
+        $session_factory = $this->container->get(SessionFactoryInterface::class);
+        $session = $session_factory->createSession();
         $request->setSession($session);
+        if ($session_started) {
+          $session->start();
+        }
       }
     }
 
@@ -1336,18 +1336,17 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->container->get('module_handler')->reload();
     }
 
-    $session_factory = $this->container->get(SessionFactoryInterface::class);
-    $session = $session_factory->createSession();
-    if ($session_started) {
-      $session->start();
-    }
-
     // The request stack is preserved across container rebuilds. Re-inject the
     // new session into the main request if one was present before.
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
         $subrequest = TRUE;
+        $session_factory = $this->container->get(SessionFactoryInterface::class);
+        $session = $session_factory->createSession();
         $request->setSession($session);
+        if ($session_started) {
+          $session->start();
+        }
       }
     }
 
