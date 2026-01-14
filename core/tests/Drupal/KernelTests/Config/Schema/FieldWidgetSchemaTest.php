@@ -11,11 +11,13 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests configuration schema for field widget orderable settings.
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldWidgetSchemaTest extends KernelTestBase {
 
   /**
