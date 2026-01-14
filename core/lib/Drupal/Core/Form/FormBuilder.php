@@ -1088,7 +1088,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       // that have their own #title properties.
       'password_confirm',
     ];
-    if (isset($element['#type']) && !in_array($element['#type'], $types_to_skip) && !empty($element['#input']) && empty($element['#attributes']['aria-label']) && empty($element['#attributes']['aria-labelledby'])) {
+    // `fieldset` elements must have a `legend`, and therefore a `#title`.
+    if (isset($element['#type']) && !in_array($element['#type'], $types_to_skip) && ($element['#type'] == 'fieldset' || !empty($element['#input'])) && empty($element['#attributes']['aria-label']) && empty($element['#attributes']['aria-labelledby'])) {
       $title_key = in_array($element['#type'], ['button', 'submit']) ? '#value' : '#title';
       // Check for empty or unset value.
       // For buttons with missing #value declarations, #value will be '' here.

@@ -80,6 +80,16 @@ class FormElementMissingTitleDeprecationTest extends KernelTestBase implements F
       ];
     }
 
+    // Fieldset missing title.
+    // Should cause deprecation.
+    $form['fieldset'] = [
+      '#type' => 'fieldset',
+      'child' => [
+        '#type' => 'checkbox',
+        '#title' => 'child',
+      ],
+    ];
+
     // Skipped types.
     // Should not cause deprecation message.
     $types_to_skip = [
@@ -163,6 +173,10 @@ class FormElementMissingTitleDeprecationTest extends KernelTestBase implements F
       [
         E_USER_DEPRECATED,
         'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "submit_missing_value" of #type "submit" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
+      ],
+      [
+        E_USER_DEPRECATED,
+        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "fieldset" of #type "fieldset" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
       ],
     ];
 

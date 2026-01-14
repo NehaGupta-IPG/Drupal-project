@@ -758,6 +758,7 @@ class FormBuilderTest extends FormTestBase {
       ],
       'child2' => [
         '#type' => 'fieldset',
+        '#title' => 'child2',
         'child2.0' => [
           '#type' => 'checkbox',
         ],
