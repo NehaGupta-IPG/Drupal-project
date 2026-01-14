@@ -7,6 +7,7 @@ namespace Drupal\FunctionalTests\Installer;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Session\MetadataBag;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware;
