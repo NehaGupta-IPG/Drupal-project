@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\TestTools\Extension;
 
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
@@ -31,7 +32,12 @@ class SchemaInspector {
    */
   public static function getTablesSpecification(ModuleHandlerInterface $handler, string $module): Schema|array {
     if ($handler->loadInclude($module, 'install')) {
-      return $handler->invoke($module, 'schema') ?? [];
+      $schema = $handler->invoke($module, 'schema') ?? [];
+      if ($schema instanceof Schema) {
+        assert($schema->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
+        assert($schema->name === $module, 'Invalid schema definition name, must be equal to the module name');
+      }
+      return $schema;
     }
     return [];
   }
@@ -54,8 +60,8 @@ class SchemaInspector {
    * @see \hook_schema()
    */
   public static function getTableNames(ModuleHandlerInterface $handler, string $module): array {
-    $specification = self::getTablesSpecification($handler, $module);
-    return $specification instanceof Schema ? $specification->tableNames() : array_keys($specification);
+    $schema = self::getTablesSpecification($handler, $module);
+    return $schema instanceof Schema ? $schema->tableNames() : array_keys($schema);
   }
 
 }
