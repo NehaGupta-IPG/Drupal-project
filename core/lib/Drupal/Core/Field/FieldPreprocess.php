@@ -275,7 +275,7 @@ class FieldPreprocess {
         ];
       }
       $variables['items'] = $items;
-      $variables['items_attributes'] = new Attribute;
+      $variables['items_attributes'] = new Attribute();
 
       if (!empty($element['#description'])) {
         $variables['description_display'] = $element['#description_display'] ?? 'after';
