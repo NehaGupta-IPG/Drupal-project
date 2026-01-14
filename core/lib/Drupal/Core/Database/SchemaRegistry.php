@@ -9,7 +9,7 @@ use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
-use Drupal\Core\Database\SchemaDefinition\SchemaType;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 
 /**
@@ -28,7 +28,7 @@ final class SchemaRegistry {
   }
 
   public function register(
-    SchemaType $schemaType,
+    SchemaDefinitionType $schemaType,
     string $schemaName,
     DatabaseObjectType $objectType,
     string $objectName,
@@ -36,7 +36,7 @@ final class SchemaRegistry {
     mixed $info,
     int $status,
   ): int {
-    if ($schemaType === SchemaType::Storage && $schemaName === 'schema_definition' && $objectType === DatabaseObjectType::Table && $objectName === static::TABLE_NAME) {
+    if ($schemaType === SchemaDefinitionType::Storage && $schemaName === 'schema_definition' && $objectType === DatabaseObjectType::Table && $objectName === static::TABLE_NAME) {
       return 0;
     }
     $try_again = FALSE;
@@ -80,7 +80,7 @@ final class SchemaRegistry {
   }
 
   public function registerUpdate(
-    SchemaType $schemaType,
+    SchemaDefinitionType $schemaType,
     string $schemaName,
     DatabaseObjectType $objectType,
     string $objectName,
@@ -110,15 +110,17 @@ final class SchemaRegistry {
         ->execute();
     }
     else {
-      return $this->register(
-        $schemaType,
-        $schemaName,
-        $objectType,
-        $objectName,
-        $infoQualifier,
-        $info,
-        $status,
-      );
+      return $this->connection->insert(static::TABLE_NAME)
+        ->fields([
+          'schema_type' => $schemaType->value,
+          'schema_name' => $schemaName,
+          'object_type' => $objectType->value,
+          'object_name' => $objectName,
+          'info_qualifier' => $infoQualifier,
+          'info' => serialize($info),
+          'status' => $status,
+        ])
+        ->execute();
     }
 
     return 0;
@@ -205,7 +207,7 @@ final class SchemaRegistry {
     );
 
     return new Schema(
-      type: SchemaType::Storage,
+      type: SchemaDefinitionType::Storage,
       name: 'schema_definition',
       tables: $tables,
     );
