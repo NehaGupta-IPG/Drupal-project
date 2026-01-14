@@ -406,7 +406,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * Test direct login link (password reset with "/login") while logged in.
    */
-  public function testUserDirectLoginLoggedIn() {
+  public function testUserDirectLoginLoggedIn(): void {
     $this->testUserPasswordResetLoggedIn(TRUE);
   }
 
