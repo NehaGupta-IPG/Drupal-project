@@ -333,7 +333,7 @@ class Xss {
             // such attributes.
             // @see \Drupal\Component\Utility\UrlHelper::filterBadProtocol()
             // @see https://www.w3.org/TR/html4/index/attributes.html
-            $skip_protocol_filtering = str_starts_with($attribute_name, 'data-') || in_array($attribute_name, static::getSkipProtocolFilteringAttributes());
+            $skip_protocol_filtering = !static::attributeHasProtocolsFiltered($attribute_name);
 
             $working = $mode = 1;
             $attributes = preg_replace('/^[-a-zA-Z][-a-zA-Z0-9]*/', '', $attributes);
@@ -464,6 +464,19 @@ class Xss {
    */
   public static function getSkipProtocolFilteringAttributes(): array {
     return static::$skipProtocolFilteringAttributes;
+  }
+
+  /**
+   * Whether dangerous protocol should be filtered from this attribute's value.
+   *
+   * @param string $attribute
+   *   Attribute name.
+   *
+   * @return bool
+   *   TRUE if dangerous protocols should be filtered.
+   */
+  public static function attributeHasProtocolsFiltered(string $attribute): bool {
+    return !str_starts_with($attribute, 'data-') && !in_array($attribute, Xss::getSkipProtocolFilteringAttributes());
   }
 
 }

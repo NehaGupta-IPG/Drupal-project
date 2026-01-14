@@ -35,7 +35,7 @@ class AttributeString extends AttributeValueBase {
     if ($this->value instanceof MarkupInterface) {
       return Html::escape(PlainTextOutput::renderFromHtml($this->value));
     }
-    elseif (str_starts_with($this->name, 'data-') || in_array($this->name, Xss::getSkipProtocolFilteringAttributes())) {
+    elseif (!Xss::attributeHasProtocolsFiltered($this->name)) {
       return Html::escape((string) $this->value);
     }
     else {
