@@ -275,6 +275,7 @@ class FieldPreprocess {
         ];
       }
       $variables['items'] = $items;
+      $variables['items_attributes'] = new Attribute;
 
       if (!empty($element['#description'])) {
         $variables['description_display'] = $element['#description_display'] ?? 'after';
@@ -284,7 +285,7 @@ class FieldPreprocess {
         $variables['description']['content'] = $element['#description'];
 
         // Add the description's id to the items aria attributes.
-        $variables['items']['#attributes']['aria-describedby'] = $element['#attributes']['aria-describedby'];
+        $variables['items_attributes']['aria-describedby'] = $description_id;
       }
     }
     else {

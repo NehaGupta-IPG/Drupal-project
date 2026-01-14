@@ -52,11 +52,13 @@
         {{ description.content }}
       </div>
     {% endif %}
-    {% for item in items %}
-      <div class="field-multiple-item container-inline">
-        {{ item }}
-      </div>
-    {% endfor %}
+    <div{{ items_attributes }}>
+      {% for item in items %}
+        <div class="field-multiple-item container-inline">
+          {{ item }}
+        </div>
+      {% endfor %}
+    </div>
     {% if description_display in ['after', 'invisible'] and description.content %}
       <div{{ description.attributes.addClass(description_classes) }}>
         {{ description.content }}
