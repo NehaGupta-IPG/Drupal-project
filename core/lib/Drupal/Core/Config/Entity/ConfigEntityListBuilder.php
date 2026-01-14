@@ -26,15 +26,16 @@ class ConfigEntityListBuilder extends EntityListBuilder {
     $entity_ids = $this->getEntityIds();
     $entities = $this->storage->loadMultipleOverrideFree($entity_ids);
 
-    // Sort the entities using the entity class's sortEntities() method.
-    $this->entityType->getClass()::sortEntities($entities);
+    // Sort the entities using the entity class's sort() method.
+    // See \Drupal\Core\Config\Entity\ConfigEntityBase::sort().
+    uasort($entities, [$this->entityType->getClass(), 'sort']);
     return $entities;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
+  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
     /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
     $operations = parent::getDefaultOperations($entity);
 

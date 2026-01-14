@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\config\Functional;
 
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\config_test\Entity\ConfigTest;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the listing of configuration entities.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityListTest extends BrowserTestBase {
 
   use RedirectDestinationTrait;
@@ -260,7 +262,7 @@ class ConfigEntityListTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
 
     // Ensure that the entity's sort method was called.
-    $this->assertTrue(\Drupal::state()->get('config_entity_sortEntities'), 'ConfigTest::sortEntities() was called.');
+    $this->assertTrue(\Drupal::state()->get('config_entity_sort'), 'ConfigTest::sort() was called.');
 
     // Confirm that the user is returned to the listing, and verify that the
     // text of the label and machine name appears in the list (versus elsewhere

@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\search\Unit;
 
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Language\Language;
 use Drupal\search\Entity\SearchPage;
 use Drupal\search\SearchPageRepository;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\search\SearchPageRepository
- * @group search
+ * Tests Drupal\search\SearchPageRepository.
  */
+#[CoversClass(SearchPageRepository::class)]
+#[Group('search')]
 class SearchPageRepositoryTest extends UnitTestCase {
 
   /**
@@ -51,14 +52,6 @@ class SearchPageRepositoryTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $language_manager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
-    $language_manager->expects($this->any())
-      ->method('getCurrentLanguage')
-      ->with()
-      ->willReturn(new Language(['id' => 'en']));
-    $container = new ContainerBuilder();
-    $container->set('language_manager', $language_manager);
-    \Drupal::setContainer($container);
 
     $this->query = $this->createMock('Drupal\Core\Entity\Query\QueryInterface');
 

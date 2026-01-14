@@ -12,7 +12,9 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Entity\SynchronizableEntityTrait;
+use Drupal\Core\Plugin\RemovableDependentPluginInterface;
 use Drupal\Core\Plugin\PluginDependencyTrait;
+use Drupal\Core\Plugin\RemovableDependentPluginReturn;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -83,7 +85,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $third_party_settings = [];
 
   /**
@@ -95,7 +97,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    *
    * @var array
    */
-  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.Classes.PropertyDeclaration, Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $_core = [];
 
   /**
@@ -233,39 +235,9 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   }
 
   /**
-   * Sorts entities using collator.
-   */
-  public static function sortEntities(array &$entities): bool {
-    $collator = \Collator::create((!extension_loaded('intl')) ? ('en') : (\Drupal::service('language_manager')->getCurrentLanguage()->getId()));
-    return uasort($entities, function ($a, $b) use ($collator) {
-      return static::compare($a, $b, $collator);
-    });
-  }
-
-  /**
-   * Callback for uasort() to compare configuration entities.
-   */
-  public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, \Collator $collator): int {
-    $a_weight = $a->weight ?? 0;
-    $b_weight = $b->weight ?? 0;
-    if ($a_weight == $b_weight) {
-      $a_label = $a->label() ?? '';
-      $b_label = $b->label() ?? '';
-      return $collator->compare($a_label, $b_label);
-    }
-    return $a_weight <=> $b_weight;
-  }
-
-  /**
    * Callback for uasort() to sort configuration entities by weight and label.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
-   * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/2265487
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
-    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
     $a_weight = $a->weight ?? 0;
     $b_weight = $b->weight ?? 0;
     if ($a_weight == $b_weight) {
@@ -509,6 +481,21 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
       $old_count = count($this->third_party_settings);
       $this->third_party_settings = array_diff_key($this->third_party_settings, array_flip($dependencies['module']));
       $changed = $old_count != count($this->third_party_settings);
+    }
+    if ($this instanceof EntityWithPluginCollectionInterface) {
+      // Allow associated plugins to recalculate their dependencies and update
+      // settings on dependency removal.
+      foreach ($this->getPluginCollections() as $plugin_collection) {
+        foreach ($plugin_collection as $id => $instance) {
+          if ($instance instanceof RemovableDependentPluginInterface) {
+            $changed = match ($instance->onCollectionDependencyRemoval($dependencies)) {
+              RemovableDependentPluginReturn::Remove => $plugin_collection->removeInstanceId($id) || TRUE,
+              RemovableDependentPluginReturn::Changed => TRUE,
+              RemovableDependentPluginReturn::Unchanged => $changed,
+            };
+          }
+        }
+      }
     }
     return $changed;
   }

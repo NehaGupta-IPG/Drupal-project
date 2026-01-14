@@ -8,7 +8,6 @@ use Drupal\block\BlockListBuilder;
 use Drupal\block\BlockViewBuilder;
 use Drupal\block\Form\BlockDeleteForm;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Condition\ConditionPluginCollection;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
@@ -219,35 +218,9 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
   }
 
   /**
-   * Helper callback for uasort() to compare configuration entities by weight and label.
-   */
-  public static function compare(ConfigEntityInterface $a, ConfigEntityInterface $b, \Collator $collator): int {
-    // Separate enabled from disabled.
-    $status = (int) $b->status() - (int) $a->status();
-    if ($status !== 0) {
-      return $status;
-    }
-
-    // Sort by weight.
-    $weight = $a->getWeight() - $b->getWeight();
-    if ($weight) {
-      return $weight;
-    }
-
-    // Sort by label.
-    return $collator->compare($a->label(), $b->label());
-  }
-
-  /**
-   * Helper callback for uasort() to sort configuration entities.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
-   * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
-   *
-   * @see https://www.drupal.org/project/drupal/issues/2265487
+   * Sorts active blocks by weight; sorts inactive blocks by name.
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
-    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
     // Separate enabled from disabled.
     $status = (int) $b->status() - (int) $a->status();
     if ($status !== 0) {
@@ -276,17 +249,11 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
   /**
    * {@inheritdoc}
    */
-  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
-    parent::postSave($storage, $update);
-
-    // EntityBase::postSave() calls EntityBase::invalidateTagsOnSave(), which
-    // only handles the regular cases. The Block entity has one special case: a
-    // newly created block may *also* appear on any page in the current theme,
-    // so we must invalidate the associated block's cache tag (which includes
-    // the theme cache tag).
-    if (!$update) {
-      Cache::invalidateTags($this->getCacheTagsToInvalidate());
-    }
+  public function getCacheTagsToInvalidate() {
+    // Only use the block_list cache tag for blocks as they are usually very
+    // rarely updated. Not having per-block cache tags results in a large
+    // reduction of unique cache tags on any page that displays blocks.
+    return $this->getEntityType()->getListCacheTags();
   }
 
   /**
@@ -388,7 +355,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
     // This is done primarily for backwards compatibility support of
     // \Drupal\block\BlockInterface::BLOCK_REGION_NONE.
     $regions = system_region_list($this->theme);
-    if (!isset($regions[$this->region]) && $this->status()) {
+    if (!isset($this->region, $regions[$this->region]) && $this->status()) {
       $this
         ->setRegion(system_default_region($this->theme))
         ->disable();

@@ -77,7 +77,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
 
     // If the default page is active, return it.
     $default = $this->configFactory->get('search.settings')->get('default_page');
-    if (isset($search_pages[$default])) {
+    if (isset($default, $search_pages[$default])) {
       return $default;
     }
 
@@ -105,8 +105,7 @@ class SearchPageRepository implements SearchPageRepositoryInterface {
    */
   public function sortSearchPages($search_pages) {
     $entity_type = $this->storage->getEntityType();
-    // Sort the entities using the entity class's sortEntities() method.
-    $entity_type->getClass()::sortEntities($search_pages);
+    uasort($search_pages, [$entity_type->getClass(), 'sort']);
     return $search_pages;
   }
 

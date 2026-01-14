@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\link\LinkItemInterface;
+use Drupal\link\LinkTitleVisibility;
 use Drupal\shortcut\Form\ShortcutDeleteForm;
 use Drupal\shortcut\ShortcutAccessControlHandler;
 use Drupal\shortcut\ShortcutForm;
@@ -41,6 +42,7 @@ use Drupal\shortcut\ShortcutInterface;
       'edit' => ShortcutForm::class,
       'delete' => ShortcutDeleteForm::class,
     ],
+    'link_target' => ['view' => ShortcutLinkTarget::class],
   ],
   links: [
     'canonical' => '/admin/config/user-interface/shortcut/link/{shortcut}',
@@ -154,7 +156,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
       ->setRequired(TRUE)
       ->setSettings([
         'link_type' => LinkItemInterface::LINK_INTERNAL,
-        'title' => DRUPAL_DISABLED,
+        'title' => LinkTitleVisibility::Disabled->value,
       ])
       ->setDisplayOptions('form', [
         'type' => 'link_default',
@@ -173,37 +175,19 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
   }
 
   /**
-   * Sorts entities using collator.
-   */
-  public static function sortEntities(array &$entities): bool {
-    $collator = \Collator::create((!extension_loaded('intl')) ? ('en') : (\Drupal::service('language_manager')->getCurrentLanguage()->getId()));
-    return uasort($entities, function ($a, $b) use ($collator) {
-      return static::compare($a, $b, $collator);
-    });
-  }
-
-  /**
-   * Helper callback for uasort() to compare configuration entities by weight and label.
-   */
-  public static function compare(ShortcutInterface $a, ShortcutInterface $b, \Collator $collator): int {
-    $a_weight = $a->getWeight();
-    $b_weight = $b->getWeight();
-    if ($a_weight == $b_weight) {
-      return $collator->compare($a->getTitle(), $b->getTitle());
-    }
-    return $a_weight <=> $b_weight;
-  }
-
-  /**
-   * Helper callback for uasort() to sort configuration entities by weight and label.
+   * Sort shortcut objects.
    *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
-   * \Drupal\Core\Config\Entity\ConfigEntityBase::sortEntities() instead.
+   * Callback for uasort().
    *
-   * @see https://www.drupal.org/project/drupal/issues/2265487
+   * @param \Drupal\shortcut\ShortcutInterface $a
+   *   First item for comparison.
+   * @param \Drupal\shortcut\ShortcutInterface $b
+   *   Second item for comparison.
+   *
+   * @return int
+   *   The comparison result for uasort().
    */
-  public static function sort(ShortcutInterface $a, ShortcutInterface $b): int {
-    @trigger_error(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ' . __CLASS__ . '::sortEntities() instead. See https://www.drupal.org/project/drupal/issues/2265487', E_USER_DEPRECATED);
+  public static function sort(ShortcutInterface $a, ShortcutInterface $b) {
     $a_weight = $a->getWeight();
     $b_weight = $b->getWeight();
     if ($a_weight == $b_weight) {
