@@ -12,7 +12,7 @@ use Drupal\Core\Database\SchemaDefinition\IntValue;
 use Drupal\Core\Database\SchemaDefinition\NullValue;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
-use Drupal\Core\Database\SchemaDefinition\SchemaType;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\StringValue;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaDefinition\UniqueKey;
@@ -35,7 +35,7 @@ class SchemaDefinitionTest extends UnitTestCase {
    */
   public function testSchemaMethods(): void {
     $schemaDefinition = new Schema(
-      type: SchemaType::Test,
+      type: SchemaDefinitionType::Test,
       name: 'test_foo_bar',
       tables: [
         new Table(
@@ -86,7 +86,7 @@ class SchemaDefinitionTest extends UnitTestCase {
     $this->expectException(SchemaDefinitionException::class);
     $this->expectExceptionMessage('All members of the \'tables\' argument of a Schema must be Table objects');
     $table = new Schema(
-      type: SchemaType::Test,
+      type: SchemaDefinitionType::Test,
       name: 'test',
       tables: [
         'foo' => [

@@ -4,7 +4,7 @@ namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
-use Drupal\Core\Database\SchemaDefinition\SchemaType;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
 
 /**
@@ -650,7 +650,7 @@ abstract class Schema implements PlaceholderInterface {
   /**
    * Creates a new table from a table schema definition.
    *
-   * @param \Drupal\Core\Database\SchemaDefinition\SchemaType $schemaType
+   * @param \Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType $schemaDefinitionType
    *   The type of Drupal feature providing the schema.
    * @param string $schemaName
    *   The schema name.
@@ -662,7 +662,7 @@ abstract class Schema implements PlaceholderInterface {
    * @throws \BadMethodCallException
    *   When concrete driver class is missing implementations.
    */
-  final public function createTableFromDefinition(SchemaType $schemaType, string $schemaName, TableDefinition $table): void {
+  final public function createTableFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, TableDefinition $table): void {
     $this->createTable($table->name, $table->toArray());
   }
 
