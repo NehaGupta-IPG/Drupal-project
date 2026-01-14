@@ -285,6 +285,7 @@ class DrupalKernelTest extends KernelTestBase {
 
     $request = Request::createFromGlobals();
     $kernel = $this->getTestKernel($request, $modules_enabled);
+    $kernel->preHandle($request);
     $container = $kernel->getContainer();
 
     // Ensure services are reset when ::resetContainer is called.

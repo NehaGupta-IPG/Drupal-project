@@ -122,7 +122,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
     // server information so that XDebug works.
     // @see install_begin_request()
     $request = Request::create($GLOBALS['base_url'] . '/core/install.php', 'GET', [], $_COOKIE, [], $_SERVER);
-    $request->setSession(new Session(new MockArraySessionStorage()));
+    $request->setSession(new Session(new MockArraySessionStorage(metaBag: new MetadataBag())));
     \Drupal::setContainer(new ContainerBuilder());
     $request_stack = new RequestStack();
     $request_stack->push($request);

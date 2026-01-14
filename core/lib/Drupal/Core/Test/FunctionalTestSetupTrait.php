@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Core\Session\MetadataBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Route;
@@ -284,7 +285,7 @@ trait FunctionalTestSetupTrait {
    */
   protected function prepareRequestForGenerator($clean_urls = TRUE, $override_server_vars = []) {
     $request = Request::createFromGlobals();
-    $request->setSession(new Session(new MockArraySessionStorage()));
+    $request->setSession(new Session(new MockArraySessionStorage(metaBag: new MetadataBag())));
     $base_path = $request->getBasePath();
     if ($clean_urls) {
       $request_path = $base_path ? $base_path . '/user' : 'user';
@@ -296,7 +297,7 @@ trait FunctionalTestSetupTrait {
     $server = array_merge($request->server->all(), $override_server_vars);
 
     $request = Request::create($request_path, 'GET', [], [], [], $server);
-    $request->setSession(new Session(new MockArraySessionStorage()));
+    $request->setSession(new Session(new MockArraySessionStorage(metaBag: new MetadataBag())));
 
     // Ensure the request time is \Drupal::time()->getRequestTime() to ensure
     // that API calls in the test use the right timestamp.

@@ -24,6 +24,7 @@ use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Installer\InstallerRedirectTrait;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Security\RequestSanitizer;
+use Drupal\Core\Session\MetadataBag;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\DrupalInstalled;
@@ -1904,7 +1905,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @see \Drupal\Core\StackMiddleware\Session::handle()
    */
   protected function initializeEphemeralSession(Request $request): void {
-    $session = new Session(new MockArraySessionStorage());
+    $session = new Session(new MockArraySessionStorage(metaBag: new MetadataBag()));
     $session->start();
     $request->setSession($session);
   }

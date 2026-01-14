@@ -47,7 +47,6 @@ trait BootableCommandTrait {
     // reachable, at least has a valid *form*, so that Drupal can correctly
     // generate links and URLs.
     $request = Request::create('http://' . basename($kernel->getSitePath()) . '/core/scripts/drupal');
-    $request->setSession(new Session(new MockArraySessionStorage()));
     $kernel->preHandle($request);
 
     // Try to register an event listener to properly terminate the Drupal kernel
