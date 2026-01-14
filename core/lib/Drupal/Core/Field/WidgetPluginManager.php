@@ -176,7 +176,7 @@ class WidgetPluginManager extends DefaultPluginManager {
         foreach ($widget_type['field_types'] as $widget_field_type) {
           // Check that the field type exists.
           if (isset($field_types[$widget_field_type])) {
-            $options[$widget_field_type][$name] = $widget_type['label'];
+            $options[$widget_field_type][$name] = $widget_type['label'] ?? '';
           }
         }
       }
