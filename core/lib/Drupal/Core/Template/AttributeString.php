@@ -29,7 +29,8 @@ class AttributeString extends AttributeValueBase {
    * Implements the magic __toString() method.
    */
   public function __toString() {
-    // Allow 'title', 'alt', and all data- attributes.
+    // Allow specific attributes where filtering does not make sense
+    // and all data- attributes.
     // @see Xss::attributes()
     if ($this->value instanceof MarkupInterface) {
       return Html::escape(PlainTextOutput::renderFromHtml($this->value));
