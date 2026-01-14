@@ -14,7 +14,6 @@ use Drupal\Core\Field\FieldPreprocess;
 use Drupal\Core\Pager\PagerPreprocess;
 use Drupal\Core\Breadcrumb\BreadcrumbPreprocess;
 use Drupal\Core\Menu\MenuPreprocess;
-use Drupal\Core\Render\Element;
 use Drupal\Core\Theme\ImagePreprocess;
 use Drupal\Core\Theme\ThemePreprocess;
 use Drupal\Core\Config\Config;
