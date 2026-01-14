@@ -797,6 +797,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $tables = (array) $tables;
     foreach ($tables as $table) {
       if ($specification instanceof Schema) {
+        assert($specification->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
+        assert($specification->name === $module, 'Invalid schema definition name, must be equal to the module name');
         try {
           $table_definition = $specification->getTableDefinition($table);
           if ($specification->type === SchemaDefinitionType::Module && $specification->name === 'system' && $table_definition->name === 'sequences') {
