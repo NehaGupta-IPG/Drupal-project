@@ -614,7 +614,8 @@ class AttributeTest extends UnitTestCase {
       ' href="' . Html::escape($already_escaped) . '"',
     ];
 
-    // Removing dangerous URLs inside CSS is not the role of stripDangerousProtocols().
+    // Removing dangerous URLs inside CSS is not the role of
+    // stripDangerousProtocols().
     $data['xss-in-style'] = [
       ['style' => 'list-style-image: url(javascript:alert(0))'],
       ' style="list-style-image: url(javascript:alert(0))"',

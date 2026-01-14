@@ -459,8 +459,8 @@ class Xss {
    * Gets the list of HTML attributes for which we skip protocol filtering.
    *
    * @return string[]
-   *   The list of HTML attributes for which
-   *   we skip dangerous protocol filtering.
+   *   The list of HTML attributes for which we skip dangerous protocol
+   *   filtering.
    */
   public static function getSkipProtocolFilteringAttributes(): array {
     return static::$skipProtocolFilteringAttributes;

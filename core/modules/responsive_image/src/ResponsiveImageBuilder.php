@@ -224,9 +224,11 @@ class ResponsiveImageBuilder {
     }
     // Sort the srcset from small to large image width or multiplier.
     ksort($srcset);
-    $source_attributes = new Attribute([
-      'srcset' => implode(', ', array_unique($srcset)),
-    ]);
+    $source_attributes = new Attribute();
+    // A srcset attribute may include data: for 1px GIFs. Putting it in a
+    // Markup object prevents the data: protocol from being escaped.
+    $source_attributes->setAttribute('srcset', Markup::create(implode(', ', array_unique($srcset))));
+
     $media_query = trim($breakpoint->getMediaQuery());
     if (!empty($media_query)) {
       $source_attributes->setAttribute('media', $media_query);

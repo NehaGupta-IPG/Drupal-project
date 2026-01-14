@@ -48,10 +48,8 @@ class ImagePreprocess {
    */
   public function preprocessImage(array &$variables): void {
     if ($variables['uri'] instanceof MarkupInterface) {
-      /*
-       * This is used to explicitly bypass XSS filtering
-       * so we don't want to cast it to a string.
-       */
+      // This is used to explicitly bypass XSS filtering so we don't want to
+      // cast it to a string.
       $variables['attributes']['src'] = $variables['uri'];
     }
     elseif (!empty($variables['uri'])) {
