@@ -4,6 +4,7 @@ namespace Drupal\Core\Field;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\TypedData\TranslatableInterface;
 
 /**
  * Defines an item list class for entity reference fields.
@@ -23,7 +24,7 @@ class EntityReferenceFieldItemList extends FieldItemList implements EntityRefere
   /**
    * {@inheritdoc}
    */
-  public function referencedEntities() {
+  public function referencedEntities(string $langcode = NULL) {
     if ($this->isEmpty()) {
       return [];
     }
@@ -51,6 +52,15 @@ class EntityReferenceFieldItemList extends FieldItemList implements EntityRefere
       }
       // Ensure the returned array is ordered by deltas.
       ksort($target_entities);
+
+      if (isset($langcode)) {
+        foreach ($target_entities as $delta => $target_entity) {
+          if (!($target_entity instanceof TranslatableInterface)) {
+            break;
+          }
+          $target_entities[$delta] = \Drupal::service('entity.repository')->getTranslationFromContext($target_entity, $langcode);
+        }
+      }
     }
 
     return $target_entities;

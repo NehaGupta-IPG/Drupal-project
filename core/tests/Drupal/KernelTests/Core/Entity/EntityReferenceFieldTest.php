@@ -13,6 +13,7 @@ use Drupal\entity_test\Entity\EntityTestStringId;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\user\Entity\Role;
@@ -40,6 +41,13 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
   protected $entityType = 'entity_test';
 
   /**
+   * The translatable entity type used in this test.
+   *
+   * @var string
+   */
+  protected $translatableEntityType = 'entity_test_mul';
+
+  /**
    * The entity type that is being referenced.
    *
    * @var string
@@ -47,11 +55,25 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
   protected $referencedEntityType = 'entity_test_rev';
 
   /**
+   * The translatable entity type that is being referenced.
+   *
+   * @var string
+   */
+  protected $translatableReferencedEntityType = 'entity_test_mulrev';
+
+  /**
    * The bundle used in this test.
    *
    * @var string
    */
   protected $bundle = 'entity_test';
+
+  /**
+   * The bundle used to test multilingual entity types.
+   *
+   * @var string
+   */
+  protected $translatableBundle = 'entity_test_mul_bundle';
 
   /**
    * The name of the field used in this test.
@@ -72,6 +94,8 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('entity_test_rev');
+    $this->installEntitySchema('entity_test_mul');
+    $this->installEntitySchema('entity_test_mulrev');
 
     // Create a field.
     $this->createEntityReferenceField(
@@ -294,6 +318,112 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
       ->create(['type' => $this->bundle]);
     $entities = $entity->{$field_name}->referencedEntities();
     $this->assertEquals($target_entity->id(), $entities[0]->id());
+  }
+
+  /**
+   * Tests handling of translated entities.
+   */
+  public function testReferencedEntitiesTranslations() {
+    $this->enableModules(['language', 'content_translation']);
+    $this->installConfig(['language']);
+    ConfigurableLanguage::createFromLangcode('es')->save();
+    ConfigurableLanguage::createFromLangcode('pt-br')->save();
+
+    // Create a field.
+    $field_name = 'field_random_machine_name';
+    $this->createEntityReferenceField(
+      $this->translatableEntityType,
+      $this->translatableBundle,
+      $field_name,
+      'Field test',
+      $this->translatableReferencedEntityType,
+      'default',
+      ['target_bundles' => [$this->translatableBundle]],
+      FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED
+    );
+
+    $field = FieldConfig::loadByName($this->translatableEntityType, $this->translatableBundle, $field_name);
+    $field->setTranslatable(TRUE);
+    $field->save();
+
+    // Rebuild the container now that we've enabled the new modules, added
+    // languages, and changed the field config.
+    $this->container->get('kernel')->rebuildContainer();
+
+    // Create the parent entity.
+    $entity = $this->container->get('entity_type.manager')
+      ->getStorage($this->translatableEntityType)
+      ->create([
+        'type' => $this->translatableBundle,
+        'name' => 'en-parent',
+      ]);
+    $entity->save();
+
+    // Create translations of the parent entity.
+    $es_parent = $entity->addTranslation('es');
+    $es_parent->set('name', 'es-parent');
+    $es_parent->save();
+
+    $pt_br_parent = $entity->addTranslation('pt-br');
+    $pt_br_parent->set('name', 'pt-br-parent');
+    $pt_br_parent->save();
+
+    // Create three target entities and attach them to parent field.
+    $target_entities = [];
+    $reference_field = [];
+    for ($i = 0; $i < 3; $i++) {
+      $target_entity = $this->container->get('entity_type.manager')
+        ->getStorage($this->translatableReferencedEntityType)
+        ->create(['type' => $this->translatableBundle]);
+
+      $target_entity->set('name', "en-target-$i");
+      $target_entity->save();
+
+      $target_entities[] = $target_entity;
+      $reference_field[]['target_id'] = $target_entity->id();
+
+      $es_translation = $target_entity->addTranslation('es');
+      $es_translation->set('name', "es-target-$i");
+      $es_translation->save();
+      $this->assertTrue($target_entity->hasTranslation('es'));
+
+      $pt_br_translation = $target_entity->addTranslation('pt-br');
+      $pt_br_translation->set('name', "pt-br-target-$i");
+      $pt_br_translation->save();
+      $this->assertTrue($target_entity->hasTranslation('pt-br'));
+    }
+
+    // Set the field value.
+    $entity->{$field_name}->setValue($reference_field);
+    $entity->save();
+
+    // Set the field value in each of the translations.
+    $es_parent->{$field_name}->setValue($reference_field);
+    $es_parent->save();
+
+    $pt_br_parent->{$field_name}->setValue($reference_field);
+    $pt_br_parent->save();
+
+    // Load the target entities via EntityReferenceField::referencedEntities().
+    $entities = $entity->{$field_name}->referencedEntities();
+    foreach ($entities as $referenced_entity) {
+      $this->assertEquals('en', $referenced_entity->language()->getId());
+      $this->assertStringStartsWith('en-target-', $referenced_entity->name->value);
+    }
+
+    // Now, try loading the target entities from the es translation.
+    $entities = $es_parent->{$field_name}->referencedEntities('es');
+    foreach ($entities as $referenced_entity) {
+      $this->assertTrue($referenced_entity->hasTranslation('es'));
+      $this->assertEquals('es', $referenced_entity->language()->getId());
+      $this->assertStringStartsWith('es-target-', $referenced_entity->name->value);
+    }
+    $entities = $pt_br_parent->{$field_name}->referencedEntities('pt-br');
+    foreach ($entities as $referenced_entity) {
+      $this->assertTrue($referenced_entity->hasTranslation('pt-br'));
+      $this->assertEquals('pt-br', $referenced_entity->language()->getId());
+      $this->assertStringStartsWith('pt-br-target-', $referenced_entity->name->value);
+    }
   }
 
   /**
