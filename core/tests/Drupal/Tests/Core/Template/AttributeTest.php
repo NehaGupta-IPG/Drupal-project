@@ -550,8 +550,16 @@ class AttributeTest extends UnitTestCase {
     $attributes->merge('not an array');
   }
 
+  /**
+   * Tests attributes containing URLs.
+   *
+   * @param array $attributes
+   *   An associative array of key-value pairs to be converted to attributes.
+   * @param string $expected_output
+   *   Expected rendered attributes.
+   */
   #[DataProvider('providerTestAttributesWithUrls')]
-  public function testAttributesWithUrls($attributes, $expected_output): void {
+  public function testAttributesWithUrls(array $attributes, string $expected_output): void {
     UrlHelper::setAllowedProtocols(['http', 'https', 'mailto']);
     $attribute = new Attribute($attributes);
 
