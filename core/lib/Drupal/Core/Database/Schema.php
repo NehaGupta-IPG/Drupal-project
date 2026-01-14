@@ -669,7 +669,7 @@ abstract class Schema implements PlaceholderInterface {
     $this->schemaRegistry->register(
       $schemaType,
       $schemaName,
-      'table',
+      DatabaseObjectType::Table,
       $table->name,
       'abstract',
       $table,
@@ -679,7 +679,7 @@ abstract class Schema implements PlaceholderInterface {
     $this->schemaRegistry->registerUpdate(
       $schemaType,
       $schemaName,
-      'table',
+      DatabaseObjectType::Table,
       $table->name,
       'abstract',
       $table,

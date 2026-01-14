@@ -30,18 +30,18 @@ final class SchemaRegistry {
   public function register(
     SchemaType $schemaType,
     string $schemaName,
-    string $objectType,
+    DatabaseObjectType $objectType,
     string $objectName,
     string $infoQualifier,
     mixed $info,
     int $status,
   ): int {
-    if ($schemaType === SchemaType::Storage && $schemaName === 'schema_definition' && $objectType === 'table' && $objectName === static::TABLE_NAME) {
+    if ($schemaType === SchemaType::Storage && $schemaName === 'schema_definition' && $objectType === DatabaseObjectType::Table && $objectName === static::TABLE_NAME) {
       return 0;
     }
     $try_again = FALSE;
     try {
-      return $this->doInsert($schemaType->value, $schemaName, $objectType, $objectName, $infoQualifier, $info, $status);
+      return $this->doInsert($schemaType->value, $schemaName, $objectType->value, $objectName, $infoQualifier, $info, $status);
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
@@ -53,7 +53,7 @@ final class SchemaRegistry {
     }
     // Now that the table has been created, try again if necessary.
     if ($try_again) {
-      return $this->doInsert($schemaType->value, $schemaName, $objectType, $objectName, $infoQualifier, $info, $status);
+      return $this->doInsert($schemaType->value, $schemaName, $objectType->value, $objectName, $infoQualifier, $info, $status);
     }
   }
 
@@ -82,7 +82,7 @@ final class SchemaRegistry {
   public function registerUpdate(
     SchemaType $schemaType,
     string $schemaName,
-    string $objectType,
+    DatabaseObjectType $objectType,
     string $objectName,
     string $infoQualifier,
     mixed $info,
@@ -90,7 +90,7 @@ final class SchemaRegistry {
   ): int {
     $exist = $this->connection->select(static::TABLE_NAME, 'r')
       ->fields('r', ['object_name'])
-      ->condition('object_type', $objectType)
+      ->condition('object_type', $objectType->value)
       ->condition('object_name', $objectName)
       ->condition('info_qualifier', $infoQualifier)
       ->execute()
@@ -104,7 +104,7 @@ final class SchemaRegistry {
           'info' => serialize($info),
           'status' => $status,
         ])
-        ->condition('object_type', $objectType)
+        ->condition('object_type', $objectType->value)
         ->condition('object_name', $objectName)
         ->condition('info_qualifier', $infoQualifier)
         ->execute();
