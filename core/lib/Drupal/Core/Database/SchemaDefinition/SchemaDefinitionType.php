@@ -11,7 +11,7 @@ namespace Drupal\Core\Database\SchemaDefinition;
  * elements (only tables at the moment) that need to be available on the
  * database.
  */
-enum SchemaType: string {
+enum SchemaDefinitionType: string {
 
   case Module = 'module';
   case Storage = 'storage';

@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\DefaultConfigMode;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -779,6 +780,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $tables = $this->invoke($module, 'schema') ?? [];
     $schema = $this->connection->schema();
     if ($tables instanceof Schema) {
+      assert($tables->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
+      assert($tables->name === $module, 'Invalid schema definition name, must be equal to the module name');
       $schema->createSchemaFromDefinition($tables);
     }
     else {

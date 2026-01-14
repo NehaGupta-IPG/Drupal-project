@@ -12,7 +12,7 @@ use Drupal\Core\Database\SchemaDefinition\ColumnType;
 use Drupal\Core\Database\SchemaDefinition\Index;
 use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
 use Drupal\Core\Database\SchemaDefinition\Schema;
-use Drupal\Core\Database\SchemaDefinition\SchemaType;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\Database\SchemaDefinition\Table;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -251,7 +251,7 @@ class BatchStorage implements BatchStorageInterface {
     );
 
     return new Schema(
-      type: SchemaType::Storage,
+      type: SchemaDefinitionType::Storage,
       name: 'batch',
       tables: $tables,
     );
