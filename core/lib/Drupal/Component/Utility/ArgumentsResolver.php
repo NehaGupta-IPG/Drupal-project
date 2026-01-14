@@ -2,6 +2,9 @@
 
 namespace Drupal\Component\Utility;
 
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
+use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
+
 /**
  * Resolves the arguments to pass to a callable.
  */
@@ -27,6 +30,11 @@ class ArgumentsResolver implements ArgumentsResolverInterface {
    * @var array
    */
   protected $wildcards;
+
+  /**
+   * The type resolver.
+   */
+  protected ?TypeResolverInterface $typeResolver = NULL;
 
   /**
    * Constructs a new ArgumentsResolver.
@@ -69,7 +77,6 @@ class ArgumentsResolver implements ArgumentsResolverInterface {
    *   Thrown when there is a missing parameter.
    */
   protected function getArgument(\ReflectionParameter $parameter) {
-    $parameter_type_hint = Reflection::getParameterClassName($parameter);
     $parameter_name = $parameter->getName();
 
     // If the argument exists and is NULL, return it, regardless of
@@ -78,15 +85,16 @@ class ArgumentsResolver implements ArgumentsResolverInterface {
       return NULL;
     }
 
-    if ($parameter_type_hint) {
-      $parameter_type_hint = new \ReflectionClass($parameter_type_hint);
-      // If the argument exists and complies with the type hint, return it.
-      if (isset($this->objects[$parameter_name]) && is_object($this->objects[$parameter_name]) && $parameter_type_hint->isInstance($this->objects[$parameter_name])) {
+    if ($parameter->hasType()) {
+      $parameter_type = $this->getTypeResolver()->resolve($parameter);
+      if (isset($this->objects[$parameter_name]) && $parameter_type->accepts($this->objects[$parameter_name])) {
         return $this->objects[$parameter_name];
       }
-      // Otherwise, resolve wildcard arguments by type matching.
+      elseif (isset($this->scalars[$parameter_name]) && $parameter_type->accepts($this->scalars[$parameter_name])) {
+        return $this->scalars[$parameter_name];
+      }
       foreach ($this->wildcards as $wildcard) {
-        if ($parameter_type_hint->isInstance($wildcard)) {
+        if ($parameter_type->accepts($wildcard)) {
           return $wildcard;
         }
       }
@@ -147,6 +155,13 @@ class ArgumentsResolver implements ArgumentsResolverInterface {
       $function_name = $function->getName();
     }
     throw new \RuntimeException(sprintf('Callable "%s" requires a value for the "$%s" argument.', $function_name, $parameter->getName()));
+  }
+
+  /**
+   * Returns the type resolver instance.
+   */
+  protected function getTypeResolver(): TypeResolverInterface {
+    return $this->typeResolver ??= TypeResolver::create();
   }
 
 }

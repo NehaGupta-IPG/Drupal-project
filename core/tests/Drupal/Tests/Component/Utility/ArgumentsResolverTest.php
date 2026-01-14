@@ -84,6 +84,28 @@ class ArgumentsResolverTest extends TestCase {
   }
 
   /**
+   * Tests getArgument() with string|\Stringable.
+   */
+  public function testGetArgumentStringable(): void {
+    $callable = function (string|\Stringable $string) {};
+
+    $string = 'Untranslated string';
+    $arguments = (new ArgumentsResolver(['string' => $string], [], []))->getArguments($callable);
+    $this->assertSame([$string], $arguments);
+
+    $stringable = new class implements \Stringable {
+
+      public function __toString(): string {
+        return 'Translated string';
+      }
+
+    };
+
+    $arguments = (new ArgumentsResolver([], ['string' => $stringable], []))->getArguments($callable);
+    $this->assertSame([$stringable], $arguments);
+  }
+
+  /**
    * Tests getArgument() with a wildcard object for a parameter with a custom name.
    */
   public function testGetWildcardArgument(): void {

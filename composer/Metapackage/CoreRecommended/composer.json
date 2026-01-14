@@ -58,6 +58,7 @@
         "symfony/service-contracts": "~v3.6.1",
         "symfony/string": "~v7.4.0",
         "symfony/translation-contracts": "~v3.6.1",
+        "symfony/type-info": "~v7.4.1",
         "symfony/validator": "~v7.4.0",
         "symfony/var-dumper": "~v7.4.0",
         "symfony/var-exporter": "~v7.4.0",
