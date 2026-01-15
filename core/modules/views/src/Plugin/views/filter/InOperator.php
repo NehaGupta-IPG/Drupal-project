@@ -49,13 +49,6 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
   protected $valueTitle;
 
   /**
-   * The controller resolver.
-   *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface
-   */
-  protected $controllerResolver;
-
-  /**
    * Constructs a InOperator object.
    *
    * @param array $configuration
@@ -67,9 +60,8 @@ class InOperator extends FilterPluginBase implements FilterOperatorsInterface {
    * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
    *   The controller resolver.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ?ControllerResolverInterface $controller_resolver = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ?ControllerResolverInterface $controllerResolver = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->controllerResolver = $controller_resolver;
   }
 
   /**
