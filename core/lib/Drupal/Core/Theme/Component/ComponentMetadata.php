@@ -137,7 +137,9 @@ class ComponentMetadata {
     $this->mandatorySchemas = $enforce_schemas;
     $this->path = $path;
 
-    $this->fullPath = base_path() . $path;
+    // In testing, base_path() may not exist.
+    $base_path = function_exists('base_path') ? base_path() : '/';
+    $this->fullPath = $base_path . $path;
 
     [, $machine_name] = explode(':', $metadata_info['id'] ?? []);
     $this->machineName = $machine_name;
