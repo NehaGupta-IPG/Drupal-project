@@ -39,12 +39,18 @@
       {{ description.content }}
     </div>
   {% endif %}
+  {% if prefix is not empty or suffix is not empty %}
+    <div class="form-item__content-wrapper">
+  {% endif %}
   {% if prefix is not empty %}
     <span class="form-item__prefix{{ disabled == 'disabled' ? ' is-disabled' }}">{{ prefix }}</span>
   {% endif %}
   {{ children }}
   {% if suffix is not empty %}
     <span class="form-item__suffix{{ disabled == 'disabled' ? ' is-disabled' }}">{{ suffix }}</span>
+  {% endif %}
+  {% if prefix is not empty or suffix is not empty %}
+    </div>
   {% endif %}
   {% if label_display == 'after' %}
     {{ label }}

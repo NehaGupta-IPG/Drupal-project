@@ -90,6 +90,15 @@ tr .form-item,
 }
 
 /**
+ * Form item wrapper.
+ */
+
+.form-item__content-wrapper {
+  display: flex;
+  align-items: baseline;
+}
+
+/**
  * Form item description.
  */
 
