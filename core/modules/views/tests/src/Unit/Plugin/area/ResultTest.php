@@ -53,7 +53,8 @@ class ResultTest extends UnitTestCase {
     $views_data = $this->prophesize(ViewsData::class)->reveal();
     $route_provider = $this->prophesize(RouteProviderInterface::class)->reveal();
     $display_plugin_manager = $this->prophesize(ViewsPluginManager::class)->reveal();
-    $this->view = new ViewExecutable($storage->reveal(), $user, $views_data, $route_provider, $display_plugin_manager);
+    $cache_plugin_manager = $this->prophesize(ViewsPluginManager::class)->reveal();
+    $this->view = new ViewExecutable($storage->reveal(), $user, $views_data, $route_provider, $display_plugin_manager, $cache_plugin_manager);
 
     $this->resultHandler = new Result([], 'result', []);
     $this->resultHandler->view = $this->view;

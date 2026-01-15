@@ -40,21 +40,7 @@ class ViewExecutableFactory {
    */
   protected $routeProvider;
 
-  /**
-   * Constructs a new ViewExecutableFactory.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Drupal\views\ViewsData $views_data
-   *   The views data.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
-   *   The route provider.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
-   *   The display plugin manager.
-   */
-  public function __construct(AccountInterface $user, RequestStack $request_stack, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
+  public function __construct(AccountInterface $user, RequestStack $request_stack, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL, protected ?ViewsPluginManager $cachePluginManager = NULL) {
     $this->user = $user;
     $this->requestStack = $request_stack;
     $this->viewsData = $views_data;
@@ -62,6 +48,10 @@ class ViewExecutableFactory {
     if ($this->displayPluginManager === NULL) {
       @trigger_error('Calling ' . __METHOD__ . ' without the $displayPluginManager argument is deprecated in drupal:10.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3410349', E_USER_DEPRECATED);
       $this->displayPluginManager = \Drupal::service('plugin.manager.views.display');
+    }
+    if ($this->cachePluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $cachePluginManager argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->cachePluginManager = \Drupal::service('plugin.manager.views.cache');
     }
   }
 
@@ -75,7 +65,7 @@ class ViewExecutableFactory {
    *   A ViewExecutable instance.
    */
   public function get(ViewEntityInterface $view) {
-    $view_executable = new ViewExecutable($view, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager);
+    $view_executable = new ViewExecutable($view, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager, $this->cachePluginManager);
     $view_executable->setRequest($this->requestStack->getCurrentRequest());
     return $view_executable;
   }

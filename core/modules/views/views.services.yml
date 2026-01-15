@@ -77,7 +77,7 @@ services:
   Drupal\views\ViewsDataHelper: '@views.views_data_helper'
   views.executable:
     class: Drupal\views\ViewExecutableFactory
-    arguments: ['@current_user', '@request_stack', '@views.views_data', '@router.route_provider', '@plugin.manager.views.display']
+    arguments: ['@current_user', '@request_stack', '@views.views_data', '@router.route_provider', '@plugin.manager.views.display', '@plugin.manager.views.cache']
   Drupal\views\ViewExecutableFactory: '@views.executable'
   views.analyzer:
     class: Drupal\views\Analyzer

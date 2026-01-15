@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit;
 
-use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Url;
@@ -14,6 +13,7 @@ use Drupal\views\Plugin\views\cache\CachePluginBase;
 use Drupal\views\Plugin\views\cache\None as NoneCache;
 use Drupal\views\Plugin\views\pager\None as NonePager;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\ViewExecutable;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -125,6 +125,13 @@ class ViewExecutableTest extends UnitTestCase {
   protected $displayPluginManager;
 
   /**
+   * The cache plugin manager.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected $cachePluginManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -146,10 +153,6 @@ class ViewExecutableTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->executable = new ViewExecutable($this->view, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager);
-    $this->executable->display_handler = $this->displayHandler;
-    $this->executable->displayHandlers = $this->displayHandlers;
-
     $this->viewExecutableFactory = $this->getMockBuilder('Drupal\views\ViewExecutableFactory')
       ->disableOriginalConstructor()
       ->getMock();
@@ -165,15 +168,20 @@ class ViewExecutableTest extends UnitTestCase {
     $success_cache->cacheGet('results')->willReturn(TRUE);
     $this->successCache = $success_cache->reveal();
 
-    $cache_manager = $this->prophesize(PluginManagerInterface::class);
+    $cache_manager = $this->prophesize(ViewsPluginManager::class);
     $cache_manager->createInstance('none')->willReturn($this->noneCache);
+    $this->cachePluginManager = $cache_manager->reveal();
+
+    $this->executable = new ViewExecutable($this->view, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager, $this->cachePluginManager);
+    $this->executable->display_handler = $this->displayHandler;
+    $this->executable->displayHandlers = $this->displayHandlers;
 
     $translation = $this->getStringTranslationStub();
     $container = new ContainerBuilder();
     $container->set('string_translation', $translation);
     $container->set('views.executable', $this->viewExecutableFactory);
     $container->set('module_handler', $module_handler);
-    $container->set('plugin.manager.views.cache', $cache_manager->reveal());
+    $container->set('plugin.manager.views.cache', $this->cachePluginManager);
     \Drupal::setContainer($container);
   }
 
@@ -558,7 +566,7 @@ class ViewExecutableTest extends UnitTestCase {
     ];
 
     $storage = new View($config, 'view');
-    $view = new ViewExecutable($storage, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager);
+    $view = new ViewExecutable($storage, $this->user, $this->viewsData, $this->routeProvider, $this->displayPluginManager, $this->cachePluginManager);
     $display = $this->getMockBuilder('Drupal\views\Plugin\views\display\DisplayPluginBase')
       ->disableOriginalConstructor()
       ->getMock();

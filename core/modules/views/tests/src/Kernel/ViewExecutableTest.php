@@ -393,6 +393,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
       $defaults['request'],
       $defaults['routeProvider'],
       $defaults['displayPluginManager'],
+      $defaults['cachePluginManager'],
       $defaults['viewsData']
     );
 
