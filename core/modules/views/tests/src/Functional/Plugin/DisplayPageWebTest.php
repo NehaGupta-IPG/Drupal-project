@@ -8,6 +8,7 @@ use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -152,6 +153,30 @@ class DisplayPageWebTest extends ViewTestBase {
     $this->assertPagePath('0');
     $this->assertPagePath('9999');
     $this->assertPagePath('☺');
+
+    // Reserved paths should trigger a validation error.
+    /** @var \Drupal\views\ReservedPathChecker $checker */
+    $checker = $this->container->get('views.reserved_path_checker');
+    foreach ($checker->listReservedFirstSegments() as $segment) {
+
+      // Trying to save a view with a reserved path to trigger validation.
+      $this->drupalGet('admin/structure/views/add');
+      $this->submitForm(
+        [
+          'label' => 'Test view ' . $segment,
+          'id' => 'test_' . $segment,
+          'page[create]' => 1,
+          'page[path]' => $segment,
+        ],
+        'Save and edit'
+      );
+      $this->assertSession()->statusCodeEquals(200);
+      // Check that the validation error message about reserved paths is shown.
+      $this->assertSession()->pageTextContains('Choose a different first segment');
+      // Confirm that the view was not created.
+      $this->assertNull(View::load('test_' . $segment));
+      $this->assertReservedPagePath($segment);
+    }
   }
 
   /**
@@ -203,6 +228,28 @@ class DisplayPageWebTest extends ViewTestBase {
     $this->drupalGet($path);
     $this->assertSession()->statusCodeEquals(200);
     // Check if we don't get any error on the view edit page.
+    $this->drupalGet('admin/structure/views/view/test_page_display_path');
+    $this->assertSession()->statusCodeEquals(200);
+  }
+
+  /**
+   * Tests that we cannot change a view page display path to reserved words.
+   *
+   * @param string $path
+   *   Path that we will attempt to set as the view page display path.
+   *
+   * @internal
+   */
+  public function assertReservedPagePath(string $path): void {
+    $view = Views::getView('test_page_display_path');
+    $view->initDisplay('page_1');
+    $view->displayHandlers->get('page_1')->overrideOption('path', $path);
+    $view->save();
+    $this->container->get('router.builder')->rebuild();
+    // Check if we successfully changed the path.
+    $this->drupalGet($path);
+    $this->assertSession()->statusCodeEquals(403);
+    // @todo Check if we get a validation error on the view edit page.
     $this->drupalGet('admin/structure/views/view/test_page_display_path');
     $this->assertSession()->statusCodeEquals(200);
   }

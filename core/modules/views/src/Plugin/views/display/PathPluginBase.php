@@ -38,6 +38,13 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
   protected $state;
 
   /**
+   * Reserved path checker service.
+   *
+   * @var \Drupal\views\ReservedPathChecker
+   */
+  protected $reservedPathChecker;
+
+  /**
    * Constructs a PathPluginBase object.
    *
    * @param array $configuration
@@ -56,6 +63,21 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
 
     $this->routeProvider = $route_provider;
     $this->state = $state;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    $instance = new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('router.route_provider'),
+      $container->get('state')
+    );
+    $instance->reservedPathChecker = $container->get('views.reserved_path_checker');
+    return $instance;
   }
 
   /**
@@ -429,10 +451,25 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
     switch ($form_state->get('section')) {
       case 'path':
         $form['#title'] .= $this->t('The menu path or URL of this view');
+
+        $description = $this->t('This view will be displayed by visiting this path on your site. You may use "%" or named route parameters like "%node" in your URL to represent values for contextual filters. Named route parameters are required when this path matches an existing path.');
+
+        $reserved_paths = $this->reservedPathChecker->listReservedFirstSegments();
+
+        if (!empty($reserved_paths) && is_array($reserved_paths)) {
+
+          $items = '';
+          foreach ($reserved_paths as $segment) {
+            $items .= '<li>' . $segment . '</li>';
+          }
+          $description .= ' ' . $this->t('The following reserved paths from the site’s web root cannot be used:') .
+            '<ul>' . $items . '</ul>';
+        }
+
         $form['path'] = [
           '#type' => 'textfield',
           '#title' => $this->t('Path'),
-          '#description' => $this->t('This view will be displayed by visiting this path on your site. You may use "%" or named route parameters like "%node" in your URL to represent values that will be used for contextual filters: For example, "node/%node/feed" or "view_path/%". Named route parameters are required when this path matches an existing path. For example, paths such as "taxonomy/term/%taxonomy_term" or "user/%user/custom-view".'),
+          '#description' => $description,
           '#default_value' => $this->getOption('path'),
           '#field_prefix' => '<span dir="ltr">' . Url::fromRoute('<none>', [], ['absolute' => TRUE])->toString() . '</span>&lrm;',
           '#attributes' => ['dir' => LanguageInterface::DIRECTION_LTR],
@@ -482,6 +519,18 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    */
   protected function validatePath($path) {
     $errors = [];
+
+    if ($path !== '' && isset($this->reservedPathChecker)) {
+      if ($this->reservedPathChecker->isReservedFirstSegment($path)) {
+        $errors[] = $this->t(
+          'The path "/@segment" cannot be used because it matches a directory in the site web root. Choose a different first segment (for example, "site-@segment").',
+          [
+            '@segment' => $this->reservedPathChecker->firstSegmentFromPath($path),
+          ]
+        );
+      }
+    }
+
     if (str_starts_with($path, '%')) {
       $errors[] = $this->t('"%" may not be used for the first segment of a path.');
     }

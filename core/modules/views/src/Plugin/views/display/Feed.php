@@ -74,6 +74,24 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    $instance = new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('router.route_provider'),
+      $container->get('state'),
+      $container->get('renderer')
+    );
+    if (property_exists($instance, 'reservedPathChecker') && !$instance->reservedPathChecker) {
+      $instance->reservedPathChecker = $container->get('views.reserved_path_checker');
+    }
+    return $instance;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getType() {
     return 'feed';
   }

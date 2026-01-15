@@ -12,6 +12,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsWizard;
 use Drupal\views\Plugin\views\wizard\WizardPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\views\ReservedPathChecker;
 
 /**
  * @todo Replace numbers with constants.
@@ -49,6 +50,13 @@ class Node extends WizardPluginBase {
   protected $entityFieldManager;
 
   /**
+   * The ReservedPathChecker Service.
+   *
+   * @var \Drupal\views\ReservedPathChecker
+   */
+  protected $reservedPathChecker;
+
+  /**
    * Node constructor.
    *
    * @param array $configuration
@@ -65,9 +73,11 @@ class Node extends WizardPluginBase {
    *   The entity field manager.
    * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $parent_form_selector
    *   The parent form selector service.
+   * @param \Drupal\views\ReservedPathChecker $reserved_path_checker
+   *   The parent form ReservedPathChecker service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, EntityDisplayRepositoryInterface $entity_display_repository, EntityFieldManagerInterface $entity_field_manager, MenuParentFormSelectorInterface $parent_form_selector) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, EntityDisplayRepositoryInterface $entity_display_repository, EntityFieldManagerInterface $entity_field_manager, MenuParentFormSelectorInterface $parent_form_selector, ReservedPathChecker $reserved_path_checker) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector, $reserved_path_checker);
 
     $this->entityDisplayRepository = $entity_display_repository;
     $this->entityFieldManager = $entity_field_manager;
@@ -84,7 +94,8 @@ class Node extends WizardPluginBase {
       $container->get('entity_type.bundle.info'),
       $container->get('entity_display.repository'),
       $container->get('entity_field.manager'),
-      $container->get('menu.parent_form_selector')
+      $container->get('menu.parent_form_selector'),
+      $container->get('views.reserved_path_checker')
     );
   }
 
