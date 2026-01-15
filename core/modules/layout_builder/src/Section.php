@@ -2,6 +2,8 @@
 
 namespace Drupal\layout_builder;
 
+use Drupal\Component\Plugin\Exception\ContextException;
+use Drupal\Component\Plugin\Exception\MissingValueContextException;
 use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Plugin\PreviewAwarePluginInterface;
 use Drupal\Core\Render\Element;
@@ -18,7 +20,7 @@ use Drupal\Core\Render\Element;
  * @see \Drupal\Core\Layout\LayoutDefinition
  * @see \Drupal\layout_builder\SectionComponent
  */
-class Section implements ThirdPartySettingsInterface {
+class Section implements ThirdPartySettingsInterface, \JsonSerializable {
 
   /**
    * The layout plugin ID.
@@ -111,11 +113,17 @@ class Section implements ThirdPartySettingsInterface {
    *
    * @return \Drupal\Core\Layout\LayoutInterface
    *   The layout plugin.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function getLayout(array $contexts = []) {
     $layout = $this->layoutPluginManager()->createInstance($this->getLayoutId(), $this->layoutSettings);
     if ($contexts) {
-      $this->contextHandler()->applyContextMapping($layout, $contexts);
+      try {
+        $this->contextHandler()->applyContextMapping($layout, $contexts);
+      }
+      catch (MissingValueContextException | ContextException $e) {
+      }
     }
     return $layout;
   }
@@ -164,6 +172,8 @@ class Section implements ThirdPartySettingsInterface {
    *
    * @return string
    *   The machine-readable name of the default region.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function getDefaultRegion() {
     return $this->layoutPluginManager()->getDefinition($this->getLayoutId())->getDefaultRegion();
@@ -356,9 +366,9 @@ class Section implements ThirdPartySettingsInterface {
     return [
       'layout_id' => $this->getLayoutId(),
       'layout_settings' => $this->getLayoutSettings(),
-      'components' => array_map(function (SectionComponent $component) {
+      'components' => array_values(array_map(function (SectionComponent $component) {
         return $component->toArray();
-      }, $this->getComponents()),
+      }, $this->getComponents())),
       'third_party_settings' => $this->thirdPartySettings,
     ];
   }
@@ -449,6 +459,17 @@ class Section implements ThirdPartySettingsInterface {
    */
   protected function contextHandler() {
     return \Drupal::service('context.handler');
+  }
+
+  /**
+   * Returns a representation of the section for use in JSON serialization.
+   *
+   * @return array
+   *   return array for JSON serialization.
+   */
+  #[\ReturnTypeWillChange]
+  public function jsonSerialize(): array {
+    return $this->toArray();
   }
 
 }

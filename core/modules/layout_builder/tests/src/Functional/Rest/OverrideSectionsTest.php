@@ -71,7 +71,7 @@ class OverrideSectionsTest extends LayoutRestTestBase {
     );
     $get_data = $this->getDecodedContents($response);
     $this->assertSame('A node at rest will stay at rest.', $get_data['title'][0]['value']);
-    $this->assertArrayNotHasKey('layout_builder__layout', $get_data);
+    $this->assertArrayHasKey('layout_builder__layout', $get_data);
 
     // Make a POST request without the override field.
     $new_node = [
