@@ -242,7 +242,6 @@ class MenuForm extends EntityForm {
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
     ];
     $tree = $this->menuTree->transform($tree, $manipulators);
-    $this->getRequest()->attributes->set('_menu_admin', FALSE);
 
     // Determine the delta; the number of weights to be made available.
     $count = function (array $tree) {
@@ -295,6 +294,7 @@ class MenuForm extends EntityForm {
       ])->toString(),
     ]);
     $links = $this->buildOverviewTreeForm($tree, $delta);
+    $this->getRequest()->attributes->set('_menu_admin', FALSE);
 
     // Get the menu links which have pending revisions, and disable the
     // tabledrag if there are any.
@@ -411,14 +411,6 @@ class MenuForm extends EntityForm {
         $form[$id]['title'] = Link::fromTextAndUrl($link->getTitle(), $link->getUrlObject())->toRenderable();
         if (!$link->isEnabled()) {
           $form[$id]['title']['#suffix'] = ' (' . $this->t('disabled') . ')';
-        }
-        // @todo Remove this in https://www.drupal.org/node/2568785.
-        elseif ($id === 'menu_plugin_id:user.logout') {
-          $form[$id]['title']['#suffix'] = ' (' . $this->t('<q>Log in</q> for anonymous users') . ')';
-        }
-        // @todo Remove this in https://www.drupal.org/node/2568785.
-        elseif (($url = $link->getUrlObject()) && $url->isRouted() && $url->getRouteName() == 'user.page') {
-          $form[$id]['title']['#suffix'] = ' (' . $this->t('logged in users only') . ')';
         }
 
         $form[$id]['enabled'] = [

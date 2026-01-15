@@ -1,6 +1,7 @@
 user.page:
   title: 'My account'
   weight: -10
+  class: Drupal\user\Plugin\Menu\UserPageMenuLink
   route_name: user.page
   menu_name: account
 user.logout:
