@@ -7,6 +7,9 @@ use Drupal\Core\Entity\Entity\EntityFormDisplay;
  * Install, update, and uninstall functions for the Link module.
  */
 
+/**
+ * Set default link widget settings for title_url and title_title.
+ */
 function link_update_10100(): string {
   $changedCount = 0;
 
