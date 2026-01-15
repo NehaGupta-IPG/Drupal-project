@@ -316,18 +316,24 @@
     const formId = form.getAttribute('id');
     // Submit-capable controls: <button type="submit">, <button> with no type (defaults to submit),
     // <input type="submit">, <input type="image">.
-    const insideSelector = 'button[type="submit"], button:not([type]), input[type="submit"], input[type="image"]';
-    const inside = Array.prototype.slice.call(form.querySelectorAll(insideSelector));
+    const insideSelector =
+      'button[type="submit"], button:not([type]), input[type="submit"], input[type="image"]';
+    const inside = Array.prototype.slice.call(
+      form.querySelectorAll(insideSelector),
+    );
     let external = [];
     if (formId) {
-      const cssEscape = (window.CSS && window.CSS.escape)
-        ? window.CSS.escape
-        : function (ident) {
-            // Minimal fallback: escape any character that is not alphanumeric, underscore, or hyphen.
-            return String(ident).replace(/[^a-zA-Z0-9_-]/g, '\\$&');
-          };
+      const cssEscape =
+        window.CSS && window.CSS.escape
+          ? window.CSS.escape
+          : function (ident) {
+              // Minimal fallback: escape any character that is not alphanumeric, underscore, or hyphen.
+              return String(ident).replace(/[^a-zA-Z0-9_-]/g, '\\$&');
+            };
       const externalSelector = `${insideSelector}[form="${cssEscape(formId)}"]`;
-      external = Array.prototype.slice.call(document.querySelectorAll(externalSelector));
+      external = Array.prototype.slice.call(
+        document.querySelectorAll(externalSelector),
+      );
     }
     // Merge and deduplicate while preserving order: inside first, then external.
     const seen = new Set();
@@ -371,7 +377,11 @@
   Drupal.ajax._lockPointerEvents = function (elements, key) {
     $(elements).each(function () {
       const $el = $(this);
-      const data = $el.data('drupalPeLocks') || { keys: {}, count: 0, prev: null };
+      const data = $el.data('drupalPeLocks') || {
+        keys: {},
+        count: 0,
+        prev: null,
+      };
       if (!data.count) {
         data.prev = this.style.pointerEvents || '';
       }
@@ -719,6 +729,20 @@
             // finished executing.
             .then(() => {
               ajax.ajaxing = false;
+              // Unlock pointer-events after all commands (including CSS loading) have completed.
+              if (ajax._peRequestKey && ajax._peersSnapshot) {
+                Drupal.ajax._unlockPointerEvents(
+                  ajax._peersSnapshot,
+                  ajax._peRequestKey,
+                );
+                ajax._peRequestKey = null;
+                ajax._peersSnapshot = null;
+              }
+              if (ajax._focusPeKey && ajax._peers) {
+                Drupal.ajax._unlockPointerEvents(ajax._peers, ajax._focusPeKey);
+                ajax._peers = null;
+                ajax._focusActive = false;
+              }
               // jQuery normally triggers the ajaxSuccess, ajaxComplete, and
               // ajaxStop events after the "success" function passed to $.ajax()
               // returns, but we prevented that via
@@ -737,19 +761,23 @@
         ajax.ajaxing = false;
       },
       complete(xmlhttprequest, status) {
-        // Always restore pointer-events to their initial state for any locks
-        // created by this Ajax instance during focus or request.
-        if (ajax._peRequestKey && ajax._peersSnapshot) {
-          Drupal.ajax._unlockPointerEvents(ajax._peersSnapshot, ajax._peRequestKey);
-          ajax._peRequestKey = null;
-          ajax._peersSnapshot = null;
-        }
-        if (ajax._focusPeKey && ajax._peers) {
-          Drupal.ajax._unlockPointerEvents(ajax._peers, ajax._focusPeKey);
-          ajax._peers = null;
-          ajax._focusActive = false;
-        }
+        // Only handle errors in complete callback. Success case now unlocks
+        // pointer-events after all commands execute (including CSS loading).
         if (status === 'error' || status === 'parsererror') {
+          // Restore pointer-events on error.
+          if (ajax._peRequestKey && ajax._peersSnapshot) {
+            Drupal.ajax._unlockPointerEvents(
+              ajax._peersSnapshot,
+              ajax._peRequestKey,
+            );
+            ajax._peRequestKey = null;
+            ajax._peersSnapshot = null;
+          }
+          if (ajax._focusPeKey && ajax._peers) {
+            Drupal.ajax._unlockPointerEvents(ajax._peers, ajax._focusPeKey);
+            ajax._peers = null;
+            ajax._focusActive = false;
+          }
           return ajax.error(xmlhttprequest, ajax.url);
         }
       },
@@ -822,7 +850,9 @@
     $(ajax.element).on('focusin', function () {
       const peers = Drupal.ajax._getFocusPeersWithSubmitControls(ajax.element);
       ajax._peers = peers;
-      const others = peers.filter ? peers.filter((el) => el !== ajax.element) : $(peers).not(ajax.element).toArray();
+      const others = peers.filter
+        ? peers.filter((el) => el !== ajax.element)
+        : $(peers).not(ajax.element).toArray();
       Drupal.ajax._lockPointerEvents(others, focusKey);
       ajax._focusActive = true;
 
@@ -1093,7 +1123,9 @@
     // Lock pointer-events for all ajax-enabled elements in the same form.
     if (this.element && this.element.form) {
       this._peRequestKey = `pe:${this.instanceIndex}:req:${Date.now()}`;
-      this._peersSnapshot = Drupal.ajax._getAjaxElementsInSameForm(this.element);
+      this._peersSnapshot = Drupal.ajax._getAjaxElementsInSameForm(
+        this.element,
+      );
       Drupal.ajax._lockPointerEvents(this._peersSnapshot, this._peRequestKey);
       // Clear any focus handlers for this element, they are superseded by the request lock.
       $(this.element).off('blur.ajaxPe change.ajaxPe keydown.ajaxPe');
