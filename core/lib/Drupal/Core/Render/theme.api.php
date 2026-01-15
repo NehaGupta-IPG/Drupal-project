@@ -185,8 +185,8 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
  *   $variables['#attached'] @endcode, e.g.:
  *   @code
  *   function THEME_preprocess_menu_local_action(array &$variables) {
- *     // We require touch events detection for button styling.
- *     $variables['#attached']['library'][] = 'core/drupal.touchevents-test';
+ *     // Attach dialog behaviors for local action buttons.
+ *     $variables['#attached']['library'][] = 'core/drupal.dialog';
  *   }
  *   @endcode
  *

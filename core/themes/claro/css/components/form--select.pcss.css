@@ -24,7 +24,7 @@
     background-position: 0 50%;
   }
 
-  .no-touchevents & {
+  @media (pointer: fine) {
     &.form-element--extrasmall,
     &[name$="][_weight]"] {
       padding-inline-end: calc(1.5rem - var(--input-border-size));

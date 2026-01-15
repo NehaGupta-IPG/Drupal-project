@@ -294,6 +294,13 @@ td.group-title {
   padding: 0;
   border-bottom: none;
   line-height: 20px;
+
+  /**
+   * Styles on devices with course pointers.
+   */
+  @media (pointer: coarse) {
+    padding: var(--space-m) var(--space-xs);
+  }
 }
 .edit-display-settings-top.views-ui-display-tab-bucket .views-display-setting {
   padding: 0.125rem 0 0;
@@ -675,11 +682,13 @@ td.group-title {
 }
 
 /**
- * Styles on devices with touchevents.
+ * Extra styles on devices with course pointers.
  */
-html:not(.no-touchevents) .views-ui-display-tab-bucket__header--actions {
-  padding: var(--space-l) var(--space-xs);
-}
-html:not(.no-touchevents) .edit-display-settings-top.views-ui-display-tab-bucket {
-  padding: var(--space-m) var(--space-xs);
+@media (pointer: coarse) {
+  .views-ui-display-tab-bucket__header--actions {
+    padding: var(--space-l) var(--space-xs);
+  }
+  .edit-display-settings-top.views-ui-display-tab-bucket {
+    padding: var(--space-m) var(--space-xs);
+  }
 }

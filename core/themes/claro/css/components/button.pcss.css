@@ -62,8 +62,8 @@
 }
 
 /* Common styles for small buttons. */
-.no-touchevents {
-  & .button--small {
+@media (pointer: fine) {
+  .button--small {
     margin-block: var(--space-s);
     margin-inline: 0 var(--space-xs);
     padding: calc(var(--space-xs) - 1px) calc(var(--space-m) - 1px); /* 1 */
@@ -71,7 +71,7 @@
   }
 
   /* Common styles for extra small buttons. */
-  & .button--extrasmall {
+  .button--extrasmall {
     margin-block: var(--space-xs);
     margin-inline: 0 var(--space-xs);
     padding: calc(calc(var(--space-xs) / 2) - 1px) calc(var(--space-s) - 1px); /* 1 */

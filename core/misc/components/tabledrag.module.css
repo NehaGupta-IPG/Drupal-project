@@ -61,27 +61,28 @@ a.tabledrag-handle:focus .handle {
     outline: solid 1px transparent;
   }
 }
-
-.touchevents .draggable td {
-  padding: 0 10px;
-}
-.touchevents .draggable .menu-item__link {
-  display: inline-block;
-  padding: 10px 0;
-}
-.touchevents a.tabledrag-handle {
-  width: 40px;
-  height: 44px;
-}
-.touchevents a.tabledrag-handle .handle {
-  height: 21px;
-  background-position: 40% 19px; /* LTR */
-}
-[dir="rtl"] .touch a.tabledrag-handle .handle {
-  background-position: right 40% top 19px;
-}
-.touchevents .draggable.drag a.tabledrag-handle .handle {
-  background-position: 50% -32px;
+@media (pointer: coarse) {
+  .draggable td {
+    padding: 0 10px;
+  }
+  .draggable .menu-item__link {
+    display: inline-block;
+    padding: 10px 0;
+  }
+  a.tabledrag-handle {
+    width: 40px;
+    height: 44px;
+  }
+  a.tabledrag-handle .handle {
+    height: 21px;
+    background-position: 40% 19px; /* LTR */
+  }
+  [dir="rtl"] a.tabledrag-handle .handle {
+    background-position: right 40% top 19px;
+  }
+  .draggable.drag a.tabledrag-handle .handle {
+    background-position: 50% -32px;
+  }
 }
 .tabledrag-toggle-weight-wrapper {
   text-align: right; /* LTR */

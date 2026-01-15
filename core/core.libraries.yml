@@ -558,7 +558,6 @@ drupal.tabledrag:
     - core/drupal
     - core/drupalSettings
     - core/once
-    - core/drupal.touchevents-test
 
 drupal.tabledrag.ajax:
   version: VERSION
@@ -621,6 +620,7 @@ drupal.touchevents-test:
   version: VERSION
   js:
     misc/touchevents-test.js: { weight: -21 }
+  deprecated: The %library_id% asset library is deprecated in Drupal 11.4.0 and will be removed in Drupal 12.0.0. There is no replacement. See https://www.drupal.org/node/3467337
 
 drupal.vertical-tabs:
   version: VERSION
@@ -790,7 +790,6 @@ drupal.dialog.off_canvas:
     - core/drupal.announce
     - core/drupal.dialog
     - core/drupal.dialog.ajax
-    - core/drupal.touchevents-test
 
 drupal.fieldListKeyboardNavigation:
   version: VERSION
