@@ -1,5 +1,13 @@
+:root {
+  --media-oembed-aspect-ratio: 16 / 9;
+}
+
 .media-oembed-content {
   max-width: 100%;
   border: none;
   background-color: transparent;
+}
+
+.media-oembed-content--responsive {
+  aspect-ratio: var(--media-oembed-aspect-ratio);
 }
