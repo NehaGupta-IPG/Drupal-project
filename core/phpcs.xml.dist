@@ -53,6 +53,7 @@
     <include-pattern>core/modules/*/Controller/*</include-pattern>
     <include-pattern>core/modules/*/Database/*</include-pattern>
   </rule>
+  <rule ref="Drupal.Attributes.ValidHookNameSniff"/>
   <rule ref="Drupal.Classes.ClassCreateInstance"/>
   <rule ref="Drupal.Classes.ClassDeclaration"/>
   <rule ref="Drupal.Classes.ClassFileName"/>
