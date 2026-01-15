@@ -56,6 +56,13 @@ class EntityCrudHookTest extends EntityKernelTestBase {
   ];
 
   /**
+   * An array of messages logged by hook implementations.
+   *
+   * @var string[]
+   */
+  protected array $messages = [];
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -73,7 +80,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    * Checks the order of CRUD hook execution messages.
    *
    * Module entity_crud_hook_test implements all core entity CRUD hooks and
-   * stores a message for each in $GLOBALS['entity_crud_hook_test'].
+   * stores a message for each in $this->messages.
    *
    * @param string[] $messages
    *   An array of plain-text messages in the order they should appear.
@@ -84,7 +91,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
     $positions = [];
     foreach ($messages as $message) {
       // Verify that each message is found and record its position.
-      $position = array_search($message, $GLOBALS['entity_crud_hook_test']);
+      $position = array_search($message, $this->messages);
       $this->assertNotFalse($position, $message);
       $positions[] = $position;
     }
@@ -110,7 +117,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_create called for type block',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $entity->save();
 
     $this->assertHookMessageOrder([
@@ -120,7 +127,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_insert called for type block',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $entity = Block::load($entity->id());
 
     $this->assertHookMessageOrder([
@@ -128,7 +135,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_block_load called',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $entity->label = 'New label';
     $entity->save();
 
@@ -139,7 +146,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_update called for type block',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $entity->delete();
 
     $this->assertHookMessageOrder([
@@ -174,7 +181,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
     ]);
     $node->save();
     $nid = $node->id();
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
 
     $comment = Comment::create([
       'cid' => NULL,
@@ -195,7 +202,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_create called for type comment',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $comment->save();
 
     $this->assertHookMessageOrder([
@@ -205,7 +212,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_insert called for type comment',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $comment = Comment::load($comment->id());
 
     $this->assertHookMessageOrder([
@@ -213,7 +220,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_comment_load called',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $comment->setSubject('New subject');
     $comment->save();
 
@@ -224,7 +231,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_update called for type comment',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $comment->delete();
 
     $this->assertHookMessageOrder([
@@ -260,7 +267,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_create called for type file',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $file->save();
 
     $this->assertHookMessageOrder([
@@ -270,7 +277,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_insert called for type file',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $file = File::load($file->id());
 
     $this->assertHookMessageOrder([
@@ -278,7 +285,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_file_load called',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $file->setFilename('new.entity_crud_hook_test.file');
     $file->save();
 
@@ -289,7 +296,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_update called for type file',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $file->delete();
 
     $this->assertHookMessageOrder([
@@ -323,7 +330,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_create called for type node',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $node->save();
 
     $this->assertHookMessageOrder([
@@ -333,7 +340,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_insert called for type node',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $node = Node::load($node->id());
 
     $this->assertHookMessageOrder([
@@ -342,7 +349,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_node_load called',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $node->title = 'New title';
     $node->save();
 
@@ -353,7 +360,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_update called for type node',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $node->delete();
 
     $this->assertHookMessageOrder([
@@ -378,7 +385,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'module' => 'entity_crud_hook_test',
     ]);
     $vocabulary->save();
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
 
     $term = Term::create([
       'vid' => $vocabulary->id(),
@@ -393,7 +400,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_create called for type taxonomy_term',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $term->save();
 
     $this->assertHookMessageOrder([
@@ -403,7 +410,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_insert called for type taxonomy_term',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $term = Term::load($term->id());
 
     $this->assertHookMessageOrder([
@@ -411,7 +418,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_taxonomy_term_load called',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $term->setName('New name');
     $term->save();
 
@@ -422,7 +429,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_update called for type taxonomy_term',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $term->delete();
 
     $this->assertHookMessageOrder([
@@ -452,7 +459,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_create called for type taxonomy_vocabulary',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $vocabulary->save();
 
     $this->assertHookMessageOrder([
@@ -462,7 +469,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_insert called for type taxonomy_vocabulary',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $vocabulary = Vocabulary::load($vocabulary->id());
 
     $this->assertHookMessageOrder([
@@ -470,7 +477,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_taxonomy_vocabulary_load called',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $vocabulary->set('name', 'New name');
     $vocabulary->save();
 
@@ -481,7 +488,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_update called for type taxonomy_vocabulary',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $vocabulary->delete();
 
     $this->assertHookMessageOrder([
@@ -509,7 +516,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_create called for type user',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $account->save();
 
     $this->assertHookMessageOrder([
@@ -519,7 +526,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_insert called for type user',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     User::load($account->id());
 
     $this->assertHookMessageOrder([
@@ -527,7 +534,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_user_load called',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $account->name = 'New name';
     $account->save();
 
@@ -538,7 +545,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'entity_crud_hook_test_entity_update called for type user',
     ]);
 
-    $GLOBALS['entity_crud_hook_test'] = [];
+    $this->messages = [];
     $account->delete();
 
     $this->assertHookMessageOrder([
@@ -575,7 +582,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('entity_create')]
   public function entityCreate(EntityInterface $entity): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_create called for type ' . $entity->getEntityTypeId();
+    $this->messages[] = 'entity_crud_hook_test_entity_create called for type ' . $entity->getEntityTypeId();
   }
 
   /**
@@ -583,7 +590,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('block_create')]
   public function blockCreate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_block_create called';
+    $this->messages[] = 'entity_crud_hook_test_block_create called';
   }
 
   /**
@@ -591,7 +598,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('comment_create')]
   public function commentCreate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_comment_create called';
+    $this->messages[] = 'entity_crud_hook_test_comment_create called';
   }
 
   /**
@@ -599,7 +606,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('file_create')]
   public function fileCreate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_file_create called';
+    $this->messages[] = 'entity_crud_hook_test_file_create called';
   }
 
   /**
@@ -607,7 +614,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('node_create')]
   public function nodeCreate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_node_create called';
+    $this->messages[] = 'entity_crud_hook_test_node_create called';
   }
 
   /**
@@ -615,7 +622,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_term_create')]
   public function taxonomyTermCreate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_term_create called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_term_create called';
   }
 
   /**
@@ -623,7 +630,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_vocabulary_create')]
   public function taxonomyVocabularyCreate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_vocabulary_create called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_vocabulary_create called';
   }
 
   /**
@@ -631,7 +638,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('user_create')]
   public function userCreate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_user_create called';
+    $this->messages[] = 'entity_crud_hook_test_user_create called';
   }
 
   /**
@@ -639,7 +646,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('entity_presave')]
   public function entityPresave(EntityInterface $entity): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_presave called for type ' . $entity->getEntityTypeId();
+    $this->messages[] = 'entity_crud_hook_test_entity_presave called for type ' . $entity->getEntityTypeId();
   }
 
   /**
@@ -647,7 +654,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('block_presave')]
   public function blockPresave(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_block_presave called';
+    $this->messages[] = 'entity_crud_hook_test_block_presave called';
   }
 
   /**
@@ -655,7 +662,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('comment_presave')]
   public function commentPresave(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_comment_presave called';
+    $this->messages[] = 'entity_crud_hook_test_comment_presave called';
   }
 
   /**
@@ -663,7 +670,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('file_presave')]
   public function filePresave(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_file_presave called';
+    $this->messages[] = 'entity_crud_hook_test_file_presave called';
   }
 
   /**
@@ -671,7 +678,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('node_presave')]
   public function nodePresave(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_node_presave called';
+    $this->messages[] = 'entity_crud_hook_test_node_presave called';
   }
 
   /**
@@ -679,7 +686,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_term_presave')]
   public function taxonomyTermPresave(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_term_presave called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_term_presave called';
   }
 
   /**
@@ -687,7 +694,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_vocabulary_presave')]
   public function taxonomyVocabularyPresave(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_vocabulary_presave called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_vocabulary_presave called';
   }
 
   /**
@@ -695,7 +702,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('user_presave')]
   public function userPresave(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_user_presave called';
+    $this->messages[] = 'entity_crud_hook_test_user_presave called';
   }
 
   /**
@@ -703,7 +710,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('entity_insert')]
   public function entityInsert(EntityInterface $entity): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_insert called for type ' . $entity->getEntityTypeId();
+    $this->messages[] = 'entity_crud_hook_test_entity_insert called for type ' . $entity->getEntityTypeId();
   }
 
   /**
@@ -711,7 +718,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('block_insert')]
   public function blockInsert(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_block_insert called';
+    $this->messages[] = 'entity_crud_hook_test_block_insert called';
   }
 
   /**
@@ -719,7 +726,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('comment_insert')]
   public function commentInsert(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_comment_insert called';
+    $this->messages[] = 'entity_crud_hook_test_comment_insert called';
   }
 
   /**
@@ -727,7 +734,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('file_insert')]
   public function fileInsert(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_file_insert called';
+    $this->messages[] = 'entity_crud_hook_test_file_insert called';
   }
 
   /**
@@ -735,7 +742,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('node_insert')]
   public function nodeInsert(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_node_insert called';
+    $this->messages[] = 'entity_crud_hook_test_node_insert called';
   }
 
   /**
@@ -743,7 +750,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_term_insert')]
   public function taxonomyTermInsert(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_term_insert called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_term_insert called';
   }
 
   /**
@@ -751,7 +758,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_vocabulary_insert')]
   public function taxonomyVocabularyInsert(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_vocabulary_insert called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_vocabulary_insert called';
   }
 
   /**
@@ -759,7 +766,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('user_insert')]
   public function userInsert(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_user_insert called';
+    $this->messages[] = 'entity_crud_hook_test_user_insert called';
   }
 
   /**
@@ -767,7 +774,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('entity_preload')]
   public function entityPreload(array $entities, $type): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_preload called for type ' . $type;
+    $this->messages[] = 'entity_crud_hook_test_entity_preload called for type ' . $type;
   }
 
   /**
@@ -775,7 +782,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('entity_load')]
   public function entityLoad(array $entities, $type): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_load called for type ' . $type;
+    $this->messages[] = 'entity_crud_hook_test_entity_load called for type ' . $type;
   }
 
   /**
@@ -783,7 +790,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('block_load')]
   public function blockLoad(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_block_load called';
+    $this->messages[] = 'entity_crud_hook_test_block_load called';
   }
 
   /**
@@ -791,7 +798,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('comment_load')]
   public function commentLoad(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_comment_load called';
+    $this->messages[] = 'entity_crud_hook_test_comment_load called';
   }
 
   /**
@@ -799,7 +806,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('file_load')]
   public function fileLoad(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_file_load called';
+    $this->messages[] = 'entity_crud_hook_test_file_load called';
   }
 
   /**
@@ -807,7 +814,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('node_load')]
   public function nodeLoad(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_node_load called';
+    $this->messages[] = 'entity_crud_hook_test_node_load called';
   }
 
   /**
@@ -815,7 +822,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_term_load')]
   public function taxonomyTermLoad(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_term_load called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_term_load called';
   }
 
   /**
@@ -823,7 +830,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_vocabulary_load')]
   public function taxonomyVocabularyLoad(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_vocabulary_load called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_vocabulary_load called';
   }
 
   /**
@@ -831,7 +838,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('user_load')]
   public function userLoad(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_user_load called';
+    $this->messages[] = 'entity_crud_hook_test_user_load called';
   }
 
   /**
@@ -839,7 +846,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('entity_update')]
   public function entityUpdate(EntityInterface $entity): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_update called for type ' . $entity->getEntityTypeId();
+    $this->messages[] = 'entity_crud_hook_test_entity_update called for type ' . $entity->getEntityTypeId();
   }
 
   /**
@@ -847,7 +854,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('block_update')]
   public function blockUpdate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_block_update called';
+    $this->messages[] = 'entity_crud_hook_test_block_update called';
   }
 
   /**
@@ -855,7 +862,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('comment_update')]
   public function commentUpdate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_comment_update called';
+    $this->messages[] = 'entity_crud_hook_test_comment_update called';
   }
 
   /**
@@ -863,7 +870,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('file_update')]
   public function fileUpdate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_file_update called';
+    $this->messages[] = 'entity_crud_hook_test_file_update called';
   }
 
   /**
@@ -871,7 +878,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('node_update')]
   public function nodeUpdate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_node_update called';
+    $this->messages[] = 'entity_crud_hook_test_node_update called';
   }
 
   /**
@@ -879,7 +886,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_term_update')]
   public function taxonomyTermUpdate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_term_update called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_term_update called';
   }
 
   /**
@@ -887,7 +894,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_vocabulary_update')]
   public function taxonomyVocabularyUpdate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_vocabulary_update called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_vocabulary_update called';
   }
 
   /**
@@ -895,7 +902,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('user_update')]
   public function userUpdate(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_user_update called';
+    $this->messages[] = 'entity_crud_hook_test_user_update called';
   }
 
   /**
@@ -903,7 +910,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('entity_predelete')]
   public function entityPredelete(EntityInterface $entity): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_predelete called for type ' . $entity->getEntityTypeId();
+    $this->messages[] = 'entity_crud_hook_test_entity_predelete called for type ' . $entity->getEntityTypeId();
   }
 
   /**
@@ -911,7 +918,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('block_predelete')]
   public function blockPredelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_block_predelete called';
+    $this->messages[] = 'entity_crud_hook_test_block_predelete called';
   }
 
   /**
@@ -919,7 +926,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('comment_predelete')]
   public function commentPredelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_comment_predelete called';
+    $this->messages[] = 'entity_crud_hook_test_comment_predelete called';
   }
 
   /**
@@ -927,7 +934,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('file_predelete')]
   public function filePredelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_file_predelete called';
+    $this->messages[] = 'entity_crud_hook_test_file_predelete called';
   }
 
   /**
@@ -935,7 +942,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('node_predelete')]
   public function nodePredelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_node_predelete called';
+    $this->messages[] = 'entity_crud_hook_test_node_predelete called';
   }
 
   /**
@@ -943,7 +950,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_term_predelete')]
   public function taxonomyTermPredelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_term_predelete called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_term_predelete called';
   }
 
   /**
@@ -951,7 +958,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_vocabulary_predelete')]
   public function taxonomyVocabularyPredelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_vocabulary_predelete called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_vocabulary_predelete called';
   }
 
   /**
@@ -959,7 +966,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('user_predelete')]
   public function userPredelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_user_predelete called';
+    $this->messages[] = 'entity_crud_hook_test_user_predelete called';
   }
 
   /**
@@ -967,7 +974,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('entity_delete')]
   public function entityDelete(EntityInterface $entity): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_delete called for type ' . $entity->getEntityTypeId();
+    $this->messages[] = 'entity_crud_hook_test_entity_delete called for type ' . $entity->getEntityTypeId();
   }
 
   /**
@@ -975,7 +982,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('block_delete')]
   public function blockDelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_block_delete called';
+    $this->messages[] = 'entity_crud_hook_test_block_delete called';
   }
 
   /**
@@ -983,7 +990,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('comment_delete')]
   public function commentDelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_comment_delete called';
+    $this->messages[] = 'entity_crud_hook_test_comment_delete called';
   }
 
   /**
@@ -991,7 +998,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('file_delete')]
   public function fileDelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_file_delete called';
+    $this->messages[] = 'entity_crud_hook_test_file_delete called';
   }
 
   /**
@@ -999,7 +1006,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('node_delete')]
   public function nodeDelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_node_delete called';
+    $this->messages[] = 'entity_crud_hook_test_node_delete called';
   }
 
   /**
@@ -1007,7 +1014,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_term_delete')]
   public function taxonomyTermDelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_term_delete called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_term_delete called';
   }
 
   /**
@@ -1015,7 +1022,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('taxonomy_vocabulary_delete')]
   public function taxonomyVocabularyDelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_taxonomy_vocabulary_delete called';
+    $this->messages[] = 'entity_crud_hook_test_taxonomy_vocabulary_delete called';
   }
 
   /**
@@ -1023,7 +1030,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    */
   #[Hook('user_delete')]
   public function userDelete(): void {
-    $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_user_delete called';
+    $this->messages[] = 'entity_crud_hook_test_user_delete called';
   }
 
 }
