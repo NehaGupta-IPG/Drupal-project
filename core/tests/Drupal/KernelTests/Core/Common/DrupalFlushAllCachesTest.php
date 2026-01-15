@@ -6,14 +6,16 @@ namespace Drupal\KernelTests\Core\Common;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal Flush All Caches.
- *
- * @legacy-covers ::drupal_flush_all_caches
  */
 #[Group('Common')]
+#[CoversFunction('drupal_flush_all_caches')]
+#[RunTestsInSeparateProcesses]
 class DrupalFlushAllCachesTest extends KernelTestBase {
 
   /**

@@ -9,22 +9,22 @@ use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\language\Entity\ConfigurableLanguage;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the loaded Revision of an entity.
  */
 #[CoversClass(ContentEntityBase::class)]
 #[Group('entity')]
+#[RunTestsInSeparateProcesses]
 class EntityRevisionsTest extends EntityKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'system',
     'entity_test',
     'language',
-    'content_translation',
   ];
 
   /**
@@ -172,8 +172,6 @@ class EntityRevisionsTest extends EntityKernelTestBase {
 
   /**
    * Tests that latest revisions are working as expected.
-   *
-   * @legacy-covers ::isLatestRevision
    */
   public function testIsLatestRevision(): void {
     // Create a basic EntityTestMulRev entity and save it.

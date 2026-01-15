@@ -81,8 +81,6 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
 
   /**
    * Tests CsrfTokenGenerator::get().
-   *
-   * @legacy-covers ::get
    */
   public function testGet(): void {
     $this->setupDefaultExpectations();
@@ -109,15 +107,13 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
 
     $this->sessionMetadata->expects($this->once())
       ->method('setCsrfTokenSeed')
-      ->with($this->isType('string'));
+      ->with($this->isString());
 
     $this->assertIsString($this->generator->get());
   }
 
   /**
    * Tests CsrfTokenGenerator::validate().
-   *
-   * @legacy-covers ::validate
    */
   public function testValidate(): void {
     $this->setupDefaultExpectations();
@@ -137,8 +133,6 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
    *   The token to be validated.
    * @param mixed $value
    *   (optional) An additional value to base the token on.
-   *
-   * @legacy-covers ::validate
    */
   #[DataProvider('providerTestValidateParameterTypes')]
   public function testValidateParameterTypes($token, $value): void {
@@ -159,7 +153,7 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
    * @return array
    *   An array of data used by the test.
    */
-  public static function providerTestValidateParameterTypes() {
+  public static function providerTestValidateParameterTypes(): array {
     return [
       [[], ''],
       [TRUE, 'foo'],
@@ -191,7 +185,7 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
    * @return array
    *   An array of data used by the test.
    */
-  public static function providerTestInvalidParameterTypes() {
+  public static function providerTestInvalidParameterTypes(): array {
     return [
       [NULL, new \stdClass()],
       [0, []],
@@ -202,8 +196,6 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
 
   /**
    * Tests the exception thrown when no 'hash_salt' is provided in settings.
-   *
-   * @legacy-covers ::get
    */
   public function testGetWithNoHashSalt(): void {
     // Update settings with no hash salt.

@@ -18,7 +18,6 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\Plugin\Block\ViewsBlock;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -130,22 +129,6 @@ class Block extends DisplayPluginBase {
       $context_handler = \Drupal::service('context.handler');
     }
     $this->contextHandler = $context_handler;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager'),
-      $container->get('plugin.manager.block'),
-      $container->get('keyvalue'),
-      $container->get('context.repository'),
-      $container->get('context.handler')
-    );
   }
 
   /**
@@ -368,6 +351,9 @@ class Block extends DisplayPluginBase {
               4 => 4,
               5 => 5,
               6 => 6,
+              7 => 7,
+              8 => 8,
+              9 => 9,
               10 => 10,
               12 => 12,
               20 => 20,

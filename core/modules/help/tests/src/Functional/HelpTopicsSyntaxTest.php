@@ -11,6 +11,7 @@ use Drupal\help_topics_twig_tester\HelpTestTwigNodeVisitor;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
@@ -18,6 +19,7 @@ use PHPUnit\Framework\ExpectationFailedException;
  */
 #[Group('help')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class HelpTopicsSyntaxTest extends BrowserTestBase {
 
   /**
@@ -196,12 +198,11 @@ class HelpTopicsSyntaxTest extends BrowserTestBase {
     $doc->strictErrorChecking = TRUE;
     $doc->validateOnParse = FALSE;
     libxml_use_internal_errors(TRUE);
+    libxml_clear_errors();
     if (!$doc->loadXML('<html><body>' . $body . '</body></html>')) {
       foreach (libxml_get_errors() as $error) {
         $this->fail('Topic ' . $id . ' fails HTML validation: ' . $error->message);
       }
-
-      libxml_clear_errors();
     }
 
     // Check for headings hierarchy.

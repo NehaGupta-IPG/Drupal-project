@@ -40,8 +40,6 @@ class DefaultTableMappingTest extends UnitTestCase {
 
   /**
    * Tests DefaultTableMapping::getTableNames().
-   *
-   * @legacy-covers ::getTableNames
    */
   public function testGetTableNames(): void {
     // The storage definitions are only used in getColumnNames() so we do not
@@ -278,8 +276,6 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   The name of the column to be processed.
    * @param string $expected
    *   The expected result.
-   *
-   * @legacy-covers ::getFieldColumnName
    */
   #[DataProvider('providerTestGetFieldColumnName')]
   public function testGetFieldColumnName($base_field, $columns, $column, $expected): void {
@@ -299,8 +295,6 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   An array of available field column names.
    * @param string $column
    *   The name of the column to be processed.
-   *
-   * @legacy-covers ::getFieldColumnName
    */
   #[DataProvider('providerTestGetFieldColumnName')]
   public function testGetFieldColumnNameInvalid($base_field, $columns, $column): void {
@@ -325,7 +319,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   field name, base field status, list of field columns, name of the column
    *   to be retrieved, expected result, whether an exception is expected.
    */
-  public static function providerTestGetFieldColumnName() {
+  public static function providerTestGetFieldColumnName(): array {
     $data = [];
     // Base field with single column.
     $data[] = [TRUE, ['foo'], 'foo', 'test'];
@@ -352,8 +346,6 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   where keys can be 'base', 'data' and 'revision'.
    * @param string $expected
    *   The expected table name.
-   *
-   * @legacy-covers ::getFieldTableName
    */
   #[DataProvider('providerTestGetFieldTableName')]
   public function testGetFieldTableName($table_names, $expected): void {
@@ -417,7 +409,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   A nested array where each inner array has the following values: a list of
    *   table names and the expected table name.
    */
-  public static function providerTestGetFieldTableName() {
+  public static function providerTestGetFieldTableName(): array {
     $data = [];
 
     $data[] = [['data' => 'data_table', 'base' => 'base_table', 'revision' => 'revision_table'], 'data_table'];
@@ -442,8 +434,6 @@ class DefaultTableMappingTest extends UnitTestCase {
 
   /**
    * Tests DefaultTableMapping::getFieldTableName() with an invalid parameter.
-   *
-   * @legacy-covers ::getFieldTableName
    */
   public function testGetFieldTableNameInvalid(): void {
     $table_mapping = new TestDefaultTableMapping($this->entityType, []);
@@ -498,7 +488,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   consisting of the entity type ID, field name and a table prefix, followed
    *   by the expected data table name and the revision table name.
    */
-  public static function providerTestGetDedicatedTableName() {
+  public static function providerTestGetDedicatedTableName(): array {
     $data = [];
 
     $data['short entity type; short field name; no prefix'] = [

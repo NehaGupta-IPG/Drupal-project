@@ -7,12 +7,14 @@ namespace Drupal\Tests\layout_builder\Functional\Rest;
 use Drupal\Tests\rest\Functional\BasicAuthResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Layout Builder Entity View Display Xml Basic Auth.
  */
 #[Group('layout_builder')]
 #[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderEntityViewDisplayXmlBasicAuthTest extends LayoutBuilderEntityViewDisplayResourceTestBase {
 
   use BasicAuthResourceTestTrait;
@@ -36,7 +38,7 @@ class LayoutBuilderEntityViewDisplayXmlBasicAuthTest extends LayoutBuilderEntity
   /**
    * {@inheritdoc}
    */
-  protected static $mimeType = 'text/xml; charset=UTF-8';
+  protected static $mimeType = 'text/xml; charset=utf-8';
 
   /**
    * {@inheritdoc}

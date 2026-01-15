@@ -23,8 +23,6 @@ class MigrationLookupTest extends MigrationLookupTestCase {
 
   /**
    * Tests transform with stub skipping.
-   *
-   * @legacy-covers ::transform
    */
   public function testTransformWithStubSkipping(): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
@@ -54,8 +52,6 @@ class MigrationLookupTest extends MigrationLookupTestCase {
 
   /**
    * Tests transform with stubbing.
-   *
-   * @legacy-covers ::transform
    */
   #[DataProvider('providerTestTransformWithStubbing')]
   public function testTransformWithStubbing($exception_class, $exception_message, $expected_message): void {
@@ -93,12 +89,12 @@ class MigrationLookupTest extends MigrationLookupTestCase {
       [
         MigrateSkipRowException::class,
         'Oh noes!',
-        "Migration lookup for destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip, with message 'Oh noes!'",
+        "Migration lookup for value '1' and destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip, with message 'Oh noes!'",
       ],
       [
         MigrateSkipRowException::class,
         '',
-        "Migration lookup for destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip",
+        "Migration lookup for value '1' and destination '' attempted to create a stub using migration destination_migration, which resulted in a row skip",
       ],
     ];
   }

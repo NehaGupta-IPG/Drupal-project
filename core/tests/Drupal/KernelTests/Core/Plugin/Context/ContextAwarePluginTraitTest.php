@@ -21,6 +21,7 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore sisko
 /**
@@ -28,6 +29,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(ContextAwarePluginTrait::class)]
 #[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class ContextAwarePluginTraitTest extends KernelTestBase {
 
   /**
@@ -57,8 +59,6 @@ class ContextAwarePluginTraitTest extends KernelTestBase {
 
   /**
    * Tests get context definitions.
-   *
-   * @legacy-covers ::getContextDefinitions
    */
   public function testGetContextDefinitions(): void {
     $this->assertIsArray($this->plugin->getContextDefinitions());
@@ -66,8 +66,6 @@ class ContextAwarePluginTraitTest extends KernelTestBase {
 
   /**
    * Tests get context definition.
-   *
-   * @legacy-covers ::getContextDefinition
    */
   public function testGetContextDefinition(): void {
     // The context is not defined, so an exception will be thrown.
@@ -78,8 +76,6 @@ class ContextAwarePluginTraitTest extends KernelTestBase {
 
   /**
    * Tests get context value.
-   *
-   * @legacy-covers ::getContextValue
    */
   public function testGetContextValue(): void {
     $this->plugin->setContextValue('nato_letter', 'Alpha');
@@ -88,8 +84,6 @@ class ContextAwarePluginTraitTest extends KernelTestBase {
 
   /**
    * Tests set context value.
-   *
-   * @legacy-covers ::setContextValue
    */
   public function testSetContextValue(): void {
     $typed_data_manager = $this->prophesize(TypedDataManagerInterface::class);
@@ -151,14 +145,14 @@ class TestConfigurableContextAwarePlugin extends PluginBase implements Configura
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getConfiguration() {
+  public function getConfiguration(): array {
     return [
       'context' => [
         'nato_letter' => 'Alpha',
