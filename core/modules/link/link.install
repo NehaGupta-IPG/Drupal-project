@@ -1,0 +1,43 @@
+<?php
+
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Link module.
+ */
+
+function link_update_10100(): string {
+  $changedCount = 0;
+
+  foreach (EntityFormDisplay::loadMultiple() as $formDisplay) {
+    $changed = FALSE;
+
+    foreach ($formDisplay->getComponents() as $fieldName => $component) {
+      if (!isset($component['type']) || $component['type'] !== 'link_default') {
+        continue;
+      }
+
+      if (!isset($component['settings']['title_url'])) {
+        $component['settings']['title_url'] = 'URL';
+        $changed = TRUE;
+      }
+
+      if (!isset($component['settings']['title_title'])) {
+        $component['settings']['title_title'] = 'Link text';
+        $changed = TRUE;
+      }
+
+      if ($changed) {
+        $formDisplay->setComponent($fieldName, $component);
+        $changedCount++;
+      }
+    }
+
+    if ($changed) {
+      $formDisplay->save();
+    }
+  }
+
+  return sprintf('Updated %d link widgets.', $changedCount);
+}
