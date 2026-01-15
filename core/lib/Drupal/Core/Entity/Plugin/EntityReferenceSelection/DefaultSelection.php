@@ -22,6 +22,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\EntityOwnerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityStorageException;
 
 /**
  * Default plugin implementation of the Entity Reference Selection plugin.
@@ -416,7 +417,6 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
    */
   public function createNewEntity($entity_type_id, $bundle, $label, $uid) {
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
-
     $values = [
       $entity_type->getKey('label') => $label,
     ];
@@ -429,6 +429,16 @@ class DefaultSelection extends SelectionPluginBase implements ContainerFactoryPl
 
     if ($entity instanceof EntityOwnerInterface) {
       $entity->setOwnerId($uid);
+    }
+
+    $violations = $entity->validate();
+    if ($violations->count() > 0) {
+      $messages = [];
+      foreach ($violations as $violation) {
+        $messages[] = $violation->getPropertyPath() . ': ' . $violation->getMessage();
+      }
+      $message = "Cannot auto-create entity due to validation errors: " . implode('; ', $messages);
+      throw new EntityStorageException($message);
     }
 
     return $entity;
