@@ -54,6 +54,7 @@ class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
     $this->container->get('theme_installer')->install(['stable9']);
     $this->config('system.theme')->set('default', 'stable9')->save();
 
+    $this->installConfig(['user']);
     // Enable all core modules.
     $this->enableVisibleAndStableCoreModules();
 

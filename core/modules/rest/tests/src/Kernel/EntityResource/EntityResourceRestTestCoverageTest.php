@@ -43,6 +43,7 @@ class EntityResourceRestTestCoverageTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig(['user']);
 
     $this->installConfig('system');
     $all_modules = $this->container->get('extension.list.module')->getList();

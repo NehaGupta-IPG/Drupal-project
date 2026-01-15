@@ -37,6 +37,7 @@ class TestCoverageTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+    $this->installConfig(['user']);
 
     $this->installConfig('system');
     $all_modules = \Drupal::service('extension.list.module')->getList();
