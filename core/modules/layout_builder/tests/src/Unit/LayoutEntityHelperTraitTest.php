@@ -94,8 +94,6 @@ class LayoutEntityHelperTraitTest extends UnitTestCase {
 
   /**
    * Tests get inline block components.
-   *
-   * @legacy-covers ::getInlineBlockComponents
    */
   #[DataProvider('providerSectionsWithInlineComponents')]
   public function testGetInlineBlockComponents(array $sections, array $expected_components, array $expected_revision_ids): void {
@@ -105,8 +103,6 @@ class LayoutEntityHelperTraitTest extends UnitTestCase {
 
   /**
    * Tests get inline block revision ids in sections.
-   *
-   * @legacy-covers ::getInlineBlockRevisionIdsInSections
    */
   #[DataProvider('providerSectionsWithInlineComponents')]
   public function testGetInlineBlockRevisionIdsInSections(array $sections, array $components, array $expected_revision_ids): void {
