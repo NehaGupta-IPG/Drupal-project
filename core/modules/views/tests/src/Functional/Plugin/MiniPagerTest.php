@@ -187,4 +187,87 @@ class MiniPagerTest extends ViewTestBase {
     }
   }
 
+  /**
+   * Tests that the mini pager uses '<current>' route for AJAX requests.
+   *
+   * This ensures that pager links work correctly in AJAX contexts like the
+   * media library modal, where the current route should be used instead of
+   * a hardcoded route.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3567237
+   */
+  public function testMiniPagerAjaxRoute(): void {
+    $view = Views::getView('test_mini_pager');
+    $view->setDisplay();
+    $view->initPager();
+
+    // Simulate an AJAX request by setting the wrapper format.
+    $request = \Drupal::request();
+    $request->query->set('_wrapper_format', 'drupal_ajax');
+
+    // Render the pager.
+    $pager_render = $view->pager->render([]);
+
+    // Verify that the route_name is '<current>' for AJAX requests.
+    $this->assertEquals('<current>', $pager_render['#route_name'], 'Mini pager should use "<current>" route for AJAX requests.');
+
+    // Clean up the request.
+    $request->query->remove('_wrapper_format');
+
+    // Test with drupal_modal wrapper format.
+    $request->query->set('_wrapper_format', 'drupal_modal');
+    $pager_render = $view->pager->render([]);
+    $this->assertEquals('<current>', $pager_render['#route_name'], 'Mini pager should use "<current>" route for modal AJAX requests.');
+
+    // Clean up.
+    $request->query->remove('_wrapper_format');
+
+    // Test with drupal_dialog wrapper format.
+    $request->query->set('_wrapper_format', 'drupal_dialog');
+    $pager_render = $view->pager->render([]);
+    $this->assertEquals('<current>', $pager_render['#route_name'], 'Mini pager should use "<current>" route for dialog AJAX requests.');
+
+    // Clean up.
+    $request->query->remove('_wrapper_format');
+  }
+
+  /**
+   * Tests that the mini pager uses '<none>' route for non-AJAX requests.
+   *
+   * This ensures backward compatibility for normal page requests.
+   */
+  public function testMiniPagerNonAjaxRoute(): void {
+    $view = Views::getView('test_mini_pager');
+    $view->setDisplay();
+    $view->initPager();
+
+    // Ensure no AJAX wrapper format is set.
+    $request = \Drupal::request();
+    $request->query->remove('_wrapper_format');
+
+    // Render the pager.
+    $pager_render = $view->pager->render([]);
+
+    // Verify that the route_name is '<none>' for non-AJAX requests.
+    $this->assertEquals('<none>', $pager_render['#route_name'], 'Mini pager should use "<none>" route for non-AJAX requests.');
+  }
+
+  /**
+   * Tests that the mini pager uses '<current>' route during live preview.
+   */
+  public function testMiniPagerLivePreviewRoute(): void {
+    $view = Views::getView('test_mini_pager');
+    $view->setDisplay();
+    $view->initPager();
+
+    // Simulate live preview mode.
+    $view->live_preview = TRUE;
+
+    // Render the pager.
+    $pager_render = $view->pager->render([]);
+
+    // Verify that the route_name is '<current>' during live preview.
+    $this->assertEquals('<current>', $pager_render['#route_name'], 'Mini pager should use "<current>" route during live preview.');
+  }
+
 }

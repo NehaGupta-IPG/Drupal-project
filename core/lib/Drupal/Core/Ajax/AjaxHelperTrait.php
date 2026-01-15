@@ -31,7 +31,10 @@ trait AjaxHelperTrait {
    *   The wrapper format. NULL if the wrapper format is not set.
    */
   protected function getRequestWrapperFormat() {
-    return \Drupal::request()->get(MainContentViewSubscriber::WRAPPER_FORMAT);
+    $request = \Drupal::request();
+    // Check query parameters first, then request (POST) parameters.
+    return $request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT)
+      ?? $request->request->get(MainContentViewSubscriber::WRAPPER_FORMAT);
   }
 
 }

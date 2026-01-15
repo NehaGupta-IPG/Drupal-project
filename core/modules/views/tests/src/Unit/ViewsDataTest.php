@@ -642,6 +642,8 @@ class ViewsDataTest extends UnitTestCase {
 
   /**
    * Tests that getting data with an empty key throws an exception.
+   *
+   * @legacy-covers ::get
    */
   #[DataProvider('providerTestGetEmptyKey')]
   public function testGetEmptyKey($key): void {
