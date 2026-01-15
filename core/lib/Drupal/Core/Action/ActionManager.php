@@ -7,7 +7,10 @@ use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\CategorizingPluginManagerTrait;
+use Drupal\Core\Plugin\Context\ContextAwarePluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Plugin\FilteredPluginManagerInterface;
+use Drupal\Core\Plugin\FilteredPluginManagerTrait;
 
 /**
  * Provides an Action plugin manager.
@@ -17,9 +20,11 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  * @see \Drupal\Core\Action\ActionBase
  * @see plugin_api
  */
-class ActionManager extends DefaultPluginManager implements CategorizingPluginManagerInterface {
+class ActionManager extends DefaultPluginManager implements CategorizingPluginManagerInterface, FilteredPluginManagerInterface {
 
   use CategorizingPluginManagerTrait;
+  use ContextAwarePluginManagerTrait;
+  use FilteredPluginManagerTrait;
 
   /**
    * Constructs a new class instance.
@@ -51,6 +56,13 @@ class ActionManager extends DefaultPluginManager implements CategorizingPluginMa
     return array_filter($this->getDefinitions(), function ($definition) use ($type) {
       return $definition['type'] === $type;
     });
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getType() {
+    return 'action';
   }
 
 }

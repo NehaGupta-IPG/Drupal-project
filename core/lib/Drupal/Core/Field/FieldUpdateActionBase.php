@@ -3,7 +3,9 @@
 namespace Drupal\Core\Field;
 
 use Drupal\Core\Action\ActionBase;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Action\ActionResult;
 
 /**
  * Provides a base for action plugins that update one or more fields.
@@ -38,22 +40,28 @@ abstract class FieldUpdateActionBase extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function execute($entity = NULL) {
+  protected function doExecute(EntityInterface $entity): ActionResult {
     foreach ($this->getFieldsToUpdate() as $field => $value) {
       $entity->$field = $value;
     }
     $entity->save();
+    return ActionResult::success($this->t('The @type %label has been updated.', [
+      '@type' => $entity->getEntityType()->getLabel(),
+      '%label' => $entity->label(),
+    ]));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE) {
+    $values = $this->getContextValues();
+    $entity = reset($values);
     /** @var \Drupal\Core\Access\AccessResultInterface $result */
-    $result = $object->access('update', $account, TRUE);
+    $result = $entity->access('update', $account, TRUE);
 
     foreach ($this->getFieldsToUpdate() as $field => $value) {
-      $result = $result->andIf($object->{$field}->access('edit', $account, TRUE));
+      $result = $result->andIf($entity->{$field}->access('edit', $account, TRUE));
     }
 
     return $return_as_object ? $result : $result->isAllowed();

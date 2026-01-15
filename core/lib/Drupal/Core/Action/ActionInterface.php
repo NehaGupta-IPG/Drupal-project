@@ -1,21 +1,16 @@
 <?php
-
 namespace Drupal\Core\Action;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Plugin\ContextProviderPluginInterface;
 use Drupal\Core\Executable\ExecutableInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides an interface for an Action plugin.
  *
- * @todo WARNING: The action API is going to receive some additions before
- * release. The following additions are likely to happen:
- *  - The way configuration is handled and configuration forms are built is
- *    likely to change in order for the plugin to be of use for Rules.
- *  - Actions are going to become context-aware in
- *    https://www.drupal.org/node/2011038, what will deprecated the 'type'
- *    annotation.
+ * @todo Decide if these are still necessary.
  *  - Instead of action implementations saving entities, support for marking
  *    required context as to be saved by the execution manager will be added as
  *    part of https://www.drupal.org/node/2347017.
@@ -28,21 +23,11 @@ use Drupal\Core\Session\AccountInterface;
  * @see \Drupal\Core\Action\ActionBase
  * @see plugin_api
  */
-interface ActionInterface extends ExecutableInterface, PluginInspectionInterface {
-
-  /**
-   * Executes the plugin for an array of objects.
-   *
-   * @param array $objects
-   *   An array of entities.
-   */
-  public function executeMultiple(array $objects);
+interface ActionInterface extends ContextProviderPluginInterface, ExecutableInterface, PluginInspectionInterface {
 
   /**
    * Checks object access.
    *
-   * @param mixed $object
-   *   The object to execute the action on.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   (optional) The user for which to check access, or NULL to check access
    *   for the current user. Defaults to NULL.
@@ -56,6 +41,38 @@ interface ActionInterface extends ExecutableInterface, PluginInspectionInterface
    *   returned, i.e. TRUE means access is explicitly allowed, FALSE means
    *   access is either explicitly forbidden or "no opinion".
    */
-  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE);
+  public function access(?AccountInterface $account = NULL, $return_as_object = FALSE);
+
+  /**
+   * Checks if the action is executable.
+   *
+   * @Todo Determine if necessary.
+   *
+   * @return bool
+   *   TRUE if the action is executable, FALSE otherwise.
+   */
+  public function isExecutable(): bool;
+
+  /**
+   * Returns human-readable messages about the result of the action.
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *   The executed actions result message.
+   *
+   * @throws \BadMethodCallException
+   *   Thrown when the action has not been executed yet.
+   */
+  public function getResultMessage() : TranslatableMarkup;
+
+  /**
+   * Returns the status of the action.
+   *
+   * @return bool
+   *   TRUE if the action was successful, FALSE otherwise.
+   *
+   * @throws \BadMethodCallException
+   *   Thrown when the action has not been executed yet.
+   */
+  public function getResultStatus() : bool;
 
 }

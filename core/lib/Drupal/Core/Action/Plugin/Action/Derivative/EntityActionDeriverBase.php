@@ -3,6 +3,7 @@
 namespace Drupal\Core\Action\Plugin\Action\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -66,7 +67,10 @@ abstract class EntityActionDeriverBase extends DeriverBase implements ContainerD
       $definitions = [];
       foreach ($this->getApplicableEntityTypes() as $entity_type_id => $entity_type) {
         $definition = $base_plugin_definition;
-        $definition['type'] = $entity_type_id;
+        $definition['context_definitions'] = [
+          $entity_type_id => EntityContextDefinition::fromEntityType($entity_type)
+            ->setDescription('The entity to perform the action on.'),
+        ];
         $definition['label'] = sprintf('%s %s', $base_plugin_definition['action_label'], $entity_type->getSingularLabel());
         $definitions[$entity_type_id] = $definition;
       }
