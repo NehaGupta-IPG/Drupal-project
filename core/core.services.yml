@@ -1524,6 +1524,7 @@ services:
   transliteration:
     class: Drupal\Core\Transliteration\PhpTransliteration
     arguments: [null, '@module_handler']
+  Drupal\Component\Transliteration\TransliterationInterface: '@transliteration'
   flood:
     class: Drupal\Core\Flood\DatabaseBackend
     arguments: ['@database', '@request_stack', '@datetime.time']
@@ -1740,6 +1741,7 @@ services:
   asset.css.collection_optimizer:
     class: Drupal\Core\Asset\CssCollectionOptimizerLazy
     arguments: [ '@asset.css.collection_grouper', '@asset.css.optimizer', '@theme.manager', '@library.dependency_resolver', '@request_stack', '@file_system', '@config.factory', '@file_url_generator', '@datetime.time', '@language_manager']
+  Drupal\Core\Asset\AssetCollectionOptimizerInterface: '@asset.css.collection_optimizer'
   asset.css.optimizer:
     class: Drupal\Core\Asset\CssOptimizer
     arguments: ['@file_url_generator']
@@ -1866,6 +1868,7 @@ services:
     tags:
       - { name: service_collector, tag: mime_type_guesser, call: addMimeTypeGuesser }
     lazy: true
+  Symfony\Component\Mime\MimeTypeGuesserInterface: '@file.mime_type.guesser'
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
     arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']

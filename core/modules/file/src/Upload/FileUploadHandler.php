@@ -45,7 +45,6 @@ class FileUploadHandler implements FileUploadHandlerInterface {
     protected EntityTypeManagerInterface $entityTypeManager,
     protected StreamWrapperManagerInterface $streamWrapperManager,
     protected EventDispatcherInterface $eventDispatcher,
-    #[Autowire(service: 'file.mime_type.guesser')]
     protected MimeTypeGuesserInterface $mimeTypeGuesser,
     protected AccountInterface $currentUser,
     protected RequestStack $requestStack,
