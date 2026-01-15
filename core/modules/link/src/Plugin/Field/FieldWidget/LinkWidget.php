@@ -211,7 +211,7 @@ class LinkWidget extends WidgetBase {
     }
     $element['uri'] = [
       '#type' => 'url',
-      '#title' => $this->t($this->getSetting('title_url')),
+      '#title' => $this->getSetting('title_url'),
       '#placeholder' => $this->getSetting('placeholder_url'),
       '#default_value' => $display_uri,
       '#element_validate' => [[static::class, 'validateUriElement']],
