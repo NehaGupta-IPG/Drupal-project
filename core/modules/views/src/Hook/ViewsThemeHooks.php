@@ -669,6 +669,8 @@ class ViewsThemeHooks {
       $query += $view->exposed_raw_input;
     }
 
+    $twig_debug = \Drupal::service('twig')->isDebug();
+
     // A boolean to store whether the table's header has any labels.
     $has_header_labels = FALSE;
     foreach ($columns as $field => $column) {
@@ -824,7 +826,25 @@ class ViewsThemeHooks {
       if (!empty($options['info'][$field]['empty_column'])) {
         $empty = TRUE;
         foreach ($variables['rows'] as $columns) {
-          $empty &= empty($columns['columns'][$column]['content']);
+          if ($twig_debug && empty($fields[$field]->options['exclude'])) {
+            $check_content = $columns['columns'][$column]['content'];
+            if (!empty($check_content)) {
+              foreach ($check_content as $item) {
+                if (isset($item['field_output']['#markup'])) {
+                  $item = (string) $item['field_output']['#markup'];
+                  $item = preg_replace('/<!--.*?-->/s', '', $item);
+                  $item = trim($item);
+                }
+                $empty &= empty($item);
+                if (!$empty) {
+                  break;
+                }
+              }
+            }
+          }
+          else {
+            $empty &= empty($columns['columns'][$column]['content']);
+          }
         }
         if ($empty) {
           foreach ($variables['rows'] as &$column_items) {
