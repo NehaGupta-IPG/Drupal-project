@@ -196,12 +196,6 @@ class FormHelper {
    *   ],
    * @endcode
    *
-   * On rare occasions, authors of form elements may need to specify a location
-   * other than '#attributes' to store the data-drupal-states attribute. In such
-   * cases, they may set the '#states_attributes_target_key' property to the
-   * desired key, for example: '#wrapper_attributes', in the form element
-   * definition.
-   *
    * @param array $elements
    *   A render array element having a #states property as described above.
    *
