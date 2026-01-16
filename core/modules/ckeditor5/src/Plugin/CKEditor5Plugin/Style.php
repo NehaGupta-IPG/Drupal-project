@@ -154,10 +154,12 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
    */
   public function getElementsSubset(): array {
     // Create an object from the configuration. It will be used to generate output.
-    $r = HTMLRestrictions::fromString(implode(array_column($this->configuration['styles'], 'element')));
+    $r = HTMLRestrictions::fromString(
+      implode(array_column($this->configuration['styles'], 'element'))
+    );
 
     // The configuration is likely to have many entries for the same element.
-    // So, compute a list of elements with the merged attributes and values merged.
+    // So, compute a list of elements with the merged attributes and values.
     // F.e.: <foo bar>, <foo baz>, <foo class="fizz">, <foo class="buzz">
     // would result in <foo bar baz class="fizz buzz">
     $elements = $r->toCKEditor5ElementsArray();
@@ -166,7 +168,7 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
     // @see \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing::getElementsSubset()
     $plain_tags = $r->extractPlainTagsSubset()->toCKEditor5ElementsArray();
 
-    // Return the unique union of the "tags only" list and the merged configuration,
+    // Return a unique union of the "tags only" list and the full list.
     // @see \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SourceEditing::getElementsSubset()
     $subset = array_unique(array_merge(
       $plain_tags,
