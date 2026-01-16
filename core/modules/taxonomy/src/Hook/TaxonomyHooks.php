@@ -320,7 +320,7 @@ class TaxonomyHooks {
         }
 
         $tree = $taxonomy_storage->loadTree($vocabulary_id);
-        $options = ['<' . t('root') . '>'];
+        $options = ['<' . $this->t('root') . '>'];
         if (empty($parent)) {
           $parent = [0];
         }
@@ -334,6 +334,7 @@ class TaxonomyHooks {
         $form['parent']['widget']['#options'] = $options;
       }
     }
+
   }
 
 }
