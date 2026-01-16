@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Plugin\Validation\Constraint;
 
+use Drupal\Core\Entity\RevisionableInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -31,10 +32,32 @@ class EntityChangedConstraintValidator extends ConstraintValidator {
             // been edited and saved in the meanwhile. Therefore, compare the
             // changed timestamps of each entity translation individually.
             if ($saved_entity->getTranslation($langcode)->getChangedTime() > $entity->getTranslation($langcode)->getChangedTime()) {
-              // Further compare the revision IDs, solves rare cases where
-              // users were not allowed to edit content in installations with
-              // workflows content moderation enabled.
-              if ($saved_entity->getLoadedRevisionId() == $entity->getLoadedRevisionId()) {
+              // Further compare the revision IDs to solve cases where users
+              // were incorrectly blocked from editing content with content
+              // moderation enabled. Skip this check for new revisions since
+              // the loaded revision ID may have been preserved from form
+              // preparation and doesn't represent actual concurrent editing.
+              // @see \Drupal\content_moderation\EntityTypeInfo::entityPrepareForm()
+              $is_new_revision = FALSE;
+              if ($entity instanceof RevisionableInterface) {
+                // Check if explicitly marked as new revision.
+                $is_new_revision = $entity->isNewRevision();
+
+                // If not explicitly marked, check if content moderation will
+                // create a new revision by comparing moderation states.
+                if (!$is_new_revision && $entity->hasField('moderation_state') && $saved_entity->hasField('moderation_state')) {
+                  $moderation_state = $entity->getTranslation($langcode)->get('moderation_state')->value;
+                  $saved_moderation_state = $saved_entity->getTranslation($langcode)->get('moderation_state')->value;
+                  // State changed, so content moderation will create a new
+                  // revision.
+                  if ($moderation_state && $saved_moderation_state && $moderation_state !== $saved_moderation_state) {
+                    $is_new_revision = TRUE;
+                  }
+                }
+              }
+
+              // Only add violation if NOT a new revision and IDs match.
+              if (!$is_new_revision && $saved_entity->getLoadedRevisionId() === $entity->getLoadedRevisionId()) {
                 $this->context->addViolation($constraint->message);
                 break;
               }
