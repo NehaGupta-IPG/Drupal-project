@@ -111,7 +111,7 @@ class Update extends Query implements ConditionInterface {
   /**
    * Executes the UPDATE query.
    *
-   * @return int|null
+   * @return int
    *   The number of rows matched by the update query. This includes rows that
    *   actually didn't have to be updated because the values didn't change.
    */
