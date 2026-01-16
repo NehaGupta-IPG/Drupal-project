@@ -741,6 +741,18 @@ class JavascriptStatesForm extends FormBase {
         ],
       ],
     ];
+
+    $form['item_with_markup'] = [
+      '#type' => 'item',
+      '#title' => $this->t('Item with markup'),
+      '#markup' => 'This is a test item with markup.',
+      '#states' => [
+        'visible' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => FALSE],
+        ],
+      ],
+    ];
+
     $form['test_select_visible_dependence']['select_visible_1'] = [
       '#type' => 'select',
       '#title' => 'Select visible 1',
