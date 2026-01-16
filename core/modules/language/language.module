@@ -8,7 +8,6 @@ use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\language\Hook\LanguageThemeHooks;
@@ -16,7 +15,7 @@ use Drupal\language\Hook\LanguageThemeHooks;
 /**
  * Implements hook_help().
  */
-function language_help($route_name, RouteMatchInterface $route_match): void {
+function language_help($route_name, RouteMatchInterface $route_match): string {
   switch ($route_name) {
     case 'help.page.language':
       $output = '';
