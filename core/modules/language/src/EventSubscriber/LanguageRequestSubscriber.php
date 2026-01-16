@@ -76,13 +76,6 @@ class LanguageRequestSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Initializes config overrides whenever the service container is rebuilt.
-   */
-  public function onContainerInitializeSubrequestFinished() {
-    $this->setLanguageOverrides();
-  }
-
-  /**
    * Sets the language for config overrides on the language manager.
    */
   private function setLanguageOverrides() {
@@ -105,10 +98,6 @@ class LanguageRequestSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     $events[KernelEvents::REQUEST][] = ['onKernelRequestLanguage', 255];
-    $events[DrupalKernelInterface::CONTAINER_INITIALIZE_SUBREQUEST_FINISHED][] = [
-      'onContainerInitializeSubrequestFinished',
-      255,
-    ];
 
     return $events;
   }
