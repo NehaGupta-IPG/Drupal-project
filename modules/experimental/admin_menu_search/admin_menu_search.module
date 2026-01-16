@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * Implements hook_toolbar().
+ */
+function admin_menu_search_toolbar() {
+  return [
+    'admin_menu_search' => [
+      '#type' => 'toolbar_item',
+      '#weight' => 100,
+      // ✅ Attach JS/CSS library HERE (THIS WAS MISSING).
+      '#attached' => [
+        'library' => [
+          'admin_menu_search/toolbar_search',
+        ],
+      ],
+      'tab' => [
+        '#type' => 'inline_template',
+        '#template' => '
+          <div class="admin-menu-search">
+            <input
+              id="admin-menu-search-input"
+              type="search"
+              placeholder="{{ placeholder }}"
+              aria-label="{{ placeholder }}"
+            />
+          </div>
+        ',
+        '#context' => [
+          'placeholder' => t('Search admin menu…'),
+        ],
+      ],
+    ],
+  ];
+}

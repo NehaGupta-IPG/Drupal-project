@@ -1,0 +1,5 @@
+name: Admin Menu Search
+type: module
+description: Adds a quick search box to the admin toolbar (PoC for Drupal core issue 3567625).
+package: Custom
+core_version_requirement: ^10 || ^11
