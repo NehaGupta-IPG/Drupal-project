@@ -196,7 +196,7 @@ class TaxonomyHooks {
    */
   #[Hook('taxonomy_term_delete')]
   public function taxonomyTermDelete(Term $term): void {
-    if ($this->configFactory->('taxonomy.settings')->get('maintain_index_table')) {
+    if ($this->configFactory->get('taxonomy.settings')->get('maintain_index_table')) {
       // Clean up the {taxonomy_index} table when terms are deleted.
       $this->database->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
