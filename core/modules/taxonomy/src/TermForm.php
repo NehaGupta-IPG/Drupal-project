@@ -15,7 +15,7 @@ class TermForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
-  public function form(array $form, FormStateInterface $form_state) {
+  public function form(array $form, FormStateInterface $form_state): array {
     $term = $this->entity;
     $vocab_storage = $this->entityTypeManager->getStorage('taxonomy_vocabulary');
     $vocabulary = $vocab_storage->load($term->bundle());
