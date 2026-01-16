@@ -9,17 +9,14 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\language\AdminLanguageRender;
+use Drupal\Core\Url;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\language\Hook\LanguageThemeHooks;
-use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
-use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
-use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrlFallback;
 
 /**
  * Implements hook_help().
  */
-function language_help($route_name, RouteMatchInterface $route_match) {
+function language_help($route_name, RouteMatchInterface $route_match): void {
   switch ($route_name) {
     case 'help.page.language':
       $output = '';
@@ -94,7 +91,7 @@ function language_help($route_name, RouteMatchInterface $route_match) {
 /**
  * Implements hook_theme().
  */
-function language_theme() {
+function language_theme(): void {
   return [
     'language_negotiation_configure_form' => [
       'render element' => 'form',
@@ -113,7 +110,7 @@ function language_theme() {
  * @see \Drupal\Core\Render\Element\LanguageSelect
  * @see \Drupal\Core\Render\Element\Select
  */
-function language_element_info_alter(&$type) {
+function language_element_info_alter(&$type): void {
   // Alter the language_select element so that it will be rendered like a select
   // field.
   if (isset($type['language_select'])) {

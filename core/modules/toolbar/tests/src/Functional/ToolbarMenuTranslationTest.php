@@ -92,7 +92,7 @@ class ToolbarMenuTranslationTest extends BrowserTestBase {
   /**
    * Tests that the toolbar is shown in the preferred admin language.
    */
-  public function testToolbarRenderedInPreferredAdminLanguage() {
+  public function testToolbarRenderedInPreferredAdminLanguage(): void {
     // Enable the 'Account administration pages' language detection.
     $this->drupalGet('admin/config/regional/language/detection');
     $this->submitForm(['language_interface[enabled][language-user-admin]' => TRUE], 'Save settings');

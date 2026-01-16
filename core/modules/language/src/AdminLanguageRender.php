@@ -8,6 +8,9 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
 
+/**
+ * The admin language render class.
+ */
 class AdminLanguageRender implements TrustedCallbackInterface {
 
   /**

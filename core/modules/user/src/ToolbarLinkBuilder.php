@@ -26,7 +26,7 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
    */
   public function __construct(
     protected AccountProxyInterface $account,
-    protected ModuleHandlerInterface $moduleHandler
+    protected ModuleHandlerInterface $moduleHandler,
   ) {
   }
 
