@@ -153,7 +153,7 @@ class Style extends CKEditor5PluginDefault implements CKEditor5PluginConfigurabl
    * {@inheritdoc}
    */
   public function getElementsSubset(): array {
-    // Create an object from the configuration. It will be used to generate output.
+    // Create an object from the configuration to generate output.
     $r = HTMLRestrictions::fromString(
       implode(array_column($this->configuration['styles'], 'element'))
     );
