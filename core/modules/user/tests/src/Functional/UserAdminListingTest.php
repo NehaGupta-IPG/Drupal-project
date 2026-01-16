@@ -72,9 +72,12 @@ class UserAdminListingTest extends BrowserTestBase {
 
     $result = $this->xpath('//table[contains(@class, "responsive-enabled")]/tbody/tr');
     $result_accounts = [];
+    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
     foreach ($result as $account) {
       $account_columns = $account->findAll('css', 'td');
-      $name = $account_columns[0]->find('css', 'a')->getText();
+      $link = $account_columns[0]->find('css', 'a');
+      $name = $link->getText();
+      $this->assertEquals($language, $link->getAttribute('lang'));
       $roles = [];
       $account_roles = $account_columns[2]->findAll('css', 'td ul li');
       if (!empty($account_roles)) {
