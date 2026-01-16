@@ -96,7 +96,7 @@ class TermForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
-  public function save(array $form, FormStateInterface $form_state) {
+  public function save(array $form, FormStateInterface $form_state): int {
     $term = $this->entity;
 
     $result = $term->save();
@@ -124,6 +124,8 @@ class TermForm extends ContentEntityForm {
 
     $form_state->setValue('tid', $term->id());
     $form_state->set('tid', $term->id());
+
+    return $result;
   }
 
   /**
@@ -133,7 +135,7 @@ class TermForm extends ContentEntityForm {
    *   The taxonomy term entity.
    *
    * @return array
-   *   A list if parent term IDs.
+   *   A list of parent term IDs.
    */
   protected function getParentIds(TermInterface $term): array {
     $parent = [];
