@@ -11960,12 +11960,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block_content/tests/src/Kernel/Migrate/MigrateBlockContentStubTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Unit\\\\Menu\\\\BlockContentLocalTasksTest\\:\\:getBlockContentListingRoutes\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Unit/Menu/BlockContentLocalTasksTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\breakpoint\\\\BreakpointManager\\:\\:clearCachedDefinitions\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -14553,12 +14547,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/content_moderation/tests/src/Unit/LatestRevisionCheckTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\content_moderation\\\\Unit\\\\ModerationInformationTest\\:\\:providerWorkflow\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/content_moderation/tests/src/Unit/ModerationInformationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\content_moderation\\\\Unit\\\\StateTransitionValidationTest\\:\\:userTransitionsProvider\\(\\) has no return type specified\\.$#',
@@ -21359,12 +21347,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/LayoutBuilderIsActiveCacheContextTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Unit\\\\LayoutEntityHelperTraitTest\\:\\:providerSectionsWithInlineComponents\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Unit/LayoutEntityHelperTraitTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Unit\\\\OverridesSectionStorageTest\\:\\:providerTestExtractEntityFromRoute\\(\\) has no return type specified\\.$#',
@@ -44822,102 +44804,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/src/EventSubscriber/WorkspaceRequestSubscriber.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\SwitchToLiveForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/SwitchToLiveForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\SwitchToLiveForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/SwitchToLiveForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceActivateForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceActivateForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceActivateForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceActivateForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceDeleteForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceDeleteForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceForm\\:\\:flagViolations\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceForm\\:\\:form\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
-	'identifier' => 'return.missing',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceMergeForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceMergeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceMergeForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceMergeForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspacePublishForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspacePublishForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspacePublishForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspacePublishForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceSwitcherForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceSwitcherForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceSwitcherForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceSwitcherForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\Form\\\\WorkspaceSwitcherForm\\:\\:submitSwitchToLive\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/Form/WorkspaceSwitcherForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\Negotiator\\\\QueryParameterWorkspaceNegotiator\\:\\:setActiveWorkspace\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -45038,19 +44924,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to deprecated method get\\(\\) of class Symfony\\\\Component\\\\HttpFoundation\\\\Request\\:
-since Symfony 7\\.4, use properties `\\-\\>attributes`, `query` or `request` directly instead$#',
-	'identifier' => 'method.deprecated',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceListBuilder.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceListBuilder\\:\\:offCanvasRender\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceListBuilder.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceManager\\:\\:doSwitchWorkspace\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -45115,12 +44988,6 @@ $ignoreErrors[] = [
 	'identifier' => 'isset.variable',
 	'count' => 2,
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceTracker.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceViewBuilder\\:\\:buildComponents\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceViewBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspacesServiceProvider\\:\\:alter\\(\\) has no return type specified\\.$#',
@@ -45589,6 +45456,121 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Kernel/WorkspaceIntegrationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\SwitchToLiveForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/SwitchToLiveForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\SwitchToLiveForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/SwitchToLiveForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceActivateForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceActivateForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceActivateForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceActivateForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceDeleteForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceDeleteForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceForm\\:\\:flagViolations\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceForm\\:\\:form\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
+	'identifier' => 'return.missing',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceMergeForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceMergeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceMergeForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceMergeForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspacePublishForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspacePublishForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspacePublishForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspacePublishForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceSwitcherForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceSwitcherForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceSwitcherForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceSwitcherForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\Form\\\\WorkspaceSwitcherForm\\:\\:submitSwitchToLive\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/Form/WorkspaceSwitcherForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Call to deprecated method get\\(\\) of class Symfony\\\\Component\\\\HttpFoundation\\\\Request\\:
+since Symfony 7\\.4, use properties `\\-\\>attributes`, `query` or `request` directly instead$#',
+	'identifier' => 'method.deprecated',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/WorkspaceListBuilder.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\WorkspaceListBuilder\\:\\:offCanvasRender\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/WorkspaceListBuilder.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\workspaces_ui\\\\WorkspaceViewBuilder\\:\\:buildComponents\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/workspaces_ui/src/WorkspaceViewBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\demo_umami_content\\\\InstallHelper\\:\\:create\\(\\) has no return type specified\\.$#',
@@ -47928,12 +47910,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Config/ConfigFactoryOverrideBaseTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Config\\\\ConfigTest\\:\\:overrideDataProvider\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Config/ConfigTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Config\\\\ConfigTest\\:\\:validateNameProvider\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -48299,18 +48275,6 @@ Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
 	'identifier' => 'method.deprecated',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Http/ClientFactoryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Menu\\\\LocalTaskIntegrationTestBase\\:\\:assertLocalTasks\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Menu/LocalTaskIntegrationTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Menu\\\\LocalTaskIntegrationTestBase\\:\\:getLocalTaskManager\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Menu/LocalTaskIntegrationTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Plugin\\\\CategorizingPluginManager\\:\\:processDefinitionCategory\\(\\) has no return type specified\\.$#',
