@@ -3,13 +3,23 @@
 namespace Drupal\Core\Config;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
+use Drupal\Core\DatabaseStorageSchemaTrait;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
  * Defines the Database storage.
  */
 class DatabaseStorage implements StorageInterface {
+
+  use DatabaseStorageSchemaTrait;
   use DependencySerializationTrait;
 
   /**
@@ -144,7 +154,7 @@ class DatabaseStorage implements StorageInterface {
     }
     catch (\Exception $e) {
       // If there was an exception, try to create the table.
-      if ($this->ensureTableExists()) {
+      if ($this->ensureSchemaExists()) {
         return $this->doWrite($name, $data);
       }
       // Some other failure that we can not recover from.
@@ -171,63 +181,47 @@ class DatabaseStorage implements StorageInterface {
   }
 
   /**
-   * Check if the config table exists and create it if not.
-   *
-   * @return bool
-   *   TRUE if the table was created, FALSE otherwise.
-   *
-   * @throws \Drupal\Core\Config\StorageException
-   *   If a database error occurs.
-   */
-  protected function ensureTableExists() {
-    try {
-      $this->connection->schema()->createTable($this->table, static::schemaDefinition());
-    }
-    // If another process has already created the config table, attempting to
-    // recreate it will throw an exception. In this case just catch the
-    // exception and do nothing.
-    catch (DatabaseException) {
-      return TRUE;
-    }
-    catch (\Exception) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
    * Defines the schema for the configuration table.
    *
    * @internal
    */
-  protected static function schemaDefinition() {
-    $schema = [
-      'description' => 'The base table for configuration data.',
-      'fields' => [
-        'collection' => [
-          'description' => 'Primary Key: Config object collection.',
-          'type' => 'varchar_ascii',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'name' => [
-          'description' => 'Primary Key: Config object name.',
-          'type' => 'varchar_ascii',
-          'length' => 255,
-          'not null' => TRUE,
-          'default' => '',
-        ],
-        'data' => [
-          'description' => 'A serialized configuration object data.',
-          'type' => 'blob',
-          'not null' => FALSE,
-          'size' => 'big',
-        ],
+  protected function schemaDefinition(): Schema {
+    $tables[] = new Table(
+      name: $this->table,
+      description: 'The base table for configuration data.',
+      columns: [
+        new Column(
+          name: 'collection',
+          description: 'Primary Key: Config object collection.',
+          type: ColumnType::VarcharAscii,
+          length: 255,
+          notNull: TRUE,
+          default: new StringValue(''),
+        ),
+        new Column(
+          name: 'name',
+          description: 'Primary Key: Config object name.',
+          type: ColumnType::VarcharAscii,
+          length: 255,
+          notNull: TRUE,
+          default: new StringValue(''),
+        ),
+        new Column(
+          name: 'data',
+          description: 'A serialized configuration object data.',
+          type: ColumnType::Blob,
+          size: ColumnSize::Big,
+          notNull: FALSE,
+        ),
       ],
-      'primary key' => ['collection', 'name'],
-    ];
-    return $schema;
+      primaryKey: new PrimaryKey(['collection', 'name']),
+    );
+
+    return new Schema(
+      type: SchemaDefinitionType::Storage,
+      name: 'config',
+      tables: $tables,
+    );
   }
 
   /**
