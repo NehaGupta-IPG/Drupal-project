@@ -1,19 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\image\Kernel;
 
-use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\File\FileExists;
 use Drupal\file\Entity\File;
 use Drupal\file\FileRepository;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the file move function for images and image styles.
- *
- * @group image
  */
+#[Group('image')]
+#[RunTestsInSeparateProcesses]
 class FileMoveTest extends KernelTestBase {
 
   use TestFileCreationTrait {
@@ -75,7 +79,7 @@ class FileMoveTest extends KernelTestBase {
     // Clone the object, so we don't have to worry about the function changing
     // our reference copy.
     $desired_filepath = 'public://' . $this->randomMachineName();
-    $result = $this->fileRepository->move(clone $file, $desired_filepath, FileSystemInterface::EXISTS_ERROR);
+    $result = $this->fileRepository->move(clone $file, $desired_filepath, FileExists::Error);
 
     // Check if image has been moved.
     $this->assertFileExists($result->getFileUri());

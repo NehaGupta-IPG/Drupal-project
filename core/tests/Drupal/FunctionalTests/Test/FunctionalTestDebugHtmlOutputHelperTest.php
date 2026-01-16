@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Test;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Helper test for FunctionalTestDebugHtmlOutputTest.
  *
  * @see \Drupal\FunctionalTests\Test\FunctionalTestDebugHtmlOutputTest::testFunctionalTestDebugHtmlOutput
- *
- * @group browsertestbase
  */
+#[Group('browsertestbase')]
+#[RunTestsInSeparateProcesses]
 class FunctionalTestDebugHtmlOutputHelperTest extends BrowserTestBase {
 
   /**
@@ -23,6 +27,7 @@ class FunctionalTestDebugHtmlOutputHelperTest extends BrowserTestBase {
    */
   public function testCreateFunctionalTestDebugHtmlOutput(): void {
     $this->drupalGet('<front>');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
 }

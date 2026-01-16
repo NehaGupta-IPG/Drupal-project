@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Functional\Views;
 
 use Drupal\block_content\Entity\BlockContent;
@@ -7,17 +9,20 @@ use Drupal\block_content\Entity\BlockContentType;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\Tests\comment\Functional\CommentTestBase as CommentBrowserTestBase;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\comment\Functional\CommentTestBase as CommentBrowserTestBase;
 use Drupal\user\RoleInterface;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment approval functionality.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentAdminTest extends CommentBrowserTestBase {
 
   /**
@@ -28,8 +33,21 @@ class CommentAdminTest extends CommentBrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $modules = [
+    'language',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
+    // Make the site multilingual to have a working language field handler.
+    ConfigurableLanguage::create([
+      'id' => 'es',
+      'title' => 'Spanish title',
+      'label' => 'Spanish label',
+    ])->save();
     \Drupal::service('module_installer')->install(['views']);
     $view = Views::getView('comment');
     $view->storage->enable()->save();
@@ -39,7 +57,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
   /**
    * Tests comment approval functionality through admin/content/comment.
    */
-  public function testApprovalAdminInterface() {
+  public function testApprovalAdminInterface(): void {
     // Set anonymous comments to require approval.
     user_role_change_permissions(RoleInterface::ANONYMOUS_ID, [
       'access comments' => TRUE,
@@ -189,7 +207,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
   /**
    * Tests commented entity label of admin view.
    */
-  public function testCommentedEntityLabel() {
+  public function testCommentedEntityLabel(): void {
     \Drupal::service('module_installer')->install(['block_content']);
     \Drupal::service('router.builder')->rebuildIfNeeded();
     $bundle = BlockContentType::create([

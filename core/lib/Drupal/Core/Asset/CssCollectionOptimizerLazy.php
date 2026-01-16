@@ -52,7 +52,7 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     protected readonly ConfigFactoryInterface $configFactory,
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly TimeInterface $time,
-    protected readonly LanguageManagerInterface $languageManager
+    protected readonly LanguageManagerInterface $languageManager,
   ) {}
 
   /**
@@ -130,14 +130,6 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
   /**
    * {@inheritdoc}
    */
-  public function getAll() {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. There is no replacement. See https://www.drupal.org/node/3301744', E_USER_DEPRECATED);
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function deleteAll() {
     $this->fileSystem->deleteRecursive('assets://css');
   }
@@ -156,10 +148,21 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
         $data .= "/* @license " . $css_asset['license']['name'] . " " . $css_asset['license']['url'] . " */\n";
       }
       $current_license = $css_asset['license'];
-      $data .= $this->optimizer->optimize($css_asset);
+
+      // Only external minified files can skip optimization.
+      // Local files (even if minified) must be processed to ensure resource
+      // paths are rewritten relative to the cached aggregated file location.
+      $is_minified = isset($css_asset['minified']) && $css_asset['minified'];
+      $is_external = isset($css_asset['type']) && $css_asset['type'] === 'external';
+      if ($is_minified && $is_external) {
+        $data .= file_get_contents($css_asset['data']);
+      }
+      else {
+        $data .= $this->optimizer->optimize($css_asset);
+      }
     }
     // Per the W3C specification at
-    // http://www.w3.org/TR/REC-CSS2/cascade.html#at-import, @import rules must
+    // https://www.w3.org/TR/REC-CSS2/cascade.html#at-import, @import rules must
     // precede any other style, so we move those to the top. The regular
     // expression is expressed in NOWDOC since it is detecting backslashes as
     // well as single and double quotes. It is difficult to read when

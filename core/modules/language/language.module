@@ -2,22 +2,16 @@
 
 /**
  * @file
- * Add language handling functionality to Drupal.
  */
 
-use Drupal\Core\Url;
-use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Entity\ContentEntityFormInterface;
 use Drupal\Core\Entity\EntityFormInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\language\AdminLanguageRender;
 use Drupal\language\Entity\ContentLanguageSettings;
+use Drupal\language\Hook\LanguageThemeHooks;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUI;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrlFallback;
@@ -171,27 +165,9 @@ function language_process_language_select($element) {
 }
 
 /**
- * Implements hook_entity_base_field_info_alter().
- */
-function language_entity_base_field_info_alter(&$fields) {
-  foreach ($fields as $definition) {
-    // Set configurable form display for language fields with display options.
-    if ($definition->getType() == 'language') {
-      foreach (['form', 'view'] as $type) {
-        if ($definition->getDisplayOptions($type)) {
-          // The related configurations will be purged manually on Language
-          // module uninstallation. @see language_modules_uninstalled().
-          $definition->setDisplayConfigurable($type, TRUE);
-        }
-      }
-    }
-  }
-}
-
-/**
  * Submit handler for the forms that have a language_configuration element.
  */
-function language_configuration_element_submit(&$form, FormStateInterface $form_state) {
+function language_configuration_element_submit(&$form, FormStateInterface $form_state): void {
   // Iterate through all the language_configuration elements and save their
   // values.
   // In case we are editing a bundle, we must check the new bundle name,
@@ -217,17 +193,6 @@ function language_configuration_element_submit(&$form, FormStateInterface $form_
       // Set the form_state language with the updated bundle.
       $form_state->set('language', $language);
     }
-  }
-}
-
-/**
- * Implements hook_entity_bundle_delete().
- */
-function language_entity_bundle_delete($entity_type_id, $bundle) {
-  // Remove the content language settings associated with the bundle.
-  $settings = ContentLanguageSettings::loadByEntityTypeBundle($entity_type_id, $bundle);
-  if (!$settings->isNew()) {
-    $settings->delete();
   }
 }
 
@@ -279,7 +244,7 @@ function language_get_default_langcode($entity_type, $bundle) {
 /**
  * Update the list of prefixes from the installed languages.
  */
-function language_negotiation_url_prefixes_update() {
+function language_negotiation_url_prefixes_update(): void {
   $config = \Drupal::configFactory()->getEditable('language.negotiation');
   $prefixes = $config->get('url.prefixes');
   foreach (\Drupal::languageManager()->getLanguages() as $language) {
@@ -293,51 +258,6 @@ function language_negotiation_url_prefixes_update() {
     // Otherwise we keep the configured prefix.
   }
   $config->set('url.prefixes', $prefixes)->save(TRUE);
-}
-
-/**
- * Implements hook_modules_installed().
- */
-function language_modules_installed($modules) {
-  if (!in_array('language', $modules)) {
-    // Since newly (un)installed modules may change the default settings for
-    // non-locked language types (e.g. content language), we need to resave the
-    // language type configuration.
-    /** @var \Drupal\language\LanguageNegotiatorInterface $negotiator */
-    $negotiator = \Drupal::service('language_negotiator');
-    $configurable = \Drupal::config('language.types')->get('configurable');
-    $negotiator->updateConfiguration($configurable);
-    $negotiator->purgeConfiguration();
-  }
-  else {
-    // In language_entity_base_field_info_alter() we are altering view/form
-    // display definitions to make language fields display configurable. Since
-    // this is not a hard dependency, and thus is not detected by the config
-    // system, we have to clean up the related values manually.
-    foreach (['entity_view_display', 'entity_form_display'] as $key) {
-      $displays = \Drupal::entityTypeManager()->getStorage($key)->loadMultiple();
-      /** @var \Drupal\Core\Entity\Display\EntityDisplayInterface $display */
-      foreach ($displays as $display) {
-        $display->save();
-      }
-    }
-  }
-}
-
-/**
- * Implements hook_modules_uninstalled().
- */
-function language_modules_uninstalled($modules) {
-  language_modules_installed($modules);
-}
-
-/**
- * Implements hook_preprocess_HOOK() for block templates.
- */
-function language_preprocess_block(&$variables) {
-  if ($variables['configuration']['provider'] == 'language') {
-    $variables['attributes']['role'] = 'navigation';
-  }
 }
 
 /**
@@ -356,99 +276,40 @@ function language_get_browser_drupal_langcode_mappings() {
 }
 
 /**
- * Implements hook_form_alter().
- */
-function language_form_alter(&$form, FormStateInterface $form_state) {
-  // Content entity forms may have added a langcode field. But content language
-  // configuration should decide if it should be exposed or not in the forms.
-  $form_object = $form_state->getFormObject();
-  if ($form_object instanceof ContentEntityFormInterface && $form_object->getEntity()->getEntityType()->hasKey('langcode')) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $form_object->getEntity();
-    $entity_type = $entity->getEntityType();
-    $langcode_key = $entity_type->getKey('langcode');
-    if (isset($form[$langcode_key]) && $form[$langcode_key]['#access'] !== FALSE) {
-      $language_configuration = ContentLanguageSettings::loadByEntityTypeBundle($entity->getEntityTypeId(), $entity->bundle());
-      $form[$langcode_key]['#access'] = $language_configuration->isLanguageAlterable();
-    }
-  }
-}
-
-/**
- * Implements hook_field_info_alter().
- */
-function language_field_info_alter(&$info) {
-  // Change the default behavior of language field.
-  $info['language']['class'] = '\Drupal\language\DefaultLanguageItem';
-}
-
-/**
- * Implements hook_entity_field_access().
- */
-function language_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
-  // Only allow edit access on a langcode field if the entity it is attached to
-  // is configured to have an alterable language. Also without items we can not
-  // decide whether or not to allow access.
-  if ($items && $operation == 'edit') {
-    // Check if we are dealing with a langcode field.
-    $langcode_key = $items->getEntity()->getEntityType()->getKey('langcode');
-    if ($field_definition->getName() == $langcode_key) {
-      // Grant access depending on whether the entity language can be altered.
-      $entity = $items->getEntity();
-      $config = ContentLanguageSettings::loadByEntityTypeBundle($entity->getEntityTypeId(), $entity->bundle());
-      return AccessResult::forbiddenIf(!$config->isLanguageAlterable());
-    }
-  }
-  return AccessResult::neutral();
-}
-
-/**
- * Implements hook_tour_tips_alter().
- */
-function language_tour_tips_alter(array &$tour_tips, EntityInterface $entity) {
-  foreach ($tour_tips as $tour_tip) {
-    if ($tour_tip->get('id') == 'language-overview') {
-      $additional_overview = '';
-      if (Drupal::service('module_handler')->moduleExists('locale')) {
-        $additional_overview = t("This page also provides an overview of how much of the site's interface has been translated for each configured language.");
-      }
-      else {
-        $additional_overview = t("If the Interface Translation module is enabled, this page will provide an overview of how much of the site's interface has been translated for each configured language.");
-      }
-      $tour_tip->set('body', $tour_tip->get('body') . '<p>' . $additional_overview . '</p>');
-    }
-    elseif ($tour_tip->get('id') == 'language-continue') {
-      $additional_continue = '';
-      $additional_modules = [];
-      if (!Drupal::service('module_handler')->moduleExists('locale')) {
-        $additional_modules[] = Drupal::service('module_handler')->getName('locale');
-      }
-      if (!Drupal::service('module_handler')->moduleExists('content_translation')) {
-        $additional_modules[] = Drupal::service('module_handler')->getName('content_translation');
-      }
-      if (!empty($additional_modules)) {
-        $additional_continue = t('Depending on your site features, additional modules that you might want to enable are:') . '<ul>';
-        foreach ($additional_modules as $additional_module) {
-          $additional_continue .= '<li>' . $additional_module . '</li>';
-        }
-        $additional_continue .= '</ul>';
-      }
-      if (!empty($additional_continue)) {
-        $tour_tip->set('body', $tour_tip->get('body') . '<p>' . $additional_continue . '</p>');
-      }
-    }
-  }
-}
-
-/**
- * Implements hook_language_types_info_alter().
+ * Prepares variables for language negotiation configuration form.
  *
- * We can't set the fixed properties in \Drupal\Core\Language\LanguageManager,
- * where the rest of the properties for the default language types are defined.
- * The LanguageNegation classes are only loaded when the language module is
- * enabled and we can't be sure of that in the LanguageManager.
+ * Default template: language-content-configuration-form.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - form: A render element representing the form.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *    template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
  */
-function language_language_types_info_alter(array &$language_types) {
-  $language_types[LanguageInterface::TYPE_CONTENT]['fixed'] = [LanguageNegotiationUI::METHOD_ID];
-  $language_types[LanguageInterface::TYPE_URL]['fixed'] = [LanguageNegotiationUrl::METHOD_ID, LanguageNegotiationUrlFallback::METHOD_ID];
+function template_preprocess_language_negotiation_configure_form(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(LanguageThemeHooks::class)->preprocessLanguageNegotiationConfigureForm($variables);
+}
+
+/**
+ * Prepares variables for language content settings table templates.
+ *
+ * Default template: language-content-settings-table.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: An associative array containing the properties of the element.
+ *     Properties used: #bundle_label, #title.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
+ *    template_preprocess functions are registered directly in hook_theme().
+ *
+ * @see https://www.drupal.org/node/3504125
+ */
+function template_preprocess_language_content_settings_table(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(LanguageThemeHooks::class)->preprocessLanguageContentSettingsTable($variables);
 }
