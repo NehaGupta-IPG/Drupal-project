@@ -623,7 +623,7 @@ class FormBuilderTest extends FormTestBase {
    * @legacy-covers ::buildForm
    */
   public function testExceededFileSize(): void {
-    $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE]);
+    $request = new Request([FormBuilderInterface::AJAX_FORM_REQUEST => TRUE], [], [], [], [], ['REQUEST_METHOD' => 'POST']);
     $request->setSession(new Session(new MockArraySessionStorage()));
     $request_stack = new RequestStack();
     $request_stack->push($request);

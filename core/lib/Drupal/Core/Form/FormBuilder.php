@@ -349,7 +349,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // In case the post request exceeds the configured allowed size
     // (post_max_size), the post request is potentially broken. Add some
     // protection against that and at the same time have a nice error message.
-    if ($ajax_form_request && !$request->get('form_id')) {
+    if ($ajax_form_request && $request->isMethod('POST') && !$request->get('form_id')) {
       throw new BrokenPostRequestException($this->getFileUploadMaxSize());
     }
 
