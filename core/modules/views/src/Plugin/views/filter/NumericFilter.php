@@ -286,10 +286,14 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
       // the operator is locked.
       $form['value'] = [
         '#type' => 'textfield',
-        '#title' => !$exposed ? $this->t('Value') : '',
+        '#title' => $this->t('Value'),
         '#size' => 30,
         '#default_value' => $this->value['value'],
       ];
+      // Visually hide label for exposed filters.
+      if ($exposed) {
+        $form['value']['#title_display'] = 'invisible';
+      }
       if (!empty($this->options['expose']['placeholder'])) {
         $form['value']['#attributes']['placeholder'] = $this->options['expose']['placeholder'];
       }
