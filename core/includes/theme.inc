@@ -859,30 +859,6 @@ function template_preprocess_field_multiple_value_form(&$variables): void {
 }
 
 /**
- * Prepares variables for individual form element templates.
- *
- * Default template: field-multiple-value-without-order-form.html.twig.
- *
- * Combines multiple values.
- *
- * @param array $variables
- *   An associative array containing:
- *   - element: A render element representing the form element.
- *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
- *    template_preprocess functions are registered directly in hook_theme().
- *
- * @see https://www.drupal.org/node/3504125
- */
-function template_preprocess_field_multiple_value_without_order_form(&$variables): void {
-  // @fixme There is no need to declare it as hook and deprecate it at the same
-  // time. Instead declare it directly on corresponding hook_theme's initial
-  // preprocess callback. Doing it here as temporal change.
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
-  \Drupal::service(FieldPreprocess::class)->preprocessFieldMultipleValueWithoutOrderForm($variables);
-}
-
-/**
  * Prepares variables for breadcrumb templates.
  *
  * Default template: breadcrumb.html.twig.

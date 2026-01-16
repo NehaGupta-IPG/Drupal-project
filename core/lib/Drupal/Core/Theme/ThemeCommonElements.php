@@ -275,6 +275,7 @@ class ThemeCommonElements {
       ],
       'field_multiple_value_without_order_form' => [
         'render element' => 'element',
+        'initial preprocess' => FieldPreprocess::class . ':preprocessFieldMultipleValueWithoutOrderForm',
       ],
       'off_canvas_page_wrapper' => [
         'variables' => [
