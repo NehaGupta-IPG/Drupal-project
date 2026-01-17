@@ -150,7 +150,6 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
   // installations can send output to the browser or redirect the user to the
   // next page.
   if ($state['interactive']) {
-    \Drupal::request()->getSession()->save();
     if ($state['parameters_changed']) {
       // Redirect to the correct page if the URL parameters have changed.
       install_goto(install_redirect_url($state));
@@ -1076,6 +1075,7 @@ function install_display_output($output, $install_state): void {
     'ETag' => '"' . $request_time . '"',
   ];
   $response->headers->add($default_headers);
+  \Drupal::request()->getSession()->save();
   $response->send();
   exit;
 }

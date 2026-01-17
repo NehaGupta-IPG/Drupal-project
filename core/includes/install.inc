@@ -538,6 +538,7 @@ function install_goto($path): void {
     'Cache-Control' => 'no-cache',
   ];
   $response = new RedirectResponse($base_url . '/' . $path, 302, $headers);
+  \Drupal::request()->getSession()->save();
   $response->send();
 }
 
