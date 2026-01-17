@@ -28,8 +28,6 @@ class ExceptionJsonSubscriberTest extends UnitTestCase {
 
   /**
    * Tests on 4xx.
-   *
-   * @legacy-covers ::on4xx
    */
   #[DataProvider('providerTestOn4xx')]
   public function testOn4xx(HttpExceptionInterface $exception, $expected_response_class): void {
@@ -47,14 +45,17 @@ class ExceptionJsonSubscriberTest extends UnitTestCase {
     $this->assertEquals('application/json', $response->headers->get('Content-Type'));
   }
 
-  public static function providerTestOn4xx() {
+  public static function providerTestOn4xx(): array {
     return [
       'uncacheable exception' => [
         new MethodNotAllowedHttpException(['POST', 'PUT'], 'test message'),
         JsonResponse::class,
       ],
       'cacheable exception' => [
-        new CacheableMethodNotAllowedHttpException((new CacheableMetadata())->setCacheContexts(['route']), ['POST', 'PUT'], 'test message'),
+        new CacheableMethodNotAllowedHttpException((new CacheableMetadata())->setCacheContexts(['route']), [
+          'POST',
+          'PUT',
+        ], 'test message'),
         CacheableJsonResponse::class,
       ],
     ];

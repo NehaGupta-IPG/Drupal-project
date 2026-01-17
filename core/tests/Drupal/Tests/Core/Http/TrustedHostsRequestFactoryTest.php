@@ -27,8 +27,6 @@ class TrustedHostsRequestFactoryTest extends UnitTestCase {
    *   TrustedHostsRequestFactory::createRequest().
    * @param string $expected
    *   The expected host of the created request.
-   *
-   * @legacy-covers ::createRequest
    */
   #[DataProvider('providerTestCreateRequest')]
   public function testCreateRequest($host, $server, $expected): void {
@@ -48,7 +46,7 @@ class TrustedHostsRequestFactoryTest extends UnitTestCase {
    *   TrustedHostsRequestFactory::createRequest().
    *   - A string containing the expected host of the created request.
    */
-  public static function providerTestCreateRequest() {
+  public static function providerTestCreateRequest(): array {
     $tests = [];
     $tests[] = ['example.com', [], 'example.com'];
     $tests[] = ['localhost', [], 'localhost'];
