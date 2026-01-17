@@ -305,7 +305,11 @@ class Ckeditor5Hooks {
             $langcode = basename($file, '.js');
             // Only add languages that Drupal can understands.
             if (in_array($langcode, $ckeditor_langcodes)) {
-              $library['js']["{$dirname}/translations/{$langcode}.js"] = ['ckeditor5_langcode' => $langcode, 'minified' => TRUE, 'preprocess' => TRUE];
+              $library['js']["{$dirname}/translations/{$langcode}.js"] = [
+                'ckeditor5_langcode' => $langcode,
+                'minified' => TRUE,
+                'preprocess' => TRUE,
+              ];
             }
           }
         }
@@ -318,21 +322,25 @@ class Ckeditor5Hooks {
    */
   #[Hook('js_alter')]
   public function jsAlter(&$javascript, AttachedAssetsInterface $assets, LanguageInterface $language): void {
-    // This file means CKEditor 5 translations are in use on the page.
-    // @see locale_js_alter()
+    $translations_library = 'core/ckeditor5.translations';
     $placeholder_file = 'core/assets/vendor/ckeditor5/translation.js';
-    // This file is used to get a weight that will make it possible to aggregate
-    // all translation files in a single aggregate.
-    $ckeditor_dll_file = 'core/assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js';
-    if (isset($javascript[$placeholder_file])) {
+    if (in_array($translations_library, $assets->getLibraries(), TRUE) || in_array($translations_library, $assets->getAlreadyLoadedLibraries(), TRUE)) {
+
+      // This file is used to get a weight that will make it possible to
+      // aggregate all translation files in a single aggregate.
+      $ckeditor_dll_file = 'core/assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js';
       // Use the placeholder file weight to set all the translations files
-      // weights so they can be aggregated together as expected.
-      $default_weight = $javascript[$placeholder_file]['weight'];
+      // weights so they can be aggregated together as expected. Account for
+      // requests where the library is not loaded such as when during an AJAX
+      // request when it was already loaded via the main request. In these cases
+      // it is unlikely that multiple JavaScript aggregates will be created
+      // anyway since AJAX requests generally result in very few libraries being
+      // loaded.
+      $default_weight = $javascript[$placeholder_file]['weight'] ?? 0;
       if (isset($javascript[$ckeditor_dll_file])) {
         $default_weight = $javascript[$ckeditor_dll_file]['weight'];
       }
-      // The placeholder file is not a real file, remove it from the list.
-      unset($javascript[$placeholder_file]);
+
       // When the locale module isn't installed there are no translations.
       if (!\Drupal::moduleHandler()->moduleExists('locale')) {
         return;
@@ -357,6 +365,8 @@ class Ckeditor5Hooks {
         }
       }
     }
+    // The placeholder file is not a real file, remove it from the list.
+    unset($javascript[$placeholder_file]);
   }
 
   /**
@@ -434,6 +444,9 @@ class Ckeditor5Hooks {
           ->diff($ol_type)
           ->diff($ul_type)
           ->toCKEditor5ElementsArray();
+      }
+      elseif (array_key_exists('ckeditor5_list', $settings['plugins']) && !array_key_exists('styles', $settings['plugins']['ckeditor5_list']['properties'])) {
+        $settings['plugins']['ckeditor5_list']['properties']['styles'] = FALSE;
       }
 
       $editor->setSettings($settings);
