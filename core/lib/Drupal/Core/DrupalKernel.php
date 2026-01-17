@@ -999,6 +999,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // expected.
       $this->container->get(ReverseContainer::class)->recordContainer();
 
+      if ($this->container->initialized('messenger')) {
+        $all_messages = $this->container->get('messenger')->all();
+      }
+
       // If there is a session, close and save it.
       if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
         if ($request = $request_stack->getMainRequest()) {
@@ -1009,10 +1013,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           }
           unset($session);
         }
-      }
-
-      if ($this->container->initialized('messenger')) {
-        $all_messages = $this->container->get('messenger')->all();
       }
     }
 
@@ -1308,6 +1308,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // expected.
     $this->container->get(ReverseContainer::class)->recordContainer();
 
+    if ($this->container->initialized('messenger')) {
+      $all_messages = $this->container->get('messenger')->all();
+    }
+
     // If there is a session, close and save it.
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
@@ -1318,10 +1322,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         }
         unset($session);
       }
-    }
-
-    if ($this->container->initialized('messenger')) {
-      $all_messages = $this->container->get('messenger')->all();
     }
 
     $persist = $this->getServicesToPersist($this->container);
