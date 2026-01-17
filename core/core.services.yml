@@ -502,7 +502,7 @@ services:
     arguments: [replica]
   database.replica_kill_switch:
     class: Drupal\Core\Database\ReplicaKillSwitch
-    arguments: ['@settings', '@datetime.time', '@session']
+    arguments: ['@settings', '@datetime.time', '@request_stack']
   Drupal\Core\Database\ReplicaKillSwitch: '@database.replica_kill_switch'
   Drupal\Core\Database\EventSubscriber\StatementExecutionSubscriber: ~
   datetime.time:
@@ -1599,7 +1599,7 @@ services:
   Drupal\Core\Utility\Token: '@token'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage
-    arguments: ['@database', '@session', '@csrf_token', '@datetime.time']
+    arguments: ['@database', '@request_stack', '@csrf_token', '@datetime.time']
     tags:
       - { name: backend_overridable }
     lazy: true
@@ -1963,7 +1963,7 @@ services:
     class: Drupal\Core\EventSubscriber\RssResponseRelativeUrlFilter
   messenger:
     class: Drupal\Core\Messenger\Messenger
-    arguments: ['@session.flash_bag', '@page_cache_kill_switch']
+    arguments: ['@request_stack', '@page_cache_kill_switch']
   Drupal\Core\Messenger\MessengerInterface: '@messenger'
   tempstore.private:
     class: Drupal\Core\TempStore\PrivateTempStoreFactory

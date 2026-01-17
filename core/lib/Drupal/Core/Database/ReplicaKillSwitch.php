@@ -5,6 +5,7 @@ namespace Drupal\Core\Database;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Site\Settings;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -29,26 +30,18 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
   protected $time;
 
   /**
-   * The session.
-   *
-   * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
-   */
-  protected $session;
-
-  /**
    * Constructs a ReplicaKillSwitch object.
    *
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings object.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
-   *   The session.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    */
-  public function __construct(Settings $settings, TimeInterface $time, SessionInterface $session) {
+  public function __construct(Settings $settings, TimeInterface $time, protected readonly RequestStack $requestStack) {
     $this->settings = $settings;
     $this->time = $time;
-    $this->session = $session;
   }
 
   /**
@@ -66,7 +59,8 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
       // from the old data.
       $duration = $this->settings->get('maximum_replication_lag', 300);
       // Set session variable with amount of time to delay before using replica.
-      $this->session->set('ignore_replica_server', $this->time->getRequestTime() + $duration);
+      $session = $this->requestStack->getSession();
+      $session->set('ignore_replica_server', $this->time->getRequestTime() + $duration);
     }
   }
 
@@ -92,12 +86,13 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
     // use the 'database.replica_kill_switch' service's trigger() method to set
     // 'ignore_replica_server' session flag to the timestamp after which the
     // replica can be re-enabled.
-    if ($this->session->has('ignore_replica_server')) {
-      if ($this->session->get('ignore_replica_server') >= $this->time->getRequestTime()) {
+    $session = $this->requestStack->getSession();
+    if ($session->has('ignore_replica_server')) {
+      if ($session->get('ignore_replica_server') >= $this->time->getRequestTime()) {
         Database::ignoreTarget('default', 'replica');
       }
       else {
-        $this->session->remove('ignore_replica_server');
+        $session->remove('ignore_replica_server');
       }
     }
   }

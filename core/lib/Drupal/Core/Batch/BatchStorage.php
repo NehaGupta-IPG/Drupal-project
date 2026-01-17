@@ -6,7 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Defines the storage handler class for batches.
@@ -23,8 +23,8 @@ class BatchStorage implements BatchStorageInterface {
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
-   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
-   *   The session.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
    *   The CSRF token generator.
    * @param \Drupal\Component\Datetime\TimeInterface $time
@@ -32,7 +32,7 @@ class BatchStorage implements BatchStorageInterface {
    */
   public function __construct(
     protected Connection $connection,
-    protected SessionInterface $session,
+    protected readonly RequestStack $requestStack,
     protected CsrfTokenGenerator $csrfToken,
     protected TimeInterface $time,
   ) {
@@ -43,7 +43,7 @@ class BatchStorage implements BatchStorageInterface {
    */
   public function load($id) {
     // Ensure that a session is started before using the CSRF token generator.
-    $this->session->start();
+    $this->requestStack->getSession()->start();
     try {
       $batch = $this->connection->select('batch', 'b')
         ->fields('b', ['batch'])
@@ -112,7 +112,7 @@ class BatchStorage implements BatchStorageInterface {
   public function create(array $batch) {
     // Ensure that a session is started before using the CSRF token generator,
     // and update the database record.
-    $this->session->start();
+    $this->requestStack->getSession()->start();
     $this->connection->update('batch')
       ->fields([
         'token' => $this->csrfToken->get($batch['id']),
