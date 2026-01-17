@@ -57,7 +57,7 @@ class MediaAccessControlHandler extends EntityAccessControlHandler implements En
     }
 
     $type = $entity->bundle();
-    $is_owner = ($account->id() && $entity->getOwnerId() && $account->id() === (int) $entity->getOwnerId());
+    $is_owner = $account->id() && (int) $account->id() === (int) $entity->getOwnerId();
     switch ($operation) {
       case 'view':
         if ($entity->isPublished()) {
