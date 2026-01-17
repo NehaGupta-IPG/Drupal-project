@@ -90,7 +90,7 @@ function language_help($route_name, RouteMatchInterface $route_match): string {
 /**
  * Implements hook_theme().
  */
-function language_theme(): void {
+function language_theme(): array {
   return [
     'language_negotiation_configure_form' => [
       'render element' => 'form',
