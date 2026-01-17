@@ -12,6 +12,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\jsonapi\Normalizer\JsonApiDocumentTopLevelNormalizer;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepository;
+use Drupal\node\Entity\Node;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -47,7 +48,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
 
     $resource_type_repository
       ->getByTypeName(Argument::any())
-      ->willReturn(new ResourceType('node', 'article', NULL));
+      ->willReturn(new ResourceType('node', 'article', Node::class));
 
     $entity_storage = $this->prophesize(EntityStorageInterface::class);
     $self = $this;
@@ -91,8 +92,6 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
 
   /**
    * Tests denormalize.
-   *
-   * @legacy-covers ::denormalize
    */
   #[DataProvider('denormalizeProvider')]
   public function testDenormalize($input, $expected): void {
@@ -220,8 +219,6 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
    *   The input UUID. May be invalid.
    * @param bool $expect_exception
    *   Whether to expect an exception.
-   *
-   * @legacy-covers ::denormalize
    */
   #[DataProvider('denormalizeUuidProvider')]
   public function testDenormalizeUuid($id, $expect_exception): void {

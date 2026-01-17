@@ -49,8 +49,6 @@ class EntityStorageBaseTest extends UnitTestCase {
 
   /**
    * Tests load.
-   *
-   * @legacy-covers ::load
    */
   #[DataProvider('providerLoad')]
   public function testLoad(string|null $expected, array $entity_fixture, string $query): void {
@@ -94,15 +92,17 @@ class EntityStorageBaseTest extends UnitTestCase {
     yield 'results-for-all-ids' => [array_combine($ids, $ids), array_combine($ids, $ids), $ids];
 
     // Data set for partial results for multiple IDs.
-    yield 'partial-results-for-multiple-ids' => [array_combine($ids, $ids), array_combine($ids, $ids), array_merge($ids, ['11', '12'])];
+    yield 'partial-results-for-multiple-ids' => [
+      array_combine($ids, $ids),
+      array_combine($ids, $ids),
+      array_merge($ids, ['11', '12']),
+    ];
   }
 
   /**
    * Test loadMultiple().
    *
    * Does not cover statically-cached results.
-   *
-   * @legacy-covers ::loadMultiple
    */
   #[DataProvider('providerLoadMultiple')]
   public function testLoadMultiple(array $expected, array $load_multiple, array|null $query): void {

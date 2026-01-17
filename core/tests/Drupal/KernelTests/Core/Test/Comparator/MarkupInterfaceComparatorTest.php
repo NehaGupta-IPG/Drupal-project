@@ -63,7 +63,7 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
    *     comparison should match, FALSE if error, or a class name of an object
    *     thrown.
    */
-  public static function dataSetProvider() {
+  public static function dataSetProvider(): array {
     return [
       'FormattableMarkup vs FormattableMarkup, equal' => [
         new FormattableMarkup('GoldFinger', []),
@@ -184,8 +184,6 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
 
   /**
    * Tests accepts.
-   *
-   * @legacy-covers ::accepts
    */
   #[DataProvider('dataSetProvider')]
   public function testAccepts($expected, $actual, bool $accepts_result, $equals_result): void {
@@ -199,8 +197,6 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
 
   /**
    * Tests assert equals.
-   *
-   * @legacy-covers ::assertEquals
    */
   #[DataProvider('dataSetProvider')]
   public function testAssertEquals($expected, $actual, bool $accepts_result, $equals_result): void {
