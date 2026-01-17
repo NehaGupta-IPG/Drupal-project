@@ -9,21 +9,26 @@ use Drupal\Core\Url;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * Tests breadcrumbs functionality.
- *
- * @group Menu
  */
+#[Group('Menu')]
+#[RunTestsInSeparateProcesses]
 class BreadcrumbTest extends BrowserTestBase {
 
   use AssertBreadcrumbTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
+   */
+  protected $profile = 'minimal';
+
+  /**
+   * {@inheritdoc}
    */
   protected static $modules = [
     'block',
@@ -84,7 +89,7 @@ class BreadcrumbTest extends BrowserTestBase {
   /**
    * Tests breadcrumbs on node and administrative paths.
    */
-  public function testBreadCrumbs() {
+  public function testBreadCrumbs(): void {
     // Prepare common base breadcrumb elements.
     $home = ['' => 'Home'];
     $admin = $home + ['admin' => 'Administration'];
@@ -390,12 +395,21 @@ class BreadcrumbTest extends BrowserTestBase {
     $this->drupalGet('menu-test/breadcrumb1/breadcrumb2/breadcrumb3');
     $this->assertSession()->responseContains('<script>alert(12);</script>');
     $this->assertSession()->assertEscaped('<script>alert(123);</script>');
+
+    // Assert that the breadcrumb cacheability is respected after not applying.
+    $this->assertBreadcrumb(Url::fromRoute('menu_test.skippable-breadcrumb', [], [
+      'query' => [
+        'menu_test_skip_breadcrumbs' => 'yes',
+      ],
+    ]), []);
+    $trail = $home + ['menu-test' => 'Menu test root'];
+    $this->assertBreadcrumb(Url::fromRoute('menu_test.skippable-breadcrumb'), $trail);
   }
 
   /**
    * Tests AssertBreadcrumbTrait works as expected.
    */
-  public function testAssertBreadcrumbTrait() {
+  public function testAssertBreadcrumbTrait(): void {
     // Ensure the test trait works as expected using menu_test routes.
     $home = ['' => 'Home'];
     $trail = $home + ['menu-test' => 'Menu test root'];
@@ -409,7 +423,7 @@ class BreadcrumbTest extends BrowserTestBase {
       $this->assertBreadcrumb('menu-test/breadcrumb1', []);
       $this->fail($message);
     }
-    catch (ExpectationFailedException $e) {
+    catch (ExpectationFailedException) {
       $this->assertTrue(TRUE, $message);
     }
 
@@ -419,7 +433,7 @@ class BreadcrumbTest extends BrowserTestBase {
       $this->assertBreadcrumb('menu-test/breadcrumb1', $home);
       $this->fail($message);
     }
-    catch (ExpectationFailedException $e) {
+    catch (ExpectationFailedException) {
       $this->assertTrue(TRUE, $message);
     }
 
@@ -436,7 +450,7 @@ class BreadcrumbTest extends BrowserTestBase {
       $this->assertBreadcrumb('menu-test/breadcrumb1', $trail);
       $this->fail($message);
     }
-    catch (ExpectationFailedException $e) {
+    catch (ExpectationFailedException) {
       $this->assertTrue(TRUE, $message);
     }
   }

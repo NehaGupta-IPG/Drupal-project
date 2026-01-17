@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user_pass_rehash().
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserPassRehashTest extends KernelTestBase {
 
   use UserCreationTrait;
@@ -29,8 +33,26 @@ class UserPassRehashTest extends KernelTestBase {
 
     $timestamp = \Drupal::time()->getRequestTime();
 
-    $user_a = $this->createUser([], NULL, FALSE, ['uid' => 12, 'mail' => '3user@example.com', 'login' => $timestamp - 1000]);
-    $user_b = $this->createUser([], NULL, FALSE, ['uid' => 123, 'mail' => 'user@example.com', 'login' => $timestamp - 1000]);
+    $user_a = $this->createUser(
+      [],
+      NULL,
+      FALSE,
+      [
+        'uid' => 12,
+        'mail' => '3user@example.com',
+        'login' => $timestamp - 1000,
+      ]
+    );
+    $user_b = $this->createUser(
+      [],
+      NULL,
+      FALSE,
+      [
+        'uid' => 123,
+        'mail' => 'user@example.com',
+        'login' => $timestamp - 1000,
+      ]
+    );
 
     // Unset passwords after the users are created in order to avoid
     // (different) password hashes being generated for the empty strings.

@@ -49,6 +49,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
     'use editorial transition archive',
     'use editorial transition archived_draft',
     'use editorial transition archived_published',
+    'administer taxonomy',
   ];
 
   /**
@@ -59,9 +60,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
   protected $workflow;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'content_moderation',
@@ -69,6 +68,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
     'block_content',
     'node',
     'entity_test',
+    'taxonomy',
   ];
 
   /**

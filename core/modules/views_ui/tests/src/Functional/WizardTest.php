@@ -6,15 +6,18 @@ namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Tests\views\Functional\Wizard\WizardTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the wizard.
  *
- * @group views_ui
  * @see \Drupal\views\Plugin\views\display\DisplayPluginBase
  * @see \Drupal\views\Plugin\views\display\PathPluginBase
  * @see \Drupal\views\Plugin\views\wizard\WizardPluginBase
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class WizardTest extends WizardTestBase {
 
   /**
@@ -25,7 +28,7 @@ class WizardTest extends WizardTestBase {
   /**
    * Tests filling in the wizard with really long strings.
    */
-  public function testWizardFieldLength() {
+  public function testWizardFieldLength(): void {
     $view = [];
     $view['label'] = $this->randomMachineName(256);
     $view['id'] = $this->randomMachineName(129);

@@ -3,6 +3,7 @@
 namespace Drupal\block\Plugin\migrate\process;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateExecutableInterface;
@@ -29,12 +30,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * This will get the destination role ID for each role in the 'roles' value on
  * the source row.
  *
- * @see \Drupal\migrate\Plugin\MigrateProcessInterface
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no
+ *   replacement.
  *
- * @MigrateProcessPlugin(
- *   id = "roles_lookup"
- * )
+ * @see https://www.drupal.org/node/3533560
+ *
+ * @see \Drupal\migrate\Plugin\MigrateProcessInterface
  */
+#[MigrateProcess('roles_lookup')]
 class RolesLookup extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -64,6 +67,7 @@ class RolesLookup extends ProcessPluginBase implements ContainerFactoryPluginInt
    *   The migrate lookup service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateLookupInterface $migrate_lookup) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533560', E_USER_DEPRECATED);
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migrateLookup = $migrate_lookup;
 
@@ -75,7 +79,7 @@ class RolesLookup extends ProcessPluginBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return new static(
       $configuration,
       $plugin_id,

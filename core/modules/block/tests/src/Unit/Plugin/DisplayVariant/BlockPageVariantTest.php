@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Unit\Plugin\DisplayVariant;
 
+use Drupal\block\Plugin\DisplayVariant\BlockPageVariant;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\DependencyInjection\Container;
+use Drupal\Core\Render\PageDisplayVariantSelectionEvent;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\block\Plugin\DisplayVariant\BlockPageVariant
- * @group block
+ * Tests Drupal\block\Plugin\DisplayVariant\BlockPageVariant.
  */
+#[CoversClass(BlockPageVariant::class)]
+#[Group('block')]
 class BlockPageVariantTest extends UnitTestCase {
 
   /**
@@ -43,8 +50,8 @@ class BlockPageVariantTest extends UnitTestCase {
    * @param array $definition
    *   The plugin definition array.
    *
-   * @return \Drupal\block\Plugin\DisplayVariant\BlockPageVariant|\PHPUnit\Framework\MockObject\MockObject
-   *   A mocked display variant plugin.
+   * @return \Drupal\block\Plugin\DisplayVariant\BlockPageVariant
+   *   A test display variant plugin.
    */
   public function setUpDisplayVariant($configuration = [], $definition = []) {
 
@@ -62,16 +69,16 @@ class BlockPageVariantTest extends UnitTestCase {
     $this->blockRepository = $this->createMock('Drupal\block\BlockRepositoryInterface');
     $this->blockViewBuilder = $this->createMock('Drupal\Core\Entity\EntityViewBuilderInterface');
 
-    return $this->getMockBuilder('Drupal\block\Plugin\DisplayVariant\BlockPageVariant')
-      ->setConstructorArgs([$configuration, 'test', $definition, $this->blockRepository, $this->blockViewBuilder, ['config:block_list']])
-      ->addMethods(['getRegionNames'])
-      ->getMock();
+    return new BlockPageVariant($configuration, 'test', $definition, $this->blockRepository, $this->blockViewBuilder, ['config:block_list']);
   }
 
+  /**
+   * Provides data to testBuild().
+   */
   public static function providerBuild() {
     $blocks_config = [
       'block1' => [
-        // region, is main content block, is messages block, is title block
+        // region, is main content block, is messages block, is title block.
         'top', FALSE, FALSE, FALSE,
       ],
       // Test multiple blocks in the same region.
@@ -198,12 +205,9 @@ class BlockPageVariantTest extends UnitTestCase {
 
   /**
    * Tests the building of a full page variant.
-   *
-   * @covers ::build
-   *
-   * @dataProvider providerBuild
    */
-  public function testBuild(array $blocks_config, $visible_block_count, array $expected_render_array) {
+  #[DataProvider('providerBuild')]
+  public function testBuild(array $blocks_config, $visible_block_count, array $expected_render_array): void {
     $display_variant = $this->setUpDisplayVariant();
     $display_variant->setMainContent(['#markup' => 'Hello kittens!']);
 
@@ -235,10 +239,8 @@ class BlockPageVariantTest extends UnitTestCase {
 
   /**
    * Tests the building of a full page variant with no main content set.
-   *
-   * @covers ::build
    */
-  public function testBuildWithoutMainContent() {
+  public function testBuildWithoutMainContent(): void {
     $display_variant = $this->setUpDisplayVariant();
     $this->blockRepository->expects($this->once())
       ->method('getVisibleBlocksPerRegion')
@@ -262,6 +264,38 @@ class BlockPageVariantTest extends UnitTestCase {
       ],
     ];
     $this->assertSame($expected, $display_variant->build());
+  }
+
+  /**
+   * Tests that cache metadata in the plugin are present in the build.
+   *
+   * @legacy-covers ::build
+   */
+  public function testCacheMetadataFromPlugin(): void {
+    $display_variant = $this->setUpDisplayVariant();
+    $this->blockRepository->expects($this->once())
+      ->method('getVisibleBlocksPerRegion')
+      ->willReturn([]);
+    $route_match = $this->createMock(RouteMatchInterface::class);
+
+    $event = new PageDisplayVariantSelectionEvent($display_variant->getPluginId(), $route_match);
+    $event->addCacheTags(['my_tag']);
+    $event->addCacheContexts(['my_context']);
+    $event->mergeCacheMaxAge(50);
+
+    $display_variant->addCacheableDependency($event);
+
+    $expectedCache = [
+      'tags' => [
+        'config:block_list',
+        'my_tag',
+      ],
+      'contexts' => [
+        'my_context',
+      ],
+      'max-age' => 50,
+    ];
+    $this->assertSame($expectedCache, $display_variant->build()['#cache']);
   }
 
 }

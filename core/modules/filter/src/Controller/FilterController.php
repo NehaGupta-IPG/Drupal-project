@@ -19,9 +19,9 @@ class FilterController {
    * @return array
    *   A renderable array.
    *
-   * @see template_preprocess_filter_tips()
+   * @see \Drupal\filter\FilterThemeHooks::preprocessFilterTips()
    */
-  public function filterTips(FilterFormatInterface $filter_format = NULL) {
+  public function filterTips(?FilterFormatInterface $filter_format = NULL) {
     $tips = $filter_format ? $filter_format->id() : -1;
 
     $build = [

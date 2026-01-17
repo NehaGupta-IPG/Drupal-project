@@ -6,12 +6,14 @@ namespace Drupal\Tests\search\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests searching with date filters that exclude some translations.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchDateIntervalTest extends BrowserTestBase {
 
   /**
@@ -84,7 +86,7 @@ class SearchDateIntervalTest extends BrowserTestBase {
   /**
    * Tests searching with date filters that exclude some translations.
    */
-  public function testDateIntervalQueryAlter() {
+  public function testDateIntervalQueryAlter(): void {
     // Search for keyword node.
     $edit = ['keys' => 'node'];
     $this->drupalGet('search/node');
