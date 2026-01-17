@@ -49,7 +49,7 @@ class SessionManagerFactory implements SessionStorageFactoryInterface {
    * {@inheritdoc}
    */
   public function createStorage(?Request $request): SessionStorageInterface {
-    $sessionManager = new SessionManager($this->requestStack, $this->connection, new MetadataBag(), $this->sessionConfiguration, $this->time);
+    $sessionManager = new SessionManager($this->requestStack, $this->connection, new MetadataBag(), $this->sessionConfiguration, $this->time, $this->handler);
     $sessionManager->setWriteSafeHandler($this->writeSafeHandler);
     return $sessionManager;
   }
