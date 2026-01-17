@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\layout_builder_test\Plugin\SectionStorage;
 
+use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -208,6 +209,14 @@ class SimpleConfigSectionStorage extends PluginBase implements SectionStorageInt
    */
   public function isApplicable(RefinableCacheableDependencyInterface $cacheability) {
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEditLabel(): TranslatableMarkup {
+    assert(Inspector::assertStringable($this->label()), 'Section storage label is expected to be a string.');
+    return $this->t('Edit layout for %label', ['%label' => $this->label() ?? $this->getStorageType() . ' ' . $this->getStorageId()]);
   }
 
 }

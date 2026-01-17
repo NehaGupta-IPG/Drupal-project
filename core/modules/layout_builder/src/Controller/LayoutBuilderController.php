@@ -2,8 +2,8 @@
 
 namespace Drupal\layout_builder\Controller;
 
-use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\layout_builder\SectionStorageInterface;
 
 /**
@@ -22,12 +22,11 @@ class LayoutBuilderController {
    * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
    *   The section storage.
    *
-   * @return string
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The title for the layout page.
    */
-  public function title(SectionStorageInterface $section_storage) {
-    assert(Inspector::assertStringable($section_storage->label()), 'Section storage label is expected to be a string.');
-    return $this->t('Edit layout for %label', ['%label' => $section_storage->label() ?? $section_storage->getStorageType() . ' ' . $section_storage->getStorageId()]);
+  public function title(SectionStorageInterface $section_storage): TranslatableMarkup {
+    return $section_storage->getEditLabel();
   }
 
   /**

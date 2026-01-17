@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\Context\ContextInterface as ComponentContextInterfac
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -71,14 +72,26 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
   protected $sampleEntityGenerator;
 
   /**
+   * The entity display repository service.
+   *
+   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface|null
+   */
+  protected $entityDisplayRepository;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, SampleEntityGeneratorInterface $sample_entity_generator) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, SampleEntityGeneratorInterface $sample_entity_generator, ?EntityDisplayRepositoryInterface $entity_display_repository = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->sampleEntityGenerator = $sample_entity_generator;
+    if (!$entity_display_repository) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $entity_display_repository parameter is deprecated in drupal:11.3.0 and must be provided in drupal:12.0.0. See https://www.drupal.org/node/3356831', E_USER_DEPRECATED);
+      $entity_display_repository = \Drupal::service('entity_display.repository');
+    }
+    $this->entityDisplayRepository = $entity_display_repository;
   }
 
   /**
@@ -91,7 +104,8 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('entity_type.bundle.info'),
-      $container->get('layout_builder.sample_entity_generator')
+      $container->get('layout_builder.sample_entity_generator'),
+      $container->get('entity_display.repository')
     );
   }
 
@@ -412,6 +426,19 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
       $this->setContextValue('view_mode', $context->getContextValue()->getMode());
     }
     parent::setContext($name, $context);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEditLabel(): TranslatableMarkup {
+    $display = $this->getSectionList();
+    $view_mode = $this->entityDisplayRepository->getViewModeOptionsByBundle($display->getTargetEntityTypeId(), $display->getTargetBundle())[$display->getMode()];
+
+    return $this->t('Edit %view_mode layout for %label', [
+      '%view_mode' => $view_mode,
+      '%label' => $this->label(),
+    ]);
   }
 
   /**

@@ -213,4 +213,11 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
     return ['navigation' => 'navigation'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getEditLabel(): TranslatableMarkup {
+    return new TranslatableMarkup('Navigation layout');
+  }
+
 }
