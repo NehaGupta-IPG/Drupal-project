@@ -1748,7 +1748,8 @@ services:
     tags:
       - { name: backend_overridable }
   Drupal\Core\Session\SessionFactoryCompat:
-    decorate: '@Symfony\Component\HttpFoundation\Session\SessionFactoryInterface'
+    decorates: 'Symfony\Component\HttpFoundation\Session\SessionFactoryInterface'
+    arguments: ['@.inner']
     tags:
       - { name: service_collector, tag: session_bag, call: registerBag }
   Symfony\Component\HttpFoundation\Session\SessionFactoryInterface:
