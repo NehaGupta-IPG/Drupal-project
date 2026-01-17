@@ -204,8 +204,6 @@ class AssetResolverTest extends UnitTestCase {
 
   /**
    * Tests get css assets.
-   *
-   * @legacy-covers ::getCssAssets
    */
   #[DataProvider('providerAttachedCssAssets')]
   public function testGetCssAssets(AttachedAssetsInterface $assets_a, AttachedAssetsInterface $assets_b, $expected_css_cache_item_count): void {
@@ -219,7 +217,7 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertCount($expected_css_cache_item_count, $this->cache->getAllCids());
   }
 
-  public static function providerAttachedCssAssets() {
+  public static function providerAttachedCssAssets(): array {
     return [
       'one js only library and one css only library' => [
         (new AttachedAssets())->setAlreadyLoadedLibraries([])->setLibraries(['core/drupal']),
@@ -236,8 +234,6 @@ class AssetResolverTest extends UnitTestCase {
 
   /**
    * Tests get js assets.
-   *
-   * @legacy-covers ::getJsAssets
    */
   #[DataProvider('providerAttachedJsAssets')]
   public function testGetJsAssets(AttachedAssetsInterface $assets_a, AttachedAssetsInterface $assets_b, $expected_js_cache_item_count, $expected_multilingual_js_cache_item_count): void {
@@ -255,7 +251,7 @@ class AssetResolverTest extends UnitTestCase {
     $this->assertCount($expected_multilingual_js_cache_item_count, $this->cache->getAllCids());
   }
 
-  public static function providerAttachedJsAssets() {
+  public static function providerAttachedJsAssets(): array {
     $time = time();
     return [
       'same libraries, different timestamps' => [

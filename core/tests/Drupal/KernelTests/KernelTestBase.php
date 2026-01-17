@@ -16,18 +16,21 @@ use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Tests\ConfigTestTrait;
 use Drupal\Tests\ExtensionListTestTrait;
-use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
+use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use Drupal\TestTools\Extension\SchemaInspector;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Exception;
@@ -36,9 +39,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -114,21 +114,29 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   }
 
   /**
+   * The class loader.
+   *
    * @var \Composer\Autoload\Classloader
    */
   protected $classLoader;
 
   /**
+   * The relative path to the test site directory.
+   *
    * @var string
    */
   protected $siteDirectory;
 
   /**
+   * The test database prefix.
+   *
    * @var string
    */
   protected $databasePrefix;
 
   /**
+   * The test container.
+   *
    * @var \Drupal\Core\DependencyInjection\ContainerBuilder
    */
   protected $container;
@@ -155,6 +163,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected $vfsRoot;
 
   /**
+   * The configuration importer.
+   *
    * @var \Drupal\Core\Config\ConfigImporter
    *
    * @todo Move into Config test base class.
@@ -302,6 +312,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   }
 
   /**
+   * Gets the database prefix used for test isolation.
+   *
    * @return string
    *   The database prefix string used to isolate test database tables.
    */
@@ -691,8 +703,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // If the test used the regular file system, remove any files created.
     if ($this->siteDirectory && !str_starts_with($this->siteDirectory, 'vfs://')) {
       // Delete test site directory.
-      $callback = function (string $path) {
-        @chmod($path, 0700);
+      $callback = function (string $path): void {
+        if (!is_link($path)) {
+          @chmod($path, 0700);
+        }
       };
       \Drupal::service('file_system')->deleteRecursive($this->siteDirectory, $callback);
     }
@@ -720,7 +734,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * Additional tear down method to close the connection at the end.
    */
   #[After]
-  public function tearDownCloseDatabaseConnection() {
+  public function tearDownCloseDatabaseConnection(): void {
     // Destroy the database connection, which for example removes the memory
     // from sqlite in memory.
     foreach (Database::getAllConnectionInfo() as $key => $targets) {

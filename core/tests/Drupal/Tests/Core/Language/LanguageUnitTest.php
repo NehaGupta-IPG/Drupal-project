@@ -36,8 +36,6 @@ class LanguageUnitTest extends UnitTestCase {
 
   /**
    * Tests get name.
-   *
-   * @legacy-covers ::getName
    */
   public function testGetName(): void {
     $name = $this->randomMachineName();
@@ -59,8 +57,6 @@ class LanguageUnitTest extends UnitTestCase {
 
   /**
    * Tests get direction.
-   *
-   * @legacy-covers ::getDirection
    */
   public function testGetDirection(): void {
     $language_code = $this->randomMachineName(2);
@@ -70,8 +66,6 @@ class LanguageUnitTest extends UnitTestCase {
 
   /**
    * Tests is default.
-   *
-   * @legacy-covers ::isDefault
    */
   public function testIsDefault(): void {
     $language_default = $this->getMockBuilder('Drupal\Core\Language\LanguageDefault')->disableOriginalConstructor()->getMock();
@@ -103,8 +97,6 @@ class LanguageUnitTest extends UnitTestCase {
    *   An array of language objects.
    * @param array $expected
    *   The expected array of keys.
-   *
-   * @legacy-covers ::sort
    */
   #[DataProvider('providerTestSortArrayOfLanguages')]
   public function testSortArrayOfLanguages(array $languages, array $expected): void {
@@ -118,7 +110,7 @@ class LanguageUnitTest extends UnitTestCase {
    * @return array
    *   An array of test data.
    */
-  public static function providerTestSortArrayOfLanguages() {
+  public static function providerTestSortArrayOfLanguages(): array {
     $language9A = new Language(['id' => 'dd', 'name' => 'A', 'weight' => 9]);
     $language10A = new Language(['id' => 'ee', 'name' => 'A', 'weight' => 10]);
     $language10B = new Language(['id' => 'ff', 'name' => 'B', 'weight' => 10]);

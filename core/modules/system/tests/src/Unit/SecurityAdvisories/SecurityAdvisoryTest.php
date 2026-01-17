@@ -94,8 +94,6 @@ class SecurityAdvisoryTest extends UnitTestCase {
    *
    * @param string $missing_field
    *   The field to test.
-   *
-   * @legacy-covers ::createFromArray
    */
   #[DataProvider('providerCreateFromArrayMissingField')]
   public function testCreateFromArrayMissingField(string $missing_field): void {
@@ -129,8 +127,6 @@ class SecurityAdvisoryTest extends UnitTestCase {
    *   The field to test for an invalid value.
    * @param string $expected_type_message
    *   The expected message for the field.
-   *
-   * @legacy-covers ::createFromArray
    */
   #[DataProvider('providerCreateFromArrayInvalidField')]
   public function testCreateFromArrayInvalidField(string $invalid_field, string $expected_type_message): void {
@@ -168,7 +164,7 @@ class SecurityAdvisoryTest extends UnitTestCase {
   protected function getValidData(): array {
     return [
       'title' => 'Generic Module1 Test - Moderately critical - Access bypass - SA-CONTRIB-2019-02-02',
-      'link' => 'https://www.drupal.org/SA-CONTRIB-2019-02-02',
+      'link' => 'https://www.drupal.org/sa-contrib-2019-002',
       'project' => 'generic_module1_test',
       'type' => 'module',
       'is_psa' => FALSE,

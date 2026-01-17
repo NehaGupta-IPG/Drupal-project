@@ -154,8 +154,6 @@ class MailManagerTest extends UnitTestCase {
 
   /**
    * Tests the getInstance method.
-   *
-   * @legacy-covers ::getInstance
    */
   public function testGetInstance(): void {
     $interface = [
@@ -177,8 +175,6 @@ class MailManagerTest extends UnitTestCase {
 
   /**
    * Tests that mails are sent in a separate render context.
-   *
-   * @legacy-covers ::mail
    */
   public function testMailInRenderContext(): void {
     $interface = [
@@ -189,7 +185,7 @@ class MailManagerTest extends UnitTestCase {
 
     $this->renderer->expects($this->exactly(1))
       ->method('executeInRenderContext')
-      ->willReturnCallback(function (RenderContext $render_context, $callback) {
+      ->willReturnCallback(function (RenderContext $render_context, $callback): void {
         $message = $callback();
         $this->assertEquals('example', $message['module']);
       });
