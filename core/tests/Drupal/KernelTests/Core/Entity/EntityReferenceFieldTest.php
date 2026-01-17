@@ -73,7 +73,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
    *
    * @var string
    */
-  protected $translatableBundle = 'entity_test_mul_bundle';
+  protected $translatableBundle = 'entity_test_mul';
 
   /**
    * The name of the field used in this test.
@@ -330,7 +330,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
     ConfigurableLanguage::createFromLangcode('pt-br')->save();
 
     // Create a field.
-    $field_name = 'field_random_machine_name';
+    $field_name = self::randomMachineName();
     $this->createEntityReferenceField(
       $this->translatableEntityType,
       $this->translatableBundle,
@@ -369,7 +369,6 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
     $pt_br_parent->save();
 
     // Create three target entities and attach them to parent field.
-    $target_entities = [];
     $reference_field = [];
     for ($i = 0; $i < 3; $i++) {
       $target_entity = $this->container->get('entity_type.manager')
@@ -379,7 +378,6 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
       $target_entity->set('name', "en-target-$i");
       $target_entity->save();
 
-      $target_entities[] = $target_entity;
       $reference_field[]['target_id'] = $target_entity->id();
 
       $es_translation = $target_entity->addTranslation('es');
@@ -407,22 +405,22 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
     // Load the target entities via EntityReferenceField::referencedEntities().
     $entities = $entity->{$field_name}->referencedEntities();
     foreach ($entities as $referenced_entity) {
-      $this->assertEquals('en', $referenced_entity->language()->getId());
-      $this->assertStringStartsWith('en-target-', $referenced_entity->name->value);
+      self::assertEquals('en', $referenced_entity->language()->getId());
+      self::assertStringStartsWith('en-target-', $referenced_entity->name->value);
     }
 
     // Now, try loading the target entities from the es translation.
     $entities = $es_parent->{$field_name}->referencedEntities('es');
     foreach ($entities as $referenced_entity) {
-      $this->assertTrue($referenced_entity->hasTranslation('es'));
-      $this->assertEquals('es', $referenced_entity->language()->getId());
-      $this->assertStringStartsWith('es-target-', $referenced_entity->name->value);
+      self::assertTrue($referenced_entity->hasTranslation('es'));
+      self::assertEquals('es', $referenced_entity->language()->getId());
+      self::assertStringStartsWith('es-target-', $referenced_entity->name->value);
     }
     $entities = $pt_br_parent->{$field_name}->referencedEntities('pt-br');
     foreach ($entities as $referenced_entity) {
-      $this->assertTrue($referenced_entity->hasTranslation('pt-br'));
-      $this->assertEquals('pt-br', $referenced_entity->language()->getId());
-      $this->assertStringStartsWith('pt-br-target-', $referenced_entity->name->value);
+      self::assertTrue($referenced_entity->hasTranslation('pt-br'));
+      self::assertEquals('pt-br', $referenced_entity->language()->getId());
+      self::assertStringStartsWith('pt-br-target-', $referenced_entity->name->value);
     }
   }
 
