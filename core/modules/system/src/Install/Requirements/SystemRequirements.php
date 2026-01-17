@@ -732,11 +732,11 @@ class SystemRequirements implements InstallRequirementsInterface {
             'title' => new TranslatableMarkup($protected_dir->getTitle()),
             'value' => t('Not fully protected'),
             'severity' => RequirementSeverity::Error,
-            'description' => t('See <a href=":doc">@doc</a> for the recommended .htaccess file to add to the %directory to protect against arbitrary code execution.',
+            'description' => t('<a href=":doc">@doc</a> to %directory to protect against arbitrary code execution.',
               [
-                ':doc' => 'https://www.drupal.org/docs/installing-drupal/some-directory-not-fully-protected',
-                '@doc' => t('how to protect a directory'),
-                '%directory' => Drupal::service('file_system')->realpath($protected_dir->getPath()),
+                ':doc' => 'https://www.drupal.org/node/3259608',
+                '@doc' => t('Add the recommended .htaccess file'),
+                '%directory' => \Drupal::service('file_system')->realpath($protected_dir->getPath()),
               ]),
           ];
         }
