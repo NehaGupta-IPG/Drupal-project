@@ -323,7 +323,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
   /**
    * Tests handling of translated entities.
    */
-  public function testReferencedEntitiesTranslations() {
+  public function testReferencedEntitiesTranslations(): void {
     $this->enableModules(['language', 'content_translation']);
     $this->installConfig(['language']);
     ConfigurableLanguage::createFromLangcode('es')->save();
