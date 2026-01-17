@@ -36,10 +36,13 @@ class ManyPlaceholderTest extends UnitTestCase {
     $session = $this->prophesize(SessionInterface::class);
     $session->start()->willReturn(TRUE);
     $session->save()->shouldBeCalled();
+    $request_stack = $this->prophesize(RequestStack::class);
+    $request_stack->getSession()
+      ->willReturn($session->reveal());
+
     $bigpipe = new BigPipe(
       $this->prophesize(RendererInterface::class)->reveal(),
-      $session->reveal(),
-      $this->prophesize(RequestStack::class)->reveal(),
+      $request_stack->reveal(),
       $this->prophesize(HttpKernelInterface::class)->reveal(),
       $this->prophesize(EventDispatcherInterface::class)->reveal(),
       $this->prophesize(ConfigFactoryInterface::class)->reveal(),
