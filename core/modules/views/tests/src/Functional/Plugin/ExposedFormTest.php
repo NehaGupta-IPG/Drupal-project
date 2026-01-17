@@ -34,6 +34,7 @@ class ExposedFormTest extends ViewTestBase {
   public static $testViews = [
     'test_exposed_form_buttons',
     'test_exposed_block',
+    'test_exposed_form_action',
     'test_exposed_form_sort_items_per_page',
     'test_exposed_form_pager',
     'test_remember_selected',
@@ -325,6 +326,45 @@ class ExposedFormTest extends ViewTestBase {
     }
     $element->findButton('Reset')->click();
     $this->assertNodesExist($arguments['All']);
+  }
+
+  /**
+   * Tests exposed form actions for an unrouted display with a linked route.
+   */
+  public function testExposedFormActionForUnroutedDisplay(): void {
+    $node = $this->nodes[0];
+    $block = $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_form_action-block_1');
+    $view = Views::getView('test_exposed_form_action');
+    $view->setDisplay('block_1');
+
+    $this->drupalGet('node/' . $node->id());
+    $form_id = $this->getExpectedExposedFormId($view);
+    $form = $this->assertSession()->elementExists('css', 'form#' . $form_id);
+    $action = $form->getAttribute('action');
+
+    $this->assertSame('/test-exposed-form-action-feed', $action);
+    $this->assertNotSame('/test-exposed-form-action-page', $action);
+    $this->assertNotNull($block);
+  }
+
+  /**
+   * Tests exposed form actions for an unrouted display without link display.
+   */
+  public function testExposedFormActionFallsBackToCurrentRoute(): void {
+    $node = $this->nodes[0];
+    $block = $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_form_action-block_2');
+    $view = Views::getView('test_exposed_form_action');
+    $view->setDisplay('block_2');
+
+    $this->drupalGet('node/' . $node->id());
+    $form_id = $this->getExpectedExposedFormId($view);
+    $form = $this->assertSession()->elementExists('css', 'form#' . $form_id);
+    $action = $form->getAttribute('action');
+
+    $this->assertSame('/node/' . $node->id(), $action);
+    $this->assertNotSame('/test-exposed-form-action-page', $action);
+    $this->assertNotSame('/test-exposed-form-action-feed', $action);
+    $this->assertNotNull($block);
   }
 
   /**

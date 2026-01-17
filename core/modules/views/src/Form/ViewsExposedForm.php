@@ -121,18 +121,31 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       '#id' => Html::getUniqueId('edit-submit-' . $view->storage->id()),
     ];
 
-    if (!$view->hasUrl()) {
-      // On any non views.ajax route, use the current route for the form action.
-      if ($this->getRouteMatch()->getRouteName() !== 'views.ajax') {
-        $form_action = Url::fromRoute('<current>')->toString();
-      }
-      else {
-        // On the views.ajax route, set the action to the page we were on.
-        $form_action = Url::fromUserInput($this->currentPathStack->getPath())->toString();
-      }
+    if ($view->hasUrl()) {
+      $form_action = $view->getUrl()->toString();
     }
     else {
-      $form_action = $view->getUrl()->toString();
+      // For unrouted displays, honor an explicitly configured link display
+      // rather than guessing based on display order.
+      $form_action = NULL;
+      $linked_display_id = $view->display_handler->getOption('link_display');
+      if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $view->displayHandlers->has($linked_display_id)) {
+        $linked_display = $view->displayHandlers->get($linked_display_id);
+        if ($linked_display->getRoutedDisplay()) {
+          $form_action = $view->getUrl(NULL, $linked_display_id)->toString();
+        }
+      }
+
+      if (!$form_action) {
+        // On any non views.ajax route, use the current route for the form action.
+        if ($this->getRouteMatch()->getRouteName() !== 'views.ajax') {
+          $form_action = Url::fromRoute('<current>')->toString();
+        }
+        else {
+          // On the views.ajax route, set the action to the page we were on.
+          $form_action = Url::fromUserInput($this->currentPathStack->getPath())->toString();
+        }
+      }
     }
 
     $form['#action'] = $form_action;
