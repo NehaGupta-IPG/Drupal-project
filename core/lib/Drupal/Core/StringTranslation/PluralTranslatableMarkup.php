@@ -10,13 +10,6 @@ use Drupal\Component\Gettext\PoItem;
 class PluralTranslatableMarkup extends TranslatableMarkup {
 
   /**
-   * The item count to display.
-   *
-   * @var int
-   */
-  protected $count;
-
-  /**
    * The already translated string.
    *
    * @var string
@@ -54,9 +47,9 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    * @see \Drupal\Component\Render\FormattableMarkup::placeholderFormat()
    */
   public function __construct($count, $singular, $plural, array $args = [], array $options = [], ?TranslationInterface $string_translation = NULL) {
-    $this->count = $count;
     $translatable_string = implode(PoItem::DELIMITER, [$singular, $plural]);
     parent::__construct($translatable_string, $args, $options, $string_translation);
+    $this->arguments['@count'] = $count;
   }
 
   /**
@@ -103,12 +96,10 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
       return '';
     }
 
-    $arguments = $this->getArguments();
-    $arguments['@count'] = $this->count;
     $translated_array = explode(PoItem::DELIMITER, $this->translatedString);
 
     $index = $this->getPluralIndex();
-    if ($this->count == 1 || $index == 0 || count($translated_array) == 1) {
+    if ($this->arguments['@count'] == 1 || $index == 0 || count($translated_array) == 1) {
       // Singular form.
       $return = $translated_array[0];
     }
@@ -116,7 +107,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
       // Nth plural form, fallback to second plural form.
       $return = $translated_array[$index] ?? $translated_array[1];
     }
-    return $this->placeholderFormat($return, $arguments);
+    return $this->placeholderFormat($return, $this->arguments);
   }
 
   /**
@@ -135,16 +126,9 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
     // @todo Refactor in https://www.drupal.org/node/2660338 so this code does
     // not depend on knowing that the Locale module exists.
     if (function_exists('locale_get_plural') && \Drupal::hasService('locale.plural.formula')) {
-      return locale_get_plural($this->count, $this->getOption('langcode'));
+      return locale_get_plural($this->arguments['@count'], $this->getOption('langcode'));
     }
     return -1;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __sleep(): array {
-    return array_merge(parent::__sleep(), ['count']);
   }
 
 }
