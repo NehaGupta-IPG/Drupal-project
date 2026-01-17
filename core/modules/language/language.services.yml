@@ -33,3 +33,4 @@ services:
   language.admin_language_render:
     class: Drupal\language\AdminLanguageRender
     arguments: ['@language_manager', '@string_translation', '@current_user']
+  Drupal\language\AdminLanguageRender: '@language.admin_language_render'
