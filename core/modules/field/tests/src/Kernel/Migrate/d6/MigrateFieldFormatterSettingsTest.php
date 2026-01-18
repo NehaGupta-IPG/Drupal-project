@@ -157,6 +157,9 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupal6TestBase {
       'image_loading' => [
         'attribute' => 'lazy',
       ],
+      'image_decoding' => [
+        'attribute' => 'auto',
+      ],
     ];
     $component = $display->getComponent('field_test_imagefield');
     $this->assertSame($expected, $component);

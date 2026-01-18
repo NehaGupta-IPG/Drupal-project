@@ -1124,6 +1124,8 @@ display:
             image_style: media_library
             image_loading:
               attribute: eager
+            image_decoding:
+              attribute: auto
         name:
           id: name
           table: media_field_data

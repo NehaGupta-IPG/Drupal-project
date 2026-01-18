@@ -170,6 +170,13 @@ field.formatter.settings.image:
         attribute:
           type: string
           label: 'Loading attribute'
+    image_decoding:
+      type: mapping
+      label: 'Image decoding settings'
+      mapping:
+        attribute:
+          type: string
+          label: 'Decoding attribute'
 
 field.formatter.settings.image_url:
   type: mapping

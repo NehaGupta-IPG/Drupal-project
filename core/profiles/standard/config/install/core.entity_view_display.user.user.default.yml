@@ -23,6 +23,8 @@ content:
       image_link: content
       image_loading:
         attribute: lazy
+      image_decoding:
+        attribute: auto
     third_party_settings: {  }
     weight: 0
     region: content

@@ -114,7 +114,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#attributes' => ['loading' => 'lazy'],
+      '#attributes' => [
+        'loading' => 'lazy',
+        'decoding' => 'auto',
+      ],
     ];
     $default_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
     $this->assertSession()->responseContains($default_output);
@@ -135,7 +138,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#attributes' => ['loading' => 'lazy'],
+      '#attributes' => [
+        'loading' => 'lazy',
+        'decoding' => 'auto',
+      ],
     ];
     $default_output = '<a href="' . $file->createFileUrl() . '">' . (string) $renderer->renderRoot($image) . '</a>';
     $this->drupalGet('node/' . $nid);
@@ -194,7 +200,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#height' => 20,
       '#style_name' => 'thumbnail',
       '#alt' => $alt,
-      '#attributes' => ['loading' => 'lazy'],
+      '#attributes' => [
+        'loading' => 'lazy',
+        'decoding' => 'auto',
+      ],
     ];
     $default_output = (string) $renderer->renderRoot($image_style);
     $this->drupalGet('node/' . $nid);
@@ -304,7 +313,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#title' => $this->randomMachineName(),
       '#width' => 40,
       '#height' => 20,
-      '#attributes' => ['loading' => 'lazy'],
+      '#attributes' => [
+        'loading' => 'lazy',
+        'decoding' => 'auto',
+      ],
     ];
     $edit = [
       $field_name . '[0][alt]' => $image['#alt'],
@@ -417,7 +429,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#attributes' => ['loading' => 'lazy'],
+      '#attributes' => [
+        'loading' => 'lazy',
+        'decoding' => 'auto',
+      ],
     ];
     $default_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
     $this->assertSession()->responseContains($default_output);
@@ -429,6 +444,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
         'image_link' => '',
         'image_style' => '',
         'image_loading' => ['attribute' => 'eager'],
+        'image_decoding' => ['attribute' => 'auto'],
       ],
     ];
     $display = \Drupal::service('entity_display.repository')
@@ -442,7 +458,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#attributes' => ['loading' => 'eager'],
+      '#attributes' => [
+        'loading' => 'eager',
+        'decoding' => 'auto',
+      ],
     ];
     $default_output = (string) $renderer->renderRoot($image);
     $this->drupalGet('node/' . $nid);
@@ -464,7 +483,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#height' => 20,
       '#style_name' => 'thumbnail',
       '#alt' => $alt,
-      '#attributes' => ['loading' => 'eager'],
+      '#attributes' => [
+        'loading' => 'eager',
+        'decoding' => 'auto',
+      ],
     ];
     $default_output = (string) $renderer->renderRoot($image_style);
     $this->drupalGet('node/' . $nid);
@@ -518,7 +540,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#title' => $title,
       '#width' => 40,
       '#height' => 20,
-      '#attributes' => ['loading' => 'lazy'],
+      '#attributes' => [
+        'loading' => 'lazy',
+        'decoding' => 'auto',
+      ],
     ];
     $default_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
     $this->drupalGet('node/' . $node->id());
@@ -543,7 +568,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#width' => 40,
       '#height' => 20,
       '#alt' => $alt,
-      '#attributes' => ['loading' => 'lazy'],
+      '#attributes' => [
+        'loading' => 'lazy',
+        'decoding' => 'auto',
+      ],
     ];
     $image_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
     $this->drupalGet('node/' . $nid);
@@ -598,7 +626,10 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
       '#title' => $title,
       '#width' => 40,
       '#height' => 20,
-      '#attributes' => ['loading' => 'lazy'],
+      '#attributes' => [
+        'loading' => 'lazy',
+        'decoding' => 'auto',
+      ],
     ];
     $default_output = str_replace("\n", '', (string) $renderer->renderRoot($image));
     $this->drupalGet('node/' . $node->id());
