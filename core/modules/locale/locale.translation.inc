@@ -4,7 +4,6 @@
  * @file
  */
 
-use Drupal\Core\Hook\Attribute\StopProceduralHookScan;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 
 /**
@@ -40,11 +39,12 @@ const LOCALE_TRANSLATION_SOURCE_COMPARE_GT = 1;
  * This project data contains all projects which will be checked for available
  * interface translations.
  *
- * For full functionality this function depends on Update module.
- * When Update module is enabled the project data will contain the most recent
- * module status; both in enabled status as in version. When Update module is
- * disabled this function will return the last known module state. The status
- * will only be updated once Update module is enabled.
+ * For full functionality this function depends on the Update Status module.
+ * When the Update Status module is enabled the project data will contain the
+ * most recent module status; both in enabled status as in version. When the
+ * Update Status module is disabled this function will return the last known
+ * module state. The status will only be updated once the Update Status module
+ * is enabled.
  *
  * @param array $project_names
  *   Array of names of the projects to get.
@@ -54,7 +54,6 @@ const LOCALE_TRANSLATION_SOURCE_COMPARE_GT = 1;
  *
  * @see locale_translation_build_projects()
  */
-#[StopProceduralHookScan]
 function locale_translation_get_projects(array $project_names = []) {
   $projects = &drupal_static(__FUNCTION__, []);
 
@@ -85,7 +84,7 @@ function locale_translation_get_projects(array $project_names = []) {
 /**
  * Clears the projects cache.
  */
-function locale_translation_clear_cache_projects() {
+function locale_translation_clear_cache_projects(): void {
   drupal_static_reset('locale_translation_get_projects');
 }
 
@@ -102,7 +101,7 @@ function locale_translation_clear_cache_projects() {
  *
  * @see locale_translation_source_build()
  */
-function locale_translation_load_sources(?array $projects = NULL, ?array $langcodes = NULL) {
+function locale_translation_load_sources(?array $projects = NULL, ?array $langcodes = NULL): array {
   $sources = [];
   $projects = $projects ?: array_keys(locale_translation_get_projects());
   $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
@@ -132,7 +131,7 @@ function locale_translation_load_sources(?array $projects = NULL, ?array $langco
  *
  * @see locale_translation_source_build()
  */
-function locale_translation_build_sources(array $projects = [], array $langcodes = []) {
+function locale_translation_build_sources(array $projects = [], array $langcodes = []): array {
   $sources = [];
   $projects = locale_translation_get_projects($projects);
   $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
@@ -327,7 +326,7 @@ function locale_translation_build_server_pattern($project, $template) {
 /**
  * Populate a queue with project to check for translation updates.
  */
-function locale_cron_fill_queue() {
+function locale_cron_fill_queue(): void {
   $updates = [];
   $config = \Drupal::config('locale.settings');
 

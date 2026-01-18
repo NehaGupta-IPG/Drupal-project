@@ -26,7 +26,7 @@ class EditorHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.editor':
         $output = '';
@@ -55,6 +55,7 @@ class EditorHooks {
         $output .= '</dl>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -96,7 +97,7 @@ class EditorHooks {
     // Then splice in the name of each text editor for each text format.
     $editors = \Drupal::service('plugin.manager.editor')->getDefinitions();
     foreach (Element::children($form['formats']) as $format_id) {
-      $editor = editor_load($format_id);
+      $editor = \Drupal::entityTypeManager()->getStorage('editor')->load($format_id);
       $editor_name = $editor && isset($editors[$editor->getEditor()]) ? $editors[$editor->getEditor()]['label'] : '—';
       $editor_column['editor'] = ['#markup' => $editor_name];
       $position = array_search('name', array_keys($form['formats'][$format_id])) + 1;
@@ -114,7 +115,7 @@ class EditorHooks {
     if ($editor === NULL) {
       $format = $form_state->getFormObject()->getEntity();
       $format_id = $format->isNew() ? NULL : $format->id();
-      $editor = editor_load($format_id);
+      $editor = $format_id ? \Drupal::entityTypeManager()->getStorage('editor')->load($format_id) : NULL;
       $form_state->set('editor', $editor);
     }
     // Associate a text editor with this text format.
@@ -318,7 +319,7 @@ class EditorHooks {
       }
     }
     // Access is granted.
-    $headers = file_get_content_headers($file);
+    $headers = $file->getDownloadHeaders();
     return $headers;
   }
 

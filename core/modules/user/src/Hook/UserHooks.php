@@ -3,8 +3,8 @@
 namespace Drupal\user\Hook;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\user\Entity\Role;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\system\Entity\Action;
@@ -32,7 +32,7 @@ class UserHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.user':
         $output = '';
@@ -87,25 +87,7 @@ class UserHooks {
       case 'entity.entity_view_display.user.default':
         return '<p>' . $this->t('This form lets administrators configure how fields should be displayed when rendering a user profile page.') . '</p>';
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'user' => [
-        'render element' => 'elements',
-      ],
-      'username' => [
-        'variables' => [
-          'account' => NULL,
-          'attributes' => [],
-          'link_options' => [],
-        ],
-      ],
-    ];
+    return NULL;
   }
 
   /**
@@ -151,20 +133,6 @@ class UserHooks {
       'weight' => 5,
     ];
     return $fields;
-  }
-
-  /**
-   * Implements hook_ENTITY_TYPE_presave() for user entities.
-   *
-   * @todo https://www.drupal.org/project/drupal/issues/3112704 Move to
-   *   \Drupal\user\Entity\User::preSave().
-   */
-  #[Hook('user_presave')]
-  public function userPresave(UserInterface $account): void {
-    $config = \Drupal::config('system.date');
-    if ($config->get('timezone.user.configurable') && !$account->getTimeZone() && !$config->get('timezone.user.default')) {
-      $account->timezone = $config->get('timezone.default');
-    }
   }
 
   /**
@@ -266,7 +234,7 @@ class UserHooks {
     $mail_config = \Drupal::config('user.mail');
     $token_options = ['langcode' => $langcode, 'callback' => 'user_mail_tokens', 'clear' => TRUE];
     $message['subject'] .= PlainTextOutput::renderFromHtml($token_service->replace($mail_config->get($key . '.subject'), $variables, $token_options));
-    $message['body'][] = $token_service->replace($mail_config->get($key . '.body'), $variables, $token_options);
+    $message['body'][] = $token_service->replacePlain($mail_config->get($key . '.body'), $variables, $token_options);
     $language_manager->setConfigOverrideLanguage($original_language);
   }
 
@@ -441,11 +409,10 @@ class UserHooks {
    */
   #[Hook('form_system_regional_settings_alter')]
   public function formSystemRegionalSettingsAlter(&$form, FormStateInterface $form_state) : void {
-    $config = \Drupal::config('system.date');
     $form['timezone']['configurable_timezones'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Users may set their own time zone'),
-      '#default_value' => $config->get('timezone.user.configurable'),
+      '#config_target' => 'system.date:timezone.user.configurable',
     ];
     $form['timezone']['configurable_timezones_wrapper'] = [
       '#type' => 'container',
@@ -462,13 +429,13 @@ class UserHooks {
     $form['timezone']['configurable_timezones_wrapper']['empty_timezone_message'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Remind users at login if their time zone is not set'),
-      '#default_value' => $config->get('timezone.user.warn'),
+      '#config_target' => 'system.date:timezone.user.warn',
       '#description' => $this->t('Only applied if users may set their own time zone.'),
     ];
     $form['timezone']['configurable_timezones_wrapper']['user_default_timezone'] = [
       '#type' => 'radios',
       '#title' => $this->t('Time zone for new users'),
-      '#default_value' => $config->get('timezone.user.default'),
+      '#config_target' => new ConfigTarget('system.date', 'timezone.user.default', toConfig: fn($v) => (int) $v),
       '#options' => [
         UserInterface::TIMEZONE_DEFAULT => $this->t('Default time zone'),
         UserInterface::TIMEZONE_EMPTY => $this->t('Empty time zone'),
@@ -476,7 +443,6 @@ class UserHooks {
       ],
       '#description' => $this->t('Only applied if users may set their own time zone.'),
     ];
-    $form['#submit'][] = 'user_form_system_regional_settings_submit';
   }
 
   /**
@@ -486,8 +452,12 @@ class UserHooks {
   public function filterFormatDisable(FilterFormatInterface $filter_format): void {
     // Remove the permission from any roles.
     $permission = $filter_format->getPermissionName();
+
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $role_storage */
+    $role_storage = \Drupal::entityTypeManager()->getStorage('user_role');
+
     /** @var \Drupal\user\Entity\Role $role */
-    foreach (Role::loadMultiple() as $role) {
+    foreach ($role_storage->loadMultipleOverrideFree() as $role) {
       if ($role->hasPermission($permission)) {
         $role->revokePermission($permission)->save();
       }

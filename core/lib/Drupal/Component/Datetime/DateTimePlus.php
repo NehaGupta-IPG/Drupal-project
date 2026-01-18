@@ -53,62 +53,6 @@ class DateTimePlus {
   const RFC7231 = 'D, d M Y H:i:s \G\M\T';
 
   /**
-   * An array of possible date parts.
-   *
-   * @var string[]
-   */
-  protected static $dateParts = [
-    'year',
-    'month',
-    'day',
-    'hour',
-    'minute',
-    'second',
-  ];
-
-  /**
-   * The value of the time value passed to the constructor.
-   *
-   * @var string
-   */
-  protected $inputTimeRaw = '';
-
-  /**
-   * The prepared time, without timezone, for this date.
-   *
-   * @var string
-   */
-  protected $inputTimeAdjusted = '';
-
-  /**
-   * The value of the timezone passed to the constructor.
-   *
-   * @var string
-   */
-  protected $inputTimeZoneRaw = '';
-
-  /**
-   * The prepared timezone object used to construct this date.
-   *
-   * @var string
-   */
-  protected $inputTimeZoneAdjusted = '';
-
-  /**
-   * The value of the format passed to the constructor.
-   *
-   * @var string
-   */
-  protected $inputFormatRaw = '';
-
-  /**
-   * The prepared format, if provided.
-   *
-   * @var string
-   */
-  protected $inputFormatAdjusted = '';
-
-  /**
    * The value of the language code passed to the constructor.
    *
    * @var string|null
@@ -219,6 +163,7 @@ class DateTimePlus {
    *   to use things like negative years, which php's parser fails on, or
    *   any other specialized input with a known format. If provided the
    *   date will be created using the createFromFormat() method.
+   *   phpcs:ignore Drupal.Commenting.FunctionComment.ParamCommentFullStop
    *   @see http://php.net/manual/datetime.createfromformat.php
    * @param string $time
    *   String representing the time.
@@ -285,6 +230,7 @@ class DateTimePlus {
    *   parameter and the current timezone are ignored when the $time parameter
    *   either is a UNIX timestamp (e.g. @946684800) or specifies a timezone
    *   (e.g. 2010-01-28T15:00:00+02:00).
+   *   phpcs:ignore Drupal.Commenting.FunctionComment.ParamCommentFullStop
    *   @see http://php.net/manual/datetime.construct.php
    * @param array $settings
    *   (optional) Keyed array of settings. Defaults to empty array.
@@ -517,7 +463,7 @@ class DateTimePlus {
    *   otherwise.
    */
   public function hasErrors() {
-    return (boolean) count($this->errors);
+    return (bool) count($this->errors);
   }
 
   /**

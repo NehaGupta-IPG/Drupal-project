@@ -34,7 +34,7 @@ class LanguageHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.language':
         $output = '';
@@ -136,23 +136,7 @@ class LanguageHooks {
       case 'language.content_settings_page':
         return '<p>' . $this->t("Change language settings for <em>content types</em>, <em>taxonomy vocabularies</em>, <em>user profiles</em>, or any other supported element on your site. By default, language settings hide the language selector and the language is the site's default language.") . '</p>';
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'language_negotiation_configure_form' => [
-        'render element' => 'form',
-        'file' => 'language.admin.inc',
-      ],
-      'language_content_settings_table' => [
-        'render element' => 'element',
-        'file' => 'language.admin.inc',
-      ],
-    ];
+    return NULL;
   }
 
   /**

@@ -41,7 +41,7 @@ class ContentModerationHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       // Main module help for the content_moderation module.
       case 'help.page.content_moderation':
@@ -78,6 +78,7 @@ class ContentModerationHooks {
         $output .= '</dl>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -198,7 +199,11 @@ class ContentModerationHooks {
   #[Hook('entity_form_display_alter')]
   public function entityFormDisplayAlter(EntityFormDisplayInterface $form_display, array $context): void {
     if ($context['form_mode'] === 'layout_builder') {
-      $form_display->setComponent('moderation_state', ['type' => 'moderation_state_default', 'weight' => -900, 'settings' => []]);
+      $form_display->setComponent('moderation_state', [
+        'type' => 'moderation_state_default',
+        'weight' => -900,
+        'settings' => [],
+      ]);
     }
   }
 

@@ -23,7 +23,7 @@ class ViewsUiHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.views_ui':
         $output = '';
@@ -57,6 +57,7 @@ class ViewsUiHooks {
         $output .= '</dl>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -66,91 +67,6 @@ class ViewsUiHooks {
   public function entityTypeBuild(array &$entity_types): void {
     /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
     $entity_types['view']->setFormClass('edit', 'Drupal\views_ui\ViewEditForm')->setFormClass('add', 'Drupal\views_ui\ViewAddForm')->setFormClass('preview', 'Drupal\views_ui\ViewPreviewForm')->setFormClass('duplicate', 'Drupal\views_ui\ViewDuplicateForm')->setFormClass('delete', 'Drupal\Core\Entity\EntityDeleteForm')->setFormClass('break_lock', 'Drupal\views_ui\Form\BreakLockForm')->setListBuilderClass('Drupal\views_ui\ViewListBuilder')->setLinkTemplate('edit-form', '/admin/structure/views/view/{view}')->setLinkTemplate('edit-display-form', '/admin/structure/views/view/{view}/edit/{display_id}')->setLinkTemplate('preview-form', '/admin/structure/views/view/{view}/preview/{display_id}')->setLinkTemplate('duplicate-form', '/admin/structure/views/view/{view}/duplicate')->setLinkTemplate('delete-form', '/admin/structure/views/view/{view}/delete')->setLinkTemplate('enable', '/admin/structure/views/view/{view}/enable')->setLinkTemplate('disable', '/admin/structure/views/view/{view}/disable')->setLinkTemplate('break-lock-form', '/admin/structure/views/view/{view}/break-lock')->setLinkTemplate('collection', '/admin/structure/views');
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-          // Edit a view
-      'views_ui_display_tab_setting' => [
-        'variables' => [
-          'description' => '',
-          'link' => '',
-          'settings_links' => [],
-          'overridden' => FALSE,
-          'defaulted' => FALSE,
-          'description_separator' => TRUE,
-          'class' => [],
-        ],
-        'file' => 'views_ui.theme.inc',
-      ],
-      'views_ui_display_tab_bucket' => [
-        'render element' => 'element',
-        'file' => 'views_ui.theme.inc',
-      ],
-      'views_ui_rearrange_filter_form' => [
-        'render element' => 'form',
-        'file' => 'views_ui.theme.inc',
-      ],
-      'views_ui_expose_filter_form' => [
-        'render element' => 'form',
-        'file' => 'views_ui.theme.inc',
-      ],
-          // Legacy theme hook for displaying views info.
-      'views_ui_view_info' => [
-        'variables' => [
-          'view' => NULL,
-          'displays' => NULL,
-        ],
-        'file' => 'views_ui.theme.inc',
-      ],
-          // List views.
-      'views_ui_views_listing_table' => [
-        'variables' => [
-          'headers' => NULL,
-          'rows' => NULL,
-          'attributes' => [],
-        ],
-        'file' => 'views_ui.theme.inc',
-      ],
-      'views_ui_view_displays_list' => [
-        'variables' => [
-          'displays' => [],
-        ],
-      ],
-          // Group of filters.
-      'views_ui_build_group_filter_form' => [
-        'render element' => 'form',
-        'file' => 'views_ui.theme.inc',
-      ],
-          // On behalf of a plugin
-      'views_ui_style_plugin_table' => [
-        'render element' => 'form',
-        'file' => 'views_ui.theme.inc',
-      ],
-          // When previewing a view.
-      'views_ui_view_preview_section' => [
-        'variables' => [
-          'view' => NULL,
-          'section' => NULL,
-          'content' => NULL,
-          'links' => '',
-        ],
-        'file' => 'views_ui.theme.inc',
-      ],
-      // Generic container wrapper, to use instead of theme_container when an id
-      // is not desired.
-      'views_ui_container' => [
-        'variables' => [
-          'children' => NULL,
-          'attributes' => [],
-        ],
-        'file' => 'views_ui.theme.inc',
-      ],
-    ];
   }
 
   /**

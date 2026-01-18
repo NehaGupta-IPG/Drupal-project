@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\shortcut\Functional;
 
 use Drupal\block_content\Entity\BlockContentType;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Url;
 use Drupal\shortcut\Entity\Shortcut;
 use Drupal\shortcut\Entity\ShortcutSet;
 use Drupal\Tests\block\Functional\AssertBlockAppearsTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Create, view, edit, delete, and change shortcut links.
- *
- * @group shortcut
  */
+#[Group('shortcut')]
+#[RunTestsInSeparateProcesses]
 class ShortcutLinksTest extends ShortcutTestBase {
 
   use AssertBlockAppearsTrait;
@@ -109,10 +110,10 @@ class ShortcutLinksTest extends ShortcutTestBase {
       $this->assertContains('internal:' . $test_path, $paths, 'Shortcut created: ' . $test_path);
 
       if (in_array($test_path, $test_cases_non_access)) {
-        $this->assertSession()->linkNotExists($title, new FormattableMarkup('Shortcut link %url not accessible on the page.', ['%url' => $test_path]));
+        $this->assertSession()->linkNotExists($title, "Shortcut link $test_path not accessible on the page.");
       }
       else {
-        $this->assertSession()->linkExists($title, 0, new FormattableMarkup('Shortcut link %url found on the page.', ['%url' => $test_path]));
+        $this->assertSession()->linkExists($title, 0, "Shortcut link $test_path found on the page.");
       }
     }
     $saved_set = ShortcutSet::load($set->id());
@@ -171,8 +172,6 @@ class ShortcutLinksTest extends ShortcutTestBase {
   public function testShortcutQuickLink(): void {
     \Drupal::service('theme_installer')->install(['claro']);
     $this->config('system.theme')->set('admin', 'claro')->save();
-    $this->config('node.settings')->set('use_admin_theme', '1')->save();
-    $this->container->get('router.builder')->rebuild();
 
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/config/system/cron');
@@ -488,7 +487,7 @@ class ShortcutLinksTest extends ShortcutTestBase {
    */
   protected function assertShortcutQuickLink(string $label, int $index = 0, string $message = ''): void {
     $links = $this->xpath('//a[normalize-space()=:label]', [':label' => $label]);
-    $message = ($message ?: (string) new FormattableMarkup('Shortcut quick link with label %label found.', ['%label' => $label]));
+    $message = ($message ?: "Shortcut quick link with label $label found.");
     $this->assertArrayHasKey($index, $links, $message);
   }
 

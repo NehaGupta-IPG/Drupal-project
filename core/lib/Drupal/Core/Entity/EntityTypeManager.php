@@ -68,7 +68,7 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations,
+   *   keyed by the corresponding namespace to look for plugin implementations.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
@@ -212,6 +212,9 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
     }
 
     $form_object = $this->classResolver->getInstanceFromDefinition($class);
+    if (!$form_object instanceof EntityFormInterface) {
+      throw new InvalidPluginDefinitionException($entity_type_id, sprintf('The "%s" form handler of the "%s" entity type specifies a class "%s" that does not extend "%s".', $operation, $entity_type_id, $class, EntityFormInterface::class));
+    }
 
     return $form_object
       ->setStringTranslation($this->stringTranslation)

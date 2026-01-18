@@ -100,7 +100,7 @@ class TwigExtension extends AbstractExtension {
       // This function will receive a renderable array, if an array is detected.
       new TwigFunction('render_var', [$this, 'renderVar']),
       // The URL and path function are defined in close parallel to those found
-      // in \Symfony\Bridge\Twig\Extension\RoutingExtension
+      // in \Symfony\Bridge\Twig\Extension\RoutingExtension.
       new TwigFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
       new TwigFunction('path', [$this, 'getPath'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
       new TwigFunction('link', [$this, 'getLink']),
@@ -128,7 +128,14 @@ class TwigExtension extends AbstractExtension {
       new TwigFilter('placeholder', [$this, 'escapePlaceholder'], ['is_safe' => ['html'], 'needs_environment' => TRUE]),
 
       // Replace twig's escape filter with our own.
-      new TwigFilter('drupal_escape', [$this, 'escapeFilter'], ['needs_environment' => TRUE, 'is_safe_callback' => 'twig_escape_filter_is_safe']),
+      new TwigFilter(
+        'drupal_escape',
+        [$this, 'escapeFilter'],
+        [
+          'needs_environment' => TRUE,
+          'is_safe_callback' => 'twig_escape_filter_is_safe',
+        ]
+      ),
 
       // Implements safe joining.
       // @todo Make that the default for |join? Upstream issue:
@@ -432,8 +439,15 @@ class TwigExtension extends AbstractExtension {
 
     $this->bubbleArgMetadata($arg);
 
+    // Immediately cast and return MarkupInterface objects to a string to ensure
+    // that when Twig renders via yield, later manipulations to the object will
+    // not affect rendering.
+    if ($autoescape && ($arg instanceof MarkupInterface)) {
+      return (string) $arg;
+    }
+
     // Keep \Twig\Markup objects intact to support autoescaping.
-    if ($autoescape && ($arg instanceof TwigMarkup || $arg instanceof MarkupInterface)) {
+    if ($autoescape && ($arg instanceof TwigMarkup)) {
       return $arg;
     }
 
@@ -463,7 +477,10 @@ class TwigExtension extends AbstractExtension {
     // We have a string or an object converted to a string: Autoescape it!
     if (isset($return)) {
       if ($autoescape && $return instanceof MarkupInterface) {
-        return $return;
+        // Immediately cast and return MarkupInterface objects to a string to
+        // ensure that when Twig renders via yield, later manipulations to the
+        // object will not affect rendering.
+        return (string) $return;
       }
       // Drupal only supports the HTML escaping strategy, so provide a
       // fallback for other strategies.
@@ -561,6 +578,9 @@ class TwigExtension extends AbstractExtension {
       $this->bubbleArgMetadata($arg);
       if ($arg instanceof RenderableInterface) {
         $arg = $arg->toRenderable();
+      }
+      elseif ($arg instanceof MarkupInterface) {
+        return $arg;
       }
       elseif (method_exists($arg, '__toString')) {
         return (string) $arg;

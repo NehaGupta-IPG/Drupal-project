@@ -19,7 +19,7 @@ class ToolbarHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.toolbar':
         $output = '<h2>' . $this->t('About') . '</h2>';
@@ -33,23 +33,7 @@ class ToolbarHooks {
         $output .= '</dl>';
         return $output;
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme($existing, $type, $theme, $path) : array {
-    $items['toolbar'] = ['render element' => 'element'];
-    $items['menu__toolbar'] = [
-      'base hook' => 'menu',
-      'variables' => [
-        'menu_name' => NULL,
-        'items' => [],
-        'attributes' => [],
-      ],
-    ];
-    return $items;
+    return NULL;
   }
 
   /**

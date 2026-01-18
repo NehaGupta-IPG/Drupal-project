@@ -27,7 +27,7 @@ class PathHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.path':
         $output = '';
@@ -58,6 +58,7 @@ class PathHooks {
       case 'entity.path_alias.add_form':
         return '<p>' . $this->t('Enter the path you wish to create the alias for, followed by the name of the new alias.') . '</p>';
     }
+    return NULL;
   }
 
   /**
@@ -94,8 +95,16 @@ class PathHooks {
           'include_locked' => FALSE,
         ],
       ]);
-      $fields['path']->setDisplayOptions('form', ['type' => 'string_textfield', 'weight' => 5, 'settings' => ['size' => 45]]);
-      $fields['alias']->setDisplayOptions('form', ['type' => 'string_textfield', 'weight' => 10, 'settings' => ['size' => 45]]);
+      $fields['path']->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 5,
+        'settings' => ['size' => 45],
+      ]);
+      $fields['alias']->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => 10,
+        'settings' => ['size' => 45],
+      ]);
     }
   }
 
@@ -105,7 +114,12 @@ class PathHooks {
   #[Hook('entity_base_field_info')]
   public function entityBaseFieldInfo(EntityTypeInterface $entity_type): array {
     if (in_array($entity_type->id(), ['taxonomy_term', 'node', 'media'], TRUE)) {
-      $fields['path'] = BaseFieldDefinition::create('path')->setLabel($this->t('URL alias'))->setTranslatable(TRUE)->setDisplayOptions('form', ['type' => 'path', 'weight' => 30])->setDisplayConfigurable('form', TRUE)->setComputed(TRUE);
+      $fields['path'] = BaseFieldDefinition::create('path')
+        ->setLabel($this->t('URL alias'))
+        ->setTranslatable(TRUE)
+        ->setDisplayOptions('form', ['type' => 'path', 'weight' => 30])
+        ->setDisplayConfigurable('form', TRUE)
+        ->setComputed(TRUE);
       return $fields;
     }
     return [];

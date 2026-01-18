@@ -445,7 +445,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param \Drupal\Core\Entity\Sql\TableMappingInterface $table_mapping
-   *   The table mapping information
+   *   The table mapping information.
    * @param array $table_data
    *   A reference to a specific entity table (for example data_table) inside
    *   the views data.
@@ -596,8 +596,12 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
         }
     }
 
-    // Do post-processing for a few field types.
+    if (!$field_definition->isRequired()) {
+      // Provides "Is empty (NULL)" and "Is not empty (NOT NULL)" operators.
+      $views_field['filter']['allow empty'] = TRUE;
+    }
 
+    // Do post-processing for a few field types.
     $process_method = 'processViewsDataFor' . Container::camelize($field_type);
     if (method_exists($this, $process_method)) {
       $this->{$process_method}($table, $field_definition, $views_field, $column_name);

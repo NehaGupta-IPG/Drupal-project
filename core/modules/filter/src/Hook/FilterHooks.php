@@ -18,7 +18,7 @@ class FilterHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.filter':
         $output = '';
@@ -61,41 +61,7 @@ class FilterHooks {
         $output = '<p>' . $this->t('A text format contains filters that change the display of user input; for example, stripping out malicious HTML or making URLs clickable. Filters are executed from top to bottom and the order is important, since one filter may prevent another filter from doing its job. For example, when URLs are converted into links before disallowed HTML tags are removed, all links may be removed. When this happens, the order of filters may need to be rearranged.') . '</p>';
         return $output;
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'filter_tips' => [
-        'variables' => [
-          'tips' => NULL,
-          'long' => FALSE,
-        ],
-      ],
-      'text_format_wrapper' => [
-        'variables' => [
-          'children' => NULL,
-          'description' => NULL,
-          'attributes' => [],
-        ],
-      ],
-      'filter_guidelines' => [
-        'variables' => [
-          'format' => NULL,
-        ],
-      ],
-      'filter_caption' => [
-        'variables' => [
-          'node' => NULL,
-          'tag' => NULL,
-          'caption' => NULL,
-          'classes' => NULL,
-        ],
-      ],
-    ];
+    return NULL;
   }
 
   /**

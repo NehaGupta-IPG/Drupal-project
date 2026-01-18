@@ -20,7 +20,7 @@ class SearchHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.search':
         $output = '';
@@ -71,22 +71,7 @@ class SearchHooks {
         $output .= '</dl>';
         return $output;
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'search_result' => [
-        'variables' => [
-          'result' => NULL,
-          'plugin_id' => NULL,
-        ],
-        'file' => 'search.pages.inc',
-      ],
-    ];
+    return NULL;
   }
 
   /**

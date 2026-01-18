@@ -20,7 +20,7 @@ class TaxonomyHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.taxonomy':
         $field_ui_url = \Drupal::moduleHandler()->moduleExists('field_ui') ? Url::fromRoute('help.page', ['name' => 'field_ui'])->toString() : '#';
@@ -70,14 +70,7 @@ class TaxonomyHooks {
         $output = '<p>' . $this->t('Taxonomy is for categorizing content. Terms are grouped into vocabularies. For example, a vocabulary called "Fruit" would contain the terms "Apple" and "Banana".') . '</p>';
         return $output;
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return ['taxonomy_term' => ['render element' => 'elements']];
+    return NULL;
   }
 
   /**
@@ -178,5 +171,10 @@ class TaxonomyHooks {
       \Drupal::database()->delete('taxonomy_index')->condition('tid', $term->id())->execute();
     }
   }
+
+  // phpcs:ignore Drupal.Commenting.InlineComment.DocBlock
+  /**
+   * @} End of "defgroup taxonomy_index".
+   */
 
 }

@@ -19,7 +19,7 @@ class LinkHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.link':
         $output = '';
@@ -54,22 +54,7 @@ class LinkHooks {
         $output .= '</dl>';
         return $output;
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'link_formatter_link_separate' => [
-        'variables' => [
-          'title' => NULL,
-          'url_title' => NULL,
-          'url' => NULL,
-        ],
-      ],
-    ];
+    return NULL;
   }
 
   /**

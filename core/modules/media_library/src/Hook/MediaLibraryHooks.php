@@ -32,7 +32,7 @@ class MediaLibraryHooks {
    * Implements hook_help().
    */
   #[Hook('help')]
-  public function help($route_name, RouteMatchInterface $route_match) {
+  public function help($route_name, RouteMatchInterface $route_match): ?string {
     switch ($route_name) {
       case 'help.page.media_library':
         $output = '<h2>' . $this->t('About') . '</h2>';
@@ -76,6 +76,7 @@ class MediaLibraryHooks {
         $output .= '</ul>';
         return $output;
     }
+    return NULL;
   }
 
   /**
@@ -98,24 +99,6 @@ class MediaLibraryHooks {
     if (empty($sources['oembed:video']['forms']['media_library_add'])) {
       $sources['oembed:video']['forms']['media_library_add'] = OEmbedForm::class;
     }
-  }
-
-  /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'media__media_library' => [
-        'base hook' => 'media',
-      ],
-      'media_library_wrapper' => [
-        'render element' => 'element',
-      ],
-      'media_library_item' => [
-        'render element' => 'element',
-      ],
-    ];
   }
 
   /**
