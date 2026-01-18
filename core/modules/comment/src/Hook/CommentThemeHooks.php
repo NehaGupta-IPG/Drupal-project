@@ -4,6 +4,7 @@ namespace Drupal\comment\Hook;
 
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
@@ -22,6 +23,7 @@ class CommentThemeHooks {
     protected DateFormatterInterface $dateFormatter,
     protected RendererInterface $renderer,
     protected EntityTypeManagerInterface $entityTypeManager,
+    protected ThemeSettingsProvider $themeSettingsProvider,
   ) {
 
   }
@@ -98,7 +100,7 @@ class CommentThemeHooks {
         $variables['changed'] = $this->dateFormatter->format($comment->getChangedTime());
       }
 
-      if (theme_get_setting('features.comment_user_picture')) {
+      if ($this->themeSettingsProvider->getSetting('features.comment_user_picture')) {
         // To change user picture settings (for instance, image style), edit the
         // 'compact' view mode on the User entity.
         $variables['user_picture'] = $this->entityTypeManager
@@ -109,7 +111,10 @@ class CommentThemeHooks {
         $variables['user_picture'] = [];
       }
 
-      $variables['submitted'] = $this->t('Submitted by @username on @datetime', ['@username' => $variables['author'], '@datetime' => $variables['created']]);
+      $variables['submitted'] = $this->t('Submitted by @username on @datetime', [
+        '@username' => $variables['author'],
+        '@datetime' => $variables['created'],
+      ]);
     }
 
     if (isset($comment->in_preview)) {
@@ -208,8 +213,11 @@ class CommentThemeHooks {
    *   An associative array containing:
    *   - element: An associative array containing render arrays for the list of
    *     comments, and the comment form. Array keys: comments, comment_form.
+   *
+   * @todo Rename to preprocess_field__comment() once
+   *   https://www.drupal.org/node/3566850 is resolved.
    */
-  #[Hook('preprocess_field__comment')]
+  #[Hook('preprocess_field')]
   public function preprocessField(&$variables): void {
     $element = $variables['element'];
     // We need to check for the field type even though we are using the comment

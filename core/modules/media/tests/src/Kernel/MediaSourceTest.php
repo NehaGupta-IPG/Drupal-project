@@ -10,12 +10,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\media\Entity\Media;
 use Drupal\media\Entity\MediaType;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore sisko
 /**
  * Tests media source plugins related logic.
  */
 #[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaSourceTest extends MediaKernelTestBase {
 
   /**
@@ -656,7 +658,7 @@ class MediaSourceTest extends MediaKernelTestBase {
    */
   protected function createMediaTypeViaForm($source_plugin_id, $field_name): void {
     /** @var \Drupal\media\MediaTypeInterface $type */
-    $type = MediaType::create(['source' => $source_plugin_id]);
+    $type = MediaType::create(['source' => $source_plugin_id, 'id' => 'test_media_type']);
 
     $form = $this->container->get('entity_type.manager')
       ->getFormObject('media_type', 'add')

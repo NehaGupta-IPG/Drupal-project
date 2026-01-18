@@ -14,6 +14,7 @@ use Drupal\field_layout\FieldLayoutBuilder;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 
 /**
@@ -21,6 +22,7 @@ use Prophecy\Argument;
  */
 #[CoversClass(FieldLayoutBuilder::class)]
 #[Group('field_layout')]
+#[IgnoreDeprecations]
 class FieldLayoutBuilderTest extends UnitTestCase {
 
   /**
@@ -283,8 +285,6 @@ class FieldLayoutBuilderTest extends UnitTestCase {
 
   /**
    * Tests build form empty.
-   *
-   * @legacy-covers ::buildForm
    */
   public function testBuildFormEmpty(): void {
     $definitions = [];
@@ -326,8 +326,6 @@ class FieldLayoutBuilderTest extends UnitTestCase {
 
   /**
    * Tests build form no layout.
-   *
-   * @legacy-covers ::buildForm
    */
   public function testBuildFormNoLayout(): void {
     $this->entityFieldManager->getFieldDefinitions(Argument::any(), Argument::any())->shouldNotBeCalled();

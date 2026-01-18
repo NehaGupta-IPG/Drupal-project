@@ -10,11 +10,13 @@ use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\SelectExtender;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Select query builder.
  */
 #[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class SelectTest extends DatabaseTestBase {
 
   /**
@@ -76,7 +78,7 @@ class SelectTest extends DatabaseTestBase {
   /**
    * Provides expected and input values for testVulnerableComment().
    */
-  public function makeCommentsProvider() {
+  public function makeCommentsProvider(): array {
     return [
       [
         '/*  */ ',
@@ -501,7 +503,7 @@ class SelectTest extends DatabaseTestBase {
    *     - the regular expression pattern to search for.
    *     - the regular expression operator 'REGEXP' or 'NOT REGEXP'.
    */
-  public static function providerRegularExpressionCondition() {
+  public static function providerRegularExpressionCondition(): array {
     return [
       [['John'], 'name', 'hn$', 'REGEXP'],
       [['Paul'], 'name', '^Pau', 'REGEXP'],
@@ -600,7 +602,7 @@ class SelectTest extends DatabaseTestBase {
    *   Array of non array compatible operators and its value in the expected
    *   exception message.
    */
-  public static function providerNonArrayOperatorWithArrayValueCondition() {
+  public static function providerNonArrayOperatorWithArrayValueCondition(): array {
     return [
       '=' => ['=', '='],
       '>' => ['>', '>'],

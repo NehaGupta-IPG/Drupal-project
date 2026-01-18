@@ -9,13 +9,16 @@ use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\ClassResolverConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests ClassResolver validation constraint with both valid and invalid values.
  */
 #[Group('Validation')]
 #[CoversClass(ClassResolverConstraintValidator::class)]
+#[RunTestsInSeparateProcesses]
 class ClassResolverConstraintValidatorTest extends KernelTestBase {
 
   /**
@@ -94,8 +97,9 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
   }
 
   /**
-   * @dataProvider provideServiceValidationCases
+   * Tests validation for service.
    */
+  #[DataProvider('provideServiceValidationCases')]
   public function testValidationForService(string $method, int $expected_violations, string $message, ?string $expected_violation_message = NULL): void {
     $definition = DataDefinition::create('integer')
       ->addConstraint('ClassResolver', ['classOrService' => 'test.service', 'method' => $method]);

@@ -9,12 +9,14 @@ use Drupal\rest\Entity\RestResourceConfig;
 use Drupal\rest\RestResourceConfigInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\rest\Entity\RestResourceConfig.
  */
 #[CoversClass(RestResourceConfig::class)]
 #[Group('rest')]
+#[RunTestsInSeparateProcesses]
 class RestResourceConfigTest extends KernelTestBase {
 
   /**
@@ -30,8 +32,6 @@ class RestResourceConfigTest extends KernelTestBase {
 
   /**
    * Tests calculate dependencies.
-   *
-   * @legacy-covers ::calculateDependencies
    */
   public function testCalculateDependencies(): void {
     $rest_config = RestResourceConfig::create([

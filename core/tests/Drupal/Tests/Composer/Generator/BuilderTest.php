@@ -21,7 +21,7 @@ class BuilderTest extends TestCase {
   /**
    * Provides test data for testBuilder.
    */
-  public static function builderTestData() {
+  public static function builderTestData(): array {
     return [
       [
         DrupalCoreRecommendedBuilder::class,
@@ -40,6 +40,13 @@ class BuilderTest extends TestCase {
           [
             'webflo/drupal-core-strict' => '*',
           ],
+          'extra' =>
+          [
+            'branch-alias' =>
+            [
+              'dev-main' => '12.x-dev',
+            ],
+          ],
         ],
       ],
 
@@ -57,6 +64,13 @@ class BuilderTest extends TestCase {
           'conflict' =>
           [
             'webflo/drupal-core-require-dev' => '*',
+          ],
+          'extra' =>
+          [
+            'branch-alias' =>
+            [
+              'dev-main' => '12.x-dev',
+            ],
           ],
         ],
       ],
@@ -77,6 +91,13 @@ class BuilderTest extends TestCase {
           'conflict' =>
           [
             'webflo/drupal-core-require-dev' => '*',
+          ],
+          'extra' =>
+          [
+            'branch-alias' =>
+            [
+              'dev-main' => '12.x-dev',
+            ],
           ],
         ],
       ],
