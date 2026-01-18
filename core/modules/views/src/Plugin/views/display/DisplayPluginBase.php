@@ -860,14 +860,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         // If aggregation is on, the group type might override the actual
         // handler that is in use. This piece of code checks that and,
         // if necessary, sets the override handler.
-        $override = NULL;
         if ($this->useGroupBy() && !empty($info['group_type'])) {
           if (empty($this->view->query)) {
             $this->view->initQuery();
-          }
-          $aggregate = $this->view->query->getAggregationInfo();
-          if (!empty($aggregate[$info['group_type']]['handler'][$type])) {
-            $override = $aggregate[$info['group_type']]['handler'][$type];
           }
         }
 
@@ -877,8 +872,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         else {
           $handler_type = $type;
         }
-
-        if ($handler = Views::handlerManager($handler_type)->getHandler($info, $override)) {
+        if ($handler = Views::handlerManager($handler_type)->getHandler($info)) {
           // Special override for area types so they know where they come from.
           if ($handler instanceof AreaPluginBase) {
             $handler->areaType = $type;
