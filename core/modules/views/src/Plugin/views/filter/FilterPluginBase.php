@@ -1241,7 +1241,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       // Force the operator form to be a select box. Some handlers uses
       // radios and they occupy a lot of space in a table row.
       $row['operator']['#type'] = 'select';
-      $row['operator']['#title'] = '';
+      $row['operator']['#title_display'] = 'invisible';
       $this->valueForm($row, $form_state);
 
       // Fix the dependencies to update value forms when operators changes. This
@@ -1257,7 +1257,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
           if (!empty($row['value'][$child]['#states']['visible'])) {
             foreach ($row['value'][$child]['#states']['visible'] as $state) {
               if (isset($state[':input[name="options[group_info][group_items][' . $item_id . '][operator]"]'])) {
-                $row['value'][$child]['#title'] = '';
+                $row['value'][$child]['#title_display'] = 'invisible';
 
                 // Exit this loop and process the next child element.
                 break;
