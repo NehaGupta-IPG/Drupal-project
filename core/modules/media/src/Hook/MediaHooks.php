@@ -3,7 +3,12 @@
 namespace Drupal\media\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\file\FileUsage\FileUsageInterface;
+use Drupal\file\Plugin\Field\FieldType\FileItem;
+use Drupal\media\MediaInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
@@ -21,6 +26,13 @@ use Drupal\Core\Hook\Attribute\Hook;
 class MediaHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    private readonly ConfigFactoryInterface $configFactory,
+    private readonly FileUsageInterface $fileUsage,
+    private readonly AccountInterface $currentUser,
+    private readonly LoggerChannelFactoryInterface $loggerFactory,
+  ) {}
 
   /**
    * Implements hook_help().
@@ -275,6 +287,53 @@ class MediaHooks {
     // The `media` field type belongs in the `general` category, so the
     // libraries need to be attached using an alter hook.
     $definitions[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY]['libraries'][] = 'media/drupal.media-icon';
+  }
+
+  /**
+   * Implements hook_ENTIT_TYPE_delete() for media items.
+   */
+  #[Hook('media_delete')]
+  public function mediaDelete(MediaInterface $media): void {
+    $source = $media->getSource();
+    $source_field = $source->getSourceFieldDefinition($media->bundle->entity);
+
+    // If the source field is not a file field, there's nothing else to do.
+    if (!is_a($source_field->getItemDefinition()->getClass(), FileItem::class, TRUE)) {
+      return;
+    }
+    // If we're not configured to delete files associated with media items,
+    // there's nothing else to do.
+    if (!$this->configFactory->get('media.settings')->get('delete_files')) {
+      return;
+    }
+
+    $file = $media->get($source_field->getName())->entity;
+    if ($file) {
+      $access = $file->access('delete', $this->currentUser);
+      $usages = $this->fileUsage->countUsage($file);
+      $logger = $this->loggerFactory->get('media');
+
+      if ($access && $usages <= 1) {
+        $file->delete();
+        $logger->notice('The file attached to media item %name was deleted.', [
+          '%name' => $media->label(),
+        ]);
+      }
+      else {
+        if (!$access) {
+          $logger->notice('The file attached to media item %name was retained because %user does not have permission to delete it.', [
+            '%name' => $media->label(),
+            '%user' => $this->currentUser->getDisplayName(),
+          ]);
+        }
+        if ($usages > 1) {
+          $logger->notice('The file attached to media item %name was retained because it has @count additional usage(s).', [
+            '%name' => $media->label(),
+            '@count' => $usages - 1,
+          ]);
+        }
+      }
+    }
   }
 
 }

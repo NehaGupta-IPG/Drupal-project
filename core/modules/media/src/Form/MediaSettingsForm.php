@@ -115,6 +115,12 @@ class MediaSettingsForm extends ConfigFormBase {
       '#config_target' => 'media.settings:standalone_url',
       '#description' => $this->t("Allow users to access @media-entities at /media/{id}.", ['@media-entities' => $this->entityTypeManager->getDefinition('media')->getPluralLabel()]),
     ];
+
+    $form['delete_files'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('When deleting media items, also delete the associated files'),
+      '#config_target' => 'media.settings:delete_files',
+    ];
     return parent::buildForm($form, $form_state);
   }
 

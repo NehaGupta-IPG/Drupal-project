@@ -15,6 +15,9 @@ media.settings:
     standalone_url:
       type: boolean
       label: 'Allow media items to be viewed standalone at /media/{id}'
+    delete_files:
+      type: boolean
+      label: 'When deleting media items, also delete the associated files'
 
 media.type.*:
   type: config_entity
