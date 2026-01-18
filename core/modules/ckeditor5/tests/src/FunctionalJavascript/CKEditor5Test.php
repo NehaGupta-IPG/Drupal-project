@@ -341,6 +341,7 @@ JS;
     // Initial vertical tabs: 3 for filters, 1 for CKE5 plugins.
     $this->assertSame([
       'Limit allowed HTML tags and correct faulty HTML',
+      'Track images uploaded via a Text Editor',
       'Convert URLs into links',
       'Embed media',
     ], $this->getVerticalTabs('#filter-settings-wrapper', FALSE));

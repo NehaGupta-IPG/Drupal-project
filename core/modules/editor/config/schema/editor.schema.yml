@@ -90,3 +90,11 @@ editor.image_upload_settings.1:
               # @see editor_image_upload_settings_form()
               min: 1
               max: 99999
+
+filter_settings.editor_file_reference:
+  type: filter
+  label: 'Track images uploaded via a Text Editor'
+  mapping:
+    absolute:
+      type: boolean
+      label: 'Use absolute URLs'

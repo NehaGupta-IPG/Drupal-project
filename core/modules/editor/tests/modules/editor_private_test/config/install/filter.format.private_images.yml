@@ -11,7 +11,8 @@ filters:
     provider: editor
     status: true
     weight: 0
-    settings: {  }
+    settings:
+      absolute: false
   filter_html:
     id: filter_html
     provider: filter

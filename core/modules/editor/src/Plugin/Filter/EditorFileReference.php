@@ -4,6 +4,7 @@ namespace Drupal\editor\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -23,7 +24,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   id: "editor_file_reference",
   title: new TranslatableMarkup("Track images uploaded via a Text Editor"),
   description: new TranslatableMarkup("Ensures that the latest versions of images uploaded via a Text Editor are displayed, along with their dimensions."),
-  type: FilterInterface::TYPE_TRANSFORM_REVERSIBLE
+  type: FilterInterface::TYPE_TRANSFORM_REVERSIBLE,
+  settings: [
+    "absolute" => FALSE,
+  ],
 )]
 class EditorFileReference extends FilterBase implements ContainerFactoryPluginInterface {
 
@@ -77,6 +81,19 @@ class EditorFileReference extends FilterBase implements ContainerFactoryPluginIn
   /**
    * {@inheritdoc}
    */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $form['absolute'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use absolute URLs'),
+      '#default_value' => $this->settings['absolute'],
+      '#description' => $this->t('If enabled, the URLs output by this filter will be absolute.'),
+    ];
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function process($text, $langcode) {
     $result = new FilterProcessResult($text);
 
@@ -92,7 +109,7 @@ class EditorFileReference extends FilterBase implements ContainerFactoryPluginIn
         if ($node->hasAttribute('src')) {
           $file = $this->entityRepository->loadEntityByUuid('file', $uuid);
           if ($file instanceof FileInterface) {
-            $node->setAttribute('src', $file->createFileUrl());
+            $node->setAttribute('src', $file->createFileUrl(!$this->settings['absolute']));
             if ($node->nodeName == 'img') {
               $image = $this->imageFactory->get($file->getFileUri());
               $width = $image->getWidth();
