@@ -9,14 +9,18 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * @coversDefaultClass \Drupal\Core\DependencyInjection\YamlFileLoader
- * @group DependencyInjection
+ * Tests Drupal\Core\DependencyInjection\YamlFileLoader.
  */
+#[CoversClass(YamlFileLoader::class)]
+#[Group('DependencyInjection')]
 class YamlFileLoaderTest extends UnitTestCase {
 
   /**
@@ -37,7 +41,7 @@ services:
   example_private_service:
     class: \Drupal\Core\ExampleClass
     public: false
-  Drupal\Core\ExampleClass: ~
+  Drupal\Tests\Core\DependencyInjection\YamlFileLoaderTest: ~
   example_tagged_iterator:
     class: \Drupal\Core\ExampleClass
     arguments: [!tagged_iterator foo.bar]
@@ -68,8 +72,8 @@ YAML;
     $builder->compile();
     $this->assertTrue($builder->has('example_service_1'));
     $this->assertFalse($builder->has('example_private_service'));
-    $this->assertTrue($builder->has('Drupal\Core\ExampleClass'));
-    $this->assertSame('Drupal\Core\ExampleClass', $builder->getDefinition('Drupal\Core\ExampleClass')->getClass());
+    $this->assertTrue($builder->has('Drupal\Tests\Core\DependencyInjection\YamlFileLoaderTest'));
+    $this->assertSame('Drupal\Tests\Core\DependencyInjection\YamlFileLoaderTest', $builder->getDefinition('Drupal\Tests\Core\DependencyInjection\YamlFileLoaderTest')->getClass());
     $this->assertInstanceOf(TaggedIteratorArgument::class, $builder->getDefinition('example_tagged_iterator')->getArgument(0));
 
     // Test service closures.
@@ -87,8 +91,9 @@ YAML;
   }
 
   /**
-   * @dataProvider providerTestExceptions
-   */
+ * Tests exceptions.
+ */
+  #[DataProvider('providerTestExceptions')]
   public function testExceptions($yml, $message): void {
     vfsStream::setup('drupal', NULL, [
       'modules' => [
@@ -106,7 +111,7 @@ YAML;
     $yaml_file_loader->load('vfs://drupal/modules/example/example.yml');
   }
 
-  public static function providerTestExceptions() {
+  public static function providerTestExceptions(): array {
     return [
       '_defaults must be an array' => [<<<YAML
 services:

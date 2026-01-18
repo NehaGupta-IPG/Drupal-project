@@ -14,18 +14,21 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
-use Drupal\workspaces\Form\WorkspacePublishForm;
 use Drupal\workspaces\WorkspaceOperationFactory;
+use Drupal\workspaces\WorkspacePublisher;
 use Drupal\workspaces\WorkspacePublisherInterface;
+use Drupal\workspaces_ui\Form\WorkspacePublishForm;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Log\LoggerInterface;
 
 /**
  * Tests workspace publishing.
- *
- * @coversDefaultClass \Drupal\workspaces\WorkspacePublisher
- *
- * @group workspaces
  */
+#[CoversClass(WorkspacePublisher::class)]
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspacePublisherTest extends KernelTestBase {
 
   use NodeCreationTrait;
@@ -44,6 +47,7 @@ class WorkspacePublisherTest extends KernelTestBase {
     'node',
     'user',
     'workspaces',
+    'workspaces_ui',
   ];
 
   /**
@@ -59,7 +63,7 @@ class WorkspacePublisherTest extends KernelTestBase {
     $this->installEntitySchema('workspace');
 
     $this->installSchema('node', ['node_access']);
-    $this->installSchema('workspaces', ['workspace_association']);
+    $this->installSchema('workspaces', ['workspace_association', 'workspace_association_revision']);
   }
 
   /**
@@ -105,7 +109,9 @@ class WorkspacePublisherTest extends KernelTestBase {
   }
 
   /**
-   * @covers \Drupal\workspaces\Form\WorkspacePublishForm::submitForm
+   * Tests submit form with exception.
+   *
+   * @legacy-covers \Drupal\workspaces\Form\WorkspacePublishForm::submitForm
    */
   public function testSubmitFormWithException(): void {
     /** @var \Drupal\Core\Messenger\MessengerInterface $messenger */
