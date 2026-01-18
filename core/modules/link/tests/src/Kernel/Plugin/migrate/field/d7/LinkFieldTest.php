@@ -10,6 +10,7 @@ use Drupal\link\Plugin\migrate\field\d7\LinkField;
 use Drupal\migrate\Plugin\MigrationInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 
 /**
@@ -17,6 +18,7 @@ use Prophecy\Argument;
  */
 #[CoversClass(LinkField::class)]
 #[Group('link')]
+#[RunTestsInSeparateProcesses]
 class LinkFieldTest extends KernelTestBase {
 
   /**
@@ -53,8 +55,6 @@ class LinkFieldTest extends KernelTestBase {
 
   /**
    * Tests alter field instance migration.
-   *
-   * @legacy-covers ::alterFieldInstanceMigration
    */
   public function testAlterFieldInstanceMigration($method = 'alterFieldInstanceMigration'): void {
     $this->plugin->$method($this->migration);

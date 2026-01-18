@@ -6,30 +6,30 @@ namespace Drupal\Tests\jsonapi\Kernel\ResourceType;
 
 use Drupal\Core\Database\Database;
 use Drupal\jsonapi\ResourceType\ResourceType;
+use Drupal\jsonapi\ResourceType\ResourceTypeRepository;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\jsonapi\ResourceType\ResourceType.
  *
- * @coversClass \Drupal\jsonapi\ResourceType\ResourceTypeRepository
- *
  * @internal
  */
 #[CoversClass(ResourceType::class)]
+#[CoversClass(ResourceTypeRepository::class)]
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class RelatedResourceTypesTest extends JsonapiKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'file',
     'node',
-    'jsonapi',
     'serialization',
     'user',
     'field',
@@ -118,8 +118,6 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
 
   /**
    * Tests get relatable resource types.
-   *
-   * @legacy-covers ::getRelatableResourceTypes
    */
   #[DataProvider('getRelatableResourceTypesProvider')]
   public function testGetRelatableResourceTypes($resource_type_name, $relatable_type_names): void {
@@ -173,8 +171,6 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
 
   /**
    * Tests get relatable resource types by field.
-   *
-   * @legacy-covers ::getRelatableResourceTypesByField
    */
   #[DataProvider('getRelatableResourceTypesByFieldProvider')]
   public function testGetRelatableResourceTypesByField($entity_type_id, $bundle, $field): void {

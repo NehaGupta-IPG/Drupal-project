@@ -23,6 +23,7 @@ use PhpTuf\ComposerStager\API\Process\Value\OutputTypeEnum;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -32,6 +33,7 @@ use Prophecy\Prophecy\ObjectProphecy;
  */
 #[CoversClass(ComposerInspector::class)]
 #[Group('package_manager')]
+#[RunTestsInSeparateProcesses]
 class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   use InstalledPackagesListTrait;
@@ -108,8 +110,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests get installed packages list.
-   *
-   * @legacy-covers ::getInstalledPackagesList
    */
   public function testGetInstalledPackagesList(): void {
     $project_root = $this->container->get(PathLocator::class)
@@ -307,8 +307,6 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
   /**
    * Tests get version.
-   *
-   * @legacy-covers ::getVersion
    */
   #[TestWith(["2.5.6"])]
   #[TestWith([NULL])]

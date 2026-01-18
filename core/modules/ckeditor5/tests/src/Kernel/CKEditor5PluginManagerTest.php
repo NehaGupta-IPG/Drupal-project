@@ -21,6 +21,7 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\Yaml\Yaml;
@@ -32,6 +33,7 @@ use Symfony\Component\Yaml\Yaml;
  * @internal
  */
 #[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class CKEditor5PluginManagerTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
@@ -170,6 +172,10 @@ YAML,
     // @see \Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass
     // @see \Drupal\Core\DrupalKernel::guessApplicationRoot()
     $container->getDefinition('module_handler')->setArgument(0, '%app.root%');
+
+    // The key value service is set directly in kernel tests, and set as
+    // synthetic and then can't be reconstructed.
+    $container->set('keyvalue', $this->container->get('keyvalue'));
 
     // To discover per-test case config schema YAML files, work around the
     // static file cache in \Drupal\Core\Extension\ExtensionDiscovery. There is

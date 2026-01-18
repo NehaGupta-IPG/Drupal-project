@@ -13,6 +13,7 @@ use Drupal\migrate\Plugin\MigratePluginManagerInterface;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -20,6 +21,7 @@ use Prophecy\Prophecy\ObjectProphecy;
  * Tests the format of messages from process plugin exceptions.
  */
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrateProcessErrorMessagesTest extends MigrateTestBase {
 
   /**
@@ -27,7 +29,6 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
    */
   protected static $modules = [
     'migrate_events_test',
-    'migrate',
   ];
 
   /**

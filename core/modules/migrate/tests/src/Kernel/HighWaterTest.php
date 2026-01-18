@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Kernel;
 
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Highwater
 /**
  * Tests migration high water property.
  */
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class HighWaterTest extends MigrateTestBase {
 
   /**
@@ -19,9 +21,7 @@ class HighWaterTest extends MigrateTestBase {
   protected static $modules = [
     'user',
     'node',
-    'migrate',
     'migrate_high_water_test',
-    'field',
   ];
 
   /**

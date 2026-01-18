@@ -18,6 +18,7 @@ use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -28,6 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[CoversClass(EntityResource::class)]
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class EntityResourceTest extends JsonapiKernelTestBase {
 
   /**
@@ -48,7 +50,6 @@ class EntityResourceTest extends JsonapiKernelTestBase {
   protected static $modules = [
     'node',
     'field',
-    'jsonapi',
     'serialization',
     'system',
     'user',
@@ -237,7 +238,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
     $request->query = new InputBag(['filter' => ['id' => 'invalid']]);
 
     // Get the response.
-    $resource_type = new ResourceType('node', 'article', NULL);
+    $resource_type = new ResourceType('node', 'article', Node::class);
     $response = $this->entityResource->getCollection($resource_type, $request);
 
     // Assertions.

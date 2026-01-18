@@ -198,7 +198,7 @@ abstract class BrowserTestBase extends TestCase {
   protected function initMink() {
     $driver = $this->getDefaultDriverInstance();
 
-    if ($driver instanceof BrowserKitDriver) {
+    if ($driver instanceof BrowserKitDriver && $driver->getClient() instanceof DrupalTestBrowser) {
       // Turn off curl timeout. Having a timeout is not a problem in a normal
       // test running, but it is a problem when debugging. Also, disable SSL
       // peer verification so that testing under HTTPS always works.
@@ -330,6 +330,10 @@ abstract class BrowserTestBase extends TestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
+      @trigger_error('Functional/FunctionalJavascript test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and is throwing an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+    }
+
     parent::setUp();
 
     $this->setUpAppRoot();
@@ -375,7 +379,7 @@ abstract class BrowserTestBase extends TestCase {
    *
    * @see \Drupal\Core\File\FileSystemInterface::deleteRecursive()
    */
-  public static function filePreDeleteCallback($path) {
+  public static function filePreDeleteCallback($path): void {
     // When the webserver runs with the same system user as phpunit, we can
     // make read-only files writable again. If not, chmod will fail while the
     // file deletion still works if file permissions have been configured
@@ -418,10 +422,12 @@ abstract class BrowserTestBase extends TestCase {
 
     if ($this->container) {
       // Cleanup mock session started in DrupalKernel::preHandle().
-      /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
-      $session = $this->container->get('request_stack')->getSession();
-      $session->clear();
-      $session->save();
+      if ($this->container->has('request_stack')) {
+        /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
+        $session = $this->container->get('request_stack')->getSession();
+        $session->clear();
+        $session->save();
+      }
 
       // If cron is running because Automated Cron started it at the end of a
       // test request, wait for it to complete.
@@ -542,7 +548,7 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * Installs Drupal into the test site.
    */
-  public function installDrupal() {
+  public function installDrupal(): void {
     $this->initUserSession();
     $this->prepareSettings();
     $this->doInstall();
@@ -611,7 +617,7 @@ abstract class BrowserTestBase extends TestCase {
    *   The configuration object with original configuration data.
    */
   protected function config($name) {
-    return $this->container->get('config.factory')->getEditable($name);
+    return \Drupal::configFactory()->getEditable($name);
   }
 
   /**

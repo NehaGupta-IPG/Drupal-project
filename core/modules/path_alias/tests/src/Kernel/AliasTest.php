@@ -14,12 +14,14 @@ use Drupal\path_alias\AliasRepository;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests path alias CRUD and lookup functionality.
  */
 #[CoversClass(AliasRepository::class)]
 #[Group('path_alias')]
+#[RunTestsInSeparateProcesses]
 class AliasTest extends KernelTestBase {
 
   use PathAliasTestTrait;
@@ -44,8 +46,6 @@ class AliasTest extends KernelTestBase {
 
   /**
    * Tests preload path alias.
-   *
-   * @legacy-covers ::preloadPathAlias
    */
   public function testPreloadPathAlias(): void {
     $path_alias_repository = $this->container->get('path_alias.repository');
@@ -290,8 +290,6 @@ class AliasTest extends KernelTestBase {
 
   /**
    * Tests lookup by system path.
-   *
-   * @legacy-covers ::lookupBySystemPath
    */
   public function testLookupBySystemPath(): void {
     $this->createPathAlias('/test-source-Case', '/test-alias');
@@ -303,8 +301,6 @@ class AliasTest extends KernelTestBase {
 
   /**
    * Tests lookup by alias.
-   *
-   * @legacy-covers ::lookupByAlias
    */
   public function testLookupByAlias(): void {
     $this->createPathAlias('/test-source', '/test-alias-Case');

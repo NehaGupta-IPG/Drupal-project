@@ -15,12 +15,14 @@ use Drupal\workflows\Entity\Workflow;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\content_moderation\Plugin\Field\ModerationStateFieldItemList.
  */
 #[CoversClass(ModerationStateFieldItemList::class)]
 #[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ModerationStateFieldItemListTest extends KernelTestBase {
 
   use ContentModerationTestTrait;
@@ -101,8 +103,6 @@ class ModerationStateFieldItemListTest extends KernelTestBase {
 
   /**
    * Tests get value.
-   *
-   * @legacy-covers ::getValue
    */
   public function testGetValue(): void {
     $this->assertEquals([['value' => 'draft']], $this->testNode->moderation_state->getValue());
@@ -110,8 +110,6 @@ class ModerationStateFieldItemListTest extends KernelTestBase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::get
    */
   public function testGet(): void {
     $this->assertEquals('draft', $this->testNode->moderation_state->get(0)->value);

@@ -8,18 +8,18 @@ use Drupal\file\Plugin\Validation\Constraint\FileExtensionSecureConstraintValida
 use Drupal\Tests\file\Kernel\Validation\FileValidatorTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the FileExtensionSecureConstraintValidator.
  */
 #[CoversClass(FileExtensionSecureConstraintValidator::class)]
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileExtensionSecureConstraintValidatorTest extends FileValidatorTestBase {
 
   /**
    * Tests validate.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidate(): void {
     // Test success with .txt extension.
