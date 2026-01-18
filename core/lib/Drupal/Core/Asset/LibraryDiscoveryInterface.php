@@ -54,4 +54,15 @@ interface LibraryDiscoveryInterface {
    */
   public function clearCachedDefinitions();
 
+  /**
+   * Verify that the library files exist.
+   *
+   * @param array $library
+   *   The library to test as returned by getLibraryByName() method.
+   *
+   * @return bool
+   *   TRUE if all files of this library exists, FALSE otherwise
+   */
+  public function isLibraryValid(array $library);
+
 }
