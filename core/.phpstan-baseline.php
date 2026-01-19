@@ -34695,7 +34695,7 @@ $ignoreErrors[] = [
   'message' => '#^Method Drupal\\\\text_with_summary_field\\\\Plugin\\\\migrate\\\\field\\\\d6\\\\TextField\\:\\:defineValueProcessPipeline\\(\\) has no return type specified\\.$#',
   'identifier' => 'missingType.return',
   'count' => 1,
-  'path' => __DIR__ . '/modules/text_with_summary_field/src/Plugin/migrate/field/d6/TextField.php',
+  'path' => __DIR__ . '/modules/text/modules/text_with_summary_field/src/Plugin/migrate/field/d6/TextField.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\text\\\\TextProcessed\\:\\:setValue\\(\\) has no return type specified\\.$#',
