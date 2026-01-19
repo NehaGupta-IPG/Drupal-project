@@ -179,7 +179,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
         $column = [
           'data' => [
             '#type' => 'inline_template',
-            '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message }}</p>{% endif %}',
+            '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message|nl2br }}</p>{% endif %}',
             '#context' => [
               'date' => $link,
               'username' => $username,
