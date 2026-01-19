@@ -15,9 +15,9 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   id: "string_long",
   label: new TranslatableMarkup("Text (plain, long)"),
   description: [
-    new TranslatableMarkup("Ideal for longer texts, like body or description"),
-    new TranslatableMarkup("Supports long text without specifying a maximum length"),
-    new TranslatableMarkup("May use more storage and be slower for searching and sorting"),
+    new TranslatableMarkup("Ideal for longer texts, like body or description."),
+    new TranslatableMarkup("Supports long text without specifying a maximum length."),
+    new TranslatableMarkup("May use more storage and be slower for searching and sorting."),
   ],
   category: "plain_text",
   default_widget: "string_textarea",
