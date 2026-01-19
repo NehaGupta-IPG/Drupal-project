@@ -37,6 +37,6 @@ interface LocalActionManagerInterface extends PluginManagerInterface {
    * @return array
    *   An array of link render arrays.
    */
-  public function getActionsForRoute($route_appears);
+  public function getActionsForRoute(string $route_appears);
 
 }
