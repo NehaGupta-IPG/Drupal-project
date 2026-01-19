@@ -5,6 +5,9 @@
  * Contains install and update functions for Views.
  */
 
+use Drupal\views\Plugin\views\display\DisplayRouterInterface;
+use Drupal\views\Views;
+
 /**
  * Implements hook_install().
  */
@@ -46,14 +49,14 @@ function views_update_11202(): void {
         continue;
       }
 
-      $executable = \Drupal\views\Views::getView($view_id);
+      $executable = Views::getView($view_id);
       if (!$executable || !$executable->setDisplay($display_id)) {
         // Skip invalid or non-loadable displays.
         continue;
       }
 
       $display_handler = $executable->display_handler;
-      if (!$display_handler || $display_handler instanceof \Drupal\views\Plugin\views\display\DisplayRouterInterface) {
+      if (!$display_handler || $display_handler instanceof DisplayRouterInterface) {
         // Routed displays already have a stable URL.
         continue;
       }
@@ -61,7 +64,7 @@ function views_update_11202(): void {
       $linked_display_id = $display_handler->getOption('link_display');
       if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $executable->displayHandlers->has($linked_display_id)) {
         $linked_display = $executable->displayHandlers->get($linked_display_id);
-        if ($linked_display instanceof \Drupal\views\Plugin\views\display\DisplayRouterInterface) {
+        if ($linked_display instanceof DisplayRouterInterface) {
           // Keep explicit routed link displays as-is.
           continue;
         }
@@ -80,7 +83,7 @@ function views_update_11202(): void {
       }
 
       $guessed_display = $executable->displayHandlers->get($guessed_display_id);
-      if (!$guessed_display instanceof \Drupal\views\Plugin\views\display\DisplayRouterInterface) {
+      if (!$guessed_display instanceof DisplayRouterInterface) {
         // Only persist guesses that resolve to routed displays.
         continue;
       }
