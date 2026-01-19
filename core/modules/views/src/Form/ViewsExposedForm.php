@@ -141,7 +141,7 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       }
 
       if (!$form_action) {
-        // On any non views.ajax route, use the current route for the form action.
+        // On any non views.ajax route, use current route for the form action.
         if ($this->getRouteMatch()->getRouteName() !== 'views.ajax') {
           $form_action = Url::fromRoute('<current>')->toString();
         }
