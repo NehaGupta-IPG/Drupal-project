@@ -14,6 +14,7 @@ use Drupal\Tests\Core\Database\Stub\StubSchema;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -21,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 #[CoversClass(InstallerRedirectTrait::class)]
 #[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerRedirectTraitTest extends KernelTestBase {
 
   /**
@@ -33,7 +35,7 @@ class InstallerRedirectTraitTest extends KernelTestBase {
    *   - Whether or not there is database connection info.
    *   - Whether or not there exists a sequences table in the database.
    */
-  public static function providerShouldRedirectToInstaller() {
+  public static function providerShouldRedirectToInstaller(): array {
     return [
       [TRUE, DatabaseNotFoundException::class, FALSE, FALSE],
       [TRUE, DatabaseNotFoundException::class, TRUE, FALSE],
@@ -69,8 +71,6 @@ class InstallerRedirectTraitTest extends KernelTestBase {
 
   /**
    * Tests should redirect to installer.
-   *
-   * @legacy-covers ::shouldRedirectToInstaller
    */
   #[DataProvider('providerShouldRedirectToInstaller')]
   public function testShouldRedirectToInstaller(bool $expected, string $exception, bool $connection, bool $connection_info, bool $sequences_table_exists = TRUE): void {

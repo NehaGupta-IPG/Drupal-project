@@ -19,6 +19,7 @@ use Drupal\Core\Session\CalculatedPermissionsItem;
 use Drupal\Core\Session\RefinableCalculatedPermissions;
 use Drupal\Core\Session\RefinableCalculatedPermissionsInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
@@ -26,11 +27,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Tests the AccessPolicyProcessor service.
- *
- * @legacy-covers \Drupal\Core\Session\AccessPolicyBase
- * @legacy-covers \Drupal\Core\Session\AccessPolicyProcessor
  */
 #[Group('Session')]
+#[CoversClass(AccessPolicyBase::class)]
+#[CoversClass(AccessPolicyProcessor::class)]
 class AccessPolicyProcessorTest extends UnitTestCase {
 
   /**
@@ -375,11 +375,11 @@ class AccessPolicyProcessorTest extends UnitTestCase {
     ?CacheBackendInterface $cache_static = NULL,
     ?AccountProxyInterface $current_user = NULL,
     ?AccountSwitcherInterface $account_switcher = NULL,
-  ) {
+  ): AccessPolicyProcessor {
     // Prophecy does not accept a willReturn call on a mocked method if said
     // method has a return type of void. However, without willReturn() or any
     // other will* call, the method mock will not be registered.
-    $prophecy_workaround = function () {};
+    $prophecy_workaround = function (): void {};
 
     if (!isset($variation_cache)) {
       $variation_cache = $this->prophesize(VariationCacheInterface::class);

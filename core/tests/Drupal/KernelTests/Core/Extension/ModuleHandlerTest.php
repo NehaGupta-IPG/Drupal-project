@@ -11,12 +11,14 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\Core\Extension\ModuleHandler.
  */
 #[CoversClass(ModuleHandler::class)]
 #[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ModuleHandlerTest extends KernelTestBase {
 
   /**
@@ -42,8 +44,6 @@ class ModuleHandlerTest extends KernelTestBase {
 
   /**
    * Tests that resetImplementations() clears the hook memory cache.
-   *
-   * @legacy-covers ::resetImplementations
    */
   public function testResetImplementationsClearsHooks(): void {
     $oldModuleHandler = \Drupal::moduleHandler();

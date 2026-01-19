@@ -10,21 +10,22 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Render\PlaceholderingRenderCache;
+use Drupal\Core\Render\RenderCache;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\Renderer;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Builder\InvocationMocker;
 
 /**
  * Tests Drupal\Core\Render\Renderer.
- *
- * @legacy-covers \Drupal\Core\Render\RenderCache
- * @legacy-covers \Drupal\Core\Render\PlaceholderingRenderCache
  */
-#[CoversClass(Renderer::class)]
 #[Group('Render')]
+#[CoversClass(Renderer::class)]
+#[CoversClass(RenderCache::class)]
+#[CoversClass(PlaceholderingRenderCache::class)]
 class RendererPlaceholdersTest extends RendererTestBase {
 
   /**
@@ -739,7 +740,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @legacy-covers ::replacePlaceholders
    */
   #[DataProvider('providerPlaceholders')]
-  public function testCacheableParentWithPostRequest(array $test_element, array $args): void {
+  public function testCacheableParentWithPostRequest(array $test_element, array $args, array $expected_placeholder_render_array, array|false $placeholder_cache_keys, array $bubbled_cache_contexts, array $bubbled_cache_tags, array $placeholder_expected_render_cache_array): void {
     $this->setUpMemoryCache();
 
     // Verify behavior when handling a non-GET request, e.g. a POST request:
@@ -776,7 +777,7 @@ class RendererPlaceholdersTest extends RendererTestBase {
    * @legacy-covers ::replacePlaceholders
    */
   #[DataProvider('providerPlaceholders')]
-  public function testPlaceholderingDisabledForPostRequests(array $test_element, array $args, array $expected_placeholder_render_array, array|false $placeholder_cache_keys): void {
+  public function testPlaceholderingDisabledForPostRequests(array $test_element, array $args, array $expected_placeholder_render_array, array|false $placeholder_cache_keys, array $bubbled_cache_contexts, array $bubbled_cache_tags, array $placeholder_expected_render_cache_array): void {
     if ($placeholder_cache_keys && !empty($test_element['placeholder']['#cache']['keys'])) {
       $this->setUpMemoryCache();
     }
@@ -1179,7 +1180,7 @@ HTML;
    * @return \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\Builder\InvocationMocker
    *   The mocked theme manager.
    */
-  protected function setupThemeManagerForDetails() {
+  protected function setupThemeManagerForDetails(): InvocationMocker {
     return $this->themeManager->expects($this->any())
       ->method('render')
       ->willReturnCallback(function ($theme, array $vars) {
@@ -1215,7 +1216,7 @@ class RecursivePlaceholdersTest implements TrustedCallbackInterface {
    * @return array
    *   A renderable array.
    */
-  public static function callback($animal) {
+  public static function callback($animal): array {
     return [
       'another' => [
         '#create_placeholder' => TRUE,
@@ -1227,7 +1228,7 @@ class RecursivePlaceholdersTest implements TrustedCallbackInterface {
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['callback'];
   }
 

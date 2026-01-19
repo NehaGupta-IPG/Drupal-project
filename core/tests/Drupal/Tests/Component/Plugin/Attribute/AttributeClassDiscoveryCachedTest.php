@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Plugin\Attribute;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Component\Discovery\MissingClassDetectionClassLoader;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Plugin\Discovery\AttributeClassDiscovery;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -13,11 +14,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @legacy-covers \Drupal\Component\Discovery\MissingClassDetectionClassLoader
+ * Tests Attribute Class Discovery Cached.
  */
 #[CoversClass(AttributeClassDiscovery::class)]
 #[Group('Attribute')]
 #[RunTestsInSeparateProcesses]
+#[CoversClass(MissingClassDetectionClassLoader::class)]
 class AttributeClassDiscoveryCachedTest extends TestCase {
 
   /**
@@ -42,8 +44,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
   /**
    * Tests that getDefinitions() retrieves the file cache correctly.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testGetDefinitions(): void {
     // Path to the classes which we'll discover and parse annotation.
@@ -101,8 +101,6 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
 
   /**
    * Tests discovery with missing traits.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testGetDefinitionsMissingTrait(): void {
     // Path to the classes which we'll discover and parse annotation.
@@ -134,7 +132,10 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
       $this->assertNull($file_cache->get($non_discoverable_file_path));
     }
 
-    $discovery = new AttributeClassDiscovery(['com\example' => [$discovery_path], 'Drupal\a_module_that_does_not_exist' => [$discovery_path]]);
+    $discovery = new AttributeClassDiscovery([
+      'com\example' => [$discovery_path],
+      'Drupal\a_module_that_does_not_exist' => [$discovery_path],
+    ]);
     $this->assertEquals([
       'discovery_test_1' => [
         'id' => 'discovery_test_1',
