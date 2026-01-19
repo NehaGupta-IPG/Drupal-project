@@ -319,11 +319,6 @@ libraries-override:
       theme:
         css/user.icons.admin.css: css/user/user.icons.admin.css
 
-  views/views.module:
-    css:
-      component:
-        css/views.module.css: css/views/views.module.css
-
   views/views.grid:
     css:
       layout:

@@ -300,7 +300,6 @@ class FieldFieldTest extends ViewsKernelTestBase {
     $render = $executable->display_handler->render();
     $expected_attachments = [
       'library' => [
-        'views/views.module',
       ],
     ];
     foreach ($this->entities as $entity) {
