@@ -18,7 +18,7 @@ class ViewsFormTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['action_bulk_test'];
+  protected static $modules = ['action_bulk_test', 'block'];
 
   /**
    * {@inheritdoc}
@@ -42,6 +42,22 @@ class ViewsFormTest extends ViewTestBase {
     // Ensure there's no form.
     $xpath = $this->cssSelect('.views-form form');
     $this->assertCount(0, $xpath);
+  }
+
+  /**
+   * Tests Views form actions for an unrouted display without link display.
+   */
+  public function testFormActionFallsBackToCurrentRoute(): void {
+    $this->drupalCreateContentType(['type' => 'article']);
+    $node = $this->drupalCreateNode(['type' => 'article']);
+    $this->drupalPlaceBlock('views_block:test_bulk_form-block_1');
+
+    $this->drupalGet('node/' . $node->id());
+    $form = $this->assertSession()->elementExists('css', '.views-form form');
+    $action = $form->getAttribute('action');
+
+    $this->assertSame('/node/' . $node->id(), $action);
+    $this->assertNotSame('/test_bulk_form', $action);
   }
 
 }
