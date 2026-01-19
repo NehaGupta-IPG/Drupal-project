@@ -79,25 +79,7 @@ class Formula extends ArgumentPluginBase implements FormulaInterface {
    * {@inheritdoc}
    */
   public function getField($field = NULL): string {
-    if (!isset($field)) {
-      $field = $this->getFormula();
-    }
-
-    // If grouping, check to see if the aggregation method needs to modify
-    // the field.
-    if ($this->view->display_handler->useGroupBy()) {
-      $this->view->initQuery();
-      if ($this->query) {
-        $info = $this->query->getAggregationInfo();
-        if (!empty($info[$this->options['group_type']]['method'])) {
-          $method = $info[$this->options['group_type']]['method'];
-          if (method_exists($this->query, $method)) {
-            return $this->query->$method($this->options['group_type'], $field);
-          }
-        }
-      }
-    }
-    return $field;
+    return parent::getField($this->getFormula());
   }
 
 }
