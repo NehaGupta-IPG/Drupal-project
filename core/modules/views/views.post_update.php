@@ -103,6 +103,18 @@ function views_post_update_table_css_class(?array &$sandbox = NULL): void {
 }
 
 /**
+ * Backfills link_display for unrouted displays with form actions.
+ */
+function views_post_update_unrouted_display_link_display(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsUnroutedFormLinkDisplayUpdate($view);
+  });
+}
+
+/**
  * Defaults `items_per_page` to NULL in Views blocks.
  */
 function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
