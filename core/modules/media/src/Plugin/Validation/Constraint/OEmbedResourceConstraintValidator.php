@@ -129,7 +129,7 @@ class OEmbedResourceConstraintValidator extends ConstraintValidator implements C
    * @param string $error_message
    *   (optional) The error message to set as a constraint violation.
    */
-  protected function handleException(\Exception $e, $error_message = NULL) {
+  protected function handleException(\Exception $e, $error_message = NULL): void {
     if ($error_message) {
       $this->context->addViolation($error_message);
     }

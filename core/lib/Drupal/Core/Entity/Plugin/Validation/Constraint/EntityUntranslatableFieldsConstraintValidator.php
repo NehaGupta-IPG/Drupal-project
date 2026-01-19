@@ -93,7 +93,7 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    * @return bool
    *   TRUE if untranslatable fields have changes, FALSE otherwise.
    */
-  protected function hasUntranslatableFieldsChanges(ContentEntityInterface $entity) {
+  protected function hasUntranslatableFieldsChanges(ContentEntityInterface $entity): bool {
     $skip_fields = $this->getFieldsToSkipFromTranslationChangesCheck($entity);
     /** @var \Drupal\Core\Entity\ContentEntityInterface $original */
     $original = $entity->getOriginal();

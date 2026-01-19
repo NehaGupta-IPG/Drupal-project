@@ -71,7 +71,7 @@ trait PluginManagerDependentValidatorTrait {
    * @return \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition[]
    *   A list of CKEditor 5 plugin definitions keyed by plugin ID.
    */
-  private function getEnableableDisabledPlugins(EditorInterface $text_editor) {
+  private function getEnableableDisabledPlugins(EditorInterface $text_editor): array {
     $disabled_plugins = array_diff_key(
       $this->pluginManager->getDefinitions(),
       $this->pluginManager->getEnabledDefinitions($text_editor)

@@ -85,7 +85,7 @@ class CommentNameConstraintValidator extends ConstraintValidator implements Cont
    * @return int
    *   The anonymous contact setting.
    */
-  protected function getAnonymousContactDetailsSetting(CommentInterface $comment) {
+  protected function getAnonymousContactDetailsSetting(CommentInterface $comment): int {
     return $comment
       ->getCommentedEntity()
       ->get($comment->getFieldName())
