@@ -17,10 +17,22 @@ use Drupal\views\Attribute\ViewsDisplayExtender;
 class DisplayExtenderTest3 extends DisplayExtenderTest {
 
   /**
+   * Whether to generate errors during validation.
+   */
+  private static bool $errors = FALSE;
+
+  /**
+   * Enable error generation for testing purposes.
+   */
+  public static function enableErrors(): void {
+    static::$errors = TRUE;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function validate() {
-    return ['Display extender test error.'];
+    return static::$errors ? ['Display extender test error.'] : [];
   }
 
 }
