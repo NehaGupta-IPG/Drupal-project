@@ -75,11 +75,4 @@ class Formula extends ArgumentPluginBase implements FormulaInterface {
     $this->query->addWhere(0, $formula, $placeholders, 'formula');
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function getField($field = NULL): string {
-    return parent::getField($this->getFormula());
-  }
-
 }

@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\views\Plugin\views\argument\FormulaInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ViewExecutable;
@@ -176,7 +177,16 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function getField($field = NULL) {
     if (!isset($field)) {
-      $field = $this->tableAlias . '.' . $this->realField;
+      if ($this instanceof FormulaInterface) {
+        $field = $this->getFormula();
+      }
+      elseif (method_exists($this, 'getFormula')) {
+        @trigger_error('The use of getFormula() in handlers not implementing FormulaInterface is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Implement FormulaInterface in your handler. See https://www.drupal.org/node/3508630', E_USER_DEPRECATED);
+        $field = $this->getFormula();
+      }
+      else {
+        $field = $this->tableAlias . '.' . $this->realField;
+      }
     }
 
     // If grouping, check to see if the aggregation method needs to modify the
