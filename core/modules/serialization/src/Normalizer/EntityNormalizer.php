@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 class EntityNormalizer extends ComplexDataNormalizer implements DenormalizerInterface {
 
   use FieldableEntityNormalizerTrait;
+  use SerializedColumnNormalizerTrait;
 
   /**
    * Constructs an EntityNormalizer object.
