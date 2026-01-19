@@ -348,7 +348,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
   /**
    * {@inheritdoc}
    */
-  public function getLocalTasks($route_name, $level = 0) {
+  public function getLocalTasks(string $route_name, int $level = 0) {
 
     if ($this->loadingLocalTasks && \Fiber::getCurrent() !== NULL) {
       // Primary and secondary task are rendered in separate blocks, each within

@@ -68,6 +68,6 @@ interface LocalTaskManagerInterface extends PluginManagerInterface {
    *
    * @see hook_menu_local_tasks_alter()
    */
-  public function getLocalTasks($route_name, $level = 0);
+  public function getLocalTasks(string $route_name, int $level = 0);
 
 }
