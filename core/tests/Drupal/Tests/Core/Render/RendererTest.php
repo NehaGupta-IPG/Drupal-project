@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Render;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Utility\OpenTelemetry;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Access\AccessResultForbidden;
@@ -1195,7 +1196,7 @@ class RendererTest extends RendererTestBase {
       // ::renderInIsolation() calls without either having been completed.
       $fibers = [];
       foreach ([0, 1] as $key) {
-        $fibers[] = new \Fiber(static fn (): MarkupInterface|string => $fiber_callback());
+        $fibers[] = new \Fiber(OpenTelemetry::bindContext(static fn (): MarkupInterface|string => $fiber_callback()));
       }
       while ($fibers) {
         foreach ($fibers as $key => $fiber) {

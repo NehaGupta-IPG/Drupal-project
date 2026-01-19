@@ -5,6 +5,7 @@ namespace Drupal\big_pipe\Render;
 use Drupal\Component\HttpFoundation\SecuredRedirectResponse;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\OpenTelemetry;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\MessageCommand;
 use Drupal\Core\Ajax\RedirectCommand;
@@ -499,16 +500,9 @@ class BigPipe {
         continue;
       }
       $placeholder_render_array = $placeholders[$placeholder_id];
-      $otelparent = Context::getCurrent();
-      $fibers[$placeholder_id] = new \Fiber(function () use ($placeholder_id, $placeholder_render_array, $otelparent) {
-        $otelscope = Context::storage()->attach($otelparent);
-        try {
-          return [$this->renderPlaceholder($placeholder_id, $placeholder_render_array)];
-        }
-        finally {
-          $otelscope->detach();
-        }
-      });
+      $fibers[$placeholder_id] = new \Fiber(OpenTelemetry::bindContext(
+        fn () => [$this->renderPlaceholder($placeholder_id, $placeholder_render_array)]
+      ));
     }
     $iterations = 0;
     while (count($fibers) > 0) {
