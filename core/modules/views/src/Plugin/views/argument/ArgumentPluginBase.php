@@ -525,6 +525,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     if ($plugin) {
       $plugin->validateOptionsForm($form['validate']['options'][$default_id], $form_state, $option_values['validate']['options'][$sanitized_id]);
     }
+
   }
 
   /**
