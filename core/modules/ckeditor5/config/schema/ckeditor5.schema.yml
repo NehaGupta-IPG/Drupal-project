@@ -240,3 +240,11 @@ ckeditor5.plugin.ckeditor5_style:
                     minAttributeValueCount: 1
               StyleSensibleElement: []
             label: 'Style tag + classes'
+
+# Plugin \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SingleLine
+ckeditor5.plugin.ckeditor5_singleLine:
+  type: mapping
+  label: 'Single line editing'
+  constraints:
+    FullyValidatable: ~
+  mapping: {}

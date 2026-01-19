@@ -24,3 +24,8 @@ services:
     arguments: [ 'ckeditor5' ]
   Drupal\ckeditor5\LanguageMapper:
     autowire: true
+  ckeditor5.hooks:
+    class: Drupal\ckeditor5\Hook\Ckeditor5Hooks
+    arguments:
+      - '@Drupal\ckeditor5\LanguageMapper'
+

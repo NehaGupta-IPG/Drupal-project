@@ -590,4 +590,18 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
     return $this->getCKEditor5Config() !== [];
   }
 
+  /**
+   * Whether this plugin is an inline formatting plugin.
+   *
+   * @return bool
+   *   TRUE if the plugin is an inline formatting plugin compatible with
+   *   single-line editing, FALSE otherwise. Defaults to FALSE if not
+   *   explicitly set.
+   *
+   * @see \Drupal\ckeditor5\Attribute\DrupalAspectsOfCKEditor5Plugin::$is_inline
+   */
+  public function isInline(): bool {
+    return $this->drupal['is_inline'] ?? FALSE;
+  }
+
 }
