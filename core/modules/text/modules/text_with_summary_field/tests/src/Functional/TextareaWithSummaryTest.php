@@ -2,16 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\text\Functional;
+namespace Drupal\Tests\text_with_summary_field\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the functionality of the text_textarea_with_summary widget.
  */
-#[Group('text')]
+#[Group('text_with_summary_field')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class TextareaWithSummaryTest extends BrowserTestBase {
 

@@ -17,7 +17,6 @@ use Drupal\migrate_drupal\Plugin\migrate\field\FieldPluginBase;
   type_map: [
     'text' => 'text',
     'text_long' => 'text_long',
-    'text_with_summary' => 'text_with_summary',
   ],
   source_module: 'text',
   destination_module: 'text',

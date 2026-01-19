@@ -16,7 +16,6 @@ use Drupal\migrate_drupal\Plugin\migrate\field\FieldPluginBase;
   type_map: [
     'text' => 'text',
     'text_long' => 'text_long',
-    'text_with_summary' => 'text_with_summary',
   ],
   source_module: 'text',
   destination_module: 'text',
@@ -98,12 +97,6 @@ class TextField extends FieldPluginBase {
         $field_name = $row->getSourceProperty('field_name');
         throw new MigrateSkipRowException("Can't migrate source field $field_name configured with both plain text and filtered text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text");
       }
-    }
-    elseif ($type == 'text_with_summary' && $plain_text) {
-      // If a text_with_summary field has plain text instances, skip the row
-      // since there's no such thing as a string_with_summary field.
-      $field_name = $row->getSourceProperty('field_name');
-      throw new MigrateSkipRowException("Can't migrate source field $field_name of type text_with_summary configured with plain text processing. See https://www.drupal.org/docs/8/upgrade/known-issues-when-upgrading-from-drupal-6-or-7-to-drupal-8#plain-text");
     }
 
     return $type;
