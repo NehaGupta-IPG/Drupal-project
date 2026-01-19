@@ -20,6 +20,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Utility\FiberResumeType;
+use OpenTelemetry\Context\Context;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -498,7 +499,16 @@ class BigPipe {
         continue;
       }
       $placeholder_render_array = $placeholders[$placeholder_id];
-      $fibers[$placeholder_id] = new \Fiber(fn() => $this->renderPlaceholder($placeholder_id, $placeholder_render_array));
+      $otelparent = Context::getCurrent();
+      $fibers[$placeholder_id] = new \Fiber(function () use ($placeholder_id, $placeholder_render_array, $otelparent) {
+        $otelscope = Context::storage()->attach($otelparent);
+        try {
+          return [$this->renderPlaceholder($placeholder_id, $placeholder_render_array)];
+        }
+        finally {
+          $otelscope->detach();
+        }
+      });
     }
     $iterations = 0;
     while (count($fibers) > 0) {

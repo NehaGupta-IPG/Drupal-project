@@ -17,6 +17,7 @@ use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Utility\FiberResumeType;
+use OpenTelemetry\Context\Context;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -616,7 +617,16 @@ class Renderer implements RendererInterface {
     // Set the provided context and call the callable, it will use that context.
     $this->setCurrentRenderContext($context);
 
-    $fiber = new \Fiber(static fn () => $callable());
+    $otelparent = Context::getCurrent();
+    $fiber = new \Fiber(static function () use ($callable, $otelparent) {
+      $otelscope = Context::storage()->attach($otelparent);
+      try {
+        return $callable();
+      }
+      finally {
+        $otelscope->detach();
+      }
+    });
     $fiber->start();
     $resume_type = NULL;
     while (!$fiber->isTerminated()) {
@@ -741,8 +751,15 @@ class Renderer implements RendererInterface {
       }
       else {
         // Get the render array for the given placeholder.
-        $fibers[$placeholder] = new \Fiber(function () use ($placeholder_element) {
-          return [$this->doRenderPlaceholder($placeholder_element), $placeholder_element];
+        $otelparent = Context::getCurrent();
+        $fibers[$placeholder] = new \Fiber(function () use ($placeholder_element, $otelparent) {
+          $otelscope = Context::storage()->attach($otelparent);
+          try {
+            return [$this->doRenderPlaceholder($placeholder_element), $placeholder_element];
+          }
+          finally {
+            $otelscope->detach();
+          }
         });
       }
     }
