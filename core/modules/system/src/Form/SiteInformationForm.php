@@ -7,7 +7,6 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\path_alias\AliasManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,13 +26,6 @@ class SiteInformationForm extends ConfigFormBase {
   protected $aliasManager;
 
   /**
-   * The path validator.
-   *
-   * @var \Drupal\Core\Path\PathValidatorInterface
-   */
-  protected $pathValidator;
-
-  /**
    * The request context.
    *
    * @var \Drupal\Core\Routing\RequestContext
@@ -49,15 +41,12 @@ class SiteInformationForm extends ConfigFormBase {
    *   The typed config manager.
    * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
    *   The path alias manager.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
-   *   The path validator.
    * @param \Drupal\Core\Routing\RequestContext $request_context
    *   The request context.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, AliasManagerInterface $alias_manager, PathValidatorInterface $path_validator, RequestContext $request_context) {
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, AliasManagerInterface $alias_manager, RequestContext $request_context) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->aliasManager = $alias_manager;
-    $this->pathValidator = $path_validator;
     $this->requestContext = $request_context;
   }
 
@@ -69,7 +58,6 @@ class SiteInformationForm extends ConfigFormBase {
       $container->get('config.factory'),
       $container->get('config.typed'),
       $container->get('path_alias.manager'),
-      $container->get('path.validator'),
       $container->get('router.request_context')
     );
   }
@@ -92,8 +80,6 @@ class SiteInformationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $site_config = $this->config('system.site');
-
     $form['site_information'] = [
       '#type' => 'details',
       '#title' => $this->t('Site details'),
@@ -131,7 +117,12 @@ class SiteInformationForm extends ConfigFormBase {
     $form['front_page']['site_frontpage'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Default front page'),
-      '#default_value' => $this->aliasManager->getAliasByPath($site_config->get('page.front')),
+      '#config_target' => new ConfigTarget(
+        'system.site',
+        'page.front',
+        fromConfig: fn($value) => $this->aliasManager->getAliasByPath($value),
+        toConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+      ),
       '#required' => TRUE,
       '#size' => 40,
       '#description' => $this->t('Specify a relative URL to display as the front page.'),
@@ -145,58 +136,29 @@ class SiteInformationForm extends ConfigFormBase {
     $form['error_page']['site_403'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Default 403 (access denied) page'),
-      '#config_target' => 'system.site:page.403',
+      '#config_target' => new ConfigTarget(
+        'system.site',
+        'page.403',
+        fromConfig: fn($value) => $this->aliasManager->getAliasByPath($value),
+        toConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+      ),
       '#size' => 40,
       '#description' => $this->t('This page is displayed when the requested document is denied to the current user. Leave blank to display a generic "access denied" page.'),
     ];
     $form['error_page']['site_404'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Default 404 (not found) page'),
-      '#config_target' => 'system.site:page.404',
+      '#config_target' => new ConfigTarget(
+        'system.site',
+        'page.404',
+        fromConfig: fn($value) => $this->aliasManager->getAliasByPath($value),
+        toConfig: fn($value) => $this->aliasManager->getPathByAlias($value),
+      ),
       '#size' => 40,
       '#description' => $this->t('This page is displayed when no other content matches the requested document. Leave blank to display a generic "page not found" page.'),
     ];
 
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    // Get the normal path of the front page.
-    $form_state->setValueForElement($form['front_page']['site_frontpage'], $this->aliasManager->getPathByAlias($form_state->getValue('site_frontpage')));
-    // Validate front page path.
-    if (($value = $form_state->getValue('site_frontpage')) && $value[0] !== '/') {
-      $form_state->setErrorByName('site_frontpage', $this->t("The path '%path' has to start with a slash.", ['%path' => $form_state->getValue('site_frontpage')]));
-
-    }
-    if (!$this->pathValidator->isValid($form_state->getValue('site_frontpage'))) {
-      $form_state->setErrorByName('site_frontpage', $this->t("Either the path '%path' is invalid or you do not have access to it.", ['%path' => $form_state->getValue('site_frontpage')]));
-    }
-    // Get the normal paths of both error pages.
-    if (!$form_state->isValueEmpty('site_403')) {
-      $form_state->setValueForElement($form['error_page']['site_403'], $this->aliasManager->getPathByAlias($form_state->getValue('site_403')));
-    }
-    if (!$form_state->isValueEmpty('site_404')) {
-      $form_state->setValueForElement($form['error_page']['site_404'], $this->aliasManager->getPathByAlias($form_state->getValue('site_404')));
-    }
-    if (($value = $form_state->getValue('site_403')) && $value[0] !== '/') {
-      $form_state->setErrorByName('site_403', $this->t("The path '%path' has to start with a slash.", ['%path' => $form_state->getValue('site_403')]));
-    }
-    if (($value = $form_state->getValue('site_404')) && $value[0] !== '/') {
-      $form_state->setErrorByName('site_404', $this->t("The path '%path' has to start with a slash.", ['%path' => $form_state->getValue('site_404')]));
-    }
-    // Validate 403 error path.
-    if (!$form_state->isValueEmpty('site_403') && !$this->pathValidator->isValid($form_state->getValue('site_403'))) {
-      $form_state->setErrorByName('site_403', $this->t("Either the path '%path' is invalid or you do not have access to it.", ['%path' => $form_state->getValue('site_403')]));
-    }
-    // Validate 404 error path.
-    if (!$form_state->isValueEmpty('site_404') && !$this->pathValidator->isValid($form_state->getValue('site_404'))) {
-      $form_state->setErrorByName('site_404', $this->t("Either the path '%path' is invalid or you do not have access to it.", ['%path' => $form_state->getValue('site_404')]));
-    }
-
-    parent::validateForm($form, $form_state);
   }
 
   /**

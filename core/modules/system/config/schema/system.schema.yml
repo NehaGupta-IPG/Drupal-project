@@ -26,9 +26,11 @@ system.site:
         403:
           type: path
           label: 'Default 403 (access denied) page'
+          nullable: true
         404:
           type: path
           label: 'Default 404 (not found) page'
+          nullable: true
         front:
           type: path
           label: 'Default front page'
