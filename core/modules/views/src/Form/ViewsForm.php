@@ -46,7 +46,7 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
    *
    * @var \Drupal\Core\Path\CurrentPathStack
    */
-  protected $currentPathStack;
+  protected $currentPath;
 
   /**
    * The URL generator to generate the form action.
@@ -85,7 +85,7 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
    *   The URL generator to generate the form action.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path_stack
+   * @param \Drupal\Core\Path\CurrentPathStack $current_path
    *   The current path stack.
    * @param string $view_id
    *   The ID of the view.
@@ -94,11 +94,11 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
    * @param string[] $view_args
    *   The arguments passed to the active view.
    */
-  public function __construct(ClassResolverInterface $class_resolver, UrlGeneratorInterface $url_generator, RequestStack $requestStack, CurrentPathStack $current_path_stack, $view_id, $view_display_id, array $view_args) {
+  public function __construct(ClassResolverInterface $class_resolver, UrlGeneratorInterface $url_generator, RequestStack $requestStack, CurrentPathStack $current_path, $view_id, $view_display_id, array $view_args) {
     $this->classResolver = $class_resolver;
     $this->urlGenerator = $url_generator;
     $this->requestStack = $requestStack;
-    $this->currentPathStack = $current_path_stack;
+    $this->currentPath = $current_path;
     $this->viewId = $view_id;
     $this->viewDisplayId = $view_display_id;
     $this->viewArguments = $view_args;
@@ -194,7 +194,7 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
         // original page path to keep the post-submit destination stable.
         $route_name = $this->requestStack->getCurrentRequest()->attributes->get('_route');
         if ($route_name === 'views.ajax') {
-          $form_action = Url::fromUserInput($this->currentPathStack->getPath())->setOptions($options)->toString();
+          $form_action = Url::fromUserInput($this->currentPath->getPath())->setOptions($options)->toString();
         }
         else {
           $form_action = Url::fromRoute('<current>')->setOptions($options)->toString();
