@@ -200,7 +200,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
   /**
    * {@inheritdoc}
    */
-  public function getLocalTasksForRoute($route_name) {
+  public function getLocalTasksForRoute(string $route_name) {
     if (!isset($this->instances[$route_name])) {
       $this->instances[$route_name] = [];
       if ($cache = $this->cacheBackend->get($this->cacheKey . ':' . $route_name)) {
@@ -292,7 +292,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
   /**
    * {@inheritdoc}
    */
-  public function getTasksBuild($current_route_name, RefinableCacheableDependencyInterface &$cacheability) {
+  public function getTasksBuild(string $current_route_name, RefinableCacheableDependencyInterface &$cacheability) {
     $tree = $this->getLocalTasksForRoute($current_route_name);
     $build = [];
 
@@ -424,7 +424,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
    *   Returns TRUE if the passed route_name and route_parameters is considered
    *   as the same as the one from the request, otherwise FALSE.
    */
-  protected function isRouteActive($current_route_name, $route_name, $route_parameters) {
+  protected function isRouteActive(string $current_route_name, string $route_name, array $route_parameters) {
     // Flag the list element as active if this tab's route and parameters match
     // the current request's route and route variables.
     $active = $current_route_name == $route_name;
