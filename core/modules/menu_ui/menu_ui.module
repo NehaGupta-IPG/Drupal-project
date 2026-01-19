@@ -89,11 +89,14 @@ function menu_ui_block_view_system_menu_block_alter(array &$build, BlockPluginIn
  * @param array $values
  *   Values for the menu link.
  */
-function _menu_ui_node_save(NodeInterface $node, array $values) {
+function _menu_ui_node_save(NodeInterface $node, array $values): void {
   /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
   if (!empty($values['entity_id'])) {
-    $entity = MenuLinkContent::load($values['entity_id']);
-    if ($entity->isTranslatable() && $node->isTranslatable()) {
+    $entity = \Drupal::service('entity.repository')->getActive('menu_link_content', $values['entity_id']);
+    if ($entity instanceof ContentEntityInterface
+      && $entity->isTranslatable()
+      && $node->isTranslatable()
+    ) {
       if (!$entity->hasTranslation($node->language()->getId())) {
         $entity = $entity->addTranslation($node->language()->getId(), $entity->toArray());
       }
