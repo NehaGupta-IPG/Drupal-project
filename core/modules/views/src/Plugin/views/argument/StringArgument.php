@@ -21,7 +21,7 @@ use Drupal\views\ManyToOneHelper;
 #[ViewsArgument(
   id: 'string',
 )]
-class StringArgument extends ArgumentPluginBase implements ArgumentInterface {
+class StringArgument extends ArgumentPluginBase implements FormulaInterface {
 
   /**
    * The many-to-one helper.

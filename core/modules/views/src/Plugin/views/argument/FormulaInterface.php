@@ -3,9 +3,9 @@
 namespace Drupal\views\Plugin\views\argument;
 
 /**
- * Provides an interface for all views arguments that have a formula. operators.
+ * Provides an interface for all Views arguments that can use a formula.
  */
-interface ArgumentInterface {
+interface FormulaInterface {
 
   /**
    * Returns the formula for this argument.

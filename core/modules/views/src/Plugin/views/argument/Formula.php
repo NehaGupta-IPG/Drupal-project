@@ -19,7 +19,7 @@ use Drupal\views\ViewExecutable;
 #[ViewsArgument(
   id: 'formula',
 )]
-class Formula extends ArgumentPluginBase implements ArgumentInterface {
+class Formula extends ArgumentPluginBase implements FormulaInterface {
 
   /**
    * An appropriate SQL string for the DB type and field type.
