@@ -42,16 +42,19 @@ function views_update_11202(): void {
 
     foreach ($displays as $display_id => $display) {
       if ($display_id === 'default') {
+        // Default display is inherited by others and does not need backfilling.
         continue;
       }
 
       $executable = \Drupal\views\Views::getView($view_id);
       if (!$executable || !$executable->setDisplay($display_id)) {
+        // Skip invalid or non-loadable displays.
         continue;
       }
 
       $display_handler = $executable->display_handler;
       if (!$display_handler || $display_handler instanceof \Drupal\views\Plugin\views\display\DisplayRouterInterface) {
+        // Routed displays already have a stable URL.
         continue;
       }
 
@@ -59,22 +62,26 @@ function views_update_11202(): void {
       if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $executable->displayHandlers->has($linked_display_id)) {
         $linked_display = $executable->displayHandlers->get($linked_display_id);
         if ($linked_display instanceof \Drupal\views\Plugin\views\display\DisplayRouterInterface) {
+          // Keep explicit routed link displays as-is.
           continue;
         }
       }
 
       $executable->initHandlers();
       if (!$display_handler->usesExposed() && !$executable->hasFormElements()) {
+        // Only adjust displays that render exposed filters or views forms.
         continue;
       }
 
       $guessed_display_id = $display_handler->getLinkDisplay();
       if (empty($guessed_display_id) || $guessed_display_id === 'custom_url' || !$executable->displayHandlers->has($guessed_display_id)) {
+        // No prior routed guess to preserve.
         continue;
       }
 
       $guessed_display = $executable->displayHandlers->get($guessed_display_id);
       if (!$guessed_display instanceof \Drupal\views\Plugin\views\display\DisplayRouterInterface) {
+        // Only persist guesses that resolve to routed displays.
         continue;
       }
 
