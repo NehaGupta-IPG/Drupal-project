@@ -410,6 +410,7 @@ drupal.announce:
     - core/drupal.debounce
 
 loadjs:
+  unique_js_aggregate: 'htmx'
   remote: https://github.com/muicss/loadjs
   version: "4.3.0"
   license:
@@ -417,7 +418,7 @@ loadjs:
     url: https://raw.githubusercontent.com/muicss/loadjs/4.3.0/LICENSE.txt
     gpl-compatible: true
   js:
-    assets/vendor/loadjs/loadjs.min.js: { minified: true, preprocess: false }
+    assets/vendor/loadjs/loadjs.min.js: { minified: true }
 
 # Common files for libraries that still rely on jQuery UI components.
 # @todo Remove when no longer required by drupal.autocomplete and drupal.dialog.
@@ -617,7 +618,7 @@ drupal.form:
     - core/once
 
 drupal.htmx:
-  unique_js_aggregate: true
+  unique_js_aggregate: 'htmx'
   version: VERSION
   js:
     misc/htmx/htmx-utils.js: {}
@@ -834,6 +835,7 @@ drupal.vertical-tabs:
     - core/drupalSettings
     - core/drupal.form
 htmx:
+  unique_js_aggregate: 'htmx'
   remote: https://github.com/bigskysoftware/htmx
   version: "2.0.4"
   license:
@@ -841,7 +843,7 @@ htmx:
     url:  https://raw.githubusercontent.com/bigskysoftware/htmx/refs/tags/v2.0.4/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/htmx/htmx.min.js: { minified: true, preprocess: false }
+    assets/vendor/htmx/htmx.min.js: { minified: true }
 
 internal.floating-ui:
   unique_js_aggregate: true
