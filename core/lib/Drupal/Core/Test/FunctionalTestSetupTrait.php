@@ -10,7 +10,6 @@ use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Session\UserSession;
@@ -507,14 +506,7 @@ trait FunctionalTestSetupTrait {
     }
     if ($modules) {
       $modules = array_unique($modules);
-      try {
-        $success = $container->get('module_installer')->install($modules, TRUE);
-        $this->assertTrue($success, 'Enabled modules: ' . implode(', ', $modules));
-      }
-      catch (MissingDependencyException $e) {
-        // The exception message has all the details.
-        $this->fail($e->getMessage());
-      }
+      $container->get('module_installer')->install($modules);
       // The container was already rebuilt by the ModuleInstaller.
       $this->container = \Drupal::getContainer();
     }

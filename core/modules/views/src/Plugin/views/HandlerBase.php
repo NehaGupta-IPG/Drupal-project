@@ -176,7 +176,7 @@ abstract class HandlerBase extends PluginBase implements ViewsHandlerInterface {
    */
   public function getField($field = NULL) {
     if (!isset($field)) {
-      if (!empty($this->formula)) {
+      if (method_exists($this, 'getFormula') && !empty($this->formula)) {
         $field = $this->getFormula();
       }
       else {
