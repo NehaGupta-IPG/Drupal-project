@@ -130,12 +130,20 @@ tr .form-item,
   color: var(--input--disabled-fg-color);
 }
 
-/* Add some spacing so that the focus ring and suffix don't overlap. */
+/* Add some spacing so that the focus ring and prefix/suffix don't overlap. */
 
 @media screen and (min-width: 37.5625rem) {
+  .form-item__prefix,
+  .form-item__suffix {
+    white-space: nowrap;
+  }
+
+  .form-item__prefix {
+    margin-inline-end: var(--space-xs);
+  }
+
   .form-item__suffix {
     margin-inline-start: var(--space-xs);
-    white-space: nowrap;
   }
 }
 
