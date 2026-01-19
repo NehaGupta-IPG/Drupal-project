@@ -1,9 +1,6 @@
 views.module:
   version: VERSION
-  css:
-    component:
-      css/views.module.css: {}
-
+  deprecated: The %library_id% asset library is deprecated in Drupal 11.4.0 and will be removed in Drupal 12.0.0. See https://www.drupal.org/node/3565395
 views.ajax:
   version: VERSION
   js:
