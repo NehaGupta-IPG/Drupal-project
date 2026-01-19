@@ -62,6 +62,9 @@ class ElementsTableSelectTest extends WebDriverTestBase {
         $page->hasUncheckedField($other_row);
       }
     }
+
+    // No PHPUnit assertions are called here.
+    $this->expectNotToPerformAssertions();
   }
 
   /**

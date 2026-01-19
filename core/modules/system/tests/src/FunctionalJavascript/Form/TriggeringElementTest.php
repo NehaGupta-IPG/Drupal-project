@@ -82,6 +82,9 @@ class TriggeringElementTest extends WebDriverTestBase {
     $this->getSession()->getDriver()->submitForm('//form[@id="' . $form_html_id . '"]');
     $assert_session->pageTextContains('The clicked button is button1.');
     $assert_session->pageTextContains('Submit handler for form_test_clicked_button executed.');
+
+    // No PHPUnit assertions are called here.
+    $this->expectNotToPerformAssertions();
   }
 
   /**

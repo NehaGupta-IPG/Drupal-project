@@ -104,6 +104,9 @@ JS;
     $assert->responseContains('<div class="unescaped">');
     $assert->responseContains("<script>alert('Marked safe');alert(\"Marked safe\");</script>");
     $assert->assertNoEscaped("<script>alert('Marked safe');alert(\"Marked safe\");</script>");
+
+    // No PHPUnit assertions are called here.
+    $this->expectNotToPerformAssertions();
   }
 
   /**
