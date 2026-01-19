@@ -17,6 +17,8 @@ display:
         type: none
       cache:
         type: tag
+      link_display: page_1
+      link_url: ''
       exposed_form:
         options:
           reset_button: true
