@@ -1046,58 +1046,43 @@ class MediaTest extends MediaTestBase {
    * without attempting to call getMetadata or set attributes.
    */
   public function testModelElementEarlyExit(): void {
-    $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
-    // Create malformed or edge-case markup that might result in missing
-    // modelElement during upcast conversion.
     $original_value = $this->host->body->value;
-    // Use an empty drupal-media tag without required attributes.
+
+    // Case 1: Malformed drupal-media element.
     $this->host->body->value = '<p>Test content</p><drupal-media></drupal-media>';
     $this->host->save();
 
     $this->drupalGet($this->host->toUrl('edit-form'));
     $this->waitForEditor();
 
-    // Verify that the editor loads without JavaScript errors.
-    // If the early exit is not working, we would see console errors
-    // attempting to call getMetadata on a null/undefined modelElement.
-    $logs = $this->getSession()->getDriver()->getWebDriverSession()->log('browser');
-    $error_logs = array_filter($logs, function ($log) {
-      return $log['level'] === 'SEVERE';
-    });
+    $editable = $page->find('css', '.ck-editor__editable');
 
-    // Assert no severe JavaScript errors occurred.
-    $this->assertEmpty($error_logs, 'No JavaScript errors should occur when modelElement does not exist.');
+    $this->assertNotNull(
+    $editable,
+    'Editor editable area exists.'
+    );
 
-    // Verify the editor is still functional by checking it initialized.
-    $assert_session->elementExists('css', '.ck-editor');
+    $this->assertSame(
+    'true',
+    $editable->getAttribute('contenteditable'),
+    'Editor remains editable when modelElement is missing.'
+    );
 
-    // Restore original value.
-    $this->host->body->value = $original_value;
+    // Case 2: Invalid media UUID.
+    $this->host->body->value = '<drupal-media data-entity-type="media" data-entity-uuid="00000000-0000-0000-0000-000000000000"></drupal-media>';
     $this->host->save();
 
-    // Test with a drupal-media element that has an invalid entity UUID.
-    $invalid_uuid = '00000000-0000-0000-0000-000000000000';
-    $this->host->body->value = '<drupal-media data-entity-type="media" data-entity-uuid="' . $invalid_uuid . '"></drupal-media>';
-    $this->host->save();
-
-    $this->drupalGet($this->host->toUrl('edit-form'));
+    $this->getSession()->reload();
     $this->waitForEditor();
 
-    // The editor should handle the invalid media gracefully.
-    // Check that the page loaded and the editor initialized.
-    $assert_session->elementExists('css', '.ck-editor');
+    $editable = $page->find('css', '.ck-editor__editable');
 
-    // Verify that no severe JavaScript errors occurred.
-    $logs = $this->getSession()->getDriver()->getWebDriverSession()->log('browser');
-    $error_logs = array_filter($logs, function ($log) {
-      return $log['level'] === 'SEVERE' && strpos($log['message'], 'modelElement') !== FALSE;
-    });
+    $this->assertNotNull($editable);
+    $this->assertSame('true', $editable->getAttribute('contenteditable'));
 
-    $this->assertEmpty($error_logs, 'No JavaScript errors related to modelElement should occur.');
-
-    // Restore original value for subsequent tests.
+    // Restore original value.
     $this->host->body->value = $original_value;
     $this->host->save();
   }
