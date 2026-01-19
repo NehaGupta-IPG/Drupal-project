@@ -33,7 +33,7 @@ class DisplayExtenderTest extends ViewsKernelTestBase {
    */
   #[IgnoreDeprecations]
   public function testDisplayExtenders(): void {
-    $this->expectDeprecation('Views::getEnabledDisplayExtenders() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use Views::getDisplayExtenders() instead. See https://www.drupal.org/node/3387596');
+    $this->expectDeprecation('Views::getEnabledDisplayExtenders() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use Views::getDisplayExtenders() instead. See https://www.drupal.org/node/3387596');
     $this->assertArrayHasKey('display_extender_test', Views::getEnabledDisplayExtenders());
 
     $view = Views::getView('test_view');
