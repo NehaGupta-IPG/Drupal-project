@@ -76,10 +76,6 @@ class TextField extends FieldPluginBase {
         case '0':
           $plain_text = TRUE;
           break;
-
-        case '1':
-          $filtered_text = TRUE;
-          break;
       }
     }
 

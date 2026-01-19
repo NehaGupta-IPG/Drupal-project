@@ -24,22 +24,22 @@ class TextWithSummaryFieldHooks {
         $output = '';
         $output .= '<h2>' . $this->t('About') . '</h2>';
         $output .= '<p>' . $this->t('The Text module allows you to create short and long text fields with optional summaries. See the <a href=":field">Field module help</a> and the <a href=":field_ui">Field UI help</a> pages for general information on fields and how to create and manage them. For more information, see the <a href=":text_documentation">online documentation for the Text module</a>.', [
-            ':field' => Url::fromRoute('help.page', [
-              'name' => 'field',
-            ])->toString(),
-            ':field_ui' => \Drupal::moduleHandler()->moduleExists('field_ui') ? Url::fromRoute('help.page', [
-              'name' => 'field_ui',
-            ])->toString() : '#',
-            ':text_documentation' => 'https://www.drupal.org/documentation/modules/text',
-          ]) . '</p>';
+          ':field' => Url::fromRoute('help.page', [
+            'name' => 'field',
+          ])->toString(),
+          ':field_ui' => \Drupal::moduleHandler()->moduleExists('field_ui') ? Url::fromRoute('help.page', [
+            'name' => 'field_ui',
+          ])->toString() : '#',
+          ':text_documentation' => 'https://www.drupal.org/documentation/modules/text',
+        ]) . '</p>';
         $output .= '<h2>' . $this->t('Uses') . '</h2>';
         $output .= '<dl>';
         $output .= '<dt>' . $this->t('Managing and displaying text fields') . '</dt>';
         $output .= '<dd>' . $this->t('The <em>settings</em> and <em>display</em> of the text field can be configured separately. See the <a href=":field_ui">Field UI help</a> for more information on how to manage fields and their display.', [
-            ':field_ui' => \Drupal::moduleHandler()->moduleExists('field_ui') ? Url::fromRoute('help.page', [
-              'name' => 'field_ui',
-            ])->toString() : '#',
-          ]) . '</dd>';
+          ':field_ui' => \Drupal::moduleHandler()->moduleExists('field_ui') ? Url::fromRoute('help.page', [
+            'name' => 'field_ui',
+          ])->toString() : '#',
+        ]) . '</dd>';
         $output .= '<dt>' . $this->t('Creating short text fields') . '</dt>';
         $output .= '<dd>' . $this->t('If you choose <em>Text (plain)</em> or <em>Text (formatted)</em> as the field type on the <em>Manage fields</em> page, then a field with a single row is displayed. You can change the maximum text length in the <em>Field settings</em> when you set up the field.') . '</dd>';
         $output .= '<dt>' . $this->t('Creating long text fields') . '</dt>';

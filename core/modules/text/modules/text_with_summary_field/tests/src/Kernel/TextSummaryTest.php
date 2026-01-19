@@ -107,4 +107,5 @@ class TextSummaryTest extends KernelTestBase {
     $this->assertEquals('test_text_with_summary.0.summary', $violations[0]->getPropertyPath());
     $this->assertEquals('The summary field is required for A text field', $violations[0]->getMessage());
   }
+
 }
