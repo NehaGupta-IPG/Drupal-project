@@ -9,6 +9,8 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -62,14 +64,27 @@ class PerformanceForm extends ConfigFormBase {
    *   The JavaScript asset collection optimizer service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface|null $themeManager
+   *   The theme manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, DateFormatterInterface $date_formatter, AssetCollectionOptimizerInterface $css_collection_optimizer, AssetCollectionOptimizerInterface $js_collection_optimizer, ModuleHandlerInterface $module_handler) {
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    DateFormatterInterface $date_formatter,
+    AssetCollectionOptimizerInterface $css_collection_optimizer,
+    AssetCollectionOptimizerInterface $js_collection_optimizer,
+    ModuleHandlerInterface $module_handler,
+    protected /*readonly*/ ?ThemeManagerInterface $themeManager = NULL,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
 
     $this->dateFormatter = $date_formatter;
     $this->cssCollectionOptimizer = $css_collection_optimizer;
     $this->jsCollectionOptimizer = $js_collection_optimizer;
     $this->moduleHandler = $module_handler;
+    if ($this->themeManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $themeManager argument is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3418842', E_USER_DEPRECATED);
+    }
   }
 
   /**
@@ -82,7 +97,8 @@ class PerformanceForm extends ConfigFormBase {
       $container->get('date.formatter'),
       $container->get('asset.css.collection_optimizer'),
       $container->get('asset.js.collection_optimizer'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get(ThemeManagerInterface::class),
     );
   }
 
@@ -143,6 +159,14 @@ class PerformanceForm extends ConfigFormBase {
       '#description' => $this->t('External resources can be optimized automatically, which can reduce both the size and number of requests made to your website.') . $disabled_message,
     ];
 
+    $validation_query = [
+      'theme' => $this->themeManager->getActiveTheme()->getName(),
+      'delta' => '1',
+      'language' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      'include' => 'system/assets.validate',
+      'scope' => 'component',
+    ];
+
     $form['bandwidth_optimization']['preprocess_css'] = [
       '#prefix' => '<div data-assets-validate-messages></div>',
       '#type' => 'checkbox',
@@ -153,7 +177,8 @@ class PerformanceForm extends ConfigFormBase {
       '#attributes' => [
         'data-performance-assets-validate-path' => Url::fromRoute(
           'system.css_asset',
-          ['file_name' => '_validate.css']
+          ['file_name' => 'css__validate.css'],
+          ['query' => $validation_query],
         )->toString(),
       ],
     ];
@@ -166,7 +191,8 @@ class PerformanceForm extends ConfigFormBase {
       '#attributes' => [
         'data-performance-assets-validate-path' => Url::fromRoute(
           'system.js_asset',
-          ['file_name' => '_validate.js']
+          ['file_name' => 'js__validate.js'],
+          ['query' => $validation_query],
         )->toString(),
       ],
     ];
