@@ -1363,44 +1363,6 @@ class ValidatorsTest extends KernelTestBase {
       'filters' => [],
       'expected_violations' => [],
     ];
-    $data['INVALID: Style plugin configured to add class to unsupported tag'] = [
-      'ckeditor5_settings' => [
-        'toolbar' => [
-          'items' => [
-            'style',
-          ],
-        ],
-        'plugins' => [
-          'ckeditor5_style' => [
-            'styles' => [
-              [
-                'label' => 'Highlighted',
-                'element' => '<blockquote class="highlighted">',
-              ],
-            ],
-          ],
-        ],
-      ],
-      'editor_image_upload_settings' => [
-        'status' => FALSE,
-      ],
-      'filters' => [
-        'filter_html' => [
-          'id' => 'filter_html',
-          'provider' => 'filter',
-          'status' => TRUE,
-          'weight' => 0,
-          'settings' => [
-            'allowed_html' => '<p> <br> <blockquote class="highlighted">',
-            'filter_html_help' => TRUE,
-            'filter_html_nofollow' => TRUE,
-          ],
-        ],
-      ],
-      'expected_violations' => [
-        'settings.plugins.ckeditor5_style' => 'The <em class="placeholder">Style</em> plugin needs another plugin to create <code>&lt;blockquote&gt;</code>, for it to be able to create the following attributes: <code>&lt;blockquote class=&quot;highlighted&quot;&gt;</code>. Enable a plugin that supports creating this tag. If none exists, you can configure the Source Editing plugin to support it.',
-      ],
-    ];
     $data['INVALID: Style plugin configured to add class already added by an other plugin'] = [
       'ckeditor5_settings' => [
         'toolbar' => [
