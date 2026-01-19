@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 #[ViewsArgument(
   id: 'date',
 )]
-class Date extends Formula implements FormulaInterface, ContainerFactoryPluginInterface {
+class Date extends Formula implements ContainerFactoryPluginInterface {
 
   /**
    * The date format used in the title.
