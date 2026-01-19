@@ -162,17 +162,6 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
       '#default_value' => !empty($this->configuration['views_label']),
     ];
 
-    $form['views_label_fieldset'] = [
-      '#type' => 'fieldset',
-      '#states' => [
-        'visible' => [
-          [
-            ':input[name="settings[views_label_checkbox]"]' => ['checked' => TRUE],
-          ],
-        ],
-      ],
-    ];
-
     $form['views_label'] = [
       '#title' => $this->t('Title'),
       '#type' => 'textfield',
@@ -184,7 +173,6 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
           ],
         ],
       ],
-      '#fieldset' => 'views_label_fieldset',
     ];
 
     if ($this->view->storage->access('edit') && \Drupal::moduleHandler()->moduleExists('views_ui')) {
