@@ -9,14 +9,16 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\Utility\CallableResolver
- * @group Utility
+ * Tests Drupal\Core\Utility\CallableResolver.
  */
+#[CoversClass(CallableResolver::class)]
+#[Group('Utility')]
 class CallableResolverTest extends UnitTestCase {
 
   /**
@@ -35,30 +37,24 @@ class CallableResolverTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->set('test_service', $this);
 
-    $class_resolver = new ClassResolver();
-    $class_resolver->setContainer($container);
+    $class_resolver = new ClassResolver($container);
 
     $this->resolver = new CallableResolver($class_resolver);
   }
 
   /**
-   * @dataProvider callableResolverTestCases
-   * @covers ::getCallableFromDefinition
+   * Tests callback resolver.
+   *
+   * @legacy-covers ::getCallableFromDefinition
    */
-  public function testCallbackResolver($definition, $result) {
-    $argument = 'bar';
-    $this->assertEquals($result . '+' . $argument, $this->resolver->getCallableFromDefinition($definition)($argument));
-  }
-
-  /**
-   * Test cases for ::testCallbackResolver.
-   */
-  public function callableResolverTestCases() {
-    return [
+  public function testCallbackResolver(): void {
+    $cases = [
       'Inline function' => [
         function ($suffix) {
           return __METHOD__ . '+' . $suffix;
         },
+        PHP_VERSION_ID >= 80400 ?
+        '{closure:Drupal\Tests\Core\Utility\CallableResolverTest::testCallbackResolver():53}' :
         'Drupal\Tests\Core\Utility\{closure}',
       ],
       'First-class callable function' => [
@@ -70,7 +66,9 @@ class CallableResolverTest extends UnitTestCase {
         __CLASS__ . '::staticMethod',
       ],
       'Arrow function' => [
-        fn($suffix) => __METHOD__ . '+' . $suffix,
+        fn($suffix): string => __METHOD__ . '+' . $suffix,
+        PHP_VERSION_ID >= 80400 ?
+        '{closure:Drupal\Tests\Core\Utility\CallableResolverTest::testCallbackResolver():69}' :
         'Drupal\Tests\Core\Utility\{closure}',
       ],
       'Static function' => [
@@ -90,16 +88,12 @@ class CallableResolverTest extends UnitTestCase {
         __CLASS__ . '::method',
       ],
       'Non-static function, instantiated by class resolver' => [
-        static::class . '::method',
-        __CLASS__ . '::method',
+        MethodCallable::class . '::method',
+        MethodCallable::class . '::method',
       ],
       'Non-static function, instantiated by class resolver, container injection' => [
         '\Drupal\Tests\Core\Utility\MockContainerInjection::getResult',
         'Drupal\Tests\Core\Utility\MockContainerInjection::getResult-foo',
-      ],
-      'Non-static function, instantiated by class resolver, container aware' => [
-        '\Drupal\Tests\Core\Utility\MockContainerAware::getResult',
-        'Drupal\Tests\Core\Utility\MockContainerAware::getResult',
       ],
       'Service notation' => [
         'test_service:method',
@@ -110,17 +104,24 @@ class CallableResolverTest extends UnitTestCase {
         __CLASS__ . '::staticMethod',
       ],
       'Class with invoke method' => [
-        static::class,
-        __CLASS__ . '::__invoke',
+        MethodCallable::class,
+        MethodCallable::class . '::__invoke',
       ],
     ];
+
+    $argument = 'bar';
+    foreach ($cases as $label => [$definition, $result]) {
+      $this->assertEquals($result . '+' . $argument, $this->resolver->getCallableFromDefinition($definition)($argument), $label);
+    }
   }
 
   /**
-   * @dataProvider callableResolverExceptionHandlingTestCases
-   * @covers ::getCallableFromDefinition
+   * Tests callback resolver exception handling.
+   *
+   * @legacy-covers ::getCallableFromDefinition
    */
-  public function testCallbackResolverExceptionHandling($definition, $exception_class, $exception_message) {
+  #[DataProvider('callableResolverExceptionHandlingTestCases')]
+  public function testCallbackResolverExceptionHandling($definition, $exception_class, $exception_message): void {
     $this->expectException($exception_class);
     $this->expectExceptionMessage($exception_message);
     $this->resolver->getCallableFromDefinition($definition);
@@ -129,7 +130,7 @@ class CallableResolverTest extends UnitTestCase {
   /**
    * Test cases for ::testCallbackResolverExceptionHandling.
    */
-  public function callableResolverExceptionHandlingTestCases() {
+  public static function callableResolverExceptionHandlingTestCases(): array {
     return [
       'String function' => [
         'not_a_callable',
@@ -142,14 +143,14 @@ class CallableResolverTest extends UnitTestCase {
         'The callable definition provided "[not_a_callable,not_a_callable]" is not a valid callable.',
       ],
       'Missing method on class, array notation' => [
-        [static::class, 'method_not_exists'],
+        [\stdClass::class, 'method_not_exists'],
         \InvalidArgumentException::class,
-        'The callable definition provided "[Drupal\Tests\Core\Utility\CallableResolverTest,method_not_exists]" is not a valid callable.',
+        'The callable definition provided "[stdClass,method_not_exists]" is not a valid callable.',
       ],
       'Missing method on class, static notation' => [
-        static::class . '::method_not_exists',
+        \stdClass::class . '::method_not_exists',
         \InvalidArgumentException::class,
-        'The callable definition provided was invalid. Either class "Drupal\Tests\Core\Utility\CallableResolverTest" does not have a method "method_not_exists", or it is not callable.',
+        'The callable definition provided was invalid. Either class "stdClass" does not have a method "method_not_exists", or it is not callable.',
       ],
       'Missing class, static notation' => [
         '\NotARealClass::method',
@@ -183,7 +184,7 @@ class CallableResolverTest extends UnitTestCase {
    * @return string
    *   A test string.
    */
-  public static function staticMethod($suffix) {
+  public static function staticMethod($suffix): string {
     return __METHOD__ . '+' . $suffix;
   }
 
@@ -199,7 +200,7 @@ class CallableResolverTest extends UnitTestCase {
    * @throws \Exception
    *   Throws an exception when called statically.
    */
-  public function method($suffix) {
+  public function method($suffix): string {
     return __METHOD__ . '+' . $suffix;
   }
 
@@ -212,54 +213,91 @@ class CallableResolverTest extends UnitTestCase {
    * @return string
    *   A test string.
    */
-  public function __invoke($suffix) {
+  public function __invoke($suffix): string {
     return __METHOD__ . '+' . $suffix;
   }
 
 }
 
+/**
+ * Test class mocking container injection.
+ */
 class MockContainerInjection implements ContainerInjectionInterface {
 
+  /**
+   * The value to be injected.
+   *
+   * @var string
+   */
   protected $injected;
 
   public function __construct($result) {
     $this->injected = $result;
   }
 
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static('foo');
   }
 
-  public function getResult($suffix) {
+  public function getResult($suffix): string {
     return __METHOD__ . '-' . $this->injected . '+' . $suffix;
   }
 
 }
 
+/**
+ * Test class for testing a mock static callable.
+ */
 class NoInstantiationMockStaticCallable {
 
   public function __construct() {
     throw new \Exception(sprintf('The class %s should not require instantiation for the static method to be called.', __CLASS__));
   }
 
-  public static function staticMethod($suffix) {
+  public static function staticMethod($suffix): string {
     return __METHOD__ . '+' . $suffix;
   }
 
 }
 
+/**
+ * A test class with callable methods.
+ */
+class MethodCallable {
+
+  /**
+   * A test __invoke method.
+   *
+   * @param string $suffix
+   *   A suffix to append.
+   *
+   * @return string
+   *   A test string.
+   */
+  public function __invoke($suffix): string {
+    return __METHOD__ . '+' . $suffix;
+  }
+
+  /**
+   * A test method that returns "foo".
+   *
+   * @param string $suffix
+   *   A suffix to append.
+   *
+   * @return string
+   *   A test string.
+   *
+   * @throws \Exception
+   *   Throws an exception when called statically.
+   */
+  public function method($suffix): string {
+    return __METHOD__ . '+' . $suffix;
+  }
+
+}
+
+/**
+ * A test class with no callable methods.
+ */
 class NoMethodCallable {
-}
-
-class MockContainerAware implements ContainerAwareInterface {
-
-  use ContainerAwareTrait;
-
-  public function getResult($suffix) {
-    if (empty($this->container)) {
-      throw new \Exception('Container was not injected.');
-    }
-    return __METHOD__ . '+' . $suffix;
-  }
-
 }

@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Module;
 
 use Drupal\Core\Extension\ExtensionNameLengthException;
 use Drupal\Core\Extension\ExtensionNameReservedException;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the installation of modules.
- *
- * @group Module
  */
+#[Group('Module')]
+#[RunTestsInSeparateProcesses]
 class InstallTest extends KernelTestBase {
 
   /**
@@ -123,7 +127,7 @@ class InstallTest extends KernelTestBase {
   /**
    * Tests installing a module with the same name as an enabled theme.
    */
-  public function testInstallModuleSameNameAsTheme() {
+  public function testInstallModuleSameNameAsTheme(): void {
     $name = 'name_collision_test';
 
     // Install and uninstall the module.

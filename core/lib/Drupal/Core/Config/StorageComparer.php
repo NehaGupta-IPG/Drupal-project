@@ -2,6 +2,9 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Component\Datetime\Time;
+use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
@@ -83,7 +86,7 @@ class StorageComparer implements StorageComparerInterface {
    *
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
-  protected $targetCacheStorage;
+  protected CacheBackendInterface $targetCacheStorage;
 
   /**
    * Indicates whether the target storage should be wrapped in a cache.
@@ -112,6 +115,7 @@ class StorageComparer implements StorageComparerInterface {
       $target_storage = $target_storage->createCollection(StorageInterface::DEFAULT_COLLECTION);
     }
 
+    $time = \Drupal::hasService(TimeInterface::class) ? \Drupal::service(TimeInterface::class) : new Time();
     if ($source_storage instanceof FileStorage) {
       // FileStorage has its own static cache so that multiple reads of the
       // same raw configuration object are not costly.
@@ -121,14 +125,14 @@ class StorageComparer implements StorageComparerInterface {
     else {
       // Wrap the source storage in a static cache so that multiple reads of the
       // same raw configuration object are not costly.
-      $this->sourceCacheStorage = new MemoryBackend();
+      $this->sourceCacheStorage = new MemoryBackend($time);
       $this->sourceStorage = new CachedStorage(
         $source_storage,
         $this->sourceCacheStorage
       );
     }
 
-    $this->targetCacheStorage = new MemoryBackend();
+    $this->targetCacheStorage = new MemoryBackend($time);
     $this->targetStorage = $target_storage;
     $this->changelist[StorageInterface::DEFAULT_COLLECTION] = $this->getEmptyChangelist();
   }
@@ -217,7 +221,7 @@ class StorageComparer implements StorageComparerInterface {
    *   (optional) Array to sort that can be used to sort the changelist. This
    *   array must contain all the items that are in the change list.
    */
-  protected function addChangeList($collection, $op, array $changes, array $sort_order = NULL) {
+  protected function addChangeList($collection, $op, array $changes, ?array $sort_order = NULL) {
     // Only add changes that aren't already listed.
     $changes = array_diff($changes, $this->changelist[$collection][$op]);
     $this->changelist[$collection][$op] = array_merge($this->changelist[$collection][$op], $changes);

@@ -72,7 +72,7 @@ class Rearrange extends ViewsFormBase {
 
     $count = 0;
 
-    // Get relationship labels
+    // Get relationship labels.
     $relationships = [];
     foreach ($display->getHandlers('relationship') as $id => $handler) {
       $relationships[$id] = $handler->adminLabel();
@@ -161,16 +161,16 @@ class Rearrange extends ViewsFormBase {
     $old_fields = $display->getOption($types[$type]['plural']);
     $new_fields = $order = [];
 
-    // Make an array with the weights
+    // Make an array with the weights.
     foreach ($form_state->getValue('fields') as $field => $info) {
-      // add each value that is a field with a weight to our list, but only if
+      // Add each value that is a field with a weight to our list, but only if
       // it has had its 'removed' checkbox checked.
       if (is_array($info) && isset($info['weight']) && empty($info['removed'])) {
         $order[$field] = $info['weight'];
       }
     }
 
-    // Sort the array
+    // Sort the array.
     asort($order);
 
     // Create a new list of fields in the new order.
@@ -179,7 +179,7 @@ class Rearrange extends ViewsFormBase {
     }
     $display->setOption($types[$type]['plural'], $new_fields);
 
-    // Store in cache
+    // Store in cache.
     $view->cacheSet();
   }
 
