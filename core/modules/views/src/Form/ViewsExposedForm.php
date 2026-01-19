@@ -10,6 +10,7 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Render\Element\Checkboxes;
 use Drupal\Core\Url;
 use Drupal\views\ExposedFormCache;
+use Drupal\views\Plugin\views\display\DisplayRouterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -121,7 +122,10 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       '#id' => Html::getUniqueId('edit-submit-' . $view->storage->id()),
     ];
 
-    if ($view->hasUrl()) {
+    // Only use a routed display when the current display is routed or when an
+    // explicit link display is configured; otherwise fall back to the current
+    // page to avoid guessing.
+    if ($view->display_handler instanceof DisplayRouterInterface) {
       $form_action = $view->getUrl()->toString();
     }
     else {
@@ -131,7 +135,7 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       $linked_display_id = $view->display_handler->getOption('link_display');
       if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $view->displayHandlers->has($linked_display_id)) {
         $linked_display = $view->displayHandlers->get($linked_display_id);
-        if ($linked_display->getRoutedDisplay()) {
+        if ($linked_display instanceof DisplayRouterInterface) {
           $form_action = $view->getUrl(NULL, $linked_display_id)->toString();
         }
       }
