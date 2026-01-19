@@ -9,6 +9,9 @@ use Drupal\Component\FileCache\FileCache;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Config\Development\ConfigSchemaChecker;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Exception\SchemaDefinitionException;
+use Drupal\Core\Database\SchemaDefinition\Schema;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DrupalKernel;
@@ -793,13 +796,26 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $schema = $this->container->get('database')->schema();
     $tables = (array) $tables;
     foreach ($tables as $table) {
-      if ($module === 'system' && $table === 'sequences') {
-        @trigger_error('Installing the table sequences with the method KernelTestBase::installSchema() is deprecated in drupal:10.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
+      if ($specification instanceof Schema) {
+        assert($specification->type === SchemaDefinitionType::Module, 'Invalid schema definition type, must be SchemaDefinitionType::Module');
+        assert($specification->name === $module, 'Invalid schema definition name, must be equal to the module name');
+        try {
+          $table_definition = $specification->getTableDefinition($table);
+          if ($specification->type === SchemaDefinitionType::Module && $specification->name === 'system' && $table_definition->name === 'sequences') {
+            @trigger_error('Installing the table sequences with the method KernelTestBase::installSchema() is deprecated in drupal:10.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
+          }
+          $schema->createTableFromDefinition($specification->type, $specification->name, $table_definition);
+        }
+        catch (SchemaDefinitionException) {
+          throw new \LogicException("$module module does not define a schema for table '$table'.");
+        }
       }
-      if (empty($specification[$table])) {
-        throw new \LogicException("$module module does not define a schema for table '$table'.");
+      else {
+        if (empty($specification[$table])) {
+          throw new \LogicException("$module module does not define a schema for table '$table'.");
+        }
+        $schema->createTable($table, $specification[$table]);
       }
-      $schema->createTable($table, $specification[$table]);
     }
   }
 

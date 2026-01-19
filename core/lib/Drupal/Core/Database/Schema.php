@@ -3,6 +3,9 @@
 namespace Drupal\Core\Database;
 
 use Drupal\Core\Database\Query\PlaceholderInterface;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\Table as TableDefinition;
 
 /**
  * Provides a base implementation for Database Schema.
@@ -15,6 +18,8 @@ abstract class Schema implements PlaceholderInterface {
    * @var \Drupal\Core\Database\Connection
    */
   protected $connection;
+
+  protected readonly SchemaRegistry $schemaRegistry;
 
   /**
    * The placeholder counter.
@@ -46,6 +51,7 @@ abstract class Schema implements PlaceholderInterface {
   public function __construct($connection) {
     $this->uniqueIdentifier = uniqid('', TRUE);
     $this->connection = $connection;
+    $this->schemaRegistry = new SchemaRegistry($connection);
   }
 
   /**
@@ -628,7 +634,61 @@ abstract class Schema implements PlaceholderInterface {
   abstract public function changeField($table, $field, $field_new, $spec, $keys_new = []);
 
   /**
-   * Create a new table from a Drupal table definition.
+   * Creates the tables in a schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\Schema $schema
+   *   A Schema definition.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If any of the specified tables already exists.
+   * @throws \BadMethodCallException
+   *   When concrete driver class is missing implementations.
+   */
+  final public function createSchemaFromDefinition(SchemaDefinition $schema): void {
+    foreach ($schema as $table) {
+      $this->createTableFromDefinition($schema->type, $schema->name, $table);
+    }
+  }
+
+  /**
+   * Creates a new table from a table schema definition.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType $schemaDefinitionType
+   *   The type of Drupal feature providing the schema.
+   * @param string $schemaName
+   *   The schema name.
+   * @param \Drupal\Core\Database\SchemaDefinition\Table $table
+   *   The table definition.
+   *
+   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   *   If the specified table already exists.
+   * @throws \BadMethodCallException
+   *   When concrete driver class is missing implementations.
+   */
+  final public function createTableFromDefinition(SchemaDefinitionType $schemaDefinitionType, string $schemaName, TableDefinition $table): void {
+    $this->schemaRegistry->register(
+      $schemaDefinitionType,
+      $schemaName,
+      DatabaseObjectType::Table,
+      $table->name,
+      'abstract',
+      $table,
+      0,
+    );
+    $this->createTable($table->name, $table->toArray());
+    $this->schemaRegistry->registerUpdate(
+      $schemaDefinitionType,
+      $schemaName,
+      DatabaseObjectType::Table,
+      $table->name,
+      'abstract',
+      $table,
+      1,
+    );
+  }
+
+  /**
+   * Create a new table from a Drupal array table definition.
    *
    * @param string $name
    *   The name of the table to create.
