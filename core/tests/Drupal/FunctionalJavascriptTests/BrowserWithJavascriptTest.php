@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests;
 
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -86,6 +87,7 @@ JS;
    * @see \Drupal\Tests\WebAssert::assertNoEscaped()
    * @see \Drupal\Tests\WebAssert::assertEscaped()
    */
+  #[DoesNotPerformAssertions]
   public function testEscapingAssertions(): void {
     $assert = $this->assertSession();
 
@@ -104,9 +106,6 @@ JS;
     $assert->responseContains('<div class="unescaped">');
     $assert->responseContains("<script>alert('Marked safe');alert(\"Marked safe\");</script>");
     $assert->assertNoEscaped("<script>alert('Marked safe');alert(\"Marked safe\");</script>");
-
-    // No PHPUnit assertions are called here.
-    $this->expectNotToPerformAssertions();
   }
 
   /**
