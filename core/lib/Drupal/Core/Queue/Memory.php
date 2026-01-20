@@ -29,11 +29,8 @@ class Memory implements QueueInterface {
 
   /**
    * Constructs a Memory object.
-   *
-   * @param string $name
-   *   An arbitrary string. The name of the queue to work with.
    */
-  public function __construct($name) {
+  public function __construct() {
     $this->queue = [];
     $this->idSequence = 0;
   }

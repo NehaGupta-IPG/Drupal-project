@@ -50,7 +50,7 @@ class MigrateException extends \Exception {
   public function __construct($message = '', $code = 0, ?\Throwable $previous = NULL, $level = MigrationInterface::MESSAGE_ERROR, $status = MigrateIdMapInterface::STATUS_FAILED) {
     $this->level = $level;
     $this->status = $status;
-    parent::__construct($message);
+    parent::__construct($message, $code, $previous);
   }
 
   /**
