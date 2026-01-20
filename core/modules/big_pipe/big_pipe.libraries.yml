@@ -1,5 +1,5 @@
 big_pipe:
-  unique_js_aggregate: true
+  js_aggregate_target: true
   version: VERSION
   js:
     js/big_pipe.commands.js: {}

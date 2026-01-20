@@ -53,12 +53,12 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
           // optimizer adds inline 'media' statements for everything except
           // 'print', so only vary groups based on that.
           $group_keys = $item['preprocess'] ? [$item['type'], $item['media'] === 'print'] : FALSE;
-          if ($item['unique_css_aggregate']) {
-            if ($item['unique_css_aggregate'] === TRUE) {
+          if ($item['css_aggregate_target']) {
+            if ($item['css_aggregate_target'] === TRUE) {
               $group_keys[] = $item['library'];
             }
             else {
-              $group_keys[] = $item['unique_css_aggregate'];
+              $group_keys[] = $item['css_aggregate_target'];
             }
             $group_keys[] = $item['category'];
           }
@@ -86,7 +86,7 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         $groups[$i]['items'] = [];
         $current_group_keys = $group_keys ?: NULL;
       }
-      if ($item['unique_css_aggregate']) {
+      if ($item['css_aggregate_target']) {
         // The first time a library is seen, add it to the list of libraries for
         // the group and record the index.
         $seen_index = $first_seen_libraries[$item['library']][$item['category']] ?? NULL;

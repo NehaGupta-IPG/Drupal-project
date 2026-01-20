@@ -42,11 +42,11 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
           // Help ensure maximum reuse of aggregate files by only grouping
           // together items that share the same 'group' value.
           $group_keys = $item['preprocess'] ? [$item['type'], $item['group']] : FALSE;
-          if ($item['unique_js_aggregate'] === TRUE) {
+          if ($item['js_aggregate_target'] === TRUE) {
             $group_keys[] = $item['library'];
           }
-          elseif ($item['unique_js_aggregate']) {
-            $group_keys[] = $item['unique_js_aggregate'];
+          elseif ($item['js_aggregate_target']) {
+            $group_keys[] = $item['js_aggregate_target'];
           }
           break;
 
@@ -74,7 +74,7 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
       // the group and record the index.
       if ($seen_index === NULL) {
         $first_seen_libraries[$item['library']] = $index;
-        if ($item['unique_js_aggregate']) {
+        if ($item['js_aggregate_target']) {
           $groups[$index]['libraries'][] = $item['library'];
         }
       }

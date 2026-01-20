@@ -340,7 +340,7 @@ ckeditor5.autoformat:
     - core/ckeditor5
 
 drupal:
-  unique_js_aggregate: 'drupal'
+  js_aggregate_target: 'drupal'
   version: VERSION
   js:
     misc/drupal.js: { weight: -18 }
@@ -351,7 +351,7 @@ drupal:
     suppressDeprecationErrors: true
 
 drupalSettings:
-  unique_js_aggregate: 'drupal'
+  js_aggregate_target: 'drupal'
   version: VERSION
   js:
     # Need to specify a negative weight like drupal.js until
@@ -410,7 +410,7 @@ drupal.announce:
     - core/drupal.debounce
 
 loadjs:
-  unique_js_aggregate: 'htmx'
+  js_aggregate_target: 'htmx'
   remote: https://github.com/muicss/loadjs
   version: "4.3.0"
   license:
@@ -618,7 +618,7 @@ drupal.form:
     - core/once
 
 drupal.htmx:
-  unique_js_aggregate: 'htmx'
+  js_aggregate_target: 'htmx'
   version: VERSION
   js:
     misc/htmx/htmx-utils.js: {}
@@ -835,7 +835,7 @@ drupal.vertical-tabs:
     - core/drupalSettings
     - core/drupal.form
 htmx:
-  unique_js_aggregate: 'htmx'
+  js_aggregate_target: 'htmx'
   remote: https://github.com/bigskysoftware/htmx
   version: "2.0.4"
   license:
@@ -846,7 +846,7 @@ htmx:
     assets/vendor/htmx/htmx.min.js: { minified: true }
 
 internal.floating-ui:
-  unique_js_aggregate: true
+  js_aggregate_target: true
   remote: https://github.com/floating-ui/floating-ui
   version: "1.7.4"
   license:

@@ -1,5 +1,5 @@
 global:
-  unique_css_aggregate: 'every_page'
+  css_aggregate_target: 'global'
   version: VERSION
   css:
     component:
@@ -63,7 +63,7 @@ quicklinks:
       css/components/blocks/quicklinks/quicklinks.css: {}
 
 recipe-collections:
-  unique_css_aggregate: 'every_page'
+  css_aggregate_target: 'global'
   css:
     component:
       css/components/blocks/recipe-collections/recipe-collections.css: {}
@@ -91,7 +91,7 @@ filter:
       css/theme/filter.admin.css: {}
 
 classy.base:
-  unique_css_aggregate: 'every_page'
+  css_aggregate_target: 'global'
   version: VERSION
   css:
     component:

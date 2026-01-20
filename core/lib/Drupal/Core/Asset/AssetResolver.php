@@ -235,7 +235,7 @@ class AssetResolver implements AssetResolverInterface {
         $options['weight'] += count($css) / 30000;
 
         $options['library'] = $library;
-        $options['unique_css_aggregate'] = $definition['unique_css_aggregate'] ?? FALSE;
+        $options['css_aggregate_target'] = $definition['css_aggregate_target'] ?? FALSE;
 
         // CSS files are being keyed by the full path.
         $css[$options['data']] = $options;
@@ -363,7 +363,7 @@ class AssetResolver implements AssetResolverInterface {
           $options['weight'] += count($javascript) / 30000;
 
           $options['library'] = $library;
-          $options['unique_js_aggregate'] = $definition['unique_js_aggregate'] ?? FALSE;
+          $options['js_aggregate_target'] = $definition['js_aggregate_target'] ?? FALSE;
 
           // Local and external files must keep their name as the associative
           // key so the same JavaScript file is not added twice.
