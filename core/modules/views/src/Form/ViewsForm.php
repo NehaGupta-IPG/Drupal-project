@@ -49,7 +49,6 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
 
   /**
    * @var \Drupal\Core\Path\CurrentPathStack
-   *
    */
   protected $currentPath;
 
