@@ -55,7 +55,7 @@ class ConfigEntityStorageTest extends KernelTestBase {
   /**
    * Test that the compilation of a query condition works as expected.
    */
-  public function testSavingEmptyUuid() {
+  public function testSavingEmptyUuid(): void {
     $entity_type = 'config_test';
     $id = 'XFiles_S06E11_Two_Fathers';
     // Load the original configuration entity.
@@ -67,7 +67,7 @@ class ConfigEntityStorageTest extends KernelTestBase {
     try {
       $entity->save();
     }
-    catch (ConfigDuplicateUUIDException $e) {
+    catch (ConfigDuplicateUUIDException) {
       // We totally expect that to happen when we remove the uuid like that.
     }
     // Make sure we assert something as well then.
