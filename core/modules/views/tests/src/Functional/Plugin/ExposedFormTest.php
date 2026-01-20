@@ -11,6 +11,7 @@ use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use Drupal\views\ViewExecutable;
+use Drupal\Core\Url;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -342,8 +343,8 @@ class ExposedFormTest extends ViewTestBase {
     $form = $this->assertSession()->elementExists('css', 'form#' . $form_id);
     $action = $form->getAttribute('action');
 
-    $this->assertSame('/test-exposed-form-action-feed', $action);
-    $this->assertNotSame('/test-exposed-form-action-page', $action);
+    $this->assertSame(Url::fromUserInput('/test-exposed-form-action-feed')->toString(), $action);
+    $this->assertNotSame(Url::fromUserInput('/test-exposed-form-action-page')->toString(), $action);
     $this->assertNotNull($block);
   }
 
@@ -361,9 +362,9 @@ class ExposedFormTest extends ViewTestBase {
     $form = $this->assertSession()->elementExists('css', 'form#' . $form_id);
     $action = $form->getAttribute('action');
 
-    $this->assertSame('/node/' . $node->id(), $action);
-    $this->assertNotSame('/test-exposed-form-action-page', $action);
-    $this->assertNotSame('/test-exposed-form-action-feed', $action);
+    $this->assertSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
+    $this->assertNotSame(Url::fromUserInput('/test-exposed-form-action-page')->toString(), $action);
+    $this->assertNotSame(Url::fromUserInput('/test-exposed-form-action-feed')->toString(), $action);
     $this->assertNotNull($block);
   }
 
