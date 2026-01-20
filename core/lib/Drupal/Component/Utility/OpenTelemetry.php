@@ -23,7 +23,7 @@ class OpenTelemetry {
    *
    * @template T
    */
-  public static function bindContext(callable $callback): \Closure {
+  public static function bindContext(callable $callback): callable {
     if (class_exists(Context::class)) {
       $parent = Context::getCurrent();
       return static function (mixed ...$args) use ($parent, $callback) {
