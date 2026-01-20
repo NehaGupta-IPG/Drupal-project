@@ -500,7 +500,7 @@ class BigPipe {
       }
       $placeholder_render_array = $placeholders[$placeholder_id];
       $fibers[$placeholder_id] = new \Fiber(OpenTelemetry::bindContext(
-        fn () => [$this->renderPlaceholder($placeholder_id, $placeholder_render_array)]
+        fn () => $this->renderPlaceholder($placeholder_id, $placeholder_render_array)
       ));
     }
     $iterations = 0;
