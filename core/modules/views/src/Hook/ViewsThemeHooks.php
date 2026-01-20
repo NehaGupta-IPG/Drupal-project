@@ -669,7 +669,7 @@ class ViewsThemeHooks {
       $query += $view->exposed_raw_input;
     }
 
-    $twig_debug = \Drupal::service('twig')->isDebug();
+    $twig_debug = \Drupal::hasService('twig') && \Drupal::service('twig')->isDebug();
 
     // A boolean to store whether the table's header has any labels.
     $has_header_labels = FALSE;

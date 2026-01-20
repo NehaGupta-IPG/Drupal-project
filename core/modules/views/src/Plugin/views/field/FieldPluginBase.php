@@ -1276,7 +1276,7 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
 
     // If twig_debug is enabled, we strip out the HTML comments before running
     // the empty check.
-    if (\Drupal::service('twig')->isDebug()) {
+    if (\Drupal::hasService('twig') && \Drupal::service('twig')->isDebug()) {
       $value = preg_replace('/<!--.*?-->/s', '', (string) $value);
       $value = trim($value);
     }
