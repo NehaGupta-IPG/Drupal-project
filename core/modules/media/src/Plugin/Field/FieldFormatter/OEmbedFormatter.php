@@ -5,6 +5,7 @@ namespace Drupal\media\Plugin\Field\FieldFormatter;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
@@ -82,6 +83,13 @@ class OEmbedFormatter extends FormatterBase {
   protected $iFrameUrlHelper;
 
   /**
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * Constructs an OEmbedFormatter instance.
    *
    * @param string $plugin_id
@@ -110,8 +118,10 @@ class OEmbedFormatter extends FormatterBase {
    *   The config factory service.
    * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
    *   The iFrame URL helper service.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler service.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, MessengerInterface $messenger, ResourceFetcherInterface $resource_fetcher, UrlResolverInterface $url_resolver, LoggerChannelFactoryInterface $logger_factory, ConfigFactoryInterface $config_factory, IFrameUrlHelper $iframe_url_helper) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, MessengerInterface $messenger, ResourceFetcherInterface $resource_fetcher, UrlResolverInterface $url_resolver, LoggerChannelFactoryInterface $logger_factory, ConfigFactoryInterface $config_factory, IFrameUrlHelper $iframe_url_helper, ModuleHandlerInterface $module_handler) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
     $this->messenger = $messenger;
     $this->resourceFetcher = $resource_fetcher;
@@ -182,12 +192,17 @@ class OEmbedFormatter extends FormatterBase {
         ];
       }
       else {
+        // We construct context information for the iframe.
+        $context = [];
+        $this->moduleHandler->alter('oembed_formatter_context', $context, $this, $resource);
+
         $url = Url::fromRoute('media.oembed_iframe', [], [
           'absolute' => TRUE,
           'query' => [
             'url' => $value,
             'max_width' => $max_width,
             'max_height' => $max_height,
+            'context' => $context,
             'hash' => $this->iFrameUrlHelper->getHash($value, $max_width, $max_height),
           ],
         ]);
