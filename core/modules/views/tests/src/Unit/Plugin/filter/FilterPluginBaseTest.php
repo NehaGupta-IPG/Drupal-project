@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Unit\Plugin\filter;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
  * Tests Drupal\views\Plugin\views\filter\FilterPluginBase.
  */
 #[CoversClass(FilterPluginBase::class)]
+#[CoversMethod(FilterPluginBase::class, 'getCacheContexts')]
 #[Group('views')]
 class FilterPluginBaseTest extends UnitTestCase {
 
@@ -64,11 +66,7 @@ class FilterPluginBaseTest extends UnitTestCase {
     ];
   }
 
-  /**
-   * @covers ::getCacheContexts
-   *
-   * @dataProvider getCacheContextsProvider
-   */
+  #[DataProvider('getCacheContextsProvider')]
   public function testGetCacheContexts(array $expected_result, array $options): void {
     $definition = [
       'title' => 'Get cache contexts Test',
