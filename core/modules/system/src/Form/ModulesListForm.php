@@ -5,6 +5,7 @@ namespace Drupal\system\Form;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\InfoParserException;
@@ -14,15 +15,16 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
+use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Component\Utility\Xss;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides module installation interface.
@@ -37,99 +39,36 @@ use Drupal\Component\Utility\Xss;
  */
 class ModulesListForm extends FormBase {
 
+  use AutowireTrait {
+    AutowireTrait::create as autowireCreate;
+  }
   use ModuleDependencyMessageTrait;
   use ModulesEnabledTrait;
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
+   * The install profile.
    */
-  protected $currentUser;
+  protected string $installProfile;
 
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The expirable key value store.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
-   */
-  protected $keyValueExpirable;
-
-  /**
-   * The module installer.
-   *
-   * @var \Drupal\Core\Extension\ModuleInstallerInterface
-   */
-  protected $moduleInstaller;
-
-  /**
-   * The permission handler.
-   *
-   * @var \Drupal\user\PermissionHandlerInterface
-   */
-  protected $permissionHandler;
-
-  /**
-   * The module extension list.
-   *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
-   */
-  protected $moduleExtensionList;
-
-  /**
-   * The access manager.
-   *
-   * @var \Drupal\Core\Access\AccessManagerInterface
-   */
-  protected $accessManager;
+  public function __construct(
+    protected ModuleHandlerInterface $moduleHandler,
+    protected ModuleInstallerInterface $moduleInstaller,
+    #[Autowire('keyvalue.expirable')]
+    protected KeyValueExpirableFactoryInterface $keyValueExpirableFactory,
+    protected AccessManagerInterface $accessManager,
+    protected AccountInterface $currentUser,
+    protected PermissionHandlerInterface $permissionHandler,
+    protected ModuleExtensionList $moduleExtensionList,
+  ) {
+  }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('module_handler'),
-      $container->get('module_installer'),
-      $container->get('keyvalue.expirable')->get('module_list'),
-      $container->get('access_manager'),
-      $container->get('current_user'),
-      $container->get('user.permissions'),
-      $container->get('extension.list.module')
-    );
-  }
-
-  /**
-   * Constructs a ModulesListForm object.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
-   *   The module installer.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable
-   *   The key value expirable factory.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
-   *   Access manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
-   *   The current user.
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
-   *   The permission handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
-   *   The module extension list.
-   */
-  public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, AccessManagerInterface $access_manager, AccountInterface $current_user, PermissionHandlerInterface $permission_handler, ModuleExtensionList $extension_list_module) {
-    $this->moduleExtensionList = $extension_list_module;
-    $this->moduleHandler = $module_handler;
-    $this->moduleInstaller = $module_installer;
-    $this->keyValueExpirable = $key_value_expirable;
-    $this->accessManager = $access_manager;
-    $this->currentUser = $current_user;
-    $this->permissionHandler = $permission_handler;
+  public static function create(ContainerInterface $container): static {
+    $instance = static::autowireCreate($container);
+    $instance->installProfile = $container->getParameter('install_profile');
+    return $instance;
   }
 
   /**
@@ -143,9 +82,6 @@ class ModulesListForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    require_once DRUPAL_ROOT . '/core/includes/install.inc';
-    $distribution = drupal_install_profile_distribution_name();
-
     $form['filters'] = [
       '#type' => 'container',
       '#attributes' => [
@@ -190,7 +126,7 @@ class ModulesListForm extends FormBase {
     foreach ($modules as $filename => $module) {
       if (empty($module->info['hidden'])) {
         $package = $module->info['package'];
-        $form['modules'][$package][$filename] = $this->buildRow($modules, $module, $distribution);
+        $form['modules'][$package][$filename] = $this->buildRow($modules, $module);
         $form['modules'][$package][$filename]['#parents'] = ['modules', $filename];
       }
       if (!$incompatible_installed && $module->status && $module->info['core_incompatible']) {
@@ -244,13 +180,11 @@ class ModulesListForm extends FormBase {
    *   The list existing modules.
    * @param \Drupal\Core\Extension\Extension $module
    *   The module for which to build the form row.
-   * @param string $distribution
-   *   The distribution.
    *
    * @return array
    *   The form row for the given module.
    */
-  protected function buildRow(array $modules, Extension $module, $distribution) {
+  protected function buildRow(array $modules, Extension $module) {
     // Set the basic properties.
     $row['#required'] = [];
     $row['#requires'] = [];
@@ -326,9 +260,9 @@ class ModulesListForm extends FormBase {
     // Disable the checkbox for required modules.
     if (!empty($module->info['required'])) {
       // Used when displaying modules that are required by the installation
-      // profile.
+      // profile
       $row['enable']['#disabled'] = TRUE;
-      $row['#required_by'][] = $distribution . (!empty($module->info['explanation']) ? ' (' . $module->info['explanation'] . ')' : '');
+      $row['#required_by'][] = $this->installProfile . (!empty($module->info['explanation']) ? ' (' . $module->info['explanation'] . ')' : '');
     }
 
     // Check the compatibilities.
@@ -372,6 +306,8 @@ class ModulesListForm extends FormBase {
     // If this module requires other modules, add them to the array.
     /** @var \Drupal\Core\Extension\Dependency $dependency_object */
     foreach ($module->requires as $dependency => $dependency_object) {
+      // @todo Add logic for not displaying hidden modules in
+      //   https://drupal.org/node/3117829.
       if ($incompatible = $this->checkDependencyMessage($modules, $dependency, $dependency_object)) {
         $row['#requires'][$dependency] = $incompatible;
         $row['enable']['#disabled'] = TRUE;
@@ -477,7 +413,7 @@ class ModulesListForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // Retrieve a list of modules to install and their dependencies.
     $modules = $this->buildModuleList($form_state);
 
@@ -487,7 +423,7 @@ class ModulesListForm extends FormBase {
       $route_name = !empty($modules['non_stable']) ? 'system.modules_list_non_stable_confirm' : 'system.modules_list_confirm';
       // Write the list of changed module states into a key value store.
       $account = $this->currentUser()->id();
-      $this->keyValueExpirable->setWithExpire($account, $modules, 60);
+      $this->keyValueExpirableFactory->get('module_list')->setWithExpire($account, $modules, 60);
 
       // Redirect to the confirmation form.
       $form_state->setRedirect($route_name);
