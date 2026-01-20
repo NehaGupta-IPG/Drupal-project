@@ -6,7 +6,6 @@ use Drupal\Component\Graph\Graph;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\migrate\Plugin\Discovery\ProviderFilterDecorator;
@@ -49,10 +48,8 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    *   The module handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
    *   The cache backend for the definitions.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager) {
+  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {
     $this->factory = new ContainerFactory($this, $this->pluginInterface);
     $this->alterInfo('migration_plugins');
     $this->setCacheBackend($cache_backend, 'migration_plugins');

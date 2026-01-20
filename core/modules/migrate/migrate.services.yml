@@ -38,7 +38,7 @@ services:
     arguments: [discovery_migration]
   plugin.manager.migration:
     class: Drupal\migrate\Plugin\MigrationPluginManager
-    arguments: ['@module_handler', '@cache.discovery_migration', '@language_manager']
+    arguments: ['@module_handler', '@cache.discovery_migration']
   Drupal\migrate\Plugin\MigrationPluginManagerInterface: '@plugin.manager.migration'
   Drupal\migrate\MigrateBuildDependencyInterface: '@plugin.manager.migration'
   migrate.lookup:
