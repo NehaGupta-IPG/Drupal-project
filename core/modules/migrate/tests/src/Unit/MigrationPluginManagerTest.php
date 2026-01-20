@@ -35,8 +35,7 @@ class MigrationPluginManagerTest extends UnitTestCase {
     // Get a plugin manager for testing.
     $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
     $cache_backend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
-    $language_manager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
-    $this->pluginManager = new MigrationPluginManager($module_handler, $cache_backend, $language_manager);
+    $this->pluginManager = new MigrationPluginManager($module_handler, $cache_backend);
   }
 
   /**

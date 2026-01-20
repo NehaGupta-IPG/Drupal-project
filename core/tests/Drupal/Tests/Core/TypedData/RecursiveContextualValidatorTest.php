@@ -62,7 +62,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $cache_backend = new NullBackend('cache');
+    $cache_backend = new NullBackend();
     $namespaces = new \ArrayObject([
       'Drupal\\Core\\TypedData' => $this->root . '/core/lib/Drupal/Core/TypedData',
       'Drupal\\Core\\Validation' => $this->root . '/core/lib/Drupal/Core/Validation',

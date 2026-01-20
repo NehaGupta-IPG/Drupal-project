@@ -130,7 +130,7 @@ class CronTest extends UnitTestCase {
     ];
 
     // Create a queue instance for this queue worker.
-    $this->queue = new Memory($queue_worker);
+    $this->queue = new Memory();
     $queue_factory->get($queue_worker)->willReturn($this->queue);
 
     // Create a mock queue worker plugin instance based on above definition.

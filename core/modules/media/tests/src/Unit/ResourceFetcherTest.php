@@ -48,7 +48,7 @@ class ResourceFetcherTest extends UnitTestCase {
     $fetcher = new ResourceFetcher(
       $client->reveal(),
       $this->createMock('\Drupal\media\OEmbed\ProviderRepositoryInterface'),
-      new NullBackend('default'),
+      new NullBackend(),
       $non_default_timeout
     );
     $fetcher->fetchResource($url);
@@ -86,7 +86,7 @@ class ResourceFetcherTest extends UnitTestCase {
     ]);
     $providers = $this->createMock('\Drupal\media\OEmbed\ProviderRepositoryInterface');
 
-    $fetcher = new ResourceFetcher($client, $providers, new NullBackend('default'));
+    $fetcher = new ResourceFetcher($client, $providers, new NullBackend());
     /** @var \Drupal\media\OEmbed\Resource $resource */
     $resource = $fetcher->fetchResource('valid');
     // The resource should have been successfully decoded as JSON.

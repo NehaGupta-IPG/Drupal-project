@@ -60,7 +60,7 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
       'Drupal\\Core\\Validation' => $this->root . '/core/lib/Drupal/Core/Validation',
       'Drupal\\Core\\Entity' => $this->root . '/core/lib/Drupal/Core/Entity',
     ]);
-    $cache_backend = new NullBackend('cache');
+    $cache_backend = new NullBackend();
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
 
     $class_resolver = $this->prophesize(ClassResolverInterface::class);

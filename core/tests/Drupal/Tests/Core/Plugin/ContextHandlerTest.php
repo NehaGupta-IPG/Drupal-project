@@ -52,7 +52,7 @@ class ContextHandlerTest extends UnitTestCase {
       'Drupal\\Core\\TypedData' => $this->root . '/core/lib/Drupal/Core/TypedData',
       'Drupal\\Core\\Validation' => $this->root . '/core/lib/Drupal/Core/Validation',
     ]);
-    $cache_backend = new NullBackend('cache');
+    $cache_backend = new NullBackend();
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
     $class_resolver = $this->prophesize(ClassResolverInterface::class);
     $class_resolver->getInstanceFromDefinition(Argument::type('string'))->will(function ($arguments) {

@@ -49,7 +49,7 @@ class HookCollectorPassTest extends KernelTestBase {
     $container->setParameter('container.modules', $module_filenames);
     $keyvalue = new KeyValueMemoryFactory();
     $container->set('keyvalue', $keyvalue);
-    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
+    $container->set('cache.bootstrap', new NullBackend());
     (new HookCollectorPass())->process($container);
     (new HookCollectorKeyValueWritePass())->process($container);
     $this->assertRegisteredHooks([
@@ -73,7 +73,7 @@ class HookCollectorPassTest extends KernelTestBase {
     $container->setParameter('container.modules', $module_filenames);
     $keyvalue = new KeyValueMemoryFactory();
     $container->set('keyvalue', $keyvalue);
-    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
+    $container->set('cache.bootstrap', new NullBackend());
     (new HookCollectorPass())->process($container);
     (new HookCollectorKeyValueWritePass())->process($container);
     $this->assertRegisteredHooks([
@@ -107,7 +107,7 @@ class HookCollectorPassTest extends KernelTestBase {
     $container->setParameter('container.modules', $module_filenames);
     $keyvalue = new KeyValueMemoryFactory();
     $container->set('keyvalue', $keyvalue);
-    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
+    $container->set('cache.bootstrap', new NullBackend());
     (new HookCollectorPass())->process($container);
 
     // This test will also fail if the deprecation notice shows up.
