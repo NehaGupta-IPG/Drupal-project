@@ -1047,6 +1047,7 @@ class MediaTest extends MediaTestBase {
    */
   public function testModelElementEarlyExit(): void {
     $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
 
     $original_value = $this->host->body->value;
 
@@ -1059,16 +1060,9 @@ class MediaTest extends MediaTestBase {
 
     $editable = $page->find('css', '.ck-editor__editable');
 
-    $this->assertNotNull(
-    $editable,
-    'Editor editable area exists.'
-    );
+    $this->assertNotNull($editable, 'Editor editable area exists.');
 
-    $this->assertSame(
-    'true',
-    $editable->getAttribute('contenteditable'),
-    'Editor remains editable when modelElement is missing.'
-    );
+    $this->assertSame('true', $editable->getAttribute('contenteditable'));
 
     // Case 2: Invalid media UUID.
     $this->host->body->value = '<drupal-media data-entity-type="media" data-entity-uuid="00000000-0000-0000-0000-000000000000"></drupal-media>';
@@ -1085,6 +1079,14 @@ class MediaTest extends MediaTestBase {
     // Restore original value.
     $this->host->body->value = $original_value;
     $this->host->save();
+
+    // Reload the page to get the Original configuration.
+    $this->getSession()->reload();
+    $this->waitForEditor();
+    // Wait for the media preview to load.
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-widget.drupal-media img'));
+    $this->click('.ck-widget.drupal-media');
+    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
   }
 
 }
