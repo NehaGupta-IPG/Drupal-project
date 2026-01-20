@@ -4,12 +4,6 @@ views.settings:
   type: config_object
   label: 'Views settings'
   mapping:
-    display_extenders:
-      type: sequence
-      label: 'Display extenders'
-      sequence:
-        type: string
-        label: 'Display extender'
     sql_signature:
       type: boolean
       label: 'Add Views signature to all SQL queries'
