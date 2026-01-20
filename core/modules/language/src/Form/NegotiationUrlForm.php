@@ -82,7 +82,7 @@ class NegotiationUrlForm extends ConfigFormBase {
         LanguageNegotiationUrl::CONFIG_PATH_PREFIX => $this->t('Path prefix'),
         LanguageNegotiationUrl::CONFIG_DOMAIN => $this->t('Domain'),
       ],
-      '#default_value' => $config->get('url.source'),
+      '#config_target' => 'language.negotiation:url.source',
     ];
 
     $form['prefix'] = [
@@ -224,7 +224,6 @@ class NegotiationUrlForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Save selected format (prefix or domain).
     $this->config('language.negotiation')
-      ->set('url.source', $form_state->getValue('language_negotiation_url_part'))
       // Save new domain and prefix values.
       ->set('url.prefixes', $form_state->getValue('prefix'))
       ->set('url.domains', $form_state->getValue('domain'))

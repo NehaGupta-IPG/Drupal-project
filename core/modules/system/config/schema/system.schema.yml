@@ -26,12 +26,24 @@ system.site:
         403:
           type: path
           label: 'Default 403 (access denied) page'
+          constraints:
+            Regex:
+              pattern: '/^\//'
+              message: "The path %value has to start with a slash."
         404:
           type: path
           label: 'Default 404 (not found) page'
+          constraints:
+            Regex:
+              pattern: '/^\//'
+              message: "The path %value has to start with a slash."
         front:
           type: path
           label: 'Default front page'
+          constraints:
+            Regex:
+              pattern: '/^\//'
+              message: "The path %value has to start with a slash."
     admin_compact_mode:
       type: boolean
       label: 'Compact mode'

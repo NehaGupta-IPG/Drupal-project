@@ -84,7 +84,7 @@ class AccessDeniedTest extends BrowserTestBase {
     ];
     $this->drupalGet('admin/config/system/site-information');
     $this->submitForm($edit, 'Save configuration');
-    $this->assertSession()->pageTextContains("The path '{$edit['site_403']}' has to start with a slash.");
+    $this->assertSession()->pageTextContains('The path "' . $edit['site_403'] . '" has to start with a slash.');
 
     // Use a custom 403 page.
     $edit = [

@@ -82,7 +82,7 @@ class FrontPageTest extends BrowserTestBase {
     $edit = ['site_frontpage' => $this->nodePath];
     $this->drupalGet('admin/config/system/site-information');
     $this->submitForm($edit, 'Save configuration');
-    $this->assertSession()->pageTextContains("The path '{$edit['site_frontpage']}' has to start with a slash.");
+    $this->assertSession()->pageTextContains('The path "' . $edit['site_frontpage'] . '" has to start with a slash.');
 
     // Change the front page to a valid path.
     $edit['site_frontpage'] = '/' . $this->nodePath;
