@@ -171,7 +171,11 @@ class AssetResolver implements AssetResolverInterface {
    */
   protected function filterLibrariesByType(array $libraries, string $asset_type): array {
     foreach ($libraries as $key => $library) {
-      [$extension, $name] = explode('/', $library, 2);
+      [$extension, $name] = array_pad(explode('/', $library), 2, NULL);
+      if (!($extension && $name)) {
+        continue;
+      }
+
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (empty($definition[$asset_type])) {
         unset($libraries[$key]);
@@ -218,7 +222,10 @@ class AssetResolver implements AssetResolverInterface {
     ];
 
     foreach ($libraries_to_load as $library) {
-      [$extension, $name] = explode('/', $library, 2);
+      [$extension, $name] = array_pad(explode('/', $library), 2, NULL);
+      if (!($extension && $name)) {
+        continue;
+      }
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       foreach ($definition['css'] as $options) {
         $options += $default_options;
@@ -272,7 +279,10 @@ class AssetResolver implements AssetResolverInterface {
     $settings = [];
 
     foreach ($this->getLibrariesToLoad($assets, 'js') as $library) {
-      [$extension, $name] = explode('/', $library, 2);
+      [$extension, $name] = array_pad(explode('/', $library), 2, NULL);
+      if (!($extension && $name)) {
+        continue;
+      }
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (isset($definition['drupalSettings'])) {
         $settings = NestedArray::mergeDeepArray([$settings, $definition['drupalSettings']], TRUE);
@@ -301,7 +311,11 @@ class AssetResolver implements AssetResolverInterface {
     // Collect all libraries that contain JS assets and are in the header.
     $header_js_libraries = [];
     foreach ($libraries_to_load as $key => $library) {
-      [$extension, $name] = explode('/', $library, 2);
+      [$extension, $name] = array_pad(explode('/', $library), 2, NULL);
+      if (!($extension && $name)) {
+        continue;
+      }
+
       $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
       if (!empty($definition['header'])) {
         $header_js_libraries[] = $library;
@@ -340,7 +354,10 @@ class AssetResolver implements AssetResolverInterface {
       $header_js_libraries = $this->libraryDependencyResolver->getLibrariesWithDependencies($header_js_libraries);
 
       foreach ($libraries_to_load as $library) {
-        [$extension, $name] = explode('/', $library, 2);
+        [$extension, $name] = array_pad(explode('/', $library), 2, NULL);
+        if (!($extension && $name)) {
+          continue;
+        }
         $definition = $this->libraryDiscovery->getLibraryByName($extension, $name);
         foreach ($definition['js'] as $options) {
           $options += $default_options;
