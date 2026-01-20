@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\field;
 
+use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -50,11 +51,11 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
   protected $entityRepository;
 
   /**
-   * The action storage.
+   * The action manager.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Action\ActionManager
    */
-  protected $actionStorage;
+  protected $actionManager;
 
   /**
    * An array of actions that can be executed.
@@ -101,21 +102,21 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    *   The messenger.
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Routing\ResettableStackedRouteMatchInterface $route_match
-   *   The current route match service.
+   * @param \Drupal\Core\Action\ActionManager $action_manager
+   *   The action manager.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   *
+   * @todo deprecate calling without an action manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MessengerInterface $messenger, EntityRepositoryInterface $entity_repository, ResettableStackedRouteMatchInterface $route_match) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, MessengerInterface $messenger, EntityRepositoryInterface $entity_repository, ActionManager $action_manager = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
-    $this->actionStorage = $entity_type_manager->getStorage('action');
     $this->languageManager = $language_manager;
     $this->messenger = $messenger;
     $this->entityRepository = $entity_repository;
-    $this->routeMatch = $route_match;
+    $this->actionManager = $action_manager;
   }
 
   /**
@@ -130,7 +131,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
       $container->get('language_manager'),
       $container->get('messenger'),
       $container->get('entity.repository'),
-      $container->get('current_route_match')
+      $container->get('plugin.manager.action')
     );
   }
 
@@ -142,9 +143,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
 
     $entity_type = $this->getEntityType();
     // Filter the actions to only include those for this entity type.
-    $this->actions = array_filter($this->actionStorage->loadMultiple(), function ($action) use ($entity_type) {
-      return $action->getType() == $entity_type;
-    });
+    $this->actions = $this->actionManager->getDefinitionsByType($entity_type);
   }
 
   /**
@@ -383,7 +382,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
         }
       }
 
-      $options[$id] = $action->label();
+      $options[$id] = $action["label"];
     }
 
     return $options;
@@ -408,7 +407,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
       $user_input = $form_state->getUserInput();
       $selected = array_filter($user_input[$this->options['id']]);
       $entities = [];
-      $action = $this->actions[$form_state->getValue('action')];
+      $action = $this->actionManager->createInstance($form_state->getValue('action'));
       $count = 0;
 
       foreach ($selected as $bulk_form_key) {
@@ -418,9 +417,9 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
           continue;
         }
         // Skip execution if the user did not have access.
-        if (!$action->getPlugin()->access($entity, $this->view->getUser())) {
+        if (!$action->access($entity, $this->view->getUser())) {
           $this->messenger->addError($this->t('No access to execute %action on the @entity_type_label %entity_label.', [
-            '%action' => $action->label(),
+            '%action' => $action->getPluginDefinition()['label'],
             '@entity_type_label' => $entity->getEntityType()->getLabel(),
             '%entity_label' => $entity->label(),
           ]));
@@ -438,21 +437,19 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
         return;
       }
 
-      $action->execute($entities);
+      $action->executeMultiple($entities);
 
-      $operation_definition = $action->getPluginDefinition();
-      if (!empty($operation_definition['confirm_form_route_name'])) {
+      if (!empty($action->getPluginDefinition()['confirm_form_route_name'])) {
         $options = [
           'query' => $this->getDestinationArray(),
         ];
-        $route_parameters = $this->routeMatch->getRawParameters()->all();
-        $form_state->setRedirect($operation_definition['confirm_form_route_name'], $route_parameters, $options);
+        $form_state->setRedirect($action->getPluginDefinition()['confirm_form_route_name'], [], $options);
       }
       else {
         // Don't display the message unless there are some elements affected and
         // there is no confirmation form.
         $this->messenger->addStatus($this->formatPlural($count, '%action was applied to @count item.', '%action was applied to @count items.', [
-          '%action' => $action->label(),
+          '%action' => $action->getPluginDefinition()['label'],
         ]));
       }
     }
