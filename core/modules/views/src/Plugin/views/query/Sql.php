@@ -1672,12 +1672,8 @@ class Sql extends QueryPluginBase {
       $entity_storage = $this->entityTypeManager->getStorage($entity_type);
       $entities = [];
 
-      foreach ($revision_ids as $index => $revision_id_by_relationship) {
-        foreach ($revision_id_by_relationship as $revision => $revision_id) {
-          // Drupal core currently has no way to load multiple revisions.
-          $entity = $entity_storage->loadRevision($revision_id);
-          $entities[$revision_id] = $entity;
-        }
+      foreach ($revision_ids as $revision_id_by_relationship) {
+        $entities = $entity_storage->loadMultipleRevisions($revision_id_by_relationship) + $entities;
       }
 
       $results = $this->assignEntitiesToResult($revision_ids, $entities, $results);
