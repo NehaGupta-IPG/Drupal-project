@@ -66,6 +66,9 @@ class FilterPluginBaseTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Tests cache contexts.
+   */
   #[DataProvider('getCacheContextsProvider')]
   public function testGetCacheContexts(array $expected_result, array $options): void {
     $definition = [
