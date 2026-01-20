@@ -68,6 +68,9 @@ display:
     display_title: Block
     position: 2
     display_options:
+      defaults:
+        link_display: false
+      link_display: page_1
       display_extenders: {  }
     cache_metadata:
       max-age: -1
