@@ -224,11 +224,6 @@ function editor_filter_xss($html, ?FilterFormatInterface $format = NULL, ?Filter
 function _editor_record_file_usage(array $uuids, EntityInterface $entity): void {
   foreach ($uuids as $uuid) {
     if ($file = \Drupal::service('entity.repository')->loadEntityByUuid('file', $uuid)) {
-      /** @var \Drupal\file\FileInterface $file */
-      if ($file->isTemporary()) {
-        $file->setPermanent();
-        $file->save();
-      }
       \Drupal::service('file.usage')->add($file, 'editor', $entity->getEntityTypeId(), $entity->id());
     }
   }
