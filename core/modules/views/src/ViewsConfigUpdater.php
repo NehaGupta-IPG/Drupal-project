@@ -68,7 +68,6 @@ class ViewsConfigUpdater {
    *   Whether the view was updated.
    */
   public function updateAll(ViewEntityInterface $view) {
-    $changed = $this->processUnroutedFormLinkDisplayUpdate($view);
     $changed = $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type, $key, $display_id) use ($view) {
       $changed = FALSE;
       if ($this->processEntityArgumentUpdate($view)) {
