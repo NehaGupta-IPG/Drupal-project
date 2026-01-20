@@ -78,13 +78,11 @@ class PathPluginBaseTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->set('plugin.manager.views.access', $this->accessPluginManager);
 
-    $config = [
-      'views.settings' => [
-        'display_extenders' => [],
-      ],
-    ];
-
-    $container->set('config.factory', $this->getConfigFactoryStub($config));
+    $display_extender_plugin_manager = $this->createStub(ViewsPluginManager::class);
+    $display_extender_plugin_manager
+      ->method('getDefinitions')
+      ->willReturn([]);
+    $container->set('plugin.manager.views.display_extender', $display_extender_plugin_manager);
 
     $language = $this->createStub(LanguageInterface::class);
     $language
