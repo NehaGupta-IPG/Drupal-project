@@ -125,7 +125,7 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
     // Only use a routed display when the current display is routed or when an
     // explicit link display is configured; otherwise fall back to the current
     // page to avoid guessing.
-    if ($view->display_handler instanceof DisplayRouterInterface) {
+    if ($view->display_handler instanceof DisplayRouterInterface && $view->hasUrl()) {
       $form_action = $view->getUrl()->toString();
     }
     else {
@@ -133,7 +133,7 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
       // rather than guessing based on display order.
       $form_action = NULL;
       $linked_display_id = $view->display_handler->getOption('link_display');
-      if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $view->displayHandlers->has($linked_display_id)) {
+      if (!empty($linked_display_id) && $linked_display_id !== 'custom_url' && $view->displayHandlers->has($linked_display_id) && $view->hasUrl(NULL, $linked_display_id)) {
         $linked_display = $view->displayHandlers->get($linked_display_id);
         if ($linked_display instanceof DisplayRouterInterface) {
           $form_action = $view->getUrl(NULL, $linked_display_id)->toString();
