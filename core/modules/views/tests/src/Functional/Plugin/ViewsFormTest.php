@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Functional\Plugin;
 
+use Drupal\Core\Url;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -56,7 +57,7 @@ class ViewsFormTest extends ViewTestBase {
     $form = $this->assertSession()->elementExists('css', '.views-form form');
     $action = $form->getAttribute('action');
 
-    $this->assertSame('/node/' . $node->id(), $action);
+    $this->assertSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
     $this->assertNotSame('/test_bulk_form', $action);
   }
 
