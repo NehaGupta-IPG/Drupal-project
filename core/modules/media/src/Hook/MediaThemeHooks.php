@@ -31,6 +31,7 @@ class MediaThemeHooks {
           'resource' => NULL,
           'media' => NULL,
           'placeholder_token' => '',
+          'context' => NULL,
         ],
       ],
       'media_embed_error' => [

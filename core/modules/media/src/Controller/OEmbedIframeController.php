@@ -136,6 +136,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
     $url = $request->query->get('url');
     $max_width = $request->query->getInt('max_width');
     $max_height = $request->query->getInt('max_height');
+    $context = $request->query->all('context', NULL);
 
     // Hash the URL and max dimensions, and ensure it is equal to the hash
     // parameter passed in the query string.
@@ -182,6 +183,7 @@ class OEmbedIframeController implements ContainerInjectionInterface {
           ],
         ],
         '#placeholder_token' => $placeholder_token,
+        '#context' => $context,
       ];
       $context = new RenderContext();
       $content = $this->renderer->executeInRenderContext($context, function () use ($element) {
