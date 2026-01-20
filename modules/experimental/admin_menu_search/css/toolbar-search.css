@@ -1,0 +1,9 @@
+.admin-menu-search {
+  padding: 2px 10px;
+}
+
+.admin-menu-search input {
+  width: 220px;
+  padding: 4px 6px;
+  font-size: 14px;
+}

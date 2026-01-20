@@ -1,0 +1,8 @@
+toolbar_search:
+  js:
+    js/toolbar-search.js: {}
+  css:
+    theme:
+      css/toolbar-search.css: {}
+  dependencies:
+    - core/drupal
