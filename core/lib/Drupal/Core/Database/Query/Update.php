@@ -110,17 +110,8 @@ class Update extends Query implements ConditionInterface {
 
   /**
    * Executes the UPDATE query.
-   *
-   * @return bool
-   *   TRUE if table rows were matched or changed by the UPDATE, FALSE
-   *   otherwise. Matched rows are those that satisfy the WHERE conditions,
-   *   that however may not need to be changed because the values of the
-   *   columns are already set to the values set by the UPDATE. Whether the
-   *   number returned is the one of the matched rows or of the changed rows
-   *   depends on the database system and the connection settings. Be careful
-   *   on making assumptions on the value returned by this function.
    */
-  public function execute() {
+  public function execute(): void {
 
     [$args, $update_values] = $this->getQueryArguments();
     $update_values += $args;
@@ -133,13 +124,11 @@ class Update extends Query implements ConditionInterface {
     $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions, TRUE);
     try {
       $stmt->execute($update_values, $this->queryOptions);
-      return (bool) $stmt->rowCount();
     }
     catch (\Exception $e) {
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $update_values, $this->queryOptions);
     }
 
-    return FALSE;
   }
 
   /**

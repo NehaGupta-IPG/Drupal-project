@@ -20,11 +20,10 @@ class UpdateTest extends DatabaseTestBase {
    * Confirms that we can update a single record successfully.
    */
   public function testSimpleUpdate(): void {
-    $updated = $this->connection->update('test')
+    $this->connection->update('test')
       ->fields(['name' => 'Tiffany'])
       ->condition('id', 1)
       ->execute();
-    $this->assertTrue($updated);
 
     $saved_name = $this->connection->query('SELECT [name] FROM {test} WHERE [id] = :id', [':id' => 1])->fetchField();
     $this->assertSame('Tiffany', $saved_name, 'Updated name successfully.');
@@ -35,11 +34,10 @@ class UpdateTest extends DatabaseTestBase {
    */
   public function testSimpleNullUpdate(): void {
     $this->ensureSampleDataNull();
-    $updated = $this->connection->update('test_null')
+    $this->connection->update('test_null')
       ->fields(['age' => NULL])
       ->condition('name', 'Kermit')
       ->execute();
-    $this->assertTrue($updated);
 
     $saved_age = $this->connection->query('SELECT [age] FROM {test_null} WHERE [name] = :name', [':name' => 'Kermit'])->fetchField();
     $this->assertNull($saved_age, 'Updated name successfully.');
@@ -49,11 +47,10 @@ class UpdateTest extends DatabaseTestBase {
    * Confirms that we can update multiple records successfully.
    */
   public function testMultiUpdate(): void {
-    $updated = $this->connection->update('test')
+    $this->connection->update('test')
       ->fields(['job' => 'Musician'])
       ->condition('job', 'Singer')
       ->execute();
-    $this->assertTrue($updated);
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
     $this->assertSame('2', $num_matches, 'Updated fields successfully.');
@@ -63,11 +60,10 @@ class UpdateTest extends DatabaseTestBase {
    * Confirms that we can update multiple records with a non-equality condition.
    */
   public function testMultiGTUpdate(): void {
-    $updated = $this->connection->update('test')
+    $this->connection->update('test')
       ->fields(['job' => 'Musician'])
       ->condition('age', 26, '>')
       ->execute();
-    $this->assertTrue($updated);
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
     $this->assertSame('2', $num_matches, 'Updated fields successfully.');
@@ -77,11 +73,10 @@ class UpdateTest extends DatabaseTestBase {
    * Confirms that we can update multiple records with a where call.
    */
   public function testWhereUpdate(): void {
-    $updated = $this->connection->update('test')
+    $this->connection->update('test')
       ->fields(['job' => 'Musician'])
       ->where('[age] > :age', [':age' => 26])
       ->execute();
-    $this->assertTrue($updated);
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
     $this->assertSame('2', $num_matches, 'Updated fields successfully.');
@@ -91,12 +86,11 @@ class UpdateTest extends DatabaseTestBase {
    * Confirms that we can stack condition and where calls.
    */
   public function testWhereAndConditionUpdate(): void {
-    $update = $this->connection->update('test')
+    $this->connection->update('test')
       ->fields(['job' => 'Musician'])
       ->where('[age] > :age', [':age' => 26])
-      ->condition('name', 'Ringo');
-    $updated = $update->execute();
-    $this->assertTrue($updated);
+      ->condition('name', 'Ringo')
+      ->execute();
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [job] = :job', [':job' => 'Musician'])->fetchField();
     $this->assertSame('1', $num_matches, 'Updated fields successfully.');
@@ -108,10 +102,9 @@ class UpdateTest extends DatabaseTestBase {
   public function testExpressionUpdate(): void {
     // Ensure that expressions are handled properly. This should set every
     // record's age to a square of itself.
-    $updated = $this->connection->update('test')
+    $this->connection->update('test')
       ->expression('age', '[age] * [age]')
       ->execute();
-    $this->assertTrue($updated);
 
     $num_matches = $this->connection->query('SELECT COUNT(*) FROM {test} WHERE [age] > :age', [':age' => '100'])->fetchField();
     $this->assertSame('4', $num_matches, '4 rows should have been updated, but they were not');
@@ -139,11 +132,10 @@ class UpdateTest extends DatabaseTestBase {
     ])->fetchField();
     $this->assertSame('2', $pre_matches, '2 rows should have been already at sleep');
 
-    $updated = $this->connection->update('test_task')
+    $this->connection->update('test_task')
       ->condition('priority', 1, '<>')
       ->fields(['task' => 'sleep'])
       ->execute();
-    $this->assertTrue($updated);
 
     $post_matches = $this->connection->query('SELECT COUNT(*) FROM {test_task} WHERE [priority] <> :priority AND [task] = :task', [
       ':priority' => 1,
@@ -158,13 +150,12 @@ class UpdateTest extends DatabaseTestBase {
    * Confirm that we can update values in a column with special name.
    */
   public function testSpecialColumnUpdate(): void {
-    $updated = $this->connection->update('select')
+    $this->connection->update('select')
       ->fields([
         'update' => 'New update value',
       ])
       ->condition('id', 1)
       ->execute();
-    $this->assertTrue($updated);
 
     $saved_value = $this->connection->query('SELECT [update] FROM {select} WHERE [id] = :id', [':id' => 1])->fetchField();
     $this->assertEquals('New update value', $saved_value);
