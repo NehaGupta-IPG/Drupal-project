@@ -45,21 +45,28 @@ class DatabaseLockBackend extends LockBackendAbstract {
   public function acquire($name, $timeout = 30.0) {
     $name = $this->normalizeName($name);
 
-    // Insure that the timeout is at least 1 ms.
+    // Ensure that the timeout is at least 1 ms.
     $timeout = max($timeout, 0.001);
     $expire = microtime(TRUE) + $timeout;
     if (isset($this->locks[$name])) {
       // Try to extend the expiration of a lock we already acquired.
-      $success = (bool) $this->database->update('semaphore')
-        ->fields(['expire' => $expire])
-        ->condition('name', $name)
-        ->condition('value', $this->getLockId())
-        ->execute();
-      if (!$success) {
+      try {
+        $this->database->upsert('semaphore')
+          ->key('name')
+          ->fields(['name', 'value', 'expire'])
+          ->values([
+            'name' => $name,
+            'value' => $this->getLockId(),
+            'expire' => $expire,
+          ])
+          ->execute();
+        return TRUE;
+      }
+      catch (DatabaseException) {
         // The lock was broken.
         unset($this->locks[$name]);
+        return FALSE;
       }
-      return $success;
     }
     else {
       // Optimistically try to acquire the lock, then retry once if it fails.
