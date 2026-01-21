@@ -6,13 +6,15 @@ namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Url;
+use Drupal\jsonapi\JsonApiSpec;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "DateFormat" config entity type.
- *
- * @group jsonapi
- * @group #slow
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class DateFormatTest extends ConfigEntityResourceTestBase {
 
   /**
@@ -50,7 +52,7 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method) {
+  protected function setUpAuthorization($method): void {
     $this->grantPermissionsToTestedRole(['administer site configuration']);
   }
 
@@ -79,10 +81,10 @@ class DateFormatTest extends ConfigEntityResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $self_url],

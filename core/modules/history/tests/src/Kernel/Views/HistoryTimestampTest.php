@@ -8,23 +8,25 @@ use Drupal\Core\Database\Database;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\user\Entity\User;
+use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the history timestamp handlers.
  *
- * @group history
  * @see \Drupal\history\Plugin\views\field\HistoryUserTimestamp
  * @see \Drupal\history\Plugin\views\filter\HistoryUserTimestamp
  */
+#[Group('history')]
+#[RunTestsInSeparateProcesses]
 class HistoryTimestampTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['history', 'node'];
+  protected static $modules = ['history', 'history_test_views', 'node'];
 
   /**
    * Views used by this test.
@@ -38,6 +40,7 @@ class HistoryTimestampTest extends ViewsKernelTestBase {
    */
   protected function setUp($import_test_views = TRUE): void {
     parent::setUp($import_test_views);
+    ViewTestData::createTestViews(static::class, ['history_test_views']);
 
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
