@@ -1671,10 +1671,8 @@ class Sql extends QueryPluginBase {
       /** @var \Drupal\Core\Entity\RevisionableStorageInterface $entity_storage */
       $entity_storage = $this->entityTypeManager->getStorage($entity_type);
       $entities = [];
-
-      foreach ($revision_ids as $revision_id_by_relationship) {
-        $entities = $entity_storage->loadMultipleRevisions($revision_id_by_relationship) + $entities;
-      }
+      $flat_ids = iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($revision_ids)), FALSE);
+      $entities = $entity_storage->loadMultipleRevisions(array_unique($flat_ids)) + $entities;
 
       $results = $this->assignEntitiesToResult($revision_ids, $entities, $results);
     }

@@ -19,6 +19,7 @@ use Drupal\views\ViewExecutable;
 use Drupal\views\ViewsData;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -242,6 +243,12 @@ class SqlTest extends UnitTestCase {
       foreach ($entity_revisions as $revision_id => $revision) {
         $entity_storages[$entity_type_id]->loadRevision($revision_id)->willReturn($revision);
       }
+      $entity_storages[$entity_type_id]->loadMultipleRevisions(Argument::that(function ($ids) use ($entity_revisions) {
+        // The array keys of $ids does not matter but we cannot use an exact
+        // match because the keys are not guaranteed by the code in
+        // \Drupal\views\Plugin\views\query\Sql::loadEntities().
+        return array_keys($entity_revisions) === array_values($ids);
+      }))->willReturn($entity_revisions);
     }
 
     $entity_type_manager->getStorage('first')->willReturn($entity_storages['first']);
