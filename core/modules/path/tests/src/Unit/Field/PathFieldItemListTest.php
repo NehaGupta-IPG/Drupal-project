@@ -1,19 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path\Unit\Field;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\path\Plugin\Field\FieldType\PathFieldItemList;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\path\Plugin\Field\FieldType\PathFieldItemList
- * @group path
+ * Contains tests for PathFieldItemList.
  */
+#[CoversClass(PathFieldItemList::class)]
+#[Group('path')]
 class PathFieldItemListTest extends UnitTestCase {
 
   /**
-   * @covers ::getValue
+   * Test computeValue method.
    *
    * @param bool $is_routed
    *   Whether the parent entity has internal path.
@@ -21,9 +27,8 @@ class PathFieldItemListTest extends UnitTestCase {
    *   Whether the parent entity is new.
    * @param array|null $expected_path_alias
    *   Expected array returned by path_alias.repository services.
-   *
-   * @dataProvider providerTestComputeValue
    */
+  #[DataProvider('providerTestComputeValue')]
   public function testComputeValue(bool $is_routed, bool $is_new, $expected_path_alias): void {
 
     // Our expected value is the expected path alias with minor changes.
@@ -103,7 +108,7 @@ class PathFieldItemListTest extends UnitTestCase {
   /**
    * Data provider for testComputeValue.
    */
-  public function providerTestComputeValue(): array {
+  public static function providerTestComputeValue(): array {
     return [
       'new entity' => [
         'is_routed' => FALSE,

@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\path\Functional;
 
 use Drupal\entity_test\Entity\EntityTestExternal;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Path form UI for external entity.
- *
- * @group path
  */
+#[Group('path')]
 class PathEntityTestExternalFormTest extends BrowserTestBase {
 
   /**
@@ -31,7 +33,7 @@ class PathEntityTestExternalFormTest extends BrowserTestBase {
   /**
    * Tests the Path form UI.
    */
-  public function testEntityTestExternalForm() {
+  public function testEntityTestExternalForm(): void {
     $this->drupalLogin($this->drupalCreateUser([
       'administer entity_test content',
       'create url aliases',
