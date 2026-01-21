@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Image;
 
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Image\Image;
-use Drupal\Core\ImageToolkit\ImageToolkitInterface;
+use Drupal\Core\ImageToolkit\ImageToolkitOperationInterface;
+use Drupal\system\Plugin\ImageToolkit\GDToolkit;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the image class.
- *
- * @requires extension gd
- * @group Image
  */
+#[Group('Image')]
+#[RequiresPhpExtension('gd')]
 class ImageTest extends UnitTestCase {
 
   /**
@@ -47,6 +52,8 @@ class ImageTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     // Use the Druplicon image.
     $this->source = __DIR__ . '/../../../../../misc/druplicon.png';
   }
@@ -57,10 +64,11 @@ class ImageTest extends UnitTestCase {
    * @param array $stubs
    *   (optional) Array containing methods to be replaced with stubs.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\system\Plugin\ImageToolkit\GDToolkit&\PHPUnit\Framework\MockObject\MockObject
+   *   Mocked GDToolkit instance.
    */
-  protected function getToolkitMock(array $stubs = []) {
-    $mock_builder = $this->getMockBuilder('Drupal\system\Plugin\ImageToolkit\GDToolkit');
+  protected function getToolkitMock(array $stubs = []): GDToolkit&MockObject {
+    $mock_builder = $this->getMockBuilder(GDToolkit::class);
     $stubs = array_merge(['getPluginId', 'save'], $stubs);
     return $mock_builder
       ->disableOriginalConstructor()
@@ -73,12 +81,13 @@ class ImageTest extends UnitTestCase {
    *
    * @param string $class_name
    *   The name of the GD toolkit operation class to be mocked.
-   * @param \Drupal\Core\Image\ImageToolkitInterface $toolkit
+   * @param \Drupal\system\Plugin\ImageToolkit\GDToolkit $toolkit
    *   The image toolkit object.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitOperationInterface&\PHPUnit\Framework\MockObject\MockObject
+   *   Mocked GDToolkit operation instance.
    */
-  protected function getToolkitOperationMock($class_name, ImageToolkitInterface $toolkit) {
+  protected function getToolkitOperationMock($class_name, GDToolkit $toolkit): ImageToolkitOperationInterface&MockObject {
     $mock_builder = $this->getMockBuilder('Drupal\system\Plugin\ImageToolkit\Operation\gd\\' . $class_name);
     $logger = $this->createMock('Psr\Log\LoggerInterface');
     return $mock_builder
@@ -149,7 +158,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::getHeight().
    */
-  public function testGetHeight() {
+  public function testGetHeight(): void {
     $this->getTestImage(FALSE);
     $this->assertEquals(100, $this->image->getHeight());
   }
@@ -157,7 +166,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::getWidth().
    */
-  public function testGetWidth() {
+  public function testGetWidth(): void {
     $this->getTestImage(FALSE);
     $this->assertEquals(88, $this->image->getWidth());
   }
@@ -165,7 +174,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::getFileSize.
    */
-  public function testGetFileSize() {
+  public function testGetFileSize(): void {
     $this->getTestImage(FALSE);
     $this->assertEquals(3905, $this->image->getFileSize());
   }
@@ -173,7 +182,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::getToolkit()->getType().
    */
-  public function testGetType() {
+  public function testGetType(): void {
     $this->getTestImage(FALSE);
     $this->assertEquals(IMAGETYPE_PNG, $this->image->getToolkit()->getType());
   }
@@ -181,7 +190,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::getMimeType().
    */
-  public function testGetMimeType() {
+  public function testGetMimeType(): void {
     $this->getTestImage(FALSE);
     $this->assertEquals('image/png', $this->image->getMimeType());
   }
@@ -189,7 +198,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::isValid().
    */
-  public function testIsValid() {
+  public function testIsValid(): void {
     $this->getTestImage(FALSE);
     $this->assertTrue($this->image->isValid());
     $this->assertFileIsReadable($this->image->getSource());
@@ -198,7 +207,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::getToolkitId().
    */
-  public function testGetToolkitId() {
+  public function testGetToolkitId(): void {
     $this->getTestImage(FALSE);
     $this->assertEquals('gd', $this->image->getToolkitId());
   }
@@ -206,7 +215,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::save().
    */
-  public function testSave() {
+  public function testSave(): void {
     $this->getTestImage();
     // This will fail if save() method isn't called on the toolkit.
     $toolkit = $this->getToolkitMock();
@@ -235,7 +244,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::save().
    */
-  public function testSaveFails() {
+  public function testSaveFails(): void {
     $this->getTestImage();
     // This will fail if save() method isn't called on the toolkit.
     $this->toolkit->expects($this->once())
@@ -248,7 +257,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::save().
    */
-  public function testChmodFails() {
+  public function testChmodFails(): void {
     $this->getTestImage();
     // This will fail if save() method isn't called on the toolkit.
     $toolkit = $this->getToolkitMock();
@@ -277,7 +286,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::parseFile().
    */
-  public function testParseFileFails() {
+  public function testParseFileFails(): void {
     $toolkit = $this->getToolkitMock();
     $image = new Image($toolkit, 'magic-foobar.png');
 
@@ -288,11 +297,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scale().
    */
-  public function testScaleWidth() {
+  public function testScaleWidth(): void {
     $this->getTestImageForOperation('Scale');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $ret = $this->image->scale(44, NULL, FALSE);
     $this->assertEquals(50, $ret['height']);
@@ -301,11 +310,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scale().
    */
-  public function testScaleHeight() {
+  public function testScaleHeight(): void {
     $this->getTestImageForOperation('Scale');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $ret = $this->image->scale(NULL, 50, FALSE);
     $this->assertEquals(44, $ret['width']);
@@ -314,12 +323,12 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scale().
    */
-  public function testScaleSame() {
+  public function testScaleSame(): void {
     $this->getTestImageForOperation('Scale');
     // Dimensions are the same, resize should not be called.
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $ret = $this->image->scale(88, 100, FALSE);
     $this->assertEquals(88, $ret['width']);
@@ -329,24 +338,24 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scaleAndCrop().
    */
-  public function testScaleAndCropWidth() {
+  public function testScaleAndCropWidth(): void {
     $this->getTestImageForOperation('ScaleAndCrop');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
-    $ret = $this->image->scaleAndCrop(34, 50, FALSE);
+    $ret = $this->image->scaleAndCrop(34, 50);
     $this->assertEquals(5, $ret['x']);
   }
 
   /**
    * Tests \Drupal\Core\Image\Image::scaleAndCrop().
    */
-  public function testScaleAndCropHeight() {
+  public function testScaleAndCropHeight(): void {
     $this->getTestImageForOperation('ScaleAndCrop');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $ret = $this->image->scaleAndCrop(44, 40);
     $this->assertEquals(5, $ret['y']);
@@ -355,11 +364,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scaleAndCrop().
    */
-  public function testScaleAndCropFails() {
+  public function testScaleAndCropFails(): void {
     $this->getTestImageForOperation('ScaleAndCrop');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $ret = $this->image->scaleAndCrop(44, 40);
     $this->assertEquals(0, $ret['x']);
@@ -371,11 +380,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::crop().
    */
-  public function testCropWidth() {
+  public function testCropWidth(): void {
     $this->getTestImageForOperation('Crop');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     // Cropping with width only should preserve the aspect ratio.
     $ret = $this->image->crop(0, 0, 44);
@@ -385,11 +394,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::crop().
    */
-  public function testCropHeight() {
+  public function testCropHeight(): void {
     $this->getTestImageForOperation('Crop');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     // Cropping with height only should preserve the aspect ratio.
     $ret = $this->image->crop(0, 0, NULL, 50);
@@ -399,11 +408,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::crop().
    */
-  public function testCrop() {
+  public function testCrop(): void {
     $this->getTestImageForOperation('Crop');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $ret = $this->image->crop(0, 0, 44, 50);
     $this->assertEquals(44, $ret['width']);
@@ -412,11 +421,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::convert().
    */
-  public function testConvert() {
+  public function testConvert(): void {
     $this->getTestImageForOperation('Convert');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $ret = $this->image->convert('png');
     $this->assertEquals('png', $ret['extension']);
@@ -425,11 +434,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::resize().
    */
-  public function testResize() {
+  public function testResize(): void {
     $this->getTestImageForOperation('Resize');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     // Resize with integer for width and height.
     $ret = $this->image->resize(30, 40);
@@ -440,11 +449,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::resize().
    */
-  public function testFloatResize() {
+  public function testFloatResize(): void {
     $this->getTestImageForOperation('Resize');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     // Pass a float for width.
     $ret = $this->image->resize(30.4, 40);
@@ -455,11 +464,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::desaturate().
    */
-  public function testDesaturate() {
+  public function testDesaturate(): void {
     $this->getTestImageForOperation('Desaturate');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $this->image->desaturate();
   }
@@ -467,11 +476,11 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::rotate().
    */
-  public function testRotate() {
+  public function testRotate(): void {
     $this->getTestImageForOperation('Rotate');
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->will($this->returnArgument(0));
+      ->willReturnArgument(0);
 
     $ret = $this->image->rotate(90);
     $this->assertEquals(90, $ret['degrees']);

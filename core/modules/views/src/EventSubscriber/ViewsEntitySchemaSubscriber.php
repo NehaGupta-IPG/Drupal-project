@@ -106,7 +106,7 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return static::getEntityTypeEvents();
   }
 
@@ -223,7 +223,7 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
         // and casting.
         $view->trustData()->save();
       }
-      catch (\Exception $e) {
+      catch (\Exception) {
         // In case the view could not be saved, log an error message that the
         // view needs to be updated manually instead of failing the entire
         // entity update process.

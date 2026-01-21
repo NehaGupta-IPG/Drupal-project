@@ -145,7 +145,7 @@ class ContextDefinition extends Plugin {
     if (isset($values['class'])) {
       return $values['class'];
     }
-    if (strpos($values['value'], 'entity:') === 0) {
+    if (str_starts_with($values['value'], 'entity:')) {
       return 'Drupal\Core\Plugin\Context\EntityContextDefinition';
     }
     return 'Drupal\Core\Plugin\Context\ContextDefinition';
@@ -155,6 +155,7 @@ class ContextDefinition extends Plugin {
    * Returns the value of an annotation.
    *
    * @return \Drupal\Core\Plugin\Context\ContextDefinitionInterface
+   *   The context definition object.
    */
   public function get() {
     return $this->definition;

@@ -39,6 +39,7 @@ class DrupalPinnedDevDependenciesBuilder extends DrupalPackageBuilder {
    * Returns the initial package metadata that describes the metapackage.
    *
    * @return array
+   *   The initial package metadata.
    */
   protected function initialPackageMetadata() {
     return [
@@ -51,6 +52,11 @@ class DrupalPinnedDevDependenciesBuilder extends DrupalPackageBuilder {
       ],
       "require" => [
         "drupal/core" => Composer::drupalVersionBranch(),
+      ],
+      "extra" => [
+        "branch-alias" => [
+          "dev-main" => Composer::drupalVersionBranch(),
+        ],
       ],
     ];
   }

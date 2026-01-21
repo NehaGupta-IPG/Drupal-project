@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\views\Tests;
 
 use Drupal\Core\Config\FileStorage;
@@ -97,6 +99,7 @@ class ViewTestData {
           'unsigned' => TRUE,
           'not null' => TRUE,
           'default' => 0,
+          'size' => 'big',
         ],
         'status' => [
           'description' => "The status of this record",

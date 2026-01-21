@@ -24,11 +24,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 class ResourceIdentifierNormalizer extends NormalizerBase implements DenormalizerInterface {
 
   /**
-   * {@inheritdoc}
-   */
-  protected $supportedInterfaceOrClass = ResourceIdentifier::class;
-
-  /**
    * The entity field manager.
    *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
@@ -48,7 +43,7 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
   /**
    * {@inheritdoc}
    */
-  public function normalize($object, $format = NULL, array $context = []) {
+  public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     assert($object instanceof ResourceIdentifier);
     $normalization = [
       'type' => $object->getTypeName(),
@@ -63,7 +58,7 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
   /**
    * {@inheritdoc}
    */
-  public function denormalize($data, $class, $format = NULL, array $context = []) {
+  public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     // If we get here, it's via a relationship POST/PATCH.
     /** @var \Drupal\jsonapi\ResourceType\ResourceType $resource_type */
     $resource_type = $context['resource_type'];
@@ -142,8 +137,10 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
   /**
    * {@inheritdoc}
    */
-  public function hasCacheableSupportsMethod(): bool {
-    return TRUE;
+  public function getSupportedTypes(?string $format): array {
+    return [
+      ResourceIdentifier::class => TRUE,
+    ];
   }
 
 }

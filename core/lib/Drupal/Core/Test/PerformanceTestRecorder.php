@@ -17,7 +17,7 @@ class PerformanceTestRecorder implements EventSubscriberInterface {
   /**
    * The state service for persistent storage if necessary.
    */
-  protected $state;
+  protected ?StateInterface $state;
 
   /**
    * @var array
@@ -40,6 +40,9 @@ class PerformanceTestRecorder implements EventSubscriberInterface {
     $this->state = $state;
   }
 
+  /**
+   * Gets the number of times an event occurred.
+   */
   public function getCount(string $type, string $name): int {
     $count = 0;
     if ($this->state) {
@@ -79,7 +82,7 @@ class PerformanceTestRecorder implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events = [];
     $events[RoutingEvents::FINISHED][] = ['onRouteBuilderFinish', -9999999];
     return $events;

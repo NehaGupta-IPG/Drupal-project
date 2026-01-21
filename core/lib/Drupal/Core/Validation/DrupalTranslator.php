@@ -28,6 +28,7 @@ class DrupalTranslator implements TranslatorInterface {
     if ($id instanceof TranslatableMarkup) {
       return $id;
     }
+    // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
     return new TranslatableMarkup($id, $this->processParameters($parameters), $this->getOptions($domain, $locale));
   }
 
@@ -66,7 +67,7 @@ class DrupalTranslator implements TranslatorInterface {
    * {@inheritdoc}
    */
   public function getLocale() {
-    return $this->locale ? $this->locale : \Drupal::languageManager()->getCurrentLanguage()->getId();
+    return $this->locale ?: \Drupal::languageManager()->getCurrentLanguage()->getId();
   }
 
   /**
@@ -86,7 +87,7 @@ class DrupalTranslator implements TranslatorInterface {
         // replacement strings.
       }
       // Check for symfony replacement patterns in the form "{{ name }}".
-      elseif (strpos($key, '{{ ') === 0 && strrpos($key, ' }}') == strlen($key) - 3) {
+      elseif (str_starts_with($key, '{{ ') && strrpos($key, ' }}') == strlen($key) - 3) {
         // Transform it into a Drupal pattern using the format %name.
         $key = '%' . substr($key, 3, strlen($key) - 6);
         $return[$key] = $value;

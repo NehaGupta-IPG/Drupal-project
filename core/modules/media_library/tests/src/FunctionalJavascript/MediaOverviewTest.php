@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\FunctionalJavascript;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the grid-style media overview page.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class MediaOverviewTest extends MediaLibraryTestBase {
 
   /**
@@ -56,7 +61,7 @@ class MediaOverviewTest extends MediaLibraryTestBase {
   /**
    * Tests that the Media Library's administration page works as expected.
    */
-  public function testAdministrationPage() {
+  public function testAdministrationPage(): void {
     $session = $this->getSession();
     $page = $session->getPage();
     $assert_session = $this->assertSession();
@@ -106,6 +111,10 @@ class MediaOverviewTest extends MediaLibraryTestBase {
     // Test that selecting elements as a part of bulk operations works.
     $page->selectFieldOption('Media type', '- Any -');
     $assert_session->elementExists('css', '#views-exposed-form-media-library-page')->submit();
+    $this->waitForText('Dog');
+
+    // Select the "Delete media" action.
+    $page->selectFieldOption('Action', 'Delete media');
     $this->waitForText('Dog');
 
     // This tests that anchor tags clicked inside the preview are suppressed.

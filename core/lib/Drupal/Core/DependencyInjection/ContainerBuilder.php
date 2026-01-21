@@ -3,7 +3,6 @@
 namespace Drupal\Core\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ContainerInterface;
-use Drupal\Component\DependencyInjection\ServiceIdHashTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
 use Symfony\Component\DependencyInjection\Container as SymfonyContainer;
@@ -19,12 +18,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInterface {
 
-  use ServiceIdHashTrait;
-
   /**
    * {@inheritdoc}
    */
-  public function __construct(ParameterBagInterface $parameterBag = NULL) {
+  public function __construct(?ParameterBagInterface $parameterBag = NULL) {
     parent::__construct($parameterBag);
     $this->setResourceTracking(FALSE);
   }
@@ -40,7 +37,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
    *   ContainerBuilder class should be fixed to allow setting synthetic
    *   services in a frozen builder.
    */
-  public function set($id, $service) {
+  public function set(string $id, ?object $service): void {
     SymfonyContainer::set($id, $service);
   }
 
@@ -68,24 +65,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
   /**
    * {@inheritdoc}
    */
-  public function setDefinition($id, Definition $definition): Definition {
-    $definition = parent::setDefinition($id, $definition);
-    // As of Symfony 3.4 all definitions are private by default.
-    // \Symfony\Component\DependencyInjection\Compiler\ResolvePrivatesPassOnly
-    // removes services marked as private from the container even if they are
-    // also marked as public. Drupal requires services that are public to
-    // remain in the container and not be removed.
-    if ($definition->isPublic() && $definition->isPrivate()) {
-      @trigger_error('Not marking service definitions as public is deprecated in drupal:9.2.0 and is required in drupal:10.0.0. Call $definition->setPublic(TRUE) before calling ::setDefinition(). See https://www.drupal.org/node/3194517', E_USER_DEPRECATED);
-      $definition->setPrivate(FALSE);
-    }
-    return $definition;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setParameter($name, $value) {
+  public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void {
     if (strtolower($name) !== $name) {
       throw new \InvalidArgumentException("Parameter names must be lowercase: $name");
     }
@@ -95,7 +75,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
   /**
    * {@inheritdoc}
    */
-  public function __sleep() {
+  public function __sleep(): array {
     assert(FALSE, 'The container was serialized.');
     return array_keys(get_object_vars($this));
   }

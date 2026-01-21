@@ -1,21 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\Core\Config\ConfigImporterException;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests installing and uninstalling of themes via configuration import.
- *
- * @group Extension
  */
+#[Group('Extension')]
+#[RunTestsInSeparateProcesses]
 class ConfigImportThemeInstallTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system'];
 
@@ -30,9 +32,11 @@ class ConfigImportThemeInstallTest extends KernelTestBase {
   /**
    * Tests config imports that install and uninstall a theme with dependencies.
    */
-  public function testConfigImportWithThemeWithModuleDependencies() {
-    $this->container->get('module_installer')->install(['test_module_required_by_theme', 'test_another_module_required_by_theme']);
-    $this->container->get('theme_installer')->install(['test_theme_depending_on_modules']);
+  public function testConfigImportWithThemeWithModuleDependencies(): void {
+    $this->container->get('module_installer')
+      ->install(['test_module_required_by_theme', 'test_another_module_required_by_theme']);
+    $this->container->get('theme_installer')
+      ->install(['test_theme_depending_on_modules']);
     $this->assertTrue($this->container->get('theme_handler')->themeExists('test_theme_depending_on_modules'), 'test_theme_depending_on_modules theme installed');
 
     $sync = $this->container->get('config.storage.sync');
@@ -50,7 +54,7 @@ class ConfigImportThemeInstallTest extends KernelTestBase {
       $error_message = 'Unable to uninstall the <em class="placeholder">Test Module Required by Theme</em> module because: Required by the theme: Test Theme Depending on Modules.';
       $this->assertStringContainsString($error_message, $e->getMessage(), 'There were errors validating the config synchronization.');
       $error_log = $this->configImporter->getErrors();
-      $this->assertEquals([$error_message], $error_log);
+      $this->assertSame($error_message, (string) $error_log[0]);
     }
 
     // Remove the other module and the theme.
@@ -73,7 +77,7 @@ class ConfigImportThemeInstallTest extends KernelTestBase {
       $error_message = 'Unable to install the <em class="placeholder">Test Theme Depending on Modules</em> theme since it requires the <em class="placeholder">Test Module Required by Theme</em> module.';
       $this->assertStringContainsString($error_message, $e->getMessage(), 'There were errors validating the config synchronization.');
       $error_log = $this->configImporter->getErrors();
-      $this->assertEquals([$error_message], $error_log);
+      $this->assertSame($error_message, (string) $error_log[0]);
     }
 
     $extensions['module']['test_module_required_by_theme'] = 0;

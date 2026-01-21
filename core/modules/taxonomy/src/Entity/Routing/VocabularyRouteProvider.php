@@ -6,6 +6,9 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
 use Symfony\Component\Routing\Route;
 
+/**
+ * Provides routes for the taxonomy vocabulary.
+ */
 class VocabularyRouteProvider extends AdminHtmlRouteProvider {
 
   /**
@@ -27,16 +30,6 @@ class VocabularyRouteProvider extends AdminHtmlRouteProvider {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function getCollectionRoute(EntityTypeInterface $entity_type) {
-    if ($route = parent::getCollectionRoute($entity_type)) {
-      $route->setRequirement('_permission', 'access taxonomy overview+administer taxonomy');
-      return $route;
-    }
-  }
-
-  /**
    * Gets the reset page route.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
@@ -49,7 +42,7 @@ class VocabularyRouteProvider extends AdminHtmlRouteProvider {
     $route = new Route('/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/reset');
     $route->setDefault('_entity_form', 'taxonomy_vocabulary.reset');
     $route->setDefault('_title', 'Reset');
-    $route->setRequirement('_permission', $entity_type->getAdminPermission());
+    $route->setRequirement('_entity_access', 'taxonomy_vocabulary.reset all weights');
     $route->setOption('_admin_route', TRUE);
     $route->setOption('parameters', [
       'taxonomy_vocabulary' => [
@@ -72,7 +65,7 @@ class VocabularyRouteProvider extends AdminHtmlRouteProvider {
   protected function getOverviewPageRoute(EntityTypeInterface $entity_type) {
     $route = new Route('/admin/structure/taxonomy/manage/{taxonomy_vocabulary}/overview');
     $route->setDefault('_title_callback', '\Drupal\Core\Entity\Controller\EntityController::title');
-    $route->setDefault('_form', 'Drupal\taxonomy\Form\OverviewTerms');
+    $route->setDefault('_entity_form', 'taxonomy_vocabulary.overview');
     $route->setRequirement('_entity_access', 'taxonomy_vocabulary.access taxonomy overview');
     $route->setOption('_admin_route', TRUE);
     $route->setOption('parameters', [

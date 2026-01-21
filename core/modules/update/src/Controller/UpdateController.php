@@ -7,7 +7,6 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\update\UpdateFetcherInterface;
 use Drupal\update\UpdateManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Controller routines for update routes.
@@ -33,26 +32,12 @@ class UpdateController extends ControllerBase {
    *
    * @param \Drupal\update\UpdateManagerInterface $update_manager
    *   Update Manager Service.
-   * @param \Drupal\Core\Render\RendererInterface|null $renderer
+   * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(UpdateManagerInterface $update_manager, RendererInterface $renderer = NULL) {
+  public function __construct(UpdateManagerInterface $update_manager, RendererInterface $renderer) {
     $this->updateManager = $update_manager;
-    if (is_null($renderer)) {
-      @trigger_error('The renderer service should be passed to UpdateController::__construct() since 9.1.0. This will be required in Drupal 10.0.0. See https://www.drupal.org/node/3179315', E_USER_DEPRECATED);
-      $renderer = \Drupal::service('renderer');
-    }
     $this->renderer = $renderer;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('update.manager'),
-      $container->get('renderer')
-    );
   }
 
   /**
@@ -80,7 +65,7 @@ class UpdateController extends ControllerBase {
       }
       if ($fetch_failed) {
         $message = ['#theme' => 'update_fetch_error_message'];
-        $this->messenger()->addError($this->renderer->renderPlain($message));
+        $this->messenger()->addError($this->renderer->renderInIsolation($message));
       }
     }
     return $build;
@@ -92,10 +77,10 @@ class UpdateController extends ControllerBase {
   public function updateStatusManually() {
     $this->updateManager->refreshUpdateData();
     $batch_builder = (new BatchBuilder())
-      ->setTitle(t('Checking available update data'))
+      ->setTitle($this->t('Checking available update data'))
       ->addOperation([$this->updateManager, 'fetchDataBatch'], [])
-      ->setProgressMessage(t('Trying to check available update data ...'))
-      ->setErrorMessage(t('Error checking available update data.'))
+      ->setProgressMessage($this->t('Trying to check available update data ...'))
+      ->setErrorMessage($this->t('Error checking available update data.'))
       ->setFinishCallback('update_fetch_data_finished');
     batch_set($batch_builder->toArray());
     return batch_process('admin/reports/updates');

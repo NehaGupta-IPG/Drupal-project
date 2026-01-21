@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Config;
 
 use Drupal\Component\Uuid\Php;
@@ -7,11 +9,14 @@ use Drupal\Core\Config\MemoryStorage;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Config\StorageComparer
- * @group Config
+ * Tests Drupal\Core\Config\StorageComparer.
  */
+#[CoversClass(StorageComparer::class)]
+#[Group('Config')]
 class StorageComparerTest extends UnitTestCase {
 
   /**
@@ -42,20 +47,22 @@ class StorageComparerTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->sourceStorage = $this->createMock('Drupal\Core\Config\StorageInterface');
     $this->targetStorage = $this->createMock('Drupal\Core\Config\StorageInterface');
 
     $this->sourceStorage->expects($this->atLeastOnce())
       ->method('getCollectionName')
-      ->will($this->returnValue(StorageInterface::DEFAULT_COLLECTION));
+      ->willReturn(StorageInterface::DEFAULT_COLLECTION);
     $this->targetStorage->expects($this->atLeastOnce())
       ->method('getCollectionName')
-      ->will($this->returnValue(StorageInterface::DEFAULT_COLLECTION));
+      ->willReturn(StorageInterface::DEFAULT_COLLECTION);
 
     $this->storageComparer = new StorageComparer($this->sourceStorage, $this->targetStorage);
   }
 
-  protected function getConfigData() {
+  protected function getConfigData(): array {
     $uuid = new Php();
     // Mock data using minimal data to use ConfigDependencyManger.
     $this->configData = [
@@ -95,8 +102,8 @@ class StorageComparerTest extends UnitTestCase {
         ],
       ],
       // Simple config.
-      'system.performance' => [
-        'stale_file_threshold' => 2592000,
+      'system.logging' => [
+        'error_level' => 'hide',
       ],
 
     ];
@@ -104,9 +111,9 @@ class StorageComparerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createChangelist
+   * Tests create changelist no change.
    */
-  public function testCreateChangelistNoChange() {
+  public function testCreateChangelistNoChange(): void {
     $config_data = $this->getConfigData();
     $config_files = array_keys($config_data);
     $this->sourceStorage->expects($this->once())
@@ -135,9 +142,9 @@ class StorageComparerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createChangelist
+   * Tests create changelist create.
    */
-  public function testCreateChangelistCreate() {
+  public function testCreateChangelistCreate(): void {
     $target_data = $source_data = $this->getConfigData();
     unset($target_data['field.storage.node.body']);
     unset($target_data['field.field.node.article.body']);
@@ -174,9 +181,9 @@ class StorageComparerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createChangelist
+   * Tests create changelist delete.
    */
-  public function testCreateChangelistDelete() {
+  public function testCreateChangelistDelete(): void {
     $target_data = $source_data = $this->getConfigData();
     unset($source_data['field.storage.node.body']);
     unset($source_data['field.field.node.article.body']);
@@ -213,9 +220,9 @@ class StorageComparerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createChangelist
+   * Tests create changelist update.
    */
-  public function testCreateChangelistUpdate() {
+  public function testCreateChangelistUpdate(): void {
     $target_data = $source_data = $this->getConfigData();
     $source_data['system.site']['title'] = 'Drupal New!';
     $source_data['field.field.node.article.body']['new_config_key'] = 'new data';
@@ -252,9 +259,11 @@ class StorageComparerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::createChangelist
+   * Tests different collections.
+   *
+   * @legacy-covers ::createChangelist
    */
-  public function testDifferentCollections() {
+  public function testDifferentCollections(): void {
     $source = new MemoryStorage();
     $target = new MemoryStorage();
 
@@ -290,7 +299,7 @@ class StorageComparerTest extends UnitTestCase {
    * @param string $prefix
    *   The prefix for random names to make sure they are unique.
    */
-  protected function generateRandomData(StorageInterface $storage, string $prefix = '') {
+  protected function generateRandomData(StorageInterface $storage, string $prefix = ''): void {
     $generator = $this->getRandomGenerator();
     for ($i = 0; $i < rand(2, 10); $i++) {
       $storage->write($prefix . $this->randomMachineName(), (array) $generator->object());

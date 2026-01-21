@@ -2,38 +2,16 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\Query\Delete as QueryDelete;
+use Drupal\pgsql\Driver\Database\pgsql\Delete as PgsqlDelete;
+
+@trigger_error('\Drupal\Core\Database\Driver\pgsql\Delete is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL database driver has been moved to the pgsql module. See https://www.drupal.org/node/3129492', E_USER_DEPRECATED);
 
 /**
  * PostgreSQL implementation of \Drupal\Core\Database\Query\Delete.
+ *
+ * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL
+ *   database driver has been moved to the pgsql module.
+ *
+ * @see https://www.drupal.org/node/3129492
  */
-class Delete extends QueryDelete {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(Connection $connection, string $table, array $options = []) {
-    // @todo Remove the __construct in Drupal 11.
-    // @see https://www.drupal.org/project/drupal/issues/3256524
-    parent::__construct($connection, $table, $options);
-    unset($this->queryOptions['return']);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function execute() {
-    $this->connection->addSavepoint();
-    try {
-      $result = parent::execute();
-    }
-    catch (\Exception $e) {
-      $this->connection->rollbackSavepoint();
-      throw $e;
-    }
-    $this->connection->releaseSavepoint();
-
-    return $result;
-  }
-
-}
+class Delete extends PgsqlDelete {}

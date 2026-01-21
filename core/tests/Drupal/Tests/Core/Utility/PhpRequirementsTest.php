@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Utility;
 
 use Drupal\Core\Utility\PhpRequirements;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the \Drupal\Core\Utility\PhpRequirements class.
- *
- * @coversDefaultClass \Drupal\Core\Utility\PhpRequirements
- * @group Utility
  */
+#[CoversClass(PhpRequirements::class)]
+#[Group('Utility')]
 class PhpRequirementsTest extends UnitTestCase {
 
   /**
@@ -21,7 +25,7 @@ class PhpRequirementsTest extends UnitTestCase {
    */
   public function testPhpEolDates(): void {
     $reflected = new \ReflectionClass(PhpRequirements::class);
-    $php_eol_dates = $reflected->getStaticProperties()['phpEolDates'];
+    $php_eol_dates = $reflected->getStaticPropertyValue('phpEolDates');
 
     foreach ($php_eol_dates as $version => $eol_date) {
       // Ensure that all of the version numbers are defined in a superset of
@@ -45,7 +49,7 @@ class PhpRequirementsTest extends UnitTestCase {
       }
       return $a_date <=> $b_date;
     });
-    $this->assertSame($php_eol_dates, $reflected->getStaticProperties()['phpEolDates']);
+    $this->assertSame($php_eol_dates, $reflected->getStaticPropertyValue('phpEolDates'));
   }
 
   /**
@@ -63,18 +67,13 @@ class PhpRequirementsTest extends UnitTestCase {
    * @param string $expected_php_version
    *   The PHP version the test should recommend.
    *
-   * @covers ::getMinimumSupportedPhp
-   *
-   * @dataProvider providerMinimumSupportedPhp
+   * @legacy-covers ::getMinimumSupportedPhp
    */
+  #[DataProvider('providerMinimumSupportedPhp')]
   public function testMinimumSupportedPhp(string $date_string, string $drupal_minimum_php, array $php_eol_dates, string $expected_php_version): void {
     $reflected = new \ReflectionClass(PhpRequirements::class);
-    $prop = $reflected->getProperty('drupalMinimumPhp');
-    $prop->setAccessible(TRUE);
-    $prop->setValue($drupal_minimum_php);
-    $prop = $reflected->getProperty('phpEolDates');
-    $prop->setAccessible(TRUE);
-    $prop->setValue($php_eol_dates);
+    $reflected->setStaticPropertyValue('drupalMinimumPhp', $drupal_minimum_php);
+    $reflected->setStaticPropertyValue('phpEolDates', $php_eol_dates);
     $date = new \DateTime($date_string);
     $this->assertSame($expected_php_version, PhpRequirements::getMinimumSupportedPhp($date));
   }
@@ -88,7 +87,7 @@ class PhpRequirementsTest extends UnitTestCase {
    * @return \Generator
    *   Test scenarios.
    */
-  public function providerMinimumSupportedPhp(): \Generator {
+  public static function providerMinimumSupportedPhp(): \Generator {
     $eol_lists = [];
 
     // Test against the known valid data from 9.0.0 to 9.3.0.

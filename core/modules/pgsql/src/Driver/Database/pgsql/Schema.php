@@ -2,23 +2,17 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
-use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\pgsql\Driver\Database\pgsql\Schema as PgsqlSchema;
 
-// cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
-// cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
-// cSpell:ignore contype fillfactor indexname indexrelid indisprimary indkey
-// cSpell:ignore indrelid nextval nspname regclass relkind relname relnamespace
-// cSpell:ignore schemaname setval
-
-/**
- * @addtogroup schemaapi
- * @{
- */
+@trigger_error('\Drupal\Core\Database\Driver\pgsql\Schema is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL database driver has been moved to the pgsql module. See https://www.drupal.org/node/3129492', E_USER_DEPRECATED);
 
 /**
  * PostgreSQL implementation of \Drupal\Core\Database\Schema.
+ *
+ * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL
+ *   database driver has been moved to the pgsql module.
+ *
+ * @see https://www.drupal.org/node/3129492
  */
 class Schema extends DatabaseSchema {
 
@@ -28,8 +22,9 @@ class Schema extends DatabaseSchema {
    * This is collected by Schema::queryTableInformation(), by introspecting the
    * database.
    *
-   * @see \Drupal\pgsql\Driver\Database\pgsql\Schema::queryTableInformation()
    * @var array
+   *
+   * @see \Drupal\pgsql\Driver\Database\pgsql\Schema::queryTableInformation()
    */
   protected $tableInformation = [];
 
@@ -49,6 +44,17 @@ class Schema extends DatabaseSchema {
    * @var string
    */
   protected $tempNamespaceName;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct($connection) {
+    parent::__construct($connection);
+
+    // If the schema is not set in the connection options then schema defaults
+    // to public.
+    $this->defaultSchema = $connection->getConnectionOptions()['schema'] ?? 'public';
+  }
 
   /**
    * Make sure to limit identifiers according to PostgreSQL compiled in length.
@@ -116,16 +122,18 @@ class Schema extends DatabaseSchema {
    */
   public function queryTableInformation($table) {
     // Generate a key to reference this table's information on.
+    $prefixed_table = $this->connection->getPrefix() . $table;
     $key = $this->connection->prefixTables('{' . $table . '}');
 
     // Take into account that temporary tables are stored in a different schema.
     // \Drupal\Core\Database\Connection::generateTemporaryTableName() sets the
     // 'db_temporary_' prefix to all temporary tables.
-    if (strpos($key, '.') === FALSE && strpos($table, 'db_temporary_') === FALSE) {
-      $key = 'public.' . $key;
+    if (str_contains($table, 'db_temporary_')) {
+      $key = $quoted_key = $this->getTempNamespaceName() . '.' . $prefixed_table;
     }
     else {
-      $key = $this->getTempNamespaceName() . '.' . $key;
+      $key = $this->defaultSchema . '.' . $prefixed_table;
+      $quoted_key = '"' . $this->defaultSchema . '"."' . $prefixed_table . '"';
     }
 
     if (!isset($this->tableInformation[$key])) {
@@ -153,7 +161,7 @@ AND (format_type(pg_attribute.atttypid, pg_attribute.atttypmod) = 'bytea'
 OR pg_get_expr(pg_attrdef.adbin, pg_attribute.attrelid) LIKE 'nextval%')
 EOD;
         $result = $this->connection->query($sql, [
-          ':key' => $key,
+          ':key' => $quoted_key,
         ]);
       }
       catch (\Exception $e) {
@@ -202,14 +210,11 @@ EOD;
   /**
    * Resets information about table blobs, sequences and serial fields.
    *
-   * @param $table
+   * @param string $table
    *   The non-prefixed name of the table.
    */
   protected function resetTableInformation($table) {
-    $key = $this->connection->prefixTables('{' . $table . '}');
-    if (strpos($key, '.') === FALSE) {
-      $key = 'public.' . $key;
-    }
+    $key = $this->defaultSchema . '.' . $this->connection->getPrefix() . $table;
     unset($this->tableInformation[$key]);
   }
 
@@ -232,6 +237,7 @@ EOD;
    *   - t: constraint trigger;
    *   - x: exclusion constraint.
    *   Defaults to 'c' for a CHECK constraint.
+   *   phpcs:ignore Drupal.Commenting.FunctionComment.ParamCommentFullStop
    *   @see https://www.postgresql.org/docs/current/catalog-pg-constraint.html
    *
    * @return array
@@ -271,15 +277,7 @@ EOD;
   }
 
   /**
-   * Generate SQL to create a new table from a Drupal schema definition.
-   *
-   * @param string $name
-   *   The name of the table to create.
-   * @param array $table
-   *   A Schema API table definition array.
-   *
-   * @return array
-   *   An array of SQL statements to create the table.
+   * {@inheritdoc}
    */
   protected function createTableSql($name, $table) {
     $sql_fields = [];
@@ -294,7 +292,11 @@ EOD;
     }
     if (isset($table['unique keys']) && is_array($table['unique keys'])) {
       foreach ($table['unique keys'] as $key_name => $key) {
-        $sql_keys[] = 'CONSTRAINT ' . $this->ensureIdentifiersLength($name, $key_name, 'key') . ' UNIQUE (' . implode(', ', $key) . ')';
+        // Use the createPrimaryKeySql(), which already discards any prefix
+        // lengths passed as part of the key column specifiers. (Postgres
+        // doesn't support setting a prefix length for PRIMARY or UNIQUE
+        // indices.)
+        $sql_keys[] = 'CONSTRAINT ' . $this->ensureIdentifiersLength($name, $key_name, 'key') . ' UNIQUE (' . $this->createPrimaryKeySql($key) . ')';
       }
     }
 
@@ -331,9 +333,9 @@ EOD;
   /**
    * Creates a safe SQL string for a field for table creation or alteration.
    *
-   * @param $name
+   * @param string $name
    *   Name of the field.
-   * @param $spec
+   * @param array $spec
    *   The field specification, as per the schema data structure format.
    */
   protected function createFieldSql($name, $spec) {
@@ -352,7 +354,7 @@ EOD;
     }
 
     if (!empty($spec['unsigned'])) {
-      $sql .= " CHECK ($name >= 0)";
+      $sql .= ' CHECK ("' . $name . '" >= 0)';
     }
 
     if (isset($spec['not null'])) {
@@ -374,7 +376,7 @@ EOD;
   /**
    * Set database-engine specific properties for a field.
    *
-   * @param $field
+   * @param array $field
    *   A field description array, as specified in the schema documentation.
    */
   protected function processField($field) {
@@ -464,6 +466,9 @@ EOD;
     return $map;
   }
 
+  /**
+   * Creates the SQL key for the given fields.
+   */
   protected function _createKeySql($fields) {
     $return = [];
     foreach ($fields as $field) {
@@ -478,7 +483,7 @@ EOD;
   }
 
   /**
-   * Create the SQL expression for primary keys.
+   * Create the SQL expression for primary and unique keys.
    *
    * Postgresql does not support key length. It does support fillfactor, but
    * that requires a separate database lookup for each column in the key. The
@@ -500,36 +505,31 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function tableExists($table) {
-    $prefixInfo = $this->getPrefixInfo($table, TRUE);
+  public function tableExists($table, $add_prefix = TRUE) {
+    $prefixInfo = $this->getPrefixInfo($table, $add_prefix);
 
-    return (bool) $this->connection->query("SELECT 1 FROM pg_tables WHERE schemaname = :schema AND tablename = :table", [':schema' => $prefixInfo['schema'], ':table' => $prefixInfo['table']])->fetchField();
+    return (bool) $this->connection->query("SELECT 1 FROM pg_tables WHERE schemaname = :schema AND tablename = :table", [
+      ':schema' => $prefixInfo['schema'],
+      ':table' => $prefixInfo['table'],
+    ])->fetchField();
   }
 
   /**
    * {@inheritdoc}
    */
   public function findTables($table_expression) {
-    $individually_prefixed_tables = $this->connection->getUnprefixedTablesMap();
-    $default_prefix = $this->connection->tablePrefix();
-    $default_prefix_length = strlen($default_prefix);
+    $prefix = $this->connection->getPrefix();
+    $prefix_length = strlen($prefix);
     $tables = [];
 
     // Load all the tables up front in order to take into account per-table
     // prefixes. The actual matching is done at the bottom of the method.
     $results = $this->connection->query("SELECT tablename FROM pg_tables WHERE schemaname = :schema", [':schema' => $this->defaultSchema]);
     foreach ($results as $table) {
-      // Take into account tables that have an individual prefix.
-      if (isset($individually_prefixed_tables[$table->tablename])) {
-        $prefix_length = strlen($this->connection->tablePrefix($individually_prefixed_tables[$table->tablename]));
-      }
-      elseif ($default_prefix && substr($table->tablename, 0, $default_prefix_length) !== $default_prefix) {
+      if ($prefix && substr($table->tablename, 0, $prefix_length) !== $prefix) {
         // This table name does not start the default prefix, which means that
         // it is not managed by Drupal so it should be excluded from the result.
         continue;
-      }
-      else {
-        $prefix_length = $default_prefix_length;
       }
 
       // Remove the prefix from the returned tables.
@@ -564,33 +564,38 @@ EOD;
     }
 
     // Get the schema and tablename for the old table.
-    $old_full_name = str_replace('"', '', $this->connection->prefixTables('{' . $table . '}'));
-    [$old_schema, $old_table_name] = strpos($old_full_name, '.') ? explode('.', $old_full_name) : ['public', $old_full_name];
-
+    $table_name = $this->connection->getPrefix() . $table;
     // Index names and constraint names are global in PostgreSQL, so we need to
     // rename them when renaming the table.
-    $indexes = $this->connection->query('SELECT indexname FROM pg_indexes WHERE schemaname = :schema AND tablename = :table', [':schema' => $old_schema, ':table' => $old_table_name]);
+    $indexes = $this->connection->query('SELECT indexname FROM pg_indexes WHERE schemaname = :schema AND tablename = :table', [
+      ':schema' => $this->defaultSchema,
+      ':table' => $table_name,
+    ]);
 
     foreach ($indexes as $index) {
-      // Get the index type by suffix, e.g. idx/key/pkey
+      // Get the index type by suffix, e.g. idx/key/pkey.
       $index_type = substr($index->indexname, strrpos($index->indexname, '_') + 1);
 
       // If the index is already rewritten by ensureIdentifiersLength() to not
       // exceed the 63 chars limit of PostgreSQL, we need to take care of that.
       // cSpell:disable-next-line
       // Example (drupal_Gk7Su_T1jcBHVuvSPeP22_I3Ni4GrVEgTYlIYnBJkro_idx).
-      if (strpos($index->indexname, 'drupal_') !== FALSE) {
-        preg_match('/^drupal_(.*)_' . preg_quote($index_type) . '/', $index->indexname, $matches);
+      if (str_starts_with($index->indexname, 'drupal_')) {
+        preg_match('/^drupal_(.*)_' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
       else {
         // Make sure to remove the suffix from index names, because
         // $this->ensureIdentifiersLength() will add the suffix again and thus
         // would result in a wrong index name.
-        preg_match('/^' . preg_quote($old_full_name) . '__(.*)__' . preg_quote($index_type) . '/', $index->indexname, $matches);
+        preg_match('/^' . preg_quote($table_name, NULL) . '__(.*)__' . preg_quote($index_type, NULL) . '/', $index->indexname, $matches);
         $index_name = $matches[1];
       }
-      $this->connection->query('ALTER INDEX "' . $index->indexname . '" RENAME TO ' . $this->ensureIdentifiersLength($new_name, $index_name, $index_type) . '');
+      // The renaming of an index will fail when the there exists an table with
+      // the same name as the renamed index.
+      if (!$this->tableExists($this->ensureIdentifiersLength($new_name, $index_name, $index_type), FALSE)) {
+        $this->executeDdlStatement('ALTER INDEX "' . $this->defaultSchema . '"."' . $index->indexname . '" RENAME TO ' . $this->ensureIdentifiersLength($new_name, $index_name, $index_type));
+      }
     }
 
     // Ensure the new table name does not include schema syntax.
@@ -603,7 +608,7 @@ EOD;
         // The initial name of the sequence is generated automatically by
         // PostgreSQL when the table is created, so we need to use
         // pg_get_serial_sequence() to retrieve it.
-        $old_sequence = $this->connection->query("SELECT pg_get_serial_sequence('" . $old_full_name . "', '" . $field . "')")->fetchField();
+        $old_sequence = $this->connection->query("SELECT pg_get_serial_sequence('" . $this->defaultSchema . '.' . $table_name . "', '" . $field . "')")->fetchField();
 
         // If the new sequence name exceeds the maximum identifier length limit,
         // it will not match the pattern that is automatically applied by
@@ -612,11 +617,11 @@ EOD;
         // subsequent table renames.
         $new_sequence = $this->ensureIdentifiersLength($new_name, $field, 'seq', '_');
 
-        $this->connection->query('ALTER SEQUENCE ' . $old_sequence . ' RENAME TO ' . $new_sequence);
+        $this->executeDdlStatement('ALTER SEQUENCE ' . $old_sequence . ' RENAME TO ' . $new_sequence);
       }
     }
     // Now rename the table.
-    $this->connection->query('ALTER TABLE {' . $table . '} RENAME TO ' . $prefixInfo['table']);
+    $this->executeDdlStatement('ALTER TABLE {' . $table . '} RENAME TO ' . $prefixInfo['table']);
     $this->resetTableInformation($table);
   }
 
@@ -628,7 +633,7 @@ EOD;
       return FALSE;
     }
 
-    $this->connection->query('DROP TABLE {' . $table . '}');
+    $this->executeDdlStatement('DROP TABLE {' . $table . '}');
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -650,14 +655,14 @@ EOD;
       $this->ensureNotNullPrimaryKey($new_keys['primary key'], [$field => $spec]);
     }
 
-    $fixnull = FALSE;
+    $fix_null = FALSE;
     if (!empty($spec['not null']) && !isset($spec['default']) && !$is_primary_key) {
-      $fixnull = TRUE;
+      $fix_null = TRUE;
       $spec['not null'] = FALSE;
     }
     $query = 'ALTER TABLE {' . $table . '} ADD COLUMN ';
     $query .= $this->createFieldSql($field, $this->processField($spec));
-    $this->connection->query($query);
+    $this->executeDdlStatement($query);
     if (isset($spec['initial_from_field'])) {
       if (isset($spec['initial'])) {
         $expression = 'COALESCE(' . $spec['initial_from_field'] . ', :default_initial_value)';
@@ -676,8 +681,8 @@ EOD;
         ->fields([$field => $spec['initial']])
         ->execute();
     }
-    if ($fixnull) {
-      $this->connection->query("ALTER TABLE {" . $table . "} ALTER $field SET NOT NULL");
+    if ($fix_null) {
+      $this->executeDdlStatement("ALTER TABLE {" . $table . "} ALTER $field SET NOT NULL");
     }
     if (isset($new_keys)) {
       // Make sure to drop the existing primary key before adding a new one.
@@ -690,7 +695,7 @@ EOD;
     }
     // Add column comment.
     if (!empty($spec['description'])) {
-      $this->connection->query('COMMENT ON COLUMN {' . $table . '}.' . $field . ' IS ' . $this->prepareComment($spec['description']));
+      $this->executeDdlStatement('COMMENT ON COLUMN {' . $table . '}.' . $field . ' IS ' . $this->prepareComment($spec['description']));
     }
     $this->resetTableInformation($table);
   }
@@ -703,7 +708,7 @@ EOD;
       return FALSE;
     }
 
-    $this->connection->query('ALTER TABLE {' . $table . '} DROP COLUMN "' . $field . '"');
+    $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP COLUMN "' . $field . '"');
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -714,19 +719,28 @@ EOD;
   public function fieldExists($table, $column) {
     $prefixInfo = $this->getPrefixInfo($table);
 
-    return (bool) $this->connection->query("SELECT 1 FROM pg_attribute WHERE attrelid = :key::regclass AND attname = :column AND NOT attisdropped AND attnum > 0", [':key' => $prefixInfo['schema'] . '.' . $prefixInfo['table'], ':column' => $column])->fetchField();
+    return (bool) $this->connection->query("SELECT 1 FROM pg_attribute WHERE attrelid = :key::regclass AND attname = :column AND NOT attisdropped AND attnum > 0", [
+      ':key' => $prefixInfo['schema'] . '.' . $prefixInfo['table'],
+      ':column' => $column,
+    ])->fetchField();
   }
 
   /**
    * {@inheritdoc}
    */
   public function indexExists($table, $name) {
-    // Details https://www.postgresql.org/docs/10/view-pg-indexes.html
+    // Details https://www.postgresql.org/docs/12/view-pg-indexes.html
     $index_name = $this->ensureIdentifiersLength($table, $name, 'idx');
     // Remove leading and trailing quotes because the index name is in a WHERE
     // clause and not used as an identifier.
     $index_name = str_replace('"', '', $index_name);
-    return (bool) $this->connection->query("SELECT 1 FROM pg_indexes WHERE indexname = '$index_name'")->fetchField();
+
+    $sql_params = [
+      ':schema' => $this->defaultSchema,
+      ':table' => $this->connection->getPrefix() . $table,
+      ':index' => $index_name,
+    ];
+    return (bool) $this->connection->query("SELECT 1 FROM pg_indexes WHERE schemaname = :schema AND tablename = :table AND indexname = :index", $sql_params)->fetchField();
   }
 
   /**
@@ -771,7 +785,7 @@ EOD;
       throw new SchemaObjectExistsException("Cannot add primary key to table '$table': primary key already exists.");
     }
 
-    $this->connection->query('ALTER TABLE {' . $table . '} ADD CONSTRAINT ' . $this->ensureIdentifiersLength($table, '', 'pkey') . ' PRIMARY KEY (' . $this->createPrimaryKeySql($fields) . ')');
+    $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD CONSTRAINT ' . $this->ensureIdentifiersLength($table, '', 'pkey') . ' PRIMARY KEY (' . $this->createPrimaryKeySql($fields) . ')');
     $this->resetTableInformation($table);
   }
 
@@ -783,7 +797,7 @@ EOD;
       return FALSE;
     }
 
-    $this->connection->query('ALTER TABLE {' . $table . '} DROP CONSTRAINT ' . $this->ensureIdentifiersLength($table, '', 'pkey'));
+    $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP CONSTRAINT ' . $this->ensureIdentifiersLength($table, '', 'pkey'));
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -809,7 +823,10 @@ EOD;
       throw new SchemaObjectExistsException("Cannot add unique key '$name' to table '$table': unique key already exists.");
     }
 
-    $this->connection->query('ALTER TABLE {' . $table . '} ADD CONSTRAINT ' . $this->ensureIdentifiersLength($table, $name, 'key') . ' UNIQUE (' . implode(',', $fields) . ')');
+    // Use the createPrimaryKeySql(), which already discards any prefix lengths
+    // passed as part of the key column specifiers. (Postgres doesn't support
+    // setting a prefix length for PRIMARY or UNIQUE indices.)
+    $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD CONSTRAINT ' . $this->ensureIdentifiersLength($table, $name, 'key') . ' UNIQUE (' . $this->createPrimaryKeySql($fields) . ')');
     $this->resetTableInformation($table);
   }
 
@@ -821,7 +838,7 @@ EOD;
       return FALSE;
     }
 
-    $this->connection->query('ALTER TABLE {' . $table . '} DROP CONSTRAINT ' . $this->ensureIdentifiersLength($table, $name, 'key'));
+    $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP CONSTRAINT ' . $this->ensureIdentifiersLength($table, $name, 'key'));
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -837,7 +854,7 @@ EOD;
       throw new SchemaObjectExistsException("Cannot add index '$name' to table '$table': index already exists.");
     }
 
-    $this->connection->query($this->_createIndexSql($table, $name, $fields));
+    $this->executeDdlStatement($this->_createIndexSql($table, $name, $fields));
     $this->resetTableInformation($table);
   }
 
@@ -849,7 +866,7 @@ EOD;
       return FALSE;
     }
 
-    $this->connection->query('DROP INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx'));
+    $this->executeDdlStatement('DROP INDEX ' . $this->defaultSchema . '.' . $this->ensureIdentifiersLength($table, $name, 'idx'));
     $this->resetTableInformation($table);
     return TRUE;
   }
@@ -874,13 +891,13 @@ EOD;
       ':table_name' => $full_name,
     ])->fetchAll();
     foreach ($result as $row) {
-      if (preg_match('/_pkey$/', $row->index_name)) {
+      if (str_ends_with($row->index_name, '_pkey')) {
         $index_schema['primary key'][] = $row->column_name;
       }
-      elseif (preg_match('/_key$/', $row->index_name)) {
+      elseif (str_ends_with($row->index_name, '_key')) {
         $index_schema['unique keys'][$row->index_name][] = $row->column_name;
       }
-      elseif (preg_match('/_idx$/', $row->index_name)) {
+      elseif (str_ends_with($row->index_name, '_idx')) {
         $index_schema['indexes'][$row->index_name][] = $row->column_name;
       }
     }
@@ -907,12 +924,11 @@ EOD;
     // Type 'serial' is known to PostgreSQL, but only during table creation,
     // not when altering. Because of that, we create it here as an 'int'. After
     // we create it we manually re-apply the sequence.
-    if (in_array($spec['pgsql_type'], ['serial', 'bigserial'])) {
-      $field_def = 'int';
-    }
-    else {
-      $field_def = $spec['pgsql_type'];
-    }
+    $field_def = match($spec['pgsql_type']) {
+      'serial' => 'int',
+      'bigserial' => 'bigint',
+      default => $spec['pgsql_type'],
+    };
 
     if (in_array($spec['pgsql_type'], ['varchar', 'character', 'text']) && isset($spec['length'])) {
       $field_def .= '(' . $spec['length'] . ')';
@@ -924,12 +940,20 @@ EOD;
     // Remove old check constraints.
     $field_info = $this->queryFieldInformation($table, $field);
 
+    // Remove old sequence.
+    $seq_name = $this->getSequenceName($table, $field);
+    if (!empty($seq_name)) {
+      // We need to add CASCADE otherwise we cannot alter the sequence because
+      // the table depends on it.
+      $this->executeDdlStatement('DROP SEQUENCE IF EXISTS ' . $seq_name . ' CASCADE');
+    }
+
     foreach ($field_info as $check) {
-      $this->connection->query('ALTER TABLE {' . $table . '} DROP CONSTRAINT "' . $check . '"');
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} DROP CONSTRAINT [' . $check . ']');
     }
 
     // Remove old default.
-    $this->connection->query('ALTER TABLE {' . $table . '} ALTER COLUMN "' . $field . '" DROP DEFAULT');
+    $this->executeDdlStatement('ALTER TABLE {' . $table . '} ALTER COLUMN [' . $field . '] DROP DEFAULT');
 
     // Convert field type.
     // Usually, we do this via a simple typecast 'USING fieldname::type'. But
@@ -939,10 +963,10 @@ EOD;
     $is_bytea = !empty($table_information->blob_fields[$field]);
     if ($spec['pgsql_type'] != 'bytea') {
       if ($is_bytea) {
-        $this->connection->query('ALTER TABLE {' . $table . '} ALTER "' . $field . '" TYPE ' . $field_def . ' USING convert_from("' . $field . '"' . ", 'UTF8')");
+        $this->executeDdlStatement('ALTER TABLE {' . $table . '} ALTER [' . $field . '] TYPE ' . $field_def . ' USING convert_from([' . $field . ']' . ", 'UTF8')");
       }
       else {
-        $this->connection->query('ALTER TABLE {' . $table . '} ALTER "' . $field . '" TYPE ' . $field_def . ' USING "' . $field . '"::' . $field_def);
+        $this->executeDdlStatement('ALTER TABLE {' . $table . '} ALTER [' . $field . '] TYPE ' . $field_def . ' USING [' . $field . ']::' . $field_def);
       }
     }
     else {
@@ -951,7 +975,7 @@ EOD;
         // Convert to a bytea type by using the SQL replace() function to
         // convert any single backslashes in the field content to double
         // backslashes ('\' to '\\').
-        $this->connection->query('ALTER TABLE {' . $table . '} ALTER "' . $field . '" TYPE ' . $field_def . ' USING decode(replace("' . $field . '"' . ", E'\\\\', E'\\\\\\\\'), 'escape');");
+        $this->executeDdlStatement('ALTER TABLE {' . $table . '} ALTER [' . $field . '] TYPE ' . $field_def . ' USING decode(replace("' . $field . '"' . ", E'\\\\', E'\\\\\\\\'), 'escape');");
       }
     }
 
@@ -962,7 +986,7 @@ EOD;
       else {
         $null_action = 'DROP NOT NULL';
       }
-      $this->connection->query('ALTER TABLE {' . $table . '} ALTER "' . $field . '" ' . $null_action);
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ALTER [' . $field . '] ' . $null_action);
     }
 
     if (in_array($spec['pgsql_type'], ['serial', 'bigserial'])) {
@@ -970,31 +994,31 @@ EOD;
       // not when altering. Because of that, the sequence needs to be created
       // and initialized by hand.
       $seq = $this->connection->makeSequenceName($table, $field_new);
-      $this->connection->query("CREATE SEQUENCE " . $seq);
+      $this->executeDdlStatement("CREATE SEQUENCE " . $seq . " OWNED BY {" . $table . "}.[" . $field_new . ']');
       // Set sequence to maximal field value to not conflict with existing
       // entries.
-      $this->connection->query("SELECT setval('" . $seq . "', MAX(\"" . $field . '")) FROM {' . $table . "}");
-      $this->connection->query('ALTER TABLE {' . $table . '} ALTER ' . $field . ' SET DEFAULT nextval(' . $this->connection->quote($seq) . ')');
+      $this->connection->query("SELECT setval('" . $seq . "', MAX([" . $field . "])) FROM {" . $table . "}");
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ALTER [' . $field . '] SET DEFAULT nextval(' . $this->connection->quote($seq) . ')');
     }
 
     // Rename the column if necessary.
     if ($field != $field_new) {
-      $this->connection->query('ALTER TABLE {' . $table . '} RENAME "' . $field . '" TO "' . $field_new . '"');
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} RENAME [' . $field . '] TO [' . $field_new . ']');
     }
 
     // Add unsigned check if necessary.
     if (!empty($spec['unsigned'])) {
-      $this->connection->query('ALTER TABLE {' . $table . '} ADD CHECK ("' . $field_new . '" >= 0)');
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD CHECK ([' . $field_new . '] >= 0)');
     }
 
     // Add default if necessary.
     if (isset($spec['default'])) {
-      $this->connection->query('ALTER TABLE {' . $table . '} ALTER COLUMN "' . $field_new . '" SET DEFAULT ' . $this->escapeDefaultValue($spec['default']));
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ALTER COLUMN [' . $field_new . '] SET DEFAULT ' . $this->escapeDefaultValue($spec['default']));
     }
 
     // Change description if necessary.
     if (!empty($spec['description'])) {
-      $this->connection->query('COMMENT ON COLUMN {' . $table . '}."' . $field_new . '" IS ' . $this->prepareComment($spec['description']));
+      $this->executeDdlStatement('COMMENT ON COLUMN {' . $table . '}.[' . $field_new . '] IS ' . $this->prepareComment($spec['description']));
     }
 
     if (isset($new_keys)) {
@@ -1003,12 +1027,18 @@ EOD;
     $this->resetTableInformation($table);
   }
 
+  /**
+   * Creates a statement for an SQL index for the given fields.
+   */
   protected function _createIndexSql($table, $name, $fields) {
     $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} (';
     $query .= $this->_createKeySql($fields) . ')';
     return $query;
   }
 
+  /**
+   * Adds keys for an SQL table.
+   */
   protected function _createKeys($table, $new_keys) {
     if (isset($new_keys['primary key'])) {
       $this->addPrimaryKey($table, $new_keys['primary key']);
@@ -1029,25 +1059,40 @@ EOD;
   }
 
   /**
-   * Retrieve a table or column comment.
+   * Retrieves a table or column comment.
+   *
+   * @param string $table
+   *   The table name.
+   * @param string|null $column
+   *   (optional) The column name.
+   *
+   * @return string|false
+   *   The table or column comment. FALSE if the table or column does not exist.
    */
   public function getComment($table, $column = NULL) {
     $info = $this->getPrefixInfo($table);
     // Don't use {} around pg_class, pg_attribute tables.
     if (isset($column)) {
-      return $this->connection->query('SELECT col_description(oid, attnum) FROM pg_class, pg_attribute WHERE attrelid = oid AND relname = ? AND attname = ?', [$info['table'], $column])->fetchField();
+      return $this->connection->query('SELECT col_description(oid, attnum) FROM pg_class, pg_attribute WHERE attrelid = oid AND relname = ? AND attname = ?', [
+        $info['table'],
+        $column,
+      ])->fetchField() ?? FALSE;
     }
     else {
-      return $this->connection->query('SELECT obj_description(oid, ?) FROM pg_class WHERE relname = ?', ['pg_class', $info['table']])->fetchField();
+      return $this->connection->query('SELECT obj_description(oid, ?) FROM pg_class WHERE relname = ?', [
+        'pg_class',
+        $info['table'],
+      ])->fetchField() ?? FALSE;
     }
   }
 
   /**
    * Calculates a base-64 encoded PostgreSQL-safe sha-256 hash.
    *
-   * The hash is modified to according to  @link https://www.postgresql.org/docs/current/sql-syntax-lexical.html PostgreSQL Lexical Structure@endlink.
+   * The hash is modified to according to PostgreSQL Lexical Structure. See
+   * https://www.postgresql.org/docs/current/sql-syntax-lexical.html.
    *
-   * @param $data
+   * @param string $data
    *   String to be hashed.
    *
    * @return string
@@ -1075,6 +1120,26 @@ EOD;
     return (bool) $this->connection->query('SELECT installed_version FROM pg_available_extensions WHERE name = :name', [
       ':name' => $name,
     ])->fetchField();
+  }
+
+  /**
+   * Retrieves a sequence name that is owned by the table and column.
+   *
+   * @param string $table
+   *   A table name that is not prefixed or quoted.
+   * @param string $column
+   *   The column name.
+   *
+   * @return string|null
+   *   The name of the sequence or NULL if it does not exist.
+   */
+  protected function getSequenceName(string $table, string $column): ?string {
+    return $this->connection
+      ->query("SELECT pg_get_serial_sequence(:table, :column)", [
+        ':table' => $this->defaultSchema . '.' . $this->connection->getPrefix() . $table,
+        ':column' => $column,
+      ])
+      ->fetchField();
   }
 
 }

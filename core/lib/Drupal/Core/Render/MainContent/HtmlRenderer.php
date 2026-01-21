@@ -22,8 +22,11 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Default main content renderer for HTML requests.
  *
- * For attachment handling of HTML responses:
- * @see template_preprocess_html()
+ * Attachments in HTML responses are handled by
+ * \Drupal\Core\Render\AttachmentsResponseProcessorInterface and
+ * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor
+ *
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
  * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface
  * @see \Drupal\Core\Render\BareHtmlPageRenderer
  * @see \Drupal\Core\Render\HtmlResponse
@@ -75,9 +78,9 @@ class HtmlRenderer implements MainContentRendererInterface {
   /**
    * The renderer configuration array.
    *
-   * @see sites/default/default.services.yml
-   *
    * @var array
+   *
+   * @see sites/default/default.services.yml
    */
   protected $rendererConfig;
 
@@ -108,7 +111,7 @@ class HtmlRenderer implements MainContentRendererInterface {
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
    */
-  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager = NULL) {
+  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager) {
     $this->titleResolver = $title_resolver;
     $this->displayVariantManager = $display_variant_manager;
     $this->eventDispatcher = $event_dispatcher;
@@ -116,10 +119,6 @@ class HtmlRenderer implements MainContentRendererInterface {
     $this->renderer = $renderer;
     $this->renderCache = $render_cache;
     $this->rendererConfig = $renderer_config;
-    if ($theme_manager === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $theme_manager argument is deprecated in drupal:9.1.0 and will be required in drupal:10.0.0. See https://www.drupal.org/node/3159762', E_USER_DEPRECATED);
-      $theme_manager = \Drupal::service('theme.manager');
-    }
     $this->themeManager = $theme_manager;
   }
 
@@ -146,7 +145,8 @@ class HtmlRenderer implements MainContentRendererInterface {
     ];
 
     // The special page regions will appear directly in html.html.twig, not in
-    // page.html.twig, hence add them here, just before rendering html.html.twig.
+    // page.html.twig, hence add them here, just before rendering
+    // html.html.twig.
     $this->buildPageTopAndBottom($html);
 
     // Render, but don't replace placeholders yet, because that happens later in
@@ -177,7 +177,7 @@ class HtmlRenderer implements MainContentRendererInterface {
     $content['#cache']['tags'][] = 'rendered';
 
     $response = new HtmlResponse($content, 200, [
-      'Content-Type' => 'text/html; charset=UTF-8',
+      'Content-Type' => 'text/html; charset=utf-8',
     ]);
 
     return $response;

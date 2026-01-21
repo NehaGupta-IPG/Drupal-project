@@ -2,18 +2,26 @@
 
 /**
  * @file
+ */
+
+use Drupal\file\FileInterface;
+
+/**
+ * @file
  * Hooks for file module.
  */
 
 /**
- * @addtogroup file
+ * @defgroup file File interface
  * @{
+ * Common file handling functions.
+ *
  * @section file_security Uploading files and security considerations
  *
  * Using \Drupal\file\Element\ManagedFile field with a defined list of allowed
  * extensions is best way to provide a file upload field. It will ensure that:
  * - File names are sanitized by the FileUploadSanitizeNameEvent event.
- * - Files are validated by hook implementations of hook_file_validate().
+ * - Files are validated by \Drupal\file\Validation\FileValidatorInterface().
  * - Files with insecure extensions will be blocked by default even if they are
  *   listed. If .txt is an allowed extension such files will be renamed.
  *
@@ -25,14 +33,15 @@
  *   '#type' => 'file',
  *   '#title' => $this->t('Upload file'),
  *   '#upload_validators' => [
- *     'file_validate_extensions' => [
- *       'png gif jpg',
+ *     'FileExtension' => [
+ *        'extensions' => 'png gif jpg',
+ *       ],
  *     ],
  *   ],
  * ];
  * @endcode
  * - Use file_save_upload() to trigger the FileUploadSanitizeNameEvent event and
- *   hook_file_validate().
+ *   \Drupal\file\Validation\FileValidatorInterface::validate().
  *
  * Important considerations, regardless of the form element used:
  * - Always use and validate against a list of allowed extensions.
@@ -41,7 +50,7 @@
  *   recommended.
  *
  * @see https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
- * @see \hook_file_validate()
+ * @see \Drupal\file\Validation\FileValidatorInterface
  * @see file_save_upload()
  * @see \Drupal\Core\File\Event\FileUploadSanitizeNameEvent
  * @see \Drupal\system\EventSubscriber\SecurityFileUploadEventSubscriber
@@ -57,34 +66,6 @@
  */
 
 /**
- * Check that files meet a given criteria.
- *
- * This hook lets modules perform additional validation on files. They're able
- * to report a failure by returning one or more error messages.
- *
- * @param \Drupal\file\FileInterface $file
- *   The file entity being validated.
- *
- * @return array
- *   An array of error messages. If there are no problems with the file return
- *   an empty array.
- *
- * @see file_validate()
- */
-function hook_file_validate(\Drupal\file\FileInterface $file) {
-  $errors = [];
-
-  if (!$file->getFilename()) {
-    $errors[] = t("The file's name is empty. Please give a name to the file.");
-  }
-  if (strlen($file->getFilename()) > 255) {
-    $errors[] = t("The file's name exceeds the 255 characters limit. Please rename the file and try again.");
-  }
-
-  return $errors;
-}
-
-/**
  * Respond to a file that has been copied.
  *
  * @param \Drupal\file\FileInterface $file
@@ -94,9 +75,9 @@ function hook_file_validate(\Drupal\file\FileInterface $file) {
  *
  * @see \Drupal\file\FileRepositoryInterface::copy()
  */
-function hook_file_copy(\Drupal\file\FileInterface $file, \Drupal\file\FileInterface $source) {
+function hook_file_copy(FileInterface $file, FileInterface $source): void {
   // Make sure that the file name starts with the owner's user name.
-  if (strpos($file->getFilename(), $file->getOwner()->name) !== 0) {
+  if (!str_starts_with($file->getFilename(), $file->getOwner()->name)) {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
     $file->save();
 
@@ -114,9 +95,9 @@ function hook_file_copy(\Drupal\file\FileInterface $file, \Drupal\file\FileInter
  *
  * @see \Drupal\file\FileRepositoryInterface::move()
  */
-function hook_file_move(\Drupal\file\FileInterface $file, \Drupal\file\FileInterface $source) {
+function hook_file_move(FileInterface $file, FileInterface $source): void {
   // Make sure that the file name starts with the owner's user name.
-  if (strpos($file->getFilename(), $file->getOwner()->name) !== 0) {
+  if (!str_starts_with($file->getFilename(), $file->getOwner()->name)) {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
     $file->save();
 

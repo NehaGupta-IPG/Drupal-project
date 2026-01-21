@@ -1,23 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Component\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ReverseContainer;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @runTestsInSeparateProcesses
- *   The reverse container uses a static to maintain information across
- *   container rebuilds.
+ * Tests the ReverseContainer class.
  *
- * @coversDefaultClass \Drupal\Component\DependencyInjection\ReverseContainer
- * @group DependencyInjection
+ * The reverse container uses a static to maintain information across
+ * container rebuilds.
  */
+#[CoversClass(ReverseContainer::class)]
+#[Group('DependencyInjection')]
+#[RunTestsInSeparateProcesses]
 class ReverseContainerTest extends TestCase {
 
   /**
-   * @covers ::getId
+   * Tests get id.
    */
   public function testGetId(): void {
     $container = new ContainerBuilder();
@@ -33,38 +39,12 @@ class ReverseContainerTest extends TestCase {
   }
 
   /**
-   * @covers ::recordContainer
+   * Tests record container.
    */
   public function testRecordContainer(): void {
     $container = new ContainerBuilder();
     $service = new \stdClass();
     $container->set('bar', $service);
-
-    $reverse_container = new ReverseContainer($container);
-    $reverse_container->recordContainer();
-
-    $container = new ContainerBuilder();
-    $reverse_container = new ReverseContainer($container);
-
-    // New container does not have a bar service.
-    $this->assertNull($reverse_container->getId($service));
-
-    // Add the bar service to make the lookup based on the old object work as
-    // expected.
-    $container->set('bar', new \stdClass());
-    $this->assertSame('bar', $reverse_container->getId($service));
-  }
-
-  /**
-   * @covers ::recordContainer
-   * @group legacy
-   */
-  public function testRecordContainerStringService(): void {
-    $container = new ContainerBuilder();
-    $service = new \stdClass();
-    $container->set('bar', $service);
-    // String services are deprecated in Symfony 4.4.
-    $container->set('string_service', 'A string');
 
     $reverse_container = new ReverseContainer($container);
     $reverse_container->recordContainer();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\error_service_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -15,7 +17,7 @@ class LonelyMonkeyController extends ControllerBase implements ContainerInjectio
   /**
    * The lonely monkey class.
    */
-  protected $class;
+  protected LonelyMonkeyClass $class;
 
   public function __construct(LonelyMonkeyClass $class) {
     $this->class = $class;

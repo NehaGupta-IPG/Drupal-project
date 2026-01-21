@@ -6,13 +6,18 @@
 namespace Drupal\Core\DependencyInjection;
 
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Serialization\Yaml;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
  * YamlFileLoader loads YAML files service definitions.
@@ -35,6 +40,7 @@ class YamlFileLoader
         'public' => 'public',
         'tags' => 'tags',
         'autowire' => 'autowire',
+        'autoconfigure' => 'autoconfigure',
     ];
 
     /**
@@ -205,7 +211,7 @@ class YamlFileLoader
      */
     private function parseDefinition(string $id, $service, string $file, array $defaults)
     {
-        if (\is_string($service) && 0 === strpos($service, '@')) {
+        if (\is_string($service) && str_starts_with($service, '@')) {
             $this->container->setAlias($id, $alias = new Alias(substr($service, 1)));
             if (isset($defaults['public'])) {
                 $alias->setPublic($defaults['public']);
@@ -231,14 +237,8 @@ class YamlFileLoader
             }
 
             if (array_key_exists('deprecated', $service)) {
-                if (method_exists($alias, 'getDeprecation')) {
-                    $deprecation = \is_array($service['deprecated']) ? $service['deprecated'] : ['message' => $service['deprecated']];
-                    $alias->setDeprecated($deprecation['package'] ?? '', $deprecation['version'] ?? '', $deprecation['message']);
-                } else {
-                    // @todo Remove when we no longer support Symfony 4 in
-                    // https://www.drupal.org/project/drupal/issues/3197729
-                    $alias->setDeprecated(true, $service['deprecated']);
-                }
+              $deprecation = \is_array($service['deprecated']) ? $service['deprecated'] : ['message' => $service['deprecated']];
+              $alias->setDeprecated($deprecation['package'] ?? '', $deprecation['version'] ?? '', $deprecation['message']);
             }
 
             return;
@@ -260,6 +260,21 @@ class YamlFileLoader
 
             $definition->setChanges([]);
         }
+
+        // Drupal services are public by default.
+        $definition->setPublic(true);
+
+        if (isset($defaults['public'])) {
+            $definition->setPublic($defaults['public']);
+        }
+        if (isset($defaults['autowire'])) {
+            $definition->setAutowired($defaults['autowire']);
+        }
+        if (isset($defaults['autoconfigure'])) {
+            $definition->setAutoconfigured($defaults['autoconfigure']);
+        }
+
+        $definition->setChanges([]);
 
         if (isset($service['class'])) {
             $definition->setClass($service['class']);
@@ -286,26 +301,20 @@ class YamlFileLoader
         }
 
         if (array_key_exists('deprecated', $service)) {
-            if (method_exists($definition, 'getDeprecation')) {
-                $deprecation = \is_array($service['deprecated']) ? $service['deprecated'] : ['message' => $service['deprecated']];
-                $definition->setDeprecated($deprecation['package'] ?? '', $deprecation['version'] ?? '', $deprecation['message']);
-            } else {
-                // @todo Remove when we no longer support Symfony 4 in
-                // https://www.drupal.org/project/drupal/issues/3197729
-                $definition->setDeprecated(true, $service['deprecated']);
-            }
+          $deprecation = \is_array($service['deprecated']) ? $service['deprecated'] : ['message' => $service['deprecated']];
+          $definition->setDeprecated($deprecation['package'] ?? '', $deprecation['version'] ?? '', $deprecation['message']);
         }
 
         if (isset($service['factory'])) {
             if (is_string($service['factory'])) {
-                if (strpos($service['factory'], ':') !== false && strpos($service['factory'], '::') === false) {
+                if (str_contains($service['factory'], ':') && !str_contains($service['factory'], '::')) {
                     $parts = explode(':', $service['factory']);
-                    $definition->setFactory(array($this->resolveServices('@'.$parts[0]), $parts[1]));
+                    $definition->setFactory([$this->resolveServices('@'.$parts[0]), $parts[1]]);
                 } else {
                     $definition->setFactory($service['factory']);
                 }
             } else {
-                $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
+                $definition->setFactory([$this->resolveServices($service['factory'][0]), $service['factory'][1]]);
             }
         }
 
@@ -337,7 +346,7 @@ class YamlFileLoader
             if (is_string($service['configurator'])) {
                 $definition->setConfigurator($service['configurator']);
             } else {
-                $definition->setConfigurator(array($this->resolveServices($service['configurator'][0]), $service['configurator'][1]));
+                $definition->setConfigurator([$this->resolveServices($service['configurator'][0]), $service['configurator'][1]]);
             }
         }
 
@@ -349,10 +358,10 @@ class YamlFileLoader
             foreach ($service['calls'] as $call) {
                 if (isset($call['method'])) {
                     $method = $call['method'];
-                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments']) : array();
+                    $args = isset($call['arguments']) ? $this->resolveServices($call['arguments']) : [];
                 } else {
                     $method = $call[0];
-                    $args = isset($call[1]) ? $this->resolveServices($call[1]) : array();
+                    $args = isset($call[1]) ? $this->resolveServices($call[1]) : [];
                 }
 
                 $definition->addMethodCall($method, $args);
@@ -392,10 +401,32 @@ class YamlFileLoader
             $definition->addTag($name, $tag);
         }
 
-        if (isset($service['decorates'])) {
+        if (null !== $decorates = $service['decorates'] ?? null) {
+            if ('' !== $decorates && '@' === $decorates[0]) {
+                throw new InvalidArgumentException(\sprintf('The value of the "decorates" option for the "%s" service must be the id of the service without the "@" prefix (replace "%s" with "%s").', $id, $service['decorates'], substr($decorates, 1)));
+            }
+
+            $decorationOnInvalid = \array_key_exists('decoration_on_invalid', $service) ? $service['decoration_on_invalid'] : 'exception';
+            if ('exception' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+            }
+            elseif ('ignore' === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
+            }
+            elseif (null === $decorationOnInvalid) {
+                $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
+            }
+            elseif ('null' === $decorationOnInvalid) {
+                throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean null (without quotes) in "%s"?', $decorationOnInvalid, $id, $file));
+            }
+            else {
+                throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean "exception", "ignore" or null in "%s"?', $decorationOnInvalid, $id, $file));
+            }
+
             $renameId = $service['decoration_inner_name'] ?? null;
             $priority = $service['decoration_priority'] ?? 0;
-            $definition->setDecoratedService($service['decorates'], $renameId, $priority);
+
+            $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
 
         if (isset($service['autowire'])) {
@@ -425,7 +456,14 @@ class YamlFileLoader
             throw new InvalidArgumentException(sprintf('The service file "%s" is not valid.', $file));
         }
 
-        return $this->validate(Yaml::decode(file_get_contents($file)), $file);
+        try {
+          $valid_file = $this->validate(Yaml::decode(file_get_contents($file)), $file);
+        }
+        catch (InvalidDataTypeException $e) {
+          throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML: ', $file) . $e->getMessage());
+        }
+
+        return $valid_file;
     }
 
     /**
@@ -449,8 +487,8 @@ class YamlFileLoader
             throw new InvalidArgumentException(sprintf('The service file "%s" is not valid. It should contain an array. Check your YAML syntax.', $file));
         }
 
-        if ($invalid_keys = array_diff_key($content, array('parameters' => 1, 'services' => 1))) {
-            throw new InvalidArgumentException(sprintf('The service file "%s" is not valid: it contains invalid keys %s. Services have to be added under "services" and Parameters under "parameters".', $file, $invalid_keys));
+        if ($invalid_keys = array_keys(array_diff_key($content, ['parameters' => 1, 'services' => 1]))) {
+            throw new InvalidArgumentException(sprintf('The service file "%s" is not valid: it contains invalid root key(s) "%s". Services have to be added under "services" and Parameters under "parameters".', $file, implode('", "', $invalid_keys)));
         }
 
         return $content;
@@ -463,19 +501,53 @@ class YamlFileLoader
      *
      * @return array|string|Reference
      */
-    private function resolveServices($value)
+    private function resolveServices(mixed $value): mixed
     {
+        if ($value instanceof TaggedValue) {
+            $argument = $value->getValue();
+            if (\in_array($value->getTag(), ['tagged', 'tagged_iterator', 'tagged_locator'], true)) {
+               $forLocator = 'tagged_locator' === $value->getTag();
+
+              if (\is_array($argument) && isset($argument['tag']) && $argument['tag']) {
+                 if ($diff = array_diff(array_keys($argument), $supportedKeys = ['tag', 'index_by', 'default_index_method', 'default_priority_method', 'exclude', 'exclude_self'])) {
+                   throw new InvalidArgumentException(sprintf('"!%s" tag contains unsupported key "%s"; supported ones are "%s".', $value->getTag(), implode('", "', $diff), implode('", "', $supportedKeys)));
+                 }
+
+                 $argument = new TaggedIteratorArgument($argument['tag'], $argument['index_by'] ?? null, $argument['default_index_method'] ?? null, $forLocator, $argument['default_priority_method'] ?? null, (array) ($argument['exclude'] ?? null), $argument['exclude_self'] ?? true);
+              } elseif (\is_string($argument) && $argument) {
+                 $argument = new TaggedIteratorArgument($argument, null, null, $forLocator);
+              } else {
+                 throw new InvalidArgumentException(sprintf('"!%s" tags only accept a non empty string or an array with a key "tag"".', $value->getTag()));
+              }
+
+              if ($forLocator) {
+                 $argument = new ServiceLocatorArgument($argument);
+              }
+
+              return $argument;
+            }
+
+            if ($value->getTag() === 'service_closure') {
+                return new ServiceClosureArgument($this->resolveServices($argument));
+            }
+
+        }
         if (is_array($value)) {
-            $value = array_map(array($this, 'resolveServices'), $value);
-        } elseif (is_string($value) &&  0 === strpos($value, '@=')) {
+            $value = array_map([$this, 'resolveServices'], $value);
+        } elseif (is_string($value) && str_starts_with($value, '@=')) {
             // Not supported.
             //return new Expression(substr($value, 2));
             throw new InvalidArgumentException(sprintf("'%s' is an Expression, but expressions are not supported.", $value));
-        } elseif (is_string($value) &&  0 === strpos($value, '@')) {
-            if (0 === strpos($value, '@@')) {
+        } elseif (is_string($value) && str_starts_with($value, '@')) {
+            if (str_starts_with($value, '@>')) {
+                $argument = $this->resolveServices(substr_replace($value, '', 1, 1));
+
+                return new ServiceClosureArgument($argument);
+            }
+            if (str_starts_with($value, '@@')) {
                 $value = substr($value, 1);
                 $invalidBehavior = null;
-            } elseif (0 === strpos($value, '@?')) {
+            } elseif (str_starts_with($value, '@?')) {
                 $value = substr($value, 2);
                 $invalidBehavior = ContainerInterface::IGNORE_ON_INVALID_REFERENCE;
             } else {
@@ -483,15 +555,12 @@ class YamlFileLoader
                 $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
             }
 
-            if ('=' === substr($value, -1)) {
+            if (str_ends_with($value, '=')) {
                 $value = substr($value, 0, -1);
-                $strict = false;
-            } else {
-                $strict = true;
             }
 
             if (null !== $invalidBehavior) {
-                $value = new Reference($value, $invalidBehavior, $strict);
+                $value = new Reference($value, $invalidBehavior);
             }
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\ckeditor5_test\Controller;
 
@@ -22,7 +22,7 @@ class CKEditor5DialogTestController {
     $build['link'] = [
       '#type' => 'link',
       '#title' => 'Add Node',
-      '#url' => Url::fromRoute('node.add', ['node_type' => 'page']),
+      '#url' => Url::fromRoute('entity.node.add_form', ['node_type' => 'page']),
       '#attributes' => [
         'class' => ['use-ajax'],
         'data-dialog-type' => 'dialog',
@@ -34,10 +34,6 @@ class CKEditor5DialogTestController {
       ],
     ];
     $build['#attached']['library'][] = 'core/drupal.dialog.ajax';
-    // Add this library to prevent Modernizr from triggering a deprecation
-    // notice during testing.
-    // @todo remove in https://www.drupal.org/project/drupal/issues/3269082.
-    $build['#attached']['library'][] = 'core/drupal.touchevents-test';
     return $build;
   }
 

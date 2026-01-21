@@ -5,6 +5,7 @@ namespace Drupal\Core\StreamWrapper;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -14,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
  * interface.
  */
 class PublicStream extends LocalStream {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -26,14 +29,14 @@ class PublicStream extends LocalStream {
    * {@inheritdoc}
    */
   public function getName() {
-    return t('Public files');
+    return $this->t('Public files');
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return t('Public local files served by the webserver.');
+    return $this->t('Public local files served by the webserver.');
   }
 
   /**
@@ -120,7 +123,7 @@ class PublicStream extends LocalStream {
    */
   protected function getLocalPath($uri = NULL) {
     $path = parent::getLocalPath($uri);
-    if (!$path || (strpos($path, 'vfs://') === 0)) {
+    if (!$path || str_starts_with($path, 'vfs://')) {
       return $path;
     }
 
@@ -131,7 +134,7 @@ class PublicStream extends LocalStream {
     $private_path = Settings::get('file_private_path');
     if ($private_path) {
       $private_path = realpath($private_path);
-      if ($private_path && strpos($path, $private_path) === 0) {
+      if ($private_path && str_starts_with($path, $private_path)) {
         return FALSE;
       }
     }

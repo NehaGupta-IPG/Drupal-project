@@ -1,18 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Routing;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Routing\LazyRouteCollection;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
 
 /**
- * @coversDefaultClass \Drupal\Core\Routing\LazyRouteCollection
- *
- * @group Routing
+ * Tests Drupal\Core\Routing\LazyRouteCollection.
  */
+#[CoversClass(LazyRouteCollection::class)]
+#[Group('Routing')]
 class LazyRouteCollectionTest extends UnitTestCase {
 
   /**
@@ -32,33 +36,35 @@ class LazyRouteCollectionTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  public function setUp(): void {
+  protected function setUp(): void {
     parent::setUp();
     $this->routeProvider = $this->createMock(RouteProviderInterface::class);
-    $this->testRoutes = new \ArrayIterator([
+    $this->testRoutes = [
       'route_1' => new Route('/route-1'),
       'route_2' => new Route('/route-2'),
-    ]);
+    ];
   }
 
   /**
-   * @covers ::getIterator
-   * @covers ::all
+   * Tests get iterator.
+   *
+   * @legacy-covers ::getIterator
+   * @legacy-covers ::all
    */
-  public function testGetIterator() {
+  public function testGetIterator(): void {
     $this->routeProvider->expects($this->exactly(2))
       ->method('getRoutesByNames')
       ->with(NULL)
       ->willReturn($this->testRoutes);
     $lazyRouteCollection = new LazyRouteCollection($this->routeProvider);
-    $this->assertEquals($this->testRoutes, $lazyRouteCollection->getIterator());
+    $this->assertEquals($this->testRoutes, (array) $lazyRouteCollection->getIterator());
     $this->assertEquals($this->testRoutes, $lazyRouteCollection->all());
   }
 
   /**
-   * @covers ::count
+   * Tests count.
    */
-  public function testCount() {
+  public function testCount(): void {
     $this->routeProvider
       ->method('getRoutesByNames')
       ->with(NULL)
@@ -69,10 +75,8 @@ class LazyRouteCollectionTest extends UnitTestCase {
 
   /**
    * Search for a both an existing and a non-existing route.
-   *
-   * @covers ::get
    */
-  public function testGetName() {
+  public function testGetName(): void {
     // Hit.
     $this->routeProvider
       ->method('getRouteByName')

@@ -10,11 +10,15 @@ use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\MaintenanceModeEvents;
 use Drupal\Core\Site\MaintenanceModeInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -25,88 +29,20 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * The maintenance mode.
-   *
-   * @var \Drupal\Core\Site\MaintenanceModeInterface
-   */
-  protected $maintenanceMode;
-
-  /**
-   * The current account.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $config;
-
-  /**
-   * The URL generator.
-   *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
-   */
-  protected $urlGenerator;
-
-  /**
-   * The bare HTML page renderer.
-   *
-   * @var \Drupal\Core\Render\BareHtmlPageRendererInterface
-   */
-  protected $bareHtmlPageRenderer;
-
-  /**
-   * The messenger.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
-
-  /**
-   * An event dispatcher instance to use for configuration events.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected $eventDispatcher;
-
-  /**
-   * Constructs a new MaintenanceModeSubscriber.
-   *
-   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenance_mode
-   *   The maintenance mode.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
-   *   The string translation.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
-   *   The url generator.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The current user.
-   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_page_renderer
-   *   The bare HTML page renderer.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
-   *   The messenger.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   The event dispatcher.
-   */
-  public function __construct(MaintenanceModeInterface $maintenance_mode, ConfigFactoryInterface $config_factory, TranslationInterface $translation, UrlGeneratorInterface $url_generator, AccountInterface $account, BareHtmlPageRendererInterface $bare_html_page_renderer, MessengerInterface $messenger, EventDispatcherInterface $event_dispatcher = NULL) {
-    $this->maintenanceMode = $maintenance_mode;
-    $this->config = $config_factory;
+  public function __construct(
+    protected readonly MaintenanceModeInterface $maintenanceMode,
+    protected readonly ConfigFactoryInterface $configFactory,
+    TranslationInterface $translation,
+    protected readonly UrlGeneratorInterface $urlGenerator,
+    protected readonly AccountInterface $account,
+    protected readonly BareHtmlPageRendererInterface $bareHtmlPageRenderer,
+    protected readonly MessengerInterface $messenger,
+    protected readonly EventDispatcherInterface $eventDispatcher,
+    protected readonly StateInterface $state,
+    #[AutowireServiceClosure('logger.channel.default')]
+    private readonly \Closure $logger,
+  ) {
     $this->stringTranslation = $translation;
-    $this->urlGenerator = $url_generator;
-    $this->account = $account;
-    $this->bareHtmlPageRenderer = $bare_html_page_renderer;
-    $this->messenger = $messenger;
-    if (!$event_dispatcher) {
-      @trigger_error('Calling MaintenanceModeSubscriber::__construct() without the $event_dispatcher argument is deprecated in drupal:9.4.0 and the $event_dispatcher argument will be required in drupal:10.0.0. See https://www.drupal.org/node/3255799', E_USER_DEPRECATED);
-      $event_dispatcher = \Drupal::service('event_dispatcher');
-    }
-    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -127,15 +63,23 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
         $this->eventDispatcher->dispatch($event, MaintenanceModeEvents::MAINTENANCE_MODE_REQUEST);
       }
       else {
-        // Display a message if the logged in user has access to the site in
-        // maintenance mode. However, suppress it on the maintenance mode
-        // settings page.
+        // Display a message if the logged-in user has access to the site in
+        // maintenance mode. Don't show maintenance message:
+        // - on AJAX requests.
+        // - on Iframe uploads.
+        // - on the maintenance mode settings page.
         if ($route_match->getRouteName() != 'system.site_maintenance_mode') {
-          if ($this->account->hasPermission('administer site configuration')) {
-            $this->messenger->addMessage($this->t('Operating in maintenance mode. <a href=":url">Go online.</a>', [':url' => $this->urlGenerator->generate('system.site_maintenance_mode')]), 'status', FALSE);
-          }
-          else {
-            $this->messenger->addMessage($this->t('Operating in maintenance mode.'), 'status', FALSE);
+          $show_message = $route_match->getRouteName() != 'system.site_maintenance_mode' &&
+            !$event->getRequest()->isXmlHttpRequest() &&
+            $event->getRequest()->get('ajax_iframe_upload', FALSE) === FALSE;
+
+          if ($show_message) {
+            if ($this->account->hasPermission('administer site configuration')) {
+              $this->messenger->addMessage($this->t('Operating in maintenance mode. <a href=":url">Go online.</a>', [':url' => $this->urlGenerator->generate('system.site_maintenance_mode')]), 'status', FALSE);
+            }
+            else {
+              $this->messenger->addMessage($this->t('Operating in maintenance mode.'), 'status', FALSE);
+            }
           }
         }
       }
@@ -164,15 +108,44 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Logs changes to maintenance mode.
+   *
+   * @param \Symfony\Component\HttpKernel\Event\TerminateEvent $event
+   *   The event object.
+   */
+  public function onTerminate(TerminateEvent $event): void {
+    $values = $this->state->getValuesSetDuringRequest('system.maintenance_mode');
+    if ($values && $values['original'] !== $values['value']) {
+      if ($values['value']) {
+        $this->getLogger()->info('Maintenance mode enabled.');
+      }
+      else {
+        $this->getLogger()->info('Maintenance mode disabled.');
+      }
+    }
+  }
+
+  /**
+   * Gets the logging service.
+   *
+   * @return \Psr\Log\LoggerInterface
+   *   The logging service.
+   */
+  protected function getLogger(): LoggerInterface {
+    return ($this->logger)();
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     $events[KernelEvents::REQUEST][] = ['onKernelRequestMaintenance', 30];
     $events[KernelEvents::EXCEPTION][] = ['onKernelRequestMaintenance'];
     $events[MaintenanceModeEvents::MAINTENANCE_MODE_REQUEST][] = [
       'onMaintenanceModeRequest',
       -1000,
     ];
+    $events[KernelEvents::TERMINATE] = ['onTerminate'];
     return $events;
   }
 

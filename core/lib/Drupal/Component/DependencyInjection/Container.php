@@ -2,6 +2,7 @@
 
 namespace Drupal\Component\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -120,27 +121,24 @@ class Container implements ContainerInterface, ResetInterface {
     $this->parameters = $container_definition['parameters'] ?? [];
     $this->serviceDefinitions = $container_definition['services'] ?? [];
     $this->frozen = $container_definition['frozen'] ?? FALSE;
-
-    // Register the service_container with itself.
-    $this->services['service_container'] = $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function get($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    if ($this->hasParameter('_deprecated_service_list')) {
-      if ($deprecation = $this->getParameter('_deprecated_service_list')[$id] ?? '') {
-        @trigger_error($deprecation, E_USER_DEPRECATED);
-      }
-    }
+  public function get(string $id, int $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): ?object {
     if (isset($this->aliases[$id])) {
+      $alias = $id;
       $id = $this->aliases[$id];
     }
 
     // Re-use shared service instance if it exists.
     if (isset($this->services[$id]) || ($invalid_behavior === ContainerInterface::NULL_ON_INVALID_REFERENCE && array_key_exists($id, $this->services))) {
       return $this->services[$id];
+    }
+
+    if ($id === 'service_container') {
+      return $this;
     }
 
     if (isset($this->loading[$id])) {
@@ -161,7 +159,7 @@ class Container implements ContainerInterface, ResetInterface {
     // is used, the actual wanted behavior is to re-try getting the service at a
     // later point.
     if (!$definition) {
-      return;
+      return NULL;
     }
 
     // Definition is a keyed array, so [0] is only defined when it is a
@@ -181,13 +179,20 @@ class Container implements ContainerInterface, ResetInterface {
       unset($this->services[$id]);
 
       if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalid_behavior) {
-        return;
+        return NULL;
       }
 
       throw $e;
     }
 
     unset($this->loading[$id]);
+
+    if (isset($this->parameters['_deprecated_service_list'][$id])) {
+      @trigger_error($this->parameters['_deprecated_service_list'][$id], E_USER_DEPRECATED);
+    }
+    if (isset($alias) && isset($this->parameters['_deprecated_service_list'][$alias])) {
+      @trigger_error($this->parameters['_deprecated_service_list'][$alias], E_USER_DEPRECATED);
+    }
 
     return $service;
   }
@@ -200,7 +205,7 @@ class Container implements ContainerInterface, ResetInterface {
    * ref-counting. A subsequent call to ContainerInterface::get() will recreate
    * a new instance of the shared service.
    */
-  public function reset() {
+  public function reset(): void {
     $this->services = [];
   }
 
@@ -305,26 +310,22 @@ class Container implements ContainerInterface, ResetInterface {
   /**
    * {@inheritdoc}
    */
-  public function set($id, $service) {
+  public function set(string $id, ?object $service): void {
     $this->services[$id] = $service;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function has($id) {
-    return isset($this->aliases[$id]) || isset($this->services[$id]) || isset($this->serviceDefinitions[$id]);
+  public function has(string $id): bool {
+    return isset($this->aliases[$id]) || isset($this->services[$id]) || isset($this->serviceDefinitions[$id]) || $id === 'service_container';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getParameter($name) {
-    if (!(isset($this->parameters[$name]) || array_key_exists($name, $this->parameters))) {
-      if (!$name) {
-        throw new ParameterNotFoundException('');
-      }
-
+  public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null {
+    if (!\array_key_exists($name, $this->parameters)) {
       throw new ParameterNotFoundException($name, NULL, NULL, NULL, $this->getParameterAlternatives($name));
     }
 
@@ -334,14 +335,14 @@ class Container implements ContainerInterface, ResetInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasParameter($name) {
-    return isset($this->parameters[$name]) || array_key_exists($name, $this->parameters);
+  public function hasParameter(string $name): bool {
+    return \array_key_exists($name, $this->parameters);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setParameter($name, $value) {
+  public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void {
     if ($this->frozen) {
       throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
@@ -352,12 +353,12 @@ class Container implements ContainerInterface, ResetInterface {
   /**
    * {@inheritdoc}
    */
-  public function initialized($id) {
+  public function initialized(string $id): bool {
     if (isset($this->aliases[$id])) {
       $id = $this->aliases[$id];
     }
 
-    return isset($this->services[$id]) || array_key_exists($id, $this->services);
+    return \array_key_exists($id, $this->services);
   }
 
   /**
@@ -379,10 +380,6 @@ class Container implements ContainerInterface, ResetInterface {
     if ($arguments instanceof \stdClass) {
       if ($arguments->type !== 'collection') {
         throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $arguments->type));
-      }
-      // In case there is nothing to resolve, we are done here.
-      if (!$arguments->resolve) {
-        return $arguments->value;
       }
       $arguments = $arguments->value;
     }
@@ -453,17 +450,26 @@ class Container implements ContainerInterface, ResetInterface {
 
           continue;
         }
+        elseif ($type == 'service_closure') {
+          $arguments[$key] = function () use ($argument) {
+            return $this->get($argument->id, $argument->invalidBehavior);
+          };
+
+          continue;
+        }
+        elseif ($type == 'iterator') {
+          $services = $argument->value;
+          $arguments[$key] = new RewindableGenerator(function () use ($services) {
+            foreach ($services as $key => $service) {
+              yield $key => $this->resolveServicesAndParameters([$service])[0];
+            }
+          }, count($services));
+
+          continue;
+        }
         // Check for collection.
         elseif ($type == 'collection') {
-          $value = $argument->value;
-
-          // Does this collection need resolving?
-          if ($argument->resolve) {
-            $arguments[$key] = $this->resolveServicesAndParameters($value);
-          }
-          else {
-            $arguments[$key] = $value;
-          }
+          $arguments[$key] = $this->resolveServicesAndParameters($argument->value);
 
           continue;
         }
@@ -497,7 +503,7 @@ class Container implements ContainerInterface, ResetInterface {
     $alternatives = [];
     foreach ($keys as $key) {
       $lev = levenshtein($search_key, $key);
-      if ($lev <= strlen($search_key) / 3 || strpos($key, $search_key) !== FALSE) {
+      if ($lev <= strlen($search_key) / 3 || str_contains($key, $search_key)) {
         $alternatives[] = $key;
       }
     }
@@ -536,7 +542,7 @@ class Container implements ContainerInterface, ResetInterface {
    * {@inheritdoc}
    */
   public function getServiceIds() {
-    return array_keys($this->serviceDefinitions + $this->services);
+    return array_merge(['service_container'], array_keys($this->serviceDefinitions + $this->services));
   }
 
   /**

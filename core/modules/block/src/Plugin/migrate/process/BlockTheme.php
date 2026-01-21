@@ -2,34 +2,36 @@
 
 namespace Drupal\block\Plugin\migrate\process;
 
-use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\Core\Config\Config;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
-use Drupal\Core\Config\Config;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @MigrateProcessPlugin(
- *   id = "block_theme"
- * )
+ * Determines the theme to use for a block.
+ *
+ * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3533560
  */
+#[MigrateProcess('block_theme')]
 class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Contains the configuration object factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * Contains the system.theme configuration object.
    */
-  protected $configFactory;
+  protected Config $themeConfig;
 
   /**
-   * Contains the system.theme configuration object.
+   * List of themes available on the destination.
    *
-   * @var \Drupal\Core\Config\Config
+   * @var string[]
    */
-  protected $themeConfig;
+  protected array $themes;
 
   /**
    * List of themes available on the destination.
@@ -45,15 +47,14 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
-   *   The migration entity.
    * @param \Drupal\Core\Config\Config $theme_config
    *   The system.theme configuration factory object.
    * @param array $themes
    *   The list of themes available on the destination.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, Config $theme_config, array $themes) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $migration);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, Config $theme_config, array $themes) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533560', E_USER_DEPRECATED);
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->themeConfig = $theme_config;
     $this->themes = $themes;
   }
@@ -61,12 +62,11 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $migration,
       $container->get('config.factory')->get('system.theme'),
       $container->get('theme_handler')->listInfo()
     );

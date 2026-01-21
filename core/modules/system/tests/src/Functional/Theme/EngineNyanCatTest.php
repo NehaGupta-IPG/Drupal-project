@@ -1,22 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore nyan
 /**
  * Tests the multi theme engine support.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class EngineNyanCatTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $modules = ['theme_test'];
+  protected static $modules = ['theme_test', 'nyan_cat'];
 
   /**
    * {@inheritdoc}
@@ -33,15 +36,8 @@ class EngineNyanCatTest extends BrowserTestBase {
 
   /**
    * Ensures a theme's template is overridable based on the 'template' filename.
-   *
-   * @group legacy
-   *
-   * @todo https://www.drupal.org/project/drupal/issues/3246981 Remove
-   *   nyan_cat_init() and the legacy group and expected deprecation from this
-   *   test.
    */
-  public function testTemplateOverride() {
-    $this->expectDeprecation('THEME_ENGINE_init() is deprecated in drupal:9.3.0 and removed in drupal:10.0.0. There is no replacement. See https://www.drupal.org/node/3246978');
+  public function testTemplateOverride(): void {
     $this->config('system.theme')
       ->set('default', 'test_theme_nyan_cat_engine')
       ->save();

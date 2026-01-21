@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Routing;
 
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\State\StateInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -11,27 +9,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 
 /**
- * Defines a class which preloads non-admin routes.
+ * Defines a class that can pre-load non-admin routes.
  *
  * On an actual site we want to avoid too many database queries so we build a
  * list of all routes which most likely appear on the actual site, which are all
  * HTML routes not starting with "/admin".
  */
 class RoutePreloader implements EventSubscriberInterface {
-
-  /**
-   * The route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\Drupal\Core\Routing\PreloadableRouteProviderInterface
-   */
-  protected $routeProvider;
-
-  /**
-   * The state key value store.
-   *
-   * @var \Drupal\Core\State\StateInterface
-   */
-  protected $state;
 
   /**
    * Contains the non-admin routes while rebuilding the routes.
@@ -41,26 +25,17 @@ class RoutePreloader implements EventSubscriberInterface {
   protected $nonAdminRoutesOnRebuild = [];
 
   /**
-   * The cache backend used to skip the state loading.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
-   */
-  protected $cache;
-
-  /**
    * Constructs a new RoutePreloader.
    *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
    *   The route provider.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key value store.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend.
    */
-  public function __construct(RouteProviderInterface $route_provider, StateInterface $state, CacheBackendInterface $cache) {
-    $this->routeProvider = $route_provider;
-    $this->state = $state;
-    $this->cache = $cache;
+  public function __construct(
+    protected RouteProviderInterface $routeProvider,
+    protected StateInterface $state,
+  ) {
   }
 
   /**
@@ -73,17 +48,7 @@ class RoutePreloader implements EventSubscriberInterface {
     // Only preload on normal HTML pages, as they will display menu links.
     if ($this->routeProvider instanceof PreloadableRouteProviderInterface && $event->getRequest()->getRequestFormat() == 'html') {
 
-      // Ensure that the state query is cached to skip the database query, if
-      // possible.
-      $key = 'routing.non_admin_routes';
-      if ($cache = $this->cache->get($key)) {
-        $routes = $cache->data;
-      }
-      else {
-        $routes = $this->state->get($key, []);
-        $this->cache->set($key, $routes, Cache::PERMANENT, ['routes']);
-      }
-
+      $routes = $this->state->get('routing.non_admin_routes', []);
       if ($routes) {
         // Preload all the non-admin routes at once.
         $this->routeProvider->preLoadRoutes($routes);
@@ -100,7 +65,7 @@ class RoutePreloader implements EventSubscriberInterface {
   public function onAlterRoutes(RouteBuildEvent $event) {
     $collection = $event->getRouteCollection();
     foreach ($collection->all() as $name => $route) {
-      if (strpos($route->getPath(), '/admin/') !== 0 && $route->getPath() != '/admin' && static::isGetAndHtmlRoute($route)) {
+      if (!str_starts_with($route->getPath(), '/admin/') && $route->getPath() != '/admin' && static::isGetAndHtmlRoute($route)) {
         $this->nonAdminRoutesOnRebuild[] = $name;
       }
     }
@@ -118,7 +83,7 @@ class RoutePreloader implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     // Set a really low priority to catch as many as possible routes.
     $events[RoutingEvents::ALTER] = ['onAlterRoutes', -1024];
     $events[RoutingEvents::FINISHED] = ['onFinishedRoutes'];

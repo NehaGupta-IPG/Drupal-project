@@ -8,8 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Path processor manager.
  *
- * Holds an array of path processor objects and uses them to sequentially process
- * a path, in order of processor priority.
+ * Holds an array of path processor objects and uses them to sequentially
+ * process a path, in order of processor priority.
  */
 class PathProcessorManager implements InboundPathProcessorInterface, OutboundPathProcessorInterface {
 
@@ -102,7 +102,7 @@ class PathProcessorManager implements InboundPathProcessorInterface, OutboundPat
   /**
    * {@inheritdoc}
    */
-  public function processOutbound($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
+  public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
     $processors = $this->getOutbound();
     foreach ($processors as $processor) {
       $path = $processor->processOutbound($path, $options, $request, $bubbleable_metadata);
@@ -132,7 +132,7 @@ class PathProcessorManager implements InboundPathProcessorInterface, OutboundPat
    */
   protected function sortProcessors($type) {
     krsort($this->{$type});
-    return array_merge([], ...$this->{$type});
+    return array_merge(...$this->{$type});
   }
 
 }

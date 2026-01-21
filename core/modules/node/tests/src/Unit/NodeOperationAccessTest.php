@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\node\Unit;
 
 use Drupal\Core\Access\AccessResult;
@@ -7,7 +9,6 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\RevisionableEntityBundleInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -16,14 +17,15 @@ use Drupal\node\NodeGrantDatabaseStorageInterface;
 use Drupal\node\NodeInterface;
 use Drupal\node\NodeStorageInterface;
 use Drupal\Tests\UnitTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests node operations.
- *
- * @coversDefaultClass \Drupal\node\NodeAccessControlHandler
- * @group node
  */
+#[CoversClass(NodeAccessControlHandler::class)]
+#[Group('node')]
 class NodeOperationAccessTest extends UnitTestCase {
 
   /**
@@ -54,13 +56,14 @@ class NodeOperationAccessTest extends UnitTestCase {
    * @param bool|null $isDefaultRevision
    *   Whether the node should be default revision, or NULL if not to expect it
    *   to be called.
-   *
-   * @dataProvider providerTestRevisionOperations
    */
-  public function testRevisionOperations($operation, array $hasPermissionMap, $assertAccess, $isDefaultRevision = NULL) {
+  #[DataProvider('providerTestRevisionOperations')]
+  public function testRevisionOperations($operation, array $hasPermissionMap, $assertAccess, $isDefaultRevision = NULL): void {
     $account = $this->createMock(AccountInterface::class);
     $account->method('hasPermission')
       ->willReturnMap($hasPermissionMap);
+    $account->method('id')
+      ->willReturn(42);
 
     $entityType = $this->createMock(EntityTypeInterface::class);
     $grants = $this->createMock(NodeGrantDatabaseStorageInterface::class);
@@ -119,11 +122,6 @@ class NodeOperationAccessTest extends UnitTestCase {
     $accessControl = new NodeAccessControlHandler($entityType, $grants, $entityTypeManager);
     $accessControl->setModuleHandler($moduleHandler);
 
-    $nodeType = $this->createMock(RevisionableEntityBundleInterface::class);
-    $typeProperty = new \stdClass();
-    $typeProperty->entity = $nodeType;
-    $node->type = $typeProperty;
-
     $access = $accessControl->access($node, $operation, $account, FALSE);
     $this->assertEquals($assertAccess, $access);
   }
@@ -134,7 +132,7 @@ class NodeOperationAccessTest extends UnitTestCase {
    * @return array
    *   Data for testing.
    */
-  public function providerTestRevisionOperations() {
+  public static function providerTestRevisionOperations() {
     $data = [];
 
     // Tests 'bypass node access' never works on revision operations.
@@ -272,23 +270,6 @@ class NodeOperationAccessTest extends UnitTestCase {
     ];
 
     return $data;
-  }
-
-  /**
-   * Tests NodeAccessControlHandler deprecation.
-   *
-   * @group legacy
-   */
-  public function testNodeAccessControlHandlerDeprecation() {
-    $entity_type = $this->prophesize(EntityTypeInterface::class);
-    $entity_type->id()->willReturn(mt_rand(1, 128));
-    $node_grant_storage = $this->prophesize(NodeGrantDatabaseStorageInterface::class);
-    $entity_type_manager = $this->prophesize(EntityTypeManagerInterface::class);
-    $container = $this->prophesize(ContainerInterface::class);
-    $container->get('entity_type.manager')->willReturn($entity_type_manager->reveal());
-    \Drupal::setContainer($container->reveal());
-    $this->expectDeprecation('Calling Drupal\node\NodeAccessControlHandler::__construct() without the $entity_type_manager argument is deprecated in drupal:9.3.0 and will be required in drupal:10.0.0. See https://www.drupal.org/node/3214171');
-    new NodeAccessControlHandler($entity_type->reveal(), $node_grant_storage->reveal());
   }
 
 }

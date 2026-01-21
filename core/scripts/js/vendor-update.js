@@ -3,12 +3,12 @@
  * Copy files for JS vendor dependencies from node_modules to the assets/vendor
  * folder.
  *
- * This script handles all dependencies except CKEditor and Modernizr, which
- * require a custom build step.
+ * This script handles all dependencies except CKEditor, which require a custom
+ * build step.
  */
 
-const path = require('path');
-const { copyFile, writeFile, readFile, chmod, mkdir } = require('fs').promises;
+const path = require('node:path');
+const { copyFile, writeFile, readFile, chmod, mkdir } = require('node:fs').promises;
 const ckeditor5Files = require('./assets/ckeditor5Files');
 const jQueryUIProcess = require('./assets/process/jqueryui');
 const mapProcess = require('./assets/process/map');
@@ -79,35 +79,13 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
       library: 'internal.backbone',
       files: ['backbone.js', 'backbone-min.js', 'backbone-min.js.map'],
     },
-    // Only used to update the version number of the deprecated library.
     {
-      pack: 'backbone',
-    },
-    {
-      pack: 'css.escape',
-      folder: 'css-escape',
-      library: 'css.escape',
-      files: ['css.escape.js'],
-    },
-    {
-      pack: 'es6-promise',
+      pack: 'htmx.org',
+      folder: 'htmx',
+      library: 'htmx',
       files: [
-        { from: 'dist/es6-promise.auto.min.js', to: 'es6-promise.auto.min.js' },
-        {
-          from: 'dist/es6-promise.auto.min.map',
-          to: 'es6-promise.auto.min.map',
-        },
-      ],
-    },
-    {
-      pack: 'farbtastic',
-      library: 'jquery.farbtastic',
-      files: [
-        'marker.png',
-        'mask.png',
-        'wheel.png',
-        'farbtastic.css',
-        { from: 'farbtastic.min.js', to: 'farbtastic.js' },
+        { from: 'dist/htmx.min.js', to: 'htmx.min.js' },
+        { from: 'dist/htmx.js', to: 'htmx.js' },
       ],
     },
     {
@@ -117,30 +95,6 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         { from: 'dist/jquery.min.js', to: 'jquery.min.js' },
         { from: 'dist/jquery.min.map', to: 'jquery.min.map' },
       ],
-    },
-    {
-      pack: 'jquery-form',
-      library: 'internal.jquery.form',
-      files: [
-        { from: 'dist/jquery.form.min.js', to: 'jquery.form.min.js' },
-        { from: 'dist/jquery.form.min.js.map', to: 'jquery.form.min.js.map' },
-        { from: 'src/jquery.form.js', to: 'src/jquery.form.js' },
-      ],
-    },
-    // Only used to update the version number of the deprecated library.
-    {
-      pack: 'jquery-form',
-    },
-    {
-      pack: 'joyride',
-      folder: 'jquery-joyride',
-      library: 'jquery.joyride',
-      files: ['jquery.joyride-2.1.js'],
-    },
-    {
-      pack: 'jquery-once',
-      library: 'jquery.once',
-      files: ['jquery.once.js', 'jquery.once.min.js', 'jquery.once.min.js.map'],
     },
     {
       pack: 'js-cookie',
@@ -161,31 +115,6 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         { from: 'dist/once.min.js.map', to: 'once.min.js.map' },
       ],
     },
-    {
-      pack: 'picturefill',
-      files: [{ from: 'dist/picturefill.min.js', to: 'picturefill.min.js' }],
-    },
-    {
-      pack: '@popperjs/core',
-      folder: 'popperjs',
-      files: [
-        { from: 'dist/umd/popper.min.js', to: 'popper.min.js' },
-        { from: 'dist/umd/popper.min.js.map', to: 'popper.min.js.map' },
-      ],
-    },
-    {
-      pack: 'shepherd.js',
-      library: 'shepherd',
-    },
-    {
-      pack: 'shepherd.js',
-      folder: 'shepherd',
-      library: 'internal.shepherd',
-      files: [
-        { from: 'dist/js/shepherd.min.js', to: 'shepherd.min.js' },
-        { from: 'dist/js/shepherd.min.js.map', to: 'shepherd.min.js.map' },
-      ],
-    },
     { pack: 'sortablejs', folder: 'sortable', files: ['Sortable.min.js'] },
     {
       pack: 'tabbable',
@@ -199,13 +128,22 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
       library: 'internal.underscore',
       files: ['underscore-min.js', 'underscore-min.js.map'],
     },
-    // Only used to update the version number of the deprecated library.
-    {
-      pack: 'underscore',
-    },
     {
       pack: 'loadjs',
       files: [{ from: 'dist/loadjs.min.js', to: 'loadjs.min.js' }],
+    },
+    {
+      pack: 'tua-body-scroll-lock',
+      files: [
+        { from: 'dist/tua-bsl.umd.min.js', to: 'tua-bsl.umd.min.js' },
+      ],
+    },
+    {
+      pack: 'transliteration',
+      files: [
+        { from: 'dist/browser/bundle.umd.min.js', to: 'bundle.umd.min.js' },
+        { from: 'dist/browser/bundle.umd.min.js.map', to: 'bundle.umd.min.js.map' },
+      ],
     },
     {
       pack: 'jquery-ui',
@@ -237,17 +175,11 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         'ui/disable-selection.js',
         'ui/focusable.js',
         'ui/form-reset-mixin.js',
-        'ui/form.js',
-        'ui/ie.js',
         'ui/jquery-patch.js',
         'ui/keycode.js',
         'ui/labels.js',
         'ui/plugin.js',
-        'ui/position.js',
-        'ui/safe-active-element.js',
-        'ui/safe-blur.js',
         'ui/scroll-parent.js',
-        'ui/tabbable.js',
         'ui/unique-id.js',
         'ui/version.js',
         'ui/widget.js',
@@ -260,6 +192,15 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         'ui/widgets/menu.js',
         'ui/widgets/mouse.js',
         'ui/widgets/resizable.js',
+      ],
+    },
+    {
+      pack: '@floating-ui/dom',
+      folder: 'floating-ui',
+      library: 'internal.floating-ui',
+      files: [
+        { from: '../core/dist/floating-ui.core.umd.min.js', to: 'floating-ui.core.umd.min.js' },
+        { from: 'dist/floating-ui.dom.umd.min.js', to: 'floating-ui.dom.umd.min.js' },
       ],
     },
     // CKEditor 5 builds the list of files dynamically based on what exists
@@ -334,12 +275,6 @@ const assetsFolder = `${coreFolder}/assets/vendor`;
         // There is no callback simply copy the file.
         console.log(`Copy ${sourceFolder}/${file.from} to ${destFolder}/${file.to}`);
         await copyFile(sourceFile, destFile);
-      }
-
-      // These 2 files come from a zip file that hasn't been updated in years
-      // hardcode the permission fix to pass the commit checks.
-      if (['jquery.joyride-2.1.js', 'marker.png'].includes(file.to)) {
-        await chmod(destFile, 0o644);
       }
     }
   }

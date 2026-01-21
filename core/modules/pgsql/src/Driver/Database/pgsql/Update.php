@@ -2,24 +2,23 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\Query\Update as QueryUpdate;
-use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\pgsql\Driver\Database\pgsql\Update as PgsqlUpdate;
+
+@trigger_error('\Drupal\Core\Database\Driver\pgsql\Update is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL database driver has been moved to the pgsql module. See https://www.drupal.org/node/3129492', E_USER_DEPRECATED);
 
 /**
  * PostgreSQL implementation of \Drupal\Core\Database\Query\Update.
+ *
+ * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL
+ *   database driver has been moved to the pgsql module.
+ *
+ * @see https://www.drupal.org/node/3129492
  */
 class Update extends QueryUpdate {
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(Connection $connection, string $table, array $options = []) {
-    // @todo Remove the __construct in Drupal 11.
-    // @see https://www.drupal.org/project/drupal/issues/3256524
-    parent::__construct($connection, $table, $options);
-    unset($this->queryOptions['return']);
-  }
-
   public function execute() {
     $max_placeholder = 0;
     $blobs = [];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\views\Tests;
 
 use Drupal\views\Plugin\views\PluginBase;
@@ -24,7 +26,7 @@ class TestHelperPlugin extends PluginBase {
    * @see \Drupal\views\Plugin\views\PluginBase::setOptionDefaults()
    */
   public function testSetOptionDefaults(&$storage, $options, $level = 0) {
-    $this->setOptionDefaults($storage, $options, $level);
+    $this->setOptionDefaults($storage, $options);
   }
 
   /**

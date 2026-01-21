@@ -2,45 +2,34 @@ langcode: en
 status: true
 dependencies:
   module:
-    - aggregator
-id: test_aggregator_style_opml
-label: test_aggregator_style_opml
-module: views
-description: ''
+    - comment
+    - user
+id: test_comment_schema
+label: Comments
+module: comment
+description: 'Find and manage comments.'
 tag: default
-base_table: aggregator_feed
-base_field: fid
+base_table: comment_field_data
+base_field: cid
 display:
   default:
-    display_plugin: default
     id: default
     display_title: Default
+    display_plugin: default
     position: 0
     display_options:
-      access:
-        type: none
-      cache:
-        type: tag
-      query:
-        type: views_query
-      exposed_form:
-        type: basic
-      pager:
-        type: full
-        options:
-          items_per_page: 10
-      style:
-        type: default
-      row:
-        type: 'entity:aggregator_feed'
+      title: Comments
       fields:
-        title:
-          id: title
-          table: aggregator_feed
-          field: title
+        subject:
+          id: subject
+          table: comment_field_data
+          field: subject
           relationship: none
           group_type: group
           admin_label: ''
+          entity_type: comment
+          entity_field: subject
+          plugin_id: field
           label: Title
           exclude: false
           alter:
@@ -83,9 +72,9 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: value
-          type: aggregator_title
+          type: comment_permalink
           settings:
-            display_as_link: false
+            link_to_entity: false
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -96,17 +85,68 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+        approve_comment:
+          id: approve_comment
+          table: comment
+          field: approve_comment
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: comment
+          plugin_id: comment_link_approve
+          label: 'Link to approve comment'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          text: Approve
+        status:
+          id: status
+          table: comment_field_data
+          field: status
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: comment
+          entity_field: status
           plugin_id: field
-          entity_type: aggregator_feed
-          entity_field: title
-        url:
-          id: url
-          table: aggregator_feed
-          field: url
-          relationship: none
-          group_type: group
-          admin_label: ''
-          label: URL
+          label: 'Approved status'
           exclude: false
           alter:
             alter_text: false
@@ -147,154 +187,116 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          display_as_link: false
-          plugin_id: url
-          entity_type: aggregator_feed
-          entity_field: url
-        description:
-          id: description
-          table: aggregator_feed
-          field: description
-          relationship: none
-          group_type: group
-          admin_label: ''
-          label: Description
-          exclude: false
-          alter:
-            alter_text: false
-            text: ''
-            make_link: false
-            path: ''
-            absolute: false
-            external: false
-            replace_spaces: false
-            path_case: none
-            trim_whitespace: false
-            alt: ''
-            rel: ''
-            link_class: ''
-            prefix: ''
-            suffix: ''
-            target: ''
-            nl2br: false
-            max_length: 0
-            word_boundary: true
-            ellipsis: true
-            more_link: false
-            more_link_text: ''
-            more_link_path: ''
-            strip_tags: false
-            trim: false
-            preserve_tags: ''
-            html: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: true
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_empty: false
-          empty_zero: false
-          hide_alter_empty: true
-          plugin_id: xss
-          entity_type: aggregator_feed
-          entity_field: description
-        modified:
-          id: modified
-          table: aggregator_feed
-          field: modified
-          relationship: none
-          group_type: group
-          admin_label: ''
-          label: 'Last modified'
-          exclude: false
-          alter:
-            alter_text: false
-            text: ''
-            make_link: false
-            path: ''
-            absolute: false
-            external: false
-            replace_spaces: false
-            path_case: none
-            trim_whitespace: false
-            alt: ''
-            rel: ''
-            link_class: ''
-            prefix: ''
-            suffix: ''
-            target: ''
-            nl2br: false
-            max_length: 0
-            word_boundary: true
-            ellipsis: true
-            more_link: false
-            more_link_text: ''
-            more_link_path: ''
-            strip_tags: false
-            trim: false
-            preserve_tags: ''
-            html: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: true
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_empty: false
-          empty_zero: false
-          hide_alter_empty: true
-          type: timestamp
+          click_sort_column: value
+          type: boolean
           settings:
-            date_format: html_date
-            custom_date_format: ''
-            timezone: ''
-          plugin_id: field
-          entity_type: aggregator_feed
-          entity_field: modified
-      filters: {  }
-      sorts: {  }
-      title: test_style_opml
-      header: {  }
-      footer: {  }
-      empty: {  }
-      relationships: {  }
-      arguments: {  }
-  feed_1:
-    display_plugin: feed
-    id: feed_1
-    display_title: Feed
-    position: 2
-    display_options:
+            format: yes-no
+            format_custom_false: ''
+            format_custom_true: Approved
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
       pager:
-        type: some
+        type: none
+        options:
+          offset: 0
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Filter
+          reset_button: false
+          reset_button_label: Reset
+          exposed_sorts_label: 'Sort by'
+          expose_sort_order: true
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      access:
+        type: perm
+        options:
+          perm: 'administer comments'
+      cache:
+        type: none
+        options: {  }
+      empty: {  }
+      sorts: {  }
+      arguments: {  }
+      filters: {  }
+      filter_groups:
+        operator: AND
+        groups: {  }
       style:
-        type: opml
+        type: table
         options:
           grouping: {  }
+          class: ''
+          row_class: ''
+          default_row_class: false
+          columns:
+            approve_comment: approve_comment
+          default: '-1'
+          info:
+            approve_comment:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+          override: false
+          sticky: false
+          summary: ''
+          empty_table: false
+          caption: ''
+          description: ''
       row:
-        type: opml_fields
+        type: fields
+      query:
+        type: views_query
         options:
-          type_field: rss
-          text_field: title
-          created_field: modified
-          description_field: description
-          html_url_field: ''
-          language_field: ''
-          xml_url_field: url
-          url_field: ''
-      path: test-feed-opml-style
-      displays: {  }
-  page:
-    display_plugin: page
+          query_comment: ''
+          disable_sql_rewrite: false
+          distinct: false
+          replica: false
+          query_tags: {  }
+      relationships: {  }
+      css_class: ''
+      use_ajax: false
+      group_by: false
+      show_admin_links: true
+      use_more: false
+      use_more_always: true
+      use_more_text: more
+      header: {  }
+      footer: {  }
+      hide_attachment_summary: false
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - user.permissions
+      tags: {  }
+      cacheable: false
+  page_1:
     id: page_1
-    display_title: <em>Page</em>
+    display_title: Page
+    display_plugin: page
     position: 1
     display_options:
-      path: test-opml-style
+      display_extenders: {  }
+      path: admin/moderate-comments
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - user.permissions
+      tags: {  }

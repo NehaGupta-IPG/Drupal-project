@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\form_test\StackMiddleware;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +33,7 @@ class FormTestMiddleware implements HttpKernelInterface {
   /**
    * {@inheritdoc}
    */
-  public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = TRUE): Response {
+  public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE): Response {
     $response = $this->httpKernel->handle($request, $type, $catch);
     $response->headers->set('X-Form-Test-Stack-Middleware', 'invoked');
     return $response;

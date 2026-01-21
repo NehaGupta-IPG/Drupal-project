@@ -198,6 +198,7 @@ display:
           order: ASC
           expose:
             label: 'Moderation state'
+            field_identifier: moderation_state
           exposed: true
       arguments: {  }
       filters: {  }
@@ -205,6 +206,7 @@ display:
         type: table
         options:
           grouping: {  }
+          class: ''
           row_class: ''
           default_row_class: true
           columns:

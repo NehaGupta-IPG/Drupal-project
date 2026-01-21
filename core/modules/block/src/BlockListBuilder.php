@@ -107,7 +107,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
    * @return array
    *   The block list as a renderable array.
    */
-  public function render($theme = NULL, Request $request = NULL) {
+  public function render($theme = NULL, ?Request $request = NULL) {
     $this->request = $request;
     $this->theme = $theme;
 
@@ -150,6 +150,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
    * Builds the main "Blocks" portion of the form.
    *
    * @return array
+   *   An array representing the blocks form structure.
    */
   protected function buildBlocksForm() {
     // Build blocks first for each region.
@@ -236,7 +237,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
           'class' => ['use-ajax', 'button', 'button--small'],
           'data-dialog-type' => 'modal',
           'data-dialog-options' => Json::encode([
-            'width' => 700,
+            'width' => 880,
           ]),
         ],
       ];
@@ -355,7 +356,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
+  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
     $operations = parent::getDefaultOperations($entity);
 
     if (isset($operations['edit'])) {

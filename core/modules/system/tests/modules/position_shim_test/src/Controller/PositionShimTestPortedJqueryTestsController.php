@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\position_shim_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 
+/**
+ * Controller for the testing jQuery UI position shim.
+ */
 class PositionShimTestPortedJqueryTestsController extends ControllerBase {
 
   /**
@@ -111,7 +116,7 @@ class PositionShimTestPortedJqueryTestsController extends ControllerBase {
       ],
       '#attached' => [
         'library' => [
-          'core/jquery.ui.position',
+          'core/drupal.jquery.position',
           'position_shim_test/position.shim.test',
         ],
       ],

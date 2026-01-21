@@ -1,18 +1,48 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\Theme;
+
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Stable 9's library overrides.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
+
+  /**
+   * A list of libraries to skip checking, in the format extension/library_name.
+   *
+   * @var string[]
+   */
+  protected $librariesToSkip = [
+    'core/drupal.dialog.off_canvas',
+    'layout_builder/drupal.layout_builder',
+    'views/views.responsive-grid',
+    'field_ui/drupal.field_ui.manage_fields',
+    'comment/drupal.comment-icon',
+    'file/drupal.file-icon',
+    'text/drupal.text-icon',
+    'link/drupal.link-icon',
+    'media/drupal.media-icon',
+    'options/drupal.options-icon',
+    'telephone/drupal.telephone-icon',
+    // This library will be changed in https://www.drupal.org/i/3096017.
+    'workspaces_ui/drupal.workspaces_ui.off-canvas',
+    'workspaces_ui/drupal.workspaces_ui.toolbar',
+    // This library will be removed in https://www.drupal.org/i/3207233.
+    'workspaces_ui/drupal.workspaces_ui.overview',
+  ];
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system', 'user', 'path_alias'];
+  protected static $modules = ['system', 'user'];
 
   /**
    * {@inheritdoc}
@@ -20,7 +50,9 @@ class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
     $this->container->get('theme_installer')->install(['stable9']);
+    $this->config('system.theme')->set('default', 'stable9')->save();
 
     // Enable all core modules.
     $this->enableVisibleAndStableCoreModules();
@@ -33,13 +65,13 @@ class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
   /**
    * Ensures that Stable 9 overrides all relevant core library assets.
    */
-  public function testStable9LibraryOverrides() {
+  public function testStable9LibraryOverrides(): void {
     // First get the clean library definitions with no active theme.
     $libraries_before = $this->getAllLibraries();
     $libraries_before = $this->removeVendorAssets($libraries_before);
 
     $this->themeManager->setActiveTheme($this->themeInitialization->getActiveThemeByName('stable9'));
-    $this->libraryDiscovery->clearCachedDefinitions();
+    $this->libraryDiscovery->clear();
 
     // Now get the library definitions with Stable 9 as the active theme.
     $libraries_after = $this->getAllLibraries();
@@ -52,7 +84,7 @@ class Stable9LibraryOverrideTest extends StableLibraryOverrideTestBase {
           continue;
         }
         // Skip internal libraries.
-        if (substr($library_name, 0, 9) === 'internal.') {
+        if (str_starts_with($library_name, 'internal.')) {
           continue;
         }
         $library_after = $libraries_after[$extension][$library_name];

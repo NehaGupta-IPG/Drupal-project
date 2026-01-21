@@ -75,6 +75,7 @@ class TwigEnvironment extends Environment {
       'cache' => TRUE,
       'debug' => FALSE,
       'auto_reload' => NULL,
+      'use_yield' => TRUE,
     ];
     // Ensure autoescaping is always on.
     $options['autoescape'] = 'html';
@@ -104,9 +105,9 @@ class TwigEnvironment extends Environment {
   /**
    * {@inheritdoc}
    */
-  public function compileSource(Source $source) {
+  public function compileSource(Source $source): string {
     // Note: always use \Drupal\Core\Serialization\Yaml here instead of the
-    // "serializer.yaml" service. This allows the core serializer to utilize
+    // "serialization.yaml" service. This allows the core serializer to utilize
     // core related functionality which isn't available as the standalone
     // component based serializer.
     $frontMatter = FrontMatter::create($source->getCode(), Yaml::class);
@@ -169,7 +170,7 @@ class TwigEnvironment extends Environment {
     $source = $loader->getSourceContext($name);
 
     // Note: always use \Drupal\Core\Serialization\Yaml here instead of the
-    // "serializer.yaml" service. This allows the core serializer to utilize
+    // "serialization.yaml" service. This allows the core serializer to utilize
     // core related functionality which isn't available as the standalone
     // component based serializer.
     try {
@@ -194,7 +195,7 @@ class TwigEnvironment extends Environment {
    * @return string
    *   The template class name.
    */
-  public function getTemplateClass($name, $index = NULL) {
+  public function getTemplateClass(string $name, ?int $index = NULL): string {
     // We override this method to add caching because it gets called multiple
     // times when the same template is used more than once. For example, a page
     // rendering 50 nodes without any node template overrides will use the same

@@ -21,7 +21,9 @@ class Extension {
   protected $type;
 
   /**
-   * The relative pathname of the extension (e.g., 'core/modules/node/node.info.yml').
+   * The relative pathname of the extension.
+   *
+   * An example relative pathname is 'core/modules/node/node.info.yml'.
    *
    * @var string
    */
@@ -51,6 +53,11 @@ class Extension {
   protected $root;
 
   /**
+   * The extension info array.
+   */
+  public array $info;
+
+  /**
    * Constructs a new Extension object.
    *
    * @param string $root
@@ -76,6 +83,7 @@ class Extension {
    * Returns the type of the extension.
    *
    * @return string
+   *   The extension type. This is usually 'module' or 'theme'.
    */
   public function getType() {
     return $this->type;
@@ -85,6 +93,7 @@ class Extension {
    * Returns the internal name of the extension.
    *
    * @return string
+   *   The machine name of the extension.
    */
   public function getName() {
     return basename($this->pathname, '.info.yml');
@@ -94,6 +103,7 @@ class Extension {
    * Returns the relative path of the extension.
    *
    * @return string
+   *   The relative path of the extension.
    */
   public function getPath() {
     return dirname($this->pathname);
@@ -103,6 +113,7 @@ class Extension {
    * Returns the relative path and filename of the extension's info file.
    *
    * @return string
+   *   The relative path and filename of the extension's .info file.
    */
   public function getPathname() {
     return $this->pathname;
@@ -112,6 +123,7 @@ class Extension {
    * Returns the filename of the extension's info file.
    *
    * @return string
+   *   The base name of the extension .info file.
    */
   public function getFilename() {
     return basename($this->pathname);
@@ -121,6 +133,7 @@ class Extension {
    * Returns the relative path of the main extension file, if any.
    *
    * @return string|null
+   *   The relative path for the main extension file, usually the *.module file.
    */
   public function getExtensionPathname() {
     if ($this->filename) {
@@ -132,6 +145,7 @@ class Extension {
    * Returns the name of the main extension file, if any.
    *
    * @return string|null
+   *   The filename of the main extension file, usually the *.module file.
    */
   public function getExtensionFilename() {
     return $this->filename;
@@ -152,15 +166,18 @@ class Extension {
   }
 
   /**
-   * Re-routes method calls to SplFileInfo.
+   * Returns SplFileInfo instance for the extension's info file.
    *
-   * Offers all SplFileInfo methods to consumers; e.g., $extension->getMTime().
+   * @return \SplFileInfo
+   *   The object to access a file information of info file.
+   *
+   * @see https://www.php.net/manual/class.splfileinfo.php
    */
-  public function __call($method, array $args) {
+  public function getFileInfo(): \SplFileInfo {
     if (!isset($this->splFileInfo)) {
       $this->splFileInfo = new \SplFileInfo($this->root . '/' . $this->pathname);
     }
-    return call_user_func_array([$this->splFileInfo, $method], $args);
+    return $this->splFileInfo;
   }
 
   /**
@@ -169,7 +186,7 @@ class Extension {
    * @return array
    *   The names of all variables that should be serialized.
    */
-  public function __sleep() {
+  public function __sleep(): array {
     // @todo \Drupal\Core\Extension\ThemeExtensionList is adding custom
     //   properties to the Extension object.
     $properties = get_object_vars($this);
@@ -182,7 +199,7 @@ class Extension {
   /**
    * Magic method implementation to unserialize the extension object.
    */
-  public function __wakeup() {
+  public function __wakeup(): void {
     // Get the app root from the container. While compiling the container we
     // have to discover all the extension service files in
     // \Drupal\Core\DrupalKernel::initializeServiceProviders(). This results in
@@ -200,13 +217,7 @@ class Extension {
    *   TRUE if an extension is marked as experimental, FALSE otherwise.
    */
   public function isExperimental(): bool {
-    // Currently, this function checks for both the key/value pairs
-    // 'experimental: true' and 'lifecycle: experimental' to determine if an
-    // extension is marked as experimental.
-    // @todo Remove the check for 'experimental: true' as part of
-    // https://www.drupal.org/node/3250342
-    return (isset($this->info['experimental']) && $this->info['experimental'])
-    || (isset($this->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER])
+    return (isset($this->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER])
         && $this->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::EXPERIMENTAL);
   }
 

@@ -5,28 +5,21 @@ namespace Drupal\pgsql\Driver\Database\pgsql;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Query\Insert as QueryInsert;
 
-// cSpell:ignore nextval setval
-
-/**
- * @ingroup database
- * @{
- */
+@trigger_error('\Drupal\Core\Database\Driver\pgsql\Insert is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL database driver has been moved to the pgsql module. See https://www.drupal.org/node/3129492', E_USER_DEPRECATED);
 
 /**
  * PostgreSQL implementation of \Drupal\Core\Database\Query\Insert.
+ *
+ * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL
+ *   database driver has been moved to the pgsql module.
+ *
+ * @see https://www.drupal.org/node/3129492
  */
 class Insert extends QueryInsert {
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(Connection $connection, string $table, array $options = []) {
-    // @todo Remove the __construct in Drupal 11.
-    // @see https://www.drupal.org/project/drupal/issues/3256524
-    parent::__construct($connection, $table, $options);
-    unset($this->queryOptions['return']);
-  }
-
   public function execute() {
     if (!$this->preExecute()) {
       return NULL;
@@ -112,6 +105,9 @@ class Insert extends QueryInsert {
     return $last_insert_id ?? NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function __toString() {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);
@@ -140,11 +136,11 @@ class Insert extends QueryInsert {
       $table_information = $this->connection->schema()->queryTableInformation($this->table);
       if (isset($table_information->serial_fields[0])) {
         // Use RETURNING syntax to get the last insert ID in the same INSERT
-        // query, see https://www.postgresql.org/docs/10/dml-returning.html.
+        // query, see https://www.postgresql.org/docs/12/dml-returning.html.
         $query .= ' RETURNING ' . $table_information->serial_fields[0];
       }
     }
-    catch (DatabaseExceptionWrapper $e) {
+    catch (DatabaseExceptionWrapper) {
       // If we fail to get the table information it is probably because the
       // table does not exist yet so adding the returning statement is pointless
       // because the query will fail. This happens for tables created on demand,

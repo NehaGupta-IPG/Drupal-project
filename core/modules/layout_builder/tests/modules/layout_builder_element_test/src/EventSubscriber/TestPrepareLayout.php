@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\layout_builder_element_test\EventSubscriber;
 
 use Drupal\Core\Messenger\MessengerInterface;
@@ -51,7 +53,7 @@ class TestPrepareLayout implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     // Act before core's layout builder subscriber.
     $events[LayoutBuilderEvents::PREPARE_LAYOUT][] = ['onBeforePrepareLayout', 20];
     // Act after core's layout builder subscriber.

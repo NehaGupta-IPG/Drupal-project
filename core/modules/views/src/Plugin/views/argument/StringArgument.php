@@ -5,6 +5,7 @@ namespace Drupal\views\Plugin\views\argument;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ManyToOneHelper;
@@ -16,15 +17,21 @@ use Drupal\views\ManyToOneHelper;
  * limits.
  *
  * @ingroup views_argument_handlers
- *
- * @ViewsArgument("string")
- */
+  */
+#[ViewsArgument(
+  id: 'string',
+)]
 class StringArgument extends ArgumentPluginBase {
+
+  /**
+   * The many-to-one helper.
+   */
+  public ManyToOneHelper $helper;
 
   /**
    * {@inheritdoc}
    */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
     if (!empty($this->definition['many to one'])) {
@@ -36,6 +43,9 @@ class StringArgument extends ArgumentPluginBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -54,6 +64,9 @@ class StringArgument extends ArgumentPluginBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
 
@@ -132,7 +145,7 @@ class StringArgument extends ArgumentPluginBase {
       ];
     }
 
-    // allow + for or, , for and
+    // Allow '+' for "or". Allow ',' for "and".
     $form['break_phrase'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Allow multiple values'),
@@ -264,6 +277,9 @@ class StringArgument extends ArgumentPluginBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function summaryArgument($data) {
     $value = $this->caseTransform($data->{$this->base_alias}, $this->options['path_case']);
     if (!empty($this->options['transform_dash'])) {
@@ -279,6 +295,9 @@ class StringArgument extends ArgumentPluginBase {
     return $this->t('Alphabetical', [], ['context' => 'Sort order']);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function title() {
     // Support case-insensitive title comparisons for PostgreSQL by converting
     // the title to lowercase.
@@ -317,6 +336,9 @@ class StringArgument extends ArgumentPluginBase {
     return $this->value;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function summaryName($data) {
     return $this->caseTransform(parent::summaryName($data), $this->options['case']);
   }

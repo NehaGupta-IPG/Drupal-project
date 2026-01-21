@@ -5,6 +5,7 @@ namespace Drupal\block_content\Plugin\views\area;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\views\Attribute\ViewsArea;
 use Drupal\views\Plugin\views\area\AreaPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -13,8 +14,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @ingroup views_area_handlers
  *
- * @ViewsArea("block_content_listing_empty")
+ * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement.
+ * @see https://www.drupal.org/node/3336219
  */
+#[ViewsArea("block_content_listing_empty")]
 class ListingEmpty extends AreaPluginBase {
 
   /**
@@ -47,7 +50,7 @@ class ListingEmpty extends AreaPluginBase {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, AccessManagerInterface $access_manager, AccountInterface $current_user) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3336219', E_USER_DEPRECATED);
     $this->accessManager = $access_manager;
     $this->currentUser = $current_user;
   }
@@ -73,7 +76,7 @@ class ListingEmpty extends AreaPluginBase {
       /** @var \Drupal\Core\Access\AccessResultInterface|\Drupal\Core\Cache\CacheableDependencyInterface $access_result */
       $access_result = $this->accessManager->checkNamedRoute('block_content.add_page', [], $this->currentUser, TRUE);
       $element = [
-        '#markup' => $this->t('Add a <a href=":url">custom block</a>.', [':url' => Url::fromRoute('block_content.add_page')->toString()]),
+        '#markup' => $this->t('Add a <a href=":url">content block</a>.', [':url' => Url::fromRoute('block_content.add_page')->toString()]),
         '#access' => $access_result->isAllowed(),
         '#cache' => [
           'contexts' => $access_result->getCacheContexts(),

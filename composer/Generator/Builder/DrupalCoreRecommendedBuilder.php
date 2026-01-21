@@ -30,7 +30,19 @@ class DrupalCoreRecommendedBuilder extends DrupalPackageBuilder {
     }
 
     // Make a list of packages we do not want to put in the 'require' section.
-    $remove_list = ['drupal/core', 'wikimedia/composer-merge-plugin', 'composer/installers'];
+    $remove_list = [
+      'drupal/core',
+      'wikimedia/composer-merge-plugin',
+      'composer/installers',
+      // This package contains no code other than interfaces, so allow sites
+      // to use any compatible version without needing to switch off of
+      // drupal/core-recommended.
+      'psr/http-message',
+      // sebastian/diff is a PHPUnit dependency with an annual major release
+      // cycle. In order to allow supporting multiple PHPUnit major versions,
+      // we cannot let it be pinned.
+      'sebastian/diff',
+    ];
 
     // Copy the 'packages' section from the Composer lock into our 'require'
     // section. There is also a 'packages-dev' section, but we do not need
@@ -51,6 +63,7 @@ class DrupalCoreRecommendedBuilder extends DrupalPackageBuilder {
    * Returns the initial package metadata that describes the metapackage.
    *
    * @return array
+   *   The initial package metadata.
    */
   protected function initialPackageMetadata() {
     return [
@@ -63,6 +76,11 @@ class DrupalCoreRecommendedBuilder extends DrupalPackageBuilder {
       ],
       "require" => [
         "drupal/core" => Composer::drupalVersionBranch(),
+      ],
+      "extra" => [
+        "branch-alias" => [
+          "dev-main" => Composer::drupalVersionBranch(),
+        ],
       ],
     ];
   }

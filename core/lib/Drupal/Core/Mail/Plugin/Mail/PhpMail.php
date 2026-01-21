@@ -2,21 +2,24 @@
 
 namespace Drupal\Core\Mail\Plugin\Mail;
 
+use Drupal\Core\Mail\Attribute\Mail;
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\MailInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 
+// cspell:ignore windir
+
 /**
  * Defines the default Drupal mail backend, using PHP's native mail() function.
- *
- * @Mail(
- *   id = "php_mail",
- *   label = @Translation("Default PHP mailer"),
- *   description = @Translation("Sends the message as plain text, using PHP's native mail() function.")
- * )
  */
+#[Mail(
+  id: 'php_mail',
+  label: new TranslatableMarkup('Default PHP Mailer'),
+  description: new TranslatableMarkup("Sends the message as plain text, using PHP's native mail() function."),
+)]
 class PhpMail implements MailInterface {
 
   /**
@@ -34,10 +37,18 @@ class PhpMail implements MailInterface {
   protected $configFactory;
 
   /**
+   * The currently active request object.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected $request;
+
+  /**
    * PhpMail constructor.
    */
   public function __construct() {
     $this->configFactory = \Drupal::configFactory();
+    $this->request = \Drupal::request();
   }
 
   /**
@@ -53,10 +64,8 @@ class PhpMail implements MailInterface {
     // Join the body array into one string.
     $message['body'] = implode("\n\n", $message['body']);
 
-    // Convert any HTML to plain-text.
+    // Convert any HTML to plain text (which also wraps the mail body).
     $message['body'] = MailFormatHelper::htmlToText($message['body']);
-    // Wrap the mail body for sending.
-    $message['body'] = MailFormatHelper::wrapMail($message['body']);
 
     return $message;
   }
@@ -89,7 +98,7 @@ class PhpMail implements MailInterface {
       if (in_array(strtolower($name), self::MAILBOX_LIST_HEADERS, TRUE)) {
         // Split values by comma, but ignore commas encapsulated in double
         // quotes.
-        $value = str_getcsv($value, ',');
+        $value = str_getcsv($value, escape: '\\');
       }
       $headers->addHeader($name, $value);
     }
@@ -101,12 +110,9 @@ class PhpMail implements MailInterface {
     // line-ending format appropriate for your system. If you need to
     // override this, adjust $settings['mail_line_endings'] in settings.php.
     $mail_body = preg_replace('@\r?\n@', $line_endings, $message['body']);
-    // For headers, PHP's API suggests that we use CRLF normally,
-    // but some MTAs incorrectly replace LF with CRLF. See #234403.
-    $mail_headers = str_replace("\r\n", "\n", $headers->toString());
-    $mail_subject = str_replace("\r\n", "\n", $mail_subject);
+    $mail_headers = $headers->toString();
 
-    if (substr(PHP_OS, 0, 3) != 'WIN') {
+    if (!$this->request->server->has('WINDIR') && !str_contains($this->request->server->get('SERVER_SOFTWARE'), 'Win32')) {
       // On most non-Windows systems, the "-f" option to the sendmail command
       // is used to set the Return-Path. There is no space between -f and
       // the value of the return path.
@@ -152,14 +158,14 @@ class PhpMail implements MailInterface {
    *   Subject of the email to be sent.
    * @param string $message
    *   Message to be sent.
-   * @param array $additional_headers
-   *   (optional) Array to be inserted at the end of the email header.
+   * @param array|string $additional_headers
+   *   (optional) String or array to be inserted at the end of the email header.
    * @param string $additional_params
    *   (optional) Can be used to pass additional flags as command line options.
    *
    * @see mail()
    */
-  protected function doMail(string $to, string $subject, string $message, $additional_headers = [], string $additional_params = ''): bool {
+  protected function doMail(string $to, string $subject, string $message, array|string $additional_headers = [], string $additional_params = ''): bool {
     return @mail(
       $to,
       $subject,

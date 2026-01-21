@@ -6,6 +6,8 @@
  */
 @media print {
   * {
+    /* Black prints faster */
+    /* https://github.com/h5bp/main.css/blob/main/dist/_print.css#L14 */
     color: #000 !important;
     background-color: transparent !important;
     box-shadow: none !important;

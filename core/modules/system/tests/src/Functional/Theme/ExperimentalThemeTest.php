@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the installation of experimental themes.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class ExperimentalThemeTest extends BrowserTestBase {
 
   /**
@@ -40,7 +44,7 @@ class ExperimentalThemeTest extends BrowserTestBase {
    *
    * @dataProvider providerTestExperimentalConfirmForm
    */
-  public function testExperimentalConfirmForm(string $theme_name, string $dependency_theme_name, string $machine_theme_name, string $machine_dependency_theme_name): void {
+  public function testExperimentalConfirmForm(): void {
     // Only experimental themes should be marked as such with a parenthetical.
     $this->drupalGet('admin/appearance');
     $this->assertSession()->responseContains(sprintf($theme_name . ' %s                (experimental theme)', \Drupal::VERSION));
@@ -61,7 +65,7 @@ class ExperimentalThemeTest extends BrowserTestBase {
 
     // The module should not be enabled and there should be a warning and a
     // list of the experimental modules with only this one.
-    $this->assertSession()->pageTextNotContains('The ' . $theme_name . ' theme has been installed.');
+    $this->assertSession()->pageTextNotContains('The Experimental test theme has been installed.');
     $this->assertSession()->pageTextContains('Experimental themes are provided for testing purposes only.');
 
     // There should be no message about enabling dependencies.
@@ -106,7 +110,7 @@ class ExperimentalThemeTest extends BrowserTestBase {
     $this->assertSession()->pageTextNotContains('The following themes are experimental: ' . $dependency_theme_name);
 
     // There should be a message about enabling dependencies.
-    $this->assertSession()->pageTextContains('You must enable the ' . $theme_name . ' theme to install ' . $dependency_theme_name);
+    $this->assertSession()->pageTextContains('You must install the following theme to install Experimental dependency test:Experimental test');
 
     // Enable the theme and confirm that it worked.
     $this->submitForm([], 'Continue');
@@ -125,7 +129,7 @@ class ExperimentalThemeTest extends BrowserTestBase {
     $this->config('system.theme')->set('default', 'test_theme')->save();
     \Drupal::service('theme_handler')->refreshInfo();
     \Drupal::service('theme_installer')->uninstall(
-      [$machine_theme_name, $machine_dependency_theme_name]
+      ['experimental_theme_test', 'experimental_theme_dependency_test']
     );
 
     // Reinstall the same theme, but this time immediately set it as the

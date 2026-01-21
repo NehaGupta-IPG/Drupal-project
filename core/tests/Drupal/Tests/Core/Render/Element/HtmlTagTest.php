@@ -1,21 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Render\Element;
 
+use Drupal\Core\Render\Element\HtmlTag;
 use Drupal\Core\Render\Markup;
 use Drupal\Tests\Core\Render\RendererTestBase;
-use Drupal\Core\Render\Element\HtmlTag;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Render\Element\HtmlTag
- * @group Render
+ * Tests Drupal\Core\Render\Element\HtmlTag.
  */
+#[CoversClass(HtmlTag::class)]
+#[Group('Render')]
 class HtmlTagTest extends RendererTestBase {
 
   /**
-   * @covers ::getInfo
+   * Tests get info.
    */
-  public function testGetInfo() {
+  public function testGetInfo(): void {
     $htmlTag = new HtmlTag([], 'test', 'test');
     $info = $htmlTag->getInfo();
     $this->assertArrayHasKey('#pre_render', $info);
@@ -24,10 +30,10 @@ class HtmlTagTest extends RendererTestBase {
   }
 
   /**
-   * @covers ::preRenderHtmlTag
-   * @dataProvider providerPreRenderHtmlTag
+   * Tests pre render html tag.
    */
-  public function testPreRenderHtmlTag($element, $expected) {
+  #[DataProvider('providerPreRenderHtmlTag')]
+  public function testPreRenderHtmlTag($element, $expected): void {
     $result = HtmlTag::preRenderHtmlTag($element);
     foreach ($result as &$child) {
       if (is_array($child) && isset($child['#tag'])) {
@@ -40,7 +46,7 @@ class HtmlTagTest extends RendererTestBase {
   /**
    * Data provider for preRenderHtmlTag test.
    */
-  public function providerPreRenderHtmlTag() {
+  public static function providerPreRenderHtmlTag(): array {
     $tags = [];
 
     // Value prefix/suffix.
@@ -80,7 +86,10 @@ class HtmlTagTest extends RendererTestBase {
       '#tag' => 'p><script>alert()</script><p',
       '#value' => 'value',
     ];
-    $tags['sanitized-tag'] = [$element, "<p&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;p>value</p&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;p>\n"];
+    $tags['sanitized-tag'] = [
+      $element,
+      "<p&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;p>value</p&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;p>\n",
+    ];
 
     // Ensure that #value is not filtered if it is marked as safe.
     $element = [
@@ -168,7 +177,10 @@ class HtmlTagTest extends RendererTestBase {
         'stroke-width' => 3,
       ],
     ];
-    $tags['path'] = [$element, '<path d="M 100 100 L 300 100 L 200 300 z" fill="orange" stroke="black" stroke-width="3" />' . "\n"];
+    $tags['path'] = [
+      $element,
+      '<path d="M 100 100 L 300 100 L 200 300 z" fill="orange" stroke="black" stroke-width="3" />' . "\n",
+    ];
 
     $element = [
       '#tag' => 'stop',
@@ -200,103 +212,16 @@ class HtmlTagTest extends RendererTestBase {
         ],
       ],
     ];
-    $tags['linearGradient'] = [$element, '<linearGradient><stop offset="5%" stop-color="#F60" />' . "\n" . '<stop offset="95%" stop-color="#FF6" />' . "\n" . '</linearGradient>' . "\n"];
+    $tags['linearGradient'] = [
+      $element,
+      '<linearGradient><stop offset="5%" stop-color="#F60" />' . "\n" . '<stop offset="95%" stop-color="#FF6" />' . "\n" . '</linearGradient>' . "\n",
+    ];
 
     // Simple link.
     $element = [
       '#tag' => 'link',
     ];
     $tags['link'] = [$element, '<link />' . "\n"];
-
-    return $tags;
-  }
-
-  /**
-   * @group legacy
-   * @covers ::preRenderConditionalComments
-   * @dataProvider providerPreRenderConditionalComments
-   */
-  public function testPreRenderConditionalComments($element, $expected, $set_safe = FALSE) {
-    if ($set_safe) {
-      $element['#prefix'] = Markup::create($element['#prefix']);
-      $element['#suffix'] = Markup::create($element['#suffix']);
-    }
-    $this->assertEquals($expected, HtmlTag::preRenderConditionalComments($element));
-  }
-
-  /**
-   * Data provider for conditional comments test.
-   */
-  public function providerPreRenderConditionalComments() {
-    // No browser specification.
-    $element = [
-      '#tag' => 'link',
-    ];
-    $tags['no-browser'] = [$element, $element];
-
-    // Specify all browsers.
-    $element['#browsers'] = [
-      'IE' => TRUE,
-      '!IE' => TRUE,
-    ];
-    $tags['all-browsers'] = [$element, $element];
-
-    // All IE.
-    $element = [
-      '#tag' => 'link',
-      '#browsers' => [
-        'IE' => TRUE,
-        '!IE' => FALSE,
-      ],
-    ];
-    $expected = $element;
-    $expected['#prefix'] = "\n<!--[if IE]>\n";
-    $expected['#suffix'] = "<![endif]-->\n";
-    $tags['all-ie'] = [$element, $expected];
-
-    // Exclude IE.
-    $element = [
-      '#tag' => 'link',
-      '#browsers' => [
-        'IE' => FALSE,
-      ],
-    ];
-    $expected = $element;
-    $expected['#prefix'] = "\n<!--[if !IE]><!-->\n";
-    $expected['#suffix'] = "<!--<![endif]-->\n";
-    $tags['no-ie'] = [$element, $expected];
-
-    // IE gt 8
-    $element = [
-      '#tag' => 'link',
-      '#browsers' => [
-        'IE' => 'gt IE 8',
-      ],
-    ];
-    $expected = $element;
-    $expected['#prefix'] = "\n<!--[if gt IE 8]><!-->\n";
-    $expected['#suffix'] = "<!--<![endif]-->\n";
-    $tags['ie9plus'] = [$element, $expected];
-
-    // Prefix and suffix filtering if not safe.
-    $element = [
-      '#tag' => 'link',
-      '#browsers' => [
-        'IE' => FALSE,
-      ],
-      '#prefix' => '<blink>prefix</blink>',
-      '#suffix' => '<blink>suffix</blink>',
-    ];
-    $expected = $element;
-    $expected['#prefix'] = "\n<!--[if !IE]><!-->\nprefix";
-    $expected['#suffix'] = "suffix<!--<![endif]-->\n";
-    $tags['non-ie-unsafe'] = [$element, $expected];
-
-    // Prefix and suffix filtering if marked as safe. This has to come after the
-    // previous test case.
-    $expected['#prefix'] = "\n<!--[if !IE]><!-->\n<blink>prefix</blink>";
-    $expected['#suffix'] = "<blink>suffix</blink><!--<![endif]-->\n";
-    $tags['non-ie-safe'] = [$element, $expected, TRUE];
 
     return $tags;
   }

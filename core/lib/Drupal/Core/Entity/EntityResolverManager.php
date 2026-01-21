@@ -4,6 +4,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Component\Utility\Reflection;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -33,7 +34,7 @@ class EntityResolverManager {
    *
    * @var \Drupal\Core\Entity\EntityTypeInterface[]
    */
-  protected $entityTypes;
+  protected ?array $entityTypes;
 
   /**
    * Constructs a new EntityRouteAlterSubscriber.
@@ -58,19 +59,19 @@ class EntityResolverManager {
    * and method that would be used. This is not possible for the service:method
    * notation as the runtime container does not allow static introspection.
    *
-   * @see \Drupal\Core\Controller\ControllerResolver::getControllerFromDefinition()
-   * @see \Drupal\Core\Controller\ClassResolver::getInstanceFromDefinition()
-   *
    * @param array $defaults
    *   The default values provided by the route.
    *
    * @return string|null
    *   Returns the controller class, otherwise NULL.
+   *
+   * @see \Drupal\Core\Controller\ControllerResolver::getControllerFromDefinition()
+   * @see \Drupal\Core\Controller\ClassResolver::getInstanceFromDefinition()
    */
   protected function getControllerClass(array $defaults) {
     $controller = NULL;
-    if (isset($defaults['_controller'])) {
-      $controller = $defaults['_controller'];
+    if (isset($defaults[RouteObjectInterface::CONTROLLER_NAME])) {
+      $controller = $defaults[RouteObjectInterface::CONTROLLER_NAME];
     }
 
     if (isset($defaults['_form'])) {
@@ -86,7 +87,7 @@ class EntityResolverManager {
       return NULL;
     }
 
-    if (strpos($controller, ':') === FALSE) {
+    if (!str_contains($controller, ':')) {
       if (method_exists($controller, '__invoke')) {
         return [$controller, '__invoke'];
       }
@@ -105,7 +106,7 @@ class EntityResolverManager {
       [$class_or_service, $method] = explode(':', $controller, 2);
       return [$this->classResolver->getInstanceFromDefinition($class_or_service), $method];
     }
-    elseif (strpos($controller, '::') !== FALSE) {
+    elseif (str_contains($controller, '::')) {
       // Controller in the class::method notation.
       return explode('::', $controller, 2);
     }
@@ -182,13 +183,13 @@ class EntityResolverManager {
     // Do not add parameter information if the route does not declare a
     // parameter in the first place. This is the case for add forms, for
     // example.
-    if (isset($entity_type) && isset($this->getEntityTypes()[$entity_type]) && (strpos($route->getPath(), '{' . $entity_type . '}') !== FALSE)) {
+    if (isset($entity_type) && isset($this->getEntityTypes()[$entity_type]) && str_contains($route->getPath(), '{' . $entity_type . '}')) {
       $parameter_definitions = $route->getOption('parameters') ?: [];
 
       // First try to figure out whether there is already a parameter upcasting
       // the same entity type already.
       foreach ($parameter_definitions as $info) {
-        if (isset($info['type']) && (strpos($info['type'], 'entity:') === 0)) {
+        if (isset($info['type']) && str_starts_with($info['type'], 'entity:')) {
           // The parameter types are in the form 'entity:$entity_type'.
           [, $parameter_entity_type] = explode(':', $info['type'], 2);
           if ($parameter_entity_type == $entity_type) {
@@ -231,6 +232,7 @@ class EntityResolverManager {
    * Gets the list of all entity types.
    *
    * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   *   An array of the entity types.
    */
   protected function getEntityTypes() {
     if (!isset($this->entityTypes)) {

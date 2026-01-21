@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\workspaces\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests concurrent edits in different workspaces.
- *
- * @group workspaces
  */
+#[Group('workspaces')]
+#[RunTestsInSeparateProcesses]
 class WorkspaceConcurrentEditingTest extends BrowserTestBase {
 
   use WorkspaceTestUtilities;
@@ -16,7 +20,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['block', 'node', 'workspaces'];
+  protected static $modules = ['block', 'node', 'workspaces', 'workspaces_ui'];
 
   /**
    * {@inheritdoc}
@@ -26,7 +30,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
   /**
    * Tests editing a node in multiple workspaces.
    */
-  public function testConcurrentEditing() {
+  public function testConcurrentEditing(): void {
     // Create a test node.
     $this->createContentType(['type' => 'test', 'label' => 'Test']);
     $this->setupWorkspaceSwitcherBlock();
@@ -74,7 +78,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
     // Check that the node fails validation for API calls.
     $violations = $test_node->validate();
     $this->assertCount(1, $violations);
-    $this->assertEquals('The content is being edited in the <em class="placeholder">Vultures</em> workspace. As a result, your changes cannot be saved.', $violations->get(0)->getMessage());
+    $this->assertEquals('The content is being edited in the Vultures workspace. As a result, your changes cannot be saved.', $violations->get(0)->getMessage());
 
     // Switch to the Live version of the site and check that the user still can
     // not edit the node.
@@ -87,7 +91,7 @@ class WorkspaceConcurrentEditingTest extends BrowserTestBase {
     // Check that the node fails validation for API calls.
     $violations = $test_node->validate();
     $this->assertCount(1, $violations);
-    $this->assertEquals('The content is being edited in the <em class="placeholder">Vultures</em> workspace. As a result, your changes cannot be saved.', $violations->get(0)->getMessage());
+    $this->assertEquals('The content is being edited in the Vultures workspace. As a result, your changes cannot be saved.', $violations->get(0)->getMessage());
 
     // Publish the changes from the 'Vultures' workspace and check that the node
     // can be edited again in other workspaces.

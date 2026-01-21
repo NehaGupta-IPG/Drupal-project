@@ -43,7 +43,7 @@ class VersionNegotiator {
    *   The name of the negotiation strategy used by the version negotiator.
    */
   public function addVersionNegotiator(VersionNegotiatorInterface $version_negotiator, $negotiator_name) {
-    assert(strpos(get_class($version_negotiator), 'Drupal\\jsonapi\\') === 0, 'Version negotiators are not a public API.');
+    assert(str_starts_with(get_class($version_negotiator), 'Drupal\\jsonapi\\'), 'Version negotiators are not a public API.');
     $this->negotiators[$negotiator_name] = $version_negotiator;
   }
 
@@ -71,10 +71,10 @@ class VersionNegotiator {
       }
       return $this->negotiators[$version_negotiator_name]->getRevision($entity, $version_argument);
     }
-    catch (VersionNotFoundException $exception) {
+    catch (VersionNotFoundException) {
       static::throwNotFoundHttpException($entity, $resource_version_identifier);
     }
-    catch (InvalidVersionIdentifierException $exception) {
+    catch (InvalidVersionIdentifierException) {
       static::throwBadRequestHttpException($resource_version_identifier);
     }
   }

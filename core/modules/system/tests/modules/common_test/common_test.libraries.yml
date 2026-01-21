@@ -41,7 +41,7 @@ js-header:
 # Library to test setting cache = FALSE, to prevent aggregation.
 no-cache:
   js:
-    nocache.js: { cache: false }
+    no_cache.js: { cache: false }
 
 order:
   js:
@@ -99,16 +99,6 @@ hook_js_alter:
     alter.js: {}
   dependencies:
     - core/drupal.tableselect
-
-browsers:
-  js:
-    old-ie.js:
-      browsers:
-        'IE': 'lte IE 8'
-        '!IE': false
-    no-ie.js:
-      browsers:
-        IE: false
 
 querystring:
   js:

@@ -3,6 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
 
 /**
@@ -18,30 +19,28 @@ use Drupal\Core\Render\Element;
  * The value of this form element will always be an array of
  * \Symfony\Component\HttpFoundation\File\UploadedFile objects, regardless of
  * whether #multiple is TRUE or FALSE
- *
- * @FormElement("file")
  */
-class File extends FormElement {
+#[FormElement('file')]
+class File extends FormElementBase {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#input' => TRUE,
       '#multiple' => FALSE,
       '#process' => [
-        [$class, 'processFile'],
+        [static::class, 'processFile'],
       ],
       '#size' => 60,
       '#pre_render' => [
-        [$class, 'preRenderFile'],
+        [static::class, 'preRenderFile'],
       ],
       '#theme' => 'input__file',
       '#theme_wrappers' => ['form_element'],
       '#value_callback' => [
-        [$class, 'valueCallback'],
+        [static::class, 'valueCallback'],
       ],
     ];
   }
@@ -61,7 +60,7 @@ class File extends FormElement {
    * Prepares a #type 'file' render element for input.html.twig.
    *
    * For assistance with handling the uploaded file correctly, see the API
-   * provided by file.inc.
+   * provided by file.api.php.
    *
    * @param array $element
    *   An associative array containing the properties of the element.

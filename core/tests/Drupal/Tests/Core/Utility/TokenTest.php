@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Utility;
 
 use Drupal\Component\Utility\Html;
@@ -10,11 +12,15 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Utility\Token;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Utility\Token
- * @group Utility
+ * Tests Drupal\Core\Utility\Token.
  */
+#[CoversClass(Token::class)]
+#[Group('Utility')]
 class TokenTest extends UnitTestCase {
 
   /**
@@ -77,6 +83,8 @@ class TokenTest extends UnitTestCase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    parent::setUp();
+
     $this->cache = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
 
     $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
@@ -101,9 +109,9 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getInfo
+   * Tests get info.
    */
-  public function testGetInfo() {
+  public function testGetInfo(): void {
     $token_info = [
       'types' => [
         'foo' => [
@@ -147,9 +155,9 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::replace
+   * Tests replace with bubbleable metadata object.
    */
-  public function testReplaceWithBubbleableMetadataObject() {
+  public function testReplaceWithBubbleableMetadataObject(): void {
     $this->moduleHandler->expects($this->any())
       ->method('invokeAll')
       ->willReturn(['[node:title]' => 'hello world']);
@@ -176,9 +184,9 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::replace
+   * Tests replace with hook tokens with bubbleable metadata.
    */
-  public function testReplaceWithHookTokensWithBubbleableMetadata() {
+  public function testReplaceWithHookTokensWithBubbleableMetadata(): void {
     $this->moduleHandler->expects($this->any())
       ->method('invokeAll')
       ->willReturnCallback(function ($hook_name, $args) {
@@ -211,17 +219,19 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::replace
-   * @covers ::replace
+   * Tests replace with hook tokens alter with bubbleable metadata.
+   *
+   * @legacy-covers ::replace
+   * @legacy-covers ::replace
    */
-  public function testReplaceWithHookTokensAlterWithBubbleableMetadata() {
+  public function testReplaceWithHookTokensAlterWithBubbleableMetadata(): void {
     $this->moduleHandler->expects($this->any())
       ->method('invokeAll')
       ->willReturn([]);
 
     $this->moduleHandler->expects($this->any())
       ->method('alter')
-      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata): void {
         $replacements['[node:title]'] = 'hello world';
         $bubbleable_metadata->addCacheContexts(['custom_context']);
         $bubbleable_metadata->addCacheTags(['node:1']);
@@ -249,9 +259,9 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::resetInfo
+   * Tests reset info.
    */
-  public function testResetInfo() {
+  public function testResetInfo(): void {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['token_info']);
@@ -260,10 +270,10 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::replace
-   * @dataProvider providerTestReplaceEscaping
+   * Tests replace escaping.
    */
-  public function testReplaceEscaping($string, array $tokens, $expected) {
+  #[DataProvider('providerTestReplaceEscaping')]
+  public function testReplaceEscaping($string, array $tokens, $expected): void {
     $this->moduleHandler->expects($this->any())
       ->method('invokeAll')
       ->willReturnCallback(function ($type, $args) {
@@ -275,7 +285,7 @@ class TokenTest extends UnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
-  public function providerTestReplaceEscaping() {
+  public static function providerTestReplaceEscaping(): array {
     $data = [];
 
     // No tokens. The first argument to Token::replace() should not be escaped.
@@ -283,7 +293,11 @@ class TokenTest extends UnitTestCase {
     $data['html-in-string'] = ['<h1>Giraffe</h1>', [], '<h1>Giraffe</h1>'];
     $data['html-in-string-quote'] = ['<h1>Giraffe"</h1>', [], '<h1>Giraffe"</h1>'];
 
-    $data['simple-placeholder-with-plain-text'] = ['<h1>[token:meh]</h1>', ['[token:meh]' => 'Giraffe"'], '<h1>' . Html::escape('Giraffe"') . '</h1>'];
+    $data['simple-placeholder-with-plain-text'] = [
+      '<h1>[token:meh]</h1>',
+      ['[token:meh]' => 'Giraffe"'],
+      '<h1>' . Html::escape('Giraffe"') . '</h1>',
+    ];
 
     $data['simple-placeholder-with-safe-html'] = [
       '<h1>[token:meh]</h1>',
@@ -295,9 +309,9 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::replacePlain
+   * Tests replace plain.
    */
-  public function testReplacePlain() {
+  public function testReplacePlain(): void {
     $this->setupSiteTokens();
     $base = 'Wow, great "[site:name]" has a slogan "[site:slogan]"';
     $plain = $this->token->replacePlain($base);
@@ -305,13 +319,36 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
+   * Scans dummy text, then tests the output.
+   */
+  public function testScan(): void {
+    // Define text with valid and not valid, fake and existing token-like
+    // strings.
+    $text = 'First a [valid:simple], but dummy token, and a dummy [valid:token with: spaces].';
+    $text .= 'Then a [not valid:token].';
+    $text .= 'Then an [:empty token type].';
+    $text .= 'Then an [empty token:].';
+    $text .= 'Then a totally empty token: [:].';
+    $text .= 'Last an existing token: [node:author:name].';
+    $token_wannabes = $this->token->scan($text);
+
+    $this->assertTrue(isset($token_wannabes['valid']['simple']), 'A simple valid token has been matched.');
+    $this->assertTrue(isset($token_wannabes['valid']['token with: spaces']), 'A valid token with space characters in the token name has been matched.');
+    $this->assertFalse(isset($token_wannabes['not valid']), 'An invalid token with spaces in the token type has not been matched.');
+    $this->assertFalse(isset($token_wannabes['empty token']), 'An empty token has not been matched.');
+    $this->assertFalse(isset($token_wannabes['']['empty token type']), 'An empty token type has not been matched.');
+    $this->assertFalse(isset($token_wannabes['']['']), 'An empty token and type has not been matched.');
+    $this->assertTrue(isset($token_wannabes['node']), 'An existing valid token has been matched.');
+  }
+
+  /**
    * Sets up the token library to return site tokens.
    */
-  protected function setupSiteTokens() {
+  protected function setupSiteTokens(): void {
     // The site name is plain text, but the slogan is markup.
     $tokens = [
       '[site:name]' => 'Your <best> buys',
-      '[site:slogan]' => Markup::Create('We are <b>best</b>'),
+      '[site:slogan]' => Markup::create('We are <b>best</b>'),
     ];
 
     $this->moduleHandler->expects($this->any())

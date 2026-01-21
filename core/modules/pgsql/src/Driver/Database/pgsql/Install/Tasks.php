@@ -5,20 +5,30 @@ namespace Drupal\pgsql\Driver\Database\pgsql\Install;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Install\Tasks as InstallTasks;
 use Drupal\Core\Database\DatabaseNotFoundException;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+
+// cspell:ignore proname trgm
 
 /**
  * Specifies installation tasks for PostgreSQL databases.
+ *
+ * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL
+ *   database driver has been moved to the pgsql module.
+ *
+ * @see https://www.drupal.org/node/3129492
  */
 class Tasks extends InstallTasks {
+
+  use StringTranslationTrait;
 
   /**
    * Minimum required PostgreSQL version.
    *
    * The contrib extension pg_trgm is supposed to be installed.
    *
-   * @see https://www.postgresql.org/docs/10/pgtrgm.html
+   * @see https://www.postgresql.org/docs/16/pgtrgm.html
    */
-  const PGSQL_MINIMUM_VERSION = '10';
+  const PGSQL_MINIMUM_VERSION = '16';
 
   /**
    * {@inheritdoc}
@@ -42,6 +52,10 @@ class Tasks extends InstallTasks {
       'arguments' => [],
     ];
     $this->tasks[] = [
+      'function' => 'checkExtensions',
+      'arguments' => [],
+    ];
+    $this->tasks[] = [
       'function' => 'initializeDatabase',
       'arguments' => [],
     ];
@@ -51,7 +65,7 @@ class Tasks extends InstallTasks {
    * {@inheritdoc}
    */
   public function name() {
-    return t('PostgreSQL');
+    return $this->t('PostgreSQL');
   }
 
   /**
@@ -103,13 +117,16 @@ class Tasks extends InstallTasks {
         catch (DatabaseNotFoundException $e) {
           // Still no dice; probably a permission issue. Raise the error to the
           // installer.
-          $this->fail(t('Database %database not found. The server reports the following message when attempting to create the database: %error.', ['%database' => $database, '%error' => $e->getMessage()]));
+          $this->fail($this->t('Database %database not found. The server reports the following message when attempting to create the database: %error.', [
+            '%database' => $database,
+            '%error' => $e->getMessage(),
+          ]));
         }
       }
       else {
         // Database connection failed for some other reason than a non-existent
         // database.
-        $this->fail(t('Failed to connect to your database server. The server reports the following message: %error.<ul><li>Is the database server running?</li><li>Does the database exist, and have you entered the correct database name?</li><li>Have you entered the correct username and password?</li><li>Have you entered the correct database hostname and port number?</li></ul>', ['%error' => $e->getMessage()]));
+        $this->fail($this->t('Failed to connect to your database server. The server reports the following message: %error.<ul><li>Is the database server running?</li><li>Does the database exist, and have you entered the correct database name?</li><li>Have you entered the correct username and password?</li><li>Have you entered the correct database hostname and port number?</li></ul>', ['%error' => $e->getMessage()]));
         return FALSE;
       }
     }
@@ -122,17 +139,17 @@ class Tasks extends InstallTasks {
   protected function checkEncoding() {
     try {
       if (Database::getConnection()->query('SHOW server_encoding')->fetchField() == 'UTF8') {
-        $this->pass(t('Database is encoded in UTF-8'));
+        $this->pass($this->t('Database is encoded in UTF-8'));
       }
       else {
-        $this->fail(t('The %driver database must use %encoding encoding to work with Drupal. Recreate the database with %encoding encoding. See <a href="INSTALL.pgsql.txt">INSTALL.pgsql.txt</a> for more details.', [
+        $this->fail($this->t('The %driver database must use %encoding encoding to work with Drupal. Recreate the database with %encoding encoding. See <a href="INSTALL.pgsql.txt">INSTALL.pgsql.txt</a> for more details.', [
           '%encoding' => 'UTF8',
           '%driver' => $this->name(),
         ]));
       }
     }
-    catch (\Exception $e) {
-      $this->fail(t('Drupal could not determine the encoding of the database was set to UTF-8'));
+    catch (\Exception) {
+      $this->fail($this->t('Drupal could not determine the encoding of the database was set to UTF-8'));
     }
   }
 
@@ -155,7 +172,7 @@ class Tasks extends InstallTasks {
       try {
         $database_connection->query($query);
       }
-      catch (\Exception $e) {
+      catch (\Exception) {
         // Ignore possible errors when the user doesn't have the necessary
         // privileges to ALTER the database.
       }
@@ -173,7 +190,7 @@ class Tasks extends InstallTasks {
           '%needed_value' => 'escape',
           '@query' => $query,
         ];
-        $this->fail(t("The %setting setting is currently set to '%current_value', but needs to be '%needed_value'. Change this by running the following query: <code>@query</code>", $replacements));
+        $this->fail($this->t("The %setting setting is currently set to '%current_value', but needs to be '%needed_value'. Change this by running the following query: <code>@query</code>", $replacements));
       }
     }
   }
@@ -207,7 +224,7 @@ class Tasks extends InstallTasks {
       try {
         $database_connection->query($query);
       }
-      catch (\Exception $e) {
+      catch (\Exception) {
         // Ignore possible errors when the user doesn't have the necessary
         // privileges to ALTER the database.
       }
@@ -225,7 +242,7 @@ class Tasks extends InstallTasks {
           '%needed_value' => 'on',
           '@query' => $query,
         ];
-        $this->fail(t("The %setting setting is currently set to '%current_value', but needs to be '%needed_value'. Change this by running the following query: <code>@query</code>", $replacements));
+        $this->fail($this->t("The %setting setting is currently set to '%current_value', but needs to be '%needed_value'. Change this by running the following query: <code>@query</code>", $replacements));
       }
     }
   }
@@ -236,6 +253,30 @@ class Tasks extends InstallTasks {
   protected function checkStandardConformingStringsSuccess() {
     $standard_conforming_strings = Database::getConnection()->query("SHOW standard_conforming_strings")->fetchField();
     return ($standard_conforming_strings == 'on');
+  }
+
+  /**
+   * Generic function to check postgresql extensions.
+   */
+  public function checkExtensions() {
+    $connection = Database::getConnection();
+    try {
+      // Enable pg_trgm for PostgreSQL 13 or higher.
+      $connection->query('CREATE EXTENSION IF NOT EXISTS pg_trgm');
+
+      if ($connection->schema()->extensionExists('pg_trgm')) {
+        $this->pass($this->t('PostgreSQL has the pg_trgm extension enabled.'));
+      }
+      else {
+        $this->fail($this->t('The <a href=":pg_trgm">pg_trgm</a> PostgreSQL extension is not present. The extension is required by Drupal 10 to improve performance when using PostgreSQL. See <a href=":requirements">Drupal database server requirements</a> for more information.', [
+          ':pg_trgm' => 'https://www.postgresql.org/docs/current/pgtrgm.html',
+          ':requirements' => 'https://www.drupal.org/docs/system-requirements/database-server-requirements',
+        ]));
+      }
+    }
+    catch (\Exception $e) {
+      $this->fail($this->t('Drupal could not check for the pg_trgm extension: @error.', ['@error' => $e->getMessage()]));
+    }
   }
 
   /**
@@ -273,10 +314,10 @@ class Tasks extends InstallTasks {
       }
       $connection->query('SELECT pg_advisory_unlock(1)');
 
-      $this->pass(t('PostgreSQL has initialized itself.'));
+      $this->pass($this->t('PostgreSQL has initialized itself.'));
     }
     catch (\Exception $e) {
-      $this->fail(t('Drupal could not be correctly setup with the existing database due to the following error: @error.', ['@error' => $e->getMessage()]));
+      $this->fail($this->t('Drupal could not be correctly setup with the existing database due to the following error: @error.', ['@error' => $e->getMessage()]));
     }
   }
 

@@ -8,14 +8,18 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Database\Statement\FetchAs;
+
+// cspell:ignore mlid
 
 /**
  * Provides a menu tree storage using the database.
  */
 class MenuTreeStorage implements MenuTreeStorageInterface {
+
+  use MenuLinkFieldDefinitions;
 
   /**
    * The maximum depth of a menu links tree.
@@ -72,35 +76,6 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * @var array
    */
   protected $serializedFields;
-
-  /**
-   * List of plugin definition fields.
-   *
-   * @todo Decide how to keep these field definitions in sync.
-   *   https://www.drupal.org/node/2302085
-   *
-   * @see \Drupal\Core\Menu\MenuLinkManager::$defaults
-   *
-   * @var array
-   */
-  protected $definitionFields = [
-    'menu_name',
-    'route_name',
-    'route_parameters',
-    'url',
-    'title',
-    'description',
-    'parent',
-    'weight',
-    'options',
-    'expanded',
-    'enabled',
-    'provider',
-    'metadata',
-    'class',
-    'form_class',
-    'id',
-  ];
 
   /**
    * Constructs a new \Drupal\Core\Menu\MenuTreeStorage.
@@ -200,8 +175,8 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $this->cacheTagsInvalidator->invalidateTags($cache_tags);
     $this->resetDefinitions();
     // Every item in the cache bin should have one of the menu cache tags but it
-    // is not guaranteed, so invalidate everything in the bin.
-    $this->menuCacheBackend->invalidateAll();
+    // is not guaranteed, so delete everything in the bin.
+    $this->menuCacheBackend->deleteAll();
   }
 
   /**
@@ -314,10 +289,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $transaction = $this->connection->startTransaction();
       if (!$original) {
         // Generate a new mlid.
-        // @todo Remove the 'return' option in Drupal 11.
-        // @see https://www.drupal.org/project/drupal/issues/3256524
-        $options = ['return' => Database::RETURN_INSERT_ID] + $this->options;
-        $link['mlid'] = $this->connection->insert($this->table, $options)
+        $link['mlid'] = $this->connection->insert($this->table, $this->options)
           ->fields(['id' => $link['id'], 'menu_name' => $link['menu_name']])
           ->execute();
         $fields = $this->preSave($link, []);
@@ -671,7 +643,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
       $query->condition($name, $value);
     }
-    $loaded = $this->safeExecuteSelect($query)->fetchAllAssoc('id', \PDO::FETCH_ASSOC);
+    $loaded = $this->safeExecuteSelect($query)->fetchAllAssoc('id', FetchAs::Associative);
     foreach ($loaded as $id => $link) {
       $loaded[$id] = $this->prepareLink($link);
     }
@@ -700,7 +672,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $query->orderBy('depth');
     $query->orderBy('weight');
     $query->orderBy('id');
-    $loaded = $this->safeExecuteSelect($query)->fetchAllAssoc('id', \PDO::FETCH_ASSOC);
+    $loaded = $this->safeExecuteSelect($query)->fetchAllAssoc('id', FetchAs::Associative);
     foreach ($loaded as $id => $link) {
       $loaded[$id] = $this->prepareLink($link);
     }
@@ -717,7 +689,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       $query = $this->connection->select($this->table, NULL, $this->options);
       $query->fields($this->table, $this->definitionFields());
       $query->condition('id', $missing_ids, 'IN');
-      $loaded = $this->safeExecuteSelect($query)->fetchAllAssoc('id', \PDO::FETCH_ASSOC);
+      $loaded = $this->safeExecuteSelect($query)->fetchAllAssoc('id', FetchAs::Associative);
       foreach ($loaded as $id => $link) {
         $this->definitions[$id] = $this->prepareLink($link);
       }
@@ -763,7 +735,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $query = $this->connection->select($this->table, NULL, $this->options);
     $query->fields($this->table);
     $query->condition('id', $ids, 'IN');
-    $loaded = $this->safeExecuteSelect($query)->fetchAllAssoc('id', \PDO::FETCH_ASSOC);
+    $loaded = $this->safeExecuteSelect($query)->fetchAllAssoc('id', FetchAs::Associative);
     foreach ($loaded as &$link) {
       foreach ($this->serializedFields() as $name) {
         if (isset($link[$name])) {
@@ -784,7 +756,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     //   https://www.drupal.org/node/2302043
     $subquery->fields($this->table, ['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9']);
     $subquery->condition('id', $id);
-    $result = current($subquery->execute()->fetchAll(\PDO::FETCH_ASSOC));
+    $result = current($subquery->execute()->fetchAll(FetchAs::Associative));
     $ids = array_filter($result);
     if ($ids) {
       $query = $this->connection->select($this->table, NULL, $this->options);
@@ -971,7 +943,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       }
     }
 
-    $links = $this->safeExecuteSelect($query)->fetchAllAssoc('id', \PDO::FETCH_ASSOC);
+    $links = $this->safeExecuteSelect($query)->fetchAllAssoc('id', FetchAs::Associative);
 
     return $links;
   }
@@ -1166,12 +1138,12 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     try {
       $this->connection->schema()->createTable($this->table, static::schemaDefinition());
     }
-    catch (DatabaseException $e) {
+    catch (DatabaseException) {
       // If another process has already created the config table, attempting to
       // recreate it will throw an exception. In this case just catch the
       // exception and do nothing.
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return FALSE;
     }
     return TRUE;
@@ -1198,11 +1170,11 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   /**
    * Determines fields that are part of the plugin definition.
    *
-   * @return array
+   * @return string[]
    *   The list of the subset of fields that are part of the plugin definition.
    */
   protected function definitionFields() {
-    return $this->definitionFields;
+    return array_keys($this->defaults);
   }
 
   /**
@@ -1251,7 +1223,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
         'route_param_key' => [
           'description' => 'An encoded string of route parameters for loading by route.',
           'type' => 'varchar',
-          'length' => 255,
+          'length' => 2048,
         ],
         'route_parameters' => [
           'description' => 'Serialized array of route parameters of this menu link.',
@@ -1263,7 +1235,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
         'url' => [
           'description' => 'The external path this link points to (when not using a route).',
           'type' => 'varchar',
-          'length' => 255,
+          'length' => 2048,
           'not null' => TRUE,
           'default' => '',
         ],

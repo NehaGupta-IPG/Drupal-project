@@ -8,7 +8,7 @@ use Drupal\Core\Database\DatabaseException;
 /**
  * Cache tags invalidations checksum implementation that uses the database.
  */
-class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTagsInvalidatorInterface {
+class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTagsInvalidatorInterface, CacheTagsChecksumPreloadInterface, CacheTagsPurgeInterface {
 
   use CacheTagsChecksumTrait;
 
@@ -70,6 +70,22 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function purge(): void {
+    try {
+      $this->connection->truncate('cachetags')->execute();
+    }
+    catch (\Throwable $e) {
+      // If the table does not exist yet, there is nothing to purge.
+      if (!$this->ensureTableExists()) {
+        throw $e;
+      }
+    }
+    $this->reset();
+  }
+
+  /**
    * Check if the cache tags table exists and create it if not.
    */
   protected function ensureTableExists() {
@@ -81,9 +97,9 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
     // If another process has already created the cachetags table, attempting to
     // recreate it will throw an exception. In this case just catch the
     // exception and do nothing.
-    catch (DatabaseException $e) {
+    catch (DatabaseException) {
     }
-    catch (\Exception $e) {
+    catch (\Exception) {
       return FALSE;
     }
     return TRUE;
@@ -115,30 +131,6 @@ class DatabaseCacheTagsChecksum implements CacheTagsChecksumInterface, CacheTags
       'primary key' => ['tag'],
     ];
     return $schema;
-  }
-
-  /**
-   * Act on an exception when cache might be stale.
-   *
-   * If the {cachetags} table does not yet exist, that's fine but if the table
-   * exists and yet the query failed, then the cache is stale and the
-   * exception needs to propagate.
-   *
-   * @param \Exception $e
-   *   The exception.
-   *
-   * @throws \Exception
-   *
-   * @deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3243014
-   */
-  protected function catchException(\Exception $e) {
-    @trigger_error('\Drupal\Core\Cache\DatabaseCacheTagsChecksum::catchException is deprecated in drupal:9.3.0 and is removed from drupal:10.0.0. There is no replacement. See https://www.drupal.org/node/3243014', E_USER_DEPRECATED);
-    if ($this->connection->schema()->tableExists('cachetags')) {
-      throw $e;
-    }
   }
 
   /**

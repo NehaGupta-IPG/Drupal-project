@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\jsonapi_test_resource_type_building\EventSubscriber;
 
 use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvents;
@@ -16,7 +18,7 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       ResourceTypeBuildEvents::BUILD => [
         ['disableResourceType'],

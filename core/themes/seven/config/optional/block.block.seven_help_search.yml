@@ -5,14 +5,12 @@ dependencies:
     - search
     - system
   theme:
-    - seven
+    - claro
   enforced:
     config:
       - search.page.help_search
-    module:
-      - help_topics
-id: seven_help_search
-theme: seven
+id: claro_help_search
+theme: claro
 region: help
 weight: -4
 provider: null

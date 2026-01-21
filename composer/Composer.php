@@ -98,8 +98,8 @@ class Composer {
   public static function ensureComposerVersion(): void {
     $composerVersion = method_exists(ComposerApp::class, 'getVersion') ?
       ComposerApp::getVersion() : ComposerApp::VERSION;
-    if (Comparator::lessThan($composerVersion, '1.9.0')) {
-      throw new \RuntimeException("Drupal core development requires Composer 1.9.0, but Composer $composerVersion is installed. Please run 'composer self-update'.");
+    if (Comparator::lessThan($composerVersion, '2.3.6')) {
+      throw new \RuntimeException("Drupal core development requires Composer 2.3.6, but Composer $composerVersion is installed. Run 'composer self-update'.");
     }
   }
 
@@ -119,9 +119,10 @@ class Composer {
    * @param string $root
    *   Path to root of drupal/drupal repository.
    * @param string $subprojectType
-   *   Type of subproject - one of Metapackage, Plugin, or Template
+   *   Type of subproject - one of Metapackage, Plugin, or Template.
    *
    * @return \Symfony\Component\Finder\Finder
+   *   A Finder object.
    */
   public static function composerSubprojectPaths(string $root, string $subprojectType): Finder {
     return Finder::create()

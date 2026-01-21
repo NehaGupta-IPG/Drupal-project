@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel;
 
 use Drupal\Core\Database\Database;
@@ -58,12 +60,15 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    */
   protected $logger;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['migrate'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->createMigrationConnection();
     $this->sourceDatabase = Database::getConnection('default', 'migrate');
@@ -94,8 +99,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
     $connection_info = Database::getConnectionInfo('default');
     foreach ($connection_info as $target => $value) {
       $prefix = $value['prefix'];
-      // Simpletest uses 7 character prefixes at most so this can't cause
-      // collisions.
+      // Tests use 7 character prefixes at most so this can't cause collisions.
       $connection_info[$target]['prefix'] = $prefix . '0';
     }
     Database::addConnectionInfo('migrate', 'default', $connection_info['default']);
@@ -104,7 +108,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
   /**
    * {@inheritdoc}
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->cleanupMigrateConnection();
     parent::tearDown();
     $this->collectMessages = FALSE;
@@ -171,7 +175,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
       $this->migration = $migration;
     }
     if ($this instanceof MigrateDumpAlterInterface) {
-      static::migrateDumpAlter($this);
+      $this->migrateDumpAlter($this);
     }
 
     $this->prepareMigration($this->migration);
@@ -187,12 +191,8 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    */
   protected function executeMigrations(array $ids) {
     $manager = $this->container->get('plugin.manager.migration');
-    array_walk($ids, function ($id) use ($manager) {
-      // This is possibly a base plugin ID and we want to run all derivatives.
-      $instances = $manager->createInstances($id);
-      $this->assertNotEmpty($instances, sprintf("No migrations created for id '%s'.", $id));
-      array_walk($instances, [$this, 'executeMigration']);
-    });
+    $instances = $manager->createInstances($ids);
+    array_walk($instances, [$this, 'executeMigration']);
   }
 
   /**
@@ -203,7 +203,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
       $this->migrateMessages[$type][] = $message;
     }
     else {
-      $this->assertEquals('status', $type, $message);
+      $this->assertEquals('status', $type, (string) $message);
     }
   }
 
@@ -251,7 +251,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
   /**
    * Gets the migration plugin.
    *
-   * @param $plugin_id
+   * @param string $plugin_id
    *   The plugin ID of the migration to get.
    *
    * @return \Drupal\migrate\Plugin\Migration

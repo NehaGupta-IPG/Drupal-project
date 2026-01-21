@@ -31,11 +31,7 @@ class CssOptimizer implements AssetOptimizerInterface {
    * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
    */
-  public function __construct(FileUrlGeneratorInterface $file_url_generator = NULL) {
-    if (!$file_url_generator) {
-      @trigger_error('Calling CssOptimizer::__construct() without the $file_url_generator argument is deprecated in drupal:9.3.0. The $file_url_generator argument will be required in drupal:10.0.0. See https://www.drupal.org/node/2940031', E_USER_DEPRECATED);
-      $file_url_generator = \Drupal::service('file_url_generator');
-    }
+  public function __construct(FileUrlGeneratorInterface $file_url_generator) {
     $this->fileUrlGenerator = $file_url_generator;
   }
 
@@ -84,7 +80,9 @@ class CssOptimizer implements AssetOptimizerInterface {
    */
   protected function processFile($css_asset) {
     $contents = $this->loadFile($css_asset['data'], TRUE);
-
+    if ($css_asset['media'] !== 'print' && $css_asset['media'] !== 'all') {
+      $contents = '@media ' . $css_asset['media'] . '{' . $contents . '}' . "\n";
+    }
     $contents = $this->clean($contents);
 
     // Get the parent directory of this file, relative to the Drupal root.
@@ -92,8 +90,13 @@ class CssOptimizer implements AssetOptimizerInterface {
     // Store base path.
     $this->rewriteFileURIBasePath = $css_base_path . '/';
 
-    // Anchor all paths in the CSS with its base URL, ignoring external and absolute paths.
-    return preg_replace_callback('/url\(\s*[\'"]?(?![a-z]+:|\/+)([^\'")]+)[\'"]?\s*\)/i', [$this, 'rewriteFileURI'], $contents);
+    // Anchor all paths in the CSS with its base URL, ignoring external and
+    // absolute paths and paths starting with '#'.
+    return preg_replace_callback(
+      '/url\(\s*[\'"]?(?![a-z]+:|\/+|#|%23)([^\'")]+)[\'"]?\s*\)/i',
+      [$this, 'rewriteFileURI'],
+      $contents
+    );
   }
 
   /**
@@ -108,40 +111,39 @@ class CssOptimizer implements AssetOptimizerInterface {
    * color.module enabled themes with CSS aggregation turned off.
    *
    * Note: the only reason this method is public is so color.module can call it;
-   * it is not on the AssetOptimizerInterface, so future refactorings can make
-   * it protected.
+   * it is not on the AssetOptimizerInterface, so any future refactoring can
+   * make it protected.
    *
-   * @param $file
+   * @param string $file
    *   Name of the stylesheet to be processed.
-   * @param $optimize
+   * @param bool|null $optimize
    *   Defines if CSS contents should be compressed or not.
-   * @param $reset_basepath
+   * @param bool $reset_base_path
    *   Used internally to facilitate recursive resolution of @import commands.
    *
    * @return string
    *   Contents of the stylesheet, including any resolved @import commands.
    */
-  public function loadFile($file, $optimize = NULL, $reset_basepath = TRUE) {
+  public function loadFile($file, $optimize = NULL, $reset_base_path = TRUE) {
     // These statics are not cache variables, so we don't use drupal_static().
-    static $_optimize, $basepath;
-    if ($reset_basepath) {
-      $basepath = '';
+    static $_optimize, $base_path;
+    if ($reset_base_path) {
+      $base_path = '';
     }
-    // Store the value of $optimize for preg_replace_callback with nested
-    // @import loops.
+    // Store $optimize for preg_replace_callback with nested @import loops.
     if (isset($optimize)) {
       $_optimize = $optimize;
     }
 
     // Stylesheets are relative one to each other. Start by adding a base path
     // prefix provided by the parent stylesheet (if necessary).
-    if ($basepath && !StreamWrapperManager::getScheme($file)) {
-      $file = $basepath . '/' . $file;
+    if ($base_path && !StreamWrapperManager::getScheme($file)) {
+      $file = $base_path . '/' . $file;
     }
     // Store the parent base path to restore it later.
-    $parent_base_path = $basepath;
+    $parent_base_path = $base_path;
     // Set the current base path to process possible child imports.
-    $basepath = dirname($file);
+    $base_path = dirname($file);
 
     // Load the CSS stylesheet. We suppress errors because themes may specify
     // stylesheets in their .info.yml file that don't exist in the theme's path,
@@ -153,7 +155,8 @@ class CssOptimizer implements AssetOptimizerInterface {
       if ($encoding = (Unicode::encodingFromBOM($contents))) {
         $contents = mb_substr(Unicode::convertToUtf8($contents, $encoding), 1);
       }
-      // If no BOM, check for fallback encoding. Per CSS spec the regex is very strict.
+      // If no BOM, check for fallback encoding. Per CSS spec the regex is very
+      // strict.
       elseif (preg_match('/^@charset "([^"]+)";/', $contents, $matches)) {
         if ($matches[1] !== 'utf-8' && $matches[1] !== 'UTF-8') {
           $contents = substr($contents, strlen($matches[0]));
@@ -166,7 +169,7 @@ class CssOptimizer implements AssetOptimizerInterface {
     }
 
     // Restore the parent base path as the file and its children are processed.
-    $basepath = $parent_base_path;
+    $base_path = $parent_base_path;
     return $content;
   }
 
@@ -205,9 +208,9 @@ class CssOptimizer implements AssetOptimizerInterface {
   /**
    * Processes the contents of a stylesheet for aggregation.
    *
-   * @param $contents
+   * @param string $contents
    *   The contents of the stylesheet.
-   * @param $optimize
+   * @param bool $optimize
    *   (optional) Boolean whether CSS contents should be minified. Defaults to
    *   FALSE.
    *
@@ -264,7 +267,12 @@ class CssOptimizer implements AssetOptimizerInterface {
     // This happens recursively but omits external files and local files
     // with supports- or media-query qualifiers, as those are conditionally
     // loaded depending on the user agent.
-    $contents = preg_replace_callback('/@import\s*(?:url\(\s*)?[\'"]?(?![a-z]+:)(?!\/\/)([^\'"\()]+)[\'"]?\s*\)?\s*;/', [$this, 'loadNestedFile'], $contents);
+    $contents = preg_replace_callback(
+      '/@import\s*(?:url\(\s*)?[\'"]?(?![a-z]+:)(?!\/\/)([^\'"\()]+)[\'"]?\s*\)?\s*;/', [
+        $this,
+        'loadNestedFile',
+      ],
+      $contents);
 
     return $contents;
   }
@@ -273,8 +281,8 @@ class CssOptimizer implements AssetOptimizerInterface {
    * Prefixes all paths within a CSS file for processFile().
    *
    * Note: the only reason this method is public is so color.module can call it;
-   * it is not on the AssetOptimizerInterface, so future refactorings can make
-   * it protected.
+   * it is not on the AssetOptimizerInterface, so any future refactoring can
+   * make it protected.
    *
    * @param array $matches
    *   An array of matches by a preg_replace_callback() call that scans for
@@ -291,27 +299,7 @@ class CssOptimizer implements AssetOptimizerInterface {
       $last = $path;
       $path = preg_replace('`(^|/)(?!\.\./)([^/]+)/\.\./`', '$1', $path);
     }
-    return 'url(' . $this->getFileUrlGenerator()->generateString($path) . ')';
-  }
-
-  /**
-   * Returns the file URL generator.
-   *
-   * This is provided for BC as sub-classes may not call the parent constructor.
-   *
-   * @return \Drupal\Core\File\FileUrlGeneratorInterface
-   *   The file URL generator.
-   *
-   * @internal
-   *   This can be removed in Drupal 10.0.x when the constructor deprecation is
-   *   removed.
-   */
-  private function getFileUrlGenerator(): FileUrlGeneratorInterface {
-    if (!$this->fileUrlGenerator) {
-      @trigger_error('Calling CssOptimizer::__construct() without the $file_url_generator argument is deprecated in drupal:9.3.0. The $file_url_generator argument will be required in drupal:10.0.0. See https://www.drupal.org/node/2940031', E_USER_DEPRECATED);
-      $this->fileUrlGenerator = \Drupal::service('file_url_generator');
-    }
-    return $this->fileUrlGenerator;
+    return 'url(' . $this->fileUrlGenerator->generateString($path) . ')';
   }
 
 }

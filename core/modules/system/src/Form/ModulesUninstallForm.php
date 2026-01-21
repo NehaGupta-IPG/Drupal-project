@@ -83,15 +83,11 @@ class ModulesUninstallForm extends FormBase {
    * @param \Drupal\Core\Update\UpdateHookRegistry|null $versioning_update_registry
    *   Versioning update registry service.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, ModuleExtensionList $extension_list_module, UpdateHookRegistry $versioning_update_registry = NULL) {
+  public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, ModuleExtensionList $extension_list_module, UpdateHookRegistry $versioning_update_registry) {
     $this->moduleExtensionList = $extension_list_module;
     $this->moduleHandler = $module_handler;
     $this->moduleInstaller = $module_installer;
     $this->keyValueExpirable = $key_value_expirable;
-    if ($versioning_update_registry === NULL) {
-      @trigger_error('The update.update_hook_registry service must be passed to ' . __NAMESPACE__ . '\ModulesUninstallForm::__construct(). It was added in drupal:9.3.0 and will be required before drupal:10.0.0.', E_USER_DEPRECATED);
-      $versioning_update_registry = \Drupal::service('update.update_hook_registry');
-    }
     $this->updateRegistry = $versioning_update_registry;
   }
 
@@ -110,12 +106,10 @@ class ModulesUninstallForm extends FormBase {
     include_once DRUPAL_ROOT . '/core/includes/install.inc';
 
     // Get a list of all available modules that can be uninstalled.
-    $uninstallable = array_filter($this->moduleExtensionList->getList(), function ($module) {
+    $modules = $this->moduleExtensionList->getList();
+    $uninstallable = array_filter($modules, function ($module) {
        return empty($module->info['required']) && $module->status;
     });
-
-    // Include system.admin.inc so we can use the sort callbacks.
-    $this->moduleHandler->loadInclude('system', 'inc', 'system.admin');
 
     $form['filters'] = [
       '#type' => 'container',
@@ -141,7 +135,7 @@ class ModulesUninstallForm extends FormBase {
     $form['modules'] = [];
 
     // Only build the rest of the form if there are any modules available to
-    // uninstall;
+    // uninstall.
     if (empty($uninstallable)) {
       return $form;
     }
@@ -169,6 +163,7 @@ class ModulesUninstallForm extends FormBase {
       $name = $module->info['name'] ?: $module->getName();
       $form['modules'][$module->getName()]['#module_name'] = $name;
       $form['modules'][$module->getName()]['name']['#markup'] = $name;
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $form['modules'][$module->getName()]['description']['#markup'] = $this->t($module->info['description']);
 
       $lifecycle = $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER];
@@ -202,7 +197,13 @@ class ModulesUninstallForm extends FormBase {
       // we can allow this module to be uninstalled.
       foreach (array_keys($module->required_by) as $dependent) {
         if ($this->updateRegistry->getInstalledVersion($dependent) !== $this->updateRegistry::SCHEMA_UNINSTALLED) {
-          $form['modules'][$module->getName()]['#required_by'][] = $dependent;
+          $module_name = $modules[$dependent]->info['name'];
+          if ($dependent != strtolower(str_replace(' ', '_', $module_name))) {
+            $form['modules'][$module->getName()]['#required_by'][] = $module_name . " (" . $dependent . ")";
+          }
+          else {
+            $form['modules'][$module->getName()]['#required_by'][] = $module_name;
+          }
           $form['uninstall'][$module->getName()]['#disabled'] = TRUE;
         }
       }

@@ -100,13 +100,15 @@ interface StreamWrapperInterface extends PhpStreamWrapperInterface {
    * Returns the type of stream wrapper.
    *
    * @return int
+   *   The type of stream wrapper. This should be one of the constants in this
+   *   class.
    */
   public static function getType();
 
   /**
    * Returns the name of the stream wrapper for use in the UI.
    *
-   * @return string
+   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
    *   The stream wrapper name.
    */
   public function getName();
@@ -114,7 +116,7 @@ interface StreamWrapperInterface extends PhpStreamWrapperInterface {
   /**
    * Returns the description of the stream wrapper for use in the UI.
    *
-   * @return string
+   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
    *   The stream wrapper description.
    */
   public function getDescription();
@@ -143,8 +145,8 @@ interface StreamWrapperInterface extends PhpStreamWrapperInterface {
    *
    * This function should return a URL that can be embedded in a web page
    * and accessed from a browser. For example, the external URL of
-   * "youtube://xIpLd0WQKCY" might be
-   * "http://www.youtube.com/watch?v=xIpLd0WQKCY".
+   * "youtube://random_string" might be
+   * "http://www.youtube.com/watch?v=random_string".
    *
    * @return string
    *   Returns a string containing a web accessible URL for the resource.
