@@ -23,7 +23,7 @@
    */
   Drupal.theme.message = ({ text }, { type, id }) => {
     const messagesTypes = Drupal.Message.getMessageTypeLabels();
-    const messageWrapper = document.createElement('div');
+    const messageWrapper = document.createElement('drupal-messages');
 
     messageWrapper.setAttribute(
       'class',
@@ -38,14 +38,12 @@
     messageWrapper.setAttribute('data-drupal-message-type', type);
 
     messageWrapper.innerHTML = `
-    <div class="messages__header">
-      <h2 id="${id}-title" class="messages__title">
-        ${messagesTypes[type]}
-      </h2>
-    </div>
-    <div class="messages__content">
+    <span slot="title">
+      ${messagesTypes[type]}
+    </span>
+    <span slot="content">
       ${text}
-    </div>
+    </span>
   `;
 
     return messageWrapper;
