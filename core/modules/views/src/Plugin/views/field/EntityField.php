@@ -410,7 +410,6 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     // Use the field's main property as default column. If the field item does
     // not define a main property, use the first column as default column.
     $default_column = $field_storage_definition->getMainPropertyName();
-    $column_names = array_keys($field_storage_definition->getColumns());
     if (empty($default_column)) {
       $column_names = array_keys($field_storage_definition->getColumns());
       $default_column = $column_names[0];

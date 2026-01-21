@@ -476,30 +476,6 @@ class ViewsConfigUpdater {
   }
 
   /**
-   * Processes displays and adds pagination_heading_level if necessary.
-   *
-   * @param $compound_handler
-   *   A compound display handler.
-   * @param string $handler_type
-   *   The handler type.
-   *
-   * @return bool
-   *   Whether the handler was updated.
-   */
-  public function processDefaultPagerHeadingUpdate(array &$compound_handler, string $handler_type): bool {
-    $allow_pager_type_update = [
-      'mini',
-      'full',
-    ];
-
-    if ($handler_type === 'pager' && in_array($compound_handler['type'], $allow_pager_type_update) && !isset($compound_handler['options']['pagination_heading_level'])) {
-      $compound_handler['options']['pagination_heading_level'] = 'h4';
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * Checks if there are any fields that have an empty group_column.
    *
    * @param \Drupal\views\ViewEntityInterface $view
