@@ -344,7 +344,7 @@ function template_preprocess_update_fetch_error_message(&$variables): void {
  */
 function update_storage_clear(): void {
   \Drupal::keyValueExpirable('update')->deleteAll();
-  \Drupal::keyValueExpirable('update_available_release')->deleteAll();
+  \Drupal::keyValueExpirable('update_available_releases')->deleteAll();
 }
 
 /**
