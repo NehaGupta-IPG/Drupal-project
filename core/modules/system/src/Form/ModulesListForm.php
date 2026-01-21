@@ -396,6 +396,40 @@ class ModulesListForm extends FormBase {
       }
     }
 
+    // Add a enable link for module which are disabled and can be enabled.
+    if (!$module->status && !$row['enable']['#disabled']) {
+      $row['links']['enable'] = [
+        '#type' => 'link',
+        '#title' => $this->t('Enable <span class="visually-hidden">@module</span>', ['@module' => $module->info['name']]),
+        '#url' => Url::fromRoute('system.admin'),
+        '#options' => [
+          'attributes' => [
+            'class' => ['module-link', 'module-link-enable'],
+          ],
+        ],
+      ];
+    }
+
+    // Transform the links into operations links.
+    if (isset($row['links'])) {
+      $test = [
+        '#type' => 'operations',
+        '#links' => [],
+      ];
+      foreach (['enable', 'configure', 'help', 'permissions', 'disable'] as $operation) {
+        if (isset($row['links'][$operation])) {
+          $test['#links'][$operation] = [
+            'title' => $row['links'][$operation]['#title'],
+            'url' => $row['links'][$operation]['#url'],
+            'attributes' => $row['links'][$operation]['#options']['attributes'] ?? [],
+          ];
+        }
+      }
+
+      // Simply replace for now.
+      $row['links'] = $test;
+    }
+
     return $row;
   }
 
