@@ -58,7 +58,6 @@ class ViewsFormTest extends ViewTestBase {
     $action = $form->getAttribute('action');
 
     $this->assertSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
-    $this->assertNotSame('/test_bulk_form', $action);
   }
 
 }
