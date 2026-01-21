@@ -22,6 +22,7 @@ use Drupal\media\OEmbed\UrlResolverInterface;
 use Drupal\media\Plugin\media\Source\OEmbedInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+// cspell:ignore allowtransparency
 /**
  * Plugin implementation of the 'oembed' formatter.
  *

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Theme;
 
-use Drupal\Core\Extension\ExtensionLifecycle;
-use Drupal\KernelTests\KernelTestBase;
-
 /**
  * Tests the behavior of a theme when base_theme info key is missing.
  */

@@ -64,6 +64,21 @@ class InstallerExistingConfigSyncDirectoryMultilingualTest extends InstallerConf
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function prepareEnvironment() {
+    parent::prepareEnvironment();
+    // Place custom local translations in the translations directory and fix up
+    // configuration.
+    mkdir($this->publicFilesDirectory . '/translations', 0777, TRUE);
+    file_put_contents($this->publicFilesDirectory . '/translations/drupal-8.0.0.es.po', $this->getPo('es'));
+    $locale_settings = Yaml::decode(file_get_contents($this->siteDirectory . '/config/sync/locale.settings.yml'));
+    $locale_settings['translation']['use_source'] = 'local';
+    $locale_settings['translation']['path'] = $this->publicFilesDirectory . '/translations';
+    file_put_contents($this->siteDirectory . '/config/sync/locale.settings.yml', Yaml::encode($locale_settings));
+  }
+
+  /**
    * Confirms that the installation installed the configuration correctly.
    */
   public function testConfigSync(): void {

@@ -71,6 +71,12 @@
   }
 }
 
+@media (forced-colors: active) {
+  .progress__bar {
+    background-color: canvastext;
+  }
+}
+
 .progress__label {
   margin-block-end: var(--progress-bar-spacing-size);
   font-size: var(--progress-bar-label-font-size);

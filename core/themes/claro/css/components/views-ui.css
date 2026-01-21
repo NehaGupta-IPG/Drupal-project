@@ -105,6 +105,14 @@ details.fieldset-no-legend {
   line-height: var(--input-line-height--small);
 }
 
+[dir="ltr"] .views-ui-dialog .form-element--type-select {
+  padding-right: calc(2rem - 1px);
+}
+
+[dir="rtl"] .views-ui-dialog .form-element--type-select {
+  padding-left: calc(2rem - 1px);
+}
+
 .views-ui-dialog .form-element--type-select {
   padding-inline-end: calc(2rem - var(--input-border-size));
   background-position-y: 56%;

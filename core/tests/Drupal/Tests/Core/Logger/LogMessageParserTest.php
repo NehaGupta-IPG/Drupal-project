@@ -111,6 +111,13 @@ class LogMessageParserTest extends UnitTestCase {
         ['message' => 'mixed @a @b @c', 'context' => ['@a' => NULL, '@b' => TRUE, '@c' => FALSE]],
         ['message' => 'mixed @a @b @c', 'context' => ['@a' => NULL, '@b' => TRUE, '@c' => FALSE]],
       ],
+
+      // Test removal of unexpected placeholders like ! while allowed
+      // placeholders beginning with @, % and : are preserved.
+      [
+        ['message' => 'Test placeholder with :url and old !bang parameter', 'context' => [':url' => 'https://drupal.org', '!bang' => 'foo bar']],
+        ['message' => 'Test placeholder with :url and old !bang parameter', 'context' => [':url' => 'https://drupal.org']],
+      ],
     ];
   }
 

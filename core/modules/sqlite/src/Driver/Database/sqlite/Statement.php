@@ -8,11 +8,10 @@ use Drupal\Core\Database\StatementPrefetchIterator;
 /**
  * SQLite implementation of \Drupal\Core\Database\Statement.
  *
- * The PDO SQLite driver only closes SELECT statements when the PDOStatement
- * destructor is called and SQLite does not allow data change (INSERT,
- * UPDATE etc) on a table which has open SELECT statements. This is a
- * user-space mock of PDOStatement that buffers all the data and doesn't
- * have those limitations.
+ * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The SQLite
+ *   database driver has been moved to the sqlite module.
+ *
+ * @see https://www.drupal.org/node/3129492
  */
 class Statement extends StatementPrefetchIterator implements StatementInterface {
 

@@ -25,6 +25,7 @@
   font-size: small;
   line-height: 1;
 }
+
 @media print {
   #toolbar-administration {
     display: none;
@@ -212,6 +213,7 @@
 .toolbar-tray-open.toolbar-vertical.toolbar-fixed {
   margin-inline-start: 15rem;
 }
+
 @media print {
   .toolbar-tray-open.toolbar-vertical.toolbar-fixed {
     margin-inline-start: 0;

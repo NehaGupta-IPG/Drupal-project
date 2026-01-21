@@ -957,3 +957,33 @@ abstract class EntityTypeManagerTestEntityBundle extends EntityTypeManagerTestEn
   }
 
 }
+
+/**
+ * Provides a bundle specific class with dummy static method implementations.
+ */
+abstract class EntityTypeManagerTestEntityBundle extends EntityTypeManagerTestEntity {
+
+  /**
+   * The bundle class field definitions.
+   *
+   * @var array[]
+   *   Keys are entity type IDs, values are arrays of which the keys are bundle
+   *   names and the values are field definitions.
+   */
+  public static $bundleClassFieldDefinitions = [];
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function bundleFieldDefinitions(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions) {
+    $definitions = parent::bundleFieldDefinitions($entity_type, $bundle, $base_field_definitions);
+
+    if (isset(static::$bundleClassFieldDefinitions[$entity_type->id()][$bundle])) {
+      $definitions += static::$bundleClassFieldDefinitions[$entity_type->id()][$bundle];
+    }
+
+    return $definitions;
+
+  }
+
+}

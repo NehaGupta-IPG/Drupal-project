@@ -99,4 +99,16 @@ class UserRoleEntityTest extends KernelTestBase {
     $this->assertSame(['a', 'c'], $role->getPermissions());
   }
 
+  public function testPermissionRevokeAndConfigSync() {
+    $role = Role::create(['id' => 'test_role', 'label' => 'Test role']);
+    $role->setSyncing(TRUE);
+    $role->grantPermission('a')
+      ->grantPermission('b')
+      ->grantPermission('c')
+      ->save();
+    $this->assertSame(['a', 'b', 'c'], $role->getPermissions());
+    $role->revokePermission('b')->save();
+    $this->assertSame(['a', 'c'], $role->getPermissions());
+  }
+
 }

@@ -33,6 +33,10 @@
  */
 
 .button {
+  border: 1px solid transparent !important;
+}
+
+.button {
   display: inline-block;
   margin-block: var(--space-m);
   margin-inline: 0 var(--space-s);

@@ -107,6 +107,13 @@
         mask-repeat: no-repeat;
         mask-position: center;
       }
+
+      @media (forced-colors: active) {
+        background: buttontext;
+        mask-image: url("../../images/search--white.svg");
+        mask-repeat: no-repeat;
+        mask-position: center;
+      }
     }
 
     &:focus {

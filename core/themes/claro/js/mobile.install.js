@@ -11,7 +11,6 @@
     }
     return 0;
   }
-
   function installStepsSetup() {
     const steps = document.querySelectorAll('.task-list li');
     if (steps.length) {
@@ -22,7 +21,6 @@
       header.appendChild(stepIndicator);
     }
   }
-
   if (document.addEventListener) {
     document.addEventListener('DOMContentLoaded', installStepsSetup);
   }

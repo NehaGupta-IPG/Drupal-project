@@ -112,7 +112,6 @@
         // Total displacement is the sum of the elements placement and size.
         displacement = placement + $el.outerHeight();
         break;
-
       case 'left':
         // Total displacement is the sum of the elements placement and size.
         displacement = placement + $el.outerWidth();
@@ -123,11 +122,9 @@
       case 'bottom':
         displacement = documentElement.clientHeight - placement;
         break;
-
       case 'right':
         displacement = documentElement.clientWidth - placement;
         break;
-
       default:
         displacement = 0;
     }

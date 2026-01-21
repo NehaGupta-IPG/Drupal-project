@@ -38,7 +38,6 @@
         callback();
         return;
       }
-
       $.ajax({
         url: Drupal.url('history/get_node_read_timestamps'),
         type: 'POST',

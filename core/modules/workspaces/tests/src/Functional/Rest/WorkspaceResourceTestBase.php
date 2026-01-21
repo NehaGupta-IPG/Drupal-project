@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Functional\Rest;
 
-use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
+use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\user\Entity\User;
 use Drupal\workspaces\Entity\Workspace;
 
 /**
  * Base class for workspace EntityResource tests.
  */
-abstract class WorkspaceResourceTestBase extends EntityResourceTestBase {
+abstract class WorkspaceResourceTestBase extends ConfigEntityResourceTestBase {
 
   /**
    * {@inheritdoc}

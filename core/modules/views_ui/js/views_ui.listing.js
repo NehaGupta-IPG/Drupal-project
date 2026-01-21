@@ -47,7 +47,6 @@
           $rows.show();
         }
       }
-
       if ($table.length) {
         $rows = $table.find('tbody tr');
         $(input).on('keyup', filterViewList);

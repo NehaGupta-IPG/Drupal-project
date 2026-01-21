@@ -46,6 +46,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class Container implements ContainerInterface, ResetInterface {
 
+  use ServiceIdHashTrait;
+
   /**
    * The parameters of the container.
    *

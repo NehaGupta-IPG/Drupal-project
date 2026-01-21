@@ -67,6 +67,8 @@ class ToolbarCacheContextsTest extends BrowserTestBase {
 
   /**
    * Tests toolbar cache integration.
+   *
+   * @group legacy
    */
   public function testCacheIntegration(): void {
     $this->installExtraModules(['csrf_test', 'dynamic_page_cache']);

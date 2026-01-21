@@ -45,6 +45,9 @@
         "symfony/lock": "^7.4",
         "symfony/var-dumper": "^7.4"
     },
+    "conflict": {
+        "phpunit/phpunit": "^9.6"
+    },
     "replace": {
         "symfony/polyfill-php72": "*",
         "symfony/polyfill-php73": "*",

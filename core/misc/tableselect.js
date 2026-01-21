@@ -161,7 +161,6 @@
       // target checkbox.
       $i.toggleClass('selected', state);
       $i.find('input[type="checkbox"]').prop('checked', state);
-
       if (to.nodeType) {
         // If we are at the end of the range, stop.
         if (i === to) {

@@ -30,7 +30,6 @@
           'none'
       : false;
   }
-
   Drupal.olivero.isDesktopNav = isDesktopNav;
 
   const stickyHeaderToggleButton = document.querySelector(

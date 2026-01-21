@@ -45,11 +45,33 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
    *
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The event to process.
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:10.0.0. Use
+   *   \Drupal\user\EventSubscriber::onMaintenanceModeRequest() instead.
+   *
+   * @see https://www.drupal.org/node/3255799
    */
   public function onMaintenanceModeRequest(RequestEvent $event) {
     // If the site is offline, log out unprivileged users.
     if ($this->account->isAuthenticated()) {
       user_logout();
+    }
+  }
+
+  /**
+   * Logout users if site is in maintenance mode and user is not exempt.
+   *
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   *   The event to process.
+   */
+  public function onMaintenanceModeRequest(RequestEvent $event) {
+    // If the site is offline, log out unprivileged users.
+    if ($this->account->isAuthenticated()) {
+      user_logout();
+      // Redirect to homepage.
+      $event->setResponse(
+        new RedirectResponse(Url::fromRoute('<front>')->toString())
+      );
     }
   }
 

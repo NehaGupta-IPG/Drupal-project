@@ -10,6 +10,11 @@ use Drupal\Core\Database\Install\Tasks as InstallTasks;
 
 /**
  * Specifies installation tasks for SQLite databases.
+ *
+ * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The SQLite
+ *   database driver has been moved to the sqlite module.
+ *
+ * @see https://www.drupal.org/node/3129492
  */
 class Tasks extends InstallTasks {
 

@@ -2,23 +2,17 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
-use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\pgsql\Driver\Database\pgsql\Schema as PgsqlSchema;
 
-// cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
-// cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
-// cSpell:ignore contype fillfactor indexname indexrelid indisprimary indkey
-// cSpell:ignore indrelid nextval nspname regclass relkind relname relnamespace
-// cSpell:ignore schemaname setval
-
-/**
- * @addtogroup schemaapi
- * @{
- */
+@trigger_error('\Drupal\Core\Database\Driver\pgsql\Schema is deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL database driver has been moved to the pgsql module. See https://www.drupal.org/node/3129492', E_USER_DEPRECATED);
 
 /**
  * PostgreSQL implementation of \Drupal\Core\Database\Schema.
+ *
+ * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The PostgreSQL
+ *   database driver has been moved to the pgsql module.
+ *
+ * @see https://www.drupal.org/node/3129492
  */
 class Schema extends DatabaseSchema {
 

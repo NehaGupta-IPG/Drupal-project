@@ -26,6 +26,37 @@
 
 /* Four column layout. */
 
+/* Two column layout. */
+
+@media (min-width: 43.75rem) {
+  .layout--fourcol-section > .layout__region--first,
+  .layout--fourcol-section > .layout__region--second {
+    margin-bottom: 2.25rem;
+  }
+
+  [dir="ltr"] .layout--fourcol-section > .layout__region--first,
+  [dir="ltr"] .layout--fourcol-section > .layout__region--third {
+    margin-right: 1.125rem;
+  }
+
+  [dir="rtl"] .layout--fourcol-section > .layout__region--first,
+  [dir="rtl"] .layout--fourcol-section > .layout__region--third {
+    margin-left: 1.125rem;
+  }
+
+  [dir="ltr"] .layout--fourcol-section > .layout__region--second,
+  [dir="ltr"] .layout--fourcol-section > .layout__region--fourth {
+    margin-left: 1.125rem;
+  }
+
+  [dir="rtl"] .layout--fourcol-section > .layout__region--second,
+  [dir="rtl"] .layout--fourcol-section > .layout__region--fourth {
+    margin-right: 1.125rem;
+  }
+}
+
+/* Four column layout. */
+
 @media (min-width: 62.5rem) {
   .layout--fourcol-section {
     --layout-fourcol-grid: repeat(4, minmax(0, 1fr));

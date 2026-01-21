@@ -393,6 +393,7 @@ drupal.ajax:
     - core/jquery
     - core/drupal
     - core/drupalSettings
+    - core/drupal.nodelist.foreach
     - core/drupal.progress
     - core/once
     - core/tabbable
@@ -468,6 +469,11 @@ drupal.autocomplete:
     - core/drupal.ajax
     - core/drupal.jquery.position
     - core/tabbable
+
+drupal.array.includes:
+  version: VERSION
+  js:
+    misc/polyfills/array.includes.js: { weight: -20 }
 
 drupal.batch:
   version: VERSION
@@ -807,6 +813,7 @@ drupal.timezone:
   js:
     misc/timezone.js: {}
   dependencies:
+    - core/drupal.nodelist.foreach
     - core/jquery
     - core/once
     - core/drupal
@@ -875,6 +882,20 @@ internal.jquery.form:
     gpl-compatible: true
   js:
     misc/jquery.form.js: {}
+  dependencies:
+    - core/jquery
+  deprecated: The %library_id% asset library is deprecated in Drupal 9.4.0 and will be removed in Drupal 10.0.0.
+
+internal.jquery.form:
+  # Internal library. Do not depend on it outside core nor add new core usage.
+  remote: https://github.com/jquery-form/form
+  version: "4.3.0"
+  license:
+    name: GNU-GPL-2.0-or-later
+    url: https://raw.githubusercontent.com/jquery-form/form/master/LICENSE
+    gpl-compatible: true
+  js:
+    assets/vendor/jquery-form/jquery.form.min.js: { minified: true }
   dependencies:
     - core/jquery
 
@@ -954,6 +975,24 @@ internal.underscore:
     gpl-compatible: true
   js:
     assets/vendor/underscore/underscore-min.js: { weight: -20, minified: true }
+  deprecated: The %library_id% asset library is deprecated in Drupal 9.4.0 and will be removed in Drupal 10.0.0.
+
+internal.underscore:
+  # Internal library. Do not depend on it outside core nor add new core usage.
+  # The library will be removed as soon as the following issues are fixed:
+  #  - https://www.drupal.org/project/drupal/issues/3270395
+  #  - https://www.drupal.org/project/drupal/issues/3203920
+  #  - https://www.drupal.org/project/drupal/issues/3204011
+  #  - https://www.drupal.org/project/drupal/issues/3204015
+  remote: https://github.com/jashkenas/underscore
+  version: "1.13.6"
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/jashkenas/underscore/1.13.6/LICENSE
+    gpl-compatible: true
+  js:
+    assets/vendor/underscore/underscore-min.js: { weight: -20, minified: true }
+
 
 
 drupal.dialog.off_canvas:

@@ -217,6 +217,16 @@ $.widget( "ui.autocomplete", {
 				role: null
 			} )
 			.hide()
+
+			// Support: IE 11 only, Edge <= 14
+			// For other browsers, we preventDefault() on the mousedown event
+			// to keep the dropdown from taking focus from the input. This doesn't
+			// work for IE/Edge, causing problems with selection and scrolling (#9638)
+			// Happily, IE and Edge support an "unselectable" attribute that
+			// prevents an element from receiving focus, exactly what we want here.
+			.attr( {
+				"unselectable": "on"
+			} )
 			.menu( "instance" );
 
 		this._addClass( this.menu.element, "ui-autocomplete", "ui-front" );

@@ -93,6 +93,13 @@
   }
 }
 
+@media (-ms-high-contrast: active), (forced-colors: active) {
+  .form-boolean {
+    -webkit-appearance: auto;
+    appearance: auto;
+  }
+}
+
 .form-boolean--type-radio {
   width: 1.1875rem;
   height: 1.1875rem;

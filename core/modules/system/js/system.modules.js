@@ -33,7 +33,6 @@
         const $visibleRows = $packDetails.find('tbody tr:visible');
         $packDetails.toggle($visibleRows.length > 0);
       }
-
       function filterModuleList(e) {
         const query = e.target.value;
         // Case insensitive expression to find query at the beginning of a word.
@@ -89,14 +88,12 @@
             .attr('open', false);
         }
       }
-
       function preventEnterKey(event) {
         if (event.which === 13) {
           event.preventDefault();
           event.stopPropagation();
         }
       }
-
       if ($table.length) {
         $rowsAndDetails = $table.find('tr, details');
         $rows = $table.find('tbody tr');

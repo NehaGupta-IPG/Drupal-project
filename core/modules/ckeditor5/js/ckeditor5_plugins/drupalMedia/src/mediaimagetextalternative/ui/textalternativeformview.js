@@ -45,6 +45,22 @@ export default class TextAlternativeFormView extends View {
     this.labeledInput = this._createLabeledInputView();
 
     /**
+     * The default alt text.
+     *
+     * @observable
+     *
+     * @member {string} #defaultAltText
+     */
+    this.set('defaultAltText', undefined);
+
+    /**
+     * The default alt text view.
+     *
+     * @type {module:ui/template~Template}
+     */
+    this.defaultAltTextView = this._createDefaultAltTextView();
+
+    /**
      * A button used to submit the form.
      */
     this.saveButtonView = this._createButton(

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Kernel;
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\views\ViewsConfigUpdater;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;

@@ -25,6 +25,19 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class ToolkitGdTest extends KernelTestBase {
 
   /**
+   * Colors that are used in testing.
+   */
+  protected const BLACK              = [0, 0, 0, 0];
+  protected const RED                = [255, 0, 0, 0];
+  protected const GREEN              = [0, 255, 0, 0];
+  protected const BLUE               = [0, 0, 255, 0];
+  protected const YELLOW             = [255, 255, 0, 0];
+  protected const WHITE              = [255, 255, 255, 0];
+  protected const TRANSPARENT        = [0, 0, 0, 127];
+  protected const FUCHSIA            = [255, 0, 255, 0];
+  protected const ROTATE_TRANSPARENT = [255, 255, 255, 127];
+
+  /**
    * The image factory service.
    */
   protected ImageFactory $imageFactory;

@@ -48,8 +48,8 @@ class PathPluginTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp($import_test_views = TRUE): void {
-    parent::setUp($import_test_views);
+  protected function setUp($import_test_views = TRUE, $modules = ['node_test_views']): void {
+    parent::setUp($import_test_views, $modules);
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');

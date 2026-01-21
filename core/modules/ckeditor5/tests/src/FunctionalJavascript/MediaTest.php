@@ -65,6 +65,24 @@ class MediaTest extends MediaTestBase {
   }
 
   /**
+   * Tests that `<drupal-media>` is converted into a block element.
+   */
+  public function testConversion() {
+    // Wrap the `<drupal-media>` markup in a `<p>`.
+    $original_value = $this->host->body->value;
+    $this->host->body->value = '<p>foo' . $original_value . '</p>';
+    $this->host->save();
+
+    $this->drupalGet($this->host->toUrl('edit-form'));
+    $this->waitForEditor();
+    $assert_session = $this->assertSession();
+    $assert_session->waitForElementVisible('css', 'img[src*="image-test.png"]', 1000);
+    $editor_html = $this->getEditorDataAsHtmlString();
+    // Observe that `<drupal-media>` was moved into its own block element.
+    $this->assertEquals('<p>foo</p>' . $original_value, str_replace('&nbsp;', '', $editor_html));
+  }
+
+  /**
    * Tests that only <drupal-media> tags are processed.
    *
    * @see \Drupal\Tests\media\Kernel\MediaEmbedFilterTest::testOnlyDrupalMediaTagProcessed()

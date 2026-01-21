@@ -54,7 +54,6 @@
       .querySelector('[data-drupal-selector="primary-nav-menu-🥕"]')
       .classList.toggle('is-active-menu-parent', state);
   }
-
   Drupal.olivero.toggleSubNav = toggleSubNav;
 
   /**
@@ -144,7 +143,6 @@
       toggleSubNav(el, false);
     });
   }
-
   Drupal.olivero.closeAllSubNav = closeAllSubNav;
 
   /**
@@ -169,7 +167,6 @@
 
     return subNavsAreOpen;
   }
-
   Drupal.olivero.areAnySubNavsOpen = areAnySubNavsOpen;
 
   // Ensure that desktop submenus close when escape key is pressed.

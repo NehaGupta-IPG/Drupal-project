@@ -46,6 +46,7 @@
       }
     }
   }
+}
 
   & p {
     margin-block-start: var(--sp);
@@ -119,6 +120,7 @@
       line-height: var(--sp3-5);
     }
   }
+}
 
   @media (min-width: 43.75rem) {
     font-size: 1.125rem;

@@ -14,6 +14,15 @@
   z-index: 1;
 }
 
+/**
+ * Creates stacking context ensuring that child elements can never appear in
+ * front of mobile navigation.
+ */
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
 .site-footer__inner {
   padding-block: var(--sp2);
 

@@ -26,6 +26,15 @@ h3 {
   font-size: var(--font-size-h4);
 }
 
+h1,
+h2 {
+  font-size: 1.602rem;
+}
+
+h3 {
+  font-size: 1.424rem;
+}
+
 .site-name {
   margin-top: var(--space-s);
   word-wrap: break-word;
@@ -46,6 +55,15 @@ h3 {
 
 .title--broad {
   font-size: var(--font-size-h1);
+}
+
+.title {
+  margin-top: 0;
+  font-size: 1.602rem;
+}
+
+.title--broad {
+  font-size: 2.027rem;
 }
 
 .site-name,
@@ -165,6 +183,10 @@ h3 {
   .layout-container {
     margin: 1.25em;
     padding: var(--space-m) var(--space-l);
+  }
+
+  .layout-sidebar-first {
+    display: none;
   }
 
   .layout-sidebar-first {

@@ -405,7 +405,6 @@
         const isChecked = event.currentTarget.checked;
 
         localStorage.setItem(contentPreviewId, JSON.stringify(isChecked));
-
         if (isChecked) {
           enableContentPreview();
           announce(

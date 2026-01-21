@@ -94,6 +94,8 @@ class FormBuilderTest extends FormTestBase {
 
   /**
    * Tests the getFormId() method with a string based form ID.
+   *
+   * @covers ::getFormId
    */
   public function testGetFormIdWithString(): void {
     $form_arg = 'foo';

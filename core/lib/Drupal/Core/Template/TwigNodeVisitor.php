@@ -28,6 +28,11 @@ class TwigNodeVisitor implements NodeVisitorInterface {
   protected ?bool $skipRenderVarFunction;
 
   /**
+   * Tracks whether there is a render array aware filter active already.
+   */
+  protected $skipRenderVarFunction;
+
+  /**
    * {@inheritdoc}
    */
   public function enterNode(Node $node, Environment $env): Node {

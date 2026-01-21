@@ -393,6 +393,8 @@ class ViewsLocalTaskTest extends UnitTestCase {
  */
 class TestViewsLocalTask extends ViewsLocalTask {
 
+  protected $result;
+
   /**
    * The view result.
    *

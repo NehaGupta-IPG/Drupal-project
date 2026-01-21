@@ -25,3 +25,11 @@
 .progress__percentage {
   margin-inline-start: 1rem;
 }
+
+[dir="ltr"] .progress__percentage {
+  margin-left: 1rem;
+}
+
+[dir="rtl"] .progress__percentage {
+  margin-right: 1rem;
+}

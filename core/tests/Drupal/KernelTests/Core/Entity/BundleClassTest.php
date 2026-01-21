@@ -285,6 +285,17 @@ class BundleClassTest extends EntityKernelTestBase {
   }
 
   /**
+   * Checks exception thrown if a bundle class doesn't exist.
+   */
+  public function testBundleClassShouldExist() {
+    $this->container->get('state')->set('entity_test_bundle_class_does_not_exist', TRUE);
+    $this->entityTypeManager->clearCachedDefinitions();
+    $this->expectException(MissingBundleClassException::class);
+    entity_test_create_bundle('bundle_class');
+    $this->storage->create(['type' => 'bundle_class']);
+  }
+
+  /**
    * Tests that a module can override an entity-type class.
    *
    * Ensures a module can implement hook_entity_info_alter() and alter the

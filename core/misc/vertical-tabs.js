@@ -185,7 +185,6 @@
       })
       .trigger('summaryUpdated');
   };
-
   Drupal.verticalTab.prototype = {
     /**
      * Displays the tab's content pane.

@@ -49,3 +49,44 @@
     appearance: revert; /* Revert <select> appearance value for modern browsers. */
   }
 }
+
+/* Necessary to show chevron in forced colors mode in modern browsers. */
+
+@media (forced-colors: active) {
+  .form-element--type-select,
+  .form-element--type-select:focus,
+  .form-element--type-select[disabled] {
+    padding-right: calc(1rem - 1px);
+    background-image: none;
+    -webkit-appearance: listbox;
+    appearance: listbox; /* Default <select> appearance value for modern browsers. */
+
+    /* Lets browser set <select> appearance to whatever the browser's default is. */
+  }
+
+  @supports ((-webkit-appearance: revert) or (appearance: revert)) {
+    .form-element--type-select,
+    .form-element--type-select:focus,
+    .form-element--type-select[disabled] {
+      -webkit-appearance: revert;
+      appearance: revert;
+    }
+  }
+}
+
+/* Necessary for Internet Explorer to show chevron. */
+
+@media screen and (-ms-high-contrast: active) {
+  .form-element--type-select,
+  .form-element--type-select:focus,
+  .form-element--type-select[disabled] {
+    padding-right: calc(1rem - 1px);
+
+    /* Re-enable default chevron for Internet Explorer. */
+  }
+  .form-element--type-select::-ms-expand,
+  .form-element--type-select:focus::-ms-expand,
+  .form-element--type-select[disabled]::-ms-expand {
+    display: block;
+  }
+}

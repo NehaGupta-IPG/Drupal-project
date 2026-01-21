@@ -59,3 +59,19 @@ function node_post_update_add_rebuild_permission_to_roles(?array &$sandbox = NUL
     return TRUE;
   });
 }
+
+/**
+ * Updates stale references to Drupal\node\Entity\Node::getCurrentUserId.
+ */
+function node_post_update_modify_base_field_author_override() {
+  $uid_fields = \Drupal::entityTypeManager()
+    ->getStorage('base_field_override')
+    ->getQuery()
+    ->condition('entity_type', 'node')
+    ->condition('field_name', 'uid')
+    ->condition('default_value_callback', 'Drupal\node\Entity\Node::getCurrentUserId')
+    ->execute();
+  foreach (BaseFieldOverride::loadMultiple($uid_fields) as $base_field_override) {
+    $base_field_override->setDefaultValueCallback('Drupal\node\Entity\Node::getDefaultEntityOwner')->save();
+  }
+}

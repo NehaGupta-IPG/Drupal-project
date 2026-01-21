@@ -18,6 +18,7 @@
   @media (min-width: 43.75rem) {
     grid-column: 2 / 14;
   }
+}
 
   @media (min-width: 62.5rem) {
     grid-column: 3 / 11;

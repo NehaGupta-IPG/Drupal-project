@@ -299,6 +299,20 @@ class LinkWidget extends WidgetBase {
       ];
     }
 
+    // Make uri required on the front-end when title filled-in.
+    if (!$this->isDefaultValueWidget($form_state) && $this->getFieldSetting('title') !== DRUPAL_DISABLED && !$element['uri']['#required']) {
+      $parents = $element['#field_parents'];
+      $parents[] = $this->fieldDefinition->getName();
+      $selector = $root = array_shift($parents);
+      if ($parents) {
+        $selector = $root . '[' . implode('][', $parents) . ']';
+      }
+
+      $element['uri']['#states']['required'] = [
+        ':input[name="' . $selector . '[' . $delta . '][title]"]' => ['filled' => TRUE],
+      ];
+    }
+
     $element['title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Link text'),

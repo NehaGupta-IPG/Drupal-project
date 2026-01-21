@@ -194,7 +194,6 @@
       },
     );
   };
-
   Drupal.AjaxError.prototype = new Error();
   Drupal.AjaxError.prototype.constructor = Drupal.AjaxError;
 
@@ -614,7 +613,6 @@
       jsonp: false,
       method: ajax.httpMethod,
     };
-
     if (elementSettings.dialog) {
       ajax.options.data.dialogOptions = elementSettings.dialog;
     }
@@ -702,7 +700,6 @@
     if (this.ajaxing) {
       return;
     }
-
     try {
       this.beforeSerialize(this.element, this.options);
       // Return the jqXHR so that external code can hook into the Deferred API.
@@ -782,7 +779,6 @@
     if (ajax.ajaxing) {
       return;
     }
-
     try {
       if (ajax.$form) {
         // If setClick is set, we must set this to ensure that the button's
@@ -794,7 +790,6 @@
           // equivalent.
           element.form.clk = element;
         }
-
         ajax.$form.ajaxSubmit(ajax.options);
       } else {
         ajax.beforeSerialize(ajax.element, ajax.options);
@@ -905,7 +900,6 @@
     // the element from triggering a new request, but does not prevent the user
     // from changing its value.
     $(this.element).prop('disabled', true);
-
     if (!this.progress || !this.progress.type) {
       return;
     }
@@ -1186,7 +1180,6 @@
       effect.hideEffect = `${type}Toggle`;
       effect.showSpeed = speed;
     }
-
     return effect;
   };
 
@@ -1569,7 +1562,6 @@
           }
         });
       }
-
       if (response.merge) {
         $.extend(true, drupalSettings, response.settings);
       } else {

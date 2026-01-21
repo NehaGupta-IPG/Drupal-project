@@ -34,6 +34,11 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
   protected array $themes;
 
   /**
+   * List of themes available on the destination.
+   */
+  protected $themes;
+
+  /**
    * Constructs a BlockTheme object.
    *
    * @param array $configuration

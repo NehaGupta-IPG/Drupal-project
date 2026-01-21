@@ -22,12 +22,10 @@
           window.location = `${batch.uri}&op=finished`;
         }
       }
-
       function errorCallback(pb) {
         $progress.prepend($('<p class="error"></p>').html(batch.errorMessage));
         $('#wait').hide();
       }
-
       if ($progress.length) {
         progressBar = new Drupal.ProgressBar(
           'updateprogress',

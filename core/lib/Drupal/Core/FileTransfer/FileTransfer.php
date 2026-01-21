@@ -120,12 +120,49 @@ abstract class FileTransfer {
   public function __get($name) {
     if ($name == 'connection') {
       $this->connect();
-      return $this->connection;
+      return $this->connectionHandle;
     }
 
     if ($name == 'chroot') {
       $this->setChroot();
-      return $this->chroot;
+      return $this->chrootPath;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __set(string $name, $value): void {
+    if ($name == 'connection') {
+      $this->connectionHandle = $value;
+    }
+    elseif ($name == 'chroot') {
+      $this->chrootPath = $value;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __isset(string $name): bool {
+    if ($name == 'connection') {
+      return isset($this->connectionHandle);
+    }
+    if ($name == 'chroot') {
+      return isset($this->chrootPath);
+    }
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unset(string $name): void {
+    if ($name == 'connection') {
+      unset($this->connectionHandle);
+    }
+    elseif ($name == 'chroot') {
+      unset($this->chrootPath);
     }
   }
 

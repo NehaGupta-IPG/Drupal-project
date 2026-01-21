@@ -59,6 +59,7 @@ class TestPerComponentEntityFormDisplay extends PerComponentEntityFormDisplay {
    * @var string[]
    */
   protected $testValues;
+  protected $entity;
 
   /**
    * The test entity.

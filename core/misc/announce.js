@@ -64,7 +64,6 @@
         priority = 'assertive';
       }
     }
-
     if (text.length) {
       // Clear the liveElement so that repeated strings will be read.
       liveElement.innerHTML = '';

@@ -33,6 +33,7 @@
   @media (min-width: 43.75rem) {
     grid-template-columns: repeat(calc(var(--grid-col-count) - 2), minmax(0, 1fr));
   }
+}
 
   @media (min-width: 62.5rem) {
     grid-template-columns: repeat(calc(var(--grid-col-count) - 6), minmax(0, 1fr));
@@ -50,6 +51,7 @@
   @media (min-width: 43.75rem) {
     grid-template-columns: repeat(calc(var(--grid-col-count) - 2), minmax(0, 1fr));
   }
+}
 
   @media (min-width: 62.5rem) {
     grid-template-columns: repeat(calc(var(--grid-col-count) - 4), minmax(0, 1fr));

@@ -3167,6 +3167,9 @@
             "provide": {
                 "ext-ctype": "*"
             },
+            "provide": {
+                "ext-ctype": "*"
+            },
             "suggest": {
                 "ext-ctype": "For best performance"
             },
@@ -3246,6 +3249,9 @@
             },
             "require": {
                 "php": ">=7.2"
+            },
+            "provide": {
+                "ext-iconv": "*"
             },
             "provide": {
                 "ext-iconv": "*"
@@ -3585,6 +3591,9 @@
             "require": {
                 "ext-iconv": "*",
                 "php": ">=7.2"
+            },
+            "provide": {
+                "ext-mbstring": "*"
             },
             "provide": {
                 "ext-mbstring": "*"
@@ -4780,7 +4789,8 @@
                 "php": ">=8.1.0",
                 "symfony/deprecation-contracts": "^2.5|^3",
                 "symfony/polyfill-ctype": "^1.8",
-                "symfony/polyfill-mbstring": "^1.3"
+                "symfony/polyfill-mbstring": "^1.3",
+                "symfony/polyfill-php72": "^1.8"
             },
             "require-dev": {
                 "phpstan/phpstan": "^2.0",

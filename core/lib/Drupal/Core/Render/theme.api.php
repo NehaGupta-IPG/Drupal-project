@@ -272,7 +272,7 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
  *   hook_theme() implementation specifies variable 'foo', then in a render
  *   array, you would provide this data using property '#foo'. Modules
  *   implementing hook_theme() also need to provide a default implementation for
- *   each of their theme hooks, normally in a Twig file. For more information
+ *   each of their theme hooks in a Twig template file. For more information
  *   and to discover available theme hooks, see the documentation of
  *   hook_theme() and the
  *   @link themeable Default theme implementations topic. @endlink
@@ -573,7 +573,7 @@ function hook_preprocess(&$variables, $hook): void {
     $hooks = \Drupal::service('theme.registry')->get();
   }
 
-  // Determine the primary theme function argument.
+  // Determine the primary theme hook argument.
   if (isset($hooks[$hook]['variables'])) {
     $keys = array_keys($hooks[$hook]['variables']);
     $key = $keys[0];

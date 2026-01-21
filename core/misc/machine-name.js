@@ -103,7 +103,6 @@
         data.$suffix.hide();
         data.$source.off('.machineName');
       }
-
       function machineNameHandler(e) {
         const data = e.data;
         const options = data.options;

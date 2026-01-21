@@ -5,6 +5,8 @@
  * Post update functions for Media.
  */
 
+use Drupal\Core\Field\Entity\BaseFieldOverride;
+
 /**
  * Implements hook_removed_post_updates().
  */

@@ -55,7 +55,6 @@
     if (a === b) {
       return typeof a === 'undefined' ? a : true;
     }
-
     return typeof a === 'undefined' || typeof b === 'undefined';
   }
 
@@ -79,7 +78,6 @@
     if (typeof b === 'undefined') {
       return a;
     }
-
     return a && b;
   }
 
@@ -205,7 +203,6 @@
         if ($.inArray(state, dependeeStates) === -1) {
           return;
         }
-
         state = states.State.sanitize(state);
 
         // Initialize the value of this state.
@@ -390,7 +387,6 @@
         selector = state;
         state = null;
       }
-
       if (state !== null) {
         // Constraints is the actual constraints of an element to check for.
         state = states.State.sanitize(state);
@@ -442,7 +438,6 @@
    */
   states.Trigger = function (args) {
     $.extend(this, args);
-
     if (this.state in states.Trigger.states) {
       this.element = $(this.selector);
 
@@ -453,7 +448,6 @@
       }
     }
   };
-
   states.Trigger.prototype = {
     /**
      * @memberof Drupal.states.Trigger#
@@ -637,7 +631,6 @@
     if (state instanceof states.State) {
       return state;
     }
-
     return new states.State(state);
   };
 

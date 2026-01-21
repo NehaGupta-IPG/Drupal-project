@@ -264,6 +264,10 @@ body.drag-y {
  */
 
 .indentation {
+  background: none !important;
+}
+
+.indentation {
   position: relative;
   inset-inline-start: calc(var(--space-xs) * -0.5);
   float: left; /* LTR */

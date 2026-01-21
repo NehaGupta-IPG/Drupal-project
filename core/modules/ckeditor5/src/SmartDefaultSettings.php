@@ -143,6 +143,19 @@ final class SmartDefaultSettings {
       $editor->setSettings(Editor::create(['editor' => 'ckeditor5'])->getSettings());
       $editor->setImageUploadSettings($old_editor->getImageUploadSettings());
     }
+    if ($old_editor && $old_editor->getEditor() === 'ckeditor') {
+      [$upgraded_settings, $messages] = $this->createSettingsFromCKEditor4($old_editor->getSettings(), HTMLRestrictions::fromTextFormat($old_editor->getFilterFormat()));
+      $editor->setSettings($upgraded_settings);
+      // *Before* determining which elements are still needed for this text
+      // format, ensure that all already enabled plugins that are configurable
+      // have valid settings.
+      // For all already enabled plugins, find the ones that are configurable,
+      // and add their default settings. For enabled plugins with element
+      // subsets, compute the appropriate settings to achieve the subset that
+      // matches the original text format restrictions.
+      $this->addDefaultSettingsForEnabledConfigurablePlugins($editor);
+      $this->computeSubsetSettingForEnabledPluginsWithSubsets($editor, $text_format);
+    }
 
     // Add toolbar items based on HTML tags and attributes.
     // NOTE: Helper updates $editor->settings by reference and returns info for
@@ -215,11 +228,165 @@ final class SmartDefaultSettings {
     // and add their default settings. For enabled plugins with element subsets,
     // compute the appropriate settings to achieve the subset that matches the
     // original text format restrictions.
+    // Note: if switching from CKEditor 4, this will already have happened for
+    // plugins that were already enabled in CKEditor 4. It's harmless to compute
+    // this again.
     $this->addDefaultSettingsForEnabledConfigurablePlugins($editor);
 
     if ($has_html_restrictions) {
       // Determine what tags/attributes are allowed in this text format that
       // were not allowed previous to the switch.
+      $allowed_by_new_plugin_config = new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($this->pluginManager->getEnabledDefinitions($editor)), $editor));
+      $surplus_tags_attributes = $allowed_by_new_plugin_config->diff($old_editor_restrictions)->diff($missing_fundamental_tags);
+      $attributes_to_tag = [];
+      $added_tags = [];
+      if (!$surplus_tags_attributes->allowsNothing()) {
+        $surplus_elements = $surplus_tags_attributes->getAllowedElements();
+        $added_tags = array_diff_key($surplus_elements, $old_editor_restrictions->getAllowedElements());
+        foreach ($surplus_elements as $tag => $attributes) {
+          $the_attributes = is_array($attributes) ? $attributes : [];
+          foreach ($the_attributes as $attribute_name => $enabled) {
+            if ($enabled) {
+              $attributes_to_tag[$attribute_name][] = $tag;
+            }
+          }
+        }
+      }
+
+      $help_enabled = $this->moduleHandler->moduleExists('help');
+      $can_access_dblog = ($this->currentUser->hasPermission('access site reports') && $this->moduleHandler->moduleExists('dblog'));
+
+      if (!empty($plugins_enabled) || !$source_editing_additions->allowsNothing()) {
+        $beginning = $help_enabled ?
+          $this->t('To maintain the capabilities of this text format, <a target="_blank" href=":ck_migration_url">the CKEditor 5 migration</a> did the following:', [
+            ':ck_migration_url' => Url::fromRoute('help.page', ['name' => 'ckeditor5'], ['fragment' => 'migration-settings'])->toString(),
+          ]) :
+          $this->t('To maintain the capabilities of this text format, the CKEditor 5 migration did the following:');
+
+        $plugin_info = !empty($plugins_enabled) ?
+          $this->t('Enabled these plugins: (%plugins).', [
+            '%plugins' => implode(', ', $plugins_enabled),
+          ]) : '';
+
+        $source_editing_info = '';
+        if (!$source_editing_additions->allowsNothing()) {
+          $source_editing_info = $help_enabled ?
+            $this->t('Added these tags/attributes to the Source Editing Plugin\'s <a target="_blank" href=":source_edit_url">Manually editable HTML tags</a> setting: @tag_list',
+              [
+                '@tag_list' => $source_editing_additions->toFilterHtmlAllowedTagsString(),
+                ':source_edit_url' => Url::fromRoute('help.page', ['name' => 'ckeditor5'], ['fragment' => 'source-editing'])->toString(),
+              ]) :
+            $this->t("Added these tags/attributes to the Source Editing Plugin's Manually editable HTML tags setting: @tag_list", ['@tag_list' => $source_editing_additions->toFilterHtmlAllowedTagsString()]);
+        }
+
+        $end = $can_access_dblog ?
+          $this->t('Additional details are available <a target="_blank" href=":dblog_url">in your logs</a>.',
+            [
+              ':dblog_url' => Url::fromRoute('dblog.overview')
+                ->setOption('query', ['type[]' => 'ckeditor5'])
+                ->toString(),
+            ]
+          ) :
+          $this->t('Additional details are available in your logs.');
+
+        $messages[MessengerInterface::TYPE_STATUS][] = new FormattableMarkup('@beginning @plugin_info @source_editing_info. @end', [
+          '@beginning' => $beginning,
+          '@plugin_info' => $plugin_info,
+          '@source_editing_info' => $source_editing_info,
+          '@end' => $end,
+        ]);
+      }
+
+      // Generate warning for:
+      // - The addition of <p>/<br> due to them being fundamental tags.
+      // - The addition of other tags/attributes previously unsupported by the
+      //   format.
+      if (!$missing_fundamental_tags->allowsNothing() || !empty($attributes_to_tag) || !empty($added_tags)) {
+        $beginning = $this->t('Updating to CKEditor 5 added support for some previously unsupported tags/attributes.');
+        $fundamental_tags = '';
+        if ($help_enabled && !$missing_fundamental_tags->allowsNothing()) {
+          $fundamental_tags = $this->formatPlural(count($missing_fundamental_tags->toCKEditor5ElementsArray()),
+            'The @tag tag was added because it is <a target="_blank" href=":fundamental_tag_link">required by CKEditor 5</a>.',
+            'The @tag tags were added because they are <a target="_blank" href=":fundamental_tag_link">required by CKEditor 5</a>.',
+            [
+              '@tag' => implode(', ', $missing_fundamental_tags->toCKEditor5ElementsArray()),
+              ':fundamental_tag_link' => URL::fromRoute('help.page', ['name' => 'ckeditor5'], ['fragment' => 'required-tags'])->toString(),
+            ]);
+        }
+        elseif (!$missing_fundamental_tags->allowsNothing()) {
+          $fundamental_tags = $this->formatPlural(count($missing_fundamental_tags->toCKEditor5ElementsArray()),
+            'The @tag tag was added because it is required by CKEditor 5.',
+            'The @tag tags were added because they are required by CKEditor 5.',
+            [
+              '@tag' => implode(', ', $missing_fundamental_tags->toCKEditor5ElementsArray()),
+            ]);
+        }
+
+        $added_elements_begin = !empty($attributes_to_tag) || !empty($added_tags) ? $this->t('A plugin introduced support for the following:') : '';
+        $added_elements_tags = !empty($added_tags) ? $this->formatPlural(
+          count($added_tags),
+          'The tag %tags;',
+          'The tags %tags;',
+          [
+            '%tags' => implode(', ', array_map(function ($tag_name) {
+              return "<$tag_name>";
+            }, array_keys($added_tags))),
+          ]) : '';
+        $added_elements_attributes = !empty($attributes_to_tag) ? $this->formatPlural(
+          count($attributes_to_tag),
+          'This attribute: %attributes;',
+          'These attributes: %attributes;',
+          [
+            '%attributes' => rtrim(array_reduce(array_keys($attributes_to_tag), function ($carry, $item) use ($attributes_to_tag) {
+              $for_tags = implode(', ', array_map(function ($item) {
+                return "<$item>";
+              }, $attributes_to_tag[$item]));
+              return "$carry $item ({$this->t('for', [],  ['context' => 'Ckeditor 5 tag list'])} $for_tags),";
+            }, ''), " ,"),
+          ]
+        ) : '';
+        $end = $can_access_dblog ?
+          $this->t('Additional details are available <a target="_blank" href=":dblog_url">in your logs</a>.',
+            [
+              ':dblog_url' => Url::fromRoute('dblog.overview')
+                ->setOption('query', ['type[]' => 'ckeditor5'])
+                ->toString(),
+            ]
+          ) :
+          $this->t('Additional details are available in your logs.');
+
+        $messages[MessengerInterface::TYPE_WARNING][] = new FormattableMarkup('@beginning @added_elements_begin @fundamental_tags @added_elements_tags @added_elements_attributes @end',
+          [
+            '@beginning' => $beginning,
+            '@added_elements_begin' => $added_elements_begin,
+            '@fundamental_tags' => $fundamental_tags,
+            '@added_elements_tags' => $added_elements_tags,
+            '@added_elements_attributes' => $added_elements_attributes,
+            '@end' => $end,
+          ]);
+      }
+    }
+
+    // In CKEditor 4, it's possible for settings to exist for plugins that are
+    // not actually enabled. During the upgrade path, these would then be mapped
+    // to equivalent CKEditor 5 configuration. But CKEditor 5 does not allow
+    // configuration to be stored for disabled plugins. Therefore determine
+    // which plugins actually are enabled, and omit the (upgraded) plugin
+    // configuration for disabled plugins.
+    // @see \Drupal\ckeditor5\Plugin\CKEditor4To5UpgradePluginInterface::mapCKEditor4SettingsToCKEditor5Configuration()
+    if ($old_editor && $old_editor->getEditor() === 'ckeditor') {
+      $enabled_definitions = $this->pluginManager->getEnabledDefinitions($editor);
+      $enabled_configurable_definitions = array_filter($enabled_definitions, function (CKEditor5PluginDefinition $definition): bool {
+        return is_a($definition->getClass(), CKEditor5PluginConfigurableInterface::class, TRUE);
+      });
+      $settings = $editor->getSettings();
+      $settings['plugins'] = array_intersect_key($settings['plugins'], $enabled_configurable_definitions);
+      $editor->setSettings($settings);
+    }
+
+    if ($has_html_restrictions) {
+      // Determine what tags/attributes are allowed in this text format that were
+      // not allowed previous to the switch.
       $allowed_by_new_plugin_config = new HTMLRestrictions($this->pluginManager->getProvidedElements(array_keys($this->pluginManager->getEnabledDefinitions($editor)), $editor));
       $surplus_tags_attributes = $allowed_by_new_plugin_config->diff($old_editor_restrictions)->diff($missing_fundamental_tags);
       $attributes_to_tag = [];
@@ -696,10 +863,10 @@ final class SmartDefaultSettings {
   /**
    * Adds CKEditor 5 toolbar items to match the format's HTML elements.
    *
-   * @param \Drupal\filter\FilterFormatInterface $format
-   *   The text format for which to compute smart default settings.
-   * @param \Drupal\editor\EditorInterface $editor
-   *   The text editor config entity to update.
+   * @param \Drupal\ckeditor5\HTMLRestrictions $surplus
+   *   A surplus compared to what is needed.
+   * @param \Drupal\ckeditor5\HTMLRestrictions $needed
+   *   Exactly what is needed.
    *
    * @return array|null
    *   NULL when nothing happened, otherwise an array with four values:
@@ -798,6 +965,7 @@ final class SmartDefaultSettings {
           // Fulfill the purpose of this method: generate the settings to add
           // this plugin's toolbar item.
           if ($plugin_definition->hasToolbarItems()) {
+            [$net_new] = self::computeNetNewElementsForPlugin($provided, $still_needed, $plugin_definition);
             $editor_settings_to_update['toolbar']['items'] = array_merge($editor_settings_to_update['toolbar']['items'], array_keys($plugin_definition->getToolbarItems()));
             foreach ($reason_why_enabled as $attribute_name => $attribute_config) {
               // Plugin was selected for tag.
@@ -822,6 +990,9 @@ final class SmartDefaultSettings {
                 }
               }
             }
+
+            // Fewer attributes are still needed.
+            $still_needed = $still_needed->diff($net_new);
           }
         }
         $editor->setSettings($editor_settings_to_update);

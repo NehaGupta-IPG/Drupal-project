@@ -190,7 +190,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     $basic_html_format_without_h4_h6['name'] .= ' (without H4 and H6)';
     $basic_html_format_without_h4_h6['format'] = 'basic_html_without_h4_h6';
     NestedArray::setValue($basic_html_format_without_h4_h6, $allowed_html_parents, $new_value);
-    FilterFormat::create($basic_html_format_without_h4_h6)->save();
+    FilterFormat::create($basic_html_format_without_h4_h6)->setSyncing(TRUE)->save();
     Editor::create(
       ['format' => 'basic_html_without_h4_h6']
       +
@@ -346,7 +346,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
           'settings' => $filter_plugin_manager->getDefinition('filter_html')['settings'],
         ],
       ],
-    ])->save();
+    ])->setSyncing(TRUE)->save();
 
     FilterFormat::create([
       'format' => 'cke4_stylescombo_span',
@@ -374,6 +374,9 @@ class SmartDefaultSettingsTest extends KernelTestBase {
                 'name' => 'Whatever',
                 'items' => [
                   'Styles',
+                  // Blockquote does not have settings. It's present only to
+                  // support an additional tag, to test realistic styles.
+                  'Blockquote',
                 ],
               ],
             ],
@@ -1351,6 +1354,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
               '<h6 id>',
             ],
           ],
+          'ckeditor5_list' => [
+            'reversed' => FALSE,
+            'startIndex' => TRUE,
+          ],
         ],
       ],
       'expected_superset' => '<br> <p> <ol reversed>',
@@ -1414,6 +1421,13 @@ class SmartDefaultSettingsTest extends KernelTestBase {
               'heading5',
               'heading6',
             ],
+          ],
+          'ckeditor5_imageResize' => [
+            'allow_resize' => TRUE,
+          ],
+          'ckeditor5_list' => [
+            'reversed' => TRUE,
+            'startIndex' => TRUE,
           ],
           'ckeditor5_sourceEditing' => [
             'allowed_tags' => [],
@@ -1549,6 +1563,10 @@ class SmartDefaultSettingsTest extends KernelTestBase {
               '<span class="llama">',
             ],
           ],
+          'ckeditor5_list' => [
+            'reversed' => FALSE,
+            'startIndex' => TRUE,
+          ],
         ],
       ],
       'expected_superset' => '<h2> <h3> <h4> <h5> <h6> <strong> <em>',
@@ -1559,6 +1577,16 @@ class SmartDefaultSettingsTest extends KernelTestBase {
             'As part of migrating to CKEditor 5, it was found that the %text_format text format\'s HTML filters includes plugins that support the following tags, but not some of their attributes. To ensure these attributes remain supported, the following were added to the Source Editing plugin\'s <em>Manually editable HTML tags</em>: @missing_attributes. The text format must be saved to make these changes active.',
             'a:2:{s:12:"%text_format";s:43:"A CKEditor 4 configured to have span styles";s:19:"@missing_attributes";s:20:"<span class="llama">";}',
           ],
+        ],
+      ],
+      'expected_db_logs' => [
+        'status' => [
+          'The CKEditor 5 migration enabled the following plugins to support tags that are allowed by the <em class="placeholder">Only the &quot;filter_html&quot; filter and its default settings</em> text format: <em class="placeholder">Link (for tags: &lt;a&gt;) Block quote (for tags: &lt;blockquote&gt;) Code (for tags: &lt;code&gt;) List (for tags: &lt;ul&gt;&lt;ol&gt;&lt;li&gt;)</em>. The text format must be saved to make these changes active.',
+          'The following tags were permitted by the <em class="placeholder">Only the &quot;filter_html&quot; filter and its default settings</em> text format\'s filter configuration, but no plugin was available that supports them. To ensure the tags remain supported by this text format, the following were added to the Source Editing plugin\'s <em>Manually editable HTML tags</em>: &lt;cite&gt; &lt;dl&gt; &lt;dt&gt; &lt;dd&gt;. The text format must be saved to make these changes active.',
+          'As part of migrating to CKEditor 5, it was found that the <em class="placeholder">Only the &quot;filter_html&quot; filter and its default settings</em> text format\'s HTML filters includes plugins that support the following tags, but not some of their attributes. To ensure these attributes remain supported, the following were added to the Source Editing plugin\'s <em>Manually editable HTML tags</em>: &lt;a hreflang&gt; &lt;blockquote cite&gt; &lt;ul type&gt; &lt;ol type=&quot;1 A I&quot;&gt; &lt;h2 id=&quot;jump-*&quot;&gt; &lt;h3 id&gt; &lt;h4 id&gt; &lt;h5 id&gt; &lt;h6 id&gt;. The text format must be saved to make these changes active.',
+        ],
+        'warning' => [
+          'As part of migrating the <em class="placeholder">Only the &quot;filter_html&quot; filter and its default settings</em> text format to CKEditor 5, the following tag(s) were added to <em>Limit allowed HTML tags and correct faulty HTML</em>, because they are needed to provide fundamental CKEditor 5 functionality : &lt;br&gt; &lt;p&gt;. The text format must be saved to make these changes active.',
         ],
       ],
       'expected_messages' => [
@@ -1593,6 +1621,22 @@ class SmartDefaultSettingsTest extends KernelTestBase {
               'heading4',
               'heading5',
               'heading6',
+            ],
+          ],
+          'ckeditor5_style' => [
+            'styles' => [
+              [
+                'label' => 'Callout',
+                'element' => '<p class="callout">',
+              ],
+              [
+                'label' => 'Interesting & highlighted quote',
+                'element' => '<blockquote class="interesting highlighted">',
+              ],
+              [
+                'label' => 'Famous',
+                'element' => '<blockquote class="famous">',
+              ],
             ],
           ],
         ],

@@ -27,6 +27,11 @@ class RedirectResponseSubscriber implements EventSubscriberInterface {
   protected bool $ignoreDestination = FALSE;
 
   /**
+   * The request context.
+   */
+  protected $requestContext;
+
+  /**
    * Constructs a RedirectResponseSubscriber object.
    *
    * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $unroutedUrlAssembler

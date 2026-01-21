@@ -1382,6 +1382,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         $this->memoryCache->set($this->buildRevisionCacheId($entity->getRevisionId()), $entity, MemoryCacheInterface::CACHE_PERMANENT, $cache_tags_revision);
       }
     }
+    $this->cacheBackend->setMultiple($items);
   }
 
   /**

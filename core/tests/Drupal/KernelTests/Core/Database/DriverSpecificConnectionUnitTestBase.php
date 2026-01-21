@@ -30,6 +30,11 @@ abstract class DriverSpecificConnectionUnitTestBase extends DriverSpecificKernel
   protected int $id;
 
   /**
+   * The connection ID of the current test connection.
+   */
+  protected $id;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {

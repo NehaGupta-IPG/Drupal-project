@@ -339,13 +339,11 @@
             model.set({ orientation: 'vertical' }, { validate: true });
           }
           break;
-
         case 'toolbar.standard':
           model.set({
             isFixed: mql.matches,
           });
           break;
-
         case 'toolbar.wide':
           model.set(
             {
@@ -360,7 +358,6 @@
             isTrayToggleVisible: mql.matches,
           });
           break;
-
         default:
           break;
       }

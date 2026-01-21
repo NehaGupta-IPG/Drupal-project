@@ -93,6 +93,19 @@
   }
 }
 
+  [dir="rtl"] .vertical-tabs__menu-item.is-selected {
+    margin-left: -1px;
+  }
+
+  [dir="ltr"] .vertical-tabs__menu-item.is-selected {
+    padding-right: 1px;
+  }
+
+  [dir="rtl"] .vertical-tabs__menu-item.is-selected {
+    padding-left: 1px;
+  }
+}
+
 .vertical-tabs__menu-item.is-selected a {
   background-color: transparent;
 }

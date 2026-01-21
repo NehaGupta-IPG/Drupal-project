@@ -106,7 +106,6 @@
         queryString = (ajaxPath.includes('?') ? '&' : '?') + queryString;
       }
     }
-
     this.element_settings = {
       url: ajaxPath + queryString,
       submit: settings,

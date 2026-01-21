@@ -491,3 +491,11 @@
     }
   }
 }
+
+@media (forced-colors: active) {
+  .action-link--icon-questionmark::before {
+    background: linktext !important;
+    mask-repeat: no-repeat;
+    mask-image: url(../../images/icons/d72222/questionmark.svg);
+  }
+}

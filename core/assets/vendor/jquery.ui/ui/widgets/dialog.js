@@ -859,6 +859,8 @@ $.widget( "ui.dialog", {
 			return;
 		}
 
+		var jqMinor = $.fn.jquery.substring( 0, 4 );
+
 		// We use a delay in case the overlay is created from an
 		// event that we're going to be cancelling (#2804)
 		var isOpening = true;

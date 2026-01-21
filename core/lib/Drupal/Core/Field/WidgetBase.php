@@ -557,6 +557,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
 
         $violations_by_delta = $item_list_violations = [];
         foreach ($violations as $violation) {
+          $violation = new InternalViolation($violation);
           // Separate violations by delta.
           $property_path = explode('.', $violation->getPropertyPath());
           $delta = array_shift($property_path);

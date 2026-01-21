@@ -1,12 +1,15 @@
-langcode: en
+uuid: aba59535-cd52-42fb-91ee-52662bca253a
+langcode: fr
 status: true
 dependencies:
   module:
     - system
   theme:
-    - olivero
-id: olivero_messages
-theme: olivero
+    - stark
+_core:
+  default_config_hash: 5MNdk3fpMKx_xxBTcz2T11DL4XEU1H5SgHl8BsYdFsA
+id: stark_messages
+theme: stark
 region: highlighted
 weight: -5
 provider: null

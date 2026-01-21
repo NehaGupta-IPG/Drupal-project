@@ -7,6 +7,7 @@ use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Component\Utility\EmailValidatorInterface;
 
 /**
  * Configure update settings for this site.

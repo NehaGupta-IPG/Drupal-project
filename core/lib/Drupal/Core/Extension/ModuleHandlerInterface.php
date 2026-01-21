@@ -240,6 +240,23 @@ interface ModuleHandlerInterface {
   public function invokeAllWith(string $hook, callable $callback): void;
 
   /**
+   * Executes a callback for each implementation of a hook.
+   *
+   * The callback is passed two arguments, a closure which executes a hook
+   * implementation. And the module name.
+   *
+   * @param string $hook
+   *   The name of the hook to invoke.
+   * @param callable $callback
+   *   A callable that invokes a hook implementation. Such that
+   *   $callback is callable(callable, string): mixed.
+   *   Arguments:
+   *    - Closure to a hook implementation.
+   *    - Implementation module machine name.
+   */
+  public function invokeAllWith(string $hook, callable $callback): void;
+
+  /**
    * Invokes a hook in a particular module.
    *
    * @param string $module

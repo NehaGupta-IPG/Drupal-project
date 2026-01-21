@@ -47,6 +47,7 @@
       color: var(--color-text-primary-medium);
     }
   }
+}
 
   @media (min-width: 62.5rem) {
     margin-block-end: var(--sp1);

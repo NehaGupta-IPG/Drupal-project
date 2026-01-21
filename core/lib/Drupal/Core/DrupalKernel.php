@@ -283,6 +283,16 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $root;
 
   /**
+   * A mapping from service classes to service IDs.
+   *
+   * @deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the
+   *   'Drupal\Component\DependencyInjection\ReverseContainer' service instead.
+   *
+   * @see https://www.drupal.org/node/3327942
+   */
+  protected $serviceIdMapping = [];
+
+  /**
    * Create a DrupalKernel object from a request.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -1860,6 +1870,23 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function addServiceFiles(array $service_yamls) {
     $this->serviceYamls['site'] = array_filter($service_yamls, 'is_file');
+  }
+
+  /**
+   * Collect a mapping between service to ids.
+   *
+   * @deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the
+   *   'Drupal\Component\DependencyInjection\ReverseContainer' service instead.
+   *
+   * @see https://www.drupal.org/node/3327942
+   */
+  protected function collectServiceIdMapping() {
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.5.1 and is removed from drupal:11.0.0. Use the 'Drupal\Component\DependencyInjection\ReverseContainer' service instead. See https://www.drupal.org/node/3327942", E_USER_DEPRECATED);
+    if (isset($this->container)) {
+      foreach ($this->container->getServiceIdMappings() as $hash => $service_id) {
+        $this->serviceIdMapping[$hash] = $service_id;
+      }
+    }
   }
 
   /**

@@ -848,7 +848,6 @@
           self.indentAmount * indentChange * self.rtl;
         self.indentCount = Math.max(self.indentCount, self.rowObject.indents);
       }
-
       return false;
     }
   };
@@ -891,7 +890,6 @@
           self.changed = true;
         }
       }
-
       if (self.indentEnabled) {
         self.rowObject.removeIndentClasses();
       }
@@ -1151,7 +1149,6 @@
             .closest('tr')
             .find('.js-indentation').length;
           break;
-
         case 'match':
           // Update the value.
           targetElement.value = sourceElement.value;
@@ -1425,7 +1422,6 @@
         self.addClass('tree-child-horizontal');
       }
     }
-
     while (currentRow.length) {
       // A greater indentation indicates this is a child.
       if (currentRow.find('.js-indentation').length > parentIndentation) {
@@ -1480,7 +1476,6 @@
     if (this.table.tBodies[0].rows[0] === row && !row.matches('.draggable')) {
       return false;
     }
-
     return true;
   };
 
@@ -1604,7 +1599,6 @@
       this.groupDepth += indentDiff;
       this.onIndent();
     }
-
     return indentDiff;
   };
 
@@ -1637,7 +1631,6 @@
           if (this.indentEnabled) {
             checkRowIndentation = checkRow.find('.js-indentation').length;
           }
-
           if (!this.indentEnabled || checkRowIndentation === rowIndentation) {
             siblings.push(checkRow[0]);
           } else if (checkRowIndentation < rowIndentation) {

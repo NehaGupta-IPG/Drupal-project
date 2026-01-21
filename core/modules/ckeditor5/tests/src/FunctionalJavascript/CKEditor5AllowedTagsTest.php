@@ -361,6 +361,20 @@ class CKEditor5AllowedTagsTest extends CKEditor5TestBase {
 
     $this->createNewTextFormat($page, $assert_session);
 
+    EntityViewMode::create([
+      'id' => 'media.view_mode_1',
+      'targetEntityType' => 'media',
+      'status' => TRUE,
+      'enabled' => TRUE,
+      'label' => 'View Mode 1',
+    ])->save();
+    EntityViewMode::create([
+      'id' => 'media.view_mode_2',
+      'targetEntityType' => 'media',
+      'status' => TRUE,
+      'enabled' => TRUE,
+      'label' => 'View Mode 2',
+    ])->save();
     // Allowed HTML field is readonly and its wrapper has a form-disabled class.
     $this->assertNotEmpty($assert_session->waitForElement('css', '.js-form-item-filters-filter-html-settings-allowed-html.form-disabled'));
     $allowed_html_field = $assert_session->fieldExists('filters[filter_html][settings][allowed_html]');

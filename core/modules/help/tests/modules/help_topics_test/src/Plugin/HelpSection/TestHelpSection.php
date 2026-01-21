@@ -14,6 +14,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 // cspell:ignore asdrsad barmm foomm sqruct wcsrefsdf sdeeeee
 
+// cspell:ignore asdrsad barmm foomm sqruct wcsrefsdf sdeeeee
+
 /**
  * Provides a searchable help section for testing.
  */

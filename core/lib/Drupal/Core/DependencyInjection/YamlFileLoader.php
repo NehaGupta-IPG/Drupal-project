@@ -248,6 +248,17 @@ class YamlFileLoader
             $definition = new ChildDefinition($service['parent']);
         } else {
             $definition = new Definition();
+            // Drupal services are public by default.
+            $definition->setPublic(true);
+
+            if (isset($defaults['public'])) {
+                $definition->setPublic($defaults['public']);
+            }
+            if (isset($defaults['autowire'])) {
+                $definition->setAutowired($defaults['autowire']);
+            }
+
+            $definition->setChanges([]);
         }
 
         // Drupal services are public by default.

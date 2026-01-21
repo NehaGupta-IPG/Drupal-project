@@ -122,6 +122,11 @@ CKEditor 5
 - Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 - Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
 
+CKEditor 5
+- Lauri Eskola 'lauriii' https://www.drupal.org/u/lauriii
+- Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
+- Ben Mullins 'bnjmnm' https://www.drupal.org/u/bnjmnm
+
 Claro
 - Cristina Chumillas 'ckrina' https://www.drupal.org/u/ckrina
 - Sascha Eggenberger 'saschaeggi' https://www.drupal.org/u/saschaeggi
@@ -493,6 +498,10 @@ The Drupal core initiative coordinators oversee approved projects that
 re-architect or otherwise improve large areas of Drupal core. See
 https://www.drupal.org/contribute/core/maintainers for more information on
 their responsibilities. The initiative coordinators are:
+
+Project Browser Initiative
+- Leslie Glynn 'leslieg' https://www.drupal.org/u/leslieg
+- Chris Wells 'chrisfromredfin' https://www.drupal.org/u/chrisfromredfin
 
 Project Browser Initiative
 - Leslie Glynn 'leslieg' https://www.drupal.org/u/leslieg

@@ -13,6 +13,10 @@
     box-shadow: none !important;
     text-shadow: none !important;
   }
+  * {
+    /* Black prints faster */
+    /* https://github.com/h5bp/main.css/blob/main/dist/_print.css#L14 */
+  }
   body {
     padding-top: 0;
   }

@@ -97,3 +97,7 @@ function user_install(): void {
 function user_update_last_removed(): int {
   return 10000;
 }
+
+// Do not add further hook_update_N() implementations to this file.
+// user_update_10000() has been added to 10.0.x which makes adding new updates
+// extremely complex.

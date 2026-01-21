@@ -111,7 +111,6 @@
         if (typeof item === 'object') {
           return processConfig(item);
         }
-
         return item;
       });
     }
@@ -138,7 +137,6 @@
       } else {
         processed[key] = value;
       }
-
       return processed;
     }, {});
   }

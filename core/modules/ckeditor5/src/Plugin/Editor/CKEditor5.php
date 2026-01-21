@@ -302,6 +302,23 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
       $form_state->set('editor', $editor);
     }
 
+    if ($css_warning = $this->stylesheetsMessage->getWarning()) {
+      // Explicitly render this single warning message visually close to the
+      // text editor since this is a very long form. Otherwise, it may be
+      // interpreted as a text format problem, or ignored entirely.
+      // All other messages will be rendered in the default location.
+      // @see \Drupal\Core\Render\Element\StatusMessages
+      $form['css_warning'] = [
+        '#theme' => 'status_messages',
+        '#message_list' => [
+          'warning' => [$css_warning],
+        ],
+        '#status_headings' => [
+          'warning' => $this->t('Warning message'),
+        ],
+      ];
+    }
+
     // AJAX validation errors should appear visually close to the text editor
     // since this is a very long form: otherwise they would not be noticed.
     $form['real_time_validation_errors_location'] = [

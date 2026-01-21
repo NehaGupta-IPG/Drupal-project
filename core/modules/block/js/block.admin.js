@@ -65,7 +65,6 @@
           });
         }
       }
-
       if ($table.length) {
         $filterRows = $table.find('div.block-filter-text-source');
         $input.on('keyup', debounce(filterBlockList, 200));

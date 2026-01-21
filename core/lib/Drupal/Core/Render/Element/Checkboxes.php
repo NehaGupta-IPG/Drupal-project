@@ -30,6 +30,12 @@ use Drupal\Core\Render\Attribute\FormElement;
  * $form['favorites']['colors']['blue']['#description'] = $this->t('The color of the sky.');
  * @endcode
  *
+ * Element properties may be set on single option items as follows.
+ *
+ * @code
+ * $form['favorites']['colors']['blue']['#description'] = $this->t('The color of the sky.');
+ * @endcode
+ *
  * @see \Drupal\Core\Render\Element\Radios
  * @see \Drupal\Core\Render\Element\Checkbox
  */

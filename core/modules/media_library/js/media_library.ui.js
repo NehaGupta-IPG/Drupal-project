@@ -215,7 +215,6 @@
             }
           };
         }
-
         ajaxObject.execute();
 
         // Announce the new view is being loaded to screen readers.

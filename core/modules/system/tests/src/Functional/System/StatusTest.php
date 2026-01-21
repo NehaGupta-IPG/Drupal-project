@@ -52,6 +52,8 @@ class StatusTest extends BrowserTestBase {
 
   /**
    * Tests that the status page returns.
+   *
+   * @group legacy
    */
   #[IgnoreDeprecations]
   public function testStatusPage(): void {

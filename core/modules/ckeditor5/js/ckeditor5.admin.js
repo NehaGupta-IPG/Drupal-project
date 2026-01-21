@@ -149,7 +149,6 @@
     const list = [...selection.value];
     list.push(element.dataset.id);
     selection.value = list;
-
     if (announceChange) {
       setTimeout(() => {
         announceChange(element.dataset.label);
@@ -176,7 +175,6 @@
     );
     list.splice(index, 1);
     selection.value = list;
-
     if (announceChange) {
       setTimeout(() => {
         announceChange(element.dataset.label);

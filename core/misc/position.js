@@ -43,11 +43,9 @@
           : 1),
     ];
   }
-
   function parseCss(element, property) {
     return parseInt(window.getComputedStyle(element)[property], 10) || 0;
   }
-
   function getDimensions(elem) {
     const raw = elem[0];
     if (raw.nodeType === Node.DOCUMENT_NODE) {
@@ -321,7 +319,6 @@
       if (w1 === w2) {
         w2 = div[0].clientWidth;
       }
-
       div.remove();
       cachedScrollbarWidth = w1 - w2;
       return cachedScrollbarWidth;
@@ -493,13 +490,11 @@
       // eslint-disable-next-line prefer-destructuring
       collision[1] = collision[0];
     }
-
     if (options.at[0] === 'right') {
       basePosition.left += targetWidth;
     } else if (options.at[0] === 'center') {
       basePosition.left += targetWidth / 2;
     }
-
     if (options.at[1] === 'bottom') {
       basePosition.top += targetHeight;
     } else if (options.at[1] === 'center') {
@@ -540,13 +535,11 @@
       } else if (options.my[0] === 'center') {
         position.left -= elemWidth / 2;
       }
-
       if (options.my[1] === 'bottom') {
         position.top -= elemHeight;
       } else if (options.my[1] === 'center') {
         position.top -= elemHeight / 2;
       }
-
       position.left += myOffset[0];
       position.top += myOffset[1];
 
@@ -574,7 +567,6 @@
           });
         }
       });
-
       if (options.using) {
         // Adds feedback as second argument to using callback, if present
         // eslint-disable-next-line func-names

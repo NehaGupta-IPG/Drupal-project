@@ -67,7 +67,6 @@
         $tab.find('button').attr('aria-expanded', 'false');
       }
     };
-
     $tab.addClass('position-container is-horizontal-enabled');
 
     $target.find('.js-tab').each((index, element) => {

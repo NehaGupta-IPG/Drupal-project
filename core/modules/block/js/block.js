@@ -58,7 +58,6 @@
         if (!$pages.length || !$pages[0].value) {
           return Drupal.t('Not restricted');
         }
-
         return Drupal.t('Restricted to certain pages');
       });
     },
@@ -209,7 +208,6 @@
             .addClass(`block-weight-${regionName}`);
           regionField[0].value = regionName;
         }
-
         updateBlockWeights(table, regionName);
       };
 

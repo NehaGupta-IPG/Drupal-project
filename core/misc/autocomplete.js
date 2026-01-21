@@ -40,7 +40,6 @@
     if (value.length > 0) {
       result.push(current.trim());
     }
-
     return result;
   }
 

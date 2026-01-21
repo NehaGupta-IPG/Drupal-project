@@ -41,6 +41,13 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   protected ThemeExtensionList $themeList;
 
   /**
+   * The uninstall validators.
+   *
+   * @var \Drupal\Core\Extension\ModuleUninstallValidatorInterface[]
+   */
+  protected $uninstallValidators = [];
+
+  /**
    * Constructs the ConfigImportSubscriber.
    *
    * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
@@ -61,6 +68,16 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   ) {
     $this->themeList = $theme_extension_list;
     $this->moduleExtensionList = $extension_list_module;
+  }
+
+  /**
+   * Adds a module uninstall validator.
+   *
+   * @param \Drupal\Core\Extension\ModuleUninstallValidatorInterface $uninstall_validator
+   *   The uninstall validator to add.
+   */
+  public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator): void {
+    $this->uninstallValidators[] = $uninstall_validator;
   }
 
   /**
@@ -234,6 +251,13 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
             '%theme' => $theme_name,
             '%required_module' => $required_module_name,
           ]));
+        }
+      }
+      foreach (array_keys($module_dependencies) as $required_module) {
+        if (!isset($core_extension['module'][$required_module])) {
+          $theme_name = $theme_data[$theme]->info['name'];
+          $required_module_name = $module_data[$required_module]->info['name'];
+          $config_importer->logError($this->t('Unable to install the %theme theme since it requires the %required_module module.', ['%theme' => $theme_name, '%required_module' => $required_module_name]));
         }
       }
     }

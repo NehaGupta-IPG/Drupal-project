@@ -38,7 +38,6 @@
       );
       tabs.classList.toggle(expandedClass);
     }
-
     if (isTabsMobileLayout() && !activeTab.matches('.tabs__tab:first-child')) {
       const newActiveTab = activeTab.cloneNode(true);
       const firstTab = tabs.querySelector('.tabs__tab:first-child');

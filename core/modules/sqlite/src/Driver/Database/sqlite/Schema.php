@@ -2,9 +2,7 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
-use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\sqlite\Driver\Database\sqlite\Schema as SqliteSchema;
 
 // cspell:ignore autoincrement autoindex
 
@@ -15,6 +13,11 @@ use Drupal\Core\Database\Schema as DatabaseSchema;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Schema.
+ *
+ * @deprecated in drupal:9.4.0 and is removed from drupal:11.0.0. The SQLite
+ *   database driver has been moved to the sqlite module.
+ *
+ * @see https://www.drupal.org/node/3129492
  */
 class Schema extends DatabaseSchema {
 

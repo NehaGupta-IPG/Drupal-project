@@ -179,7 +179,6 @@
     this.unbind = function () {
       return self._unbind.call(self);
     };
-
     this.bind();
     // Object constructor; no return value.
   };

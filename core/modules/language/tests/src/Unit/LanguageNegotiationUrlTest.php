@@ -35,6 +35,7 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    * @var \Drupal\Core\Session\AccountInterface
    */
   protected $user;
+  protected $languages;
 
   /**
    * An array of languages.

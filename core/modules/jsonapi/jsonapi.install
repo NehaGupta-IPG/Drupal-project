@@ -31,3 +31,17 @@ function jsonapi_install(): void {
 function jsonapi_update_last_removed(): int {
   return 9401;
 }
+
+/**
+ * Set values for maintenance_header_retry_seconds min and max.
+ *
+ * @see https://www.drupal.org/node/3247453
+ */
+function jsonapi_update_9401() {
+  $config = \Drupal::configFactory()->getEditable('jsonapi.settings');
+  $config->set('maintenance_header_retry_seconds', [
+    'min' => 5,
+    'max' => 10,
+  ]);
+  $config->save(TRUE);
+}

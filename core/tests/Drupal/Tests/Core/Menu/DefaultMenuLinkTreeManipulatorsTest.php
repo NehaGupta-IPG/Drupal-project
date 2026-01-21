@@ -308,6 +308,7 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
       ->willReturn(AccessResult::allowed());
 
     $this->mockTree();
+    $this->cacheContextManager->assertValidTokens(['user.permissions'])->shouldBeCalled()->willReturn(TRUE);
     $this->defaultMenuTreeManipulators->checkAccess($this->originalTree);
 
     $expected_access_result = AccessResult::allowed();

@@ -63,6 +63,15 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
     $filename = array_shift($filename_parts);
     // Remove final extension. In the case of dot filenames this will be empty.
     $final_extension = (string) array_pop($filename_parts);
+    // Check if we're dealing with a dot file that is also an insecure extension
+    // e.g. .htaccess. In this scenario there is only one 'part' and the
+    // extension becomes the filename. We use the original filename from the
+    // event rather than the trimmed version above.
+    $insecure_uploads = $this->config->get('allow_insecure_uploads');
+    if (!$insecure_uploads && $final_extension === '' && str_contains($event->getFilename(), '.') && in_array(strtolower($filename), FileSystemInterface::INSECURE_EXTENSIONS, TRUE)) {
+      $final_extension = $filename;
+      $filename = '';
+    }
 
     $extensions = $event->getAllowedExtensions();
     if (!empty($extensions) && !in_array(strtolower($final_extension), $extensions, TRUE)) {

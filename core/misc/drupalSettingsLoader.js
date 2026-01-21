@@ -17,7 +17,6 @@
    * @type {object}
    */
   window.drupalSettings = {};
-
   if (settingsElement !== null) {
     window.drupalSettings = JSON.parse(settingsElement.textContent);
   }

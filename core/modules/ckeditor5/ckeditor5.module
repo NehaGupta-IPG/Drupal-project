@@ -15,6 +15,7 @@ use Drupal\Core\Ajax\MessageCommand;
 use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Ajax\RemoveCommand;
+use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 
@@ -194,6 +195,47 @@ function _ckeditor5_theme_css($theme = NULL): array {
           $css[$key] = $url;
         }
         // CSS URL is relative to theme.
+        else {
+          $css[$key] = '/' . $theme_path . '/' . $url;
+        }
+      }
+    }
+    if (isset($info['base theme'])) {
+      $css = array_merge(_ckeditor5_theme_css($info['base theme']), $css);
+    }
+  }
+  return $css;
+}
+
+/**
+ * Retrieves the default theme's CKEditor 5 stylesheets.
+ *
+ * Themes may specify CSS files for use within CKEditor 5 by including a
+ * "ckeditor5-stylesheets" key in their .info.yml file.
+ *
+ * @code
+ * ckeditor5-stylesheets:
+ *   - css/ckeditor.css
+ * @endcode
+ *
+ * @return string[]
+ *   A list of paths to CSS files.
+ */
+function _ckeditor5_theme_css($theme = NULL): array {
+  $css = [];
+  if (!isset($theme)) {
+    $theme = \Drupal::config('system.theme')->get('default');
+  }
+  if (isset($theme) && $theme_path = \Drupal::service('extension.list.theme')->getPath($theme)) {
+    $info = \Drupal::service('extension.list.theme')->getExtensionInfo($theme);
+    if (isset($info['ckeditor5-stylesheets']) && $info['ckeditor5-stylesheets'] !== FALSE) {
+      $css = $info['ckeditor5-stylesheets'];
+      foreach ($css as $key => $url) {
+        // CSS url is external or relative to Drupal root.
+        if (UrlHelper::isExternal($url) || $url[0] === '/') {
+          $css[$key] = $url;
+        }
+        // CSS url is relative to theme.
         else {
           $css[$key] = '/' . $theme_path . '/' . $url;
         }

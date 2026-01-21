@@ -59,6 +59,7 @@ class TestPerComponentEntityDisplay extends ComponentEntityDisplayBase {
    * @var string[]
    */
   protected $testValues;
+  protected $entity;
 
   /**
    * The test entity.

@@ -251,7 +251,6 @@
         ) {
           return true;
         }
-
         elementSettings.wrapper = 'views-preview-wrapper';
         elementSettings.method = 'replaceWith';
         elementSettings.base = link.id;

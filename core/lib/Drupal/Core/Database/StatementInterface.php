@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Database;
 
+// cSpell:ignore mydriver
+
 /**
  * Represents a prepared statement.
  *

@@ -103,7 +103,6 @@
     searchWideWrapper.addEventListener('transitionend', handleFocus, {
       once: true,
     });
-
     if (visibility === true) {
       Drupal.olivero.closeAllSubNav();
 
@@ -124,7 +123,6 @@
       });
     }
   }
-
   Drupal.olivero.toggleSearchVisibility = toggleSearchVisibility;
 
   /**

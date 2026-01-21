@@ -973,4 +973,67 @@ class Renderer implements RendererInterface {
     return $elements;
   }
 
+  /**
+   * Add cache debug information to the render array.
+   *
+   * @param array $elements
+   *   The renderable array that must be wrapped with the cache debug output.
+   * @param bool $is_cache_hit
+   *   A flag indicating that the cache is hit or miss.
+   * @param array $pre_bubbling_elements
+   *   The renderable array for pre-bubbling elements.
+   * @param float $render_time
+   *   The rendering time.
+   *
+   * @return array
+   *   The renderable array.
+   */
+  protected function addDebugOutput(array $elements, bool $is_cache_hit, array $pre_bubbling_elements = [], float $render_time = 0) {
+    if (empty($elements['#markup'])) {
+      return $elements;
+    }
+
+    $debug_items = [
+      'CACHE' => &$elements,
+      'PRE-BUBBLING CACHE' => &$pre_bubbling_elements,
+    ];
+    $prefix = "<!-- START RENDERER -->";
+    $prefix .= "\n<!-- CACHE-HIT: " . ($is_cache_hit ? 'Yes' : 'No') . " -->";
+    foreach ($debug_items as $name_prefix => $debug_item) {
+      if (!empty($debug_item['#cache']['tags'])) {
+        $prefix .= "\n<!-- " . $name_prefix . " TAGS:";
+        foreach ($debug_item['#cache']['tags'] as $tag) {
+          $prefix .= "\n   * " . $tag;
+        }
+        $prefix .= "\n-->";
+      }
+      if (!empty($debug_item['#cache']['contexts'])) {
+        $prefix .= "\n<!-- " . $name_prefix . " CONTEXTS:";
+        foreach ($debug_item['#cache']['contexts'] as $context) {
+          $prefix .= "\n   * " . $context;
+        }
+        $prefix .= "\n-->";
+      }
+      if (!empty($debug_item['#cache']['keys'])) {
+        $prefix .= "\n<!-- " . $name_prefix . " KEYS:";
+        foreach ($debug_item['#cache']['keys'] as $key) {
+          $prefix .= "\n   * " . $key;
+        }
+        $prefix .= "\n-->";
+      }
+      if (!empty($debug_item['#cache']['max-age'])) {
+        $prefix .= "\n<!-- " . $name_prefix . " MAX-AGE: " . $debug_item['#cache']['max-age'] . " -->";
+      }
+    }
+
+    if (!empty($render_time)) {
+      $prefix .= "\n<!-- RENDERING TIME: " . number_format($render_time, 9) . " -->";
+    }
+    $suffix = "<!-- END RENDERER -->";
+
+    $elements['#markup'] = Markup::create("$prefix\n" . $elements['#markup'] . "\n$suffix");
+
+    return $elements;
+  }
+
 }

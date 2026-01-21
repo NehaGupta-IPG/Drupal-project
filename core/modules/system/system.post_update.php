@@ -5,6 +5,7 @@
  * Post update functions for System.
  */
 
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\Core\Entity\EntityFormModeInterface;
 use Drupal\views\ViewEntityInterface;

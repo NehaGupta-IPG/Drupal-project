@@ -335,4 +335,14 @@ class KernelTestBaseTest extends KernelTestBase {
     $this->assertSame(1, \Drupal::service('extension.list.module')->get($module)->status);
   }
 
+  /**
+   * @covers ::bootEnvironment
+   */
+  public function testDatabaseDriverModuleEnabled() {
+    $module = Database::getConnection()->getProvider();
+
+    // Test that the module that is providing the database driver is enabled.
+    $this->assertSame(1, \Drupal::service('extension.list.module')->get($module)->status);
+  }
+
 }

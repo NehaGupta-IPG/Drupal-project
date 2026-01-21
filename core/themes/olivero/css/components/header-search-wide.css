@@ -234,6 +234,11 @@
   }
 }
 
+  .block-search-wide__button path {
+    fill: ButtonText;
+  }
+}
+
 /* Provide rudimentary access to site search if JS is disabled. */
 
 html:not(.js) .search-block-form:focus-within .block-search-wide__wrapper {

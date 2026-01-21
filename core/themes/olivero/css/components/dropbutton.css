@@ -37,6 +37,7 @@
   .dropbutton-single & {
     padding-inline-end: 0;
   }
+}
 
   .dropbutton-wrapper.open & {
     border-radius: var(--dropbutton--border-radius) var(--dropbutton--border-radius) 0 0;

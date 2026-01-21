@@ -141,4 +141,8 @@
     color: var(--color-gray-050);
     font-size: 0.75rem;
   }
+  & .form-item .form-item__description {
+    color: var(--color-gray-050);
+    font-size: 0.75rem;
+  }
 }

@@ -75,7 +75,6 @@ class DrupalDialogEvent extends Event {
       open: false,
       returnValue: undef,
     };
-
     function openDialog(settings) {
       settings = $.extend({}, drupalSettings.dialog, options, settings);
       if (settings.dialogClass) {
@@ -101,7 +100,6 @@ class DrupalDialogEvent extends Event {
         new DrupalDialogEvent('aftercreate', dialog, event.settings),
       );
     }
-
     function closeDialog(value) {
       domElement.dispatchEvent(new DrupalDialogEvent('beforeclose', dialog));
 

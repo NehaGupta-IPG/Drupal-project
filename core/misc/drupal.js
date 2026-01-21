@@ -326,7 +326,6 @@ window.Drupal = { behaviors: {}, locale: {} };
       // Order the keys by the character length. The shortest one is the first.
       keys.sort((a, b) => a.length - b.length);
     }
-
     if (keys.length === 0) {
       return str;
     }
@@ -341,7 +340,6 @@ window.Drupal = { behaviors: {}, locale: {} };
         fragments[i] = Drupal.stringReplace(fragments[i], args, keys.slice(0));
       }
     }
-
     return fragments.join(args[key]);
   };
 
@@ -373,7 +371,6 @@ window.Drupal = { behaviors: {}, locale: {} };
     if (drupalTranslations?.strings?.[options.context]?.[str]) {
       str = drupalTranslations.strings[options.context][str];
     }
-
     if (args) {
       str = Drupal.formatString(str, args);
     }
@@ -518,7 +515,6 @@ window.Drupal = { behaviors: {}, locale: {} };
     } else if (args['@count'] !== 1) {
       index = 1;
     }
-
     return translations[index];
   };
 
@@ -577,7 +573,6 @@ window.Drupal = { behaviors: {}, locale: {} };
     if (!Proxy || !Reflect) {
       return target;
     }
-
     return new Proxy(target, {
       get: (target, key, ...rest) => {
         if (key === deprecatedProperty) {

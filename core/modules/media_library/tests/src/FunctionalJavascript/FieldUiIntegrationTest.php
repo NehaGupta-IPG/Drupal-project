@@ -33,6 +33,11 @@ class FieldUiIntegrationTest extends MediaLibraryTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->drupalPlaceBlock('local_tasks_block');

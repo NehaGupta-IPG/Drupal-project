@@ -30,6 +30,14 @@
       content: none;
     }
   }
+}
+
+@media (min-width: 62.5rem) {
+
+  .breadcrumb {
+    position: static;
+  }
+}
 
   @media (min-width: 62.5rem) {
     position: static;

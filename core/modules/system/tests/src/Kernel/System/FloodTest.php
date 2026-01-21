@@ -6,7 +6,6 @@ namespace Drupal\Tests\system\Kernel\System;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Flood\DatabaseBackend;
-use Drupal\Core\Flood\MemoryBackend;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;

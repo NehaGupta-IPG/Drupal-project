@@ -69,4 +69,40 @@ class ImageTest extends ImageTestTestBase {
     $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', '.ck-widget.image-inline > img[src$="test-svg-upload.svg"]'));
   }
 
+  protected function addImage() {
+    $page = $this->getSession()->getPage();
+    $this->assertNotEmpty($image_upload_field = $page->find('css', '.ck-file-dialog-button input[type="file"]'));
+    $image = $this->getTestFiles('image')[0];
+    $image_upload_field->attachFile($this->container->get('file_system')->realpath($image->uri));
+    // Wait for the image to be uploaded and rendered by CKEditor 5.
+    $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', '.ck-widget.image > img[src*="' . $image->filename . '"]'));
+  }
+
+  /**
+   * Tests the ckeditor5_imageResize and ckeditor5_imageUpload settings forms.
+   */
+  public function testImageSettingsForm() {
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet('admin/config/content/formats/manage/test_format');
+
+    // The image resize and upload plugin settings forms should be present.
+    $assert_session->elementExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-imageresize"]');
+    $assert_session->elementExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-image"]');
+
+    // Removing the drupalImageInsert button from the toolbar must remove the
+    // plugin settings forms too.
+    $this->triggerKeyUp('.ckeditor5-toolbar-item-drupalInsertImage', 'ArrowUp');
+    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->elementNotExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-imageresize"]');
+    $assert_session->elementNotExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-image"]');
+
+    // Re-adding the drupalImageInsert button to the toolbar must re-add the
+    // plugin settings forms too.
+    $this->triggerKeyUp('.ckeditor5-toolbar-item-drupalInsertImage', 'ArrowDown');
+    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->elementExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-imageresize"]');
+    $assert_session->elementExists('css', '[data-drupal-selector="edit-editor-settings-plugins-ckeditor5-image"]');
+  }
+
 }

@@ -84,6 +84,9 @@ class ViewsConfigUpdater {
       if ($this->processRssViewModeUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->processImageLazyLoadFieldHandler($handler, $handler_type, $view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }

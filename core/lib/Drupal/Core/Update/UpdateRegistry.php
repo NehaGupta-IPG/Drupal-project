@@ -228,6 +228,11 @@ class UpdateRegistry implements EventSubscriberInterface {
    *
    * @return callable[]
    *   A list of update functions.
+   *
+   * @deprecated in drupal:9.4.0 and is removed from drupal:10.0.0. Use
+   *   \Drupal\Core\Update\UpdateRegistry::getUpdateFunctions() instead.
+   *
+   * @see https://www.drupal.org/node/3260162
    */
   public function getUpdateFunctions($extension_name) {
     $this->scanExtensionsAndLoadUpdateFiles($extension_name);
@@ -282,7 +287,59 @@ class UpdateRegistry implements EventSubscriberInterface {
       return !str_starts_with($function_name, "{$extension}_{$this->updateType}_");
     });
 
-    $this->keyValue->set('existing_updates', array_values($remaining_update_functions));
+  /**
+   * Processes the list of installed extensions when core.extension changes.
+   *
+   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   *   The Event to process.
+   */
+  public function onConfigSave(ConfigCrudEvent $event) {
+    $config = $event->getConfig();
+    if ($config->getName() === 'core.extension') {
+      // Build the old extension configuration list from configuration rather
+      // than using $this->enabledExtensions. This ensures that if the
+      // UpdateRegistry is constructed after _drupal_maintenance_theme() has
+      // added a theme to the theme handler it will not be considered as already
+      // installed.
+      $old_extension_list = array_keys($config->getOriginal('module') ?? []);
+      $new_extension_list = array_keys($config->get('module'));
+      if ($this->includeThemes()) {
+        $new_extension_list = array_merge($new_extension_list, array_keys($config->get('theme')));
+        $old_extension_list = array_merge($old_extension_list, array_keys($config->getOriginal('theme') ?? []));
+      }
+
+      // The list of extensions installed or uninstalled. In regular operation
+      // only one of the lists will have a single value. This is because Drupal
+      // can only install one extension at a time.
+      $uninstalled_extensions = array_diff($old_extension_list, $new_extension_list);
+      $installed_extensions = array_diff($new_extension_list, $old_extension_list);
+
+      // Set the list of enabled extensions correctly so update function
+      // discovery works as expected.
+      $this->enabledExtensions = $new_extension_list;
+
+      foreach ($uninstalled_extensions as $uninstalled_extension) {
+        $this->filterOutInvokedUpdatesByExtension($uninstalled_extension);
+      }
+      foreach ($installed_extensions as $installed_extension) {
+        // Ensure that all post_update functions are registered already. This
+        // should include existing post-updates, as well as any specified as
+        // having been previously removed, to ensure that newly installed and
+        // updated sites have the same entries in the registry.
+        $this->registerInvokedUpdates(array_merge(
+          $this->getUpdateFunctions($installed_extension),
+          array_keys($this->getRemovedPostUpdates($installed_extension))
+        ));
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getSubscribedEvents() {
+    $events[ConfigEvents::SAVE][] = ['onConfigSave'];
+    return $events;
   }
 
   /**
