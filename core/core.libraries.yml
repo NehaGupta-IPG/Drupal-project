@@ -230,6 +230,7 @@ drupal.active-link:
 drupal.ajax:
   version: VERSION
   js:
+    misc/sizzle-deprecation.js: { weight: -1 }
     misc/ajax.js: {}
   css:
     component:

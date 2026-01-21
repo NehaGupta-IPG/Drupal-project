@@ -22,7 +22,7 @@
     status,
   ) {
     $('.hilited').removeClass('hilited');
-    $(response.selector).addClass('hilited');
+    Drupal.deprecateSizzleSelector(response.selector).addClass('hilited');
   };
 
   /**

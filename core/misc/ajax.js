@@ -1329,8 +1329,8 @@
       // Get information from the response. If it is not there, default to
       // our presets.
       const $wrapper = response.selector
-        ? $(response.selector)
-        : $(ajax.wrapper);
+        ? Drupal.deprecateSizzleSelector(response.selector)
+        : Drupal.deprecateSizzleSelector(ajax.wrapper);
       const method = response.method || ajax.method;
       const effect = ajax.getEffect(response);
 
@@ -1427,7 +1427,7 @@
      */
     remove(ajax, response, status) {
       const settings = response.settings || ajax.settings || drupalSettings;
-      $(response.selector)
+      Drupal.deprecateSizzleSelector(response.selector)
         .each(function () {
           Drupal.detachBehaviors(this, settings);
         })
@@ -1450,7 +1450,7 @@
      *   The request status.
      */
     changed(ajax, response, status) {
-      const $element = $(response.selector);
+      const $element = Drupal.deprecateSizzleSelector(response.selector);
       if (!$element.hasClass('ajax-changed')) {
         $element.addClass('ajax-changed');
         if (response.asterisk) {
@@ -1533,7 +1533,7 @@
      */
     css(ajax, response, status) {
       // eslint-disable-next-line no-jquery/no-css
-      $(response.selector).css(response.argument);
+      Drupal.deprecateSizzleSelector(response.selector).css(response.argument);
     },
 
     /**
@@ -1598,7 +1598,10 @@
      *   The XMLHttpRequest status.
      */
     data(ajax, response, status) {
-      $(response.selector).data(response.name, response.value);
+      Drupal.deprecateSizzleSelector(response.selector).data(
+        response.name,
+        response.value,
+      );
     },
 
     /**
@@ -1659,7 +1662,7 @@
      *   The XMLHttpRequest status.
      */
     invoke(ajax, response, status) {
-      const $element = $(response.selector);
+      const $element = Drupal.deprecateSizzleSelector(response.selector);
       $element[response.method](...response.args);
     },
 
@@ -1679,7 +1682,7 @@
       // :even and :odd are reversed because jQuery counts from 0 and
       // we count from 1, so we're out of sync.
       // Match immediate children of the parent element to allow nesting.
-      $(response.selector)
+      Drupal.deprecateSizzleSelector(response.selector)
         .find('> tbody > tr:visible, > tr:visible')
         .removeClass('odd even')
         .filter(':even')
