@@ -240,9 +240,6 @@ class SqlTest extends UnitTestCase {
     }
 
     foreach ($entity_revisions_by_type as $entity_type_id => $entity_revisions) {
-      foreach ($entity_revisions as $revision_id => $revision) {
-        $entity_storages[$entity_type_id]->loadRevision($revision_id)->willReturn($revision);
-      }
       $entity_storages[$entity_type_id]->loadMultipleRevisions(Argument::that(function ($ids) use ($entity_revisions) {
         // The array keys of $ids does not matter but we cannot use an exact
         // match because the keys are not guaranteed by the code in
