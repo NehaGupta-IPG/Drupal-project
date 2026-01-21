@@ -35,14 +35,14 @@ class ItemListTest extends UnitTestCase {
     parent::setUp();
 
     $this->preprocess = new ThemePreprocess(
-      $this->createMock(ConfigFactoryInterface::class),
-      $this->createMock(PathMatcherInterface::class),
-      $this->createMock(CurrentPathStack::class),
-      $this->createMock(LanguageManagerInterface::class),
-      $this->createMock(RendererInterface::class),
-      $this->createMock(RouteMatchInterface::class),
-      $this->createMock(ThemeManagerInterface::class),
-      $this->createMock(ThemeSettingsProvider::class)
+      $this->createStub(ConfigFactoryInterface::class),
+      $this->createStub(PathMatcherInterface::class),
+      $this->createStub(CurrentPathStack::class),
+      $this->createStub(LanguageManagerInterface::class),
+      $this->createStub(RendererInterface::class),
+      $this->createStub(RouteMatchInterface::class),
+      $this->createStub(ThemeManagerInterface::class),
+      $this->createStub(ThemeSettingsProvider::class)
     );
   }
 
