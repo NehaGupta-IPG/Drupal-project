@@ -9,7 +9,14 @@ use Drupal\Core\Asset\AssetResolver;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\JsCollectionGrouper;
+use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Asset\LibraryDependencyResolver;
+use Drupal\Core\Asset\LibraryDependencyResolverInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Cache\MemoryBackend;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Tests\UnitTestCase;
@@ -293,6 +300,50 @@ class AssetResolverTest extends UnitTestCase {
     foreach ($group_a as $key => $value) {
       $this->assertSame($value['items'], $group_b[$key]['items']);
     }
+  }
+
+  public function testDrupalSettingsOnlyLibrary(): void {
+    $library_discovery = $this->createMock(LibraryDiscoveryInterface::class);
+    $library_dependency_resolver = $this->createMock(LibraryDependencyResolverInterface::class);
+    $module_handler = $this->createMock(ModuleHandlerInterface::class);
+    $theme_manager = $this->createMock(ThemeManagerInterface::class);
+    $language_manager = $this->createMock(LanguageManagerInterface::class);
+    $cache = $this->createMock(CacheBackendInterface::class);
+    $theme_handler = $this->createMock(ThemeHandlerInterface::class);
+
+    // Simulate a library that has only drupalSettings and no js/css.
+    $library_discovery->expects($this->once())
+      ->method('getLibraryByName')
+      ->with('core', 'my_settings')
+      ->willReturn([
+        'drupalSettings' => [
+          'myModule' => [
+            'foo' => 'bar',
+          ],
+        ],
+      ]);
+
+    $library_dependency_resolver->method('getLibrariesWithDependencies')->willReturn(['core/my_settings']);
+    $library_dependency_resolver->method('getMinimalRepresentativeSubset')->willReturn(['core/my_settings']);
+
+    $assets = new AttachedAssets();
+    $assets->setLibraries(['core/my_settings']);
+
+    $resolver = new AssetResolver(
+      $library_discovery,
+      $library_dependency_resolver,
+      $module_handler,
+      $theme_manager,
+      $language_manager,
+      $cache,
+      $theme_handler
+    );
+
+    $result = (new \ReflectionMethod(AssetResolver::class, 'getJsSettingsAssets'))
+      ->invoke($resolver, $assets);
+
+    $this->assertArrayHasKey('myModule', $result);
+    $this->assertSame('bar', $result['myModule']['foo']);
   }
 
 }
