@@ -54,6 +54,9 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
     $this->alterInfo('migration_plugins');
     $this->setCacheBackend($cache_backend, 'migration_plugins');
     $this->moduleHandler = $module_handler;
+    if (func_num_args() > 2) {
+      @trigger_error('Passing a LanguageManagerInterface object to the MigrationPluginManager constructor is deprecated in drupal:11.4.0 and will be removed from drupal:12.0.0. See https://www.drupal.org/node/3568857', E_USER_DEPRECATED);
+    }
   }
 
   /**
