@@ -4,16 +4,43 @@ namespace Drupal\Core\Field\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\TypedData\TranslatableInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Parent plugin for entity reference formatters.
  */
 abstract class EntityReferenceFormatterBase extends FormatterBase {
+
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected ?EntityRepositoryInterface $entityRepository = NULL) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+    if ($this->entityRepository === NULL) {
+      @trigger_error('Calling ' . static::class . '::' . __FUNCTION__ . '() without the $entityRepository argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3492902', E_USER_DEPRECATED);
+      $this->entityRepository = \Drupal::service('entity.repository');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['label'],
+      $configuration['view_mode'],
+      $configuration['third_party_settings'],
+      $container->get('entity.repository'),
+    );
+  }
 
   /**
    * Returns the referenced entities for display.
@@ -49,7 +76,7 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
 
         // Set the entity in the correct language for display.
         if ($entity instanceof TranslatableInterface) {
-          $entity = \Drupal::service('entity.repository')->getTranslationFromContext($entity, $langcode);
+          $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode);
         }
 
         $access = $this->checkAccess($entity);

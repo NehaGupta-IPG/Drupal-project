@@ -2,6 +2,7 @@
 
 namespace Drupal\image\Plugin\Field\FieldWidget;
 
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -13,6 +14,7 @@ use Drupal\file\Element\ManagedFile;
 use Drupal\file\Entity\File;
 use Drupal\file\Plugin\Field\FieldWidget\FileWidget;
 use Drupal\image\Entity\ImageStyle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -25,34 +27,28 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
 )]
 class ImageWidget extends FileWidget {
 
-  /**
-   * The image factory service.
-   *
-   * @var \Drupal\Core\Image\ImageFactory
-   */
-  protected $imageFactory;
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info, protected ?ImageFactory $imageFactory = NULL, protected ?EntityRepositoryInterface $entityRepository = NULL) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $element_info);
+    if ($this->entityRepository === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $entityRepository argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3486475', E_USER_DEPRECATED);
+      $this->entityRepository = \Drupal::service('entity.repository');
+    }
+  }
 
   /**
-   * Constructs an ImageWidget object.
-   *
-   * @param string $plugin_id
-   *   The plugin ID for the widget.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
-   *   The definition of the field to which the widget is associated.
-   * @param array $settings
-   *   The widget settings.
-   * @param array $third_party_settings
-   *   Any third party settings.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $element_info
-   *   The element info manager service.
-   * @param \Drupal\Core\Image\ImageFactory $image_factory
-   *   The image factory service.
+   * {@inheritdoc}
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info, ?ImageFactory $image_factory = NULL) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings, $element_info);
-    $this->imageFactory = $image_factory ?: \Drupal::service('image.factory');
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings'],
+      $container->get('element_info'),
+      $container->get('image.factory'),
+      $container->get('entity.repository'),
+    );
   }
 
   /**
@@ -179,7 +175,7 @@ class ImageWidget extends FileWidget {
       $default_image = $this->fieldDefinition->getFieldStorageDefinition()->getSetting('default_image');
     }
     // Convert the stored UUID into a file ID.
-    if (!empty($default_image['uuid']) && $entity = \Drupal::service('entity.repository')->loadEntityByUuid('file', $default_image['uuid'])) {
+    if (!empty($default_image['uuid']) && $entity = $this->entityRepository->loadEntityByUuid('file', $default_image['uuid'])) {
       $default_image['fid'] = $entity->id();
     }
     $element['#default_image'] = !empty($default_image['fid']) ? $default_image : [];
