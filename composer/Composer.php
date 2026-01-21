@@ -8,6 +8,7 @@ use Composer\Semver\Comparator;
 use Composer\Semver\VersionParser;
 use Drupal\Composer\Generator\ComponentGenerator;
 use Drupal\Composer\Generator\PackageGenerator;
+use Drupal\Composer\NpmDependencies\NpmDependencyManager;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -129,6 +130,26 @@ class Composer {
       ->files()
       ->name('composer.json')
       ->in("$root/composer/$subprojectType");
+  }
+
+  /**
+   * Aggregate npm dependencies from modules/themes and install them.
+   *
+   * Scans configured paths for package.json files, merges dependencies with
+   * conflict resolution, and installs via php-npm.
+   *
+   * @param \Composer\Script\Event $event
+   *   The Composer event.
+   *
+   * @return int
+   *   Exit code: 0 for success, 1 for failure.
+   */
+  public static function npmInstall(Event $event): int {
+    $manager = new NpmDependencyManager(
+      $event->getComposer(),
+      $event->getIO()
+    );
+    return $manager->install();
   }
 
 }
