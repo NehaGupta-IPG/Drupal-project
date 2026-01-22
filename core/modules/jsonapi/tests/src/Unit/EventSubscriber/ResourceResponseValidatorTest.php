@@ -10,6 +10,7 @@ use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\jsonapi\EventSubscriber\ResourceResponseValidator;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\Routing\Routes;
+use Drupal\node\Entity\Node;
 use Drupal\rest\ResourceResponse;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -60,8 +61,6 @@ class ResourceResponseValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate response.
-   *
-   * @legacy-covers ::validateResponse
    */
   #[DataProvider('validateResponseProvider')]
   public function testValidateResponse($request, $response, $expected, $description): void {
@@ -81,7 +80,7 @@ class ResourceResponseValidatorTest extends UnitTestCase {
   public static function validateResponseProvider() {
     $defaults = [
       'route_name' => 'jsonapi.node--article.individual',
-      'resource_type' => new ResourceType('node', 'article', NULL),
+      'resource_type' => new ResourceType('node', 'article', Node::class),
     ];
 
     $test_data = [
