@@ -754,6 +754,7 @@ function claro_views_ui_display_tab_alter(&$element): void {
  * Implements hook_preprocess_HOOK() for views_exposed_form.
  */
 function claro_preprocess_views_exposed_form(&$variables): void {
+  $variables['#attached']['library'][] = 'claro/views';
   $form = &$variables['form'];
 
   // Add BEM classes for items in the form.

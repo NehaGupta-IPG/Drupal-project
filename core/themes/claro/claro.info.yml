@@ -149,8 +149,6 @@ libraries-extend:
     - claro/drupal.node.preview
   system/status.report:
     - claro/status.report
-  views/views.module:
-    - claro/views
   views_ui/admin.styling:
     - claro/views_ui
   media/media_embed_ckeditor_theme:

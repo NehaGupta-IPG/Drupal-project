@@ -446,7 +446,7 @@ class ViewExecutable {
    */
   public $element = [
     '#attached' => [
-      'library' => ['views/views.module'],
+      'library' => [],
       'drupalSettings' => [],
     ],
     '#cache' => [],

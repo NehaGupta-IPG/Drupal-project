@@ -124,8 +124,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT "menu_tree".* FROM "menu_tree" "menu_tree" WHERE ("menu_name" = "main") AND ("depth" <= 2) ORDER BY "p1" ASC, "p2" ASC, "p3" ASC, "p4" ASC, "p5" ASC, "p6" ASC, "p7" ASC, "p8" ASC, "p9" ASC',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:stark:Drupal\Core\Utility\ThemeRegistry", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:stark:Drupal\Core\Utility\ThemeRegistry") AND ("value" = "LOCK_ID")',
-      'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("library_info:stark:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
-      'DELETE FROM "semaphore"  WHERE ("name" = "library_info:stark:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("path_alias_prefix_list:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "path_alias_prefix_list:Drupal\Core\Cache\CacheCollector") AND ("value" = "LOCK_ID")',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("active-trail:route:view.frontpage.page_1:route_parameters:a:2:{s:10:"display_id";s:6:"page_1";s:7:"view_id";s:9:"frontpage";}:Drupal\Core\Cache\CacheCollector", "LOCK_ID", "EXPIRE")',
@@ -134,13 +132,13 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 39,
-      'CacheGetCount' => 97,
+      'QueryCount' => 37,
+      'CacheGetCount' => 96,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 20,
         'data' => 5,
-        'discovery' => 37,
+        'discovery' => 36,
         'bootstrap' => 10,
         'dynamic_page_cache' => 1,
         'render' => 13,
@@ -148,7 +146,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'entity' => 2,
         'menu' => 3,
       ],
-      'CacheSetCount' => 45,
+      'CacheSetCount' => 43,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 10,

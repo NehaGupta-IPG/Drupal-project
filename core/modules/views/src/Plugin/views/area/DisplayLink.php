@@ -205,6 +205,11 @@ class DisplayLink extends AreaPluginBase {
         'target_display_id' => $this->options['display_id'],
         'attributes' => ['class' => $classes],
       ],
+      '#attached' => [
+        'library' => [
+          'views.display_link',
+        ],
+      ],
     ];
   }
 

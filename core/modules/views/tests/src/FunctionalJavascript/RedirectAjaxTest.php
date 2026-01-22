@@ -74,7 +74,6 @@ class RedirectAjaxTest extends WebDriverTestBase {
 
     $this->assertSession()->pageTextContains('The Article Tiny paws and playful mews, kittens bring joy in every hue has been deleted.');
     $this->assertStringStartsWith($original_url, $this->getSession()->getCurrentUrl());
-    $this->assertSession()->responseContains('core/modules/views/css/views.module.css');
   }
 
 }

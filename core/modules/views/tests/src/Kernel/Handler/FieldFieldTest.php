@@ -299,9 +299,7 @@ class FieldFieldTest extends ViewsKernelTestBase {
     // preserved in the render array.
     $render = $executable->display_handler->render();
     $expected_attachments = [
-      'library' => [
-        'views/views.module',
-      ],
+      'library' => [],
     ];
     foreach ($this->entities as $entity) {
       $expected_attachments['library'][] = 'foo/fake_library';

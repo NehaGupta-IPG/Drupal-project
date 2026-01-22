@@ -1019,6 +1019,7 @@ class ViewsThemeHooks {
 
     // Add items to the variables array.
     $variables['items'] = $items;
+    $variables['#attached']['library'][] = 'views/views.grid';
   }
 
   /**
