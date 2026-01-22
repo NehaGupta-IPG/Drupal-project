@@ -416,7 +416,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     }
 
     // Try to determine a sensible default.
-    if (count($column_names) == 1) {
+    if (isset($column_names) && ($column_names) == 1) {
       $default_column = $column_names[0];
     }
 
