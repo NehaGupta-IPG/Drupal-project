@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'Search form' block.
+ *
+ * @property \Drupal\Core\Form\FormBuilderInterface $formBuilder
+ * @property \Drupal\search\SearchPageRepositoryInterface $searchPageRepository
  */
 #[Block(
   id: "search_form_block",
@@ -24,38 +27,38 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 )]
 class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
-  /**
-   * The form builder.
-   *
-   * @var \Drupal\Core\Form\FormBuilderInterface
-   */
-  protected $formBuilder;
-
-  /**
-   * The search page repository.
-   *
-   * @var \Drupal\search\SearchPageRepositoryInterface
-   */
-  protected $searchPageRepository;
-
-  /**
-   * Constructs a new SearchLocalTask.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
-   *   The form builder.
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
-   *   The search page repository.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder, SearchPageRepositoryInterface $search_page_repository) {
+  public function __construct(
+    array $configuration,
+    string $plugin_id,
+    array|object $plugin_definition,
+    protected \Closure|FormBuilderInterface $formBuilderClosure,
+    protected \Closure|SearchPageRepositoryInterface $searchPageRepositoryClosure,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->formBuilder = $form_builder;
-    $this->searchPageRepository = $search_page_repository;
+    if ($formBuilderClosure instanceof FormBuilderInterface) {
+      @trigger_error('Passing a FormBuilderInterface object as the form builder argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a closure that returns the form builder instead. See https://www.drupal.org/node/3553889', E_USER_DEPRECATED);
+      $this->formBuilderClosure = static fn(): FormBuilderInterface => \Drupal::service('form_builder');
+    }
+    if ($searchPageRepositoryClosure instanceof SearchPageRepositoryInterface) {
+      @trigger_error('Passing a SearchPageRepositoryInterface object as the search page repository argument in ' . __METHOD__ . 'is deprecated in drupal:11.3.0 and will not be supported in drupal:12.0.0. Pass a closure that returns the search page repository instead. See https://www.drupal.org/node/3553889', E_USER_DEPRECATED);
+      $this->searchPageRepositoryClosure = static fn(): SearchPageRepositoryInterface => \Drupal::service('search.search_page_repository');
+    }
+  }
+
+  /**
+   * Maintains backwards compatibility to service properties.
+   */
+  public function __get(string $name): mixed {
+    // The $formBuilder and $searchPageRepository properties will be restored in
+    // Drupal 12 using property hooks, but until then, provide backwards
+    // compatibility for the properties for any subclasses by invoking the
+    // respective closures.
+    $closureName = $name . 'Closure';
+    if (property_exists($this, $closureName)) {
+      return ($this->$closureName)();
+    }
+
+    return NULL;
   }
 
   /**
@@ -63,8 +66,8 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static($configuration, $plugin_id, $plugin_definition,
-      $container->get('form_builder'),
-      $container->get('search.search_page_repository')
+      fn(): FormBuilderInterface => $container->get('form_builder'),
+      fn(): SearchPageRepositoryInterface => $container->get('search.search_page_repository')
     );
   }
 
