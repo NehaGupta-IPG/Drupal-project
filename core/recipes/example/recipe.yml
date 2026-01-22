@@ -11,7 +11,7 @@ install:
   # configuration from the new modules is created. This allows the Drupal recipe
   # control over the configuration.
   - node
-  - text
+  - user
 config:
   # A Drupal recipe can have a config directory. All configuration is this
   # directory will be imported after the modules have been installed.
@@ -19,18 +19,18 @@ config:
   # by the modules it configures. This allows them to not have to maintain or
   # copy this configuration.
   import:
-    text:
-      - text.settings
+    user:
+      - user.settings
     # Import all configuration that is provided by the node module and any
-    # optional configuration that depends on the text module that is provided by
+    # optional configuration that depends on the user module that is provided by
     # modules already installed.
     node: '*'
   # Configuration actions may be defined. The structure here should be
-  # entity_type.ID.action. Below, text.settings is updated to set the default
-  # summary length for text fields to 700 characters.
+  # entity_type.ID.action. Below, user.settings is updated to set the
+  # Anonymous user label to 'Anonymous test'.
   actions:
-    text.settings:
+    user.settings:
       simpleConfigUpdate:
-        default_summary_length: 700
+        anonymous: 'Anonymous Test'
 # A Drupal recipe can have a content directory. All content in this directory
 # will be created after the configuration is installed.
