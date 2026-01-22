@@ -53,11 +53,34 @@ class MediaLibraryImageUploadTest extends MediaLibraryTestBase {
     $this->assertNotEmpty($image_path);
     $this->assertFileExists($image_path);
 
-    // Find the file input inside the media library modal and attach the file.
-    $file_input = $this->getSession()->getPage()->find('css', '.media-library input[type="file"], input[type="file"]');
-    if (!$file_input) {
-      $this->fail('File upload input not found in media library modal.');
+    // Wait for the media library/dialog to appear.
+    $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', '.media-library, .ui-dialog'));
+
+    // Try a set of selectors that the input might be rendered with in different envs.
+    $selectors = [
+      '.media-library input[type="file"]',
+      '.ui-dialog input[type="file"]',
+      '.dropzone input[type="file"]',
+      'input[type="file"].js-media-library-dropzone',
+      'input[type="file"]',
+    ];
+
+    $file_input = NULL;
+    foreach ($selectors as $sel) {
+      $element = $this->getSession()->getPage()->find('css', $sel);
+      if ($element) {
+        // Ensure the input is visible so attachFile will work in some drivers.
+        $this->getSession()->executeScript("var el = document.querySelector(" . json_encode($sel) . "); if (el) { el.style.display = 'block'; el.style.visibility = 'visible'; el.style.opacity = 1; }");
+        $file_input = $element;
+        break;
+      }
     }
+
+    if (!$file_input) {
+      // Dump HTML to help debug why the input isn't present in CI.
+      $this->fail('File upload input not found in media library modal. Page HTML: ' . substr($this->getSession()->getPage()->getHtml(), 0, 2000));
+    }
+
     $file_input->attachFile($image_path);
     $this->waitForText('The image was resized to fit within the maximum allowed dimensions of 16x16 pixels.');
   }
