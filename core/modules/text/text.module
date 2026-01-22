@@ -33,7 +33,8 @@ use Drupal\filter\Entity\FilterFormat;
 function text_summary($text, $format = NULL, $size = NULL) {
 
   if (!isset($size)) {
-    $size = \Drupal::config('text.settings')->get('default_summary_length');
+    // 60 was the previous text setting default value.
+    $size = 60;
   }
 
   // Find where the delimiter is in the body.
