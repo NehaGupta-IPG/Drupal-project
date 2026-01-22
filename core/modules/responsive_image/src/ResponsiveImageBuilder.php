@@ -337,7 +337,11 @@ class ResponsiveImageBuilder {
 
     $entity = ImageStyle::load($style_name);
     if ($entity instanceof ImageStyle) {
-      return $this->fileUrlGenerator->transformRelative($entity->buildUrl($path));
+      // If the image style supports this type of image generate the derivative,
+      // otherwise fall back to just the path to the original file.
+      if ($entity->supportsUri($path)) {
+        return $this->fileUrlGenerator->transformRelative($entity->buildUrl($path));
+      }
     }
     return $this->fileUrlGenerator->generateString($path);
   }
