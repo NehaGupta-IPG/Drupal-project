@@ -6,14 +6,17 @@ namespace Drupal\KernelTests\Core\Composer;
 
 use Drupal\Core\Composer\ProjectRoot;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Composer\ProjectRoot
- * @group Composer
- *
  * @internal
  */
+#[Group('Composer')]
+#[CoversClass(ProjectRoot::class)]
+#[CoversMethod(ProjectRoot::class, 'getProjectVendorDirectory')]
 #[RunTestsInSeparateProcesses]
 class ProjectRootTest extends KernelTestBase {
 
@@ -22,8 +25,6 @@ class ProjectRootTest extends KernelTestBase {
    *
    * We don't have a good way to unit test vendor discovery, so we must rely on
    * the behavior of a semi-installed Drupal site.
-   *
-   * @covers ::getProjectVendorDirectory
    */
   public function testGetProjectVendorDirectory(): void {
     $root = new ProjectRoot($this->container->getParameter('app.root'));

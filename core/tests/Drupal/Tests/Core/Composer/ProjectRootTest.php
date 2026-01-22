@@ -7,13 +7,17 @@ namespace Drupal\Tests\Core\Composer;
 use Drupal\Core\Composer\ProjectRoot;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Composer\ProjectRoot
- * @group Composer
- *
  * @internal
  */
+#[Group('Composer')]
+#[CoversClass(ProjectRoot::class)]
+#[CoversMethod(ProjectRoot::class, 'isDevInstall')]
 class ProjectRootTest extends UnitTestCase {
 
   /**
@@ -26,7 +30,7 @@ class ProjectRootTest extends UnitTestCase {
    * @param string $root_path
    *   The root directory of the vfsStream mock.
    */
-  protected function getMockProjectRoot($root_path): ProjectRoot {
+  protected function getMockProjectRoot(string $root_path): ProjectRoot {
     $root = $this->getMockBuilder(ProjectRoot::class)
       ->onlyMethods(['getProjectVendorDirectory'])
       ->setConstructorArgs([vfsStream::url($root_path)])
@@ -59,10 +63,7 @@ class ProjectRootTest extends UnitTestCase {
     ];
   }
 
-  /**
-   * @covers ::isDevInstall
-   * @dataProvider provideInstalledJson
-   */
+  #[DataProvider('provideInstalledJson')]
   public function testIsDevInstall($expected, $filesystem): void {
     vfsStream::setup('root_test', NULL, $filesystem);
     $root = $this->getMockProjectRoot('root_test');

@@ -9,19 +9,23 @@ use Drupal\Core\Composer\ProjectRootInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\Core\Composer\Dependencies\DevDependencyFinder
- * @group Composer
- * @group Dependencies
- *
  * @internal
  *
  * @todo Make this a UnitTestBase test when the systems it tests no longer have
  *   dependencies on install.inc.
  * @see https://www.drupal.org/node/2909480
  */
+#[Group('Composer')]
+#[Group('Dependencies')]
+#[CoversClass(DevDependencyFinder::class)]
+#[CoversMethod(DevDependencyFinder::class, 'buildRequirements')]
 #[RunTestsInSeparateProcesses]
 class DevDependencyFinderTest extends KernelTestBase {
 
@@ -35,10 +39,7 @@ class DevDependencyFinderTest extends KernelTestBase {
     ];
   }
 
-  /**
-   * @covers ::buildRequirements
-   * @dataProvider provideBuildRequirements
-   */
+  #[DataProvider('provideBuildRequirements')]
   public function testBuildRequirements($expected, $isDevInstall): void {
     $mock_root = $this->getMockBuilder(ProjectRootInterface::class)
       ->onlyMethods(['getProjectVendorDirectory', 'isDevInstall'])
