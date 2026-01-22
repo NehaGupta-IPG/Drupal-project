@@ -13,7 +13,8 @@
         "drupal/core": "self.version",
         "drupal/core-project-message": "self.version",
         "drupal/core-recipe-unpack": "self.version",
-        "drupal/core-vendor-hardening": "self.version"
+        "drupal/core-vendor-hardening": "self.version",
+        "theodoreb/php-npm": "dev-main"
     },
     "conflict": {
         "dealerdirect/phpcodesniffer-composer-installer": "1.1.0"
@@ -98,6 +99,16 @@
         "drupal-recipe-unpack": {
             "on-require": false
         },
+        "drupal-npm-install": {
+            "scan-paths": [
+                "core",
+                "modules",
+                "themes",
+                "profiles"
+            ],
+            "include-dev-dependencies": false,
+            "conflict-resolution": "highest-satisfies"
+        },
         "drupal-core-project-message": {
             "post-install-cmd-message": [
                 "<bg=blue;fg=white>drupal/drupal</>: This package is meant for core development,",
@@ -135,9 +146,14 @@
             "Drupal\\Composer\\Composer::generateComponentPackages"
         ],
         "phpcs": "phpcs --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
-        "phpcbf": "phpcbf --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --"
+        "phpcbf": "phpcbf --standard=core/phpcs.xml.dist --parallel=\"$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)\" --",
+        "npm-install": "Drupal\\Composer\\Composer::npmInstall"
     },
     "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/theodoreb/php-npm"
+        },
         {
             "type": "path",
             "canonical": false,

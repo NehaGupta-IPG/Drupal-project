@@ -1,0 +1,8 @@
+{
+    "name": "drupal-project",
+    "private": true,
+    "description": "Aggregated npm dependencies from Drupal modules and themes",
+    "_drupalSources": [],
+    "_generatedBy": "drupal/drupal composer npm-install",
+    "_generatedAt": "2026-01-22T00:53:18+00:00"
+}
