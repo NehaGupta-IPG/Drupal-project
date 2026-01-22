@@ -1,14 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that form values are properly delivered to AJAX callbacks.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class FormValuesTest extends WebDriverTestBase {
 
   /**
@@ -31,10 +36,9 @@ class FormValuesTest extends WebDriverTestBase {
 
   /**
    * Submits forms with select and checkbox elements via Ajax.
-   *
-   * @dataProvider formModeProvider
    */
-  public function testSimpleAjaxFormValue($form_mode) {
+  #[DataProvider('formModeProvider')]
+  public function testSimpleAjaxFormValue($form_mode): void {
     $this->drupalGet('ajax_forms_test_get_form');
 
     $session = $this->getSession();
@@ -76,7 +80,7 @@ class FormValuesTest extends WebDriverTestBase {
   /**
    * Tests that AJAX elements with invalid callbacks return error code 500.
    */
-  public function testSimpleInvalidCallbacksAjaxFormValue() {
+  public function testSimpleInvalidCallbacksAjaxFormValue(): void {
     $this->drupalGet('ajax_forms_test_get_form');
 
     $session = $this->getSession();
@@ -115,7 +119,7 @@ class FormValuesTest extends WebDriverTestBase {
   /**
    * Data provider for testSimpleAjaxFormValue.
    */
-  public function formModeProvider() {
+  public static function formModeProvider() {
     return [
       ['direct'],
       ['dialog'],

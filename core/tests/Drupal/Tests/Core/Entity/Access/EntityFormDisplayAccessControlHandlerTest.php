@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Entity\Access;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
@@ -19,11 +21,14 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Entity\Entity\Access\EntityFormDisplayAccessControlHandler
- * @group Entity
+ * Tests Drupal\Core\Entity\Entity\Access\EntityFormDisplayAccessControlHandler.
  */
+#[CoversClass(EntityFormDisplayAccessControlHandler::class)]
+#[Group('Entity')]
 class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
 
   /**
@@ -210,10 +215,12 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::access
-   * @covers ::checkAccess
+   * Tests access.
+   *
+   * @legacy-covers ::access
+   * @legacy-covers ::checkAccess
    */
-  public function testAccess() {
+  public function testAccess(): void {
     $this->assertAllowOperations([], $this->anon);
     $this->assertAllowOperations(['view', 'update', 'delete'], $this->member);
     $this->assertAllowOperations(['view', 'update', 'delete'], $this->parentMember);

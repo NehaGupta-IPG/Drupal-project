@@ -1,22 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel;
 
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity_test\Entity\EntityTest;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the field type manager.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldTypePluginManagerTest extends FieldKernelTestBase {
 
   /**
    * Tests the default settings convenience methods.
    */
-  public function testDefaultSettings() {
+  public function testDefaultSettings(): void {
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     foreach (['test_field', 'shape', 'hidden_test_field'] as $type) {
       $definition = $field_type_manager->getDefinition($type);
@@ -28,7 +32,7 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
   /**
    * Tests creation of field item instances.
    */
-  public function testCreateInstance() {
+  public function testCreateInstance(): void {
     /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     foreach (['test_field', 'shape', 'hidden_test_field'] as $type) {
@@ -55,7 +59,7 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
   /**
    * Tests creation of field item instances.
    */
-  public function testCreateInstanceWithConfig() {
+  public function testCreateInstanceWithConfig(): void {
     /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $type = 'test_field';
@@ -87,7 +91,7 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
   /**
    * Tests all field items provide an existing main property.
    */
-  public function testMainProperty() {
+  public function testMainProperty(): void {
     // Let's enable all Drupal modules in Drupal core, so we test any field
     // type plugin.
     $this->enableAllCoreModules();
@@ -111,15 +115,27 @@ class FieldTypePluginManagerTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests UI definitions per entity type.
+   */
+  public function testUiDefinitionsPerEntityType(): void {
+    /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
+    $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
+    $definitions = $field_type_manager->getEntityTypeUiDefinitions('node');
+    $this->assertEquals('Boolean (overridden by alter)', (string) $definitions['boolean']['label']);
+    $definitions = $field_type_manager->getEntityTypeUiDefinitions('entity_test');
+    $this->assertEquals('Boolean', (string) $definitions['boolean']['label']);
+  }
+
+  /**
    * Enable all core modules.
    */
-  protected function enableAllCoreModules() {
+  protected function enableAllCoreModules(): void {
     $listing = new ExtensionDiscovery($this->root);
     $module_list = $listing->scan('module', FALSE);
     /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
     $module_handler = $this->container->get('module_handler');
     $module_list = array_filter(array_keys($module_list), function ($module) use ($module_handler, $module_list) {
-      return !$module_handler->moduleExists($module) && substr($module_list[$module]->getPath(), 0, 4) === 'core';
+      return !$module_handler->moduleExists($module) && str_starts_with($module_list[$module]->getPath(), 'core');
     });
     $this->enableModules($module_list);
   }

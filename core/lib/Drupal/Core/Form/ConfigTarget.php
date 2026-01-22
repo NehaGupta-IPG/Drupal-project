@@ -36,20 +36,20 @@ final class ConfigTarget {
   /**
    * Transforms a value loaded from config before it gets displayed by the form.
    *
-   * @var \Closure|null
+   * @var callable|null
    *
    * @see ::getValue()
    */
-  public readonly ?\Closure $fromConfig;
+  public readonly mixed $fromConfig;
 
   /**
    * Transforms a value submitted by the form before it is set in the config.
    *
-   * @var \Closure|null
+   * @var callable|null
    *
    * @see ::setValue()
    */
-  public readonly ?\Closure $toConfig;
+  public readonly mixed $toConfig;
 
   /**
    * Constructs a ConfigTarget object.
@@ -74,8 +74,8 @@ final class ConfigTarget {
    *   return an array with the transformed values, also keyed by property path.
    *   The callback will receive the form state object as its second argument.
    *   The callback may return a special values:
-   *   - ToConfig::NoMapping, to indicate that the given form value does not
-   *     need to be mapped onto the Config object
+   *   - ToConfig::NoOp, to indicate that the given form value does not need to
+   *     be mapped onto the Config object
    *   - ToConfig::DeleteKey to indicate that the targeted property path should
    *     be deleted from config.
    *   Defaults to NULL.
@@ -86,8 +86,8 @@ final class ConfigTarget {
     ?callable $fromConfig = NULL,
     ?callable $toConfig = NULL,
   ) {
-    $this->fromConfig = $fromConfig ? $fromConfig(...) : NULL;
-    $this->toConfig = $toConfig ? $toConfig(...) : NULL;
+    $this->fromConfig = $fromConfig;
+    $this->toConfig = $toConfig;
 
     if (is_string($propertyPath)) {
       $propertyPath = [$propertyPath];
@@ -217,8 +217,8 @@ final class ConfigTarget {
     if ($this->toConfig) {
       $value = ($this->toConfig)($value, $form_state);
       if ($is_multi_target) {
-        // If we're targeting multiple property paths, $value needs to be an array
-        // with every targeted property path.
+        // If we're targeting multiple property paths, $value needs to be an
+        // array with every targeted property path.
         if (!is_array($value)) {
           throw new \LogicException(sprintf('The toConfig callable returned a %s, but it must be an array with a key-value pair for each of the targeted property paths.', gettype($value)));
         }
@@ -237,7 +237,7 @@ final class ConfigTarget {
     }
 
     // Set the returned value, or if a special value (one of the cases in the
-    // ConfigTargetValue enum): apply the appropriate action.
+    // ToConfig enum): apply the appropriate action.
     array_walk($value, fn (mixed $value, string $property) => match ($value) {
       // No-op.
       ToConfig::NoOp => NULL,

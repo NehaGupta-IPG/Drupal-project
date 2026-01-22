@@ -1,20 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\announcements_feed\Kernel;
 
+use Drupal\announcements_feed\AnnounceFetcher;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\announcements_feed\AnnounceFetcher
- *
- * @group announcements_feed
+ * Tests Drupal\announcements_feed\AnnounceFetcher.
  */
+#[CoversClass(AnnounceFetcher::class)]
+#[Group('announcements_feed')]
+#[RunTestsInSeparateProcesses]
 class AnnounceFetcherTest extends AnnounceTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
     parent::setUp();
     $this->installConfig(['announcements_feed']);
   }
@@ -25,11 +34,9 @@ class AnnounceFetcherTest extends AnnounceTestBase {
    * @param mixed[] $feed_item
    *   The feed item to test. 'title' and 'url' are omitted from this array
    *   because they do not need to vary between test cases.
-   *
-   * @dataProvider providerShowAnnouncements
    */
+  #[DataProvider('providerShowAnnouncements')]
   public function testShowAnnouncements(array $feed_item): void {
-    $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
     $this->setFeedItems([$feed_item]);
     $feeds = $this->fetchFeedItems();
     $this->assertCount(1, $feeds);
@@ -43,7 +50,6 @@ class AnnounceFetcherTest extends AnnounceTestBase {
    * Tests feed fields.
    */
   public function testFeedFields(): void {
-    $this->markTestSkipped('Skipped due to major version-specific logic. See https://www.drupal.org/project/drupal/issues/3359322');
     $feed_item_1 = [
       'id' => '1001',
       'content_html' => 'Test teaser 1',
@@ -68,7 +74,7 @@ class AnnounceFetcherTest extends AnnounceTestBase {
   /**
    * Data provider for testShowAnnouncements().
    */
-  public function providerShowAnnouncements(): array {
+  public static function providerShowAnnouncements(): array {
     return [
       '1' => [
         'feed_item' => [

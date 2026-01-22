@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the off-canvas dialog functionality.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class FrameworkTest extends WebDriverTestBase {
 
   /**
@@ -24,7 +28,7 @@ class FrameworkTest extends WebDriverTestBase {
   /**
    * Tests that new JavaScript and CSS files are lazy-loaded on an AJAX request.
    */
-  public function testLazyLoad() {
+  public function testLazyLoad(): void {
     $expected = [
       'setting_name' => 'ajax_forms_test_lazy_load_form_submit',
       'setting_value' => 'executed',
@@ -84,7 +88,7 @@ class FrameworkTest extends WebDriverTestBase {
   /**
    * Tests that drupalSettings.currentPath is not updated on AJAX requests.
    */
-  public function testCurrentPathChange() {
+  public function testCurrentPathChange(): void {
     $this->drupalGet('ajax_forms_test_lazy_load_form');
     $page = $this->getSession()->getPage();
     $assert = $this->assertSession();
@@ -99,7 +103,7 @@ class FrameworkTest extends WebDriverTestBase {
   /**
    * Tests that overridden CSS files are not added during lazy load.
    */
-  public function testLazyLoadOverriddenCSS() {
+  public function testLazyLoadOverriddenCSS(): void {
     // The test_theme throws a few JavaScript errors. Since we're only
     // interested in CSS for this test, we're not letting this test fail on
     // those.
