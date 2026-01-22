@@ -276,7 +276,7 @@
 }
 .toolbar-tab--inert {
   /* Important is required as this is set to display: block with very high
-   specificity. */
+   * specificity. */
   display: none !important;
 }
 /* Anti flicker styling. */
