@@ -85,7 +85,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $group_info = NULL;
 
   /**
@@ -100,7 +100,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * @var bool
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $no_operator = FALSE;
 
   /**
@@ -108,7 +108,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * @var bool
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $always_required = FALSE;
 
   /**
@@ -889,7 +889,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *   (optional) The form element to set any errors on.
    *
    * @return string
-   *   Returns an error message if validation fails, or NULL if validation passes.
+   *   The error message if validation fails, or NULL if validation passes.
    */
   protected function validateIdentifier($identifier, ?FormStateInterface $form_state = NULL, &$form_group = []) {
     $error = '';
@@ -990,6 +990,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * filter.
    */
   public function groupForm(&$form, FormStateInterface $form_state) {
+    $groups = [];
     if (!empty($this->options['group_info']['optional']) && !$this->multipleExposedInput()) {
       $groups = ['All' => $this->t('- Any -')];
     }
@@ -1226,9 +1227,11 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         continue;
       }
       // Each rows contains three widgets:
-      // a) The title, where users define how they identify a pair of operator | value
-      // b) The operator
-      // c) The value (or values) to use in the filter with the selected operator
+      // - The title, where users define how they identify a pair of
+      //   operator | value.
+      // - The operator.
+      // - The value (or values) to use in the filter with the selected
+      //   operator.
 
       // In each row, we have to display the operator form and the value from
       // $row acts as a fake form to render each widget in a row.
@@ -1498,16 +1501,20 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
       if (!empty($selected_group_id)) {
         $selected_group = $selected_group_id;
       }
-      else {
+      elseif (isset($input[$this->options['group_info']['identifier']])) {
         $selected_group = $input[$this->options['group_info']['identifier']];
       }
+      else {
+        return FALSE;
+      }
+
       if ($selected_group == 'All' && !empty($this->options['group_info']['optional'])) {
         return NULL;
       }
       if ($selected_group != 'All' && empty($this->options['group_info']['group_items'][$selected_group])) {
         return FALSE;
       }
-      if (isset($selected_group) && isset($this->options['group_info']['group_items'][$selected_group])) {
+      if (isset($this->options['group_info']['group_items'][$selected_group])) {
         $selected_group_options = $this->options['group_info']['group_items'][$selected_group];
 
         $operator_id = $this->options['expose']['operator'];
@@ -1524,9 +1531,8 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
         $this->group_info = $input[$this->options['group_info']['identifier']];
         return TRUE;
       }
-      else {
-        return FALSE;
-      }
+
+      return FALSE;
     }
   }
 
@@ -1613,10 +1619,10 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
 
     if (!empty($this->options['expose']['identifier'])) {
       if ($this->options['is_grouped']) {
-        $value = $input[$this->options['group_info']['identifier']];
+        $value = $input[$this->options['group_info']['identifier']] ?? NULL;
       }
       else {
-        $value = $input[$this->options['expose']['identifier']];
+        $value = $input[$this->options['expose']['identifier']] ?? NULL;
       }
 
       // Various ways to check for the absence of non-required input.

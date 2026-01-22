@@ -4,7 +4,7 @@ namespace Drupal\views;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Render\Markup;
@@ -20,7 +20,7 @@ class FieldViewsDataProvider {
   use StringTranslationTrait;
 
   public function __construct(
-    protected readonly EntityTypeManager $entityTypeManager,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly FieldTypePluginManagerInterface $fieldTypePluginManager,
     protected readonly EntityFieldManagerInterface $entityFieldManager,
   ) {}
@@ -139,8 +139,8 @@ class FieldViewsDataProvider {
     if (!empty($translatable_configs) && empty($untranslatable_configs)) {
       $translation_join_type = 'language';
     }
-    // If the field is translatable only on certain bundles, there will be a join
-    // on langcode OR bundle name.
+    // If the field is translatable only on certain bundles, there will be a
+    // join on langcode OR bundle name.
     elseif (!empty($translatable_configs) && !empty($untranslatable_configs)) {
       foreach ($untranslatable_configs as $config) {
         $untranslatable_config_bundles[] = $config->getTargetBundle();
@@ -184,7 +184,7 @@ class FieldViewsDataProvider {
         'value' => $untranslatable_config_bundles,
       ];
     }
-    elseif ($translation_join_type === 'language') {
+    elseif ($translation_join_type === 'language' && $data_table) {
       $data[$table_alias]['table']['join'][$data_table]['extra'][] = [
         'left_field' => 'langcode',
         'field' => 'langcode',
@@ -226,7 +226,7 @@ class FieldViewsDataProvider {
           'field' => 'bundle',
         ];
       }
-      elseif ($translation_join_type === 'language') {
+      elseif ($translation_join_type === 'language' && $entity_revision_data_table) {
         $data[$table_alias]['table']['join'][$entity_revision_data_table]['extra'][] = [
           'left_field' => 'langcode',
           'field' => 'langcode',
@@ -268,8 +268,8 @@ class FieldViewsDataProvider {
         'help' => $this->t('Appears in: @bundles.', ['@bundles' => implode(', ', $bundles_names)]),
       ];
 
-      // Go through and create a list of aliases for all possible combinations of
-      // entity type + name.
+      // Go through and create a list of aliases for all possible combinations
+      // of entity type + name.
       $aliases = [];
       $also_known = [];
       foreach ($all_labels as $label_name => $true) {
@@ -296,15 +296,15 @@ class FieldViewsDataProvider {
       }
       if ($aliases) {
         $data[$table_alias][$field_alias]['aliases'] = $aliases;
-        // The $also_known variable contains markup that is HTML escaped and that
-        // loses safeness when imploded. The help text is used in #description
-        // and therefore XSS admin filtered by default. Escaped HTML is not
-        // altered by XSS filtering, therefore it is safe to just concatenate the
-        // strings. Afterwards we mark the entire string as safe, so it won't be
-        // escaped, no matter where it is used.
+        // The $also_known variable contains markup that is HTML escaped and
+        // that loses safeness when imploded. The help text is used in
+        // #description and therefore XSS admin filtered by default. Escaped
+        // HTML is not altered by XSS filtering, therefore it is safe to just
+        // concatenate the strings. Afterwards we mark the entire string as
+        // safe, so it won't be escaped, no matter where it is used.
         // Considering the dual use of this help data (both as metadata and as
-        // help text), other patterns such as use of #markup would not be correct
-        // here.
+        // help text), other patterns such as use of #markup would not be
+        // correct here.
         $data[$table_alias][$field_alias]['help'] = Markup::create($data[$table_alias][$field_alias]['help'] . ' ' . $this->t('Also known as:') . ' ' . implode(', ', $also_known));
       }
 
@@ -328,7 +328,8 @@ class FieldViewsDataProvider {
     foreach ($field_columns as $column => $attributes) {
       $allow_sort = TRUE;
 
-      // Identify likely filters and arguments for each column based on field type.
+      // Identify likely filters and arguments for each column based on field
+      // type.
       switch ($attributes['type']) {
         case 'int':
         case 'mediumint':
@@ -387,8 +388,8 @@ class FieldViewsDataProvider {
           'help' => $this->t('Appears in: @bundles.', ['@bundles' => implode(', ', $bundles_names)]),
         ];
 
-        // Go through and create a list of aliases for all possible combinations of
-        // entity type + name.
+        // Go through and create a list of aliases for all possible combinations
+        // of entity type + name.
         $aliases = [];
         $also_known = [];
         foreach ($all_labels as $label_name => $true) {
@@ -508,7 +509,7 @@ class FieldViewsDataProvider {
    * @param \Drupal\field\FieldStorageConfigInterface $field_storage
    *   The field storage definition.
    *
-   * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage|bool
+   * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage|false
    *   Returns the entity type storage if supported and FALSE otherwise.
    */
   public function getSqlStorageForField(FieldStorageConfigInterface $field_storage): SqlContentEntityStorage|bool {

@@ -250,7 +250,7 @@ class BigPipe {
     // that strings in inline JavaScript or CDATA sections aren't used instead.
     $parts = explode('</body>', $content);
     $post_body = array_pop($parts);
-    $pre_body = implode('', $parts);
+    $pre_body = implode('</body>', $parts);
 
     $this->sendPreBody($pre_body, $nojs_placeholders, $cumulative_assets);
     $this->sendPlaceholders($placeholders, $this->getPlaceholderOrder($pre_body, $placeholders), $cumulative_assets);
@@ -292,7 +292,7 @@ class BigPipe {
       // Create a new HtmlResponse. Ensure the CSS and (non-bottom) JS is sent
       // before the HTML they're associated with.
       // @see \Drupal\Core\Render\HtmlResponseSubscriber
-      // @see template_preprocess_html()
+      // @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
       $js_bottom_placeholder = '<nojs-bigpipe-placeholder-scripts-bottom-placeholder token="' . Crypt::randomBytesBase64(55) . '">';
 
       $html_response = new HtmlResponse();
@@ -398,7 +398,7 @@ class BigPipe {
       // before the HTML they're associated with. In other words: ensure the
       // critical assets for this placeholder's markup are loaded first.
       // @see \Drupal\Core\Render\HtmlResponseSubscriber
-      // @see template_preprocess_html()
+      // @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
       $css_placeholder = '<nojs-bigpipe-placeholder-styles-placeholder token="' . $token . '">';
       $js_placeholder = '<nojs-bigpipe-placeholder-scripts-placeholder token="' . $token . '">';
       $elements['#markup'] = BigPipeMarkup::create($css_placeholder . $js_placeholder . (string) $elements['#markup']);

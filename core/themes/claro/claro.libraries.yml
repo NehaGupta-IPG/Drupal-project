@@ -12,12 +12,10 @@ global-styling:
       css/classy/components/field.css: {}
       css/classy/components/icons.css: {}
       css/classy/components/inline-form.css: {}
-      css/classy/components/item-list.css: {}
       css/classy/components/link.css: {}
       css/classy/components/links.css: {}
       css/classy/components/menu.css: {}
       css/classy/components/more-link.css: {}
-      css/classy/components/tablesort.css: {}
       css/classy/components/textarea.css: {}
       css/classy/components/ui-dialog.css: {}
       css/components/accordion.css: {}
@@ -50,7 +48,6 @@ global-styling:
       css/components/tables.css: {}
       css/components/table--file-multiple-widget.css: {}
       css/components/search-admin-settings.css: {}
-      css/components/tablesort-indicator.css: {}
       css/components/tableselect.css: {}
       css/components/tabs.css: {}
     theme:
@@ -127,13 +124,21 @@ claro.drupal.dialog:
 claro.tabledrag:
   version: VERSION
   js:
-    js/tabledrag.js: {}
+    js/tabledrag.js: { weight: -1 }
 
 drupal.node.preview:
   version: VERSION
   css:
     theme:
       css/components/node-preview.css: {}
+
+drupal.tablesort:
+  version: VERSION
+  css:
+    component:
+      css/classy/components/tablesort.css: {}
+      css/components/tablesort.css: {}
+      css/components/tablesort-indicator.css: {}
 
 media-form:
   version: VERSION
@@ -205,6 +210,11 @@ details-focus:
 ajax:
   js:
     js/ajax.js: {}
+
+item-list:
+  css:
+    component:
+      css/classy/components/item-list.css: {}
 
 form.password-confirm:
   css:

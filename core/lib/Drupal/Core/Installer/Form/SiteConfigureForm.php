@@ -86,7 +86,7 @@ class SiteConfigureForm extends ConfigFormBase {
     global $install_state;
     $form['#title'] = $this->t('Configure site');
 
-    // Warn about settings.php permissions risk
+    // Warn about settings.php permissions risk.
     $settings_dir = $this->sitePath;
     $settings_file = $settings_dir . '/settings.php';
     // Check that $_POST is empty so we only show this message when the form is
@@ -106,6 +106,7 @@ class SiteConfigureForm extends ConfigFormBase {
         ]));
     }
 
+    $form['#attached']['library'][] = 'core/drupal.fieldgroup';
     $form['#attached']['library'][] = 'system/drupal.system';
     // Add JavaScript time zone detection.
     $form['#attached']['library'][] = 'core/drupal.timezone';
@@ -114,7 +115,8 @@ class SiteConfigureForm extends ConfigFormBase {
     $form['#attached']['drupalSettings']['copyFieldValue']['edit-site-mail'] = ['edit-account-mail'];
 
     $form['site_information'] = [
-      '#type' => 'fieldgroup',
+      '#type' => 'fieldset',
+      '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $this->t('Site information'),
       '#access' => empty($install_state['config_install_path']),
     ];
@@ -146,7 +148,8 @@ class SiteConfigureForm extends ConfigFormBase {
     }
 
     $form['admin_account'] = [
-      '#type' => 'fieldgroup',
+      '#type' => 'fieldset',
+      '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $account_label,
     ];
     $form['admin_account']['account']['name'] = [
@@ -170,7 +173,8 @@ class SiteConfigureForm extends ConfigFormBase {
     ];
 
     $form['regional_settings'] = [
-      '#type' => 'fieldgroup',
+      '#type' => 'fieldset',
+      '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $this->t('Regional settings'),
       '#access' => empty($install_state['config_install_path']),
     ];
@@ -189,9 +193,10 @@ class SiteConfigureForm extends ConfigFormBase {
     ];
 
     $form['update_notifications'] = [
-      '#type' => 'fieldgroup',
+      '#type' => 'fieldset',
+      '#attributes' => ['class' => ['fieldgroup']],
       '#title' => $this->t('Update notifications'),
-      '#description' => $this->t('When checking for updates, your site automatically sends anonymous information to Drupal.org. See the <a href="@update-module-docs" target="_blank">Update module documentation</a> for details.', ['@update-module-docs' => 'https://www.drupal.org/node/178772']),
+      '#description' => $this->t('When checking for updates, your site automatically sends anonymous information to Drupal.org. See the <a href="@update-status-module-docs" target="_blank">Update Status module documentation</a> for details.', ['@update-status-module-docs' => 'https://www.drupal.org/node/178772']),
       '#access' => empty($install_state['config_install_path']),
     ];
     $form['update_notifications']['enable_update_status_module'] = [

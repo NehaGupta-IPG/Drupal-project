@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
  * \Drupal\Core\Render\AttachmentsResponseProcessorInterface and
  * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor
  *
- * @see template_preprocess_html()
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
  * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface
  * @see \Drupal\Core\Render\BareHtmlPageRenderer
  * @see \Drupal\Core\Render\HtmlResponse
@@ -177,7 +177,7 @@ class HtmlRenderer implements MainContentRendererInterface {
     $content['#cache']['tags'][] = 'rendered';
 
     $response = new HtmlResponse($content, 200, [
-      'Content-Type' => 'text/html; charset=UTF-8',
+      'Content-Type' => 'text/html; charset=utf-8',
     ]);
 
     return $response;
