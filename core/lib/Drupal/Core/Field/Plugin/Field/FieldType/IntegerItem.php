@@ -2,23 +2,29 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Defines the 'integer' field type.
- *
- * @FieldType(
- *   id = "integer",
- *   label = @Translation("Number (integer)"),
- *   description = @Translation("This field stores a number in the database as an integer."),
- *   category = @Translation("Number"),
- *   default_widget = "number",
- *   default_formatter = "number_integer"
- * )
  */
+#[FieldType(
+  id: "integer",
+  label: new TranslatableMarkup("Integer"),
+  description: [
+    new TranslatableMarkup("Number without decimal part or fraction"),
+    new TranslatableMarkup("Values are positive, negative, or zero"),
+    new TranslatableMarkup("Maximum values depend on the system"),
+    new TranslatableMarkup("Examples: 123, -123, 0, 3 (pi)"),
+  ],
+  category: "number",
+  weight: -50,
+  default_widget: "number",
+  default_formatter: "number_integer"
+)]
 class IntegerItem extends NumericItemBase {
 
   /**

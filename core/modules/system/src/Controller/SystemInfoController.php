@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Controller;
 
+use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -62,11 +63,12 @@ class SystemInfoController implements ContainerInjectionInterface {
   public function php() {
     if (function_exists('phpinfo')) {
       ob_start();
-      phpinfo(~ (INFO_VARIABLES | INFO_ENVIRONMENT));
+      $phpinfo_flags = Settings::get('sa_core_2023_004_phpinfo_flags', ~ (INFO_VARIABLES | INFO_ENVIRONMENT));
+      phpinfo($phpinfo_flags);
       $output = ob_get_clean();
     }
     else {
-      $output = $this->t('The phpinfo() function is disabled. For more information, visit the <a href=":phpinfo">Enabling and disabling phpinfo()</a> handbook page.', [':phpinfo' => 'https://www.drupal.org/node/243993']);
+      $output = $this->t('The phpinfo() function is disabled. See <a href=":url" target="_blank">PHP documentation</a>.', [':url' => 'https://www.php.net/manual/function.phpinfo.php']);
     }
     return new Response($output);
   }

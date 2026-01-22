@@ -4,15 +4,15 @@ namespace Drupal\views\Plugin\views\area;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Attribute\ViewsArea;
 use Drupal\views\Plugin\views\style\DefaultSummary;
 
 /**
  * Views area handler to display some configurable result summary.
  *
  * @ingroup views_area_handlers
- *
- * @ViewsArea("result")
  */
+#[ViewsArea("result")]
 class Result extends AreaPluginBase {
 
   /**
@@ -36,14 +36,14 @@ class Result extends AreaPluginBase {
     $item_list = [
       '#theme' => 'item_list',
       '#items' => [
-        '@start -- the initial record number in the set',
-        '@end -- the last record number in the set',
-        '@total -- the total records in the set',
-        '@label -- the human-readable name of the view',
-        '@per_page -- the number of items per page',
-        '@current_page -- the current page number',
-        '@current_record_count -- the current page record count',
-        '@page_count -- the total page count',
+        '@start -- ' . $this->t('The initial record number in the set.'),
+        '@end -- ' . $this->t('The last record number in the set.'),
+        '@total -- ' . $this->t('The total records in the set.'),
+        '@label -- ' . $this->t('The human-readable name of the view.'),
+        '@per_page -- ' . $this->t('The number of items per page.'),
+        '@current_page -- ' . $this->t('The current page number.'),
+        '@current_record_count -- ' . $this->t('The current page record count.'),
+        '@page_count -- ' . $this->t('The total page count.'),
       ],
     ];
     $list = \Drupal::service('renderer')->render($item_list);
@@ -78,7 +78,7 @@ class Result extends AreaPluginBase {
     // Calculate the page totals.
     $current_page = (int) $this->view->getCurrentPage() + 1;
     $per_page = (int) $this->view->getItemsPerPage();
-    // @TODO: Maybe use a possible is views empty functionality.
+    // @todo Maybe use a possible is views empty functionality.
     // Not every view has total_rows set, use view->result instead.
     $total = $this->view->total_rows ?? count($this->view->result);
     $label = Html::escape($this->view->storage->label());

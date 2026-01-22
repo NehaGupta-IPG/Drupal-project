@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Menu;
 
+use Drupal\Core\Menu\LocalTaskManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -54,7 +58,7 @@ abstract class LocalTaskIntegrationTestBase extends UnitTestCase {
   /**
    * Sets up the local task manager for the test.
    */
-  protected function getLocalTaskManager($module_dirs, $route_name, $route_params) {
+  protected function getLocalTaskManager(array $module_dirs, string $route_name, array $route_params): LocalTaskManager&MockObject {
     $manager = $this
       ->getMockBuilder('Drupal\Core\Menu\LocalTaskManager')
       ->disableOriginalConstructor()
@@ -63,30 +67,25 @@ abstract class LocalTaskIntegrationTestBase extends UnitTestCase {
 
     $argumentResolver = $this->createMock('Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface');
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'argumentResolver');
-    $property->setAccessible(TRUE);
     $property->setValue($manager, $argumentResolver);
 
-    // todo mock a request with a route.
+    // @todo Mock a request with a route.
     $request_stack = new RequestStack();
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'requestStack');
-    $property->setAccessible(TRUE);
     $property->setValue($manager, $request_stack);
 
     $accessManager = $this->createMock('Drupal\Core\Access\AccessManagerInterface');
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'accessManager');
-    $property->setAccessible(TRUE);
     $property->setValue($manager, $accessManager);
 
     $route_provider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'routeProvider');
-    $property->setAccessible(TRUE);
     $property->setValue($manager, $route_provider);
 
     $module_handler = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandlerInterface')
       ->disableOriginalConstructor()
       ->getMock();
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'moduleHandler');
-    $property->setAccessible(TRUE);
     $property->setValue($manager, $module_handler);
     // Set all the modules as being existent.
     $module_handler->expects($this->any())
@@ -98,11 +97,9 @@ abstract class LocalTaskIntegrationTestBase extends UnitTestCase {
     $pluginDiscovery = new YamlDiscovery('links.task', $module_dirs);
     $pluginDiscovery = new ContainerDerivativeDiscoveryDecorator($pluginDiscovery);
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'discovery');
-    $property->setAccessible(TRUE);
     $property->setValue($manager, $pluginDiscovery);
 
     $method = new \ReflectionMethod('Drupal\Core\Menu\LocalTaskManager', 'alterInfo');
-    $method->setAccessible(TRUE);
     $method->invoke($manager, 'local_tasks');
 
     $plugin_stub = $this->createMock('Drupal\Core\Menu\LocalTaskInterface');
@@ -111,7 +108,6 @@ abstract class LocalTaskIntegrationTestBase extends UnitTestCase {
       ->method('createInstance')
       ->willReturn($plugin_stub);
     $property = new \ReflectionProperty('Drupal\Core\Menu\LocalTaskManager', 'factory');
-    $property->setAccessible(TRUE);
     $property->setValue($manager, $factory);
 
     $cache_backend = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
@@ -123,14 +119,14 @@ abstract class LocalTaskIntegrationTestBase extends UnitTestCase {
   /**
    * Tests integration for local tasks.
    *
-   * @param $route_name
+   * @param string $route_name
    *   Route name to base task building on.
-   * @param $expected_tasks
-   *   A list of tasks groups by level expected at the given route
+   * @param array $expected_tasks
+   *   A list of tasks groups by level expected at the given route.
    * @param array $route_params
    *   (optional) A list of route parameters used to resolve tasks.
    */
-  protected function assertLocalTasks($route_name, $expected_tasks, $route_params = []) {
+  protected function assertLocalTasks(string $route_name, array $expected_tasks, array $route_params = []): void {
 
     $directory_list = [];
     foreach ($this->directoryList as $key => $value) {
