@@ -67,7 +67,7 @@ class CommentFieldItemList extends FieldItemList {
   /**
    * {@inheritdoc}
    */
-  public function hasAffectingChanges(FieldItemListInterface $original_items, $langcode) {
+  public function hasAffectingChanges(FieldItemListInterface $original_items, $langcode): bool {
     return $this->status !== $original_items->status;
   }
 

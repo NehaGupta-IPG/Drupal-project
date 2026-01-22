@@ -243,7 +243,7 @@ class CommentTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests making changes on entity with hidden non-translatable comment field.
    */
-  public function testNonTranslatableCommentFieldHasAffectingChanges() {
+  public function testNonTranslatableCommentFieldHasAffectingChanges(): void {
     // Make comment field non-translatable and hide on translation forms.
     $this->drupalLogin($this->administrator);
     $edit = [
