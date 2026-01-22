@@ -240,4 +240,38 @@ class CommentTranslationUITest extends ContentTranslationUITestBase {
     }
   }
 
+  /**
+   * Tests making changes on entity with hidden non-translatable comment field.
+   */
+  public function testNonTranslatableCommentFieldHasAffectingChanges() {
+    // Make comment field non-translatable and hide on translation forms.
+    $this->drupalLogin($this->administrator);
+    $edit = [
+      'entity_types[node]' => 1,
+      'settings[node][article][translatable]' => 1,
+      'settings[node][article][settings][content_translation][untranslatable_fields_hide]' => 1,
+      'settings[node][article][fields][comment_article]' => 0,
+    ];
+    $this->drupalGet('/admin/config/regional/content-language');
+    $this->submitForm($edit, 'Save configuration');
+    // Create article translator.
+    $user = $this->createUser([
+      'create content translations',
+      'translate article node',
+    ]);
+    $this->drupalLogin($user);
+    // Create a node.
+    $node = $this->drupalCreateNode([
+      'title' => 'Node with non-translatable comment field',
+      'type' => 'article',
+    ]);
+    $nid = $node->id();
+    // Create translation on entity with hidden non-translatable comment field.
+    $this->drupalGet("/node/$nid/translations/add/en/fr");
+    $this->submitForm([], 'Save (this translation)');
+    $assert_session = $this->assertSession();
+    $assert_session->pageTextNotContains('Non-translatable fields can only be changed when updating the original language.');
+    $assert_session->pageTextContains('Article Node with non-translatable comment field has been updated.');
+  }
+
 }
