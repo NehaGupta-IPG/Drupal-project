@@ -58,11 +58,11 @@ class MediaLibraryImageUploadTest extends MediaLibraryTestBase {
 
     // Try a set of selectors that the input might be rendered with in different envs.
     $selectors = [
-      '.media-library input[type="file"]',
+      '.media-library input[type="files[upload]"]',
       '.ui-dialog input[type="file"]',
       '.dropzone input[type="file"]',
       'input[type="file"].js-media-library-dropzone',
-      'input[type="file"]',
+      'input[type="files[upload]"]',
     ];
 
     $file_input = NULL;
