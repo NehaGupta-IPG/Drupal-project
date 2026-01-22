@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Render\Element;
 use Drupal\Core\Render\Element\HtmlTag;
 use Drupal\Core\Render\Markup;
 use Drupal\Tests\Core\Render\RendererTestBase;
+use Drupal\Core\Render\ElementInfoManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -22,7 +23,7 @@ class HtmlTagTest extends RendererTestBase {
    * Tests get info.
    */
   public function testGetInfo(): void {
-    $htmlTag = new HtmlTag([], 'test', 'test');
+    $htmlTag = new HtmlTag([], 'test', 'test', elementInfoManager: $this->createStub(ElementInfoManagerInterface::class));
     $info = $htmlTag->getInfo();
     $this->assertArrayHasKey('#pre_render', $info);
     $this->assertArrayHasKey('#attributes', $info);
