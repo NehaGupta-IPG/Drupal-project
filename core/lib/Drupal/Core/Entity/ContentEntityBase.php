@@ -578,6 +578,17 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
+  public function getBundleEntity(): ?EntityInterface {
+    $entityType = $this->getEntityType();
+    if (!$entityType->hasKey('bundle') || !$entityType->getBundleEntityType()) {
+      return NULL;
+    }
+    return $this->get($entityType->getKey('bundle'))->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function uuid() {
     return $this->getEntityKey('uuid');
   }
@@ -602,7 +613,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * Gets a translated field.
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface
+   * @return \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>
    *   The translated field.
    */
   protected function getTranslatedField($name, $langcode) {
@@ -1477,8 +1488,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if (!$original) {
       $id = $this->getOriginalId() ?? $this->id();
       $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
-      $original = !$this->wasDefaultRevision()
-        ? $storage->loadRevision($this->getLoadedRevisionId())
+      $original = $this->getLoadedRevisionId() && $storage instanceof RevisionableStorageInterface
+        ? $storage->loadRevisionUnchanged($this->getLoadedRevisionId())
         : $storage->loadUnchanged($id);
     }
 
