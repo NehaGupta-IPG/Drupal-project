@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
+ * Tests for the DevDependencyFinder class.
+ *
  * @internal
  *
  * @todo Make this a UnitTestBase test when the systems it tests no longer have
@@ -39,6 +41,9 @@ class DevDependencyFinderTest extends KernelTestBase {
     ];
   }
 
+  /**
+   * Tests the buildRequirements() method.
+   */
   #[DataProvider('provideBuildRequirements')]
   public function testBuildRequirements($expected, $isDevInstall): void {
     $mock_root = $this->getMockBuilder(ProjectRootInterface::class)
