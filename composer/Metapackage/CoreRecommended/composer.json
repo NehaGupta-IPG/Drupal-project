@@ -62,6 +62,7 @@
         "symfony/var-dumper": "~v7.4.0",
         "symfony/var-exporter": "~v7.4.0",
         "symfony/yaml": "~v7.4.0",
+        "theodoreb/php-npm": "~dev-main",
         "twig/twig": "~v3.22.0"
     },
     "extra": {

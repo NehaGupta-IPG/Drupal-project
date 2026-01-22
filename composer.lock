@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7e7e808d0ae067e9f0b2f383a9924df",
+    "content-hash": "60e9a0e37f0494eec61e9254c4c5589b",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4761,6 +4761,76 @@
                 }
             ],
             "time": "2025-11-16T10:14:42+00:00"
+        },
+        {
+            "name": "theodoreb/php-npm",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/theodoreb/php-npm.git",
+                "reference": "753659552c06e9911fe7186c5cf274e97089b83b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/theodoreb/php-npm/zipball/753659552c06e9911fe7186c5cf274e97089b83b",
+                "reference": "753659552c06e9911fe7186c5cf274e97089b83b",
+                "shasum": ""
+            },
+            "require": {
+                "composer/semver": "^3.0",
+                "guzzlehttp/guzzle": "^7.0",
+                "php": "^8.1",
+                "symfony/console": "^6.0 || ^7.0",
+                "symfony/yaml": "^6.0 || ^7.0"
+            },
+            "require-dev": {
+                "captainhook/captainhook": "^5.0",
+                "captainhook/plugin-composer": "^5.0",
+                "phpunit/phpunit": "^10.0"
+            },
+            "default-branch": true,
+            "bin": [
+                "bin/php-npm"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PhpNpm\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "PhpNpm\\Tests\\": "tests/"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Théodore BIADALA",
+                    "homepage": "https://github.com/theodoreb"
+                }
+            ],
+            "description": "A PHP-based npm client for managing frontend assets without requiring Node.js",
+            "homepage": "https://github.com/theodoreb/php-npm",
+            "keywords": [
+                "dependencies",
+                "frontend",
+                "node-modules",
+                "npm",
+                "package-manager"
+            ],
+            "support": {
+                "issues": "https://github.com/theodoreb/php-npm/issues",
+                "source": "https://github.com/theodoreb/php-npm"
+            },
+            "time": "2026-01-22T00:29:45+00:00"
         },
         {
             "name": "twig/twig",
@@ -10333,7 +10403,8 @@
         "drupal/core": 20,
         "drupal/core-project-message": 20,
         "drupal/core-recipe-unpack": 20,
-        "drupal/core-vendor-hardening": 20
+        "drupal/core-vendor-hardening": 20,
+        "theodoreb/php-npm": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
@@ -10342,5 +10413,5 @@
     "platform-overrides": {
         "php": "8.3.0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

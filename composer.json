@@ -14,7 +14,7 @@
         "drupal/core-project-message": "self.version",
         "drupal/core-recipe-unpack": "self.version",
         "drupal/core-vendor-hardening": "self.version",
-        "theodoreb/php-npm": "^1.0"
+        "theodoreb/php-npm": "dev-main"
     },
     "conflict": {
         "dealerdirect/phpcodesniffer-composer-installer": "1.1.0"
@@ -150,6 +150,10 @@
         "npm-install": "Drupal\\Composer\\Composer::npmInstall"
     },
     "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/theodoreb/php-npm"
+        },
         {
             "type": "path",
             "canonical": false,
