@@ -6,9 +6,11 @@ namespace Drupal\Tests\link\Unit;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Routing\UrlGenerator;
 use Drupal\Core\Url;
@@ -62,7 +64,9 @@ class LinkFormatterTest extends UnitTestCase {
     $fieldList->setValue([$linkItem]);
 
     $pathValidator = $this->createMock(PathValidatorInterface::class);
-    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
+    $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+    $menuLinkManager = $this->createMock(MenuLinkManagerInterface::class);
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $entityTypeManager, $menuLinkManager);
     $elements = $linkFormatter->viewElements($fieldList, 'es');
     $this->assertEquals('link', $elements[0]['#type']);
   }
@@ -98,7 +102,9 @@ class LinkFormatterTest extends UnitTestCase {
     $fieldList->setValue([$linkItem]);
 
     $pathValidator = $this->createMock(PathValidatorInterface::class);
-    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
+    $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+    $menuLinkManager = $this->createMock(MenuLinkManagerInterface::class);
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $entityTypeManager, $menuLinkManager);
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage('Unexpected!!!');
     $linkFormatter->viewElements($fieldList, 'fr');
@@ -141,7 +147,9 @@ class LinkFormatterTest extends UnitTestCase {
     $fieldList->setValue([$linkItem]);
 
     $pathValidator = $this->createMock(PathValidatorInterface::class);
-    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator);
+    $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+    $menuLinkManager = $this->createMock(MenuLinkManagerInterface::class);
+    $linkFormatter = new LinkFormatter('', [], $fieldDefinition, [], '', '', [], $pathValidator, $entityTypeManager, $menuLinkManager);
     $elements = $linkFormatter->viewElements($fieldList, 'zh');
     $this->assertEquals([
       [

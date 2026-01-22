@@ -3,11 +3,15 @@
 namespace Drupal\link\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -28,13 +32,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LinkFormatter extends FormatterBase {
 
   /**
-   * The path validator service.
-   *
-   * @var \Drupal\Core\Path\PathValidatorInterface
-   */
-  protected $pathValidator;
-
-  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -46,7 +43,9 @@ class LinkFormatter extends FormatterBase {
       $configuration['label'],
       $configuration['view_mode'],
       $configuration['third_party_settings'],
-      $container->get('path.validator')
+      $container->get('path.validator'),
+      $container->get('entity_type.manager'),
+      $container->get('plugin.manager.menu.link')
     );
   }
 
@@ -67,12 +66,15 @@ class LinkFormatter extends FormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Third party settings.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   * @param \Drupal\Core\Path\PathValidatorInterface $pathValidator
    *   The path validator service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
+   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
+   *   The menu link manager.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, PathValidatorInterface $path_validator) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, protected PathValidatorInterface $pathValidator, protected EntityTypeManagerInterface $entityTypeManager, protected MenuLinkManagerInterface $menuLinkManager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
-    $this->pathValidator = $path_validator;
   }
 
   /**
@@ -179,6 +181,33 @@ class LinkFormatter extends FormatterBase {
       // By default use the full URL as the link text.
       $url = $this->buildUrl($item);
       $link_title = $url->toString();
+
+      // Use the entity title for the link text for internal URLs only.
+      if (empty($settings['url_only']) && !$url->isExternal() && empty($item->title) && $url->isRouted()) {
+        $route_parameters = $url->getRouteParameters();
+        if (!empty($route_parameters)) {
+          foreach ($route_parameters as $entity_type => $id) {
+            if ($this->entityTypeManager->hasDefinition($entity_type)) {
+              if ($entity = $this->entityTypeManager->getStorage($entity_type)->load($id)) {
+                $translated_entity = $entity instanceof TranslatableInterface && $entity->hasTranslation($langcode) ? $entity->getTranslation($langcode) : $entity;
+                if ($translated_entity instanceof FieldableEntityInterface && $translated_entity->hasField('title')) {
+                  $link_title = $translated_entity->get('title')->value;
+                }
+                elseif ($translated_entity instanceof FieldableEntityInterface &&  $translated_entity->hasField('name')) {
+                  $link_title = $translated_entity->get('name')->value;
+                }
+              }
+            }
+          }
+        }
+        else {
+          $menu_links = $this->menuLinkManager->loadLinksByRoute($url->getRouteName());
+          if (!empty($menu_links)) {
+            $root_menu_item = reset($menu_links);
+            $link_title = $root_menu_item->getTitle();
+          }
+        }
+      }
 
       // If the title field value is available, use it for the link text.
       if (empty($settings['url_only']) && !empty($item->title)) {

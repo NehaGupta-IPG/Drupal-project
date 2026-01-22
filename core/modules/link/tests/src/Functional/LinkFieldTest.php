@@ -407,6 +407,22 @@ class LinkFieldTest extends BrowserTestBase {
     $output = $this->renderTestEntity($id);
     $expected_link = (string) Link::fromTextAndUrl($title, Url::fromUri($value))->toString();
     $this->assertStringContainsString($expected_link, $output);
+
+    // Verify that a link without link text and an entity URL is rendered
+    // using the entity title as text.
+    $node = $this->drupalCreateNode();
+    $link = "entity:node/{$node->id()}";
+    $edit = [
+      "{$field_name}[0][uri]" => $link,
+      "{$field_name}[0][title]" => '',
+    ];
+    $this->drupalGet("entity_test/manage/{$id}/edit");
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->statusMessageContains('entity_test ' . $id . ' has been updated.', 'status');
+
+    $output = $this->renderTestEntity($id);
+    $expected_link = (string) Link::fromTextAndUrl($node->label(), Url::fromUri($link))->toString();
+    $this->assertStringContainsString($expected_link, $output);
   }
 
   /**
