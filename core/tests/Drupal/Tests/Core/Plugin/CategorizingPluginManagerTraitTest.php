@@ -36,14 +36,14 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $module_handler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $module_handler->expects($this->any())
+    $module_handler = $this->createStub(ModuleHandlerInterface::class);
+    $module_handler
       ->method('getModuleList')
       ->willReturn(['node' => []]);
-    $module_extension_list = $this->createMock(ModuleExtensionList::class);
-    $module_extension_list->expects($this->any())
+    $module_extension_list = $this->createStub(ModuleExtensionList::class);
+    $module_extension_list
       ->method('getName')
-      ->willReturnCallback(function ($argument) {
+      ->willReturnCallback(function ($argument): string {
         if ($argument == 'node') {
           return 'Node';
         }
@@ -55,8 +55,6 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests get categories.
-   *
-   * @legacy-covers ::getCategories
    */
   public function testGetCategories(): void {
     $this->assertSame([
@@ -67,8 +65,6 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests get sorted definitions.
-   *
-   * @legacy-covers ::getSortedDefinitions
    */
   public function testGetSortedDefinitions(): void {
     $sorted = $this->pluginManager->getSortedDefinitions();
@@ -77,8 +73,6 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests get grouped definitions.
-   *
-   * @legacy-covers ::getGroupedDefinitions
    */
   public function testGetGroupedDefinitions(): void {
     $grouped = $this->pluginManager->getGroupedDefinitions();
@@ -89,8 +83,6 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests process definition category.
-   *
-   * @legacy-covers ::processDefinitionCategory
    */
   public function testProcessDefinitionCategory(): void {
     // Existing category.
@@ -136,6 +128,7 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
    * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
    *   The module extension list.
    */
+  // @phpstan-ignore pluginManagerSetsCacheBackend.missingCacheBackend
   public function __construct(ModuleHandlerInterface $module_handler, ModuleExtensionList $module_extension_list) {
     $this->moduleHandler = $module_handler;
     $this->moduleExtensionList = $module_extension_list;
@@ -146,7 +139,7 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
    *
    * Provides some test definitions to the trait.
    */
-  public function getDefinitions() {
+  public function getDefinitions(): array {
     return [
       'cucumber' => [
         'label' => 'cucumber',

@@ -29,17 +29,12 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
     protected EntityTypeManagerInterface $entityTypeManager,
     protected Connection $database,
     protected WorkspaceManagerInterface $workspaceManager,
-    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected WorkspaceTrackerInterface $workspaceTracker,
     protected EventDispatcherInterface $eventDispatcher,
     protected WorkspaceInterface $sourceWorkspace,
     protected LoggerInterface $logger,
-    protected ?TimeInterface $time = NULL,
-  ) {
-    if ($time === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $time argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3531037', E_USER_DEPRECATED);
-      $this->time = \Drupal::time();
-    }
-  }
+    protected TimeInterface $time,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -53,7 +48,7 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
       throw new WorkspaceConflictException();
     }
 
-    $tracked_entities = $this->workspaceAssociation->getTrackedEntities($this->sourceWorkspace->id());
+    $tracked_entities = $this->workspaceTracker->getTrackedEntities($this->sourceWorkspace->id());
     $event = new WorkspacePrePublishEvent($this->sourceWorkspace, $tracked_entities);
     $this->eventDispatcher->dispatch($event);
 
@@ -99,14 +94,15 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
             // Extend the execution time in order to allow processing workspaces
             // that contain a large number of items.
             if ((int) ($counter / $step_size) >= 1) {
-              set_time_limit($max_execution_time);
+              set_time_limit((int) $max_execution_time);
               $counter = 0;
             }
           }
         }
       });
+      $transaction->commitOrRelease();
     }
-    catch (\Exception $e) {
+    catch (\Throwable $e) {
       if (isset($transaction)) {
         $transaction->rollBack();
       }
@@ -147,7 +143,7 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
   public function getDifferringRevisionIdsOnTarget() {
     $target_revision_difference = [];
 
-    $tracked_entities = $this->workspaceAssociation->getTrackedEntities($this->sourceWorkspace->id());
+    $tracked_entities = $this->workspaceTracker->getTrackedEntities($this->sourceWorkspace->id());
     foreach ($tracked_entities as $entity_type_id => $tracked_revisions) {
       $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
 
@@ -177,8 +173,8 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
    * {@inheritdoc}
    */
   public function getDifferringRevisionIdsOnSource() {
-    // Get the Workspace association revisions which haven't been pushed yet.
-    return $this->workspaceAssociation->getTrackedEntities($this->sourceWorkspace->id());
+    // Get the tracked revisions that haven't been published.
+    return $this->workspaceTracker->getTrackedEntities($this->sourceWorkspace->id());
   }
 
   /**

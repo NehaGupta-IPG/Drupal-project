@@ -90,7 +90,7 @@ class FrontMatterTest extends TestCase {
    * @legacy-covers ::parse
    */
   #[DataProvider('providerFrontMatterData')]
-  public function testFrontMatterData($yaml, $line, $content = self::SOURCE): void {
+  public function testFrontMatterData(?array $yaml, $line, $content = self::SOURCE): void {
     $source = static::createFrontMatterSource($yaml, $content);
     $frontMatter = FrontMatter::create($source);
     $this->assertEquals($content, $frontMatter->getContent());
@@ -104,7 +104,7 @@ class FrontMatterTest extends TestCase {
    * @return array
    *   Array of front matter data.
    */
-  public static function providerFrontMatterData() {
+  public static function providerFrontMatterData(): array {
     $data['none'] = [
       'yaml' => NULL,
       'line' => 1,

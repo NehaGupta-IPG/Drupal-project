@@ -5,21 +5,17 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Test;
 
 use Drupal\Core\Test\PhpUnitTestDiscovery;
-use Drupal\Core\Test\TestDiscovery;
 use Drupal\KernelTests\KernelTestBase;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\Finder\Finder;
 
 /**
- * Tests ::findAllClassFiles() between TestDiscovery and PhpUnitTestDiscovery.
- *
- * PhpUnitTestDiscovery uses PHPUnit API to build the list of test classes,
- * while TestDiscovery uses Drupal legacy code.
+ * Tests ::findAllClassFiles().
  */
-#[CoversClass(PhpUnitTestDiscovery::class)]
+#[CoversMethod(PhpUnitTestDiscovery::class, 'findAllClassFiles')]
 #[Group('TestSuites')]
 #[Group('Test')]
 #[Group('#slow')]
@@ -27,40 +23,35 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class PhpUnitApiFindAllClassFilesTest extends KernelTestBase {
 
   /**
-   * Checks that Drupal legacy and PHPUnit API based discoveries are equal.
+   * Checks PHPUnit API based discovery.
    */
   #[DataProvider('argumentsProvider')]
-  #[IgnoreDeprecations]
-  public function testEquality(?string $extension = NULL, ?string $directory = NULL): void {
-    // PHPUnit discovery.
-    $configurationFilePath = $this->container->getParameter('app.root') . \DIRECTORY_SEPARATOR . 'core';
-    $phpUnitTestDiscovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($configurationFilePath);
-    $phpUnitList = $phpUnitTestDiscovery->findAllClassFiles($extension, $directory);
+  public function testAllClasses(?string $extension = NULL, ?string $directory = NULL, array $testsArg = [], ?string $expectedDirectory = NULL): void {
+    $core = $this->container->getParameter('app.root') . '/core';
+    $phpUnitTestDiscovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($core);
+    $phpUnitList = $phpUnitTestDiscovery->findAllClassFiles($extension, $directory, $testsArg);
 
-    // Legacy TestDiscovery.
-    $testDiscovery = new TestDiscovery(
-      $this->container->getParameter('app.root'),
-      $this->container->get('class_loader')
-    );
-    $internalList = $testDiscovery->findAllClassFiles($extension, $directory);
+    $testFiles = [];
+    foreach (Finder::create()->files()->name('*Test.php')->in($core . ($expectedDirectory ? '/' . $expectedDirectory : '')) as $file) {
+      $path = $file->getPathname();
+      if ($expectedDirectory || str_starts_with($path, $core . '/tests/Drupal/') || str_contains($path, '/tests/src/')) {
+        $testFiles[] = $path;
+      }
+    }
 
-    // Downgrade results to make them comparable, working around bugs and
-    // additions.
-    // 1. TestDiscovery discovers non-test classes that PHPUnit does not.
-    $internalList = array_intersect_key($internalList, $phpUnitList);
-
-    $this->assertEquals($internalList, $phpUnitList);
+    $this->assertSame([], array_values(array_diff($testFiles, $phpUnitList)));
   }
 
   /**
-   * Provides test data to ::testEquality.
+   * Provides test data to ::testAllClasses().
    */
   public static function argumentsProvider(): \Generator {
     yield 'All tests' => [];
-    yield 'Extension: system' => ['extension' => 'system'];
-    yield 'Extension: system, directory' => [
+    yield 'System kernel Menu tests' => [
       'extension' => 'system',
-      'directory' => 'core/modules/system/tests/src',
+      'directory' => 'core/modules/system/tests/src/Kernel',
+      'testsArg' => ['Menu'],
+      'expectedDirectory' => 'modules/system/tests/src/Kernel/Menu',
     ];
   }
 

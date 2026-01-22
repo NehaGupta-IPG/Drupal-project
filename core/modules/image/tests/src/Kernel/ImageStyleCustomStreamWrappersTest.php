@@ -37,18 +37,10 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
   protected $imageStyle;
 
   /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->fileSystem = $this->container->get('file_system');
     $this->config('system.file')
       ->set('default_scheme', 'public')
       ->set('allow_insecure_uploads', FALSE)
@@ -66,7 +58,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    */
   public function register(ContainerBuilder $container): void {
     parent::register($container);
-    foreach ($this->providerTestCustomStreamWrappers() as $stream_wrapper) {
+    foreach (static::providerTestCustomStreamWrappers() as $stream_wrapper) {
       $scheme = $stream_wrapper[0];
       $class = $stream_wrapper[2];
       $container->register("stream_wrapper.$scheme", $class)
@@ -81,9 +73,11 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    *   The source stream wrapper scheme.
    * @param string $expected_scheme
    *   The derivative expected stream wrapper scheme.
+   * @param class-string $class
+   *   The stream wrapper service class.
    */
   #[DataProvider('providerTestCustomStreamWrappers')]
-  public function testCustomStreamWrappers($source_scheme, $expected_scheme): void {
+  public function testCustomStreamWrappers(string $source_scheme, string $expected_scheme, string $class): void {
     $derivative_uri = $this->imageStyle->buildUri("$source_scheme://some/path/image.png");
     $derivative_scheme = StreamWrapperManager::getScheme($derivative_uri);
 
@@ -108,7 +102,7 @@ class ImageStyleCustomStreamWrappersTest extends KernelTestBase {
    *   - The derivative expected stream wrapper scheme.
    *   - The stream wrapper service class.
    */
-  public static function providerTestCustomStreamWrappers() {
+  public static function providerTestCustomStreamWrappers(): array {
     return [
       ['public', 'public', PublicStream::class],
       ['private', 'private', PrivateStream::class],

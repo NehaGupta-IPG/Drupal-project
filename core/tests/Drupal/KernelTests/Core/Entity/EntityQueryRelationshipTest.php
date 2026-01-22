@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\Query\QueryException;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\EntityTestHelper;
@@ -218,7 +217,8 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
    * Tests the invalid specifier in the query relationship.
    */
   public function testInvalidSpecifier(): void {
-    $this->expectException(PluginNotFoundException::class);
+    $this->expectException(QueryException::class);
+    $this->expectExceptionMessageIs("Cannot determine entity type for relationship 'language' for field 'langcode.language.foo'");
     $this->container
       ->get('entity_type.manager')
       ->getStorage('taxonomy_term')
@@ -234,7 +234,7 @@ class EntityQueryRelationshipTest extends EntityKernelTestBase {
   #[DataProvider('providerTestInvalidFieldName')]
   public function testInvalidFieldName(string $field_name): void {
     $this->expectException(QueryException::class);
-    $this->expectExceptionMessage("'non_existent_field_name' not found");
+    $this->expectExceptionMessageIs("'non_existent_field_name' not found");
 
     // Check that non-existent field names in a complex relationship query
     // throws a meaningful exception.

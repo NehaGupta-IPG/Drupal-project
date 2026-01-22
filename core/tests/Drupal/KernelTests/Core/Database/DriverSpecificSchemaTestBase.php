@@ -8,6 +8,18 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Schema;
+use Drupal\Core\Database\SchemaDefinition\Column;
+use Drupal\Core\Database\SchemaDefinition\ColumnSize;
+use Drupal\Core\Database\SchemaDefinition\ColumnType;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnExpression;
+use Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage;
+use Drupal\Core\Database\SchemaDefinition\Index;
+use Drupal\Core\Database\SchemaDefinition\IntValue;
+use Drupal\Core\Database\SchemaDefinition\PrimaryKey;
+use Drupal\Core\Database\SchemaDefinition\Schema as SchemaDefinition;
+use Drupal\Core\Database\SchemaDefinition\SchemaDefinitionType;
+use Drupal\Core\Database\SchemaDefinition\StringValue;
+use Drupal\Core\Database\SchemaDefinition\Table;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -53,6 +65,18 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    *   Optional column to test.
    */
   abstract public function checkSchemaComment(string|false $description, string $table, ?string $column = NULL): void;
+
+  /**
+   * Checks that the database computes a column with the given storage.
+   *
+   * @param \Drupal\Core\Database\SchemaDefinition\GeneratedColumnStorage $storage
+   *   The asserted storage.
+   * @param string $table
+   *   The table to test.
+   * @param string $column
+   *   The generated column to test.
+   */
+  abstract public function checkGeneratedColumnStorage(GeneratedColumnStorage $storage, string $table, string $column): void;
 
   /**
    * Tests inserting data into an existing table.
@@ -185,7 +209,12 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertFalse($this->tryInsert(), 'Insert without a default failed.');
 
     // Add a default value to the column.
-    $this->schema->changeField('test_table', 'test_field', 'test_field', ['type' => 'int', 'not null' => TRUE, 'default' => 0]);
+    $this->schema->changeField(
+      'test_table',
+      'test_field',
+      'test_field',
+      ['type' => 'int', 'not null' => TRUE, 'default' => 0]
+    );
     // The insert should now succeed.
     $this->assertTrue($this->tryInsert(), 'Insert with a default succeeded.');
 
@@ -211,7 +240,12 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertTrue($index_exists, 'Index was renamed.');
 
     // We need the default so that we can insert after the rename.
-    $this->schema->changeField('test_table2', 'test_field', 'test_field', ['type' => 'int', 'not null' => TRUE, 'default' => 0]);
+    $this->schema->changeField(
+      'test_table2',
+      'test_field',
+      'test_field',
+      ['type' => 'int', 'not null' => TRUE, 'default' => 0]
+    );
     $this->assertFalse($this->tryInsert(), 'Insert into the old table failed.');
     $this->assertTrue($this->tryInsert('test_table2'), 'Insert into the new table succeeded.');
 
@@ -225,14 +259,29 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Recreate the table.
     $this->schema->createTable('test_table', $table_specification);
-    $this->schema->changeField('test_table', 'test_field', 'test_field', ['type' => 'int', 'not null' => TRUE, 'default' => 0]);
-    $this->schema->addField('test_table', 'test_serial', ['type' => 'int', 'not null' => TRUE, 'default' => 0, 'description' => 'Added column description.']);
+    $this->schema->changeField(
+      'test_table',
+      'test_field',
+      'test_field',
+      ['type' => 'int', 'not null' => TRUE, 'default' => 0]
+    );
+    $this->schema->addField(
+      'test_table',
+      'test_serial',
+      ['type' => 'int', 'not null' => TRUE, 'default' => 0, 'description' => 'Added column description.']
+    );
 
     // Assert that the column comment has been set.
     $this->checkSchemaComment('Added column description.', 'test_table', 'test_serial');
 
     // Change the new field to a serial column.
-    $this->schema->changeField('test_table', 'test_serial', 'test_serial', ['type' => 'serial', 'not null' => TRUE, 'description' => 'Changed column description.'], ['primary key' => ['test_serial']]);
+    $this->schema->changeField(
+      'test_table',
+      'test_serial',
+      'test_serial',
+      ['type' => 'serial', 'not null' => TRUE, 'description' => 'Changed column description.'],
+      ['primary key' => ['test_serial']]
+    );
 
     // Assert that the column comment has been set.
     $this->checkSchemaComment('Changed column description.', 'test_table', 'test_serial');
@@ -249,7 +298,12 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     // Test adding a serial field to an existing table.
     $this->schema->dropTable('test_table');
     $this->schema->createTable('test_table', $table_specification);
-    $this->schema->changeField('test_table', 'test_field', 'test_field', ['type' => 'int', 'not null' => TRUE, 'default' => 0]);
+    $this->schema->changeField(
+      'test_table',
+      'test_field',
+      'test_field',
+      ['type' => 'int', 'not null' => TRUE, 'default' => 0]
+    );
     $this->schema->addField('test_table', 'test_serial', ['type' => 'serial', 'not null' => TRUE], ['primary key' => ['test_serial']]);
 
     // Test the primary key columns.
@@ -266,7 +320,12 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertEquals(2, $count, 'There were two rows.');
 
     // Test adding a new column and form a composite primary key with it.
-    $this->schema->addField('test_table', 'test_composite_primary_key', ['type' => 'int', 'not null' => TRUE, 'default' => 0], ['primary key' => ['test_serial', 'test_composite_primary_key']]);
+    $this->schema->addField(
+      'test_table',
+      'test_composite_primary_key',
+      ['type' => 'int', 'not null' => TRUE, 'default' => 0],
+      ['primary key' => ['test_serial', 'test_composite_primary_key']]
+    );
 
     // Test the primary key columns.
     $this->assertSame(['test_serial', 'test_composite_primary_key'], $method->invoke($this->schema, 'test_table'));
@@ -603,7 +662,12 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
 
     // Change the field type and make sure the primary key stays in place.
-    $this->schema->changeField($table_name, 'test_field', 'test_field', ['type' => 'varchar', 'length' => 32, 'not null' => TRUE]);
+    $this->schema->changeField(
+      $table_name,
+      'test_field',
+      'test_field',
+      ['type' => 'varchar', 'length' => 32, 'not null' => TRUE]
+    );
     $this->assertTrue($this->schema->fieldExists($table_name, 'test_field'));
     $this->assertEquals($initial_primary_key, $find_primary_key_columns->invoke($this->schema, $table_name));
 
@@ -692,7 +756,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
       'primary key' => ['test_field'],
     ];
     $this->expectException(SchemaException::class);
-    $this->expectExceptionMessage("The 'test_field' field specification does not define 'not null' as TRUE.");
+    $this->expectExceptionMessageIs("The 'test_field' field specification does not define 'not null' as TRUE.");
     $this->schema->createTable($table_name, $table_spec);
   }
 
@@ -770,8 +834,13 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->createTable($table_name, $table_spec);
 
     $this->expectException(SchemaException::class);
-    $this->expectExceptionMessage("The 'new_test_field' field specification does not define 'not null' as TRUE.");
-    $this->schema->addField($table_name, 'new_test_field', ['type' => 'int'], ['primary key' => ['test_field', 'new_test_field']]);
+    $this->expectExceptionMessageIs("The 'new_test_field' field specification does not define 'not null' as TRUE.");
+    $this->schema->addField(
+      $table_name,
+      'new_test_field',
+      ['type' => 'int'],
+      ['primary key' => ['test_field', 'new_test_field']]
+    );
   }
 
   /**
@@ -789,7 +858,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->schema->createTable($table_name, $table_spec);
 
     $this->expectException(SchemaException::class);
-    $this->expectExceptionMessage("The 'changed_test_field' field specification does not define 'not null' as TRUE.");
+    $this->expectExceptionMessageIs("The 'changed_test_field' field specification does not define 'not null' as TRUE.");
     $this->schema->dropPrimaryKey($table_name);
     $this->schema->changeField($table_name, 'test_field', 'changed_test_field', ['type' => 'int'], ['primary key' => ['changed_test_field']]);
   }
@@ -897,8 +966,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
   /**
    * Tests find primary key columns.
-   *
-   * @legacy-covers ::findPrimaryKeyColumns
    */
   public function testFindPrimaryKeyColumns(): void {
     $method = new \ReflectionMethod(get_class($this->schema), 'findPrimaryKeyColumns');
@@ -1245,7 +1312,12 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Insert a row and check that columns have the expected default values.
     $this->connection->insert($table_name)->fields(['column1' => 1])->execute();
-    $result = $this->connection->select($table_name, 't')->fields('t', ['column2', 'column3', 'column4', 'column5', 'column6', 'column7'])->condition('column1', 1)->execute()->fetchObject();
+    $result = $this->connection
+      ->select($table_name, 't')
+      ->fields('t', ['column2', 'column3', 'column4', 'column5', 'column6', 'column7'])
+      ->condition('column1', 1)
+      ->execute()
+      ->fetchObject();
     $this->assertNull($result->column2);
     $this->assertSame('200', $result->column3);
     $this->assertSame('1.23', $result->column4);
@@ -1255,11 +1327,26 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
 
     // Force SQLite schema to create a new table and copy data by adding a not
     // field with an initial value.
-    $this->schema->addField('test_table', 'new_column', ['type' => 'varchar', 'length' => 20, 'not null' => TRUE, 'description' => 'Added new column', 'initial' => 'test']);
+    $this->schema->addField(
+      'test_table',
+      'new_column',
+      [
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE,
+        'description' => 'Added new column',
+        'initial' => 'test',
+      ]
+    );
 
     // Test that the columns default values are still correct.
     $this->connection->insert($table_name)->fields(['column1' => 2, 'new_column' => 'value'])->execute();
-    $result = $this->connection->select($table_name, 't')->fields('t', ['column2', 'column3', 'column4', 'column5', 'column6', 'column7'])->condition('column1', 2)->execute()->fetchObject();
+    $result = $this->connection
+      ->select($table_name, 't')
+      ->fields('t', ['column2', 'column3', 'column4', 'column5', 'column6', 'column7'])
+      ->condition('column1', 2)
+      ->execute()
+      ->fetchObject();
     $this->assertNull($result->column2);
     $this->assertSame('200', $result->column3);
     $this->assertSame('1.23', $result->column4);
@@ -1407,6 +1494,251 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     ])->execute();
 
     $this->assertEquals($id + 1, $id_two);
+  }
+
+  /**
+   * Tests creating a table with a generated column.
+   */
+  public function testCreateTableWithGeneratedColumn(): void {
+    $tableName = 'test_generated_column';
+    $schemaDefinition = new SchemaDefinition(
+      type: SchemaDefinitionType::Test,
+      name: 'test_schema',
+      tables: [
+        new Table(
+          name: $tableName,
+          description: 'Basic test table with a generated column.',
+          columns: [
+            Column::serial(
+              name: 'id',
+            ),
+            Column::varcharAscii(
+              name: 'name',
+              description: "A person's name",
+              length: 255,
+              notNull: TRUE,
+              default: new StringValue(''),
+              binary: TRUE,
+            ),
+            Column::int(
+              name: 'age',
+              description: "The person's age",
+              size: ColumnSize::Small,
+              unsigned: TRUE,
+              notNull: TRUE,
+              default: new IntValue(0),
+            ),
+            Column::generated(
+              name: 'double_age',
+              type: ColumnType::Int,
+              description: "The person's age X 2",
+              storage: GeneratedColumnStorage::Stored,
+              expression: new GeneratedColumnExpression('[age] * 2'),
+            ),
+            Column::generated(
+              name: 'shout',
+              type: ColumnType::Varchar,
+              description: "The person's name in capitals",
+              storage: GeneratedColumnStorage::Virtual,
+              length: 512,
+              expression: new GeneratedColumnExpression('UPPER([name])'),
+            ),
+            Column::generated(
+              name: 'big_age',
+              type: ColumnType::Int,
+              description: "The person's age in a wider unsigned column",
+              storage: GeneratedColumnStorage::Stored,
+              size: ColumnSize::Big,
+              unsigned: TRUE,
+              expression: new GeneratedColumnExpression('[age] * 100'),
+            ),
+            Column::generated(
+              name: 'half_age',
+              type: ColumnType::Numeric,
+              description: "Half of the person's age",
+              storage: GeneratedColumnStorage::Virtual,
+              precision: 10,
+              scale: 2,
+              expression: new GeneratedColumnExpression('[age] / 2'),
+            ),
+            // SQLite rebuilds a table by reading its CREATE TABLE text
+            // back and splitting it into column definitions on commas and
+            // parentheses. The literal and the comment here hold both, so
+            // they check that the split skips quoted text and comments.
+            Column::generated(
+              name: 'tricky',
+              type: ColumnType::Int,
+              description: 'A generated column whose expression is quoted',
+              storage: GeneratedColumnStorage::Virtual,
+              expression: new GeneratedColumnExpression("CASE WHEN [name] = 'a, b (c''d)' /* , ) */ THEN 1 ELSE 0 END"),
+            ),
+          ],
+          primaryKey: new PrimaryKey(['id']),
+          indexes: [
+            new Index(
+              name: 'double_age',
+              columns: ['double_age'],
+            ),
+          ],
+        ),
+      ],
+    );
+
+    $this->schema->createSchemaFromDefinition($schemaDefinition);
+    $this->assertTrue($this->schema->tableExists($tableName));
+    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Stored, $tableName, 'double_age');
+    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Virtual, $tableName, 'shout');
+    $this->connection->insert($tableName)->fields([
+      'name' => 'John',
+      'age' => 42,
+    ])->execute();
+    $doubleAge = $this->connection
+      ->select($tableName)
+      ->fields($tableName, ['double_age'])
+      ->condition('name', 'John')
+      ->execute()
+      ->fetchField();
+    $this->assertSame('84', $doubleAge);
+    $typed = $this->connection
+      ->select($tableName)
+      ->fields($tableName, ['shout', 'big_age', 'half_age'])
+      ->condition('name', 'John')
+      ->execute()
+      ->fetchAssoc();
+    $this->assertSame('JOHN', $typed['shout']);
+    $this->assertSame('4200', $typed['big_age']);
+    // The scale is applied by the database, so the text form of the value
+    // differs per driver.
+    $this->assertEquals(21, $typed['half_age']);
+
+    $trickyName = "a, b (c'd)";
+    $this->connection->insert($tableName)->fields([
+      'name' => $trickyName,
+      'age' => 7,
+    ])->execute();
+    $tricky = $this->connection
+      ->select($tableName)
+      ->fields($tableName, ['tricky'])
+      ->condition('name', $trickyName)
+      ->execute()
+      ->fetchField();
+    $this->assertSame('1', $tricky);
+
+    // A later schema change that rebuilds the table on SQLite must not disturb
+    // the generated columns.
+    $this->schema->addField($tableName, 'nickname', [
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => TRUE,
+      'initial' => '',
+    ]);
+    $this->assertTrue($this->schema->fieldExists($tableName, 'double_age'));
+    $this->assertTrue($this->schema->fieldExists($tableName, 'tricky'));
+    $this->assertTrue($this->schema->indexExists($tableName, 'double_age'));
+    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Stored, $tableName, 'double_age');
+    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Virtual, $tableName, 'tricky');
+    $doubleAge = $this->connection
+      ->select($tableName)
+      ->fields($tableName, ['double_age'])
+      ->condition('name', 'John')
+      ->execute()
+      ->fetchField();
+    $this->assertSame('84', $doubleAge);
+    $tricky = $this->connection
+      ->select($tableName)
+      ->fields($tableName, ['tricky'])
+      ->condition('name', $trickyName)
+      ->execute()
+      ->fetchField();
+    $this->assertSame('1', $tricky);
+
+    // Generated columns can also be added to an existing table. SQLite adds a
+    // VIRTUAL column in place and needs a table rebuild for a STORED one, so
+    // cover both.
+    $this->schema->addField($tableName, 'triple_age', Column::generated(
+      name: 'triple_age',
+      type: ColumnType::Int,
+      storage: GeneratedColumnStorage::Virtual,
+      expression: new GeneratedColumnExpression('[age] * 3'),
+    )->toArray());
+    $this->schema->addField($tableName, 'quadruple_age', Column::generated(
+      name: 'quadruple_age',
+      type: ColumnType::Int,
+      storage: GeneratedColumnStorage::Stored,
+      expression: new GeneratedColumnExpression('[age] * 4'),
+    )->toArray());
+    $this->assertTrue($this->schema->indexExists($tableName, 'double_age'));
+    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Virtual, $tableName, 'triple_age');
+    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Stored, $tableName, 'quadruple_age');
+    $ages = $this->connection
+      ->select($tableName)
+      ->fields($tableName, ['double_age', 'triple_age', 'quadruple_age'])
+      ->condition('name', 'John')
+      ->execute()
+      ->fetchAssoc();
+    $this->assertSame([
+      'double_age' => '84',
+      'triple_age' => '126',
+      'quadruple_age' => '168',
+    ], $ages);
+    // Adding the stored column rebuilt the table a second time, so check that
+    // the quoted expression still matches the row it was written for.
+    $tricky = $this->connection
+      ->select($tableName)
+      ->fields($tableName, ['tricky'])
+      ->condition('name', $trickyName)
+      ->execute()
+      ->fetchField();
+    $this->assertSame('1', $tricky);
+
+    // On SQLite, altering this table rebuilds it from its CREATE TABLE text.
+    // The compound primary key is listed there as its own PRIMARY KEY (...)
+    // entry between the column definitions, and the rebuild must not mistake
+    // it for a column while recovering the generated column.
+    $pkTableName = 'test_generated_column_pk';
+    $this->schema->createTable($pkTableName, (new Table(
+      name: $pkTableName,
+      columns: [
+        Column::varcharAscii(
+          name: 'name',
+          length: 255,
+          notNull: TRUE,
+          default: new StringValue(''),
+        ),
+        Column::int(
+          name: 'age',
+          notNull: TRUE,
+          default: new IntValue(0),
+        ),
+        Column::generated(
+          name: 'double_age',
+          type: ColumnType::Int,
+          storage: GeneratedColumnStorage::Stored,
+          expression: new GeneratedColumnExpression('[age] * 2'),
+        ),
+      ],
+      primaryKey: new PrimaryKey(['name', 'age']),
+    ))->toArray());
+    $this->connection->insert($pkTableName)->fields([
+      'name' => 'Jane',
+      'age' => 30,
+    ])->execute();
+    $this->schema->changeField($pkTableName, 'name', 'name', [
+      'type' => 'varchar_ascii',
+      'length' => 320,
+      'not null' => TRUE,
+      'default' => '',
+    ]);
+    $this->checkGeneratedColumnStorage(GeneratedColumnStorage::Stored, $pkTableName, 'double_age');
+    $doubleAge = $this->connection
+      ->select($pkTableName)
+      ->fields($pkTableName, ['double_age'])
+      ->condition('age', 30)
+      ->execute()
+      ->fetchField();
+    $this->assertSame('60', $doubleAge);
+    $this->assertTrue($this->schema->dropField($pkTableName, 'double_age'));
+    $this->assertFalse($this->schema->fieldExists($pkTableName, 'double_age'));
   }
 
 }

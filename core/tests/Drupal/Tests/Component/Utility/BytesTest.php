@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Bytes;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -21,7 +20,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[Group('Utility')]
 class BytesTest extends TestCase {
 
-  use ExpectDeprecationTrait;
   use ProphecyTrait;
 
   /**
@@ -33,11 +31,9 @@ class BytesTest extends TestCase {
    * @param float $expected_number
    *   The expected return value from
    *   \Drupal\Component\Utility\Bytes::toNumber().
-   *
-   * @legacy-covers ::toNumber
    */
   #[DataProvider('providerTestToNumber')]
-  public function testToNumber($size, float $expected_number): void {
+  public function testToNumber(string|float $size, float $expected_number): void {
     $this->assertSame($expected_number, Bytes::toNumber($size));
   }
 
@@ -92,7 +88,7 @@ class BytesTest extends TestCase {
    * @legacy-covers ::validateConstraint
    */
   #[DataProvider('providerTestValidate')]
-  public function testValidate($string, bool $expected_result): void {
+  public function testValidate(string|int|float $string, bool $expected_result): void {
     $this->assertSame($expected_result, Bytes::validate($string));
 
     $execution_context = $this->prophesize(ExecutionContextInterface::class);

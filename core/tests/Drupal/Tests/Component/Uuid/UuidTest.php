@@ -41,7 +41,7 @@ class UuidTest extends TestCase {
    * @return array
    *   An array of UUID generator instances.
    */
-  public static function providerUuidInstances() {
+  public static function providerUuidInstances(): array {
 
     $instances = [];
     $instances[][] = new Php();
@@ -70,7 +70,7 @@ class UuidTest extends TestCase {
    *   The message to display on failure.
    */
   #[DataProvider('providerTestValidation')]
-  public function testValidation($uuid, $is_valid, $message): void {
+  public function testValidation(string $uuid, bool $is_valid, string $message): void {
     $this->assertSame($is_valid, Uuid::isValid($uuid), $message);
   }
 
@@ -83,7 +83,7 @@ class UuidTest extends TestCase {
    *   - (bool) Whether or not the Uuid is valid.
    *   - Failure message.
    */
-  public static function providerTestValidation() {
+  public static function providerTestValidation(): array {
     return [
       // These valid UUIDs.
       ['6ba7b810-9dad-11d1-80b4-00c04fd430c8', TRUE, 'Basic FQDN UUID did not validate'],

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
-use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -37,20 +35,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
   protected $tableMapping;
 
   /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected EntityFieldManagerInterface $entityFieldManager;
-
-  /**
-   * The entity definition update manager.
-   *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
-   */
-  protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -64,8 +48,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
   /**
    * Tests DefaultTableMapping::getFieldTableName().
-   *
-   * @legacy-covers ::getFieldTableName
    */
   public function testGetFieldTableName(): void {
     // Test the field table name for a single-valued base field, which is stored
@@ -86,8 +68,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
   /**
    * Tests get all field table names.
-   *
-   * @legacy-covers ::getAllFieldTableNames
    */
   public function testGetAllFieldTableNames(): void {
     // Check a field that is stored in all the shared tables.
@@ -125,8 +105,6 @@ class DefaultTableMappingIntegrationTest extends EntityKernelTestBase {
 
   /**
    * Tests DefaultTableMapping::getTableNames().
-   *
-   * @legacy-covers ::getTableNames
    */
   public function testGetTableNames(): void {
     $storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('entity_test_mulrev');

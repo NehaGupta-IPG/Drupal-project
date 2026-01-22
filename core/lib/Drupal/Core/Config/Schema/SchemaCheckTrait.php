@@ -6,6 +6,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityType;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\Plugin\DataType\ConfigEntityAdapter;
+use Drupal\Core\TypedData\Plugin\DataType\Enum;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\Type\BooleanInterface;
@@ -57,13 +58,6 @@ trait SchemaCheckTrait {
       //   Remove this in https://www.drupal.org/project/drupal/issues/3425992.
       'default_form' => [
         "The 'contact.form.feedback' config does not exist.",
-      ],
-    ],
-    'editor.editor.*' => [
-      // @todo Fix stream wrappers not being available early enough in
-      //   https://www.drupal.org/project/drupal/issues/3416735
-      'image_upload.scheme' => [
-        '^The file storage you selected is not a visible, readable and writable stream wrapper\. Possible choices: <em class="placeholder"><\/em>\.$',
       ],
     ],
     'search.settings' => [
@@ -240,6 +234,12 @@ trait SchemaCheckTrait {
       $class = get_class($element);
       if (!$success) {
         return [$error_key => "variable type is $type but applied schema class is $class"];
+      }
+    }
+    elseif ($element && $value instanceof \UnitEnum) {
+      if (!$element instanceof Enum) {
+        $class = get_class($element);
+        return [$error_key => "variable is an Enum but applied schema class is $class"];
       }
     }
     else {

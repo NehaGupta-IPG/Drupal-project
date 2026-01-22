@@ -89,8 +89,6 @@ class OverridesSectionStorageTest extends UnitTestCase {
    *   The value to pass to ::extractEntityFromRoute().
    * @param array $defaults
    *   The defaults to pass to ::extractEntityFromRoute().
-   *
-   * @legacy-covers ::extractEntityFromRoute
    */
   #[DataProvider('providerTestExtractEntityFromRoute')]
   public function testExtractEntityFromRoute($success, $expected_entity_type_id, $value, array $defaults): void {
@@ -125,7 +123,7 @@ class OverridesSectionStorageTest extends UnitTestCase {
   /**
    * Provides data for ::testExtractEntityFromRoute().
    */
-  public static function providerTestExtractEntityFromRoute() {
+  public static function providerTestExtractEntityFromRoute(): array {
     // Data provider values are:
     // - whether a successful result is expected
     // - the expected entity ID
@@ -166,7 +164,6 @@ class OverridesSectionStorageTest extends UnitTestCase {
    * Tests build routes.
    *
    * @legacy-covers ::buildRoutes
-   * @legacy-covers ::hasIntegerId
    * @legacy-covers ::getEntityTypes
    * @legacy-covers \Drupal\layout_builder\Routing\LayoutBuilderRoutesTrait::buildLayoutRoutes
    */

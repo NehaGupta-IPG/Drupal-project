@@ -37,7 +37,6 @@ class DefaultsSectionStorageTest extends KernelTestBase {
     'layout_builder',
     'layout_builder_defaults_test',
     'entity_test',
-    'field',
     'user',
   ];
 
@@ -91,8 +90,6 @@ class DefaultsSectionStorageTest extends KernelTestBase {
    *   Whether Layout Builder is enabled for this display.
    * @param array $section_data
    *   Data to store as the sections value for Layout Builder.
-   *
-   * @legacy-covers ::access
    */
   #[DataProvider('providerTestAccess')]
   public function testAccess($expected, $operation, $is_enabled, array $section_data): void {
@@ -117,7 +114,7 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   /**
    * Provides test data for ::testAccess().
    */
-  public static function providerTestAccess() {
+  public static function providerTestAccess(): array {
     $section_data = [
       new Section(
         'layout_onecol',
@@ -144,8 +141,6 @@ class DefaultsSectionStorageTest extends KernelTestBase {
 
   /**
    * Tests get contexts.
-   *
-   * @legacy-covers ::getContexts
    */
   public function testGetContexts(): void {
     $display = LayoutBuilderEntityViewDisplay::create([
@@ -166,8 +161,6 @@ class DefaultsSectionStorageTest extends KernelTestBase {
 
   /**
    * Tests get contexts during preview.
-   *
-   * @legacy-covers ::getContextsDuringPreview
    */
   public function testGetContextsDuringPreview(): void {
     $display = LayoutBuilderEntityViewDisplay::create([
@@ -198,8 +191,6 @@ class DefaultsSectionStorageTest extends KernelTestBase {
 
   /**
    * Tests get tempstore key.
-   *
-   * @legacy-covers ::getTempstoreKey
    */
   public function testGetTempstoreKey(): void {
     $display = LayoutBuilderEntityViewDisplay::create([
@@ -235,6 +226,22 @@ class DefaultsSectionStorageTest extends KernelTestBase {
     $section_storage_manager = $this->container->get('plugin.manager.layout_builder.section_storage');
     $section_storage = $section_storage_manager->load('defaults', $contexts);
     $this->assertInstanceOf(DefaultsSectionStorage::class, $section_storage);
+  }
+
+  /**
+   * @legacy-covers ::isSupported
+   */
+  public function testIsSupported(): void {
+    $display = LayoutBuilderEntityViewDisplay::create([
+      'targetEntityType' => 'entity_test',
+      'bundle' => 'entity_test',
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+    $display->enableLayoutBuilder()->save();
+    $this->assertTrue($this->plugin->isSupported('entity_test', 'entity_test', 'default'));
+    $display->disableLayoutBuilder()->save();
+    $this->assertFalse($this->plugin->isSupported('entity_test', 'entity_test', 'default'));
   }
 
 }

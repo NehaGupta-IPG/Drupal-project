@@ -21,7 +21,7 @@ class DialogTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['ajax_test', 'ajax_forms_test', 'contact'];
+  protected static $modules = ['ajax_test', 'ajax_forms_test', 'dialog_test'];
 
   /**
    * {@inheritdoc}
@@ -32,7 +32,6 @@ class DialogTest extends WebDriverTestBase {
    * Tests sending non-JS and AJAX requests to open and manipulate modals.
    */
   public function testDialog(): void {
-    $this->drupalLogin($this->drupalCreateUser(['administer contact forms']));
     // Ensure the elements render without notices or exceptions.
     $this->drupalGet('ajax-test/dialog');
 
@@ -204,10 +203,10 @@ class DialogTest extends WebDriverTestBase {
     $form_dialog->findButton('Close')->press();
 
     // Non AJAX version of Link 6.
-    $this->drupalGet('admin/structure/contact/add');
+    $this->drupalGet('dialog-test/add');
     // Check we get a chunk of the code, we can't test the whole form as form
     // build id and token with be different.
-    $this->assertSession()->elementExists('xpath', "//form[@id='contact-form-add-form']");
+    $this->assertSession()->elementExists('xpath', "//form[@id='dialog-test-entity-form-add-form']");
 
     // Reset: Return to the dialog links page.
     $this->drupalGet('ajax-test/dialog');
@@ -216,10 +215,10 @@ class DialogTest extends WebDriverTestBase {
     $dialog_add = $this->assertSession()->waitForElementVisible('css', 'div.ui-dialog');
     $this->assertNotNull($dialog_add, 'Form dialog is visible');
 
-    $form_add = $dialog_add->find('css', 'form.contact-form-add-form');
+    $form_add = $dialog_add->find('css', 'form.dialog-test-entity-form-add-form');
     $this->assertNotNull($form_add, 'Modal dialog JSON contains entity form.');
 
-    $form_title = $dialog_add->find('css', "h1.ui-dialog-title:contains('Add contact form')");
+    $form_title = $dialog_add->find('css', "h1.ui-dialog-title:contains('Add dialog test entity form')");
     $this->assertNotNull($form_title, 'The add form title is as expected.');
 
     // Test: dialog link opener with title callback.
@@ -262,6 +261,41 @@ class DialogTest extends WebDriverTestBase {
     $width = $this->getSession()->getDriver()->evaluateScript($script);
     // The theme is adding 4px as padding and border on each side.
     $this->assertSame(808, $width);
+  }
+
+  /**
+   * Tests that closing a dialog cancels a resize that is already scheduled.
+   *
+   * Dialog resizing is debounced by 20ms. Closing a dialog removes its element
+   * from the DOM, which destroys the jQuery UI instance, so a resize that runs
+   * after the dialog closed would act on a destroyed dialog and throw.
+   *
+   * @see https://www.drupal.org/node/3472624
+   */
+  public function testCloseCancelsScheduledResize(): void {
+    $this->drupalGet('ajax-test/dialog');
+    $this->getSession()->getPage()->clickLink('Link 1 (modal)');
+    $this->assertNotNull($this->assertSession()->waitForElementVisible('css', 'div.ui-dialog'));
+
+    // Schedule a resize, then close the dialog in the same tick so that the
+    // resize is always still pending when the dialog goes away. Flag the end
+    // of a period comfortably longer than the 20ms debounce, so that the test
+    // does not assert before a resize would have run.
+    $script = <<<SCRIPT
+      (function () {
+        window.dialogResizeElapsed = false;
+        jQuery(document).trigger('drupalViewportOffsetChange', Drupal.displace.offsets);
+        document.querySelector('.ui-dialog button[title="Close"]').click();
+        window.setTimeout(function () {
+          window.dialogResizeElapsed = true;
+        }, 200);
+      }())
+      SCRIPT;
+    $this->getSession()->executeScript($script);
+    $this->assertJsCondition('window.dialogResizeElapsed === true');
+
+    $errors = $this->getSession()->evaluateScript("JSON.parse(sessionStorage.getItem('js_testing_log_test.errors') || JSON.stringify([]))");
+    $this->assertSame([], $errors);
   }
 
 }

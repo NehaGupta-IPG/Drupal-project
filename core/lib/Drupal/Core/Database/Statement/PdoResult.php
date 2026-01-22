@@ -67,12 +67,6 @@ class PdoResult extends ResultBase {
     if (!empty($fetchOptions)) {
       $this->setFetchMode($mode, $fetchOptions);
     }
-    if (isset($fetchOptions['cursor_orientation'])) {
-      if (isset($fetchOptions['cursor_offset'])) {
-        return $this->clientFetch($mode, $fetchOptions['cursor_orientation'], $fetchOptions['cursor_offset']);
-      }
-      return $this->clientFetch($mode, $fetchOptions['cursor_orientation']);
-    }
     return $this->clientFetch($mode);
   }
 
@@ -80,7 +74,14 @@ class PdoResult extends ResultBase {
    * {@inheritdoc}
    */
   public function fetchAll(FetchAs $mode, array $fetchOptions): array {
-    return $this->clientFetchAll($mode, $fetchOptions['column'] ?? $fetchOptions['class'] ?? NULL, $fetchOptions['constructor_args'] ?? NULL);
+    return $this->clientFetchAll($mode, ...match ($mode) {
+      FetchAs::Column => [$fetchOptions['column'] ?? NULL],
+      FetchAs::ClassObject => [
+        $fetchOptions['class'] ?? NULL,
+        $fetchOptions['constructor_args'] ?? NULL,
+      ],
+      default => [],
+    });
   }
 
 }

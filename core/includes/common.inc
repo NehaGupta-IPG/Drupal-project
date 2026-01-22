@@ -8,10 +8,10 @@
  * a cached page are instead located in bootstrap.inc.
  */
 
-use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheTagsPurgeInterface;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Render\Element\Table;
 
 /**
  * @defgroup php_wrappers PHP wrapper functions
@@ -53,16 +53,6 @@ const SAVED_NEW = 1;
  * Return status for saving which involved an update to an existing item.
  */
 const SAVED_UPDATED = 2;
-
-/**
- * Return status for saving which deleted an existing item.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
- *   There is no replacement.
- *
- * @see https://www.drupal.org/node/3328750
- */
-const SAVED_DELETED = 3;
 
 /**
  * The default aggregation group for CSS files added to the page.
@@ -138,166 +128,23 @@ function base_path() {
 /**
  * Assists in attaching the tableDrag JavaScript behavior to a themed table.
  *
- * Draggable tables should be used wherever an outline or list of sortable items
- * needs to be arranged by an end-user. Draggable tables are very flexible and
- * can manipulate the value of form elements placed within individual columns.
+ * @deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Render\Element\Table::attachTabledrag() instead.
  *
- * To set up a table to use drag and drop in place of weight select-lists or in
- * place of a form that contains parent relationships, the form must be themed
- * into a table. The table must have an ID attribute set and it
- * may be set as follows:
- * @code
- * $table = [
- *   '#type' => 'table',
- *   '#header' => $header,
- *   '#rows' => $rows,
- *   '#attributes' => [
- *     'id' => 'my-module-table',
- *   ],
- * ];
- * return \Drupal::service('renderer')->render($table);
- * @endcode
- *
- * In the theme function for the form, a special class must be added to each
- * form element within the same column, "grouping" them together.
- *
- * In a situation where a single weight column is being sorted in the table, the
- * classes could be added like this (in the theme function):
- * @code
- * $form['my_elements'][$delta]['weight']['#attributes']['class'] = ['my-elements-weight'];
- * @endcode
- *
- * Each row of the table must also have a class of "draggable" in order to
- * enable the drag handles:
- * @code
- * $row = [...];
- * $rows[] = [
- *   'data' => $row,
- *   'class' => ['draggable'],
- * ];
- * @endcode
- *
- * When tree relationships are present, the two additional classes
- * 'tabledrag-leaf' and 'tabledrag-root' can be used to refine the behavior:
- * - Rows with the 'tabledrag-leaf' class cannot have child rows.
- * - Rows with the 'tabledrag-root' class cannot be nested under a parent row.
- *
- * Calling drupal_attach_tabledrag() would then be written as such:
- * @code
- * drupal_attach_tabledrag('my-module-table', [
- *   'action' => 'order',
- *   'relationship' => 'sibling',
- *   'group' => 'my-elements-weight',
- * ];
- * @endcode
- *
- * In a more complex case where there are several groups in one column (such as
- * the block regions on the admin/structure/block page), a separate subgroup
- * class must also be added to differentiate the groups.
- * @code
- * $form['my_elements'][$region][$delta]['weight']['#attributes']['class'] = ['my-elements-weight', 'my-elements-weight-' . $region];
- * @endcode
- *
- * The 'group' option is still 'my-element-weight', and the additional
- * 'subgroup' option will be passed in as 'my-elements-weight-' . $region. This
- * also means that you'll need to call drupal_attach_tabledrag() once for every
- * region added.
- *
- * @code
- * foreach ($regions as $region) {
- *   drupal_attach_tabledrag('my-module-table', [
- *     'action' => 'order',
- *     'relationship' => 'sibling',
- *     'group' => 'my-elements-weight',
- *     'subgroup' => 'my-elements-weight-' . $region,
- *   ]);
- * }
- * @endcode
- *
- * In a situation where tree relationships are present, adding multiple
- * subgroups is not necessary, because the table will contain indentations that
- * provide enough information about the sibling and parent relationships. See
- * MenuForm::BuildOverviewForm for an example creating a table
- * containing parent relationships.
- *
- * @param array $element
- *   A form element to attach the tableDrag behavior to.
- * @param array $options
- *   These options are used to generate JavaScript settings necessary to
- *   configure the tableDrag behavior appropriately for this particular table.
- *   An associative array containing the following keys:
- *   - 'table_id': String containing the target table's id attribute.
- *     If the table does not have an id, one will need to be set,
- *     such as <table id="my-module-table">.
- *   - 'action': String describing the action to be done on the form item.
- *      Either 'match' 'depth', or 'order':
- *     - 'match' is typically used for parent relationships.
- *     - 'order' is typically used to set weights on other form elements with
- *       the same group.
- *     - 'depth' updates the target element with the current indentation.
- *   - 'relationship': String describing where the "action" option
- *     should be performed. Either 'parent', 'sibling', 'group', or 'self':
- *     - 'parent' will only look for fields up the tree.
- *     - 'sibling' will look for fields in the same group in rows above and
- *       below it.
- *     - 'self' affects the dragged row itself.
- *     - 'group' affects the dragged row, plus any children below it (the entire
- *       dragged group).
- *   - 'group': A class name applied on all related form elements for this
- *      action.
- *   - 'subgroup': (optional) If the group has several subgroups within it, this
- *     string should contain the class name identifying fields in the same
- *     subgroup.
- *   - 'source': (optional) If the $action is 'match', this string should
- *     contain the classname identifying what field will be used as the source
- *     value when matching the value in $subgroup.
- *   - 'hidden': (optional) The column containing the field elements may be
- *     entirely hidden from view dynamically when the JavaScript is loaded. Set
- *     to FALSE if the column should not be hidden.
- *   - 'limit': (optional) Limit the maximum amount of parenting in this table.
- *
+ * @see https://www.drupal.org/node/3035565
  * @see MenuForm::BuildOverviewForm()
+ * @see \Drupal\Core\Render\Element\Table::attachTabledrag()
  */
 function drupal_attach_tabledrag(&$element, array $options): void {
-  // Add default values to elements.
-  $options = $options + [
-    'subgroup' => NULL,
-    'source' => NULL,
-    'hidden' => TRUE,
-    'limit' => 0,
-  ];
-
-  $group = $options['group'];
-
-  $tabledrag_id = &drupal_static(__FUNCTION__);
-  $tabledrag_id = (!isset($tabledrag_id)) ? 0 : $tabledrag_id + 1;
-
-  // If a subgroup or source isn't set, assume it is the same as the group.
-  $target = $options['subgroup'] ?? $group;
-  $source = $options['source'] ?? $target;
-  $element['#attached']['drupalSettings']['tableDrag'][$options['table_id']][$group][$tabledrag_id] = [
-    'target' => $target,
-    'source' => $source,
-    'relationship' => $options['relationship'],
-    'action' => $options['action'],
-    'hidden' => $options['hidden'],
-    'limit' => $options['limit'],
-  ];
-
-  $element['#attached']['library'][] = 'core/drupal.tabledrag';
+  @trigger_error('drupal_attach_tabledrag() is deprecated in drupal:11.5.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Render\Element\Table::attachTabledrag() instead. See https://www.drupal.org/node/3035565', E_USER_DEPRECATED);
+  Table::attachTabledrag($element, $options);
 }
 
 /**
  * Hides an element from later rendering.
  *
- * The first time render() or RenderInterface::render() is called on an element
- * tree, as each element in the tree is rendered, it is marked with a #printed
- * flag and the rendered children of the element are cached. Subsequent calls to
- * render() or RenderInterface::render() will not traverse the child tree of
- * this element again: they will just use the cached children. So if you want to
- * hide an element, be sure to call hide() on the element before its parent tree
- * is rendered for the first time, as it will have no effect on subsequent
- * renderings of the parent tree.
+ * Refer to \Drupal\Core\Render\RendererInterface::render()
+ * for additional documentation.
  *
  * @param array $element
  *   The element to be hidden.
@@ -305,11 +152,15 @@ function drupal_attach_tabledrag(&$element, array $options): void {
  * @return array
  *   The element.
  *
- * @see \Drupal\Core\Render\RendererInterface
- * @see render()
- * @see show()
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To hide form
+ *   elements, use ['#access'] = FALSE. For render elements, use
+ *   ['#printed'] = TRUE.
+ *
+ * @see https://www.drupal.org/node/3261271
+ * @see \Drupal\Core\Render\RendererInterface::render()
  */
 function hide(&$element) {
+  @trigger_error("The global hide() function is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To hide form elements, use ['#access'] = FALSE. For render elements, use ['#printed'] = TRUE. See https://www.drupal.org/node/3261271", E_USER_DEPRECATED);
   $element['#printed'] = TRUE;
   return $element;
 }
@@ -317,17 +168,8 @@ function hide(&$element) {
 /**
  * Shows a hidden element for later rendering.
  *
- * You can also use render($element), which shows the element while rendering
- * it.
- *
- * The first time render() or RenderInterface::render() is called on an element
- * tree, as each element in the tree is rendered, it is marked with a #printed
- * flag and the rendered children of the element are cached. Subsequent calls to
- * render() or RenderInterface::render() will not traverse the child tree of
- * this element again: they will just use the cached children. So if you want to
- * show an element, be sure to call show() on the element before its parent tree
- * is rendered for the first time, as it will have no effect on subsequent
- * renderings of the parent tree.
+ * Refer to \Drupal\Core\Render\RendererInterface::render()
+ * for additional documentation.
  *
  * @param array $element
  *   The element to be shown.
@@ -335,11 +177,15 @@ function hide(&$element) {
  * @return array
  *   The element.
  *
- * @see \Drupal\Core\Render\RendererInterface
- * @see render()
- * @see hide()
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To show form
+ *   elements, use ['#access'] = TRUE. For render elements, use
+ *   ['#printed'] = FALSE.
+ *
+ * @see https://www.drupal.org/node/3261271
+ * @see \Drupal\Core\Render\RendererInterface::render()
  */
 function show(&$element) {
+  @trigger_error("The global show() function is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To show form elements, use ['#access'] = TRUE. For render elements, use ['#printed'] = FALSE. See https://www.drupal.org/node/3261271", E_USER_DEPRECATED);
   $element['#printed'] = FALSE;
   return $element;
 }
@@ -441,9 +287,8 @@ function drupal_flush_all_caches($kernel = NULL): void {
   // Wipe the Twig PHP Storage cache.
   \Drupal::service('twig')->invalidate();
 
-  // Rebuild profile, profile, theme_engine and theme data.
+  // Rebuild profile and theme data.
   \Drupal::service('extension.list.profile')->reset();
-  \Drupal::service('extension.list.theme_engine')->reset();
   \Drupal::service('theme_handler')->refreshInfo();
   // In case the active theme gets requested later in the same request we need
   // to reset the theme manager.
@@ -464,9 +309,6 @@ function drupal_flush_all_caches($kernel = NULL): void {
   // Rebuild all information based on new module data.
   \Drupal::moduleHandler()->invokeAll('rebuild');
 
-  // Clear all plugin caches.
-  \Drupal::service('plugin.cache_clearer')->clearCachedDefinitions();
-
   // Rebuild the menu router based on all rebuilt data.
   // Important: This rebuild must happen last, so the menu router is guaranteed
   // to be based on up to date information.
@@ -479,52 +321,4 @@ function drupal_flush_all_caches($kernel = NULL): void {
     \Drupal::theme()->resetActiveTheme();
     drupal_maintenance_theme();
   }
-}
-
-/**
- * Assembles the Drupal Updater registry.
- *
- * An Updater is a class that knows how to update various parts of the Drupal
- * file system, for example to update modules that have newer releases, or to
- * install a new theme.
- *
- * @return array
- *   The Drupal Updater class registry.
- *
- * @see \Drupal\Core\Updater\Updater
- * @see hook_updater_info()
- * @see hook_updater_info_alter()
- */
-function drupal_get_updaters() {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
-
-  $updaters = &drupal_static(__FUNCTION__);
-  if (!isset($updaters)) {
-    $updaters = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info');
-    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info', $updaters);
-    uasort($updaters, [SortArray::class, 'sortByWeightElement']);
-  }
-  return $updaters;
-}
-
-/**
- * Assembles the Drupal FileTransfer registry.
- *
- * @return array
- *   The Drupal FileTransfer class registry.
- *
- * @see \Drupal\Core\FileTransfer\FileTransfer
- * @see hook_filetransfer_info()
- * @see hook_filetransfer_info_alter()
- */
-function drupal_get_filetransfer_info() {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
-
-  $info = &drupal_static(__FUNCTION__);
-  if (!isset($info)) {
-    $info = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info');
-    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info', $info);
-    uasort($info, [SortArray::class, 'sortByWeightElement']);
-  }
-  return $info;
 }

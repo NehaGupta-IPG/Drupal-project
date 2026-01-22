@@ -26,6 +26,7 @@ class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'body_field',
     'node',
     'ckeditor5',
     'inline_form_errors',
@@ -66,7 +67,7 @@ class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
       'field_storage' => $field_storage,
       'bundle' => 'page',
       'label' => 'Body',
-      'settings' => ['display_summary' => TRUE],
+      'settings' => [],
       'required' => TRUE,
     ])->save();
 
@@ -76,7 +77,7 @@ class FormErrorHandlerCKEditor5Test extends WebDriverTestBase {
       'bundle' => 'page',
       'mode' => 'default',
       'status' => TRUE,
-    ])->setComponent('body', ['type' => 'text_textarea_with_summary'])
+    ])->setComponent('body', ['type' => 'text_textarea'])
       ->save();
 
     $account = $this->drupalCreateUser([

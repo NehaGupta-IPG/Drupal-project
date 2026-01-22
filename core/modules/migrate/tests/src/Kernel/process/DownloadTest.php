@@ -69,7 +69,7 @@ class DownloadTest extends FileTestBase {
 
     // Pass or fail, we'll need to make the file writable again so the test
     // can clean up after itself.
-    $fix_permissions = function () use ($destination_uri) {
+    $fix_permissions = function () use ($destination_uri): void {
       $this->container
         ->get('file_system')
         ->chmod($destination_uri, 0755);
@@ -97,16 +97,16 @@ class DownloadTest extends FileTestBase {
    * @return string
    *   The local URI of the downloaded file.
    */
-  protected function doTransform($destination_uri, $configuration = []) {
+  protected function doTransform($destination_uri, array $configuration = []) {
     // Prepare a mock HTTP client.
-    $this->container->set('http_client', $this->createMock(Client::class));
+    $this->container->set('http_client', $this->createStub(Client::class));
 
     // Instantiate the plugin statically so it can pull dependencies out of
     // the container.
     $plugin = Download::create($this->container, $configuration, 'download', []);
 
     // Execute the transformation.
-    $executable = $this->createMock(MigrateExecutableInterface::class);
+    $executable = $this->createStub(MigrateExecutableInterface::class);
     $row = new Row([], []);
 
     // Return the downloaded file's local URI.
