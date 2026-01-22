@@ -46,35 +46,27 @@ class ProjectRootTest extends UnitTestCase {
     ];
   }
 
-  /**
-   * Verify behavior for missing or bad installed.json.
-   *
-   * @covers ::getInstalledPackages
-   * @dataProvider provideEmptyInstalledJson
-   */
-  public function testGetInstalledPackagesEmpty($filesystem): void {
-    vfsStream::setup('root_test', NULL, $filesystem);
-    $root = $this->getMockProjectRoot('root_test');
-    $this->assertSame([], $root->getInstalledPackages());
-  }
-
   public static function provideInstalledJson(): array {
     return [
       [
-        ['package_name' => 'package_version'],
-        ['vendor' => ['composer' => ['installed.json' => '[{"name": "package_name", "version_normalized": "package_version"}]']]],
+        TRUE,
+        ['vendor' => ['composer' => ['installed.json' => '{"dev": true}']]],
+      ],
+      [
+        FALSE,
+        ['vendor' => ['composer' => ['installed.json' => '{"dev": false}']]],
       ],
     ];
   }
 
   /**
-   * @covers ::getInstalledPackages
+   * @covers ::isDevInstall
    * @dataProvider provideInstalledJson
    */
-  public function testGetInstalledPackages($expected, $filesystem): void {
+  public function testIsDevInstall($expected, $filesystem): void {
     vfsStream::setup('root_test', NULL, $filesystem);
     $root = $this->getMockProjectRoot('root_test');
-    $this->assertEquals($expected, $root->getInstalledPackages());
+    $this->assertEquals($expected, $root->isDevInstall());
   }
 
 }

@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\Composer;
 
 use Drupal\Core\Composer\ProjectRoot;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * @coversDefaultClass \Drupal\Core\Composer\ProjectRoot
@@ -13,6 +14,7 @@ use Drupal\KernelTests\KernelTestBase;
  *
  * @internal
  */
+#[RunTestsInSeparateProcesses]
 class ProjectRootTest extends KernelTestBase {
 
   /**

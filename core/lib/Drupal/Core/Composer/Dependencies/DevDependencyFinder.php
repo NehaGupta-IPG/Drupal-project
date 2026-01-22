@@ -6,7 +6,6 @@ use Drupal\Core\Composer\ProjectRootInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Composer\Semver\Semver;
 
 /**
  * Builds hook_requirements() info about Composer dev dependencies.
@@ -47,42 +46,8 @@ class DevDependencyFinder {
    *
    * @see hook_requirements()
    */
-  public function buildRequirements() {
-    // Get a list of installed packages.
-    $installed = $this->projectRoot->getInstalledPackages();
-    // Get the dev requirements for the root project.
-    $dev_requirements = $this->projectRoot->getDevRequirements();
-
-    // Make a list of installed dev requirements.
-    $installed_dev = array_intersect_key($installed, $dev_requirements);
-
-    // If the number of dev requirements and installed dev requirements is
-    // exactly the same, then we reason that the user probably issued a
-    // 'composer install' command (defaulting to --dev). We then verify this by
-    // checking core's dev requirement version constraints. If the version
-    // constraints do not match, then either the user has an out-of-date vendor/
-    // directory, or contrib has non-dev requirements on the same packages as
-    // core's dev requirements, but in different versions. This is highly
-    // unlikely, but still doesn't count as core dev requirements. This leaves
-    // us with an edge case where contrib happens to require exactly the same
-    // packages, with similar version constraints. In this case, it is
-    // reasonable to issue a warning for the same reasons we'd issue the warning
-    // for core's dev requirements. And we're unable to tell the difference
-    // anyway.
-    $dev_installed = FALSE;
-    if ($installed_dev && (count($installed_dev) === count($dev_requirements))) {
-      $dev_installed = TRUE;
-      foreach ($dev_requirements as $package_name => $version_constraint) {
-        // Special case for @dev packages, which can generate un-parseable local
-        // version numbers, such as [behat/mink] => 9999999-dev.
-        if (strpos($version_constraint, 'dev') === FALSE) {
-          if (!Semver::satisfies($installed_dev[$package_name], $version_constraint)) {
-            $dev_installed = FALSE;
-            break;
-          }
-        }
-      }
-    }
+  public function buildRequirements(): array {
+    $dev_installed = $this->projectRoot->isDevInstall();
 
     $requirements = [
       'composer_dev_dependencies' => [

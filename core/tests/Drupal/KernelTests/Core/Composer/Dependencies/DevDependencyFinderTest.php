@@ -9,6 +9,7 @@ use Drupal\Core\Composer\ProjectRootInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * @coversDefaultClass \Drupal\Core\Composer\Dependencies\DevDependencyFinder
@@ -21,38 +22,16 @@ use Drupal\KernelTests\KernelTestBase;
  *   dependencies on install.inc.
  * @see https://www.drupal.org/node/2909480
  */
+#[RunTestsInSeparateProcesses]
 class DevDependencyFinderTest extends KernelTestBase {
 
   /**
    * Data provider for ::testBuildRequirements())
    */
   public static function provideBuildRequirements(): array {
-    // Data provider methods are run before setUp(), so they can't use
-    // constants from *.inc files. REQUIREMENT_OK = 0, REQUIREMENT_WARNING = 1.
     return [
-      'no_dev_no_install' => [RequirementSeverity::OK, [], []],
-      'no_dev_requirements' => [RequirementSeverity::OK, ['any_requirement' => '0.0.1'], []],
-      'dev_requirements_installed' => [
-        RequirementSeverity::Warning,
-        ['dev_requirement' => '0.0.1'],
-        ['dev_requirement' => '0.0.*'],
-      ],
-      'dev_package_installed' => [
-        RequirementSeverity::Warning,
-        [
-          'dev_requirement' => '999999-dev',
-          'dev_requirement_2' => '1.0.3',
-        ],
-        [
-          'dev_requirement' => '^1@dev',
-          'dev_requirement_2' => '^1',
-        ],
-      ],
-      'contrib_needs_other_version' => [
-        RequirementSeverity::OK,
-        ['dev_requirement' => '2.0.0'],
-        ['dev_requirement' => '1.0.*'],
-      ],
+      'no_dev_install' => [RequirementSeverity::OK, FALSE],
+      'dev_install' => [RequirementSeverity::Warning, TRUE],
     ];
   }
 
@@ -60,16 +39,13 @@ class DevDependencyFinderTest extends KernelTestBase {
    * @covers ::buildRequirements
    * @dataProvider provideBuildRequirements
    */
-  public function testBuildRequirements($expected, $installed, $dev_requirements): void {
+  public function testBuildRequirements($expected, $isDevInstall): void {
     $mock_root = $this->getMockBuilder(ProjectRootInterface::class)
-      ->onlyMethods(['getInstalledPackages', 'getDevRequirements', 'getProjectVendorDirectory'])
+      ->onlyMethods(['getProjectVendorDirectory', 'isDevInstall'])
       ->getMock();
     $mock_root->expects($this->once())
-      ->method('getInstalledPackages')
-      ->willReturn($installed);
-    $mock_root->expects($this->once())
-      ->method('getDevRequirements')
-      ->willReturn($dev_requirements);
+      ->method('isDevInstall')
+      ->willReturn($isDevInstall);
 
     $finder = new DevDependencyFinder(
       $mock_root,
