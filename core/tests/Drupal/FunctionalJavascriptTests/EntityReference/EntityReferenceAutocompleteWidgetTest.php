@@ -104,6 +104,16 @@ class EntityReferenceAutocompleteWidgetTest extends WebDriverTestBase {
     $assert_session->pageTextContains('Test page');
     $assert_session->pageTextContains('Page test');
 
+    $this->drupalGet('node/add/page');
+    $page = $this->getSession()->getPage();
+    // This should be the same as searching "Test page".
+    $autocomplete_field->setValue('Test ../page');
+    $this->getSession()->getDriver()->keyDown($autocomplete_field->getXpath(), ' ');
+    $assert_session->waitOnAutocomplete();
+    $results = $page->findAll('css', '.ui-autocomplete li');
+    $this->assertCount(1, $results);
+    $assert_session->pageTextContains('Test page');
+
     // Now switch the autocomplete widget to the 'STARTS_WITH' match operator.
     $display_repository->getFormDisplay('node', 'page')
       ->setComponent($field_name, [
