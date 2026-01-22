@@ -32,7 +32,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'test_datetime_element';
   }
 
@@ -79,7 +79,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datetimeDateCallbackTrusted', string $time_callback = 'datetimeTimeCallbackTrusted') {
+  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datetimeDateCallbackTrusted', string $time_callback = 'datetimeTimeCallbackTrusted'): array {
 
     $form['datetime_element'] = [
       '#title' => 'datelist test',
@@ -210,12 +210,18 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
       'untrusted date' => [
         'datetimeDateCallback',
         'datetimeTimeCallbackTrusted',
-        sprintf('DateTime element #date_date_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966', Variable::callableToString([static::class, 'datetimeDateCallback'])),
+        sprintf(
+          'DateTime element #date_date_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966',
+          Variable::callableToString([static::class, 'datetimeDateCallback']),
+        ),
       ],
       'untrusted time' => [
         'datetimeDateCallbackTrusted',
         'datetimeTimeCallback',
-        sprintf('DateTime element #date_time_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966', Variable::callableToString([static::class, 'datetimeTimeCallback'])),
+        sprintf(
+          'DateTime element #date_time_callbacks callbacks must be methods of a class that implements \Drupal\Core\Security\TrustedCallbackInterface or be an anonymous function. The callback was %s. See https://www.drupal.org/node/3217966',
+          Variable::callableToString([static::class, 'datetimeTimeCallback']),
+        ),
       ],
     ];
   }
@@ -285,7 +291,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return [
       'datetimeDateCallbackTrusted',
       'datetimeTimeCallbackTrusted',
