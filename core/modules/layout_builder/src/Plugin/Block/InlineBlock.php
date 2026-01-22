@@ -15,6 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Psr\Log\LoggerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\layout_builder\Plugin\Derivative\InlineBlockDeriver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -36,13 +37,6 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   use RefinableDependentAccessTrait;
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * The block content entity.
    *
    * @var \Drupal\block_content\BlockContentInterface
@@ -50,25 +44,11 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   protected $blockContent;
 
   /**
-   * The entity display repository.
-   *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
-   */
-  protected $entityDisplayRepository;
-
-  /**
    * Whether a new block is being created.
    *
    * @var bool
    */
   protected $isNew = TRUE;
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $currentUser;
 
   /**
    * Constructs a new InlineBlock.
@@ -79,19 +59,21 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
    *   The entity display repository.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   A logger instance.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, AccountInterface $current_user) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityTypeManagerInterface $entityTypeManager, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected AccountInterface $currentUser, protected ?LoggerInterface $logger = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-
-    $this->entityTypeManager = $entity_type_manager;
-    $this->entityDisplayRepository = $entity_display_repository;
-    $this->currentUser = $current_user;
+    if (!$logger) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $logger argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3436810', E_USER_DEPRECATED);
+      $this->logger = \Drupal::service('logger.channel.layout_builder');
+    }
     if (!empty($this->configuration['block_revision_id']) || !empty($this->configuration['block_serialized'])) {
       $this->isNew = FALSE;
     }
@@ -107,7 +89,8 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('entity_display.repository'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('logger.channel.layout_builder')
     );
   }
 
@@ -210,7 +193,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     if ($entity = $this->getEntity()) {
       return $entity->access('view', $account, TRUE);
     }
-    return AccessResult::forbidden();
+    return AccessResult::allowedIfHasPermission($account, 'administer blocks');
   }
 
   /**
@@ -218,14 +201,18 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    */
   public function build() {
     $block = $this->getEntity();
+    if (!$block) {
+      return ['#markup' => $this->t('This block is broken or missing. You may be missing content or you might need to enable the original module.')];
+    }
     return $this->entityTypeManager->getViewBuilder($block->getEntityTypeId())->view($block, $this->configuration['view_mode']);
   }
 
   /**
    * Loads or creates the block content entity of the block.
    *
-   * @return \Drupal\block_content\BlockContentInterface
-   *   The block content entity.
+   * @return \Drupal\block_content\BlockContentInterface|null
+   *   The block content entity, or NULL if a revision was specified but can not
+   *   be loaded.
    */
   protected function getEntity() {
     if (!isset($this->blockContent)) {
@@ -234,6 +221,9 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
       }
       elseif (!empty($this->configuration['block_revision_id'])) {
         $entity = $this->entityTypeManager->getStorage('block_content')->loadRevision($this->configuration['block_revision_id']);
+        if (!$entity) {
+          $this->logger->error('Unable to load inline block content entity with revision ID %vid.', ['%vid' => $this->configuration['block_revision_id']]);
+        }
         $this->blockContent = $entity;
       }
       else {
