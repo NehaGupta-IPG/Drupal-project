@@ -13,33 +13,25 @@ use Drupal\Component\Serialization\Json;
 class ProjectRoot implements ProjectRootInterface {
 
   /**
-   * The full path to the root directory of the Drupal installation.
-   *
-   * @var string
-   */
-  protected $appRoot;
-
-  /**
    * The full path to the vendor directory for this Drupal installation.
    *
    * @var string
    */
-  protected $vendorDirectory;
+  protected string $vendorDirectory;
 
   /**
    * Construct a ProjectRoot object.
    *
-   * @param string $app_root
+   * @param string $appRoot
    *   Full path to the Drupal root directory.
    */
-  public function __construct($app_root) {
-    $this->appRoot = $app_root;
+  public function __construct(protected string $appRoot) {
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getProjectVendorDirectory() {
+  public function getProjectVendorDirectory(): string {
     if (empty($this->vendorDirectory)) {
       // In order to discover the vendor directory, we require the Drupal class
       // loader facade which is always in appRoot. appRoot/autoload.php
@@ -50,7 +42,7 @@ class ProjectRoot implements ProjectRootInterface {
       $autoload = require $this->appRoot . '/autoload.php';
       if ($autoload instanceof ClassLoader) {
         $ref_loader = new \ReflectionClass($autoload);
-        $vendor_dir = dirname(dirname($ref_loader->getFileName()));
+        $vendor_dir = dirname($ref_loader->getFileName(), 2);
       }
       $this->vendorDirectory = $vendor_dir;
     }

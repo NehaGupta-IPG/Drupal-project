@@ -18,10 +18,8 @@ class DevDependencyFinder {
 
   /**
    * The Composer project root service.
-   *
-   * @var \Drupal\Core\Composer\ProjectRootInterface
    */
-  protected $projectRoot;
+  protected ProjectRootInterface $projectRoot;
 
   /**
    * Constructor.

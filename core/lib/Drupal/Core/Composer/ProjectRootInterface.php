@@ -13,7 +13,7 @@ interface ProjectRootInterface {
    * @return string
    *   Absolute path to the vendor directory.
    */
-  public function getProjectVendorDirectory();
+  public function getProjectVendorDirectory(): string;
 
   /**
    * Gets whether Composer dev dependencies are installed.
