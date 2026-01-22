@@ -61,7 +61,7 @@ final readonly class PackageJsonFinder {
       // Exclude vendor directory.
       ->exclude('vendor')
       // Only direct children's package.json, not deeply nested ones.
-      ->depth('< 2')
+      ->depth('< 4')
       ->in($validPaths);
 
     // Apply custom filter for ignored packages.
