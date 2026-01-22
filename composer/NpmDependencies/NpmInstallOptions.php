@@ -29,13 +29,15 @@ final readonly class NpmInstallOptions {
 
   /**
    * Default paths to scan for package.json files.
+   *
+   * Core is listed first to ensure its dependencies take precedence
+   * when using first-wins conflict resolution strategy.
    */
   const array DEFAULT_SCAN_PATHS = [
-    'modules/contrib',
-    'modules/custom',
-    'themes/contrib',
-    'themes/custom',
-    'profiles/contrib',
+    'core',
+    'modules',
+    'themes',
+    'profiles',
   ];
 
   /**

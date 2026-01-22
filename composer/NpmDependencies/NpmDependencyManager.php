@@ -59,8 +59,14 @@ final class NpmDependencyManager {
     // Step 1: Find package.json files.
     $this->io->write('Scanning for package.json files...');
     $finder = new PackageJsonFinder($this->projectRoot, $this->options);
-    $packageJsonFiles = $finder->find();
 
+    if (!$finder->hasValidPaths()) {
+      $this->io->write('<comment>No configured scan paths exist.</comment>');
+      $this->io->write('Configured paths: ' . implode(', ', $this->options->scanPaths));
+      return 0;
+    }
+
+    $packageJsonFiles = $finder->find();
     $fileCount = iterator_count($packageJsonFiles);
     if ($fileCount === 0) {
       $this->io->write('<comment>No package.json files found in configured paths.</comment>');

@@ -101,10 +101,10 @@
         },
         "drupal-npm-install": {
             "scan-paths": [
-                "modules/contrib",
-                "modules/custom",
-                "themes/contrib",
-                "themes/custom"
+                "core",
+                "modules",
+                "themes",
+                "profiles"
             ],
             "include-dev-dependencies": false,
             "conflict-resolution": "highest-satisfies"

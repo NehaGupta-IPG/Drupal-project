@@ -28,12 +28,31 @@ final readonly class PackageJsonFinder {
   ) {}
 
   /**
+   * Checks if any valid scan paths exist.
+   *
+   * @return bool
+   *   TRUE if at least one scan path exists on disk.
+   */
+  public function hasValidPaths(): bool {
+    return !empty($this->getValidScanPaths());
+  }
+
+  /**
    * Finds all package.json files in the configured scan paths.
    *
    * @return \Symfony\Component\Finder\Finder
    *   A Finder instance containing all discovered package.json files.
+   *
+   * @throws \RuntimeException
+   *   If no valid scan paths exist. Call hasValidPaths() first.
    */
   public function find(): Finder {
+    $validPaths = $this->getValidScanPaths();
+
+    if (empty($validPaths)) {
+      throw new \RuntimeException('No valid scan paths exist. Call hasValidPaths() first.');
+    }
+
     $finder = new Finder();
     $finder->files()
       ->name('package.json')
@@ -42,17 +61,8 @@ final readonly class PackageJsonFinder {
       // Exclude vendor directory.
       ->exclude('vendor')
       // Only direct children's package.json, not deeply nested ones.
-      ->depth('< 3');
-
-    $validPaths = $this->getValidScanPaths();
-
-    if (empty($validPaths)) {
-      // Return an empty finder if no valid paths exist.
-      $finder->in([]);
-      return $finder;
-    }
-
-    $finder->in($validPaths);
+      ->depth('< 2')
+      ->in($validPaths);
 
     // Apply custom filter for ignored packages.
     $finder->filter(function (\SplFileInfo $file): bool {
