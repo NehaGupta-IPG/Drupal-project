@@ -12374,6 +12374,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/comment.module',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Access to an undefined property Drupal\\\\comment\\\\CommentFieldItemList\\:\\:\\$status\\.$#',
+	'identifier' => 'property.notFound',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/comment/src/CommentFieldItemList.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\CommentForm\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
