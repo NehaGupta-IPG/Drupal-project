@@ -10,6 +10,8 @@ use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Drupal\Core\EventDispatcher\EventDispatcherFactory;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\Connection.
@@ -76,9 +78,18 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Constructs a \Drupal\sqlite\Driver\Database\sqlite\Connection object.
    */
-  public function __construct(\PDO $connection, array $connection_options) {
+  public function __construct(
+    \PDO $connection,
+    array $connection_options,
+    ?EventDispatcherInterface $eventDispatcher = NULL,
+  ) {
+    if ($eventDispatcher === NULL) {
+      @trigger_error('Not passing the $eventDispatcher parameter to ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and is throwing an error from drupal:12.0.0. See https://www.drupal.org/node/3494044', E_USER_DEPRECATED);
+      $eventDispatcher = (\Drupal::hasContainer() && \Drupal::hasService(EventDispatcherInterface::class)) ? \Drupal::service(EventDispatcherInterface::class) : new EventDispatcherFactory();
+    }
+
     assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof SqliteConnection : TRUE);
-    parent::__construct($connection, $connection_options);
+    parent::__construct($connection, $connection_options, $eventDispatcher);
 
     // Empty prefix means query the main database -- no need to attach anything.
     $prefix = $this->connectionOptions['prefix'] ?? '';

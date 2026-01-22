@@ -8,6 +8,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\PlaceholderInterface;
+use Drupal\Core\EventDispatcher\EventDispatcherFactoryInterface;
 use Drupal\Tests\Core\Database\Stub\StubCondition;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
@@ -230,10 +231,15 @@ class ConditionTest extends UnitTestCase {
    * Tests that the core Condition can be overridden.
    */
   public function testContribCondition(): void {
-    $connection = new StubConnection($this->createMock(StubPDO::class), [
-      'namespace' => 'Drupal\mock\Driver\Database\mock',
-      'prefix' => '',
-    ]);
+    $connection = new StubConnection(
+      $this->createStub(StubPDO::class),
+      [
+        'namespace' => 'Drupal\mock\Driver\Database\mock',
+        'prefix' => '',
+      ],
+      ['', ''],
+      $this->createStub(EventDispatcherFactoryInterface::class),
+    );
     $condition = $connection->condition('AND');
     $this->assertSame(StubCondition::class, get_class($condition));
   }

@@ -11,7 +11,9 @@ use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Drupal\Core\EventDispatcher\EventDispatcherFactory;
 use Pdo\Pgsql;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 // cSpell:ignore ilike nextval
 
@@ -92,9 +94,19 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * Constructs a connection object.
    */
-  public function __construct(\PDO $connection, array $connection_options) {
+  public function __construct(
+    \PDO $connection,
+    array $connection_options,
+    ?EventDispatcherInterface $eventDispatcher = NULL,
+  ) {
+    if ($eventDispatcher === NULL) {
+      @trigger_error('Not passing the $eventDispatcher parameter to ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and is throwing an error from drupal:12.0.0. See https://www.drupal.org/node/3494044', E_USER_DEPRECATED);
+      $eventDispatcher = (\Drupal::hasContainer() && \Drupal::hasService(EventDispatcherInterface::class)) ? \Drupal::service(EventDispatcherInterface::class) : new EventDispatcherFactory();
+    }
+
     // @phpstan-ignore class.notFound
     assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Pgsql : TRUE);
+
     // Sanitize the schema name here, so we do not have to do it in other
     // functions.
     if (isset($connection_options['schema']) && ($connection_options['schema'] !== 'public')) {
@@ -105,7 +117,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // needs this.
     $this->connectionOptions = $connection_options;
 
-    parent::__construct($connection, $connection_options);
+    parent::__construct($connection, $connection_options, $eventDispatcher);
 
     // Force PostgreSQL to use the UTF-8 character set by default.
     $this->connection->exec("SET NAMES 'UTF8'");

@@ -4,7 +4,6 @@ namespace Drupal\Core\Database;
 
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Core\Database\Event\DatabaseEvent;
-use Drupal\Core\Database\Exception\EventException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
@@ -14,7 +13,9 @@ use Drupal\Core\Database\Query\Truncate;
 use Drupal\Core\Database\Query\Update;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Drupal\Core\EventDispatcher\EventDispatcherFactory;
 use Drupal\Core\Pager\PagerManagerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Base Database API class.
@@ -167,6 +168,11 @@ abstract class Connection {
   protected TransactionManagerInterface $transactionManager;
 
   /**
+   * The event dispatcher.
+   */
+  protected readonly EventDispatcherInterface $eventDispatcher;
+
+  /**
    * Constructs a Connection object.
    *
    * @param object $connection
@@ -176,8 +182,20 @@ abstract class Connection {
    *   - prefix
    *   - namespace
    *   - Other driver-specific options.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $eventDispatcher
+   *   The event dispatcher.
    */
-  public function __construct(object $connection, array $connection_options) {
+  public function __construct(
+    object $connection,
+    array $connection_options,
+    ?EventDispatcherInterface $eventDispatcher = NULL,
+  ) {
+    if ($eventDispatcher === NULL) {
+      @trigger_error('Not passing the $eventDispatcher parameter to ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and is throwing an error from drupal:12.0.0. See https://www.drupal.org/node/3494044', E_USER_DEPRECATED);
+      $eventDispatcher = (\Drupal::hasContainer() && \Drupal::hasService(EventDispatcherInterface::class)) ? \Drupal::service(EventDispatcherInterface::class) : new EventDispatcherFactory();
+    }
+    $this->eventDispatcher = $eventDispatcher;
+
     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
 
     // Manage the table prefix.
@@ -1534,15 +1552,9 @@ abstract class Connection {
    *
    * @return \Drupal\Core\Database\Event\DatabaseEvent
    *   The database event.
-   *
-   * @throws \Drupal\Core\Database\Exception\EventException
-   *   If the container is not initialized.
    */
   public function dispatchEvent(DatabaseEvent $event, ?string $eventName = NULL): DatabaseEvent {
-    if (\Drupal::hasService('event_dispatcher')) {
-      return \Drupal::service('event_dispatcher')->dispatch($event, $eventName);
-    }
-    throw new EventException('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
+    return $this->eventDispatcher->dispatch($event, $eventName);
   }
 
   /**

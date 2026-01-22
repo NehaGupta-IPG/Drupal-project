@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests query batching.
@@ -236,7 +237,7 @@ class QueryBatchTest extends KernelTestBase {
     // closed.
     $connection_options = ['database' => ':memory:'];
     $pdo = Connection::open($connection_options);
-    $connection = new Connection($pdo, $connection_options);
+    $connection = new Connection($pdo, $connection_options, $this->container->get(EventDispatcherInterface::class));
 
     // Create the tables and fill them with data.
     foreach ($source_data as $table => $rows) {

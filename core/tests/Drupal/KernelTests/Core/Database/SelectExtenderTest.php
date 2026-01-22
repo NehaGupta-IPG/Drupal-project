@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests the Select query extender classes.
@@ -131,7 +132,7 @@ class SelectExtenderTest extends KernelTestBase {
     $additional_class_loader->register(TRUE);
 
     $mock_pdo = $this->createMock(StubPDO::class);
-    $connection = new StubConnection($mock_pdo, ['namespace' => $namespace]);
+    $connection = new StubConnection($mock_pdo, ['namespace' => $namespace], ['', ''], $this->container->get(EventDispatcherInterface::class));
 
     // Tests the method \Drupal\Core\Database\Query\Select::extend().
     $select = $connection->select('test')->extend($extend);

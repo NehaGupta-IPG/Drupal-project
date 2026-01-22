@@ -10,6 +10,8 @@ use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
+use Drupal\Core\EventDispatcher\EventDispatcherFactory;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Pdo\Mysql;
 
 /**
@@ -69,9 +71,19 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function __construct(\PDO $connection, array $connection_options) {
+  public function __construct(
+    \PDO $connection,
+    array $connection_options,
+    ?EventDispatcherInterface $eventDispatcher = NULL,
+  ) {
+    if ($eventDispatcher === NULL) {
+      @trigger_error('Not passing the $eventDispatcher parameter to ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and is throwing an error from drupal:12.0.0. See https://www.drupal.org/node/3494044', E_USER_DEPRECATED);
+      $eventDispatcher = (\Drupal::hasContainer() && \Drupal::hasService(EventDispatcherInterface::class)) ? \Drupal::service(EventDispatcherInterface::class) : new EventDispatcherFactory();
+    }
+
     // @phpstan-ignore class.notFound
     assert(\PHP_VERSION_ID >= 80400 ? $connection instanceof Mysql : TRUE);
+
     // If the SQL mode doesn't include 'ANSI_QUOTES' (explicitly or via a
     // combination mode), then MySQL doesn't interpret a double quote as an
     // identifier quote, in which case use the non-ANSI-standard backtick.
@@ -94,7 +106,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     if ($this->identifierQuotes === ['"', '"'] && !$is_ansi_quotes_mode) {
       $this->identifierQuotes = ['`', '`'];
     }
-    parent::__construct($connection, $connection_options);
+    parent::__construct($connection, $connection_options, $eventDispatcher);
   }
 
   /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\sqlite\Unit;
 
+use Drupal\Core\EventDispatcher\EventDispatcherFactoryInterface;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\sqlite\Driver\Database\sqlite\SqliteConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
@@ -30,7 +31,7 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerCreateConnectionOptionsFromUrl')]
   public function testCreateConnectionOptionsFromUrl(string $url, string $expected): void {
-    $sqlite_connection = new Connection($this->createMock(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class), []);
+    $sqlite_connection = new Connection($this->createStub(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class), [], $this->createMock(EventDispatcherFactoryInterface::class));
     $database = $sqlite_connection->createConnectionOptionsFromUrl($url, NULL);
     $this->assertEquals('sqlite', $database['driver']);
     $this->assertEquals($expected, $database['database']);

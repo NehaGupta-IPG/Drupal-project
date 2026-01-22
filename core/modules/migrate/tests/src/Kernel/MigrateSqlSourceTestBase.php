@@ -10,6 +10,7 @@ use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Base class for tests of Migrate source plugins that use a database.
@@ -42,7 +43,7 @@ abstract class MigrateSqlSourceTestBase extends MigrateSourceTestBase {
     // closed.
     $connection_options = ['database' => ':memory:'];
     $pdo = Connection::open($connection_options);
-    $connection = new Connection($pdo, $connection_options);
+    $connection = new Connection($pdo, $connection_options, $this->container->get(EventDispatcherInterface::class));
 
     // Create the tables and fill them with data.
     foreach ($source_data as $table => $rows) {

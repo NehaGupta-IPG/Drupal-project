@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
+use Drupal\Core\EventDispatcher\EventDispatcherFactoryInterface;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
@@ -115,7 +116,7 @@ abstract class MigrateTestCase extends UnitTestCase {
     if (extension_loaded('pdo_sqlite')) {
       $connection_options['database'] = ':memory:';
       $pdo = Connection::open($connection_options);
-      $connection = new Connection($pdo, $connection_options);
+      $connection = new Connection($pdo, $connection_options, $this->createStub(EventDispatcherFactoryInterface::class));
     }
     else {
       $this->markTestSkipped('The pdo_sqlite extension is not available.');

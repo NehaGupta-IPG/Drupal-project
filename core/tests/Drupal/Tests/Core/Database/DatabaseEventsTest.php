@@ -10,18 +10,25 @@ use Drupal\Core\Database\Event\StatementEvent;
 use Drupal\Core\Database\Event\StatementExecutionEndEvent;
 use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\Database\Event\StatementExecutionStartEvent;
-use Drupal\Core\Database\Exception\EventException;
+use Drupal\Core\EventDispatcher\EventDispatcherFactory;
+use Drupal\Core\EventDispatcher\EventDispatcherFactoryInterface;
+use Drupal\Core\EventDispatcher\EventDispatcherFactoryStage;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests Drupal\Core\Database\Connection.
+ * Tests the database events.
+ *
+ * We need to run these tests in isolation since they instantiate the event
+ * dispatcher via the factory that uses a static to hold it.
  */
 #[CoversClass(Connection::class)]
 #[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class DatabaseEventsTest extends UnitTestCase {
 
   /**
@@ -35,7 +42,7 @@ class DatabaseEventsTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->connection = new StubConnection($this->createMock(StubPDO::class), []);
+    $this->connection = new StubConnection($this->createStub(StubPDO::class), [], ['', ''], new EventDispatcherFactory());
   }
 
   /**
@@ -90,9 +97,11 @@ class DatabaseEventsTest extends UnitTestCase {
    * @legacy-covers ::dispatchEvent
    */
   public function testEventDispatchingWhenNoContainerAvailable(): void {
-    $this->expectException(EventException::class);
-    $this->expectExceptionMessage('The event dispatcher service is not available. Database API events can only be fired if the container is initialized');
     $this->connection->dispatchEvent($this->createMock(DatabaseEvent::class));
+    $reflectedProperty = new \ReflectionProperty($this->connection, 'eventDispatcher');
+    $eventDispatcher = $reflectedProperty->getValue($this->connection);
+    $this->assertInstanceOf(EventDispatcherFactoryInterface::class, $eventDispatcher);
+    $this->assertSame(EventDispatcherFactoryStage::PreBootstrap, $eventDispatcher->getInstanceStage());
   }
 
 }

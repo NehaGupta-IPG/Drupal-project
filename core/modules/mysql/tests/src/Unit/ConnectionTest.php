@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Tests MySQL database connections.
@@ -32,8 +33,12 @@ class ConnectionTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->connection = $this->getMockBuilder(Connection::class)
-      // @phpstan-ignore class.notFound
-      ->setConstructorArgs([$this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class), []])
+      ->setConstructorArgs([
+        // @phpstan-ignore class.notFound
+        $this->createStub(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class),
+        [],
+        $this->createStub(EventDispatcherInterface::class),
+      ])
       ->onlyMethods(['getServerVersion'])
       ->getMock();
   }

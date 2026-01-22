@@ -8,6 +8,8 @@ use Drupal\Core\Database\Event\StatementEvent;
 use Drupal\Core\Database\Event\StatementExecutionEndEvent;
 use Drupal\Core\Database\Event\StatementExecutionFailureEvent;
 use Drupal\Core\Database\Event\StatementExecutionStartEvent;
+use Drupal\Core\EventDispatcher\EventDispatcherFactoryInterface;
+use Drupal\Core\EventDispatcher\EventDispatcherFactoryStage;
 use Drupal\database_test\EventSubscriber\DatabaseEventSubscriber;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -100,6 +102,16 @@ class DatabaseEventTest extends DatabaseTestBase {
     $this->assertEmpty($subscriber->statementIdsInExecution);
     $this->assertFalse($this->connection->isEventEnabled(StatementExecutionStartEvent::class));
     $this->assertTrue($this->connection->isEventEnabled(StatementExecutionEndEvent::class));
+  }
+
+  /**
+   * Tests that the event dispatcher was instantiated in the container.
+   */
+  public function testEventDispatcherInstantiatedInContainer(): void {
+    $reflectedProperty = new \ReflectionProperty($this->connection, 'eventDispatcher');
+    $eventDispatcher = $reflectedProperty->getValue($this->connection);
+    $this->assertInstanceOf(EventDispatcherFactoryInterface::class, $eventDispatcher);
+    $this->assertSame(EventDispatcherFactoryStage::FullContainer, $eventDispatcher->getInstanceStage());
   }
 
 }

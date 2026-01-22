@@ -930,7 +930,9 @@ services:
     arguments: ['@request_stack']
   Drupal\Core\Routing\RouteMatchInterface: '@current_route_match'
   event_dispatcher:
-    class: Symfony\Component\EventDispatcher\EventDispatcher
+    class: Symfony\Component\EventDispatcher\EventDispatcherInterface
+    factory: Drupal\Core\EventDispatcher\EventDispatcherFactory::createInstance
+    arguments: ['FullContainer']
   Psr\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Contracts\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
   Symfony\Component\EventDispatcher\EventDispatcherInterface: '@event_dispatcher'
