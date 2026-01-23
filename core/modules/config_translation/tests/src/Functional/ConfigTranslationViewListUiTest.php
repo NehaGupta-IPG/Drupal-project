@@ -64,7 +64,7 @@ class ConfigTranslationViewListUiTest extends UITestBase {
 
     // Test if the link to translate actually goes to the translate page.
     $this->drupalGet($translate_link);
-    $this->assertSession()->responseContains('<th>Language</th>');
+    $this->assertSession()->elementExists('xpath', '//th[text()="Language"]');
 
     // Test that the 'Edit' tab appears.
     $this->assertSession()->linkByHrefExists('admin/structure/views/view/test_view');

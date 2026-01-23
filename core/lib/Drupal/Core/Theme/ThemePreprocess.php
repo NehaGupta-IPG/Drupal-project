@@ -612,6 +612,11 @@ class ThemePreprocess {
           // 'field' keys.
           $cell_attributes = new Attribute($cell);
         }
+        // Add scope="col" to header cells for WCAG 1.3.1 compliance, but only
+        // if scope is not already set. This allows developers to override.
+        if ($is_header && !isset($cell_attributes['scope'])) {
+          $cell_attributes['scope'] = 'col';
+        }
         $variables['header'][$col_key] = [];
         $variables['header'][$col_key]['tag'] = $is_header ? 'th' : 'td';
         $variables['header'][$col_key]['attributes'] = $cell_attributes;
@@ -676,6 +681,12 @@ class ThemePreprocess {
               // class from header to cell as needed.
               if (isset($responsive_classes[$responsive_index])) {
                 $cell_attributes['class'][] = $responsive_classes[$responsive_index];
+              }
+              // Add scope="row" to row header cells for WCAG 1.3.1 compliance,
+              // but only if scope is not already set. This allows developers
+              // to override.
+              if ($is_header && !isset($cell_attributes['scope'])) {
+                $cell_attributes['scope'] = 'row';
               }
               $variables[$section][$row_key]['cells'][$col_key]['tag'] = $is_header ? 'th' : 'td';
               $variables[$section][$row_key]['cells'][$col_key]['attributes'] = new Attribute($cell_attributes);
