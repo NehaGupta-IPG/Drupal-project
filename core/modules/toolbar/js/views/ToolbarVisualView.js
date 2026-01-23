@@ -118,8 +118,8 @@
           : 0;
         this.model.set('height', toolbarHeight);
 
-        $('body')[0].style.paddingTop = toolbarPlaceholderSize;
-        $('html')[0].style.scrollPaddingTop = toolbarPlaceholderSize;
+        $('body')[0].style.paddingTop = `${toolbarPlaceholderSize}px`;
+        $('html')[0].style.scrollPaddingTop = `${toolbarPlaceholderSize}px`;
 
         this.triggerDisplace();
       },
