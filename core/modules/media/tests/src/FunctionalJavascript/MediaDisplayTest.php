@@ -11,12 +11,14 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Basic display tests for Media.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaDisplayTest extends MediaJavascriptTestBase {
 
   /**
@@ -50,7 +52,7 @@ class MediaDisplayTest extends MediaJavascriptTestBase {
   /**
    * Tests basic media display.
    */
-  public function testMediaDisplay() {
+  public function testMediaDisplay(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -115,7 +117,7 @@ class MediaDisplayTest extends MediaJavascriptTestBase {
     // visually hidden, and there is no link to the image file.
     /** @var \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator */
     $file_url_generator = \Drupal::service('file_url_generator');
-    $expected_image_src = $file_url_generator->generateString(\Drupal::token()->replace('public://styles/large/public/[date:custom:Y]-[date:custom:m]/example_1.jpeg'));
+    $expected_image_src = $file_url_generator->generate(\Drupal::token()->replace('public://styles/large/public/[date:custom:Y]-[date:custom:m]/example_1.jpeg'))->toString();
     $this->assertStringContainsString($expected_image_src, $media_image->getAttribute('src'));
     $field = $assert_session->elementExists('xpath', '/div[1]', $media_item);
     $assert_session->elementExists('xpath', '/div[@class="visually-hidden"]', $field);

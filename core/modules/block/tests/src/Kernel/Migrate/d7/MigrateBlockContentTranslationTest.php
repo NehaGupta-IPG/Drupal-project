@@ -1,33 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\block\Kernel\Migrate\d7;
 
+use Drupal\block\Hook\BlockHooks;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests migration of i18n block translations.
- *
- * @group migrate_drupal_7
- * @group #slow
  */
+#[Group('migrate_drupal_7')]
+#[RunTestsInSeparateProcesses]
 class MigrateBlockContentTranslationTest extends MigrateDrupal7TestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'node',
     'text',
     'block',
-    'comment',
-    'filter',
-    'views',
     'block_content',
-    'config_translation',
     'language',
-    'locale',
     'path_alias',
-    'taxonomy',
   ];
 
   /**
@@ -46,18 +43,20 @@ class MigrateBlockContentTranslationTest extends MigrateDrupal7TestBase {
       'd7_filter_format',
       'block_content_type',
       'block_content_body_field',
+      'block_content_body_field_storage',
       'd7_custom_block',
       'd7_user_role',
       'd7_block',
       'd7_block_translation',
     ]);
-    block_rebuild();
+    $blockRebuild = new BlockHooks();
+    $blockRebuild->rebuild();
   }
 
   /**
    * Tests the migration of block title translation.
    */
-  public function testBlockContentTranslation() {
+  public function testBlockContentTranslation(): void {
     // @todo Skipped due to frequent random test failures.
     // See https://www.drupal.org/project/drupal/issues/3389365
     $this->markTestSkipped();

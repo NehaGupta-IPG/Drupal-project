@@ -10,11 +10,14 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\ResettableStackedRouteMatchInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Plugin\views\field\UserBulkForm;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\user\Plugin\views\field\UserBulkForm
- * @group user
+ * Tests Drupal\user\Plugin\views\field\UserBulkForm.
  */
+#[CoversClass(UserBulkForm::class)]
+#[Group('user')]
 class UserBulkFormTest extends UnitTestCase {
 
   /**
@@ -29,7 +32,7 @@ class UserBulkFormTest extends UnitTestCase {
   /**
    * Tests the constructor assignment of actions.
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     $actions = [];
 
     for ($i = 1; $i <= 2; $i++) {

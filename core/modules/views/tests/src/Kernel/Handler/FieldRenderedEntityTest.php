@@ -1,29 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\views\Kernel\Handler;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
 use Drupal\views\Entity\View;
-use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
-use Drupal\Core\Entity\Entity\EntityViewMode;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the core Drupal\views\Plugin\views\field\RenderedEntity handler.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FieldRenderedEntityTest extends ViewsKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['entity_test', 'field'];
 
@@ -44,7 +46,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpFixtures() {
+  protected function setUpFixtures(): void {
     $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
     $this->installConfig(['entity_test']);
@@ -111,7 +113,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
   /**
    * Tests the default rendered entity output.
    */
-  public function testRenderedEntityWithoutAndWithField() {
+  public function testRenderedEntityWithoutAndWithField(): void {
     // First test without test_field displayed.
     \Drupal::currentUser()->setAccount($this->user);
 
@@ -127,7 +129,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
       '#display_id' => 'default',
     ];
     $renderer = \Drupal::service('renderer');
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
     for ($i = 1; $i <= 3; $i++) {
       $view_field = (string) $view->style_plugin->getField($i - 1, 'rendered_entity');
       $search_result = str_contains($view_field, "Test $i");
@@ -150,7 +152,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
       '#display_id' => 'default',
     ];
 
-    $renderer->renderPlain($build);
+    $renderer->renderInIsolation($build);
     for ($i = 1; $i <= 3; $i++) {
       $view_field = (string) $view->style_plugin->getField($i - 1, 'rendered_entity');
       $search_result = str_contains($view_field, "Test $i");
@@ -165,7 +167,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
    * Ensures that the expected cacheability metadata is applied.
    *
    * @param array $build
-   *   The render array
+   *   The render array.
    *
    * @internal
    */

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Core\Database\Database;
@@ -44,9 +46,7 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
   protected $timestampNow;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['locale', 'locale_test'];
 
@@ -57,10 +57,10 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
     parent::setUp();
 
     // Setup timestamps to identify old and new translation sources.
-    $this->timestampOld = REQUEST_TIME - 300;
-    $this->timestampMedium = REQUEST_TIME - 200;
-    $this->timestampNew = REQUEST_TIME - 100;
-    $this->timestampNow = REQUEST_TIME;
+    $this->timestampOld = \Drupal::time()->getRequestTime() - 300;
+    $this->timestampMedium = \Drupal::time()->getRequestTime() - 200;
+    $this->timestampNew = \Drupal::time()->getRequestTime() - 100;
+    $this->timestampNow = \Drupal::time()->getRequestTime();
 
     // Enable import of translations. By default this is disabled for automated
     // tests.
@@ -111,7 +111,7 @@ abstract class LocaleUpdateBase extends BrowserTestBase {
    *   in source and translations strings.
    */
   protected function makePoFile($path, $filename, $timestamp = NULL, array $translations = []) {
-    $timestamp = $timestamp ? $timestamp : REQUEST_TIME;
+    $timestamp = $timestamp ?: \Drupal::time()->getRequestTime();
     $path = 'public://' . $path;
     $text = '';
     $po_header = <<<EOF
@@ -119,7 +119,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Type: text/plain; charset=utf-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\\n"
 

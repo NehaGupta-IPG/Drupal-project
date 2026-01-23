@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests non-standard named translation files get imported during install.
- *
- * @group Installer
  */
+#[Group('Installer')]
+#[RunTestsInSeparateProcesses]
 class InstallerTranslationNonStandardFilenamesTest extends InstallerTranslationMultipleLanguageNonInteractiveTest {
 
   /**
    * {@inheritdoc}
    */
-  protected function prepareEnvironment() {
+  protected function prepareEnvironment(): void {
     BrowserTestBase::prepareEnvironment();
     // Place custom local translations in the translations directory.
     mkdir(DRUPAL_ROOT . '/' . $this->siteDirectory . '/files/translations', 0777, TRUE);
@@ -25,7 +29,7 @@ class InstallerTranslationNonStandardFilenamesTest extends InstallerTranslationM
   /**
    * {@inheritdoc}
    */
-  protected function prepareSettings() {
+  protected function prepareSettings(): void {
     parent::prepareSettings();
     $settings['config']['locale.settings']['translation']['default_filename'] = (object) [
       'value' => '%project.%language.po',
