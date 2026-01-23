@@ -260,13 +260,10 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
       $form['value']['value'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Value'),
+        '#title_display' => $exposed ? 'invisible' : 'before',
         '#size' => 30,
         '#default_value' => $this->value['value'],
       ];
-      // Visually hide label for exposed filters.
-      if ($exposed) {
-        $form['value']['value']['#title_display'] = 'invisible';
-      }
       if (!empty($this->options['expose']['placeholder'])) {
         $form['value']['value']['#attributes']['placeholder'] = $this->options['expose']['placeholder'];
       }
@@ -287,13 +284,10 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
       $form['value'] = [
         '#type' => 'textfield',
         '#title' => $this->t('Value'),
+        '#title_display' => $exposed ? 'invisible' : 'before',
         '#size' => 30,
         '#default_value' => $this->value['value'],
       ];
-      // Visually hide label for exposed filters.
-      if ($exposed) {
-        $form['value']['#title_display'] = 'invisible';
-      }
       if (!empty($this->options['expose']['placeholder'])) {
         $form['value']['#attributes']['placeholder'] = $this->options['expose']['placeholder'];
       }
