@@ -65,6 +65,7 @@ class DatetimeFormElementTest extends EntityKernelTestBase implements FormInterf
     // Test time-only element.
     $form['datetime_time_only'] = [
       '#type' => 'datetime',
+      '#title' => 'datetime',
       '#date_date_element' => 'none',
       '#date_time_element' => 'time',
       '#date_time_format' => 'H:i',
