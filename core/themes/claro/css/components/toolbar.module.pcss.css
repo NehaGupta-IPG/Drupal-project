@@ -97,8 +97,8 @@
   & .toolbar-tray-vertical {
     position: absolute;
     inset-inline-start: -100%;
-    width: 15rem;
     top: var(--drupal-displace-offset-top, 39px);
+    width: 15rem;
   }
   & .toolbar-tray-horizontal {
     z-index: 503;

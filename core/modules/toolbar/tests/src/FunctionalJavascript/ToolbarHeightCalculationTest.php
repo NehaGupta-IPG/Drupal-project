@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\toolbar\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests height calculation of toolbar.
- *
- * @group toolbar
  */
+#[Group('toolbar')]
+#[RunTestsInSeparateProcesses]
 class ToolbarHeightCalculationTest extends WebDriverTestBase {
 
   /**
@@ -52,9 +55,8 @@ class ToolbarHeightCalculationTest extends WebDriverTestBase {
    *   Additional toolbar items to create.
    * @param array $additional_menu_items
    *   Additional menu items to create.
-   *
-   * @dataProvider toolbarHeightCalculationTestCases
    */
+  #[DataProvider('toolbarHeightCalculationTestCases')]
   public function testToolbarHeightCalculation(array $additional_toolbar_items, array $additional_menu_items): void {
     if (!empty($additional_toolbar_items)) {
       \Drupal::state()->set('toolbar_test_toolbar_items', $additional_toolbar_items);
@@ -63,7 +65,7 @@ class ToolbarHeightCalculationTest extends WebDriverTestBase {
       \Drupal::state()->set('toolbar_test_menu_items', $additional_menu_items);
     }
     if (!empty($additional_toolbar_items) || !empty($additional_menu_items)) {
-      \Drupal::service('cache.render')->invalidateAll();
+      \Drupal::service('cache.render')->deleteAll();
     }
 
     $this->drupalGet('user');
@@ -111,7 +113,7 @@ class ToolbarHeightCalculationTest extends WebDriverTestBase {
    * @return array
    *   An array of test cases.
    */
-  public function toolbarHeightCalculationTestCases(): array {
+  public static function toolbarHeightCalculationTestCases(): array {
     return [
       'No extra modules' => [
         'additional_toolbar_items' => [],

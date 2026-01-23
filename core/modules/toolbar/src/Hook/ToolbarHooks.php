@@ -2,7 +2,9 @@
 
 namespace Drupal\toolbar\Hook;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\toolbar\Controller\ToolbarController;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -11,7 +13,16 @@ use Drupal\Core\Hook\Attribute\Hook;
 /**
  * Hook implementations for toolbar.
  */
-class ToolbarHooks {
+final class ToolbarHooks {
+
+  use StringTranslationTrait;
+
+  public function __construct(
+    private readonly AccountInterface $currentUser,
+    TranslationInterface $translation,
+  ) {
+    $this->stringTranslation = $translation;
+  }
 
   use StringTranslationTrait;
 
@@ -45,7 +56,7 @@ class ToolbarHooks {
   public function pageTop(array &$page_top): void {
     $page_top['toolbar'] = [
       '#type' => 'toolbar',
-      '#access' => \Drupal::currentUser()->hasPermission('access toolbar'),
+      '#access' => $this->currentUser->hasPermission('access toolbar'),
       '#cache' => [
         'keys' => [
           'toolbar',

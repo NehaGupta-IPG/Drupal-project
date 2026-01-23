@@ -34,7 +34,7 @@ class MenuLinkDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * Creates a MenuLinkDeriver.
    *
-   * @param $base_plugin_id
+   * @param string $base_plugin_id
    *   The base plugin id.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
