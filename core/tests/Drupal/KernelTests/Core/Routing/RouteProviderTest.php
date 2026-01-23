@@ -778,9 +778,8 @@ class RouteProviderTest extends KernelTestBase {
 
   /**
    * Tests the possibility to pass a forward slash as part of the parameters.
-   *
-   * @dataProvider providerTestParameterInfiniteParts
    */
+  #[DataProvider('providerTestParameterInfiniteParts')]
   public function testParameterInfiniteParts(string $route_path, string $parameter, string $route_requirement, string $request_path, int $expected_routes): void {
     $connection = Database::getConnection();
     $provider = new RouteProvider($connection, $this->state, $this->currentPath, $this->cache, $this->pathProcessor, $this->cacheTagsInvalidator, 'test_routes');
