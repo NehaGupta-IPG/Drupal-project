@@ -194,8 +194,10 @@ class UserPermissionsForm extends FormBase {
           'warning' => '',
         ];
         if (!empty($perm_item['restrict access'])) {
-          $perm_item['warning'] = $this->t('Warning: Give to trusted roles only; this permission has security implications.') .
-            (empty($perm_item['warning']) ? '' : ' ' . $perm_item['warning']);
+          $perm_item['warning'] = $this->t(
+            'Warning: Give to trusted roles only; this permission has security implications. @warning',
+            ['@warning' => $perm_item['warning']]
+          );
         }
         $form['permissions'][$perm]['description'] = [
           '#type' => 'inline_template',
