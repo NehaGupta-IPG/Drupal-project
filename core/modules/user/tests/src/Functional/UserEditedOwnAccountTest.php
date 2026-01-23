@@ -45,6 +45,32 @@ class UserEditedOwnAccountTest extends BrowserTestBase {
     // Set the new name on the user account and attempt to log back in.
     $account->name = $edit['name'];
     $this->drupalLogin($account);
+
+    // Attempt to change username to an email other than my own.
+    $edit['name'] = $this->randomMachineName() . '@example.com';
+    $this->drupalGet('user/' . $account->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('An email address was provided as a username, but does not match the account email address.');
+    $this->assertSession()->pageTextNotContains('The changes have been saved.');
+
+    // Lookup user by name to make sure we didn't actually change the name.
+    $accounts = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['name' => $edit['name']]);
+    $this->assertTrue(empty($accounts), 'Username was not changed to email address other than my own.');
+
+    // Change username to my email address.
+    $edit['name'] = $account->getEmail();
+    $this->drupalGet('user/' . $account->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('The changes have been saved.');
+
+    // Test that 'verify_email_match' turned off allows emails that don't match.
+    $this->config('user.settings')->set('verify_email_match', FALSE)->save();
+
+    // Change username to random, non-matching email address.
+    $edit['name'] = $this->randomMachineName() . '@example.com';
+    $this->drupalGet('user/' . $account->id() . '/edit');
+    $this->submitForm($edit, 'Save');
+    $this->assertSession()->pageTextContains('The changes have been saved.');
   }
 
 }

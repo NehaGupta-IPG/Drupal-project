@@ -138,6 +138,12 @@ class AccountSettingsForm extends ConfigFormBase {
       '#config_target' => 'user.settings:verify_mail',
       '#description' => $this->t('New users will be required to validate their email address prior to logging into the site, and will be assigned a system-generated password. With this setting disabled, users will be logged in immediately upon registering, and may select their own passwords during registration.'),
     ];
+    $form['registration_cancellation']['user_email_match_verification'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('When an email address is used as username, require a matching email address.'),
+      '#default_value' => $config->get('verify_email_match'),
+      '#config_target' => 'user.settings:verify_email_match',
+    ];
     $form['registration_cancellation']['user_password_strength'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable password strength indicator'),

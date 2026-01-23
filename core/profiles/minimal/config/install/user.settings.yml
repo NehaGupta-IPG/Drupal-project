@@ -1,6 +1,7 @@
 langcode: en
 anonymous: Anonymous
 verify_mail: true
+verify_email_match: true
 notify:
   cancel_confirm: true
   password_reset: true

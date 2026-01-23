@@ -3,6 +3,7 @@ _core:
 langcode: fr
 anonymous: Anonyme
 verify_mail: true
+verify_email_match: true
 notify:
   cancel_confirm: true
   password_reset: true

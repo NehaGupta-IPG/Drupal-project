@@ -12,6 +12,9 @@ user.settings:
     verify_mail:
       type: boolean
       label: 'Require email verification when a visitor creates an account'
+    verify_email_match:
+      type: boolean
+      label: 'Require email and username match when email is used as username.'
     notify:
       type: mapping
       label: 'Notify user'

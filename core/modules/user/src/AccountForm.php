@@ -3,6 +3,7 @@
 namespace Drupal\user;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Utility\EmailValidator;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\ContentEntityForm;
@@ -33,20 +34,28 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
   protected $languageManager;
 
   /**
+   * The email validator service.
+   */
+  protected EmailValidator $emailValidator;
+
+  /**
    * Constructs a new EntityForm object.
    *
    * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
    *   The entity repository.
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
+   * @param \Drupal\Component\Utility\EmailValidator $email_validator
+   *   The email validator service.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
+  public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, EmailValidator $email_validator, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->languageManager = $language_manager;
+    $this->emailValidator = $email_validator;
   }
 
   /**
@@ -56,8 +65,9 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     return new static(
       $container->get('entity.repository'),
       $container->get('language_manager'),
+      $container->get('email.validator'),
       $container->get('entity_type.bundle.info'),
-      $container->get('datetime.time')
+      $container->get('datetime.time'),
     );
   }
 
@@ -444,6 +454,26 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
     // If there's a session set to the users id, remove the password reset tag
     // since a new password was saved.
     $this->getRequest()->getSession()->remove('pass_reset_' . $user->id());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $entity = parent::validateForm($form, $form_state);
+
+    // Check whether the user name provided is an email address, if so, make
+    // sure it matches the mail value.
+    if ($this->config('user.settings')->get('verify_email_match')) {
+      $name = $form_state->getValue('name');
+      if ($this->emailValidator->isValid($name)) {
+        $mail = $form_state->getValue('mail');
+        if (($name !== $mail) && $this->emailValidator->isValid($mail)) {
+          $form_state->setErrorByName('name', $this->t('An email address was provided as a username, but does not match the account email address.'));
+        }
+      }
+    }
+    return $entity;
   }
 
 }

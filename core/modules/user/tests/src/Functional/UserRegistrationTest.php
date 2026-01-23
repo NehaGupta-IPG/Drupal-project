@@ -183,6 +183,72 @@ class UserRegistrationTest extends BrowserTestBase {
   }
 
   /**
+   * Tests new users username matches their email if username is an email.
+   */
+  public function testRegistrationEmailAsUsername(): void {
+    // Don't require email verification.
+    // Allow registration by site visitors without administrator approval.
+    $this->config('user.settings')
+      ->set('verify_mail', FALSE)
+      ->set('register', UserInterface::REGISTER_VISITORS)
+      ->save();
+
+    $mail = $this->randomMachineName() . '@example.com';
+    $different = $this->randomMachineName() . $mail;
+
+    // Set up edit array.
+    $edit = [];
+    $edit['mail'] = $mail;
+    $edit['name'] = $different;
+    $edit['pass[pass1]'] = $edit['pass[pass2]'] = $this->randomMachineName();
+
+    // Attempt to create an account using an email that doesn't match the name.
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('An email address was provided as a username, but does not match the account email address.');
+
+    // Attempt to create new account using matching email address.
+    $edit['name'] = $edit['mail'] = $this->randomMachineName() . '@example.com';
+
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextContains('Registration successful. You are now logged in.');
+
+    $storage = $this->container->get('entity_type.manager')->getStorage('user');
+    $accounts = $storage->loadByProperties(['name' => $edit['name']]);
+
+    $new_user = reset($accounts);
+    $this->assertTrue(($new_user->getDisplayName() === $edit['name']) && ($new_user->getEmail() === $edit['mail']));
+  }
+
+  /**
+   * Tests new users username not matching their email if username is an email.
+   */
+  public function testRegistrationEmailAsUsernameDisabled(): void {
+    // Test that 'verify_email_match' turned off allows emails that don't match.
+    $this->config('user.settings')
+      ->set('verify_email_match', FALSE)
+      ->set('verify_mail', FALSE)
+      ->set('register', UserInterface::REGISTER_VISITORS)
+      ->save();
+
+    $mail = $this->randomMachineName() . '@example.com';
+    $different = $this->randomMachineName() . $mail;
+
+    $edit = [];
+    $edit['mail'] = $mail;
+    $edit['name'] = $different;
+    $edit['pass[pass1]'] = $edit['pass[pass2]'] = $this->randomMachineName();
+
+    // Attempt to create an account using an email that doesn't match the name.
+    // This should be OK, as 'verify_email_match' is disabled.
+    $this->drupalGet('user/register');
+    $this->submitForm($edit, 'Create new account');
+    $this->assertSession()->pageTextNotContains('An email address was provided as a username, but does not match the account email address.');
+    $this->assertSession()->pageTextContains('Registration successful. You are now logged in.');
+  }
+
+  /**
    * Tests that UUID isn't cached in form state on register form.
    *
    * This is a regression test for https://www.drupal.org/node/2500527 to ensure

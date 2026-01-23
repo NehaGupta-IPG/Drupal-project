@@ -54,6 +54,9 @@ process:
       1: visitors
       0: admin_only
   anonymous: anonymous
+  verify_email_match:
+    plugin: default_value
+    default_value: true
 destination:
   plugin: config
   config_name: user.settings

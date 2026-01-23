@@ -97,3 +97,13 @@ function user_install(): void {
 function user_update_last_removed(): int {
   return 10000;
 }
+
+/**
+ * Add verify email match to user configuration.
+ */
+function user_update_110201(&$sandbox): void {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('user.settings');
+  $config->set('verify_email_match', TRUE);
+  $config->save(TRUE);
+}
