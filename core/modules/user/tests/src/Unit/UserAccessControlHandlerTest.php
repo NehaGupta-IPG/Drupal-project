@@ -409,9 +409,8 @@ class UserAccessControlHandlerTest extends UnitTestCase {
 
   /**
    * Tests that roles can be only be edited by users with permission.
-   *
-   * @dataProvider rolesAccessProvider
    */
+  #[DataProvider('rolesAccessProvider')]
   public function testRolesAccess($viewer, $target, $view, $edit): void {
     $this->assertFieldAccess('roles', $viewer, $target, $view, $edit);
   }
