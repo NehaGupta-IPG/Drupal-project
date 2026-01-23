@@ -91,11 +91,10 @@ class FormTestLabelForm extends FormBase {
       '#title' => $this->t('Textfield test for required with title'),
       '#required' => TRUE,
     ];
-    $form['form_textfield_test_no_title_required'] = [
+    $form['form_textfield_test_hidden_title_required'] = [
       '#type' => 'textfield',
-      // We use an empty title, since not setting #title suppresses the label
-      // and required marker.
-      '#title' => '',
+      '#title' => $this->t('Textfield test for required with invisible title'),
+      '#title_display' => 'invisible',
       '#required' => TRUE,
     ];
     $form['form_textfield_test_title'] = [

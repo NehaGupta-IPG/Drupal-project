@@ -72,8 +72,8 @@ class ElementsLabelsTest extends KernelTestBase {
     $this->assertSession()->elementExists('xpath', '//label[@for="edit-form-textfield-test-title-and-required" and @class="js-form-required form-required"]/following-sibling::input[@id="edit-form-textfield-test-title-and-required"]');
 
     // Verify that label tag with required marker precedes required textfield
-    // with no title.
-    $this->assertSession()->elementExists('xpath', '//input[@id="edit-form-textfield-test-no-title-required"]/preceding-sibling::label[@for="edit-form-textfield-test-no-title-required" and @class="js-form-required form-required"]');
+    // with hidden title.
+    $this->assertSession()->elementExists('xpath', '//input[@id="edit-form-textfield-test-hidden-title-required"]/preceding-sibling::label[@for="edit-form-textfield-test-hidden-title-required" and @class="visually-hidden js-form-required form-required"]');
 
     // Verify that label preceding field and label class is visually-hidden.
     $this->assertSession()->elementExists('xpath', '//input[@id="edit-form-textfield-test-title-invisible"]/preceding-sibling::label[@for="edit-form-textfield-test-title-invisible" and @class="visually-hidden"]');
