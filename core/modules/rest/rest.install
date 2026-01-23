@@ -27,12 +27,12 @@ function rest_update_11001() {
     foreach ($displays as $display) {
       $display_id = $display['id'];
       $display_style_type = $views_config->get('display.' . $display_id . ".display_options.style.type");
-      $pager_conf = $views_config->get('display.' . $display_id . '.display_options.style.pager');
+      $pager_conf = $views_config->get('display.' . $display_id . '.display_options.style.options.pager');
 
       // Only add pager configuration if it is not already set.
       if ($display_style_type === 'serializer' && is_null($pager_conf)) {
         $editable_view_config = $config_factory->getEditable($view_id);
-        $editable_view_config->set('display.' . $display_id . '.display_options.style.pager', 0);
+        $editable_view_config->set('display.' . $display_id . '.display_options.style.options.pager', FALSE);
         $editable_view_config->save();
       }
     }

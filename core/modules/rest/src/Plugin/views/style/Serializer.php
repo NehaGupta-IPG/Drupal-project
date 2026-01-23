@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\rest\Plugin\views\display\RestExport;
 use Drupal\views\Attribute\ViewsStyle;
 use Drupal\views\Plugin\views\style\StylePluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -149,8 +150,7 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
     }
 
     $result = $rows;
-    $is_class_rest_export = get_class($this->displayHandler) === 'Drupal\rest\Plugin\views\display\RestExport';
-    if ($this->options['pager'] && $this->view->pager && $this->displayHandler && $is_class_rest_export) {
+    if ($this->options['pager'] && $this->view->pager && $this->displayHandler instanceof RestExport) {
       $result = $this->wrapRowsInPager($rows);
     }
 
@@ -180,17 +180,17 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
     $total_items = $pager->getTotalItems();
 
     $total_pages = 0;
-    if (!in_array($class, ['Drupal\views\Plugin\views\pager\None', 'Drupal\views\Plugin\views\pager\Some'])) {
+    if (!in_array($class, ['Drupal\views\Plugin\views\pager\None', 'Drupal\views\Plugin\views\pager\Some'], TRUE)) {
       $total_pages = $pager->getPagerTotal();
     }
 
     return [
       'rows' => $rows,
       'pager' => [
-        'current_page' => intval($current_page),
-        'total_items' => intval($total_items),
-        'total_pages' => intval($total_pages),
-        'items_per_page' => intval($items_per_page),
+        'current_page' => (int) $current_page,
+        'total_items' => (int) $total_items,
+        'total_pages' => (int) $total_pages,
+        'items_per_page' => (int) $items_per_page,
       ],
     ];
   }

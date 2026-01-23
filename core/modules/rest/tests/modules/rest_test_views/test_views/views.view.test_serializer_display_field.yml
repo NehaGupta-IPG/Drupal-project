@@ -30,7 +30,8 @@ display:
         type: basic
       style:
         type: serializer
-        pager: 0
+        options:
+          pager: false
       row:
         type: data_field
       fields:
@@ -87,7 +88,8 @@ display:
         type: none
       style:
         type: serializer
-        pager: 0
+        options:
+          pager: false
       row:
         type: data_field
   rest_export_2:
@@ -107,6 +109,7 @@ display:
           perm: 'administer views'
       style:
         type: serializer
-        pager: 0
+        options:
+          pager: false
       row:
         type: data_field

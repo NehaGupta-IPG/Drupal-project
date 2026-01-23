@@ -70,7 +70,7 @@ display:
         options:
           formats:
             json: json
-        pager: 0
+          pager: false
       row:
         type: data_field
         options:

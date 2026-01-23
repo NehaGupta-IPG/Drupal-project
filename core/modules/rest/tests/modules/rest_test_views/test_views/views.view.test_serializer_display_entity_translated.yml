@@ -30,7 +30,8 @@ display:
         type: basic
       style:
         type: serializer
-        pager: 0
+        options:
+          pager: false
       row:
         type: data_entity
       title: 'Test serialize translated entity rows'
