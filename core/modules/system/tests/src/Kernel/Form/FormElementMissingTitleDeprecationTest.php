@@ -145,51 +145,15 @@ class FormElementMissingTitleDeprecationTest extends KernelTestBase implements F
    * Ensures that missing #title property triggers deprecation message.
    */
   public function testDeprecationMessage(): void {
-    // ::expectDeprecation only checks the existence of the expected messages.
-    // It doesn't rule out unexpected / unwanted messages. Therefore, we check
-    // for an exact match to rule out unexpected cases.
-    // See ExpectDeprecationTrait::tearDownErrorHandler.
-    $expected = [
-      [
-        E_USER_DEPRECATED,
-        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_missing_title" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
-      ],
-      [
-        E_USER_DEPRECATED,
-        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_title_is_empty_string" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
-      ],
-      [
-        E_USER_DEPRECATED,
-        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_title_is_space" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
-      ],
-      [
-        E_USER_DEPRECATED,
-        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_title_is_false" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
-      ],
-      [
-        E_USER_DEPRECATED,
-        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "button_missing_value" of #type "button" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
-      ],
-      [
-        E_USER_DEPRECATED,
-        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "submit_missing_value" of #type "submit" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
-      ],
-      [
-        E_USER_DEPRECATED,
-        'Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "fieldset" of #type "fieldset" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004',
-      ],
-    ];
-
-    $actual = [];
-    set_error_handler(function (int $errno, string $errstr) use (&$actual): void {
-      $actual[] = [$errno, $errstr];
-    });
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_missing_title" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_title_is_empty_string" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_title_is_space" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "textfield_title_is_false" of #type "textfield" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "button_missing_value" of #type "button" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "submit_missing_value" of #type "submit" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
+    $this->expectDeprecation('Form elements that need titles for accessibility missing title attributes is deprecated in drupal:10.3.0 and is required in drupal:11.0.0. Form element "fieldset" of #type "fieldset" from form "form_test_element_missing_title_deprecation" is missing a #title attribute. See https://www.drupal.org/project/drupal/issues/933004');
 
     $this->container->get('form_builder')->getForm($this);
-
-    restore_error_handler();
-
-    $this->assertEquals($expected, $actual);
   }
 
 }
