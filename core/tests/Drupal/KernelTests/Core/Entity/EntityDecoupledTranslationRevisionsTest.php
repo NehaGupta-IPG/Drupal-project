@@ -98,8 +98,8 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
     $entity_type_id = 'entity_test_mulrev';
 
     $fields['mul_mul_field'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Multivalue'))
-      ->setDescription(t('A translatable multi-value string field'))
+      ->setLabel('Multivalue')
+      ->setDescription('A translatable multi-value string field')
       ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
       ->setTranslatable(TRUE)
       ->setRevisionable(TRUE);
@@ -432,8 +432,8 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
       $expected_value = $default_entity->get('non_mul_field')->value;
       $this->assertEquals($expected_value, $value, $this->formatMessage('Loaded untranslatable field value does not match the previous one.'));
     }
-    $multifield_value = array_column($entity->get('mul_mul_field')->getValue(), 'value');
-    $this->assertEquals($previous_multivalue_field_value, $multifield_value, $this->formatMessage('Loaded multi-value field does not match the previous one. 1'));
+    $multi_value_field_value = array_column($entity->get('mul_mul_field')->getValue(), 'value');
+    $this->assertEquals($previous_multivalue_field_value, $multi_value_field_value, $this->formatMessage('Loaded multi-value field does not match the previous one. 1'));
 
     // Perform a change and store it.
     $label = $this->generateNewEntityLabel($entity, $previous_revision_id, TRUE);
@@ -459,9 +459,9 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
       }
       $max_delta = count($previous_multivalue_field_value);
       for ($delta = 0; $delta <= $max_delta; $delta++) {
-        $multifield_delta_value = $entity->language()->getName() . ($entity->isDefaultRevision() ? ' Default' : ' Pending') . ' Δ' . $delta . ' ' . $prev . ' -> ' . ($entity->getLoadedRevisionId() + 1);
-        $entity->get('mul_mul_field')->set($delta, $multifield_delta_value);
-        $previous_multivalue_field_value[$delta] = $multifield_delta_value;
+        $multivalue_field_delta_value = $entity->language()->getName() . ($entity->isDefaultRevision() ? ' Default' : ' Pending') . ' Δ' . $delta . ' ' . $prev . ' -> ' . ($entity->getLoadedRevisionId() + 1);
+        $entity->get('mul_mul_field')->set($delta, $multivalue_field_delta_value);
+        $previous_multivalue_field_value[$delta] = $multivalue_field_delta_value;
       }
     }
 
@@ -493,13 +493,13 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
         $rta_expected = $langcode == $active_langcode || ($untranslatable_update && $all_translations_affected);
         $this->assertEquals($rta_expected, $translation->isRevisionTranslationAffected(), $this->formatMessage("'$langcode' translation incorrectly affected"));
         $this->assertEquals($value, $translation->get('non_mul_field')->value, $this->formatMessage('Loaded untranslatable field value does not match the previous one.'));
-        $multifield_translation_expected = $this->previousMultivalueFieldValue[$langcode];
-        $multifield_translation_value = array_column($translation->get('mul_mul_field')->getValue(), 'value');
+        $multi_value_field_translation_expected = $this->previousMultivalueFieldValue[$langcode];
+        $multi_value_field_translation_value = array_column($translation->get('mul_mul_field')->getValue(), 'value');
         $label_expected = $label;
         if ($langcode !== $active_langcode) {
           $default_translation = $default_entity->hasTranslation($langcode) ? $default_entity->getTranslation($langcode) : $default_entity;
           $label_expected = $default_translation->label();
-          $multifield_translation_expected = array_column($default_translation->get('mul_mul_field')
+          $multi_value_field_translation_expected = array_column($default_translation->get('mul_mul_field')
             ->getValue(), 'value');
         }
         // Verify new default values were updated.
@@ -509,9 +509,9 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
           $this->assertEquals($translation->get('non_mul_field')->value, $default_translation->get('non_mul_field')->value, $this->formatMessage('Loaded untranslatable field value does not match default field value'));
           $this->assertEquals($translation->get('mul_mul_field')->getValue(), $default_translation->get('mul_mul_field')->getValue(), $this->formatMessage('Loaded multi-value field value does not match default field value'));
         }
-        $this->assertEquals($multifield_translation_expected, $multifield_translation_value, $this->formatMessage('Loaded multi-value field value does not match the previous one.'));
+        $this->assertEquals($multi_value_field_translation_expected, $multi_value_field_translation_value, $this->formatMessage('Loaded multi-value field value does not match the previous one.'));
         $this->assertEquals($label_expected, $translation->label(), $this->formatMessage("Incorrect '$langcode' translation label"));
-        $this->assertEquals($multifield_translation_expected, $multifield_translation_value, $this->formatMessage('Loaded multi-value field value does not match the previous one.'));
+        $this->assertEquals($multi_value_field_translation_expected, $multi_value_field_translation_value, $this->formatMessage('Loaded multi-value field value does not match the previous one.'));
       }
     }
 
