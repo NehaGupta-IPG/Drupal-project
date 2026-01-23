@@ -338,4 +338,91 @@ class StyleSerializerTest extends ViewTestBase {
     $this->assertSame($expected, $names, 'The translated content was found in the JSON.');
   }
 
+  /**
+   * Tests the pager option in REST export.
+   */
+  public function testRestViewsPager(): void {
+    $this->drupalCreateContentType(['type' => 'page']);
+
+    // Create multiple nodes for pagination testing.
+    $nodes = [];
+    for ($i = 0; $i < 10; $i++) {
+      $nodes[] = $this->drupalCreateNode(['title' => 'Node ' . $i]);
+    }
+
+    // Load the view and configure it with a pager.
+    $view = Views::getView('test_serializer_node_display_field');
+    $view->setDisplay('rest_export_1');
+
+    // Set pager to show 5 items per page.
+    $view->displayHandlers->get('rest_export_1')->overrideOption('pager', [
+      'type' => 'full',
+      'options' => ['items_per_page' => 5],
+    ]);
+
+    // Enable the pager option in the style plugin.
+    $view->displayHandlers->get('rest_export_1')->overrideOption('style', [
+      'type' => 'serializer',
+      'options' => [
+        'formats' => ['json'],
+        'pager' => TRUE,
+      ],
+    ]);
+    $view->save();
+
+    // Request the first page.
+    $result = Json::decode($this->drupalGet('test/serialize/node-field', ['query' => ['_format' => 'json']]));
+
+    // Verify pager structure exists in the response.
+    $this->assertArrayHasKey('rows', $result, 'Response contains rows key.');
+    $this->assertArrayHasKey('pager', $result, 'Response contains pager key.');
+    $this->assertCount(5, $result['rows'], 'First page contains 5 items.');
+
+    // Verify pager information is correct.
+    $this->assertEquals(0, $result['pager']['current_page'], 'Current page is 0.');
+    $this->assertEquals(10, $result['pager']['total_items'], 'Total items is 10.');
+    $this->assertEquals(2, $result['pager']['total_pages'], 'Total pages is 2.');
+    $this->assertEquals(5, $result['pager']['items_per_page'], 'Items per page is 5.');
+
+    // Request the second page.
+    $result = Json::decode($this->drupalGet('test/serialize/node-field', ['query' => ['_format' => 'json', 'page' => 1]]));
+
+    // Verify second page pager info.
+    $this->assertArrayHasKey('pager', $result, 'Second page response contains pager key.');
+    $this->assertEquals(1, $result['pager']['current_page'], 'Current page is 1.');
+    $this->assertCount(5, $result['rows'], 'Second page contains 5 items.');
+  }
+
+  /**
+   * Tests that pager option is disabled by default.
+   */
+  public function testRestViewsPagerDisabledByDefault(): void {
+    $this->drupalCreateContentType(['type' => 'page']);
+
+    // Create a few nodes.
+    for ($i = 0; $i < 3; $i++) {
+      $this->drupalCreateNode(['title' => 'Node ' . $i]);
+    }
+
+    // Load the view without enabling the pager option.
+    $view = Views::getView('test_serializer_node_display_field');
+    $view->setDisplay('rest_export_1');
+
+    // Set a pager but don't enable the pager style option.
+    $view->displayHandlers->get('rest_export_1')->overrideOption('pager', [
+      'type' => 'full',
+      'options' => ['items_per_page' => 10],
+    ]);
+    $view->save();
+
+    // Request the view.
+    $result = Json::decode($this->drupalGet('test/serialize/node-field', ['query' => ['_format' => 'json']]));
+
+    // Verify that the response is a plain array without pager wrapper.
+    $this->assertArrayNotHasKey('rows', $result, 'Response does not contain rows key when pager option is disabled.');
+    $this->assertArrayNotHasKey('pager', $result, 'Response does not contain pager key when pager option is disabled.');
+    $this->assertIsArray($result, 'Response is an array.');
+    $this->assertCount(3, $result, 'Response contains all 3 items.');
+  }
+
 }
