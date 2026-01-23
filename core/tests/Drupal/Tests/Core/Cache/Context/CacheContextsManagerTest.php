@@ -1,27 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache\Context;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\CacheContextInterface;
+use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Container;
 
+// cspell:ignore cnenzrgre
 /**
- * @coversDefaultClass \Drupal\Core\Cache\Context\CacheContextsManager
- * @group Cache
+ * Tests Drupal\Core\Cache\Context\CacheContextsManager.
  */
+#[CoversClass(CacheContextsManager::class)]
+#[Group('Cache')]
 class CacheContextsManagerTest extends UnitTestCase {
 
   /**
-   * @covers ::optimizeTokens
-   *
-   * @dataProvider providerTestOptimizeTokens
+   * Tests optimize tokens.
    */
-  public function testOptimizeTokens(array $context_tokens, array $optimized_context_tokens) {
+  #[DataProvider('providerTestOptimizeTokens')]
+  public function testOptimizeTokens(array $context_tokens, array $optimized_context_tokens): void {
     $container = $this->getMockBuilder('Drupal\Core\DependencyInjection\Container')
       ->disableOriginalConstructor()
       ->getMock();
@@ -62,7 +68,7 @@ class CacheContextsManagerTest extends UnitTestCase {
   /**
    * Provides a list of context token sets.
    */
-  public function providerTestOptimizeTokens() {
+  public static function providerTestOptimizeTokens(): array {
     return [
       [['a', 'x'], ['a', 'x']],
       [['a.b', 'x'], ['a.b', 'x']],
@@ -98,9 +104,9 @@ class CacheContextsManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::convertTokensToKeys
+   * Tests convert tokens to keys.
    */
-  public function testConvertTokensToKeys() {
+  public function testConvertTokensToKeys(): void {
     $container = $this->getMockContainer();
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
 
@@ -119,9 +125,11 @@ class CacheContextsManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::convertTokensToKeys
+   * Tests invalid context.
+   *
+   * @legacy-covers ::convertTokensToKeys
    */
-  public function testInvalidContext() {
+  public function testInvalidContext(): void {
     $container = $this->getMockContainer();
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
 
@@ -130,11 +138,12 @@ class CacheContextsManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::convertTokensToKeys
+   * Tests invalid calculated context.
    *
-   * @dataProvider providerTestInvalidCalculatedContext
+   * @legacy-covers ::convertTokensToKeys
    */
-  public function testInvalidCalculatedContext($context_token) {
+  #[DataProvider('providerTestInvalidCalculatedContext')]
+  public function testInvalidCalculatedContext($context_token): void {
     $container = $this->getMockContainer();
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
 
@@ -145,20 +154,20 @@ class CacheContextsManagerTest extends UnitTestCase {
   /**
    * Provides a list of invalid 'baz' cache contexts: the parameter is missing.
    */
-  public function providerTestInvalidCalculatedContext() {
+  public static function providerTestInvalidCalculatedContext(): array {
     return [
       ['baz'],
       ['baz:'],
     ];
   }
 
-  public function testAvailableContextStrings() {
+  public function testAvailableContextStrings(): void {
     $cache_contexts_manager = new CacheContextsManager($this->getMockContainer(), $this->getContextsFixture());
     $contexts = $cache_contexts_manager->getAll();
     $this->assertEquals(["foo", "baz"], $contexts);
   }
 
-  public function testAvailableContextLabels() {
+  public function testAvailableContextLabels(): void {
     $container = $this->getMockContainer();
     $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
     $labels = $cache_contexts_manager->getLabels();
@@ -166,7 +175,7 @@ class CacheContextsManagerTest extends UnitTestCase {
     $this->assertEquals($expected, $labels);
   }
 
-  protected function getContextsFixture() {
+  protected function getContextsFixture(): array {
     return ['foo', 'baz'];
   }
 
@@ -195,8 +204,9 @@ class CacheContextsManagerTest extends UnitTestCase {
    * Provides a list of cache context token arrays.
    *
    * @return array
+   *   An array of cache context token arrays.
    */
-  public function validateTokensProvider() {
+  public static function validateTokensProvider(): array {
     return [
       [[], FALSE],
       [['foo'], FALSE],
@@ -224,11 +234,12 @@ class CacheContextsManagerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::validateTokens
+   * Tests validate contexts.
    *
-   * @dataProvider validateTokensProvider
+   * @legacy-covers ::validateTokens
    */
-  public function testValidateContexts(array $contexts, $expected_exception_message) {
+  #[DataProvider('validateTokensProvider')]
+  public function testValidateContexts(array $contexts, $expected_exception_message): void {
     $container = new ContainerBuilder();
     $cache_contexts_manager = new CacheContextsManager($container, ['foo', 'foo.bar', 'baz']);
     if ($expected_exception_message !== FALSE) {
@@ -249,21 +260,21 @@ class FooCacheContext implements CacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getLabel() {
+  public static function getLabel(): string {
     return 'Foo';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getContext() {
+  public function getContext(): string {
     return 'bar';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata() {
+  public function getCacheableMetadata(): CacheableMetadata {
     return new CacheableMetadata();
   }
 
@@ -277,14 +288,14 @@ class BazCacheContext implements CalculatedCacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getLabel() {
+  public static function getLabel(): string {
     return 'Baz';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getContext($parameter = NULL) {
+  public function getContext($parameter = NULL): string {
     if (!is_string($parameter) || strlen($parameter) === 0) {
       throw new \Exception();
     }
@@ -294,7 +305,7 @@ class BazCacheContext implements CalculatedCacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public function getCacheableMetadata($parameter = NULL) {
+  public function getCacheableMetadata($parameter = NULL): CacheableMetadata {
     return new CacheableMetadata();
   }
 
@@ -308,14 +319,14 @@ class NoOptimizeCacheContext implements CacheContextInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getLabel() {
+  public static function getLabel(): string {
     return 'Foo';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getContext() {
+  public function getContext(): string {
     return 'bar';
   }
 

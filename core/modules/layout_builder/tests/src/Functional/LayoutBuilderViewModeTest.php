@@ -1,19 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\layout_builder\Functional;
+
+use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Layout Builder UI with view modes.
- *
- * @group layout_builder
- * @group #slow
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
+
+  use EnableLayoutBuilderTrait;
 
   /**
    * Tests that a non-default view mode works as expected.
    */
-  public function testNonDefaultViewMode() {
+  public function testNonDefaultViewMode(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -24,12 +32,10 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
 
     $field_ui_prefix = 'admin/structure/types/manage/bundle_with_section_field';
     // Allow overrides for the layout.
-    $this->drupalGet("$field_ui_prefix/display/default");
-    $page->checkField('layout[enabled]');
-    $page->pressButton('Save');
-    $page->checkField('layout[allow_custom]');
-    $page->pressButton('Save');
+    $display = LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.default');
+    $this->enableLayoutBuilder($display);
 
+    $this->drupalGet("$field_ui_prefix/display/default");
     $this->clickLink('Manage layout');
     // Confirm the body field only is shown once.
     $assert_session->elementsCount('css', '.field--name-body', 1);
@@ -41,8 +47,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
     $assert_session->addressEquals("$field_ui_prefix/display/teaser");
     $assert_session->elementNotExists('css', '#layout-builder__layout');
     $assert_session->checkboxNotChecked('layout[enabled]');
-    $page->checkField('layout[enabled]');
-    $page->pressButton('Save');
+    $this->enableLayoutBuilderFromUi('bundle_with_section_field', 'teaser', FALSE);
     $assert_session->linkExists('Manage layout');
     $page->clickLink('Manage layout');
     // Confirm the body field only is shown once.
@@ -58,15 +63,17 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
     $page->checkField('display_modes_custom[full]');
     $page->pressButton('Save');
 
-    $assert_session->linkExists('Full content');
-    $page->clickLink('Full content');
-    $assert_session->addressEquals("$field_ui_prefix/display/full");
-    $page->checkField('layout[enabled]');
-    $page->pressButton('Save');
+    // Enable Layout Builder for the full view mode.
+    $display = LayoutBuilderEntityViewDisplay::load('node.bundle_with_section_field.full');
+    $this->enableLayoutBuilder($display);
+    $this->drupalGet("$field_ui_prefix/display/full");
     $assert_session->linkExists('Manage layout');
     $page->clickLink('Manage layout');
-    // Confirm the body field only is shown once.
-    $assert_session->elementsCount('css', '.field--name-body', 1);
+    // The fields have all been hidden at this point.
+    // Verify no Layout Builder blocks exist.
+    $assert_session->addressEquals("$field_ui_prefix/display/full/layout");
+    $assert_session->statusCodeEquals(200);
+    $assert_session->elementsCount('css', '.layout-builder-block', 0);
   }
 
   /**
@@ -74,7 +81,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
    *
    * @see \Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage::getDefaultSectionStorage()
    */
-  public function testLayoutBuilderUiFullViewMode() {
+  public function testLayoutBuilderUiFullViewMode(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -250,7 +257,7 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
   /**
    * Ensures that one bundle doesn't interfere with another bundle.
    */
-  public function testFullViewModeMultipleBundles() {
+  public function testFullViewModeMultipleBundles(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -267,13 +274,10 @@ class LayoutBuilderViewModeTest extends LayoutBuilderTestBase {
 
     // Create another bundle without the full view mode enabled.
     $this->createContentType(['type' => 'default_bundle']);
-    $this->drupalGet('admin/structure/types/manage/default_bundle/display/default');
 
-    // Enable Layout Builder for defaults and overrides.
-    $page->checkField('layout[enabled]');
-    $page->pressButton('Save');
-    $page->checkField('layout[allow_custom]');
-    $page->pressButton('Save');
+    $display = LayoutBuilderEntityViewDisplay::load('node.default_bundle.default');
+    $this->enableLayoutBuilder($display);
+    $this->drupalGet('admin/structure/types/manage/default_bundle/display/default');
     $assert_session->checkboxChecked('layout[allow_custom]');
   }
 

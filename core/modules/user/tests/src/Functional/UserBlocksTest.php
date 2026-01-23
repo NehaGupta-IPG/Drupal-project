@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Url;
 use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests user blocks.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserBlocksTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['block', 'views'];
 
@@ -47,7 +49,7 @@ class UserBlocksTest extends BrowserTestBase {
   /**
    * Tests that user login block is hidden from user/login.
    */
-  public function testUserLoginBlockVisibility() {
+  public function testUserLoginBlockVisibility(): void {
     // Array keyed list where key being the URL address and value being expected
     // visibility as boolean type.
     $paths = [
@@ -70,7 +72,7 @@ class UserBlocksTest extends BrowserTestBase {
   /**
    * Tests the user login block.
    */
-  public function testUserLoginBlock() {
+  public function testUserLoginBlock(): void {
     // Create a user with some permission that anonymous users lack.
     $user = $this->drupalCreateUser(['administer permissions']);
 

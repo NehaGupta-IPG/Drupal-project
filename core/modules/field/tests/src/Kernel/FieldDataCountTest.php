@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel;
 
 use Drupal\Core\Database\Database;
@@ -7,14 +9,17 @@ use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the count of field data records.
  *
- * @group field
  * @see \Drupal\Core\Entity\FieldableEntityStorageInterface::countFieldData()
  * @see \Drupal\field\Entity\FieldStorageConfig::hasData()
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldDataCountTest extends FieldKernelTestBase {
 
   /**
@@ -46,7 +51,7 @@ class FieldDataCountTest extends FieldKernelTestBase {
   /**
    * Tests entityCount() and hadData() methods.
    */
-  public function testEntityCountAndHasData() {
+  public function testEntityCountAndHasData(): void {
     // Create a field with a cardinality of 2 to show that we are counting
     // entities and not rows in a table.
     /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
@@ -144,7 +149,7 @@ class FieldDataCountTest extends FieldKernelTestBase {
   /**
    * Verify that we can count a table that contains an entry with index 0.
    */
-  public function testCountWithIndex0() {
+  public function testCountWithIndex0(): void {
     // Create a field that will require dedicated storage.
     /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
     $field_storage = FieldStorageConfig::create([

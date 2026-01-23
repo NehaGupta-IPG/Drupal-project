@@ -5,6 +5,7 @@ namespace Drupal\views\Form;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Render\Element\Checkboxes;
 use Drupal\Core\Url;
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @internal
  */
-class ViewsExposedForm extends FormBase {
+class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
 
   /**
    * The exposed form cache.
@@ -78,7 +79,7 @@ class ViewsExposedForm extends FormBase {
 
     // Let form plugins know this is for exposed widgets.
     $form_state->set('exposed', TRUE);
-    // Check if the form was already created
+    // Check if the form was already created.
     if ($cache = $this->exposedFormCache->getForm($view->storage->id(), $view->current_display)) {
       return $cache;
     }
@@ -195,7 +196,6 @@ class ViewsExposedForm extends FormBase {
     $view->exposed_data = $values;
     $view->exposed_raw_input = [];
 
-    $exclude = ['submit', 'form_build_id', 'form_id', 'form_token', 'exposed_form_plugin', 'reset'];
     /** @var \Drupal\views\Plugin\views\exposed_form\ExposedFormPluginBase $exposed_form_plugin */
     $exposed_form_plugin = $view->display_handler->getPlugin('exposed_form');
     $exposed_form_plugin->exposedFormSubmit($form, $form_state, $exclude);

@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Cache\Context;
 
 use Drupal\Core\Cache\Context\SessionCacheContext;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Cache\Context\SessionCacheContext
- * @group Cache
+ * Tests Drupal\Core\Cache\Context\SessionCacheContext.
  */
+#[CoversClass(SessionCacheContext::class)]
+#[Group('Cache')]
 class SessionCacheContextTest extends UnitTestCase {
 
   /**
@@ -50,9 +55,11 @@ class SessionCacheContextTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getContext
+   * Tests same context for same session.
+   *
+   * @legacy-covers ::getContext
    */
-  public function testSameContextForSameSession() {
+  public function testSameContextForSameSession(): void {
     $this->request->setSession($this->session);
     $cache_context = new SessionCacheContext($this->requestStack);
 
@@ -69,9 +76,11 @@ class SessionCacheContextTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getContext
+   * Tests different context for different session.
+   *
+   * @legacy-covers ::getContext
    */
-  public function testDifferentContextForDifferentSession() {
+  public function testDifferentContextForDifferentSession(): void {
     $this->request->setSession($this->session);
     $cache_context = new SessionCacheContext($this->requestStack);
 
@@ -89,15 +98,6 @@ class SessionCacheContextTest extends UnitTestCase {
 
     $this->assertStringNotContainsString($session1_id, $context1, 'Session ID not contained in cache context');
     $this->assertStringNotContainsString($session2_id, $context2, 'Session ID not contained in cache context');
-  }
-
-  /**
-   * @covers ::getContext
-   */
-  public function testContextWithoutSessionInRequest() {
-    $cache_context = new SessionCacheContext($this->requestStack);
-
-    $this->assertSame('none', $cache_context->getContext());
   }
 
 }

@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\EventSubscriber;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\EventSubscriber\FinishResponseSubscriber;
 use Drupal\Core\Language\Language;
@@ -9,6 +12,8 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -16,9 +21,10 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * @coversDefaultClass \Drupal\Core\EventSubscriber\FinishResponseSubscriber
- * @group EventSubscriber
+ * Tests Drupal\Core\EventSubscriber\FinishResponseSubscriber.
  */
+#[CoversClass(FinishResponseSubscriber::class)]
+#[Group('EventSubscriber')]
 class FinishResponseSubscriberTest extends UnitTestCase {
 
   /**
@@ -56,6 +62,13 @@ class FinishResponseSubscriberTest extends UnitTestCase {
    */
   protected $cacheContextsManager;
 
+  /**
+   * The mock time service.
+   *
+   * @var \Drupal\Component\Datetime\TimeInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $time;
+
   protected function setUp(): void {
     parent::setUp();
 
@@ -64,20 +77,22 @@ class FinishResponseSubscriberTest extends UnitTestCase {
     $this->requestPolicy = $this->createMock(RequestPolicyInterface::class);
     $this->responsePolicy = $this->createMock(ResponsePolicyInterface::class);
     $this->cacheContextsManager = $this->createMock(CacheContextsManager::class);
+    $this->time = $this->createMock(TimeInterface::class);
   }
 
   /**
    * Finish subscriber should set some default header values.
    *
-   * @covers ::onRespond
+   * @legacy-covers ::onRespond
    */
-  public function testDefaultHeaders() {
+  public function testDefaultHeaders(): void {
     $finishSubscriber = new FinishResponseSubscriber(
       $this->languageManager,
       $this->getConfigFactoryStub(),
       $this->requestPolicy,
       $this->responsePolicy,
       $this->cacheContextsManager,
+      $this->time,
       FALSE
     );
 
@@ -99,15 +114,16 @@ class FinishResponseSubscriberTest extends UnitTestCase {
   /**
    * Finish subscriber should not overwrite existing header values.
    *
-   * @covers ::onRespond
+   * @legacy-covers ::onRespond
    */
-  public function testExistingHeaders() {
+  public function testExistingHeaders(): void {
     $finishSubscriber = new FinishResponseSubscriber(
       $this->languageManager,
       $this->getConfigFactoryStub(),
       $this->requestPolicy,
       $this->responsePolicy,
       $this->cacheContextsManager,
+      $this->time,
       FALSE
     );
 
