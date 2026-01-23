@@ -3,7 +3,7 @@
  * A Backbone view for the toolbar element. Listens to mouse & touch.
  */
 
-(function ($, Drupal, drupalSettings, Backbone) {
+(function ($, Drupal, drupalSettings, Backbone, debounce) {
   Drupal.toolbar.ToolbarVisualView = Backbone.View.extend(
     /** @lends Drupal.toolbar.ToolbarVisualView# */ {
       /**
@@ -65,6 +65,11 @@
         // Trigger an activeTab change so that listening scripts can respond on
         // page load. This will call render.
         this.model.trigger('change:activeTab');
+
+        const observer = new ResizeObserver(
+          debounce(() => this.updateToolbarHeight(), 100),
+        );
+        observer.observe($('#toolbar-bar').get(0));
       },
 
       /**
@@ -427,4 +432,4 @@
       },
     },
   );
-})(jQuery, Drupal, drupalSettings, Backbone);
+})(jQuery, Drupal, drupalSettings, Backbone, Drupal.debounce);

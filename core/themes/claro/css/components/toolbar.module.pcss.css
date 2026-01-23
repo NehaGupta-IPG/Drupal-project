@@ -98,6 +98,10 @@
     position: absolute;
     inset-inline-start: -100%;
     width: 15rem;
+    top: var(--drupal-displace-offset-top, 39px);
+  }
+  & .toolbar-tray-horizontal {
+    z-index: 503;
   }
 }
 /* .toolbar-loading is required by Toolbar JavaScript to pre-render markup
