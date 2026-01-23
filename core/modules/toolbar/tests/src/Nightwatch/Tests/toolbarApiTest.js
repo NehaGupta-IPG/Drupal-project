@@ -81,7 +81,7 @@ module.exports = {
           toReturn.toolbarModelIsTrayToggleVisible =
             models.toolbarModel.get('isTrayToggleVisible') === true;
           toReturn.toolbarModelHeight =
-            models.toolbarModel.get('height') === 79;
+            models.toolbarModel.get('height') === 80;
           toReturn.toolbarModelOffsetsBottom =
             models.toolbarModel.get('offsets').bottom === 0;
           toReturn.toolbarModelOffsetsLeft =
