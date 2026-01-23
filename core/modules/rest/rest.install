@@ -15,7 +15,7 @@ function rest_update_last_removed(): int {
 /**
  * Update views with "serializer" display adding pager setting if not set yet.
  */
-function rest_update_11001() {
+function rest_update_11001(): void {
 
   $config_factory = \Drupal::configFactory();
   $view_ids = $config_factory->listAll('views.view.');
