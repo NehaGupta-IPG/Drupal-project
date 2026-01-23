@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Render\Element;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -410,9 +411,8 @@ class TableTest extends KernelTestBase {
 
   /**
    * Tests scope attributes for WCAG 1.3.1 compliance.
-   *
-   * @dataProvider tableScopeAttributesDataProvider
    */
+  #[DataProvider('tableScopeAttributesDataProvider')]
   public function testThemeTableScopeAttributes(array $header, array $rows, array $footer, array $expected, array $not_expected): void {
     $table = [
       '#type' => 'table',
