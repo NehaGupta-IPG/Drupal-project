@@ -11,6 +11,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+// cspell:ignore previ
+
 /**
  * Test unicode handling features implemented in Unicode component.
  */
