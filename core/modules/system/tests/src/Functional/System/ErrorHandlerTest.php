@@ -106,13 +106,7 @@ class ErrorHandlerTest extends BrowserTestBase {
    * Tests the exception handler.
    */
   public function testExceptionHandler(): void {
-    $error_exception = [
-      '%type' => 'Exception',
-      '@message' => 'Drupal & awesome',
-      '%function' => 'Drupal\error_test\Controller\ErrorTestController->triggerException()',
-      '%line' => 56,
-      '%file' => $this->getModulePath('error_test') . '/error_test.module',
-    ];
+    $error_exception = '<em class="placeholder">Exception</em>: Drupal &amp; awesome in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerException()</em> (line';
     $select = \Drupal::database()->select('bananas_are_awesome', 'b')->fields('b');
     $message = \Drupal::database()->prepareStatement((string) $select, [])->getQueryString();
     $message = str_replace(["\r", "\n"], ' ', $message);
@@ -125,16 +119,7 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%line' => 64,
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
-    $error_renderer_exception = [
-      '%type' => 'Exception',
-      '@message' => 'This is an exception that occurs during rendering',
-      '%function' => PHP_VERSION_ID >= 80400 ?
-      'Drupal\error_test\Controller\ErrorTestController->{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():104}()' :
-      'Drupal\error_test\Controller\ErrorTestController->Drupal\error_test\Controller\{closure}()',
-      '%line' => 82,
-      '%file' => $this->getModulePath('error_test') . '/error_test.module',
-    ];
-
+    $error_renderer_exception = '<em class="placeholder">Exception</em>: This is an exception that occurs during rendering in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;{closure:Drupal\error_test\Controller\ErrorTestController::triggerRendererException():104}()</em> (line';
     $this->drupalGet('error-test/trigger-exception');
     $this->assertSession()->statusCodeEquals(500);
     $this->assertErrorMessage($error_exception);
