@@ -86,7 +86,7 @@ class CommentBlockTest extends CommentTestBase {
       $position = strpos($this->getSession()->getPage()->getContent(), $comments[$i]->getSubject());
     }
 
-    // Test that links to comments work when comments are across pages.
+    // Test that links to comments work when comments are across pages. gg
     $this->setCommentsPerPage(1);
 
     for ($i = 0; $i < 10; $i++) {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\System;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -31,24 +30,9 @@ class ErrorHandlerTest extends BrowserTestBase {
    */
   public function testErrorHandler(): void {
     $config = $this->config('system.logging');
-    $error_notice = [
-      '%type' => 'Notice',
-      '@message' => 'Object of class stdClass could not be converted to int',
-      '%function' => 'Drupal\error_test\Controller\ErrorTestController->generateWarnings()',
-      '%file' => $this->getModulePath('error_test') . '/error_test.module',
-    ];
-    $error_warning = [
-      '%type' => 'Warning',
-      '@message' => 'var_export does not handle circular references',
-      '%function' => 'Drupal\error_test\Controller\ErrorTestController->generateWarnings()',
-      '%file' => $this->getModulePath('error_test') . '/error_test.module',
-    ];
-    $error_user_notice = [
-      '%type' => 'User warning',
-      '@message' => 'Drupal & awesome',
-      '%function' => 'Drupal\error_test\Controller\ErrorTestController->generateWarnings()',
-      '%file' => $this->getModulePath('error_test') . '/error_test.module',
-    ];
+    $error_notice = '<em class="placeholder">Notice</em>: Object of class stdClass could not be converted to int in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;generateWarnings()</em> (line';
+    $error_warning = '<em class="placeholder">Warning</em>: var_export does not handle circular references in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;generateWarnings()</em> (line';
+    $error_user_notice = '<em class="placeholder">User warning</em>: Drupal &amp; awesome in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;generateWarnings()</em> (line';
 
     // Set error reporting to display verbose notices.
     $this->config('system.logging')->set('error_level', ERROR_REPORTING_DISPLAY_VERBOSE)->save();
@@ -163,7 +147,7 @@ class ErrorHandlerTest extends BrowserTestBase {
     // Assert statement improved since static queries adds table alias in the
     // error message.
     $this->assertSession()->pageTextContains($error_pdo_exception['@message']);
-    $error_details = 'in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerPDOException()</em> (line ';
+    $error_details = 'in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;triggerPDOException()</em> (line';
     $this->assertSession()->responseContains($error_details);
     $this->drupalGet('error-test/trigger-renderer-exception');
     $this->assertSession()->statusCodeEquals(500);
@@ -186,8 +170,7 @@ class ErrorHandlerTest extends BrowserTestBase {
    *
    * @internal
    */
-  public function assertErrorMessage(array $error): void {
-    $message = new FormattableMarkup('%type: @message in %function (line ', $error);
+  public function assertErrorMessage($message): void {
     $this->assertSession()->responseContains($message);
   }
 
@@ -196,8 +179,7 @@ class ErrorHandlerTest extends BrowserTestBase {
    *
    * @internal
    */
-  public function assertNoErrorMessage(array $error): void {
-    $message = new FormattableMarkup('%type: @message in %function (line ', $error);
+  public function assertNoErrorMessage($message): void {
     $this->assertSession()->responseNotContains($message);
   }
 

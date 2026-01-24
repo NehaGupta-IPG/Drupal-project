@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Traits;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\field\Traits\BodyFieldCreationTrait;
 use PHPUnit\Framework\TestCase;
@@ -51,11 +50,13 @@ trait ContentTypeCreationTrait {
       $this->createBodyField('node', $type->id());
     }
 
+    $id = $type->id();
+    $message = "Created content type $id.";
     if ($this instanceof TestCase) {
-      $this->assertSame($status, SAVED_NEW, (new FormattableMarkup('Created content type %type.', ['%type' => $type->id()]))->__toString());
+      $this->assertSame($status, SAVED_NEW, $message);
     }
     else {
-      $this->assertEquals(SAVED_NEW, $status, (new FormattableMarkup('Created content type %type.', ['%type' => $type->id()]))->__toString());
+      $this->assertEquals(SAVED_NEW, $status, $message);
     }
 
     return $type;

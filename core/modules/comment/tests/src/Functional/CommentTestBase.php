@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\CommentPreviewMode;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\CommentInterface;
@@ -297,7 +296,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   - 2: Contact information required.
    */
   protected function setCommentAnonymous($level) {
-    $this->setCommentSettings('anonymous', $level, new FormattableMarkup('Anonymous commenting set to level @level.', ['@level' => $level]));
+    $this->setCommentSettings('anonymous', $level, "Anonymous commenting set to level $level.");
   }
 
   /**
@@ -310,7 +309,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   Defaults to 'comment'.
    */
   protected function setCommentsPerPage($number, $field_name = 'comment') {
-    $this->setCommentSettings('per_page', $number, new FormattableMarkup('Number of comments per page set to @number.', ['@number' => $number]), $field_name);
+    $this->setCommentSettings('per_page', $number, "Number of comments per page set to $number", $field_name);
   }
 
   /**
