@@ -5,6 +5,7 @@ namespace Drupal\system\Controller;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\ModuleDependencyMessageTrait;
 use Drupal\Core\Extension\ModuleExtensionList;
@@ -24,10 +25,22 @@ use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * Returns responses for System routes.
+ *
+ * @property-read \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+ * @property-read \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
  */
 class SystemController extends ControllerBase {
 
+  use DeprecatedServicePropertyTrait;
   use ModuleDependencyMessageTrait;
+
+  /**
+   * Deprecated service properties.
+   */
+  protected array $deprecatedProperties = [
+    'moduleExtensionList' => 'extension.list.module',
+    'themeExtensionList' => 'extension.list.theme',
+  ];
 
   public function __construct(
     protected SystemManager $systemManager,
@@ -231,9 +244,9 @@ class SystemController extends ControllerBase {
   /**
    * Returns a theme listing which excludes obsolete themes.
    *
-   * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
+   * @param \Drupal\Core\Extension\ThemeExtensionList|null $themeExtensionList
    *   The theme extension list.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
    *   The module extension list.
    *
    * @return string
@@ -247,7 +260,13 @@ class SystemController extends ControllerBase {
     title: new TranslatableMarkup('Appearance'),
     requirements: ['_permission' => 'administer themes'],
   )]
-  public function themesPage(ThemeExtensionList $themeExtensionList, ModuleExtensionList $moduleExtensionList) {
+  public function themesPage(?ThemeExtensionList $themeExtensionList = NULL, ?ModuleExtensionList $moduleExtensionList = NULL) {
+    if ($themeExtensionList === NULL || $moduleExtensionList === NULL) {
+      @trigger_error('Not passing the theme and module extension lists to SystemController::themesPage() is deprecated in drupal:11.4.0 and will error in drupal:12.0.0. Pass the services directly to the method. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+      $themeExtensionList = $this->themeExtensionList;
+      $moduleExtensionList = $this->moduleExtensionList;
+    }
+
     $config = $this->config('system.theme');
     // Get all available themes.
     $themes = $themeExtensionList->getList(TRUE);
