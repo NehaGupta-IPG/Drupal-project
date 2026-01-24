@@ -619,7 +619,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    * @return int
    *   The current request time.
    */
-  public static function getRequestTime() {
+  public static function getRequestTime(): int {
     return \Drupal::time()->getRequestTime();
   }
 
