@@ -35,8 +35,6 @@ class SystemController extends ControllerBase {
     protected ThemeAccessCheck $themeAccess,
     FormBuilderInterface $form_builder,
     protected MenuLinkTreeInterface $menuLinkTree,
-    protected ModuleExtensionList $moduleExtensionList,
-    protected ThemeExtensionList $themeExtensionList,
     protected ThemeManagerInterface $themeManager,
     readonly protected TimeInterface $time,
   ) {
@@ -233,6 +231,11 @@ class SystemController extends ControllerBase {
   /**
    * Returns a theme listing which excludes obsolete themes.
    *
+   * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
+   *   The theme extension list.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
+   *
    * @return string
    *   An HTML string of the theme listing page.
    *
@@ -244,10 +247,10 @@ class SystemController extends ControllerBase {
     title: new TranslatableMarkup('Appearance'),
     requirements: ['_permission' => 'administer themes'],
   )]
-  public function themesPage() {
+  public function themesPage(ThemeExtensionList $themeExtensionList, ModuleExtensionList $moduleExtensionList) {
     $config = $this->config('system.theme');
     // Get all available themes.
-    $themes = $this->themeExtensionList->getList(TRUE);
+    $themes = $themeExtensionList->getList(TRUE);
 
     // Remove obsolete themes.
     $themes = array_filter($themes, function ($theme) {
@@ -315,7 +318,7 @@ class SystemController extends ControllerBase {
 
       // Check module dependencies.
       if ($theme->module_dependencies) {
-        $modules = $this->moduleExtensionList->getList();
+        $modules = $moduleExtensionList->getList();
         foreach ($theme->module_dependencies as $dependency => $dependency_object) {
           if ($incompatible = $this->checkDependencyMessage($modules, $dependency, $dependency_object)) {
             $theme->module_dependencies_list[$dependency] = $incompatible;
