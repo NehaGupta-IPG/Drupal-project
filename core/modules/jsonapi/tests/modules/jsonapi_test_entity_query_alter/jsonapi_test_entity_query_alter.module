@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Contains implementation of hooks to alter entity queries for JSON:API.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Entity\Query\QueryInterface;
+use Drupal\jsonapi\ResourceType\ResourceType;
+
+/**
+ * Implements hook_query_entity_query_alter().
+ */
+function jsonapi_test_entity_query_alter_entity_query_alter(QueryInterface $query): void {
+  $request_stack = \Drupal::requestStack();
+  /** @var \Drupal\Core\Render\RendererInterface $renderer */
+  $renderer = \Drupal::service('renderer');
+
+  // Retrieve the current request.
+  $request = $request_stack->getCurrentRequest();
+  if (!$request) {
+    return;
+  }
+
+  if ($request->isMethodCacheable() && $renderer->hasRenderContext()) {
+    $build = ['#cache' => ['contexts' => ['url.query_args:custom_nid']]];
+    $renderer->render($build);
+  }
+
+  // Get the resource type from the route match.
+  $route_match = \Drupal::routeMatch();
+  $resource_type = $route_match->getParameter('resource_type');
+
+  // Get the custom_nid query parameter from the request.
+  $custom_nid = $request->query->get('custom_nid');
+
+  // If custom_nid, resource_type, and it's a NodeType resource, apply condition.
+  if ($custom_nid && $resource_type instanceof ResourceType && $resource_type->getEntityTypeId() === 'node') {
+    $query->condition('nid', $custom_nid);
+  }
+}

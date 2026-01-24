@@ -467,7 +467,9 @@ class EntityResource {
     }
     // Each item of the collection data contains an array with 'entity' and
     // 'access' elements.
-    $collection_data = $this->loadEntitiesWithAccess($storage, $results, $request->get(ResourceVersionRouteEnhancer::WORKING_COPIES_REQUESTED, FALSE));
+    $collection_data = $this->executeInRenderContext(function () use ($storage, $results, $request) {
+      return $this->loadEntitiesWithAccess($storage, $results, $request->get(ResourceVersionRouteEnhancer::WORKING_COPIES_REQUESTED, FALSE));
+    }, $query_cacheability);
     $primary_data = new ResourceObjectData($collection_data);
     $primary_data->setHasNextPage($has_next_page);
 
@@ -520,14 +522,36 @@ class EntityResource {
    * @todo Remove this after https://www.drupal.org/project/drupal/issues/3028976 is fixed.
    */
   protected function executeQueryInRenderContext(QueryInterface $query, CacheableMetadata $query_cacheability) {
-    $context = new RenderContext();
-    $results = $this->renderer->executeInRenderContext($context, function () use ($query) {
+    return $this->executeInRenderContext(function () use ($query) {
       return $query->execute();
+    }, $query_cacheability);
+  }
+
+  /**
+   * Executes a callable in a render context.
+   *
+   * @param callable $f
+   *   The function to execute in a render context.
+   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   *   The value object to carry the captured cacheability.
+   *
+   * @return mixed
+   *   Returns the return value of the executed callable.
+   *
+   * @see node_query_node_access_alter()
+   * @see https://www.drupal.org/project/drupal/issues/2557815
+   * @see https://www.drupal.org/project/drupal/issues/2794385
+   * @todo Remove this after https://www.drupal.org/project/drupal/issues/3028976 is fixed.
+   */
+  protected function executeInRenderContext(callable $f, CacheableMetadata $cacheability) {
+    $context = new RenderContext();
+    $ret = $this->renderer->executeInRenderContext($context, function () use ($f) {
+      return $f();
     });
     if (!$context->isEmpty()) {
-      $query_cacheability->addCacheableDependency($context->pop());
+      $cacheability->addCacheableDependency($context->pop());
     }
-    return $results;
+    return $ret;
   }
 
   /**

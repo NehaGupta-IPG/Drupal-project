@@ -1,0 +1,3 @@
+name: 'JSON API test entity query alter with cacheable metadata'
+type: module
+package: Testing
