@@ -3,6 +3,7 @@
 namespace Drupal\Core\Controller\ArgumentResolver;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
@@ -20,11 +21,17 @@ final class ServiceValueResolver implements ValueResolverInterface {
    * {@inheritdoc}
    */
   public function resolve(Request $request, ArgumentMetadata $argument): array {
-    if (!$this->container->has($argument->getType())) {
-      return [];
+    foreach ($argument->getAttributes(Autowire::class) as $attribute) {
+      if ($this->container->has($attribute->value)) {
+        return [$this->container->get($attribute->value)];
+      }
     }
 
-    return [$this->container->get($argument->getType())];
+    if ($this->container->has($argument->getType())) {
+      return [$this->container->get($argument->getType())];
+    }
+
+    return [];
   }
 
 }
