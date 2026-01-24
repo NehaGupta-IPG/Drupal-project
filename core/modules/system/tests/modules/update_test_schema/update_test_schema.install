@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Url;
+use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Implements hook_schema().
@@ -59,10 +60,12 @@ if ($schema_version >= 8002) {
   /**
    * Schema version 8002.
    */
-  function update_test_schema_update_8002(): string {
+  function update_test_schema_update_8002(): FormattableMarkup {
     // Return a message that contains a system path with an alias.
     // @see \Drupal\FunctionalTests\Update\UpdatePathTestBaseTest::testPathAliasProcessing()
-    return 'Visit <a href="' . Url::fromRoute('system.admin_structure')->toString() . '">the structure page</a> to do many useful things.';
+    return new FormattableMarkup('Visit <a href=":link">the structure page</a> to do many useful things.', [
+      ':link' => Url::fromRoute('system.admin_structure')->toString(),
+    ]);
   }
 
 }
