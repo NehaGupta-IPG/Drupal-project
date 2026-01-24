@@ -531,7 +531,7 @@ class UrlHelperTest extends TestCase {
     return [
       ['javascript://example.com?foo&bar', '//example.com?foo&amp;bar', ['http', 'https']],
       // Test custom protocols.
-      ['https://example.com?foo&bar', '//example.com?foo&amp;bar', ['https']],
+      ['http://example.com?foo&bar', '//example.com?foo&amp;bar', ['https']],
       // Valid protocol.
       ['https://example.com?foo&bar', 'https://example.com?foo&amp;bar', ['https', 'http']],
       // Colon not part of the URL scheme.
@@ -570,7 +570,7 @@ class UrlHelperTest extends TestCase {
     return [
       ['javascript://example.com', '//example.com', ['http', 'https']],
       // Test custom protocols.
-      ['https://example.com', '//example.com', ['https']],
+      ['http://example.com', '//example.com', ['https']],
       // Valid protocol.
       ['https://example.com', 'https://example.com', ['https', 'http']],
       // Colon not part of the URL scheme.

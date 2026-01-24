@@ -106,7 +106,7 @@ class LanguageHooks {
         return $output;
 
       case 'language.negotiation_session':
-        $output = '<p>' . $this->t('Determine the language from a request/session parameter. Example: "http://example.com?language=de" sets language to German based on the use of "de" within the "language" parameter.') . '</p>';
+        $output = '<p>' . $this->t('Determine the language from a request/session parameter. Example: "https://example.com?language=de" sets language to German based on the use of "de" within the "language" parameter.') . '</p>';
         return $output;
 
       case 'language.negotiation_browser':

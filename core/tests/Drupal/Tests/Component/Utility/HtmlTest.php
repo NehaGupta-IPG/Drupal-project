@@ -371,17 +371,17 @@ class HtmlTest extends TestCase {
       // 'srcset', so special-case it.
       $data += [
         "$tag_name, srcset, $base_path: root-relative" => [
-          "<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, {$base_path}root-relative 300w\">root-relative test</$tag_name>",
+          "<$tag_name srcset=\"https://example.com{$base_path}already-absolute 200w, {$base_path}root-relative 300w\">root-relative test</$tag_name>",
           'https://example.com',
-          "<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, http://example.com{$base_path}root-relative 300w\">root-relative test</$tag_name>",
+          "<$tag_name srcset=\"https://example.com{$base_path}already-absolute 200w, https://example.com{$base_path}root-relative 300w\">root-relative test</$tag_name>",
         ],
         "$tag_name, srcset, $base_path: protocol-relative" => [
-          "<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, //example.com{$base_path}protocol-relative 300w\">protocol-relative test</$tag_name>",
+          "<$tag_name srcset=\"https://example.com{$base_path}already-absolute 200w, //example.com{$base_path}protocol-relative 300w\">protocol-relative test</$tag_name>",
           'https://example.com',
           FALSE,
         ],
         "$tag_name, srcset, $base_path: absolute" => [
-          "<$tag_name srcset=\"http://example.com{$base_path}already-absolute 200w, http://example.com{$base_path}absolute 300w\">absolute test</$tag_name>",
+          "<$tag_name srcset=\"https://example.com{$base_path}already-absolute 200w, https://example.com{$base_path}absolute 300w\">absolute test</$tag_name>",
           'https://example.com',
           FALSE,
         ],
@@ -397,7 +397,7 @@ class HtmlTest extends TestCase {
           "$tag_name, $attribute, $base_path: root-relative" => [
             "<$tag_name $attribute=\"{$base_path}root-relative\">root-relative test</$tag_name>",
             'https://example.com',
-            "<$tag_name $attribute=\"http://example.com{$base_path}root-relative\">root-relative test</$tag_name>",
+            "<$tag_name $attribute=\"https://example.com{$base_path}root-relative\">root-relative test</$tag_name>",
           ],
           "$tag_name, $attribute, $base_path: protocol-relative" => [
             "<$tag_name $attribute=\"//example.com{$base_path}protocol-relative\">protocol-relative test</$tag_name>",
@@ -405,7 +405,7 @@ class HtmlTest extends TestCase {
             FALSE,
           ],
           "$tag_name, $attribute, $base_path: absolute" => [
-            "<$tag_name $attribute=\"http://example.com{$base_path}absolute\">absolute test</$tag_name>",
+            "<$tag_name $attribute=\"https://example.com{$base_path}absolute\">absolute test</$tag_name>",
             'https://example.com',
             FALSE,
           ],
@@ -426,7 +426,7 @@ class HtmlTest extends TestCase {
     ];
     $data['carriage return within html'] = [
       "<a\rhref='/node'>My link</a>",
-      'http://example.com',
+      'https://example.com',
       '<a href="https://example.com/node">My link</a>',
     ];
 

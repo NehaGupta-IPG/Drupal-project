@@ -202,13 +202,13 @@ class EntityLinkSuggestionsTest extends CKEditor5TestBase {
     // Click to trigger the reset of the the autocomplete status.
     $autocomplete_field->click();
     // Enter a URL and verify that no link suggestions are found.
-    $autocomplete_field->setValue('http://example.com');
+    $autocomplete_field->setValue('https://example.com');
     $autocomplete_field->click();
     $this->assertSession()->assertWaitOnAjaxRequest();
     $this->assertSession()->waitForElementVisible('css', '.entity-link-suggestions-result-line.ui-menu-item');
     $results = $page->findAll('css', '.entity-link-suggestions-result-line.ui-menu-item');
     $this->assertCount(1, $results);
-    $this->assertSame('http://example.com', $results[0]->find('css', '.entity-link-suggestions-result-line--title')->getText());
+    $this->assertSame('https://example.com', $results[0]->find('css', '.entity-link-suggestions-result-line--title')->getText());
     $this->assertSame('No content suggestions found. This URL will be used as is.', $results[0]->find('css', '.entity-link-suggestions-result-line--description')->getText());
     // Accept the first autocomplete suggestion.
     $results[0]->click();
@@ -227,7 +227,7 @@ class EntityLinkSuggestionsTest extends CKEditor5TestBase {
     $page->find('css', '.ck-editor__editable')->click();
     $this->assertBalloonClosed();
 
-    $changed_link = $assert_session->waitForElementVisible('css', '.ck-content [href="http://example.com"]');
+    $changed_link = $assert_session->waitForElementVisible('css', '.ck-content [href="https://example.com"]');
     $this->assertNotNull($changed_link);
     foreach (['data-entity-type', 'data-entity-uuid'] as $attribute_name) {
       $this->assertFalse($changed_link->hasAttribute($attribute_name), "Link should no longer have $attribute_name");

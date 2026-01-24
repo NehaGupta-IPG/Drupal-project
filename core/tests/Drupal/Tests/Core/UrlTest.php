@@ -402,7 +402,7 @@ class UrlTest extends UnitTestCase {
   public function testGetRouteParametersWithExternalUrl(): void {
     $url = Url::fromUri('https://example.com');
     $this->expectException(\UnexpectedValueException::class);
-    $this->expectExceptionMessage('http://example.com has no corresponding route.');
+    $this->expectExceptionMessage('https://example.com has no corresponding route.');
     $url->getRouteParameters();
   }
 

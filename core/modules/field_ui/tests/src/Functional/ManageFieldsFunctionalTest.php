@@ -275,7 +275,7 @@ class ManageFieldsFunctionalTest extends ManageFieldsFunctionalTestBase {
     $this->assertStringEndsWith('/admin/structure/types/manage/article/fields/node.article.body', $url['path']);
     $query = [];
     parse_str($url['query'], $query);
-    $this->assertSame(['http://example.com'], $query['destinations']);
+    $this->assertSame(['https://example.com'], $query['destinations']);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseContains('Attempt to update field <em class="placeholder">Body</em> failed: <em class="placeholder">The internal path component &#039;https://example.com&#039; is external. You are not allowed to specify an external URL together with internal:/.</em>.');
   }

@@ -139,7 +139,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
     return [
       [new Request(), FALSE],
       [new Request(['destination' => 'test']), 'https://example.com/drupal/test'],
-      [new Request(['destination' => '/drupal/test']), 'https://example.com/drupal/test'],
+      [new Request(['destination' => '/drupal/test']), 'http://example.com/drupal/test'],
       [new Request(['destination' => 'example.com']), 'https://example.com/drupal/example.com'],
       [new Request(['destination' => 'example:com']), 'https://example.com/drupal/example:com'],
       [new Request(['destination' => 'javascript:alert(0)']), 'https://example.com/drupal/javascript:alert(0)'],
@@ -191,11 +191,11 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
   public static function providerTestDestinationRedirectToExternalUrl(): array {
     return [
       'absolute external url' => [
-        new Request(['destination' => 'http://example.com']),
+        new Request(['destination' => 'https://example.com']),
         'https://example.com',
       ],
       'absolute external url with folder' => [
-        new Request(['destination' => 'http://example.com/foobar']),
+        new Request(['destination' => 'https://example.com/foobar']),
         'https://example.com/foobar',
       ],
       'absolute external url with folder2' => [
