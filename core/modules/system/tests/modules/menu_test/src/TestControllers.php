@@ -65,7 +65,7 @@ class TestControllers {
    */
   public function testDefaults($placeholder = NULL) {
     if ($placeholder) {
-      return ['#markup' => "Sometimes there is a placeholder: $placeholder"];
+      return ['#markup' => "Sometimes there is a placeholder: '$placeholder'."];
     }
     else {
       return ['#markup' => 'Sometimes there is no placeholder.'];
