@@ -227,7 +227,8 @@ EOF;
       // Simple string longer than max length.
       ['Longer string than previous.', 10, 'Longer str'],
       // Unicode.
-      ['以呂波耳・ほへとち。リヌルヲ。', 10, '以呂波'],
+      ['以呂波耳・ほへとち。リヌルヲ。', 2, ''],
+      ['以呂波耳・ほへとち。リヌルヲ。', 3, '以'],
     ];
   }
 
