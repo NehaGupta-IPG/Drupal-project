@@ -477,6 +477,13 @@ block_settings:
       label: 'Context assignments'
       sequence:
         type: string
+    schema:
+      requiredKey: false
+      type: integer
+      label: 'Block configuration schema version'
+      constraints:
+        Range:
+          min: 0
 
 condition.plugin:
   type: mapping

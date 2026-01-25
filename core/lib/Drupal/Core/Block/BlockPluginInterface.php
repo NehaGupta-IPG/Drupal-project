@@ -167,4 +167,11 @@ interface BlockPluginInterface extends ConfigurableInterface, DependentPluginInt
    */
   public function getMachineNameSuggestion();
 
+  /**
+   * Checks for outstanding configuration schema update methods and runs them.
+   *
+   * @return $this
+   */
+  public function updateSchema(): static;
+
 }

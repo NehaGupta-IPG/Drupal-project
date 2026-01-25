@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for block_test_config_update.
+ */
+
+declare(strict_types=1);
+
+use Drupal\block\BlockInterface;
+use Drupal\block_test_config_update\Plugin\Block\TestDisplayMessageConfigUpdate2Block;
+use Drupal\block_test_config_update\Plugin\Block\TestDisplayMessageConfigUpdateBlock;
+
+if (\Drupal::keyValue('block_test')->get('config_update_test_class') === TestDisplayMessageConfigUpdateBlock::class) {
+
+  /**
+   * Update 'test_block_display_message' block config schema to add a field.
+   */
+  function block_test_config_update_update_11400(): void {
+    $blocks = \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['plugin' => 'test_block_display_message']);
+    foreach ($blocks as $block) {
+      assert($block instanceof BlockInterface);
+      $block->getPlugin();
+      $block->save();
+    }
+  }
+
+}
+
+if (\Drupal::keyValue('block_test')->get('config_update_test_class') === TestDisplayMessageConfigUpdate2Block::class) {
+
+  /**
+   * Update 'test_block_display_message' block config schema to add a field.
+   */
+  function block_test_config_update_update_11401(): void {
+    $blocks = \Drupal::entityTypeManager()->getStorage('block')->loadByProperties(['plugin' => 'test_block_display_message']);
+    foreach ($blocks as $block) {
+      assert($block instanceof BlockInterface);
+      $block->getPlugin();
+      $block->save();
+    }
+  }
+
+}

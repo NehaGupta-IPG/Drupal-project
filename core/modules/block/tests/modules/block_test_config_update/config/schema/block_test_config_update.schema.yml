@@ -1,0 +1,7 @@
+block.settings.test_block_display_message:
+  type: block_settings
+  label: 'Test block display message settings'
+  mapping:
+    display_message:
+      type: string
+      label: 'Message text'

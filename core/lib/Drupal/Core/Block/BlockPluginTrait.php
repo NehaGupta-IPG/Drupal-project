@@ -5,6 +5,7 @@ namespace Drupal\Core\Block;
 use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Block\Attribute\ConfigUpdate;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Messenger\MessengerTrait;
@@ -82,6 +83,7 @@ trait BlockPluginTrait {
       $this->defaultConfiguration(),
       $configuration
     );
+    $this->updateSchema();
   }
 
   /**
@@ -301,6 +303,34 @@ trait BlockPluginTrait {
    */
   public function createPlaceholder(): bool {
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function updateSchema(): static {
+    $current_schema = $this->getConfiguration()['schema'] ?? 0;
+    $reflection = new \ReflectionClass($this);
+    $update_methods = [];
+    foreach ($reflection->getMethods() as $reflection_method) {
+      foreach ($reflection_method->getAttributes(ConfigUpdate::class) as $reflection_attribute) {
+        $attribute = $reflection_attribute->newInstance();
+        assert($attribute instanceof ConfigUpdate);
+        if ($attribute->schema > $current_schema) {
+          $update_methods[$attribute->schema] = $reflection_method->getName();
+        }
+      }
+    }
+    if (!$update_methods) {
+      return $this;
+    }
+
+    ksort($update_methods);
+    foreach ($update_methods as $schema => $method) {
+      $this->{$method}();
+      $this->configuration['schema'] = $schema;
+    }
+    return $this;
   }
 
 }
