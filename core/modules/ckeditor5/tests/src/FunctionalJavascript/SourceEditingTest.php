@@ -243,4 +243,39 @@ JS;
     ];
   }
 
+  /**
+   * Tests that the <template> tag is preserved in source editing mode.
+   */
+  public function testTemplateTag(): void {
+    $text_editor = Editor::load('test_format');
+    $text_format = FilterFormat::load('test_format');
+    $text_format->filters('filter_html')->setConfiguration([
+      'status' => FALSE,
+    ]);
+
+    $this->assertSame([], array_map(
+      function (ConstraintViolationInterface $v) {
+        return (string) $v->getMessage();
+      },
+     iterator_to_array(CKEditor5::validatePair(
+       $text_editor,
+       $text_format
+      ))
+    ));
+
+    $text_format->save();
+
+    $page = $this->getSession()->getPage();
+    $expected_markup = '<template><div>llama</div></template>';
+    $this->drupalGet('node/add/page');
+    $this->waitForEditor();
+    $page->fillField('Title', 'Animals with strange names');
+    $this->pressEditorButton('Source');
+    $editor = $page->find('css', '.ck-source-editing-area textarea');
+    $editor->setValue($expected_markup);
+    $this->pressEditorButton('Source');
+    $this->pressEditorButton('Source');
+    $this->assertSame($expected_markup, $this->getEditorDataAsHtmlString());
+  }
+
 }
