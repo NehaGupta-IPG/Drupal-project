@@ -1136,13 +1136,15 @@ function hook_updater_info_alter(&$updaters) {
  *   - runtime: The runtime requirements are being checked and shown on the
  *     status report page.
  *
+ * phpcs:disable
  * @return array<string, array{
- *     'title'?: \Drupal\Core\StringTranslation\TranslatableMarkup,
- *     'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
- *     'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
- *     'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
- *     'weight'?: int,
- *   }>
+ *   'title'?: \Drupal\Core\StringTranslation\TranslatableMarkup,
+ *   'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>|string,
+ *   'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
+ *   'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
+ *   'weight'?: int,
+ * }>
+ * phpcs:enable
  *   An associative array where the keys are arbitrary but must be unique (it
  *   is suggested to use the module short name as a prefix) and the values are
  *   themselves associative arrays with the following elements:

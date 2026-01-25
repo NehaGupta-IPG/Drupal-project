@@ -5,12 +5,14 @@ namespace Drupal\Core\Extension;
 /**
  * Provides method for checking requirements during install time.
  *
+ * phpcs:disable
  * @phpstan-type RequirementInfo array{
  *   'title'?: \Drupal\Core\StringTranslation\TranslatableMarkup,
- *   'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
+ *   'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>|string,
  *   'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
  *   'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
  *   'weight'?: int,
+ * phpcs:enable
  * }
  */
 interface InstallRequirementsInterface {
