@@ -37,6 +37,7 @@ class ContextualThemeHooks {
 
     if (isset($element) && is_array($element) && !empty($element['#contextual_links'])) {
       $variables['#cache']['contexts'][] = 'user.permissions';
+      $variables['#cache']['contexts'][] = 'user.admin_language';
       if ($this->currentUser->hasPermission('access contextual links')) {
         // Mark this element as potentially having contextual links attached to
         // it.
