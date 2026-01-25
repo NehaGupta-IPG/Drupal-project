@@ -85,6 +85,11 @@ export default class DrupalHtmlBuilder {
     this._appendAttributes(node);
     this._append('>');
     if (!this.selfClosingTags.includes(nodeName)) {
+      if (nodeName === 'template' && node.content) {
+        this.appendNode(node.content);
+      } else {
+        this._appendChildren(node);
+      }
       this._appendChildren(node);
       this._append('</');
       this._append(nodeName);
