@@ -4,6 +4,7 @@ namespace Drupal\Core\Render;
 
 // cspell:ignore turbolinks
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
@@ -79,6 +80,8 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   public function processAttachments(AttachmentsInterface $response) {
     assert($response instanceof HtmlResponse);
 
+    $before_attached = $response->getAttachments();
+
     // First, render the actual placeholders; this may cause additional
     // attachments to be added to the response, which the attachment
     // placeholders rendered by renderHtmlResponseAttachmentPlaceholders() will
@@ -119,17 +122,59 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
 
     // If we don't have any placeholders, there is no need to proceed.
     if (!empty($attached['html_response_attachment_placeholders'])) {
+      $variables = [];
       // Get the placeholders from attached and then remove them.
       $attachment_placeholders = $attached['html_response_attachment_placeholders'];
       unset($attached['html_response_attachment_placeholders']);
 
+      $before_assets = AttachedAssets::createFromRenderArray(['#attached' => $before_attached]);
       $assets = AttachedAssets::createFromRenderArray(['#attached' => $attached]);
       // Take Ajax page state into account, to allow for something like
       // Turbolinks to be implemented without altering core.
       // @see https://github.com/rails/turbolinks/
       $ajax_page_state = $this->requestStack->getCurrentRequest()->get('ajax_page_state');
-      $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : []);
-      $variables = $this->processAssetLibraries($assets, $attachment_placeholders);
+      $ajax_page_state_libraries = isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : [];
+      $before_assets->setAlreadyLoadedLibraries($ajax_page_state_libraries);
+      $assets->setAlreadyLoadedLibraries($ajax_page_state_libraries + $before_assets->getLibraries());
+
+      $maintenance_mode = defined('MAINTENANCE_MODE') || \Drupal::state()->get('system.maintenance_mode');
+
+      // Print styles - if present.
+      if (isset($attachment_placeholders['styles'])) {
+        // Optimize CSS if necessary, but only during normal site operation.
+        $optimize_css = !$maintenance_mode && $this->config->get('css.preprocess');
+        $before_css = $this->assetResolver->getCssAssets($before_assets, $optimize_css, $this->languageManager->getCurrentLanguage());
+        $after_css = $this->assetResolver->getCssAssets($assets, $optimize_css, $this->languageManager->getCurrentLanguage());
+        $css = $before_css + $after_css;
+        $variables['styles'] = $this->cssCollectionRenderer->render($css);
+      }
+
+      // Print scripts - if any are present.
+      if (isset($attachment_placeholders['scripts']) || isset($attachment_placeholders['scripts_bottom'])) {
+        // Optimize JS if necessary, but only during normal site operation.
+        $optimize_js = !$maintenance_mode && $this->config->get('js.preprocess');
+        [$before_js_assets_header, $before_js_assets_footer] = $this->assetResolver->getJsAssets($before_assets, $optimize_js, $this->languageManager->getCurrentLanguage());
+        [$after_js_assets_header, $after_js_assets_footer] = $this->assetResolver->getJsAssets($assets, $optimize_js, $this->languageManager->getCurrentLanguage());
+
+        $settings_in_header = count($before_js_assets_header['drupalSettings'] ?? []) || count($after_js_assets_header['drupalSettings'] ?? []);
+
+        $settings = [];
+
+        foreach ([$before_js_assets_header, $before_js_assets_footer, $after_js_assets_header, $after_js_assets_footer] as &$js_assets) {
+          $settings = NestedArray::mergeDeep($settings, $js_assets['drupalSettings'] ?? []);
+          unset($js_assets['drupalSettings']);
+        }
+        if ($settings) {
+          if ($settings_in_header) {
+            $before_js_assets_header['drupalSettings'] = $settings;
+          }
+          else {
+            $before_js_assets_footer['drupalSettings'] = $settings;
+          }
+        }
+        $variables['scripts'] = $this->jsCollectionRenderer->render($before_js_assets_header) + $this->jsCollectionRenderer->render($after_js_assets_header);
+        $variables['scripts_bottom'] = $this->jsCollectionRenderer->render($before_js_assets_footer) + $this->jsCollectionRenderer->render($after_js_assets_footer);
+      }
       // $variables now contains the markup to load the asset libraries. Update
       // $attached with the final list of libraries and JavaScript settings, so
       // that $response can be updated with those. Then the response object will
