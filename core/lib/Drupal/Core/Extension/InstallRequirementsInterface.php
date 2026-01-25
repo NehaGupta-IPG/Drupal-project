@@ -12,8 +12,8 @@ namespace Drupal\Core\Extension;
  *   'description'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>,
  *   'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
  *   'weight'?: int,
- * phpcs:enable
  * }
+ * phpcs:enable
  */
 interface InstallRequirementsInterface {
 
