@@ -20,8 +20,6 @@ class ToolbarLinkBuilderTest extends UnitTestCase {
 
   /**
    * Tests structure of display name render array.
-   *
-   * @legacy-covers ::renderDisplayName
    */
   public function testRenderDisplayName(): void {
     $account = $this->prophesize(AccountProxyInterface::class);

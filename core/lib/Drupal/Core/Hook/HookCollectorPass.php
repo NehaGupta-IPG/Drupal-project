@@ -287,7 +287,7 @@ class HookCollectorPass implements CompilerPassInterface {
       }
       foreach ($moduleImplements as $module => $v) {
         if (is_string($hook) && str_starts_with($hook, 'preprocess_') && str_contains($hook, '__')) {
-          $this->preprocessForSuggestions[$module . '_' . $hook] = TRUE;
+          $this->preprocessForSuggestions[$module . '_' . $hook] = 'module';
         }
         foreach (array_keys($implementationsByHookOrig[$hook], $module, TRUE) as $identifier) {
           $implementationsByHook[$hook][$identifier] = $module;
@@ -451,7 +451,11 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
-    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . $all_modules_preg);
+    // List of modules must be included in the cache key to ensure rediscovery
+    // takes place when a new module is installed. Some modules define hooks
+    // on behalf of other modules and those hooks need to be found.
+    // Hash to prevent massive key sizes.
+    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . hash('xxh3', $all_modules_preg));
 
     $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
