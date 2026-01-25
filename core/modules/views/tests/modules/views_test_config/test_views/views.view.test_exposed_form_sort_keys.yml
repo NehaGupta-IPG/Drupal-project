@@ -1,0 +1,97 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - entity_test
+id: test_exposed_form_sort_keys
+label: test_exposed_form_sort_keys
+module: views
+description: ''
+tag: ''
+base_table: entity_test
+base_field: id
+display:
+  default:
+    id: default
+    display_title: Default
+    display_plugin: default
+    position: 0
+    display_options:
+      fields:
+        id:
+          id: id
+          table: entity_test
+          field: id
+          plugin_id: field
+      pager:
+        type: full
+        options:
+          expose:
+            items_per_page: true
+            offset: true
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Apply
+          reset_button: true
+          reset_button_label: Reset
+          exposed_sorts_label: 'Sort by'
+          expose_sort_key: custom_sort_key
+          expose_sort_order: true
+          sort_order_key: custom_sort_order
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      access:
+        type: none
+      cache:
+        type: tag
+      sorts:
+        id:
+          id: id
+          table: entity_test
+          field: id
+          plugin_id: standard
+          order: asc
+          expose:
+            label: id
+            field_identifier: id
+          exposed: true
+      style:
+        type: default
+      row:
+        type: fields
+      query:
+        type: views_query
+        options:
+          query_comment: ''
+      display_extenders: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - entity_test_view_grants
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url.query_args
+        - 'url.query_args:custom_sort_key'
+        - 'url.query_args:custom_sort_order'
+        - 'url.query_args:sort_by'
+      tags: {  }
+  page_1:
+    id: page_1
+    display_title: Page
+    display_plugin: page
+    position: 0
+    display_options:
+      display_extenders: {  }
+      path: test_exposed_form_sort_keys
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - entity_test_view_grants
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url.query_args
+        - 'url.query_args:custom_sort_key'
+        - 'url.query_args:custom_sort_order'
+        - 'url.query_args:sort_by'
+      tags: {  }

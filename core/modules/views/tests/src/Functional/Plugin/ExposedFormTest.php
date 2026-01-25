@@ -35,8 +35,9 @@ class ExposedFormTest extends ViewTestBase {
     'test_exposed_form_buttons',
     'test_exposed_block',
     'test_exposed_form_sort_items_per_page',
+    'test_exposed_form_sort_keys',
     'test_exposed_form_pager',
-    'test_remember_selected',
+    'test_remember_selected'
   ];
 
   /**
@@ -477,15 +478,81 @@ class ExposedFormTest extends ViewTestBase {
   }
 
   /**
+   * Tests exposed forms with exposed sort and custom keys.
+   */
+  public function testExposedSortKeys(): void {
+    for ($i = 0; $i < 50; $i++) {
+      $entity = EntityTest::create([]);
+      $entity->save();
+    }
+    $contexts = [
+      'languages:language_interface',
+      'entity_test_view_grants',
+      'theme',
+      'url.query_args',
+      'languages:language_content',
+    ];
+    $view_id = 'view-test-exposed-form-sort-keys';
+
+    $this->drupalGet('test_exposed_form_sort_keys');
+    $this->assertCacheContexts($contexts);
+    $this->assertIds(range(1, 10, 1), $view_id);
+
+    $this->drupalGet('test_exposed_form_sort_keys', ['query' => ['custom_sort_order' => 'DESC']]);
+    $this->assertCacheContexts($contexts);
+    $this->assertIds(range(50, 41, 1), $view_id);
+
+    $this->drupalGet('test_exposed_form_sort_keys', ['query' => ['custom_sort_order' => 'DESC', 'items_per_page' => 25]]);
+    $this->assertCacheContexts($contexts);
+    $this->assertIds(range(50, 26, 1), $view_id);
+
+    $this->drupalGet('test_exposed_form_sort_keys', ['query' => ['custom_sort_order' => 'DESC', 'items_per_page' => 25, 'offset' => 10]]);
+    $this->assertCacheContexts($contexts);
+    $this->assertIds(range(40, 16, 1), $view_id);
+
+    // Check that the custom field identifier is used in the URL query string.
+    $this->drupalGet('test_exposed_form_sort_keys');
+    $this->submitForm(['custom_sort_key' => 'id', 'custom_sort_order' => 'DESC'], 'Apply');
+    $this->assertCacheContexts($contexts);
+    $this->assertIds(range(50, 41), $view_id);
+    $url = $this->getSession()->getCurrentUrl();
+    $this->assertStringContainsString('custom_sort_key=id', $url);
+    $this->assertStringContainsString('custom_sort_order=DESC', $url);
+  }
+
+  /**
+   * Tests exposed form settings with exposed sort and custom keys.
+   */
+  public function testExposedSortKeysForm(): void {
+    $admin_user = $this->drupalCreateUser([
+      'administer views',
+    ]);
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/structure/views/nojs/display/test_exposed_form_sort_keys/page_1/exposed_form_options');
+    foreach (FilterPluginBase::RESTRICTED_IDENTIFIERS as $restricted_identifier) {
+      $edit = [];
+      foreach (['expose_sort_key', 'sort_order_key'] as $key) {
+        $edit["exposed_form_options[$key]"] = $restricted_identifier;
+      }
+      $this->submitForm($edit, 'Apply');
+      $this->assertSession()->pageTextContains('This value is not allowed for the key Exposed sort key');
+      $this->assertSession()->pageTextContains('This value is not allowed for the key Sort order key');
+    }
+  }
+
+  /**
    * Checks whether the specified ids are the ones displayed in the view output.
    *
    * @param int[] $ids
    *   The ids to check.
+   * @param string $view_id
+   *   The view id to use in the div selector for finding the ids.
    *
    * @internal
    */
-  protected function assertIds(array $ids): void {
-    $elements = $this->cssSelect('div.view-test-exposed-form-sort-items-per-page div.views-row span.field-content');
+  protected function assertIds(array $ids, string $view_id = 'view-test-exposed-form-sort-items-per-page'): void {
+    $elements = $this->cssSelect("div.$view_id div.views-row span.field-content");
     $actual_ids = [];
     foreach ($elements as $element) {
       $actual_ids[] = (int) $element->getText();

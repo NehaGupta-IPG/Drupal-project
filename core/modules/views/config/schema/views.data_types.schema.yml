@@ -476,9 +476,45 @@ views_exposed_form:
     exposed_sorts_label:
       type: label
       label: 'Exposed sorts label'
+    expose_sort_key:
+      type: string
+      label: 'Exposed sort key'
+      constraints:
+        NotBlank: [ ]
+        Regex:
+          pattern: '/[^a-zA-Z0-9_~\.\-]+/'
+          match: false
+          message: 'Invalid characters in expose_sort_key'
+        Choice:
+          choices:
+            - 'value'
+            - 'q'
+            - 'destination'
+            - '_format'
+            - '_wrapper_format'
+            - 'token'
+          match: false
     expose_sort_order:
       type: boolean
       label: 'Expose sort order'
+    sort_order_key:
+      type: string
+      label: 'Sort order key'
+      constraints:
+        NotBlank: [ ]
+        Regex:
+          pattern: '/[^a-zA-Z0-9_~\.\-]+/'
+          match: false
+          message: 'Invalid characters in sort_order_key'
+        Choice:
+          choices:
+            - 'value'
+            - 'q'
+            - 'destination'
+            - '_format'
+            - '_wrapper_format'
+            - 'token'
+          match: false
     sort_asc_label:
       type: label
       label: 'Ascending'

@@ -298,7 +298,8 @@ abstract class SortPluginBase extends HandlerBase implements CacheableDependency
     $cache_contexts = [];
     // Exposed sorts use GET parameters, so it depends on the current URL.
     if ($this->isExposed()) {
-      $cache_contexts[] = 'url.query_args:sort_by';
+      $sort_key = $this->view->getDisplay()->getPlugin('exposed_form')->options['expose_sort_key'];
+      $cache_contexts[] = 'url.query_args:' . $sort_key;
     }
     return $cache_contexts;
   }

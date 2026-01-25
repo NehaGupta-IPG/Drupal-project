@@ -254,6 +254,34 @@ class ViewsConfigUpdater {
   }
 
   /**
+   * Adds views' exposed form sort defaults keys: sort_by and sort_order.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View to update.
+   *
+   * @return bool
+   *   TRUE if view has rendered_entity fields.
+   */
+  public function addExposedFormSortKeys(ViewEntityInterface $view): bool {
+    $changed = FALSE;
+    $displays = $view->get('display');
+    // This cannot be done in View::preSave() due to trusted data.
+    $executable = $view->getExecutable();
+    foreach ($displays as $display_id => &$display) {
+      $executable->setDisplay($display_id);
+      if (isset($display['display_options']['exposed_form']) && !isset($display['display_options']['exposed_form']['options']['expose_sort_key'])) {
+        $display['display_options']['exposed_form']['options']['expose_sort_key'] = 'sort_by';
+        $display['display_options']['exposed_form']['options']['sort_order_key'] = 'sort_order';
+        $changed = TRUE;
+      }
+    }
+    if ($changed) {
+      $view->set('display', $displays);
+    }
+    return $changed;
+  }
+
+  /**
    * Checks if 'remember_roles' setting of an exposed filter has disabled roles.
    *
    * @param \Drupal\views\ViewEntityInterface $view

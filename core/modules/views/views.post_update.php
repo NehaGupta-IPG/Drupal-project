@@ -79,6 +79,18 @@ function views_post_update_format_plural(?array &$sandbox = NULL): void {
 }
 
 /**
+ * Post update configured views for adding the default exposed forms sort keys.
+ */
+function views_post_update_views_exposed_form_sort_keys(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->addExposedFormSortKeys($view);
+  });
+}
+
+/**
  * Clean-up empty remember_roles display settings for views filters.
  */
 function views_post_update_update_remember_role_empty(?array &$sandbox = NULL): void {

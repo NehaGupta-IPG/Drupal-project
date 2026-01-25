@@ -158,7 +158,9 @@ display:
           reset_button: false
           reset_button_label: Reset
           exposed_sorts_label: 'Sort by'
+          expose_sort_key: sort_by
           expose_sort_order: false
+          sort_order_key: sort_order
           sort_asc_label: Asc
           sort_desc_label: Desc
       access:

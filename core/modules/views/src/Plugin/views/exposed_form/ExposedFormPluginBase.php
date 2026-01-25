@@ -6,6 +6,8 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
 
 /**
@@ -30,6 +32,8 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     $options['reset_button_label'] = ['default' => $this->t('Reset')];
     $options['exposed_sorts_label'] = ['default' => $this->t('Sort by')];
     $options['expose_sort_order'] = ['default' => TRUE];
+    $options['expose_sort_key'] = ['default' => 'sort_by'];
+    $options['sort_order_key'] = ['default' => 'sort_order'];
     $options['sort_asc_label'] = ['default' => $this->t('Asc')];
     $options['sort_desc_label'] = ['default' => $this->t('Desc')];
     return $options;
@@ -73,11 +77,34 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       '#required' => TRUE,
     ];
 
+    $form['expose_sort_key'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Exposed sort key'),
+      '#description' => $this->t('This will appear in the URL after the ? to identify this sorting. Cannot be blank. Only letters, digits and the dot ("."), hyphen ("-"), underscore ("_"), and tilde ("~") characters are allowed. @reserved_identifiers are reserved words and cannot be used.',
+        ['@reserved_identifiers' => '"' . implode('", "', FilterPluginBase::RESTRICTED_IDENTIFIERS) . '"']),
+      '#default_value' => $this->options['expose_sort_key'],
+      '#required' => TRUE,
+    ];
+
     $form['expose_sort_order'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Allow people to choose the sort order'),
       '#description' => $this->t('If sort order is not exposed, the sort criteria settings for each sort will determine its order.'),
       '#default_value' => $this->options['expose_sort_order'],
+    ];
+
+    $form['sort_order_key'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Sort order key'),
+      '#description' => $this->t('This will appear in the URL after the ? to identify this sorting order. Cannot be blank. Only letters, digits and the dot ("."), hyphen ("-"), underscore ("_"), and tilde ("~") characters are allowed. @reserved_identifiers are reserved words and cannot be used.',
+        ['@reserved_identifiers' => '"' . implode('", "', FilterPluginBase::RESTRICTED_IDENTIFIERS) . '"']),
+      '#default_value' => $this->options['sort_order_key'],
+      '#required' => TRUE,
+      '#states' => [
+        'visible' => [
+          'input[name="exposed_form_options[expose_sort_order]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
 
     $form['sort_asc_label'] = [
@@ -103,6 +130,57 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
         ],
       ],
     ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateOptionsForm(&$form, FormStateInterface $form_state): void {
+    parent::validateOptionsForm($form, $form_state);
+    $this->validateKey('expose_sort_key', $form_state->getValue(['exposed_form_options', 'expose_sort_key']), $this->t('Exposed sort key'), $form_state);
+    $this->validateKey('sort_order_key', $form_state->getValue(['exposed_form_options', 'sort_order_key']), $this->t('Sort order key'), $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate() {
+    $errors = parent::validate();
+    $errors[] = $this->validateKey('expose_sort_key', $this->options['expose_sort_key'], $this->t('Exposed sort key'));
+    $errors[] = $this->validateKey('sort_order_key', $this->options['sort_order_key'], $this->t('Sort order key'));
+    return $errors;
+  }
+
+  /**
+   * Validates a key.
+   *
+   * Sets the form error if $form_state is passed and returns the error string.
+   *
+   * @param string $key
+   *   The key to check.
+   * @param string $value
+   *   The value to validate.
+   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $label
+   *   The label to use in the error message.
+   * @param ?\Drupal\Core\Form\FormStateInterface $form_state
+   *   (optional) The form state to set any errors on.
+   *
+   * @return string|TranslatableMarkup
+   *   The error message if any, or an empty string.
+   */
+  protected function validateKey(string $key, string $value, string|TranslatableMarkup $label, ?FormStateInterface $form_state = NULL): string|TranslatableMarkup {
+    $error = '';
+    $form_key = 'exposed_form_options][' . $key;
+    if (in_array($value, FilterPluginBase::RESTRICTED_IDENTIFIERS)) {
+      $error = $this->t('This value is not allowed for the key %key', ['%key' => $label]);
+    }
+    elseif (preg_match('/[^a-zA-Z0-9_~\.\-]+/', $value)) {
+      $error = $this->t('The key %key has illegal characters.', ['%key' => $label]);
+    }
+    if (!empty($form_state) && !empty($error)) {
+      $form_state->setErrorByName($form_key, $error);
+    }
+    return $error;
   }
 
   /**
@@ -153,7 +231,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
   public function query() {
     $view = $this->view;
     $exposed_data = $view->exposed_data ?? [];
-    $sort_by = $exposed_data['sort_by'] ?? NULL;
+    $sort_by = $exposed_data[$this->options['expose_sort_key']] ?? NULL;
     if (!empty($sort_by)) {
       // Make sure the original order of sorts is preserved
       // (e.g. a sticky sort is often first)
@@ -163,8 +241,8 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
           $sort->query();
         }
         elseif (!empty($sort->options['expose']['field_identifier']) && $sort->options['expose']['field_identifier'] === $sort_by) {
-          if (isset($exposed_data['sort_order']) && in_array($exposed_data['sort_order'], ['ASC', 'DESC'], TRUE)) {
-            $sort->options['order'] = $exposed_data['sort_order'];
+          if (isset($exposed_data[$this->options['sort_order_key']]) && in_array($exposed_data[$this->options['sort_order_key']], ['ASC', 'DESC'], TRUE)) {
+            $sort->options['order'] = $exposed_data[$this->options['sort_order_key']];
           }
           $sort->setRelationship();
           $sort->query();
@@ -212,7 +290,9 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     }
 
     if (count($exposed_sorts)) {
-      $form['sort_by'] = [
+      $sort_by_key = $this->options['expose_sort_key'];
+      $sort_order_key = $this->options['sort_order_key'];
+      $form[$sort_by_key] = [
         '#type' => 'select',
         '#options' => $exposed_sorts_options,
         '#title' => $this->options['exposed_sorts_label'],
@@ -222,22 +302,22 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
         'DESC' => $this->options['sort_desc_label'],
       ];
       $user_input = $form_state->getUserInput();
-      if (isset($user_input['sort_by']) && isset($exposed_sorts[$user_input['sort_by']]) && isset($this->view->sort[$exposed_sorts[$user_input['sort_by']]])) {
-        $default_sort_order = $this->view->sort[$exposed_sorts[$user_input['sort_by']]]->options['order'];
+      if (isset($user_input[$sort_by_key]) && isset($exposed_sorts[$user_input[$sort_by_key]]) && isset($this->view->sort[$exposed_sorts[$user_input[$sort_by_key]]])) {
+        $default_sort_order = $this->view->sort[$exposed_sorts[$user_input[$sort_by_key]]]->options['order'];
       }
       else {
         $first_sort = reset($this->view->sort);
         $default_sort_order = $first_sort->options['order'];
       }
 
-      if (!isset($user_input['sort_by'])) {
+      if (!isset($user_input[$sort_by_key])) {
         $keys = array_keys($exposed_sorts);
-        $user_input['sort_by'] = array_shift($keys);
+        $user_input[$sort_by_key] = array_shift($keys);
         $form_state->setUserInput($user_input);
       }
 
       if ($this->options['expose_sort_order']) {
-        $form['sort_order'] = [
+        $form[$sort_order_key] = [
           '#type' => 'select',
           '#options' => $sort_order,
           '#title' => $this->t('Order', [], ['context' => 'Sort order']),
@@ -366,7 +446,8 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       }
 
       if ($has_exposed_sort_handler) {
-        $contexts[] = 'url.query_args:sort_order';
+        $contexts[] = 'url.query_args:' . $this->options['expose_sort_key'];
+        $contexts[] = 'url.query_args:' . $this->options['sort_order_key'];
       }
     }
 
