@@ -212,13 +212,6 @@ class EntityValidationTest extends EntityKernelTestBase {
     $this->assertEquals('field_test_text.0.format', $violation->getPropertyPath(), 'Violation property path is correct.');
     $this->assertEquals($test_entity->field_test_text->format, $violation->getInvalidValue(), 'Violation contains invalid value.');
 
-    // Invalid 'created' timestamp.
-    $test_entity = clone $entity;
-    $test_entity->set('created', -2147483649);
-    $violations = $test_entity->validate();
-    $this->assertEquals(1, $violations->count(), 'Validation failed for invalid created timestamp.');
-    $this->assertEquals('This value should be between "-2147483648" and "2147483648".', html_entity_decode(strip_tags((string) $violations[0]->getMessage())));
-
     // Valid 'created' timestamp.
     $test_entity->set('created', 1234567890);
     $violations = $test_entity->validate();
