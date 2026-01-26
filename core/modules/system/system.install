@@ -10,6 +10,7 @@ use Drupal\Core\Config\Entity\ConfigEntityType;
 use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
 use Drupal\Core\Entity\Schema\DynamicallyFieldableEntityStorageSchemaInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\TimestampItem;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -222,7 +223,11 @@ function _system_update_process_timestamp_field(string $entity_type_id, string $
   // Get the original storage definition for this field.
   $last_installed_schema_repository = \Drupal::service('entity.last_installed_schema.repository');
   $original_storage_definitions = $last_installed_schema_repository->getLastInstalledFieldStorageDefinitions($entity_type_id);
-  $original_storage_definition = $original_storage_definitions[$field_name];
+  $original_storage_definition = $original_storage_definitions[$field_name] ?? NULL;
+  if (!$original_storage_definition instanceof FieldStorageDefinitionInterface) {
+    $logger->notice("Timestamp for entity '$entity_type_id' field '$field_name' not updated because the original storage field definition was not found.");
+    return;
+  }
 
   // Get the current storage definition for this field.
   $storage_definition = $storage_definitions[$field_name];
