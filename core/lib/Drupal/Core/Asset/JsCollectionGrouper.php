@@ -59,6 +59,7 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
       // If the group keys don't match the most recent group we're working with,
       // then a new group must be made.
       if ($group_keys !== $current_group_keys) {
+        $record_libraries = TRUE;
         $index++;
         // Initialize the new group with the same properties as the first item
         // being placed into it. The item's 'data' and 'weight' properties are
@@ -74,7 +75,7 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
       // the group and record the index.
       if ($seen_index === NULL) {
         $first_seen_libraries[$item['library']] = $index;
-        if ($item['js_aggregate_target']) {
+        if ($record_libraries) {
           $groups[$index]['libraries'][] = $item['library'];
         }
       }
@@ -85,10 +86,18 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
       if ($seen_index && $seen_index !== $index) {
         unset($groups[$seen_index]['libraries']);
         unset($groups[$index]['libraries']);
+        $record_libraries = FALSE;
       }
 
       // Add the item to the current group.
       $groups[$index]['items'][] = $item;
+    }
+    // Ensure libraries only appear once for each group and in the same order
+    // every time.
+    foreach ($groups as $index => $group) {
+      if (isset($group['libraries'])) {
+        $groups[$index]['libraries'] = array_values(array_unique($group['libraries']));
+      }
     }
 
     return $groups;

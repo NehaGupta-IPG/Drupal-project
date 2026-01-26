@@ -98,10 +98,10 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
       $this->drupalGet('node/add/page');
     }, 'umamiNodeAddEditor');
     $expected = [
-      'ScriptCount' => 30,
-      'ScriptBytes' => 3693594,
+      'ScriptCount' => 24,
+      'ScriptBytes' => 3635768,
       'StylesheetCount' => 7,
-      'StylesheetBytes' => 681729,
+      'StylesheetBytes' => 680950,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
