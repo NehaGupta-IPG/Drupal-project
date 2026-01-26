@@ -100,7 +100,7 @@ services:
   workspaces.entity.repository:
     decorates: entity.repository
     class: Drupal\workspaces\WorkspacesEntityRepository
-    arguments: ['@.inner', '@workspaces.manager']
+    arguments: ['@.inner', '@workspaces.manager', '@workspaces.tracker']
     public: false
 
   workspaces.entity.query.sql:
