@@ -28,8 +28,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
       'properties' => [
         "value" => [
           "Range" => [
-            "min" => "-2147483648",
-            "max" => "2147483648",
+            "min" => "-9223372036854775807",
+            "max" => "9223372036854775807",
           ],
         ],
       ],
