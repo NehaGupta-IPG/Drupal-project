@@ -17,7 +17,7 @@ use Drupal\Core\TypedData\DataDefinition;
   label: new TranslatableMarkup("Timestamp"),
   description: [
     new TranslatableMarkup("Date and time stored in seconds since January 1, 1970 (UTC)"),
-    new TranslatableMarkup("Allowed values: 1901-12-13 to 2038-01-19 03:14:07 UTC"),
+    new TranslatableMarkup("Allowed values: -292277022657-01-27 to 292277026596-12-04 15:30:07 UTC"),
     new TranslatableMarkup("Compact and efficient for storage, sorting and calculations"),
     new TranslatableMarkup("Example: 979536485"),
   ],
