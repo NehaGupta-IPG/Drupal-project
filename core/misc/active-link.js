@@ -51,9 +51,6 @@
         ),
       );
 
-      // Add query string selector for pagers, exposed filters.
-      selectors = selectors.map((current) => current + querySelector);
-
       context.querySelectorAll(selectors.join(',')).forEach((activeLink) => {
         // Check if the link does not contain query parameters that
         // don't match the current query.
