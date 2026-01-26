@@ -386,13 +386,13 @@ class Registry implements DestructableInterface {
    * @return string|false
    *   The name of the base hook or FALSE.
    *
-   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. 
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0.
    *   There is no replacement.
    *
    * @see https://www.drupal.org/node/3567793
    */
   public function getBaseHook($hook) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3567793', E_USER_DEPRECATED); 
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3567793', E_USER_DEPRECATED);
 
     $this->init($this->themeName);
     $base_hook = $hook;
