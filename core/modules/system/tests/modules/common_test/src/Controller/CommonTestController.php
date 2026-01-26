@@ -57,6 +57,18 @@ class CommonTestController {
           'set_active_class' => TRUE,
         ],
       ],
+      'with_other_query' => [
+        '#type' => 'link',
+        '#title' => $this->t('Link with another query string'),
+        '#url' => Url::fromRoute('<current>'),
+        '#options' => [
+          'query' => [
+            'bar' => 'baz',
+            'three' => 'four',
+          ],
+          'set_active_class' => TRUE,
+        ],
+      ],
     ];
   }
 
