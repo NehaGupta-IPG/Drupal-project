@@ -121,7 +121,7 @@ function system_update_12002(): void {
 function system_update_12003(&$sandbox): string|null {
   // Execute only if allowed setting, 'timestamp_field_update_y2038', is true.
   if (Settings::get('timestamp_field_update_y2038', TRUE) === FALSE) {
-    return t("Update '11001 - Update TimestampItem field schema size to support dates greater than 2038' skipped due to setting of 'timestamp_field_update_y2038' in settings.php");
+    return t("Update '12000 - Update TimestampItem field schema size to support dates greater than 2038' skipped due to setting of 'timestamp_field_update_y2038' in settings.php");
   }
   $timeout = Settings::get('timestamp_field_update_y2038_timeout', 0);
   if (!isset($sandbox['items'])) {
@@ -136,7 +136,7 @@ function system_update_12003(&$sandbox): string|null {
     // On subsequent runs check if the timeout is exceeded. If it is exceeded
     // then throw an UpdateException with a helpful message. The exception is
     // used to ensure that the update is not marked complete.
-    throw new UpdateException(sprintf("Update 10202 failed to complete, stopped after %d seconds", Settings::get('timestamp_field_update_y2038_timeout')));
+    throw new UpdateException(sprintf("Update 12000 failed to complete, stopped after %d seconds", Settings::get('timestamp_field_update_y2038_timeout')));
   }
 
   [$entity_type_id, $field_name] = $sandbox['items'][$sandbox['current']] ?? [NULL, NULL];
@@ -250,8 +250,9 @@ function _system_update_process_timestamp_field(string $entity_type_id, string $
   $field_table_names = $table_mapping->getAllFieldTableNames($field_name);
   foreach ($field_table_names as $table) {
     if (!$schema->fieldExists($table, $column_name)) {
-      // If a column does not exist for any of the tables, then log a message.
-      $logger->notice("Failed to update entity '$entity_type_id' field '$field_name' to remove year 2038 limitation.");
+      // If a column does not exist for any of the tables, then install it.
+      \Drupal::service('entity.definition_update_manager')->installFieldStorageDefinition($field_name, $entity_type_id, $storage_definition->getProvider(), $storage_definition);
+      $logger->notice("Successfully updated entity '$entity_type_id' field '$field_name' to remove year 2038 limitation.");
       return;
     }
   }

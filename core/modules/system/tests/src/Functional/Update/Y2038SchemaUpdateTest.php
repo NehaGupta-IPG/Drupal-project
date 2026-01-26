@@ -72,7 +72,29 @@ class Y2038SchemaUpdateTest extends UpdatePathTestBase {
    * Tests update of time fields.
    */
   public function testUpdate(): void {
-    if (\Drupal::service('database')->databaseType() == 'sqlite') {
+    if (\Drupal::service('database')->databaseType() === 'sqlite') {
+      $this->markTestSkipped("This test does not support the SQLite database driver.");
+    }
+
+    // Test the update with an additional field that does not have a database
+    // column. First, set this update to run.
+    $settings['settings']['timestamp_field_update_y2038'] = (object) [
+      'value' => TRUE,
+    ];
+    $this->writeSettings($settings);
+    $this->assertBeforeSpecification(['int', 'integer', 'bigint']);
+    // Add the field that does not have a database column.
+    require DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-y2038-timestamp-2885413.php';
+    $this->timestampFields[] = ['node', 'field_foo'];
+    $this->runUpdates();
+    $this->assertAfterSpecifications(['int']);
+  }
+
+  /**
+   * Tests update of time fields can be skipped.
+   */
+  public function testUpdateCanBeSkipped(): void {
+    if (\Drupal::service('database')->databaseType() === 'sqlite') {
       $this->markTestSkipped("This test does not support the SQLite database driver.");
     }
 
@@ -82,21 +104,10 @@ class Y2038SchemaUpdateTest extends UpdatePathTestBase {
     ];
     $this->writeSettings($settings);
     $this->assertBeforeSpecification(['int', 'integer', 'bigint']);
+    $this->checkEntityFieldDefinitionUpdates = FALSE;
     $this->runUpdates();
     // Confirm the specifications have not changed.
     $this->assertBeforeSpecification(['int', 'integer', 'bigint']);
-
-    // Test the update with an additional field that does not have a database
-    // column. First, set this update to run.
-    $settings['settings']['timestamp_field_update_y2038'] = (object) [
-      'value' => TRUE,
-    ];
-    $this->writeSettings($settings);
-    // Add the field that does not have a database column.
-    require DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-y2038-timestamp-2885413.php';
-    $this->assertBeforeSpecification(['int', 'integer', 'bigint']);
-    $this->runUpdates();
-    $this->assertAfterSpecifications(['int']);
   }
 
   /**
@@ -142,11 +153,11 @@ class Y2038SchemaUpdateTest extends UpdatePathTestBase {
       ] = $this->getSpecifications($field_data);
 
       // The original is updated to size of 'big'.
-      $this->assertEquals($specification_original['size'], 'big', "Failed for '$field_data[0]' original specification '$field_data[1]'");
+      $this->assertEquals('big', $specification_original['size'], "Failed for '$field_data[0]' original specification '$field_data[1]'");
       $this->assertContains($specification_original['type'], $expected_values, "Failed for '$field_data[0]' original specification '$field_data[1]'");
 
       // The current specification is still a big integer.
-      $this->assertEquals($specification_current['size'], 'big', "Failed for '$field_data[0]' original specification '$field_data[1]'");
+      $this->assertEquals('big', $specification_current['size'], "Failed for '$field_data[0]' original specification '$field_data[1]'");
       $this->assertContains($specification_current['type'], $expected_values, "Failed for '$field_data[0]' original specification '$field_data[1]'");
 
       // Check the log output for the expected success message.
