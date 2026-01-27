@@ -2555,6 +2555,10 @@ function hook_validation_constraint_alter(array &$definitions) {
  *   necessary to support Drupal's content negotiation. It is recommended to
  *   omit this key and use Drupal's content negotiation rather than using
  *   substantially different URLs between Ajax and non-Ajax.
+ * - reset: Whether the form should be reset if the element successfully submits
+ *   the form. Valid options are TRUE or FALSE.
+ * - clear: Whether the form should be cleared if the element successfully
+ *   submits the form. Valid options are TRUE or FALSE.
  *
  * @subsection sub_callback Setting up a callback to process Ajax
  * Once you have set up your form to trigger an Ajax response (see @ref sub_form
