@@ -29,7 +29,7 @@ class DiscoveryCachedTraitTest extends TestCase {
    *   - Definitions to be returned by getDefinitions().
    *   - Plugin name to query for.
    */
-  public static function providerGetDefinition() {
+  public static function providerGetDefinition(): array {
     return [
       ['definition', [], ['plugin_name' => 'definition'], 'plugin_name'],
       ['definition', ['plugin_name' => 'definition'], [], 'plugin_name'],
@@ -38,7 +38,7 @@ class DiscoveryCachedTraitTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getDefinition
+   * Tests get definition.
    */
   #[DataProvider('providerGetDefinition')]
   public function testGetDefinition($expected, $cached_definitions, $get_definitions, $plugin_id): void {

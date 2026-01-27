@@ -8,9 +8,9 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Session\UserSession;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\RoleInterface;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Drupal\Core\Session\UserSession.
@@ -69,8 +69,6 @@ class UserSessionTest extends UnitTestCase {
 
   /**
    * Tests the hasRole method.
-   *
-   * @legacy-covers ::hasRole
    */
   public function testHasRole(): void {
     $user1 = $this->createUserSession(['role_one']);

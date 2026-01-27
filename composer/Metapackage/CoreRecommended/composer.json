@@ -7,7 +7,7 @@
         "webflo/drupal-core-strict": "*"
     },
     "require": {
-        "drupal/core": "11.x-dev",
+        "drupal/core": "12.x-dev",
         "asm89/stack-cors": "~v2.3.0",
         "composer/semver": "~3.4.4",
         "doctrine/lexer": "~3.0.1",
@@ -63,5 +63,10 @@
         "symfony/var-exporter": "~v7.4.0",
         "symfony/yaml": "~v7.4.0",
         "twig/twig": "~v3.22.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "12.x-dev"
+        }
     }
 }

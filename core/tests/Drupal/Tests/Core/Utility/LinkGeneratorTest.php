@@ -97,7 +97,7 @@ class LinkGeneratorTest extends UnitTestCase {
    * @return array
    *   Returns some test data.
    */
-  public static function providerTestGenerateHrefs() {
+  public static function providerTestGenerateHrefs(): array {
     return [
       // Test that the URL returned by the URL generator is used.
       ['test_route_1', [], FALSE, '/test-route-1'],
@@ -133,8 +133,6 @@ class LinkGeneratorTest extends UnitTestCase {
 
   /**
    * Tests the generate() method with a route.
-   *
-   * @legacy-covers ::generate
    */
   public function testGenerate(): void {
     $this->urlGenerator->expects($this->once())
@@ -163,8 +161,6 @@ class LinkGeneratorTest extends UnitTestCase {
    *
    * The set_active_class option is set to TRUE to ensure we do not get the
    * active class and the data-drupal-link-system-path attribute.
-   *
-   * @legacy-covers ::generate
    */
   public function testGenerateNoLink(): void {
     $this->urlGenerator->expects($this->never())
@@ -195,8 +191,6 @@ class LinkGeneratorTest extends UnitTestCase {
    *
    * The set_active_class option is set to TRUE to ensure we do not get the
    * active class and the data-drupal-link-system-path attribute.
-   *
-   * @legacy-covers ::generate
    */
   public function testGenerateNone(): void {
     $this->urlGenerator->expects($this->once())
@@ -218,8 +212,6 @@ class LinkGeneratorTest extends UnitTestCase {
 
   /**
    * Tests the generate() method with the <button> route.
-   *
-   * @legacy-covers ::generate
    */
   public function testGenerateButton(): void {
     $this->urlGenerator->expects($this->never())
@@ -249,8 +241,6 @@ class LinkGeneratorTest extends UnitTestCase {
    *
    * The set_active_class option is set to TRUE to ensure this does not cause
    * an error together with an external URL.
-   *
-   * @legacy-covers ::generate
    */
   public function testGenerateExternal(): void {
     $this->urlAssembler->expects($this->once())
@@ -283,8 +273,6 @@ class LinkGeneratorTest extends UnitTestCase {
 
   /**
    * Tests the generate() method with a URL containing double quotes.
-   *
-   * @legacy-covers ::generate
    */
   public function testGenerateUrlWithQuotes(): void {
     $this->urlAssembler->expects($this->once())
@@ -584,8 +572,6 @@ class LinkGeneratorTest extends UnitTestCase {
 
   /**
    * Tests altering the URL object using hook_link_alter().
-   *
-   * @legacy-covers ::generate
    */
   public function testGenerateWithAlterHook(): void {
     $options = ['query' => [], 'language' => NULL, 'set_active_class' => FALSE, 'absolute' => FALSE];
@@ -613,7 +599,7 @@ class LinkGeneratorTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('alter')
-      ->willReturnCallback(function ($hook, &$options) {
+      ->willReturnCallback(function ($hook, &$options): void {
         $options['url'] = (new Url('test_route_1'))->setUrlGenerator($this->urlGenerator);
       });
 
