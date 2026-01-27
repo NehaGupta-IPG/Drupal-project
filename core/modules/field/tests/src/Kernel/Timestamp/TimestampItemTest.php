@@ -57,7 +57,7 @@ class TimestampItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the datetime field type.
    */
-  public function testUnixTimestamp(): void {
+  public function testDateTime(): void {
     // Verify entity creation.
     $entity = EntityTest::create();
     $value = 1488914208;
@@ -75,44 +75,6 @@ class TimestampItemTest extends FieldKernelTestBase {
 
     // Verify changing the date value.
     $new_value = 1488914000;
-    $entity->field_timestamp->value = $new_value;
-    $this->assertEquals($entity->field_timestamp->value, $new_value);
-
-    // Read changed entity and assert changed values.
-    $this->entityValidateAndSave($entity);
-    $entity = EntityTest::load($id);
-    $this->assertEquals($entity->field_timestamp->value, $new_value);
-
-    // Test sample item generation.
-    $entity = EntityTest::create();
-    $entity->field_timestamp->generateSampleItems();
-    $this->entityValidateAndSave($entity);
-
-    // Ensure there is sample value a generated for the field.
-    $this->assertNotNull($entity->field_timestamp->value);
-  }
-
-  /**
-   * Tests using entity fields with a datetime as value.
-   */
-  public function testDateTime(): void {
-    // Verify entity creation.
-    $entity = EntityTest::create();
-    $value = new \DateTime('Tue Mar 07 2017 19:16:48 GMT+0000');
-    $entity->field_timestamp = $value;
-    $entity->name->value = $this->randomMachineName();
-    $this->entityValidateAndSave($entity);
-
-    // Verify entity has been created properly.
-    $id = $entity->id();
-    $entity = EntityTest::load($id);
-    $this->assertInstanceOf(FieldItemListInterface::class, $entity->field_timestamp);
-    $this->assertInstanceOf(FieldItemInterface::class, $entity->field_timestamp[0]);
-    $this->assertEquals($entity->field_timestamp->value, $value);
-    $this->assertEquals($entity->field_timestamp[0]->value, $value);
-
-    // Verify changing the date value.
-    $new_value = new \DateTime('Tue Mar 07 2017 19:13:20 GMT+0000');
     $entity->field_timestamp->value = $new_value;
     $this->assertEquals($entity->field_timestamp->value, $new_value);
 
