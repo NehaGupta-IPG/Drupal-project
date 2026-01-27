@@ -350,8 +350,14 @@ final class Recipe {
       $recipe_data['name'] = new TaggedValue('translate', $recipe_data['name']);
     }
 
+    $tag_classes = [];
+    // @todo Add comment explaining this temporary code and linking to follow-up
+    //   issue to resolve this.
+    if (\Drupal::hasContainer() && count(\Drupal::languageManager()->getLanguages()) < 2) {
+      $tag_classes = ['translate' => TranslatableMarkup::class];
+    }
     // Replace 'translate' tags with proper translations.
-    $recipe_data = Yaml::decodeTags($recipe_data, ['translate' => TranslatableMarkup::class]);
+    $recipe_data = Yaml::decodeTags($recipe_data, $tag_classes);
 
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
     $violations = Validation::createValidator()->validate($recipe_data, $constraints);
