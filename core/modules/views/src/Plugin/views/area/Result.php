@@ -98,7 +98,10 @@ class Result extends AreaPluginBase {
   }
 
   /**
+   * Get the total number of results.
+   *
    * @return int|null
+   *   Total number of results.
    */
   protected function getTotal(): ?int {
     return $this->view->total_rows ?? count($this->view->result);
