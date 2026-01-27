@@ -33,6 +33,7 @@ class JsCollectionGrouper implements AssetCollectionGrouperInterface {
     // the request. In order to do this, we need to keep track of whether
     // libraries span multiple groups or not.
     $first_seen_libraries = [];
+    $record_libraries = TRUE;
 
     $index = -1;
     foreach ($js_assets as $item) {

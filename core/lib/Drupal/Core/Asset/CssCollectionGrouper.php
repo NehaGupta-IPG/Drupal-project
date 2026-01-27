@@ -39,6 +39,7 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
     // simplified URL to improve front end cache hit rates. In order to do this,
     // we need to keep track of whether libraries span multiple groups or not.
     $first_seen_libraries = [];
+    $record_libraries = TRUE;
 
     foreach ($css_assets as $item) {
       // If the item can be grouped with other items, set $group_keys to an
@@ -73,6 +74,7 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
       // If the group keys don't match the most recent group we're working with,
       // then a new group must be made.
       if ($group_keys !== $current_group_keys) {
+        $record_libraries = TRUE;
         $i++;
         // Initialize the new group with the same properties as the first item
         // being placed into it. The item's 'data', 'weight' and 'basename'
@@ -92,7 +94,9 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         $seen_index = $first_seen_libraries[$item['library']][$item['category']] ?? NULL;
         if ($seen_index === NULL) {
           $first_seen_libraries[$item['library']][$item['category']] = $i;
-          $groups[$i]['libraries'][] = $item['library'];
+          if ($record_libraries) {
+            $groups[$i]['libraries'][] = $item['library'];
+          }
           $seen_index = $i;
         }
         // If a library has been seen in a previous index, this means that index
@@ -101,6 +105,8 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         if ($seen_index && $seen_index !== $i) {
           unset($groups[$seen_index]['libraries']);
           unset($groups[$i]['libraries']);
+          // Stop recording libraries until the next group.
+          $record_libraries = FALSE;
         }
       }
 
