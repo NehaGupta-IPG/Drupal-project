@@ -60,11 +60,8 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
             }
             else {
               $group_keys[] = $item['css_aggregate_target'];
+              $group_keys[] = $item['category'];
             }
-          }
-          // Alter hooks can add items without a category.
-          if ($group_keys && isset($item['category'])) {
-            $group_keys[] = $item['category'];
           }
           break;
 
@@ -87,14 +84,15 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         if ($item['media'] !== 'print') {
           $groups[$i]['media'] = 'all';
         }
-        unset($groups[$i]['data'], $groups[$i]['weight'], $groups[$i]['basename'], $groups[$i]['library'], $groups[$i]['group']);
+        unset($groups[$i]['data'], $groups[$i]['weight'], $groups[$i]['basename'], $groups[$i]['library'], $groups[$i]['group'], $groups[$i]['version'], $groups[$i]['category']);
         $groups[$i]['items'] = [];
         $current_group_keys = $group_keys ?: NULL;
       }
       // Alter hooks can add items without a library.
       if (isset($item['library'])) {
         if ($record_libraries) {
-          $groups[$i]['libraries'][] = $item['library'];
+          $groups[$i]['libraries'][$item['library']] = $item['library'];
+          $groups[$i]['categories'][$item['library']][$item['category']] = $item['category'];
         }
         // The first time a library is seen, add it to the list of libraries for
         // the group and record the index.
@@ -106,11 +104,11 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         // If a library has been seen in a previous index, this means that index
         // does not contain all of the assets for that library, so unset the
         // libraries key from that group.
-        if ($seen_index && $seen_index !== $i) {
+        if ($seen_index !== $i) {
           unset($groups[$seen_index]['libraries']);
+          unset($groups[$seen_index]['categories']);
           unset($groups[$i]['libraries']);
-          unset($groups[$seen_index]['category']);
-          unset($groups[$i]['category']);
+          unset($groups[$i]['categories']);
           // Stop recording libraries until the next group.
           $record_libraries = FALSE;
         }

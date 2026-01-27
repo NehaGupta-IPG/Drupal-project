@@ -180,7 +180,7 @@ class AssetOptimizationTest extends BrowserTestBase {
       $this->assertSession()->statusCodeEquals(200);
     }
     else {
-      if (isset($parts['query']['category'])) {
+      if (isset($parts['query']['categories'])) {
         $session->visit($this->omitCategory($url));
         $this->assertSession()->statusCodeEquals(400);
 
@@ -312,19 +312,19 @@ class AssetOptimizationTest extends BrowserTestBase {
   }
 
   /**
-   * Removes the 'category' query parameter from the given URL.
+   * Removes the 'categories' query parameter from the given URL.
    *
    * @param string $url
    *   The source URL.
    *
    * @return string
-   *   The URL with the 'category' parameter omitted.
+   *   The URL with the 'categories' parameter omitted.
    */
   protected function omitCategory(string $url): string {
     // First replace the hash, so we don't get served the actual file on disk.
     $url = $this->replaceGroupHash($url);
     $parts = UrlHelper::parse($url);
-    unset($parts['query']['category']);
+    unset($parts['query']['categories']);
     $query = UrlHelper::buildQuery($parts['query']);
     return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
   }
@@ -384,19 +384,19 @@ class AssetOptimizationTest extends BrowserTestBase {
   }
 
   /**
-   * Replaces the 'category' query parameter with an invalid value.
+   * Replaces the 'categories' query parameter with an invalid value.
    *
    * @param string $url
    *   The source URL.
    *
    * @return string
-   *   The URL with 'category' set to an arbitrary string.
+   *   The URL with 'categories' set to an arbitrary string.
    */
   protected function invalidCategory(string $url): string {
     // First replace the hash, so we don't get served the actual file on disk.
     $url = $this->replaceGroupHash($url);
     $parts = UrlHelper::parse($url);
-    $parts['query']['category'] = 'abcdefghijklmnop';
+    $parts['query']['categories'] = 'abcdefghijklmnop';
     $query = UrlHelper::buildQuery($parts['query']);
     return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
   }

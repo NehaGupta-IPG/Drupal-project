@@ -137,19 +137,6 @@ abstract class AssetControllerBase extends FileDownloadController {
         throw new BadRequestHttpException('The libraries to include must be passed as a query argument');
       }
     }
-    else {
-      if ($this->assetType === 'css' && !$request->query->has('category')) {
-        throw new BadRequestHttpException('Category must be passed when libraries are passed.');
-      }
-    }
-    if ($request->query->has('category')) {
-      if ($this->assetType !== 'css') {
-        throw new BadRequestHttpException('Category must only passed for CSS.');
-      }
-      if (!$request->query->has('libraries')) {
-        throw new BadRequestHttpException('Libraries must be passed when category is passed');
-      }
-    }
 
     if (!$request->query->has('language')) {
       throw new BadRequestHttpException('The language must be passed as a query argument');
