@@ -5,7 +5,6 @@ namespace Drupal\system\Controller;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\AssetGroupSetHashTrait;
 
@@ -52,10 +51,10 @@ class JsAssetController extends AssetControllerBase {
     $language = $this->languageManager()->getLanguage($request->query->get('language'));
 
     if ($request->query->has('libraries')) {
-     [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($attached_assets, FALSE, $language, FALSE);
+      [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($attached_assets, FALSE, $language, FALSE);
     }
     else {
-       [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($attached_assets, FALSE, $language);
+      [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($attached_assets, FALSE, $language);
     }
     $scope = $request->query->get('scope');
     if (!isset($scope)) {
