@@ -613,7 +613,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * Gets a translated field.
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface
+   * @return \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>
    *   The translated field.
    */
   protected function getTranslatedField($name, $langcode) {
@@ -1488,8 +1488,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if (!$original) {
       $id = $this->getOriginalId() ?? $this->id();
       $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
-      $original = !$this->wasDefaultRevision()
-        ? $storage->loadRevision($this->getLoadedRevisionId())
+      $original = $this->getLoadedRevisionId() && $storage instanceof RevisionableStorageInterface
+        ? $storage->loadRevisionUnchanged($this->getLoadedRevisionId())
         : $storage->loadUnchanged($id);
     }
 
