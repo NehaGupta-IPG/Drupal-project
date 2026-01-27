@@ -134,6 +134,7 @@ class Result extends AreaPluginBase {
     }
     $current_record_count = ($end - $start) + $start_offset;
     // Get the search information.
+    $replacements = [];
     $replacements['@start'] = $start;
     $replacements['@end'] = $end;
     $replacements['@total'] = $total;
