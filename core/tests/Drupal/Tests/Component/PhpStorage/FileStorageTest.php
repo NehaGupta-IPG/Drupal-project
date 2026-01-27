@@ -54,7 +54,7 @@ class FileStorageTest extends PhpStorageTestBase {
   }
 
   /**
-   * @legacy-covers ::deleteAll
+   * Tests delete all.
    */
   public function testDeleteAll(): void {
     // Random generator.
@@ -89,7 +89,7 @@ class FileStorageTest extends PhpStorageTestBase {
   }
 
   /**
-   * @legacy-covers ::createDirectory
+   * Tests create directory fail warning.
    */
   public function testCreateDirectoryFailWarning(): void {
     $directory = new vfsStreamDirectory('permissionDenied', 0200);
@@ -99,7 +99,7 @@ class FileStorageTest extends PhpStorageTestBase {
     ]);
     $code = "<?php\n echo 'here';";
 
-    // PHPUnit 10 cannot expect warnings, so we have to catch them ourselves.
+    // PHPUnit cannot expect warnings, so we have to catch them ourselves.
     $messages = [];
     set_error_handler(function (int $errno, string $errstr) use (&$messages): void {
       $messages[] = [$errno, $errstr];

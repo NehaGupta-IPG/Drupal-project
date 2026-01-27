@@ -98,7 +98,15 @@ function locale_translation_batch_status_check($project, $langcode, array $optio
   // Check the status of remote translation files.
   if ($options['use_remote'] && isset($source->files[LOCALE_TRANSLATION_REMOTE])) {
     $remote_file = $source->files[LOCALE_TRANSLATION_REMOTE];
-    if ($result = locale_translation_http_check($remote_file->uri)) {
+    if ($langcode === 'en') {
+      // drupal.org does not support english as translation.
+      $uri = locale_translation_build_server_pattern($source, strtr(\Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN, ['%language' => $langcode]));
+      if ($uri === $remote_file->uri) {
+        $failure = TRUE;
+      }
+    }
+
+    if (!$failure && $result = locale_translation_http_check($remote_file->uri)) {
       // Update the file object with the result data. In case of a redirect we
       // store the resulting uri.
       if (isset($result['last_modified'])) {
@@ -352,7 +360,7 @@ function locale_translation_download_source($source_file, $directory = 'temporar
     $data = (string) \Drupal::httpClient()->get($source_file->uri)->getBody();
     /** @var \Drupal\Core\File\FileSystemInterface $fileSystem */
     $fileSystem = \Drupal::service('file_system');
-    $filename = $fileSystem->basename($source_file->uri);
+    $filename = basename($source_file->uri);
     if ($uri = $fileSystem->saveData($data, $directory . $filename, FileExists::Replace)) {
       $file = clone($source_file);
       $file->type = LOCALE_TRANSLATION_LOCAL;

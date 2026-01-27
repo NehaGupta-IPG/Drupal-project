@@ -1252,6 +1252,7 @@ function simpletest_script_reporter_init(): void {
     'fail' => 'Fail',
     'error' => 'Error',
     'skipped' => 'Skipped',
+    'cli_fail' => 'Failure',
     'exception' => 'Exception',
     'debug' => 'Log',
   ];
@@ -1307,15 +1308,19 @@ function simpletest_script_reporter_display_summary($class, $results, $duration 
     $summary[] = $results['#debug'] . ' log(s)';
   }
 
-  if ($results['#time']) {
-    $time = sprintf('%8.3fs', $results['#time']);
-  }
-  else {
-    $time = sprintf('%8.3fs', $duration);
+  if ($results['#cli_fail']) {
+    $summary[] = 'exit code ' . $results['#exit_code'];
   }
 
+  // The key $results['#time'] holds the sum of the tests execution times,
+  // without taking into account the process spawning time and the setup
+  // times of the tests themselves. So for reporting to be consistent with
+  // PHPUnit CLI reported execution time, we report here the overall time of
+  // execution of the spawned process.
+  $time = sprintf('%8.3fs', $duration);
+
   $output = vsprintf('%s %s %s', [$time, trim_with_ellipsis($class, 70, STR_PAD_LEFT), implode(', ', $summary)]);
-  $status = ($results['#fail'] || $results['#exception'] || $results['#error'] ? 'fail' : 'pass');
+  $status = ($results['#fail'] || $results['#cli_fail'] || $results['#exception'] || $results['#error'] ? 'fail' : 'pass');
   simpletest_script_print($output . "\n", simpletest_script_color_code($status));
 }
 
@@ -1458,7 +1463,17 @@ function simpletest_script_reporter_display_results(TestRunResultsStorageInterfa
 function simpletest_script_format_result($result): void {
   global $args, $results_map, $color;
 
-  $summary = sprintf("%-9.9s %9.3fs %s\n", $results_map[$result->status], $result->time, trim_with_ellipsis($result->function, 80, STR_PAD_LEFT));
+  if ($result->time == 0) {
+    $duration = "          ";
+  }
+  elseif ($result->time < 0.001) {
+    $duration = "     <1 ms";
+  }
+  else {
+    $duration = sprintf("%9.3fs", $result->time);
+  }
+
+  $summary = sprintf("%-9.9s %s %s\n", $results_map[$result->status], $duration, trim_with_ellipsis($result->function, 80, STR_PAD_LEFT));
 
   simpletest_script_print($summary, simpletest_script_color_code($result->status));
 
@@ -1494,7 +1509,7 @@ function simpletest_script_print_error($message): void {
  *
  * @param string $message
  *   The message to print.
- * @param int $color_code
+ * @param int|string $color_code
  *   The color code to use for coloring.
  */
 function simpletest_script_print($message, $color_code): void {
@@ -1520,7 +1535,7 @@ function simpletest_script_print($message, $color_code): void {
 function simpletest_script_color_code($status) {
   return match ($status) {
     'pass' => SIMPLETEST_SCRIPT_COLOR_PASS,
-    'fail', 'error', 'exception' => SIMPLETEST_SCRIPT_COLOR_FAIL,
+    'fail', 'cli_fail', 'error', 'exception' => SIMPLETEST_SCRIPT_COLOR_FAIL,
     'skipped' => SIMPLETEST_SCRIPT_COLOR_YELLOW,
     'debug' => SIMPLETEST_SCRIPT_COLOR_CYAN,
     default => 0,

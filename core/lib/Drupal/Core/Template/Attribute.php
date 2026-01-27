@@ -26,7 +26,7 @@ use Drupal\Core\Serialization\Attribute\JsonSchema;
  *  $attributes['class'] = ['black-cat', 'white-cat'];
  *  $attributes['class'][] = 'black-white-cat';
  *  echo '<cat class="cat ' . $attributes['class'] . '"' . $attributes . '>';
- *  // Produces <cat class="cat black-cat white-cat black-white-cat" id="socks" class="cat black-cat white-cat black-white-cat">
+ *  // Produces <cat class="cat black-cat white-cat black-white-cat" id="socks" class="black-cat white-cat black-white-cat">
  * @endcode
  *
  * When printing out individual attributes to customize them within a Twig
@@ -37,7 +37,7 @@ use Drupal\Core\Serialization\Attribute\JsonSchema;
  * @endcode
  * Produces:
  * @code
- * <cat class="cat black-cat white-cat black-white-cat my-custom-class" id="socks">
+ * <cat class="black-cat white-cat black-white-cat my-custom-class" id="socks">
  * @endcode
  *
  * The attribute keys and values are automatically escaped for output with
@@ -145,8 +145,8 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
     elseif (is_bool($value)) {
       $value = new AttributeBoolean($name, $value);
     }
-    // As a development aid, we allow the value to be a safe string object.
-    elseif ($value instanceof MarkupInterface) {
+    // As a development aid, we allow the value to be any Stringable object.
+    elseif ($value instanceof \Stringable) {
       // Attributes are not supposed to display HTML markup, so we just convert
       // the value to plain text.
       $value = PlainTextOutput::renderFromHtml($value);

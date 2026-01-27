@@ -9,9 +9,7 @@ use Drupal\Core\Render\Attribute\FormElement;
  * Provides a form element for a set of checkboxes.
  *
  * Properties:
- *
- * @property $options
- *   An associative array whose keys are the values returned for each
+ * - #options: An associative array whose keys are the values returned for each
  *   checkbox, and whose values are the labels next to each checkbox. The
  *   #options array cannot have a 0 key, as it would not be possible to discern
  *   checked and unchecked states.
@@ -67,6 +65,13 @@ class Checkboxes extends FormElementBase {
         $element['#default_value'] = [];
       }
       $weight = 0;
+      $child_attributes = $element['#attributes'];
+      // Prevent child elements from inheriting an aria-describedby attribute.
+      // The individual children won't have descriptions and the attribute will
+      // be invalid.
+      if (isset($child_attributes['aria-describedby'])) {
+        unset($child_attributes['aria-describedby']);
+      }
       foreach ($element['#options'] as $key => $choice) {
         // Integer 0 is not a valid #return_value, so use '0' instead.
         // @see \Drupal\Core\Render\Element\Checkbox::valueCallback().
@@ -93,7 +98,7 @@ class Checkboxes extends FormElementBase {
           '#title' => $choice,
           '#return_value' => $key,
           '#default_value' => $default_value,
-          '#attributes' => $element['#attributes'],
+          '#attributes' => $child_attributes,
           '#ajax' => $element['#ajax'] ?? NULL,
           // Errors should only be shown on the parent checkboxes element.
           '#error_no_message' => TRUE,
