@@ -52,7 +52,7 @@ class AjaxRequestSubscriber implements EventSubscriberInterface {
 
     $request = $event->getRequest();
 
-    if (!$request->get(AjaxResponseSubscriber::AJAX_REQUEST_PARAMETER)) {
+    if (!$request->query->get(AjaxResponseSubscriber::AJAX_REQUEST_PARAMETER)) {
       return;
     }
 
