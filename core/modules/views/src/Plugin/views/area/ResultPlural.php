@@ -3,7 +3,6 @@
 namespace Drupal\views\Plugin\views\area;
 
 use Drupal\Component\Gettext\PoItem;
-use Drupal\Component\Utility\Xss;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsArea;
 use Drupal\views\Plugin\views\style\DefaultSummary;
@@ -93,7 +92,7 @@ class ResultPlural extends Result {
 
     // Send the output.
     if (!empty($this->getTotal()) || !empty($this->options['empty'])) {
-      $output .= Xss::filterAdmin(str_replace(array_keys($replacements), array_values($replacements), $format));
+      $output .= str_replace(array_keys($replacements), array_values($replacements), $format);
       // Return as render array.
       return [
         '#markup' => $output,
