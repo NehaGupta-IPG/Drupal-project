@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Recipe;
 
+use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeConfigurator;
 use Drupal\Core\Recipe\UnknownRecipeException;
 use Drupal\KernelTests\KernelTestBase;
@@ -36,7 +37,7 @@ class RecipeConfiguratorTest extends KernelTestBase {
     // Test methods.
     /** @var \Drupal\Core\Recipe\Recipe[] $recipes */
     $recipes = (array) $reflection->invoke($recipe_configurator);
-    $recipes_names = array_map(fn(Recipe $recipe): string => $recipe->name, $recipes);
+    $recipes_names = array_map(fn(Recipe $recipe): string => (string) $recipe->name, $recipes);
     $recipe_extensions = $recipe_configurator->listAllExtensions();
     $expected_recipes_names = [
       'Install two modules',
