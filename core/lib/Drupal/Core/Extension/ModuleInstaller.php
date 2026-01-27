@@ -269,6 +269,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   The config sync status.
    */
   private function doInstall(array $module_list, array $installed_modules, bool $sync_status): void {
+    $priorEntityTypes = \Drupal::entityTypeManager()->getDefinitions();
+
     $extension_config = \Drupal::configFactory()->getEditable('core.extension');
 
     // Save this data without checking schema. This is a performance
@@ -367,10 +369,18 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $update_manager = \Drupal::entityDefinitionUpdateManager();
       /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
       $entity_field_manager = \Drupal::service('entity_field.manager');
-      foreach ($entity_type_manager->getDefinitions() as $entity_type) {
+      foreach ($entity_type_manager->getDefinitions() as $entity_type_id => $entity_type) {
         $is_fieldable_entity_type = $entity_type->entityClassImplements(FieldableEntityInterface::class);
 
-        if ($entity_type->getProvider() == $module) {
+        // Due to plugin discovery handling of dependencies, an entity type can
+        // get available after its provider is enabled, when all dependency
+        // modules have been enabled too. Account for that by comparing with
+        // prior entity types. Also check whether current module is provider to
+        // account for core provided entity types.
+        if (
+          !isset($priorEntityTypes[$entity_type_id])
+          || $entity_type->getProvider() === $module
+        ) {
           if ($is_fieldable_entity_type) {
             $update_manager->installFieldableEntityType($entity_type, $entity_field_manager->getFieldStorageDefinitions($entity_type->id()));
           }
