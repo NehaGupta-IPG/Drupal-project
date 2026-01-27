@@ -64,6 +64,11 @@ class ContextualLinks extends RenderElementBase {
 
     $contextual_links_manager = static::contextualLinkManager();
 
+    // The 'contextual' group is reserved for literal links, an array with keys
+    // title, path and options.
+    $literal_links = $element['#contextual_links']['contextual']['route_parameters'] ?? [];
+    unset($element['#contextual_links']['contextual']);
+
     foreach ($element['#contextual_links'] as $group => $args) {
       $args += [
         'route_parameters' => [],
@@ -76,6 +81,13 @@ class ContextualLinks extends RenderElementBase {
 
     // Transform contextual links into parameters suitable for links.html.twig.
     $links = [];
+    foreach ($literal_links as $class => $literal_link) {
+      $class = Html::getClass($class);
+      $links[$class] = [
+        'title' => $literal_link['title'],
+        'url' => Url::fromUserInput($literal_link['path'], $literal_link['options'] ?? []),
+      ];
+    }
     $use_ajax = FALSE;
     foreach ($items as $class => $item) {
       // Check whether any of the contextual links have the use-ajax class.
