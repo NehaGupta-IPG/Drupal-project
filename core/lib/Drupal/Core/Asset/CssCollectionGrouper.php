@@ -63,7 +63,7 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
             }
           }
           // Alter hooks can add items without a category.
-          if (isset($item['category'])) {
+          if ($group_keys && isset($item['category'])) {
             $group_keys[] = $item['category'];
           }
           break;
