@@ -10,15 +10,17 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensure that account cancellation methods work as expected.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserCancelTest extends BrowserTestBase {
 
   use CommentTestTrait;

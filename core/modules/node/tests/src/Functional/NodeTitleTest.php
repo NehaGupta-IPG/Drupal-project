@@ -7,12 +7,14 @@ namespace Drupal\Tests\node\Functional;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests node title.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeTitleTest extends NodeTestBase {
 
   use CommentTestTrait;

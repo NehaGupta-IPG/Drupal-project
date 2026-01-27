@@ -8,12 +8,15 @@ use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs kernel tests on the deprecation of the comment_uri method.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentUriDeprecationTest extends EntityKernelTestBase {
   use CommentTestTrait;
 
@@ -66,9 +69,8 @@ class CommentUriDeprecationTest extends EntityKernelTestBase {
 
   /**
    * Tests the deprecation of comment_uri() method.
-   *
-   * @group legacy
    */
+  #[IgnoreDeprecations]
   public function testCommentUriMethod(): void {
 
     // Create a node with a comment and make it unpublished.

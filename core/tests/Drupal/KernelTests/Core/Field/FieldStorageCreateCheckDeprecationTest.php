@@ -8,14 +8,17 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Tests the field storage create check subscriber.
- *
- * @group Field
- * @group legacy
  */
+#[Group('Field')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class FieldStorageCreateCheckDeprecationTest extends KernelTestBase {
 
   /**

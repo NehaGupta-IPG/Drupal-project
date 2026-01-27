@@ -87,8 +87,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
 
   /**
    * Tests uses group by.
-   *
-   * @legacy-covers ::usesGroupBy
    */
   public function testUsesGroupBy(): void {
     $this->assertFalse($this->plugin->usesGroupBy());
@@ -96,8 +94,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
 
   /**
    * Tests define options.
-   *
-   * @legacy-covers ::defineOptions
    */
   public function testDefineOptions(): void {
     $options = $this->plugin->defineOptions();
@@ -107,8 +103,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
 
   /**
    * Tests render with destination.
-   *
-   * @legacy-covers ::render
    */
   public function testRenderWithDestination(): void {
     $entity_type_id = $this->randomMachineName();
@@ -146,6 +140,11 @@ class EntityOperationsUnitTest extends UnitTestCase {
       '#attached' => [
         'library' => ['core/drupal.dialog.ajax'],
       ],
+      '#cache' => [
+        'contexts' => [],
+        'tags' => [],
+        'max-age' => -1,
+      ],
     ];
     $expected_build['#links']['foo']['query'] = ['destination' => 'foobar'];
     $build = $this->plugin->render($result);
@@ -154,8 +153,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
 
   /**
    * Tests render without destination.
-   *
-   * @legacy-covers ::render
    */
   public function testRenderWithoutDestination(): void {
     $entity_type_id = $this->randomMachineName();
@@ -193,6 +190,11 @@ class EntityOperationsUnitTest extends UnitTestCase {
       '#attached' => [
         'library' => ['core/drupal.dialog.ajax'],
       ],
+      '#cache' => [
+        'contexts' => [],
+        'tags' => [],
+        'max-age' => -1,
+      ],
     ];
     $build = $this->plugin->render($result);
     $this->assertSame($expected_build, $build);
@@ -200,8 +202,6 @@ class EntityOperationsUnitTest extends UnitTestCase {
 
   /**
    * Tests render without entity.
-   *
-   * @legacy-covers ::render
    */
   public function testRenderWithoutEntity(): void {
     $this->setUpMockLoggerWithMissingEntity();

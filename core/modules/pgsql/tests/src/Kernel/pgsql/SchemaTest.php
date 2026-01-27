@@ -5,15 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
+use Drupal\pgsql\Driver\Database\pgsql\Schema;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore attname attnum attrelid objid refobjid refobjsubid regclass
 // cspell:ignore relkind relname
 
 /**
  * Tests schema API for the PostgreSQL driver.
- *
- * @group Database
  */
+#[Group('Database')]
+#[RunTestsInSeparateProcesses]
+#[CoversClass(Schema::class)]
 class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
@@ -63,7 +68,9 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
-   * @covers \Drupal\pgsql\Driver\Database\pgsql\Schema::introspectIndexSchema
+   * Tests introspect index schema.
+   *
+   * @legacy-covers \Drupal\pgsql\Driver\Database\pgsql\Schema::introspectIndexSchema
    */
   public function testIntrospectIndexSchema(): void {
     $table_specification = [
@@ -236,7 +243,9 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   }
 
   /**
-   * @covers \Drupal\pgsql\Driver\Database\pgsql\Schema::extensionExists
+   * Tests pgsql extension exists.
+   *
+   * @legacy-covers \Drupal\pgsql\Driver\Database\pgsql\Schema::extensionExists
    */
   public function testPgsqlExtensionExists(): void {
     // Test the method for a non existing extension.
