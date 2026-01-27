@@ -88,15 +88,15 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         $groups[$i]['items'] = [];
         $current_group_keys = $group_keys ?: NULL;
       }
-      if ($item['css_aggregate_target']) {
+      if (isset($item['library'])) {
+        if ($record_libraries) {
+          $groups[$i]['libraries'][] = $item['library'];
+        }
         // The first time a library is seen, add it to the list of libraries for
         // the group and record the index.
         $seen_index = $first_seen_libraries[$item['library']][$item['category']] ?? NULL;
         if ($seen_index === NULL) {
           $first_seen_libraries[$item['library']][$item['category']] = $i;
-          if ($record_libraries) {
-            $groups[$i]['libraries'][] = $item['library'];
-          }
           $seen_index = $i;
         }
         // If a library has been seen in a previous index, this means that index
@@ -105,6 +105,8 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         if ($seen_index && $seen_index !== $i) {
           unset($groups[$seen_index]['libraries']);
           unset($groups[$i]['libraries']);
+          unset($groups[$seen_index]['category']);
+          unset($groups[$i]['category']);
           // Stop recording libraries until the next group.
           $record_libraries = FALSE;
         }
