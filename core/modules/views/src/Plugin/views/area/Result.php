@@ -23,13 +23,6 @@ class Result extends AreaPluginBase {
   protected int $total;
 
   /**
-   * The token replacements.
-   *
-   * @var array
-   */
-  protected array $replacements = [];
-
-  /**
    * {@inheritdoc}
    */
   protected function defineOptions() {
@@ -89,12 +82,12 @@ class Result extends AreaPluginBase {
       return [];
     }
     $output = '';
-    $this->calculateTotalAndReplacements();
+    $replacements = $this->getReplacements();
     $format = $this->options['content'];
 
     // Send the output.
-    if (!empty($this->total) || !empty($this->options['empty'])) {
-      $output .= str_replace(array_keys($this->replacements), array_values($this->replacements), $format);
+    if (!empty($this->getTotal()) || !empty($this->options['empty'])) {
+      $output .= str_replace(array_keys($replacements), array_values($replacements), $format);
       // Return as render array.
       return [
         '#markup' => $output,
@@ -105,45 +98,57 @@ class Result extends AreaPluginBase {
   }
 
   /**
-   * Calculate the replacement tokens.
+   * @return int|null
    */
-  protected function calculateTotalAndReplacements(): void {
+  protected function getTotal(): ?int {
+    return $this->view->total_rows ?? count($this->view->result);
+  }
+
+  /**
+   * Calculate the replacement tokens.
+   *
+   * @return array
+   *   The token replacements.
+   */
+  protected function getReplacements(): array {
     // Calculate the page totals.
     $current_page = (int) $this->view->getCurrentPage() + 1;
     $per_page = (int) $this->view->getItemsPerPage();
     // @todo Maybe use a possible is views empty functionality.
     // Not every view has total_rows set, use view->result instead.
-    $this->total = $this->view->total_rows ?? count($this->view->result);
+    $total = $this->getTotal();
     $label = Html::escape($this->view->storage->label());
     // If there is no result the "start" and "current_record_count" should be
     // equal to 0. To have the same calculation logic, we use a "start offset"
     // to handle all the cases.
-    $start_offset = empty($this->total) ? 0 : 1;
+    $start_offset = empty($total) ? 0 : 1;
     if ($per_page === 0) {
       $page_count = 1;
       $start = $start_offset;
-      $end = $this->total;
+      $end = $total;
     }
     else {
-      $page_count = (int) ceil($this->total / $per_page);
+      $page_count = (int) ceil($total / $per_page);
       $total_count = $current_page * $per_page;
-      if ($total_count > $this->total) {
-        $total_count = $this->total;
+      if ($total_count > $total) {
+        $total_count = $total;
       }
       $start = ($current_page - 1) * $per_page + $start_offset;
       $end = $total_count;
     }
     $current_record_count = ($end - $start) + $start_offset;
     // Get the search information.
-    $this->replacements['@start'] = $start;
-    $this->replacements['@end'] = $end;
-    $this->replacements['@total'] = $this->total;
-    $this->replacements['@format_total'] = number_format($this->total, 0, '.', ',');
-    $this->replacements['@label'] = $label;
-    $this->replacements['@per_page'] = $per_page;
-    $this->replacements['@current_page'] = $current_page;
-    $this->replacements['@current_record_count'] = $current_record_count;
-    $this->replacements['@page_count'] = $page_count;
+    $replacements['@start'] = $start;
+    $replacements['@end'] = $end;
+    $replacements['@total'] = $total;
+    $replacements['@format_total'] = number_format($total, 0, '.', ',');
+    $replacements['@label'] = $label;
+    $replacements['@per_page'] = $per_page;
+    $replacements['@current_page'] = $current_page;
+    $replacements['@current_record_count'] = $current_record_count;
+    $replacements['@page_count'] = $page_count;
+
+    return $replacements;
   }
 
 }

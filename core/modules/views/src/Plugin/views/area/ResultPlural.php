@@ -79,9 +79,9 @@ class ResultPlural extends Result {
       return [];
     }
     $output = '';
-    $this->calculateTotalAndReplacements();
+    $replacements = $this->getReplacements();
     $format = PluralTranslatableMarkup::createFromTranslatedString(
-      $this->replacements[$this->options['plural_count_token']],
+      $replacements[$this->options['plural_count_token']],
       implode(
         PoItem::DELIMITER,
         [
@@ -92,8 +92,8 @@ class ResultPlural extends Result {
     );
 
     // Send the output.
-    if (!empty($this->total) || !empty($this->options['empty'])) {
-      $output .= Xss::filterAdmin(str_replace(array_keys($this->replacements), array_values($this->replacements), $format));
+    if (!empty($this->getTotal()) || !empty($this->options['empty'])) {
+      $output .= Xss::filterAdmin(str_replace(array_keys($replacements), array_values($replacements), $format));
       // Return as render array.
       return [
         '#markup' => $output,
