@@ -52,15 +52,11 @@ class JsAssetController extends AssetControllerBase {
     $language = $this->languageManager()->getLanguage($request->query->get('language'));
 
     if ($request->query->has('libraries')) {
-      // If we're creating an aggregate for a single library, we don't need the
-      // dependencies because those will be handled by different aggregates, so
-      // get a list of dependencies, then set them as already loaded.
-      $with_dependencies = $this->libraryDependencyResolver->getLibrariesWithDependencies($attached_assets->getLibraries());
-      $already_loaded = array_diff($with_dependencies, explode(',', UrlHelper::uncompressQueryParameter($request->query->get('libraries'))));
-      $attached_assets->setAlreadyLoadedLibraries($already_loaded);
+     [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($attached_assets, FALSE, $language, FALSE);
     }
-
-    [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($attached_assets, FALSE, $language);
+    else {
+       [$js_assets_header, $js_assets_footer] = $this->assetResolver->getJsAssets($attached_assets, FALSE, $language);
+    }
     $scope = $request->query->get('scope');
     if (!isset($scope)) {
       throw new BadRequestHttpException('The URL must have a scope query argument.');
