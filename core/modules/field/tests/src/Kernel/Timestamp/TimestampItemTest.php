@@ -91,7 +91,7 @@ class TimestampItemTest extends FieldKernelTestBase {
   }
 
   /**
-   * Tests using entity fields with a DateTime object as value.
+   * Tests using entity fields with a datetime as value.
    */
   public function testDateTime(): void {
     // Verify entity creation.
