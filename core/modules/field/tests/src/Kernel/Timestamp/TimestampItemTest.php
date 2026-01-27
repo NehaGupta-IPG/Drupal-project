@@ -13,9 +13,9 @@ use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 
 /**
  * Tests the timestamp fields.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class TimestampItemTest extends FieldKernelTestBase {
 
   /**
