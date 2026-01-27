@@ -62,7 +62,10 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
               $group_keys[] = $item['css_aggregate_target'];
             }
           }
-          $group_keys[] = $item['category'];
+          // Alter hooks can add items without a category.
+          if (isset($item['category'])) {
+            $group_keys[] = $item['category'];
+          }
           break;
 
         case 'external':
@@ -88,6 +91,7 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
         $groups[$i]['items'] = [];
         $current_group_keys = $group_keys ?: NULL;
       }
+      // Alter hooks can add items without a library.
       if (isset($item['library'])) {
         if ($record_libraries) {
           $groups[$i]['libraries'][] = $item['library'];
