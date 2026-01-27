@@ -16,13 +16,6 @@ use Drupal\views\Plugin\views\style\DefaultSummary;
 class Result extends AreaPluginBase {
 
   /**
-   * Total number of results.
-   *
-   * @var int
-   */
-  protected int $total;
-
-  /**
    * {@inheritdoc}
    */
   protected function defineOptions() {
