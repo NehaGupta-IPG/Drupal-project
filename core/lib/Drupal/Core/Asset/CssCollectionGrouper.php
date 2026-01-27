@@ -61,8 +61,8 @@ class CssCollectionGrouper implements AssetCollectionGrouperInterface {
             else {
               $group_keys[] = $item['css_aggregate_target'];
             }
-            $group_keys[] = $item['category'];
           }
+          $group_keys[] = $item['category'];
           break;
 
         case 'external':
