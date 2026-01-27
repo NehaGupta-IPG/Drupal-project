@@ -16,14 +16,14 @@ ul.menu {
 }
 .menu-item--expanded {
   list-style-type: circle;
-  list-style-image: url(../../../../../../../misc/menu-expanded.png);
+  list-style-image: url(../../../../../../../misc/menu-expanded.svg);
 }
 .menu-item--collapsed {
   list-style-type: disc;
-  list-style-image: url(../../../../../../../misc/menu-collapsed.png); /* LTR */
+  list-style-image: url(../../../../../../../misc/menu-collapsed.svg); /* LTR */
 }
 [dir="rtl"] .menu-item--collapsed {
-  list-style-image: url(../../../../../../../misc/menu-collapsed-rtl.png);
+  list-style-image: url(../../../../../../../misc/menu-collapsed-rtl.svg);
 }
 .menu-item {
   margin: 0;
