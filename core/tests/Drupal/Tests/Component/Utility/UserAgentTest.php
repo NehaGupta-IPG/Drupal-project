@@ -70,8 +70,6 @@ class UserAgentTest extends TestCase {
 
   /**
    * Tests matching language from user agent.
-   *
-   * @legacy-covers ::getBestMatchingLangcode
    */
   #[DataProvider('providerTestGetBestMatchingLangcode')]
   public function testGetBestMatchingLangcode($accept_language, $expected): void {
@@ -86,7 +84,7 @@ class UserAgentTest extends TestCase {
    *   - An accept-language string.
    *   - Expected best matching language code.
    */
-  public static function providerTestGetBestMatchingLangcode() {
+  public static function providerTestGetBestMatchingLangcode(): array {
     // Random generator.
     $random = new Random();
 

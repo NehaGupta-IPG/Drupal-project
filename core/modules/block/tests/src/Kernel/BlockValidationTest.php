@@ -93,6 +93,10 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
     unset($cases['INVALID: period separated']);
     // And instead add a test case that verifies it is allowed for blocks.
     $cases['VALID: period separated'] = ['period.separated', TRUE];
+    // Add test cases to ensure machine names cannot start or end with a period.
+    // @see https://www.drupal.org/node/3244349
+    $cases['INVALID: begins with period'] = ['.begins_with_period', FALSE];
+    $cases['VALID: ends with period'] = ['ends_with_period.', TRUE];
     return $cases;
   }
 
@@ -137,7 +141,7 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
     parent::testRequiredPropertyValuesMissing([
       'region' => [
         'region' => [
-          'This is not a valid region of the <em class="placeholder">stark</em> theme.',
+          'This value should not be blank.',
           'This value should not be null.',
         ],
       ],
@@ -262,7 +266,7 @@ class BlockValidationTest extends ConfigEntityValidationTestBase {
       'settings' => [
         'id' => 'system_menu_block:account',
         'label' => 'Account Menu',
-        'label_display' => FALSE,
+        'label_display' => '0',
         'provider' => 'system',
         'level' => $level,
         'depth' => $depth,

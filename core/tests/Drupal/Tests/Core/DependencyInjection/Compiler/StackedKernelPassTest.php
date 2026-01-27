@@ -51,8 +51,6 @@ class StackedKernelPassTest extends UnitTestCase {
 
   /**
    * Tests process with stacked kernel.
-   *
-   * @legacy-covers ::process
    */
   public function testProcessWithStackedKernel(): void {
     $stacked_kernel = new Definition(StackedHttpKernel::class);
@@ -106,8 +104,6 @@ class StackedKernelPassTest extends UnitTestCase {
 
   /**
    * Tests process with http kernel.
-   *
-   * @legacy-covers ::process
    */
   public function testProcessWithHttpKernel(): void {
     $kernel = new Definition(HttpKernelInterface::class);
@@ -220,7 +216,7 @@ class StackedKernelPassTest extends UnitTestCase {
    * @return \Symfony\Component\DependencyInjection\Definition
    *   The middleware definition.
    */
-  protected function createMiddlewareServiceDefinition($tag = TRUE, $priority = 0) {
+  protected function createMiddlewareServiceDefinition($tag = TRUE, $priority = 0): Definition {
     $definition = new Definition(TestHttpMiddlewareClass::class, ['test']);
     $definition->setPublic(TRUE);
 

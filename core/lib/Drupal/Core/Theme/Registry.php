@@ -184,7 +184,7 @@ class Registry implements DestructableInterface {
    * These are stored to prevent adding preprocess suggestions to the invoke map
    * that are not discovered in modules.
    *
-   * @var array<string, true>
+   * @var array<string, string>
    */
   protected ?array $preprocessForSuggestions = NULL;
 
@@ -241,7 +241,7 @@ class Registry implements DestructableInterface {
     $this->moduleList = $module_list;
     $this->themeName = $theme_name;
     if (!$key_value_factory) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $key_value_factory argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3550627', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $key_value_factory argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3550627', E_USER_DEPRECATED);
       $key_value_factory = \Drupal::service('keyvalue');
     }
     $this->keyValueFactory = $key_value_factory;
@@ -666,9 +666,6 @@ class Registry implements DestructableInterface {
             // named variable preprocessors.
             $prefixes = [];
             $prefixes[] = $name . '_engine';
-            // The theme engine registers on behalf of the theme using the
-            // theme's name.
-            $prefixes[] = $theme;
 
             foreach ($prefixes as $prefix) {
               foreach ([$prefix . '_preprocess', $prefix . '_preprocess_' . $hook] as $function) {
@@ -836,6 +833,8 @@ class Registry implements DestructableInterface {
     // Collect all variable preprocess functions in the correct order.
     $suggestion_level = [];
     $invokes = [];
+    $preprocess_extension_types = $this->getPreprocessForSuggestions();
+
     // Look for functions named according to the pattern and add them if they
     // have matching hooks in the registry.
     foreach ($prefixes as $prefix) {
@@ -852,9 +851,12 @@ class Registry implements DestructableInterface {
           if (isset($cache[$matches[2]])) {
             $level = substr_count($matches[1], '__');
             $suggestion_level[$level][$candidate] = $matches[1];
-            $module_preprocess_function = $prefix . '_preprocess_' . $matches[1];
-            if (isset($this->getPreprocessForSuggestions()[$module_preprocess_function])) {
-              $invokes[$candidate] = ['module' => $prefix, 'hook' => 'preprocess_' . $matches[1]];
+            $preprocess_function = $prefix . '_preprocess_' . $matches[1];
+            if (\array_key_exists($preprocess_function, $preprocess_extension_types)) {
+              $invokes[$candidate] = [
+                $preprocess_extension_types[$preprocess_function] => $prefix,
+                'hook' => 'preprocess_' . $matches[1],
+              ];
             }
           }
         }
@@ -1036,8 +1038,8 @@ class Registry implements DestructableInterface {
   /**
    * Returns discovered preprocess suggestions.
    *
-   * @return array<string, true>
-   *   Preprocess suggestions discovered in modules.
+   * @return array<string, string>
+   *   Preprocess suggestions discovered in themes and modules.
    */
   protected function getPreprocessForSuggestions(): array {
     if ($this->preprocessForSuggestions === NULL) {
