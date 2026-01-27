@@ -75,7 +75,7 @@ class Result extends AreaPluginBase {
    * {@inheritdoc}
    */
   public function query() {
-    if (strpos($this->options['content'], '@total') !== FALSE || strpos($this->options['content'], '@format_total') !== FALSE) {
+    if (str_contains($this->options['content'], '@total') || str_contains($this->options['content'], '@format_total')) {
       $this->view->get_total_rows = TRUE;
     }
   }
