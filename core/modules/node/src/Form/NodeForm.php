@@ -169,7 +169,9 @@ class NodeForm extends ContentEntityForm {
       '#wrapper_attributes' => ['class' => ['entity-meta__author']],
     ];
 
-    $form['status']['#group'] = 'footer';
+    if (isset($form['status'])) {
+      $form['status']['#group'] = 'footer';
+    }
 
     // Node author information for administrators.
     $form['author'] = [
@@ -285,7 +287,10 @@ class NodeForm extends ContentEntityForm {
       $node->save();
       $node_link = $node->toLink($this->t('View'))->toString();
       $context = ['@type' => $node->getType(), '%title' => $node->label(), 'link' => $node_link];
-      $t_args = ['@type' => $node->getBundleEntity()->label(), '%title' => $node->access('view') ? $node->toLink()->toString() : $node->label()];
+      $t_args = [
+        '@type' => $node->getBundleEntity()->label(),
+        '%title' => $node->access('view') ? $node->toLink()->toString() : $node->label(),
+      ];
 
       if ($insert) {
         $this->logger('content')->info('@type: added %title.', $context);

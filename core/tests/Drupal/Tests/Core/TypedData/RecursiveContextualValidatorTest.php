@@ -96,8 +96,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Ensures that passing an explicit group is not supported.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateWithGroups(): void {
     $this->expectException(\LogicException::class);
@@ -106,8 +104,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Ensures that passing a non typed data value is not supported.
-   *
-   * @legacy-covers ::validate
    */
   public function testValidateWithoutTypedData(): void {
     $this->expectException(\InvalidArgumentException::class);
@@ -134,7 +130,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
     $typed_data = $this->typedDataManager->create(
       DataDefinition::create('string')
         ->addConstraint('Callback', [
-          'callback' => function ($value, ExecutionContextInterface $context) {
+          'callback' => function ($value, ExecutionContextInterface $context): void {
             $context->addViolation('test violation: ' . $value);
           },
         ])
@@ -154,7 +150,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
    */
   public function testBasicValidateWithMultipleConstraints(): void {
     $options = [
-      'callback' => function ($value, ExecutionContextInterface $context) {
+      'callback' => function ($value, ExecutionContextInterface $context): void {
         $context->addViolation('test violation');
       },
     ];
@@ -206,7 +202,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
    *   The typed data object.
    */
   protected function setupTypedData(array $tree, $name = '') {
-    $callback = function ($value, ExecutionContextInterface $context) {
+    $callback = function ($value, ExecutionContextInterface $context): void {
       $context->addViolation('violation: ' . (is_array($value) ? count($value) : $value));
     };
 
@@ -240,8 +236,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate property with custom group.
-   *
-   * @legacy-covers ::validateProperty
    */
   public function testValidatePropertyWithCustomGroup(): void {
     $tree = [
@@ -257,8 +251,6 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
 
   /**
    * Tests validate property with invalid objects.
-   *
-   * @legacy-covers ::validateProperty
    */
   #[DataProvider('providerTestValidatePropertyWithInvalidObjects')]
   public function testValidatePropertyWithInvalidObjects($object): void {

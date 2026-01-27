@@ -119,8 +119,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests get cache valid token.
-   *
-   * @legacy-covers ::getCache
    */
   public function testGetCacheValidToken(): void {
     $form_build_id = 'the_form_build_id';
@@ -145,8 +143,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests get cache invalid token.
-   *
-   * @legacy-covers ::getCache
    */
   public function testGetCacheInvalidToken(): void {
     $form_build_id = 'the_form_build_id';
@@ -171,8 +167,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests get cache anon user.
-   *
-   * @legacy-covers ::getCache
    */
   public function testGetCacheAnonUser(): void {
     $form_build_id = 'the_form_build_id';
@@ -195,8 +189,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests get cache auth user.
-   *
-   * @legacy-covers ::getCache
    */
   public function testGetCacheAuthUser(): void {
     $form_build_id = 'the_form_build_id';
@@ -217,8 +209,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests get cache no form.
-   *
-   * @legacy-covers ::getCache
    */
   public function testGetCacheNoForm(): void {
     $form_build_id = 'the_form_build_id';
@@ -238,8 +228,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests load cached form state.
-   *
-   * @legacy-covers ::loadCachedFormState
    */
   public function testLoadCachedFormState(): void {
     $form_build_id = 'the_form_build_id';
@@ -266,8 +254,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests load cached form state with files.
-   *
-   * @legacy-covers ::loadCachedFormState
    */
   public function testLoadCachedFormStateWithFiles(): void {
     $form_build_id = 'the_form_build_id';
@@ -308,8 +294,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests set cache with form.
-   *
-   * @legacy-covers ::setCache
    */
   public function testSetCacheWithForm(): void {
     $form_build_id = 'the_form_build_id';
@@ -320,20 +304,18 @@ class FormCacheTest extends UnitTestCase {
 
     $this->formCacheStore->expects($this->once())
       ->method('setWithExpire')
-      ->with($form_build_id, $form, $this->isType('int'));
+      ->with($form_build_id, $form, $this->isInt());
 
     $form_state_data = $form_state->getCacheableArray();
     $this->formStateCacheStore->expects($this->once())
       ->method('setWithExpire')
-      ->with($form_build_id, $form_state_data, $this->isType('int'));
+      ->with($form_build_id, $form_state_data, $this->isInt());
 
     $this->formCache->setCache($form_build_id, $form, $form_state);
   }
 
   /**
    * Tests set cache without form.
-   *
-   * @legacy-covers ::setCache
    */
   public function testSetCacheWithoutForm(): void {
     $form_build_id = 'the_form_build_id';
@@ -346,15 +328,13 @@ class FormCacheTest extends UnitTestCase {
     $form_state_data = $form_state->getCacheableArray();
     $this->formStateCacheStore->expects($this->once())
       ->method('setWithExpire')
-      ->with($form_build_id, $form_state_data, $this->isType('int'));
+      ->with($form_build_id, $form_state_data, $this->isInt());
 
     $this->formCache->setCache($form_build_id, $form, $form_state);
   }
 
   /**
    * Tests set cache auth user.
-   *
-   * @legacy-covers ::setCache
    */
   public function testSetCacheAuthUser(): void {
     $form_build_id = 'the_form_build_id';
@@ -366,12 +346,12 @@ class FormCacheTest extends UnitTestCase {
     $form_data['#cache_token'] = $cache_token;
     $this->formCacheStore->expects($this->once())
       ->method('setWithExpire')
-      ->with($form_build_id, $form_data, $this->isType('int'));
+      ->with($form_build_id, $form_data, $this->isInt());
 
     $form_state_data = $form_state->getCacheableArray();
     $this->formStateCacheStore->expects($this->once())
       ->method('setWithExpire')
-      ->with($form_build_id, $form_state_data, $this->isType('int'));
+      ->with($form_build_id, $form_state_data, $this->isInt());
 
     $this->csrfToken->expects($this->once())
       ->method('get')
@@ -385,8 +365,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests set cache build id mismatch.
-   *
-   * @legacy-covers ::setCache
    */
   public function testSetCacheBuildIdMismatch(): void {
     $form_build_id = 'the_form_build_id';
@@ -408,8 +386,6 @@ class FormCacheTest extends UnitTestCase {
 
   /**
    * Tests delete cache.
-   *
-   * @legacy-covers ::deleteCache
    */
   public function testDeleteCache(): void {
     $form_build_id = 'the_form_build_id';

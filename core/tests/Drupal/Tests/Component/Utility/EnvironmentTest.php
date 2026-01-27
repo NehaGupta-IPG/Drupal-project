@@ -29,8 +29,6 @@ class EnvironmentTest extends TestCase {
    * @param bool $expected
    *   The expected return value from
    *   \Drupal\Component\Utility\Environment::checkMemoryLimit().
-   *
-   * @legacy-covers ::checkMemoryLimit
    */
   #[DataProvider('providerTestCheckMemoryLimit')]
   public function testCheckMemoryLimit($required, $custom_memory_limit, $expected): void {
@@ -46,7 +44,7 @@ class EnvironmentTest extends TestCase {
    *   \Drupal\Component\Utility\Environment::checkMemoryLimit():
    *   required and memory_limit, and the expected return value.
    */
-  public static function providerTestCheckMemoryLimit() {
+  public static function providerTestCheckMemoryLimit(): array {
     return [
       // Minimal amount of memory should be available.
       ['30MB', NULL, TRUE],
