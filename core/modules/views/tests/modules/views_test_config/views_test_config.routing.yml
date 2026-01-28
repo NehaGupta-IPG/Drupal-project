@@ -1,0 +1,9 @@
+views_test_config.refresh_view:
+  path: '/views-test/ajax-refresh/{view_name}'
+  defaults:
+    _controller: '\Drupal\views_test_config\Controller\RefreshViewController::refreshView'
+  options:
+    _admin_route: FALSE
+  requirements:
+    _access: 'TRUE'
+    view_name: '[a-z_]+'
