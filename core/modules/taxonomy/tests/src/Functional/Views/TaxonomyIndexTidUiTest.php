@@ -517,7 +517,7 @@ class TaxonomyIndexTidUiTest extends UITestBase {
     // Case 5: OR
     // - filter "tid" with terms from tags as "is one of"
     // - filter "taxonomy_other_tags_target_id" with term from other tags
-    // as "is one of".
+    // as "is one of"
     $view = View::load('test_filter_taxonomy_index_tid');
     $display = &$view->getDisplay('default');
     $display['display_options']['filters']['tid']['value'][0] = $this->terms[1][0]->id();

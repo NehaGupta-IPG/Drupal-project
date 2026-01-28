@@ -43,7 +43,7 @@ class WorkspaceAssociationRevisionTableUpdateTest extends UpdatePathTestBase {
       ->fetchAll();
 
     // Verify we have the correct test data in the workspace_association table:
-    // 4 node revisions and 4 taxonomy term revisions
+    // 4 node revisions and 4 taxonomy term revisions.
     $this->assertCount(8, $workspace_associations, 'Test data exists in workspace_association table.');
 
     // Store expected results using the old getAssociatedRevisions logic.

@@ -25,9 +25,8 @@ class ItemsPerPageTest extends WizardTestBase {
    * {@inheritdoc}
    */
   protected static $configSchemaCheckerExclusions = [
-    // To be able to test with the now invalid:
-    // - `items_per_page: 'none'`
-    // - `items_per_page: '5'`
+    // To be able to test with the now invalid 'items_per_page' values of 'none'
+    // and '5'.
     'block.block.views_block_items_per_page_test_with_historical_override',
   ];
 

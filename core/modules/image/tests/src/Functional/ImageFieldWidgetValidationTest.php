@@ -32,7 +32,7 @@ class ImageFieldWidgetValidationTest extends ImageFieldTestBase {
   public function testWidgetElementValidation(): void {
     $page = $this->getSession()->getPage();
 
-    // Check for image widget in add/node/article page
+    // Check for image widget in add/node/article page.
     $field_name = 'field_image';
     $field_settings = [
       'description' => 'Image test description',
@@ -56,7 +56,7 @@ class ImageFieldWidgetValidationTest extends ImageFieldTestBase {
     $altElement = $this->assertSession()->elementExists('css', 'input[data-drupal-selector="edit-field-image-0-alt"]');
     $this->assertTrue(str_contains($altElement->getAttribute('class'), 'error'));
 
-    // Title is not marked as errored
+    // Title is not marked as errored.
     $titleElement = $this->assertSession()->elementExists('css', 'input[data-drupal-selector="edit-field-image-0-title"]');
     $this->assertFalse(str_contains($titleElement->getAttribute('class'), 'error'));
   }

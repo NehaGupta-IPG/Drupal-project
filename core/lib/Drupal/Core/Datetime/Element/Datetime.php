@@ -79,7 +79,7 @@ class Datetime extends DateElementBase {
     if ($input !== FALSE) {
       if ($element['#date_date_element'] === 'datetime-local' && !empty($input['date'])) {
         // With a datetime-local input, the date value is always normalized to
-        // the format Y-m-d\TH:i
+        // the format "Y-m-d\TH:i".
         // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
         // 'html_datetime' is not a valid format to pass to
         // DrupalDateTime::createFromFormat()
@@ -245,7 +245,7 @@ class Datetime extends DateElementBase {
 
       $date_format = $element['#date_date_element'] != 'none' ? static::getHtml5DateFormat($element) : '';
       // With a datetime-local input, the date value is always normalized to
-      // the format Y-m-d\TH:i
+      // the format "Y-m-d\TH:i".
       // @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/datetime-local
       // 'html_datetime' returned by static::getHtml5DateFormat($element) is not
       // a valid format.
