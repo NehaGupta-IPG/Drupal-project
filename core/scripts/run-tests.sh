@@ -37,7 +37,6 @@ use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Process\Process;
 
 // cspell:ignore exitcode testbots wwwrun
 
@@ -89,6 +88,7 @@ if (Config::get('help')) {
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
+// Initialize script variables and bootstrap Drupal kernel.
 simpletest_script_init($autoloader);
 
 if (!class_exists(TestCase::class)) {
@@ -101,13 +101,9 @@ if (empty(Config::get('phpunit-configuration'))) {
   Config::set('phpunit-configuration', \Drupal::root() . \DIRECTORY_SEPARATOR . 'core');
 }
 
-if (Config::get('execute-test')) {
-  simpletest_script_setup_database();
-  $test_run_results_storage = simpletest_script_setup_test_run_results_storage();
-  $test_run = TestRun::get($test_run_results_storage, Config::get('test-id'));
-  simpletest_script_run_one_test($test_run, Config::get('execute-test'));
-  // Sub-process exited already; this is just for clarity.
-  exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
+if (!Composer::upgradePHPUnitCheck(Version::id())) {
+  simpletest_script_print_error("PHPUnit testing framework version 11 or greater is required when running on PHP 8.4 or greater. Run the command 'composer run-script drupal-phpunit-upgrade' in order to fix this.");
+  exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
 }
 
 if (Config::get('list')) {
@@ -163,7 +159,7 @@ if (Config::get('list-files') || Config::get('list-files-json')) {
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
-simpletest_script_setup_database(TRUE);
+simpletest_script_setup_database();
 
 // Setup the test run results storage environment. Currently, this coincides
 // with the simpletest database schema.
@@ -195,13 +191,9 @@ if (Config::get('clean')) {
   exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
 }
 
-if (!Composer::upgradePHPUnitCheck(Version::id())) {
-  simpletest_script_print_error("PHPUnit testing framework version 11 or greater is required when running on PHP 8.4 or greater. Run the command 'composer run-script drupal-phpunit-upgrade' in order to fix this.");
-  exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
-}
-
 echo "\n";
 echo "Drupal test run\n\n";
+echo "--------------------------------------------------------------\n";
 echo sprintf("Drupal Version.......: %s\n", \Drupal::VERSION);
 echo sprintf("PHP Version..........: %s\n", \PHP_VERSION);
 echo sprintf("PHP Binary...........: %s\n", $php ?? getenv('_'));
@@ -216,7 +208,7 @@ if (Config::get('dburl')) {
   echo sprintf("Database Version.....: %s\n", $sut_connection->version());
 }
 echo sprintf("Working directory....: %s\n", getcwd());
-echo "-------------------------------\n";
+echo "--------------------------------------------------------------\n";
 echo "\n";
 
 $test_list = simpletest_script_get_test_list();
@@ -354,21 +346,6 @@ function simpletest_script_init(ClassLoader $autoloader): void {
     Config::set('php', $php);
   }
 
-  // Detect if we're in the top-level process using the private 'execute-test'
-  // argument. Determine if being run on drupal.org's testing infrastructure
-  // using the presence of 'drupalci' in the sqlite argument.
-  // @todo https://www.drupal.org/project/drupalci_testbot/issues/2860941 Use
-  //   better environment variable to detect DrupalCI.
-  if (!Config::get('execute-test') && preg_match('/drupalci/', Config::get('sqlite') ?? '')) {
-    // Update PHPUnit if needed and possible. There is a later check once the
-    // autoloader is in place to ensure we're on the correct version. We need to
-    // do this before the autoloader is in place to ensure that it is correct.
-    $composer = ($composer = rtrim('\\' === DIRECTORY_SEPARATOR ? preg_replace('/[\r\n].*/', '', `where.exe composer.phar`) : `which composer.phar`))
-      ? $php . ' ' . escapeshellarg($composer)
-      : 'composer';
-    passthru("$composer run-script drupal-phpunit-upgrade-check");
-  }
-
   // Get URL from arguments.
   if (Config::get('url')) {
     $parsed_url = parse_url(Config::get('url'));
@@ -465,13 +442,8 @@ function simpletest_script_init(ClassLoader $autoloader): void {
  *   connection is retained in
  *   $databases['simpletest_original_default']['default'] and restored after
  *   each test.
- *
- * @param bool $new
- *   Whether this process is a run-tests.sh master process. If TRUE, the SQLite
- *   database file specified by --sqlite (if any) is set up. Otherwise, database
- *   connections are prepared only.
  */
-function simpletest_script_setup_database($new = FALSE): void {
+function simpletest_script_setup_database(): void {
   // If there is an existing Drupal installation that contains a database
   // connection info in settings.php, then $databases['default']['default'] will
   // hold the default database connection already. This connection is assumed to
@@ -518,13 +490,16 @@ function simpletest_script_setup_test_run_results_storage($new = FALSE) {
     if (!str_starts_with($sqlite, '/')) {
       $sqlite = DRUPAL_ROOT . '/' . $sqlite;
     }
+    elseif ($sqlite === ':memory:') {
+      $sqlite = ':memory:';
+    }
     $databases['test-runner']['default'] = [
       'driver' => 'sqlite',
       'database' => $sqlite,
       'prefix' => '',
     ];
     // Create the test runner SQLite database, unless it exists already.
-    if ($new && !file_exists($sqlite)) {
+    if ($sqlite !== ':memory:' && $new && !file_exists($sqlite)) {
       if (!is_dir(dirname($sqlite))) {
         mkdir(dirname($sqlite));
       }
@@ -575,6 +550,8 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
 
   $total_status = SIMPLETEST_SCRIPT_EXIT_SUCCESS;
 
+  $process_runner = PhpUnitTestRunner::create(\Drupal::getContainer())->setConfigurationFilePath($args['phpunit-configuration']);
+
   // Multi-process execution.
   $children = [];
   while (!empty($test_classes) || !empty($children)) {
@@ -593,16 +570,21 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
       $test_ids[] = $test_run->id();
 
       $test_class = array_shift($test_classes);
+
       // Fork a child process.
-      $command = simpletest_script_command($test_run, $test_class, $script_basename);
       try {
-        $process = new Process($command);
-        $process->start();
+        $process = $process_runner->startPhpUnitOnSingleTestClass(
+          $test_run,
+          $test_class,
+          $args['color'],
+          $args['suppress-deprecations'],
+        );
       }
-      catch (\Exception $e) {
-        echo get_class($e) . ": " . $e->getMessage() . "\n";
-        echo "Unable to fork test process. Aborting.\n";
-        exit(SIMPLETEST_SCRIPT_EXIT_SUCCESS);
+      catch (\Throwable $e) {
+        // PHPUnit catches exceptions already, so this is only reached when an
+        // exception is thrown in the wrapped test runner environment.
+        echo (string) $e;
+        exit(SIMPLETEST_SCRIPT_EXIT_EXCEPTION);
       }
 
       // Register our new child.
@@ -620,16 +602,25 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
     foreach ($children as $cid => $child) {
       if ($child['process']->isTerminated()) {
         // The child exited.
-        echo $child['process']->getOutput();
-        $errorOutput = $child['process']->getErrorOutput();
-        if ($errorOutput) {
-          echo 'ERROR: ' . $errorOutput;
+        $child['test_run']->end(microtime(TRUE));
+        $process_outcome = $process_runner->processPhpUnitOnSingleTestClassOutcome(
+          $child['process'],
+          $child['test_run'],
+          $child['class'],
+        );
+        simpletest_script_reporter_display_summary(
+          $child['class'],
+          $process_outcome['summaries'][$child['class']],
+          $child['test_run']->duration()
+        );
+        if ($process_outcome['error_output']) {
+          echo 'ERROR: ' . $process_outcome['error_output'];
         }
-        if (in_array($child['process']->getExitCode(), [SIMPLETEST_SCRIPT_EXIT_FAILURE, SIMPLETEST_SCRIPT_EXIT_ERROR])) {
-          $total_status = max($child['process']->getExitCode(), $total_status);
+        if (in_array($process_outcome['status'], [SIMPLETEST_SCRIPT_EXIT_FAILURE, SIMPLETEST_SCRIPT_EXIT_ERROR])) {
+          $total_status = max($process_outcome['status'], $total_status);
         }
-        elseif ($child['process']->getExitCode()) {
-          $message = 'FATAL ' . $child['class'] . ': test runner returned an unexpected error code (' . $child['process']->getExitCode() . ').';
+        elseif ($process_outcome['status']) {
+          $message = 'FATAL ' . $child['class'] . ': test runner returned an unexpected error code (' . $process_outcome['status'] . ').';
           echo $message . "\n";
           $total_status = max(SIMPLETEST_SCRIPT_EXIT_EXCEPTION, $total_status);
           if (Config::get('die-on-fail')) {
@@ -648,82 +639,6 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
     }
   }
   return $total_status;
-}
-
-/**
- * Run a PHPUnit-based test.
- */
-function simpletest_script_run_phpunit(TestRun $test_run, $class) {
-  $runner = PhpUnitTestRunner::create(\Drupal::getContainer())->setConfigurationFilePath(Config::get('phpunit-configuration'));
-  $start = microtime(TRUE);
-  $results = $runner->execute($test_run, $class, $status, Config::get('color'));
-  $time = microtime(TRUE) - $start;
-
-  $runner->processPhpUnitResults($test_run, $results);
-
-  $summaries = $runner->summarizeResults($results);
-  foreach ($summaries as $class => $summary) {
-    simpletest_script_reporter_display_summary($class, $summary, $time);
-  }
-  return $status;
-}
-
-/**
- * Run a single test, bootstrapping Drupal if needed.
- */
-function simpletest_script_run_one_test(TestRun $test_run, $test_class): void {
-  try {
-    if (Config::get('suppress-deprecations')) {
-      putenv('SYMFONY_DEPRECATIONS_HELPER=disabled');
-    }
-    $status = simpletest_script_run_phpunit($test_run, $test_class);
-    exit($status);
-  }
-  // DrupalTestCase::run() catches exceptions already, so this is only reached
-  // when an exception is thrown in the wrapping test runner environment.
-  catch (Exception $e) {
-    echo (string) $e;
-    exit(SIMPLETEST_SCRIPT_EXIT_EXCEPTION);
-  }
-}
-
-/**
- * Return a command used to run a test in a separate process.
- *
- * @param string $test_class
- *   The name of the test class to run.
- *
- * @return list<string>
- *   The list of command-line elements.
- */
-function simpletest_script_command(TestRun $test_run, string $test_class, string $script_basename): array {
-  $command = [];
-  $command[] = Config::get('php');
-  $command[] = './core/scripts/' . $script_basename;
-  $command[] = '--url';
-  $command[] = Config::get('url');
-  if (Config::get('sqlite')) {
-    $command[] = '--sqlite';
-    $command[] = Config::get('sqlite');
-  }
-  if (Config::get('dburl')) {
-    $command[] = '--dburl';
-    $command[] = Config::get('dburl');
-  }
-  $command[] = '--php';
-  $command[] = Config::get('php');
-  $command[] = '--test-id';
-  $command[] = $test_run->id();
-  foreach (['verbose', 'keep-results', 'color', 'die-on-fail', 'suppress-deprecations'] as $arg) {
-    if (Config::get($arg)) {
-      $command[] = '--' . $arg;
-    }
-  }
-  // --execute-test and class name needs to come last.
-  $command[] = '--execute-test';
-  $command[] = $test_class;
-
-  return $command;
 }
 
 /**
@@ -947,7 +862,6 @@ function dump_tests_sequence(array $tests): void {
   echo "-----------------------\n\n";
   echo " Seq Slow? Group            Cnt Class\n";
   echo "-----------------------------------------\n";
-  $i = 0;
   foreach ($tests as $testInfo) {
     echo sprintf(
       "%4d %5s %15s %4d %s\n",
@@ -1148,7 +1062,7 @@ function simpletest_script_reporter_write_xml_results(TestRunResultsStorageInter
       $case = $dom_document->createElement('testcase');
       $case->setAttribute('classname', $test_class);
       if (str_contains($result->function, '->')) {
-        [$class, $name] = explode('->', $result->function, 2);
+        [, $name] = explode('->', $result->function, 2);
       }
       else {
         $name = $result->function;
@@ -1243,7 +1157,7 @@ function simpletest_script_reporter_display_results(TestRunResultsStorageInterfa
  *   The result object to format.
  */
 function simpletest_script_format_result($result): void {
-  global $results_map, $color;
+  global $results_map, $color, $results_map;
 
   if ($result->time == 0) {
     $duration = "          ";
@@ -1415,13 +1329,13 @@ function simpletest_script_load_messages_by_test_id(TestRunResultsStorageInterfa
  */
 function trim_with_ellipsis(string $input, int $length, int $side): string {
   if (strlen($input) < $length) {
-      return str_pad($input, $length, ' ', \STR_PAD_RIGHT);
+    return str_pad($input, $length, ' ', \STR_PAD_RIGHT);
   }
   elseif (strlen($input) > $length) {
-      return match($side) {
-        \STR_PAD_RIGHT => substr($input, 0, $length - 1) . '…',
-        default => '…' . substr($input, -$length + 1),
-      };
+    return match($side) {
+      \STR_PAD_RIGHT => substr($input, 0, $length - 1) . '…',
+      default => '…' . substr($input, -$length + 1),
+    };
   }
   return $input;
 }

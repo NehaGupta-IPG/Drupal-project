@@ -263,18 +263,6 @@ final class Configuration {
       "Stops tests from failing if deprecation errors are triggered.\nIf this is not set the value specified in the SYMFONY_DEPRECATIONS_HELPER environment variable, or the value specified in core/phpunit.xml (if it exists), or the default value will be used.\nThe default is that any unexpected silenced deprecation error will fail tests.",
     ));
     $inputDefinition->addOption(new InputOption(
-      'test-id',
-      NULL,
-      InputOption::VALUE_REQUIRED,
-      "(internal)",
-    ));
-    $inputDefinition->addOption(new InputOption(
-      'execute-test',
-      NULL,
-      InputOption::VALUE_REQUIRED,
-      "(internal)",
-    ));
-    $inputDefinition->addOption(new InputOption(
       'xml',
       NULL,
       InputOption::VALUE_REQUIRED,
