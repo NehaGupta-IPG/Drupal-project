@@ -9,6 +9,7 @@ use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\views\Plugin\views\filter\LanguageFilter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -150,8 +151,23 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
    * {@inheritdoc}
    */
   public function alterQuery($query, array $tables, $operation, AccountInterface $account, $base_table) {
+    $operator = '';
     if (!$langcode = $query->getMetaData('langcode')) {
       $langcode = FALSE;
+
+      // If views has a 'language' filter use its value and operator as $langcode.
+      $view = $query->getMetaData('view');
+      if (isset($view->filter)) {
+        /** @var \Drupal\views\Plugin\views\filter\LanguageFilter $filter */
+        foreach ($view->filter as $filter) {
+          if ($filter instanceof LanguageFilter && $filter->table == $base_table) {
+            if (!empty($filter->value) && in_array($filter->operator, ['in', 'not in'])) {
+              $operator = $filter->operator;
+              $langcode = $filter->value;
+            }
+          }
+        }
+      }
     }
 
     // Find all instances of the base table being joined which could appear
@@ -177,22 +193,35 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
         }
         $subquery->condition('na.grant_' . $operation, 1, '>=');
 
-        // Add langcode-based filtering if this is a multilingual site.
+        $field = 'nid';
+        // Add langcode-based filtering only on multilingual sites.
         if ($is_multilingual) {
-          // If no specific langcode to check for is given, use the grant entry
-          // which is set as a fallback.
-          // If a specific langcode is given, use the grant entry for it.
-          if ($langcode === FALSE) {
-            $subquery->condition('na.fallback', 1, '=');
+          // For node_field_data, bind langcode directly from the table to ensure
+          // each row is checked against the correct langcode in node_access.
+          // This handles Views with relationships and contextual filters correctly.
+          // @see https://www.drupal.org/project/drupal/issues/3061782#comment-15948338
+          if ($base_table === 'node_field_data') {
+            $subquery->where("[$table_alias].[$field] = [na].[nid] AND ([$table_alias].[langcode] = [na].[langcode] OR [na].[langcode] = '')");
           }
           else {
-            $subquery->condition('na.langcode', $langcode, '=');
+            // For other base tables (e.g., 'node'), use query metadata or Views
+            // filter for langcode.
+            if ($langcode === FALSE) {
+              // No specific langcode: use the fallback grant entry.
+              $subquery->condition('na.fallback', 1, '=');
+            }
+            else {
+              // Use the operator from Views LanguageFilter if available,
+              // otherwise default to 'in'.
+              $subquery->condition('na.langcode', $langcode, $operator ?: 'in');
+            }
+            $subquery->where("[$table_alias].[$field] = [na].[nid]");
           }
         }
-
-        $field = 'nid';
-        // Now handle entities.
-        $subquery->where("[$table_alias].[$field] = [na].[nid]");
+        else {
+          // Non-multilingual site: just match nid without langcode filtering.
+          $subquery->where("[$table_alias].[$field] = [na].[nid]");
+        }
 
         if (empty($tableinfo['join type'])) {
           $query->exists($subquery);
