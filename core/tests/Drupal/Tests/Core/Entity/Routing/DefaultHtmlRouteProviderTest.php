@@ -63,8 +63,6 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
 
   /**
    * Tests get add page route.
-   *
-   * @legacy-covers ::getAddPageRoute
    */
   #[DataProvider('providerTestGetAddPageRoute')]
   public function testGetAddPageRoute(?Route $expected, EntityTypeInterface $entity_type): void {
@@ -104,8 +102,6 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
 
   /**
    * Tests get add form route.
-   *
-   * @legacy-covers ::getAddFormRoute
    */
   #[DataProvider('providerTestGetAddFormRoute')]
   public function testGetAddFormRoute(?Route $expected, EntityTypeInterface $entity_type, ?EntityTypeInterface $bundle_entity_type = NULL, ?FieldStorageDefinitionInterface $field_storage_definition = NULL): void {
@@ -221,8 +217,6 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
 
   /**
    * Tests get canonical route.
-   *
-   * @legacy-covers ::getCanonicalRoute
    */
   #[DataProvider('providerTestGetCanonicalRoute')]
   public function testGetCanonicalRoute(?Route $expected, EntityTypeInterface $entity_type, ?FieldStorageDefinitionInterface $field_storage_definition = NULL): void {
@@ -283,8 +277,6 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
 
   /**
    * Tests get collection route.
-   *
-   * @legacy-covers ::getCollectionRoute
    */
   #[DataProvider('providerTestGetCollectionRoute')]
   public function testGetCollectionRoute(?Route $expected, EntityTypeInterface $entity_type): void {
@@ -378,8 +370,6 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
 
   /**
    * Tests get entity type id key type.
-   *
-   * @legacy-covers ::getEntityTypeIdKeyType
    */
   public function testGetEntityTypeIdKeyType(): void {
     $entity_type = $this->prophesize(EntityTypeInterface::class);
@@ -397,8 +387,6 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
 
   /**
    * Tests get entity type id key type not fieldable.
-   *
-   * @legacy-covers ::getEntityTypeIdKeyType
    */
   public function testGetEntityTypeIdKeyTypeNotFieldable(): void {
     $entity_type = $this->prophesize(EntityTypeInterface::class);

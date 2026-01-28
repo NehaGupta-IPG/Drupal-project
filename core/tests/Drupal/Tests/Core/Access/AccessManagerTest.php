@@ -231,8 +231,6 @@ class AccessManagerTest extends UnitTestCase {
 
   /**
    * Tests \Drupal\Core\Access\AccessManager::check() with no account specified.
-   *
-   * @legacy-covers ::check
    */
   public function testCheckWithNullAccount(): void {
     $this->setupAccessChecker();
@@ -421,8 +419,6 @@ class AccessManagerTest extends UnitTestCase {
 
   /**
    * Tests the checkNamedRoute with default values.
-   *
-   * @legacy-covers ::checkNamedRoute
    */
   public function testCheckNamedRouteWithDefaultValue(): void {
     $this->routeCollection = new RouteCollection();
