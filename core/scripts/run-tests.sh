@@ -487,11 +487,11 @@ function simpletest_script_setup_test_run_results_storage($new = FALSE) {
   }
   // Otherwise, set up a SQLite connection for the test runner.
   else {
-    if (!str_starts_with($sqlite, '/')) {
-      $sqlite = DRUPAL_ROOT . '/' . $sqlite;
-    }
-    elseif ($sqlite === ':memory:') {
+    if ($sqlite === ':memory:') {
       $sqlite = ':memory:';
+    }
+    elseif (!str_starts_with($sqlite, '/')) {
+      $sqlite = DRUPAL_ROOT . '/' . $sqlite;
     }
     $databases['test-runner']['default'] = [
       'driver' => 'sqlite',
@@ -550,7 +550,8 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
 
   $total_status = SIMPLETEST_SCRIPT_EXIT_SUCCESS;
 
-  $process_runner = PhpUnitTestRunner::create(\Drupal::getContainer())->setConfigurationFilePath($args['phpunit-configuration']);
+  $process_runner = PhpUnitTestRunner::create(\Drupal::getContainer())
+    ->setConfigurationFilePath(Config::get('phpunit-configuration'));
 
   // Multi-process execution.
   $children = [];
@@ -576,8 +577,8 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
         $process = $process_runner->startPhpUnitOnSingleTestClass(
           $test_run,
           $test_class,
-          $args['color'],
-          $args['suppress-deprecations'],
+          Config::get('color'),
+          Config::get('suppress-deprecations'),
         );
       }
       catch (\Throwable $e) {
@@ -614,7 +615,7 @@ function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_ru
           $child['test_run']->duration()
         );
         if ($process_outcome['error_output']) {
-          echo 'ERROR: ' . $process_outcome['error_output'];
+          echo 'ERROR: ' . implode("\n", $process_outcome['error_output']);
         }
         if (in_array($process_outcome['status'], [SIMPLETEST_SCRIPT_EXIT_FAILURE, SIMPLETEST_SCRIPT_EXIT_ERROR])) {
           $total_status = max($process_outcome['status'], $total_status);
