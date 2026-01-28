@@ -7,7 +7,12 @@ access comments:
   title: 'View comments'
 post comments:
   title: 'Post comments'
+reply comments:
+  title: 'Reply comments'
 skip comment approval:
   title: 'Skip comment approval'
 edit own comments:
   title: 'Edit own comments'
+
+permission_callbacks:
+  - \Drupal\comment\CommentPermissions::commentTypePermissions

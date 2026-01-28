@@ -56,8 +56,8 @@ class CommentFieldItemList extends FieldItemList {
       // takes care of showing the thread and form based on individual
       // permissions, so if a user only has ‘post comments’ access, only the
       // form will be shown and not the comments.
-      $result = AccessResult::allowedIfHasPermission($account ?: \Drupal::currentUser(), 'access comments')
-        ->orIf(AccessResult::allowedIfHasPermission($account ?: \Drupal::currentUser(), 'post comments'));
+      $result = AccessResult::allowedIfHasPermission($account ?: \Drupal::currentUser(), 'access comments ' . $this->getSetting('comment_type'))
+        ->orIf(AccessResult::allowedIfHasPermission($account ?: \Drupal::currentUser(), 'post comments ' . $this->getSetting('comment_type')));
       return $return_as_object ? $result : $result->isAllowed();
     }
     return parent::access($operation, $account, $return_as_object);
