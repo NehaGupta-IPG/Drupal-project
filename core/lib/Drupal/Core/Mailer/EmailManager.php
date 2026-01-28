@@ -140,6 +140,9 @@ class EmailManager extends DefaultPluginManager {
     return $this->renderer->executeInRenderContext(new RenderContext(), function () use ($email) {
       $metadata = new BubbleableMetadata();
 
+      // Call preBuild to set defaults from the plugin class.
+      $email->preBuild();
+
       // Build and render the HTML body
       $html = $email->htmlBody();
       if ($html instanceof RenderableInterface) {
@@ -151,9 +154,6 @@ class EmailManager extends DefaultPluginManager {
       if ($text instanceof RenderableInterface) {
         $text = $text->toRenderable();
       }
-
-      // Call preBuild to set defaults from the plugin class.
-      $email->preBuild();
 
       $email_data = [
         'body' => [
