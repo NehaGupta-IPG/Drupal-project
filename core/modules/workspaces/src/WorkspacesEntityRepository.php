@@ -25,8 +25,8 @@ class WorkspacesEntityRepository implements EntityRepositoryInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadUniqueEntityByProperties(string $entity_type_id, array $values = [], bool $allow_empty = TRUE): ?EntityInterface {
-    return $this->inner->loadUniqueEntityByProperties($entity_type_id, $values, $allow_empty);
+  public function loadOneByProperties(string $entity_type_id, array $values = []): ?EntityInterface {
+    return $this->inner->loadOneByProperties($entity_type_id, $values);
   }
 
   /**

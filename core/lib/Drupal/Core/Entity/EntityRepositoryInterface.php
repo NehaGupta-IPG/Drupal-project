@@ -34,24 +34,20 @@ interface EntityRepositoryInterface {
   public function loadEntityByUuid($entity_type_id, $uuid);
 
   /**
-   * Loads a unique entity by properties.
+   * Loads a single entity by properties.
    *
    * @param string $entity_type_id
    *   The entity type ID to load from.
    * @param array $values
    *   The properties to pass to EntityStorageInterface::loadByProperties().
-   * @param bool $allow_empty
-   *   Whether not finding a result is allowed. Defaults to TRUE.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
-   *   The entity object, or NULL if there is no entity and $allow_empty was set
-   *   to TRUE.
+   *   The entity object, or NULL if there is no entity.
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
-   *   Thrown in case multiple entities were found or none was found and
-   *   $allow_empty was set to FALSE.
+   *   Thrown in case multiple entities were found.
    */
-  public function loadUniqueEntityByProperties(string $entity_type_id, array $values = [], bool $allow_empty = TRUE): ?EntityInterface;
+  public function loadOneByProperties(string $entity_type_id, array $values = []): ?EntityInterface;
 
   /**
    * Loads an entity by the config target identifier.
