@@ -121,7 +121,7 @@ field.formatter.settings.text_trimmed:
       label: 'Trim length'
 
 field.widget.settings.text_textarea:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Text area (multiple rows) display format settings'
   mapping:
     rows:
@@ -132,7 +132,7 @@ field.widget.settings.text_textarea:
       label: 'Placeholder'
 
 field.widget.settings.text_textarea_with_summary:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Text area with a summary display format settings'
   mapping:
     rows:
@@ -149,7 +149,7 @@ field.widget.settings.text_textarea_with_summary:
       label: 'Always show summary'
 
 field.widget.settings.text_textfield:
-  type: mapping
+  type: field.widget.settings.base
   label: 'Text field display format settings'
   mapping:
     size:
