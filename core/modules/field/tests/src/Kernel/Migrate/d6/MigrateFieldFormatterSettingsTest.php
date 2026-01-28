@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\field\Kernel\Migrate\d6;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\file\FileUrlType;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -144,7 +145,7 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupal6TestBase {
     $this->assertSame($expected, $component);
     $display = EntityViewDisplay::load('node.story.default');
     $expected['type'] = 'file_url_plain';
-    $expected['settings'] = [];
+    $expected['settings'] = ['show_link_as' => FileUrlType::Relative->value];
     $component = $display->getComponent('field_test_filefield');
     $this->assertSame($expected, $component);
 
