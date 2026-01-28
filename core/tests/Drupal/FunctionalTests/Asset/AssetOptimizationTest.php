@@ -166,24 +166,40 @@ class AssetOptimizationTest extends BrowserTestBase {
     $session = $this->getSession();
     $session->visit($this->replaceGroupDelta($url));
     $this->assertSession()->statusCodeEquals(200);
+    $parts = UrlHelper::parse($url);
+    if (isset($parts['query']['include'])) {
+      $session->visit($this->omitInclude($url));
+      $this->assertSession()->statusCodeEquals(400);
+
+      $session->visit($this->invalidInclude($url));
+      $this->assertSession()->statusCodeEquals(400);
+
+      $session->visit($this->invalidExclude($url));
+      $this->assertSession()->statusCodeEquals(400);
+      $session->visit($this->setInvalidLibrary($url));
+      $this->assertSession()->statusCodeEquals(200);
+    }
+    else {
+      if (isset($parts['query']['categories'])) {
+        $session->visit($this->omitCategory($url));
+        $this->assertSession()->statusCodeEquals(400);
+
+        $session->visit($this->invalidCategory($url));
+        $this->assertSession()->statusCodeEquals(400);
+      }
+
+      $session->visit($this->omitLibraries($url));
+      $this->assertSession()->statusCodeEquals(400);
+
+      $session->visit($this->invalidLibraries($url));
+      $this->assertSession()->statusCodeEquals(400);
+    }
 
     $session->visit($this->omitTheme($url));
     $this->assertSession()->statusCodeEquals(400);
 
-    $session->visit($this->omitInclude($url));
-    $this->assertSession()->statusCodeEquals(400);
-
-    $session->visit($this->invalidInclude($url));
-    $this->assertSession()->statusCodeEquals(400);
-
-    $session->visit($this->invalidExclude($url));
-    $this->assertSession()->statusCodeEquals(400);
-
     $session->visit($this->replaceFileNamePrefix($url));
     $this->assertSession()->statusCodeEquals(400);
-
-    $session->visit($this->setInvalidLibrary($url));
-    $this->assertSession()->statusCodeEquals(200);
 
     // When an invalid asset hash name is given.
     $session->visit($this->replaceGroupHash($url));
@@ -296,6 +312,42 @@ class AssetOptimizationTest extends BrowserTestBase {
   }
 
   /**
+   * Removes the 'categories' query parameter from the given URL.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with the 'categories' parameter omitted.
+   */
+  protected function omitCategory(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    unset($parts['query']['categories']);
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
+   * Removes the 'libraries' query parameter from the given URL.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with the 'libraries' parameter omitted.
+   */
+  protected function omitLibraries(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    unset($parts['query']['libraries']);
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
    * Replaces the 'include' query parameter with an invalid value.
    *
    * @param string $url
@@ -309,6 +361,42 @@ class AssetOptimizationTest extends BrowserTestBase {
     $url = $this->replaceGroupHash($url);
     $parts = UrlHelper::parse($url);
     $parts['query']['include'] = 'abcdefghijklmnop';
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
+   * Replaces the 'libraries' query parameter with an invalid value.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with 'libraries' set to an arbitrary string.
+   */
+  protected function invalidLibraries(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    $parts['query']['libraries'] = 'abcdefghijklmnop';
+    $query = UrlHelper::buildQuery($parts['query']);
+    return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
+  }
+
+  /**
+   * Replaces the 'categories' query parameter with an invalid value.
+   *
+   * @param string $url
+   *   The source URL.
+   *
+   * @return string
+   *   The URL with 'categories' set to an arbitrary string.
+   */
+  protected function invalidCategory(string $url): string {
+    // First replace the hash, so we don't get served the actual file on disk.
+    $url = $this->replaceGroupHash($url);
+    $parts = UrlHelper::parse($url);
+    $parts['query']['categories'] = 'abcdefghijklmnop';
     $query = UrlHelper::buildQuery($parts['query']);
     return $this->getAbsoluteUrl($parts['path'] . '?' . $query . '#' . $parts['fragment']);
   }

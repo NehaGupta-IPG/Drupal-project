@@ -29,10 +29,10 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     }, 'umamiFrontAndRecipePages');
 
     $expected = [
-      'ScriptCount' => 1,
+      'ScriptCount' => 3,
       'ScriptBytes' => 11700,
-      'StylesheetCount' => 6,
-      'StylesheetBytes' => 117400,
+      'StylesheetCount' => 9,
+      'StylesheetBytes' => 58961,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -49,10 +49,10 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     }, 'umamiFrontAndRecipePagesAuthenticated');
 
     $expected = [
-      'ScriptCount' => 3,
-      'ScriptBytes' => 73750,
-      'StylesheetCount' => 5,
-      'StylesheetBytes' => 79400,
+      'ScriptCount' => 6,
+      'ScriptBytes' => 73800,
+      'StylesheetCount' => 9,
+      'StylesheetBytes' => 52300,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -70,10 +70,38 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
       $this->doRequests();
     }, 'umamiFrontAndRecipePagesEditor');
     $expected = [
-      'ScriptCount' => 5,
-      'ScriptBytes' => 262800,
-      'StylesheetCount' => 5,
-      'StylesheetBytes' => 203850,
+      'ScriptCount' => 12,
+      'ScriptBytes' => 263000,
+      'StylesheetCount' => 9,
+      'StylesheetBytes' => 176935,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Checks the node/add page asset requests as an author.
+   */
+  public function testNodeAddPagesAuthor(): void {
+    $user = $this->createUser();
+    $user->addRole('author');
+    $user->save();
+    $this->drupalLogin($user);
+    $this->drupalGet('<front>');
+    // Give additional time for the request and all assets to be returned
+    // before making the next request.
+    sleep(2);
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('node/add/article');
+      sleep(2);
+      $this->drupalGet('node/add/recipe');
+      sleep(2);
+      $this->drupalGet('node/add/page');
+    }, 'umamiNodeAddEditor');
+    $expected = [
+      'ScriptCount' => 24,
+      'ScriptBytes' => 3635768,
+      'StylesheetCount' => 7,
+      'StylesheetBytes' => 680950,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

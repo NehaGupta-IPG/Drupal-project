@@ -41,6 +41,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'weight' => 0.012,
         'media' => 'all',
         'preprocess' => TRUE,
+        'css_aggregate_target' => FALSE,
         'data' => 'core/modules/system/system.base.css',
         'basename' => 'system.base.css',
       ],
@@ -50,6 +51,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'weight' => 0.013,
         'media' => 'all',
         'preprocess' => TRUE,
+        'css_aggregate_target' => FALSE,
         'data' => 'core/modules/system/js.module.css',
         'basename' => 'js.module.css',
       ],
@@ -59,6 +61,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'weight' => 0.004,
         'media' => 'screen',
         'preprocess' => TRUE,
+        'css_aggregate_target' => FALSE,
         'data' => 'core/misc/ui/themes/base/jquery.ui.core.css',
         'basename' => 'jquery.ui.core.css',
       ],
@@ -68,6 +71,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'weight' => 0.011,
         'media' => 'all',
         'preprocess' => TRUE,
+        'css_aggregate_target' => FALSE,
         'data' => 'core/modules/field/theme/field.css',
         'basename' => 'field.css',
       ],
@@ -77,6 +81,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'weight' => 0.009,
         'media' => 'all',
         'preprocess' => TRUE,
+        'css_aggregate_target' => FALSE,
         'data' => 'http://example.com/external.css',
         'basename' => 'external.css',
       ],
@@ -86,6 +91,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'type' => 'file',
         'weight' => 0.001,
         'preprocess' => TRUE,
+        'css_aggregate_target' => FALSE,
         'data' => 'core/themes/example/css/base/elements.css',
         'basename' => 'elements.css',
       ],
@@ -95,6 +101,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
         'type' => 'file',
         'weight' => 0.003,
         'preprocess' => TRUE,
+        'css_aggregate_target' => FALSE,
         'data' => 'core/themes/example/css/print.css',
         'basename' => 'print.css',
       ],
@@ -102,30 +109,21 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
 
     $groups = $this->grouper->group($css_assets);
 
-    $this->assertCount(5, $groups, "5 groups created.");
+    $this->assertCount(4, $groups, "4 groups created.");
 
     // Check group 1.
     $group = $groups[0];
-    $this->assertSame(-100, $group['group']);
     $this->assertSame('file', $group['type']);
     $this->assertSame('all', $group['media']);
     $this->assertTrue($group['preprocess']);
-    $this->assertCount(3, $group['items']);
+    $this->assertCount(4, $group['items']);
     $this->assertContainsEquals($css_assets['system.base.css'], $group['items']);
     $this->assertContainsEquals($css_assets['js.module.css'], $group['items']);
-
-    // Check group 2.
-    $group = $groups[1];
-    $this->assertSame(0, $group['group']);
-    $this->assertSame('file', $group['type']);
-    $this->assertSame('all', $group['media']);
-    $this->assertTrue($group['preprocess']);
-    $this->assertCount(1, $group['items']);
+    $this->assertContainsEquals($css_assets['jquery.ui.core.css'], $group['items']);
     $this->assertContainsEquals($css_assets['field.css'], $group['items']);
 
     // Check group 3.
-    $group = $groups[2];
-    $this->assertSame(0, $group['group']);
+    $group = $groups[1];
     $this->assertSame('external', $group['type']);
     $this->assertSame('all', $group['media']);
     $this->assertTrue($group['preprocess']);
@@ -133,8 +131,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
     $this->assertContainsEquals($css_assets['external.css'], $group['items']);
 
     // Check group 4.
-    $group = $groups[3];
-    $this->assertSame(100, $group['group']);
+    $group = $groups[2];
     $this->assertSame('file', $group['type']);
     $this->assertSame('all', $group['media']);
     $this->assertTrue($group['preprocess']);
@@ -142,8 +139,7 @@ class CssCollectionGrouperUnitTest extends UnitTestCase {
     $this->assertContainsEquals($css_assets['elements.css'], $group['items']);
 
     // Check group 5.
-    $group = $groups[4];
-    $this->assertSame(100, $group['group']);
+    $group = $groups[3];
     $this->assertSame('file', $group['type']);
     $this->assertSame('print', $group['media']);
     $this->assertTrue($group['preprocess']);

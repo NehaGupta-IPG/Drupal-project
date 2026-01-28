@@ -13,7 +13,7 @@ internal.backbone:
     url: https://raw.githubusercontent.com/jashkenas/backbone/1.6.1/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/backbone/backbone-min.js: { weight: -19, minified: true }
+    assets/vendor/backbone/backbone-min.js: { weight: -19, minified: true, preprocess: false }
   dependencies:
     - core/internal.underscore
 
@@ -30,7 +30,7 @@ ckeditor5:
     # (if it exists). The files loaded after this one will include CKEditor 5
     # translations, enabled plugins, and the rest of the JavaScript needed on
     # the page.
-    assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js: { preprocess: false, minified: true }
+    assets/vendor/ckeditor5/ckeditor5-dll/ckeditor5-dll.js: { minified: true, preprocess: false }
   dependencies:
     - core/ckeditor5.translations
 
@@ -340,6 +340,7 @@ ckeditor5.autoformat:
     - core/ckeditor5
 
 drupal:
+  js_aggregate_target: 'drupal'
   version: VERSION
   js:
     misc/drupal.js: { weight: -18 }
@@ -350,6 +351,7 @@ drupal:
     suppressDeprecationErrors: true
 
 drupalSettings:
+  js_aggregate_target: 'drupal'
   version: VERSION
   js:
     # Need to specify a negative weight like drupal.js until
@@ -408,6 +410,7 @@ drupal.announce:
     - core/drupal.debounce
 
 loadjs:
+  js_aggregate_target: 'htmx'
   remote: https://github.com/muicss/loadjs
   version: "4.3.0"
   license:
@@ -615,6 +618,7 @@ drupal.form:
     - core/once
 
 drupal.htmx:
+  js_aggregate_target: 'htmx'
   version: VERSION
   js:
     misc/htmx/htmx-utils.js: {}
@@ -831,6 +835,7 @@ drupal.vertical-tabs:
     - core/drupalSettings
     - core/drupal.form
 htmx:
+  js_aggregate_target: 'htmx'
   remote: https://github.com/bigskysoftware/htmx
   version: "2.0.4"
   license:
@@ -838,9 +843,10 @@ htmx:
     url:  https://raw.githubusercontent.com/bigskysoftware/htmx/refs/tags/v2.0.4/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/htmx/htmx.min.js: { minified: true, preprocess: false }
+    assets/vendor/htmx/htmx.min.js: { minified: true }
 
 internal.floating-ui:
+  js_aggregate_target: true
   remote: https://github.com/floating-ui/floating-ui
   version: "1.7.4"
   license:
@@ -907,7 +913,7 @@ once:
     url: https://git.drupalcode.org/project/once/-/raw/v1.0.1/LICENSE.md
     gpl-compatible: true
   js:
-    assets/vendor/once/once.min.js: { weight: -19, minified: true }
+    assets/vendor/once/once.min.js: { weight: -19, minified: true, preprocess: false }
 
 sortable:
   remote: https://github.com/SortableJS/Sortable
@@ -917,7 +923,7 @@ sortable:
     url: https://raw.githubusercontent.com/SortableJS/Sortable/1.15.6/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/sortable/Sortable.min.js: { minified: true }
+    assets/vendor/sortable/Sortable.min.js: { minified: true, preprocess: false }
 
 tabbable:
   remote: https://github.com/focus-trap/tabbable
@@ -927,7 +933,7 @@ tabbable:
     url: https://raw.githubusercontent.com/focus-trap/tabbable/v6.3.0/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/tabbable/index.umd.min.js: { weight: -1, minified: true }
+    assets/vendor/tabbable/index.umd.min.js: { weight: -1, minified: true, preprocess: false }
 
 transliteration:
   remote: https://github.com/dzcpy/transliteration
@@ -937,7 +943,7 @@ transliteration:
     url: https://raw.githubusercontent.com/dzcpy/transliteration/1.6.5/LICENSE.txt
     gpl-compatible: true
   js:
-    assets/vendor/transliteration/bundle.umd.min.js: { minified: true }
+    assets/vendor/transliteration/bundle.umd.min.js: { minified: true, preprocess: false }
 
 internal.underscore:
   # Internal library. Do not depend on it outside core nor add new core usage.
@@ -953,7 +959,7 @@ internal.underscore:
     url: https://raw.githubusercontent.com/jashkenas/underscore/1.13.7/LICENSE
     gpl-compatible: true
   js:
-    assets/vendor/underscore/underscore-min.js: { weight: -20, minified: true }
+    assets/vendor/underscore/underscore-min.js: { weight: -20, minified: true, preprocess: false }
 
 
 drupal.dialog.off_canvas:
