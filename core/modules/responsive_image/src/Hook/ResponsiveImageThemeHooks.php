@@ -182,17 +182,26 @@ class ResponsiveImageThemeHooks {
       ];
     }
 
-    // Get width and height from fallback responsive image style and transfer
-    // them to img tag so browser can do aspect ratio calculation and prevent
-    // recalculation of layout on image load.
-    $dimensions = $this->responsiveImageBuilder->getImageDimensions($responsive_image_style->getFallbackImageStyle(), [
-      'width' => $variables['width'],
-      'height' => $variables['height'],
-    ],
-      $variables['uri']
-    );
-    $variables['img_element']['#width'] = $dimensions['width'];
-    $variables['img_element']['#height'] = $dimensions['height'];
+    // Get width and height from image style and transfer them to img tag so
+    // browser can do aspect ratio calculation and prevent recalculation of
+    // layout on image load.
+    // When output_image_tag is TRUE (single source, no media query), use
+    // dimensions from the selected image style in the source. Otherwise, use
+    // dimensions from the fallback image style.
+    if ($variables['output_image_tag'] && !empty($variables['sources'][0]['width']) && !empty($variables['sources'][0]['height'])) {
+      $variables['img_element']['#width'] = $variables['sources'][0]['width'];
+      $variables['img_element']['#height'] = $variables['sources'][0]['height'];
+    }
+    else {
+      $dimensions = $this->responsiveImageBuilder->getImageDimensions($responsive_image_style->getFallbackImageStyle(), [
+        'width' => $variables['width'],
+        'height' => $variables['height'],
+      ],
+        $variables['uri']
+      );
+      $variables['img_element']['#width'] = $dimensions['width'];
+      $variables['img_element']['#height'] = $dimensions['height'];
+    }
 
     if (isset($variables['attributes'])) {
       if (isset($variables['attributes']['alt'])) {
