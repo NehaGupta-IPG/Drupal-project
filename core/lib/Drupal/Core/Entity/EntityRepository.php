@@ -70,7 +70,7 @@ class EntityRepository implements EntityRepositoryInterface {
   public function loadOneByProperties(string $entity_type_id, array $values = []): ?EntityInterface {
     $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadByProperties($values);
     if (count($entities) > 1) {
-      throw new EntityStorageException('Trying to load a unique entity but found multiple candidates.');
+      throw new EntityStorageException('Trying to load a single entity but found multiple candidates.');
     }
     return ($entities) ? reset($entities) : NULL;
   }
