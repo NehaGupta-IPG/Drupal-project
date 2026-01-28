@@ -3656,6 +3656,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Update.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Query\\\\Update\\:\\:execute\\(\\) should return int but return statement is missing\\.$#',
+	'identifier' => 'return.missing',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Update.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$affected_rows might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -20076,6 +20082,12 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Select.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\pgsql\\\\Driver\\\\Database\\\\pgsql\\\\Update\\:\\:execute\\(\\) should return int but return statement is missing\\.$#',
+	'identifier' => 'return.missing',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Update.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\pgsql\\\\Driver\\\\Database\\\\pgsql\\\\Upsert\\:\\:execute\\(\\) should return int but return statement is missing\\.$#',
