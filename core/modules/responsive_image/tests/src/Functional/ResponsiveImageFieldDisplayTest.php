@@ -553,13 +553,12 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
     // View the node.
     $this->drupalGet('node/' . $nid);
 
-    // Assert the img tag has medium and large images and fallback dimensions
-    // from the large image style are used.
+    // Assert the img tag has medium and large images without fallback dimensions.
     $node = $node_storage->load($nid);
     $image_uri = File::load($node->{$field_name}->target_id)->getFileUri();
     $medium_transform_url = $this->fileUrlGenerator->transformRelative($medium_style->buildUrl($image_uri));
     $large_transform_url = $this->fileUrlGenerator->transformRelative($large_style->buildUrl($image_uri));
-    $this->assertSession()->responseMatches('/<img loading="eager" srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" width="480" height="480" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>/');
+    $this->assertSession()->responseMatches('/<img loading="eager" srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>/');
 
     $this->responsiveImgStyle
       // Test the output of an empty media query.
@@ -571,7 +570,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Assert the picture tag has source tags that include dimensions.
     $this->drupalGet('node/' . $nid);
-    $this->assertSession()->responseMatches('/<picture>\s+<source srcset="' . \preg_quote($large_transform_url, '/') . ' 1x" media="\(min-width: 851px\)" type="image\/avif" width="480" height="480"\/>\s+<source srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" type="image\/avif" width="220" height="220"\/>\s+<img loading="eager" width="480" height="480" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>\s+<\/picture>/');
+    $this->assertSession()->responseMatches('/<picture>\s+<source srcset="' . \preg_quote($large_transform_url, '/') . ' 1x" media="\(min-width: 851px\)" type="image\/avif" width="480" height="480"\/>\s+<source srcset="' . \preg_quote($medium_transform_url, '/') . ' 1x, ' . \preg_quote($large_transform_url, '/') . ' 1.5x, ' . \preg_quote($large_transform_url, '/') . ' 2x" type="image\/avif" width="220" height="220"\/>\s+<img loading="eager" src="' . \preg_quote($large_transform_url, '/') . '" alt="\w+" \/>\s+<\/picture>/');
   }
 
   /**
