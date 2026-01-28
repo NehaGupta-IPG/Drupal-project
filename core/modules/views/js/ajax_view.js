@@ -80,31 +80,25 @@
     }
 
     // Check if there are any GET parameters to send to views.
-    let queryString = window.location.search || '';
-    if (queryString !== '') {
-      // Remove the question mark and Drupal path component if any.
-      queryString = queryString.slice(1);
-
-      // Remove current exposed filters.
-      const params = decodeURI(queryString)
-        .split('&')
-        .filter((param) => {
-          const [name, value] = param.split('=');
-          return (
-            this.$exposed_form.find(`input[name="${name}"]`).length === 0 &&
-            /*
-            Submitting filters should reset paging and sorting
-            because that is what happens without AJAX.
-             */
-            !['page', 'reset', 'sort', 'order', 'q', 'render'].includes(name)
-          );
-        });
-      queryString = encodeURI(params.join('&'));
-      // If there is a '?' in ajaxPath, clean URL are on and & should be
-      // used to add parameters.
-      if (queryString !== '') {
-        queryString = (ajaxPath.includes('?') ? '&' : '?') + queryString;
+    const urlParams = new URLSearchParams(window.location.search || '');
+    const filteredParams = new URLSearchParams();
+    urlParams.forEach((value, name) => {
+      if (
+        this.$exposed_form.find(`input[name="${name}"]`).length === 0 &&
+        /*
+        Submitting filters should reset paging and sorting
+        because that is what happens without AJAX.
+         */
+        !['page', 'reset', 'sort', 'order', 'q', 'render'].includes(name)
+      ) {
+        filteredParams.append(name, value);
       }
+    });
+    let queryString = filteredParams.toString();
+    // If there is a '?' in ajaxPath, clean URL are on and & should be
+    // used to add parameters.
+    if (queryString !== '') {
+      queryString = (ajaxPath.includes('?') ? '&' : '?') + queryString;
     }
 
     this.element_settings = {
