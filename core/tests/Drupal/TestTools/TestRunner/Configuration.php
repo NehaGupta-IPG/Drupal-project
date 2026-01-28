@@ -162,7 +162,7 @@ final class Configuration {
       'sqlite',
       NULL,
       InputOption::VALUE_REQUIRED,
-      'A pathname to use for the SQLite database of the test runner. Required unless this script is executed with a working Drupal installation. A relative pathname is interpreted relative to the Drupal root directory. Note that \':memory:\' cannot be used, because this script spawns sub-processes. However, you may use e.g. \'/tmpfs/test.sqlite\'',
+      'A pathname to use for the SQLite database of the test runner. Required unless this script is executed with a working Drupal installation. A relative pathname is interpreted relative to the Drupal root directory.',
     ));
     $inputDefinition->addOption(new InputOption(
       'dburl',
