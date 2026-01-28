@@ -22,8 +22,11 @@ class Email extends Plugin {
    * @param TranslatableMarkup|null $description
    * @param string|null $module
    * @param string|null $key
+   * @param string $class
    * @param string|null $html_body_template
    * @param string|null $text_body_template
+   * @param string|null $default_subject
+   * @param array|null $default_recipients
    */
   public function __construct(
     public readonly string              $id,
@@ -34,6 +37,8 @@ class Email extends Plugin {
     public string                        $class = EmailPluginDefault::class,
     public readonly ?string              $html_body_template = NULL,
     public readonly ?string              $text_body_template = NULL,
+    public readonly ?string              $default_subject = NULL,
+    public readonly ?array               $default_recipients = NULL,
   )
   {
 

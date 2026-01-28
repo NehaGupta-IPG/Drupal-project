@@ -66,6 +66,10 @@ class EmailManager extends DefaultPluginManager {
     'html_body_template' => NULL,
     // Template for the text version of the email body.
     'text_body_template' => NULL,
+    // Default subject for the email.
+    'default_subject' => NULL,
+    // Default recipients for the email.
+    'default_recipients' => NULL,
   ];
 
   /**
@@ -147,6 +151,9 @@ class EmailManager extends DefaultPluginManager {
       if ($text instanceof RenderableInterface) {
         $text = $text->toRenderable();
       }
+
+      // Call preBuild to set defaults from the plugin class.
+      $email->preBuild();
 
       $email_data = [
         'body' => [

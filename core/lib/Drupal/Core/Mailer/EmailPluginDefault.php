@@ -90,6 +90,31 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return NULL;
   }
 
+  public function getDefaultSubject(): \Stringable|string|null {
+    return $this->pluginDefinition['default_subject'] ?? NULL;
+  }
+
+  public function getDefaultRecipients(): ?array {
+    return $this->pluginDefinition['default_recipients'] ?? NULL;
+  }
+
+  public function preBuild(): static {
+    if ($this->getHeader('Subject') === NULL && $default_subject = $this->getDefaultSubject()) {
+      $this->subject($default_subject);
+    }
+    $default_recipients = $this->getDefaultRecipients();
+    if (!empty($default_recipients['to']) && $this->getHeader('To') === NULL) {
+      $this->to(...$default_recipients['to']);
+    }
+    if (!empty($default_recipients['cc']) && $this->getHeader('Cc') === NULL) {
+      $this->cc(...$default_recipients['cc']);
+    }
+    if (!empty($default_recipients['bcc']) && $this->getHeader('Bcc') === NULL) {
+      $this->bcc(...$default_recipients['bcc']);
+    }
+    return $this;
+  }
+
   public function getHeaders(): array {
     return $this->headers;
   }
@@ -127,7 +152,7 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return $this;
   }
 
-  public function subject(\Stringable $subject): static {
+  public function subject(\Stringable|string $subject): static {
     $this->setHeader('Subject', $subject);
     return $this;
   }

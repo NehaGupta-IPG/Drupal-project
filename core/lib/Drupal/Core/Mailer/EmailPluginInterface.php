@@ -39,4 +39,10 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
 
   public function getHeaders(): array;
 
+  public function preBuild(): static;
+
+  public function getDefaultRecipients(): ?array;
+
+  public function getDefaultSubject(): \Stringable|string|null;
+
 }
