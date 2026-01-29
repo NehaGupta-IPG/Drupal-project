@@ -7,6 +7,7 @@ namespace Drupal\Tests\settings_tray\FunctionalJavascript;
 use Drupal\block\Entity\Block;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\FunctionalJavascript\OffCanvasTestBase;
+use WebDriver\Exception\StaleElementReference;
 
 /**
  * Base class for Settings Tray tests.
