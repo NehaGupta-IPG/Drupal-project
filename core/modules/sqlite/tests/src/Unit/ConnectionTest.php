@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\sqlite\Unit;
 
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\sqlite\Driver\Database\sqlite\SqliteConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
@@ -30,7 +31,14 @@ class ConnectionTest extends UnitTestCase {
    */
   #[DataProvider('providerCreateConnectionOptionsFromUrl')]
   public function testCreateConnectionOptionsFromUrl(string $url, string $expected): void {
-    $sqlite_connection = new Connection($this->createMock(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class), []);
+    $sqlite_connection = new Connection(
+      $this->createStub(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
+      ConnectionParametersFactory::createFromOptionsArray([
+        'driver' => 'sqlite',
+        'database' => ':memory:',
+        'foo' => 'bar',
+      ]),
+    );
     $database = $sqlite_connection->createConnectionOptionsFromUrl($url, NULL);
     $this->assertEquals('sqlite', $database['driver']);
     $this->assertEquals($expected, $database['database']);
@@ -59,10 +67,38 @@ class ConnectionTest extends UnitTestCase {
   public function testDeprecationOfRootInConnectionOptionsFromUrl(): void {
     $this->expectDeprecation('Passing the $root value to Drupal\sqlite\Driver\Database\sqlite\Connection::createConnectionOptionsFromUrl() is deprecated in drupal:11.2.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287');
     $root = dirname(__DIR__, 8);
-    $sqlite_connection = new Connection($this->createMock(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class), []);
+    $sqlite_connection = new Connection(
+      $this->createStub(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
+      ConnectionParametersFactory::createFromOptionsArray([
+        'driver' => 'sqlite',
+        'database' => ':memory:',
+      ]),
+    );
     $database = $sqlite_connection->createConnectionOptionsFromUrl('sqlite://localhost/tmp/test', $root);
     $this->assertEquals('sqlite', $database['driver']);
     $this->assertEquals('tmp/test', $database['database']);
+  }
+
+  /**
+   * Confirms legacy array access to the ConnectionParameters.
+   */
+  public function testConnectionParametersArrayAccess(): void {
+    $sqlite_connection = new Connection(
+      $this->createStub(\PHP_VERSION_ID >= 80400 ? SqliteConnection::class : StubPDO::class),
+      ConnectionParametersFactory::createFromOptionsArray([
+        'driver' => 'sqlite',
+        'database' => ':memory:',
+        'foo' => 'bar',
+      ]),
+    );
+    $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()->driver);
+    $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()->database);
+    $this->assertEquals('sqlite', $sqlite_connection->getConnectionOptions()['driver']);
+    $this->assertEquals(':memory:', $sqlite_connection->getConnectionOptions()['database']);
+
+    $this->assertEquals('bar', $sqlite_connection->getConnectionOptions()['foo']);
+    $sqlite_connection->getConnectionOptions()['foo'] = 'qux';
+    $this->assertEquals('qux', $sqlite_connection->getConnectionOptions()['foo']);
   }
 
 }

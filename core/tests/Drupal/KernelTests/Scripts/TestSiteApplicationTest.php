@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Scripts;
 
 use Drupal\Component\FileSystem\FileSystem;
+use Drupal\Core\Database\ConnectionParametersFactory;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\KernelTests\KernelTestBase;
@@ -290,7 +291,7 @@ class TestSiteApplicationTest extends KernelTestBase {
    *   The database key of the added connection.
    */
   protected function addTestDatabase($db_prefix): string {
-    $database = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'));
+    $database = ConnectionParametersFactory::createFromUrl(getenv('SIMPLETEST_DB'))->toArray();
     $database['prefix'] = $db_prefix;
     $target = __CLASS__ . $db_prefix;
     Database::addConnectionInfo($target, 'default', $database);

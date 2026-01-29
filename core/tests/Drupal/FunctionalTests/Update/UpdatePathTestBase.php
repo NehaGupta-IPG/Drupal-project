@@ -179,8 +179,12 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
     ];
 
     // Since the installer isn't run, add the database settings here too.
+    $database = [];
+    foreach (Database::getConnectionInfo() as $target => $parameters) {
+      $database[$target] = $parameters->toArray();
+    }
     $settings['databases']['default'] = (object) [
-      'value' => Database::getConnectionInfo(),
+      'value' => $database,
       'required' => TRUE,
     ];
 

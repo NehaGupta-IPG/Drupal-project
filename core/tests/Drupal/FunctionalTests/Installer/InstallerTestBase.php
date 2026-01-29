@@ -259,7 +259,7 @@ abstract class InstallerTestBase extends BrowserTestBase {
   protected function setUpSettings() {
     $parameters = $this->parameters['forms']['install_settings_form'];
     $driver = $parameters['driver'];
-    unset($parameters[$driver]['dependencies']);
+    unset($parameters[$driver]['dependencies'], $parameters[$driver]['module']);
     $edit = $this->translatePostValues($parameters);
     $this->submitForm($edit, $this->translations['Save and continue']);
   }

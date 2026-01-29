@@ -303,11 +303,11 @@ class CredentialForm extends MigrateUpgradeFormBase {
     if (!$this->errors) {
       $options = array_flip(['database', 'host', 'port', 'prefix', 'namespace']);
       $source = array_map('strval', array_intersect_key(
-        $connection->getConnectionOptions(),
+        $connection->getConnectionOptions()->toArray(),
         $options,
       ));
       $destination = array_map('strval', array_intersect_key(
-        Database::getConnection()->getConnectionOptions(),
+        Database::getConnection()->getConnectionOptions()->toArray(),
         $options,
       ));
       ksort($source);

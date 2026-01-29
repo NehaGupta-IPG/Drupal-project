@@ -137,7 +137,7 @@ class ConnectionTest extends UnitTestCase {
       ],
       [
         'Drupal\Tests\Core\Database\Stub\Select',
-        NULL,
+        '',
         'Select',
       ],
       // Tests with the CoreFake database driver. This driver has no custom
@@ -676,8 +676,10 @@ class ConnectionTest extends UnitTestCase {
    */
   public function testFindCallerFromDebugBacktrace(): void {
     Database::addConnectionInfo('default', 'default', [
-      'driver' => 'test',
+      'driver' => 'stub',
       'namespace' => 'Drupal\Tests\Core\Database\Stub',
+      'autoload' => __DIR__ . '/Stub/',
+      'database' => 'stub',
     ]);
     $connection = new StubConnection($this->createMock(StubPDO::class), []);
     $result = $connection->findCallerFromDebugBacktrace();

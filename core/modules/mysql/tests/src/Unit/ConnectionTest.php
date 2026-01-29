@@ -12,6 +12,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 
+// cspell:ignore djarin grogu kuiil
+
 /**
  * Tests MySQL database connections.
  */
@@ -32,8 +34,11 @@ class ConnectionTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->connection = $this->getMockBuilder(Connection::class)
-      // @phpstan-ignore class.notFound
-      ->setConstructorArgs([$this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class), []])
+      ->setConstructorArgs([
+        // @phpstan-ignore class.notFound
+        $this->createMock(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class),
+        ['driver' => 'mysql', 'database' => 'foo'],
+      ])
       ->onlyMethods(['getServerVersion'])
       ->getMock();
   }
@@ -123,6 +128,44 @@ class ConnectionTest extends UnitTestCase {
         '5.7.28-31',
       ],
     ];
+  }
+
+  /**
+   * Confirms legacy array access to the ConnectionParameters.
+   */
+  public function testConnectionParametersArrayAccess(): void {
+    $mysql_connection = new Connection(
+      // @phpstan-ignore class.notFound
+      $this->createStub(\PHP_VERSION_ID >= 80400 ? Mysql::class : \PDO::class),
+      [
+        'driver' => 'mysql',
+        'database' => 'kaboom',
+        'foo' => 'bar',
+        'din' => [
+          'djarin',
+          'grogu',
+        ],
+      ],
+    );
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()->driver);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()->database);
+    $this->assertEquals('mysql', $mysql_connection->getConnectionOptions()['driver']);
+    $this->assertEquals('kaboom', $mysql_connection->getConnectionOptions()['database']);
+    $this->assertEquals('bar', $mysql_connection->getConnectionOptions()['foo']);
+    $this->assertEquals(['djarin', 'grogu'], $mysql_connection->getConnectionOptions()['din']);
+
+    $mysql_connection->getConnectionOptions()['driver'] = 'qux';
+    $mysql_connection->getConnectionOptions()['database'] = 'qux';
+    $mysql_connection->getConnectionOptions()['foo'] = 'qux';
+    $mysql_connection->getConnectionOptions()['din']['also'] = 'kuiil';
+    $mysql_connection->getConnectionOptions()['pdo'][\PDO::ATTR_EMULATE_PREPARES] = TRUE;
+    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['driver']);
+    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['database']);
+    $this->assertEquals('qux', $mysql_connection->getConnectionOptions()['foo']);
+    $this->assertEquals(['djarin', 'grogu', 'also' => 'kuiil'], $mysql_connection->getConnectionOptions()['din']);
+    $this->assertEquals(['djarin', 'grogu', 'also' => 'kuiil'], $mysql_connection->getConnectionOptions()->din);
+    $this->assertEquals([\PDO::ATTR_EMULATE_PREPARES => TRUE], $mysql_connection->getConnectionOptions()['pdo']);
+    $this->assertEquals([\PDO::ATTR_EMULATE_PREPARES => TRUE], $mysql_connection->getConnectionOptions()->pdo);
   }
 
 }

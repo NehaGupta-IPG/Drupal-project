@@ -42,7 +42,13 @@ class StubConnection extends Connection {
    */
   public function __construct(\PDO $connection, array $connection_options, $identifier_quotes = ['', '']) {
     $this->identifierQuotes = $identifier_quotes;
-    parent::__construct($connection, $connection_options);
+    $options = array_merge([
+      'driver' => 'stub',
+      'namespace' => __NAMESPACE__,
+      'autoload' => __DIR__,
+      'database' => 'stub',
+    ], $connection_options);
+    parent::__construct($connection, $options);
   }
 
   /**

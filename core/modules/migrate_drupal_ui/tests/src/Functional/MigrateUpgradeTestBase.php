@@ -98,7 +98,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    * @todo Remove when we don't use global. https://www.drupal.org/node/2552791
    */
   protected function createMigrationConnection() {
-    $connection_info = Database::getConnectionInfo('default')['default'];
+    $connection_info = Database::getConnectionInfo('default')['default']->toArray();
     if ($connection_info['driver'] === 'sqlite') {
       // Create database file in the test site's public file directory so that
       // \Drupal\Tests\BrowserTestBase::cleanupEnvironment() will delete this
@@ -294,7 +294,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    * @see \Drupal\migrate_drupal_ui\Form\CredentialForm
    */
   protected function getCredentials() {
-    $connection_options = $this->sourceDatabase->getConnectionOptions();
+    $connection_options = $this->sourceDatabase->getConnectionOptions()->toArray();
     $version = $this->getLegacyDrupalVersion($this->sourceDatabase);
     $driver = $connection_options['driver'];
 

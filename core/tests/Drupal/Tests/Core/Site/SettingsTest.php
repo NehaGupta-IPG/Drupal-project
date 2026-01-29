@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Site;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Database\ConnectionParametersInterface;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
@@ -318,6 +319,7 @@ class SettingsTest extends UnitTestCase {
   public function testDatabaseInfoInitialization(string $driver, ?string $namespace, ?string $autoload, string $expected_namespace, ?string $expected_autoload): void {
     $databases['mock'][$driver] = [
       'driver' => $driver,
+      'database' => 'test',
       'prefix' => '',
     ];
     if (!is_null($namespace)) {
@@ -337,27 +339,24 @@ class SettingsTest extends UnitTestCase {
     $class_loader = $this->createMock(ClassLoader::class);
     if (!empty($expected_autoload)) {
       $class_loader->expects($this->once())
-        ->method('addPsr4')
+        ->method('setPsr4')
         ->with($expected_namespace . '\\', vfsStream::url('root') . '/' . $expected_autoload);
     }
     else {
       $class_loader->expects($this->never())
-        ->method('addPsr4');
+        ->method('setPsr4');
     }
 
     Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
 
-    $expected = [
-      $driver => [
-        'driver' => $driver,
-        'namespace' => $expected_namespace,
-        'prefix' => '',
-      ],
-    ];
+    $mock_connection_parameters = Database::getConnectionInfo('mock')[$driver];
+    $this->assertInstanceOf(ConnectionParametersInterface::class, $mock_connection_parameters);
+    $this->assertSame($driver, $mock_connection_parameters->driver);
+    $this->assertSame($expected_namespace, $mock_connection_parameters->namespace);
+    $this->assertSame('', $mock_connection_parameters->prefix);
     if (!is_null($expected_autoload)) {
-      $expected[$driver]['autoload'] = $expected_autoload;
+      $this->assertSame($expected_autoload, $mock_connection_parameters->autoload);
     }
-    $this->assertEquals($expected, Database::getConnectionInfo('mock'));
   }
 
   /**
@@ -392,13 +391,6 @@ class SettingsTest extends UnitTestCase {
         NULL,
         'Drupal\\mysql\\Driver\\Database\\mysql',
         'core/modules/mysql/src/Driver/Database/mysql/',
-      ],
-      [
-        'mysql',
-        'Drupal\\Driver\\Database\\mysql',
-        NULL,
-        'Drupal\\Driver\\Database\\mysql',
-        NULL,
       ],
       [
         'mysql',
@@ -438,13 +430,6 @@ class SettingsTest extends UnitTestCase {
       ],
       [
         'pgsql',
-        'Drupal\\Driver\\Database\\pgsql',
-        NULL,
-        'Drupal\\Driver\\Database\\pgsql',
-        NULL,
-      ],
-      [
-        'pgsql',
         'Drupal\\pgsql\\Driver\\Database\\pgsql',
         'modules/custom/pgsql/src/Driver/Database/pgsql/',
         'Drupal\\pgsql\\Driver\\Database\\pgsql',
@@ -478,13 +463,6 @@ class SettingsTest extends UnitTestCase {
         NULL,
         'Drupal\\sqlite\\Driver\\Database\\sqlite',
         'core/modules/sqlite/src/Driver/Database/sqlite/',
-      ],
-      [
-        'sqlite',
-        'Drupal\\Driver\\Database\\sqlite',
-        NULL,
-        'Drupal\\Driver\\Database\\sqlite',
-        NULL,
       ],
       [
         'sqlite',

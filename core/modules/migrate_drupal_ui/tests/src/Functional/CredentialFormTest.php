@@ -148,7 +148,7 @@ class CredentialFormTest extends MigrateUpgradeTestBase {
    * @see \Drupal\migrate_drupal_ui\Form\CredentialForm
    */
   protected function getDestinationSiteCredentials(): array {
-    $connection_options = \Drupal::database()->getConnectionOptions();
+    $connection_options = \Drupal::database()->getConnectionOptions()->toArray();
     $version = $this->getLegacyDrupalVersion($this->sourceDatabase);
     $driver = $connection_options['driver'];
 

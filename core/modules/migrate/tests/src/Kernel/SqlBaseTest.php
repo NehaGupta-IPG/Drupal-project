@@ -142,7 +142,7 @@ class SqlBaseTest extends MigrateTestBase {
     $sql_base = new TestSqlBase([], $this->migration);
     $target = 'test_state_db_target2';
     $key = 'test_state_migrate_connection2';
-    $database = Database::getConnectionInfo('default')['default'];
+    $database = Database::getConnectionInfo('default')['default']->toArray();
     $database['database'] = 'godot';
     $config = ['target' => $target, 'key' => $key, 'database' => $database];
     $database_state_key = 'migrate_sql_base_test2';
