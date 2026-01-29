@@ -14,7 +14,8 @@ interface OutboundPathProcessorInterface {
    * Processes the outbound path.
    *
    * @param string $path
-   *   The path to process, with a leading slash.
+   *   The path to process, with a leading slash such as '/node/1' or an internal path beginning
+   *   with '/'. May also be a route name.
    * @param array $options
    *   (optional) An associative array of additional options, with the following
    *   elements:
@@ -37,13 +38,16 @@ interface OutboundPathProcessorInterface {
    *     dependent URL requires so.
    *   - 'route': The route object for the given path. It will be set by
    *     \Drupal\Core\Routing\UrlGenerator::generateFromRoute().
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The HttpRequest object representing the current request.
+   * @param \Symfony\Component\HttpFoundation\Request|null $request
+   *   The current HTTP request object, or NULL when there is no active request
+   *   context. For example, this may be NULL during cron runs, command line
+   *   operations, or when generating links outside the scope of an HTTP
+   *   request.
    * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
    *   (optional) Object to collect path processors' bubbleable metadata.
    *
    * @return string
-   *   The processed path.
+   *   The processed outbound path.
    */
   public function processOutbound($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL);
 
