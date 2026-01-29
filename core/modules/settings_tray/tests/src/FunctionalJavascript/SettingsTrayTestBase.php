@@ -53,9 +53,24 @@ abstract class SettingsTrayTestBase extends OffCanvasTestBase {
     //   sleep is necessary in.
     usleep(100000);
 
-    $block = $this->getSession()->getPage()->find('css', $block_selector);
-    $block->mouseOver();
-    $block->click();
+    // Retry mechanism for stale element references.
+    $max_attempts = 3;
+    $attempt = 0;
+    while ($attempt < $max_attempts) {
+      try {
+        $block = $this->getSession()->getPage()->find('css', $block_selector);
+        $block->mouseOver();
+        $block->click();
+        break;
+      }
+      catch (\WebDriver\Exception\StaleElementReference $e) {
+        $attempt++;
+        if ($attempt >= $max_attempts) {
+          throw $e;
+        }
+        usleep(100000);
+      }
+    }
     $this->waitForOffCanvasToOpen();
     $this->assertOffCanvasBlockFormIsValid();
   }
