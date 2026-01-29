@@ -97,7 +97,8 @@ class UserSelection extends DefaultSelection {
       '#type' => 'checkbox',
       '#title' => $this->t('Include the anonymous user.'),
       '#default_value' => $configuration['include_anonymous'],
-      // If inactive users are not included, then it's not possible to get the Anonymous user either.
+      // If inactive users are not included, then it's not possible to get the
+      // Anonymous user either.
       '#states' => [
         'visible' => [
           ':input[name="settings[handler_settings][include_blocked]"]' => ['checked' => TRUE],
