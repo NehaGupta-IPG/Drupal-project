@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media_library\Unit;
 
-use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Url;
 use Drupal\media\MediaInterface;
 use Drupal\media_library\Hook\MediaLibraryThemeHooks;
 use Drupal\Tests\UnitTestCase;
