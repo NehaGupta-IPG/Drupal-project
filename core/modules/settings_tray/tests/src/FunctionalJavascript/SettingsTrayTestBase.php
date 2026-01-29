@@ -64,7 +64,7 @@ abstract class SettingsTrayTestBase extends OffCanvasTestBase {
         $block->click();
         break;
       }
-      catch (\WebDriver\Exception\StaleElementReference $e) {
+      catch (StaleElementReference $e) {
         $attempt++;
         if ($attempt >= $max_attempts) {
           throw $e;
