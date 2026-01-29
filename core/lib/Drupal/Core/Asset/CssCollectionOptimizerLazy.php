@@ -9,6 +9,7 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Drupal\Core\Asset\AssetQueryStringInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -41,6 +42,8 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
    *   The time service.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager.
+   * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
+   *   The assetQueryString.
    */
   public function __construct(
     protected readonly AssetCollectionGrouperInterface $grouper,
@@ -53,6 +56,7 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
     protected readonly FileUrlGeneratorInterface $fileUrlGenerator,
     protected readonly TimeInterface $time,
     protected readonly LanguageManagerInterface $languageManager,
+    protected readonly AssetQueryStringInterface $assetQueryString,
   ) {}
 
   /**
@@ -105,6 +109,7 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
       'language' => $this->languageManager->getCurrentLanguage()->getId(),
       'theme' => $this->themeManager->getActiveTheme()->getName(),
       'include' => UrlHelper::compressQueryParameter(implode(',', $this->dependencyResolver->getMinimalRepresentativeSubset($libraries))),
+      'default_query_string' => $this->assetQueryString->get(),
     ];
     $ajax_page_state = $this->requestStack->getCurrentRequest()->get('ajax_page_state');
     $already_loaded = isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : [];
