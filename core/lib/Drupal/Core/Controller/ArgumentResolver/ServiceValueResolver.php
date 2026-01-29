@@ -22,13 +22,15 @@ final class ServiceValueResolver implements ValueResolverInterface {
    */
   public function resolve(Request $request, ArgumentMetadata $argument): array {
     foreach ($argument->getAttributes(Autowire::class) as $attribute) {
-      if ($this->container->has($attribute->value)) {
-        return [$this->container->get($attribute->value)];
+      $service_id = (string) $attribute->value;
+      if ($this->container->has($service_id)) {
+        return [$this->container->get($service_id)];
       }
     }
 
-    if ($this->container->has($argument->getType())) {
-      return [$this->container->get($argument->getType())];
+    $type = $argument->getType();
+    if ($type !== NULL && $this->container->has($type)) {
+      return [$this->container->get($type)];
     }
 
     return [];
