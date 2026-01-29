@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\text\Functional;
+namespace Drupal\Tests\text_with_summary\Functional;
 
 use Drupal\Tests\system\Functional\Module\GenericModuleTestBase;
 use PHPUnit\Framework\Attributes\Group;
