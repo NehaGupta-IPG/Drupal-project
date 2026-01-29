@@ -31,19 +31,11 @@ class TextSummaryTest extends KernelTestBase {
     'system',
     'user',
     'filter',
+    'text_with_summary_field',
     'text',
     'field',
     'entity_test',
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->installConfig(['text']);
-  }
 
   /**
    * Tests required summary.

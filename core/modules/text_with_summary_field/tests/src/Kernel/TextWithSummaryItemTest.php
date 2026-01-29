@@ -25,7 +25,7 @@ class TextWithSummaryItemTest extends FieldKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['filter'];
+  protected static $modules = ['filter', 'text_with_summary_field'];
 
   /**
    * Field storage entity.

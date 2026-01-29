@@ -27,7 +27,7 @@ class TextWithSummaryTokenReplaceTest extends TokenReplaceKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'filter'];
+  protected static $modules = ['node', 'filter', 'text_with_summary_field'];
 
   /**
    * {@inheritdoc}

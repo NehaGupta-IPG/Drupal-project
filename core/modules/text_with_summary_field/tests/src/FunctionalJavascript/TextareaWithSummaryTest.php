@@ -22,7 +22,7 @@ class TextareaWithSummaryTest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['text', 'node'];
+  protected static $modules = ['text_with_summary_field', 'node'];
 
   /**
    * {@inheritdoc}
