@@ -163,6 +163,18 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected $vfsRoot;
 
   /**
+   * The configuration importer.
+   *
+   * @var \Drupal\Core\Config\ConfigImporter
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   the configImporter() method instead which returns a fresh ConfigImporter.
+   *
+   * @see https://www.drupal.org/node/3570442
+   */
+  protected $configImporter;
+
+  /**
    * The key_value service that must persist between container rebuilds.
    *
    * @var \Drupal\Core\KeyValueStore\KeyValueMemoryFactory
@@ -610,6 +622,11 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $route_provider_definition = new Definition(RouteProvider::class);
     $route_provider_definition->setPublic(TRUE);
     $container->setDefinition($id, $route_provider_definition);
+
+    // Remove the stored configuration importer so if used again it will be
+    // built with up-to-date services.
+    // @phpstan-ignore property.deprecated
+    $this->configImporter = NULL;
 
     // Allow kernel tests to register hooks.
     $definition = $container->register(static::class, static::class)->setSynthetic(TRUE);

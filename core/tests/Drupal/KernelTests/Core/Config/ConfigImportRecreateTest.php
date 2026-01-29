@@ -65,17 +65,19 @@ class ConfigImportRecreateTest extends KernelTestBase {
 
     // A node type, a field, an entity view display and an entity form display
     // will be recreated.
-    $creates = $this->configImporter()->getUnprocessedConfiguration('create');
-    $deletes = $this->configImporter()->getUnprocessedConfiguration('delete');
+    $configImporter = $this->configImporter();
+    $creates = $configImporter->getUnprocessedConfiguration('create');
+    $deletes = $configImporter->getUnprocessedConfiguration('delete');
     $this->assertCount(5, $creates, 'There are 5 configuration items to create.');
     $this->assertCount(5, $deletes, 'There are 5 configuration items to delete.');
-    $this->assertCount(0, $this->configImporter()->getUnprocessedConfiguration('update'), 'There are no configuration items to update.');
+    $this->assertCount(0, $configImporter->getUnprocessedConfiguration('update'), 'There are no configuration items to update.');
     $this->assertSame($creates, array_reverse($deletes), 'Deletes and creates contain the same configuration names in opposite orders due to dependencies.');
 
-    $this->configImporter()->import();
+    $configImporter = $this->configImporter();
+    $configImporter->import();
 
     // Verify that there is nothing more to import.
-    $this->assertFalse($this->configImporter()->hasUnprocessedConfigurationChanges());
+    $this->assertFalse($configImporter->hasUnprocessedConfigurationChanges());
     $content_type = NodeType::load($type_name);
     $this->assertEquals('Node type one', $content_type->label());
   }

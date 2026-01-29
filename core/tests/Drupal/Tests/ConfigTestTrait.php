@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
-use Drupal\Core\Config\ConfigImporter;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\Config\StorageCopyTrait;
@@ -18,27 +17,23 @@ trait ConfigTestTrait {
   use StorageCopyTrait;
 
   /**
-   * The configuration importer.
-   */
-  protected ConfigImporter $configImporter;
-
-  /**
    * Returns a ConfigImporter object to import test configuration.
    *
    * @return \Drupal\Core\Config\ConfigImporter
    *   The config importer object.
    */
   protected function configImporter() {
-    if (!isset($this->configImporter)) {
-      // Set up the ConfigImporter object for testing.
-      $storage_comparer = new StorageComparer(
-        $this->container->get('config.storage.sync'),
-        $this->container->get('config.storage')
-      );
-      $this->configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer);
-    }
-    // Always recalculate the changelist when called.
-    return $this->configImporter->reset();
+    $storage_comparer = new StorageComparer(
+      $this->container->get('config.storage.sync'),
+      $this->container->get('config.storage')
+    );
+    $configImporter = $this->container->get(ConfigImporterFactory::class)->get($storage_comparer);
+
+    // Set the deprecated property for backwards compatibility.
+    // @phpstan-ignore property.deprecated
+    $this->configImporter = $configImporter;
+
+    return $configImporter->reset();
   }
 
   /**
