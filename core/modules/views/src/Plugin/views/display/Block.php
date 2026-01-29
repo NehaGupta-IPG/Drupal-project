@@ -11,6 +11,9 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\Plugin\Block\ViewsBlock;
+use Drupal\views\Plugin\ViewsPluginManager;
+use Drupal\views\ViewsData;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The plugin that handles a block.
@@ -53,25 +56,48 @@ class Block extends DisplayPluginBase {
    */
   protected $blockManager;
 
-  /**
-   * Constructs a new Block instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
-   *   The block manager.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, BlockManagerInterface $block_manager) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EntityTypeManagerInterface $entity_type_manager,
+    BlockManagerInterface $block_manager,
+    protected ?ViewsData $viewsData = NULL,
+    protected ?ViewsPluginManager $accessPluginManager = NULL,
+    protected ?ViewsPluginManager $cachePluginManager = NULL,
+    protected ?ViewsPluginManager $displayExtenderPluginManager = NULL,
+    protected ?ViewsPluginManager $exposedFormPluginManager = NULL,
+    protected ?ViewsPluginManager $pagerPluginManager = NULL,
+    protected ?ViewsPluginManager $rowPluginManager = NULL,
+    protected ?ViewsPluginManager $stylePluginManager = NULL,
+    protected ?ViewsPluginManager $queryPluginManager = NULL,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $viewsData, $accessPluginManager, $cachePluginManager, $displayExtenderPluginManager, $exposedFormPluginManager, $pagerPluginManager, $rowPluginManager, $stylePluginManager, $queryPluginManager);
 
     $this->entityTypeManager = $entity_type_manager;
     $this->blockManager = $block_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('plugin.manager.block'),
+      $container->get('views.views_data'),
+      $container->get('plugin.manager.views.access'),
+      $container->get('plugin.manager.views.cache'),
+      $container->get('plugin.manager.views.display_extender'),
+      $container->get('plugin.manager.views.exposed_form'),
+      $container->get('plugin.manager.views.pager'),
+      $container->get('plugin.manager.views.row'),
+      $container->get('plugin.manager.views.style'),
+      $container->get('plugin.manager.views.query'),
+    );
   }
 
   /**

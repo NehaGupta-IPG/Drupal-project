@@ -86,6 +86,41 @@ class CollectRoutesTest extends UnitTestCase {
 
     $container->setParameter('serializer.format_providers', ['json']);
 
+    $views_data = $this->getMockBuilder('\Drupal\views\ViewsData')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('views.views_data', $views_data);
+
+    $cache_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.cache', $cache_plugin_manager);
+
+    $display_extender_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.display_extender', $display_extender_plugin_manager);
+
+    $exposed_form_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.exposed_form', $exposed_form_plugin_manager);
+
+    $pager_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.pager', $pager_plugin_manager);
+
+    $row_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.row', $row_plugin_manager);
+
+    $query_plugin_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $container->set('plugin.manager.views.query', $query_plugin_manager);
+
     \Drupal::setContainer($container);
 
     $this->restExport = RestExport::create($container, [], "test_routes", []);

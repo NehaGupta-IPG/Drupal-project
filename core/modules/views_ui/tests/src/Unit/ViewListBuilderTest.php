@@ -10,7 +10,9 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuParentFormSelector;
 use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\ViewExecutableFactory;
+use Drupal\views\ViewsData;
 use Drupal\views_ui\ViewListBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -25,6 +27,20 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ViewListBuilderTest extends UnitTestCase {
 
   /**
+   * The views data.
+   *
+   * @var \Drupal\views\ViewsData
+   */
+  protected ViewsData $viewsData;
+
+  /**
+   * The plugin manager for views plugins.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager
+   */
+  protected ViewsPluginManager $viewPluginManager;
+
+  /**
    * Tests the listing of displays on a views list builder.
    *
    * @see \Drupal\views_ui\ViewListBuilder::getDisplaysList()
@@ -34,6 +50,14 @@ class ViewListBuilderTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $display_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->viewsData = $this->getMockBuilder('Drupal\views\ViewsData')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->viewPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
       ->disableOriginalConstructor()
       ->getMock();
 
@@ -78,7 +102,20 @@ class ViewListBuilderTest extends UnitTestCase {
 
     $default_display = $this->getMockBuilder('Drupal\views\Plugin\views\display\DefaultDisplay')
       ->onlyMethods(['initDisplay'])
-      ->setConstructorArgs([[], 'default', $display_manager->getDefinition('default')])
+      ->setConstructorArgs([
+        [],
+        'default',
+        $display_manager->getDefinition('default'),
+        $this->viewsData,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+      ])
       ->getMock();
     $route_provider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $state = $this->createMock('\Drupal\Core\State\StateInterface');
@@ -94,6 +131,15 @@ class ViewListBuilderTest extends UnitTestCase {
         $state,
         $menu_storage,
         $parent_form_selector,
+        $this->viewsData,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
       ])
       ->getMock();
     $page_display->expects($this->any())
@@ -106,7 +152,20 @@ class ViewListBuilderTest extends UnitTestCase {
 
     $embed_display = $this->getMockBuilder('Drupal\views\Plugin\views\display\Embed')
       ->onlyMethods(['initDisplay'])
-      ->setConstructorArgs([[], 'default', $display_manager->getDefinition('embed')])
+      ->setConstructorArgs([
+        [],
+        'default',
+        $display_manager->getDefinition('embed'),
+        $this->viewsData,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+        $this->viewPluginManager,
+      ])
       ->getMock();
 
     $values = [];

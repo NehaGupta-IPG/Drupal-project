@@ -10,6 +10,7 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\PluginDependencyTrait;
@@ -18,15 +19,20 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\views\Form\ViewsForm;
 use Drupal\views\Plugin\views\area\AreaPluginBase;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Views;
+use Drupal\views\ViewsData;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base class for views display plugins.
  */
 abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInterface, DependentPluginInterface {
   use PluginDependencyTrait;
+  use DependencySerializationTrait;
 
   /**
    * The top object of a view.
@@ -133,26 +139,86 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public DisplayPluginInterface $default_display;
 
-  /**
-   * Constructs a new DisplayPluginBase object.
-   *
-   * Because DisplayPluginBase::initDisplay() takes the display configuration by
-   * reference and handles it differently than usual plugin configuration, pass
-   * an empty array of configuration to the parent. This prevents our
-   * configuration from being duplicated.
-   *
-   * @todo Replace DisplayPluginBase::$display with
-   *   DisplayPluginBase::$configuration to standardize with other plugins.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected ?ViewsData $viewsData = NULL,
+    protected ?ViewsPluginManager $accessPluginManager = NULL,
+    protected ?ViewsPluginManager $cachePluginManager = NULL,
+    protected ?ViewsPluginManager $displayExtenderPluginManager = NULL,
+    protected ?ViewsPluginManager $exposedFormPluginManager = NULL,
+    protected ?ViewsPluginManager $pagerPluginManager = NULL,
+    protected ?ViewsPluginManager $rowPluginManager = NULL,
+    protected ?ViewsPluginManager $stylePluginManager = NULL,
+    protected ?ViewsPluginManager $queryPluginManager = NULL,
+  ) {
     parent::__construct([], $plugin_id, $plugin_definition);
+
+    if ($this->viewsData === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $viewsData argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->viewsData = \Drupal::service(ViewsData::class);
+    }
+
+    if ($this->accessPluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $accessPluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->accessPluginManager = \Drupal::service('plugin.manager.views.access');
+    }
+
+    if ($this->cachePluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $cachePluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->cachePluginManager = \Drupal::service('plugin.manager.views.cache');
+    }
+
+    if ($this->displayExtenderPluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $displayExtenderPluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->displayExtenderPluginManager = \Drupal::service('plugin.manager.views.display_extender');
+    }
+
+    if ($this->exposedFormPluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $exposedFormPluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->exposedFormPluginManager = \Drupal::service('plugin.manager.views.exposed_form');
+    }
+
+    if ($this->pagerPluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $pagerPluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->pagerPluginManager = \Drupal::service('plugin.manager.views.pager');
+    }
+
+    if ($this->rowPluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $rowPluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->rowPluginManager = \Drupal::service('plugin.manager.views.row');
+    }
+
+    if ($this->stylePluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $stylePluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->stylePluginManager = \Drupal::service('plugin.manager.views.style');
+    }
+
+    if ($this->queryPluginManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $queryPluginManager argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3421323', E_USER_DEPRECATED);
+      $this->queryPluginManager = \Drupal::service('plugin.manager.views.query');
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, mixed $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('views.views_data'),
+      $container->get('plugin.manager.views.access'),
+      $container->get('plugin.manager.views.cache'),
+      $container->get('plugin.manager.views.display_extender'),
+      $container->get('plugin.manager.views.exposed_form'),
+      $container->get('plugin.manager.views.pager'),
+      $container->get('plugin.manager.views.row'),
+      $container->get('plugin.manager.views.style'),
+      $container->get('plugin.manager.views.query'),
+    );
   }
 
   /**
@@ -165,11 +231,10 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $display['display_options'] += ['display_extenders' => []];
     $this->extenders = [];
     if ($extenders = Views::getEnabledDisplayExtenders()) {
-      $manager = Views::pluginManager('display_extender');
       $display_extender_options = $display['display_options']['display_extenders'];
       foreach ($extenders as $extender) {
         /** @var \Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase $plugin */
-        if ($plugin = $manager->createInstance($extender)) {
+        if ($plugin = $this->displayExtenderPluginManager->createInstance($extender)) {
           $extender_options = $display_extender_options[$plugin->getPluginId()] ?? [];
           $plugin->init($this->view, $this, $extender_options);
           $this->extenders[$extender] = $plugin;
@@ -797,7 +862,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
     // Query plugins allow specifying a specific query class per base table.
     if ($type == 'query') {
-      $views_data = Views::viewsData()->get($this->view->storage->get('base_table'));
+      $views_data = $this->viewsData->get($this->view->storage->get('base_table'));
       $name = $views_data['table']['base']['query_id'] ?? 'views_query';
     }
     else {
@@ -806,7 +871,8 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
 
     // Plugin instances are stored on the display for re-use.
     if (!isset($this->plugins[$type][$name])) {
-      $plugin = Views::pluginManager($type)->createInstance($name);
+      $plugin_manager = lcfirst(Container::camelize($type)) . 'PluginManager';
+      $plugin = $this->{$plugin_manager}->createInstance($name);
 
       // Initialize the plugin.
       $plugin->init($this->view, $this, $options['options']);
@@ -1193,7 +1259,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $pager_plugin = $this->getPlugin('pager');
     if (!$pager_plugin) {
       // Default to the no pager plugin.
-      $pager_plugin = Views::pluginManager('pager')->createInstance('none');
+      $pager_plugin = $this->pagerPluginManager->createInstance('none');
     }
 
     $pager_str = $pager_plugin->summaryTitle();
@@ -1254,7 +1320,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $access_plugin = $this->getPlugin('access');
     if (!$access_plugin) {
       // Default to the no access control plugin.
-      $access_plugin = Views::pluginManager('access')->createInstance('none');
+      $access_plugin = $this->accessPluginManager->createInstance('none');
     }
 
     $access_str = $access_plugin->summaryTitle();
@@ -1274,7 +1340,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $cache_plugin = $this->getPlugin('cache');
     if (!$cache_plugin) {
       // Default to the no cache control plugin.
-      $cache_plugin = Views::pluginManager('cache')->createInstance('none');
+      $cache_plugin = $this->cachePluginManager->createInstance('none');
     }
 
     $cache_str = $cache_plugin->summaryTitle();
@@ -1331,7 +1397,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
     $exposed_form_plugin = $this->getPlugin('exposed_form');
     if (!$exposed_form_plugin) {
       // Default to the no cache control plugin.
-      $exposed_form_plugin = Views::pluginManager('exposed_form')->createInstance('basic');
+      $exposed_form_plugin = $this->exposedFormPluginManager->createInstance('basic');
     }
 
     $exposed_form_str = $exposed_form_plugin->summaryTitle();
@@ -1989,8 +2055,9 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
         $plugin_options = $this->getOption($plugin_type);
         $type = $form_state->getValue([$plugin_type, 'type']);
         if ($plugin_options['type'] != $type) {
+          $plugin_manager = lcfirst(Container::camelize($plugin_type)) . 'PluginManager';
           /** @var \Drupal\views\Plugin\views\ViewsPluginInterface $plugin */
-          $plugin = Views::pluginManager($plugin_type)->createInstance($type);
+          $plugin = $this->{$plugin_manager}->createInstance($type);
           if ($plugin) {
             $plugin->init($this->view, $this, $plugin_options['options']);
             $plugin_options = [

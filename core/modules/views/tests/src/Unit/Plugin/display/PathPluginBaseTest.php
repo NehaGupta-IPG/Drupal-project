@@ -6,9 +6,12 @@ namespace Drupal\Tests\views\Unit\Plugin\display;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
+use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\Plugin\views\display\PathPluginBase;
+use Drupal\views\ViewsData;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -41,11 +44,67 @@ class PathPluginBaseTest extends UnitTestCase {
   protected $accessPluginManager;
 
   /**
+   * The mocked views cache plugin manager.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected ViewsPluginManager|MockObject $cachePluginManager;
+
+  /**
+   * The mocked views display_extender plugin manager.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected ViewsPluginManager|MockObject $displayExtenderPluginManager;
+
+  /**
+   * The mocked views exposed_form plugin manager.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected ViewsPluginManager|MockObject $exposedFormPluginManager;
+
+  /**
+   * The mocked views pager plugin manager.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected ViewsPluginManager|MockObject $pagerPluginManager;
+
+  /**
+   * The mocked views row plugin manager.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected ViewsPluginManager|MockObject $rowPluginManager;
+
+  /**
+   * The mocked views style plugin manager.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected ViewsPluginManager|MockObject $stylePluginManager;
+
+  /**
+   * The mocked views query plugin manager.
+   *
+   * @var \Drupal\views\Plugin\ViewsPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected ViewsPluginManager|MockObject $queryPluginManager;
+
+  /**
    * The mocked key value storage.
    *
    * @var \Drupal\Core\State\StateInterface|\PHPUnit\Framework\MockObject\MockObject
    */
   protected $state;
+
+  /**
+   * The mocked views data.
+   *
+   * @var \Drupal\views\ViewsData|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected ViewsData|MockObject $viewsData;
 
   /**
    * {@inheritdoc}
@@ -55,8 +114,91 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $this->state = $this->createMock('\Drupal\Core\State\StateInterface');
+    $this->viewsData = $this->getMockBuilder('Drupal\views\ViewsData')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $access_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\access\AccessPluginBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->accessPluginManager = $this->createMock(ViewsPluginManager::class);
+    $this->accessPluginManager->expects($this->any())
+      ->method('createInstance')
+      ->willReturn($access_plugin);
+
+    $cache_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\cache\CachePluginBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->cachePluginManager = $this->createMock(ViewsPluginManager::class);
+    $this->cachePluginManager->expects($this->any())
+      ->method('createInstance')
+      ->willReturn($cache_plugin);
+
+    $display_extender_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\display_extender\DisplayExtenderPluginBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->displayExtenderPluginManager = $this->createMock(ViewsPluginManager::class);
+    $this->displayExtenderPluginManager->expects($this->any())
+      ->method('createInstance')
+      ->willReturn($display_extender_plugin);
+
+    $exposed_form_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\exposed_form\ExposedFormPluginBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->exposedFormPluginManager = $this->createMock(ViewsPluginManager::class);
+    $this->exposedFormPluginManager->expects($this->any())
+      ->method('createInstance')
+      ->willReturn($exposed_form_plugin);
+
+    $pager_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\pager\PagerPluginBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->pagerPluginManager = $this->createMock(ViewsPluginManager::class);
+    $this->pagerPluginManager->expects($this->any())
+      ->method('createInstance')
+      ->willReturn($pager_plugin);
+
+    $row_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\row\RowPluginBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->rowPluginManager = $this->createMock(ViewsPluginManager::class);
+    $this->rowPluginManager->expects($this->any())
+      ->method('createInstance')
+      ->willReturn($row_plugin);
+
+    $style_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\style\StylePluginBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->stylePluginManager = $this->createMock(ViewsPluginManager::class);
+    $this->stylePluginManager->expects($this->any())
+      ->method('createInstance')
+      ->willReturn($style_plugin);
+
+    $query_plugin = $this->getMockBuilder('\Drupal\views\Plugin\views\query\QueryPluginBase')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->queryPluginManager = $this->createMock(ViewsPluginManager::class);
+    $this->queryPluginManager->expects($this->any())
+      ->method('createInstance')
+      ->willReturn($query_plugin);
+
     $this->pathPlugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
-      ->setConstructorArgs([[], 'path_base', [], $this->routeProvider, $this->state])
+      ->setConstructorArgs([
+        [],
+        'path_base',
+        [],
+        $this->routeProvider,
+        $this->state,
+        $this->viewsData,
+        $this->accessPluginManager,
+        $this->cachePluginManager,
+        $this->displayExtenderPluginManager,
+        $this->exposedFormPluginManager,
+        $this->pagerPluginManager,
+        $this->rowPluginManager,
+        $this->stylePluginManager,
+        $this->queryPluginManager,
+      ])
       ->onlyMethods([])
       ->getMock();
     $this->setupContainer();
@@ -70,7 +212,6 @@ class PathPluginBaseTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $container = new ContainerBuilder();
-    $container->set('plugin.manager.views.access', $this->accessPluginManager);
 
     $config = [
       'views.settings' => [
@@ -100,6 +241,24 @@ class PathPluginBaseTest extends UnitTestCase {
       ->method('get')
       ->willReturn([]);
     $container->set('cache.data', $cache);
+
+    $container->set('plugin.manager.views.cache', $this->cachePluginManager);
+
+    $container->set('plugin.manager.views.access', $this->accessPluginManager);
+
+    $container->set('plugin.manager.views.display_extender', $this->displayExtenderPluginManager);
+
+    $container->set('plugin.manager.views.exposed_form', $this->exposedFormPluginManager);
+
+    $container->set('plugin.manager.views.pager', $this->pagerPluginManager);
+
+    $container->set('plugin.manager.views.row', $this->rowPluginManager);
+
+    $container->set('plugin.manager.views.style', $this->stylePluginManager);
+
+    $container->set('plugin.manager.views.query', $this->queryPluginManager);
+
+    $container->set('views.views_data', $this->viewsData);
 
     \Drupal::setContainer($container);
   }
@@ -147,7 +306,22 @@ class PathPluginBaseTest extends UnitTestCase {
       'path' => 'test_route',
     ];
     $this->pathPlugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
-      ->setConstructorArgs([[], 'path_base', ['returns_response' => TRUE], $this->routeProvider, $this->state])
+      ->setConstructorArgs([
+        [],
+        'path_base',
+        ['returns_response' => TRUE],
+        $this->routeProvider,
+        $this->state,
+        $this->viewsData,
+        $this->accessPluginManager,
+        $this->cachePluginManager,
+        $this->displayExtenderPluginManager,
+        $this->exposedFormPluginManager,
+        $this->pagerPluginManager,
+        $this->rowPluginManager,
+        $this->stylePluginManager,
+        $this->queryPluginManager,
+      ])
       ->onlyMethods([])
       ->getMock();
     $this->pathPlugin->initDisplay($view, $display);
