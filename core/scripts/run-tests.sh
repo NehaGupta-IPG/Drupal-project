@@ -196,7 +196,7 @@ echo "Drupal test run\n\n";
 echo "--------------------------------------------------------------\n";
 echo sprintf("Drupal Version.......: %s\n", \Drupal::VERSION);
 echo sprintf("PHP Version..........: %s\n", \PHP_VERSION);
-echo sprintf("PHP Binary...........: %s\n", $php ?? getenv('_'));
+echo sprintf("PHP Binary...........: %s\n", getenv('_'));
 echo sprintf("PHPUnit Version......: %s\n", Version::id());
 echo sprintf("PHPUnit configuration: %s\n", Config::get('phpunit-configuration'));
 if (Config::get('dburl')) {
@@ -223,7 +223,7 @@ for ($i = 0; $i < Config::get('repeat'); $i++) {
 }
 
 // Execute tests.
-$status = simpletest_script_execute_batch($test_run_results_storage, $tests_to_run, $script_basename);
+$status = simpletest_script_execute_batch($test_run_results_storage, $tests_to_run);
 
 // Stop the timer.
 simpletest_script_reporter_timer_stop();
@@ -311,40 +311,6 @@ function simpletest_script_init(ClassLoader $autoloader): void {
   $host = 'localhost';
   $path = '';
   $port = '80';
-  $php = "";
-
-  // Determine location of php command automatically, unless a command line
-  // argument is supplied.
-  if ($php_env = getenv('_')) {
-    // '_' is an environment variable set by the shell. It contains the command
-    // that was executed.
-    $php = $php_env;
-  }
-
-  if ($sudo = getenv('SUDO_COMMAND')) {
-    // 'SUDO_COMMAND' is an environment variable set by the sudo program.
-    // This will be set if the script is run directly by sudo or if the
-    // script is run under a shell started by sudo.
-    if (str_contains($sudo, basename(__FILE__))) {
-      // This script may have been directly run by sudo. $php may have the
-      // path to sudo from getenv('_') if run with the -E option.
-      // Extract what may be the PHP interpreter.
-      [$php] = explode(' ', $sudo, 2);
-    }
-  }
-
-  if (Config::get('php')) {
-    // Caller has specified path to php. Override auto-detection.
-    $php = Config::get('php');
-  }
-
-  if ($php == "") {
-    simpletest_script_print_error('Unable to automatically determine the path to the PHP interpreter. Supply the --php command line argument.');
-    exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
-  }
-  else {
-    Config::set('php', $php);
-  }
 
   // Get URL from arguments.
   if (Config::get('url')) {
@@ -545,7 +511,7 @@ function simpletest_script_setup_test_run_results_storage($new = FALSE) {
 /**
  * Execute a batch of tests.
  */
-function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_run_results_storage, $test_classes, string $script_basename) {
+function simpletest_script_execute_batch(TestRunResultsStorageInterface $test_run_results_storage, $test_classes) {
   global $test_ids;
 
   $total_status = SIMPLETEST_SCRIPT_EXIT_SUCCESS;
@@ -1158,7 +1124,7 @@ function simpletest_script_reporter_display_results(TestRunResultsStorageInterfa
  *   The result object to format.
  */
 function simpletest_script_format_result($result): void {
-  global $results_map, $color, $results_map;
+  global $results_map;
 
   if ($result->time == 0) {
     $duration = "          ";

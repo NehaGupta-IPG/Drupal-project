@@ -174,7 +174,7 @@ final class Configuration {
       'php',
       NULL,
       InputOption::VALUE_REQUIRED,
-      "The absolute path to the PHP executable. Usually not needed.",
+      "(deprecated) Unused.",
     ));
     $inputDefinition->addOption(new InputOption(
       'concurrency',
