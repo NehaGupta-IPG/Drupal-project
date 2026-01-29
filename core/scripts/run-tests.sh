@@ -163,7 +163,7 @@ simpletest_script_setup_database();
 
 // Setup the test run results storage environment. Currently, this coincides
 // with the simpletest database schema.
-$test_run_results_storage = simpletest_script_setup_test_run_results_storage(TRUE);
+$test_run_results_storage = simpletest_script_setup_test_run_results_storage();
 
 if (Config::get('clean')) {
   // Clean up left-over tables and directories.
@@ -441,7 +441,7 @@ function simpletest_script_setup_database(): void {
 /**
  * Sets up the test runs results storage.
  */
-function simpletest_script_setup_test_run_results_storage($new = FALSE) {
+function simpletest_script_setup_test_run_results_storage() {
   $databases['default'] = Database::getConnectionInfo('default');
 
   // If no --sqlite parameter has been passed, then the test runner database
@@ -456,7 +456,7 @@ function simpletest_script_setup_test_run_results_storage($new = FALSE) {
     if ($sqlite === ':memory:') {
       $sqlite = ':memory:';
     }
-    elseif (!str_starts_with($sqlite, '/')) {
+    elseif (is_string($sqlite) && !str_starts_with($sqlite, '/')) {
       $sqlite = DRUPAL_ROOT . '/' . $sqlite;
     }
     $databases['test-runner']['default'] = [
@@ -465,7 +465,7 @@ function simpletest_script_setup_test_run_results_storage($new = FALSE) {
       'prefix' => '',
     ];
     // Create the test runner SQLite database, unless it exists already.
-    if ($sqlite !== ':memory:' && $new && !file_exists($sqlite)) {
+    if ($sqlite !== ':memory:' && !file_exists($sqlite)) {
       if (!is_dir(dirname($sqlite))) {
         mkdir(dirname($sqlite));
       }
@@ -484,7 +484,7 @@ function simpletest_script_setup_test_run_results_storage($new = FALSE) {
     simpletest_script_print_error($databases['test-runner']['default']['driver'] . ': ' . $e->getMessage());
     exit(SIMPLETEST_SCRIPT_EXIT_FAILURE);
   }
-  if ($new && $sqlite) {
+  if ($sqlite) {
     try {
       $test_run_results_storage->buildTestingResultsEnvironment(Config::get('keep-results-table'));
     }
