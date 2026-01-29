@@ -35,8 +35,8 @@
         "phpspec/prophecy": "^1.23",
         "phpspec/prophecy-phpunit": "^2",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan": "^1.12.27 || ^2.1.26",
-        "phpstan/phpstan-phpunit": "^1.4.2 || ^2.0.7",
+        "phpstan/phpstan": "^1.12.27 || ^2.1.34",
+        "phpstan/phpstan-phpunit": "^1.4.2 || ^2.0.11",
         "phpunit/phpunit": "^11.5.42",
         "symfony/browser-kit": "^7.4",
         "symfony/css-selector": "^7.4",
@@ -83,7 +83,7 @@
             "https://www.drupal.org/node/2718229"
         ],
         "branch-alias": {
-            "dev-main": "11.x-dev"
+            "dev-main": "12.x-dev"
         },
         "installer-paths": {
             "core": ["type:drupal-core"],
