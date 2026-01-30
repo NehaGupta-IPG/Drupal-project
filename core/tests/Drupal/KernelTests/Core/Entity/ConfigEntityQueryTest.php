@@ -8,6 +8,7 @@ use Drupal\config_test\Entity\ConfigQueryTest;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Config\Entity\Query\QueryFactory;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -23,7 +24,7 @@ class ConfigEntityQueryTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['config_test'];
+  protected static $modules = ['config_test', 'system'];
 
   /**
    * Stores the search results for alter comparison.
@@ -793,6 +794,67 @@ class ConfigEntityQueryTest extends KernelTestBase {
       // This also tests whether $this->queryResults[$value] is even set at all.
       $this->assertSame($value, $this->queryResults[$value]);
     }
+  }
+
+  /**
+   * Provides data for testConfigQuerySorting().
+   *
+   * @return array
+   *   An array of test data sets.
+   */
+  public static function sortComparisonProvider(): array {
+    return [
+      'ASC sorting - case-insensitive' => [
+        'values' => ['foo', 'Bar', 'ZOO'],
+        'expected' => ['Bar', 'foo', 'ZOO'],
+        'direction' => 'ASC',
+      ],
+      'DESC sorting - case-insensitive' => [
+        'values' => ['foo', 'Bar', 'ZOO'],
+        'expected' => ['ZOO', 'foo', 'Bar'],
+        'direction' => 'DESC',
+      ],
+    ];
+  }
+
+  /**
+   * Test config entity query sorting.
+   *
+   * @param array $values
+   *   The values to test.
+   * @param array $expected
+   *   The expected sorted result.
+   * @param string $direction
+   *   The sort direction.
+   *
+   * @legacy-covers ::execute
+   */
+  #[DataProvider('sortComparisonProvider')]
+  public function testConfigQuerySorting(
+    array $values,
+    array $expected,
+    string $direction,
+  ): void {
+    $storage = $this->container->get('entity_type.manager')->getStorage('menu');
+    // Create menu config entities.
+    foreach ($values as $label) {
+      $id = strtolower($label);
+
+      $storage->create([
+        'id' => $id,
+        'label' => $label,
+      ])->save();
+    }
+
+    // Execute the config entity query.
+    $result = \Drupal::entityQuery('menu')
+      ->sort('label', $direction)
+      ->execute();
+
+    $menus = $storage->loadMultiple($result);
+    $actual = array_map(fn ($menu) => $menu->label(), $menus);
+
+    $this->assertSame($expected, array_values($actual));
   }
 
 }
