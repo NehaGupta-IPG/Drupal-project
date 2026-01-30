@@ -22,7 +22,7 @@ class PagerManager implements PagerManagerInterface {
   protected $pagerParams;
 
   /**
-   * The request_stack service.
+   * The request stack.
    *
    * @var \Symfony\Component\HttpFoundation\RequestStack
    */
