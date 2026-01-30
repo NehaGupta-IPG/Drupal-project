@@ -211,7 +211,7 @@ class RowRenderCacheTest extends ViewsKernelTestBase {
         $cache = [
           '#cache' => [
             'keys' => $keys,
-            'contexts' => ['languages:language_interface', 'theme', 'user.permissions'],
+            'contexts' => ['languages:language_interface', 'theme', 'user.permissions', 'url.query_args'],
           ],
         ];
         $element = $render_cache->get($cache);

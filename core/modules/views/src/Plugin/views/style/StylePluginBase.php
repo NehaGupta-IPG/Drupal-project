@@ -4,6 +4,7 @@ namespace Drupal\views\Plugin\views\style;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
@@ -701,6 +702,7 @@ abstract class StylePluginBase extends PluginBase {
             '#cache' => [
               'keys' => $cache_plugin->getRowCacheKeys($row),
               'tags' => $cache_plugin->getRowCacheTags($row),
+              'contexts' => $this instanceof CacheableDependencyInterface ? $this->getCacheContexts() : [],
               'max-age' => $max_age,
             ],
             '#cache_properties' => $field_ids,
