@@ -2,8 +2,6 @@
 
 namespace Drupal\Core\Installer;
 
-use Composer\InstalledVersions;
-use Drupal\Component\Serialization\Json;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionDiscovery;
@@ -227,22 +225,6 @@ class InstallerKernel extends DrupalKernel {
     }
 
     return NULL;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function discoverServiceProviders(): void {
-    parent::discoverServiceProviders();
-
-    // Read the root composer.json to see if it wants to register a special
-    // service provider for the installer.
-    ['install_path' => $project_root] = InstalledVersions::getRootPackage();
-    $composer_json = Json::decode(file_get_contents($project_root . '/composer.json'));
-    $service_provider = $composer_json['extra']['drupal-installer']['service-provider'] ?? NULL;
-    if (isset($service_provider) && class_exists($service_provider)) {
-      $this->serviceProviderClasses['app'][$service_provider] = $service_provider;
-    }
   }
 
 }
