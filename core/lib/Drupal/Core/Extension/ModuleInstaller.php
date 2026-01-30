@@ -352,14 +352,11 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // @todo should this be in the loop?
     \Drupal::getContainer()->get('plugin.cache_clearer')->clearCachedDefinitions();
 
+    $entity_type_providers_to_install = $module_list;
     foreach ($module_list as $module) {
-      // Set the schema version to the number of the last update provided by
-      // the module, or the minimum core schema version.
-      $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
-      $versions = $this->updateRegistry->getAvailableUpdates($module);
-      if ($versions) {
-        $version = max(max($versions), $version);
-      }
+      // Remove the module from the list of possible entity type providers to
+      // install.
+      array_shift($entity_type_providers_to_install);
 
       // Notify interested components that this module's entity types and
       // field storage definitions are new. For example, a SQL-based storage
@@ -381,10 +378,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
             $update_manager->installEntityType($entity_type);
           }
         }
-        elseif ($is_fieldable_entity_type) {
+        elseif ($is_fieldable_entity_type && !in_array($entity_type->getProvider(), $entity_type_providers_to_install, TRUE)) {
           // The module being installed may be adding new fields to existing
           // entity types. Field definitions for any entity type defined by
-          // the module are handled in the if branch.
+          // modules being installed are handled in the if branch.
           foreach ($entity_field_manager->getFieldStorageDefinitions($entity_type->id()) as $storage_definition) {
             if ($storage_definition->getProvider() == $module) {
               // If the module being installed is also defining a storage key
@@ -400,10 +397,20 @@ class ModuleInstaller implements ModuleInstallerInterface {
           }
         }
       }
+    }
 
+    foreach ($module_list as $module) {
       // Install default configuration of the module.
       $config_installer = \Drupal::service('config.installer');
       $config_installer->installDefaultConfig('module', $module, DefaultConfigMode::InstallSimple);
+
+      // Set the schema version to the number of the last update provided by
+      // the module, or the minimum core schema version.
+      $version = \Drupal::CORE_MINIMUM_SCHEMA_VERSION;
+      $versions = $this->updateRegistry->getAvailableUpdates($module);
+      if ($versions) {
+        $version = max(max($versions), $version);
+      }
 
       // If the module has no current updates, but has some that were
       // previously removed, set the version to the value of
@@ -558,7 +565,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
       }
 
       // Allow modules to react prior to the uninstallation of a module.
-      $this->invokeAll('module_preuninstall', [$module, $sync_status]);
+      $this->moduleHandler->invokeAll('module_preuninstall', [$module, $sync_status]);
 
       // Uninstall the module.
       $this->moduleHandler->loadInclude($module, 'install');
@@ -652,12 +659,12 @@ class ModuleInstaller implements ModuleInstallerInterface {
     \Drupal::service('router.builder')->rebuild();
 
     // Let other modules react.
-    $this->invokeAll('modules_uninstalled', [$module_list, $sync_status]);
+    $this->moduleHandler->invokeAll('modules_uninstalled', [$module_list, $sync_status]);
 
     // Flush all persistent caches.
     // Any cache entry might implicitly depend on the uninstalled modules,
     // so clear all of them explicitly.
-    $this->invokeAll('cache_flush');
+    $this->moduleHandler->invokeAll('cache_flush');
     foreach (Cache::getBins() as $cache_backend) {
       $cache_backend->deleteAll();
     }
@@ -715,10 +722,10 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $source_storage = $config_installer->getSourceStorage();
 
     if (!empty($module_filenames)) {
-      // This reboots the kernel to register the module's bundle and its services
-      // in the service container. The $module_filenames argument is taken over as
-      // %container.modules% parameter, which is passed to a fresh ModuleHandler
-      // instance upon first retrieval.
+      // This reboots the kernel to register the module's bundle and its
+      // services in the service container. The $module_filenames argument is
+      // taken over as %container.modules% parameter, which is passed to a fresh
+      // ModuleHandler instance upon first retrieval.
       $this->kernel->updateModules($module_filenames, $module_filenames);
       $container = $this->kernel->getContainer();
     }
@@ -794,7 +801,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
   }
 
   /**
-   * Call procedural hooks in all installed modules during installation.
+   * Call a procedural hook in an installed module during installation.
    *
    * Hooks called during install will remain procedural.
    * - hook_install()
@@ -806,23 +813,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
    * - hook_update_last_removed()
    * - hook_update_N()
    *
-   * @param string $hook
-   *   The name of the hook to invoke.
-   * @param array $args
-   *   Arguments to pass to the hook.
-   *
-   * @return void
-   */
-  protected function invokeAll($hook, $args = []): void {
-    $this->moduleHandler->loadAll();
-    $this->moduleHandler->invokeAll($hook, $args);
-  }
-
-  /**
-   * Call a procedural hook in an installed module during installation.
-   *
-   * Hook_install(), hook_uninstall() etc. will remain procedural.
-   *
    * @param string $module
    *   The module (it can be a profile, too).
    * @param string $hook
@@ -831,6 +821,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   Arguments to pass to the hook.
    *
    * @return mixed
+   *   The return value of the procedural hook. Defaults to NULL if a hook
+   *   function does not exist.
    */
   protected function invoke(string $module, string $hook, array $args = []): mixed {
     $function = $module . '_' . $hook;

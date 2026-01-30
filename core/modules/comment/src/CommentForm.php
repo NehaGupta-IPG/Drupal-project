@@ -120,11 +120,6 @@ class CommentForm extends ContentEntityForm {
     $anonymous_contact = $field_definition->getSetting('anonymous');
     $is_admin = $comment->id() && $this->currentUser->hasPermission('administer comments');
 
-    if (!$this->currentUser->isAuthenticated() && $anonymous_contact != CommentInterface::ANONYMOUS_MAYNOT_CONTACT) {
-      $form['#attached']['library'][] = 'core/drupal.form';
-      $form['#attributes']['data-user-info-from-browser'] = TRUE;
-    }
-
     // If not replying to a comment, use our dedicated page callback for new
     // Comments on entities.
     if (!$comment->id() && !$comment->hasParentComment()) {
@@ -194,9 +189,6 @@ class CommentForm extends ContentEntityForm {
       '#maxlength' => 60,
       '#access' => $this->currentUser->isAnonymous() || $is_admin,
       '#size' => 30,
-      '#attributes' => [
-        'data-drupal-default-value' => $config->get('anonymous'),
-      ],
     ];
 
     if ($is_admin) {
@@ -262,7 +254,7 @@ class CommentForm extends ContentEntityForm {
     $comment = $this->entity;
     $entity = $comment->getCommentedEntity();
     $field_definition = $this->entityFieldManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$comment->getFieldName()];
-    $preview_mode = $field_definition->getSetting('preview');
+    $preview_mode = CommentPreviewMode::tryFrom($field_definition->getSetting('preview'));
 
     // No delete action on the comment form.
     unset($element['delete']);
@@ -272,12 +264,12 @@ class CommentForm extends ContentEntityForm {
 
     // Only show the save button if comment previews are optional or if we are
     // already previewing the submission.
-    $element['submit']['#access'] = ($comment->id() && $this->currentUser->hasPermission('administer comments')) || $preview_mode != DRUPAL_REQUIRED || $form_state->get('comment_preview');
+    $element['submit']['#access'] = ($comment->id() && $this->currentUser->hasPermission('administer comments')) || $preview_mode != CommentPreviewMode::Required || $form_state->get('comment_preview');
 
     $element['preview'] = [
       '#type' => 'submit',
       '#value' => $this->t('Preview'),
-      '#access' => $preview_mode != DRUPAL_DISABLED,
+      '#access' => $preview_mode != CommentPreviewMode::Disabled,
       '#submit' => ['::submitForm', '::preview'],
     ];
 
@@ -368,8 +360,49 @@ class CommentForm extends ContentEntityForm {
    *   The current state of the form.
    */
   public function preview(array &$form, FormStateInterface $form_state) {
-    $comment_preview = comment_preview($this->entity, $form_state);
+    $comment_preview = [];
+    $comment = $this->entity;
+
+    $entity = $comment->getCommentedEntity();
+
+    if (!$form_state->getErrors()) {
+      $comment->in_preview = TRUE;
+      $comment_build = $this->entityTypeManager->getViewBuilder('comment')->view($comment);
+      $comment_build['#weight'] = -100;
+
+      $comment_preview['comment_preview'] = $comment_build;
+    }
+
+    if ($comment->hasParentComment()) {
+      $build = [];
+      $parent = $comment->getParentComment();
+      if ($parent && $parent->isPublished()) {
+        $build = $this->entityTypeManager->getViewBuilder('comment')->view($parent);
+      }
+    }
+    else {
+      // The comment field output includes rendering the parent entity of the
+      // thread to which the comment is a reply. The rendered entity output
+      // includes the comment reply form, which contains the comment preview and
+      // therefore the rendered parent entity. This results in an infinite loop
+      // of parent entity output rendering the comment form and the comment form
+      // rendering the parent entity. To prevent this infinite loop we
+      // temporarily set the value of the comment field on a clone of the entity
+      // to hidden before calling the entity view builder. That way when the
+      // output of the commented entity is rendered, it excludes the comment
+      // field output.
+      $field_name = $comment->getFieldName();
+      $entity = clone $entity;
+      $entity->$field_name->status = CommentItemInterface::HIDDEN;
+      $build = $this->entityTypeManager
+        ->getViewBuilder($entity->getEntityTypeId())
+        ->view($entity);
+    }
+
+    $comment_preview['comment_output_below'] = $build;
+    $comment_preview['comment_output_below']['#weight'] = 200;
     $comment_preview['#title'] = $this->t('Preview comment');
+
     $form_state->set('comment_preview', $comment_preview);
     $form_state->setRebuild();
   }
@@ -392,7 +425,7 @@ class CommentForm extends ContentEntityForm {
       // Add a log entry.
       $logger->info('Comment posted: %subject.', [
         '%subject' => $comment->getSubject(),
-        'link' => Link::fromTextAndUrl(t('View'), $comment->toUrl()->setOption('fragment', 'comment-' . $comment->id()))->toString(),
+        'link' => Link::fromTextAndUrl($this->t('View'), $comment->toUrl()->setOption('fragment', 'comment-' . $comment->id()))->toString(),
       ]);
       // Add an appropriate message upon submitting the comment form.
       $this->messenger()->addStatus($this->getStatusMessage($comment, $is_new));
