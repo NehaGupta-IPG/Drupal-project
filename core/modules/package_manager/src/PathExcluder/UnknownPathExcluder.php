@@ -102,6 +102,7 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
       $web_root,
       'composer.json',
       'composer.lock',
+      ...$paths_to_include,
     ];
     foreach ($this->getScaffoldFiles() as $scaffold_file_path) {
       // The web root is always included in staging operations, so we don't need
@@ -146,12 +147,6 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
       throw new \RuntimeException("Could not scan for files in the project root.");
     }
     while ($entry = readdir($handle)) {
-      foreach ($paths_to_include as $pattern) {
-        if (fnmatch($pattern, $entry)) {
-          // If the path matches any of the patterns, skip to the next entry.
-          continue 2;
-        }
-      }
       $files_in_project_root[] = $entry;
     }
     closedir($handle);
