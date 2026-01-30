@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Checks if referenced entities are valid.
@@ -56,6 +57,10 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
    * {@inheritdoc}
    */
   public function validate($value, Constraint $constraint): void {
+    if (!$constraint instanceof ValidReferenceConstraint) {
+      throw new UnexpectedTypeException($constraint, ValidReferenceConstraint::class);
+    }
+
     /** @var \Drupal\Core\Field\FieldItemListInterface $value */
     /** @var ValidReferenceConstraint $constraint */
     if (!isset($value)) {
@@ -74,6 +79,7 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
         if (!$item->entity->isNew()) {
           $this->context->buildViolation($constraint->nullMessage)
             ->atPath((string) $delta)
+            ->setCode($constraint::EMPTY_REFERENCE_ERROR)
             ->addViolation();
           return;
         }
@@ -102,11 +108,13 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
       if ($handler instanceof SelectionWithAutocreateInterface) {
         $valid_new_entities = $handler->validateReferenceableNewEntities($new_entities);
         $invalid_new_entities = array_diff_key($new_entities, $valid_new_entities);
+        $invalid_new_entities_code = $constraint::NON_REFERENCEABLE_NEW_ENTITY_ERROR;
       }
       else {
         // If the selection handler does not support referencing newly created
         // entities, all of them should be invalidated.
         $invalid_new_entities = $new_entities;
+        $invalid_new_entities_code = $constraint::NEW_ENTITIES_DISALLOWED_ERROR;
       }
 
       foreach ($invalid_new_entities as $delta => $entity) {
@@ -114,6 +122,7 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
           ->setParameter('%type', $target_type_id)
           ->setParameter('%label', $entity->label())
           ->atPath((string) $delta . '.entity')
+          ->setCode($invalid_new_entities_code)
           ->setInvalidValue($entity)
           ->addViolation();
       }
@@ -143,11 +152,19 @@ class ValidReferenceConstraintValidator extends ConstraintValidator implements C
             continue;
           }
 
-          $message = isset($existing_entities[$target_id]) ? $constraint->message : $constraint->nonExistingMessage;
+          if (isset($existing_entities[$target_id])) {
+            $message = $constraint->message;
+            $code = $constraint::NON_REFERENCEABLE_EXISTING_ENTITY_ERROR;
+          }
+          else {
+            $message = $constraint->nonExistingMessage;
+            $code = $constraint::NON_EXISTING_ENTITY_ERROR;
+          }
           $this->context->buildViolation($message)
             ->setParameter('%type', $target_type_id)
             ->setParameter('%id', $target_id)
             ->atPath((string) $delta . '.target_id')
+            ->setCode($code)
             ->setInvalidValue($target_id)
             ->addViolation();
         }
