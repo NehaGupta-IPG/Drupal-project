@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 class PagerManagerTest extends KernelTestBase {
 
   /**
-   * @covers ::getUpdatedParameters
+   * Tests get updated parameters.
    */
   #[DataProvider('providerTestGetUpdatedParameters')]
   public function testGetUpdatedParameters($element, $index, $existing_page_parameter, $expected_page_parameter): void {
@@ -45,7 +45,7 @@ class PagerManagerTest extends KernelTestBase {
     $query = $pager_manager->getUpdatedParameters($request->query->all(), $element, $index);
 
     $this->assertArrayHasKey('other', $query);
-    
+
     $this->assertEquals($expected_page_parameter, $query['page']);
   }
 
@@ -82,7 +82,7 @@ class PagerManagerTest extends KernelTestBase {
 
   /**
    * Provides test cases for PagerManagerTest::testGetUpdatedParameters().
-   * 
+   *
    * @return array
    *   An array of test cases, with an existing page parameter set.
    */
