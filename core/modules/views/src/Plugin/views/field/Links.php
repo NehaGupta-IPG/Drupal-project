@@ -6,7 +6,6 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Url as UrlObject;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * An abstract handler which provides a collection of links.
@@ -21,7 +20,7 @@ abstract class Links extends FieldPluginBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
@@ -29,18 +28,6 @@ abstract class Links extends FieldPluginBase {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected RedirectDestinationInterface $redirectDestination) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('redirect.destination')
-    );
   }
 
   /**

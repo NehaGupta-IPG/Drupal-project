@@ -1,5 +1,5 @@
 // cspell:ignore testcases
-const path = require('path');
+const path = require('node:path');
 const { globSync } = require('glob');
 
 // Find directories which have Nightwatch tests in them.
@@ -15,6 +15,7 @@ const defaultIgnore = ['vendor/**'];
 
 globSync('**/tests/**/Nightwatch/**/*.js', {
   cwd: path.resolve(process.cwd(), `../${searchDirectory}`),
+  follow: true,
   ignore: process.env.DRUPAL_NIGHTWATCH_IGNORE_DIRECTORIES
     ? process.env.DRUPAL_NIGHTWATCH_IGNORE_DIRECTORIES.split(',').concat(
         defaultIgnore,

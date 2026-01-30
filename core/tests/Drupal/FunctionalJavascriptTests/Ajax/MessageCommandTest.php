@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
  * Tests adding messages via AJAX command.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class MessageCommandTest extends WebDriverTestBase {
 
   /**
@@ -179,7 +181,7 @@ class MessageCommandTest extends WebDriverTestBase {
    * @param string $type
    *   The expected type.
    */
-  protected function waitForMessageVisible($message, $selector = '[data-drupal-messages]', $type = 'status') {
+  protected function waitForMessageVisible($message, $selector = '[data-drupal-messages]', $type = 'status'): void {
     $this->assertNotEmpty($this->assertSession()->waitForElementVisible('css', $selector . ' .messages--' . $type . ':contains("' . $message . '")'));
   }
 
@@ -193,7 +195,7 @@ class MessageCommandTest extends WebDriverTestBase {
    * @param string $type
    *   The expected type.
    */
-  protected function waitForMessageRemoved($message, $selector = '[data-drupal-messages]', $type = 'status') {
+  protected function waitForMessageRemoved($message, $selector = '[data-drupal-messages]', $type = 'status'): void {
     $this->assertNotEmpty($this->assertSession()->waitForElementRemoved('css', $selector . ' .messages--' . $type . ':contains("' . $message . '")'));
   }
 
