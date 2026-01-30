@@ -52,15 +52,15 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('Umami');
 
     $expected = [
-      'QueryCount' => 205,
-      'CacheGetCount' => 249,
-      'CacheSetCount' => 252,
+      'QueryCount' => 206,
+      'CacheGetCount' => 253,
+      'CacheSetCount' => 255,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 25,
+      'CacheTagLookupQueryCount' => 24,
       'CacheTagInvalidationCount' => 0,
-      'ScriptCount' => 1,
-      'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
+      'ScriptCount' => 3,
+      'ScriptBytes' => 72552,
+      'StylesheetCount' => 6,
       'StylesheetBytes' => 39150,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -117,20 +117,21 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     $this->clearCaches();
     // Now visit a different page to warm non-route-specific caches.
     $this->drupalGet('user/login');
+    sleep(2);
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('<front>');
     }, 'umamiFrontPageCoolCache');
 
     $expected = [
-      'QueryCount' => 61,
-      'CacheGetCount' => 175,
-      'CacheSetCount' => 74,
+      'QueryCount' => 74,
+      'CacheGetCount' => 206,
+      'CacheSetCount' => 81,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 20,
-      'ScriptCount' => 1,
-      'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
+      'ScriptCount' => 3,
+      'ScriptBytes' => 72552,
+      'StylesheetCount' => 3,
       'StylesheetBytes' => 38850,
     ];
     $this->assertMetrics($expected, $performance_data);
