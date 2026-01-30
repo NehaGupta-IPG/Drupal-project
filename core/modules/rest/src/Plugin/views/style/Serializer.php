@@ -174,15 +174,11 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
    */
   protected function wrapRowsInPager(array $rows): array {
     $pager = $this->view->pager;
-    $class = get_class($pager);
     $current_page = $pager->getCurrentPage();
     $items_per_page = $pager->getItemsPerPage();
     $total_items = $pager->getTotalItems();
 
-    $total_pages = 0;
-    if (!in_array($class, ['Drupal\views\Plugin\views\pager\None', 'Drupal\views\Plugin\views\pager\Some'], TRUE)) {
-      $total_pages = $pager->getPagerTotal();
-    }
+    $total_pages = $pager->usePager() ? $pager->getPagerTotal() : 0;
 
     return [
       'rows' => $rows,
