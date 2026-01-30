@@ -3,6 +3,7 @@
 namespace Drupal\Core\Pager;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides a manager for pagers.
@@ -19,6 +20,13 @@ class PagerManager implements PagerManagerInterface {
    * @var \Drupal\Core\Pager\PagerParametersInterface
    */
   protected $pagerParams;
+
+  /**
+   * The request_stack service.
+   * 
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected RequestStack $requestStack;
 
   /**
    * An associative array of pagers.
@@ -43,9 +51,12 @@ class PagerManager implements PagerManagerInterface {
    *
    * @param \Drupal\Core\Pager\PagerParametersInterface $pager_params
    *   The pager parameters.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request
+   *   The request_stack service.
    */
-  public function __construct(PagerParametersInterface $pager_params) {
+  public function __construct(PagerParametersInterface $pager_params, RequestStack $request) {
     $this->pagerParams = $pager_params;
+    $this->requestStack = $request;
   }
 
   /**
@@ -78,7 +89,7 @@ class PagerManager implements PagerManagerInterface {
   public function getUpdatedParameters(array $query, $element, $index) {
     // For a single link within a pager, update its link whilst
     // remembering the current index of other pagers.
-    $pagers_indexes = explode(',', \Drupal::request()->query->get('page'));
+    $pagers_indexes = explode(',', $this->requestStack->getCurrentRequest()->query->get('page') ?? '');
     $pagers_indexes[$element] = $index;
     // Fill missing array elements.
     for ($i = min(array_keys($pagers_indexes)); $i <= max(array_keys($pagers_indexes)); $i++) {
