@@ -23,16 +23,16 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 class PagerManagerTest extends KernelTestBase {
 
   /**
-   * Tests get updated parameters.
+   * @covers ::getUpdatedParameters
    */
-  public function testGetUpdatedParameters(): void {
-    $element = 2;
-    $index = 5;
+  #[DataProvider('providerTestGetUpdatedParameters')]
+  public function testGetUpdatedParameters($element, $index, $existing_page_parameter, $expected_page_parameter): void {
     $test_parameters = [
       'other' => 'arbitrary',
     ];
     $request = Request::create('http://example.com', 'GET', $test_parameters);
     $request->setSession(new Session(new MockArraySessionStorage()));
+    $request->query->set('page', $existing_page_parameter);
 
     /** @var \Symfony\Component\HttpFoundation\RequestStack $request_stack */
     $request_stack = $this->container->get('request_stack');
@@ -45,8 +45,8 @@ class PagerManagerTest extends KernelTestBase {
     $query = $pager_manager->getUpdatedParameters($request->query->all(), $element, $index);
 
     $this->assertArrayHasKey('other', $query);
-
-    $this->assertEquals(",,$index", $query['page']);
+    
+    $this->assertEquals($expected_page_parameter, $query['page']);
   }
 
   /**
@@ -78,6 +78,20 @@ class PagerManagerTest extends KernelTestBase {
     }
 
     $this->assertEquals($expected_max_element_id, $pager_manager->getMaxPagerElementId());
+  }
+
+  /**
+   * Provides test cases for PagerManagerTest::testGetUpdatedParameters().
+   * 
+   * @return array
+   *   An array of test cases, with an existing page parameter set.
+   */
+  public static function providerTestGetUpdatedParameters() {
+    return [
+      'no_existing_page_parameter' => [2, 5, '', ',,5'],
+      'page_parameter_with_id_less_than_max_pager_id' => [2, 5, ',7', ',7,5'],
+      'page_parameter_with_id_greater_than_max_pager_id' => [2, 5, ',,,9', ',,5,9'],
+    ];
   }
 
   /**
