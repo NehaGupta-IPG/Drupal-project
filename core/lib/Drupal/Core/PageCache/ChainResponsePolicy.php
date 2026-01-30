@@ -17,14 +17,17 @@ use Symfony\Component\HttpFoundation\Response;
  *   <li>Otherwise returns NULL</li>
  * </ol>
  */
-class ChainResponsePolicy implements ChainResponsePolicyInterface {
+class ChainResponsePolicy implements ResponsePolicyInterface {
 
   /**
-   * A list of policy rules to apply when this policy is checked.
+   * Constructs a ChainResponsePolicy object.
    *
-   * @var \Drupal\Core\PageCache\ResponsePolicyInterface[]
+   * @param \Traversable<\Drupal\Core\PageCache\ResponsePolicyInterface> $rules
+   *   The response policies to evaluate.
    */
-  protected $rules = [];
+  public function __construct(
+    protected \Traversable $rules,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -39,14 +42,6 @@ class ChainResponsePolicy implements ChainResponsePolicyInterface {
         throw new \UnexpectedValueException('Return value of ResponsePolicyInterface::check() must be one of ResponsePolicyInterface::DENY or NULL');
       }
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addPolicy(ResponsePolicyInterface $policy) {
-    $this->rules[] = $policy;
-    return $this;
   }
 
 }

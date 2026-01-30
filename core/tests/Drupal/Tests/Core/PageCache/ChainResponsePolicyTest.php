@@ -21,13 +21,6 @@ use Symfony\Component\HttpFoundation\Response;
 class ChainResponsePolicyTest extends UnitTestCase {
 
   /**
-   * The chain response policy under test.
-   *
-   * @var \Drupal\Core\PageCache\ChainResponsePolicy
-   */
-  protected $policy;
-
-  /**
    * A request object.
    *
    * @var \Symfony\Component\HttpFoundation\Request
@@ -47,7 +40,6 @@ class ChainResponsePolicyTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->policy = new ChainResponsePolicy();
     $this->response = new Response();
     $this->request = new Request();
   }
@@ -58,7 +50,8 @@ class ChainResponsePolicyTest extends UnitTestCase {
    * @legacy-covers ::check
    */
   public function testEmptyChain(): void {
-    $result = $this->policy->check($this->response, $this->request);
+    $policy = new ChainResponsePolicy(new \ArrayIterator([]));
+    $result = $policy->check($this->response, $this->request);
     $this->assertNull($result);
   }
 
@@ -68,15 +61,15 @@ class ChainResponsePolicyTest extends UnitTestCase {
    * @legacy-covers ::check
    */
   public function testNullRuleChain(): void {
-    $rule = $this->createMock('Drupal\Core\PageCache\ResponsePolicyInterface');
+    $rule = $this->createMock(ResponsePolicyInterface::class);
     $rule->expects($this->once())
       ->method('check')
       ->with($this->response, $this->request)
       ->willReturn(NULL);
 
-    $this->policy->addPolicy($rule);
+    $policy = new ChainResponsePolicy(new \ArrayIterator([$rule]));
 
-    $result = $this->policy->check($this->response, $this->request);
+    $result = $policy->check($this->response, $this->request);
     $this->assertNull($result);
   }
 
@@ -87,16 +80,16 @@ class ChainResponsePolicyTest extends UnitTestCase {
    */
   #[DataProvider('providerChainExceptionOnInvalidReturnValue')]
   public function testChainExceptionOnInvalidReturnValue(bool|int|\stdClass|array $return_value): void {
-    $rule = $this->createMock('Drupal\Core\PageCache\ResponsePolicyInterface');
+    $rule = $this->createMock(ResponsePolicyInterface::class);
     $rule->expects($this->once())
       ->method('check')
       ->with($this->response, $this->request)
       ->willReturn($return_value);
 
-    $this->policy->addPolicy($rule);
+    $policy = new ChainResponsePolicy(new \ArrayIterator([$rule]));
 
     $this->expectException(\UnexpectedValueException::class);
-    $this->policy->check($this->response, $this->request);
+    $policy->check($this->response, $this->request);
   }
 
   /**
@@ -120,25 +113,28 @@ class ChainResponsePolicyTest extends UnitTestCase {
    * Asserts that check() returns immediately when a rule returned DENY.
    */
   public function testStopChainOnFirstDeny(): void {
-    $rule1 = $this->createMock('Drupal\Core\PageCache\ResponsePolicyInterface');
+    $rule1 = $this->createMock(ResponsePolicyInterface::class);
     $rule1->expects($this->once())
       ->method('check')
       ->with($this->response, $this->request);
-    $this->policy->addPolicy($rule1);
 
-    $deny_rule = $this->createMock('Drupal\Core\PageCache\ResponsePolicyInterface');
+    $deny_rule = $this->createMock(ResponsePolicyInterface::class);
     $deny_rule->expects($this->once())
       ->method('check')
       ->with($this->response, $this->request)
       ->willReturn(ResponsePolicyInterface::DENY);
-    $this->policy->addPolicy($deny_rule);
 
-    $ignored_rule = $this->createMock('Drupal\Core\PageCache\ResponsePolicyInterface');
+    $ignored_rule = $this->createMock(ResponsePolicyInterface::class);
     $ignored_rule->expects($this->never())
       ->method('check');
-    $this->policy->addPolicy($ignored_rule);
 
-    $actual_result = $this->policy->check($this->response, $this->request);
+    $policy = new ChainResponsePolicy(new \ArrayIterator([
+      $rule1,
+      $deny_rule,
+      $ignored_rule,
+    ]));
+
+    $actual_result = $policy->check($this->response, $this->request);
     $this->assertSame(ResponsePolicyInterface::DENY, $actual_result);
   }
 

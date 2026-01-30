@@ -18,14 +18,17 @@ use Symfony\Component\HttpFoundation\Request;
  *   <li>Otherwise returns NULL</li>
  * </ol>
  */
-class ChainRequestPolicy implements ChainRequestPolicyInterface {
+class ChainRequestPolicy implements RequestPolicyInterface {
 
   /**
-   * A list of policy rules to apply when this policy is evaluated.
+   * Constructs a ChainRequestPolicy object.
    *
-   * @var \Drupal\Core\PageCache\RequestPolicyInterface[]
+   * @param \Traversable<\Drupal\Core\PageCache\RequestPolicyInterface> $rules
+   *   The request policies to evaluate.
    */
-  protected $rules = [];
+  public function __construct(
+    protected \Traversable $rules,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -47,14 +50,6 @@ class ChainRequestPolicy implements ChainRequestPolicyInterface {
     }
 
     return $final_result;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addPolicy(RequestPolicyInterface $policy) {
-    $this->rules[] = $policy;
-    return $this;
   }
 
 }

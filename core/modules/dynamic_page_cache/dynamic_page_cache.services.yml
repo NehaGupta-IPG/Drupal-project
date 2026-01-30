@@ -21,14 +21,11 @@ services:
 
   # Request & response policies.
   dynamic_page_cache_request_policy:
-    class: Drupal\dynamic_page_cache\PageCache\RequestPolicy\DefaultRequestPolicy
-    tags:
-      - { name: service_collector, tag: dynamic_page_cache_request_policy, call: addPolicy}
+    class: Drupal\Core\PageCache\ChainRequestPolicy
+    arguments: [!tagged_iterator dynamic_page_cache_request_policy]
   dynamic_page_cache_response_policy:
     class: Drupal\Core\PageCache\ChainResponsePolicy
-    tags:
-      - { name: service_collector, tag: dynamic_page_cache_response_policy, call: addPolicy}
-    lazy: true
+    arguments: [!tagged_iterator dynamic_page_cache_response_policy]
   dynamic_page_cache_deny_admin_routes:
     class: Drupal\dynamic_page_cache\PageCache\ResponsePolicy\DenyAdminRoutes
     public: false

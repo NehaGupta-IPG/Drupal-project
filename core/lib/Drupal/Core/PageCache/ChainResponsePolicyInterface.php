@@ -3,18 +3,13 @@
 namespace Drupal\Core\PageCache;
 
 /**
- * Defines the interface for compound request policies.
+ * Defines the interface for compound response policies.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\PageCache\ResponsePolicyInterface instead.
+ *
+ * @see https://www.drupal.org/node/9999999
  */
 interface ChainResponsePolicyInterface extends ResponsePolicyInterface {
-
-  /**
-   * Add a policy to the list of policy rules.
-   *
-   * @param \Drupal\Core\PageCache\ResponsePolicyInterface $policy
-   *   The request policy rule to add.
-   *
-   * @return $this
-   */
-  public function addPolicy(ResponsePolicyInterface $policy);
 
 }
