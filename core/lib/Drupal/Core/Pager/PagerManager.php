@@ -76,16 +76,11 @@ class PagerManager implements PagerManagerInterface {
    * {@inheritdoc}
    */
   public function getUpdatedParameters(array $query, $element, $index) {
-    // Build the 'page' query parameter. This is built based on the current
-    // page of each pager element (or NULL if the pager is not set), with the
-    // exception of the requested page index for the current element.
-    $element_pages = [];
-    $max = $this->getMaxPagerElementId();
-    for ($i = 0; $i <= $max; $i++) {
-      $currentPage = ($pager = $this->getPager($i)) ? $pager->getCurrentPage() : NULL;
-      $element_pages[] = ($i == $element) ? $index : $currentPage;
-    }
-    $query['page'] = implode(',', $element_pages);
+    // For a single link within a pager, update its link whilst
+    // remembering the current index of other pagers.
+    $pagers_indexes = explode(',', \Drupal::request()->query->get('page'));
+    $pagers_indexes[$element] = $index;
+    $query['page'] = implode(',', $pagers_indexes);
 
     // Merge the query parameters passed to this function with the parameters
     // from the current request. In case of collision, the parameters passed
