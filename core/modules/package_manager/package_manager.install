@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Update functions for the Package Manager module.
+ */
+
+/**
  * Change the include_unknown_files_in_project_root setting to a sequence.
  */
 function package_manager_update_11201(): void {
