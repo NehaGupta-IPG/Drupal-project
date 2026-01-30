@@ -12,14 +12,13 @@ use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\RoleInterface;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the display of image fields.
+ *
+ * @group image
+ * @group #slow
  */
-#[Group('image')]
-#[RunTestsInSeparateProcesses]
 class ImageFieldDisplayTest extends ImageFieldTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -29,7 +28,9 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['field_ui'];
 
@@ -57,7 +58,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Tests image formatters on node display.
    */
-  public function _testImageFieldFormatters($scheme): void {
+  public function _testImageFieldFormatters($scheme) {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
@@ -83,7 +84,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->submitForm([], "{$field_name}_settings_edit");
     $this->assertSession()->linkByHrefNotExists(Url::fromRoute('entity.image_style.collection')->toString(), 'Link to image styles configuration is absent when permissions are insufficient');
 
-    // Restore 'administer image styles' permission to testing admin user.
+    // Restore 'administer image styles' permission to testing admin user
     user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => TRUE]);
 
     // Create a new node with an image attached.
@@ -102,6 +103,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Save node.
     $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $alt);
+    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
 
     // Test that the default formatter is being used.
@@ -289,6 +291,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Verify that the attached image is being previewed using the 'medium'
     // style.
+    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $file = $node->{$field_name}->entity;
 
@@ -386,7 +389,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->submitForm([], "{$field_name}_settings_edit");
     $this->assertSession()->linkByHrefNotExists(Url::fromRoute('entity.image_style.collection')->toString(), 'Link to image styles configuration is absent when permissions are insufficient');
 
-    // Restore 'administer image styles' permission to testing admin user.
+    // Restore 'administer image styles' permission to testing admin user
     user_role_change_permissions(reset($admin_user_roles), ['administer image styles' => TRUE]);
 
     // Create a new node with an image attached.
@@ -405,6 +408,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Save node.
     $nid = $this->uploadNodeImage($test_image, $field_name, 'article', $alt);
+    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
 
     // Test that the default image loading attribute is being used.
@@ -448,8 +452,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
     $this->drupalGet('node/' . $nid);
     $this->assertSession()->responseContains($default_output);
 
-    // Test the image loading "priority" formatter works together with
-    // "image_style".
+    // Test the image loading "priority" formatter works together with "image_style".
     $display_options['settings']['image_style'] = 'thumbnail';
     $display->setComponent($field_name, $display_options)
       ->save();
@@ -535,6 +538,7 @@ class ImageFieldDisplayTest extends ImageFieldTestBase {
 
     // Upload the 'image-test.gif' file.
     $nid = $this->uploadNodeImage($images[2], $field_name, 'article', $alt);
+    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $file = $node->{$field_name}->entity;
     $image = [

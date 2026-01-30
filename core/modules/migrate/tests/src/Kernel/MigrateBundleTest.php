@@ -7,18 +7,18 @@ namespace Drupal\Tests\migrate\Kernel;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests setting of bundles on content entity migrations.
+ *
+ * @group migrate
  */
-#[Group('migrate')]
-#[RunTestsInSeparateProcesses]
 class MigrateBundleTest extends MigrateTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['taxonomy', 'text', 'user', 'system'];
 
@@ -102,8 +102,7 @@ class MigrateBundleTest extends MigrateTestBase {
 
     $term_migration = \Drupal::service('plugin.manager.migration')->createStubMigration($definition);
 
-    // Import and validate the term entities were created with the correct
-    // bundle.
+    // Import and validate the term entities were created with the correct bundle.
     $term_executable = new MigrateExecutable($term_migration, $this);
     $term_executable->import();
     /** @var \Drupal\taxonomy\Entity\Term $term */
@@ -145,8 +144,7 @@ class MigrateBundleTest extends MigrateTestBase {
 
     $term_migration = \Drupal::service('plugin.manager.migration')->createStubMigration($definition);
 
-    // Import and validate the term entities were created with the correct
-    // bundle.
+    // Import and validate the term entities were created with the correct bundle.
     $term_executable = new MigrateExecutable($term_migration, $this);
     $term_executable->import();
     /** @var \Drupal\taxonomy\Entity\Term $term */

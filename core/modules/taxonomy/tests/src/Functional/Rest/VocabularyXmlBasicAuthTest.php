@@ -6,14 +6,10 @@ namespace Drupal\Tests\taxonomy\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\BasicAuthResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests Vocabulary Xml Basic Auth.
+ * @group rest
  */
-#[Group('rest')]
-#[RunTestsInSeparateProcesses]
 class VocabularyXmlBasicAuthTest extends VocabularyResourceTestBase {
 
   use BasicAuthResourceTestTrait;
@@ -37,7 +33,7 @@ class VocabularyXmlBasicAuthTest extends VocabularyResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $mimeType = 'text/xml; charset=utf-8';
+  protected static $mimeType = 'text/xml; charset=UTF-8';
 
   /**
    * {@inheritdoc}

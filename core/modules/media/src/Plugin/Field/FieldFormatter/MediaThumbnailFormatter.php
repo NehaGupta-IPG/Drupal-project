@@ -40,7 +40,7 @@ class MediaThumbnailFormatter extends ImageFormatter {
    * Constructs a MediaThumbnailFormatter object.
    *
    * @param string $plugin_id
-   *   The plugin ID for the formatter.
+   *   The plugin_id for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -146,7 +146,7 @@ class MediaThumbnailFormatter extends ImageFormatter {
       $elements[$delta] = [
         '#theme' => 'image_formatter',
         '#item' => $media->get('thumbnail')->first(),
-        '#attributes' => [
+        '#item_attributes' => [
           'loading' => $this->getSetting('image_loading')['attribute'],
         ],
         '#image_style' => $this->getSetting('image_style'),

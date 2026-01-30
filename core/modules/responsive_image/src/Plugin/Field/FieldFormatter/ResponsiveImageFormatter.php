@@ -59,7 +59,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
    * Constructs a ResponsiveImageFormatter object.
    *
    * @param string $plugin_id
-   *   The plugin ID for the formatter.
+   *   The plugin_id for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -267,16 +267,16 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       // Extract field item attributes for the theme function, and unset them
       // from the $item so that the field template does not re-render them.
       $item = $file->_referringItem;
-      $attributes = $item->_attributes;
+      $item_attributes = $item->_attributes;
       unset($item->_attributes);
 
       $image_loading_settings = $this->getSetting('image_loading');
-      $attributes['loading'] = $image_loading_settings['attribute'];
+      $item_attributes['loading'] = $image_loading_settings['attribute'];
 
       $elements[$delta] = [
         '#theme' => 'responsive_image_formatter',
         '#item' => $item,
-        '#attributes' => $attributes,
+        '#item_attributes' => $item_attributes,
         '#responsive_image_style_id' => $responsive_image_style ? $responsive_image_style->id() : '',
         '#url' => $url,
         '#cache' => [

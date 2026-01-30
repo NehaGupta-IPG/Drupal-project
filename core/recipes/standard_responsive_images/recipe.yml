@@ -4,7 +4,5 @@ type: 'Responsive image'
 install:
   - responsive_image
 config:
-  # There's no need to conflict with existing responsive image styles.
-  strict: false
   import:
     image: '*'

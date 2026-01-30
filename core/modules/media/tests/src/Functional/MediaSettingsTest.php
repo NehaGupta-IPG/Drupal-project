@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\Functional;
 
 use Drupal\Core\Url;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Testing the media settings.
+ *
+ * @group media
  */
-#[Group('media')]
-#[RunTestsInSeparateProcesses]
 class MediaSettingsTest extends MediaFunctionalTestBase {
 
   /**
@@ -29,6 +27,21 @@ class MediaSettingsTest extends MediaFunctionalTestBase {
       'administer site configuration',
       'administer media',
     ]));
+  }
+
+  /**
+   * Tests that media warning appears if oEmbed media types exists.
+   */
+  public function testStatusPage(): void {
+    $assert_session = $this->assertSession();
+
+    $this->drupalGet('admin/reports/status');
+    $assert_session->pageTextNotContains('It is potentially insecure to display oEmbed content in a frame');
+
+    $this->createMediaType('oembed:video');
+
+    $this->drupalGet('admin/reports/status');
+    $assert_session->pageTextContains('It is potentially insecure to display oEmbed content in a frame');
   }
 
   /**

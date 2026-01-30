@@ -21,9 +21,7 @@ class Extension {
   protected $type;
 
   /**
-   * The relative pathname of the extension.
-   *
-   * An example relative pathname is 'core/modules/node/node.info.yml'.
+   * The relative pathname of the extension (e.g., 'core/modules/node/node.info.yml').
    *
    * @var string
    */
@@ -83,7 +81,6 @@ class Extension {
    * Returns the type of the extension.
    *
    * @return string
-   *   The extension type. This is usually 'module' or 'theme'.
    */
   public function getType() {
     return $this->type;
@@ -93,7 +90,6 @@ class Extension {
    * Returns the internal name of the extension.
    *
    * @return string
-   *   The machine name of the extension.
    */
   public function getName() {
     return basename($this->pathname, '.info.yml');
@@ -103,7 +99,6 @@ class Extension {
    * Returns the relative path of the extension.
    *
    * @return string
-   *   The relative path of the extension.
    */
   public function getPath() {
     return dirname($this->pathname);
@@ -113,7 +108,6 @@ class Extension {
    * Returns the relative path and filename of the extension's info file.
    *
    * @return string
-   *   The relative path and filename of the extension's .info file.
    */
   public function getPathname() {
     return $this->pathname;
@@ -123,7 +117,6 @@ class Extension {
    * Returns the filename of the extension's info file.
    *
    * @return string
-   *   The base name of the extension .info file.
    */
   public function getFilename() {
     return basename($this->pathname);
@@ -133,7 +126,6 @@ class Extension {
    * Returns the relative path of the main extension file, if any.
    *
    * @return string|null
-   *   The relative path for the main extension file, usually the *.module file.
    */
   public function getExtensionPathname() {
     if ($this->filename) {
@@ -145,7 +137,6 @@ class Extension {
    * Returns the name of the main extension file, if any.
    *
    * @return string|null
-   *   The filename of the main extension file, usually the *.module file.
    */
   public function getExtensionFilename() {
     return $this->filename;

@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Kernel\Plugin;
 
-use Drupal\block\Entity\Block;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\block\Entity\Block;
 
 /**
  * Tests views block config dependencies functionality.
+ *
+ * @group views
  */
-#[Group('views')]
-#[RunTestsInSeparateProcesses]
 class BlockDependenciesTest extends ViewsKernelTestBase {
 
   /**
@@ -24,7 +22,9 @@ class BlockDependenciesTest extends ViewsKernelTestBase {
   public static $testViews = ['test_exposed_block'];
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['node', 'block', 'user', 'field'];
 

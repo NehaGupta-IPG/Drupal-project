@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Functional;
 
-use Drupal\block\Entity\Block;
 use Drupal\Component\Utility\Html;
+use Drupal\block\Entity\Block;
 use Drupal\Core\Url;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests basic block functionality.
+ *
+ * @group block
+ * @group #slow
  */
-#[Group('block')]
-#[RunTestsInSeparateProcesses]
 class BlockTest extends BlockTestBase {
 
   /**
@@ -185,7 +184,7 @@ class BlockTest extends BlockTestBase {
       $this->assertSession()->elementTextEquals('xpath', $xpath, 'Place block');
 
       $link = $this->getSession()->getPage()->find('xpath', $xpath);
-      [, $query_string] = explode('?', $link->getAttribute('href'), 2);
+      [$path, $query_string] = explode('?', $link->getAttribute('href'), 2);
       parse_str($query_string, $query_parts);
       $this->assertEquals($weight, $query_parts['weight'], 'Found the expected weight query string.');
 
@@ -226,8 +225,7 @@ class BlockTest extends BlockTestBase {
     $block['theme'] = $this->config('system.theme')->get('default');
     $block['region'] = 'header';
 
-    // Set block title to confirm that interface works and override any custom
-    // titles.
+    // Set block title to confirm that interface works and override any custom titles.
     $this->drupalGet('admin/structure/block/add/' . $block['id'] . '/' . $block['theme']);
     $this->submitForm([
       'settings[label]' => $block['settings[label]'],
@@ -391,7 +389,7 @@ class BlockTest extends BlockTestBase {
    *   The machine name of the theme region to move the block to, for example
    *   'header' or 'sidebar_first'.
    */
-  public function moveBlockToRegion(array $block, $region): void {
+  public function moveBlockToRegion(array $block, $region) {
     // Set the created block to a specific region.
     $block += ['theme' => $this->config('system.theme')->get('default')];
     $edit = [];
@@ -453,18 +451,19 @@ class BlockTest extends BlockTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
+      'block_view',
+      'config:block.block.powered',
       'config:user.role.anonymous',
       'http_response',
       'rendered',
     ];
     sort($expected_cache_tags);
-    $keys = \Drupal::service('cache_contexts_manager')
-      ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
-      ->getKeys();
+    $keys = \Drupal::service('cache_contexts_manager')->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])->getKeys();
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
     $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
     $expected_cache_tags = [
-      'config:block_list',
+      'block_view',
+      'config:block.block.powered',
       'rendered',
     ];
     sort($expected_cache_tags);
@@ -493,6 +492,9 @@ class BlockTest extends BlockTestBase {
     $cache_entry = \Drupal::cache('page')->get($cid);
     $expected_cache_tags = [
       'config:block_list',
+      'block_view',
+      'config:block.block.powered',
+      'config:block.block.powered_2',
       'config:user.role.anonymous',
       'http_response',
       'rendered',
@@ -500,23 +502,21 @@ class BlockTest extends BlockTestBase {
     sort($expected_cache_tags);
     $this->assertEquals($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
-      'config:block_list',
+      'block_view',
+      'config:block.block.powered',
       'rendered',
     ];
     sort($expected_cache_tags);
-    $keys = \Drupal::service('cache_contexts_manager')
-      ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
-      ->getKeys();
+    $keys = \Drupal::service('cache_contexts_manager')->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])->getKeys();
     $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered:' . implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
     $expected_cache_tags = [
-      'config:block_list',
+      'block_view',
+      'config:block.block.powered_2',
       'rendered',
     ];
     sort($expected_cache_tags);
-    $keys = \Drupal::service('cache_contexts_manager')
-      ->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])
-      ->getKeys();
+    $keys = \Drupal::service('cache_contexts_manager')->convertTokensToKeys(['languages:language_interface', 'theme', 'user.permissions'])->getKeys();
     $cache_entry = \Drupal::cache('render')->get('entity_view:block:powered_2:' . implode(':', $keys));
     $this->assertSame($expected_cache_tags, $cache_entry->tags);
 
@@ -577,7 +577,7 @@ class BlockTest extends BlockTestBase {
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextNotContains('Hello test world');
 
-    \Drupal::keyValue('block_test')->set('access', TRUE);
+    \Drupal::state()->set('test_block_access', TRUE);
     $this->drupalGet('<front>');
     $this->assertSession()->pageTextContains('Hello test world');
   }

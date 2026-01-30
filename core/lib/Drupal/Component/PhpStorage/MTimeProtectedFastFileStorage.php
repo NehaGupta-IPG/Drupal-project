@@ -217,9 +217,9 @@ class MTimeProtectedFastFileStorage extends FileStorage {
   /**
    * A brute force tempnam implementation supporting streams.
    *
-   * @param string $directory
+   * @param $directory
    *   The directory where the temporary filename will be created.
-   * @param string $prefix
+   * @param $prefix
    *   The prefix of the generated temporary filename.
    *
    * @return string

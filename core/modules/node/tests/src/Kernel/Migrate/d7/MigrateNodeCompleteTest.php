@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel\Migrate\d7;
 
-use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\migrate\MigrateExecutable;
 use Drupal\migrate_drupal\NodeMigrateType;
 use Drupal\node\Entity\Node;
@@ -13,15 +12,12 @@ use Drupal\Tests\file\Kernel\Migrate\d7\FileMigrationSetupTrait;
 use Drupal\Tests\migrate_drupal\Kernel\d7\MigrateDrupal7TestBase;
 use Drupal\Tests\migrate_drupal\Traits\CreateTestContentEntitiesTrait;
 use Drupal\Tests\migrate_drupal\Traits\NodeMigrateTypeTestTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test class for a complete node migration for Drupal 7.
+ *
+ * @group migrate_drupal_7
  */
-#[Group('migrate_drupal_7')]
-#[Group('#slow')]
-#[RunTestsInSeparateProcesses]
 class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
 
   use FileMigrationSetupTrait;
@@ -116,14 +112,14 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
       ->orderBy('vid')
       ->orderBy('langcode')
       ->execute()
-      ->fetchAll(FetchAs::Associative));
+      ->fetchAll(\PDO::FETCH_ASSOC));
     $this->assertEquals($this->expectedNodeFieldDataTable(), $db->select('node_field_data', 'nr')
       ->fields('nr')
       ->orderBy('nid')
       ->orderBy('vid')
       ->orderBy('langcode')
       ->execute()
-      ->fetchAll(FetchAs::Associative));
+      ->fetchAll(\PDO::FETCH_ASSOC));
 
     // Load and test each revision.
     $data = $this->expectedRevisionEntityData()[0];
@@ -1010,7 +1006,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
    */
   protected function expectedRevisionEntityData(): array {
     return [
-      [
+      $revision_data = [
         // Node 1, revision 1, en.
         0 =>
           [

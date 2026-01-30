@@ -122,8 +122,13 @@ class ComponentLoader implements LoaderInterface {
     catch (ComponentNotFoundException) {
       throw new LoaderError('Unable to find component');
     }
+    // If any of the templates, or the component definition, are fresh. Then the
+    // component is fresh.
     $metadata_path = $component->getPluginDefinition()[YamlDirectoryDiscovery::FILE_KEY];
-    return $file_is_fresh($component->getTemplatePath()) && $file_is_fresh($metadata_path);
+    if ($file_is_fresh($metadata_path)) {
+      return TRUE;
+    }
+    return $file_is_fresh($component->getTemplatePath());
   }
 
 }

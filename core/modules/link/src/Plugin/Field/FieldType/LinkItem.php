@@ -13,7 +13,6 @@ use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\Url;
 use Drupal\link\LinkItemInterface;
-use Drupal\link\LinkTitleVisibility;
 
 /**
  * Plugin implementation of the 'link' field type.
@@ -21,7 +20,7 @@ use Drupal\link\LinkTitleVisibility;
 #[FieldType(
   id: "link",
   label: new TranslatableMarkup("Link"),
-  description: new TranslatableMarkup("A URL or internal path, with optional link text"),
+  description: new TranslatableMarkup("Stores a URL string, optional varchar link text, and optional blob of attributes to assemble a link."),
   default_widget: "link_default",
   default_formatter: "link",
   constraints: [
@@ -29,7 +28,6 @@ use Drupal\link\LinkTitleVisibility;
     "LinkAccess" => [],
     "LinkExternalProtocols" => [],
     "LinkNotExistingInternal" => [],
-    "LinkTitleRequired" => [],
   ]
 )]
 class LinkItem extends FieldItemBase implements LinkItemInterface {
@@ -39,7 +37,7 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
    */
   public static function defaultFieldSettings() {
     return [
-      'title' => LinkTitleVisibility::Optional->value,
+      'title' => DRUPAL_OPTIONAL,
       'link_type' => LinkItemInterface::LINK_GENERIC,
     ] + parent::defaultFieldSettings();
   }
@@ -110,7 +108,11 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
       '#type' => 'radios',
       '#title' => $this->t('Allow link text'),
       '#default_value' => $this->getSetting('title'),
-      '#options' => LinkTitleVisibility::asOptions(),
+      '#options' => [
+        DRUPAL_DISABLED => $this->t('Disabled'),
+        DRUPAL_OPTIONAL => $this->t('Optional'),
+        DRUPAL_REQUIRED => $this->t('Required'),
+      ],
     ];
 
     return $element;
@@ -127,14 +129,20 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
       // Set random length for the domain name.
       $domain_length = mt_rand(7, 15);
 
-      $link_title_visibility = LinkTitleVisibility::tryFrom((int) $field_definition->getSetting('title'));
-      $values['title'] = match ($link_title_visibility) {
-        LinkTitleVisibility::Required => $random->sentences(4),
-        // In case of optional title, randomize its generation.
-        LinkTitleVisibility::Optional => mt_rand(0, 1) ? $random->sentences(4) : '',
-        // Disabled, or a value that does not translate to an enum case.
-        default => '',
-      };
+      switch ($field_definition->getSetting('title')) {
+        case DRUPAL_DISABLED:
+          $values['title'] = '';
+          break;
+
+        case DRUPAL_REQUIRED:
+          $values['title'] = $random->sentences(4);
+          break;
+
+        case DRUPAL_OPTIONAL:
+          // In case of optional title, randomize its generation.
+          $values['title'] = mt_rand(0, 1) ? $random->sentences(4) : '';
+          break;
+      }
       $values['uri'] = 'https://www.' . $random->word($domain_length) . '.' . $tlds[mt_rand(0, (count($tlds) - 1))];
     }
     else {

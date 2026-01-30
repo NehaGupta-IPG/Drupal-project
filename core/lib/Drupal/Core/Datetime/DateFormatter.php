@@ -26,10 +26,33 @@ class DateFormatter implements DateFormatterInterface {
   protected $timezones;
 
   /**
-   * The available date formats.
+   * The date format storage.
    *
-   * @var array
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
+  protected $dateFormatStorage;
+
+  /**
+   * Language manager for retrieving the default langcode when none is specified.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * The configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
   protected $dateFormats = [];
 
   /**
@@ -51,14 +74,26 @@ class DateFormatter implements DateFormatterInterface {
     '@count sec|@count sec' => 1,
   ];
 
-  public function __construct(
-    protected EntityTypeManagerInterface $entityTypeManager,
-    protected LanguageManagerInterface $languageManager,
-    TranslationInterface $translation,
-    protected ConfigFactoryInterface $configFactory,
-    protected RequestStack $requestStack,
-  ) {
+  /**
+   * Constructs a Date object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
+   *   The string translation.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   The request stack.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, TranslationInterface $translation, ConfigFactoryInterface $config_factory, RequestStack $request_stack) {
+    $this->dateFormatStorage = $entity_type_manager->getStorage('date_format');
+    $this->languageManager = $language_manager;
     $this->stringTranslation = $translation;
+    $this->configFactory = $config_factory;
+    $this->requestStack = $request_stack;
   }
 
   /**
@@ -85,7 +120,7 @@ class DateFormatter implements DateFormatterInterface {
     $date = DrupalDateTime::createFromTimestamp($timestamp, $this->timezones[$timezone], $create_settings);
 
     // If we have a non-custom date format use the provided date format pattern.
-    if ($type && $type !== 'custom') {
+    if ($type !== 'custom') {
       if ($date_format = $this->dateFormat($type, $langcode)) {
         $format = $date_format->getPattern();
       }
@@ -128,7 +163,7 @@ class DateFormatter implements DateFormatterInterface {
         break;
       }
     }
-    return $output ?: $this->t('0 sec', [], ['langcode' => $langcode]);
+    return $output ? $output : $this->t('0 sec', [], ['langcode' => $langcode]);
   }
 
   /**
@@ -230,8 +265,7 @@ class DateFormatter implements DateFormatterInterface {
             }
             else {
               // If we did not output days, set the granularity to 0 so that we
-              // will not output hours and get things like "@count week @count
-              // hour".
+              // will not output hours and get things like "@count week @count hour".
               $granularity = 0;
             }
             break;
@@ -257,8 +291,7 @@ class DateFormatter implements DateFormatterInterface {
       }
       elseif ($output) {
         // Break if there was previous output but not any output at this level,
-        // to avoid skipping levels and getting output like "@count year @count
-        // second".
+        // to avoid skipping levels and getting output like "@count year @count second".
         break;
       }
 
@@ -301,7 +334,7 @@ class DateFormatter implements DateFormatterInterface {
     if (!isset($this->dateFormats[$type][$langcode])) {
       $original_language = $this->languageManager->getConfigOverrideLanguage();
       $this->languageManager->setConfigOverrideLanguage(new Language(['id' => $langcode]));
-      $this->dateFormats[$type][$langcode] = $this->entityTypeManager->getStorage('date_format')->load($type);
+      $this->dateFormats[$type][$langcode] = $this->dateFormatStorage->load($type);
       $this->languageManager->setConfigOverrideLanguage($original_language);
     }
     return $this->dateFormats[$type][$langcode];

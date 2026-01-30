@@ -4,7 +4,6 @@ namespace Drupal\Core\Entity\KeyValueStore;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityStorageInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\TranslatableInterface;
 
@@ -45,13 +44,6 @@ class KeyValueContentEntityStorage extends KeyValueEntityStorage implements Cont
    */
   public function loadMultipleRevisions(array $revision_ids) {
     return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function loadRevisionUnchanged($revision_id): ?EntityInterface {
-    return NULL;
   }
 
   /**

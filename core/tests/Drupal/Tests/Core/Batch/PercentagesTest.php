@@ -6,25 +6,22 @@ namespace Drupal\Tests\Core\Batch;
 
 use Drupal\Core\Batch\Percentage;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Batch helper object.
  *
  * Make sure that the rounding works properly in all cases.
+ *
+ * @coversDefaultClass \Drupal\Core\Batch\Percentage
+ * @group Batch
  */
-#[CoversClass(Percentage::class)]
-#[Group('Batch')]
 class PercentagesTest extends UnitTestCase {
+  protected $testCases = [];
 
   /**
-   * Tests percentages.
-   *
-   * @legacy-covers ::format
+   * @dataProvider providerTestPercentages
+   * @covers ::format
    */
-  #[DataProvider('providerTestPercentages')]
   public function testPercentages($total, $current, $expected_result): void {
     $actual_result = Percentage::format($total, $current);
     $this->assertEquals($actual_result, $expected_result, sprintf('The expected the batch api percentage at the state %s/%s is %s%% and got %s%%.', $current, $total, $expected_result, $actual_result));
@@ -34,12 +31,12 @@ class PercentagesTest extends UnitTestCase {
    * Provide data for batch unit tests.
    *
    * @return array
-   *   An array of data used by the test. The array values, in order, are the
-   *   total count, the current count, and the expected percentage.
+   *   An array of data used by the test.
    */
-  public static function providerTestPercentages(): array {
+  public static function providerTestPercentages() {
     // Set up an array of test cases.
     return [
+      // array(total, current, expected).
       // 1/2 is 50%.
       [2, 1, '50'],
       // Though we should never encounter a case where the current set is set

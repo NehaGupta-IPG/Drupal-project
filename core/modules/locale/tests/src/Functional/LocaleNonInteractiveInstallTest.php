@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests installing in a different language with a non-dev version string.
+ *
+ * @group locale
  */
-#[Group('locale')]
-#[RunTestsInSeparateProcesses]
 class LocaleNonInteractiveInstallTest extends BrowserTestBase {
 
   /**
@@ -34,7 +32,7 @@ class LocaleNonInteractiveInstallTest extends BrowserTestBase {
    * @return string
    *   The version string to test, for example, '8.0.0' or '8.6.x'.
    */
-  protected function getVersionStringToTest(): string {
+  protected function getVersionStringToTest() {
     include_once $this->root . '/core/includes/install.core.inc';
     $version = _install_get_version_info(\Drupal::VERSION);
     return $version['major'] . '.0.0';

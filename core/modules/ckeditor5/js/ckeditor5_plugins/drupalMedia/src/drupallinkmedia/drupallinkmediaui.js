@@ -83,7 +83,7 @@ export default class DrupalLinkMediaUI extends Plugin {
       // depending on whether the media is already linked.
       this.listenTo(button, 'execute', () => {
         if (this._isSelectedLinkedMedia(editor.model.document.selection)) {
-          plugin._addToolbarView();
+          plugin._addActionsView();
         } else {
           plugin._showUI(true);
         }
@@ -103,7 +103,8 @@ export default class DrupalLinkMediaUI extends Plugin {
   _isSelectedLinkedMedia(selection) {
     const selectedModelElement = selection.getSelectedElement();
     return (
-      selectedModelElement?.is('element', 'drupalMedia') &&
+      !!selectedModelElement &&
+      selectedModelElement.is('element', 'drupalMedia') &&
       selectedModelElement.hasAttribute('linkHref')
     );
   }

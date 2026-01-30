@@ -17,9 +17,8 @@ trait TestRequirementsTrait {
    * Returns the Drupal root directory.
    *
    * @return string
-   *   The Drupal root directory.
    */
-  protected static function getDrupalRoot(): string {
+  protected static function getDrupalRoot() {
     return dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
   }
 

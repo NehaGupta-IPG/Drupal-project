@@ -25,7 +25,9 @@ abstract class EntityKernelTestBase extends KernelTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'user',
@@ -75,9 +77,6 @@ abstract class EntityKernelTestBase extends KernelTestBase {
         if ($rp->class == $class) {
           foreach (array_intersect(['node', 'comment'], $class::$modules) as $module) {
             $this->installEntitySchema($module);
-          }
-          if (in_array('taxonomy', $class::$modules, TRUE)) {
-            $this->installEntitySchema('taxonomy_term');
           }
         }
       }

@@ -9,9 +9,7 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Tests emphasis in CKEditor 5.
@@ -19,10 +17,9 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  * CKEditor's use of <i> is converted to <em> in Drupal, so additional coverage
  * is provided here to verify successful conversion.
  *
+ * @group ckeditor5
  * @internal
  */
-#[Group('ckeditor5')]
-#[RunTestsInSeparateProcesses]
 class EmphasisTest extends WebDriverTestBase {
   use CKEditor5TestTrait;
 
@@ -93,7 +90,7 @@ class EmphasisTest extends WebDriverTestBase {
       ],
     ])->save();
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolation $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(

@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_drupal_ui\Functional\d7;
 
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\migrate\Plugin\MigrationInterface;
 
 /**
  * Tests that a double slash is not in d7_file file not found migrate messages.
+ *
+ * @group migrate_drupal_ui
  */
-#[Group('migrate_drupal_ui')]
-#[IgnoreDeprecations]
-#[RunTestsInSeparateProcesses]
 class DoubleSlashTest extends MigrateUpgradeExecuteTestBase {
 
   /**
@@ -86,7 +82,7 @@ class DoubleSlashTest extends MigrateUpgradeExecuteTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getSourceBasePath(): string {
+  protected function getSourceBasePath() {
     return __DIR__ . '/files';
   }
 

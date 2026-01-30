@@ -4,20 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\taxonomy\Functional;
 
-use Drupal\Core\Entity\Form\RevisionDeleteForm;
-use Drupal\taxonomy\Entity\Term;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\taxonomy\Entity\Term;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Taxonomy term revision delete form test.
+ *
+ * @group taxonomy
+ * @coversDefaultClass \Drupal\Core\Entity\Form\RevisionDeleteForm
  */
-#[CoversClass(RevisionDeleteForm::class)]
-#[Group('taxonomy')]
-#[RunTestsInSeparateProcesses]
 class TaxonomyRevisionDeleteTest extends BrowserTestBase {
 
   use TaxonomyTestTrait;

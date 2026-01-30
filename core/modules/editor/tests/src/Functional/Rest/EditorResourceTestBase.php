@@ -10,7 +10,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
 /**
- * Resource test base for Editor entity.
+ * ResourceTestBase for Editor entity.
  */
 abstract class EditorResourceTestBase extends ConfigEntityResourceTestBase {
 

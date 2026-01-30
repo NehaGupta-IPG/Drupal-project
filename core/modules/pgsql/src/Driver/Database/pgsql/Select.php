@@ -14,9 +14,6 @@ use Drupal\Core\Database\Query\Select as QuerySelect;
  */
 class Select extends QuerySelect {
 
-  /**
-   * {@inheritdoc}
-   */
   public function orderRandom() {
     $alias = $this->addExpression('RANDOM()', 'random_field');
     $this->orderBy($alias);

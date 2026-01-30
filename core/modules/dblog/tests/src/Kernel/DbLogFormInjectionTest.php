@@ -10,14 +10,12 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests serializing a form with an injected dblog logger instance.
+ *
+ * @group dblog
  */
-#[Group('dblog')]
-#[RunTestsInSeparateProcesses]
 class DbLogFormInjectionTest extends KernelTestBase implements FormInterface {
 
   use DependencySerializationTrait;
@@ -30,7 +28,9 @@ class DbLogFormInjectionTest extends KernelTestBase implements FormInterface {
   protected $logger;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['system', 'dblog', 'user'];
 
@@ -45,7 +45,7 @@ class DbLogFormInjectionTest extends KernelTestBase implements FormInterface {
    * Process callback.
    *
    * @param array $element
-   *   Form element.
+   *   Form element
    *
    * @return array
    *   Processed element.
@@ -70,7 +70,7 @@ class DbLogFormInjectionTest extends KernelTestBase implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state): void {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $form_state->setRebuild();
   }
 

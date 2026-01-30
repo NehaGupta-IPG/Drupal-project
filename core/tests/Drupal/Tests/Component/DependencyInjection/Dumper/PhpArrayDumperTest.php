@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\DependencyInjection\Dumper;
 
-use Drupal\Component\DependencyInjection\Dumper\PhpArrayDumper;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Tests Drupal\Component\DependencyInjection\Dumper\PhpArrayDumper.
+ * @coversDefaultClass \Drupal\Component\DependencyInjection\Dumper\PhpArrayDumper
+ * @group DependencyInjection
  */
-#[CoversClass(PhpArrayDumper::class)]
-#[Group('DependencyInjection')]
 class PhpArrayDumperTest extends OptimizedPhpArrayDumperTest {
 
   /**
@@ -28,14 +24,14 @@ class PhpArrayDumperTest extends OptimizedPhpArrayDumperTest {
   /**
    * {@inheritdoc}
    */
-  protected static function serializeDefinition(array $service_definition): string|array {
+  protected static function serializeDefinition(array $service_definition): array {
     return $service_definition;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected static function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): string {
+  protected static function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
     if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
       return sprintf('@?%s', $id);
     }
@@ -46,7 +42,7 @@ class PhpArrayDumperTest extends OptimizedPhpArrayDumperTest {
   /**
    * {@inheritdoc}
    */
-  protected static function getParameterCall($name): string {
+  protected static function getParameterCall($name) {
     return '%' . $name . '%';
   }
 

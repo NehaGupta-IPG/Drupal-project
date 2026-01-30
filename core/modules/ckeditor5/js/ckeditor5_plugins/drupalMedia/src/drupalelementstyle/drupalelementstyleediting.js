@@ -1,8 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* cspell:ignore drupalelementstyle drupalelementstylecommand */
-/* cspell:ignore drupalelementstyleediting */
-import { Plugin } from 'ckeditor5/src/core';
-import * as icons from '@ckeditor/ckeditor5-icons';
+/* cspell:ignore drupalelementstylecommand */
+import { Plugin, icons } from 'ckeditor5/src/core';
 import { first } from 'ckeditor5/src/utils';
 import DrupalElementStyleCommand from './drupalelementstylecommand';
 import { groupNameToModelAttributeKey } from '../utils';
@@ -164,7 +162,7 @@ function viewToModelStyleAttribute(styles, modelAttribute) {
  *      drupalElementStyles:
  *        side:
  *          - name: 'side'
- *            icon: 'IconObjectRight'
+ *            icon: 'objectBlockRight'
  *            title: 'Side image'
  *            attributeName: 'class'
  *            attributeValue: 'image-side'
@@ -172,12 +170,12 @@ function viewToModelStyleAttribute(styles, modelAttribute) {
  *        align:
  *           - name: 'right'
  *             title: 'Right aligned media'
- *             icon: 'IconObjectInlineRight'
+ *             icon: 'objectRight'
  *             attributeName: 'data-align'
  *             modelElements: [ 'drupalMedia' ]
  *           - name: 'left'
  *             title: 'Left aligned media'
- *             icon: 'IconObjectInlineLeft'
+ *             icon: 'objectLeft'
  *             attributeName: 'data-align'
  *             attributeValue: 'left'
  *             modelElements: [ 'drupalMedia' ]

@@ -6,7 +6,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\File\MimeType\MimeTypeMapInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
 
@@ -76,13 +75,13 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
     if (!parent::isApplicable($field_definition)) {
       return FALSE;
     }
-    /** @var \Drupal\Core\File\MimeType\MimeTypeMapInterface $mime_type_map */
-    $mime_type_map = \Drupal::service(MimeTypeMapInterface::class);
+    /** @var \Symfony\Component\Mime\MimeTypeGuesserInterface $extension_mime_type_guesser */
+    $extension_mime_type_guesser = \Drupal::service('file.mime_type.guesser.extension');
     $extension_list = array_filter(preg_split('/\s+/', $field_definition->getSetting('file_extensions')));
 
     foreach ($extension_list as $extension) {
-      $mime_type = $mime_type_map->getMimeTypeForExtension($extension);
-      if ($mime_type !== NULL && static::mimeTypeApplies($mime_type)) {
+      $mime_type = $extension_mime_type_guesser->guessMimeType('fakedFile.' . $extension);
+      if (static::mimeTypeApplies($mime_type)) {
         return TRUE;
       }
     }
@@ -193,12 +192,11 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
     // grouping in case the multiple file behavior is not 'tags'.
     /** @var \Drupal\file\Entity\File $file */
     foreach ($this->getEntitiesToView($items, $langcode) as $file) {
-      $mime_type = $file->getMimeType();
-      if ($mime_type !== NULL && static::mimeTypeApplies($mime_type)) {
+      if (static::mimeTypeApplies($file->getMimeType())) {
         $source_attributes = new Attribute();
         $source_attributes
           ->setAttribute('src', $file->createFileUrl())
-          ->setAttribute('type', $mime_type);
+          ->setAttribute('type', $file->getMimeType());
         if ($this->getSetting('multiple_file_display_type') === 'tags') {
           $source_files[] = [
             [

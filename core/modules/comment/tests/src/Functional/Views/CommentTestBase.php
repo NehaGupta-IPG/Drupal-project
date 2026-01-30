@@ -16,7 +16,9 @@ abstract class CommentTestBase extends ViewTestBase {
   use CommentTestTrait;
 
   /**
-   * {@inheritdoc}
+   * Modules to install.
+   *
+   * @var array
    */
   protected static $modules = ['node', 'comment', 'comment_test_views'];
 
@@ -67,7 +69,7 @@ abstract class CommentTestBase extends ViewTestBase {
     $this->account2 = $this->drupalCreateUser();
     $this->drupalLogin($this->account);
 
-    $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
+    $this->drupalCreateContentType(['type' => 'page', 'name' => t('Basic page')]);
     $this->addDefaultCommentField('node', 'page');
 
     $this->nodeUserPosted = $this->drupalCreateNode();

@@ -17,7 +17,9 @@ abstract class NodeTitleTestBase extends NodeTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['block'];
 

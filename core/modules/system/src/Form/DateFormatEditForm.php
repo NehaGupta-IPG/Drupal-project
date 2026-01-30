@@ -6,7 +6,6 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -15,8 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 class DateFormatEditForm extends DateFormatFormBase {
-
-  use StringTranslationTrait;
 
   /**
    * Constructs a DateFormatEditForm object.
@@ -53,7 +50,7 @@ class DateFormatEditForm extends DateFormatFormBase {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
-    $now = $this->t('Displayed as %date', ['%date' => $this->dateFormatter->format($this->time->getRequestTime(), $this->entity->id())]);
+    $now = t('Displayed as %date', ['%date' => $this->dateFormatter->format($this->time->getRequestTime(), $this->entity->id())]);
     $form['date_format_pattern']['#field_suffix'] = ' <small data-drupal-date-formatter="preview">' . $now . '</small>';
     $form['date_format_pattern']['#default_value'] = $this->entity->getPattern();
 

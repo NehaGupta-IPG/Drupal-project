@@ -29,16 +29,17 @@ class Color extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
+    $class = static::class;
     return [
       '#input' => TRUE,
       '#process' => [
-        [static::class, 'processAjaxForm'],
+        [$class, 'processAjaxForm'],
       ],
       '#element_validate' => [
-        [static::class, 'validateColor'],
+        [$class, 'validateColor'],
       ],
       '#pre_render' => [
-        [static::class, 'preRenderColor'],
+        [$class, 'preRenderColor'],
       ],
       '#theme' => 'input__color',
       '#theme_wrappers' => ['form_element'],
@@ -52,7 +53,7 @@ class Color extends FormElementBase {
     $value = trim($element['#value']);
 
     // Default to black if no value is given.
-    // @see https://www.w3.org/TR/html5/number-state.html#color-state
+    // @see http://www.w3.org/TR/html5/number-state.html#color-state
     if ($value === '') {
       $form_state->setValueForElement($element, '#000000');
     }

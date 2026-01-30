@@ -270,7 +270,6 @@ trait BlockPluginTrait {
    * Wraps the transliteration service.
    *
    * @return \Drupal\Component\Transliteration\TransliterationInterface
-   *   The transliteration service.
    */
   protected function transliteration() {
     if (!$this->transliteration) {
@@ -294,13 +293,6 @@ trait BlockPluginTrait {
    */
   public function setInPreview(bool $in_preview): void {
     $this->inPreview = $in_preview;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function createPlaceholder(): bool {
-    return FALSE;
   }
 
 }

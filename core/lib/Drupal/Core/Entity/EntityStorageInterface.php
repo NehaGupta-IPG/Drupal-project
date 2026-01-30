@@ -8,9 +8,8 @@ namespace Drupal\Core\Entity;
  * For common default implementations, see
  * \Drupal\Core\Entity\Sql\SqlContentEntityStorage for content entities and
  * \Drupal\Core\Config\Entity\ConfigEntityStorage for config entities. Those
- * implementations are used by default when the
- * \Drupal\Core\Entity\Attribute\ContentEntityType or
- * \Drupal\Core\Entity\Attribute\ConfigEntityType attributes are used.
+ * implementations are used by default when the @ContentEntityType or
+ * @ConfigEntityType annotations are used.
  *
  * @ingroup entity_api
  */
@@ -29,7 +28,7 @@ interface EntityStorageInterface {
   /**
    * Resets the internal entity cache.
    *
-   * @param array<string|int>|null $ids
+   * @param $ids
    *   (optional) If specified, the cache is reset for the entities with the
    *   given ids only.
    */
@@ -38,19 +37,19 @@ interface EntityStorageInterface {
   /**
    * Loads one or more entities.
    *
-   * @param array<string|int>|null $ids
+   * @param $ids
    *   An array of entity IDs, or NULL to load all entities.
    *
    * @return \Drupal\Core\Entity\EntityInterface[]
-   *   An array of successfully loaded objects indexed by their IDs.
-   *   Returns an empty array if no matching entities are found.
+   *   An array of entity objects indexed by their IDs. Returns an empty array
+   *   if no matching entities are found.
    */
   public function loadMultiple(?array $ids = NULL);
 
   /**
    * Loads one entity.
    *
-   * @param string|int $id
+   * @param mixed $id
    *   The ID of the entity to load.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
@@ -61,7 +60,7 @@ interface EntityStorageInterface {
   /**
    * Loads an unchanged entity from the database.
    *
-   * @param string|int $id
+   * @param mixed $id
    *   The ID of the entity to load.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null

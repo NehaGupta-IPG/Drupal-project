@@ -12,6 +12,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\search\Form\SearchBlockForm;
 use Drupal\search\SearchPageRepositoryInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'Search form' block.
@@ -55,6 +56,16 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->formBuilder = $form_builder;
     $this->searchPageRepository = $search_page_repository;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static($configuration, $plugin_id, $plugin_definition,
+      $container->get('form_builder'),
+      $container->get('search.search_page_repository')
+    );
   }
 
   /**

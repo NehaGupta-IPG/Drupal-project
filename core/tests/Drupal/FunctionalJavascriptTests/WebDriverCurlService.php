@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests;
 
-use WebDriver\Exception as WebDriverException;
-use WebDriver\Exception\CurlExec;
 use WebDriver\Service\CurlService;
-
-// cspell:ignore curle curlopt customrequest failonerror postfields
-// cspell:ignore returntransfer
+use WebDriver\Exception\CurlExec;
+use WebDriver\Exception as WebDriverException;
 
 @trigger_error('The \Drupal\FunctionalJavascriptTests\WebDriverCurlService class is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3462152', E_USER_DEPRECATED);
 
@@ -38,7 +35,7 @@ class WebDriverCurlService extends CurlService {
    *
    * This is useful if the caller is implementing it's own waiting process.
    */
-  public static function enableRetry(): void {
+  public static function enableRetry() {
     static::$retry = TRUE;
   }
 
@@ -47,7 +44,7 @@ class WebDriverCurlService extends CurlService {
    *
    * This is useful if the caller is implementing it's own waiting process.
    */
-  public static function disableRetry(): void {
+  public static function disableRetry() {
     static::$retry = FALSE;
   }
 
@@ -63,8 +60,8 @@ class WebDriverCurlService extends CurlService {
     while ($retries < $max_retries) {
       try {
         $customHeaders = [
-          'Content-Type: application/json;charset=utf-8',
-          'Accept: application/json;charset=utf-8',
+          'Content-Type: application/json;charset=UTF-8',
+          'Accept: application/json;charset=UTF-8',
         ];
 
         $curl = curl_init($url);
@@ -136,13 +133,13 @@ class WebDriverCurlService extends CurlService {
         $info = curl_getinfo($curl);
         $info['request_method'] = $requestMethod;
 
-        if (array_key_exists(CURLOPT_FAILONERROR, $extraOptions) && $extraOptions[CURLOPT_FAILONERROR] && CURLE_GOT_NOTHING !== curl_errno($curl) && $error = curl_error($curl)) {
-          $curl = NULL;
+        if (array_key_exists(CURLOPT_FAILONERROR, $extraOptions) && $extraOptions[CURLOPT_FAILONERROR] && CURLE_GOT_NOTHING !== ($errno = curl_errno($curl)) && $error = curl_error($curl)) {
+          curl_close($curl);
 
           throw WebDriverException::factory(WebDriverException::CURL_EXEC, sprintf("Curl error thrown for http %s to %s%s\n\n%s", $requestMethod, $url, $parameters && is_array($parameters) ? ' with params: ' . json_encode($parameters) : '', $error));
         }
 
-        $curl = NULL;
+        curl_close($curl);
 
         $result = json_decode($rawResult, TRUE);
         if (isset($result['status']) && $result['status'] === WebDriverException::STALE_ELEMENT_REFERENCE) {

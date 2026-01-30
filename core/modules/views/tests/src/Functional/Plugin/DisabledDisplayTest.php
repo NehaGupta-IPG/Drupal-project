@@ -5,16 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ability to disable and enable view displays.
  *
+ * @group views
  * @see \Drupal\views\Plugin\views\display\Feed
  */
-#[Group('views')]
-#[RunTestsInSeparateProcesses]
 class DisabledDisplayTest extends ViewTestBase {
 
   /**
@@ -25,7 +22,9 @@ class DisabledDisplayTest extends ViewTestBase {
   public static $testViews = ['test_disabled_display'];
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['block', 'node', 'views'];
 

@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Theme;
 
 use Drupal\Tests\block\FunctionalJavascript\BlockFilterTest;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Runs BlockFilterTest in Claro.
  *
+ * @group block
+ *
  * @see \Drupal\Tests\block\FunctionalJavascript\BlockFilterTest.
  */
-#[Group('block')]
-#[RunTestsInSeparateProcesses]
 class ClaroBlockFilterTest extends BlockFilterTest {
 
   /**
-   * Modules to install.
+   * Modules to enable.
    *
    * Install the shortcut module so that claro.settings has its schema checked.
    * There's currently no way for Claro to provide a default and have valid

@@ -6,24 +6,22 @@ namespace Drupal\Tests\layout_builder\FunctionalJavascript;
 
 use Behat\Mink\Element\NodeElement;
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\block_content\Entity\BlockContentType;
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\FunctionalJavascriptTests\JSWebAssert;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\Tests\system\Traits\OffCanvasTestTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cspell:ignore blocknodebundle fieldbody
+// cspell:ignore fieldbody
+
 /**
  * Tests the Layout Builder disables interactions of rendered blocks.
+ *
+ * @group layout_builder
  */
-#[Group('layout_builder')]
-#[Group('#slow')]
-#[RunTestsInSeparateProcesses]
 class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
 
-  use BlockContentCreationTrait;
   use ContextualLinkClickTrait;
   use OffCanvasTestTrait;
 
@@ -65,11 +63,13 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
       ],
     ]);
 
-    $this->createBlockContentType([
+    $bundle = BlockContentType::create([
       'id' => 'basic',
       'label' => 'Basic block',
       'revision' => 1,
-    ], TRUE);
+    ]);
+    $bundle->save();
+    block_content_add_body_field($bundle->id());
 
     BlockContent::create([
       'type' => 'basic',
@@ -155,7 +155,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
    * @param string $rendered_locator
    *   The CSS locator to confirm the block was rendered.
    */
-  protected function addBlock($block_link_text, $rendered_locator): void {
+  protected function addBlock($block_link_text, $rendered_locator) {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -189,7 +189,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
     try {
       $element->click();
       $tag_name = $element->getTagName();
-      $this->fail("$tag_name was clickable when it shouldn't have been");
+      $this->fail(new FormattableMarkup("@tag_name was clickable when it shouldn't have been", ['@tag_name' => $tag_name]));
     }
     catch (\Exception $e) {
       $this->assertTrue(JSWebAssert::isExceptionNotClickable($e));
@@ -314,7 +314,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
    * @return int
    *   The element position.
    */
-  protected function getElementVerticalPosition($css_selector, $position_type): int {
+  protected function getElementVerticalPosition($css_selector, $position_type) {
     $this->assertContains($position_type, ['top', 'bottom'], 'Expected position type.');
     return (int) $this->getSession()->evaluateScript("document.querySelector('$css_selector').getBoundingClientRect().$position_type + window.pageYOffset");
   }
@@ -330,7 +330,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
    *
    * @see https://www.drupal.org/node/3460567
    */
-  protected function movePointerTo($selector): void {
+  protected function movePointerTo($selector) {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use $this->getSession()->getDriver()->mouseOver() instead. See https://www.drupal.org/node/3460567', E_USER_DEPRECATED);
     $driver_session = $this->getSession()->getDriver()->getWebDriverSession();
     $element = $driver_session->element('css selector', $selector);

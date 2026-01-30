@@ -5,7 +5,6 @@ namespace Drupal\Core\Template;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Core\Serialization\Attribute\JsonSchema;
 
 /**
  * Collects, sanitizes, and renders HTML attributes.
@@ -26,7 +25,7 @@ use Drupal\Core\Serialization\Attribute\JsonSchema;
  *  $attributes['class'] = ['black-cat', 'white-cat'];
  *  $attributes['class'][] = 'black-white-cat';
  *  echo '<cat class="cat ' . $attributes['class'] . '"' . $attributes . '>';
- *  // Produces <cat class="cat black-cat white-cat black-white-cat" id="socks" class="black-cat white-cat black-white-cat">
+ *  // Produces <cat class="cat black-cat white-cat black-white-cat" id="socks" class="cat black-cat white-cat black-white-cat">
  * @endcode
  *
  * When printing out individual attributes to customize them within a Twig
@@ -37,7 +36,7 @@ use Drupal\Core\Serialization\Attribute\JsonSchema;
  * @endcode
  * Produces:
  * @code
- * <cat class="black-cat white-cat black-white-cat my-custom-class" id="socks">
+ * <cat class="cat black-cat white-cat black-white-cat my-custom-class" id="socks">
  * @endcode
  *
  * The attribute keys and values are automatically escaped for output with
@@ -63,9 +62,6 @@ use Drupal\Core\Serialization\Attribute\JsonSchema;
  *   // Produces <input value="Highlight the &lt;em&gt; tag">
  * @endcode
  *
- * @implements \ArrayAccess<string, \Drupal\Core\Template\AttributeValueBase>
- * @implements \IteratorAggregate<string, \Drupal\Core\Template\AttributeValueBase>
- *
  * @see \Drupal\Component\Utility\Html::escape()
  * @see \Drupal\Component\Render\PlainTextOutput::renderFromHtml()
  * @see \Drupal\Component\Utility\UrlHelper::stripDangerousProtocols()
@@ -75,7 +71,7 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   /**
    * Stores the attribute data.
    *
-   * @var array<string, \Drupal\Core\Template\AttributeValueBase>
+   * @var \Drupal\Core\Template\AttributeValueBase[]
    */
   protected $storage = [];
 
@@ -97,13 +93,6 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   public function offsetGet($name): mixed {
     if (isset($this->storage[$name])) {
       return $this->storage[$name];
-    }
-    // The 'class' array key is expected to be itself an array, and therefore
-    // can be accessed using array append syntax before it has been initialized.
-    if ($name === 'class') {
-      // Initialize the class attribute as an empty array if not set.
-      $this->offsetSet('class', []);
-      return $this->storage['class'];
     }
     return NULL;
   }
@@ -148,8 +137,8 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
     elseif (is_bool($value)) {
       $value = new AttributeBoolean($name, $value);
     }
-    // As a development aid, we allow the value to be any Stringable object.
-    elseif ($value instanceof \Stringable) {
+    // As a development aid, we allow the value to be a safe string object.
+    elseif ($value instanceof MarkupInterface) {
       // Attributes are not supposed to display HTML markup, so we just convert
       // the value to plain text.
       $value = PlainTextOutput::renderFromHtml($value);
@@ -178,12 +167,13 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   /**
    * Adds classes or merges them on to array of existing CSS classes.
    *
-   * @param string|array ...$args
+   * @param string|array ...
    *   CSS classes to add to the class attribute array.
    *
    * @return $this
    */
-  public function addClass(...$args) {
+  public function addClass() {
+    $args = func_get_args();
     if ($args) {
       $classes = [];
       foreach ($args as $arg) {
@@ -240,12 +230,13 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   /**
    * Removes an attribute from an Attribute object.
    *
-   * @param string|array ...$args
+   * @param string|array ...
    *   Attributes to remove from the attribute array.
    *
    * @return $this
    */
-  public function removeAttribute(...$args) {
+  public function removeAttribute() {
+    $args = func_get_args();
     foreach ($args as $arg) {
       // Support arrays or multiple arguments.
       if (is_array($arg)) {
@@ -264,14 +255,15 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   /**
    * Removes argument values from array of existing CSS classes.
    *
-   * @param string|array ...$args
+   * @param string|array ...
    *   CSS classes to remove from the class attribute array.
    *
    * @return $this
    */
-  public function removeClass(...$args) {
+  public function removeClass() {
     // With no class attribute, there is no need to remove.
     if (isset($this->storage['class']) && $this->storage['class'] instanceof AttributeArray) {
+      $args = func_get_args();
       $classes = [];
       foreach ($args as $arg) {
         // Merge the values passed in from the classes array.
@@ -324,7 +316,6 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   /**
    * Implements the magic __toString() method.
    */
-  #[JsonSchema(['type' => 'string', 'description' => 'Rendered HTML element attributes'])]
   public function __toString() {
     $return = '';
     /** @var \Drupal\Core\Template\AttributeValueBase $value */
@@ -362,10 +353,7 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   }
 
   /**
-   * Retrieves the iterator for the object.
-   *
-   * @return \ArrayIterator<string, \Drupal\Core\Template\AttributeValueBase>
-   *   The iterator.
+   * {@inheritdoc}
    */
   public function getIterator(): \ArrayIterator {
     return new \ArrayIterator($this->storage);

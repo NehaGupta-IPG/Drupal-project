@@ -24,7 +24,7 @@ trait TaxonomyTestTrait {
    * @return \Drupal\taxonomy\VocabularyInterface
    *   A vocabulary used for testing.
    */
-  protected function createVocabulary(array $values = []) {
+  public function createVocabulary(array $values = []) {
     $values += [
       'name' => $this->randomMachineName(),
       'description' => $this->randomMachineName(),
@@ -49,7 +49,7 @@ trait TaxonomyTestTrait {
    * @return \Drupal\taxonomy\TermInterface
    *   The new taxonomy term object.
    */
-  protected function createTerm(VocabularyInterface $vocabulary, $values = []) {
+  public function createTerm(VocabularyInterface $vocabulary, $values = []) {
     $term = Term::create($values + [
       'name' => $this->randomMachineName(),
       'description' => [

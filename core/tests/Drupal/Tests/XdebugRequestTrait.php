@@ -6,9 +6,6 @@ namespace Drupal\Tests;
 
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Trait for testing with Xdebug cookies extraction from request.
- */
 trait XdebugRequestTrait {
 
   /**

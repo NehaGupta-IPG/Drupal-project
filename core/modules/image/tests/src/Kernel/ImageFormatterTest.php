@@ -12,19 +12,18 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\Tests\field\Kernel\FieldKernelTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RequiresPhpExtension;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the image field rendering using entity fields of the image field type.
+ *
+ * @group image
  */
-#[Group('image')]
-#[RunTestsInSeparateProcesses]
 class ImageFormatterTest extends FieldKernelTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['file', 'image'];
 
@@ -107,8 +106,9 @@ class ImageFormatterTest extends FieldKernelTestBase {
 
   /**
    * Tests ImageFormatter's handling of SVG images.
+   *
+   * @requires extension gd
    */
-  #[RequiresPhpExtension('gd')]
   public function testImageFormatterSvg(): void {
     // Install the default image styles.
     $this->installConfig(['image']);

@@ -4,18 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\announcements_feed\Kernel;
 
-use Drupal\announcements_feed\AnnounceRenderer;
 use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests Drupal\announcements_feed\AnnounceRenderer.
+ * @coversDefaultClass \Drupal\announcements_feed\AnnounceRenderer
+ *
+ * @group announcements_feed
  */
-#[CoversClass(AnnounceRenderer::class)]
-#[Group('announcements_feed')]
-#[RunTestsInSeparateProcesses]
 class AnnounceRendererTest extends AnnounceTestBase {
 
   /**
@@ -40,7 +35,7 @@ class AnnounceRendererTest extends AnnounceTestBase {
       'url' => 'https://www.drupal.org/project/announce',
       '_drupalorg' => [
         'featured' => TRUE,
-        'version' => '>=10',
+        'version' => '^10||^11',
       ],
       'date_modified' => "2021-09-02T15:09:42+00:00",
       'date_published' => "2021-09-01T15:09:42+00:00",
@@ -51,7 +46,7 @@ class AnnounceRendererTest extends AnnounceTestBase {
       'url' => 'https://www.drupal.org/project/announce',
       '_drupalorg' => [
         'featured' => FALSE,
-        'version' => '>=10',
+        'version' => '^10||^11',
       ],
       'date_modified' => "2021-09-02T15:09:42+00:00",
       'date_published' => "2021-09-01T15:09:42+00:00",

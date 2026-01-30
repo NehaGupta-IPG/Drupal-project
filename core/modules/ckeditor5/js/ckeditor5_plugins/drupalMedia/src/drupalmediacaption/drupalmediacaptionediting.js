@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* cspell:ignore insertdrupalmedia JSONified drupalmediacaptioncommand downcasted */
 import { Plugin } from 'ckeditor5/src/core';
-import { ModelElement, enableViewPlaceholder } from 'ckeditor5/src/engine';
+import { Element, enablePlaceholder } from 'ckeditor5/src/engine';
 import { toWidgetEditable } from 'ckeditor5/src/widget';
 import { isDrupalMedia } from '../utils';
 import ToggleDrupalMediaCaptionCommand from './drupalmediacaptioncommand';
@@ -193,7 +193,7 @@ export default class DrupalMediaCaptionEditing extends Plugin {
     /**
      * A map of saved Drupal Media captions and related model elements.
      *
-     * @member {WeakMap.<module:engine/model/element~ModelElement,Object>}
+     * @member {WeakMap.<module:engine/model/element~Element,Object>}
      *
      * @see _saveCaption
      */
@@ -249,7 +249,7 @@ export default class DrupalMediaCaptionEditing extends Plugin {
         const figcaptionElement = writer.createEditableElement('figcaption');
         figcaptionElement.placeholder = Drupal.t('Enter media caption');
 
-        enableViewPlaceholder({
+        enablePlaceholder({
           view,
           element: figcaptionElement,
           keepOnFocus: true,
@@ -275,15 +275,15 @@ export default class DrupalMediaCaptionEditing extends Plugin {
   /**
    * Returns the saved caption of a Drupal Media model element.
    *
-   * @param {module:engine/model/element~ModelElement} drupalMediaModelElement
+   * @param {module:engine/model/element~Element} drupalMediaModelElement
    *   The model element the caption should be returned for.
-   * @return {module:engine/model/element~ModelElement|null}
+   * @return {module:engine/model/element~Element|null}
    *   The model caption element or `null` if there is none.
    */
   _getSavedCaption(drupalMediaModelElement) {
     const jsonObject = this._savedCaptionsMap.get(drupalMediaModelElement);
 
-    return jsonObject ? ModelElement.fromJSON(jsonObject) : null;
+    return jsonObject ? Element.fromJSON(jsonObject) : null;
   }
 
   /**
@@ -292,13 +292,13 @@ export default class DrupalMediaCaptionEditing extends Plugin {
    * A caption is saved every time it gets hidden and/or the type of an Drupal
    * Media changes. The user should be able to restore it on demand.
    *
-   * @param {module:engine/model/element~ModelElement} drupalMediaModelElement
+   * @param {module:engine/model/element~Element} drupalMediaModelElement
    *   The model element the caption is saved for.
-   * @param {module:engine/model/element~ModelElement} caption
+   * @param {module:engine/model/element~Element} caption
    *   The caption model element to be saved.
    *
    * @see _getSavedCaption
-   * @see module:engine/model/element~ModelElement#toJSON
+   * @see module:engine/model/element~Element#toJSON
    */
   _saveCaption(drupalMediaModelElement, caption) {
     this._savedCaptionsMap.set(drupalMediaModelElement, caption.toJSON());

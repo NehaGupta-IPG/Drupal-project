@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\UpdateSystem;
 
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the hook invocation for determining update dependencies.
+ *
+ * @group Update
  */
-#[Group('Update')]
-#[RunTestsInSeparateProcesses]
 class DependencyHookInvocationTest extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'update_test_0',

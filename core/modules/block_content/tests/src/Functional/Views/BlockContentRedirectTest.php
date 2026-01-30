@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Functional\Views;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-
 /**
  * Tests the redirect destination on block content on entity operations.
+ *
+ * @group block_content
  */
-#[Group('block_content')]
-#[RunTestsInSeparateProcesses]
 class BlockContentRedirectTest extends BlockContentTestBase {
 
   /**
@@ -22,7 +19,9 @@ class BlockContentRedirectTest extends BlockContentTestBase {
   public static $testViews = ['test_block_content_redirect_destination'];
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['block', 'block_content', 'views'];
 
@@ -36,13 +35,18 @@ class BlockContentRedirectTest extends BlockContentTestBase {
    */
   public function testRedirectDestination(): void {
     $this->drupalLogin($this->drupalCreateUser(['access block library', 'administer block content']));
+    $this->drupalGet('admin/content/block');
 
     // Create a content block.
-    $block = $this->createBlockContent();
+    $this->clickLink('content block');
+    $edit = [];
+    $edit['info[0][value]'] = 'Test redirect destination';
+    $edit['body[0][value]'] = $this->randomMachineName(16);
+    $this->submitForm($edit, 'Save');
 
     // Check the block content is present in the view redirect destination.
     $this->drupalGet('admin/content/redirect_destination');
-    $this->assertSession()->pageTextContains($block->label());
+    $this->assertSession()->pageTextContains('Test redirect destination');
 
     // Edit the created block and save.
     $this->clickLink('Edit');

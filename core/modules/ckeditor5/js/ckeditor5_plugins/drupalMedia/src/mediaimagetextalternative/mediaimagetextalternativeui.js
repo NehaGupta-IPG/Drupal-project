@@ -1,13 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* cspell:ignore imagetextalternative mediaimagetextalternative */
-/* cspell:ignore mediaimagetextalternativeediting textalternativeformview */
+/* cspell:ignore textalternativeformview */
 
-import { Plugin } from 'ckeditor5/src/core';
-import { IconLowVision } from '@ckeditor/ckeditor5-icons';
+import { Plugin, icons } from 'ckeditor5/src/core';
 import {
   ButtonView,
   ContextualBalloon,
-  CssTransitionDisablerMixin,
   clickOutsideHandler,
 } from 'ckeditor5/src/ui';
 
@@ -68,7 +65,7 @@ export default class MediaImageTextAlternativeUi extends Plugin {
 
       view.set({
         label: Drupal.t('Override media image alternative text'),
-        icon: IconLowVision,
+        icon: icons.lowVision,
         tooltip: true,
       });
 
@@ -101,9 +98,7 @@ export default class MediaImageTextAlternativeUi extends Plugin {
     /**
      * A form containing a textarea and buttons, used to change the `alt` text value.
      */
-    this._form = new (CssTransitionDisablerMixin(TextAlternativeFormView))(
-      editor.locale,
-    );
+    this._form = new TextAlternativeFormView(editor.locale);
 
     // Render the form so its #element is available for clickOutsideHandler.
     this._form.render();

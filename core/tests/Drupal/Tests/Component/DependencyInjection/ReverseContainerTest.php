@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\DependencyInjection;
 
 use Drupal\Component\DependencyInjection\ReverseContainer;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -16,14 +13,15 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * The reverse container uses a static to maintain information across
  * container rebuilds.
+ *
+ * @runTestsInSeparateProcesses
+ * @coversDefaultClass \Drupal\Component\DependencyInjection\ReverseContainer
+ * @group DependencyInjection
  */
-#[CoversClass(ReverseContainer::class)]
-#[Group('DependencyInjection')]
-#[RunTestsInSeparateProcesses]
 class ReverseContainerTest extends TestCase {
 
   /**
-   * Tests get id.
+   * @covers ::getId
    */
   public function testGetId(): void {
     $container = new ContainerBuilder();
@@ -39,7 +37,7 @@ class ReverseContainerTest extends TestCase {
   }
 
   /**
-   * Tests record container.
+   * @covers ::recordContainer
    */
   public function testRecordContainer(): void {
     $container = new ContainerBuilder();

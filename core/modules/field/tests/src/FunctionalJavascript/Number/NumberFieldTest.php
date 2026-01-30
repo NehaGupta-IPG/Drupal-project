@@ -8,14 +8,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\Node;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the numeric field widget.
+ *
+ * @group field
  */
-#[Group('field')]
-#[RunTestsInSeparateProcesses]
 class NumberFieldTest extends WebDriverTestBase {
 
   /**
@@ -52,7 +50,7 @@ class NumberFieldTest extends WebDriverTestBase {
     $type = $this->randomMachineName();
     $float_field = $this->randomMachineName();
     $integer_field = $this->randomMachineName();
-    $thousand_separators = ['', '.', ',', ' ', mb_chr(8201, 'UTF-8'), "'"];
+    $thousand_separators = ['', '.', ',', ' ', chr(8201), "'"];
     $decimal_separators = ['.', ','];
     $prefix = $this->randomMachineName();
     $suffix = $this->randomMachineName();

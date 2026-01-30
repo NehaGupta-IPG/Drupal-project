@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Recipe;
 
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Finder\Finder;
 
 /**
  * Tests that all core recipes have a generic test.
+ *
+ * @group Recipe
  */
-#[Group('Recipe')]
 class CoreRecipesTest extends UnitTestCase {
 
   /**
@@ -50,8 +49,9 @@ class CoreRecipesTest extends UnitTestCase {
    *
    * @param string $path
    *   The path to the recipe file.
+   *
+   * @dataProvider providerRecipeHasGenericTest
    */
-  #[DataProvider('providerRecipeHasGenericTest')]
   public function testRecipeHasGenericTest(string $path): void {
     $this->assertFileExists($path . '/tests/src/Functional/GenericTest.php');
   }

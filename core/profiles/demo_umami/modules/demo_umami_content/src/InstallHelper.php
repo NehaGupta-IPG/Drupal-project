@@ -184,17 +184,17 @@ class InstallHelper implements ContainerInjectionInterface {
     foreach ($translated_languages as $language) {
       if (file_exists($default_content_path . "$language/$filename") &&
       ($handle = fopen($default_content_path . "$language/$filename", 'r')) !== FALSE) {
-        $header = fgetcsv($handle, escape: '');
+        $header = fgetcsv($handle);
         $line_counter = 0;
-        while (($content = fgetcsv($handle, escape: '')) !== FALSE) {
+        while (($content = fgetcsv($handle)) !== FALSE) {
           $keyed_content[$language][$line_counter] = array_combine($header, $content);
           $line_counter++;
         }
         fclose($handle);
       }
       else {
-        // Language directory exists, but the file in this language was not
-        // found, remove that language from list of languages to be translated.
+        // Language directory exists, but the file in this language was not found,
+        // remove that language from list of languages to be translated.
         $key = array_search($language, $translated_languages);
         unset($translated_languages[$key]);
       }
@@ -207,7 +207,7 @@ class InstallHelper implements ContainerInjectionInterface {
    *
    * @param string $vocabulary
    *   Machine name of vocabulary to which it was saved.
-   * @param int|string $term_csv_id
+   * @param int $term_csv_id
    *   The term's ID from the CSV file.
    *
    * @return int
@@ -235,7 +235,7 @@ class InstallHelper implements ContainerInjectionInterface {
   }
 
   /**
-   * Retrieves th ID of a media image saved during the import process.
+   * Retrieves the Media Image ID of a media image saved during the import process.
    *
    * @param int $media_image_csv_id
    *   The media image's ID from the CSV file.
@@ -426,7 +426,7 @@ class InstallHelper implements ContainerInjectionInterface {
     if (!empty($data['slug'])) {
       $values['path'] = [['alias' => '/' . $data['slug']]];
     }
-    // Save node alias.
+    // Save node alias
     $this->saveNodePath($langcode, 'page', $data['id'], $data['slug']);
 
     // Set article author.
@@ -454,7 +454,6 @@ class InstallHelper implements ContainerInjectionInterface {
       'title' => $data['title'],
       'moderation_state' => 'published',
       'langcode' => 'en',
-      'promote' => TRUE,
     ];
     // Set article author.
     if (!empty($data['author'])) {
@@ -464,7 +463,7 @@ class InstallHelper implements ContainerInjectionInterface {
     if (!empty($data['slug'])) {
       $values['path'] = [['alias' => '/' . $data['slug']]];
     }
-    // Save node alias.
+    // Save node alias
     $this->saveNodePath($langcode, 'recipe', $data['id'], $data['slug']);
     // Set field_media_image field.
     if (!empty($data['image_reference'])) {
@@ -564,7 +563,7 @@ class InstallHelper implements ContainerInjectionInterface {
     if (!empty($data['slug'])) {
       $values['path'] = [['alias' => '/' . $data['slug']]];
     }
-    // Save node alias.
+    // Save node alias
     $this->saveNodePath($langcode, 'article', $data['id'], $data['slug']);
     // Set article author.
     if (!empty($data['author'])) {
@@ -744,7 +743,7 @@ class InstallHelper implements ContainerInjectionInterface {
    * Imports content.
    *
    * @param string $entity_type
-   *   Entity type to be imported.
+   *   Entity type to be imported
    * @param string $bundle_machine_name
    *   Bundle machine name to be imported.
    *

@@ -65,7 +65,7 @@ class FieldType extends DataType {
   public $weight = 0;
 
   /**
-   * The plugin ID of the default widget for this field type.
+   * The plugin_id of the default widget for this field type.
    *
    * This widget must be available whenever the field type is available (i.e.
    * provided by the field type module, or by a module the field type module
@@ -77,7 +77,7 @@ class FieldType extends DataType {
   public $default_widget;
 
   /**
-   * The plugin ID of the default formatter for this field type.
+   * The plugin_id of the default formatter for this field type.
    *
    * This formatter must be available whenever the field type is available (i.e.
    * provided by the field type module, or by a module the field type module
@@ -89,7 +89,7 @@ class FieldType extends DataType {
   public $default_formatter;
 
   /**
-   * Indicates that fields of this type cannot be created through the UI.
+   * A boolean stating that fields of this type cannot be created through the UI.
    *
    * @var bool
    */

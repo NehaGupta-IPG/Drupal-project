@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\Core\Form\FormState;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Full generic test suite for any form that data with the configuration system.
@@ -14,9 +13,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *   For a full working implementation.
  */
 abstract class ConfigFormTestBase extends KernelTestBase {
-
-  use StringTranslationTrait;
-
   /**
    * Form ID to use for testing.
    *
@@ -58,7 +54,7 @@ abstract class ConfigFormTestBase extends KernelTestBase {
     $errors = $form_state->getErrors();
     $valid_form = empty($errors);
     $values = print_r($values, TRUE);
-    $errors = $valid_form ? $this->t('None') : implode(' ', $errors);
+    $errors = $valid_form ? t('None') : implode(' ', $errors);
     $this->assertTrue($valid_form, sprintf('Input values: %s<br/>Validation handler errors: %s', $values, $errors));
     foreach ($this->values as $data) {
       $this->assertEquals($this->config($data['#config_name'])->get($data['#config_key']), $data['#value']);

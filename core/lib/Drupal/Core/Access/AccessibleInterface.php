@@ -22,7 +22,7 @@ interface AccessibleInterface {
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
    *
-   * @return ($return_as_object is true ? \Drupal\Core\Access\AccessResultInterface : bool)
+   * @return bool|\Drupal\Core\Access\AccessResultInterface
    *   The access result. Returns a boolean if $return_as_object is FALSE (this
    *   is the default) and otherwise an AccessResultInterface object.
    *   When a boolean is returned, the result of AccessInterface::isAllowed() is

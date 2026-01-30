@@ -32,10 +32,10 @@ class FormAjaxException extends \Exception {
    *   (optional) The exception message.
    * @param int $code
    *   (optional) A user defined exception code.
-   * @param \Throwable $previous
+   * @param \Exception $previous
    *   (optional) The previous exception for nested exceptions.
    */
-  public function __construct(array $form, FormStateInterface $form_state, $message = "", $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct(array $form, FormStateInterface $form_state, $message = "", $code = 0, ?\Exception $previous = NULL) {
     parent::__construct($message, $code, $previous);
     $this->form = $form;
     $this->formState = $form_state;

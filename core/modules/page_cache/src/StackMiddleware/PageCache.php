@@ -20,14 +20,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class PageCache implements HttpKernelInterface {
 
   /**
-   * Name of Page Cache's response header.
-   */
-  const HEADER = 'X-Drupal-Cache';
-
-  /**
    * The wrapped HTTP kernel.
+   *
+   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
    */
-  protected \Closure $httpKernel;
+  protected $httpKernel;
 
   /**
    * The cache bin.
@@ -60,7 +57,7 @@ class PageCache implements HttpKernelInterface {
   /**
    * Constructs a PageCache object.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface|\Closure $http_kernel
+   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
    *   The decorated kernel.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache bin.
@@ -69,11 +66,7 @@ class PageCache implements HttpKernelInterface {
    * @param \Drupal\Core\PageCache\ResponsePolicyInterface $response_policy
    *   A policy rule determining the cacheability of the response.
    */
-  public function __construct(HttpKernelInterface|\Closure $http_kernel, CacheBackendInterface $cache, RequestPolicyInterface $request_policy, ResponsePolicyInterface $response_policy) {
-    if ($http_kernel instanceof HttpKernelInterface) {
-      @trigger_error('Calling ' . __METHOD__ . '() without a service closure $http_kernel argument is deprecated in drupal:11.3.0 and it will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3538740', E_USER_DEPRECATED);
-      $http_kernel = static fn() => $http_kernel;
-    }
+  public function __construct(HttpKernelInterface $http_kernel, CacheBackendInterface $cache, RequestPolicyInterface $request_policy, ResponsePolicyInterface $response_policy) {
     $this->httpKernel = $http_kernel;
     $this->cache = $cache;
     $this->requestPolicy = $request_policy;
@@ -90,11 +83,6 @@ class PageCache implements HttpKernelInterface {
     }
     else {
       $response = $this->pass($request, $type, $catch);
-      // Don't indicate non-cacheability on responses to uncacheable requests.
-      // @see https://tools.ietf.org/html/rfc7231#section-4.2.3
-      if ($request->isMethodCacheable()) {
-        $response->headers->set(static::HEADER, 'UNCACHEABLE (request policy)');
-      }
     }
 
     return $response;
@@ -109,13 +97,13 @@ class PageCache implements HttpKernelInterface {
    *   The type of the request (one of HttpKernelInterface::MAIN_REQUEST or
    *   HttpKernelInterface::SUB_REQUEST)
    * @param bool $catch
-   *   Whether to catch exceptions or not.
+   *   Whether to catch exceptions or not
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   A response object.
    */
   protected function pass(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE) {
-    return ($this->httpKernel)()->handle($request, $type, $catch);
+    return $this->httpKernel->handle($request, $type, $catch);
   }
 
   /**
@@ -127,14 +115,14 @@ class PageCache implements HttpKernelInterface {
    *   The type of the request (one of HttpKernelInterface::MAIN_REQUEST or
    *   HttpKernelInterface::SUB_REQUEST)
    * @param bool $catch
-   *   Whether to catch exceptions or not.
+   *   Whether to catch exceptions or not
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   A response object.
    */
   protected function lookup(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE) {
     if ($response = $this->get($request)) {
-      $response->headers->set(static::HEADER, 'HIT');
+      $response->headers->set('X-Drupal-Cache', 'HIT');
     }
     else {
       $response = $this->fetch($request, $type, $catch);
@@ -185,27 +173,27 @@ class PageCache implements HttpKernelInterface {
   /**
    * Fetches a response from the backend and stores it in the cache.
    *
+   * @see drupal_page_header()
+   *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   A request object.
    * @param int $type
    *   The type of the request (one of HttpKernelInterface::MAIN_REQUEST or
    *   HttpKernelInterface::SUB_REQUEST)
    * @param bool $catch
-   *   Whether to catch exceptions or not.
+   *   Whether to catch exceptions or not
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   A response object.
-   *
-   * @see drupal_page_header()
    */
   protected function fetch(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE) {
     /** @var \Symfony\Component\HttpFoundation\Response $response */
-    $response = ($this->httpKernel)()->handle($request, $type, $catch);
+    $response = $this->httpKernel->handle($request, $type, $catch);
 
     // Only set the 'X-Drupal-Cache' header if caching is allowed for this
     // response.
     if ($this->storeResponse($request, $response)) {
-      $response->headers->set(static::HEADER, 'MISS');
+      $response->headers->set('X-Drupal-Cache', 'MISS');
     }
 
     return $response;
@@ -245,7 +233,6 @@ class PageCache implements HttpKernelInterface {
     //   so by replacing/extending this middleware service or adding another
     //   one.
     if (!$response instanceof CacheableResponseInterface) {
-      $response->headers->set(static::HEADER, 'UNCACHEABLE (no cacheability)');
       return FALSE;
     }
 
@@ -259,7 +246,6 @@ class PageCache implements HttpKernelInterface {
 
     // Allow policy rules to further restrict which responses to cache.
     if ($this->responsePolicy->check($response, $request) === ResponsePolicyInterface::DENY) {
-      $response->headers->set(static::HEADER, 'UNCACHEABLE (response policy)');
       return FALSE;
     }
 
@@ -344,7 +330,7 @@ class PageCache implements HttpKernelInterface {
    *   identify objects used to build the cache item, which should trigger
    *   cache invalidation when updated. For example if a cached item represents
    *   a node, both the node ID and the author's user ID might be passed in as
-   *   tags. For example, ['node' => [123], 'user' => [92]].
+   *   tags. For example array('node' => array(123), 'user' => array(92)).
    */
   protected function set(Request $request, Response $response, $expire, array $tags) {
     $cid = $this->getCacheId($request);

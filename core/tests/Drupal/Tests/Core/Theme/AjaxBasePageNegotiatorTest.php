@@ -8,19 +8,15 @@ use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Theme\AjaxBasePageNegotiator;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Tests Drupal\Core\Theme\AjaxBasePageNegotiator.
+ * @coversDefaultClass \Drupal\Core\Theme\AjaxBasePageNegotiator
+ * @group Theme
  */
-#[CoversClass(AjaxBasePageNegotiator::class)]
-#[Group('Theme')]
 class AjaxBasePageNegotiatorTest extends UnitTestCase {
 
   /**
@@ -57,13 +53,13 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
   }
 
   /**
-   * Tests applies.
+   * @covers ::applies
+   * @dataProvider providerTestApplies
    */
-  #[DataProvider('providerTestApplies')]
   public function testApplies($request_data, $expected): void {
     $request = new Request();
     foreach ($request_data as $key => $data) {
-      $request->attributes->set($key, $data);
+      $request->query->set($key, $data);
     }
     $route_match = RouteMatch::createFromRequest($request);
     $this->requestStack->push($request);
@@ -72,32 +68,24 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $this->assertSame($expected, $result);
   }
 
-  public static function providerTestApplies(): array {
+  public static function providerTestApplies() {
     $data = [];
     $data['empty'] = [[], FALSE];
     $data['no_theme'] = [['ajax_page_state' => ['theme' => '', 'theme_token' => '']], FALSE];
     $data['valid_theme_empty_theme_token'] = [['ajax_page_state' => ['theme' => 'claro', 'theme_token' => '']], TRUE];
-    $data['valid_theme_valid_theme_token'] = [
-      [
-        'ajax_page_state' => [
-          'theme' => 'claro',
-          'theme_token' => 'valid_theme_token',
-        ],
-      ],
-      TRUE,
-    ];
+    $data['valid_theme_valid_theme_token'] = [['ajax_page_state' => ['theme' => 'claro', 'theme_token' => 'valid_theme_token']], TRUE];
     return $data;
   }
 
   /**
-   * Tests determine active theme valid token.
+   * @covers ::determineActiveTheme
    */
   public function testDetermineActiveThemeValidToken(): void {
     $theme = 'claro';
     $theme_token = 'valid_theme_token';
 
     $request = new Request();
-    $request->attributes->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
+    $request->query->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
     $this->requestStack->push($request);
     $route_match = RouteMatch::createFromRequest($request);
 
@@ -108,13 +96,13 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
   }
 
   /**
-   * Tests determine active theme invalid token.
+   * @covers ::determineActiveTheme
    */
   public function testDetermineActiveThemeInvalidToken(): void {
     $theme = 'claro';
     $theme_token = 'invalid_theme_token';
     $request = new Request();
-    $request->attributes->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
+    $request->query->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
     $request->request = new InputBag($request->request->all());
     $this->requestStack->push($request);
     $route_match = RouteMatch::createFromRequest($request);
@@ -126,7 +114,7 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
   }
 
   /**
-   * Tests determine active theme default theme.
+   * @covers ::determineActiveTheme
    */
   public function testDetermineActiveThemeDefaultTheme(): void {
     $theme = 'stark';
@@ -135,7 +123,7 @@ class AjaxBasePageNegotiatorTest extends UnitTestCase {
     $theme_token = '';
 
     $request = new Request([]);
-    $request->attributes->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
+    $request->query->set('ajax_page_state', ['theme' => $theme, 'theme_token' => $theme_token]);
     $request->request = new InputBag($request->request->all());
     $this->requestStack->push($request);
     $route_match = RouteMatch::createFromRequest($request);

@@ -7,16 +7,13 @@ namespace Drupal\Tests\views\Kernel\Handler;
 use Drupal\entity_test\Entity\EntityTestComputedField;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Provides some integration tests for the Field handler.
  *
  * @see \Drupal\views\Plugin\views\field\EntityField
+ * @group views
  */
-#[Group('views')]
-#[RunTestsInSeparateProcesses]
 class ComputedFieldTest extends ViewsKernelTestBase {
 
   /**
@@ -27,7 +24,9 @@ class ComputedFieldTest extends ViewsKernelTestBase {
   public static $testViews = ['computed_field_view'];
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['entity_test'];
 

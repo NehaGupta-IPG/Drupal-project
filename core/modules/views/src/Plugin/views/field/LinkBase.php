@@ -11,6 +11,7 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\views\Entity\Render\EntityTranslationRenderTrait;
 use Drupal\views\ResultRow;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Field handler to present a link to an entity.
@@ -63,7 +64,7 @@ abstract class LinkBase extends FieldPluginBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
+   *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
@@ -81,6 +82,21 @@ abstract class LinkBase extends FieldPluginBase {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityRepository = $entity_repository;
     $this->languageManager = $language_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('access_manager'),
+      $container->get('entity_type.manager'),
+      $container->get('entity.repository'),
+      $container->get('language_manager')
+    );
   }
 
   /**

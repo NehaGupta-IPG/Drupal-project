@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Kernel\Views;
 
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 
@@ -13,10 +12,10 @@ use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
  */
 abstract class LanguageTestBase extends ViewsKernelTestBase {
 
-  use StringTranslationTrait;
-
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['system', 'language'];
 
@@ -52,8 +51,8 @@ abstract class LanguageTestBase extends ViewsKernelTestBase {
   protected function viewsData() {
     $data = parent::viewsData();
     $data['views_test_data']['langcode'] = [
-      'title' => $this->t('Langcode'),
-      'help' => $this->t('Langcode'),
+      'title' => t('Langcode'),
+      'help' => t('Langcode'),
       'field' => [
         'id' => 'language',
       ],

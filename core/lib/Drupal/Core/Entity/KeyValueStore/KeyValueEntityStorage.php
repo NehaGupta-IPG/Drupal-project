@@ -131,19 +131,6 @@ class KeyValueEntityStorage extends EntityStorageBase {
   /**
    * {@inheritdoc}
    */
-  protected function mapFromStorageRecords(array $records) {
-    $entities = [];
-    foreach ($records as $record) {
-      /** @var \Drupal\Core\Entity\EntityInterface $entity */
-      $entity = $this->doCreate($record);
-      $entities[$entity->id()] = $entity;
-    }
-    return $entities;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function doDelete($entities) {
     $entity_ids = array_keys($entities);
     $this->keyValueStore->deleteMultiple($entity_ids);

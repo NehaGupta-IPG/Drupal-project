@@ -6,14 +6,12 @@ namespace Drupal\Tests\config\Functional;
 
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests configuration entities.
+ *
+ * @group config
  */
-#[Group('config')]
-#[RunTestsInSeparateProcesses]
 class ConfigDependencyWebTest extends BrowserTestBase {
 
   /**
@@ -22,7 +20,9 @@ class ConfigDependencyWebTest extends BrowserTestBase {
   const MAX_ID_LENGTH = ConfigEntityStorage::MAX_ID_LENGTH;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['config_test'];
 

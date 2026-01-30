@@ -6,28 +6,25 @@ namespace Drupal\KernelTests;
 
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Database\Database;
-use Drupal\TestTools\Extension\Dump\DebugDump;
+use Drupal\Tests\StreamCapturer;
+use Drupal\user\Entity\Role;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\visitor\vfsStreamStructureVisitor;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Client\ClientExceptionInterface;
 
 /**
- * Tests Drupal\KernelTests\KernelTestBase.
+ * @coversDefaultClass \Drupal\KernelTests\KernelTestBase
+ *
+ * @group PHPUnit
+ * @group Test
+ * @group KernelTests
+ * @group #slow
  */
-#[CoversClass(KernelTestBase::class)]
-#[Group('PHPUnit')]
-#[Group('Test')]
-#[Group('KernelTests')]
-#[RunTestsInSeparateProcesses]
 class KernelTestBaseTest extends KernelTestBase {
 
   /**
-   * Tests set up before class.
+   * @covers ::setUpBeforeClass
    */
   public function testSetUpBeforeClass(): void {
     // Note: PHPUnit automatically restores the original working directory.
@@ -35,7 +32,7 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
-   * Tests boot environment.
+   * @covers ::bootEnvironment
    */
   public function testBootEnvironment(): void {
     $this->assertMatchesRegularExpression('/^test\d{8}$/', $this->databasePrefix);
@@ -58,7 +55,7 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
-   * Tests get database connection info with out manual set db url.
+   * @covers ::getDatabaseConnectionInfo
    */
   public function testGetDatabaseConnectionInfoWithOutManualSetDbUrl(): void {
     $options = $this->container->get('database')->getConnectionOptions();
@@ -66,7 +63,7 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
-   * Tests set up.
+   * @covers ::setUp
    */
   public function testSetUp(): void {
     $this->assertTrue($this->container->has('request_stack'));
@@ -95,9 +92,9 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
-   * Tests set up does not leak.
+   * @covers ::setUp
+   * @depends testSetUp
    */
-  #[Depends('testSetUp')]
   public function testSetUpDoesNotLeak(): void {
     // Ensure that we have a different database prefix.
     $schema = $this->container->get('database')->schema();
@@ -105,7 +102,7 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
-   * Tests register.
+   * @covers ::register
    */
   public function testRegister(): void {
     // Verify that this container is identical to the actual container.
@@ -153,8 +150,9 @@ class KernelTestBaseTest extends KernelTestBase {
 
   /**
    * Tests whether the fixture can re-install modules and configuration.
+   *
+   * @depends testContainerIsolation
    */
-  #[Depends('testContainerIsolation')]
   public function testSubsequentContainerIsolation(): void {
     $this->enableModules(['system', 'user']);
     $this->assertNull($this->installConfig('user'));
@@ -179,7 +177,7 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
-   * Tests render.
+   * @covers ::render
    */
   public function testRender(): void {
     $type = 'processed_text';
@@ -207,7 +205,7 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
-   * Tests render with theme.
+   * @covers ::render
    */
   public function testRenderWithTheme(): void {
     $this->enableModules(['system']);
@@ -227,7 +225,7 @@ class KernelTestBaseTest extends KernelTestBase {
   }
 
   /**
-   * Tests boot kernel.
+   * @covers ::bootKernel
    */
   public function testBootKernel(): void {
     $this->assertNull($this->container->get('request_stack')->getParentRequest(), 'There should only be one request on the stack');
@@ -237,7 +235,7 @@ class KernelTestBaseTest extends KernelTestBase {
   /**
    * Tests that a usable session is on the request.
    *
-   * @legacy-covers ::bootKernel
+   * @covers ::bootKernel
    */
   public function testSessionOnRequest(): void {
     /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
@@ -254,7 +252,7 @@ class KernelTestBaseTest extends KernelTestBase {
    * Tests the assumption that local time is in 'Australia/Sydney'.
    */
   public function testLocalTimeZone(): void {
-    // The 'Australia/Sydney' time zone is set in core/tests/bootstrap.php.
+    // The 'Australia/Sydney' time zone is set in core/tests/bootstrap.php
     $this->assertEquals('Australia/Sydney', date_default_timezone_get());
   }
 
@@ -308,25 +306,24 @@ class KernelTestBaseTest extends KernelTestBase {
    * Tests the dump() function provided by the var-dumper Symfony component.
    */
   public function testVarDump(): void {
+    // Append the stream capturer to the STDERR stream, so that we can test the
+    // dump() output and also prevent it from actually outputting in this
+    // particular test.
+    stream_filter_register("capture", StreamCapturer::class);
+    stream_filter_append(STDERR, "capture");
+
     // Dump some variables.
-    $object = (object) [
-      'Aldebaran' => 'Betelgeuse',
-    ];
-    dump($object);
-    dump('Alpheratz');
+    $this->enableModules(['system', 'user']);
+    $role = Role::create(['id' => 'test_role', 'label' => 'Test role']);
+    dump($role);
+    dump($role->id());
 
-    $dumpString = json_encode(DebugDump::getDumps());
-
-    $this->assertStringContainsString('KernelTestBaseTest::testVarDump', $dumpString);
-    $this->assertStringContainsString('Aldebaran', $dumpString);
-    $this->assertStringContainsString('Betelgeuse', $dumpString);
-    $this->assertStringContainsString('Alpheratz', $dumpString);
+    $this->assertStringContainsString('Drupal\user\Entity\Role', StreamCapturer::$cache);
+    $this->assertStringContainsString('test_role', StreamCapturer::$cache);
   }
 
   /**
-   * Tests database driver module enabled.
-   *
-   * @legacy-covers ::bootEnvironment
+   * @covers ::bootEnvironment
    */
   public function testDatabaseDriverModuleEnabled(): void {
     $module = Database::getConnection()->getProvider();

@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldFormatter;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
@@ -12,6 +11,7 @@ use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'string' formatter.
@@ -37,7 +37,7 @@ class StringFormatter extends FormatterBase {
    * Constructs a StringFormatter instance.
    *
    * @param string $plugin_id
-   *   The plugin ID for the formatter.
+   *   The plugin_id for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -57,6 +57,22 @@ class StringFormatter extends FormatterBase {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
 
     $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['label'],
+      $configuration['view_mode'],
+      $configuration['third_party_settings'],
+      $container->get('entity_type.manager')
+    );
   }
 
   /**
@@ -106,33 +122,27 @@ class StringFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    $url = NULL;
     $entity = $items->getEntity();
     $entity_type = $entity->getEntityType();
 
-    $render_as_link = FALSE;
     if ($this->getSetting('link_to_entity') && !$entity->isNew() && $entity_type->hasLinkTemplate('canonical')) {
       $url = $this->getEntityUrl($entity);
-      $access = $url->access(return_as_object: TRUE);
-      (new CacheableMetadata())
-        ->addCacheableDependency($access)
-        ->applyTo($elements);
-      $render_as_link = $access->isAllowed();
     }
 
     foreach ($items as $delta => $item) {
-      if ($render_as_link) {
-        assert(isset($url));
+      $view_value = $this->viewValue($item);
+      if ($url) {
         $elements[$delta] = [
           '#type' => 'link',
-          '#title' => $this->viewValue($item),
+          '#title' => $view_value,
           '#url' => $url,
         ];
       }
       else {
-        $elements[$delta] = $this->viewValue($item);
+        $elements[$delta] = $view_value;
       }
     }
-
     return $elements;
   }
 

@@ -34,7 +34,4 @@ phpstan-tmp
 .eslintcache
 
 # Ignore stylelint cache
-.stylelintcache
-
-# Ignore phpcs cache
-.phpcscache
+.stylelint-cache

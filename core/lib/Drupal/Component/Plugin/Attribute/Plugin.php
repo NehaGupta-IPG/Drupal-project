@@ -18,7 +18,7 @@ class Plugin extends AttributeBase {
    * Constructs a plugin attribute object.
    *
    * @param string $id
-   *   The plugin ID.
+   *   The attribute class ID.
    * @param class-string|null $deriver
    *   (optional) The deriver class.
    */

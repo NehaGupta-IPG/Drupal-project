@@ -30,10 +30,6 @@
     background-position: right center;
     background-size: 40px;
 
-    [dir="rtl"] & {
-      background-position: left center;
-    }
-
     @media (forced-colors: active) {
       background-color: canvastext;
       background-image: none;
@@ -41,6 +37,11 @@
       mask-position: right center;
       mask-size: 40px;
     }
+  }
+
+  @nest [dir="rtl"] & {
+    border-inline-end: 1px solid #e6e4df;
+    border-inline-start: 0;
   }
 }
 

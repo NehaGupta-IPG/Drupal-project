@@ -19,7 +19,9 @@ use Drupal\Tests\BrowserTestBase;
 abstract class DateTestBase extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['node', 'entity_test', 'datetime', 'field_ui'];
 
@@ -64,7 +66,7 @@ abstract class DateTestBase extends BrowserTestBase {
   protected static $timezones = [
     // UTC-12, no DST.
     'Pacific/Kwajalein',
-    // UTC-11, no DST.
+    // UTC-11, no DST
     'Pacific/Midway',
     // UTC-7, no DST.
     'America/Phoenix',
@@ -72,7 +74,7 @@ abstract class DateTestBase extends BrowserTestBase {
     'UTC',
     // UTC+5:30, no DST.
     'Asia/Kolkata',
-    // UTC+12, no DST.
+    // UTC+12, no DST
     'Pacific/Funafuti',
     // UTC+13, no DST.
     'Pacific/Tongatapu',
@@ -82,7 +84,6 @@ abstract class DateTestBase extends BrowserTestBase {
    * Returns the type of field to be tested.
    *
    * @return string
-   *   The field type to be tested.
    */
   abstract protected function getTestFieldType();
 
@@ -157,7 +158,7 @@ abstract class DateTestBase extends BrowserTestBase {
   /**
    * Renders an entity_test and sets the output in the internal browser.
    *
-   * @param string|int $id
+   * @param int $id
    *   The entity_test ID to render.
    * @param string $view_mode
    *   (optional) The view mode to use for rendering. Defaults to 'full'.

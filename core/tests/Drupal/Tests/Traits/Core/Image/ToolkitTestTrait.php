@@ -23,7 +23,6 @@ trait ToolkitTestTrait {
    */
   protected function imageTestReset(): void {
     \Drupal::state()->delete('image_test.results');
-    \Drupal::state()->delete('image_test.autowiring_operation');
   }
 
   /**
@@ -46,7 +45,6 @@ trait ToolkitTestTrait {
       'my_operation',
       'convert',
       'failing',
-      'autowiring',
     ];
     if (count(array_intersect($expected, $operations)) > 0 && !in_array('apply', $expected)) {
       $expected[] = 'apply';

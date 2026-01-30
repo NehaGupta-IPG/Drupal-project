@@ -6,15 +6,13 @@ namespace Drupal\Tests\content_moderation\Functional;
 
 use Drupal\Tests\workspaces\Functional\WorkspaceTestUtilities;
 use Drupal\workspaces\Entity\Workspace;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Workspaces together with Content Moderation.
+ *
+ * @group content_moderation
+ * @group workspaces
  */
-#[Group('content_moderation')]
-#[Group('workspaces')]
-#[RunTestsInSeparateProcesses]
 class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase {
 
   use WorkspaceTestUtilities;
@@ -22,7 +20,15 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['node', 'workspaces', 'workspaces_ui'];
+  protected static $modules = ['node', 'workspaces'];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -32,27 +38,15 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
   /**
    * {@inheritdoc}
    */
-  protected function getAdministratorPermissions(): array {
-    return array_merge($this->permissions, [
-      'bypass node access',
-      'administer workspaces',
-    ]);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
 
-    $this->adminUser = $this->drupalCreateUser($this->getAdministratorPermissions());
-    $this->drupalLogin($this->adminUser);
+    $this->drupalLogin($this->rootUser);
 
     // Enable moderation on Article node type.
     $this->createContentTypeFromUi('Article', 'article', TRUE);
 
     $this->setupWorkspaceSwitcherBlock();
-    $this->createWorkspaceThroughUi('Stage', 'stage');
   }
 
   /**
@@ -76,19 +70,15 @@ class WorkspaceContentModerationIntegrationTest extends ModerationStateTestBase 
 
     $first_article = $this->drupalGetNodeByTitle('First article - published', TRUE);
     $this->assertEquals('published', $first_article->moderation_state->value);
-    $this->assertTrue($first_article->isPublished());
 
     $second_article = $this->drupalGetNodeByTitle('Second article - draft', TRUE);
     $this->assertEquals('draft', $second_article->moderation_state->value);
-    $this->assertFalse($second_article->isPublished());
 
-    // Check that neither of them are published in Live.
+    // Check that neither of them are visible in Live.
     $this->switchToLive();
-    $first_article = $this->drupalGetNodeByTitle('First article - published', TRUE);
-    $this->assertFalse($first_article->isPublished());
-
-    $second_article = $this->drupalGetNodeByTitle('Second article - draft', TRUE);
-    $this->assertFalse($second_article->isPublished());
+    $this->drupalGet('<front>');
+    $this->assertSession()->pageTextNotContains('First article');
+    $this->assertSession()->pageTextNotContains('Second article');
 
     // Switch back to Stage.
     $this->switchToWorkspace($stage);

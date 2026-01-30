@@ -287,7 +287,6 @@ class UpdateRegistry implements EventSubscriberInterface {
 
   /**
    * @return bool
-   *   TRUE if themes are to be updated, FALSE otherwise.
    */
   protected function includeThemes(): bool {
     return $this->updateType === 'post_update';

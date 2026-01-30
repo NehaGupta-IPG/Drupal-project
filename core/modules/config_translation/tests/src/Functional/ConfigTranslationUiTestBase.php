@@ -50,12 +50,16 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
   protected $localeStorage;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'block',
     'config_translation',
     'config_translation_test',
+    'contact',
+    'contact_test',
     'contextual',
     'entity_test',
     'field_test',
@@ -90,10 +94,12 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
         'administer languages',
         'administer site configuration',
         'link to any page',
+        'administer contact forms',
         'administer filters',
         $filtered_html_format->getPermissionName(),
         $full_html_format->getPermissionName(),
         $filter_test_format->getPermissionName(),
+        'access site-wide contact form',
         'access contextual links',
         'administer views',
         'administer account settings',
@@ -119,11 +125,11 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
   /**
    * Gets translation from locale storage.
    *
-   * @param string $config_name
+   * @param $config_name
    *   Configuration object.
-   * @param string $key
+   * @param $key
    *   Translation configuration field key.
-   * @param string $langcode
+   * @param $langcode
    *   String language code to load translation.
    *
    * @return bool|mixed
@@ -187,7 +193,7 @@ abstract class ConfigTranslationUiTestBase extends BrowserTestBase {
   }
 
   /**
-   * Returns a .po file with a given number of plural forms.
+   * Helper function that returns a .po file with a given number of plural forms.
    */
   public function getPoFile($plurals) {
     $po_file = [];
@@ -197,7 +203,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=utf-8\\n"
+"Content-Type: text/plain; charset=UTF-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=1; plural=0;\\n"
 EOF;
@@ -207,7 +213,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=utf-8\\n"
+"Content-Type: text/plain; charset=UTF-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=2; plural=(n>1);\\n"
 EOF;
@@ -217,7 +223,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 8\\n"
 "MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=utf-8\\n"
+"Content-Type: text/plain; charset=UTF-8\\n"
 "Content-Transfer-Encoding: 8bit\\n"
 "Plural-Forms: nplurals=4; plural=(((n%100)==1)?(0):(((n%100)==2)?(1):((((n%100)==3)||((n%100)==4))?(2):3)));\\n"
 EOF;

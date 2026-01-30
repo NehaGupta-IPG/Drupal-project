@@ -4,12 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Core\Container;
 
-use Drupal\Component\DependencyInjection\Container;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test whether deprecation notices are triggered via \Drupal::service().
@@ -17,11 +12,12 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Note: this test must be a BrowserTestBase so the container is properly
  * compiled. The container in KernelTestBase tests is always an instance of
  * \Drupal\Core\DependencyInjection\ContainerBuilder.
+ *
+ * @group Container
+ * @group legacy
+ *
+ * @coversDefaultClass \Drupal\Component\DependencyInjection\Container
  */
-#[CoversClass(Container::class)]
-#[Group('Container')]
-#[IgnoreDeprecations]
-#[RunTestsInSeparateProcesses]
 class ServiceDeprecationTest extends BrowserTestBase {
 
   /**
@@ -35,31 +31,15 @@ class ServiceDeprecationTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests get deprecated.
+   * @covers ::get
    */
   public function testGetDeprecated(): void {
     $this->expectDeprecation('The "deprecation_test.service" service is deprecated in drupal:9.0.0 and is removed from drupal:20.0.0. This is a test.');
-    // @phpstan-ignore-next-line
-    \Drupal::service('deprecation_test.service');
-  }
-
-  /**
-   * Tests get deprecated service via the alias.
-   *
-   * @legacy-covers ::get
-   */
-  public function testGetDeprecatedAlias(): void {
-    $this->expectDeprecation('The "deprecation_test.service" service is deprecated in drupal:9.0.0 and is removed from drupal:20.0.0. This is a test.');
     $this->expectDeprecation('The "deprecation_test.alias" alias is deprecated in drupal:9.0.0 and is removed from drupal:20.0.0. This is a test.');
     // @phpstan-ignore-next-line
+    \Drupal::service('deprecation_test.service');
+    // @phpstan-ignore-next-line
     \Drupal::service('deprecation_test.alias');
-  }
-
-  /**
-   * Tests just installing the module does not trigger deprecation notices.
-   */
-  public function testNoDeprecations(): void {
-    $this->addToAssertionCount(1);
   }
 
 }

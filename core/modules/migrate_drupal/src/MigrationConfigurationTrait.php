@@ -5,7 +5,6 @@ namespace Drupal\migrate_drupal;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\RequirementsInterface;
 
@@ -71,7 +70,7 @@ trait MigrationConfigurationTrait {
     $system_data = [];
     try {
       $results = $connection->select('system', 's', [
-        'fetch' => FetchAs::Associative,
+        'fetch' => \PDO::FETCH_ASSOC,
       ])
         ->fields('s')
         ->execute();
@@ -114,7 +113,7 @@ trait MigrationConfigurationTrait {
    *
    * @param string $database_state_key
    *   The state key.
-   * @param numeric $drupal_version
+   * @param int $drupal_version
    *   The version of Drupal we're getting the migrations for.
    *
    * @return \Drupal\migrate\Plugin\MigrationInterface[]
@@ -182,7 +181,6 @@ trait MigrationConfigurationTrait {
    * Returns the follow-up migration tags.
    *
    * @return string[]
-   *   An array of follow-up migration tags.
    */
   protected function getFollowUpMigrationTags() {
     if ($this->followUpMigrationTags === NULL) {

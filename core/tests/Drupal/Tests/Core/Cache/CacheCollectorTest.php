@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Cache;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheCollector;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests Drupal\Core\Cache\CacheCollector.
+ * @coversDefaultClass \Drupal\Core\Cache\CacheCollector
+ * @group Cache
  */
-#[CoversClass(CacheCollector::class)]
-#[Group('Cache')]
 class CacheCollectorTest extends UnitTestCase {
 
   /**

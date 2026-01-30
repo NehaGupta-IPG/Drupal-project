@@ -6,14 +6,12 @@ namespace Drupal\Tests\media\Functional;
 
 use Drupal\Tests\content_translation\Functional\ContentTranslationUITestBase;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Media Translation UI.
+ *
+ * @group media
  */
-#[Group('media')]
-#[RunTestsInSeparateProcesses]
 class MediaTranslationUITest extends ContentTranslationUITestBase {
 
   use MediaTypeCreationTrait;
@@ -59,7 +57,7 @@ class MediaTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  public function setupBundle(): void {
+  public function setupBundle() {
     $this->createMediaType('test', [
       'id' => $this->bundle,
       'queue_thumbnail_downloads' => FALSE,

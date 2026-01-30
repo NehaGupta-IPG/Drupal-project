@@ -138,14 +138,12 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
       if ($this->numberOfRequiredParams !== 1 && $this->numberOfParams !== 1) {
         throw new EntityMethodException(sprintf('Entity method config action \'%s\' requires an array value. The number of parameters or required parameters for %s::%s() is not 1', $this->pluginId, $entity->getEntityType()->getClass(), $this->method));
       }
-      $result = $entity->{$this->method}($value);
+      $entity->{$this->method}($value);
     }
     else {
-      $result = $entity->{$this->method}(...$value);
+      $entity->{$this->method}(...$value);
     }
-    // If an instance of the entity (either itself, or a clone) was returned
-    // by the method, return that.
-    return is_a($result, get_class($entity)) ? $result : $entity;
+    return $entity;
   }
 
 }

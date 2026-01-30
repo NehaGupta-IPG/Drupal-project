@@ -15,7 +15,7 @@ use Drupal\Core\TypedData\DataDefinition;
 #[FieldType(
   id: "telephone",
   label: new TranslatableMarkup("Telephone number"),
-  description: new TranslatableMarkup("A telephone number, optionally displayed as a telephone link"),
+  description: new TranslatableMarkup("This field stores a telephone number."),
   default_widget: "telephone_default",
   default_formatter: "basic_string"
 )]
@@ -70,11 +70,7 @@ class TelephoneItem extends FieldItemBase {
       'value' => [
         'Length' => [
           'max' => self::MAX_LENGTH,
-          'maxMessage' => $this->t('%name: the telephone number may not be longer than @max characters.', [
-            '%name' => $this->getFieldDefinition()
-              ->getLabel(),
-            '@max' => self::MAX_LENGTH,
-          ]),
+          'maxMessage' => $this->t('%name: the telephone number may not be longer than @max characters.', ['%name' => $this->getFieldDefinition()->getLabel(), '@max' => self::MAX_LENGTH]),
         ],
       ],
     ]);

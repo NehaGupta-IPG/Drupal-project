@@ -268,7 +268,7 @@ class StringDatabaseStorage implements StringStorageInterface {
    * @param \Drupal\locale\StringInterface $string
    *   The string object.
    *
-   * @return string|null
+   * @return string
    *   The table name.
    */
   protected function dbStringTable($string) {
@@ -278,7 +278,6 @@ class StringDatabaseStorage implements StringStorageInterface {
     elseif ($string->isTranslation()) {
       return 'locales_target';
     }
-    return NULL;
   }
 
   /**
@@ -527,10 +526,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   protected function dbDelete($table, $keys) {
     $query = $this->connection->delete($table, $this->options);
     foreach ($keys as $field => $value) {
-      if (!is_array($value)) {
-        $value = [$value];
-      }
-      $query->condition($field, $value, 'IN');
+      $query->condition($field, $value);
     }
     return $query;
   }

@@ -6,16 +6,13 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the mini pager plugin.
  *
+ * @group views
  * @see \Drupal\views\Plugin\views\pager\Mini
  */
-#[Group('views')]
-#[RunTestsInSeparateProcesses]
 class MiniPagerTest extends ViewTestBase {
 
   /**
@@ -26,7 +23,9 @@ class MiniPagerTest extends ViewTestBase {
   public static $testViews = ['test_mini_pager'];
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['node'];
 
@@ -87,7 +86,7 @@ class MiniPagerTest extends ViewTestBase {
     $this->assertSession()->pageTextContains($this->nodes[18]->label());
     $this->assertSession()->pageTextContains($this->nodes[19]->label());
 
-    // Test @total value in result summary.
+    // Test @total value in result summary
     $view = Views::getView('test_mini_pager');
     $view->setDisplay('page_4');
     $this->executeView($view);
@@ -176,8 +175,7 @@ class MiniPagerTest extends ViewTestBase {
       $this->assertEquals('h3', $this->assertSession()->elementExists('css', ".pager .visually-hidden")->getTagName());
     }
 
-    // The core views template and Stable9 use a different class structure than
-    // other core themes.
+    // The core views template and Stable9 use a different class structure than other core themes.
     $themes = ['stark', 'stable9'];
     $this->container->get('theme_installer')->install($themes);
     foreach ($themes as $theme) {

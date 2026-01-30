@@ -54,8 +54,9 @@
  *   displayed after the main title tag that appears in the template.
  * - view_mode: View mode; for example, "teaser" or "full".
  * - teaser: Flag for the teaser state. Will be true if view_mode is 'teaser'.
+ * - page: Flag for the full page state. Will be true if view_mode is 'full'.
  *
- * @see \Drupal\node\Hook\NodeThemeHooks::preprocessNode()
+ * @see template_preprocess_node()
  */
 #}
 
@@ -94,7 +95,7 @@
     {% if display_submitted %}
       <div class="node__meta">
         <span{{ author_attributes }}>
-          {{ 'By'|t }} <span class="node__author">{{- author_name -}}</span>, {{ date }}
+          {{ 'By'|t }} {% apply spaceless %}<span class="node__author">{{ author_name }}</span>{% endapply %}, {{ date }}
         </span>
         {{ metadata }}
       </div>
@@ -102,7 +103,7 @@
   {% endblock %}
   {% block image %}{{~ content.field_image ~}}{% endblock %}
   {% block title %}
-    {% if label %}
+    {% if label and not page %}
       <h2{{ title_attributes.addClass('node__title', 'teaser__title') }}>
         <a href="{{ url }}" rel="bookmark">{{ label }}</a>
       </h2>

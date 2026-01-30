@@ -88,7 +88,6 @@ class YamlDiscovery implements DiscoveryInterface {
               $options['context'] = $definition[$context_key];
               unset($definition[$context_key]);
             }
-            // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
             $definition[$property] = new TranslatableMarkup($definition[$property], [], $options);
           }
         }

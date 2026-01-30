@@ -8,21 +8,16 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\Views;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the generic field handler.
  *
+ * @group views
+ * @group #slow
  * @see \Drupal\views\Plugin\views\field\FieldPluginBase
  */
-#[Group('views')]
-#[RunTestsInSeparateProcesses]
 class FieldKernelTest extends ViewsKernelTestBase {
 
-  /**
-   * {@inheritdoc}
-   */
   protected static $modules = ['user'];
 
   /**
@@ -146,7 +141,6 @@ class FieldKernelTest extends ViewsKernelTestBase {
     $view->initHandlers();
     $this->executeView($view);
     $row = $view->result[0];
-    $view->row_index = 0;
     $id_field = $view->field['id'];
 
     // Don't check the rewrite checkbox, so the text shouldn't appear.
@@ -174,7 +168,6 @@ class FieldKernelTest extends ViewsKernelTestBase {
     $view->initHandlers();
     $this->executeView($view);
     $row = $view->result[0];
-    $view->row_index = 0;
     $id_field = $view->field['id'];
 
     $id_field->options['alter']['text'] = '<p>{{ id }}</p>';
@@ -207,7 +200,6 @@ class FieldKernelTest extends ViewsKernelTestBase {
     $view->initHandlers();
     $this->executeView($view);
     $row = $view->result[0];
-    $view->row_index = 0;
     $id_field = $view->field['id'];
 
     $id_field->options['alter']['text'] = '<p>{{ id }}</p>';
@@ -243,7 +235,6 @@ class FieldKernelTest extends ViewsKernelTestBase {
     $name_field_0->options['alter']['text'] = '%1 !1';
 
     $row = $view->result[0];
-    $view->row_index = 1;
     $output = (string) $renderer->executeInRenderContext(new RenderContext(), function () use ($name_field_0, $row) {
       return $name_field_0->advancedRender($row);
     });
@@ -288,8 +279,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
     $name_field_2->options['alter']['alter_text'] = TRUE;
     $name_field_2->options['alter']['text'] = '{% if name_2|length > 3 %}{{ name_2 }} {{ name_1 }}{% endif %}';
 
-    foreach ($view->result as $index => $row) {
-      $view->row_index = $index;
+    foreach ($view->result as $row) {
       $expected_output_0 = $row->views_test_data_name;
       $expected_output_1 = "$row->views_test_data_name $row->views_test_data_name";
       $expected_output_2 = "$row->views_test_data_name $row->views_test_data_name $row->views_test_data_name";
@@ -406,7 +396,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
    * This tests alters the result to get easier and less coupled results. It is
    * important that assertSame() is used in this test since in PHP 0 == ''.
    */
-  public function _testHideIfEmpty(): void {
+  public function _testHideIfEmpty() {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -540,8 +530,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
     });
     $this->assertSame($random_name, (string) $render, 'If the rewritten string is not empty, "0" should not be treated as empty.');
 
-    // Test when results are rewritten to an empty string and non-zero empty
-    // results are hidden.
+    // Test when results are rewritten to an empty string and non-zero empty results are hidden.
     $view->field['name']->options['hide_alter_empty'] = TRUE;
     $view->field['name']->options['hide_empty'] = TRUE;
     $view->field['name']->options['empty_zero'] = FALSE;
@@ -688,7 +677,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
   /**
    * Tests the usage of the empty text.
    */
-  public function _testEmptyText(): void {
+  public function _testEmptyText() {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -816,7 +805,7 @@ class FieldKernelTest extends ViewsKernelTestBase {
       $this->assertEquals($expect[$key], $result_text);
     }
 
-    // Test also word_boundary.
+    // Test also word_boundary
     $alter['word_boundary'] = TRUE;
     $expect = [
       'Tuy nhiên',

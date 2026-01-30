@@ -11,7 +11,7 @@ use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\RoleInterface;
 use Drupal\views\Attribute\ViewsFilter;
 use Drupal\views\Plugin\views\filter\ManyToOne;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Filter handler for user roles.
@@ -45,7 +45,7 @@ class Permissions extends ManyToOne {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
+   *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\user\PermissionHandlerInterface $permission_handler
@@ -53,14 +53,7 @@ class Permissions extends ManyToOne {
    * @param \Drupal\Core\Extension\ModuleExtensionList|\Drupal\Core\Extension\ModuleHandlerInterface $module_extension_list
    *   The module extension list.
    */
-  public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    PermissionHandlerInterface $permission_handler,
-    #[Autowire(service: 'extension.list.module')]
-    ModuleExtensionList|ModuleHandlerInterface $module_extension_list,
-  ) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, PermissionHandlerInterface $permission_handler, ModuleExtensionList|ModuleHandlerInterface $module_extension_list) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->permissionHandler = $permission_handler;
@@ -74,6 +67,16 @@ class Permissions extends ManyToOne {
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('user.permissions'),
+      $container->get('extension.list.module'),
+    );
+  }
+
   public function getValueOptions() {
     if (!isset($this->valueOptions)) {
       $permissions = $this->permissionHandler->getPermissions();

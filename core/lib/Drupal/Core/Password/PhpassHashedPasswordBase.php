@@ -221,8 +221,11 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
         break;
 
       default:
-        return $this->corePassword->check($password, $stored_hash);
+        if (isset($this->corePassword)) {
+          return $this->corePassword->check($password, $stored_hash);
+        }
 
+        return FALSE;
     }
 
     // Compare using hash_equals() instead of === to mitigate timing attacks.

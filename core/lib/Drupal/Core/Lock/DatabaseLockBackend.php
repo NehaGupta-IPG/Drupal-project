@@ -165,16 +165,9 @@ class DatabaseLockBackend extends LockBackendAbstract {
       if (empty($lock_id)) {
         $lock_id = $this->getLockId();
       }
-      // In functional tests the test site may have been removed before the
-      // final request has been terminated.
-      try {
-        $this->database->delete('semaphore')
-          ->condition('value', $lock_id)
-          ->execute();
-      }
-      catch (\Exception $e) {
-        $this->catchException($e);
-      }
+      $this->database->delete('semaphore')
+        ->condition('value', $lock_id)
+        ->execute();
     }
   }
 
@@ -205,7 +198,7 @@ class DatabaseLockBackend extends LockBackendAbstract {
    * yet the query failed, then the semaphore is stale and the exception needs
    * to propagate.
    *
-   * @param \Exception $e
+   * @param $e
    *   The exception.
    *
    * @throws \Exception

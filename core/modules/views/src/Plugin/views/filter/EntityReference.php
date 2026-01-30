@@ -18,6 +18,7 @@ use Drupal\views\FieldAPIHandlerTrait;
 use Drupal\views\Plugin\EntityReferenceSelection\ViewsSelection;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ViewExecutable;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Filters a view by entity references.
@@ -102,6 +103,20 @@ class EntityReference extends ManyToOne {
     if (isset($this->definition['entity field'])) {
       $this->definition['field_name'] = $this->definition['entity field'];
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): EntityReference {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('plugin.manager.entity_reference_selection'),
+      $container->get('entity_type.manager'),
+      $container->get('messenger'),
+    );
   }
 
   /**
@@ -345,13 +360,14 @@ class EntityReference extends ManyToOne {
    */
   public function submitExtraOptionsForm($form, FormStateInterface $form_state): void {
     $sub_handler = $form_state->getValue('options')['sub_handler'];
-    // Unset sub handler settings that are not selected so they are not saved.
-    // ConfigHandlerExtra::submitForm will set the selected sub handler's
-    // settings.
+
+    // Ensure that only the select sub handler option is saved.
     foreach (array_keys($this->getSubHandlerOptions()) as $sub_handler_option) {
-      $subform_key = static::SUBFORM_PREFIX . $sub_handler_option;
-      if ($sub_handler_option !== $sub_handler && isset($this->options[$subform_key])) {
-        unset($this->options[$subform_key]);
+      if ($sub_handler_option == $sub_handler) {
+        $this->options['sub_handler_settings'] = $this->options[static::SUBFORM_PREFIX . $sub_handler_option];
+      }
+      if (isset($this->options[static::SUBFORM_PREFIX . $sub_handler_option])) {
+        unset($this->options[static::SUBFORM_PREFIX . $sub_handler_option]);
       }
     }
   }

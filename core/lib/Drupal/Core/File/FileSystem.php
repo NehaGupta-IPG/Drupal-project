@@ -151,11 +151,6 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function basename($uri, $suffix = NULL) {
-    @trigger_error(
-      "Calling FileSystem::basename() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Use PHP native basename() instead. See https://www.drupal.org/node/3530869",
-      E_USER_DEPRECATED,
-    );
-
     $separators = '/';
     if (DIRECTORY_SEPARATOR != '/') {
       // For Windows OS add special separator.
@@ -277,7 +272,7 @@ class FileSystem implements FileSystemInterface {
       $wrapper = $this->streamWrapperManager->getViaScheme($scheme);
 
       if ($filename = tempnam($wrapper->getDirectoryPath(), $prefix)) {
-        return $scheme . '://' . basename($filename);
+        return $scheme . '://' . static::basename($filename);
       }
       else {
         return FALSE;
@@ -319,13 +314,6 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function delete($path) {
-    if (is_link($path)) {
-      // See https://bugs.php.net/52176.
-      if (!($this->unlink($path) || '\\' !== \DIRECTORY_SEPARATOR || $this->rmdir($path)) && file_exists($path)) {
-        throw new FileException("Failed to unlink symlink '$path'.");
-      }
-      return TRUE;
-    }
     if (is_file($path)) {
       if (!$this->unlink($path)) {
         throw new FileException("Failed to unlink file '$path'.");
@@ -352,21 +340,15 @@ class FileSystem implements FileSystemInterface {
    * {@inheritdoc}
    */
   public function deleteRecursive($path, ?callable $callback = NULL) {
-    // Ensure paths are local paths when a recursive delete is started.
-    if ($this->streamWrapperManager->isValidUri($path)) {
-      $path = $this->realpath($path);
-    }
-
     if ($callback) {
       call_user_func($callback, $path);
     }
 
-    // Allow broken links to be removed.
-    if (!file_exists($path) && !is_link($path)) {
+    if (!file_exists($path)) {
       return TRUE;
     }
 
-    if (is_dir($path) && !is_link($path)) {
+    if (is_dir($path)) {
       $dir = dir($path);
       while (($entry = $dir->read()) !== FALSE) {
         if ($entry == '.' || $entry == '..') {
@@ -466,7 +448,7 @@ class FileSystem implements FileSystemInterface {
     // Prepare the destination directory.
     if ($this->prepareDirectory($destination)) {
       // The destination is already a directory, so append the source basename.
-      $destination = $this->streamWrapperManager->normalizeUri($destination . '/' . basename($source));
+      $destination = $this->streamWrapperManager->normalizeUri($destination . '/' . $this->basename($source));
     }
     else {
       // Perhaps $destination is a dir/file?
@@ -552,7 +534,7 @@ class FileSystem implements FileSystemInterface {
       // @phpstan-ignore staticMethod.deprecated
       $fileExists = FileExists::fromLegacyInt($fileExists, __METHOD__);
     }
-    $basename = basename($destination);
+    $basename = $this->basename($destination);
     if (!Unicode::validateUtf8($basename)) {
       throw new FileException(sprintf("Invalid filename '%s'", $basename));
     }

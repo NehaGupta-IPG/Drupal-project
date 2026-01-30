@@ -9,14 +9,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the untranslatable fields behaviors.
+ *
+ * @group content_translation
  */
-#[Group('content_translation')]
-#[RunTestsInSeparateProcesses]
 class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendingRevisionTestBase {
 
   use LanguageTestTrait;
@@ -25,6 +23,14 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
    * {@inheritdoc}
    */
   protected static $modules = ['field_test'];
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -52,7 +58,7 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
   /**
    * {@inheritdoc}
    */
-  protected function setupTestFields(): void {
+  protected function setupTestFields() {
     parent::setupTestFields();
 
     $field_storage = FieldStorageConfig::create([

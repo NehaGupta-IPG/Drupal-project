@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\link\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests link field form states functionality.
+ *
+ * @group link
  */
-#[Group('link')]
-#[Group('#slow')]
-#[RunTestsInSeparateProcesses]
 class LinkFieldFormStatesTest extends WebDriverTestBase {
 
   /**
@@ -43,9 +39,8 @@ class LinkFieldFormStatesTest extends WebDriverTestBase {
   }
 
   /**
- * Tests link field form states.
- */
-  #[DataProvider('linkFieldFormStatesData')]
+   * @dataProvider linkFieldFormStatesData
+   */
   public function testLinkFieldFormStates(string $uri, string $title): void {
     $this->drupalGet('entity_test/add');
     $session = $this->assertSession();

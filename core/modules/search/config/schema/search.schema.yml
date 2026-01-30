@@ -10,7 +10,8 @@ search.settings:
       type: integer
       label: 'AND/OR combination limit'
       constraints:
-        PositiveOrZero: ~
+        Range:
+          min: 0
     default_page:
       type: string
       label: 'Default search page'

@@ -7,7 +7,6 @@ use Drupal\Component\Annotation\Reflection\MockFileFinder;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Test\Exception\MissingGroupException;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Discovers available tests.
@@ -27,11 +26,6 @@ class TestDiscovery {
    * Statically cached list of test classes.
    *
    * @var array
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is
-   *   no replacement.
-   *
-   * @see https://www.drupal.org/node/3447698
    */
   protected $testClasses;
 
@@ -61,9 +55,10 @@ class TestDiscovery {
    *
    * @param string $root
    *   The app root.
-   * @param class-string $class_loader
+   * @param $class_loader
    *   The class loader. Normally Composer's ClassLoader, as included by the
-   *   front controller, but may also be decorated.
+   *   front controller, but may also be decorated; e.g.,
+   *   \Symfony\Component\ClassLoader\ApcClassLoader.
    */
   public function __construct($root, $class_loader) {
     $this->root = $root;
@@ -113,11 +108,11 @@ class TestDiscovery {
 
     // Expose tests provided by core recipes.
     $base_path = $this->root . '/core/recipes';
-    if ($handle = @opendir($base_path)) {
-      while (($recipe = readdir($handle)) !== FALSE) {
+    if (@opendir($base_path)) {
+      while (($recipe = readdir()) !== FALSE) {
         $this->testNamespaces["Drupal\\FunctionalTests\\Recipe\\Core\\$recipe\\"][] = "$base_path/$recipe/tests/src/Functional";
       }
-      closedir($handle);
+      closedir();
     }
 
     foreach ($this->testNamespaces as $prefix => $paths) {
@@ -155,14 +150,8 @@ class TestDiscovery {
    *
    * @todo Remove singular grouping; retain list of groups in 'group' key.
    * @see https://www.drupal.org/node/2296615
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
-   *   PhpUnitTestDiscovery::getTestClasses() instead.
-   *
-   * @see https://www.drupal.org/node/3447698
    */
   public function getTestClasses($extension = NULL, array $types = [], ?string $directory = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use PhpUnitTestDiscovery::getTestClasses() instead. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
     if (!isset($extension) && empty($types)) {
       if (!empty($this->testClasses)) {
         return $this->testClasses;
@@ -187,15 +176,6 @@ class TestDiscovery {
       catch (MissingGroupException $e) {
         // If the class name ends in Test and is not a migrate table dump.
         if (str_ends_with($classname, 'Test') && !str_contains($classname, 'migrate_drupal\Tests\Table')) {
-          $reflection = new \ReflectionClass($classname);
-          $groupAttributes = $reflection->getAttributes(Group::class, \ReflectionAttribute::IS_INSTANCEOF);
-          if (!empty($groupAttributes)) {
-            $group = '##no-group-annotations';
-            $info['group'] = $group;
-            $info['groups'] = [$group];
-            $list[$group][$classname] = $info;
-            continue;
-          }
           throw $e;
         }
         // If the class is @group annotation just skip it. Most likely it is an
@@ -237,14 +217,8 @@ class TestDiscovery {
    * @return array
    *   A classmap containing all discovered class files; i.e., a map of
    *   fully-qualified classnames to path names.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
-   *   PhpUnitTestDiscovery::findAllClassFiles() instead.
-   *
-   * @see https://www.drupal.org/node/3447698
    */
   public function findAllClassFiles($extension = NULL, ?string $directory = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use PhpUnitTestDiscovery::findAllClassFiles() instead. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
     $classmap = [];
     $namespaces = $this->registerTestNamespaces();
     if (isset($extension)) {
@@ -269,10 +243,10 @@ class TestDiscovery {
    * @param string $namespace_prefix
    *   The namespace prefix to use for discovered classes. Must contain a
    *   trailing namespace separator (backslash).
-   *   For example: 'Drupal\\node\\Tests\\'.
+   *   For example: 'Drupal\\node\\Tests\\'
    * @param string $path
    *   The directory path to scan.
-   *   For example: '/path/to/drupal/core/modules/node/tests/src'.
+   *   For example: '/path/to/drupal/core/modules/node/tests/src'
    *
    * @return array
    *   An associative array whose keys are fully-qualified class names and whose
@@ -283,14 +257,8 @@ class TestDiscovery {
    *
    * @todo Limit to '*Test.php' files (~10% less files to reflect/introspect).
    * @see https://www.drupal.org/node/2296635
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is
-   *   no replacement.
-   *
-   * @see https://www.drupal.org/node/3447698
    */
   public static function scanDirectory($namespace_prefix, $path) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
     if (!str_ends_with($namespace_prefix, '\\')) {
       throw new \InvalidArgumentException("Namespace prefix for $path must contain a trailing namespace separator.");
     }
@@ -345,14 +313,8 @@ class TestDiscovery {
    *
    * @throws \Drupal\Core\Test\Exception\MissingGroupException
    *   If the class does not have a @group annotation.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is
-   *   no replacement.
-   *
-   * @see https://www.drupal.org/node/3447698
    */
   public static function getTestInfo($classname, $doc_comment = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3447698', E_USER_DEPRECATED);
     if ($doc_comment === NULL) {
       $reflection = new \ReflectionClass($classname);
       $doc_comment = $reflection->getDocComment();
@@ -389,7 +351,7 @@ class TestDiscovery {
     $info['type'] = 'PHPUnit-' . static::getPhpunitTestSuite($classname);
 
     if (!empty($annotations['coversDefaultClass'])) {
-      $info['description'] = 'Tests ' . ltrim($annotations['coversDefaultClass']) . '.';
+      $info['description'] = 'Tests ' . $annotations['coversDefaultClass'] . '.';
     }
     else {
       $info['description'] = static::parseTestClassSummary($doc_comment);
@@ -438,9 +400,6 @@ class TestDiscovery {
    */
   public static function getPhpunitTestSuite($classname) {
     if (preg_match('/Drupal\\\\Tests\\\\(\w+)\\\\(\w+)/', $classname, $matches)) {
-      if ($matches[1] === 'Component') {
-        return 'Unit-Component';
-      }
       // This could be an extension test, in which case the first match will be
       // the extension name. We assume that lower-case strings are module names.
       if (strtolower($matches[1]) == $matches[1]) {

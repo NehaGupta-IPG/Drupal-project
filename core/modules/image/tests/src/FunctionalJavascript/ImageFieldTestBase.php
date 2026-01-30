@@ -19,7 +19,9 @@ abstract class ImageFieldTestBase extends WebDriverTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'node',

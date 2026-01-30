@@ -11,23 +11,17 @@ class TestRun {
 
   /**
    * The test database prefix.
+   *
+   * @var string
    */
-  protected string $databasePrefix;
+  protected $databasePrefix;
 
   /**
    * The latest class under test.
+   *
+   * @var string
    */
-  protected string $testClass;
-
-  /**
-   * The time the test run started.
-   */
-  protected float $startExecutionTime;
-
-  /**
-   * The time the test run ended.
-   */
-  protected float $endExecutionTime;
+  protected $testClass;
 
   /**
    * TestRun constructor.
@@ -103,42 +97,12 @@ class TestRun {
    *   The database prefix.
    */
   public function getDatabasePrefix(): string {
-    if (!isset($this->databasePrefix)) {
+    if (is_null($this->databasePrefix)) {
       $state = $this->testRunResultsStorage->getCurrentTestRunState($this);
       $this->databasePrefix = $state['db_prefix'];
       $this->testClass = $state['test_class'];
     }
     return $this->databasePrefix;
-  }
-
-  /**
-   * Mark start of the test run execution.
-   *
-   * @param float $time
-   *   The time the test run started.
-   */
-  public function start(float $time): void {
-    $this->startExecutionTime = $time;
-  }
-
-  /**
-   * Mark end of the test run execution.
-   *
-   * @param float $time
-   *   The time the test run ended.
-   */
-  public function end(float $time): void {
-    $this->endExecutionTime = $time;
-  }
-
-  /**
-   * Gets the test run execution elapsed time.
-   *
-   * @return float
-   *   The elapsed time.
-   */
-  public function duration(): float {
-    return $this->endExecutionTime - $this->startExecutionTime;
   }
 
   /**
@@ -148,6 +112,11 @@ class TestRun {
    *   The test class.
    */
   public function getTestClass(): string {
+    if (is_null($this->testClass)) {
+      $state = $this->testRunResultsStorage->getCurrentTestRunState($this);
+      $this->databasePrefix = $state['db_prefix'];
+      $this->testClass = $state['test_class'];
+    }
     return $this->testClass;
   }
 
@@ -205,7 +174,7 @@ class TestRun {
       foreach (file($error_log_path) as $line) {
         if (preg_match('/\[.*?\] (.*?): (.*?) in (.*) on line (\d+)/', $line, $match)) {
           // Parse PHP fatal errors for example: PHP Fatal error: Call to
-          // undefined function break_me() in /path/to/file.php on line 17.
+          // undefined function break_me() in /path/to/file.php on line 17
           $this->insertLogEntry([
             'test_class' => $test_class,
             'status' => 'fail',

@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Redirects to an entity deletion form.
@@ -54,6 +55,20 @@ class DeleteAction extends EntityActionBase {
     $this->tempStore = $temp_store_factory->get('entity_delete_multiple_confirm');
 
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('tempstore.private'),
+      $container->get('current_user')
+    );
   }
 
   /**

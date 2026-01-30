@@ -6,14 +6,15 @@ namespace Drupal\FunctionalTests\Update;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Site\Settings;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Language\Language;
-use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
-use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
+use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -48,9 +49,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
   }
 
   /**
-   * Modules to install after the database is loaded.
-   *
-   * @var string[]
+   * Modules to enable after the database is loaded.
    */
   protected static $modules = [];
 
@@ -93,7 +92,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
    * then needed to set various things such as the config directories and the
    * container that would normally be done via the installer.
    */
-  public function installDrupal(): void {
+  public function installDrupal() {
     // Set the update URL. This must be set here rather than in
     // self::__construct() or the old URL generator will leak additional test
     // sites. Additionally, we need to prevent the path alias processor from
@@ -137,16 +136,6 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
 
     // Load the database(s).
     foreach ($this->databaseDumpFiles as $file) {
-      // Determine the version of the database dump if specified.
-      $matches = [];
-      $dumpVersion = preg_match('/drupal-(\d+\.\d+\.\d+)\./', $file, $matches) === 1 ? $matches[1] : NULL;
-
-      // If the db driver is mysqli, we do not need to run the update tests for
-      // db dumps prior to 11.2 when the module was introduced.
-      if (Database::getConnection()->getProvider() === 'mysqli' && $dumpVersion && version_compare($dumpVersion, '11.2.0', '<')) {
-        $this->markTestSkipped("The mysqli driver was introduced in Drupal 11.2, skip update tests from database at version {$dumpVersion}");
-      }
-
       if (str_ends_with($file, '.gz')) {
         $file = "compress.zlib://$file";
       }
@@ -234,18 +223,14 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
    * Replace User 1 with the user created here.
    */
   protected function replaceUser1() {
-    // We try not to save content entities in hook_update_N() because the schema
-    // might be out of sync, or hook invocations might rely on other schemas
-    // that also aren't updated yet. Hence we are directly updating the database
-    // tables with the values.
-    Database::getConnection()->update('users_field_data')
-      ->fields([
-        'name' => $this->rootUser->getAccountName(),
-        'pass' => \Drupal::service('password')->hash($this->rootUser->pass_raw),
-        'mail' => $this->rootUser->getEmail(),
-      ])
-      ->condition('uid', 1)
-      ->execute();
+    /** @var \Drupal\user\UserInterface $account */
+    // @todo Saving the account before the update is problematic.
+    //   https://www.drupal.org/node/2560237
+    $account = User::load(1);
+    $account->setPassword($this->rootUser->pass_raw);
+    $account->setEmail($this->rootUser->getEmail());
+    $account->setUsername($this->rootUser->getAccountName());
+    $account->save();
   }
 
   /**
@@ -270,7 +255,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
       ->fetchAllKeyed(0, 1);
     // For the purpose of fetching the notices and displaying more helpful error
     // messages, let's override the error handler temporarily.
-    set_error_handler(function ($severity, $message, $filename, $lineno): void {
+    set_error_handler(function ($severity, $message, $filename, $lineno) {
       throw new \ErrorException($message, 0, $severity, $filename, $lineno);
     });
     foreach ($result as $route_name => $route) {

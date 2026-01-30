@@ -201,7 +201,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       $form['actions']['submit']['#value'] = $this->options['submit_button'];
     }
 
-    // Check if there is exposed sorts for this view.
+    // Check if there is exposed sorts for this view
     $exposed_sorts = [];
     $exposed_sorts_options = [];
     foreach ($this->view->sort as $id => $handler) {
@@ -322,12 +322,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
     if (isset($views_session[$this->view->storage->id()][$display_id])) {
       unset($views_session[$this->view->storage->id()][$display_id]);
     }
-    if (!empty($views_session)) {
-      $session->set('views', $views_session);
-    }
-    else {
-      $session->remove('views');
-    }
+    $session->set('views', $views_session);
 
     // Set the form to allow redirect.
     if (empty($this->view->live_preview) && !\Drupal::request()->isXmlHttpRequest()) {

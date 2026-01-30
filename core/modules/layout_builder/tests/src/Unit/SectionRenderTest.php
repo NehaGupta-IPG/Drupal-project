@@ -22,16 +22,13 @@ use Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- * Tests Drupal\layout_builder\Section.
+ * @coversDefaultClass \Drupal\layout_builder\Section
+ * @group layout_builder
  */
-#[CoversClass(Section::class)]
-#[Group('layout_builder')]
 class SectionRenderTest extends UnitTestCase {
 
   /**
@@ -102,7 +99,7 @@ class SectionRenderTest extends UnitTestCase {
   }
 
   /**
-   * Tests to render array.
+   * @covers ::toRenderArray
    */
   public function testToRenderArray(): void {
     $block_content = ['#markup' => 'The block content.'];
@@ -151,7 +148,7 @@ class SectionRenderTest extends UnitTestCase {
   }
 
   /**
-   * Tests to render array access denied.
+   * @covers ::toRenderArray
    */
   public function testToRenderArrayAccessDenied(): void {
     $block = $this->prophesize(BlockPluginInterface::class);
@@ -183,7 +180,7 @@ class SectionRenderTest extends UnitTestCase {
   }
 
   /**
-   * Tests to render array preview.
+   * @covers ::toRenderArray
    */
   public function testToRenderArrayPreview(): void {
     $block_content = ['#markup' => 'The block content.'];
@@ -233,7 +230,7 @@ class SectionRenderTest extends UnitTestCase {
   }
 
   /**
-   * Tests to render array empty.
+   * @covers ::toRenderArray
    */
   public function testToRenderArrayEmpty(): void {
     $section = [];
@@ -243,9 +240,7 @@ class SectionRenderTest extends UnitTestCase {
   }
 
   /**
-   * Tests context aware block.
-   *
-   * @legacy-covers ::toRenderArray
+   * @covers ::toRenderArray
    */
   public function testContextAwareBlock(): void {
     $block_content = ['#markup' => 'The block content.'];
@@ -297,7 +292,7 @@ class SectionRenderTest extends UnitTestCase {
   }
 
   /**
-   * Tests to render array missing plugin id.
+   * @covers ::toRenderArray
    */
   public function testToRenderArrayMissingPluginId(): void {
     $this->expectException(PluginException::class);

@@ -8,26 +8,22 @@ use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Tests Drupal\Core\DrupalKernel.
+ * @coversDefaultClass \Drupal\Core\DrupalKernel
+ * @group DrupalKernel
+ * @group #slow
  */
-#[CoversClass(DrupalKernel::class)]
-#[Group('DrupalKernel')]
 class DrupalKernelTest extends UnitTestCase {
 
   /**
    * Tests hostname validation with settings.
    *
-   * @legacy-covers ::setupTrustedHosts
+   * @covers ::setupTrustedHosts
+   * @dataProvider providerTestTrustedHosts
    */
-  #[DataProvider('providerTestTrustedHosts')]
   public function testTrustedHosts($host, $server_name, $message, $expected = FALSE): void {
     $request = new Request();
 
@@ -58,7 +54,7 @@ class DrupalKernelTest extends UnitTestCase {
   /**
    * Provides test data for testTrustedHosts().
    */
-  public static function providerTestTrustedHosts(): array {
+  public static function providerTestTrustedHosts() {
     $data = [];
 
     // Tests canonical URL.
@@ -115,8 +111,10 @@ class DrupalKernelTest extends UnitTestCase {
    *
    * This test is run in a separate process since it defines DRUPAL_ROOT. This
    * stops any possible pollution of other tests.
+   *
+   * @covers ::findSitePath
+   * @runInSeparateProcess
    */
-  #[RunInSeparateProcess]
   public function testFindSitePath(): void {
     $vfs_root = vfsStream::setup('drupal_root');
     $sites_php = <<<'EOD'
@@ -143,11 +141,9 @@ EOD;
   }
 
   /**
-   * Tests un booted terminate.
-   *
-   * @legacy-covers ::terminate
+   * @covers ::terminate
+   * @runInSeparateProcess
    */
-  #[RunInSeparateProcess]
   public function testUnBootedTerminate(): void {
     $kernel = new DrupalKernel('test', new ClassLoader());
     $kernel->terminate(new Request(), new Response());
@@ -165,16 +161,16 @@ class FakeAutoloader {
    * Registers this instance as an autoloader.
    *
    * @param bool $prepend
-   *   Whether to prepend the autoloader or not.
+   *   Whether to prepend the autoloader or not
    */
-  public function register($prepend = FALSE): void {
+  public function register($prepend = FALSE) {
     spl_autoload_register([$this, 'loadClass'], TRUE, $prepend);
   }
 
   /**
    * Deregisters this instance as an autoloader.
    */
-  public function unregister(): void {
+  public function unregister() {
     spl_autoload_unregister([$this, 'loadClass']);
   }
 
@@ -183,7 +179,7 @@ class FakeAutoloader {
    *
    * This class never loads.
    */
-  public function loadClass(): NULL {
+  public function loadClass() {
     return NULL;
   }
 
@@ -192,7 +188,7 @@ class FakeAutoloader {
    *
    * This class never finds.
    */
-  public function findFile(): NULL {
+  public function findFile() {
     return NULL;
   }
 

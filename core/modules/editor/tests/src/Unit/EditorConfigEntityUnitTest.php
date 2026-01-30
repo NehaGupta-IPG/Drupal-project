@@ -8,14 +8,11 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\editor\Entity\Editor;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests Drupal\editor\Entity\Editor.
+ * @coversDefaultClass \Drupal\editor\Entity\Editor
+ * @group editor
  */
-#[CoversClass(Editor::class)]
-#[Group('editor')]
 class EditorConfigEntityUnitTest extends UnitTestCase {
 
   /**
@@ -94,7 +91,7 @@ class EditorConfigEntityUnitTest extends UnitTestCase {
   }
 
   /**
-   * Tests calculate dependencies.
+   * @covers ::calculateDependencies
    */
   public function testCalculateDependencies(): void {
     $format_id = 'filter.format.test';

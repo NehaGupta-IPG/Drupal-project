@@ -40,8 +40,7 @@ class GenerateTheme extends Command {
    * GenerateTheme constructor.
    *
    * @param string|null $name
-   *   The name of the command; passing null means it must be set in
-   *   configure().
+   *   The name of the command; passing null means it must be set in configure().
    * @param string|null $root
    *   The path for the Drupal root.
    */
@@ -66,9 +65,6 @@ class GenerateTheme extends Command {
       ->addUsage('custom_theme --name "Custom Theme" --starterkit mystarterkit');
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function initialize(InputInterface $input, OutputInterface $output): void {
     if ($input->getOption('name') === NULL) {
       $input->setOption('name', $input->getArgument('machine-name'));
@@ -137,7 +133,6 @@ class GenerateTheme extends Command {
     $mirror_iterator = (new Finder)
       ->in($starterkit->getPath())
       ->files()
-      ->ignoreDotFiles(FALSE)
       ->notName($starterkit_config['ignore'])
       ->notPath($starterkit_config['ignore']);
 
@@ -211,7 +206,6 @@ class GenerateTheme extends Command {
    * Generates a path to a temporary location.
    *
    * @return string
-   *   A temporary path.
    */
   private function getUniqueTmpDirPath(): string {
     return sys_get_temp_dir() . '/drupal-starterkit-theme-' . uniqid(md5(microtime()), TRUE);
@@ -224,7 +218,6 @@ class GenerateTheme extends Command {
    *   The machine name of the theme.
    *
    * @return \Drupal\Core\Extension\Extension|null
-   *   The extension info array. NULL if the theme_name is not discovered.
    */
   private function getThemeInfo(string $theme_name): ? Extension {
     $extension_discovery = new ExtensionDiscovery($this->root, FALSE, []);
@@ -238,16 +231,10 @@ class GenerateTheme extends Command {
     return $theme;
   }
 
-  /**
-   * Returns a Symfony file finder.
-   */
   private static function createFilesFinder(string $dir): Finder {
     return (new Finder)->in($dir)->files();
   }
 
-  /**
-   * Loads the Starter Kit configuration.
-   */
   private static function loadStarterKitConfig(
     Extension $theme,
     string $version,
@@ -306,9 +293,6 @@ class GenerateTheme extends Command {
     return $starterkit_config;
   }
 
-  /**
-   * Gets the Starter Kit version string.
-   */
   private static function getStarterKitVersion(
     Extension $theme,
     SymfonyStyle $io,
@@ -364,9 +348,6 @@ class GenerateTheme extends Command {
     return $source_version;
   }
 
-  /**
-   * Returns the possible file name patterns.
-   */
   private static function namePatterns(string $machine_name, string $label): array {
     return [
       'machine_name' => $machine_name,

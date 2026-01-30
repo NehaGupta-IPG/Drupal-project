@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\DependencyInjection;
 
-use Drupal\Component\DependencyInjection\PhpArrayContainer;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Tests Drupal\Component\DependencyInjection\PhpArrayContainer.
+ * @coversDefaultClass \Drupal\Component\DependencyInjection\PhpArrayContainer
+ * @group DependencyInjection
  */
-#[CoversClass(PhpArrayContainer::class)]
-#[Group('DependencyInjection')]
 class PhpArrayContainerTest extends ContainerTest {
 
   /**
@@ -31,7 +27,7 @@ class PhpArrayContainerTest extends ContainerTest {
   /**
    * Helper function to return a service definition.
    */
-  protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): string {
+  protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
     if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
       return sprintf('@?%s', $id);
     }
@@ -42,7 +38,7 @@ class PhpArrayContainerTest extends ContainerTest {
   /**
    * Helper function to return a service definition.
    */
-  protected function getParameterCall($name): string {
+  protected function getParameterCall($name) {
     return '%' . $name . '%';
   }
 

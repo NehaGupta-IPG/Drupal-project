@@ -7,28 +7,31 @@ namespace Drupal\Tests\Core\Routing;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Routing\Router;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use Prophecy\Argument;
 
 /**
- * Tests Drupal\Core\Routing\Router.
+ * @coversDefaultClass \Drupal\Core\Routing\Router
+ * @group Routing
+ * @group legacy
  */
-#[CoversClass(Router::class)]
-#[Group('Routing')]
-#[IgnoreDeprecations]
 class RouterUnsupportedTest extends UnitTestCase {
 
   /**
-   * Tests generate unsupported.
+   * @covers ::generate
    */
   public function testGenerateUnsupported(): void {
     $this->expectException(\BadMethodCallException::class);
     $route_provider = $this->prophesize(RouteProviderInterface::class);
     $current_path_stack = $this->prophesize(CurrentPathStack::class);
+    $url_generator = $this->prophesize(UrlGeneratorInterface::class);
     $route_name = 'test.route';
-    $router = new Router($route_provider->reveal(), $current_path_stack->reveal());
+    $route_path = '/test';
+    $url_generator
+      ->generate($route_name, Argument::any(), Argument::any())
+      ->willReturn($route_path);
+    $router = new Router($route_provider->reveal(), $current_path_stack->reveal(), $url_generator->reveal());
     $router->generate($route_name);
   }
 

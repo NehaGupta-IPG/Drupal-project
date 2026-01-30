@@ -9,20 +9,17 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
 use GuzzleHttp\RequestOptions;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "Term" content entity type.
+ *
+ * @group jsonapi
+ * @group #slow
  */
-#[Group('jsonapi')]
-#[RunTestsInSeparateProcesses]
 class TermTest extends ResourceTestBase {
 
   use CommonCollectionFilterAccessTestPatternsTrait;
@@ -69,7 +66,7 @@ class TermTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method): void {
+  protected function setUpAuthorization($method) {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole(['access content', 'view vocabulary labels']);
@@ -96,7 +93,7 @@ class TermTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpRevisionAuthorization($method): void {
+  protected function setUpRevisionAuthorization($method) {
     parent::setUpRevisionAuthorization($method);
     $this->grantPermissionsToTestedRole(['administer taxonomy']);
   }
@@ -253,10 +250,10 @@ class TermTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
-        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
+        'version' => '1.0',
       ],
       'links' => [
         'self' => ['href' => $base_url->toString()],
@@ -460,8 +457,9 @@ class TermTest extends ResourceTestBase {
    * Tests GETting a term with a parent term other than the default <root> (0).
    *
    * @see ::getExpectedNormalizedEntity()
+   *
+   * @dataProvider providerTestGetIndividualTermWithParent
    */
-  #[DataProvider('providerTestGetIndividualTermWithParent')]
   public function testGetIndividualTermWithParent(array $parent_term_ids): void {
     // Create all possible parent terms.
     Term::create(['vid' => Vocabulary::load('camelids')->id()])
@@ -482,11 +480,7 @@ class TermTest extends ResourceTestBase {
     $request_options = NestedArray::mergeDeep($request_options, $this->getAuthenticationRequestOptions());
     $this->setUpAuthorization('GET');
     $response = $this->request('GET', $url, $request_options);
-    $expected_document = $this->getExpectedDocument();
-    $working_copy_url = clone $url;
-    $working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
-    $expected_document['data']['links']['working-copy']['href'] = $working_copy_url->setAbsolute()->toString();
-    $this->assertSameDocument($expected_document, Json::decode($response->getBody()));
+    $this->assertSameDocument($this->getExpectedDocument(), Json::decode($response->getBody()));
   }
 
   /**

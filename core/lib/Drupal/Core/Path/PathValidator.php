@@ -10,7 +10,6 @@ use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteObjectInterface;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -60,7 +59,7 @@ class PathValidator implements PathValidatorInterface {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user.
    * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
-   *   The path processor.
+   *   The path processor;
    */
   public function __construct(AccessAwareRouterInterface $access_aware_router, UrlMatcherInterface $access_unaware_router, AccountInterface $account, InboundPathProcessorInterface $path_processor) {
     $this->accessAwareRouter = $access_aware_router;
@@ -119,12 +118,7 @@ class PathValidator implements PathValidatorInterface {
       return Url::fromUri($path);
     }
 
-    try {
-      $request = Request::create('/' . $path);
-    }
-    catch (BadRequestException) {
-      return FALSE;
-    }
+    $request = Request::create('/' . $path);
     $attributes = $this->getPathAttributes($path, $request, $access_check);
 
     if (!$attributes) {
@@ -148,7 +142,7 @@ class PathValidator implements PathValidatorInterface {
    *   If FALSE then skip access check and check only whether the path is
    *   valid.
    *
-   * @return array|false
+   * @return array|bool
    *   An array of request attributes or FALSE if an exception was thrown.
    */
   protected function getPathAttributes($path, Request $request, $access_check) {
@@ -159,7 +153,7 @@ class PathValidator implements PathValidatorInterface {
       $router = $this->accessAwareRouter;
     }
 
-    $initial_request_context = $router->getContext() ?: new RequestContext();
+    $initial_request_context = $router->getContext() ? $router->getContext() : new RequestContext();
     $path = $this->pathProcessor->processInbound('/' . $path, $request);
 
     try {
@@ -176,9 +170,6 @@ class PathValidator implements PathValidatorInterface {
       $result = FALSE;
     }
     catch (MethodNotAllowedException) {
-      $result = FALSE;
-    }
-    catch (BadRequestException) {
       $result = FALSE;
     }
 

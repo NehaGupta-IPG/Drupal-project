@@ -6,18 +6,16 @@ namespace Drupal\Tests\file\Functional;
 
 use Drupal\Core\File\FileExists;
 use Drupal\file\Entity\File;
-use Drupal\file_test\FileTestHelper;
 use Drupal\Tests\TestFileCreationTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the _file_save_upload_from_form() function.
  *
+ * @group file
+ * @group #slow
+ *
  * @see _file_save_upload_from_form()
  */
-#[Group('file')]
-#[RunTestsInSeparateProcesses]
 class SaveUploadFormTest extends FileManagedTestBase {
 
   use TestFileCreationTrait {
@@ -25,7 +23,9 @@ class SaveUploadFormTest extends FileManagedTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['dblog', 'file_validator_test'];
 
@@ -99,7 +99,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     // Check that the correct hooks were called then clean out the hook
     // counters.
     $this->assertFileHooksCalled(['validate', 'insert']);
-    FileTestHelper::reset();
+    file_test_reset();
   }
 
   /**
@@ -118,7 +118,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->assertEquals('image', substr($file1->getMimeType(), 0, 5), 'A MIME type was set.');
 
     // Reset the hook counters to get rid of the 'load' we just called.
-    FileTestHelper::reset();
+    file_test_reset();
 
     // Upload a second file.
     $image2 = current($this->drupalGetTestFiles('image'));
@@ -159,7 +159,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("You WIN!");
-    $this->assertFileExists('temporary://' . $dir . '/' . trim(basename($image3_realpath)));
+    $this->assertFileExists('temporary://' . $dir . '/' . trim(\Drupal::service('file_system')->basename($image3_realpath)));
   }
 
   /**
@@ -189,11 +189,10 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->assertFileHooksCalled(['validate']);
 
     // Reset the hook counters.
-    FileTestHelper::reset();
+    file_test_reset();
 
     $extensions = 'foo ' . $this->imageExtension;
-    // Now tell _file_save_upload_from_form() to allow the extension of our test
-    // image.
+    // Now tell _file_save_upload_from_form() to allow the extension of our test image.
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
       'files[file_test_upload][]' => $file_system->realpath($this->image->getFileUri()),
@@ -210,7 +209,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->assertFileHooksCalled(['validate', 'load', 'update']);
 
     // Reset the hook counters.
-    FileTestHelper::reset();
+    file_test_reset();
 
     // Now tell _file_save_upload_from_form() to allow any extension.
     $edit = [
@@ -247,7 +246,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->drupalGet('file-test/save_upload_from_form_test');
     $this->submitForm($edit, 'Submit');
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->responseContains('For security reasons, your upload has been renamed to <em class="placeholder">' . $this->phpFile->filename . '_.txt</em>');
+    $this->assertSession()->responseContains('For security reasons, your upload has been renamed to <em class="placeholder">' . $this->phpFile->filename . '_.txt' . '</em>');
     $this->assertSession()->pageTextContains('File MIME type is text/plain.');
     $this->assertSession()->pageTextContains("You WIN!");
 
@@ -258,7 +257,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     // Turn on insecure uploads.
     $config->set('allow_insecure_uploads', 1)->save();
     // Reset the hook counters.
-    FileTestHelper::reset();
+    file_test_reset();
 
     $this->drupalGet('file-test/save_upload_from_form_test');
     $this->submitForm($edit, 'Submit');
@@ -274,7 +273,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $config->set('allow_insecure_uploads', 0)->save();
 
     // Reset the hook counters.
-    FileTestHelper::reset();
+    file_test_reset();
 
     $edit = [
       'file_test_replace' => FileExists::Replace->name,
@@ -307,7 +306,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->image = $file_repository->move($this->image, $original_uri . '.foo.' . $this->imageExtension);
 
     // Reset the hook counters to get rid of the 'move' we just called.
-    FileTestHelper::reset();
+    file_test_reset();
 
     $extensions = $this->imageExtension;
     $edit = [
@@ -332,7 +331,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     // Test with uppercase extensions.
     $this->image = $file_repository->move($this->image, $original_uri . '.foo2.' . $this->imageExtension);
     // Reset the hook counters.
-    FileTestHelper::reset();
+    file_test_reset();
     $extensions = $this->imageExtension;
     $edit = [
       'files[file_test_upload][]' => $file_system->realpath($this->image->getFileUri()),
@@ -355,7 +354,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
 
     // Ensure we don't munge files if we're allowing any extension.
     // Reset the hook counters.
-    FileTestHelper::reset();
+    file_test_reset();
 
     // Ensure we don't munge files if we're allowing any extension.
     $edit = [
@@ -376,7 +375,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     // Ensure that setting $validators['FileExtension'] = ['extensions' => NULL]
     // rejects all files.
     // Reset the hook counters.
-    FileTestHelper::reset();
+    file_test_reset();
 
     $edit = [
       'files[file_test_upload][]' => $file_system->realpath($this->image->getFileUri()),
@@ -573,8 +572,7 @@ class SaveUploadFormTest extends FileManagedTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains("Epic upload FAIL!");
 
-    // Search for combined error message followed by a formatted list of
-    // messages.
+    // Search for combined error message followed by a formatted list of messages.
     $this->assertSession()->responseContains('One or more files could not be uploaded.<ul>');
   }
 

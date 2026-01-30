@@ -5,28 +5,27 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\ContentEntityStorageBase;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTestMulRev;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\user\Entity\User;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test decoupled translation revisions.
+ *
+ * @group entity
+ *
+ * @coversDefaultClass \Drupal\Core\Entity\ContentEntityStorageBase
  */
-#[CoversClass(ContentEntityStorageBase::class)]
-#[Group('entity')]
-#[RunTestsInSeparateProcesses]
 class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
+    'system',
     'entity_test',
     'language',
   ];
@@ -112,7 +111,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * Data provider for ::testDecoupledDefaultRevisions.
    */
-  public static function dataTestDecoupledPendingRevisions(): array {
+  public static function dataTestDecoupledPendingRevisions() {
     $sets = [];
 
     $sets['Intermixed languages - No initial default translation'][] = [
@@ -202,9 +201,10 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
    *   An array with arrays of arguments for the ::doSaveNewRevision() method as
    *   values. Every child array corresponds to a method invocation.
    *
-   * @legacy-covers ::createRevision
+   * @covers ::createRevision
+   *
+   * @dataProvider dataTestDecoupledPendingRevisions
    */
-  #[DataProvider('dataTestDecoupledPendingRevisions')]
   public function testDecoupledPendingRevisions($sequence): void {
     $revision_id = $this->doTestEditSequence($sequence);
     $this->assertCount($revision_id, $sequence);
@@ -213,7 +213,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * Data provider for ::testUntranslatableFields.
    */
-  public static function dataTestUntranslatableFields(): array {
+  public static function dataTestUntranslatableFields() {
     $sets = [];
 
     $sets['Default behavior - Untranslatable fields affect all revisions'] = [
@@ -261,10 +261,11 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
    *   Whether untranslatable field changes affect all revisions or only the
    *   default revision.
    *
-   * @legacy-covers ::createRevision
-   * @legacy-covers \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraintValidator::validate
+   * @covers ::createRevision
+   * @covers \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraintValidator::validate
+   *
+   * @dataProvider dataTestUntranslatableFields
    */
-  #[DataProvider('dataTestUntranslatableFields')]
   public function testUntranslatableFields($sequence, $default_translation_affected): void {
     // Configure the untranslatable fields edit mode.
     $this->state->set('entity_test.untranslatable_fields.default_translation_affected', $default_translation_affected);
@@ -289,7 +290,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
    * @return int
    *   The latest saved revision id.
    */
-  protected function doTestEditSequence($sequence): int {
+  protected function doTestEditSequence($sequence) {
     $revision_id = NULL;
     foreach ($sequence as $index => $step) {
       $this->stepIndex = $index;
@@ -418,7 +419,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
     $violations = $entity->validate();
     $messages = [];
     foreach ($violations as $violation) {
-      /** @var \Symfony\Component\Validator\ConstraintViolationInterface */
+      /** \Symfony\Component\Validator\ConstraintViolationInterface */
       $messages[] = $violation->getMessage();
     }
     $this->assertEquals($valid, !$violations->count(), $this->formatMessage('Validation does not match the expected result: %s', implode(', ', $messages)));
@@ -468,7 +469,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
    * @return string
    *   A revision label.
    */
-  protected function generateNewEntityLabel(ContentEntityInterface $revision, $previous_revision_id, $next = FALSE): string {
+  protected function generateNewEntityLabel(ContentEntityInterface $revision, $previous_revision_id, $next = FALSE) {
     $language_label = $revision->language()->getName();
     $revision_type = $revision->isDefaultRevision() ? 'Default' : 'Pending';
     $revision_id = $next ? $this->storage->getLatestRevisionId($revision->id()) + 1 : $revision->getLoadedRevisionId();
@@ -484,7 +485,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
    * @return string
    *   The formatted message.
    */
-  protected function formatMessage($message): mixed {
+  protected function formatMessage($message) {
     $args = func_get_args();
     array_shift($args);
     $params = array_merge($args, $this->stepInfo);
@@ -496,8 +497,8 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * Checks that changes to multiple translations are handled correctly.
    *
-   * @legacy-covers ::createRevision
-   * @legacy-covers \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraintValidator::validate
+   * @covers ::createRevision
+   * @covers \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraintValidator::validate
    */
   public function testMultipleTranslationChanges(): void {
     // Configure the untranslatable fields edit mode.
@@ -545,7 +546,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   An entity object.
    */
-  protected function doTestInternalProperties(ContentEntityInterface $entity): void {
+  protected function doTestInternalProperties(ContentEntityInterface $entity) {
     $this->assertFalse($entity->isValidationRequired());
     $entity->setValidationRequired(TRUE);
     $this->assertTrue($entity->isValidationRequired());
@@ -556,7 +557,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * Tests that deleted translations are not accidentally restored.
    *
-   * @legacy-covers ::createRevision
+   * @covers ::createRevision
    */
   public function testRemovedTranslations(): void {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
@@ -590,6 +591,8 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
 
   /**
    * Checks that the revision create hook works as expected.
+   *
+   * @covers ::createRevision
    */
   public function testCreateRevisionHook(): void {
     $entity = EntityTestMulRev::create();

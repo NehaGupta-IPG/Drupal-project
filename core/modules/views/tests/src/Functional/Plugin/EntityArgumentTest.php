@@ -8,16 +8,13 @@ use Drupal\Tests\taxonomy\Functional\Views\TaxonomyTestBase;
 use Drupal\user\UserInterface;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the handler of the view: entity target argument.
  *
+ * @group views
  * @see \Drupal\views\Plugin\views\argument\EntityArgument
  */
-#[Group('views')]
-#[RunTestsInSeparateProcesses]
 class EntityArgumentTest extends TaxonomyTestBase {
 
   /**
@@ -28,7 +25,9 @@ class EntityArgumentTest extends TaxonomyTestBase {
   public static array $testViews = ['test_entity_id_argument'];
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['node', 'taxonomy'];
 

@@ -53,8 +53,9 @@
  * - title_suffix: Additional output populated by modules, intended to be
  *   displayed after the main title tag that appears in the template.
  * - view_mode: View mode; for example, "teaser" or "full".
+ * - page: Flag for the full page state. Will be true if view_mode is 'full'.
  *
- * @see \Drupal\node\Hook\NodeThemeHooks::preprocessNode()
+ * @see template_preprocess_node()
  *
  * @ingroup themeable
  */
@@ -62,7 +63,7 @@
 <article{{ attributes }}>
 
   {{ title_prefix }}
-  {% if label and view_mode != "full" %}
+  {% if label and not page %}
     <h2{{ title_attributes }}>
       <a href="{{ url }}" rel="bookmark">{{ label }}</a>
     </h2>

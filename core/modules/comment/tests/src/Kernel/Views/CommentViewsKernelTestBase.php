@@ -14,7 +14,9 @@ use Drupal\views\Tests\ViewTestData;
 abstract class CommentViewsKernelTestBase extends ViewsKernelTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['comment_test_views', 'user', 'comment'];
 

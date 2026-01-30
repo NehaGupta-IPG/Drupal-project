@@ -1,7 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* cspell:ignore drupalmediaediting drupalmediametadatarepository */
-/* cspell:ignore imagetextalternative insertdrupalmedia */
-/* cspell:ignore insertdrupalmediacommand mediaimagetextalternative */
+/* cspell:ignore insertdrupalmedia drupalmediaediting insertdrupalmediacommand drupalmediametadatarepository */
 
 import { Plugin } from 'ckeditor5/src/core';
 import { toWidget, Widget } from 'ckeditor5/src/widget';
@@ -36,9 +34,6 @@ export default class DrupalMediaEditing extends Plugin {
       drupalMediaAlt: 'alt',
       drupalMediaEntityType: 'data-entity-type',
       drupalMediaEntityUuid: 'data-entity-uuid',
-      drupalLinkEntityUuid: 'data-link-entity-uuid',
-      drupalLinkEntityType: 'data-link-entity-type',
-      drupalLinkEntityMetadata: 'data-link-entity-metadata',
     };
     this.converterAttributes = [
       'drupalMediaEntityUuid',
@@ -80,7 +75,7 @@ export default class DrupalMediaEditing extends Plugin {
   /**
    * Upcast `drupalMediaIsImage` from Drupal Media metadata.
    *
-   * @param {module:engine/model/node~ModelNode} modelElement
+   * @param {module:engine/model/node~Node} modelElement
    *   The `drupalMedia` model element.
    *
    * @see module:drupalMedia/drupalmediametadatarepository~DrupalMediaMetadataRepository
@@ -129,7 +124,7 @@ export default class DrupalMediaEditing extends Plugin {
   /**
    * Upcast `drupalMediaType` from Drupal Media metadata.
    *
-   * @param {module:engine/model/node~ModelNode} modelElement
+   * @param {module:engine/model/node~Node} modelElement
    *   The `drupalMedia` model element.
    *
    * @see module:drupalMedia/drupalmediametadatarepository~DrupalMediaMetadataRepository
@@ -173,7 +168,7 @@ export default class DrupalMediaEditing extends Plugin {
   /**
    * Fetches preview from the server.
    *
-   * @param {module:engine/model/element~ModelElement} modelElement
+   * @param {module:engine/model/element~Element} modelElement
    *   The model element which preview should be loaded.
    * @return {Promise<{preview: string, label: string}>}
    *   A promise that returns an object.
@@ -332,9 +327,8 @@ export default class DrupalMediaEditing extends Plugin {
 
             // Preview was ready meaning that a new preview can be loaded.
             // "Change the attribute to loading to prepare for the loading of
-            // the updated preview. Preview is kept intact so that it can still
-            // be interacted with via the UI until the new preview has been
-            // rendered.
+            // the updated preview. Preview is kept intact so that it remains
+            // interactable in the UI until the new preview has been rendered.
             viewWriter.setAttribute(
               'data-drupal-media-preview',
               'loading',
@@ -470,7 +464,7 @@ export default class DrupalMediaEditing extends Plugin {
    *
    * Not previewing data-caption since it does not get updated by new changes.
    *
-   * @param {module:engine/model/element~ModelElement} modelElement
+   * @param {module:engine/model/element~Element} modelElement
    *   The drupalMedia model element to be converted.
    * @return {string}
    *   The model element converted into HTML.

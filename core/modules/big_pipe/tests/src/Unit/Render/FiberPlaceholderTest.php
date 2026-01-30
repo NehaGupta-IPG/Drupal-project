@@ -18,8 +18,6 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,16 +27,13 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Tests Drupal\big_pipe\Render\BigPipe.
+ * @coversDefaultClass \Drupal\big_pipe\Render\BigPipe
+ * @group big_pipe
  */
-#[CoversClass(BigPipe::class)]
-#[Group('big_pipe')]
 class FiberPlaceholderTest extends UnitTestCase {
 
   /**
-   * Tests long placeholder fiber suspending loop.
-   *
-   * @legacy-covers \Drupal\big_pipe\Render\BigPipe::sendPlaceholders
+   * @covers \Drupal\big_pipe\Render\BigPipe::sendPlaceholders
    */
   public function testLongPlaceholderFiberSuspendingLoop(): void {
     $request_stack = $this->prophesize(RequestStack::class);
@@ -115,18 +110,14 @@ class FiberPlaceholderTest extends UnitTestCase {
 
 }
 
-/**
- * Test class for testing fiber placeholders.
- */
 class TurtleLazyBuilder implements TrustedCallbackInterface {
 
   /**
-   * Render API callback: Suspends execution twice to simulate a long operation.
+   * #lazy_builder callback.
    *
-   * This function is assigned as a #lazy_builder callback.
+   * Suspends its own execution twice to simulate long operation.
    *
    * @return array
-   *   The lazy builder callback.
    */
   public static function turtle(): array {
     if (\Fiber::getCurrent() !== NULL) {

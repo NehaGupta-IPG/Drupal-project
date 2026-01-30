@@ -12,26 +12,25 @@ use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\user\Traits\UserCreationTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the creation of text fields.
+ *
+ * @group field
  */
-#[Group('field')]
-#[RunTestsInSeparateProcesses]
 class StringFormatterTest extends KernelTestBase {
 
-  use UserCreationTrait;
-
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'field',
+    'text',
     'entity_test',
     'system',
+    'filter',
     'user',
   ];
 
@@ -71,10 +70,7 @@ class StringFormatterTest extends KernelTestBase {
     // Configure the theme system.
     $this->installConfig(['system', 'field']);
     $this->installEntitySchema('entity_test_rev');
-    $this->setUpCurrentUser(permissions: [
-      'view test entity',
-      'administer entity_test content',
-    ]);
+    $this->installEntitySchema('entity_test_label');
 
     $this->entityType = 'entity_test_rev';
     $this->bundle = $this->entityType;
@@ -130,7 +126,7 @@ class StringFormatterTest extends KernelTestBase {
     $value .= "\n\n<strong>" . $this->randomString() . '</strong>';
     $value .= "\n\n" . $this->randomString();
 
-    $entity = EntityTestRev::create(['name' => 'view revision']);
+    $entity = EntityTestRev::create([]);
     $entity->{$this->fieldName}->value = $value;
 
     // Verify that all HTML is escaped and newlines are retained.
@@ -200,7 +196,6 @@ class StringFormatterTest extends KernelTestBase {
    */
   public function testLinkToContentForEntitiesWithNoCanonicalPath(): void {
     $this->enableModules(['entity_test']);
-    $this->installEntitySchema('entity_test_label');
     $field_name = 'test_field_name';
     $entity_type = $bundle = 'entity_test_label';
 

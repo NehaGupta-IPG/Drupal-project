@@ -15,7 +15,9 @@ use Drupal\Tests\BrowserTestBase;
 abstract class ShortcutTestBase extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['node', 'toolbar', 'shortcut'];
 
@@ -61,7 +63,7 @@ abstract class ShortcutTestBase extends BrowserTestBase {
       // Populate the default shortcut set.
       $shortcut = Shortcut::create([
         'shortcut_set' => 'default',
-        'title' => 'Add content',
+        'title' => t('Add content'),
         'weight' => -20,
         'link' => [
           'uri' => 'internal:/node/add',
@@ -71,7 +73,7 @@ abstract class ShortcutTestBase extends BrowserTestBase {
 
       $shortcut = Shortcut::create([
         'shortcut_set' => 'default',
-        'title' => 'All content',
+        'title' => t('All content'),
         'weight' => -19,
         'link' => [
           'uri' => 'internal:/admin/content',

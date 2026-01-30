@@ -15,7 +15,9 @@ abstract class PathTestBase extends BrowserTestBase {
   use PathAliasTestTrait;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['node', 'path'];
 

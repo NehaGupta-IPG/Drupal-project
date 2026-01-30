@@ -13,7 +13,9 @@ use Drupal\Tests\BrowserTestBase;
 abstract class BlockTestBase extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to install.
+   *
+   * @var array
    */
   protected static $modules = [
     'block',

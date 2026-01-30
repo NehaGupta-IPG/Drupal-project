@@ -7,19 +7,12 @@ namespace Drupal\Tests\system\Kernel;
 use Drupal\Core\Access\AccessResult;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Entity\Menu;
-use Drupal\system\MenuAccessControlHandler;
 use Drupal\Tests\user\Traits\UserCreationTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests Drupal\system\MenuAccessControlHandler.
+ * @coversDefaultClass \Drupal\system\MenuAccessControlHandler
+ * @group system
  */
-#[CoversClass(MenuAccessControlHandler::class)]
-#[Group('system')]
-#[RunTestsInSeparateProcesses]
 class MenuAccessControlHandlerTest extends KernelTestBase {
 
   use UserCreationTrait {
@@ -27,7 +20,9 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'system',
@@ -51,12 +46,10 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
   }
 
   /**
-   * Tests access.
-   *
-   * @legacy-covers ::checkAccess
-   * @legacy-covers ::checkCreateAccess
+   * @covers ::checkAccess
+   * @covers ::checkCreateAccess
+   * @dataProvider testAccessProvider
    */
-  #[DataProvider('providerTestAccess')]
   public function testAccess($permissions, $which_entity, $view_label_access_result, $view_access_result, $update_access_result, $delete_access_result, $create_access_result): void {
     $user = $this->drupalCreateUser($permissions);
 
@@ -74,13 +67,7 @@ class MenuAccessControlHandlerTest extends KernelTestBase {
     static::assertEquals($create_access_result, $this->accessControlHandler->createAccess(NULL, $user, [], TRUE));
   }
 
-  /**
-   * Provides test cases for menu access control based on user permissions and menu lock status.
-   *
-   * @return array
-   *   An array of test cases.
-   */
-  public static function providerTestAccess(): array {
+  public static function testAccessProvider() {
     // RefinableCacheableDependencyTrait::addCacheContexts() only needs the
     // container to perform an assertion, but we can't use the container here,
     // so disable assertions for the purposes of this test.

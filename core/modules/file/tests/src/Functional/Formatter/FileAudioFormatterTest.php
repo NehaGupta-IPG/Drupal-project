@@ -6,18 +6,12 @@ namespace Drupal\Tests\file\Functional\Formatter;
 
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\file\Entity\File;
-use Drupal\file\Plugin\Field\FieldFormatter\FileAudioFormatter;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests Drupal\file\Plugin\Field\FieldFormatter\FileAudioFormatter.
+ * @coversDefaultClass \Drupal\file\Plugin\Field\FieldFormatter\FileAudioFormatter
+ * @group file
+ * @group #slow
  */
-#[CoversClass(FileAudioFormatter::class)]
-#[Group('file')]
-#[RunTestsInSeparateProcesses]
 class FileAudioFormatterTest extends FileMediaFormatterTestBase {
 
   /**
@@ -26,14 +20,12 @@ class FileAudioFormatterTest extends FileMediaFormatterTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * Tests render.
+   * @covers ::viewElements
    *
-   * @legacy-covers ::viewElements
+   * @dataProvider dataProvider
    */
-  #[DataProvider('dataProvider')]
   public function testRender($tag_count, $formatter_settings): void {
-    // Create a file field that accepts .mp3 and an unknown file extension.
-    $field_config = $this->createMediaField('file_audio', 'unknown-extension, mp3', $formatter_settings);
+    $field_config = $this->createMediaField('file_audio', 'mp3', $formatter_settings);
 
     file_put_contents('public://file.mp3', str_repeat('t', 10));
     $file1 = File::create([
