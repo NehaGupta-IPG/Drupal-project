@@ -10,6 +10,8 @@
  * @internal
  */
 
+use Composer\Autoload\ClassLoader;
+use Drupal\BuildTests\Framework\BuildTestBase;
 use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\Html;
@@ -24,19 +26,17 @@ use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestRun;
 use Drupal\Core\Test\TestRunnerKernel;
 use Drupal\Core\Test\TestRunResultsStorageInterface;
-use Drupal\BuildTests\Framework\BuildTestBase;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\TestTools\TestRunner\Configuration as Config;
-
-use Composer\Autoload\ClassLoader;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Version;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 // cspell:ignore exitcode testbots wwwrun
 
@@ -196,7 +196,7 @@ echo "Drupal test run\n\n";
 echo "--------------------------------------------------------------\n";
 echo sprintf("Drupal Version.......: %s\n", \Drupal::VERSION);
 echo sprintf("PHP Version..........: %s\n", \PHP_VERSION);
-echo sprintf("PHP Binary...........: %s\n", getenv('_'));
+echo sprintf("PHP Binary...........: %s\n", (new PhpExecutableFinder())->find());
 echo sprintf("PHPUnit Version......: %s\n", Version::id());
 echo sprintf("PHPUnit configuration: %s\n", Config::get('phpunit-configuration'));
 if (Config::get('dburl')) {
