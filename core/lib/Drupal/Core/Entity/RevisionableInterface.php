@@ -50,6 +50,11 @@ interface RevisionableInterface extends EntityInterface {
   /**
    * Gets the revision identifier of the entity.
    *
+   * For translatable entities, this will always return the same value,
+   * regardless of which translation it is called on. To get the revision
+   * identifier of a specific translation, use
+   * TranslatableRevisionableStorageInterface::getLatestTranslationAffectedRevisionId().
+   *
    * @return int|null|string
    *   The revision identifier of the entity, or NULL if the entity does not
    *   have a revision identifier.
